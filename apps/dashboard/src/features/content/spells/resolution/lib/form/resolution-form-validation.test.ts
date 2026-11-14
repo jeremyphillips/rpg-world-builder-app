@@ -55,10 +55,15 @@ describe('resolutionFormSchema', () => {
     )
   })
 
-  it('requires proximityDistanceFt when proximityKind is distance', () => {
+  it('rejects creature-only requirements on object targets at the requirement row', () => {
+    const defaults = createDefaultAttackResolutionFormValues()
     const result = resolutionFormSchema.safeParse({
-      ...createDefaultAttackResolutionFormValues(),
-      proximityDistanceFt: undefined,
+      ...defaults,
+      target: {
+        ...defaults.target!,
+        kind: 'object',
+        requirements: [{ kind: 'size', bound: 'large', comparison: 'or-smaller' }],
+      },
     })
 
     expect(result.success).toBe(false)
@@ -66,7 +71,28 @@ describe('resolutionFormSchema', () => {
 
     expect(result.error.issues).toContainEqual(
       expect.objectContaining({
-        path: ['proximityDistanceFt'],
+        path: ['target', 'requirements', 0],
+        message: expect.stringContaining('Only applies to creatures'),
+      }),
+    )
+  })
+
+  it('requires target distance when proximity is distance', () => {
+    const defaults = createDefaultAttackResolutionFormValues()
+    const result = resolutionFormSchema.safeParse({
+      ...defaults,
+      target: {
+        ...defaults.target!,
+        proximity: { kind: 'distance' },
+      },
+    })
+
+    expect(result.success).toBe(false)
+    if (result.success) return
+
+    expect(result.error.issues).toContainEqual(
+      expect.objectContaining({
+        path: ['target', 'proximity', 'distance', 'value'],
         message: resolutionFormValidationMessages.proximityDistanceRequired(),
       }),
     )

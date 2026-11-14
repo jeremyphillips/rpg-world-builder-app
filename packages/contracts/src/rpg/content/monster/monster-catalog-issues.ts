@@ -63,6 +63,7 @@ export type MonsterCatalogIssueBody = {
   actions?: readonly CatalogAction[]
   bonusActions?: readonly CatalogAction[]
   reactions?: readonly CatalogAction[]
+  legendaryActions?: readonly CatalogAction[]
   proficiencies?: {
     skills?: readonly CatalogSkillEntry[]
   }

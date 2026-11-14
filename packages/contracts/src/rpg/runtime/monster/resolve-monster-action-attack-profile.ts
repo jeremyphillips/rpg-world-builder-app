@@ -1,24 +1,35 @@
 import { isWeaponEquipment, type Equipment } from '../../content/equipment'
+import { findSpellCastingSource } from '../../content/monster/spell-casting-source'
 import type {
   MonsterAction,
   MonsterActionDraft,
   MonsterBody,
+  MonsterBonusAction,
+  MonsterBonusActionDraft,
+  MonsterLegendaryAction,
+  MonsterLegendaryActionDraft,
   MonsterReaction,
   MonsterReactionDraft,
 } from '../../content/monster'
 import type { MagicPropertyDefinitionProvider } from '../../content/equipment/instance/magic-property'
+import { resolveEquipmentMagicProperties } from '../../content/equipment/instance/resolve-equipment-magic-properties'
 import type { WeaponDamage } from '../../content/equipment/weapon-variant'
 import { type RollValue } from '../../primitives/mechanics/roll'
 import type { Ability } from '../../vocab/ability'
-import { getDamageTypeLabel } from '../../vocab/damage/vocabulary'
 import type { WeaponProperty } from '../../vocab/weapon/property'
 import { abilityModifier } from '../creature/ability-modifier'
 import type { CreatureEquipmentCatalog } from '../creature/equipment'
 import { isWeaponProficient } from '../creature/proficiencies'
 import { resolveInventoryWeaponAttackTotals } from '../creature/resolve-inventory-weapon-attack'
 import { resolveStatBlockDamagePart } from '../creature/stat-block-average'
-import { resolveWeaponAttackAbilityModifier, weaponAttackBonus } from '../creature/weapon-attack'
+import {
+  resolveWeaponAttackAbilityModifier,
+  resolveWeaponAttackModes,
+  resolveWeaponAttackReach,
+  weaponAttackBonus,
+} from '../creature/weapon-attack'
 import { unavailableField, type DerivedField, type DerivedFieldReason } from './derived-field'
+import { resolveMonsterActionIdentity } from './resolve-monster-action-identity'
 
 export const MONSTER_ACTION_ATTACK_KINDS = ['weapon', 'natural-weapon', 'attack'] as const
 export type MonsterActionAttackKind = (typeof MONSTER_ACTION_ATTACK_KINDS)[number]
@@ -37,15 +48,47 @@ export type MonsterActionAttackRoll = {
   damageTypeId: string
 }
 
+export type MonsterActionOnHitSource = 'action' | 'magic-property'
+
+type ResolvedOnHitOwner = {
+  source: MonsterActionOnHitSource
+  propertyId?: string
+}
+
+export type ResolvedOnHitDamage = ResolvedOnHitOwner & {
+  kind: 'damage'
+  expression: string
+  average: number
+  damageTypeId: string
+  description?: string
+}
+
+export type ResolvedOnHitCondition = ResolvedOnHitOwner & {
+  kind: 'condition'
+  conditionId: string
+  description?: string
+}
+
+export type ResolvedOnHitNote = ResolvedOnHitOwner & {
+  kind: 'note'
+  description: string
+}
+
+/** Ordered on-hit presentation. Damage entries are the only numeric riders. */
+export type ResolvedOnHitEffect = ResolvedOnHitDamage | ResolvedOnHitCondition | ResolvedOnHitNote
+
 export type MonsterActionAttackUnresolvedCapability = {
-  id: 'versatile' | 'thrown'
+  id: 'versatile'
   reason: DerivedFieldReason
 }
 
 /** Structured attack math before stat-block string formatting. */
 export type MonsterActionAttackProfile = {
   sourceKind: 'weapon' | 'natural-weapon' | 'attack'
-  /** Catalog item name for weapons; authored name otherwise. */
+  /**
+   * Mechanical source label for breakdowns. Catalog weapon name, or the natural
+   * or authored label. May differ from `name` when the action or instance has a custom name.
+   */
   sourceLabel: string
   name: string
   governingAbility: Ability
@@ -56,18 +99,25 @@ export type MonsterActionAttackProfile = {
   reach?: number
   range?: { normal: number; long?: number }
   primary: MonsterActionAttackRoll
-  onHit: MonsterActionAttackRoll[]
+  onHit: ResolvedOnHitEffect[]
   /** Catalog weapon properties. Absent for authored attacks. */
   weaponProperties?: readonly string[]
   /**
-   * Catalog traits the single attack line does not resolve (versatile two-hand
-   * damage, a separate thrown attack). The resolved primary roll stays the
-   * catalog or authored roll.
+   * Catalog traits the single attack line does not resolve. Versatile two-hand
+   * damage stays here. Thrown is represented as melee and ranged on one profile.
    */
   unresolvedCapabilities: readonly MonsterActionAttackUnresolvedCapability[]
 }
 
-type ProfileAction = MonsterAction | MonsterReaction | MonsterActionDraft | MonsterReactionDraft
+type ProfileAction =
+  | MonsterAction
+  | MonsterBonusAction
+  | MonsterReaction
+  | MonsterLegendaryAction
+  | MonsterLegendaryActionDraft
+  | MonsterActionDraft
+  | MonsterBonusActionDraft
+  | MonsterReactionDraft
 
 type ProfileMonster = {
   abilityScores?: Partial<MonsterBody['abilityScores']>
@@ -95,23 +145,98 @@ function hasDamageRoll(value: unknown): value is RollValue {
   return diceOk || typeof roll.flat === 'number'
 }
 
-function onHitRolls(onHit: unknown): MonsterActionAttackRoll[] {
-  if (!onHit || typeof onHit !== 'object' || !('additionalDamage' in onHit)) return []
-  const list = (onHit as { additionalDamage?: unknown }).additionalDamage
-  if (!Array.isArray(list)) return []
-  return list.flatMap((part) => {
-    if (!part || typeof part !== 'object') return []
-    const row = part as { roll?: unknown; damageType?: unknown }
-    if (!hasDamageRoll(row.roll) || typeof row.damageType !== 'string') return []
-    const resolved = resolveStatBlockDamagePart(row.roll, 0)
-    return [
-      {
-        expression: resolved.expression,
-        average: resolved.average,
-        damageTypeId: row.damageType,
-      },
-    ]
+function effectList(onHit: unknown): unknown[] {
+  if (!onHit || typeof onHit !== 'object' || !('effects' in onHit)) return []
+  const list = (onHit as { effects?: unknown }).effects
+  return Array.isArray(list) ? list : []
+}
+
+function trimmedDescription(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined
+  const trimmed = value.trim()
+  return trimmed.length > 0 ? trimmed : undefined
+}
+
+type OnHitEffectRow = {
+  kind?: unknown
+  roll?: unknown
+  damageType?: unknown
+  conditionId?: unknown
+  description?: unknown
+}
+
+function onHitOwner(owner: ResolvedOnHitOwner): ResolvedOnHitOwner {
+  return owner.propertyId ? owner : { source: owner.source }
+}
+
+function resolveDamageOnHit(
+  row: OnHitEffectRow,
+  owner: ResolvedOnHitOwner,
+  description: string | undefined,
+): ResolvedOnHitDamage | undefined {
+  if (!hasDamageRoll(row.roll) || typeof row.damageType !== 'string') return undefined
+  const resolved = resolveStatBlockDamagePart(row.roll, 0)
+  return {
+    ...onHitOwner(owner),
+    kind: 'damage',
+    expression: resolved.expression,
+    average: resolved.average,
+    damageTypeId: row.damageType,
+    ...(description ? { description } : {}),
+  }
+}
+
+function resolveConditionOnHit(
+  row: OnHitEffectRow,
+  owner: ResolvedOnHitOwner,
+  description: string | undefined,
+): ResolvedOnHitCondition | undefined {
+  if (typeof row.conditionId !== 'string' || !row.conditionId) return undefined
+  return {
+    ...onHitOwner(owner),
+    kind: 'condition',
+    conditionId: row.conditionId,
+    ...(description ? { description } : {}),
+  }
+}
+
+function resolveOnHitEffect(
+  effect: unknown,
+  owner: ResolvedOnHitOwner,
+): ResolvedOnHitEffect | undefined {
+  if (!effect || typeof effect !== 'object' || !('kind' in effect)) return undefined
+  const row = effect as OnHitEffectRow
+  const description = trimmedDescription(row.description)
+  if (row.kind === 'damage') return resolveDamageOnHit(row, owner, description)
+  if (row.kind === 'condition') return resolveConditionOnHit(row, owner, description)
+  if (row.kind === 'note' && description) return { ...onHitOwner(owner), kind: 'note', description }
+  return undefined
+}
+
+function resolveOnHitEffects(
+  actionOnHit: unknown,
+  propertyEffects: readonly { effect: unknown; propertyId: string }[],
+): ResolvedOnHitEffect[] {
+  const actionEffects = effectList(actionOnHit).flatMap((effect) => {
+    const resolved = resolveOnHitEffect(effect, { source: 'action' })
+    return resolved ? [resolved] : []
   })
+  const fromProperties = propertyEffects.flatMap(({ effect, propertyId }) => {
+    const resolved = resolveOnHitEffect(effect, { source: 'magic-property', propertyId })
+    return resolved ? [resolved] : []
+  })
+  return [...actionEffects, ...fromProperties]
+}
+
+function propertyOnHitEffects(
+  entry: MonsterBody['equipment'][number],
+  item: Equipment,
+  provider: MagicPropertyDefinitionProvider,
+): { effect: unknown; propertyId: string }[] {
+  const magic = resolveEquipmentMagicProperties(entry, item, provider)
+  return magic.resolved.flatMap(({ definition }) =>
+    effectList(definition.onHit).map((effect) => ({ effect, propertyId: definition.id })),
+  )
 }
 
 // fallow-ignore-next-line complexity
@@ -121,18 +246,19 @@ function governingAbility(
 ): { ability: Ability; modifier: number } | undefined {
   const modifier = resolveWeaponAttackAbilityModifier(weapon, scores)
   if (modifier === undefined) return undefined
-  if (weapon.mode === 'ranged') return { ability: 'dex', modifier }
 
   if (weapon.properties.includes('finesse')) {
     const strMod = typeof scores.str === 'number' ? abilityModifier(scores.str) : undefined
     const dexMod = typeof scores.dex === 'number' ? abilityModifier(scores.dex) : undefined
-    if (dexMod === modifier && (strMod === undefined || dexMod > strMod)) {
-      return { ability: 'dex', modifier }
+    if (strMod === modifier && (dexMod === undefined || strMod >= dexMod)) {
+      return { ability: 'str', modifier }
     }
-    if (strMod === modifier) return { ability: 'str', modifier }
     if (dexMod === modifier) return { ability: 'dex', modifier }
   }
 
+  if (weapon.mode === 'ranged') {
+    return typeof scores.dex === 'number' ? { ability: 'dex', modifier } : undefined
+  }
   return typeof scores.str === 'number' ? { ability: 'str', modifier } : undefined
 }
 
@@ -156,7 +282,6 @@ function unresolvedWeaponCapabilities(
   const unresolved: MonsterActionAttackUnresolvedCapability[] = []
   if (properties.includes('versatile'))
     unresolved.push({ id: 'versatile', reason: 'missing-input' })
-  if (properties.includes('thrown')) unresolved.push({ id: 'thrown', reason: 'missing-input' })
   return unresolved
 }
 
@@ -200,20 +325,31 @@ function resolveWeaponProfile(
   }
   if (!primary.expression) return unavailableField('missing-reference')
 
+  const modes = resolveWeaponAttackModes(catalogItem)
+  const reach = resolveWeaponAttackReach(catalogItem)
   return {
     status: 'resolved',
     value: {
       sourceKind: 'weapon',
       sourceLabel: catalogItem.name,
-      name: action.name ?? entry.customName ?? catalogItem.name,
+      name: resolveMonsterActionIdentity({
+        action,
+        equipment: args.monster.equipment,
+        equipmentCatalog: args.equipmentCatalog,
+        magicPropertyProvider: args.magicPropertyProvider,
+        equipmentCatalogStatus: 'ready',
+      }).displayName,
       governingAbility: governing.ability,
       proficiencyContribution: proficient ? args.proficiencyBonus : 0,
       attackBonus: totals.attackBonus,
-      modes: [catalogItem.mode],
-      ...(catalogItem.mode === 'melee' ? { reach: 5 } : {}),
-      ...(catalogItem.range ? { range: catalogItem.range } : {}),
+      modes,
+      ...(reach !== undefined ? { reach } : {}),
+      ...(modes.includes('ranged') && catalogItem.range ? { range: catalogItem.range } : {}),
       primary,
-      onHit: onHitRolls(action.onHit),
+      onHit: resolveOnHitEffects(
+        action.onHit,
+        propertyOnHitEffects(entry, catalogItem, args.magicPropertyProvider),
+      ),
       weaponProperties: catalogItem.properties,
       unresolvedCapabilities: unresolvedWeaponCapabilities(catalogItem.properties),
     },
@@ -238,12 +374,13 @@ function resolveNaturalProfile(
 
   const attackBonus = weaponAttackBonus(governing.modifier, true, args.proficiencyBonus)
   const primary = resolveStatBlockDamagePart(action.damage, governing.modifier)
+  const named = resolveMonsterActionIdentity({ action, equipmentCatalogStatus: 'ready' })
   return {
     status: 'resolved',
     value: {
       sourceKind: 'natural-weapon',
-      sourceLabel: action.name?.trim() || 'Natural weapon',
-      name: action.name ?? '',
+      sourceLabel: named.defaultName || 'Natural weapon',
+      name: named.displayName,
       governingAbility: governing.ability,
       proficiencyContribution: args.proficiencyBonus,
       attackBonus,
@@ -255,29 +392,32 @@ function resolveNaturalProfile(
         average: primary.average,
         damageTypeId: action.damageType ?? '',
       },
-      onHit: onHitRolls(action.onHit),
+      onHit: resolveOnHitEffects(action.onHit, []),
       unresolvedCapabilities: [],
     },
   }
 }
 
-function abilityFromEntry(entry: ProfileAction, entryId: string): Ability | undefined {
-  if (entry.id !== entryId) return undefined
-  if (entry.kind === 'spell' && entry.castingAbility?.kind === 'ability') {
-    return entry.castingAbility.ability
+function abilityFromAttackEntry(entry: ProfileAction, entryId: string): Ability | undefined {
+  if (
+    entry.id !== entryId ||
+    entry.kind !== 'attack' ||
+    entry.bonusSource?.kind !== 'spellcasting'
+  ) {
+    return undefined
   }
-  if (entry.kind === 'attack' && entry.bonusSource?.kind === 'spell') {
-    const nested = entry.bonusSource.castingAbility
-    if (nested?.kind === 'ability' && nested.ability) return nested.ability
-  }
+  const nested = entry.bonusSource.castingAbility
+  if (nested?.kind === 'ability' && nested.ability) return nested.ability
   return undefined
 }
 
 function resolveSharedAbility(monster: ProfileMonster, entryId: string): Ability | undefined {
+  const spell = findSpellCastingSource(monster, entryId)
+  if (spell) return spell.ability
   const sections = [monster.actions, monster.bonusActions, monster.reactions] as const
   for (const section of sections) {
     for (const entry of section ?? []) {
-      const ability = abilityFromEntry(entry, entryId)
+      const ability = abilityFromAttackEntry(entry, entryId)
       if (ability) return ability
     }
   }
@@ -328,19 +468,19 @@ function resolveAuthoredProfile(
     value: {
       sourceKind: 'attack',
       sourceLabel: action.name?.trim() || 'Custom attack',
-      name: action.name ?? '',
+      name: resolveMonsterActionIdentity({ action, equipmentCatalogStatus: 'ready' }).displayName,
       governingAbility: ability.ability,
       proficiencyContribution: ability.proficient ? args.proficiencyBonus : 0,
       attackBonus,
       modes: [...modes],
-      ...(modes.includes('melee') && action.reach !== undefined ? { reach: action.reach } : {}),
+      ...(modes.includes('melee') ? { reach: action.reach ?? 5 } : {}),
       ...(modes.includes('ranged') && action.range ? { range: action.range } : {}),
       primary: {
         expression: primary.expression,
         average: primary.average,
         damageTypeId: action.damageType ?? '',
       },
-      onHit: onHitRolls(action.onHit),
+      onHit: resolveOnHitEffects(action.onHit, []),
       unresolvedCapabilities: [],
     },
   }
@@ -349,7 +489,7 @@ function resolveAuthoredProfile(
 /**
  * Attack bonus, damage averages, and reach/range for one monster action.
  * Incomplete drafts are unavailable. This does not throw.
- * Versatile two-hand damage is not applied. A thrown weapon does not become a second line.
+ * Versatile two-hand damage is not applied. A thrown melee weapon is one profile with both modes.
  */
 export function resolveMonsterActionAttackProfile(
   args: ResolveMonsterActionAttackProfileInput,
@@ -360,15 +500,4 @@ export function resolveMonsterActionAttackProfile(
   if (action.kind === 'natural-weapon') return resolveNaturalProfile(action, args)
   if (action.kind === 'attack') return resolveAuthoredProfile(action, args)
   return unavailableField('missing-input')
-}
-
-/** Primary damage type labels on stat-block lines stay the id. On-hit parts use display labels. */
-export function attackProfileOnHitLabels(
-  onHit: readonly MonsterActionAttackRoll[],
-): Array<{ expression: string; average: number; damageTypeLabel: string }> {
-  return onHit.map((part) => ({
-    expression: part.expression,
-    average: part.average,
-    damageTypeLabel: getDamageTypeLabel(part.damageTypeId),
-  }))
 }

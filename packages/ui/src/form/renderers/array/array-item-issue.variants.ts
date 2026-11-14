@@ -17,6 +17,7 @@ export const arrayItemIssueSummaryClasses = cva(
         collapsed: 'text-destructive',
         expanded: 'mb-3 text-destructive',
         compactSummary: 'text-destructive font-normal',
+        rowAlert: 'text-destructive font-normal',
       },
     },
     defaultVariants: {

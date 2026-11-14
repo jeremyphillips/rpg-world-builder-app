@@ -37,6 +37,7 @@ const TYPE_CATEGORIES: Record<FieldConfig['type'], FieldMessageCategory> = {
   select: 'choice',
   radio: 'choice',
   radioCard: 'choice',
+  segmentedControl: 'choice',
   chips: 'multi',
   combobox: 'multi',
   chooseFromChips: 'multi',

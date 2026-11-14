@@ -43,6 +43,19 @@ export function findContentEditEntity<T extends { id: string }>(
   return entities?.find((entity) => entity.id === entityId)
 }
 
+/** Replaces one list-cache entity so the edit shell reloads saved row ids immediately. */
+export function replaceCachedContentEntity<T extends { id: string }>(
+  current: readonly T[] | undefined,
+  saved: T,
+): readonly T[] | undefined {
+  if (!current) return current
+  const index = current.findIndex((entity) => entity.id === saved.id)
+  if (index < 0) return [...current, saved]
+  const next = current.slice()
+  next[index] = saved
+  return next
+}
+
 export type ContentEditFormLoadInput = {
   def: AnyContentFormDef
   entity: {

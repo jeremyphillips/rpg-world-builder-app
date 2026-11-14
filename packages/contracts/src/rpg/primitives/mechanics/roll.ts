@@ -40,6 +40,11 @@ export function formatRollValue(roll: RollValue): string {
   return `${dicePart}${formatSignedFlat(roll.flat)}`
 }
 
+/** Stat-block spacing for a compact roll expression (`3d8+3` → `3d8 + 3`). */
+export function formatStatBlockRollExpression(expression: string): string {
+  return expression.replace(/([+-])(\d+)$/, ' $1 $2')
+}
+
 /**
  * Returns the average result of a roll value.
  * Combined rolls average dice and add flat.

@@ -83,7 +83,9 @@ describe('assertOptionalDisclosureFieldConfig', () => {
     } as FieldConfig)
 
     expect(error).toHaveBeenCalledWith(
-      expect.stringContaining('only allowed for text, textSuggestions, textarea, richtext, select'),
+      expect.stringContaining(
+        'only allowed for text, textSuggestions, textarea, richtext, select, rollValue',
+      ),
     )
   })
 
@@ -100,7 +102,7 @@ describe('assertOptionalDisclosureFieldConfig', () => {
     expect(error).toHaveBeenCalledWith(expect.stringContaining('incompatible with required: true'))
   })
 
-  it('errors when optionalDisclosure is used on text before implementation', () => {
+  it('allows a valid text optionalDisclosure config', () => {
     const error = vi.spyOn(console, 'error').mockImplementation(() => undefined)
 
     assertOptionalDisclosureFieldConfig({
@@ -110,8 +112,7 @@ describe('assertOptionalDisclosureFieldConfig', () => {
       optionalDisclosure: { addLabel: 'Add note' },
     } as FieldConfig)
 
-    expect(error).toHaveBeenCalledWith(expect.stringContaining('not implemented for "text"'))
-    expect(error).toHaveBeenCalledWith(expect.stringContaining('TODO(text)'))
+    expect(error).not.toHaveBeenCalled()
   })
 
   it('allows a valid richtext optionalDisclosure config', () => {

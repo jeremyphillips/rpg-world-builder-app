@@ -10,6 +10,7 @@ Magic property **presets** live in `@rpg/catalog` (`loadSeedMagicProperties`, `c
 - At most one **enhancement** preset per instance (validated on write via `validateEquipmentMagicProperties`).
 - At most one manual `adjustments` row per `target` (`attack_roll`, `damage_roll`, `armor_class`).
 - Enhancement contributions are derived from presets and must not be duplicated into `adjustments`.
+- Optional `onHit` on a preset is unconditional extra damage, a condition, or a note. It uses the attack profile, not a second calculator. A rider that applies only while a weapon is active, such as Flame Tongue's extra fire, stays in `description` until activation-aware resolution exists.
 
 ## Stacks
 

@@ -5,6 +5,7 @@ import { z } from 'zod'
 
 import { Form } from '../../shells/form.client'
 import type { FormItem } from '../../field-config'
+import { amountAfterJoinedPairUnitChange } from './joined-pair-field-renderer.lib'
 
 const movementRowSchema = z.object({
   mode: z.string().min(1),
@@ -104,6 +105,14 @@ const wealthFields: FormItem[] = [
     },
   },
 ]
+
+describe('amountAfterJoinedPairUnitChange', () => {
+  it('clears 120 feet when the unit becomes miles and keeps the amount when the unit is unchanged', () => {
+    expect(amountAfterJoinedPairUnitChange(120, 'ft', 'mi')).toBeUndefined()
+    expect(amountAfterJoinedPairUnitChange(500, 'ft', 'mi')).toBeUndefined()
+    expect(amountAfterJoinedPairUnitChange(120, 'ft', 'ft')).toBe(120)
+  })
+})
 
 describe('JoinedPairFieldRenderer', () => {
   it('passes sizingLabels through to the end select trigger', () => {

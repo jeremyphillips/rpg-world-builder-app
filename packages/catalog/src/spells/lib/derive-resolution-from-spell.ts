@@ -218,8 +218,8 @@ function buildPointSelection(
 }
 
 function buildTargetsSelection(
-  spell: Pick<Spell, 'range'>,
-  method: SpellResolutionMethod,
+  _spell: Pick<Spell, 'range'>,
+  _method: SpellResolutionMethod,
   overrides: ResolutionDerivationOverrides,
   proximity: ResolutionTargetProximity,
 ): Pick<SpellResolution, 'selectionMode' | 'target'> {

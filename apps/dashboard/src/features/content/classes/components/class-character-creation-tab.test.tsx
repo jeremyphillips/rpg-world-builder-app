@@ -38,6 +38,7 @@ function TabShell({
         formCtx={{
           entityCatalogLayer: formCtx?.entityCatalogLayer,
           embeddedSeedRowIds: formCtx?.embeddedSeedRowIds,
+          embeddedSystemOriginRowIds: formCtx?.embeddedSystemOriginRowIds,
         }}
       />
     </FormProvider>
@@ -65,10 +66,7 @@ describe('ClassCharacterCreationTab', () => {
     render(<TabShell />)
     expect(screen.getAllByText('Character chooses').length).toBeGreaterThanOrEqual(1)
     expect(screen.getByText('Skill Proficiencies from:')).toBeInTheDocument()
-    expect(
-      screen.getByText(/Define the class's baseline equipment and wealth/i),
-    ).toBeInTheDocument()
-    expect(screen.getByRole('group', { name: /Starting equipment/i })).toBeInTheDocument()
+    expect(document.getElementById('class-starting-equipment-heading')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Add package/i })).toBeInTheDocument()
     expect(screen.getByText(/No packages added/i)).toBeInTheDocument()
   })
@@ -97,6 +95,9 @@ describe('ClassCharacterCreationTab', () => {
           embeddedSeedRowIds: {
             'characterCreation.startingEquipment.options': monkSeedIds,
           },
+          embeddedSystemOriginRowIds: {
+            'characterCreation.startingEquipment.options': monkSeedIds,
+          },
         }}
       />,
     )
@@ -118,6 +119,9 @@ describe('ClassCharacterCreationTab', () => {
           embeddedSeedRowIds: {
             'characterCreation.startingEquipment.options': monkSeedIds,
           },
+          embeddedSystemOriginRowIds: {
+            'characterCreation.startingEquipment.options': monkSeedIds,
+          },
         }}
       />,
     )
@@ -133,6 +137,9 @@ describe('ClassCharacterCreationTab', () => {
         formCtx={{
           entityCatalogLayer: 'system',
           embeddedSeedRowIds: {
+            'characterCreation.startingEquipment.options': monkSeedIds,
+          },
+          embeddedSystemOriginRowIds: {
             'characterCreation.startingEquipment.options': monkSeedIds,
           },
         }}
@@ -185,6 +192,9 @@ describe('ClassCharacterCreationTab', () => {
           embeddedSeedRowIds: {
             'characterCreation.startingEquipment.options': monkSeedIds,
           },
+          embeddedSystemOriginRowIds: {
+            'characterCreation.startingEquipment.options': monkSeedIds,
+          },
         }}
       />,
     )
@@ -225,6 +235,9 @@ describe('ClassCharacterCreationTab', () => {
           embeddedSeedRowIds: {
             'characterCreation.startingEquipment.options': monkSeedIds,
           },
+          embeddedSystemOriginRowIds: {
+            'characterCreation.startingEquipment.options': monkSeedIds,
+          },
         }}
       />,
     )
@@ -244,6 +257,9 @@ describe('ClassCharacterCreationTab', () => {
         formCtx={{
           entityCatalogLayer: 'system',
           embeddedSeedRowIds: {
+            'characterCreation.startingEquipment.options': monkSeedIds,
+          },
+          embeddedSystemOriginRowIds: {
             'characterCreation.startingEquipment.options': monkSeedIds,
           },
         }}

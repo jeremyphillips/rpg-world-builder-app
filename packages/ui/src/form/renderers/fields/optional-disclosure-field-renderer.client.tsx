@@ -10,6 +10,7 @@ import { FieldReadOnlyValueField } from '../../../components/ui/field-read-only-
 import { OptionalFieldDisclosure } from '../../../components/ui/optional-field-disclosure.client'
 import { pickFieldChromeProps } from '../../../components/ui/field-chrome.variants'
 import { SelectField } from '../../../components/ui/select-field'
+import { TextField } from '../../../components/ui/text-field'
 import { TextareaField } from '../../../components/ui/textarea-field'
 import { TextSuggestionsField } from '../../../components/ui/text-suggestions-field.client'
 import type { FieldHintPosition } from '../../../components/ui/field.variants'
@@ -20,6 +21,7 @@ import { resolveNestedFieldErrorMessage } from '../../errors/resolve-field-error
 import type {
   OptionalDisclosureConfig,
   RichTextFieldConfig,
+  TextFieldConfig,
   SelectFieldConfig,
   TextareaFieldConfig,
   TextSuggestionsFieldConfig,
@@ -117,6 +119,98 @@ export function OptionalDisclosureTextareaFieldRenderer({
           disabled={config.disabled}
           ref={registerRef}
           value={value ?? ''}
+          onChange={onChange}
+          onBlur={onBlur}
+        />
+      </OptionalFieldDisclosure>
+      {confirmDialog}
+    </>
+  )
+}
+
+type OptionalDisclosureTextRendererProps = {
+  config: TextFieldConfig
+  disclosure: OptionalDisclosureConfig
+  field: ControllerRenderProps
+  id: string
+  error?: string
+  invalid?: boolean
+  describedBy?: string
+  hint?: string
+  hintPosition?: FieldHintPosition
+}
+
+/** Collapses an empty single-line field. Opening an empty value does not write form state. */
+export function OptionalDisclosureTextFieldRenderer({
+  config,
+  disclosure,
+  field,
+  id,
+  error,
+  invalid,
+  describedBy,
+  hint,
+  hintPosition,
+}: OptionalDisclosureTextRendererProps) {
+  const controlSize = useFieldControlSize(config.controlSizeOverride)
+  const { ref: registerRef, value, onChange, onBlur, name } = field
+  const [manualOpen, setManualOpen] = useState(false)
+  const hasValue = Boolean(String(value ?? '').trim())
+  const expandWhenPopulated = disclosure.expandWhenPopulated !== false
+  const open = manualOpen || (expandWhenPopulated && hasValue)
+  const { defaultValues } = useFormState({ name })
+  const defaultsRef = useRef<unknown>(undefined)
+
+  useEffect(() => {
+    if (defaultsRef.current === undefined && defaultValues !== undefined) {
+      defaultsRef.current = defaultValues
+      return
+    }
+    if (defaultsRef.current === defaultValues) return
+    defaultsRef.current = defaultValues
+    setManualOpen(false)
+  }, [defaultValues])
+
+  const clearValue = () => {
+    onChange('')
+    setManualOpen(false)
+  }
+  const { attemptClear, confirmDialog } = useConfirmBeforeClear({
+    confirmBeforeClear: disclosure.confirmBeforeClear,
+    clearingFields: [config],
+    onClear: clearValue,
+  })
+
+  return (
+    <>
+      <OptionalFieldDisclosure
+        controlId={id}
+        fieldLabel={config.label}
+        addLabel={disclosure.addLabel}
+        removeLabel={disclosure.removeLabel}
+        open={open}
+        onOpenChange={setManualOpen}
+        onRemove={attemptClear}
+        size={controlSize}
+      >
+        <TextField
+          id={id}
+          {...pickFieldChromeProps(config)}
+          label=""
+          aria-label={config.label}
+          error={error}
+          invalid={invalid}
+          describedBy={describedBy}
+          hint={hint}
+          hintPosition={hintPosition}
+          info={config.info}
+          required={config.required}
+          width={config.width}
+          size={controlSize}
+          placeholder={config.placeholder}
+          disabled={config.disabled}
+          ref={registerRef}
+          value={typeof value === 'string' ? value : ''}
           onChange={onChange}
           onBlur={onBlur}
         />

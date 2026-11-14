@@ -5,14 +5,17 @@ import { buildEmbeddedMasterDetailListItem } from './build-embedded-master-detai
 describe('buildEmbeddedMasterDetailListItem', () => {
   const field = { id: 'rhf-1' }
   const getRowIssueCount = vi.fn(() => 0)
+  const origin = new Set(['rage'])
+  const persisted = new Set(['rage', 'custom-feature'])
 
-  it('marks system seed rows as non-deletable with structured meta', () => {
+  it('marks system-origin rows as non-deletable', () => {
     const item = buildEmbeddedMasterDetailListItem({
       field,
       index: 0,
       row: { id: 'rage' },
       entityCatalogLayer: 'system',
-      seedRowIds: new Set(['rage']),
+      persistedRowIds: persisted,
+      systemOriginRowIds: origin,
       getRowIssueCount,
       title: 'Rage',
       eyebrow: 'Level 1',
@@ -21,30 +24,56 @@ describe('buildEmbeddedMasterDetailListItem', () => {
     expect(item).toMatchObject({
       id: 'rage',
       title: 'Rage',
-      meta: { eyebrow: 'Level 1', sourceLabel: 'System' },
+      meta: {
+        eyebrow: 'Level 1',
+        provenance: 'system',
+        persistence: 'persisted',
+      },
       deletable: false,
       hasError: false,
     })
   })
 
-  it('allows homebrew rows to be deleted with homebrew source meta', () => {
+  it('keeps a saved homebrew addition deletable and homebrew', () => {
     const item = buildEmbeddedMasterDetailListItem({
       field,
       index: 1,
       row: { id: 'custom-feature' },
       entityCatalogLayer: 'system',
-      seedRowIds: new Set(['rage']),
+      persistedRowIds: persisted,
+      systemOriginRowIds: origin,
       getRowIssueCount,
       title: 'Custom Feature',
+      kindLabel: 'Feature',
     })
 
     expect(item).toMatchObject({
       id: 'custom-feature',
       title: 'Custom Feature',
-      meta: { sourceLabel: 'Homebrew' },
+      meta: {
+        kindLabel: 'Feature',
+        provenance: 'homebrew',
+        persistence: 'persisted',
+      },
       deletable: true,
-      hasError: false,
     })
+  })
+
+  it('does not let a kind label replace provenance or persistence', () => {
+    const item = buildEmbeddedMasterDetailListItem({
+      field,
+      index: 1,
+      row: { id: 'custom-feature' },
+      entityCatalogLayer: 'system',
+      persistedRowIds: persisted,
+      systemOriginRowIds: origin,
+      getRowIssueCount,
+      title: 'Custom Feature',
+      kindLabel: 'System',
+    })
+
+    expect(item.meta?.provenance).toBe('homebrew')
+    expect(item.meta?.persistence).toBe('persisted')
   })
 
   it('surfaces row validation counts from getRowIssueCount', () => {
@@ -62,7 +91,7 @@ describe('buildEmbeddedMasterDetailListItem', () => {
     expect(item.id).toBe('rhf-1')
     expect(item.issueCount).toBe(2)
     expect(item.hasError).toBe(true)
-    expect(item.meta).toEqual({ sourceLabel: 'Homebrew' })
+    expect(item.meta).toEqual({ provenance: 'homebrew', persistence: 'new' })
     expect(getRowIssueCount).toHaveBeenCalledWith(0)
   })
 })

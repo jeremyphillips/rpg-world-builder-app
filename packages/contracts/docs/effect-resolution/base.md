@@ -37,6 +37,20 @@ Implementation: [`deriveEffectRecipientFromResolution`](../../src/rpg/content/sp
 
 When `countKind` is omitted: `count === 1` → `exact`; otherwise → `up-to`.
 
+Optional `target.requirements` narrows who may be chosen. The list is shared
+with monster saves. See [monster-actions.md](./monster-actions.md). Spell
+targeting and optional `occupantRequirements` (self/point + area) use the same
+schema and formatter helpers.
+
+**Target-kind applicability:** Each requirement row is checked against the
+target’s `kind`. Creature-only rows (size, type, condition, willing, any-of,
+and sight from the target’s perspective) fail validation when the target is
+`object` or `creature-or-object`. `creature-or-object` requires a requirement to
+be valid for **both** creatures and objects (for example actor sight and written
+clauses). Area `occupantRequirements` and teleport passenger lists always use
+effective kind `creature`. See
+[`requirement-target-compatibility.ts`](../../src/rpg/content/lib/resolution/requirement-target-compatibility.ts).
+
 ## Validation (per mode)
 
 | Mode      | Required | Forbidden                          |

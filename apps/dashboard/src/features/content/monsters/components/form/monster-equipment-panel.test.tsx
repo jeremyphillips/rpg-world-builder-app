@@ -647,7 +647,10 @@ describe('MonsterEquipmentPanel', () => {
 
       await user.click(screen.getByLabelText('Remove Dagger'))
       expect(screen.getByText(/is used by Stab/i)).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: 'Remove weapon and action' })).toBeInTheDocument()
+      expect(screen.getByText(/missing weapon/i)).toBeInTheDocument()
+      expect(
+        screen.getByRole('button', { name: MONSTER_REMOVE_EQUIPMENT_CONFIRM_LABEL }),
+      ).toBeInTheDocument()
     })
 
     it('shows one combined dialog when customized and referenced', async () => {
@@ -668,10 +671,12 @@ describe('MonsterEquipmentPanel', () => {
       )
 
       await user.click(screen.getByLabelText('Remove Shard'))
-      expect(screen.getByText(/remove the linked actions/i)).toBeInTheDocument()
+      expect(screen.getByText(/missing weapon/i)).toBeInTheDocument()
       await user.click(screen.getByRole('button', { name: MONSTER_REMOVE_EQUIPMENT_CONFIRM_LABEL }))
       expect(formRef.current?.getValues('equipment')).toEqual([])
-      expect(formRef.current?.getValues('actions')).toEqual([])
+      expect(formRef.current?.getValues('actions')).toEqual([
+        { id: 'stab', kind: 'weapon', equipmentEntryId: 'stack', name: 'Stab' },
+      ])
     })
 
     it('only removes the targeted entryId when two stacks share an equipment id', async () => {
@@ -717,8 +722,10 @@ describe('MonsterEquipmentPanel', () => {
       act(() => {
         formRef.current?.setValue('equipment', [], { shouldDirty: true })
       })
-      await user.click(screen.getByRole('button', { name: 'Remove weapon and action' }))
-      expect(formRef.current?.getValues('actions')).toEqual([])
+      await user.click(screen.getByRole('button', { name: MONSTER_REMOVE_EQUIPMENT_CONFIRM_LABEL }))
+      expect(formRef.current?.getValues('actions')).toEqual([
+        { id: 'stab', kind: 'weapon', equipmentEntryId: 'stack', name: 'Stab' },
+      ])
     })
   })
 

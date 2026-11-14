@@ -6,6 +6,15 @@ export type FormIssueSeverity = 'crossRow' | 'row' | 'field'
 /** Where a validation issue belongs in the form hierarchy. */
 export type FormIssueScope = 'form' | 'section' | 'array' | 'item' | 'field'
 
+/** Routed ownership target for one validation issue. */
+export type FormIssueClaimKind = 'field' | 'slot' | 'row' | 'section' | 'form' | 'fallback'
+
+export type FormIssueClaim = {
+  kind: FormIssueClaimKind
+  /** Control, slot, row (`itemPrefix`), or summary target path. */
+  target: string
+}
+
 /** Flattened validation issue with array item context when applicable. */
 export type FormIssue = {
   /** Dot path from form root, e.g. `startingWealth.tiers.1.minLevel`. */
@@ -15,6 +24,8 @@ export type FormIssue = {
    * {@link path} when omitted (pre-enrichment callers).
    */
   presentationPath?: string
+  /** Routed ownership after {@link routeFormIssues}. */
+  claim?: FormIssueClaim
   /** Full field-context message shown beside the control. */
   message: string
   /** Shorter summary label for collapsed row chrome; falls back to `message`. */

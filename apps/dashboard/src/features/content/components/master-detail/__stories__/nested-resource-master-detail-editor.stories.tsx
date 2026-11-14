@@ -10,13 +10,13 @@ const stubItems: MasterDetailListItem[] = [
   {
     id: 'f1',
     title: 'Champion',
-    meta: { sourceLabel: 'System' },
+    meta: { provenance: 'system', persistence: 'persisted' },
     deletable: false,
   },
   {
     id: 'f2',
     title: 'Battle Master',
-    meta: { eyebrow: 'Modified', sourceLabel: 'Homebrew' },
+    meta: { eyebrow: 'Modified', provenance: 'homebrew', persistence: 'persisted' },
     deletable: true,
   },
 ]
@@ -24,7 +24,7 @@ const stubItems: MasterDetailListItem[] = [
 const longItems: MasterDetailListItem[] = Array.from({ length: 20 }, (_, index) => ({
   id: `subclass-${index}`,
   title: `Subclass ${index + 1}`,
-  meta: { sourceLabel: 'Homebrew' as const },
+  meta: { provenance: 'homebrew', persistence: 'persisted' as const },
   deletable: true,
 }))
 

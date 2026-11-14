@@ -6,12 +6,15 @@ import {
   type LimitedUse,
 } from '../../primitives/limited-use'
 import { getAbilityLabel } from '../../vocab/ability'
-import { SPELL_COMPONENT_ENTRIES, type SpellComponentId } from '../../vocab/spell/components'
-import type { MonsterReferencedSpell } from './reaction-trigger'
 import {
-  MONSTER_SECTION_ECONOMY,
-  type MonsterActionSectionId,
-} from '../../content/spell/casting-economy'
+  formatMonsterSpellComponentOmissionClause,
+  joinMonsterSpellCastingIntroSegments,
+} from './spell-component-omission'
+import type { MonsterReferencedSpell } from './reaction-trigger'
+import { type MonsterActionSectionId } from '../../content/spell/casting-economy'
+import { formatSpellCastAtLevelName } from '../../content/spell/format-spell-cast-level'
+
+type MonsterSpellPresentationSection = MonsterActionSectionId | 'legendaryActions'
 
 type SpellEntry = Extract<MonsterAction | MonsterReaction, { kind: 'spell' }>
 
@@ -29,7 +32,9 @@ function usageKey(use: LimitedUse | undefined): string {
 export function formatMonsterStatBlockSubject(name: string): string {
   const trimmed = name.trim()
   if (!trimmed) return 'the creature'
-  return `the ${trimmed.toLowerCase()}`
+  const lower = trimmed.toLowerCase()
+  if (lower.startsWith('the ')) return lower
+  return `the ${lower}`
 }
 
 function escapeHtml(value: string): string {
@@ -53,34 +58,55 @@ function listPhrase(labels: string[]): string {
   return `${labels.slice(0, -1).join(', ')}, or ${labels[labels.length - 1]}`
 }
 
-function abilityPhrase(entry: SpellEntry, spellsInBody: ReadonlyMap<string, SpellEntry>): string {
+function resolutionMethodKind(
+  spellId: string | undefined,
+  spellsById: ReadonlyMap<string, MonsterReferencedSpell> | undefined,
+  catalogStatus: 'ready' | 'unavailable',
+): string | undefined {
+  if (catalogStatus !== 'ready' || !spellId) return undefined
+  return spellsById?.get(spellId)?.resolution?.method?.kind
+}
+
+function directSaveDcSuffix(args: {
+  entry: SpellEntry
+  spellsById?: ReadonlyMap<string, MonsterReferencedSpell>
+  catalogStatus: 'ready' | 'unavailable'
+  saveDc?: number
+}): string {
+  if (args.entry.castingAbility?.kind !== 'ability' || args.saveDc === undefined) return ''
+  const hasSavingThrow = args.entry.spells.some(
+    (spell) =>
+      resolutionMethodKind(spell.spellId, args.spellsById, args.catalogStatus) === 'saving-throw',
+  )
+  if (!hasSavingThrow) return ''
+  return ` as the spellcasting ability (spell save DC ${args.saveDc})`
+}
+
+function abilityPhrase(
+  entry: SpellEntry,
+  spellsInBody: ReadonlyMap<string, SpellEntry>,
+  saveDcSuffix: string,
+): string {
   if (entry.castingAbility?.kind === 'shared') {
     const target = spellsInBody.get(entry.castingAbility.entryId)
     return `using the same spellcasting ability as ${target?.name ?? 'that entry'}`
   }
   if (entry.castingAbility?.kind === 'ability') {
-    return `using ${getAbilityLabel(entry.castingAbility.ability)}`
+    return `using ${getAbilityLabel(entry.castingAbility.ability)}${saveDcSuffix}`
   }
   return 'using its spellcasting ability'
-}
-
-function componentPhrase(omitted: readonly SpellComponentId[] | undefined): string {
-  if (!omitted?.length) return ''
-  const labels = omitted.map((id) => SPELL_COMPONENT_ENTRIES[id].label)
-  return ` without ${listPhrase(labels)} components`
 }
 
 function spellName(
   spell: SpellRow,
   spellsById: ReadonlyMap<string, MonsterReferencedSpell> | undefined,
   catalogStatus: 'ready' | 'unavailable',
+  castAtLevel: number | undefined = spell.castAtLevel,
 ): string {
   if (!spell.spellId) return 'Unavailable spell'
   const label = spellLabel(spell.spellId, spellsById, catalogStatus).html
   const level = catalogStatus === 'ready' ? spellsById?.get(spell.spellId)?.level : undefined
-  if (spell.castAtLevel === undefined) return label
-  if (level !== undefined && spell.castAtLevel <= level) return label
-  return `${label} (level ${spell.castAtLevel} version)`
+  return formatSpellCastAtLevelName({ name: label, castAtLevel, spellLevel: level })
 }
 
 function groupLine(
@@ -94,7 +120,7 @@ function groupLine(
   const label = limitedUse
     ? `${formatLimitedUseNotation(limitedUse, 'stat-block')}${each}`
     : 'At Will'
-  return `<p>${label}: ${names.join(', ')}</p>`
+  return `<p><strong>${label}</strong>: ${names.join(', ')}</p>`
 }
 
 function presentationGroups(spells: readonly SpellRow[]): Array<{
@@ -113,24 +139,71 @@ function presentationGroups(spells: readonly SpellRow[]): Array<{
   return groups
 }
 
+function inheritedCastAtLevel(
+  spell: SpellRow,
+  entry: SpellEntry,
+  spellsInBody: ReadonlyMap<string, SpellEntry>,
+): number | undefined {
+  if (spell.castAtLevel !== undefined) return spell.castAtLevel
+  if (entry.spellInvocation !== 'use-entry' || entry.castingAbility?.kind !== 'shared') {
+    return undefined
+  }
+  const source = spellsInBody.get(entry.castingAbility.entryId)
+  return source?.spells.find((row) => row.spellId === spell.spellId)?.castAtLevel
+}
+
 function castingSentence(args: {
   entry: SpellEntry
   monsterName: string
-  section: MonsterActionSectionId
+  section: MonsterSpellPresentationSection
   spellsById?: ReadonlyMap<string, MonsterReferencedSpell>
   catalogStatus: 'ready' | 'unavailable'
   spellsInBody: ReadonlyMap<string, SpellEntry>
+  saveDcSuffix: string
 }): string {
   const labels = args.entry.spells.map((spell) =>
-    spellName(spell, args.spellsById, args.catalogStatus),
+    spellName(
+      spell,
+      args.spellsById,
+      args.catalogStatus,
+      inheritedCastAtLevel(spell, args.entry, args.spellsInBody),
+    ),
   )
   const subject = formatMonsterStatBlockSubject(args.monsterName)
   const capitalSubject = subject.charAt(0).toUpperCase() + subject.slice(1)
-  const response =
-    MONSTER_SECTION_ECONOMY[args.section] === 'reaction'
-      ? " in response to the spell's trigger"
-      : ''
-  return `<p>${capitalSubject} casts ${listPhrase(labels)}${response}, ${abilityPhrase(args.entry, args.spellsInBody)}${componentPhrase(args.entry.omittedComponents)}.</p>`
+  const response = args.section === 'reactions' ? " in response to the spell's trigger" : ''
+  const omission = formatMonsterSpellComponentOmissionClause(args.entry.omittedComponents)
+  const omissionSegment = omission ? `, ${omission}` : ''
+  if (args.entry.spellInvocation === 'use-entry' && args.entry.castingAbility?.kind === 'shared') {
+    const target = args.spellsInBody.get(args.entry.castingAbility.entryId)
+    return `<p>${capitalSubject} uses ${target?.name ?? 'that entry'} to cast ${listPhrase(labels)}${omissionSegment}.</p>`
+  }
+  return `<p>${capitalSubject} casts ${listPhrase(labels)}${response}${omissionSegment}, ${abilityPhrase(args.entry, args.spellsInBody, args.saveDcSuffix)}.</p>`
+}
+
+export function formatLegendaryActionUsesIntro(args: {
+  monsterName: string
+  uses: number
+  usesInLair?: number
+}): string {
+  const subject = formatMonsterStatBlockSubject(args.monsterName)
+  const capitalSubject = subject.charAt(0).toUpperCase() + subject.slice(1)
+  const pool =
+    args.usesInLair === undefined ? String(args.uses) : `${args.uses} (${args.usesInLair} in Lair)`
+  return `Legendary Action Uses: ${pool}. Immediately after another creature's turn, ${subject} can expend a use to take one of the following actions. ${capitalSubject} regains all expended uses at the start of each of its turns.`
+}
+
+export function formatOnceUntilNextTurnSentence(args: {
+  monsterName: string
+  kind: string
+  /** Prose saving throw on a custom ability or trait. Structured saves use `kind`. */
+  hasSavingThrow?: boolean
+}): string {
+  const subject = formatMonsterStatBlockSubject(args.monsterName)
+  const capitalSubject = subject.charAt(0).toUpperCase() + subject.slice(1)
+  const sentence = `${capitalSubject} can't take this action again until the start of its next turn.`
+  if (args.kind === 'save' || args.hasSavingThrow) return `Failure or Success: ${sentence}`
+  return sentence
 }
 
 export function formatMonsterLimitedUseHeading(name: string, limitedUse?: LimitedUse): string {
@@ -141,10 +214,12 @@ export function formatMonsterLimitedUseHeading(name: string, limitedUse?: Limite
 export function formatMonsterSpellEntry(args: {
   entry: SpellEntry
   monsterName: string
-  section: MonsterActionSectionId
+  section: MonsterSpellPresentationSection
   spellsById?: ReadonlyMap<string, MonsterReferencedSpell>
   catalogStatus: 'ready' | 'unavailable'
   spellsInBody: ReadonlyMap<string, SpellEntry>
+  /** Derived with `abilitySaveDc`. Omitted numbers are not printed. */
+  saveDc?: number
 }): { heading: string; bodyHtml: string } {
   const entryLimit = limitedUseSchema.safeParse(args.entry.limitedUse)
   const heading = formatMonsterLimitedUseHeading(
@@ -155,12 +230,22 @@ export function formatMonsterSpellEntry(args: {
   const perSpellLimits = args.entry.spells.some((spell) => spell.limitedUse)
   const useGroupLabels =
     args.section !== 'reactions' && (groups.length > 1 || perSpellLimits) && !args.entry.limitedUse
+  const saveDcSuffix = directSaveDcSuffix(args)
+  const subject = formatMonsterStatBlockSubject(args.monsterName)
+  const capitalSubject = subject.charAt(0).toUpperCase() + subject.slice(1)
+  const omissionClause = formatMonsterSpellComponentOmissionClause(args.entry.omittedComponents)
+  const abilitySegment = abilityPhrase(args.entry, args.spellsInBody, saveDcSuffix)
+  const showGroupedIntro = useGroupLabels && (Boolean(saveDcSuffix) || Boolean(omissionClause))
+  const groupedIntro = showGroupedIntro
+    ? `<p>${capitalSubject} casts one of the following spells, ${joinMonsterSpellCastingIntroSegments(omissionClause, abilitySegment)}:</p>`
+    : ''
   const bodyHtml = useGroupLabels
-    ? groups
+    ? groupedIntro +
+      groups
         .map((group) =>
           groupLine(group.spells, group.limitedUse, args.spellsById, args.catalogStatus),
         )
         .join('')
-    : castingSentence(args)
+    : castingSentence({ ...args, saveDcSuffix })
   return { heading, bodyHtml }
 }

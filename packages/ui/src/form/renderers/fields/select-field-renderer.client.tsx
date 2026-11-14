@@ -39,13 +39,14 @@ export function SelectFieldRenderer({
   const changeButtonRef = useRef<HTMLButtonElement>(null)
   const selectWasOpenRef = useRef(false)
   const value = normalizedSelectFieldValue(state.field.value)
-  const committedLabel = resolveSelectFieldOptionLabel(state.field.value, state.resolvedOptions)
+  const [committedValue, setCommittedValue] = useState(value)
+  if (committedValue !== value) {
+    setCommittedValue(value)
+    if (changing) setChanging(false)
+  }
+  const committedLabel = resolveSelectFieldOptionLabel(state.field.value, state.flatOptions)
   const showEditor =
     !changeLabel || changing || value === '' || (value !== '' && committedLabel == null)
-
-  useEffect(() => {
-    setChanging(false)
-  }, [state.field.value])
 
   useEffect(() => {
     if (!changing || !changeLabel) return
@@ -58,6 +59,15 @@ export function SelectFieldRenderer({
     requestAnimationFrame(() => {
       changeButtonRef.current?.focus()
     })
+  }
+
+  const exitChangeOnBlur = () => {
+    state.field.onBlur()
+    if (!changeLabel || !value) return
+    window.setTimeout(() => {
+      if (selectWasOpenRef.current) return
+      setChanging(false)
+    }, 0)
   }
 
   if (state.isReadOnly) {
@@ -76,6 +86,7 @@ export function SelectFieldRenderer({
       <FieldReadOnlyValueField
         id={id}
         displayValue={committedLabel ?? state.displayValue}
+        className="px-0"
         controlEnd={
           <Button
             {...formMicroActionButtonProps}
@@ -117,9 +128,7 @@ export function SelectFieldRenderer({
           focusChangeButton()
         }
       }}
-      onBlur={() => {
-        state.field.onBlur()
-      }}
+      onBlur={exitChangeOnBlur}
       onOpenChange={(open) => {
         if (open) {
           selectWasOpenRef.current = true

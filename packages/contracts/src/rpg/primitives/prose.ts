@@ -19,6 +19,28 @@ export function joinNaturalList(
   return `${items.slice(0, -1).join(', ')}, ${conjunction} ${items.at(-1)}`
 }
 
+const CARDINAL_WORDS = [
+  'zero',
+  'one',
+  'two',
+  'three',
+  'four',
+  'five',
+  'six',
+  'seven',
+  'eight',
+  'nine',
+  'ten',
+] as const
+
+/**
+ * English cardinal for small counts in generated prose (e.g. SRD stat blocks).
+ * Values 0–10 use words; larger values fall back to decimal digits.
+ */
+export function formatCardinalWord(n: number): string {
+  return CARDINAL_WORDS[n] ?? String(n)
+}
+
 /** English ordinal suffix for integers (1 → 1st, 11 → 11th). */
 export function formatOrdinal(n: number): string {
   const mod100 = n % 100

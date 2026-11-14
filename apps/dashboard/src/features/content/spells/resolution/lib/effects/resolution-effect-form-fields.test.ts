@@ -95,7 +95,7 @@ describe('resolutionFields effects array', () => {
     const itemHeader = arrayField?.item?.header
 
     expect(itemHeader).toBeDefined()
-    expect(itemHeader?.summaryDependsOn).toContain('resolution.proximityKind')
+    expect(itemHeader?.summaryDependsOn).toContain('resolution.target.proximity.kind')
     expect(itemHeader?.fallback(0)).toBe('Effect 1')
     expect(
       itemHeader?.primary?.(
@@ -118,9 +118,9 @@ describe('resolutionFields effects array', () => {
         },
         0,
         {
-          'resolution.proximityKind': 'touch',
-          'resolution.targetKind': 'creature',
-          'resolution.targetCount': 1,
+          'resolution.target.proximity.kind': 'touch',
+          'resolution.target.kind': 'creature',
+          'resolution.target.count': 1,
         },
       ),
     ).toBe('Inflicts 1d6 Fire damage.')

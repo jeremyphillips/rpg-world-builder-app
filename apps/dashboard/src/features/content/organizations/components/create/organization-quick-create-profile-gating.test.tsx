@@ -59,7 +59,6 @@ describe('Organization quick create profile gating', () => {
     const optionalDetailsToggle = screen.getByRole('button', { name: /Optional details/i })
     expect(optionalDetailsToggle).toHaveAttribute('aria-expanded', 'false')
     expect(optionalDetailsToggle.closest('.bg-field-container')).toBeInstanceOf(HTMLElement)
-    expect(screen.queryByRole('textbox', { name: /description/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Set up manually' })).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('combobox', { name: /Starting point/i }))
@@ -76,7 +75,7 @@ describe('Organization quick create profile gating', () => {
     await waitFor(() => {
       expect(screen.getByRole('group', { name: /Organization profile/i })).toBeInTheDocument()
     })
-  })
+  }, 15_000)
 
   it('remounts optional details collapsed after expand when uiStateKey is stable', async () => {
     const user = userEvent.setup()

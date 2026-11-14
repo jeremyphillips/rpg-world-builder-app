@@ -8,6 +8,41 @@ const options = [
   { label: 'Chaotic Evil', value: 'ce' },
 ]
 
+const trailingOptions = [
+  {
+    kind: 'group' as const,
+    label: "Use another action's ability",
+    options: [
+      {
+        label: 'Spellcasting (Intelligence)',
+        value: 'shared:spellcasting',
+        trailing: { text: 'DC 15', variant: 'strong' as const },
+      },
+    ],
+  },
+  {
+    kind: 'group' as const,
+    label: 'Choose an ability',
+    options: [
+      {
+        label: 'Intelligence',
+        value: 'int',
+        trailing: { text: 'DC 15', variant: 'strong' as const },
+      },
+      {
+        label: 'Wisdom',
+        value: 'wis',
+        trailing: { text: 'DC 13', variant: 'strong' as const },
+      },
+      {
+        label: 'Charisma',
+        value: 'cha',
+        trailing: { text: '4 spells', variant: 'quiet' as const },
+      },
+    ],
+  },
+]
+
 const meta = {
   title: 'Forms/SelectField',
   component: SelectField,
@@ -68,4 +103,23 @@ export const DisabledOptionReason: Story = {
       { label: 'Fly', value: 'fly', disabled: true, disabledReason: 'Already used' },
     ],
   },
+}
+
+/**
+ * `FieldOption.trailing` with `strong` (DC) and `quiet` (counts) in grouped options.
+ * Open the list to verify metadata aligns to the right edge in each row and on the trigger.
+ */
+export const WithOptionTrailing: Story = {
+  args: {
+    id: 'spellcasting-ability',
+    label: 'Spellcasting ability',
+    hint: 'Strong trailing for resolved DCs; quiet for supporting counts.',
+    value: 'int',
+    options: trailingOptions,
+  },
+  render: (args) => (
+    <div className="w-full max-w-md">
+      <SelectField {...args} />
+    </div>
+  ),
 }

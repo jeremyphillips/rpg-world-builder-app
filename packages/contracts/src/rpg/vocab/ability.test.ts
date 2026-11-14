@@ -71,7 +71,7 @@ describe('buildGroupedSpellcastingAbilityOptions', () => {
   it('groups standard and unusual spellcasting abilities', () => {
     expect(buildGroupedSpellcastingAbilityOptions()).toEqual([
       {
-        label: 'Common',
+        label: 'Common abilities',
         options: [
           { value: 'int', label: 'Intelligence' },
           { value: 'wis', label: 'Wisdom' },
@@ -79,7 +79,7 @@ describe('buildGroupedSpellcastingAbilityOptions', () => {
         ],
       },
       {
-        label: 'Advanced',
+        label: 'Other abilities',
         options: [
           { value: 'str', label: 'Strength' },
           { value: 'dex', label: 'Dexterity' },

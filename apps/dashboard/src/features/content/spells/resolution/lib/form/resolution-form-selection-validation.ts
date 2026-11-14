@@ -12,6 +12,7 @@ import { SPELL_AREA_GEOMETRY_NONE } from '../../../lib/spell-form-labels'
 import { resolutionFormValidationMessages } from './resolution-form-messages'
 import type { ResolutionFormValues } from './resolution-form-schema'
 import { validateResolutionFormOutcomes } from './resolution-form-outcome-validation'
+import { validateResolutionFormTargetRequirements } from './resolution-form-target-requirements-validation'
 
 function validateResolutionFormMethodFields(
   values: ResolutionFormValues,
@@ -34,11 +35,14 @@ function validateResolutionFormTargetProximity(
   values: ResolutionFormValues,
   ctx: z.RefinementCtx,
 ): void {
-  if (values.selectionMode !== 'targets' || values.proximityKind !== 'distance') return
-  if (values.proximityDistanceFt !== undefined) return
+  if (values.selectionMode !== 'targets' || values.target?.proximity.kind !== 'distance') return
+  if (values.target.proximity.distance?.value !== undefined) return
 
   addCustomRefinementIssue(ctx, resolutionFormValidationMessages.proximityDistanceRequired(), [
-    'proximityDistanceFt',
+    'target',
+    'proximity',
+    'distance',
+    'value',
   ])
 }
 
@@ -105,4 +109,5 @@ export function validateResolutionFormSelection(
   validateResolutionFormPointOrigin(values, ctx)
   validateResolutionFormProjectileCount(values, ctx)
   validateResolutionFormOutcomes(values, ctx)
+  validateResolutionFormTargetRequirements(values, ctx)
 }

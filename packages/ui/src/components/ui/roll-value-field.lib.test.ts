@@ -32,6 +32,9 @@ describe('roll-value-field.lib', () => {
     expect(rollValuePartsHaveDice({ diceCount: 1 })).toBe(false)
     expect(rollValuePartsHaveFlat({ flatAmount: 0 })).toBe(true)
     expect(shouldShowRollValueDiceFields({ diceCount: 1, diceFaces: 6 })).toBe(true)
+    expect(shouldShowRollValueDiceFields({})).toBe(false)
+    expect(shouldShowRollValueDiceFields({ diceCount: 2 })).toBe(true)
+    expect(shouldShowRollValueDiceFields({ diceCount: 2, flatAmount: 1 })).toBe(true)
     expect(shouldShowRollValueDiceFields({ flatAmount: 1 })).toBe(false)
     expect(shouldShowRollValueModifierFields({ flatAmount: 2 })).toBe(true)
     expect(shouldShowRollValueModifierFields({ diceCount: 1, diceFaces: 6 })).toBe(false)
@@ -62,7 +65,10 @@ describe('roll-value-field.lib', () => {
   it('applies dice and modifier patches', () => {
     expect(
       applyRollValueFieldPatch({ diceCount: 1, diceFaces: 6 }, { faces: 12 }, DEFAULTS),
-    ).toEqual({ diceCount: 1, diceFaces: 12 })
+    ).toEqual({ diceFaces: 12 })
+    expect(applyRollValueFieldPatch({ diceCount: 2 }, { count: 3 }, DEFAULTS)).toEqual({
+      diceCount: 3,
+    })
     expect(applyRollValueFieldPatch({}, { clearModifier: true }, DEFAULTS)).toEqual({
       clearFlat: true,
     })

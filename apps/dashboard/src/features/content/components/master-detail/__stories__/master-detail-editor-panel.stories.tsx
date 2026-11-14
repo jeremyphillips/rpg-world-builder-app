@@ -59,7 +59,7 @@ function PanelStory({
         selectedIdentity={
           selectedIdentity ?? {
             title: 'Rage',
-            meta: { eyebrow: 'Level 1', sourceLabel: 'System' },
+            meta: { eyebrow: 'Level 1', provenance: 'system', persistence: 'persisted' },
             deletable: true,
           }
         }
@@ -80,13 +80,32 @@ export const SelectedRow: Story = {
   render: () => <PanelStory editor={selectedEditor} />,
 }
 
+export const InlineTitle: Story = {
+  render: () => (
+    <PanelStory
+      editor={selectedEditor}
+      selectedIdentity={{
+        title: 'Rage',
+        rowKey: 'field-a',
+        meta: { eyebrow: 'Level 1', provenance: 'system', persistence: 'persisted' },
+        inlineTitle: {
+          field: 'name',
+          mode: 'authored',
+          fallback: 'Trait 1',
+          placeholder: 'Trait 1',
+        },
+      }}
+    />
+  ),
+}
+
 export const SelectedRowWithIssues: Story = {
   render: () => (
     <PanelStory
       editor={selectedEditor}
       selectedIdentity={{
         title: 'Rage',
-        meta: { eyebrow: 'Level 1', sourceLabel: 'System' },
+        meta: { eyebrow: 'Level 1', provenance: 'system', persistence: 'persisted' },
         deletable: true,
         issueCount: 2,
       }}

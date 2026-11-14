@@ -4,7 +4,13 @@ import { entryProvenanceSchema } from '../../primitives/provenance'
 import type { ProvenanceEntryHostPath } from './content-type-capabilities'
 
 type ZodLike = {
-  def: { type: string; innerType?: ZodLike }
+  def: {
+    type: string
+    innerType?: ZodLike
+    in?: ZodLike
+    out?: ZodLike
+    schema?: ZodLike
+  }
   shape?: Record<string, ZodLike>
   options?: readonly ZodLike[]
   element?: ZodLike
@@ -19,10 +25,20 @@ function asZod(schema: z.ZodType): ZodLike {
 function unwrap(schema: ZodLike): ZodLike {
   const type = schema.def.type
   if (
-    (type === 'optional' || type === 'default' || type === 'nullable' || type === 'prefault') &&
+    (type === 'optional' ||
+      type === 'default' ||
+      type === 'nullable' ||
+      type === 'prefault' ||
+      type === 'preprocess') &&
     schema.def.innerType
   ) {
     return unwrap(schema.def.innerType)
+  }
+  if (type === 'pipe' && schema.def.out) {
+    return unwrap(schema.def.out)
+  }
+  if (type === 'transform' && schema.def.schema) {
+    return unwrap(schema.def.schema)
   }
   return schema
 }

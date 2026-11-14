@@ -41,5 +41,6 @@ describe('resolveGroupLegendSize', () => {
   it('maps structural tiers to legend size tokens', () => {
     expect(resolveGroupLegendSize('section')).toBe('section')
     expect(resolveGroupLegendSize('subsection')).toBe('subsection')
+    expect(resolveGroupLegendSize('leaf')).toBe('subsection')
   })
 })

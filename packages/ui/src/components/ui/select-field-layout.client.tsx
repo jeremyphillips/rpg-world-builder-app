@@ -94,6 +94,7 @@ export function SelectFieldInlineLayout({
       invalid={invalid}
       describedBy={describedBy}
       hint={hint}
+      hintPosition={hintPosition}
       required={required}
       width={width}
       size={size}
@@ -101,24 +102,12 @@ export function SelectFieldInlineLayout({
     >
       {hasActiveFieldChrome(chrome) ? (
         <FieldChromeShell chrome={chrome} size={size}>
-          <SelectFieldInlineBody
-            label={label}
-            info={info}
-            required={required}
-            hintPosition={hintPosition}
-            control={control}
-          />
+          <SelectFieldInlineBody label={label} info={info} required={required} control={control} />
           <Field.Error />
         </FieldChromeShell>
       ) : (
         <>
-          <SelectFieldInlineBody
-            label={label}
-            info={info}
-            required={required}
-            hintPosition={hintPosition}
-            control={control}
-          />
+          <SelectFieldInlineBody label={label} info={info} required={required} control={control} />
           <Field.Error />
         </>
       )}
@@ -130,19 +119,16 @@ function SelectFieldInlineBody({
   label,
   info,
   required,
-  hintPosition,
   control,
 }: {
   label: string
   info?: ReactNode
   required?: boolean
-  hintPosition?: FieldHintPosition
   control: ReactElement | ReactNode
 }) {
   const visibility = useOwnedLabelVisibility()
-  const { hasHint } = useFieldRootContext('SelectFieldInlineBody')
-  const resolvedHintPosition = hintPosition ?? 'below-label'
-  const hintInLabelSlot = hasHint && resolvedHintPosition === 'below-label'
+  const { hasHint, hintPosition } = useFieldRootContext('SelectFieldInlineBody')
+  const hintInLabelSlot = hasHint && hintPosition === 'below-label'
   const showLabelSlot = showOwnedLabelSlot({
     labelVisibility: visibility,
     hintInLabelSlot,
@@ -170,7 +156,7 @@ function SelectFieldInlineBody({
           <div className={fieldInlineControlRowClasses}>{control}</div>
         </>
       )}
-      {resolvedHintPosition === 'below-control' ? <Field.Hint /> : null}
+      {hintPosition === 'below-control' ? <Field.Hint /> : null}
     </>
   )
 }
@@ -198,6 +184,7 @@ export function SelectFieldDefaultLayout({
       invalid={invalid}
       describedBy={describedBy}
       hint={hint}
+      hintPosition={hintPosition}
       required={required}
       width={width}
       size={size}
@@ -205,7 +192,6 @@ export function SelectFieldDefaultLayout({
       anatomy
     >
       <FieldLayout
-        hintPosition={hintPosition}
         wrapControl={false}
         label={<FormFieldLabel label={label} required={required} info={info} />}
         control={control}

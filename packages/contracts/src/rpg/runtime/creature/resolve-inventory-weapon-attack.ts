@@ -55,7 +55,7 @@ export function resolveInventoryWeaponAttackTotals(args: {
   proficient: boolean
   proficiencyBonus: number | undefined
   provider: MagicPropertyDefinitionProvider
-  /** Replaces catalog weapon dice. Ability and damage-roll adjustments still apply. */
+  /** Replaces the catalog base roll. Ability and damage-roll adjustments still apply. */
   damage?: WeaponDamage
 }): InventoryWeaponAttackTotals | undefined {
   if (!isWeaponEquipment(args.item)) return undefined

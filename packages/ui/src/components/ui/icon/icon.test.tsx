@@ -9,7 +9,7 @@ const ICON_NAMES = Object.keys(ICON_GLYPHS) as IconName[]
 describe('Icon', () => {
   it('registers each glyph once', () => {
     expect(new Set(Object.values(ICON_GLYPHS)).size).toBe(ICON_NAMES.length)
-    expect(ICON_NAMES).toHaveLength(113)
+    expect(ICON_NAMES).toHaveLength(114)
   })
 
   it('renders every glyph as one decorative svg', () => {

@@ -65,8 +65,8 @@ describe('projectContentEntity', () => {
     } as never)
 
     expect(document.secondary).toBe('Political')
-    expect(document.fields.some((field) => field.text.includes('Smuggling'))).toBe(true)
     expect(document.fields.some((field) => field.text.includes('contraband'))).toBe(true)
+    expect(document.fields.some((field) => field.text.includes('illicit transport'))).toBe(true)
   })
 
   it('projects plate Armor Class from the campaign rules', () => {

@@ -34,6 +34,10 @@ export interface JoinedPairFieldFormStartSelectControl {
   ariaLabel: string
   hasError?: boolean
   describedBy?: string
+  allowCustom?: boolean
+  clearable?: boolean
+  customMin?: number
+  customMax?: number
   onChange: (value: string | number | undefined) => void
   onBlur?: () => void
 }
@@ -91,6 +95,7 @@ export interface JoinedPairFieldFormProps {
       }
   startOccupant: JoinedPairStartOccupantConfig
   endOccupant: JoinedPairEndOccupantConfig
+  showLayoutMessage?: boolean
 }
 
 /** Standalone joined-pair field shell — label, occupants, and shared error slot. */
@@ -111,6 +116,7 @@ export function JoinedPairFieldForm({
   end,
   startOccupant,
   endOccupant,
+  showLayoutMessage = true,
 }: JoinedPairFieldFormProps) {
   assertAllowedJoinedPairComposition({ start: startOccupant, end: endOccupant })
   const labelId = `${id}-label`
@@ -123,6 +129,7 @@ export function JoinedPairFieldForm({
       id={id}
       error={error}
       hint={hint}
+      hintPosition={hintPosition}
       required={required}
       width={resolveFieldAnatomyWidth(width, chrome)}
       size={size}
@@ -131,10 +138,10 @@ export function JoinedPairFieldForm({
       anatomy
     >
       <FieldLayout
-        hintPosition={hintPosition}
         wrapControl={false}
         chrome={chrome}
         size={size}
+        showMessageRegion={showLayoutMessage}
         label={<FormFieldLabel id={labelId} label={label} required={required} info={info} />}
         control={
           <JoinedPair.Root
@@ -175,6 +182,10 @@ export function JoinedPairFieldForm({
                 placeholder={start.placeholder}
                 hasError={startHasError}
                 describedBy={start.describedBy}
+                allowCustom={start.allowCustom}
+                clearable={start.clearable}
+                customMin={start.customMin}
+                customMax={start.customMax}
                 onValueChange={start.onChange}
                 onBlur={start.onBlur}
               />

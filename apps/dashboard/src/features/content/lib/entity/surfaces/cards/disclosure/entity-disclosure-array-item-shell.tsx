@@ -1,6 +1,6 @@
 import type { ArrayItemShellRenderProps } from '@rpg/ui/form'
 
-import type { ReactElement } from 'react'
+import type { ReactElement, ReactNode } from 'react'
 
 import type { EntitySummaryStatusItem } from '../../../summary/entity-summary-status.types'
 import { EntityCard } from '../content/entity-card'
@@ -15,6 +15,8 @@ export type EntityDisclosureArrayItemShellProps = ArrayItemShellRenderProps & {
   headingHref?: string
   /** Overrides default header.ariaLabel for disclosure controls. */
   toolbarAriaLabel?: string
+  /** Replaces the string summary when the meta line needs more than one InlineMetadata row. */
+  description?: ReactNode
   density?: 'compact' | 'comfortable'
 }
 
@@ -32,6 +34,7 @@ export function EntityDisclosureArrayItemShell({
   status,
   headingHref,
   toolbarAriaLabel,
+  description,
   collapsed,
   onToggleCollapse,
   dragHandleProps,
@@ -39,12 +42,13 @@ export function EntityDisclosureArrayItemShell({
   children,
   density = 'compact',
 }: EntityDisclosureArrayItemShellProps) {
-  const entity = projectArrayItemEntitySummary({
+  const projected = projectArrayItemEntitySummary({
     header,
     summary,
     classification,
     status,
   })
+  const entity = description !== undefined ? { ...projected, description } : projected
 
   return (
     <div data-array-item-prefix={itemPrefix}>

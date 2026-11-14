@@ -6,10 +6,13 @@ import {
 } from '../field-config'
 
 export const OPTIONAL_DISCLOSURE_IMPLEMENTED_KINDS = [
+  'text',
   'textarea',
   'select',
   'textSuggestions',
   'richtext',
+  'rollValue',
+  'joinedPair',
 ] as const
 export type OptionalDisclosureImplementedKind =
   (typeof OPTIONAL_DISCLOSURE_IMPLEMENTED_KINDS)[number]

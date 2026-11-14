@@ -2,7 +2,12 @@ import type { ContentTypeKey } from '../../primitives/content/content-type-keys'
 import { MONSTER_ACTION_SECTIONS } from '../monster/action-sections'
 
 /** Nested entry arrays (keyed by stable `id`) that may carry entry provenance. */
-export type ProvenanceEntryHostPath = 'actions' | 'bonusActions' | 'reactions' | 'traits'
+export type ProvenanceEntryHostPath =
+  | 'actions'
+  | 'bonusActions'
+  | 'reactions'
+  | 'legendaryActions'
+  | 'traits'
 
 /** Explicit opt-out when a duplicable type has no nested authored ids to regenerate. */
 export const noNestedRegenerationRequired = 'none' as const
@@ -105,6 +110,8 @@ export function readProvenanceHostEntries(
       return body.bonusActions
     case 'reactions':
       return body.reactions
+    case 'legendaryActions':
+      return body.legendaryActions
     case 'traits':
       return body.traits
   }
@@ -122,6 +129,8 @@ export function writeProvenanceHostEntries(
       return { ...body, bonusActions: entries }
     case 'reactions':
       return { ...body, reactions: entries }
+    case 'legendaryActions':
+      return { ...body, legendaryActions: entries }
     case 'traits':
       return { ...body, traits: entries }
   }

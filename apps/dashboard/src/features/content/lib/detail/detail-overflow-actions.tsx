@@ -43,6 +43,15 @@ export function detailOverflowDeleteAction(
   }
 }
 
+export function detailOverflowAvailabilityAction(onSelect: () => void): DetailOverflowAction {
+  return {
+    id: 'campaign-availability',
+    label: 'Campaign availability',
+    icon: <ActionIcon action="edit" size={OVERFLOW_MENU_ICON_STEP} />,
+    onSelect,
+  }
+}
+
 export function detailOverflowDuplicateAction(
   label: string,
   onSelect: () => void,

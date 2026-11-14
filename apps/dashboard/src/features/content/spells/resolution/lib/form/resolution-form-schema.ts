@@ -68,15 +68,33 @@ export const resolutionOutcomeFormItemSchema = z.object({
 
 export type ResolutionOutcomeFormItem = z.infer<typeof resolutionOutcomeFormItemSchema>
 
+const resolutionFormTargetProximitySchema = z.object({
+  kind: z.enum(RESOLUTION_PROXIMITY_KINDS),
+  distance: z
+    .object({
+      value: z.coerce.number().min(0),
+      unit: z.literal('ft').default('ft'),
+    })
+    .optional(),
+})
+
+export const resolutionFormTargetSchema = z.object({
+  count: z.coerce.number().int().min(1).default(1),
+  countKind: z.enum(RESOLUTION_TARGET_COUNT_KINDS).optional(),
+  kind: z.enum(RESOLUTION_TARGET_KINDS).default('creature-or-object'),
+  proximity: resolutionFormTargetProximitySchema,
+  requirements: z.array(z.record(z.string(), z.unknown())).optional(),
+})
+
+export type ResolutionFormTargetValues = z.infer<typeof resolutionFormTargetSchema>
+
+const resolutionFormRequirementRowSchema = z.record(z.string(), z.unknown())
+
 export const resolutionFormSchema = z
   .object({
     selectionMode: z.enum(RESOLUTION_SELECTION_MODES).default('targets'),
-    targetCount: z.coerce.number().int().min(1).default(1),
-    countKind: z.enum(RESOLUTION_TARGET_COUNT_KINDS).optional(),
-    targetKind: z.enum(RESOLUTION_TARGET_KINDS).default('creature-or-object'),
-    proximityKind: z.enum(RESOLUTION_PROXIMITY_KINDS).default('touch'),
-    proximityDistanceFt: z.coerce.number().min(0).optional(),
-    proximityReachDistanceFt: z.coerce.number().min(0).optional(),
+    target: resolutionFormTargetSchema.optional(),
+    occupantRequirements: z.array(resolutionFormRequirementRowSchema).optional(),
     originDistanceFt: z.coerce.number().min(0).optional(),
     areaOfEffect: areaGeometryFormSchema.optional(),
     methodKind: z.enum(RESOLUTION_METHOD_KINDS),

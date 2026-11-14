@@ -13,6 +13,10 @@ export {
   SlotFieldRenderer,
   type SlotFieldRendererProps,
 } from './containers/form-items.client'
+export {
+  AnatomyFieldRowCluster,
+  type AnatomyFieldRowClusterProps,
+} from './presentation/anatomy-field-row-cluster.client'
 export { FormFieldStack, type FormFieldStackProps } from './containers/form-field-stack.client'
 export {
   FieldNode,
@@ -151,6 +155,7 @@ export {
   applyOptionAvailabilityToFieldOptions,
   applyOptionAvailabilityToSelectOptions,
   flattenSelectFieldOptions,
+  filterSelectFieldOptionList,
   resolveSelectFieldConfigOptions,
   resolveSelectFieldFlatOptions,
   resolveSelectFieldDisplayLabel,
@@ -160,12 +165,14 @@ export {
   type FieldType,
   type FieldOption,
   type FieldOptionGroup,
+  type SelectOptionTrailing,
   type SelectFieldOptionListItem,
   isFieldOptionGroup,
   type FieldVisibility,
   type FieldOptionAvailability,
   type FieldDynamicHint,
   type FieldDynamicSelectOptions,
+  type FieldDynamicComboboxOptions,
   type FieldDynamicSuggestions,
   type FieldDerivedMeta,
   type FieldDerivedMetaConfig,
@@ -182,6 +189,8 @@ export {
   OPTIONAL_DISCLOSURE_FIELD_KINDS,
   type SelectFieldConfig,
   type RadioFieldConfig,
+  type SegmentedControlFieldConfig,
+  type FieldInteractivity,
   type CheckboxFieldConfig,
   type SwitchFieldConfig,
   type JsonFieldConfig,
@@ -246,6 +255,8 @@ export {
   type DependentConfig,
   type DependentDependentsConfig,
   type ArrayAddActionConfig,
+  type ArrayAddMenuConfig,
+  type ArrayAddMenuPresentationMap,
   type ArrayRelationshipAddAction,
   type ArrayItemConfig,
   type ArrayItemHeaderVisibility,
@@ -308,6 +319,7 @@ export {
   type DiceFormulaValue,
 } from '../components/ui/dice-formula-field.lib'
 export type { FieldSize } from '../components/ui/field.client'
+export type { ArrayResolveFieldsFn } from './config/array/array-resolve-fields.lib'
 export {
   makeFieldErrorMap,
   safeParseWithFieldErrors,
@@ -336,6 +348,7 @@ export {
   countInvalidArrayItems,
   indexArrayItemIssues,
   collectArraySections,
+  resolveSectionFieldOrder,
   resolveArrayItemFieldOrder,
   resolveIssueFocusControlId,
   resolveIssueFocusFieldName,
@@ -359,6 +372,8 @@ export {
   useDebouncedArrayItemValidationTrigger,
   useDebouncedArrayValidationTrigger,
 } from './hooks/use-form-validation-presentation.client'
+export { useFieldIssue, type FieldIssuePresentation } from './hooks/use-field-issue.client'
+export { useSlotIssues, type SlotIssuePresentation } from './context/slot-issue.context'
 export { useProgressiveFieldValidationTrigger } from './hooks/use-progressive-field-validation-trigger.client'
 export {
   flattenPatchToLeafSetValues,

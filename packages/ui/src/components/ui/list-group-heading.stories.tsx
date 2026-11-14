@@ -38,6 +38,11 @@ export const WithCount: Story = {
 }
 
 export const FollowsCompleteGroup: Story = {
+  args: {
+    label: 'Game terms',
+    count: 2,
+    first: true,
+  },
   render: () => (
     <>
       <ListGroupHeading label="Game terms" count={2} first />

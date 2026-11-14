@@ -6,4 +6,5 @@ export const MONSTER_DETAIL_SECTION_IDS = {
   actions: 'monster-actions-heading',
   bonusActions: 'monster-bonus-actions-heading',
   reactions: 'monster-reactions-heading',
+  legendaryActions: 'monster-legendary-actions-heading',
 } as const

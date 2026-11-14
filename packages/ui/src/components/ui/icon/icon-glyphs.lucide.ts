@@ -1,6 +1,7 @@
 import {
   ArrowDownUp,
   ArrowLeft,
+  ArrowLeftRight,
   ArrowRight,
   ArrowUpDown,
   Backpack,
@@ -117,6 +118,7 @@ import {
 export const LUCIDE_ICON_GLYPHS = {
   'arrow-down-up': ArrowDownUp,
   'arrow-left': ArrowLeft,
+  'arrow-left-right': ArrowLeftRight,
   'arrow-right': ArrowRight,
   'arrow-up-down': ArrowUpDown,
   backpack: Backpack,

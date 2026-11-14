@@ -4,7 +4,7 @@ import { isFieldOptionGroup } from '@rpg/ui/form'
 import { getSpellcastingAbilityFieldOptions } from './spellcasting-ability-field-options'
 
 describe('getSpellcastingAbilityFieldOptions', () => {
-  it('returns Common and Advanced ability groups', () => {
+  it('returns Common abilities and Other abilities groups', () => {
     const options = getSpellcastingAbilityFieldOptions()
 
     expect(options).toHaveLength(2)
@@ -17,14 +17,14 @@ describe('getSpellcastingAbilityFieldOptions', () => {
       throw new Error('expected grouped spellcasting ability options')
     }
 
-    expect(commonGroup.label).toBe('Common')
+    expect(commonGroup.label).toBe('Common abilities')
     expect(commonGroup.options.map((option) => option.label)).toEqual([
       'Intelligence',
       'Wisdom',
       'Charisma',
     ])
 
-    expect(advancedGroup.label).toBe('Advanced')
+    expect(advancedGroup.label).toBe('Other abilities')
     expect(advancedGroup.options.map((option) => option.label)).toEqual([
       'Strength',
       'Dexterity',

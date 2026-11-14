@@ -50,7 +50,7 @@ export type SpellFormCastingTime = {
 
 export type SpellFormRange = {
   kind: SpellRange['kind']
-  value?: { value: number }
+  value?: { value?: number; unit?: 'ft' | 'mi' }
   description?: string
 }
 
@@ -188,7 +188,7 @@ export function trySpellCastingTimeFromFormValues(
 export function spellRangeToFormValues(range: SpellRange): SpellFormRange {
   switch (range.kind) {
     case 'distance':
-      return { kind: range.kind, value: { value: range.value.value } }
+      return { kind: range.kind, value: { value: range.value.value, unit: range.value.unit } }
     case 'special':
       return { kind: range.kind, description: range.description }
     default:
@@ -201,7 +201,7 @@ export function spellRangeFromFormValues(range: SpellFormRange): SpellRange {
     case 'distance':
       return spellRangeSchema.parse({
         kind: 'distance',
-        value: { value: range.value?.value ?? 0, unit: 'ft' },
+        value: { value: range.value?.value, unit: range.value?.unit ?? 'ft' },
       })
     case 'special':
       return spellRangeSchema.parse({
@@ -306,7 +306,7 @@ export function trySpellRangeFromFormValues(
     range.kind === 'distance'
       ? {
           kind: 'distance',
-          value: { value: range.value?.value ?? 0, unit: 'ft' },
+          value: { value: range.value?.value, unit: range.value?.unit ?? 'ft' },
         }
       : range.kind === 'special'
         ? {
@@ -679,9 +679,10 @@ function spellDraftOptionalCastingBlock(persistedValues: Omit<SpellFormValues, '
           ),
         }
       : {}),
-    ...(persistedValues.range
-      ? { range: spellRangeFromFormValues(persistedValues.range as SpellFormRange) }
-      : {}),
+    ...(() => {
+      const range = trySpellRangeFromFormValues(persistedValues.range as SpellFormRange)
+      return range ? { range } : {}
+    })(),
     ...(persistedValues.duration
       ? { duration: spellDurationFromFormValues(persistedValues.duration as SpellFormDuration) }
       : {}),

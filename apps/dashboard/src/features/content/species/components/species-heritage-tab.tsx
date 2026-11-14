@@ -86,7 +86,13 @@ function HeritageScalarSection({
   onRemove: () => void
 }) {
   const scalarFields = useMemo(() => heritageScalarFields(formCtx), [formCtx])
-  const heritageLocked = isEmbeddedRowSystemLocked(heritage, formCtx.entityCatalogLayer)
+  const heritageOriginIds =
+    formCtx.entityCatalogLayer === 'system' && heritage?.id ? new Set([heritage.id]) : undefined
+  const heritageLocked = isEmbeddedRowSystemLocked(
+    heritage,
+    formCtx.entityCatalogLayer,
+    heritageOriginIds,
+  )
   const showRemovalAction = formCtx.entityCatalogLayer === 'homebrew' && !heritageLocked
 
   const { handleRemoveClick, removePending, removeError, dialogs } = useHeritageRemovalFlow({

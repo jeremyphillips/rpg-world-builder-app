@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
+import { standardFeet } from '../primitives/distance-presets'
 
 import { closedSetEnum, keysFromEntries, vocabEnumFromEntries } from './enum-schema'
 import { getTermSentenceForm } from './types'
@@ -102,10 +103,32 @@ export const speedFeetSchema = z.number().int().min(0)
  * Preset baseline movement speeds (in feet) shown as a select in authoring UIs.
  * 5-foot increments through 120 ft — covers common species and monster speeds.
  */
-export const MOVEMENT_SPEED_FEET = [
-  5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 105, 110, 115,
+export const MOVEMENT_SPEED_FEET = standardFeet(5, 120, 5) as unknown as readonly [
+  5,
+  10,
+  15,
+  20,
+  25,
+  30,
+  35,
+  40,
+  45,
+  50,
+  55,
+  60,
+  65,
+  70,
+  75,
+  80,
+  85,
+  90,
+  95,
+  100,
+  105,
+  110,
+  115,
   120,
-] as const
+]
 
 export type MovementSpeedFeet = (typeof MOVEMENT_SPEED_FEET)[number]
 
@@ -168,13 +191,14 @@ export function resolveCreatureMovement(entity: CreatureLikeMovement): MovementS
 
 /**
  * Dashboard detail/overview formatter (mode-labeled, readable).
+ * The default unit keeps existing species and overview copy. Stat blocks pass `ft.`.
  *
  * @example formatMovementDisplay({ walk: 30 }) // → "Walk 30 ft"
  * @example formatMovementDisplay({ walk: 30, fly: 60 }) // → "Walk 30 ft, Fly 60 ft"
  */
-export function formatMovementDisplay(speeds: MovementSpeeds): string {
+export function formatMovementDisplay(speeds: MovementSpeeds, unit: 'ft' | 'ft.' = 'ft'): string {
   return MOVEMENT_MODES.filter((mode) => speeds[mode] !== undefined)
-    .map((mode) => `${getMovementModeLabel(mode)} ${speeds[mode]} ft`)
+    .map((mode) => `${getMovementModeLabel(mode)} ${speeds[mode]} ${unit}`)
     .join(', ')
 }
 

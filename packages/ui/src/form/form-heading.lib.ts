@@ -53,8 +53,8 @@ export function resolveNamedGroupDepthAfterEntering(
 }
 
 /** Bridges structural tier to existing group legend size tokens. */
-export function resolveGroupLegendSize(tier: 'section' | 'subsection'): FieldGroupLegendSize {
-  return tier
+export function resolveGroupLegendSize(tier: FormHeadingTier): FieldGroupLegendSize {
+  return tier === 'section' ? 'section' : 'subsection'
 }
 
 export function isNonWhitespaceLabel(label: string | undefined): label is string {

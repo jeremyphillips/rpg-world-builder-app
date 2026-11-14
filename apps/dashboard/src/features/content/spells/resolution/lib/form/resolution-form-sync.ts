@@ -1,12 +1,22 @@
 import { applyResolutionStructuralCleanup } from '@rpg/contracts'
 import type { FormValueSync } from '@rpg/ui/form'
 
-import { resolutionFormToSelectionContext } from '../selection/resolution-selection-context.lib'
+import { buildResolutionTargetRequirementValueSyncs } from '../../../../lib/forms/fields/resolution-target-requirement-form-sync.lib'
+
+import {
+  resolutionFormToSelectionContext,
+  selectionCleanupPatchToFormPatch,
+} from '../selection/resolution-selection-context.lib'
 import { buildDefaultOutcomeFormSlots } from './resolution-outcome-slots.lib'
 import type { ResolutionFormValues } from './resolution-form-schema'
 import { RESOLUTION_FIELD_NAME } from './resolution-form-values'
 
-const RESOLUTION_SYNC_DEPENDS_ON = [`${RESOLUTION_FIELD_NAME}.proximityKind`] as const
+const RESOLUTION_SYNC_DEPENDS_ON = [
+  `${RESOLUTION_FIELD_NAME}.target.proximity.kind`,
+  `${RESOLUTION_FIELD_NAME}.methodKind`,
+  `${RESOLUTION_FIELD_NAME}.attackType`,
+  `${RESOLUTION_FIELD_NAME}.applicationPatternKind`,
+] as const
 
 function resolutionSlice(values: Record<string, unknown>): ResolutionFormValues | undefined {
   const resolution = values[RESOLUTION_FIELD_NAME]
@@ -28,7 +38,7 @@ export function applyResolutionFormStructuralCleanup(
   return {
     [RESOLUTION_FIELD_NAME]: {
       ...resolution,
-      ...patch,
+      ...selectionCleanupPatchToFormPatch(patch, resolution),
     },
   }
 }
@@ -45,21 +55,17 @@ function applyDefaultOutcomesWhenMissing(
 }
 
 /** Pass to `<Form valueSyncs={…}>` on spell create/edit routes. */
+const resolutionRequirementPaths = [
+  `${RESOLUTION_FIELD_NAME}.target.requirements`,
+  `${RESOLUTION_FIELD_NAME}.occupantRequirements`,
+] as const
+
 export const resolutionFormValueSyncs: FormValueSync[] = [
+  ...buildResolutionTargetRequirementValueSyncs(resolutionRequirementPaths),
   {
-    dependsOn: [
-      `${RESOLUTION_FIELD_NAME}.proximityKind`,
-      `${RESOLUTION_FIELD_NAME}.methodKind`,
-      `${RESOLUTION_FIELD_NAME}.attackType`,
-      `${RESOLUTION_FIELD_NAME}.applicationPatternKind`,
-    ],
+    dependsOn: [...RESOLUTION_SYNC_DEPENDS_ON],
     apply: (values, changedKeys) => {
-      const resolutionKeys = [
-        `${RESOLUTION_FIELD_NAME}.proximityKind`,
-        `${RESOLUTION_FIELD_NAME}.methodKind`,
-        `${RESOLUTION_FIELD_NAME}.attackType`,
-        `${RESOLUTION_FIELD_NAME}.applicationPatternKind`,
-      ]
+      const resolutionKeys = [...RESOLUTION_SYNC_DEPENDS_ON]
       if (!changedKeys.some((key) => resolutionKeys.includes(key))) return undefined
       return applyResolutionFormStructuralCleanup(values)
     },

@@ -1,9 +1,7 @@
+import { MEASURED_RANGE_FEET } from '@rpg/contracts'
 import type { FormItem, InlineSentenceFieldConfig } from '@rpg/ui/form'
 
-import {
-  feetInputUnitField,
-  SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
-} from '../../../../lib/forms/fields/content-identity-form-fields'
+import { distanceJoinedPairField } from '../../../../lib/forms/fields/content-distance-form-fields'
 import {
   RESOLUTION_FIELD_LABELS,
   resolutionCountKindOptions,
@@ -71,13 +69,22 @@ function resolutionDistanceTargetField(): InlineSentenceFieldConfig {
       targetKindSegment(),
       { kind: 'text', value: 'within', tone: 'label' },
       {
-        kind: 'number',
-        name: `${RESOLUTION_PREFIX}.proximityDistanceFt`,
-        min: 0,
-        digits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
+        kind: 'joinedPair',
         ariaLabel: RESOLUTION_FIELD_LABELS.proximityDistance,
+        start: {
+          kind: 'select',
+          name: `${RESOLUTION_PREFIX}.proximityDistanceFt`,
+          options: MEASURED_RANGE_FEET.map((feet) => ({ value: feet, label: String(feet) })),
+          digits: 3,
+          allowCustom: true,
+          ariaLabel: RESOLUTION_FIELD_LABELS.proximityDistance,
+        },
+        end: {
+          kind: 'label',
+          text: 'ft.',
+          ariaLabel: 'Distance unit',
+        },
       },
-      { kind: 'text', value: 'feet', tone: 'label' },
     ],
   }
 }
@@ -90,16 +97,15 @@ export function resolutionTargetFormFields(): FormItem[] {
     resolutionTouchTargetField(),
     resolutionReachTargetField(),
     resolutionDistanceTargetField(),
-    feetInputUnitField(
-      `${RESOLUTION_PREFIX}.proximityReachDistanceFt`,
-      RESOLUTION_FIELD_LABELS.proximityReachDistance,
-      {
-        valueDigits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
-        width: 'auto',
-        visibility: visibleWhenProximityKind('reach'),
-        hint: 'Optional explicit reach distance in feet. Omit to use the caster’s default reach.',
-      },
-    ),
+    distanceJoinedPairField({
+      amountName: `${RESOLUTION_PREFIX}.proximityReachDistanceFt`,
+      label: RESOLUTION_FIELD_LABELS.proximityReachDistance,
+      presets: MEASURED_RANGE_FEET,
+      allowCustom: true,
+      clearable: true,
+      visibility: visibleWhenProximityKind('reach'),
+      hint: 'Optional explicit reach distance in feet. Omit to use the caster’s default reach.',
+    }),
     {
       type: 'number',
       name: `${RESOLUTION_PREFIX}.targetCount`,
@@ -118,17 +124,15 @@ export function resolutionTargetFormFields(): FormItem[] {
       width: 'md',
       visibility: combineFieldVisibility(targetsMode, visibleWhenCountKindEditable()),
     },
-    feetInputUnitField(
-      `${RESOLUTION_PREFIX}.originDistanceFt`,
-      RESOLUTION_FIELD_LABELS.originDistance,
-      {
-        valueDigits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
-        width: 'auto',
-        required: true,
-        visibility: visibleWhenSelectionMode('point'),
-        hint: 'Distance within which the caster selects the origin point.',
-      },
-    ),
+    distanceJoinedPairField({
+      amountName: `${RESOLUTION_PREFIX}.originDistanceFt`,
+      label: RESOLUTION_FIELD_LABELS.originDistance,
+      presets: MEASURED_RANGE_FEET,
+      allowCustom: true,
+      required: true,
+      visibility: visibleWhenSelectionMode('point'),
+      hint: 'Distance within which the caster selects the origin point.',
+    }),
   ]
 }
 

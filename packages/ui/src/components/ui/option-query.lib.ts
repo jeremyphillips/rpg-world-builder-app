@@ -1,10 +1,21 @@
 import { matchSearchDocumentQuery, scoreSearchDocument, type SearchDocument } from '@rpg/search'
 
+import {
+  buildPickerSearchFields,
+  mapPickerFieldsToSearchDocument,
+  resolveIncludeSupportingForCombobox,
+  type PickerSearchOptions,
+} from '../../lib/picker-search.lib'
+
+export type { PickerSearchOptions }
+
 export interface LabelValueMetadataOption {
   label: string
   value: string
   metadata?: string
   searchTerms?: readonly string[]
+  aliases?: readonly string[]
+  search?: PickerSearchOptions
 }
 
 const COMBOBOX_SEARCH_PROFILE = 'forgiving' as const
@@ -13,20 +24,16 @@ const COMBOBOX_SEARCH_PROFILE = 'forgiving' as const
 export function assembleComboboxOptionSearchDocument(
   option: LabelValueMetadataOption,
 ): SearchDocument {
-  const fields = [
-    { key: 'label', text: option.label, role: 'primary' as const },
-    { key: 'value', text: option.value, role: 'keyword' as const },
-    ...(option.metadata
-      ? [{ key: 'metadata', text: option.metadata, role: 'secondary' as const }]
-      : []),
-    ...(option.searchTerms?.map((term, index) => ({
-      key: `searchTerm-${index}`,
-      text: term,
-      role: 'keyword' as const,
-    })) ?? []),
-  ]
+  const fields = buildPickerSearchFields({
+    label: option.label,
+    supportingText: option.metadata,
+    searchTerms: option.searchTerms,
+    aliases: option.aliases,
+    includeSupporting: resolveIncludeSupportingForCombobox(option.search, Boolean(option.metadata)),
+    valueSlug: option.value,
+  })
 
-  return { id: option.value, fields }
+  return mapPickerFieldsToSearchDocument(option.value, fields)
 }
 
 export function optionMatchesQuery(option: LabelValueMetadataOption, query: string): boolean {

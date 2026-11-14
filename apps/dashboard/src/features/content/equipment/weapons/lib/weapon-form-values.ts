@@ -21,9 +21,9 @@ type WeaponInput = Extract<CreateEquipmentInput, { kind: 'weapon' }>
 
 export function damageToForm(
   damage: WeaponDamage | undefined,
-): Pick<WeaponEquipmentFormValues, 'hasDamage' | 'damage'> {
-  if (!damage) return { hasDamage: false }
-  return { hasDamage: true, damage: rollToFormShape(damage) }
+): Pick<WeaponEquipmentFormValues, 'damage'> {
+  if (!damage) return {}
+  return { damage: rollToFormShape(damage) }
 }
 
 export function weaponFormValuesFromEntity(
@@ -32,14 +32,12 @@ export function weaponFormValuesFromEntity(
   WeaponEquipmentFormValues,
   | 'category'
   | 'mode'
-  | 'hasDamage'
   | 'damage'
   | 'damageType'
   | 'versatileDamage'
   | 'properties'
   | 'mastery'
-  | 'rangeNormal'
-  | 'rangeLong'
+  | 'range'
   | 'specialRules'
 > {
   return {
@@ -52,14 +50,12 @@ export function weaponFormValuesFromEntity(
       : undefined,
     properties: item.properties,
     mastery: item.mastery,
-    rangeNormal: item.range?.normal,
-    rangeLong: item.range?.long,
+    range: item.range,
     specialRules: item.specialRules,
   }
 }
 
 function damageFromForm(values: EquipmentInputBuildCtx<'weapon'>['values']): WeaponInput['damage'] {
-  if (!values.hasDamage) return undefined
   return normalizeRollFormValue(values.damage as RollFormShape | undefined)
 }
 
@@ -92,11 +88,12 @@ function optionalVersatileDamage(
 function optionalWeaponRange(
   values: EquipmentInputBuildCtx<'weapon'>['values'],
 ): Partial<WeaponInput> {
-  if (values.rangeNormal === undefined) return {}
+  const range = values.range
+  if (range?.normal === undefined) return {}
   return {
     range: {
-      normal: values.rangeNormal,
-      ...(values.rangeLong !== undefined && { long: values.rangeLong }),
+      normal: range.normal,
+      ...(range.long !== undefined && { long: range.long }),
     },
   }
 }

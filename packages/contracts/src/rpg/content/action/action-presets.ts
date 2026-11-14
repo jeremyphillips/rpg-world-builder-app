@@ -13,7 +13,7 @@ import { RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID } from '../lib/resolution/schema'
 export type ActionPresetDcSource =
   | { kind: 'ability'; ability: Ability; proficient: boolean }
   | {
-      kind: 'spell'
+      kind: 'spellcasting'
       castingAbility: { kind: 'ability'; ability: Ability } | { kind: 'shared'; entryId: string }
     }
 
@@ -56,7 +56,8 @@ type SavingThrowPreset = {
     resolution: EffectResolution
     dcSource: ActionPresetDcSource
     limitedUse?: { kind: 'recharge'; minRoll: number }
-    suggestedName: string
+    /** Printed default when it differs from the vocabulary label. Not copied onto actions. */
+    defaultName?: string
   }
 }
 
@@ -155,7 +156,7 @@ export const ACTION_PRESET_ENTRIES = {
       resolution: BREATH_WEAPON_RESOLUTION,
       dcSource: { kind: 'ability', ability: 'con', proficient: true },
       limitedUse: { kind: 'recharge', minRoll: 5 },
-      suggestedName: 'Fire Breath',
+      defaultName: 'Fire Breath',
     },
   },
   constrict: {
@@ -165,7 +166,6 @@ export const ACTION_PRESET_ENTRIES = {
     defaults: {
       resolution: CONSTRICT_RESOLUTION,
       dcSource: { kind: 'ability', ability: 'str', proficient: true },
-      suggestedName: 'Constrict',
     },
   },
   multiattack: {
@@ -184,6 +184,14 @@ export const ACTION_PRESET_IDS = Object.keys(ACTION_PRESET_ENTRIES) as [
 
 export function getActionPreset(id: string): ActionPreset | undefined {
   return ACTION_PRESET_ENTRIES[id as ActionPresetId]
+}
+
+/** Printed default for a preset. Vocabulary label, unless the preset defines `defaultName`. */
+export function actionPresetDefaultName(preset: ActionPreset): string | undefined {
+  if (preset.mechanics === 'saving-throw' && preset.defaults.defaultName) {
+    return preset.defaults.defaultName
+  }
+  return getActionVocabularyEntry(preset.vocabularyId)?.label
 }
 
 function presetVocabularyGroup(presetId: ActionPresetId): ActionGroup | undefined {

@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import { getSenseEntry } from '@rpg/contracts'
+
 import { GRANT_TYPES } from './grant-form-schema'
 import { buildGrantArrayAddMenu } from './grant-add-menu.lib'
 import { getGrantTemplateById } from './grant-template-registry'
@@ -28,16 +30,16 @@ describe('buildGrantArrayAddMenu', () => {
     expect(menu.items.map((item) => item.groupId)).toEqual(['character-options', 'combat-traits'])
   })
 
-  it('builds weighted search terms from template metadata and vocab refs', () => {
+  it('exposes string discovery fields from template metadata and vocab refs', () => {
     const menu = buildGrantArrayAddMenu(['senses'])
     const senseItem = menu.items.find((item) => item.id === 'special-sense')
 
-    expect(senseItem?.searchTerms).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ text: 'Special sense', role: 'label', weight: 1 }),
-        expect.objectContaining({ text: 'darkvision', role: 'alias', weight: 1 }),
-        expect.objectContaining({ text: 'Darkvision', role: 'label', weight: 0.8 }),
-      ]),
+    expect(senseItem?.aliases).toEqual(
+      expect.arrayContaining(['darkvision', 'blindsight', 'tremorsense', 'truesight']),
     )
+    expect(senseItem?.searchTerms).toEqual(
+      expect.arrayContaining(['sense', 'vision', getSenseEntry('darkvision')!.label]),
+    )
+    expect(senseItem?.description).toBe(getGrantTemplateById('special-sense')?.description)
   })
 })

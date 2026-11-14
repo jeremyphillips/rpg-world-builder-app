@@ -16,32 +16,37 @@ import { SpellResolutionProximitySelect } from '../../components/target/spell-re
 import { ResolutionSelectionModeSelect } from '../../components/target/spell-resolution-selection-mode-select'
 import { SpellResolutionSelectionHints } from '../../components/target/spell-resolution-selection-hints'
 import { deriveDefaultEffectRecipient, type ResolutionTargetKind } from '@rpg/contracts'
+import { buildActiveCreatureTypeFieldOptions } from '@/features/vocabulary'
+
+import {
+  resolutionOccupantRequirementsFields,
+  resolutionTargetAuthoringFields,
+} from '../../../../lib/forms/fields/resolution-target-authoring-fields'
 import { formatEffectRowPrimary, formatEffectRowSummary } from '../../../lib/effects/effect-display'
 import { resolutionEffectItemFields } from '../effects/resolution-effect-form-fields'
 import { resolutionSelectionContextFromWatched } from '../selection/resolution-selection-context.lib'
 import { RESOLUTION_FIELD_LABELS, RESOLUTION_SECTION_LABELS } from './resolution-form-labels'
 import {
   combineFieldVisibility,
+  visibleWhenAreaSelectionMode,
   visibleWhenResolutionConfigured,
+  visibleWhenSelectionMode,
   visibleWhenSelectionModeIsOneOf,
 } from './resolution-form-visibility'
 import { RESOLUTION_FIELD_NAME } from './resolution-form-values'
-import {
-  resolutionTargetFormFields,
-  visibleWhenApplicationPatternKind,
-} from './resolution-target-form-fields'
+import { visibleWhenApplicationPatternKind } from './resolution-target-form-fields'
 import { areaGeometryFormFields } from '../../../../lib/forms/fields/area-geometry-form-fields'
 
 const RESOLUTION_PREFIX = RESOLUTION_FIELD_NAME
 
 const RESOLUTION_SUMMARY_DEPENDS_ON = [
   `${RESOLUTION_PREFIX}.selectionMode`,
-  `${RESOLUTION_PREFIX}.countKind`,
+  `${RESOLUTION_PREFIX}.target.countKind`,
   `${RESOLUTION_PREFIX}.areaOfEffect.shape`,
   `${RESOLUTION_PREFIX}.originDistanceFt`,
-  `${RESOLUTION_PREFIX}.proximityKind`,
-  `${RESOLUTION_PREFIX}.targetKind`,
-  `${RESOLUTION_PREFIX}.targetCount`,
+  `${RESOLUTION_PREFIX}.target.proximity.kind`,
+  `${RESOLUTION_PREFIX}.target.kind`,
+  `${RESOLUTION_PREFIX}.target.count`,
   `${RESOLUTION_PREFIX}.methodKind`,
   `${RESOLUTION_PREFIX}.attackType`,
 ] as const
@@ -187,6 +192,8 @@ export function resolutionOutcomeBranchesFields(): FormItem[] {
 /** Slot-backed and grouped fields shown when resolution is configured. */
 export function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
   const configured = visibleWhenResolutionConfigured()
+  const creatureTypeOptions = buildActiveCreatureTypeFieldOptions(ctx.creatureTypeVocabulary)
+  const targetsMode = visibleWhenSelectionMode('targets')
 
   return [
     // Dialogs/notices mount here so they share form context but stay out of the layout flow.
@@ -218,16 +225,33 @@ export function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
           render: () => createElement(SpellResolutionSelectionHints),
         },
         {
-          kind: 'slot',
-          name: '_resolutionProximitySelect',
-          render: () => createElement(SpellResolutionProximitySelect),
+          kind: 'group',
+          legend: 'Targeting',
+          visibility: targetsMode,
+          fields: [
+            {
+              kind: 'slot',
+              name: '_resolutionProximitySelect',
+              render: () => createElement(SpellResolutionProximitySelect),
+            },
+            ...resolutionTargetAuthoringFields({
+              prefix: `${RESOLUTION_PREFIX}.target`,
+              creatureTypeOptions,
+              externalProximitySelect: true,
+              sentenceStyle: 'spell',
+            }),
+          ],
         },
-        ...resolutionTargetFormFields(),
         ...areaGeometryFormFields({
           fieldPrefix: `${RESOLUTION_PREFIX}.areaOfEffect`,
           legend: RESOLUTION_FIELD_LABELS.areaOfEffect,
           shapeHint: 'Mechanical area geometry for resolution preview and execution.',
           visibility: visibleWhenSelectionModeIsOneOf('self', 'point'),
+        }),
+        ...resolutionOccupantRequirementsFields({
+          requirementsPath: `${RESOLUTION_PREFIX}.occupantRequirements`,
+          creatureTypeOptions,
+          visibility: visibleWhenAreaSelectionMode(),
         }),
       ],
     },

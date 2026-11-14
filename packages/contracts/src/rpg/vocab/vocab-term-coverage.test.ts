@@ -74,8 +74,13 @@ import { PROFICIENCY_BONUS_TERM } from './mechanics/proficiency-bonus'
 import { PASSIVE_PERCEPTION_TERM } from './mechanics/passive-perception'
 import { TELEPATHY_TERM } from './mechanics/telepathy'
 import { SAVING_THROW_TERM } from './mechanics/saving-throw'
+import { MOVEMENT_ALLOWANCE_TERM } from './movement-allowance'
 import { MOVEMENT_MODE_TERM, MOVEMENT_OPERATION_TERM } from './movement-mode'
 import { ACTION_GROUP_TERM, ACTION_VOCABULARY_TERM } from './action/action-vocabulary'
+import {
+  CREATURE_TRAIT_GROUP_TERM,
+  CREATURE_TRAIT_VOCABULARY_TERM,
+} from './creature/trait-vocabulary'
 import { NATURAL_ATTACK_FORM_TERM } from './action/natural-attack-form'
 import { PROFICIENCY_TERM } from './proficiency'
 import { SENSE_TERM } from './sense'
@@ -84,6 +89,7 @@ import { CASTING_TIME_UNIT_TERM } from './spell/casting-time'
 import { SPELL_COMPONENT_TERM } from './spell/components'
 import { SPELL_DELIVERY_METHOD_TERM } from './spell/delivery-method'
 import { DURATION_UNIT_TERM } from './spell/duration'
+import { TIME_UNIT_TERM } from './time-unit'
 import { SPELL_FUNCTION_TAG_TERM } from './spell/function-tag'
 import { SPELL_GRANT_AVAILABILITY_TERM } from './spell/grant-availability'
 import { SPELL_RANGE_KIND_TERM } from './spell/range'
@@ -118,6 +124,7 @@ const RPG_VOCAB_CLOSED_TERMS = [
   REQUIREMENT_CONDITION_TYPE_TERM,
   FEAT_PART_TERM,
   LANGUAGE_CATEGORY_TERM,
+  MOVEMENT_ALLOWANCE_TERM,
   MOVEMENT_MODE_TERM,
   MOVEMENT_OPERATION_TERM,
   PROFICIENCY_TERM,
@@ -146,6 +153,7 @@ const RPG_VOCAB_CLOSED_TERMS = [
   SPELL_COMPONENT_TERM,
   SPELL_DELIVERY_METHOD_TERM,
   DURATION_UNIT_TERM,
+  TIME_UNIT_TERM,
   SPELL_FUNCTION_TAG_TERM,
   SPELL_GRANT_AVAILABILITY_TERM,
   SPELL_RANGE_KIND_TERM,
@@ -163,6 +171,8 @@ const RPG_VOCAB_CLOSED_TERMS = [
   NPC_WEALTH_TIER_TERM,
   ACTION_GROUP_TERM,
   ACTION_VOCABULARY_TERM,
+  CREATURE_TRAIT_GROUP_TERM,
+  CREATURE_TRAIT_VOCABULARY_TERM,
   NATURAL_ATTACK_FORM_TERM,
   RESOLUTION_APPLICATION_AMOUNT_TERM,
   RESOLUTION_METHOD_KIND_TERM,
@@ -233,7 +243,7 @@ function expectVocabularyTerm(term: VocabularyTerm): void {
 
 describe('rpg/vocab term coverage', () => {
   it('defines closed vocab terms for every *_ENTRIES map', () => {
-    expect(RPG_VOCAB_CLOSED_TERMS).toHaveLength(65)
+    expect(RPG_VOCAB_CLOSED_TERMS).toHaveLength(69)
     for (const term of RPG_VOCAB_CLOSED_TERMS) {
       expectVocabularyTerm(term)
     }

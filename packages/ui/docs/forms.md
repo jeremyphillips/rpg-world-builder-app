@@ -101,7 +101,9 @@ editors that render via `FormItems` + `namePrefix` must also supply matching
 `resolverFields` on the tab — same `FormItem` shapes with **full** RHF paths
 (`heritage.name`, `traits`, `characterCreation.levelLimits.classLevelCaps`, …).
 These configs are **not rendered**; they exist solely so tier-1 validation copy uses
-field labels instead of Zod defaults.
+field labels instead of Zod defaults. A `kind: 'slot'` or array container labels
+only its own path. A nested issue uses a registered descendant, or the unlabeled
+catalog (`Required.` / `Add at least one item.`) when nothing is registered.
 
 Pair `resolverFields` with `errorPaths` on header-only tabs: `errorPaths` drives tab
 badges and the footer summary; `resolverFields` drives inline message copy.
@@ -183,12 +185,16 @@ Centralized in `Field.Root` context:
 
 **Hint vs error.** Hints are guidance; errors are validation. Never encode required-ness as a hint.
 
+Adapters resolve effective hint presentation once. `Field.Root` stores that `hintPosition`. `FieldLayout`, `Field.Hint`, and `aria-describedby` read it. Do not pass a second position into `FieldLayout`.
+
 | `hintPosition`          | Role                                   | When invalid                                   |
 | ----------------------- | -------------------------------------- | ---------------------------------------------- |
 | `below-label` (default) | Description / guidance under the label | Stays visible; error renders under the control |
 | `below-control`         | Supporting text under the control      | Replaced by the field error (same slot)        |
 
-**Hint placement.** `hintPosition`: `below-label` (default) or `below-control`.
+**Who owns what.** Zod and React Hook Form own whether a value is invalid and the message text. `useFieldErrorPresentation` owns whether that message is visible. `resolveFieldHintPresentation` owns hint text. Inside an anatomy row, `resolveRowAwareFieldHintPresentation` forces `below-control` (settings rows keep `below-label`) before the adapter creates `Field.Root`. `Field.Root` owns the stored position, message ids, and `aria-describedby`: a below-label hint stays linked beside the error id; a below-control hint yields to the error id only. `FieldLayout` owns which region renders the hint. `Field.Hint` hides a below-control hint while an error is visible. Fieldset shells (`ChooseCountFieldShell`, chips outside a row) are the other single-position path: one `hintPosition` drives the legend, the message region, and `resolveFieldDescribedBy`.
+
+**Hint placement.** `hintPosition`: `below-label` (default) or `below-control`. Pass it on the field adapter or `Field.Root`, not on `FieldLayout`.
 
 ### Field recommendations
 
@@ -200,7 +206,7 @@ placement band: **below label/hint, above the control**. Cardinality does not ch
 Pass `recommendation` on [`FormField`](../../packages/ui/src/components/ui/form-field.tsx),
 [`FieldLayout`](../../packages/ui/src/components/ui/field-layout.tsx), leaf wrappers such as
 [`ComboboxField`](../../packages/ui/src/components/ui/combobox-field.client.tsx), or schema-driven
-combobox fields via `recommendation` / `recommendationResolve` on [`ComboboxFieldConfig`](../../packages/ui/src/form/field-config.ts).
+combobox fields via `recommendation` / `recommendationResolve` on [`ComboboxFieldConfig`](../../packages/ui/src/form/field-config/choice-fields.types.ts).
 
 ```ts
 type FieldLayoutRecommendation = FieldRecommendation | FieldRecommendationGroup
@@ -288,8 +294,12 @@ Simple leaf types (`text`, `number`, `checkbox`, …) do not need helpers.
 `form-group`, `form-stack`, `form-columns`. Snippet comments reference inventory const names (`FIELD_WIDTHS`,
 `SEMANTIC_SURFACE_TONES`) — import from `@rpg/ui/form` when using those tokens in code.
 
-JSDoc on complex configs in [field-config.ts](../src/form/field-config.ts) documents
+JSDoc on complex configs in [field-config/](../src/form/field-config/) documents
 common options, defaults, and allowed values — especially `ArrayConfig.item.surface`.
+
+Layer map (imports flow one way): `field-options`, `field-visibility`, `field-dynamic.types`,
+`field-base.types` → leaf `*.types.ts` + `field-config.types` → `form-item.types` → runtime
+`*.lib.ts` → `index.ts` barrel.
 
 ### Vocabularies and hover documentation
 
@@ -330,7 +340,9 @@ Collapsible sections, separators, nested groups: [containers.md](./forms/contain
 Rich text, combobox, editable grid, dice formula, chips, input unit/select, etc.:
 [field-types.md](./forms/field-types.md).
 
-Config union source of truth: [field-config.ts](../src/form/field-config.ts).
+Config union source of truth: [field-config/](../src/form/field-config/) (`FieldConfig` in
+[`field-config.types.ts`](../src/form/field-config/field-config.types.ts); barrel
+[`index.ts`](../src/form/field-config/index.ts) preserves `./field-config` imports).
 
 ## Validation — contracts-first
 
@@ -368,6 +380,32 @@ English defaults. See `field-error-map-fixture.stories.tsx` for a synthetic form
 covering each edge case. Tiers, naming, and copy style →
 [packages/contracts/docs/validation-messages.md](../../contracts/docs/validation-messages.md).
 
+### Issue routing (`prepareFormIssues`)
+
+Every Zod issue is routed to exactly one **claim** before controls read it. Registry
+entries have a role: `control` (bound field), `slotOwner` (a slot that declares
+`issuePaths`), `hostSlot` (a slot with no issue paths), or `array` (the array
+container). Lookup tries each concrete array index before the `*` key.
+
+Claim order: exact `control` or `slotOwner` → slot `issuePaths` ownership → ancestor
+or descendant `control` / `slotOwner` → row → form. An array root claims only an
+issue on its own path (`too_small`). Host slots never claim descendants. An issue
+on an unregistered object uses the first descendant control's label. Roll and
+dice atoms are label-only, so `dice.count` and `dice.faces` both claim the roll
+control.
+
+Tab badges, row badges, array legends, and the tabbed error summary all count
+**distinct claim targets**. A control shows a message only when routing claimed
+that path.
+
+- `useFieldIssue` / `useSlotIssues` — routed messages for leaves and slots.
+- `ArrayItemConfig.resolveFields` — per-row field trees for master-detail badges,
+  `makeFieldErrorMap`, and routing (heterogeneous array rows).
+- `collectIssueClaimReport` — publish/draft claim audits in tests (`allowFormIssueRoutingFallback`
+  opts out of the Vitest non-control guard). `expectIssuesClaimedByControls` fails
+  when a field-severity issue does not land on a `control`, a `slotOwner`, or the
+  array path that owns that issue.
+
 ### Field copy — placeholders and instructions
 
 Linguistic templates (`Choose …`, choice-count hints) live in
@@ -396,12 +434,12 @@ dashboard form modules — set `digits` on narrow selects or `presentation: 'com
 
 Co-located form tests import helpers from `@rpg/ui/form/test-utils`:
 
-| Helper                                                          | Purpose                                                                                       |
-| --------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| `assertFieldPathsRegistered(fields)`                            | Every `flattenFields` leaf path resolves in the error-map registry                            |
-| `assertRegistryCoverage(schema, fields, opts?)`                 | Schema leaf paths are registered (use `exemptPaths` for slug, slot tabs, grant unions)        |
-| `assertInvalidSubmitUsesRefinedMessages(schema, fields, opts?)` | Invalid payloads produce no Zod-default copy; optional `catchAllWhitelist` / `unionWhitelist` |
-| `expectNoDefaultZodMessages(messages)`                          | Standalone detector for `Invalid input`, `Too small:`, etc.                                   |
+| Helper                                                          | Purpose                                                                                |
+| --------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `assertFieldPathsRegistered(fields)`                            | Every `flattenFields` leaf path resolves in the error-map registry                     |
+| `assertRegistryCoverage(schema, fields, opts?)`                 | Schema leaf paths are registered (use `exemptPaths` for slug, slot tabs, grant unions) |
+| `assertInvalidSubmitUsesRefinedMessages(schema, fields, opts?)` | Invalid payloads produce no Zod-default copy; optional `catchAllWhitelist`             |
+| `expectNoDefaultZodMessages(messages)`                          | Standalone detector for `Invalid input`, `Too small:`, etc.                            |
 
 Pass a targeted `invalidValue` when `{}` parses successfully or triggers unrelated
 paths (tabbed forms, equipment kinds). Master-detail sub-forms (trait rows,
@@ -529,6 +567,16 @@ request are **not** guaranteed — API idempotency keys remain a separate safegu
 />
 ```
 
+## Default kinds
+
+A displayed suggestion, a rules fallback, and a stored value are different.
+
+- **Authored values** are in React Hook Form before the control mounts. Create them on the entity or row. Do not wait for the field to mount, and do not refill a value the author cleared.
+- **Rules-derived values** stay out of the form until the author chooses one. Readers use the shared rules resolver. A select may show that fallback as a `placeholder`. Mounting the control does not store it. Choosing the same number does store it.
+- **Presentation suggestions** are placeholders or an explicit action such as Add dice. `rollValue` does not write `defaultCount` / `defaultFaces` into `defaultValues` or into form state on render. Optional rolls with no stored dice show Add dice. Required rolls always show count and faces editors with empty placeholders until the author sets values.
+
+Weapon damage rolls and spell effect rolls still use that display contract. Seeding those rows at creation is a follow-up. Closed optional disclosures stay absent until their add action runs `seedWhen`.
+
 ## The RHF boundary
 
 **Primitives never import `react-hook-form`.** They take `error?: string` and standard
@@ -561,12 +609,12 @@ Runnable recipes beat copying from docs. Start at `Forms/Form`, `Forms/TabbedFor
 
 ## Further reading
 
-| Doc                                                    | Contents                                              |
-| ------------------------------------------------------ | ----------------------------------------------------- |
-| [field-types.md](./forms/field-types.md)               | richtext, combobox, editableGrid, chips, inputUnit, … |
-| [containers.md](./forms/containers.md)                 | group, row, columns, stack, array, slot               |
-| [heading-hierarchy.md](./forms/heading-hierarchy.md)   | heading tiers, labelVisibility, migration notes       |
-| [sizing-and-spacing.md](./forms/sizing-and-spacing.md) | size, width, digits, rhythm tokens                    |
-| [patterns.md](./forms/patterns.md)                     | TabbedForm chrome, FormCard, wizard, Storybook index  |
-| [field-config.ts](../src/form/field-config.ts)         | Config types (source of truth)                        |
-| [README.md](../README.md)                              | Package overview, wizard pattern                      |
+| Doc                                                    | Contents                                               |
+| ------------------------------------------------------ | ------------------------------------------------------ |
+| [field-types.md](./forms/field-types.md)               | richtext, combobox, editableGrid, chips, inputUnit, …  |
+| [containers.md](./forms/containers.md)                 | group, row, columns, stack, array, slot                |
+| [heading-hierarchy.md](./forms/heading-hierarchy.md)   | heading tiers, labelVisibility, migration notes        |
+| [sizing-and-spacing.md](./forms/sizing-and-spacing.md) | size, width, digits, rhythm tokens                     |
+| [patterns.md](./forms/patterns.md)                     | TabbedForm chrome, FormCard, wizard, Storybook index   |
+| [field-config/](../src/form/field-config/)             | Config types — primitives → leaves → containers → libs |
+| [README.md](../README.md)                              | Package overview, wizard pattern                       |

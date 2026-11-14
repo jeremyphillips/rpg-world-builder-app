@@ -2,7 +2,7 @@ import {
   isFieldOptionGroup,
   type FieldOption,
   type SelectFieldOptionListItem,
-} from '../../form/field-config'
+} from '../../form/field-config/field-options'
 import { cn } from '../../lib/utils'
 import { fieldWidthVariants, type FieldWidth } from './field-control.variants'
 

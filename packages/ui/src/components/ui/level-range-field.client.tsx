@@ -12,8 +12,8 @@ import { resolveFieldAnatomyWidth, type FieldChrome } from './field-chrome.varia
 import type { FieldLabelVisibility } from '../../form/form-heading.lib'
 import { FormFieldLabel } from '../../form/presentation/form-field-label.client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select.client'
-import type { FieldOption } from '../../form/field-config'
-import { flattenSelectFieldOptions } from '../../form/field-config'
+import type { FieldOption } from '../../form/field-config/field-options'
+import { flattenSelectFieldOptions } from '../../form/field-config/field-options'
 import { InlineSentenceConnector, InlineSentenceRow } from './inline-sentence-row'
 
 export interface LevelRangeFieldProps {
@@ -89,6 +89,7 @@ export function LevelRangeField({
       id={id}
       error={error}
       hint={hint}
+      hintPosition={hintPosition}
       required={required}
       width={rootWidth}
       size={size}
@@ -96,7 +97,6 @@ export function LevelRangeField({
       anatomy
     >
       <FieldLayout
-        hintPosition={hintPosition}
         wrapControl={false}
         chrome={chrome}
         size={size}

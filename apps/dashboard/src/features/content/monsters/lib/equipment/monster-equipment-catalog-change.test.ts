@@ -20,16 +20,15 @@ describe('monster equipment catalog changes', () => {
     const values = resolveMonsterCreateDefaultValues()
     values.equipment = [{ entryId: 'dagger-1', equipmentId: 'dagger', quantity: 1 }]
     values.actions = [{ id: 'stab', kind: 'weapon', equipmentEntryId: 'dagger-1', name: 'Stab' }]
-    values.reactions = [{ id: 'parry', kind: 'weapon', equipmentEntryId: 'dagger-1' }]
+    values.reactions = [{ id: 'parry', kind: 'parry', name: 'Parry', acBonus: 2 }]
 
     expect(findActionsReferencingEntry(values, 'dagger-1')).toEqual([
       { section: 'actions', id: 'stab', name: 'Stab' },
-      { section: 'reactions', id: 'parry', name: undefined },
     ])
     const removed = removeEquipmentEntryWithDependents(values, 'dagger-1')
     expect(removed.equipment).toEqual([])
-    expect(removed.actions).toEqual([])
-    expect(removed.reactions).toEqual([])
+    expect(removed.actions).toEqual(values.actions)
+    expect(removed.reactions).toEqual(values.reactions)
   })
 
   it('keeps weapon references on a weapon swap and confirms a non-weapon swap', () => {

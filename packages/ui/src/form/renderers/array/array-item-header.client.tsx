@@ -28,7 +28,7 @@ import {
   type ArrayItemLeadingChromeOptions,
 } from './array-item-toolbar.variants'
 import type { ArrayItemIssueSummaryProps } from './array-item-issue.client'
-import { ArrayItemIssueSummary } from './array-item-issue.client'
+import { ArrayItemIssueSummaries } from './array-item-issue-summaries.client'
 
 export interface ArrayItemDragHandleProps {
   ariaLabel: string
@@ -188,7 +188,9 @@ export function ArrayItemHeaderContent({ header }: ArrayItemHeaderContentProps) 
 
 export interface ArrayItemHeaderSummaryProps {
   summary?: string
+  /** @deprecated Prefer {@link issueSummaries}. */
   issueSummary?: ArrayItemIssueSummaryProps
+  issueSummaries?: readonly ArrayItemIssueSummaryProps[]
   collapsed: boolean
   leadingChrome: ArrayItemLeadingChromeOptions
   /** When true, summary lines include toolbar-column indent (stuffed-main shell path). */
@@ -198,11 +200,14 @@ export interface ArrayItemHeaderSummaryProps {
 export function ArrayItemHeaderSummary({
   summary,
   issueSummary,
-  collapsed,
+  issueSummaries,
+  collapsed: _collapsed,
   leadingChrome,
   indentSummary = false,
 }: ArrayItemHeaderSummaryProps) {
-  if (!summary && !issueSummary) return null
+  const resolvedIssueSummaries = issueSummaries ?? (issueSummary ? [issueSummary] : [])
+
+  if (!summary && resolvedIssueSummaries.length === 0) return null
 
   const summaryIndent = indentSummary
     ? arrayItemHeaderSummaryIndentClasses(leadingChrome)
@@ -210,13 +215,7 @@ export function ArrayItemHeaderSummary({
 
   return (
     <>
-      {issueSummary ? (
-        <ArrayItemIssueSummary
-          {...issueSummary}
-          placement={issueSummary.placement ?? (collapsed ? 'collapsed' : 'expanded')}
-          className={cn(issueSummary.className, summaryIndent)}
-        />
-      ) : null}
+      <ArrayItemIssueSummaries summaries={resolvedIssueSummaries} className={summaryIndent} />
       {summary ? (
         <p className={cn(arrayItemHeaderSummaryClasses, summaryIndent)}>{summary}</p>
       ) : null}

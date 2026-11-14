@@ -34,3 +34,41 @@ export function joinedPairBoundNames(occupants: JoinedPairOccupantsConfig): stri
   }
   return names
 }
+
+export function lowestNumericPreset(
+  options: readonly { value: string | number }[],
+): number | undefined {
+  const values = options.flatMap((option) =>
+    typeof option.value === 'number' ? [option.value] : [],
+  )
+  if (values.length === 0) return undefined
+  return Math.min(...values)
+}
+
+/** Integers the custom number input may commit. In-progress text is not a commit. */
+export function isJoinedPairCustomAmountInBounds(
+  value: number,
+  customMin: number,
+  customMax?: number,
+): boolean {
+  return (
+    Number.isInteger(value) && value >= customMin && (customMax === undefined || value <= customMax)
+  )
+}
+
+/** Value to store when Custom is chosen. `keep` leaves an in-bounds custom number alone. */
+export function customJoinedPairSelection(input: {
+  value: string | number | undefined
+  options: readonly { value: string | number }[]
+  customMin: number
+  customMax?: number
+}): { keep: true } | { write: number } {
+  const keepsCurrent =
+    typeof input.value === 'number' &&
+    !input.options.some((option) => option.value === input.value) &&
+    isJoinedPairCustomAmountInBounds(input.value, input.customMin, input.customMax)
+  if (keepsCurrent) return { keep: true }
+  const lowest = lowestNumericPreset(input.options)
+  if (lowest === undefined || input.value === lowest) return { keep: true }
+  return { write: lowest }
+}

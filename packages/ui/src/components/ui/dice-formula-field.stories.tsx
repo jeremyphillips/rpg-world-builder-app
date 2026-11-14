@@ -8,7 +8,7 @@ import { z } from 'zod'
 import { DiceFormulaField } from './dice-formula-field.client'
 import { Text } from './text'
 import { Form } from '../../form/shells/form.client'
-import type { FormItem } from '../../form/field-config'
+import type { FormItem } from '../../form/field-config/form-item.types'
 import {
   defaultDiceFormulaForMode,
   formatDiceFormula,

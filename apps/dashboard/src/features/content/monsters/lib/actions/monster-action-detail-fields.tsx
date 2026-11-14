@@ -1,67 +1,149 @@
 import {
   ABILITY_IDS,
+  monsterActionAuthoring,
+  monsterActionUsageCapability,
+  PARRY_AC_BONUS_MAX,
+  PARRY_AC_BONUS_MIN,
   getAbilityLabel,
   getContentTypeTerm,
   getWeaponModeLabel,
+  isPrimarySpellcastingAction,
+  BONUS_STANDARD_ACTION_IDS,
+  getActionVocabularyEntry,
+  MEASURED_RANGE_FEET,
   REACH_FEET,
+  TELEPORT_WITHIN_DEFAULT,
   WEAPON_MODES,
 } from '@rpg/contracts'
-import type { FieldVisibility, FormItem } from '@rpg/ui/form'
+import {
+  combineFieldVisibilityAll,
+  type FieldVisibility,
+  type FormItem,
+  type JoinedPairFieldConfig,
+  type SelectFieldConfig,
+} from '@rpg/ui/form'
+
+import { buildActiveCreatureTypeFieldOptions } from '@/features/vocabulary'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { areaGeometryFormFields } from '../../../lib/forms/fields/area-geometry-form-fields'
-import { distanceInputSelectField } from '../../../lib/forms/fields/content-speed-form-fields'
-import { damageTypeField } from '../../../lib/forms/mechanics/damage-type-field'
+import { distanceJoinedPairField } from '../../../lib/forms/fields/content-distance-form-fields'
 import {
-  rollValueFieldConfigs,
-  rollValueFields,
-} from '../../../lib/forms/mechanics/roll-value-fields'
+  resolutionOccupantRequirementsFields,
+  resolutionTargetAuthoringFields,
+} from '../../../lib/forms/fields/resolution-target-authoring-fields'
 import {
-  MONSTER_ACTION_NAME_LABEL,
+  ATTACK_RANGE_LONG_FIELD_LABEL,
+  ATTACK_RANGE_NORMAL_FIELD_LABEL,
+  attackRangeJoinedPairFields,
+} from '../../../lib/forms/fields/weapon-attack-range-form-fields'
+import { MonsterAttackRangeClusterSlot } from './monster-attack-range-cluster-slot.client'
+import { damageFieldGroup } from '../../../lib/forms/mechanics/damage-field-group'
+import {
+  SAVING_THROW_ABILITY_HINT,
+  SAVING_THROW_ABILITY_LABEL,
+  SAVING_THROW_DC_SOURCE_LABEL,
+  SAVING_THROW_SECTION_LEGEND,
+  SAVING_THROW_SPELLCASTING_HINT,
+} from '../../../lib/forms/mechanics/saving-throw-field-copy'
+import { savingThrowFieldGroup } from '../../../lib/forms/mechanics/saving-throw-field-group'
+import { MonsterActionAttackSummary } from '../../components/form/monster-action-attack-summary'
+import { MonsterActionBonusSummary } from '../../components/form/monster-action-bonus-summary'
+import { MonsterActionParrySummary } from '../../components/form/monster-action-parry-summary'
+import { MonsterActionMultiattackSummary } from '../../components/form/monster-action-multiattack-summary'
+import { MonsterActionSpellSummary } from '../../components/form/monster-action-spell-summary'
+import {
+  MONSTER_RULES_TEXT_LABEL,
   MONSTER_ADDITIONAL_CONDITION_HINT,
   MONSTER_ADDITIONAL_CONDITION_LABEL,
   MONSTER_CUSTOM_DESCRIPTION_ADD_LABEL,
   MONSTER_CUSTOM_DESCRIPTION_HINT,
   MONSTER_CUSTOM_DESCRIPTION_LABEL,
   MONSTER_DAMAGE_TYPE_CHANGE_LABEL,
-  MONSTER_ACTION_DAMAGE_FIELD_LABEL,
+  MONSTER_ACTION_DISTANCE_SECTION_LEGEND,
   MONSTER_ACTION_REACH_FIELD_LABEL,
   MONSTER_NATURAL_WEAPON_DAMAGE_HINT,
-  MONSTER_ATTACK_BONUS_ABILITY_LABEL,
-  MONSTER_ATTACK_BONUS_KIND_ABILITY_LABEL,
-  MONSTER_ATTACK_BONUS_KIND_SPELL_LABEL,
-  MONSTER_ATTACK_BONUS_LABEL,
-  MONSTER_ATTACK_BONUS_PROFICIENCY_LABEL,
-  MONSTER_SAVE_ABILITY_LABEL,
+  MONSTER_ABILITY_SOURCE_KIND_ABILITY_LABEL,
+  MONSTER_ABILITY_SOURCE_KIND_SPELL_LABEL,
+  MONSTER_ATTACK_BONUS_SOURCE_ABILITY_HINT,
+  MONSTER_ATTACK_BONUS_SOURCE_ABILITY_LABEL,
+  MONSTER_ATTACK_BONUS_SOURCE_SPELL_HINT,
+  MONSTER_ATTACK_BONUS_SOURCE_SPELL_LABEL,
+  MONSTER_ATTACK_BONUS_ADVANCED_LEGEND,
+  MONSTER_ATTACK_BONUS_INCLUDE_PROFICIENCY_HINT,
+  MONSTER_ATTACK_BONUS_INCLUDE_PROFICIENCY_LABEL,
   MONSTER_SAVE_DC_ABILITY_LABEL,
-  MONSTER_SAVE_DC_KIND_ABILITY_LABEL,
-  MONSTER_SAVE_DC_KIND_SPELL_LABEL,
-  MONSTER_SAVE_DC_LABEL,
   MONSTER_SAVE_DC_PROFICIENCY_LABEL,
   MONSTER_SAVE_THROW_SECTION_DESCRIPTION,
-  MONSTER_SAVE_THROW_SECTION_LEGEND,
+  MONSTER_SAVE_TARGETING_DESCRIPTION,
+  MONSTER_SAVE_TARGETING_LEGEND,
+  MONSTER_SAVE_AREA_OCCUPANT_REQUIREMENTS_HINT,
+  MONSTER_SAVE_TARGETING_MODE_AREA_FROM_SELF,
+  MONSTER_SAVE_TARGETING_MODE_LABEL,
+  MONSTER_SAVE_TARGETING_MODE_SELECTED_TARGETS,
   MONSTER_TRIGGER_LABEL,
+  MONSTER_TRIGGER_PLACEHOLDER,
+  MONSTER_PARRY_AC_BONUS_HINT,
+  MONSTER_PARRY_AC_BONUS_LABEL,
+  MONSTER_PARRY_FOLLOW_UP_ADD_LABEL,
+  MONSTER_PARRY_FOLLOW_UP_HINT,
+  MONSTER_PARRY_FOLLOW_UP_LABEL,
+  MONSTER_TAKE_ACTIONS_ACTIONS_LABEL,
+  MONSTER_TAKE_ACTIONS_BEHAVIOR_HINT_DISABLED,
+  MONSTER_TAKE_ACTIONS_CHOICE_EACH,
+  MONSTER_TAKE_ACTIONS_CHOICE_LABEL,
+  MONSTER_TAKE_ACTIONS_CHOICE_ONE,
+  MONSTER_TAKE_ACTIONS_RESTRICTION_ADD_LABEL,
+  MONSTER_TAKE_ACTIONS_RESTRICTION_HINT,
+  MONSTER_TAKE_ACTIONS_RESTRICTION_LABEL,
+  MONSTER_TAKE_ACTIONS_RESTRICTION_PLACEHOLDER,
+  MONSTER_TELEPORT_PASSENGER_HINT,
+  MONSTER_TELEPORT_DISTANCE_HINT,
+  MONSTER_TELEPORT_DISTANCE_LABEL,
+  MONSTER_TELEPORT_PASSENGER_ADD_LABEL,
+  MONSTER_TELEPORT_PASSENGER_LEGEND,
+  MONSTER_TELEPORT_WITHIN_HINT,
+  MONSTER_TELEPORT_WITHIN_LABEL,
+  MONSTER_REACTION_ADDITIONAL_RULES_ADD_LABEL,
+  MONSTER_REACTION_ADDITIONAL_RULES_HINT,
+  MONSTER_REACTION_ADDITIONAL_RULES_LABEL,
+  MONSTER_REACTION_REFERENCE_HINT,
+  MONSTER_REFERENCE_ACTION_LABEL,
+  MONSTER_TURN_LIMIT_ADD_LABEL,
+  MONSTER_TURN_LIMIT_EMPTY_LABEL,
+  MONSTER_TURN_LIMIT_LABEL,
+  MONSTER_TURN_LIMIT_OPTION_LABEL,
+  MONSTER_ATTACK_BONUS_LABEL,
 } from '../monster-form-labels'
 import type { MonsterActionSection } from '../../lib/actions/monster-action-equipment-references'
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
-import {
-  MonsterActionAttackCastingField,
-  MonsterActionCastingAbilityField,
-  MonsterActionSaveDcCastingField,
-} from './monster-action-casting-fields'
+import type { MonsterFormAdvisory } from '../monster-form-advisories'
+import { monsterFormAdvisorySlot } from '../monster-form-advisory-presentation'
+import { MonsterActionAttackAbilityField } from './monster-attack-ability-field'
+import { MonsterActionCastingAbilityField } from './monster-action-casting-fields'
+import { MonsterActionRechargeField } from './monster-action-recharge-field'
 import {
   monsterActionLimitedUseFields,
   monsterActionOnHitFields,
-  spellComponentField,
 } from './monster-action-on-hit-fields'
-import {
-  monsterSaveAbilityHintWhen,
-  monsterSaveDcAbilityHintWhen,
-} from './monster-action-save-field-hints'
+import { monsterSpellComponentRequirementsField } from './monster-spell-component-form-fields'
+import { monsterSaveDcAbilityHintWhen } from './monster-action-save-field-hints'
+import { monsterWeaponDamageOverrideField } from './monster-weapon-damage-override'
+import type { MonsterFormValues } from '../monster-form-values'
 import {
   MonsterActionSaveFailureNoteField,
   MonsterActionSaveSuccessAmountField,
 } from './monster-action-save-outcome-fields'
+import { legendaryActionCategory } from './legendary-action-category'
+import { leapDistanceFields } from './leap-distance-options'
+import { legendaryActionDetailFields } from './monster-legendary-action-fields'
+import { monsterSpellCastAtLevelField } from './monster-spell-cast-at-level-form-fields'
+import { MONSTER_SPELL_PICKER_INTERCEPT } from '../../components/form/monster-spell-picker-context'
+import {
+  MonsterSpellChangeAction,
+  MonsterSpellEntryCard,
+  MonsterSpellFrequencySlot,
+} from '../../components/form/monster-spell-entry-card'
 
 function meleeVisibility(name: 'mode' | 'modes'): FieldVisibility {
   return {
@@ -79,8 +161,60 @@ function rangedVisibility(name: 'mode' | 'modes'): FieldVisibility {
   }
 }
 
+function distanceVisibility(name: 'mode' | 'modes'): FieldVisibility {
+  return {
+    dependsOn: [name],
+    visibleWhen: (values) =>
+      name === 'mode'
+        ? values.mode === 'melee' || values.mode === 'ranged'
+        : arrayIncludes(values.modes, 'melee') || arrayIncludes(values.modes, 'ranged'),
+  }
+}
+
 function arrayIncludes(value: unknown, mode: string): boolean {
   return Array.isArray(value) && value.includes(mode)
+}
+
+function withModeFieldVisibility<T extends { visibility?: FieldVisibility }>(
+  field: T,
+  modeVisibility: FieldVisibility,
+): T {
+  return {
+    ...field,
+    visibility: field.visibility
+      ? combineFieldVisibilityAll(field.visibility, modeVisibility)
+      : modeVisibility,
+  }
+}
+
+function dualAttackModesVisibility(name: 'mode' | 'modes'): FieldVisibility {
+  return {
+    dependsOn: [name],
+    visibleWhen: (values) =>
+      name === 'modes' &&
+      arrayIncludes(values.modes, 'melee') &&
+      arrayIncludes(values.modes, 'ranged'),
+  }
+}
+
+function meleeOnlyAttackModeVisibility(name: 'mode' | 'modes'): FieldVisibility {
+  return {
+    dependsOn: [name],
+    visibleWhen: (values) =>
+      name === 'mode'
+        ? values.mode === 'melee'
+        : arrayIncludes(values.modes, 'melee') && !arrayIncludes(values.modes, 'ranged'),
+  }
+}
+
+function rangedOnlyAttackModeVisibility(name: 'mode' | 'modes'): FieldVisibility {
+  return {
+    dependsOn: [name],
+    visibleWhen: (values) =>
+      name === 'mode'
+        ? values.mode === 'ranged'
+        : arrayIncludes(values.modes, 'ranged') && !arrayIncludes(values.modes, 'melee'),
+  }
 }
 
 const monsterActionOptionalDescriptionField = {
@@ -91,30 +225,34 @@ const monsterActionOptionalDescriptionField = {
   optionalDisclosure: { addLabel: MONSTER_CUSTOM_DESCRIPTION_ADD_LABEL },
 } as const satisfies FormItem
 
+function monsterReactionConditionField(action: MonsterActionDraftRow): FormItem {
+  const spell = action.kind === 'spell'
+  return {
+    type: 'text',
+    name: 'trigger.text',
+    label: spell ? MONSTER_ADDITIONAL_CONDITION_LABEL : MONSTER_TRIGGER_LABEL,
+    hint: spell ? MONSTER_ADDITIONAL_CONDITION_HINT : undefined,
+    ...(spell ? {} : { placeholder: MONSTER_TRIGGER_PLACEHOLDER, required: true }),
+  }
+}
+
 function monsterActionDescriptionField(action: MonsterActionDraftRow): FormItem {
-  if (action.kind === 'special') {
+  if (monsterActionAuthoring(action).description === 'authored') {
     return {
       type: 'richtext',
       name: 'description',
-      label: MONSTER_CUSTOM_DESCRIPTION_LABEL,
-      required: true,
+      label: MONSTER_RULES_TEXT_LABEL,
     }
   }
   return monsterActionOptionalDescriptionField
 }
 
-function monsterSaveResolutionDamageRow(ctx: ContentFormCtx): FormItem {
-  return {
-    kind: 'row',
-    fields: [
-      ...rollValueFieldConfigs({
-        namePrefix: 'resolution.effects.0.roll',
-        label: MONSTER_ACTION_DAMAGE_FIELD_LABEL,
-        required: true,
-      }),
-      damageTypeField({ name: 'resolution.effects.0.damageType', ctx, required: true }),
-    ],
-  }
+function monsterSaveResolutionDamageGroup(ctx: ContentFormCtx): FormItem {
+  return damageFieldGroup({
+    ctx,
+    damageTypeName: 'resolution.effects.0.damageType',
+    rollName: 'resolution.effects.0.roll',
+  })
 }
 
 function whenFieldEquals(field: string, value: string): FieldVisibility {
@@ -138,49 +276,59 @@ function abilityOptions() {
   return ABILITY_IDS.map((id) => ({ value: id, label: getAbilityLabel(id) }))
 }
 
-function monsterActionBonusSourceDependent(
-  namePrefix: string,
-  sharedCastingOptions: { value: string; label: string }[],
-): FormItem {
-  const abilityBranch = whenFieldEquals('bonusSource.kind', 'ability')
-  const spellBranch = whenFieldEquals('bonusSource.kind', 'spell')
+type MonsterAbilitySourcePath = 'bonusSource' | 'dcSource'
+
+type MonsterAbilitySourceRequiredMarks = {
+  controller?: boolean
+  ability?: boolean
+  castingAbility?: boolean
+}
+
+function monsterAbilitySourceDependent(input: {
+  sourcePath: MonsterAbilitySourcePath
+  namePrefix: string
+  controllerLabel: string
+  abilityFields: FormItem[]
+  dependentsChrome?: 'none'
+  required?: MonsterAbilitySourceRequiredMarks
+  spellcastingHint?: string
+  currentActionId?: string
+  sourceOptions?: { value: string; label: string }[]
+  sourceHint?: SelectFieldConfig['hint']
+}): FormItem {
+  const kindName = `${input.sourcePath}.kind`
+  const abilityBranch = whenFieldEquals(kindName, 'ability')
+  const spellBranch = whenFieldEquals(kindName, 'spellcasting')
   return {
     kind: 'dependent',
     controller: {
       type: 'select',
-      name: 'bonusSource.kind',
-      label: MONSTER_ATTACK_BONUS_LABEL,
+      name: kindName,
+      label: input.controllerLabel,
       placeholder: 'Choose',
-      options: [
-        { value: 'ability', label: MONSTER_ATTACK_BONUS_KIND_ABILITY_LABEL },
-        { value: 'spell', label: MONSTER_ATTACK_BONUS_KIND_SPELL_LABEL },
+      options: input.sourceOptions ?? [
+        { value: 'ability', label: MONSTER_ABILITY_SOURCE_KIND_ABILITY_LABEL },
+        { value: 'spellcasting', label: MONSTER_ABILITY_SOURCE_KIND_SPELL_LABEL },
       ],
+      ...(input.sourceHint ? { hint: input.sourceHint } : {}),
+      ...(input.required?.controller ? { required: true } : {}),
     },
     dependents: {
-      visibility: whenFieldIsOneOf('bonusSource.kind', ['ability', 'spell']),
+      ...(input.dependentsChrome ? { chrome: input.dependentsChrome } : {}),
+      visibility: whenFieldIsOneOf(kindName, ['ability', 'spellcasting']),
       fields: [
-        {
-          type: 'select',
-          name: 'bonusSource.ability',
-          label: MONSTER_ATTACK_BONUS_ABILITY_LABEL,
-          placeholder: 'Choose',
-          options: abilityOptions(),
-          visibility: abilityBranch,
-        },
-        {
-          type: 'switch',
-          name: 'bonusSource.proficient',
-          label: MONSTER_ATTACK_BONUS_PROFICIENCY_LABEL,
-          visibility: abilityBranch,
-        },
+        ...input.abilityFields.map((field) => ({ ...field, visibility: abilityBranch })),
         {
           kind: 'slot',
-          name: 'bonusSource.castingAbility',
+          name: `${input.sourcePath}.castingAbility`,
           visibility: spellBranch,
           render: () => (
-            <MonsterActionAttackCastingField
-              namePrefix={namePrefix}
-              sharedOptions={sharedCastingOptions}
+            <MonsterActionCastingAbilityField
+              name={`${input.namePrefix}.${input.sourcePath}.castingAbility`}
+              currentActionId={input.currentActionId ?? ''}
+              required={input.required?.castingAbility}
+              hint={input.spellcastingHint}
+              preview={input.sourcePath === 'bonusSource' ? 'attack-bonus' : 'save-dc'}
             />
           ),
         },
@@ -189,164 +337,191 @@ function monsterActionBonusSourceDependent(
   }
 }
 
-function monsterActionSaveDcDependent(
-  namePrefix: string,
-  sharedCastingOptions: { value: string; label: string }[],
-): FormItem {
-  const abilityBranch = whenFieldEquals('dcSource.kind', 'ability')
-  const spellBranch = whenFieldEquals('dcSource.kind', 'spell')
-  return {
-    kind: 'dependent',
-    controller: {
-      type: 'select',
-      name: 'dcSource.kind',
-      label: MONSTER_SAVE_DC_LABEL,
-      placeholder: 'Choose',
-      options: [
-        { value: 'ability', label: MONSTER_SAVE_DC_KIND_ABILITY_LABEL },
-        { value: 'spell', label: MONSTER_SAVE_DC_KIND_SPELL_LABEL },
-      ],
+function monsterActionBonusSourceDependent(namePrefix: string, currentActionId: string): FormItem {
+  return monsterAbilitySourceDependent({
+    sourcePath: 'bonusSource',
+    namePrefix,
+    controllerLabel: MONSTER_ATTACK_BONUS_LABEL,
+    currentActionId,
+    dependentsChrome: 'none',
+    sourceOptions: [
+      { value: 'ability', label: MONSTER_ATTACK_BONUS_SOURCE_ABILITY_LABEL },
+      { value: 'spellcasting', label: MONSTER_ATTACK_BONUS_SOURCE_SPELL_LABEL },
+    ],
+    sourceHint: {
+      resolve: {
+        dependsOn: ['bonusSource.kind'],
+        hintWhen: (values) => {
+          if (values['bonusSource.kind'] === 'ability')
+            return MONSTER_ATTACK_BONUS_SOURCE_ABILITY_HINT
+          if (values['bonusSource.kind'] === 'spellcasting') {
+            return MONSTER_ATTACK_BONUS_SOURCE_SPELL_HINT
+          }
+          return undefined
+        },
+      },
     },
-    dependents: {
-      chrome: 'none',
-      visibility: whenFieldIsOneOf('dcSource.kind', ['ability', 'spell']),
-      fields: [
-        {
-          kind: 'row',
-          visibility: abilityBranch,
-          fields: [
-            {
-              type: 'select',
-              name: 'dcSource.ability',
-              label: MONSTER_SAVE_DC_ABILITY_LABEL,
-              placeholder: 'Choose',
-              options: abilityOptions(),
-              width: '1/2',
-              hint: {
-                resolve: {
-                  dependsOn: ['dcSource.ability'],
-                  hintWhen: monsterSaveDcAbilityHintWhen,
-                },
+    required: { controller: true, ability: true, castingAbility: true },
+    abilityFields: [
+      {
+        kind: 'slot',
+        name: 'bonusSource.ability',
+        render: () => (
+          <MonsterActionAttackAbilityField
+            name={`${namePrefix}.bonusSource.ability`}
+            proficientName={`${namePrefix}.bonusSource.proficient`}
+          />
+        ),
+      },
+      {
+        kind: 'group',
+        legend: MONSTER_ATTACK_BONUS_ADVANCED_LEGEND,
+        headingScale: 'field',
+        disclosure: { variant: 'legend', defaultOpen: false, persistOpen: false },
+        fields: [
+          {
+            type: 'switch',
+            name: 'bonusSource.proficient',
+            label: MONSTER_ATTACK_BONUS_INCLUDE_PROFICIENCY_LABEL,
+            hint: MONSTER_ATTACK_BONUS_INCLUDE_PROFICIENCY_HINT,
+            defaultValue: true,
+          },
+        ],
+      },
+    ],
+  })
+}
+
+function monsterActionSaveDcDependent(namePrefix: string, currentActionId: string): FormItem {
+  return monsterAbilitySourceDependent({
+    sourcePath: 'dcSource',
+    namePrefix,
+    controllerLabel: SAVING_THROW_DC_SOURCE_LABEL,
+    currentActionId,
+    dependentsChrome: 'none',
+    spellcastingHint: SAVING_THROW_SPELLCASTING_HINT,
+    required: { controller: true, ability: true, castingAbility: true },
+    abilityFields: [
+      {
+        kind: 'row',
+        fields: [
+          {
+            type: 'select',
+            name: 'dcSource.ability',
+            label: MONSTER_SAVE_DC_ABILITY_LABEL,
+            placeholder: 'Choose',
+            options: abilityOptions(),
+            width: '1/2',
+            required: true,
+            hint: {
+              resolve: {
+                dependsOn: ['dcSource.ability'],
+                hintWhen: monsterSaveDcAbilityHintWhen,
               },
             },
-            {
-              type: 'switch',
-              name: 'dcSource.proficient',
-              label: MONSTER_SAVE_DC_PROFICIENCY_LABEL,
-              labelPosition: 'above',
-              width: '1/2',
-            },
-          ],
-        },
-        {
-          kind: 'slot',
-          name: 'dcSource.castingAbility',
-          visibility: spellBranch,
-          render: () => (
-            <MonsterActionSaveDcCastingField
-              namePrefix={namePrefix}
-              sharedOptions={sharedCastingOptions}
-            />
-          ),
-        },
-      ],
-    },
-  }
+          },
+          {
+            type: 'switch',
+            name: 'dcSource.proficient',
+            label: MONSTER_SAVE_DC_PROFICIENCY_LABEL,
+            labelPosition: 'above',
+            width: '1/2',
+          },
+        ],
+      },
+    ],
+  })
 }
 
-function monsterActionSaveSelectionDependent(): FormItem {
+function monsterActionSaveSelectionDependent(ctx: ContentFormCtx): FormItem {
   const selfMode = whenFieldEquals('resolution.selectionMode', 'self')
   const targetsMode = whenFieldEquals('resolution.selectionMode', 'targets')
+  const creatureTypeOptions = buildActiveCreatureTypeFieldOptions(ctx.creatureTypeVocabulary)
   return {
-    kind: 'dependent',
-    controller: {
-      type: 'select',
-      name: 'resolution.selectionMode',
-      label: 'Selection',
-      options: [
-        { value: 'self', label: 'Area from self' },
-        { value: 'targets', label: 'Creatures in reach' },
-      ],
-    },
-    dependents: {
-      visibility: whenFieldIsOneOf('resolution.selectionMode', ['self', 'targets']),
-      fields: [
-        ...areaGeometryFormFields({
-          fieldPrefix: 'resolution.areaOfEffect',
-          legend: 'Area',
-          legendVisibility: 'srOnly',
-          shapeHint: 'Area measured from the monster.',
-          visibility: selfMode,
-        }),
-        {
-          type: 'number',
-          name: 'resolution.target.count',
-          label: 'Target count',
-          min: 1,
-          digits: 2,
-          visibility: targetsMode,
-        },
-        {
-          type: 'select',
-          name: 'resolution.target.proximity.kind',
-          label: 'Target distance',
+    kind: 'group',
+    heading: { label: MONSTER_SAVE_TARGETING_LEGEND },
+    description: MONSTER_SAVE_TARGETING_DESCRIPTION,
+    fieldChrome: { variant: 'panel', elevation: 'canvas' },
+    fields: [
+      {
+        kind: 'dependent',
+        controller: {
+          type: 'segmentedControl',
+          name: 'resolution.selectionMode',
+          label: MONSTER_SAVE_TARGETING_MODE_LABEL,
+          fullWidth: true,
+          width: 'full',
           options: [
-            { value: 'reach', label: 'Reach' },
-            { value: 'distance', label: 'Range' },
+            { value: 'targets', label: MONSTER_SAVE_TARGETING_MODE_SELECTED_TARGETS },
+            { value: 'self', label: MONSTER_SAVE_TARGETING_MODE_AREA_FROM_SELF },
           ],
-          visibility: targetsMode,
+          defaultValue: 'targets',
         },
-        {
-          ...distanceInputSelectField({
-            name: 'resolution.target.proximity.distance.value',
-            label: 'Distance (ft)',
-            visibility: {
-              dependsOn: ['resolution.selectionMode', 'resolution.target.proximity.kind'],
-              visibleWhen: (values) =>
-                values['resolution.selectionMode'] === 'targets' &&
-                (values['resolution.target.proximity.kind'] === 'distance' ||
-                  values['resolution.target.proximity.kind'] === 'reach'),
-            },
-          }),
+        dependents: {
+          chrome: 'none',
+          visibility: whenFieldIsOneOf('resolution.selectionMode', ['self', 'targets']),
+          fields: [
+            ...areaGeometryFormFields({
+              fieldPrefix: 'resolution.areaOfEffect',
+              legend: 'Area',
+              legendVisibility: 'srOnly',
+              shapeHint: 'Area measured from the monster.',
+              visibility: selfMode,
+              includeExplicitNoneOption: false,
+            }),
+            ...resolutionTargetAuthoringFields({
+              prefix: 'resolution.target',
+              visibility: targetsMode,
+              creatureTypeOptions,
+              includeProximityKindSelect: false,
+              requirementsFieldChrome: { variant: 'panel', emphasis: 'faint' },
+            }),
+            ...resolutionOccupantRequirementsFields({
+              requirementsPath: 'resolution.occupantRequirements',
+              creatureTypeOptions,
+              visibility: selfMode,
+              hint: MONSTER_SAVE_AREA_OCCUPANT_REQUIREMENTS_HINT,
+              fieldsOnly: true,
+              requirementsFieldChrome: { variant: 'panel', emphasis: 'faint' },
+            }),
+          ],
         },
-      ],
-    },
+      },
+    ],
   }
 }
 
 function monsterActionSaveSection(
   ctx: ContentFormCtx,
   namePrefix: string,
-  sharedCastingOptions: { value: string; label: string }[],
+  currentActionId: string,
 ): FormItem {
   return {
     kind: 'group',
-    heading: { label: MONSTER_SAVE_THROW_SECTION_LEGEND },
+    heading: { label: SAVING_THROW_SECTION_LEGEND },
     description: MONSTER_SAVE_THROW_SECTION_DESCRIPTION,
-    headingScale: 'subsection',
     fields: [
       {
         type: 'select',
         name: 'resolution.method.ability',
-        label: MONSTER_SAVE_ABILITY_LABEL,
+        label: SAVING_THROW_ABILITY_LABEL,
         options: abilityOptions(),
-        hint: {
-          resolve: {
-            dependsOn: ['resolution.method.ability'],
-            hintWhen: monsterSaveAbilityHintWhen,
-          },
-        },
+        hint: SAVING_THROW_ABILITY_HINT,
+        required: true,
       },
-      monsterActionSaveDcDependent(namePrefix, sharedCastingOptions),
-      monsterActionSaveSelectionDependent(),
+      monsterActionSaveDcDependent(namePrefix, currentActionId),
+      monsterActionSaveSelectionDependent(ctx),
+      monsterSaveResolutionDamageGroup(ctx),
       {
         kind: 'slot',
         name: '_saveFailureNote',
+        issuePaths: ['resolution.outcomes'],
         render: () => <MonsterActionSaveFailureNoteField namePrefix={namePrefix} />,
       },
       {
         kind: 'slot',
         name: '_saveSuccessAmount',
+        issuePaths: ['resolution.outcomes'],
         render: () => <MonsterActionSaveSuccessAmountField namePrefix={namePrefix} />,
       },
     ],
@@ -362,42 +537,146 @@ const reachFeetOptions = REACH_FEET.map((feet) => ({
   label: String(feet),
 }))
 
-function reachRangeFields(modeField: 'mode' | 'modes'): FormItem[] {
-  return [
-    {
-      type: 'joinedPair',
-      label: MONSTER_ACTION_REACH_FIELD_LABEL,
-      width: 'auto',
-      visibility: meleeVisibility(modeField),
-      start: {
-        kind: 'select',
-        name: 'reach',
-        options: reachFeetOptions,
-        digits: 2,
-        defaultValue: 5,
-        ariaLabel: 'Reach value',
+function monsterAttackReachField(_modeField: 'mode' | 'modes'): JoinedPairFieldConfig {
+  return {
+    type: 'joinedPair',
+    label: MONSTER_ACTION_REACH_FIELD_LABEL,
+    width: 'auto',
+    start: {
+      kind: 'select',
+      name: 'reach',
+      options: reachFeetOptions,
+      digits: 2,
+      placeholder: '5',
+      ariaLabel: 'Reach value',
+    },
+    end: {
+      kind: 'label',
+      text: 'ft.',
+      ariaLabel: 'Reach unit',
+    },
+  }
+}
+
+function monsterAttackRangeJoinedPairs(modeField: 'mode' | 'modes'): JoinedPairFieldConfig[] {
+  const ranged = rangedVisibility(modeField)
+  return attackRangeJoinedPairFields({
+    normalName: 'range.normal',
+    longName: 'range.long',
+    normalRequired: true,
+    normalLabel: ATTACK_RANGE_NORMAL_FIELD_LABEL,
+    longLabel: ATTACK_RANGE_LONG_FIELD_LABEL,
+  }).map((field) => withModeFieldVisibility(field, ranged))
+}
+
+type MonsterAttackDistanceFormScope = {
+  idPrefix: string
+  namePrefix: string
+}
+
+function monsterAttackDistanceFields(
+  modeField: 'mode' | 'modes',
+  formScope: MonsterAttackDistanceFormScope,
+): FormItem {
+  const reach = monsterAttackReachField(modeField)
+  const rangeFields = monsterAttackRangeJoinedPairs(modeField)
+  const rangeClusterRow = {
+    kind: 'row' as const,
+    spacing: 'compact' as const,
+    fields: rangeFields.map((field) => ({ ...field, width: '1/2' as const })),
+  }
+  return {
+    kind: 'group',
+    legend: MONSTER_ACTION_DISTANCE_SECTION_LEGEND,
+    visibility: distanceVisibility(modeField),
+    fields: [
+      {
+        kind: 'row',
+        visibility: dualAttackModesVisibility(modeField),
+        fields: [
+          {
+            ...withModeFieldVisibility(reach, meleeVisibility(modeField)),
+            width: '1/3',
+          },
+          {
+            kind: 'slot',
+            name: 'attackRangeCluster',
+            width: '2/3',
+            render: () => (
+              <MonsterAttackRangeClusterSlot
+                idPrefix={formScope.idPrefix}
+                namePrefix={formScope.namePrefix}
+                fields={rangeClusterRow.fields}
+              />
+            ),
+          },
+        ],
       },
-      end: {
-        kind: 'label',
-        text: 'ft.',
-        ariaLabel: 'Reach unit',
+      {
+        kind: 'row',
+        visibility: meleeOnlyAttackModeVisibility(modeField),
+        fields: [withModeFieldVisibility(reach, meleeVisibility(modeField))],
       },
-    },
-    {
-      type: 'number',
-      name: 'range.normal',
-      label: 'Normal range',
-      min: 5,
-      visibility: rangedVisibility(modeField),
-    },
-    {
-      type: 'number',
-      name: 'range.long',
-      label: 'Long range',
-      min: 5,
-      visibility: rangedVisibility(modeField),
-    },
-  ]
+      {
+        kind: 'row',
+        visibility: rangedOnlyAttackModeVisibility(modeField),
+        fields: rangeFields,
+      },
+    ],
+  }
+}
+
+function monsterActionAttackPreviewSlot(
+  ctx: ContentFormCtx,
+  action: MonsterActionDraftRow,
+): FormItem {
+  return {
+    kind: 'slot',
+    name: 'attackPreview',
+    render: () => <MonsterActionAttackSummary ctx={ctx} action={action} />,
+  }
+}
+
+function monsterActionSpellPreviewSlot(
+  ctx: ContentFormCtx,
+  action: MonsterActionDraftRow,
+  section: MonsterActionSection,
+): FormItem {
+  return {
+    kind: 'slot',
+    name: 'spellPreview',
+    render: () => <MonsterActionSpellSummary ctx={ctx} action={action} section={section} />,
+  }
+}
+
+function monsterActionMultiattackPreviewSlot(
+  ctx: ContentFormCtx,
+  action: MonsterActionDraftRow,
+): FormItem {
+  return {
+    kind: 'slot',
+    name: 'multiattackPreview',
+    render: () => <MonsterActionMultiattackSummary ctx={ctx} action={action} />,
+  }
+}
+
+function monsterActionAuthoringPreviewSlots(
+  ctx: ContentFormCtx,
+  action: MonsterActionDraftRow,
+  section: MonsterActionSection,
+): FormItem[] {
+  switch (action.kind) {
+    case 'weapon':
+    case 'natural-weapon':
+    case 'attack':
+      return [monsterActionAttackPreviewSlot(ctx, action)]
+    case 'spell':
+      return [monsterActionSpellPreviewSlot(ctx, action, section)]
+    case 'multiattack':
+      return [monsterActionMultiattackPreviewSlot(ctx, action)]
+    default:
+      return []
+  }
 }
 
 function spellOptions(ctx: ContentFormCtx) {
@@ -407,107 +686,206 @@ function spellOptions(ctx: ContentFormCtx) {
   }))
 }
 
-// fallow-ignore-next-line complexity
-export function monsterActionDetailFields(input: {
+function monsterActionUsageEditor(action: MonsterActionDraftRow, namePrefix: string): FormItem[] {
+  const usage = monsterActionUsageCapability(action)
+  if (usage.presentation === 'none') return []
+  if (usage.kinds.length === 1 && usage.kinds[0] === 'recharge') {
+    const presentation = usage.presentation === 'included' ? 'included' : 'optional'
+    return [
+      {
+        kind: 'slot',
+        name: 'limitedUse',
+        render: () => (
+          <MonsterActionRechargeField
+            name={`${namePrefix}.limitedUse`}
+            presentation={presentation}
+          />
+        ),
+      },
+    ]
+  }
+  return monsterActionLimitedUseFields()
+}
+
+function monsterActionEquipmentField(
+  equipmentOptions: { value: string; label: string }[],
+): FormItem {
+  return {
+    type: 'select',
+    width: '1/2',
+    name: 'equipmentEntryId',
+    label: getContentTypeTerm('equipment').label,
+    placeholder: 'Select',
+    options: equipmentOptions,
+    presentation: { change: { label: 'Change weapon' } },
+  }
+}
+
+function monsterActionSpellMechanics(input: {
+  ctx: ContentFormCtx
+  action: MonsterActionDraftRow
+  namePrefix: string
+  sharedCastingOptions: { value: string; label: string }[]
+  onCastingSourceBlocked?: (message: string) => void
+}): FormItem[] {
+  return [
+    {
+      kind: 'slot',
+      name: 'castingAbility',
+      render: () => (
+        <MonsterActionCastingAbilityField
+          name={`${input.namePrefix}.castingAbility`}
+          currentActionId={input.action.id}
+          sourceActionId={input.action.id}
+          onBlocked={input.onCastingSourceBlocked}
+          profile={isPrimarySpellcastingAction(input.action) ? 'primary' : 'shared'}
+          preview="save-dc"
+        />
+      ),
+    },
+    {
+      kind: 'array',
+      name: 'spells',
+      label: getContentTypeTerm('spells').label,
+      addAction: { label: 'Add spell', intercept: MONSTER_SPELL_PICKER_INTERCEPT },
+      item: {
+        collapsible: true,
+        header: {
+          fallback: (index) => `Spell ${index + 1}`,
+          primary: (values) => {
+            const spellId = typeof values.spellId === 'string' ? values.spellId : ''
+            return input.ctx.spellCatalogById?.get(spellId)?.name
+          },
+        },
+        renderShell: (props) => (
+          <MonsterSpellEntryCard {...props} catalog={input.ctx.spellCatalogById} />
+        ),
+        beforeRemove: {
+          name: 'changeSpell',
+          render: () => <MonsterSpellChangeAction catalog={input.ctx.spellCatalogById} />,
+        },
+      },
+      fields: [
+        {
+          kind: 'row',
+          fields: [
+            {
+              kind: 'slot',
+              name: 'frequency',
+              width: '1/2',
+              render: () => <MonsterSpellFrequencySlot />,
+            },
+            monsterSpellCastAtLevelField({
+              catalog: input.ctx.spellCatalogById,
+              spellIdField: 'spellId',
+              labelVisibility: 'srOnly',
+              width: '1/2',
+            }),
+          ],
+        },
+      ],
+    },
+    monsterSpellComponentRequirementsField(),
+    ...monsterActionLimitedUseFields({
+      addDisabled:
+        input.action.kind === 'spell' &&
+        (input.action.spells ?? []).some((spell) => spell.limitedUse != null),
+    }),
+  ]
+}
+
+/** Trigger and save setup, then configuration, on-hit, then usage (recharge / limits). */
+function monsterActionMechanicFields(input: {
   ctx: ContentFormCtx
   action: MonsterActionDraftRow
   section: MonsterActionSection
   namePrefix: string
-  equipmentOptions: { value: string; label: string }[]
   sharedCastingOptions: { value: string; label: string }[]
-  attackOptions?: { value: string; label: string }[]
+  attackOptions: { value: string; label: string }[]
+  equipment: MonsterFormValues['equipment']
+  onCastingSourceBlocked?: (message: string) => void
 }): FormItem[] {
-  const { ctx, action, section, namePrefix, equipmentOptions, sharedCastingOptions } = input
-  const attackOptions = input.attackOptions ?? []
-  const fields: FormItem[] = [
-    { type: 'text', name: 'name', label: MONSTER_ACTION_NAME_LABEL },
-    monsterActionDescriptionField(action),
-  ]
-
-  if (action.kind === 'save') {
-    fields.push(monsterSaveResolutionDamageRow(ctx))
+  const { ctx, action, section, namePrefix } = input
+  const trigger =
+    section === 'reactions' && action.kind !== 'multiattack'
+      ? [monsterReactionConditionField(action)]
+      : []
+  if (action.kind === 'spell') {
+    return [...trigger, ...monsterActionSpellMechanics(input)]
   }
 
-  if (section === 'reactions') {
-    fields.push({
-      type: 'text',
-      name: 'trigger.text',
-      label: action.kind === 'spell' ? MONSTER_ADDITIONAL_CONDITION_LABEL : MONSTER_TRIGGER_LABEL,
-      hint: action.kind === 'spell' ? MONSTER_ADDITIONAL_CONDITION_HINT : undefined,
-    })
-  }
-
-  if (action.kind !== 'spell' && action.kind !== 'natural-weapon') {
-    fields.push(...monsterActionLimitedUseFields())
-  }
-
-  if (action.kind === 'weapon') {
-    fields.push({
-      type: 'select',
-      name: 'equipmentEntryId',
-      label: getContentTypeTerm('equipment').label,
-      placeholder: 'Select',
-      options: equipmentOptions,
-    })
-    fields.push(...rollValueFields({ namePrefix: 'damage', label: 'Damage override' }))
-    fields.push(monsterActionOnHitFields(ctx))
-  }
-
-  if (action.kind === 'natural-weapon') {
-    fields.push(
-      {
-        kind: 'row',
-        fields: [
-          ...rollValueFieldConfigs({
-            namePrefix: 'damage',
-            label: MONSTER_ACTION_DAMAGE_FIELD_LABEL,
-            required: true,
-            hint: {
-              text: MONSTER_NATURAL_WEAPON_DAMAGE_HINT,
-              position: 'below-control',
-            },
+  const usage = monsterActionUsageEditor(action, namePrefix)
+  const saveGroup =
+    action.kind === 'special'
+      ? [
+          savingThrowFieldGroup({
+            renderCastingAbility: () => (
+              <MonsterActionCastingAbilityField
+                name={`${namePrefix}.savingThrow.dcSource.castingAbility`}
+                currentActionId={action.id}
+                required={false}
+                hint={SAVING_THROW_SPELLCASTING_HINT}
+                preview="save-dc"
+              />
+            ),
           }),
-          {
-            ...damageTypeField({
-              name: 'damageType',
-              ctx,
-              scope: 'physical-and-vocabulary',
-              required: true,
-            }),
-            presentation: { change: { label: MONSTER_DAMAGE_TYPE_CHANGE_LABEL } },
-          },
-        ],
-      },
+        ]
+      : []
+  const kindFields: FormItem[] = []
+  if (action.kind === 'weapon') {
+    kindFields.push(
+      monsterWeaponDamageOverrideField({
+        ctx,
+        equipment: input.equipment,
+        equipmentEntryId: action.equipmentEntryId,
+        damage: action.damage,
+      }),
       monsterActionOnHitFields(ctx),
     )
   }
-
+  if (action.kind === 'natural-weapon') {
+    kindFields.push(
+      damageFieldGroup({
+        ctx,
+        damageTypeName: 'damageType',
+        rollName: 'damage',
+        scope: 'physical-and-vocabulary',
+        typeChangeLabel: MONSTER_DAMAGE_TYPE_CHANGE_LABEL,
+        rollHint: {
+          text: MONSTER_NATURAL_WEAPON_DAMAGE_HINT,
+          position: 'below-control',
+        },
+      }),
+      monsterActionOnHitFields(ctx),
+    )
+  }
   if (action.kind === 'attack') {
-    fields.push(
-      monsterActionBonusSourceDependent(namePrefix, sharedCastingOptions),
+    kindFields.push(
       {
         type: 'chips',
         name: 'modes',
         label: 'Modes',
         options: modeOptions(),
-      },
-      ...reachRangeFields('modes'),
-      damageTypeField({ name: 'damageType', ctx, required: true }),
-      ...rollValueFields({
-        namePrefix: 'damage',
-        label: MONSTER_ACTION_DAMAGE_FIELD_LABEL,
         required: true,
+      },
+      monsterActionBonusSourceDependent(namePrefix, action.id),
+      monsterAttackDistanceFields('modes', {
+        idPrefix: `monster-action-${action.id}`,
+        namePrefix,
+      }),
+      damageFieldGroup({
+        ctx,
+        damageTypeName: 'damageType',
+        rollName: 'damage',
       }),
       monsterActionOnHitFields(ctx),
     )
   }
-
   if (action.kind === 'save') {
-    fields.push(monsterActionSaveSection(ctx, namePrefix, sharedCastingOptions))
+    kindFields.push(monsterActionSaveSection(ctx, namePrefix, action.id))
   }
-
   if (action.kind === 'multiattack') {
-    fields.push({
+    kindFields.push({
       kind: 'array',
       name: 'steps',
       label: 'Steps',
@@ -519,47 +897,310 @@ export function monsterActionDetailFields(input: {
           type: 'chips',
           name: 'actionIds',
           label: 'Attacks',
-          options: attackOptions,
+          options: input.attackOptions,
         },
       ],
     })
   }
+  return [...trigger, ...saveGroup, ...kindFields, ...usage]
+}
 
-  if (action.kind === 'spell') {
-    fields.push(
+function turnLimitField(): FormItem {
+  return {
+    type: 'select',
+    name: 'onceUntilNextTurn',
+    label: MONSTER_TURN_LIMIT_LABEL,
+    placeholder: MONSTER_TURN_LIMIT_EMPTY_LABEL,
+    optionalDisclosure: { addLabel: MONSTER_TURN_LIMIT_ADD_LABEL },
+    options: [{ value: 'true', label: MONSTER_TURN_LIMIT_OPTION_LABEL }],
+  }
+}
+
+function monsterActionParryPreviewSlot(
+  ctx: ContentFormCtx,
+  action: MonsterActionDraftRow,
+): FormItem {
+  return {
+    kind: 'slot',
+    name: 'parryPreview',
+    render: () => <MonsterActionParrySummary ctx={ctx} action={action} />,
+  }
+}
+
+function bonusAuthoringFields(input: {
+  ctx: ContentFormCtx
+  action: MonsterActionDraftRow
+  section: MonsterActionSection
+  namePrefix: string
+}): FormItem[] | undefined {
+  if (input.section !== 'bonusActions') return undefined
+  const preview: FormItem = {
+    kind: 'slot',
+    name: 'bonusPreview',
+    render: () => <MonsterActionBonusSummary ctx={input.ctx} action={input.action} />,
+  }
+  const usage = monsterActionUsageEditor(input.action, input.namePrefix)
+  if (input.action.kind === 'leap') {
+    return [preview, ...leapDistanceFields(), ...usage]
+  }
+  if (input.action.kind === 'teleport') {
+    const creatureTypeOptions = buildActiveCreatureTypeFieldOptions(
+      input.ctx.creatureTypeVocabulary,
+    )
+    return [
+      preview,
+      distanceJoinedPairField({
+        amountName: 'distanceFeet',
+        label: MONSTER_TELEPORT_DISTANCE_LABEL,
+        presets: MEASURED_RANGE_FEET,
+        allowCustom: true,
+        required: true,
+        hint: { text: MONSTER_TELEPORT_DISTANCE_HINT },
+      }),
       {
-        kind: 'slot',
-        name: 'castingAbility',
-        render: () => (
-          <MonsterActionCastingAbilityField
-            name={`${namePrefix}.castingAbility`}
-            sharedOptions={sharedCastingOptions}
-            labelPosition="settings"
-          />
-        ),
-      },
-      spellComponentField(),
-      ...monsterActionLimitedUseFields(),
-      {
-        kind: 'array',
-        name: 'spells',
-        label: getContentTypeTerm('spells').label,
-        addAction: { label: 'Add spell' },
-        item: { header: { fallback: (index) => `Spell ${index + 1}` } },
+        kind: 'group',
+        name: 'passenger',
+        legend: MONSTER_TELEPORT_PASSENGER_LEGEND,
+        description: MONSTER_TELEPORT_PASSENGER_HINT,
+        optionalDisclosure: {
+          addLabel: MONSTER_TELEPORT_PASSENGER_ADD_LABEL,
+          seedWhen: () => ({ withinFeet: TELEPORT_WITHIN_DEFAULT }),
+        },
         fields: [
-          {
-            type: 'select',
-            name: 'spellId',
-            label: getContentTypeTerm('spells').label,
-            placeholder: 'Choose',
-            options: spellOptions(ctx),
-          },
-          { type: 'number', name: 'castAtLevel', label: 'Cast at level', min: 0, max: 9 },
-          ...monsterActionLimitedUseFields(),
+          distanceJoinedPairField({
+            amountName: 'passenger.withinFeet',
+            label: MONSTER_TELEPORT_WITHIN_LABEL,
+            presets: MEASURED_RANGE_FEET,
+            allowCustom: true,
+            required: true,
+            hint: { text: MONSTER_TELEPORT_WITHIN_HINT },
+          }),
+          ...resolutionOccupantRequirementsFields({
+            requirementsPath: 'passenger.requirements',
+            creatureTypeOptions,
+            fieldsOnly: true,
+          }),
         ],
       },
-    )
+      ...usage,
+    ]
   }
+  if (input.action.kind === 'take-actions') {
+    return [
+      preview,
+      {
+        type: 'segmentedControl',
+        name: 'combination',
+        label: MONSTER_TAKE_ACTIONS_CHOICE_LABEL,
+        defaultValue: 'one',
+        options: [
+          { value: 'one', label: MONSTER_TAKE_ACTIONS_CHOICE_ONE },
+          { value: 'each', label: MONSTER_TAKE_ACTIONS_CHOICE_EACH },
+        ],
+        interactivity: {
+          dependsOn: ['standardActions'],
+          disabledWhen: (values) => {
+            const selected = values.standardActions
+            return !Array.isArray(selected) || selected.length < 2
+          },
+        },
+        hint: {
+          position: 'below-control',
+          resolve: {
+            dependsOn: ['standardActions'],
+            hintWhen: (values) => {
+              const selected = values.standardActions
+              if (!Array.isArray(selected) || selected.length < 2) {
+                return MONSTER_TAKE_ACTIONS_BEHAVIOR_HINT_DISABLED
+              }
+              return undefined
+            },
+          },
+        },
+      },
+      {
+        type: 'chips',
+        name: 'standardActions',
+        label: MONSTER_TAKE_ACTIONS_ACTIONS_LABEL,
+        noun: { singular: 'action', plural: 'actions' },
+        required: true,
+        options: BONUS_STANDARD_ACTION_IDS.map((id) => ({
+          value: id,
+          label: getActionVocabularyEntry(id)?.label ?? id,
+        })),
+      },
+      {
+        type: 'text',
+        name: 'restriction',
+        label: MONSTER_TAKE_ACTIONS_RESTRICTION_LABEL,
+        hint: { text: MONSTER_TAKE_ACTIONS_RESTRICTION_HINT },
+        placeholder: MONSTER_TAKE_ACTIONS_RESTRICTION_PLACEHOLDER,
+        optionalDisclosure: { addLabel: MONSTER_TAKE_ACTIONS_RESTRICTION_ADD_LABEL },
+      },
+      ...usage,
+    ]
+  }
+  return undefined
+}
 
-  return fields
+function reactionAuthoringFields(input: {
+  ctx: ContentFormCtx
+  action: MonsterActionDraftRow
+  section: MonsterActionSection
+  namePrefix: string
+  attackOptions?: { value: string; label: string }[]
+  referenceOptions?: { value: string; label: string }[]
+  advisories?: readonly MonsterFormAdvisory[]
+}): FormItem[] | undefined {
+  if (input.section !== 'reactions') return undefined
+  const attackOptions = input.attackOptions ?? []
+  const referenceOptions = input.referenceOptions ?? []
+  if (input.action.kind === 'parry') {
+    return [
+      monsterActionParryPreviewSlot(input.ctx, input.action),
+      monsterFormAdvisorySlot(input.advisories ?? [], input.namePrefix),
+      {
+        type: 'number',
+        name: 'acBonus',
+        label: MONSTER_PARRY_AC_BONUS_LABEL,
+        hint: { text: MONSTER_PARRY_AC_BONUS_HINT },
+        min: PARRY_AC_BONUS_MIN,
+        max: PARRY_AC_BONUS_MAX,
+        step: 1,
+        required: true,
+        control: 'stepper',
+      },
+      {
+        type: 'select',
+        name: 'followUpActionId',
+        label: MONSTER_PARRY_FOLLOW_UP_LABEL,
+        hint: { text: MONSTER_PARRY_FOLLOW_UP_HINT },
+        placeholder: 'Choose',
+        options: attackOptions,
+        optionalDisclosure: {
+          addLabel: MONSTER_PARRY_FOLLOW_UP_ADD_LABEL,
+          seedWhen: () => '',
+        },
+      },
+    ]
+  }
+  if (input.action.kind === 'action-reference') {
+    return [
+      monsterFormAdvisorySlot(input.advisories ?? [], input.namePrefix),
+      monsterReactionConditionField(input.action),
+      {
+        type: 'select',
+        name: 'actionIds.0',
+        label: MONSTER_REFERENCE_ACTION_LABEL,
+        hint: { text: MONSTER_REACTION_REFERENCE_HINT },
+        placeholder: 'Choose',
+        options: referenceOptions,
+        required: true,
+      },
+      {
+        type: 'richtext',
+        name: 'description',
+        label: MONSTER_REACTION_ADDITIONAL_RULES_LABEL,
+        hint: MONSTER_REACTION_ADDITIONAL_RULES_HINT,
+        optionalDisclosure: { addLabel: MONSTER_REACTION_ADDITIONAL_RULES_ADD_LABEL },
+      },
+    ]
+  }
+  return undefined
+}
+
+function legendaryAuthoringFields(input: {
+  ctx: ContentFormCtx
+  action: MonsterActionDraftRow
+  section: MonsterActionSection
+  namePrefix: string
+  sharedCastingOptions: { value: string; label: string }[]
+  referenceOptions?: { value: string; label: string }[]
+  sourceSpellOptions?: { value: string; label: string }[]
+  onCastingSourceBlocked?: (message: string) => void
+  advisories?: readonly MonsterFormAdvisory[]
+}): FormItem[] | undefined {
+  const category =
+    input.section === 'legendaryActions' ? legendaryActionCategory(input.action) : undefined
+  if (!category || category === 'custom') return undefined
+  return [
+    monsterFormAdvisorySlot(input.advisories ?? [], input.namePrefix),
+    ...legendaryActionDetailFields({
+      category,
+      namePrefix: input.namePrefix,
+      actionId: input.action.id,
+      sharedCastingOptions: input.sharedCastingOptions,
+      referenceOptions: input.referenceOptions ?? [],
+      catalogSpellOptions: spellOptions(input.ctx),
+      sourceSpellOptions: input.sourceSpellOptions ?? [],
+      spellCatalogById: input.ctx.spellCatalogById,
+      onCastingSourceBlocked: input.onCastingSourceBlocked,
+    }),
+    turnLimitField(),
+  ]
+}
+
+function sharedAuthoringFields(input: {
+  ctx: ContentFormCtx
+  action: MonsterActionDraftRow
+  section: MonsterActionSection
+  namePrefix: string
+  equipmentOptions: { value: string; label: string }[]
+  equipment?: MonsterFormValues['equipment']
+  sharedCastingOptions: { value: string; label: string }[]
+  attackOptions?: { value: string; label: string }[]
+  onCastingSourceBlocked?: (message: string) => void
+  advisories?: readonly MonsterFormAdvisory[]
+}): FormItem[] {
+  const { ctx, action, section, namePrefix } = input
+  const source =
+    action.kind === 'weapon' ? [monsterActionEquipmentField(input.equipmentOptions)] : []
+  const preview = monsterActionAuthoringPreviewSlots(ctx, action, section)
+  const primaryProse = action.kind === 'special' ? [monsterActionDescriptionField(action)] : []
+  const supplemental = action.kind === 'special' ? [] : [monsterActionDescriptionField(action)]
+  return [
+    ...source,
+    ...preview,
+    monsterFormAdvisorySlot(input.advisories ?? [], namePrefix),
+    ...primaryProse,
+    ...monsterActionMechanicFields({
+      ctx,
+      action,
+      section,
+      namePrefix,
+      sharedCastingOptions: input.sharedCastingOptions,
+      attackOptions: input.attackOptions ?? [],
+      equipment: input.equipment ?? [],
+      onCastingSourceBlocked: input.onCastingSourceBlocked,
+    }),
+    turnLimitField(),
+    ...supplemental,
+  ]
+}
+
+/**
+ * Detail body order: source, preview, advisory, primary prose, mechanics, supplemental prose.
+ * Identity stays on the master-detail header.
+ */
+export function monsterActionDetailFields(input: {
+  ctx: ContentFormCtx
+  action: MonsterActionDraftRow
+  section: MonsterActionSection
+  namePrefix: string
+  equipmentOptions: { value: string; label: string }[]
+  equipment?: MonsterFormValues['equipment']
+  sharedCastingOptions: { value: string; label: string }[]
+  attackOptions?: { value: string; label: string }[]
+  referenceOptions?: { value: string; label: string }[]
+  sourceSpellOptions?: { value: string; label: string }[]
+  onCastingSourceBlocked?: (message: string) => void
+  /** Already collected for this form. The advisory slot only filters this list. */
+  advisories?: readonly MonsterFormAdvisory[]
+}): FormItem[] {
+  return (
+    reactionAuthoringFields(input) ??
+    legendaryAuthoringFields(input) ??
+    bonusAuthoringFields(input) ??
+    sharedAuthoringFields(input)
+  )
 }

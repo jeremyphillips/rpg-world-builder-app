@@ -6,7 +6,7 @@ import { CardFooter } from './card'
 import { FormCard, formCardContentClass } from './form-card'
 import { SubmitButton } from './submit-button'
 import { Form } from '../../form/shells/form.client'
-import type { FormItem } from '../../form/field-config'
+import type { FormItem } from '../../form/field-config/form-item.types'
 
 const schema = z.object({
   email: z.string().email('Enter a valid email'),

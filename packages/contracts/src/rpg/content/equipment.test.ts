@@ -12,6 +12,7 @@ import {
   formatWeaponDamage,
   formatWeaponProperties,
   formatWeaponRange,
+  weaponRangeSchema,
   formatToolUtilizeAction,
   formatToolUtilizes,
   getArmorAcDisplay,
@@ -65,17 +66,15 @@ const SHORTBOW_STORED = systemRecord('shortbow', {
   range: { normal: 80, long: 320 },
 })
 
-const NET_STORED = systemRecord('net', {
+const NO_DAMAGE_WEAPON_STORED = systemRecord('utility-weapon', {
   kind: 'weapon',
-  name: 'Net',
+  name: 'Utility weapon',
   cost: { amount: 1, currency: 'gp' },
-  weight: { value: 3, unit: 'lb' },
-  category: 'martial',
-  mode: 'ranged',
-  properties: ['special', 'thrown'],
-  mastery: 'topple',
-  range: { normal: 5, long: 15 },
-  specialRules: 'A Large or smaller creature hit is Restrained until freed. Escape DC 10.',
+  weight: { value: 1, unit: 'lb' },
+  category: 'simple',
+  mode: 'melee',
+  properties: [],
+  mastery: 'nick',
 })
 
 const BLOWGUN_STORED = systemRecord('blowgun', {
@@ -285,14 +284,14 @@ describe('equipmentSchema', () => {
 })
 
 describe('weapon equipment variant', () => {
-  it('parses melee, ranged, net, and flat-damage weapons', () => {
+  it('parses melee, ranged, no-damage, and flat-damage weapons', () => {
     expect(equipmentSchema.parse(LONGSWORD_STORED)).toMatchObject({ name: 'Longsword' })
     expect(equipmentSchema.parse(SHORTBOW_STORED)).toMatchObject({ range: { normal: 80 } })
-    const net = equipmentSchema.parse(NET_STORED)
-    expect(net.kind).toBe('weapon')
-    if (net.kind === 'weapon') {
-      expect(net.damage).toBeUndefined()
-      expect(net.damageType).toBeUndefined()
+    const utility = equipmentSchema.parse(NO_DAMAGE_WEAPON_STORED)
+    expect(utility.kind).toBe('weapon')
+    if (utility.kind === 'weapon') {
+      expect(utility.damage).toBeUndefined()
+      expect(utility.damageType).toBeUndefined()
     }
     const blowgun = equipmentSchema.parse(BLOWGUN_STORED)
     if (blowgun.kind === 'weapon') {
@@ -304,7 +303,9 @@ describe('weapon equipment variant', () => {
     expect(equipmentSchema.safeParse({ ...LONGSWORD_STORED, damageType: undefined }).success).toBe(
       false,
     )
-    expect(equipmentSchema.safeParse({ ...NET_STORED, damageType: 'piercing' }).success).toBe(false)
+    expect(
+      equipmentSchema.safeParse({ ...NO_DAMAGE_WEAPON_STORED, damageType: 'piercing' }).success,
+    ).toBe(false)
     expect(
       equipmentSchema.safeParse({ ...LONGSWORD_STORED, versatileDamage: undefined }).success,
     ).toBe(false)
@@ -405,12 +406,28 @@ describe('getArmorAcDisplay', () => {
   })
 })
 
+describe('weaponRangeSchema', () => {
+  it('accepts a single range and a disadvantage band, including values outside the preset list', () => {
+    expect(weaponRangeSchema.parse({ normal: 120 })).toEqual({ normal: 120 })
+    expect(weaponRangeSchema.parse({ normal: 60, long: 240 })).toEqual({ normal: 60, long: 240 })
+    expect(weaponRangeSchema.parse({ normal: 175, long: 200 })).toEqual({ normal: 175, long: 200 })
+  })
+
+  it('rejects a missing normal range, zero, and a long range that does not exceed normal', () => {
+    expect(weaponRangeSchema.safeParse({ normal: 0 }).success).toBe(false)
+    expect(weaponRangeSchema.safeParse({ normal: 30, long: 30 }).success).toBe(false)
+    expect(weaponRangeSchema.safeParse({ normal: 80, long: 30 }).success).toBe(false)
+    expect(weaponRangeSchema.safeParse({ long: 30 }).success).toBe(false)
+  })
+})
+
 describe('weapon display helpers', () => {
   it('formats properties, range, and damage', () => {
     expect(formatWeaponProperties(['versatile', 'finesse'])).toBe('Versatile, Finesse')
     expect(formatWeaponProperties([])).toBe('—')
     expect(formatWeaponRange({ normal: 80, long: 320 })).toBe('80/320 ft.')
     expect(formatWeaponRange({ normal: 5 })).toBe('5 ft.')
+    expect(formatWeaponRange({ normal: 60, long: 240 })).toBe('60/240 ft.')
     expect(formatWeaponDamage({ dice: { count: 2, faces: 6 } })).toBe('2d6')
     expect(formatWeaponDamage({ flat: 1 })).toBe('1')
   })

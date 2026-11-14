@@ -32,10 +32,18 @@ export type WeaponDamageType = z.infer<typeof weaponDamageTypeSchema>
 // Range — normal reach in feet; long is optional (absent for melee-only)
 // ---------------------------------------------------------------------------
 
-export const weaponRangeSchema = z.object({
-  normal: z.number().int().min(0),
-  long: z.number().int().min(0).optional(),
-})
+export const weaponRangeSchema = z
+  .object({
+    normal: z.number().int().positive(),
+    long: z.number().int().positive().optional(),
+  })
+  .superRefine((range, ctx) => {
+    if (range.long !== undefined && range.long <= range.normal) {
+      addCustomRefinementIssue(ctx, equipmentVariantValidationMessages.longRangeExceedsNormal(), [
+        'long',
+      ])
+    }
+  })
 
 export type WeaponRange = z.infer<typeof weaponRangeSchema>
 
@@ -100,7 +108,10 @@ export const weaponEquipmentKindFields = {
   kind: z.literal('weapon'),
   category: weaponCategorySchema,
   mode: weaponModeSchema,
-  /** Absent for utility weapons (net) that deal no damage. */
+  /**
+   * Optional on stored weapons. Weapon publish authoring requires a roll and
+   * damage type. A dedicated flow for non-damaging weapons is deferred.
+   */
   damage: weaponDamageSchema.optional(),
   /** Must be present whenever `damage` is present, and absent otherwise. */
   damageType: weaponDamageTypeSchema.optional(),
@@ -110,7 +121,7 @@ export const weaponEquipmentKindFields = {
   mastery: weaponMasterySchema,
   /** Normal/long throw or fire range in feet. Present for thrown/ranged weapons. */
   range: weaponRangeSchema.optional(),
-  /** Prose for the 'special' property — lance mounted rule, net restrain text, etc. */
+  /** Prose for the 'special' property, such as the lance mounted rule. */
   specialRules: z.string().optional(),
 } as const
 

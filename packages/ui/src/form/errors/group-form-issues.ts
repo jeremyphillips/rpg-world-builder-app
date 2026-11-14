@@ -8,19 +8,38 @@ import { FORM_ISSUE_SEVERITY_ORDER } from './form-issue.types'
 
 const MAX_NAMED_FIELD_SUMMARY_PARTS = 2
 
-/** Joins field issue summaries with a 2-label cap and "+N more" overflow. */
-export function buildFieldSummaryText(
-  fieldIssues: FormIssue[],
+function buildCappedIssueSummaryText(
+  parts: readonly string[],
   maxNamed = MAX_NAMED_FIELD_SUMMARY_PARTS,
 ): string | undefined {
-  if (fieldIssues.length === 0) return undefined
-
-  const parts = fieldIssues.map((issue) => issue.message)
+  if (parts.length === 0) return undefined
   if (parts.length <= maxNamed) return joinArrayItemSummaryParts(parts)
 
   const named = parts.slice(0, maxNamed)
   const extra = parts.length - maxNamed
   return joinInlineMetadata([joinArrayItemSummaryParts(named), `+${extra} more`])
+}
+
+/** Joins field issue summaries with a 2-label cap and "+N more" overflow. */
+export function buildFieldSummaryText(
+  fieldIssues: FormIssue[],
+  maxNamed = MAX_NAMED_FIELD_SUMMARY_PARTS,
+): string | undefined {
+  return buildCappedIssueSummaryText(
+    fieldIssues.map((issue) => issue.message),
+    maxNamed,
+  )
+}
+
+/** Joins row/cross-row issue summaries with the same cap as field summaries. */
+export function buildHeaderIssuesSummaryText(
+  headerIssues: FormIssue[],
+  maxNamed = MAX_NAMED_FIELD_SUMMARY_PARTS,
+): string | undefined {
+  return buildCappedIssueSummaryText(
+    headerIssues.map((issue) => issue.summaryMessage ?? issue.message),
+    maxNamed,
+  )
 }
 
 function compareIssues(left: FormIssue, right: FormIssue, fieldOrder: readonly string[]): number {
@@ -39,12 +58,18 @@ function compareIssues(left: FormIssue, right: FormIssue, fieldOrder: readonly s
   return left.path.localeCompare(right.path)
 }
 
-function countUniquePresentationPaths(issues: readonly FormIssue[]): number {
-  const paths = new Set<string>()
+/** Distinct claim targets. Unrouted issues fall back to the presentation path. */
+export function countIssueClaimTargets(issues: readonly FormIssue[]): number {
+  const targets = new Set<string>()
   for (const issue of issues) {
-    paths.add(issue.presentationPath ?? issue.path)
+    targets.add(issue.claim?.target ?? issue.presentationPath ?? issue.path)
   }
-  return paths.size
+  return targets.size
+}
+
+function isRowHeaderIssue(issue: FormIssue): boolean {
+  if (issue.claim?.kind === 'row') return true
+  return issue.severity !== 'field'
 }
 
 function issueBelongsToArrayPath(issue: FormIssue, arrayPath: string): boolean {
@@ -73,16 +98,18 @@ function buildIssueGroup(
   fieldOrder: readonly string[],
 ): ArrayItemIssueGroup {
   const sortedIssues = [...issues].sort((left, right) => compareIssues(left, right, fieldOrder))
-  const fieldIssues = sortedIssues.filter((issue) => issue.severity === 'field')
+  const fieldIssues = sortedIssues.filter(
+    (issue) => issue.severity === 'field' && issue.claim?.kind !== 'row',
+  )
   const fieldSummary = buildFieldSummaryText(fieldIssues)
 
   return {
     itemPrefix,
     arrayPath,
     itemIndex,
-    totalCount: countUniquePresentationPaths(sortedIssues),
+    totalCount: countIssueClaimTargets(sortedIssues),
     sortedIssues,
-    headerIssues: sortedIssues.filter((issue) => issue.severity !== 'field'),
+    headerIssues: sortedIssues.filter((issue) => isRowHeaderIssue(issue)),
     fieldIssues,
     fieldSummary,
   }
@@ -162,11 +189,9 @@ export function countInvalidArrayItems(issues: readonly FormIssue[], arrayPath: 
   return indices.size
 }
 
-/** Count unique presentation paths under an array path (including nested descendants). */
+/** Count distinct claim targets under an array path (including nested descendants). */
 export function countIssuesForArrayPath(issues: readonly FormIssue[], arrayPath: string): number {
-  return countUniquePresentationPaths(
-    issues.filter((issue) => issueBelongsToArrayPath(issue, arrayPath)),
-  )
+  return countIssueClaimTargets(issues.filter((issue) => issueBelongsToArrayPath(issue, arrayPath)))
 }
 
 export type ArrayIssueIndex = Map<string, ArrayItemIssueGroup>

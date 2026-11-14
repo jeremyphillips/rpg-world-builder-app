@@ -65,3 +65,23 @@ export const WithUnavailableAction: Story = {
     return <Host values={values} />
   },
 }
+
+export const LegendaryActions: Story = {
+  render: () => {
+    const values = resolveMonsterCreateDefaultValues()
+    values.legendaryActionUses = 3
+    values.actions = [
+      { id: 'rend', kind: 'natural-weapon', name: 'Rend', mode: 'melee', damageType: 'slashing' },
+    ]
+    values.legendaryActions = [
+      {
+        id: 'pounce',
+        kind: 'action-reference',
+        name: 'Pounce',
+        actionIds: ['rend'],
+        movement: { allowance: 'half-speed' },
+      },
+    ]
+    return <Host values={values} />
+  },
+}

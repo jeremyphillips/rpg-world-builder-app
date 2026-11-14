@@ -11,6 +11,8 @@ import { InputSelectFieldRenderer } from './input-select-field-renderer.client'
 import { InputUnitFieldRenderer } from './input-unit-field-renderer.client'
 import { LevelRangeFieldRenderer } from './level-range-field-renderer.client'
 import { JoinedPairFieldRenderer } from './joined-pair-field-renderer.client'
+import { OptionalDisclosureJoinedPairFieldRenderer } from './optional-disclosure-joined-pair-field-renderer.client'
+import { OptionalDisclosureRollValueFieldRenderer } from './optional-disclosure-roll-value-field-renderer.client'
 import { RollValueFieldRenderer } from './roll-value-field-renderer.client'
 
 type SpecializedFieldRendererProps = {
@@ -74,8 +76,31 @@ export function renderSpecializedField({
     case 'inlineSentence':
       return <InlineSentenceFieldRenderer config={renderConfig} id={id} namePrefix={namePrefix} />
     case 'joinedPair':
+      if (renderConfig.optionalDisclosure) {
+        return (
+          <OptionalDisclosureJoinedPairFieldRenderer
+            config={renderConfig}
+            disclosure={renderConfig.optionalDisclosure}
+            id={id}
+            namePrefix={namePrefix}
+          />
+        )
+      }
       return <JoinedPairFieldRenderer config={renderConfig} id={id} namePrefix={namePrefix} />
     case 'rollValue':
+      if (renderConfig.optionalDisclosure) {
+        return (
+          <OptionalDisclosureRollValueFieldRenderer
+            config={renderConfig}
+            disclosure={renderConfig.optionalDisclosure}
+            fullName={fullName}
+            id={id}
+            namePrefix={namePrefix}
+            hint={hint}
+            hintPosition={hintPosition}
+          />
+        )
+      }
       return (
         <RollValueFieldRenderer
           config={renderConfig}

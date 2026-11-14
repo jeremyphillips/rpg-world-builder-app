@@ -43,11 +43,6 @@ export const GRANT_TEMPLATE_GROUPS: readonly GrantTemplateGroup[] = [
 
 export type GrantTemplateDuplicatePolicy = 'allow' | 'warn' | 'block'
 
-export type GrantTemplateSearchMetadata = {
-  aliases?: string[]
-  keywords?: string[]
-}
-
 export type GrantTemplateVocabRef =
   | { kind: 'movementMode'; id: MovementMode }
   | { kind: 'movementOperation'; id: MovementOperation }
@@ -73,7 +68,8 @@ export type GrantTemplate = {
   createDefault: () => Record<string, unknown>
   repeatable?: boolean
   duplicatePolicy?: GrantTemplateDuplicatePolicy
-  search?: GrantTemplateSearchMetadata
+  aliases?: readonly string[]
+  searchTerms?: readonly string[]
   vocabRefs?: GrantTemplateVocabRef[]
 }
 
@@ -89,10 +85,8 @@ export const GRANT_TEMPLATES: readonly GrantTemplate[] = [
     groupId: 'proficiencies',
     grantType: 'weaponProficiency',
     createDefault: () => ({ grantType: 'weaponProficiency', proficiencySource: 'specific' }),
-    search: {
-      aliases: ['weapons', 'martial', 'simple'],
-      keywords: ['proficiency'],
-    },
+    aliases: ['weapons', 'martial', 'simple'],
+    searchTerms: ['proficiency'],
     vocabRefs: Object.keys(WEAPON_CATEGORY_ENTRIES).map((id) => ({
       kind: 'weaponCategory' as const,
       id: id as WeaponCategory,
@@ -105,10 +99,8 @@ export const GRANT_TEMPLATES: readonly GrantTemplate[] = [
     groupId: 'proficiencies',
     grantType: 'toolProficiency',
     createDefault: () => ({ grantType: 'toolProficiency', proficiencySource: 'specific' }),
-    search: {
-      aliases: ['tools', 'artisan', 'gaming set', "thieves' tools"],
-      keywords: ['proficiency'],
-    },
+    aliases: ['tools', 'artisan', 'gaming set', "thieves' tools"],
+    searchTerms: ['proficiency'],
     vocabRefs: Object.keys(TOOL_CATEGORY_ENTRIES).map((id) => ({
       kind: 'toolCategory' as const,
       id: id as ToolCategory,
@@ -121,10 +113,8 @@ export const GRANT_TEMPLATES: readonly GrantTemplate[] = [
     groupId: 'proficiencies',
     grantType: 'skillProficiency',
     createDefault: () => ({ grantType: 'skillProficiency', proficiencySource: 'specific' }),
-    search: {
-      aliases: ['skills', 'expertise'],
-      keywords: ['proficiency'],
-    },
+    aliases: ['skills', 'expertise'],
+    searchTerms: ['proficiency'],
   },
   {
     id: 'armor-training',
@@ -133,10 +123,8 @@ export const GRANT_TEMPLATES: readonly GrantTemplate[] = [
     groupId: 'proficiencies',
     grantType: 'armorTraining',
     createDefault: () => ({ grantType: 'armorTraining', proficiencySource: 'specific' }),
-    search: {
-      aliases: ['armor', 'shield', 'heavy armor', 'medium armor', 'light armor'],
-      keywords: ['training', 'proficiency'],
-    },
+    aliases: ['armor', 'shield', 'heavy armor', 'medium armor', 'light armor'],
+    searchTerms: ['training', 'proficiency'],
     vocabRefs: Object.keys(ARMOR_CATEGORY_ENTRIES).map((id) => ({
       kind: 'armorCategory' as const,
       id: id as ArmorCategory,
@@ -149,10 +137,8 @@ export const GRANT_TEMPLATES: readonly GrantTemplate[] = [
     groupId: 'character-options',
     grantType: 'languages',
     createDefault: () => ({ grantType: 'languages' }),
-    search: {
-      aliases: ['speak', 'read', 'write', 'tongue'],
-      keywords: ['language'],
-    },
+    aliases: ['speak', 'read', 'write', 'tongue'],
+    searchTerms: ['language'],
   },
   {
     id: 'spells',
@@ -166,10 +152,8 @@ export const GRANT_TEMPLATES: readonly GrantTemplate[] = [
       spellCastingEnabled: true,
       spellUseLimit: 'at-will',
     }),
-    search: {
-      aliases: ['innate spells', 'spellcasting', 'cantrips', 'always prepared'],
-      keywords: ['spells', 'magic'],
-    },
+    aliases: ['innate spells', 'spellcasting', 'cantrips', 'always prepared'],
+    searchTerms: ['spells', 'magic'],
     vocabRefs: Object.keys(REST_KIND_ENTRIES).map((id) => ({
       kind: 'restKind' as const,
       id: id as RestKind,
@@ -187,10 +171,8 @@ export const GRANT_TEMPLATES: readonly GrantTemplate[] = [
       featCategory: 'general',
       featAllowAnyQualifying: true,
     }),
-    search: {
-      aliases: ['feat', 'optional feature', 'asi alternative'],
-      keywords: ['choice'],
-    },
+    aliases: ['feat', 'optional feature', 'asi alternative'],
+    searchTerms: ['choice'],
     vocabRefs: Object.keys(FEAT_CATEGORY_ENTRIES).map((id) => ({
       kind: 'featCategory' as const,
       id: id as FeatCategory,
@@ -203,10 +185,8 @@ export const GRANT_TEMPLATES: readonly GrantTemplate[] = [
     groupId: 'combat-traits',
     grantType: 'resistances',
     createDefault: () => ({ grantType: 'resistances' }),
-    search: {
-      aliases: ['resistance', 'damage resistance'],
-      keywords: ['resist'],
-    },
+    aliases: ['resistance', 'damage resistance'],
+    searchTerms: ['resist'],
   },
   {
     id: 'special-sense',
@@ -215,10 +195,8 @@ export const GRANT_TEMPLATES: readonly GrantTemplate[] = [
     groupId: 'combat-traits',
     grantType: 'senses',
     createDefault: () => ({ grantType: 'senses', senseRange: 60 }),
-    search: {
-      aliases: ['darkvision', 'blindsight', 'tremorsense', 'truesight'],
-      keywords: ['sense', 'vision'],
-    },
+    aliases: ['darkvision', 'blindsight', 'tremorsense', 'truesight'],
+    searchTerms: ['sense', 'vision'],
     vocabRefs: ['darkvision', 'blindsight', 'tremorsense', 'truesight'].map((id) => ({
       kind: 'sense' as const,
       id,
@@ -231,10 +209,8 @@ export const GRANT_TEMPLATES: readonly GrantTemplate[] = [
     groupId: 'combat-traits',
     grantType: 'damageType',
     createDefault: () => ({ grantType: 'damageType' }),
-    search: {
-      aliases: ['unarmed', 'natural weapon'],
-      keywords: ['damage'],
-    },
+    aliases: ['unarmed', 'natural weapon'],
+    searchTerms: ['damage'],
   },
   {
     id: 'movement-bonus',
@@ -248,10 +224,8 @@ export const GRANT_TEMPLATES: readonly GrantTemplate[] = [
       movementOperation: 'increase',
       movementFeet: '5',
     }),
-    search: {
-      aliases: ['speed', 'walking speed', 'flying speed', 'swim speed'],
-      keywords: ['movement', 'bonus'],
-    },
+    aliases: ['speed', 'walking speed', 'flying speed', 'swim speed'],
+    searchTerms: ['movement', 'bonus'],
     vocabRefs: [
       ...MOVEMENT_MODES.map((id) => ({ kind: 'movementMode' as const, id })),
       ...MOVEMENT_OPERATIONS.map((id) => ({ kind: 'movementOperation' as const, id })),
@@ -269,10 +243,8 @@ export const GRANT_TEMPLATES: readonly GrantTemplate[] = [
       rollMode: 'advantage',
       rollTargets: ['saving-throw'],
     }),
-    search: {
-      aliases: ['advantage', 'disadvantage', 'fey ancestry'],
-      keywords: ['saving throw', 'attack roll'],
-    },
+    aliases: ['advantage', 'disadvantage', 'fey ancestry'],
+    searchTerms: ['saving throw', 'attack roll'],
   },
   {
     id: 'save-outcome-override',
@@ -286,10 +258,8 @@ export const GRANT_TEMPLATES: readonly GrantTemplate[] = [
       saveOutcomeUses: 1,
       saveOutcomeRest: 'long',
     }),
-    search: {
-      aliases: ['legendary resistance'],
-      keywords: ['saving throw', 'success'],
-    },
+    aliases: ['legendary resistance'],
+    searchTerms: ['saving throw', 'success'],
   },
 ] as const
 

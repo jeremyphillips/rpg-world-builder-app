@@ -29,13 +29,19 @@ function TraitsValuesProbe() {
 function TabShell({
   traits = [] as Trait[],
   entityCatalogLayer,
+  embeddedSeedRowIds,
+  embeddedSystemOriginRowIds,
 }: {
   traits?: Trait[]
   entityCatalogLayer?: ContentFormCtx['entityCatalogLayer']
+  embeddedSeedRowIds?: ContentFormCtx['embeddedSeedRowIds']
+  embeddedSystemOriginRowIds?: ContentFormCtx['embeddedSystemOriginRowIds']
 }) {
   return (
     <TestFormShell defaultValues={{ traits }}>
-      <SpeciesTraitsTab formCtx={{ entityCatalogLayer }} />
+      <SpeciesTraitsTab
+        formCtx={{ entityCatalogLayer, embeddedSeedRowIds, embeddedSystemOriginRowIds }}
+      />
       <TraitsValuesProbe />
     </TestFormShell>
   )
@@ -96,7 +102,7 @@ describe('SpeciesTraitsTab', () => {
   })
 
   it('renders source meta without a Custom or Grant eyebrow', () => {
-    render(<TabShell traits={[darkvision]} />)
+    render(<TabShell traits={[darkvision]} embeddedSeedRowIds={{ traits: ['t1'] }} />)
     const list = screen.getByRole('navigation', { name: 'Traits' })
     expect(within(list).getByText('Homebrew')).toBeInTheDocument()
     expect(within(list).queryByText(/Custom/)).not.toBeInTheDocument()
@@ -178,7 +184,14 @@ describe('SpeciesTraitsTab', () => {
 
   it('locks system traits on a system species (no overflow delete, System meta)', async () => {
     const user = userEvent.setup()
-    render(<TabShell traits={[darkvision]} entityCatalogLayer="system" />)
+    render(
+      <TabShell
+        traits={[darkvision]}
+        entityCatalogLayer="system"
+        embeddedSeedRowIds={{ traits: ['t1'] }}
+        embeddedSystemOriginRowIds={{ traits: ['t1'] }}
+      />,
+    )
 
     expect(screen.getAllByText(/System/).length).toBeGreaterThan(0)
     await user.click(screen.getByRole('button', { name: /Actions for Darkvision/i }))

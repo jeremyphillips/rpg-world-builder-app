@@ -38,7 +38,7 @@ describe('buildSubclassSelectedIdentity', () => {
 
     expect(identity).toMatchObject({
       title: 'Champion',
-      meta: { eyebrow: 'Modified', sourceLabel: 'System' },
+      meta: { eyebrow: 'Modified', provenance: 'system', persistence: 'persisted' },
       deletable: false,
     })
     identity?.onAvailabilityChange?.()

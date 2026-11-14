@@ -2,6 +2,8 @@ import { useCallback, useMemo, useRef } from 'react'
 import { useWatch } from 'react-hook-form'
 import type { FormItem } from '@rpg/ui/form'
 
+import type { EmbeddedArrayResolverFieldInput } from '../forms/validation/tabbed-form-resolver-fields'
+
 import type { Availability, AvailabilityReason } from '@/lib/availability'
 import { openCampaignAvailabilityDialog } from '../campaign-access/open-campaign-availability-dialog.lib'
 import type { ContentFormCtx } from '../forms/registry/content-form-registry'
@@ -33,11 +35,16 @@ export interface UseEmbeddedMasterDetailRowsParams {
   formCtx: ContentFormCtx
   fieldName: string
   editor: UseMasterDetailArrayResult
-  itemFields: FormItem[]
+  itemFields: FormItem[] | EmbeddedArrayResolverFieldInput
   itemNoun: MasterDetailItemNounTerm
-  mapListItem: (
-    ctx: FormEmbeddedMasterDetailMapListItemContext,
-  ) => Pick<MasterDetailListItem, 'title'> & { eyebrow?: string }
+  mapListItem: (ctx: FormEmbeddedMasterDetailMapListItemContext) => Pick<
+    MasterDetailListItem,
+    'title'
+  > & {
+    eyebrow?: string
+    kindLabel?: string
+    summary?: string
+  }
   access?: FormEmbeddedMasterDetailAccessConfig
   resolveRowReasons?: (ctx: {
     row: unknown
@@ -52,6 +59,8 @@ export interface UseEmbeddedMasterDetailRowsParams {
   /** When set, replaces presentation-path issue counts for heterogeneous rows. */
   resolveRowIssueCount?: (index: number) => number
   showDelete?: boolean
+  /** Detail caption placement for every row in this array, such as "Actions". */
+  sectionLabel?: string
 }
 
 export function useEmbeddedMasterDetailRows({
@@ -66,15 +75,21 @@ export function useEmbeddedMasterDetailRows({
   resolveAvailabilityFormItems,
   resolveRowIssueCount,
   showDelete = true,
+  sectionLabel,
 }: UseEmbeddedMasterDetailRowsParams) {
   const watched = useWatch({ name: fieldName }) as unknown[] | undefined
   const availabilityDialogRef = useRef<HTMLDivElement>(null)
-  const seedRowIds = useMemo(() => {
+  const persistedRowIds = useMemo(() => {
     const ids = formCtx.embeddedSeedRowIds?.[fieldName]
     return ids?.length ? new Set(ids) : undefined
   }, [formCtx.embeddedSeedRowIds, fieldName])
+  const systemOriginRowIds = useMemo(() => {
+    const ids = formCtx.embeddedSystemOriginRowIds?.[fieldName]
+    return ids?.length ? new Set(ids) : undefined
+  }, [formCtx.embeddedSystemOriginRowIds, fieldName])
 
   const validation = useMasterDetailRowValidation(fieldName, itemFields)
+  const { getRowHeaderIssues } = validation
   const getRowIssueCount = resolveRowIssueCount ?? validation.getRowIssueCount
   const showRowBadges = resolveRowIssueCount ? true : validation.showRowBadges
 
@@ -89,7 +104,9 @@ export function useEmbeddedMasterDetailRows({
         access,
         mapListItem,
         getRowIssueCount,
-        seedRowIds,
+        persistedRowIds,
+        systemOriginRowIds,
+        sectionLabel,
         resolveRowReasons,
       })
     }
@@ -108,10 +125,14 @@ export function useEmbeddedMasterDetailRows({
         index: formIndex,
         row: row as { id?: string } | undefined,
         entityCatalogLayer: formCtx.entityCatalogLayer,
-        seedRowIds,
+        persistedRowIds,
+        systemOriginRowIds,
         getRowIssueCount,
         title: masterDetailItemTitle(listDisplay.title, itemNoun),
         eyebrow: listDisplay.eyebrow,
+        kindLabel: listDisplay.kindLabel,
+        summary: listDisplay.summary,
+        sectionLabel,
         showDelete,
         extraReasons:
           resolveRowReasons?.({
@@ -139,7 +160,9 @@ export function useEmbeddedMasterDetailRows({
     itemNoun,
     mapListItem,
     resolveRowReasons,
-    seedRowIds,
+    persistedRowIds,
+    systemOriginRowIds,
+    sectionLabel,
     showDelete,
     watched,
   ])
@@ -171,11 +194,13 @@ export function useEmbeddedMasterDetailRows({
   const selectedIdentity = useMemo((): MasterDetailEditorIdentity | undefined => {
     if (!selectedRow) return undefined
     const issueCount = showRowBadges ? (selectedRow.item.issueCount ?? 0) : 0
+    const headerIssues = getRowHeaderIssues(selectedRow.formIndex)
     return {
       title: selectedRow.item.title,
       meta: selectedRow.item.meta,
       deletable: selectedRow.item.deletable,
       ...(issueCount > 0 ? { issueCount } : {}),
+      ...(headerIssues.length > 0 ? { headerIssues } : {}),
       ...(access && selectedRow.availability
         ? {
             availability: selectedRow.availability,
@@ -183,7 +208,7 @@ export function useEmbeddedMasterDetailRows({
           }
         : {}),
     }
-  }, [access, openAvailabilityDialog, selectedRow, showRowBadges])
+  }, [access, getRowHeaderIssues, openAvailabilityDialog, selectedRow, showRowBadges])
 
   const availabilityFormItems = useMemo((): FormItem[] | undefined => {
     if (!access || !selectedRow || access.kind !== 'availability') return undefined

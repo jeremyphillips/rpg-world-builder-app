@@ -18,13 +18,9 @@ export function formatProficiencyBonus(value: number): string {
   return `${getTermCompactLabel(PROFICIENCY_BONUS_TERM)} ${formatSignedModifier(value)}`
 }
 
-/** SRD-style passive Perception phrase for stat blocks (`passive Perception 12`). */
+/** Stat-block passive Perception phrase (`Passive Perception 12`). */
 export function formatPassivePerceptionStatPhrase(value: number): string {
-  const label = vocabularyTermLabel(PASSIVE_PERCEPTION_TERM, {
-    number: 'singular',
-    casing: 'sentence',
-  })
-  return `${label} ${value}`
+  return `${vocabularyTermLabel(PASSIVE_PERCEPTION_TERM)} ${value}`
 }
 
 export type FormatCreatureCommunicationOptions = {

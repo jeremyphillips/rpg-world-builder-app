@@ -13,6 +13,7 @@ import { FormFieldLabel } from '../../form/presentation/form-field-label.client'
 import { ADD_DICE_LABEL, DiceFormulaControls } from './dice-formula-field-controls.client'
 import type { DiceFormulaPatch } from './dice-formula-field.lib'
 import { FieldLayout } from './field-layout'
+import { resolveFieldDescribedBy } from './field-validation-props'
 import { resolveFieldAnatomyWidth, type FieldChrome } from './field-chrome.variants'
 import type { FieldHintPosition } from './field.variants'
 import {
@@ -92,13 +93,21 @@ export function RollValueField({
     () => rollValuePartsToDiceFormula(parts, fieldDefaults),
     [fieldDefaults, parts],
   )
-  const showDiceFields = shouldShowRollValueDiceFields(parts)
+  const showDiceFields = required || shouldShowRollValueDiceFields(parts)
   const showModifierFields = shouldShowRollValueModifierFields(parts)
   const hintId = `${id}-hint`
   const errorId = `${id}-error`
   const inlineLabelId = `${id}-inline-label`
   const hasError = Boolean(error)
-  const describedBy = hasError ? errorId : hint ? hintId : undefined
+  const describedBy = resolveFieldDescribedBy(
+    error,
+    undefined,
+    hint,
+    undefined,
+    errorId,
+    hintId,
+    hintPosition,
+  )
   const rootWidth = resolveFieldAnatomyWidth(width, chrome)
 
   const applyPatch = React.useCallback(
@@ -125,6 +134,16 @@ export function RollValueField({
     onPartsChange(defaultRollValueDice(fieldDefaults))
   }, [fieldDefaults, onPartsChange])
 
+  const diceAtoms =
+    showDiceFields && (required || shouldShowRollValueDiceFields(parts))
+      ? {
+          count: typeof parts.diceCount === 'number' ? parts.diceCount : null,
+          faces: typeof parts.diceFaces === 'number' ? parts.diceFaces : null,
+          countPlaceholder: String(fieldDefaults.count),
+          facesPlaceholder: `d${fieldDefaults.faces}`,
+        }
+      : undefined
+
   const controls = (
     <DiceFormulaControls
       id={id}
@@ -136,6 +155,7 @@ export function RollValueField({
       modifierMode="optional"
       showModifierFields={showModifierFields}
       showDiceFields={showDiceFields}
+      diceAtoms={diceAtoms}
       countMin={countMin}
       countMax={countMax}
       modifierMin={modifierMin}
@@ -143,7 +163,7 @@ export function RollValueField({
       modifierOperators={ROLL_VALUE_MODIFIER_OPERATORS}
       controlLabels={ROLL_VALUE_CONTROL_LABELS}
       facesNotation
-      onAddDice={handleAddDice}
+      onAddDice={required ? undefined : handleAddDice}
       addDiceLabel={ADD_DICE_LABEL}
       labelPosition="above"
       inlineLabelId={inlineLabelId}
@@ -170,6 +190,7 @@ export function RollValueField({
       id={id}
       error={error}
       hint={hint}
+      hintPosition={hintPosition}
       required={required}
       size={size}
       width={rootWidth}
@@ -177,7 +198,6 @@ export function RollValueField({
       anatomy
     >
       <FieldLayout
-        hintPosition={hintPosition}
         wrapControl={false}
         label={
           <FormFieldLabel

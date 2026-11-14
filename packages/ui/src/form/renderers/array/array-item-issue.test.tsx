@@ -66,6 +66,24 @@ describe('array-item-issue', () => {
     expect(summary).toHaveTextContent('Missing Rarity · Missing Quantity')
   })
 
+  it('renders compact row issue text from compactSummaryText', () => {
+    render(
+      <ArrayItemIssueSummary
+        placement="compactSummary"
+        summaryId="item-0-summary"
+        compactSummaryText="Row incompatible"
+        group={{
+          totalCount: 1,
+          sortedIssues: [],
+          headerIssues: [],
+          fieldSummary: undefined,
+        }}
+      />,
+    )
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Row incompatible')
+  })
+
   it('formats legend issue labels', () => {
     expect(arrayLegendIssueLabel(2, 1)).toBe('2 issues in 1 row')
     expect(arrayLegendIssueLabel(1, 3)).toBe('1 issue in 3 rows')

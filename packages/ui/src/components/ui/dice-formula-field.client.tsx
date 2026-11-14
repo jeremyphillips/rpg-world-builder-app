@@ -165,6 +165,7 @@ export function DiceFormulaField({
       id={id}
       error={error}
       hint={hint}
+      hintPosition={hintPosition}
       required={required}
       size={size}
       width={rootWidth}
@@ -172,7 +173,6 @@ export function DiceFormulaField({
       anatomy
     >
       <FieldLayout
-        hintPosition={hintPosition}
         wrapControl={false}
         label={
           <FormFieldLabel

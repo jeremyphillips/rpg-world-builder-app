@@ -18,7 +18,6 @@ const ctx = makeContentFormCtx()
 const traitsSchema = z.object({
   traits: z.array(
     z.object({
-      kind: z.literal('grant'),
       grants: z.array(grantRowFormSchema),
     }),
   ),

@@ -50,7 +50,7 @@ describe('RichTextLinkPicker', () => {
 
     const tablist = screen.getByRole('tablist')
     expect(tablist).toHaveClass('ui-tabs__list--pill', 'grid', 'grid-cols-2', 'w-full')
-    expect(screen.getByRole('searchbox', { name: 'Search internal content' })).toBeInTheDocument()
+    expect(screen.getByRole('searchbox', { name: 'Search content' })).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Filter by content type' })).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Filter by content type' })).toHaveTextContent(
       'All types',

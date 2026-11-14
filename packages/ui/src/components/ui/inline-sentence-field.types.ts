@@ -1,4 +1,4 @@
-import type { FieldOption, SelectFieldOptionListItem } from '../../form/field-config'
+import type { FieldOption, SelectFieldOptionListItem } from '../../form/field-config/field-options'
 import type { FieldLabelVisibility } from '../../form/form-heading.lib'
 import type { FieldDigits } from './field-digit-metrics'
 import type { FieldSize } from './field.client'
@@ -140,6 +140,10 @@ export type InlineSentenceBoundJoinedPairSelect = Omit<
   position: 'start' | 'end'
   value?: string | number
   options: readonly TypedSelectOption[]
+  allowCustom?: boolean
+  clearable?: boolean
+  customMin?: number
+  customMax?: number
   onChange?: (value: string | number | undefined) => void
 }
 

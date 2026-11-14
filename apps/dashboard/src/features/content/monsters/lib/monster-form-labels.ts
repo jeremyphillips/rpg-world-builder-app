@@ -5,6 +5,8 @@ import {
   CHALLENGE_RATING_TERM,
   CREATURE_ARMOR_CLASS_KIND_TERM,
   getActionEconomyLabel,
+  getActionEconomySectionLabel,
+  getMonsterActionKindLabel,
   getSpellAtomicEffectKindLabel,
   getArmorCategoryLabel,
   getArmorCategorySentenceForm,
@@ -20,6 +22,7 @@ import {
   getTermLabelSingular,
   HIT_POINTS_TERM,
   LANGUAGE_TERM,
+  MONSTER_SPELLCASTING_ACTION_NAME,
   PASSIVE_PERCEPTION_TERM,
   PROFICIENCY_TERM,
   RECHARGE_DIE_FACES,
@@ -45,10 +48,6 @@ import { vocabularyFieldLabel } from '@/features/vocabulary'
 import type { MonsterActionSection } from './actions/monster-action-equipment-references'
 
 const armorClassLabel = CREATURE_ARMOR_CLASS_KIND_TERM.label
-
-function actionEconomySectionHeading(id: 'action' | 'bonus-action' | 'reaction'): string {
-  return `${getActionEconomyLabel(id)}s`
-}
 
 /** Shown beside a clamped hit-point formula. Owned here and reused by the detail display. */
 export const MONSTER_HP_MINIMUM_NOTE = '(minimum 1)'
@@ -103,28 +102,52 @@ export function formatMonsterEquipmentEquippedAriaLabel(displayName: string): st
 export const MONSTER_EQUIPPED_LABEL = 'Equipped'
 export const MONSTER_CUSTOMIZATION_LABEL = 'Customization'
 export const MONSTER_CUSTOM_NAME_LABEL = 'Custom name'
-export const MONSTER_CUSTOM_DESCRIPTION_LABEL = 'Custom description'
-export const MONSTER_CUSTOM_DESCRIPTION_HINT = 'Optional text shown with this action.'
-export const MONSTER_CUSTOM_DESCRIPTION_ADD_LABEL = 'Add custom description'
+export const MONSTER_USE_DEFAULT_NAME_LABEL = 'Use default name'
+export const MONSTER_CUSTOM_DESCRIPTION_LABEL = 'Additional details'
+export const MONSTER_CUSTOM_DESCRIPTION_HINT =
+  'Narrative detail shown with the generated rules. It does not change them.'
+export const MONSTER_CUSTOM_DESCRIPTION_ADD_LABEL = 'Add additional details'
+export const MONSTER_RULES_TEXT_LABEL = 'Rules text'
+export const MONSTER_CUSTOM_NAME_ADD_LABEL = 'Add custom name'
 export const MONSTER_NATURAL_WEAPON_DAMAGE_HINT = 'Ability modifiers are applied automatically.'
+export const MONSTER_BASE_DAMAGE_OVERRIDE_LABEL = 'Base damage override'
+export const MONSTER_DAMAGE_OVERRIDE_ADD_LABEL = 'Override'
+export const MONSTER_DAMAGE_OVERRIDE_REMOVE_LABEL = 'Use weapon default'
+export const MONSTER_WEAPON_DAMAGE_USING_LABEL = 'Using weapon base damage'
+export const MONSTER_WEAPON_DAMAGE_REPLACING_LABEL = 'Replacing weapon base roll'
+export const MONSTER_WEAPON_DAMAGE_UNAVAILABLE_LABEL = 'Weapon unavailable'
+export const MONSTER_WEAPON_DAMAGE_NONE_LABEL = 'This weapon has no base damage.'
 export const MONSTER_ON_HIT_LEGEND = 'On hit'
 export const MONSTER_ON_HIT_HINT =
-  'Additional damage dealt when this attack hits, beyond its primary damage.'
+  'Effects that apply when this attack hits, beyond its primary damage.'
+export const MONSTER_ON_HIT_ADD_LABEL = 'Add effect'
+export const MONSTER_ON_HIT_KIND_LABEL = 'Effect'
+export const MONSTER_ON_HIT_NOTE_LABEL = 'Note'
+export const MONSTER_ON_HIT_DETAILS_LABEL = 'Details'
+export const MONSTER_ON_HIT_DETAILS_ADD_LABEL = 'Add details'
 export const MONSTER_ACTION_ATTACK_PREVIEW_LABEL = 'Attack preview'
+export const MONSTER_ACTION_SPELL_PREVIEW_LABEL = 'Spellcasting preview'
+export const MONSTER_REACTION_PREVIEW_LABEL = 'Reaction preview'
+export const MONSTER_ACTION_MULTIATTACK_PREVIEW_LABEL = 'Multiattack preview'
+export const MONSTER_MULTIATTACK_STEPS_LABEL = 'Steps'
+export const MONSTER_TRAIT_PREVIEW_LABEL = 'Trait preview'
 /** Stat-block preview row — not action-economy {@link getActionEconomyLabel} “Action”. */
 export const MONSTER_ACTION_ATTACK_PREVIEW_ATTACK_LABEL = 'Attack'
 export const MONSTER_ACTION_DAMAGE_FIELD_LABEL = getSpellAtomicEffectKindLabel('damage')
 export const MONSTER_ACTION_ATTACK_PREVIEW_DAMAGE_LABEL = MONSTER_ACTION_DAMAGE_FIELD_LABEL
 export const MONSTER_ACTION_ATTACK_PREVIEW_EXTRA_LABEL = 'Extra'
-export const MONSTER_ACTION_REACH_FIELD_LABEL = 'Reach'
-export const MONSTER_ACTION_ATTACK_PREVIEW_REACH_LABEL = MONSTER_ACTION_REACH_FIELD_LABEL
+export const MONSTER_ACTION_DISTANCE_SECTION_LEGEND = 'Distance'
+export const MONSTER_ACTION_REACH_FIELD_LABEL = 'Melee reach'
+export const MONSTER_ACTION_ATTACK_PREVIEW_REACH_LABEL = 'Reach'
 export const MONSTER_ACTION_ATTACK_PREVIEW_RANGE_LABEL = 'Range'
 export const MONSTER_ACTION_ATTACK_PREVIEW_PROPERTIES_LABEL = 'Properties'
 export const MONSTER_DAMAGE_TYPE_CHANGE_LABEL = 'Change'
 export const MONSTER_REMOVE_LABEL = 'Remove'
 export const MONSTER_CANCEL_LABEL = 'Cancel'
 export const MONSTER_LOADING_EQUIPMENT = `Loading ${getContentTypeMidSentenceLabel('equipment')}…`
+export const MONSTER_LOADING_SPELLS = `Loading ${getContentTypeMidSentenceLabel('spells')}…`
 export const MONSTER_EQUIPMENT_CATALOG_ERROR = formatContentLoadErrorMessage('equipment')
+export const MONSTER_SPELL_CATALOG_ERROR = formatContentLoadErrorMessage('spells')
 export const MONSTER_RETRY_LABEL = 'Retry'
 export const MONSTER_SKILL_LOADING = `Loading ${getContentTypeMidSentenceLabel('skill-proficiencies', { plural: true })}…`
 export const MONSTER_SKILL_ERROR = formatContentListLoadErrorMessage('skill-proficiencies')
@@ -176,14 +199,23 @@ export const MONSTER_ACTION_ITEM_NOUN = defineMasterDetailItemNoun({
 })
 
 export const MONSTER_TRAITS_HEADING = getMonsterTraitSectionLabel()
-export const MONSTER_ACTIONS_HEADING = actionEconomySectionHeading('action')
-export const MONSTER_BONUS_ACTIONS_HEADING = actionEconomySectionHeading('bonus-action')
-export const MONSTER_REACTIONS_HEADING = actionEconomySectionHeading('reaction')
+export const MONSTER_ACTIONS_HEADING = getActionEconomySectionLabel('action')
+export const MONSTER_BONUS_ACTIONS_HEADING = getActionEconomySectionLabel('bonus-action')
+export const MONSTER_REACTIONS_HEADING = getActionEconomySectionLabel('reaction')
+export const MONSTER_LEGENDARY_ACTIONS_HEADING = 'Legendary Actions'
+export const MONSTER_LEGENDARY_USES_LABEL = 'Uses'
+export const MONSTER_LEGENDARY_LAIR_USES_LABEL = 'Uses in lair'
+export const MONSTER_TURN_LIMIT_ADD_LABEL = 'Add turn limit'
+export const MONSTER_TURN_LIMIT_LABEL = 'Turn limit'
+export const MONSTER_TURN_LIMIT_EMPTY_LABEL = 'No turn limit'
+export const MONSTER_TURN_LIMIT_OPTION_LABEL =
+  "Can't take this action again until the start of its next turn"
 
 const MONSTER_ACTION_SECTION_HEADINGS = {
   actions: MONSTER_ACTIONS_HEADING,
   bonusActions: MONSTER_BONUS_ACTIONS_HEADING,
   reactions: MONSTER_REACTIONS_HEADING,
+  legendaryActions: MONSTER_LEGENDARY_ACTIONS_HEADING,
 } as const satisfies Record<MonsterActionSection, string>
 
 export function monsterActionSectionHeading(section: MonsterActionSection): string {
@@ -191,6 +223,82 @@ export function monsterActionSectionHeading(section: MonsterActionSection): stri
 }
 
 export const MONSTER_ADD_LABEL = 'Add'
+
+export const MONSTER_LIMIT_ADD_LABEL = 'Add limit'
+export const MONSTER_RECHARGE_ADD_LABEL = 'Add recharge'
+export const MONSTER_ACQUISITION_SAVE_DESCRIPTION = 'Saving throw effect'
+export const MONSTER_ACQUISITION_ATTACK_DESCRIPTION = 'Custom attack'
+export const MONSTER_ACQUISITION_SPELL_PRIMARY_DESCRIPTION =
+  'Create a spell list whose casting ability other actions can reuse.'
+export const MONSTER_ACQUISITION_SPELL_STANDALONE_DESCRIPTION =
+  'Create a separate spell action with its own spell choices.'
+export const MONSTER_ACQUISITION_SPELL_DESCRIPTION = MONSTER_ACQUISITION_SPELL_PRIMARY_DESCRIPTION
+export const MONSTER_CAST_SPELL_LABEL = 'Cast a spell'
+export const MONSTER_ACQUISITION_SPECIAL_DESCRIPTION = 'Custom rules or effects'
+export const MONSTER_ACQUISITION_MULTIATTACK_DESCRIPTION =
+  'Combine multiple attacks into one action'
+
+export const LEGENDARY_REFERENCE_DESCRIPTION = 'Use an action already defined for this creature.'
+export const LEGENDARY_REFERENCE_DISABLED_NOTE = 'No attacks or abilities in Actions'
+export const LEGENDARY_SPELLCASTING_DEFAULT_NAME = 'Use Spellcasting'
+export const LEGENDARY_SPELLCASTING_DESCRIPTION =
+  'Cast a spell from an existing action that already lists spells.'
+export const LEGENDARY_SPELLCASTING_DISABLED_NOTE = 'No Spellcasting action with spells'
+export const LEGENDARY_CAST_SPELL_LABEL = 'Cast a spell'
+export const LEGENDARY_CAST_SPELL_DEFAULT_NAME = 'Cast a spell'
+export const LEGENDARY_CAST_SPELL_DESCRIPTION = 'Choose a spell from the catalog.'
+export const LEGENDARY_CAST_SPELL_DISABLED_NOTE = 'Spell catalog is not ready'
+export const LEGENDARY_CUSTOM_LABEL = 'Custom ability'
+export const LEGENDARY_CUSTOM_DESCRIPTION = 'Write a standalone legendary ability.'
+
+export const LEGENDARY_ACTION_CATEGORY_LABELS = {
+  reference: getMonsterActionKindLabel('action-reference'),
+  spellcasting: LEGENDARY_SPELLCASTING_DEFAULT_NAME,
+  'cast-spell': LEGENDARY_CAST_SPELL_LABEL,
+  custom: LEGENDARY_CUSTOM_LABEL,
+} as const
+
+export const LEGENDARY_ACTION_DEFAULT_NAMES = {
+  spellcasting: LEGENDARY_SPELLCASTING_DEFAULT_NAME,
+  'cast-spell': LEGENDARY_CAST_SPELL_DEFAULT_NAME,
+  custom: LEGENDARY_CUSTOM_LABEL,
+} as const
+
+export const MONSTER_REFERENCE_ACTION_LABEL = 'Source action'
+export const MONSTER_REFERENCE_ACTION_HINT =
+  'Choose an attack or ability from Actions. If you select several attacks, the creature makes one of them.'
+export const MONSTER_MOVEMENT_LABEL = 'Movement'
+export const MONSTER_MOVEMENT_PLACEHOLDER = 'No movement'
+export const MONSTER_MOVEMENT_ADD_LABEL = 'Add movement'
+export const MONSTER_MOVEMENT_HINT = 'Optional movement before the action.'
+export const MONSTER_MOVEMENT_OPPORTUNITY_LABEL = 'Without provoking Opportunity Attacks'
+export const MONSTER_LEGENDARY_SPELLCASTING_FIELD_LABEL = 'Source action'
+export const MONSTER_LEGENDARY_SPELLCASTING_FIELD_HINT =
+  'Choose an existing action from Actions. Its spells and casting ability are reused.'
+export const MONSTER_SPELLCASTING_SPELL_HINT = 'Choose a spell from this Spellcasting action.'
+export const MONSTER_CAST_SPELL_HINT = 'Choose a spell from the catalog.'
+export const MONSTER_CAST_AT_LEVEL_HINT = 'Set only to cast a higher-level version.'
+export const MONSTER_SPELL_FREQUENCY_LABEL = 'Frequency'
+export const MONSTER_SPELL_CAST_HIGHER_LEVEL_LABEL = 'Cast at a higher level'
+export const MONSTER_SPELL_COMPONENT_OMISSION_ADD_LABEL = 'Omit spell components'
+export const MONSTER_SPELL_COMPONENT_OMISSION_LABEL = 'Omit components'
+export const MONSTER_SPELL_COMPONENT_OMISSION_HINT = "Select components that aren't required."
+export const MONSTER_SPELL_CAST_LEVEL_PLACEHOLDER = 'Select level'
+export const MONSTER_SPELL_CHANGE_LABEL = 'Change spell'
+export const MONSTER_SPELL_ALREADY_USED_LABEL = 'Already used'
+export const MONSTER_SPELL_PICKER_SEARCH_PLACEHOLDER = 'Search spells'
+export const MONSTER_SPELL_PICKER_NO_RESULTS = 'No spells match this search.'
+export const MONSTER_SPELL_PICKER_NO_ITEMS = 'No spells are available.'
+export const MONSTER_REMOVE_REFERENCED_ACTION_HEADLINE = 'Remove referenced action'
+export const MONSTER_MOVE_REFERENCED_ACTION_HEADLINE = 'Move referenced action'
+
+export function formatRemoveReferencedActionBody(names: string): string {
+  return `This action is used by ${names}. Removing it drops that reference.`
+}
+
+export function formatMoveReferencedActionBody(names: string): string {
+  return `${names} will be invalid until this action is moved back to Actions.`
+}
 
 function monsterArmorSlotMidSentenceNoun(slot: CreatureArmorSlot): string {
   if (slot === 'shield') return getArmorCategorySentenceForm('shields', 1)
@@ -225,19 +333,43 @@ export function getMonsterArmorSlotUiCopy(slot: CreatureArmorSlot): {
 
 export const MONSTER_ACTION_NAME_LABEL = 'Name'
 export const MONSTER_ATTACK_BONUS_LABEL = 'Attack bonus'
-export const MONSTER_ATTACK_BONUS_KIND_ABILITY_LABEL = 'Ability'
-export const MONSTER_ATTACK_BONUS_KIND_SPELL_LABEL = 'Spellcasting'
+
+export function formatMonsterActionAttackPreviewConfigureHint(fieldLabel: string): string {
+  return `Configure ${fieldLabel} to calculate this attack.`
+}
+
+export function formatMonsterActionSpellPreviewConfigureHint(fieldLabel: string): string {
+  return `Configure ${fieldLabel} to preview this spellcasting action.`
+}
+
+export function formatMonsterActionMultiattackPreviewConfigureHint(fieldLabel: string): string {
+  return `Configure ${fieldLabel} to preview this multiattack.`
+}
 export const MONSTER_ATTACK_BONUS_ABILITY_LABEL = 'Ability'
 export const MONSTER_ATTACK_BONUS_PROFICIENCY_LABEL = 'Proficient'
 export const MONSTER_SAVE_FAILURE_NOTE_LABEL = 'Failure note'
 export const MONSTER_SAVE_SUCCESS_AMOUNT_LABEL = 'On successful save'
-export const MONSTER_SAVE_THROW_SECTION_LEGEND = 'Saving throw'
 export const MONSTER_SAVE_THROW_SECTION_DESCRIPTION =
   'Set the saving throw target and how difficult it is to succeed.'
-export const MONSTER_SAVE_ABILITY_LABEL = 'Save ability'
-export const MONSTER_SAVE_DC_LABEL = 'Save DC'
-export const MONSTER_SAVE_DC_KIND_ABILITY_LABEL = 'Ability-based'
-export const MONSTER_SAVE_DC_KIND_SPELL_LABEL = 'Spellcasting-based'
+export const MONSTER_SAVE_TARGETING_LEGEND = 'Targeting'
+export const MONSTER_SAVE_TARGETING_DESCRIPTION = 'Who makes the savings throw?'
+export const MONSTER_SAVE_TARGETING_MODE_LABEL = 'Targeting mode'
+export const MONSTER_SAVE_TARGETING_MODE_SELECTED_TARGETS = 'Selected targets'
+export const MONSTER_SAVE_TARGETING_MODE_AREA_FROM_SELF = 'Area from self'
+export const MONSTER_SAVE_AREA_OCCUPANT_REQUIREMENTS_HINT =
+  'Optional restrictions on which creatures in the area are affected.'
+export const MONSTER_ABILITY_SOURCE_KIND_ABILITY_LABEL = 'Ability-based'
+export const MONSTER_ABILITY_SOURCE_KIND_SPELL_LABEL = 'Spellcasting-based'
+export const MONSTER_ATTACK_BONUS_SOURCE_ABILITY_LABEL = 'Use an ability score'
+export const MONSTER_ATTACK_BONUS_SOURCE_SPELL_LABEL = 'Use a spellcasting ability'
+export const MONSTER_ATTACK_BONUS_SOURCE_ABILITY_HINT =
+  'Uses the selected ability modifier, with optional proficiency.'
+export const MONSTER_ATTACK_BONUS_SOURCE_SPELL_HINT =
+  'Uses the selected spellcasting ability and proficiency bonus.'
+export const MONSTER_ATTACK_BONUS_INCLUDE_PROFICIENCY_LABEL = 'Include proficiency bonus'
+export const MONSTER_ATTACK_BONUS_INCLUDE_PROFICIENCY_HINT =
+  "Adds the creature's proficiency bonus to the attack roll. Normally enabled for custom attacks."
+export const MONSTER_ATTACK_BONUS_ADVANCED_LEGEND = 'Advanced options'
 export const MONSTER_SAVE_DC_ABILITY_LABEL = 'DC ability'
 export const MONSTER_SAVE_DC_PROFICIENCY_LABEL = 'Include proficiency bonus'
 export const MONSTER_LIMIT_RECHARGES_ON_LABEL = 'Recharges on'
@@ -262,6 +394,64 @@ function normalizeRechargeMinRoll(minRoll: unknown): number | undefined {
   return value
 }
 export const MONSTER_TRIGGER_LABEL = getMonsterReactionFieldLabel('trigger')
+export const MONSTER_TRIGGER_PLACEHOLDER = 'When this reaction can be used'
+export const MONSTER_PARRY_AC_BONUS_LABEL = 'AC bonus'
+export const MONSTER_PARRY_AC_BONUS_HINT = 'Added against the triggering attack.'
+export const MONSTER_PARRY_FOLLOW_UP_ADD_LABEL = 'Add attack on a miss'
+export const MONSTER_PARRY_FOLLOW_UP_LABEL = 'Attack'
+export const MONSTER_PARRY_FOLLOW_UP_HINT = 'Choose an existing attack from Actions.'
+export const MONSTER_PARRY_DESCRIPTION = 'Add a bonus to AC against the triggering attack.'
+export const MONSTER_LEAP_DESCRIPTION = 'Jump by spending movement.'
+export const MONSTER_LEAP_DISTANCE_LABEL = 'Jump distance'
+export const MONSTER_LEAP_DISTANCE_HINT = 'How far the creature jumps.'
+export const MONSTER_LEAP_MOVEMENT_LABEL = 'Movement spent'
+export const MONSTER_LEAP_MOVEMENT_HINT = 'Movement required to make the jump.'
+export function formatLeapWalkSpeedHint(walkFeet: number): string {
+  return `${MONSTER_LEAP_MOVEMENT_HINT} Walk Speed: ${walkFeet} ft.`
+}
+export const MONSTER_TELEPORT_DESCRIPTION = 'Teleport to an unoccupied space it can see.'
+export const MONSTER_TELEPORT_DISTANCE_LABEL = 'Distance'
+export const MONSTER_TELEPORT_DISTANCE_HINT = 'How far it teleports.'
+export const MONSTER_TELEPORT_PASSENGER_ADD_LABEL = 'Include another creature'
+export const MONSTER_TELEPORT_PASSENGER_LEGEND = 'Another creature'
+export const MONSTER_TELEPORT_PASSENGER_HINT =
+  'Optional restrictions on the other creature. The sentence begins with "itself or a …".'
+export const MONSTER_TELEPORT_WITHIN_LABEL = 'Within'
+export const MONSTER_TELEPORT_WITHIN_HINT = 'How close that creature must be.'
+export const MONSTER_TAKE_ACTIONS_DESCRIPTION = 'Take Dash, Disengage, or Hide.'
+export const MONSTER_TAKE_ACTIONS_ACTIONS_LABEL = 'Actions'
+export const MONSTER_TAKE_ACTIONS_CHOICE_LABEL = 'Action behavior'
+export const MONSTER_TAKE_ACTIONS_BEHAVIOR_HINT_DISABLED =
+  'Select at least two actions to configure behavior.'
+export const MONSTER_TAKE_ACTIONS_CHOICE_ONE = 'Chooses one'
+export const MONSTER_TAKE_ACTIONS_CHOICE_EACH = 'Uses each'
+export const MONSTER_TAKE_ACTIONS_RESTRICTION_ADD_LABEL = 'Add restriction'
+export const MONSTER_TAKE_ACTIONS_RESTRICTION_LABEL = 'Restriction'
+export const MONSTER_TAKE_ACTIONS_RESTRICTION_HINT = 'Leading clause, without a final period.'
+export const MONSTER_TAKE_ACTIONS_RESTRICTION_PLACEHOLDER = 'While in Dim Light or darkness'
+export const MONSTER_BONUS_ACTION_PREVIEW_LABEL = 'Preview'
+export const MONSTER_ACTION_REFERENCE_ACQUISITION_LABEL = 'Use existing action'
+export const MONSTER_ACTION_REFERENCE_UNNAMED_TITLE = 'Use action'
+export const MONSTER_ACTION_REFERENCE_CHOOSE_SOURCE = 'Choose a source action'
+export const MONSTER_ACTION_REFERENCE_SOURCE_UNAVAILABLE = 'Source action unavailable'
+
+export function formatMonsterActionReferenceUseTitle(names: string): string {
+  return `Use ${names}`
+}
+
+export function formatMonsterActionReferenceUsesSummary(names: string): string {
+  return `Uses ${names}`
+}
+export const MONSTER_REACTION_REFERENCE_HINT =
+  'The reaction uses this action. The action stays in Actions.'
+export const MONSTER_REACTION_ADDITIONAL_RULES_ADD_LABEL = 'Add additional rules'
+export const MONSTER_REACTION_ADDITIONAL_RULES_LABEL = 'Additional rules'
+export const MONSTER_REACTION_ADDITIONAL_RULES_HINT =
+  'Additional restrictions or effects when using the referenced action.'
+export const MONSTER_REACTION_CAST_SPELL_DESCRIPTION =
+  'Cast one or more spells in response to their triggers.'
+export const MONSTER_REACTION_CUSTOM_LABEL = 'Custom reaction'
+export const MONSTER_REACTION_CUSTOM_DESCRIPTION = 'Write the trigger and the response.'
 export const MONSTER_ADDITIONAL_CONDITION_LABEL =
   getMonsterReactionFieldLabel('additionalCondition')
 export const MONSTER_ADDITIONAL_CONDITION_HINT = "Each spell's own trigger always applies."
@@ -272,6 +462,14 @@ export function monsterAddWeaponShortcut(): string {
 
 export function formatAddedEquipmentNotice(name: string): string {
   return `${name} was added to ${getContentTypeItemLabel('equipment')}.`
+}
+
+export function formatCastingSourceDeleteNotice(names: readonly string[]): string {
+  return `This action's spellcasting ability is used by ${names.join(', ')}.`
+}
+
+export function formatCastingSourceChangeNotice(names: readonly string[]): string {
+  return `This spellcasting ability is used by ${names.join(', ')}.`
 }
 
 export function formatDropTriggerBody(): string {
@@ -292,12 +490,11 @@ export function formatRemoveEquipmentConfirmTitle(name: string): string {
 }
 
 export function formatRemoveEquipmentConfirmBody(actionSummary: string): string {
-  return `This ${getContentTypeSentenceForm('equipment', 1)} is used by ${actionSummary}. Removing it will also remove that action.`
+  return `This ${getContentTypeSentenceForm('equipment', 1)} is used by ${actionSummary}. Those actions keep a missing weapon until you choose another or delete them.`
 }
 
-export function formatRemoveEquipmentConfirmLabel(actionCount: number): string {
-  if (actionCount === 1) return 'Remove weapon and action'
-  return `Remove weapon and ${actionCount} actions`
+export function formatRemoveEquipmentConfirmLabel(_actionCount: number): string {
+  return MONSTER_REMOVE_EQUIPMENT_CONFIRM_LABEL
 }
 
 export const MONSTER_EQUIPMENT_REMOVAL_FALLBACK_NAME = getContentTypeMidSentenceLabel('equipment')
@@ -385,7 +582,7 @@ export function formatEquipmentRemovalConfirmCopy({
   const equipmentPhrase = getContentTypeSentenceForm('equipment', 1)
   return {
     headline: formatRemoveEquipmentConfirmTitle(displayName),
-    description: `This ${equipmentPhrase} has customizations and is used by ${actionPhrase}. Removing it will discard those customizations and remove the linked actions.${summarySuffix}`,
+    description: `This ${equipmentPhrase} has customizations and is used by ${actionPhrase}. Removing it discards those customizations. The actions keep a missing weapon until you choose another or delete them.${summarySuffix}`,
     confirmLabel: MONSTER_REMOVE_EQUIPMENT_CONFIRM_LABEL,
   }
 }

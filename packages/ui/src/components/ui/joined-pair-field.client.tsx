@@ -3,7 +3,7 @@
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
-import type { FieldSize } from './field.client'
+import { useOptionalFieldDescribedBy, type FieldSize } from './field.client'
 import { groupedEndLabelSegmentShellClasses } from './select-compact-trigger.variants'
 import { SelectLikeValueSlot } from './select-like-trigger-slots.client'
 import {
@@ -13,6 +13,10 @@ import {
   joinedPairStartTextSegmentVariants,
   type JoinedPairGroupVariantProps,
 } from './joined-pair-field.variants'
+import {
+  customJoinedPairSelection,
+  isJoinedPairCustomAmountInBounds,
+} from './joined-pair-field.lib'
 import type {
   JoinedPairLabelOccupantProps,
   JoinedPairNumberOccupantProps,
@@ -86,6 +90,8 @@ export function JoinedPairNumberOccupant({
   onValueChange,
   onBlur,
 }: JoinedPairNumberOccupantProps) {
+  const fieldDescribedBy = useOptionalFieldDescribedBy()
+  const resolvedDescribedBy = describedBy ?? fieldDescribedBy
   const displayValue = value ?? ''
 
   return (
@@ -108,7 +114,7 @@ export function JoinedPairNumberOccupant({
           value={displayValue}
           required={required}
           aria-invalid={hasError || undefined}
-          aria-describedby={describedBy}
+          aria-describedby={resolvedDescribedBy}
           onChange={(event) => onValueChange(parseNumberValue(event.target.value))}
           onBlur={onBlur}
           className="rounded-l-md rounded-r-none"
@@ -143,6 +149,8 @@ export function JoinedPairTextStartOccupant({
   onValueChange: (value: string) => void
   onBlur?: () => void
 }) {
+  const fieldDescribedBy = useOptionalFieldDescribedBy()
+  const resolvedDescribedBy = describedBy ?? fieldDescribedBy
   return (
     <>
       <label htmlFor={id} className="sr-only">
@@ -158,7 +166,7 @@ export function JoinedPairTextStartOccupant({
         value={value ?? ''}
         required={required}
         aria-invalid={hasError || undefined}
-        aria-describedby={describedBy}
+        aria-describedby={resolvedDescribedBy}
         onChange={(event) => onValueChange(event.target.value)}
         onBlur={onBlur}
         className={joinedPairStartTextSegmentVariants({ size })}
@@ -166,6 +174,9 @@ export function JoinedPairTextStartOccupant({
     </>
   )
 }
+
+const DISTANCE_CLEAR_OPTION = '__distance_clear__'
+const DISTANCE_CUSTOM_OPTION = '__distance_custom__'
 
 export function JoinedPairSelectOccupant({
   id,
@@ -181,14 +192,79 @@ export function JoinedPairSelectOccupant({
   hasError,
   describedBy,
   ariaLabel,
+  allowCustom = false,
+  clearable = false,
+  customMin = 1,
+  customMax,
   onValueChange,
   onBlur,
 }: JoinedPairSelectOccupantProps) {
-  const encodedValue = encodeStoredSelectOptionValue(value, options)
-  const hideCaret = position === 'end' && options.length <= 1
+  const fieldDescribedBy = useOptionalFieldDescribedBy()
+  const resolvedDescribedBy = describedBy ?? fieldDescribedBy
+  const [editingCustom, setEditingCustom] = React.useState(false)
+  const [draft, setDraft] = React.useState<number | undefined | null>(null)
+  const displayOptions = React.useMemo(() => {
+    const next = [...options]
+    if (typeof value === 'number' && !next.some((option) => option.value === value)) {
+      next.push({ value, label: String(value) })
+    }
+    if (clearable) next.unshift({ value: DISTANCE_CLEAR_OPTION, label: '—' })
+    if (allowCustom) next.push({ value: DISTANCE_CUSTOM_OPTION, label: 'Custom' })
+    return next
+  }, [allowCustom, clearable, options, value])
+  const encodedValue = encodeStoredSelectOptionValue(value, displayOptions)
+  const hideCaret = position === 'end' && displayOptions.length <= 1
+
+  if (editingCustom && allowCustom && position === 'start') {
+    const shown = draft === null ? (typeof value === 'number' ? value : undefined) : draft
+    return (
+      <JoinedPairNumberOccupant
+        id={id}
+        ariaLabel={ariaLabel}
+        value={shown}
+        size={size}
+        disabled={disabled}
+        placeholder={placeholder}
+        min={customMin}
+        max={customMax}
+        digits={digits}
+        hasError={hasError}
+        describedBy={resolvedDescribedBy}
+        onValueChange={(next) => {
+          if (next !== undefined && isJoinedPairCustomAmountInBounds(next, customMin, customMax)) {
+            setDraft(null)
+            onValueChange(next)
+            return
+          }
+          setDraft(next)
+        }}
+        onBlur={() => {
+          setEditingCustom(false)
+          setDraft(null)
+          onBlur?.()
+        }}
+      />
+    )
+  }
 
   function handleChange(nextEncoded: string) {
-    const resolved = resolveSelectOptionChange(nextEncoded, options)
+    const resolved = resolveSelectOptionChange(nextEncoded, displayOptions)
+    if (resolved === DISTANCE_CLEAR_OPTION) {
+      onValueChange(undefined)
+      return
+    }
+    if (resolved === DISTANCE_CUSTOM_OPTION) {
+      const selection = customJoinedPairSelection({
+        value,
+        options,
+        customMin,
+        customMax,
+      })
+      if ('write' in selection) onValueChange(selection.write)
+      setDraft(null)
+      setEditingCustom(true)
+      return
+    }
     onValueChange(resolved)
   }
 
@@ -208,13 +284,13 @@ export function JoinedPairSelectOccupant({
           sizingLabels={sizingLabels}
           hideCaret={hideCaret}
           aria-invalid={hasError || undefined}
-          aria-describedby={describedBy}
+          aria-describedby={resolvedDescribedBy}
           onBlur={onBlur}
         >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>
-          {options.map((option) => (
+          {displayOptions.map((option) => (
             <SelectOptionItem
               key={encodeSelectOptionValue(option.value)}
               option={{
@@ -222,6 +298,7 @@ export function JoinedPairSelectOccupant({
                 value: String(option.value),
                 disabled: option.disabled,
                 disabledReason: option.disabledReason,
+                trailing: option.trailing,
               }}
               itemValue={encodeSelectOptionValue(option.value)}
             />

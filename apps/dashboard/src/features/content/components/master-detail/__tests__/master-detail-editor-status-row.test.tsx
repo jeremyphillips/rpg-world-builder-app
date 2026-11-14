@@ -20,6 +20,18 @@ describe('MasterDetailEditorStatusRow', () => {
     expect(screen.getByText('2 issues')).toBeInTheDocument()
   })
 
+  it('renders row-claimed issues beside the count', () => {
+    render(
+      <MasterDetailEditorStatusRow
+        issueCount={1}
+        headerIssues={[{ path: 'actions.0', message: 'Add an outcome.' }]}
+      />,
+    )
+
+    expect(screen.getByText('1 issue')).toBeInTheDocument()
+    expect(screen.getByRole('alert')).toHaveTextContent('Add an outcome.')
+  })
+
   it('renders issue count without availability', () => {
     render(<MasterDetailEditorStatusRow issueCount={1} />)
 

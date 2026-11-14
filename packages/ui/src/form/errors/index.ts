@@ -1,5 +1,7 @@
 export type {
   FormIssue,
+  FormIssueClaim,
+  FormIssueClaimKind,
   FormIssueScope,
   FormIssueSeverity,
   ArrayItemIssueGroup,
@@ -13,6 +15,7 @@ export {
 export { classifyFormIssue, classifyFormIssues } from './classify-form-issue'
 export {
   filterIssuesForItemPrefix,
+  countIssueClaimTargets,
   groupIssuesForItemPrefix,
   sortFormIssues,
   countInvalidArrayItems,
@@ -27,6 +30,7 @@ export {
   resolveArrayItemFieldOrder,
   resolveFieldOrderIndex,
   collectArraySections,
+  resolveSectionFieldOrder,
   type ArraySectionMeta,
 } from './resolve-field-order'
 export {
@@ -40,9 +44,15 @@ export {
   resolveNestedFieldErrorMessage,
 } from './resolve-field-error-message'
 export {
+  findRoutedIssueForFieldPath,
+  findRoutedIssuesForSlot,
+  resolveFieldIssueDisplayMessage,
+} from './resolve-field-issue.lib'
+export {
   enrichFormIssuesWithPresentationPaths,
   resolveFormIssuePresentationPath,
 } from './resolve-form-issue-presentation-path.lib'
+export { routeFormIssues, FORM_ISSUE_ROUTING_FALLBACK_LOG } from './route-form-issues.lib'
 export {
   buildValidationSessionExpandKey,
   resolveValidationExpandKeys,

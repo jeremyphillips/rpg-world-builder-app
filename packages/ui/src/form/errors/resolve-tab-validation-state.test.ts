@@ -217,14 +217,17 @@ describe('resolveInvalidSubmitTabId', () => {
       name: { type: 'custom', message: 'Required' },
       notes: { type: 'custom', message: 'Required' },
     } as unknown as FieldErrors
-    const issues = issuesFromErrors(errors)
     const notesTab: TabValidationTab = {
       id: 'notes',
       fields: [{ type: 'text', name: 'notes', label: 'Notes', required: true }],
     }
     const tabList = [identityTab, notesTab]
+    const tabListFields = tabList.flatMap((tab) => tab.fields)
+    const scopedIssues = prepareFormIssues(errors, tabListFields)
 
-    expect(resolveInvalidSubmitTabId(issues, tabList, allFields, 'rules')).toBe('identity')
+    expect(resolveInvalidSubmitTabId(scopedIssues, tabList, tabListFields, 'rules')).toBe(
+      'identity',
+    )
   })
 })
 

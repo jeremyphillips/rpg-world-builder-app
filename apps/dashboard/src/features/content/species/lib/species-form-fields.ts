@@ -210,11 +210,9 @@ export function buildSpeciesTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       errorPaths: ['heritage'],
       resolverFields: [
         ...prefixFormItems(heritageScalarFields(ctx), 'heritage'),
-        embeddedArrayResolverField(
-          'heritage.options',
-          getSpeciesHeritageOptionsLabel(),
-          heritageOptionItemFields(ctx),
-        ),
+        embeddedArrayResolverField('heritage.options', getSpeciesHeritageOptionsLabel(), {
+          itemFields: heritageOptionItemFields(ctx),
+        }),
       ],
       header: createElement(SpeciesHeritageTab, { formCtx: ctx }),
     },

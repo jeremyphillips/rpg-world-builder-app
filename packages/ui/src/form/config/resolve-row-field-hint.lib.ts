@@ -2,7 +2,7 @@ import type { FieldHintPosition, FieldLabelPosition } from '../../components/ui/
 import { resolveFieldHintPresentation, type FieldHintIcon } from '../field-config'
 
 type FieldHintSource = Parameters<typeof resolveFieldHintPresentation>[0] & {
-  labelPosition?: FieldLabelPosition
+  labelPosition?: FieldLabelPosition | 'inline'
 }
 
 /** Row-aware hint resolution — hints always render below the control in anatomy rows. */

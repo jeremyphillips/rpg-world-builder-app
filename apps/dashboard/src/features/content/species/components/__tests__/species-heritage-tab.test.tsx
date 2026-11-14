@@ -40,17 +40,29 @@ function TabShell({
   entityCatalogLayer,
   campaignId = 'camp-1',
   entityId = 'species-1',
+  embeddedSeedRowIds,
+  embeddedSystemOriginRowIds,
 }: {
   heritage?: HeritageForm
   entityCatalogLayer?: ContentFormCtx['entityCatalogLayer']
   campaignId?: string
   entityId?: string
+  embeddedSeedRowIds?: ContentFormCtx['embeddedSeedRowIds']
+  embeddedSystemOriginRowIds?: ContentFormCtx['embeddedSystemOriginRowIds']
 }) {
   return (
     <QueryClientProvider client={makeTestQueryClient()}>
       <CampaignAccessFormProvider>
         <TestFormShell defaultValues={{ heritage }}>
-          <SpeciesHeritageTab formCtx={{ entityCatalogLayer, campaignId, entityId }} />
+          <SpeciesHeritageTab
+            formCtx={{
+              entityCatalogLayer,
+              campaignId,
+              entityId,
+              embeddedSeedRowIds,
+              embeddedSystemOriginRowIds,
+            }}
+          />
           <HeritageValuesProbe />
         </TestFormShell>
       </CampaignAccessFormProvider>
@@ -127,7 +139,14 @@ describe('SpeciesHeritageTab', () => {
 
   it('locks system options on a system species', async () => {
     const user = userEvent.setup()
-    render(<TabShell heritage={draconicHeritageForm} entityCatalogLayer="system" />)
+    render(
+      <TabShell
+        heritage={draconicHeritageForm}
+        entityCatalogLayer="system"
+        embeddedSeedRowIds={{ 'heritage.options': ['o1'] }}
+        embeddedSystemOriginRowIds={{ 'heritage.options': ['o1'] }}
+      />,
+    )
 
     expect(screen.getAllByText(/System/).length).toBeGreaterThan(0)
     await user.click(screen.getByRole('button', { name: /Actions for Breath Weapon/i }))

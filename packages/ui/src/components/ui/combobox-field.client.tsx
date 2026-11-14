@@ -256,6 +256,7 @@ export function ComboboxField({
       invalid={invalid}
       describedBy={describedBy}
       hint={hint}
+      hintPosition={hintPosition}
       required={required}
       width={rootWidth}
       size={size}
@@ -263,7 +264,6 @@ export function ComboboxField({
       anatomy
     >
       <FieldLayout
-        hintPosition={hintPosition}
         recommendation={recommendation}
         wrapControl={false}
         label={<FormFieldLabel label={label} info={info} required={required} />}

@@ -4,7 +4,7 @@ import {
   type ResolutionApplicationAmount,
 } from '@rpg/contracts'
 import { SelectField, TextareaField } from '@rpg/ui'
-import { toOptions, useFieldControlSize } from '@rpg/ui/form'
+import { toOptions, useFieldControlSize, useSlotIssues } from '@rpg/ui/form'
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import {
@@ -36,6 +36,7 @@ function outcomesPath(namePrefix: string): string {
 
 export function MonsterActionSaveFailureNoteField({ namePrefix }: { namePrefix: string }) {
   const controlSize = useFieldControlSize()
+  const slotIssues = useSlotIssues()
   const { setValue } = useFormContext()
   const outcomes = readMonsterSaveOutcomes(useWatch({ name: outcomesPath(namePrefix) }))
   const path = outcomesPath(namePrefix)
@@ -47,6 +48,7 @@ export function MonsterActionSaveFailureNoteField({ namePrefix }: { namePrefix: 
       rows={2}
       width="full"
       size={controlSize}
+      error={slotIssues.message}
       value={monsterSaveFailureNote(outcomes)}
       onChange={(event) => {
         setValue(path, withMonsterSaveFailureNote(outcomes, event.target.value), {
@@ -60,6 +62,7 @@ export function MonsterActionSaveFailureNoteField({ namePrefix }: { namePrefix: 
 
 export function MonsterActionSaveSuccessAmountField({ namePrefix }: { namePrefix: string }) {
   const controlSize = useFieldControlSize()
+  const slotIssues = useSlotIssues()
   const { setValue } = useFormContext()
   const path = outcomesPath(namePrefix)
   const outcomes = readMonsterSaveOutcomes(useWatch({ name: path }))
@@ -72,6 +75,7 @@ export function MonsterActionSaveSuccessAmountField({ namePrefix }: { namePrefix
       placeholder="Choose"
       options={SAVE_AMOUNT_OPTIONS}
       value={monsterSaveOutcomeAmount(outcomes)}
+      error={slotIssues.message}
       size={controlSize}
       width="full"
       onValueChange={(next) => {

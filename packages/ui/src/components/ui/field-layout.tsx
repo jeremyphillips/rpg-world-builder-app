@@ -3,14 +3,13 @@
 import type { ReactElement, ReactNode } from 'react'
 
 import type { FieldLabelVisibility } from '../../form/form-heading.lib'
-import { Field, type FieldSize } from './field.client'
+import { Field, type FieldSize, useFieldRootContext } from './field.client'
 import type { FieldChrome } from './field-chrome.variants'
 import { FieldChromeShell } from './field-chrome-shell'
 import { hasActiveFieldChrome } from './field-chrome.variants'
 import type { FieldControlBand } from './field-control-band.variants'
 import { FieldControlRegion, FieldLabelRegion, FieldMessageRegion } from './field-anatomy-regions'
 import { resolveFieldPresentation } from './field-row-presentation.lib'
-import type { FieldHintPosition } from './field.variants'
 import { cn } from '../../lib/utils'
 import { FieldLayoutLabelRegionContent } from './field-layout-label-region.client'
 import { useOwnedLabelVisibility } from './owned-label-visibility.lib'
@@ -18,7 +17,6 @@ import { resolveFieldLayoutRecommendation } from './field-recommendation.lib'
 import type { FieldLayoutRecommendation } from './field-recommendation.types'
 
 export interface FieldLayoutProps {
-  hintPosition?: FieldHintPosition
   label: ReactNode
   recommendation?: FieldLayoutRecommendation | null
   control: ReactElement | ReactNode
@@ -36,6 +34,11 @@ export interface FieldLayoutProps {
    * Do not default this to `'visible'` — that would shadow the root.
    */
   labelVisibility?: FieldLabelVisibility
+  /**
+   * When false, hint/error stay on {@link Field.Root} for `aria-describedby` but
+   * render outside this layout (e.g. optional-disclosure row message track).
+   */
+  showMessageRegion?: boolean
 }
 
 /**
@@ -46,11 +49,10 @@ export interface FieldLayoutProps {
  * align sibling fields. Pair with `Field.Root` `anatomy` so Root spacing is
  * region-owned (no stack gap).
  *
- * Default hint placement is below the label (inside the label region) with a
- * tighter label→hint gap. Below-control hints and errors live in the message region.
+ * Hint placement comes from `Field.Root` `hintPosition`. Below-label hints sit in
+ * the label region. Below-control hints and errors live in the message region.
  */
 export function FieldLayout({
-  hintPosition = 'below-label',
   label,
   recommendation,
   control,
@@ -59,7 +61,9 @@ export function FieldLayout({
   size = 'md',
   controlBand = 'single-line',
   labelVisibility,
+  showMessageRegion = true,
 }: FieldLayoutProps) {
+  const { hintPosition } = useFieldRootContext('FieldLayout')
   const visibility = useOwnedLabelVisibility(labelVisibility)
   const resolvedRecommendation = resolveFieldLayoutRecommendation(hintPosition, recommendation)
   const showVisibleLabel = Boolean(label) && visibility !== 'srOnly'
@@ -94,11 +98,13 @@ export function FieldLayout({
         />
       </FieldLabelRegion>
       <FieldControlRegion>{bandedControl}</FieldControlRegion>
-      <FieldMessageRegion size={size}>
-        <Field.DerivedMeta />
-        {hintPosition === 'below-control' ? <Field.Hint /> : null}
-        <Field.Error />
-      </FieldMessageRegion>
+      {showMessageRegion ? (
+        <FieldMessageRegion size={size}>
+          <Field.DerivedMeta />
+          {hintPosition === 'below-control' ? <Field.Hint /> : null}
+          <Field.Error />
+        </FieldMessageRegion>
+      ) : null}
     </>
   )
 

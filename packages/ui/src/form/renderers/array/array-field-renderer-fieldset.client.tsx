@@ -112,7 +112,9 @@ export function ArrayFieldRendererFieldset({
       <div className={state.itemListClasses}>
         {fields.length === 0 ? (
           <div className="flex flex-col gap-1.5">
-            <ArrayFieldEmptyState itemLabel={state.emptyItemLabel} />
+            {config.emptyState === 'none' ? null : (
+              <ArrayFieldEmptyState itemLabel={state.emptyItemLabel} />
+            )}
             <ArrayFieldContainerError
               fullName={state.fullName}
               errorId={containerErrorId}

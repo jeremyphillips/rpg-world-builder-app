@@ -1,0 +1,128 @@
+import type { BonusTeleportPassenger } from '../../content/monster/action'
+import {
+  BONUS_STANDARD_ACTION_IDS,
+  type BonusActionCombination,
+} from '../../content/monster/bonus-standard-actions'
+import { formatAreaOccupantCreaturePhrase } from '../../content/lib/resolution/format-target-composition'
+import { joinNaturalList } from '../../primitives/prose'
+import { getActionVocabularyEntry } from '../../vocab/action/action-vocabulary'
+import { formatMonsterStatBlockSubject } from './spell-entry-presentation'
+
+function capitalSubject(monsterName: string): string {
+  const subject = formatMonsterStatBlockSubject(monsterName)
+  return subject.charAt(0).toUpperCase() + subject.slice(1)
+}
+
+/** Positive whole feet. A preset ladder is not a limit. */
+export function isPositiveWholeFeet(value: number | undefined): value is number {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 1
+}
+
+/** Leap sentence. Omitted until both distances are positive whole feet. */
+export function formatMonsterLeap(args: {
+  monsterName: string
+  distanceFeet: number | undefined
+  movementFeet: number | undefined
+}): string | undefined {
+  if (!isPositiveWholeFeet(args.distanceFeet) || !isPositiveWholeFeet(args.movementFeet)) {
+    return undefined
+  }
+  return `${capitalSubject(args.monsterName)} jumps up to ${args.distanceFeet} feet by spending ${args.movementFeet} feet of movement.`
+}
+
+function leadingRestriction(restriction: string | undefined): string | undefined {
+  if (!restriction) return undefined
+  const trimmed = restriction.trim().replace(/\.$/, '')
+  return trimmed.length > 0 ? trimmed : undefined
+}
+
+function orderedStandardLabels(ids: readonly string[]): string[] {
+  return BONUS_STANDARD_ACTION_IDS.flatMap((id) => {
+    if (!ids.includes(id)) return []
+    const label = getActionVocabularyEntry(id)?.label
+    return label ? [label] : []
+  })
+}
+
+/**
+ * Mechanical combination for stat-block phrasing only. One or zero standard actions
+ * ignore combination. With two or more, absent `combination` defaults to `one` for display.
+ */
+export function resolveTakeActionsEffectiveCombination(
+  standardActions: readonly string[] | undefined,
+  combination: BonusActionCombination | undefined,
+): BonusActionCombination | undefined {
+  const count = standardActions?.length ?? 0
+  if (count < 2) return undefined
+  return combination ?? 'one'
+}
+
+function takesClause(
+  labels: readonly string[],
+  combination: BonusActionCombination | undefined,
+): string | undefined {
+  if (labels.length === 0) return undefined
+  if (labels.length === 1) return `takes the ${labels[0]} action`
+  if (!combination) return undefined
+  if (combination === 'one') {
+    return `takes the ${joinNaturalList(labels, { conjunction: 'or' })} action`
+  }
+  return `takes the ${joinNaturalList(labels, { conjunction: 'and' })} actions`
+}
+
+/**
+ * Dash, Disengage, and Hide. One selected action ignores `combination`.
+ * Two or more use {@link resolveTakeActionsEffectiveCombination} for phrasing.
+ */
+export function formatMonsterTakeActions(args: {
+  monsterName: string
+  standardActions: readonly string[] | undefined
+  combination?: BonusActionCombination
+  restriction?: string
+}): string | undefined {
+  const effectiveCombination = resolveTakeActionsEffectiveCombination(
+    args.standardActions,
+    args.combination,
+  )
+  const clause = takesClause(
+    orderedStandardLabels(args.standardActions ?? []),
+    effectiveCombination,
+  )
+  if (!clause) return undefined
+  const subject = formatMonsterStatBlockSubject(args.monsterName)
+  const lead = leadingRestriction(args.restriction)
+  if (!lead) return `${capitalSubject(args.monsterName)} ${clause}.`
+  return `${lead}, ${subject} ${clause}.`
+}
+
+function articleFor(label: string): 'a' | 'an' {
+  return /^[aeiou]/i.test(label) ? 'an' : 'a'
+}
+
+/** Noun phrase after “itself or”, including the article. */
+export function formatTeleportPassengerCreaturePhrase(
+  passenger: Pick<BonusTeleportPassenger, 'requirements'>,
+): string {
+  const core = formatAreaOccupantCreaturePhrase(passenger.requirements)
+  return `${articleFor(core)} ${core}`
+}
+
+/**
+ * Self teleport, or self plus a structured passenger.
+ * An open passenger without a distance prints nothing, including no self-only sentence.
+ */
+export function formatMonsterTeleport(args: {
+  monsterName: string
+  distanceFeet: number | undefined
+  passenger?: BonusTeleportPassenger
+}): string | undefined {
+  if (!isPositiveWholeFeet(args.distanceFeet)) return undefined
+  const subject = formatMonsterStatBlockSubject(args.monsterName)
+  const capital = capitalSubject(args.monsterName)
+  if (!args.passenger) {
+    return `${capital} teleports up to ${args.distanceFeet} feet to an unoccupied space it can see.`
+  }
+  if (!isPositiveWholeFeet(args.passenger.withinFeet)) return undefined
+  const creaturePhrase = formatTeleportPassengerCreaturePhrase(args.passenger)
+  return `${capital} teleports itself or ${creaturePhrase} within ${args.passenger.withinFeet} feet of itself up to ${args.distanceFeet} feet to an unoccupied space ${subject} can see.`
+}

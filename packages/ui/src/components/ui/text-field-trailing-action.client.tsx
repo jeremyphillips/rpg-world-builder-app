@@ -3,7 +3,7 @@
 import * as React from 'react'
 
 import { Button } from './button.client'
-import { Field, type FieldSize } from './field.client'
+import { Field, type FieldSize, useFieldRootContext } from './field.client'
 import { FieldLayout } from './field-layout'
 import { FieldLabelContent } from './field-label-content'
 import { Input } from './input.client'
@@ -14,7 +14,7 @@ import type { FieldWidth } from './field-control.variants'
 import type { FieldHintPosition } from './field.variants'
 
 import type { FieldChrome } from './field-chrome.variants'
-import type { TrailingFieldActionConfig } from '../../form/field-config'
+import type { TrailingFieldActionConfig } from '../../form/field-config/field-base.types'
 
 export type TextFieldTrailingActionProps = {
   id: string
@@ -76,6 +76,8 @@ function TextFieldTrailingActionControl({
   inputProps: TextFieldTrailingActionProps['inputProps']
   ref: React.ForwardedRef<HTMLInputElement>
 }) {
+  const { describedBy: contextDescribedBy } = useFieldRootContext('TextFieldTrailingActionControl')
+  const describedBy = fieldDescribedBy ?? contextDescribedBy
   return (
     <div className="flex w-full min-w-0 flex-col gap-2">
       <InputActionGroup
@@ -91,7 +93,7 @@ function TextFieldTrailingActionControl({
           size={size}
           type={type}
           disabled={disabled}
-          aria-describedby={fieldDescribedBy}
+          aria-describedby={describedBy}
           aria-invalid={inputInvalid || undefined}
           aria-required={required || undefined}
           {...inputProps}
@@ -158,13 +160,13 @@ export const TextFieldTrailingAction = React.forwardRef<
         invalid={invalid}
         describedBy={fieldDescribedBy}
         hint={hint}
+        hintPosition={hintPosition}
         required={required}
         size={size}
         width={width}
         anatomy
       >
         <FieldLayout
-          hintPosition={hintPosition}
           wrapControl={false}
           label={
             <Field.Label id={`${id}-label`} htmlFor={id}>

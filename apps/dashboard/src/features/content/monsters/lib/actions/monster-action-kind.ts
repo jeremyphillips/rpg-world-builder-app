@@ -1,4 +1,11 @@
-import { monsterActionDraftSchema, monsterReactionDraftSchema } from '@rpg/contracts'
+import {
+  isPrimarySpellcastingAction,
+  monsterActionDraftSchema,
+  monsterBonusActionDraftSchema,
+  monsterLegendaryActionDraftSchema,
+  monsterReactionDraftSchema,
+  monsterSectionAllowsKind,
+} from '@rpg/contracts'
 
 import type { MonsterActionSection } from './monster-action-equipment-references'
 import type { MonsterActionDraftRow } from './monster-action-presets'
@@ -16,7 +23,14 @@ export function monsterActionActiveKeys(
   kind: string,
   section: MonsterActionSection,
 ): readonly string[] {
-  const schema = section === 'reactions' ? monsterReactionDraftSchema : monsterActionDraftSchema
+  const schema =
+    section === 'reactions'
+      ? monsterReactionDraftSchema
+      : section === 'legendaryActions'
+        ? monsterLegendaryActionDraftSchema
+        : section === 'bonusActions'
+          ? monsterBonusActionDraftSchema
+          : monsterActionDraftSchema
   return variantKeys(schema, kind)
 }
 
@@ -43,8 +57,21 @@ export function actionMoveDropsTrigger(
   return (
     from === 'reactions' &&
     to !== 'reactions' &&
-    monsterActionTriggerText(action.trigger) !== undefined
+    monsterActionTriggerText('trigger' in action ? action.trigger : undefined) !== undefined
   )
+}
+
+/** Whether Move to may place this row in `to`. Primary Spellcasting stays in Actions. */
+export function monsterActionSectionMoveAllowed(
+  action: { kind?: string; profile?: string },
+  from: MonsterActionSection,
+  to: MonsterActionSection,
+): boolean {
+  if (from === to) return false
+  if (from === 'legendaryActions' || to === 'legendaryActions') return false
+  if (!action.kind || !monsterSectionAllowsKind(to, action.kind)) return false
+  if (isPrimarySpellcastingAction(action) && to !== 'actions') return false
+  return true
 }
 
 export function actionAfterSectionMove(
@@ -52,6 +79,7 @@ export function actionAfterSectionMove(
   to: MonsterActionSection,
 ): MonsterActionDraftRow {
   if (to === 'reactions') return action
+  if (!('trigger' in action)) return action
   const { trigger: _trigger, ...rest } = action
-  return rest
+  return rest as MonsterActionDraftRow
 }

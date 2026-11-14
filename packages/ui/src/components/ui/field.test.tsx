@@ -44,7 +44,10 @@ describe('Field', () => {
     const input = screen.getByLabelText('Name')
     expect(input).toHaveAttribute('aria-invalid', 'true')
     expect(input).toHaveAttribute('aria-describedby', 'name-hint name-error')
-    expect(screen.getByRole('alert')).toHaveTextContent('Name is required.')
+    const alert = screen.getByRole('alert')
+    expect(alert).toHaveTextContent('Name is required.')
+    expect(alert).toHaveClass('text-style-field-error')
+    expect(alert).not.toHaveClass('text-style-body')
     expect(screen.getByText('Your display name.')).toBeInTheDocument()
   })
 

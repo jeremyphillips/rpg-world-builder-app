@@ -73,13 +73,13 @@ export function resolveEffectiveFieldChrome(
     return explicit.variant === 'none' ? undefined : explicit
   }
 
+  if (context.fieldChromeSuppressed) {
+    return undefined
+  }
+
   const cascade = normalizeFieldChrome(context.fieldChromeCascade)
   if (cascade) {
     return cascade.variant === 'none' ? undefined : cascade
-  }
-
-  if (context.fieldChromeSuppressed) {
-    return undefined
   }
 
   return DEFAULT_FIELD_CHROME

@@ -4,25 +4,39 @@
  * Evaluates duplicate-policy states against current row values and maps
  * configured menu items to `ButtonDropdown` item props at render time.
  */
-import type { WeightedSearchField } from '../../../lib/search'
+import type { ButtonDropdownItem } from '../../../components/ui/button-dropdown.types'
+import type { PickerSearchOptions } from '../../../lib/picker-search.types'
 
 export type ArrayAddMenuDuplicatePolicy = 'allow' | 'warn' | 'block'
 
 export type ArrayAddMenuItemConfig = {
   id: string
   label: string
+  /** Supporting line shown beneath the label in the add menu. */
   description?: string
   groupId?: string
-  searchTerms?: WeightedSearchField[]
+  searchTerms?: readonly string[]
+  aliases?: readonly string[]
+  search?: PickerSearchOptions
   appendDefaults: Record<string, unknown> | (() => Record<string, unknown>)
   isDuplicate?: (items: unknown[]) => boolean
   duplicatePolicy?: ArrayAddMenuDuplicatePolicy
 }
 
+export type ArrayAddMenuPresentationMap = Partial<
+  Record<string, { disabled?: boolean; note?: string }>
+>
+
 export type ArrayAddMenuConfig = {
   groups: { id: string; label: string }[]
   items: ArrayAddMenuItemConfig[]
   enableSearch?: boolean
+  /** Watched form paths used to refresh menu item presentation. */
+  contextDependsOn?: readonly string[]
+  presentationWhen?: (
+    watched: Record<string, unknown>,
+    items: unknown[],
+  ) => ArrayAddMenuPresentationMap | undefined
 }
 
 export function resolveArrayAddMenuAppendDefaults(
@@ -50,25 +64,25 @@ export function resolveArrayAddMenuItemPresentation(
 export function buildArrayAddMenuItems(
   addActionMenu: ArrayAddMenuConfig,
   currentItems: unknown[],
-): Array<{
-  id: string
-  label: string
-  description?: string
-  groupId?: string
-  searchTerms?: WeightedSearchField[]
-  disabled?: boolean
-  note?: string
-}> {
+  context?: {
+    presentation?: ArrayAddMenuPresentationMap
+  },
+): ButtonDropdownItem[] {
   return addActionMenu.items.map((item) => {
     const presentation = resolveArrayAddMenuItemPresentation(item, currentItems)
+    const dynamic = context?.presentation?.[item.id]
+    const disabled = presentation.disabled || Boolean(dynamic?.disabled)
+    const note = presentation.disabled ? presentation.note : (dynamic?.note ?? presentation.note)
     return {
       id: item.id,
       label: item.label,
-      description: item.description,
+      ...(item.description !== undefined ? { metadata: item.description } : {}),
       groupId: item.groupId,
       searchTerms: item.searchTerms,
-      disabled: presentation.disabled,
-      note: presentation.note,
+      aliases: item.aliases,
+      search: item.search,
+      disabled,
+      ...(note !== undefined ? { note } : {}),
     }
   })
 }

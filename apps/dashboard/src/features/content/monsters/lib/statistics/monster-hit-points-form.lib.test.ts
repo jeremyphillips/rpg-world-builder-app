@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { resolveMonsterCreateDefaultValues } from '../monster-form-values'
 import {
   applyHitPointsFixedToggle,
+  buildMonsterHitPointsFormValueSyncs,
   formatMonsterHitPointsPreviewLine,
   hitPointsDiceAuthoringFields,
   hitPointsDiceFromFormValues,
@@ -78,6 +79,24 @@ describe('monster hit points form', () => {
       false,
     )
     expect(restored.hitPoints).toEqual({ kind: 'hit-dice', count: 4 })
+  })
+
+  it('does not clear stored die faces while no size is selected', () => {
+    const diceSync = buildMonsterHitPointsFormValueSyncs().find((sync) =>
+      sync.dependsOn.includes('sizes'),
+    )
+    expect(diceSync).toBeDefined()
+
+    const formValues = {
+      ...resolveMonsterCreateDefaultValues(),
+      sizes: [],
+      hitPointsUseFixed: false,
+      hitPoints: { kind: 'hit-dice' as const, count: 2 },
+      hitPointsDice: { count: 2, faces: 8 },
+      'hitPointsDice.faces': '8',
+    }
+
+    expect(diceSync!.apply(formValues, ['sizes'])).toBeUndefined()
   })
 
   it('derives dice faces from creature size', () => {

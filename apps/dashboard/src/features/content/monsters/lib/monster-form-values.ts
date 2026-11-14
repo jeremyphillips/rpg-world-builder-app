@@ -7,6 +7,7 @@ import {
   type CreatureWeaponProficiencies,
   type Monster,
   type MonsterAction,
+  type MonsterLegendaryAction,
   type MonsterReaction,
 } from '@rpg/contracts'
 import type { DiceFormulaValue } from '@rpg/ui'
@@ -33,6 +34,8 @@ import {
   finalizeContentInput,
   slugForInputParse,
 } from '../../lib/forms/registry/content-form-key-helpers'
+import { mapWeaponActionDamageToForm } from './actions/monster-weapon-damage-form'
+import { withDefaultSaveResolutionTarget } from './actions/monster-save-resolution-target.lib'
 import {
   normalizeMonsterFormValues,
   type MonsterNormalizeBaseline,
@@ -84,6 +87,9 @@ export type MonsterFormValues = FieldValues & {
   actions: Array<MonsterAction | Record<string, unknown>>
   bonusActions: Array<MonsterAction | Record<string, unknown>>
   reactions: Array<MonsterReaction | Record<string, unknown>>
+  legendaryActions: Array<MonsterLegendaryAction | Record<string, unknown>>
+  legendaryActionUses?: number
+  legendaryActionUsesInLair?: number
   [MONSTER_HIT_POINTS_USE_FIXED_FIELD]?: boolean
   [MONSTER_HIT_POINTS_DICE_FIELD]?: DiceFormulaValue
   [MONSTER_HIT_POINTS_STASH_FIELD]?: MonsterHitPointStash
@@ -122,6 +128,7 @@ export function resolveMonsterCreateDefaultValues(): MonsterFormValues {
     actions: [],
     bonusActions: [],
     reactions: [],
+    legendaryActions: [],
     weaponProficiencyMode: MONSTER_DEFAULT_WEAPON_PROFICIENCY_MODE,
     weaponProficiencyReconciliationPending: false,
   }
@@ -196,9 +203,24 @@ export function monsterToFormValues(
     defenses: entity.defenses,
     equipment: entity.equipment,
     traits: entity.traits,
-    actions: entity.actions,
-    bonusActions: entity.bonusActions,
-    reactions: entity.reactions,
+    actions: entity.actions
+      .map(mapWeaponActionDamageToForm)
+      .map((action) => withDefaultSaveResolutionTarget(action as Record<string, unknown>)),
+    bonusActions: entity.bonusActions
+      .map(mapWeaponActionDamageToForm)
+      .map((action) => withDefaultSaveResolutionTarget(action as Record<string, unknown>)),
+    reactions: entity.reactions
+      .map(mapWeaponActionDamageToForm)
+      .map((action) => withDefaultSaveResolutionTarget(action as Record<string, unknown>)),
+    legendaryActions: entity.legendaryActions
+      .map(mapWeaponActionDamageToForm)
+      .map((action) => withDefaultSaveResolutionTarget(action as Record<string, unknown>)),
+    ...(entity.legendaryActionUses !== undefined
+      ? { legendaryActionUses: entity.legendaryActionUses }
+      : {}),
+    ...(entity.legendaryActionUsesInLair !== undefined
+      ? { legendaryActionUsesInLair: entity.legendaryActionUsesInLair }
+      : {}),
     ...(() => {
       const hydration = weaponProficiencyHydrationFromWeapons(weapons)
       return {

@@ -15,6 +15,7 @@ import { nameField } from '../../lib/forms/fields/content-identity-form-fields'
 import { monstersQueryKey, useMonsters } from '../hooks/use-monsters'
 import { buildMonsterTabs } from './monster-form-fields'
 import { buildMonsterPreviewIdentity, buildMonsterPreviewSections } from './monster-form-preview'
+import { buildMonsterActionRequirementValueSyncs } from '../../lib/forms/fields/resolution-target-requirement-form-sync.lib'
 import { buildMonsterHitPointsFormValueSyncs } from './statistics/monster-hit-points-form.lib'
 import { resolveMonsterFormSchema } from './monster-form-schema'
 import {
@@ -53,6 +54,7 @@ function buildMonsterFormValueSyncs(): FormValueSync[] {
       },
     },
     ...buildMonsterHitPointsFormValueSyncs(),
+    ...buildMonsterActionRequirementValueSyncs(),
   ]
 }
 
@@ -82,6 +84,7 @@ export const monsterFormDef: ContentFormDef<Monster, MonsterFormValues, CreateMo
     actions: entity.actions.map((action) => action.id),
     bonusActions: entity.bonusActions.map((action) => action.id),
     reactions: entity.reactions.map((action) => action.id),
+    legendaryActions: entity.legendaryActions.map((action) => action.id),
   }),
   toFormValues: monsterToFormValues,
   enrichEditLayoutCtx: (ctx, entity) => ({

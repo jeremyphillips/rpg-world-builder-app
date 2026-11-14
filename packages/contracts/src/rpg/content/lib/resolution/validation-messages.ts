@@ -62,6 +62,10 @@ export const spellResolutionValidationMessages = {
     'validation.spellResolution.areaForbiddenForMode',
     ({ mode }) => `Area of effect is not allowed when selection mode is "${mode}".`,
   ),
+  occupantRequirementsRequireArea: defineMessage(
+    'validation.spellResolution.occupantRequirementsRequireArea',
+    () => 'Area occupant requirements are only allowed when an area of effect is present.',
+  ),
   methodIncompatibleWithSelectionMode: defineMessage<{
     compatibility: 'deferred' | 'unsupported'
     reasonCode: string

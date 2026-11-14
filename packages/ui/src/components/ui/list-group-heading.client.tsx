@@ -5,6 +5,7 @@ import * as React from 'react'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 import { Eyebrow } from './eyebrow'
+import { InlineMetadata } from './inline-metadata'
 import {
   listGroupHeadingVariants,
   type ListGroupHeadingVariantProps,
@@ -44,13 +45,18 @@ export function ListGroupHeading({
       className={listGroupHeadingVariants({ first, follows })}
     >
       <Eyebrow size="xs" as="span" className="ui-list-group-heading__eyebrow">
-        <span className="ui-list-group-heading__label">{label}</span>
         {count != null ? (
-          <>
-            <span aria-hidden="true">·</span>
-            <span className="ui-list-group-heading__count">{count}</span>
-          </>
-        ) : null}
+          <InlineMetadata role="supporting" density="compact">
+            <InlineMetadata.Item>
+              <span className="ui-list-group-heading__label">{label}</span>
+            </InlineMetadata.Item>
+            <InlineMetadata.Item>
+              <span className="ui-list-group-heading__count">{count}</span>
+            </InlineMetadata.Item>
+          </InlineMetadata>
+        ) : (
+          <span className="ui-list-group-heading__label">{label}</span>
+        )}
       </Eyebrow>
     </Component>
   )

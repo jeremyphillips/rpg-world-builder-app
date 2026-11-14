@@ -2,6 +2,7 @@ import { useEffect, useRef, type ReactNode, type RefObject } from 'react'
 import { FormItems, type FormItem } from '@rpg/ui/form'
 
 import { AvailabilityAlert, type Availability } from '@/lib/availability'
+import { MasterDetailDetailFormScope } from '../../lib/master-detail/master-detail-detail-form-scope'
 import { wrapMasterDetailDetailFields } from '../../lib/master-detail/wrap-master-detail-detail-fields'
 import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
 import type { UseMasterDetailArrayResult } from '../../lib/master-detail/use-master-detail-array'
@@ -10,9 +11,15 @@ import type { DetailOverflowMenuEntry } from '../../lib/detail/detail-overflow-a
 import {
   MasterDetailEditorShell,
   type MasterDetailEditorIdentity,
+  type MasterDetailInlineTitle,
 } from './master-detail-editor-shell'
 
-export type { MasterDetailEditorIdentity }
+export type { MasterDetailEditorIdentity, MasterDetailInlineTitle }
+
+function omitInlineTitleField(fields: FormItem[], fieldName: string | undefined): FormItem[] {
+  if (!fieldName) return fields
+  return fields.filter((item) => !('name' in item) || item.name !== fieldName)
+}
 
 export interface MasterDetailEditorPanelProps {
   editor: UseMasterDetailArrayResult
@@ -33,7 +40,7 @@ export interface MasterDetailEditorPanelProps {
   /** Override RHF prefix for availability dialog fields (defaults to row prefix). */
   availabilityNamePrefix?: string
   availabilityDialogRef?: RefObject<HTMLDivElement | null>
-  /** Leading overflow entries, such as Move to. */
+  /** Extra overflow entries, such as Move to, rendered after availability and duplicate. */
   overflowActions?: readonly DetailOverflowMenuEntry[]
   /** Attack summary, notices, and advisories rendered above the row fields. */
   detailLeading?: ReactNode
@@ -100,16 +107,18 @@ function MasterDetailSelectedRowEditor({
         </div>
       ) : null}
       {detailLeading}
-      {renderBody ? (
-        renderBody({ selectedFieldId, selectedIndex, namePrefix: rowPrefix })
-      ) : (
-        <FormItems
-          key={`${selectedFieldId}:${selectedIndex}`}
-          items={wrapMasterDetailDetailFields(itemFields)}
-          idPrefix={`${idPrefix}-${selectedFieldId}`}
-          namePrefix={rowPrefix}
-        />
-      )}
+      <MasterDetailDetailFormScope>
+        {renderBody ? (
+          renderBody({ selectedFieldId, selectedIndex, namePrefix: rowPrefix })
+        ) : (
+          <FormItems
+            key={`${selectedFieldId}:${selectedIndex}`}
+            items={wrapMasterDetailDetailFields(itemFields)}
+            idPrefix={`${idPrefix}-${selectedFieldId}`}
+            namePrefix={rowPrefix}
+          />
+        )}
+      </MasterDetailDetailFormScope>
     </MasterDetailRowPrefixProvider>
   )
 }
@@ -142,8 +151,14 @@ export function MasterDetailEditorPanel({
   const selectedFieldId = editor.selectedFieldId
   const hasSelectedRow = showSelectedDetail && selectedIndex !== null && Boolean(selectedFieldId)
 
+  const inlineTitle = hasSelectedRow ? selectedIdentity?.inlineTitle : undefined
+
   useEffect(() => {
     if (!editor.lastAddedFieldId || editor.lastAddedFieldId !== selectedFieldId) return
+    if (inlineTitle?.initialEdit) {
+      editor.clearLastAddedFieldId()
+      return
+    }
     const root = bodyRef.current
     if (!root) return
     const focusable = root.querySelector<HTMLElement>(
@@ -151,11 +166,16 @@ export function MasterDetailEditorPanel({
     )
     focusable?.focus()
     editor.clearLastAddedFieldId()
-  }, [editor, selectedFieldId])
+  }, [editor, inlineTitle?.initialEdit, selectedFieldId])
+
+  const visibleFields = omitInlineTitleField(itemFields, inlineTitle?.field)
 
   return (
     <MasterDetailEditorShell
       itemNoun={itemNoun}
+      namePrefix={
+        hasSelectedRow && selectedIndex !== null ? `${fieldName}.${selectedIndex}` : undefined
+      }
       selectedIdentity={hasSelectedRow ? selectedIdentity : undefined}
       onDelete={
         onDelete ??
@@ -169,7 +189,7 @@ export function MasterDetailEditorPanel({
     >
       {hasSelectedRow && selectedFieldId && selectedIndex !== null ? (
         <MasterDetailSelectedRowEditor
-          itemFields={itemFields}
+          itemFields={visibleFields}
           fieldName={fieldName}
           idPrefix={idPrefix}
           selectedFieldId={selectedFieldId}

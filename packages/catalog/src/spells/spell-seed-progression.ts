@@ -19,6 +19,7 @@ export const SRD_521_SPELL_SEED_PROGRESSION = {
   'fire-bolt': FIRE_BOLT_PROGRESSION,
   'poison-spray': POISON_SPRAY_PROGRESSION,
   fireball: FIREBALL_PROGRESSION,
+  'lightning-bolt': FIREBALL_PROGRESSION,
   'magic-missile': MAGIC_MISSILE_PROGRESSION,
   'eldritch-blast': ELDRITCH_BLAST_PROGRESSION,
 } as const satisfies Record<string, SpellResolutionProgression>

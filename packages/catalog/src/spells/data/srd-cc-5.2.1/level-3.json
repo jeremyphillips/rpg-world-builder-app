@@ -232,6 +232,61 @@
     }
   },
   {
+    "id": "srd-cc-5.2.1:fear",
+    "slug": "fear",
+    "rulesetId": "srd-cc-5.2.1",
+    "catalogLayer": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Fear",
+    "description": "<p>Each creature in a 30-foot Cone must succeed on a Wisdom saving throw or drop whatever it is holding and have the Frightened condition for the duration. A Frightened creature takes the Dash action and moves away from you by the safest route on each of its turns unless there is nowhere to move. If the creature ends its turn in a space where it doesn't have line of sight to you, the creature makes a Wisdom saving throw. On a successful save, the spell ends on that creature.</p>",
+    "school": "illusion",
+    "level": 3,
+    "classIds": ["bard", "sorcerer", "warlock", "wizard"],
+    "tags": {
+      "conditions": ["frightened"],
+      "roles": ["control"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "self"
+    },
+    "areaOfEffect": {
+      "shape": "cone",
+      "length": {
+        "value": 30,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "minute",
+      "concentration": true,
+      "upTo": true
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": {
+        "description": "a white feather"
+      }
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "condition"
+      }
+    }
+  },
+  {
     "id": "srd-cc-5.2.1:fireball",
     "slug": "fireball",
     "rulesetId": "srd-cc-5.2.1",
@@ -466,6 +521,134 @@
           "note": "Slot damage and stored spell level stay prose"
         }
       ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:lightning-bolt",
+    "slug": "lightning-bolt",
+    "rulesetId": "srd-cc-5.2.1",
+    "catalogLayer": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Lightning Bolt",
+    "description": "<p>A stroke of lightning forming a 100-foot-long, 5-foot-wide Line blasts out from you in a direction you choose. Each creature in the Line makes a Dexterity saving throw, taking 8d6 Lightning damage on a failed save or half as much damage on a successful one.</p>",
+    "school": "evocation",
+    "level": 3,
+    "classIds": ["sorcerer", "wizard"],
+    "tags": {
+      "damageTypes": ["lightning"],
+      "roles": ["damage"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "self"
+    },
+    "areaOfEffect": {
+      "shape": "line",
+      "length": {
+        "value": 100,
+        "unit": "ft"
+      },
+      "width": {
+        "value": 5,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": {
+        "description": "a bit of fur and a crystal rod"
+      }
+    },
+    "higherLevelSlotEffect": "<p>The damage increases by 1d6 for each spell slot level above 3.</p>",
+    "modeling": {
+      "status": "sufficient-for-character-sheet"
+    },
+    "resolution": {
+      "selectionMode": "self",
+      "areaOfEffect": {
+        "shape": "line",
+        "length": {
+          "value": 100,
+          "unit": "ft"
+        },
+        "width": {
+          "value": 5,
+          "unit": "ft"
+        }
+      },
+      "effects": [
+        {
+          "id": "damage",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 8,
+              "faces": 6
+            }
+          },
+          "damageType": "lightning"
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "failed-save",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "full"
+            }
+          ]
+        },
+        {
+          "result": "successful-save",
+          "applications": [
+            {
+              "effectId": "damage",
+              "amount": "half"
+            }
+          ]
+        }
+      ],
+      "method": {
+        "kind": "saving-throw",
+        "ability": "dex"
+      },
+      "progression": {
+        "basis": "spell-slot-level",
+        "tracks": [
+          {
+            "kind": "linear",
+            "reference": {
+              "subject": {
+                "kind": "effect",
+                "effectId": "damage"
+              },
+              "property": "roll"
+            },
+            "increment": {
+              "kind": "roll",
+              "roll": {
+                "dice": {
+                  "count": 1,
+                  "faces": 6
+                }
+              }
+            }
+          }
+        ]
+      }
     }
   },
   {

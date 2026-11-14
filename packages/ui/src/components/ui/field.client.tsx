@@ -63,6 +63,11 @@ export function useOptionalFieldLabelVisibility(): FieldLabelVisibility | undefi
   return React.useContext(FieldContext)?.labelVisibility
 }
 
+/** `aria-describedby` from the nearest field root. Undefined outside a root. */
+export function useOptionalFieldDescribedBy(): string | undefined {
+  return React.useContext(FieldContext)?.describedBy
+}
+
 export interface FieldRootProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Override the generated control id (e.g. to match an external schema). */
   id?: string
@@ -316,7 +321,7 @@ export function FieldErrorText({
   ...props
 }: FieldErrorTextProps) {
   return (
-    <Text
+    <p
       id={id}
       role="alert"
       aria-live="polite"
@@ -324,7 +329,7 @@ export function FieldErrorText({
       {...props}
     >
       {children}
-    </Text>
+    </p>
   )
 }
 

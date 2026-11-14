@@ -30,6 +30,30 @@ const fields: FormItem[] = [
 ]
 
 describe('Form rollValue field', () => {
+  it('does not store suggested dice until add dice', async () => {
+    const user = userEvent.setup()
+    const onSubmit = vi.fn()
+
+    render(
+      <Form
+        schema={schema}
+        fields={fields}
+        onSubmit={onSubmit}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Add dice' })).toBeInTheDocument()
+    expect(screen.queryByLabelText('Number of dice')).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Add dice' }))
+    expect(screen.getByLabelText('Number of dice')).toHaveValue(1)
+    await submitAndExpectPayload(user, onSubmit, {
+      damage: {
+        dice: { count: 1, faces: 6 },
+      },
+    })
+  })
+
   it('binds nested roll paths and optional flat modifier defaults', async () => {
     const user = userEvent.setup()
     const onSubmit = vi.fn()

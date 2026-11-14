@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { systemDefaultArmorClassRules, type Equipment } from '@rpg/contracts'
+import { systemDefaultArmorClassRules, type Equipment, type Monster } from '@rpg/contracts'
 
 import { pickEquipment, pickMonster, pickSkillProficiency } from '@/test/fixtures/pick'
 
@@ -28,7 +28,56 @@ describe('monster-display', () => {
     })
 
     expect(viewModel.statRows.find((row) => row.id === 'ac')?.value).toContain('14')
-    expect(viewModel.statRows.find((row) => row.id === 'hp')?.value).toContain('7')
+    expect(viewModel.statRows.find((row) => row.id === 'hp')?.value).toBe('7 (3d6 - 3)')
+    expect(viewModel.statRows.find((row) => row.id === 'cr')?.value).toBe('1/8 (XP 25; PB +2)')
+    expect(viewModel.statRows.find((row) => row.id === 'speed')?.value).toBe('Walk 30 ft.')
+    expect(viewModel.detailsLeaves.find((leaf) => leaf.id === 'senses')?.body).toBe(
+      'Darkvision 60 ft., Passive Perception 8',
+    )
+  })
+
+  it('escapes a swarm noun in the stat block', () => {
+    const monster = {
+      ...pickMonster('hell-hound'),
+      traits: [{ id: 'swarm', preset: 'swarm' as const, noun: '<bat>' }],
+    }
+    const viewModel = buildMonsterDetailViewModel({
+      monster,
+      creatureTypeLabel: 'Fiend',
+      equipmentById: new Map(),
+      catalogState: 'pending',
+      derived: null,
+    })
+    expect(viewModel.traits[0]?.descriptionHtml).toContain('Tiny &lt;bat&gt;')
+    expect(viewModel.traits[0]?.descriptionHtml).not.toContain('<bat>')
+  })
+
+  it('formats hell hound header rows and hover on the speed phrase', () => {
+    const base = pickMonster('hell-hound')
+    const monster = {
+      ...base,
+      hover: true,
+      movement: { walk: 20, fly: 40 },
+    }
+    const derived = tryDeriveMonsterStatBlock(monster, [], [pickSkillProficiency('perception')], {
+      armorClassRules: systemDefaultArmorClassRules(),
+    })
+    const viewModel = buildMonsterDetailViewModel({
+      monster,
+      creatureTypeLabel: 'Fiend',
+      equipmentById: new Map<string, Equipment>(),
+      catalogState: 'ready',
+      derived,
+    })
+
+    expect(viewModel.statRows.find((row) => row.id === 'cr')?.value).toBe('3 (XP 700; PB +2)')
+    expect(viewModel.statRows.find((row) => row.id === 'hp')?.value).toBe('58 (9d8 + 18)')
+    expect(viewModel.statRows.find((row) => row.id === 'speed')?.value).toBe(
+      'Walk 20 ft., Fly 40 ft. (hover)',
+    )
+    expect(viewModel.detailsLeaves.find((leaf) => leaf.id === 'senses')?.body).toBe(
+      'Darkvision 60 ft., Passive Perception 15',
+    )
   })
 
   it('keeps the detail ready when only armor class is a missing reference', () => {
@@ -114,6 +163,13 @@ describe('monster-display', () => {
       ),
     ).toBe(true)
     expect(viewModel.traits.length).toBeGreaterThan(0)
+    expect(viewModel.traits.map((trait) => trait.name)).toEqual([
+      'Pack Tactics',
+      'Sunlight Sensitivity',
+    ])
+    expect(viewModel.traits[0]?.descriptionHtml).toContain('The kobold warrior')
+    expect(viewModel.traits[0]?.descriptionHtml).toContain('its allies')
+    expect(viewModel.traits[0]?.descriptionHtml).not.toContain('This creature')
   })
 
   it('labels an authored reaction trigger and its response', () => {
@@ -145,6 +201,49 @@ describe('monster-display', () => {
         descriptionHtml: '<p>Adds 2 to AC.</p>',
       }),
     ])
+  })
+
+  it('generates a parry trigger from the creature name and hides an unresolved follow-up', () => {
+    const monster = {
+      ...pickMonster('kobold-warrior'),
+      name: 'Knight',
+      reactions: [
+        {
+          id: 'parry',
+          kind: 'parry' as const,
+          name: 'Parry',
+          acBonus: 2,
+          followUpActionId: 'missing-rapier',
+        },
+      ],
+    }
+    const viewModel = buildMonsterDetailViewModel({
+      monster,
+      creatureTypeLabel: 'Humanoid',
+      equipmentById: new Map(),
+      catalogState: 'ready',
+      derived: null,
+    })
+    expect(viewModel.reactions[0]).toEqual(
+      expect.objectContaining({
+        triggerLine: 'Trigger: The knight is hit by a melee attack roll while holding a weapon.',
+        responseLabel: 'Response:',
+        descriptionHtml:
+          '<p>The knight adds 2 to its AC against that attack, possibly causing it to miss.</p>',
+      }),
+    )
+    const renamed = buildMonsterDetailViewModel({
+      monster: { ...monster, name: 'Warrior Veteran' },
+      creatureTypeLabel: 'Humanoid',
+      equipmentById: new Map(),
+      catalogState: 'ready',
+      derived: null,
+    })
+    expect(renamed.reactions[0]?.triggerLine).toBe(
+      'Trigger: The warrior veteran is hit by a melee attack roll while holding a weapon.',
+    )
+    expect(renamed.reactions[0]?.descriptionHtml).toContain('The warrior veteran adds 2')
+    expect(renamed.reactions[0]?.descriptionHtml).not.toContain('missing-rapier')
   })
 
   it('leaves an unspecified reaction trigger unlabeled', () => {
@@ -225,7 +324,7 @@ describe('monster-display', () => {
     expect(viewModel.traits.length).toBe(monster.traits.length - 1)
   })
 
-  it('keeps kobold template trait prose from the cited description override', () => {
+  it('prints kobold template traits with the creature name', () => {
     const monster = pickMonster('kobold-warrior')
     const viewModel = buildMonsterDetailViewModel({
       monster,
@@ -239,7 +338,7 @@ describe('monster-display', () => {
       expect.objectContaining({
         id: 'pack-tactics',
         name: 'Pack Tactics',
-        descriptionHtml: expect.stringContaining('The kobold has Advantage'),
+        descriptionHtml: expect.stringContaining('The kobold warrior has Advantage'),
       }),
       expect.objectContaining({
         id: 'sunlight-sensitivity',
@@ -247,5 +346,77 @@ describe('monster-display', () => {
         descriptionHtml: expect.stringContaining('ability checks and attack rolls'),
       }),
     ])
+  })
+
+  it('prints the legendary intro and a reference row', () => {
+    const monster = {
+      ...pickMonster('hell-hound'),
+      name: 'Ancient Red Dragon',
+      legendaryActionUses: 3,
+      actions: [
+        {
+          id: 'rend',
+          kind: 'natural-weapon' as const,
+          name: 'Rend',
+          mode: 'melee' as const,
+          properties: [] as const,
+          damage: { dice: { count: 2, faces: 6 } },
+          damageType: 'slashing',
+        },
+      ],
+      legendaryActions: [
+        {
+          id: 'swipe',
+          kind: 'action-reference' as const,
+          name: 'Tail Swipe',
+          actionIds: ['rend'],
+        },
+      ],
+    }
+    const viewModel = buildMonsterDetailViewModel({
+      monster: monster as unknown as Monster,
+      creatureTypeLabel: 'Dragon',
+      equipmentById: new Map(),
+      catalogState: 'pending',
+      derived: null,
+    })
+    expect(viewModel.legendaryActionsIntro).toContain('Legendary Action Uses: 3')
+    expect(viewModel.legendaryActions[0]?.descriptionHtml).toContain('makes one Rend attack')
+    expect(viewModel.legendaryActions[0]?.name).toBe('Tail Swipe')
+  })
+
+  it('heads an unnamed reference with the derived source title', () => {
+    const monster = {
+      ...pickMonster('hell-hound'),
+      name: 'Rust Monster',
+      actions: [
+        {
+          id: 'antennae',
+          kind: 'natural-weapon' as const,
+          name: 'Antennae',
+          mode: 'melee' as const,
+          properties: [] as const,
+          damage: { dice: { count: 1, faces: 6 } },
+          damageType: 'piercing',
+        },
+      ],
+      reactions: [
+        {
+          id: 'reflex',
+          kind: 'action-reference' as const,
+          actionIds: ['antennae'],
+          trigger: { text: 'The rust monster is hit by an attack.' },
+        },
+      ],
+    }
+    const viewModel = buildMonsterDetailViewModel({
+      monster: monster as unknown as Monster,
+      creatureTypeLabel: 'Monstrosity',
+      equipmentById: new Map(),
+      catalogState: 'pending',
+      derived: null,
+    })
+    expect(viewModel.reactions[0]?.name).toBe('Use Antennae')
+    expect(viewModel.reactions[0]?.descriptionHtml).toContain('makes one Antennae attack')
   })
 })

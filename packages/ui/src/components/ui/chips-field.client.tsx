@@ -15,7 +15,7 @@ import {
 } from './field.variants'
 import { FieldLabelContent, FieldLabelInfoAction } from './field-label-content'
 import { shouldShowVisibleRequiredMarker } from './field-required.lib'
-import type { FieldOption } from '../../form/field-config'
+import type { FieldOption } from '../../form/field-config/field-options'
 import type { FieldWidth } from './field-control.variants'
 import type { SelectFieldValueProps } from './select-field-value-props'
 import { fieldHasValidationError, resolveFieldDescribedBy } from './field-validation-props'

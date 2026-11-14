@@ -9,31 +9,40 @@ export interface BuildEmbeddedMasterDetailListItemParams {
   index: number
   row: { id?: string } | undefined
   entityCatalogLayer: ContentFormCtx['entityCatalogLayer']
-  seedRowIds?: ReadonlySet<string>
+  persistedRowIds?: ReadonlySet<string>
+  systemOriginRowIds?: ReadonlySet<string>
   getRowIssueCount: (index: number) => number
   title: string
   eyebrow?: string
+  kindLabel?: string
+  summary?: string
+  sectionLabel?: string
   showDelete?: boolean
   extraReasons?: readonly AvailabilityReason[]
 }
 
-/** Builds a list row with structured meta and deletable flag for the detail panel. */
+/** Builds a list row. Callers supply classification. They cannot replace provenance or persistence. */
 export function buildEmbeddedMasterDetailListItem({
   field,
   index,
   row,
   entityCatalogLayer,
-  seedRowIds,
+  persistedRowIds,
+  systemOriginRowIds,
   getRowIssueCount,
   title,
   eyebrow,
+  kindLabel,
+  summary,
+  sectionLabel,
   showDelete = true,
   extraReasons = [],
 }: BuildEmbeddedMasterDetailListItemParams): MasterDetailListItem {
   const rowMeta = resolveEmbeddedRowMeta({
     row,
     entityCatalogLayer,
-    seedRowIds,
+    persistedRowIds,
+    systemOriginRowIds,
     extraReasons,
   })
   const issueCount = getRowIssueCount(index)
@@ -42,8 +51,12 @@ export function buildEmbeddedMasterDetailListItem({
     id: resolveMasterDetailRowKey(field.id, row),
     title,
     meta: {
+      provenance: rowMeta.provenance,
+      persistence: rowMeta.persistence,
       ...(eyebrow !== undefined ? { eyebrow } : {}),
-      sourceLabel: rowMeta.sourceLabel,
+      ...(kindLabel ? { kindLabel } : {}),
+      ...(summary ? { summary } : {}),
+      ...(sectionLabel ? { sectionLabel } : {}),
     },
     deletable: showDelete && rowMeta.deletable,
     issueCount,

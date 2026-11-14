@@ -25,11 +25,15 @@ import {
 import { validateResolutionMethodCompatibility } from './selection-method-compatibility'
 import { validateResolutionModeFields } from './selection-mode-validation'
 import { isResolutionEffectKind } from './selection-availability'
+import {
+  refineRequirementsForTargetKind,
+  resolutionTargetRequirementsSchema,
+} from './target-requirements'
 import { spellResolutionValidationMessages } from './validation-messages'
 
 const resolutionDistanceSchema = z.object({
-  value: z.number().min(0),
-  unit: z.literal('ft'),
+  value: z.number().int().positive(),
+  unit: z.literal('ft').default('ft'),
 })
 
 export const resolutionSavingThrowMethodSchema = z.object({
@@ -126,12 +130,22 @@ export const resolutionTargetSchema = z
     countKind: z.enum(RESOLUTION_TARGET_COUNT_KINDS).optional(),
     kind: z.enum(RESOLUTION_TARGET_KINDS),
     proximity: resolutionTargetProximitySchema,
+    requirements: resolutionTargetRequirementsSchema.optional(),
   })
-  .superRefine((value) => {
+  .superRefine((value, ctx) => {
     value.countKind = inferResolutionTargetCountKind(value.count, value.countKind)
+    refineRequirementsForTargetKind(value.kind, value.requirements, ctx)
   })
 
 export type ResolutionTarget = z.infer<typeof resolutionTargetSchema>
+
+/** Authoring default for creature targets at a distance — one creature within 5 feet. */
+export const DEFAULT_RESOLUTION_TARGET = {
+  count: 1,
+  countKind: 'exact',
+  kind: 'creature',
+  proximity: { kind: 'distance', distance: { value: 5, unit: 'ft' } },
+} as const satisfies ResolutionTarget
 
 export const resolutionOriginSchema = z.object({
   proximity: z.object({
@@ -149,6 +163,7 @@ export const effectResolutionFieldShape = {
   target: resolutionTargetSchema.optional(),
   origin: resolutionOriginSchema.optional(),
   areaOfEffect: areaGeometrySchema.optional(),
+  occupantRequirements: resolutionTargetRequirementsSchema.optional(),
   effects: z.array(resolutionEffectSchema).min(1),
   outcomes: z.array(resolutionOutcomeSchema).min(1),
 }
@@ -158,6 +173,7 @@ export type EffectResolutionValidationInput = {
   target?: ResolutionTarget
   origin?: ResolutionOrigin
   areaOfEffect?: z.infer<typeof areaGeometrySchema>
+  occupantRequirements?: z.infer<typeof resolutionTargetRequirementsSchema>
   method: { kind: ResolutionMethodKind }
   effects: readonly ResolutionEffect[]
   outcomes: readonly {
@@ -167,11 +183,33 @@ export type EffectResolutionValidationInput = {
   }[]
 }
 
+function refineOccupantRequirementsFields(
+  resolution: EffectResolutionValidationInput,
+  ctx: z.RefinementCtx,
+): void {
+  const requirements = resolution.occupantRequirements
+  if (!requirements) return
+
+  const hasArea = Boolean(resolution.areaOfEffect)
+  const areaAllowed = resolution.selectionMode === 'self' || resolution.selectionMode === 'point'
+  if (!hasArea || !areaAllowed) {
+    addCustomRefinementIssue(
+      ctx,
+      spellResolutionValidationMessages.occupantRequirementsRequireArea(),
+      ['occupantRequirements'],
+    )
+    return
+  }
+
+  refineRequirementsForTargetKind('creature', requirements, ctx, ['occupantRequirements'])
+}
+
 export function validateEffectResolution(
   resolution: EffectResolutionValidationInput,
   ctx: z.RefinementCtx,
 ): void {
   validateResolutionModeFields(resolution, ctx)
+  refineOccupantRequirementsFields(resolution, ctx)
   validateResolutionMethodCompatibility(
     {
       selectionMode: resolution.selectionMode,

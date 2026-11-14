@@ -1,7 +1,11 @@
-import { resolveDependsOnWatchName } from '../config/form-depends-on.lib'
+import {
+  resolveDependsOnRelativeValues,
+  resolveDependsOnWatchName,
+} from '../config/form-depends-on.lib'
 import type { FormIssue } from './form-issue.types'
 import type { FieldConfig, FieldVisibility, FormItem, RowConfig } from '../field-config'
 import {
+  isFieldInteractivityDisabled,
   isFieldVisible,
   resolveDependentsVisibility,
   resolveFieldConfigBoundNames,
@@ -78,9 +82,14 @@ function isContainerVisible(
   return visibility.visibleWhen(resolveVisibilityWatchValues(visibility, formValues, namePrefix))
 }
 
-function addInactiveBoundNames(field: FieldConfig, inactive: Set<string>): void {
+function addInactiveBoundNames(
+  field: FieldConfig,
+  inactive: Set<string>,
+  namePrefix?: string,
+): void {
   for (const name of resolveFieldConfigBoundNames(field)) {
-    inactive.add(name)
+    const path = namePrefix ? `${namePrefix}.${name}` : name
+    inactive.add(path)
   }
 }
 
@@ -95,7 +104,11 @@ function walkInactiveField(
     ? resolveVisibilityWatchValues(field.visibility, formValues, namePrefix)
     : formValues
   const hidden = forceInactive || !isFieldVisible(field, visibilityValues)
-  if (hidden) addInactiveBoundNames(field, inactive)
+  const interactivityValues = field.interactivity
+    ? resolveDependsOnRelativeValues(field.interactivity.dependsOn, formValues, namePrefix)
+    : visibilityValues
+  const interactivityDisabled = isFieldInteractivityDisabled(field, interactivityValues)
+  if (hidden || interactivityDisabled) addInactiveBoundNames(field, inactive, namePrefix)
 }
 
 function walkInactiveContainerFields(
@@ -195,7 +208,7 @@ function walkDependentInactive(
   const sectionHidden =
     forceInactive || !isContainerVisible(item.visibility, formValues, namePrefix)
   if (sectionHidden) {
-    addInactiveBoundNames(item.controller, inactive)
+    addInactiveBoundNames(item.controller, inactive, namePrefix)
     walkInactiveFromItems(
       item.dependents.fields as Array<FormItem | RowConfig>,
       formValues,
@@ -211,7 +224,7 @@ function walkDependentInactive(
     resolveVisibilityWatchValuesForField(item.controller, formValues, namePrefix),
   )
   if (controllerHidden) {
-    addInactiveBoundNames(item.controller, inactive)
+    addInactiveBoundNames(item.controller, inactive, namePrefix)
   }
 
   const dependentsVisibility = resolveDependentsVisibility(item, item.controller)

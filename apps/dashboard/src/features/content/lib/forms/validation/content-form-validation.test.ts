@@ -173,7 +173,6 @@ describe.each(registryEntries)('ContentFormDef[%s] validation', (routeKey, def) 
 
     assertInvalidSubmitUsesRefinedMessages(schema, fields, {
       invalidValue: invalidValueFor(routeKey),
-      unionWhitelist: [/^grant\b/, /^grants\b/, /^features\b/, /^traits\b/, /^heritage\b/],
     })
   })
 })
@@ -245,6 +244,9 @@ function minimalValidEquipmentFor(kind: (typeof EQUIPMENT_KINDS)[number]): Recor
         category: 'simple',
         mode: 'melee',
         mastery: 'cleave',
+        properties: [],
+        damage: { dice: { count: 1, faces: 6 } },
+        damageType: 'slashing',
       }
     case 'armor':
       return { ...base, kind, armorCategory: 'light' }
@@ -398,7 +400,6 @@ describe('embedded content sub-forms validation', () => {
     })
     assertInvalidSubmitUsesRefinedMessages(traitRowFormSchema, fields, {
       invalidValue: { kind: 'custom', name: '', grants: [] },
-      unionWhitelist: [/^grants\b/],
     })
   })
 
@@ -414,7 +415,6 @@ describe('embedded content sub-forms validation', () => {
         choose: 1,
         options: [{ kind: 'custom', name: 'Option', grants: [] }],
       },
-      unionWhitelist: [/^options\b/],
     })
   })
 
@@ -434,7 +434,6 @@ describe('embedded content sub-forms validation', () => {
     })
     assertInvalidSubmitUsesRefinedMessages(schema, fields, {
       invalidValue: { name: '', level: 1, grants: [] },
-      unionWhitelist: [/^grants\b/],
     })
   })
 
@@ -446,7 +445,6 @@ describe('embedded content sub-forms validation', () => {
     })
     assertInvalidSubmitUsesRefinedMessages(startingEquipmentOptionFormSchema, fields, {
       invalidValue: { label: '', items: [] },
-      unionWhitelist: [/^items\b/],
     })
   })
 
@@ -497,7 +495,6 @@ describe('content form schema factories', () => {
     const classSchema = createClassFormSchema(MAX_CHARACTER_LEVEL)
     assertInvalidSubmitUsesRefinedMessages(classSchema, classFields, {
       invalidValue: invalidValueFor('classes'),
-      unionWhitelist: [/^features\b/],
     })
   })
 

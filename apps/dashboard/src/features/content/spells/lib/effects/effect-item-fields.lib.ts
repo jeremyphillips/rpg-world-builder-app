@@ -1,7 +1,7 @@
 import { SPELL_ATOMIC_EFFECT_KINDS, type SpellAtomicEffectKind } from '@rpg/contracts'
 import type { FieldConfig, FieldVisibility, FormItem } from '@rpg/ui/form'
 
-import { damageEffectFieldConfigs } from '../../../lib/forms/mechanics/damage-effect-fields'
+import { damageFieldGroup } from '../../../lib/forms/mechanics/damage-field-group'
 import { rollValueFieldConfigs } from '../../../lib/forms/mechanics/roll-value-fields'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 
@@ -11,7 +11,6 @@ const effectLabelKinds = ['damage', ...rollOnlyKinds] as const
 export type EffectItemFieldsOptions = {
   includeLabel?: boolean
   includeDescription?: boolean
-  damageRollLabel?: string
 }
 
 function visibleWhenEffectKind(kinds: readonly SpellAtomicEffectKind[]): FieldVisibility {
@@ -32,24 +31,21 @@ export function effectItemFieldsForKinds(
   kinds: readonly SpellAtomicEffectKind[] = SPELL_ATOMIC_EFFECT_KINDS,
   options: EffectItemFieldsOptions = {},
 ): FormItem[] {
-  const {
-    includeLabel = true,
-    includeDescription = true,
-    damageRollLabel = 'Damage roll',
-  } = options
+  const { includeLabel = true, includeDescription = true } = options
   const allowedKinds = new Set<SpellAtomicEffectKind>(kinds)
 
   const fields: FormItem[] = []
 
   if (allowedKinds.has('damage')) {
-    fields.push({
-      kind: 'row',
-      visibility: visibleWhenEffectKind(['damage']),
-      fields: fieldsWithVisibility(
-        damageEffectFieldConfigs({ ctx, rollLabel: damageRollLabel }),
-        visibleWhenEffectKind(['damage']),
-      ),
-    })
+    fields.push(
+      damageFieldGroup({
+        ctx,
+        damageTypeName: 'damageType',
+        rollName: 'roll',
+        legendVisibility: 'srOnly',
+        visibility: visibleWhenEffectKind(['damage']),
+      }),
+    )
   }
 
   if (rollOnlyKinds.some((kind) => allowedKinds.has(kind))) {

@@ -45,6 +45,10 @@ describe('ActionButton', () => {
     expect(ACTION_ICONS.details).toBe('info')
   })
 
+  it('maps replace to the arrow-left-right glyph', () => {
+    expect(ACTION_ICONS.replace).toBe('arrow-left-right')
+  })
+
   it('names icon-only details as View details when aria-label is omitted', () => {
     render(<ActionButton action="details" variant="text" tone="neutral" size="icon-xs" />)
 

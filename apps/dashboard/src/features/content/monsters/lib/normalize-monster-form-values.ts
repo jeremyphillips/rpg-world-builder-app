@@ -1,8 +1,12 @@
+import { normalizeRichTextHtml } from '@rpg/ui'
 import {
   protectionFromArmorClass,
   creatureWeaponProficienciesSchema,
   creatureWeaponProficiencyTargetsFromGrantSet,
   monsterActionDraftSchema,
+  monsterBonusActionDraftSchema,
+  omitEmptySavingThrow,
+  monsterLegendaryActionDraftSchema,
   monsterReactionDraftSchema,
   type ArmorClassRules,
   type ContentValidationIntent,
@@ -11,6 +15,8 @@ import {
 import { normalizeLimitedUse } from '../../lib/forms/limited-use/normalize-limited-use'
 import { monsterActionActiveKeys, monsterActionTriggerText } from './actions/monster-action-kind'
 import { normalizeMonsterSaveOutcomes } from './actions/monster-action-save-outcomes'
+import { withDefaultSaveResolutionTarget } from './actions/monster-save-resolution-target.lib'
+import { weaponActionDamageToDraft } from './actions/monster-weapon-damage-form'
 
 import { movementRowsToRecordForPreview } from '../../lib/forms/fields/content-movement-form-fields'
 
@@ -70,7 +76,7 @@ function pickKeys(
 
 function applyReactionTriggerDraft(
   cleaned: Record<string, unknown>,
-  section: 'actions' | 'bonusActions' | 'reactions',
+  section: 'actions' | 'bonusActions' | 'reactions' | 'legendaryActions',
 ): void {
   if (section !== 'reactions') return
   const text = monsterActionTriggerText(cleaned.trigger)
@@ -85,6 +91,85 @@ function applySaveOutcomeDraft(cleaned: Record<string, unknown>): void {
   resolution.outcomes = normalizeMonsterSaveOutcomes(resolution.outcomes)
 }
 
+function applySaveTargetDraft(cleaned: Record<string, unknown>): void {
+  const withTarget = withDefaultSaveResolutionTarget(cleaned)
+  if (withTarget === cleaned || !isRecord(withTarget.resolution)) return
+  cleaned.resolution = withTarget.resolution
+}
+
+const RICH_TEXT_KEYS = ['description', 'descriptionOverride'] as const
+
+function applyRichTextFields(record: Record<string, unknown>): void {
+  for (const key of RICH_TEXT_KEYS) {
+    const value = record[key]
+    if (typeof value !== 'string') continue
+    const normalized = normalizeRichTextHtml(value)
+    if (normalized.length > 0) record[key] = normalized
+    else delete record[key]
+  }
+}
+
+function rollHasInput(roll: unknown): boolean {
+  if (!isRecord(roll)) return false
+  if (typeof roll.flat === 'number') return true
+  const dice = roll.dice
+  if (!isRecord(dice)) return false
+  return typeof dice.count === 'number' || typeof dice.faces === 'number'
+}
+
+function effectRowHasInput(row: unknown): boolean {
+  if (!isRecord(row)) return false
+  if (typeof row.kind === 'string') return true
+  if (row.damageType !== undefined || row.conditionId !== undefined) return true
+  if (typeof row.description === 'string') return true
+  return rollHasInput(row.roll)
+}
+
+/** Keeps fields that belong to the selected kind. A row with no kind stays as authored. */
+function effectRowForKind(row: Record<string, unknown>): Record<string, unknown> {
+  const description = row.description
+  if (row.kind === 'damage') {
+    return {
+      kind: 'damage',
+      ...(row.roll !== undefined ? { roll: row.roll } : {}),
+      ...(row.damageType !== undefined ? { damageType: row.damageType } : {}),
+      ...(description !== undefined ? { description } : {}),
+    }
+  }
+  if (row.kind === 'condition') {
+    return {
+      kind: 'condition',
+      ...(row.conditionId !== undefined ? { conditionId: row.conditionId } : {}),
+      ...(description !== undefined ? { description } : {}),
+    }
+  }
+  if (row.kind === 'note') {
+    return {
+      kind: 'note',
+      ...(description !== undefined ? { description } : {}),
+    }
+  }
+  return row
+}
+
+/** Drops an untouched effect shell. A started row stays, including an incomplete one. */
+function omitEmptyOnHit(cleaned: Record<string, unknown>): void {
+  if (!isRecord(cleaned.onHit)) return
+  const rows = cleaned.onHit.effects
+  if (!Array.isArray(rows)) {
+    delete cleaned.onHit
+    return
+  }
+  const authored = rows
+    .filter(effectRowHasInput)
+    .map((row) => effectRowForKind(row as Record<string, unknown>))
+  if (authored.length === 0) {
+    delete cleaned.onHit
+    return
+  }
+  cleaned.onHit.effects = authored
+}
+
 function applyLimitedUseDraft(cleaned: Record<string, unknown>): void {
   if (!('limitedUse' in cleaned)) return
   const limitedUse = normalizeLimitedUse(cleaned.limitedUse)
@@ -92,9 +177,71 @@ function applyLimitedUseDraft(cleaned: Record<string, unknown>): void {
   else delete cleaned.limitedUse
 }
 
+function coerceSpellCastAtLevel(spell: Record<string, unknown>): void {
+  if (typeof spell.castAtLevel !== 'string') return
+  const level = Number(spell.castAtLevel)
+  if (Number.isInteger(level)) spell.castAtLevel = level
+  else delete spell.castAtLevel
+}
+
+/** Same limited-use normalizer as the action, applied to each spell row. */
+function applySpellEntryDraft(cleaned: Record<string, unknown>): void {
+  if (!Array.isArray(cleaned.spells)) return
+  cleaned.spells = cleaned.spells.map((spell) => {
+    if (!isRecord(spell)) return spell
+    const next = { ...spell }
+    applyLimitedUseDraft(next)
+    coerceSpellCastAtLevel(next)
+    return next
+  })
+}
+
+function applyTurnAndInvocationDraft(
+  cleaned: Record<string, unknown>,
+  section: 'actions' | 'bonusActions' | 'reactions' | 'legendaryActions',
+): void {
+  if (cleaned.onceUntilNextTurn === true || cleaned.onceUntilNextTurn === 'true') {
+    cleaned.onceUntilNextTurn = true
+  } else {
+    delete cleaned.onceUntilNextTurn
+  }
+  if (section === 'legendaryActions' && cleaned.spellInvocation === 'use-entry') {
+    cleaned.spellInvocation = 'use-entry'
+    if (Array.isArray(cleaned.spells)) {
+      cleaned.spells = cleaned.spells.map((spell) => {
+        if (!isRecord(spell)) return spell
+        const next = { ...spell }
+        delete next.castAtLevel
+        return next
+      })
+    }
+  } else {
+    delete cleaned.spellInvocation
+  }
+  if (Array.isArray(cleaned.actionIds)) {
+    cleaned.actionIds = cleaned.actionIds.filter((id) => typeof id === 'string' && id.length > 0)
+  }
+  if (!isRecord(cleaned.movement)) {
+    delete cleaned.movement
+    return
+  }
+  const allowance = cleaned.movement.allowance
+  if (allowance !== 'half-speed' && allowance !== 'speed') {
+    delete cleaned.movement
+    return
+  }
+  if (cleaned.movement.withoutOpportunityAttacks !== true) {
+    delete cleaned.movement.withoutOpportunityAttacks
+  }
+}
+
 function stabilizeDraftActionKeys(
   active: Record<string, unknown>,
-  schema: typeof monsterActionDraftSchema | typeof monsterReactionDraftSchema,
+  schema:
+    | typeof monsterActionDraftSchema
+    | typeof monsterBonusActionDraftSchema
+    | typeof monsterReactionDraftSchema
+    | typeof monsterLegendaryActionDraftSchema,
 ): unknown {
   const parsed = schema.safeParse(active)
   if (!parsed.success) return active
@@ -106,21 +253,61 @@ function stabilizeDraftActionKeys(
   return stable
 }
 
+function omitTakeActionsCombination(
+  cleaned: Record<string, unknown>,
+  intent: ContentValidationIntent,
+): void {
+  if (intent !== 'publish') return
+  if (cleaned.kind !== 'take-actions') return
+  const selected = Array.isArray(cleaned.standardActions) ? cleaned.standardActions : []
+  if (selected.length < 2) delete cleaned.combination
+}
+
+function normalizeWeaponActionDamage(cleaned: Record<string, unknown>): void {
+  if (cleaned.kind === 'weapon' && isRecord(cleaned.damage)) {
+    cleaned.damage = weaponActionDamageToDraft(cleaned.damage)
+  }
+}
+
+function omitEmptySavingThrowField(cleaned: Record<string, unknown>): void {
+  if (!('savingThrow' in cleaned)) return
+  const savingThrow = omitEmptySavingThrow(cleaned.savingThrow)
+  if (savingThrow === undefined) delete cleaned.savingThrow
+  else cleaned.savingThrow = savingThrow
+}
+
+function draftSchemaForSection(
+  section: 'actions' | 'bonusActions' | 'reactions' | 'legendaryActions',
+) {
+  if (section === 'reactions') return monsterReactionDraftSchema
+  if (section === 'legendaryActions') return monsterLegendaryActionDraftSchema
+  if (section === 'bonusActions') return monsterBonusActionDraftSchema
+  return monsterActionDraftSchema
+}
+
 function normalizeAction(
   action: unknown,
-  section: 'actions' | 'bonusActions' | 'reactions',
+  section: 'actions' | 'bonusActions' | 'reactions' | 'legendaryActions',
+  intent: ContentValidationIntent,
 ): unknown {
   if (!isRecord(action)) return action
   const cleaned = omitEmptyStrings(action)
   if (!isRecord(cleaned)) return cleaned
+  applyRichTextFields(cleaned)
+  omitEmptyOnHit(cleaned)
   applyReactionTriggerDraft(cleaned, section)
+  applyTurnAndInvocationDraft(cleaned, section)
   applyLimitedUseDraft(cleaned)
+  applySpellEntryDraft(cleaned)
+  omitTakeActionsCombination(cleaned, intent)
+  normalizeWeaponActionDamage(cleaned)
   applySaveOutcomeDraft(cleaned)
+  applySaveTargetDraft(cleaned)
+  omitEmptySavingThrowField(cleaned)
   const keys =
     typeof cleaned.kind === 'string' ? monsterActionActiveKeys(cleaned.kind, section) : []
   const active = keys.length > 0 ? pickKeys(cleaned, keys) : cleaned
-  const schema = section === 'reactions' ? monsterReactionDraftSchema : monsterActionDraftSchema
-  return stabilizeDraftActionKeys(active, schema)
+  return stabilizeDraftActionKeys(active, draftSchemaForSection(section))
 }
 
 function normalizeArmorClass(
@@ -209,11 +396,54 @@ function normalizeCommunication(
   return {}
 }
 
+function normalizeTraitRichText(value: unknown): unknown {
+  if (!Array.isArray(value)) return value
+  return value.map((trait) => {
+    if (!isRecord(trait)) return trait
+    applyRichTextFields(trait)
+    if ('savingThrow' in trait) {
+      const savingThrow = omitEmptySavingThrow(trait.savingThrow)
+      if (savingThrow === undefined) delete trait.savingThrow
+      else trait.savingThrow = savingThrow
+    }
+    return trait
+  })
+}
+
 /**
  * Single serializer for monster preview and save.
  * Inactive AC, HP, and action-kind fields are dropped. Empty strings are absent.
  * Update payloads send `null` only for clearable keys the baseline actually had.
  */
+function normalizedActionSections(
+  values: MonsterFormValues,
+  intent: ContentValidationIntent,
+): Record<string, unknown> {
+  return {
+    actions: (values.actions ?? []).map((action) => normalizeAction(action, 'actions', intent)),
+    bonusActions: (values.bonusActions ?? []).map((action) =>
+      normalizeAction(action, 'bonusActions', intent),
+    ),
+    reactions: (values.reactions ?? []).map((action) =>
+      normalizeAction(action, 'reactions', intent),
+    ),
+    legendaryActions: (values.legendaryActions ?? []).map((action) =>
+      normalizeAction(action, 'legendaryActions', intent),
+    ),
+  }
+}
+
+function legendaryUseFields(values: MonsterFormValues): Record<string, number> {
+  const fields: Record<string, number> = {}
+  if (typeof values.legendaryActionUses === 'number') {
+    fields.legendaryActionUses = values.legendaryActionUses
+  }
+  if (typeof values.legendaryActionUsesInLair === 'number') {
+    fields.legendaryActionUsesInLair = values.legendaryActionUsesInLair
+  }
+  return fields
+}
+
 export function normalizeMonsterFormValues(
   values: MonsterFormValues,
   options: NormalizeMonsterFormOptions,
@@ -239,12 +469,9 @@ export function normalizeMonsterFormValues(
     ),
     defenses: values.defenses,
     equipment: values.equipment,
-    traits: omitEmptyStrings(values.traits),
-    actions: (values.actions ?? []).map((action) => normalizeAction(action, 'actions')),
-    bonusActions: (values.bonusActions ?? []).map((action) =>
-      normalizeAction(action, 'bonusActions'),
-    ),
-    reactions: (values.reactions ?? []).map((action) => normalizeAction(action, 'reactions')),
+    traits: normalizeTraitRichText(omitEmptyStrings(values.traits)),
+    ...normalizedActionSections(values, options.intent),
+    ...legendaryUseFields(values),
   }
 
   applyOptionalScalars(normalized, values, challengeRating, hasFly)

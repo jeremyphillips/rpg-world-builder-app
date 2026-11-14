@@ -1,8 +1,8 @@
-import type { CatalogLayer, ContentStatus, ResolvedSubclass } from '@rpg/contracts'
+import type { CatalogLayer, ResolvedSubclass } from '@rpg/contracts'
 
 import type { MasterDetailEditorIdentity } from '../../../components/master-detail/master-detail-editor-shell'
+import type { MasterDetailItemMeta } from '../../../lib/master-detail/master-detail-item-meta'
 import type { MasterDetailAvailabilityPresentation } from '../../../lib/master-detail/master-detail-availability.types'
-import { resolveMasterDetailSourceLabel } from '../../../lib/master-detail/resolve-master-detail-source-label'
 import {
   isDraftSubclassId,
   isSubclassDeletable,
@@ -11,17 +11,16 @@ import {
 import type { SubclassFormValues } from './subclass-form-fields'
 import type { SubclassListItem } from './subclass-editor-state'
 
-export function resolveSubclassSourceLabel(
+export function subclassMasterDetailMeta(
   subclassId: string,
-  source: CatalogLayer,
-  status: ContentStatus,
-): string {
-  const listSource =
-    isDraftSubclassId(subclassId) || (source === 'homebrew' && status === 'draft')
-      ? 'unsaved'
-      : source
-
-  return resolveMasterDetailSourceLabel(listSource)
+  source: CatalogLayer | 'unsaved',
+  modified: boolean,
+): MasterDetailItemMeta {
+  return {
+    provenance: source === 'system' ? 'system' : 'homebrew',
+    persistence: source === 'unsaved' || isDraftSubclassId(subclassId) ? 'new' : 'persisted',
+    ...(modified ? { eyebrow: 'Modified' as const } : {}),
+  }
 }
 
 function resolveSubclassSelectionSource(
@@ -30,14 +29,6 @@ function resolveSubclassSelectionSource(
 ): CatalogLayer {
   if (selectedEntity?.catalogLayer) return selectedEntity.catalogLayer
   return isDraftSubclassId(selectedId) ? 'homebrew' : 'system'
-}
-
-function resolveSubclassSelectionStatus(
-  selectedId: string,
-  selectedEntity: ResolvedSubclass | undefined,
-): ContentStatus {
-  if (selectedEntity?.status) return selectedEntity.status
-  return isDraftSubclassId(selectedId) ? 'draft' : 'published'
 }
 
 function resolveSubclassDisplayName(
@@ -72,14 +63,14 @@ export function buildSubclassSelectedIdentity({
   }
 
   const source = resolveSubclassSelectionSource(selectedId, selectedEntity)
-  const status = resolveSubclassSelectionStatus(selectedId, selectedEntity)
 
   return {
     title: resolveSubclassDisplayName(selectedValues, selectedListItem),
-    meta: {
-      ...(modifiedIds.has(selectedId) ? { eyebrow: 'Modified' } : {}),
-      sourceLabel: resolveSubclassSourceLabel(selectedId, source, status),
-    },
+    meta: subclassMasterDetailMeta(
+      selectedId,
+      selectedListItem.catalogLayer,
+      modifiedIds.has(selectedId),
+    ),
     deletable: isSubclassDeletable(source, selectedId),
     availability: selectedAvailability,
     onAvailabilityChange,

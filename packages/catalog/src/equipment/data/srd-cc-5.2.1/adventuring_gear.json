@@ -1130,6 +1130,27 @@
     }
   },
   {
+    "id": "srd-cc-5.2.1:net",
+    "slug": "net",
+    "rulesetId": "srd-cc-5.2.1",
+    "catalogLayer": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Net",
+    "description": "When you take the Attack action, you can replace one of your attacks with throwing a Net. Target a creature you can see within 15 feet of yourself. The target must succeed on a Dexterity saving throw (DC 8 plus your Dexterity modifier and Proficiency Bonus) or have the Restrained condition until it escapes. The target succeeds automatically if it is Huge or larger. To escape, the target or a creature within 5 feet of it must take an action to make a DC 10 Strength (Athletics) check, freeing the Restrained creature on a success. Destroying the Net (AC 10; 5 HP; Immunity to Bludgeoning, Poison, and Psychic damage) also frees the target, ending the effect.",
+    "cost": {
+      "amount": 1,
+      "currency": "gp"
+    },
+    "kind": "adventuring_gear",
+    "gearKind": "general",
+    "weight": {
+      "value": 3,
+      "unit": "lb"
+    }
+  },
+  {
     "id": "srd-cc-5.2.1:oil",
     "slug": "oil",
     "rulesetId": "srd-cc-5.2.1",

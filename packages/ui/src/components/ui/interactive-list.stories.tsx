@@ -1,3 +1,4 @@
+import { Text } from './text'
 import { Icon } from './icon/icon'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
@@ -61,9 +62,9 @@ export const ListDensityLadder: Story = {
     <div className="flex w-full max-w-md flex-col gap-6">
       {(['compact', 'comfortable', 'spacious'] as const).map((density) => (
         <DemoPanel key={density}>
-          <p className="border-b border-border px-3 py-2 text-style-caption text-muted-foreground">
+          <Text variant="caption" className="border-b border-border px-3 py-2">
             {density}
-          </p>
+          </Text>
           <InteractiveListViewport>
             <InteractiveList density={density} role="listbox" aria-label={`Spells (${density})`}>
               <InteractiveListRow

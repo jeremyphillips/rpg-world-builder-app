@@ -2,6 +2,8 @@ import { keysFromEntries } from '../enum-schema'
 import type { GameTermEntry, VocabularyTerm } from '../types'
 import type { NaturalAttackForm } from './natural-attack-form'
 
+import { ACTION_VOCABULARY_SEARCH_TERMS } from './action-vocabulary-search-terms'
+
 /**
  * Action identity and wording.
  * Core entries name common actions. They do not imply implemented rules.
@@ -49,6 +51,7 @@ export type ActionVocabularyEntry = GameTermEntry & {
   readonly gerund: string
   readonly group: ActionGroup
   readonly naturalForm?: NaturalAttackForm
+  readonly searchTerms?: readonly string[]
 }
 
 export const ACTION_VOCABULARY_ENTRIES = {
@@ -224,4 +227,10 @@ export const ACTION_VOCABULARY_IDS = keysFromEntries(ACTION_VOCABULARY_ENTRIES)
 
 export function getActionVocabularyEntry(id: string): ActionVocabularyEntry | undefined {
   return ACTION_VOCABULARY_ENTRIES[id as ActionVocabularyId]
+}
+
+export function getActionVocabularySearchTerms(id: string): readonly string[] {
+  const fromEntry = getActionVocabularyEntry(id)?.searchTerms
+  if (fromEntry?.length) return fromEntry
+  return ACTION_VOCABULARY_SEARCH_TERMS[id as keyof typeof ACTION_VOCABULARY_SEARCH_TERMS] ?? []
 }

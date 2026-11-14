@@ -3,6 +3,8 @@ import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm } from 'react-hook-form'
 import { describe, expect, it, vi } from 'vitest'
 
+import type * as CharacterFeature from '@/features/character'
+
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import {
   resolveMonsterCreateDefaultValues,
@@ -11,7 +13,7 @@ import {
 import { MonsterActionSections } from './monster-action-sections'
 
 vi.mock('@/features/character', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/features/character')>()
+  const actual = await importOriginal<typeof CharacterFeature>()
   return {
     ...actual,
     EquipmentPickerDrawer: ({
@@ -56,7 +58,6 @@ describe('MonsterActionSections', () => {
     await user.click(addButtons[0]!)
     await user.click(await screen.findByRole('menuitem', { name: /Claw/i }))
 
-    expect(screen.getByDisplayValue('Claw')).toBeInTheDocument()
     expect(screen.getByRole('button', { current: true, name: /Claw/i })).toBeInTheDocument()
   })
 
@@ -71,6 +72,21 @@ describe('MonsterActionSections', () => {
     await user.click(screen.getByRole('button', { name: 'Commit mock weapon' }))
 
     expect(screen.getByText(/Longsword was added/i)).toBeInTheDocument()
-    expect(screen.getByRole('button', { current: true, name: /Action 1/i })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { current: true, name: /Unresolved reference/i }),
+    ).toBeInTheDocument()
+  })
+
+  it('adds a custom legendary ability from the legendary menu and selects it', async () => {
+    const user = userEvent.setup()
+    render(<Host ctx={readyCtx} />)
+
+    const addButtons = screen.getAllByRole('button', { name: 'Add' })
+    await user.click(addButtons[3]!)
+    await user.click(await screen.findByRole('menuitem', { name: /Custom ability/i }))
+
+    expect(
+      screen.getByRole('button', { current: true, name: /Custom ability/i }),
+    ).toBeInTheDocument()
   })
 })

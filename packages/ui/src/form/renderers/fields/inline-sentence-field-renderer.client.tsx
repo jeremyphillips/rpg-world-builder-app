@@ -1,7 +1,7 @@
 'use client'
 
 import { useContext, useEffect, useMemo, useRef } from 'react'
-import { useController, useFormState, type UseControllerReturn } from 'react-hook-form'
+import { useController, type UseControllerReturn } from 'react-hook-form'
 
 import { InlineSentenceField } from '../../../components/ui/inline-sentence-field.client'
 import { pickFieldChromeProps } from '../../../components/ui/field-chrome.variants'
@@ -32,10 +32,7 @@ import {
   ArrayItemPresentationContext,
   resolvePresentedFieldValidation,
 } from '../../context/array-item-presentation.context'
-import {
-  resolveFirstFieldErrorMessage,
-  resolveNestedFieldErrorMessage,
-} from '../../errors/resolve-field-error-message'
+import { resolveFirstFieldErrorMessage } from '../../errors/resolve-field-error-message'
 import { useFormValidationPresentation } from '../../hooks/use-form-validation-presentation.client'
 import { resolveRowAwareFieldHintPresentation } from '../../config/resolve-row-field-hint.lib'
 import { resolveFieldPlaceholder } from '../../config/field-placeholder.lib'
@@ -92,7 +89,7 @@ function syncResolvedInlineSentenceSelectValue(
 
   const controller = controllerByName.get(segment.name)
   const resolvedOptions = resolvedSelectOptionsBySegment.get(segment.name)
-  if (!controller || !resolvedOptions) return
+  if (!controller || !resolvedOptions || resolvedOptions.length === 0) return
 
   const currentValue = coerceInlineSentenceSelectValue(controller.field.value)
   const validValues = new Set(resolvedOptions.map((option) => option.value))
@@ -218,6 +215,10 @@ function buildInlineSentenceJoinedPairSelectControl(options: {
     sizingLabels: occupant.sizingLabels,
     placeholder: occupant.placeholder,
     ariaLabel: occupant.ariaLabel,
+    allowCustom: occupant.allowCustom,
+    clearable: occupant.clearable,
+    customMin: occupant.customMin,
+    customMax: occupant.customMax,
     hasError,
     onChange: field?.onChange,
     onBlur: field?.onBlur,
@@ -302,7 +303,6 @@ export function InlineSentenceFieldRenderer({
   config,
   id,
   namePrefix,
-  error,
 }: InlineSentenceFieldRendererProps) {
   const inAnatomyRow = useFieldRowParticipation()
   const controlSize = useFieldControlSize(config.controlSizeOverride)
@@ -333,7 +333,6 @@ export function InlineSentenceFieldRenderer({
   }, [controllers, uniqueBoundNames])
 
   const presentation = useFormValidationPresentation()
-  const { errors } = useFormState()
   const { suppressFieldErrorText, rowSummaryId } = useContext(ArrayItemPresentationContext)
 
   const boundValidations = useMemo(() => {
@@ -341,14 +340,11 @@ export function InlineSentenceFieldRenderer({
 
     for (const name of uniqueBoundNames) {
       const fullPath = resolveFullName(namePrefix, name)
-      const controller = controllerByName.get(name)
-      const rhfMessage =
-        resolveNestedFieldErrorMessage(errors, fullPath) ?? controller?.fieldState.error?.message
 
       validations.set(
         name,
         resolvePresentedFieldValidation(
-          rhfMessage,
+          undefined,
           fullPath,
           presentation,
           suppressFieldErrorText,
@@ -358,19 +354,10 @@ export function InlineSentenceFieldRenderer({
     }
 
     return validations
-  }, [
-    controllerByName,
-    errors,
-    namePrefix,
-    presentation,
-    rowSummaryId,
-    suppressFieldErrorText,
-    uniqueBoundNames,
-  ])
+  }, [namePrefix, presentation, rowSummaryId, suppressFieldErrorText, uniqueBoundNames])
 
   const combinedError = resolveFirstFieldErrorMessage(
     ...uniqueBoundNames.map((name) => boundValidations.get(name)?.error),
-    error,
   )
 
   const resolvedSelectOptionsBySegment = useMemo(() => {
@@ -394,6 +381,13 @@ export function InlineSentenceFieldRenderer({
 
   useEffect(() => {
     if (!config.optionsResolve) return
+
+    const hasSelectableOption = visibleSegments.some(
+      (segment) =>
+        segment.kind === 'select' &&
+        (resolvedSelectOptionsBySegment.get(segment.name)?.length ?? 0) > 0,
+    )
+    if (!hasSelectableOption) return
 
     syncResolvedInlineSentenceSelectValues(
       visibleSegments,
@@ -459,8 +453,9 @@ export function InlineSentenceFieldRenderer({
 
       const selectSegment = segment as InlineSentenceSelectSegment
       const selectLabel = selectSegment.ariaLabel ?? config.label
+      const resolvedFromMap = resolvedSelectOptionsBySegment.get(segment.name)
       const resolvedOptions =
-        resolvedSelectOptionsBySegment.get(segment.name) ?? selectSegment.options
+        resolvedFromMap !== undefined ? resolvedFromMap : selectSegment.options
       const selectControl: InlineSentenceBoundSelect = {
         kind: 'select',
         id: controlId,

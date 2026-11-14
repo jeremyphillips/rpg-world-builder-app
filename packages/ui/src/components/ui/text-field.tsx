@@ -10,7 +10,7 @@ import type { FieldHintPosition } from './field.variants'
 import type { FieldChromeProps } from './field-chrome.variants'
 import type { FieldValidationProps } from './field-validation-props'
 import type { FieldLabelPresentationProps } from './field-label-props'
-import type { TrailingFieldActionConfig } from '../../form/field-config'
+import type { TrailingFieldActionConfig } from '../../form/field-config/field-base.types'
 
 export interface TextFieldProps
   extends

@@ -16,12 +16,12 @@ const items: MasterDetailListItem[] = [
   {
     id: 'a',
     title: 'Rage',
-    meta: { eyebrow: 'Level 1', sourceLabel: 'System' },
+    meta: { eyebrow: 'Level 1', provenance: 'system', persistence: 'persisted' },
   },
   {
     id: 'b',
     title: 'Unarmored Defense',
-    meta: { eyebrow: 'Level 1', sourceLabel: 'Homebrew' },
+    meta: { eyebrow: 'Level 1', provenance: 'homebrew', persistence: 'persisted' },
   },
 ]
 
@@ -134,7 +134,7 @@ describe('MasterDetailListPanel', () => {
           {
             id: 'a',
             title: 'Legacy Option',
-            meta: { eyebrow: 'Level 5', sourceLabel: 'System' },
+            meta: { eyebrow: 'Level 5', provenance: 'system', persistence: 'persisted' },
             availabilityStatusLabel: 'Unavailable',
           },
         ]}
@@ -160,7 +160,7 @@ describe('MasterDetailListPanel', () => {
       {
         id: 'a',
         title: 'Rage',
-        meta: { eyebrow: 'Level 1', sourceLabel: 'System' },
+        meta: { eyebrow: 'Level 1', provenance: 'system', persistence: 'persisted' },
         issueCount: 2,
         hasError: true,
       },

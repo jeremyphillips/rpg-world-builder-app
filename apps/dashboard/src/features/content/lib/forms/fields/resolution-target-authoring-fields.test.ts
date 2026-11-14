@@ -1,0 +1,138 @@
+import { describe, expect, it } from 'vitest'
+
+import {
+  buildResolutionRequirementAddMenu,
+  formatResolutionRequirementSummary,
+  formatResolutionTargetAuthoringPreview,
+  resolveResolutionRequirementCollapsible,
+} from './resolution-target-authoring-fields'
+
+const creatureTypes = [
+  { value: 'humanoid', label: 'Humanoid' },
+  { value: 'giant', label: 'Giant' },
+]
+
+describe('resolution target authoring fields', () => {
+  it('summarizes simple rows and collapses multi-value rows to a phrase', () => {
+    const label = (id: string) => creatureTypes.find((option) => option.value === id)?.label ?? id
+    expect(formatResolutionRequirementSummary({ kind: 'sight', who: 'actor' }, label)).toBe(
+      'You can see it',
+    )
+    expect(
+      formatResolutionRequirementSummary(
+        { kind: 'size', bound: 'large', comparison: 'or-smaller' },
+        label,
+      ),
+    ).toBe('Large or smaller')
+    expect(
+      formatResolutionRequirementSummary(
+        { kind: 'creature-type', mode: 'include', ids: ['humanoid', 'giant'] },
+        label,
+      ),
+    ).toBe('Humanoid or Giant')
+    expect(
+      formatResolutionRequirementSummary(
+        {
+          kind: 'any-of',
+          willing: true,
+          conditionIds: ['grappled', 'incapacitated', 'restrained'],
+        },
+        label,
+      ),
+    ).toBe('Willing or has the Grappled, Incapacitated, or Restrained condition')
+    expect(
+      formatResolutionRequirementSummary({ kind: 'size', comparison: 'or-smaller' }, label),
+    ).toBe('Creature size')
+    expect(
+      formatResolutionRequirementSummary(
+        { kind: 'size', bound: 'huge', comparison: 'only' },
+        label,
+      ),
+    ).toBe('Huge only')
+    expect(formatResolutionRequirementSummary({ kind: 'written', text: 'demon' }, label)).toBe(
+      'demon',
+    )
+  })
+
+  it('previews reach and distance the same when both specify feet', () => {
+    const values = {
+      'resolution.target.count': 1,
+      'resolution.target.kind': 'creature',
+      'resolution.target.proximity.distance.value': 5,
+    }
+    expect(
+      formatResolutionTargetAuthoringPreview(
+        { ...values, 'resolution.target.proximity.kind': 'reach' },
+        'resolution.target',
+      ),
+    ).toBe(
+      formatResolutionTargetAuthoringPreview(
+        { ...values, 'resolution.target.proximity.kind': 'distance' },
+        'resolution.target',
+      ),
+    )
+  })
+
+  it('previews reach without distance as within your reach', () => {
+    expect(
+      formatResolutionTargetAuthoringPreview(
+        {
+          'resolution.target.count': 1,
+          'resolution.target.kind': 'creature',
+          'resolution.target.proximity.kind': 'reach',
+        },
+        'resolution.target',
+      ),
+    ).toBe('One creature within your reach')
+  })
+
+  it('previews the stat-block sentence, including an awkward written noun', () => {
+    expect(
+      formatResolutionTargetAuthoringPreview(
+        {
+          'resolution.target.count': 1,
+          'resolution.target.kind': 'creature',
+          'resolution.target.proximity.kind': 'distance',
+          'resolution.target.proximity.distance.value': 5,
+          'resolution.target.requirements': [
+            { kind: 'size', bound: 'large', comparison: 'or-smaller' },
+            { kind: 'sight', who: 'actor' },
+          ],
+        },
+        'resolution.target',
+      ),
+    ).toBe('One Large or smaller creature you can see within 5 feet')
+    expect(
+      formatResolutionTargetAuthoringPreview(
+        {
+          'resolution.target.count': 1,
+          'resolution.target.kind': 'creature',
+          'resolution.target.proximity.kind': 'distance',
+          'resolution.target.proximity.distance.value': 5,
+          'resolution.target.requirements': [{ kind: 'written', text: 'demon' }],
+        },
+        'resolution.target',
+      ),
+    ).toBe('One creature within 5 feet demon')
+  })
+
+  it('blocks a second sight row and does not seed a size or condition', () => {
+    const menu = buildResolutionRequirementAddMenu()
+    const sight = menu.items.find((item) => item.id === 'sight-target')
+    const size = menu.items.find((item) => item.id === 'size')
+    const condition = menu.items.find((item) => item.id === 'condition')
+    expect(sight?.isDuplicate?.([{ kind: 'sight', who: 'actor' }])).toBe(true)
+    expect(size?.appendDefaults).toEqual({ kind: 'size', comparison: 'or-smaller' })
+    const creatureType = menu.items.find((item) => item.id === 'creature-type')
+    expect(creatureType?.appendDefaults).toEqual({ kind: 'creature-type', mode: 'include' })
+    expect(condition?.appendDefaults).toEqual({ kind: 'condition', presence: 'has' })
+    expect(condition?.isDuplicate?.([{ kind: 'any-of' }])).toBe(true)
+    expect(menu.items.some((item) => item.id === 'any-of')).toBe(false)
+  })
+
+  it('disables disclosure when a requirement row has no editable fields', () => {
+    expect(resolveResolutionRequirementCollapsible({ kind: 'willing' })).toBe(false)
+    expect(resolveResolutionRequirementCollapsible({ kind: 'sight', who: 'actor' })).toBe(false)
+    expect(resolveResolutionRequirementCollapsible({ kind: 'size' })).toBe(true)
+  })
+})

@@ -23,6 +23,10 @@ import {
   resolutionMethodFromForm,
 } from '../lib/form/resolution-outcome-slots.lib'
 import {
+  createDefaultResolutionFormTarget,
+  flatTargetSelectionFields,
+} from '../lib/form/resolution-form-target.lib'
+import {
   initializeOriginFromSpellRange,
   RESOLUTION_FIELD_NAME,
 } from '../lib/form/resolution-form-values'
@@ -73,12 +77,19 @@ function enrichTargetsModeDefaults(
   resolution: ResolutionFormValues,
   patch: Partial<ResolutionFormValues>,
 ): Partial<ResolutionFormValues> {
+  if (patch.target) return patch
+  const current = flatTargetSelectionFields(resolution.target)
   return {
-    proximityKind: resolution.proximityKind ?? 'touch',
-    targetCount: patch.targetCount ?? 1,
-    countKind: patch.countKind ?? 'exact',
-    targetKind: patch.targetKind ?? resolution.targetKind ?? 'creature-or-object',
     ...patch,
+    target:
+      resolution.target ??
+      createDefaultResolutionFormTarget({
+        count: current.targetCount ?? 1,
+        countKind: current.countKind ?? 'exact',
+        kind: current.targetKind ?? 'creature-or-object',
+        proximityKind: current.proximityKind ?? 'touch',
+        proximityDistanceFt: current.proximityDistanceFt,
+      }),
   }
 }
 
@@ -308,13 +319,13 @@ function createController(
             getForm,
             resolution,
             change,
-            selectionCleanupPatchToFormPatch(plan.requestedPatch),
-            selectionCleanupPatchToFormPatch(plan.cleanupPatch),
+            selectionCleanupPatchToFormPatch(plan.requestedPatch, resolution),
+            selectionCleanupPatchToFormPatch(plan.cleanupPatch, resolution),
             applyOutcomePlanPatch(
               {
                 ...resolution,
-                ...selectionCleanupPatchToFormPatch(plan.requestedPatch),
-                ...selectionCleanupPatchToFormPatch(plan.cleanupPatch),
+                ...selectionCleanupPatchToFormPatch(plan.requestedPatch, resolution),
+                ...selectionCleanupPatchToFormPatch(plan.cleanupPatch, resolution),
               } as ResolutionFormValues,
               plan,
             ),
@@ -345,11 +356,12 @@ function createController(
       const pendingChange = pending.change
       const incompatibleClear = selectionCleanupPatchToFormPatch(
         buildIncompatibleSelectionClearPatch(plan.incompatibleSelections),
+        resolution,
       )
       const mergedResolution = {
         ...resolution,
-        ...selectionCleanupPatchToFormPatch(plan.requestedPatch),
-        ...selectionCleanupPatchToFormPatch(plan.cleanupPatch),
+        ...selectionCleanupPatchToFormPatch(plan.requestedPatch, resolution),
+        ...selectionCleanupPatchToFormPatch(plan.cleanupPatch, resolution),
         ...incompatibleClear,
       } as ResolutionFormValues
       const nextEffects =
@@ -363,8 +375,8 @@ function createController(
 
       applyPatch(
         mergeResolutionPatch(getForm, resolution, pending.change, {
-          ...selectionCleanupPatchToFormPatch(plan.requestedPatch),
-          ...selectionCleanupPatchToFormPatch(plan.cleanupPatch),
+          ...selectionCleanupPatchToFormPatch(plan.requestedPatch, resolution),
+          ...selectionCleanupPatchToFormPatch(plan.cleanupPatch, resolution),
           ...incompatibleClear,
           ...applyOutcomePlanPatch(mergedResolution, plan),
           effects: nextEffects,

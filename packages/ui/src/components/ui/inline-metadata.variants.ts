@@ -41,31 +41,23 @@ export const inlineMetadataItemVariants = cva('', {
   ],
 })
 
-export const inlineMetadataSeparatorVariants = cva('font-normal text-muted-foreground', {
-  variants: {
-    density: {
-      compact: '',
-      comfortable: '',
+export const inlineMetadataSeparatorVariants = cva(
+  'shrink-0 px-1 font-normal text-muted-foreground',
+  {
+    variants: {
+      density: {
+        compact: '',
+        comfortable: '',
+      },
+      wrap: {
+        false: '',
+        true: '',
+      },
+      /** Opt-in. Default inherits so heading density stays a spacing token. */
+      size: {
+        xs: 'text-xs',
+      },
     },
-    wrap: {
-      false: '',
-      true: '',
-    },
-    /** Opt-in. Default inherits so heading density stays a spacing token. */
-    size: {
-      xs: 'text-xs',
-    },
+    compoundVariants: [],
   },
-  compoundVariants: [
-    {
-      wrap: false,
-      density: 'compact',
-      className: 'mx-1',
-    },
-    {
-      wrap: false,
-      density: 'comfortable',
-      className: 'mx-1.5',
-    },
-  ],
-})
+)

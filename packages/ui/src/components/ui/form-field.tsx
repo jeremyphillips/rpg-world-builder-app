@@ -83,7 +83,7 @@ function FormFieldSettingsRoot({
   recommendation: FieldLayoutRecommendation | null
 }) {
   const presentation = resolveFieldPresentation({
-    size,
+    size: size ?? 'md',
     labelLayout: headerHasVisibleContent ? mapFormLabelPositionToLayout('settings') : 'hidden',
     controlBand,
   })
@@ -218,7 +218,6 @@ export function FormField({
       anatomy
     >
       <FieldLayout
-        hintPosition={hintPosition}
         recommendation={recommendation}
         label={labelNode(label, info, required)}
         control={children}

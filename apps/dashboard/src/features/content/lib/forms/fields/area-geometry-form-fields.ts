@@ -8,15 +8,28 @@ import { SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS } from './content-identity-for
 
 export const AREA_GEOMETRY_FORM_NONE = 'none'
 
+export const AREA_GEOMETRY_SHAPE_PLACEHOLDER = 'Choose a shape…'
+
+const areaGeometryContractShapeOptions = toOptions(
+  AREA_GEOMETRY_SHAPES,
+  Object.fromEntries(
+    AREA_GEOMETRY_SHAPES.map((shape) => [shape, AREA_GEOMETRY_SHAPE_ENTRIES[shape].label]),
+  ) as Record<(typeof AREA_GEOMETRY_SHAPES)[number], string>,
+)
+
 export const areaGeometryShapeOptions = [
   { value: AREA_GEOMETRY_FORM_NONE, label: 'None' },
-  ...toOptions(
-    AREA_GEOMETRY_SHAPES,
-    Object.fromEntries(
-      AREA_GEOMETRY_SHAPES.map((shape) => [shape, AREA_GEOMETRY_SHAPE_ENTRIES[shape].label]),
-    ) as Record<(typeof AREA_GEOMETRY_SHAPES)[number], string>,
-  ),
+  ...areaGeometryContractShapeOptions,
 ]
+
+export function resolveAreaGeometryShapeOptions(input?: {
+  includeExplicitNoneOption?: boolean
+}): { value: string; label: string }[] {
+  if (input?.includeExplicitNoneOption === false) {
+    return areaGeometryContractShapeOptions
+  }
+  return areaGeometryShapeOptions
+}
 
 const distanceValueSchema = z.object({
   value: z.coerce.number(),
@@ -58,8 +71,17 @@ export function areaGeometryFormFields(input: {
   legendVisibility?: 'visible' | 'srOnly'
   shapeHint: string
   visibility?: FieldVisibility
+  /** When false, Shape uses contract vocabulary only (no explicit None row). Default true. */
+  includeExplicitNoneOption?: boolean
+  shapePlaceholder?: string
+  /** Applies when `includeExplicitNoneOption` is false. Default true. */
+  shapeRequired?: boolean
 }): FormItem[] {
   const { fieldPrefix, legend, legendVisibility, shapeHint, visibility } = input
+  const includeExplicitNone = input.includeExplicitNoneOption !== false
+  const shapeOptions = resolveAreaGeometryShapeOptions({
+    includeExplicitNoneOption: input.includeExplicitNoneOption,
+  })
   const whenShape = (shapes: readonly string[]) =>
     visibleWhenAreaShape(fieldPrefix, shapes, visibility)
   return [
@@ -75,9 +97,15 @@ export function areaGeometryFormFields(input: {
               type: 'select',
               name: `${fieldPrefix}.shape`,
               label: 'Shape',
-              options: areaGeometryShapeOptions,
+              options: shapeOptions,
               hint: { text: shapeHint, position: 'below-control' },
               width: 'auto',
+              ...(includeExplicitNone
+                ? {}
+                : {
+                    placeholder: input.shapePlaceholder ?? AREA_GEOMETRY_SHAPE_PLACEHOLDER,
+                    required: input.shapeRequired !== false,
+                  }),
             },
             distanceInputSelectField({
               name: `${fieldPrefix}.radius`,

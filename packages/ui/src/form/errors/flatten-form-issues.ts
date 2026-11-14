@@ -14,7 +14,7 @@ function isFieldError(value: unknown): value is FieldError & { message: string }
   )
 }
 
-function parseArrayItemContext(
+export function parseArrayItemContext(
   path: string,
 ): Pick<FormIssue, 'arrayPath' | 'itemIndex' | 'itemPrefix' | 'relativePath'> {
   const segments = path.split('.')

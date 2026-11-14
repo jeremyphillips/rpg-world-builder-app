@@ -30,9 +30,29 @@ const ctx = {
   damageTypeVocabulary: buildSeedDamageTypeVocabulary(),
 } as ContentFormCtx
 
-function Host({ action }: { action: MonsterActionDraftRow }) {
+function Host({
+  action,
+  section = 'actions',
+}: {
+  action: MonsterActionDraftRow
+  section?: 'actions' | 'legendaryActions'
+}) {
   const values = resolveMonsterCreateDefaultValues()
-  values.actions = [action]
+  if (section === 'legendaryActions') {
+    values.legendaryActionUses = 3
+    values.actions = [
+      {
+        id: 'rend',
+        kind: 'natural-weapon',
+        name: 'Rend',
+        mode: 'melee',
+        damageType: 'slashing',
+      },
+    ]
+    values.legendaryActions = [action]
+  } else {
+    values.actions = [action]
+  }
   const form = useForm<MonsterFormValues>({ shouldUnregister: true, defaultValues: values })
   return (
     <FormProvider {...form}>
@@ -68,19 +88,37 @@ const claw: MonsterActionDraftRow = {
 }
 
 export const Claw: Story = {
-  args: { ctx, sections: undefined as never, located: null },
+  args: { ctx, sections: undefined as never, located: null, rows: undefined as never },
   render: () => <Host action={claw} />,
 }
 
+export const LegendaryActions: Story = {
+  args: { ctx, sections: undefined as never, located: null, rows: undefined as never },
+  render: () => (
+    <Host
+      section="legendaryActions"
+      action={{
+        id: 'pounce',
+        kind: 'action-reference',
+        name: 'Pounce',
+        actionIds: ['rend'],
+        movement: { allowance: 'half-speed' },
+      }}
+    />
+  ),
+}
+
 export const WithDescriptionAndOnHit: Story = {
-  args: { ctx, sections: undefined as never, located: null },
+  args: { ctx, sections: undefined as never, located: null, rows: undefined as never },
   render: () => (
     <Host
       action={{
         ...claw,
         description: '<p>Rakes with both claws.</p>',
         onHit: {
-          additionalDamage: [{ damageType: 'poison', roll: { dice: { count: 1, faces: 4 } } }],
+          effects: [
+            { kind: 'damage', damageType: 'poison', roll: { dice: { count: 1, faces: 4 } } },
+          ],
         },
       }}
     />

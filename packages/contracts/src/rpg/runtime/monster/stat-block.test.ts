@@ -19,7 +19,10 @@ import { normalizeEquipmentInstance } from '../../content/equipment/instance/nor
 import { resolveInventoryWeaponAttackTotals } from '../creature/resolve-inventory-weapon-attack'
 import { systemDefaultArmorClassRules } from '../../campaign/patches/campaign-mechanics-patch'
 import { ARMOR_CLASS_RULES_MATRIX } from '../../vocab/mechanics/armor-class-scale'
-import { resolveMonsterActionAttackProfile } from './resolve-monster-action-attack-profile'
+import {
+  resolveMonsterActionAttackProfile,
+  type ResolveMonsterActionAttackProfileInput,
+} from './resolve-monster-action-attack-profile'
 import {
   deriveMonsterDraftStatBlock as deriveMonsterDraftStatBlockRaw,
   deriveMonsterStatBlock as deriveMonsterStatBlockRaw,
@@ -893,6 +896,7 @@ describe('monster spellcasting lines', () => {
         {
           id: 'spellcasting',
           kind: 'spell',
+          profile: 'primary',
           name: 'Spellcasting',
           castingAbility: { kind: 'ability', ability: 'int' },
           spells: [{ spellId: `${RULESET}:mage-hand` }],
@@ -956,7 +960,7 @@ describe('resolveMonsterHitPoints size', () => {
 })
 
 describe('resolveMonsterActionAttackProfile', () => {
-  it('matches the published dagger line and keeps thrown range without a second attack', () => {
+  it('matches the published dagger line with melee and ranged on one bonus', () => {
     const block = deriveMonsterStatBlock({ monster: kobold, equipmentCatalog, skillCatalog })
     const line = block.attacks.find((attack) => attack.id === 'dagger')
     const profile = resolveMonsterActionAttackProfile({
@@ -965,7 +969,7 @@ describe('resolveMonsterActionAttackProfile', () => {
       equipmentCatalog,
       proficiencyBonus: block.proficiencyBonus,
       magicPropertyProvider: EMPTY_MAGIC_PROVIDER,
-    })
+    } as ResolveMonsterActionAttackProfileInput)
     expect(profile.status).toBe('resolved')
     if (profile.status !== 'resolved') return
     expect(profile.value.attackBonus).toBe(line?.attackBonus)
@@ -973,10 +977,9 @@ describe('resolveMonsterActionAttackProfile', () => {
     expect(profile.value.primary.expression).toBe(line?.damageExpression)
     expect(profile.value.range).toEqual(line?.range)
     expect(profile.value.reach).toBe(5)
-    expect(profile.value.modes).toEqual(['melee'])
+    expect(profile.value.modes).toEqual(['melee', 'ranged'])
     expect(profile.value.sourceLabel).toBe('Dagger')
-    expect(profile.value.unresolvedCapabilities.map((entry) => entry.id)).toEqual(['thrown'])
-    expect(profile.value.unresolvedCapabilities[0]?.reason).toBe('missing-input')
+    expect(profile.value.unresolvedCapabilities).toEqual([])
   })
 
   it('does not apply versatile damage and does not invent dice when damage is missing', () => {
@@ -1005,7 +1008,7 @@ describe('resolveMonsterActionAttackProfile', () => {
       equipmentCatalog: catalog,
       proficiencyBonus: block.proficiencyBonus,
       magicPropertyProvider: EMPTY_MAGIC_PROVIDER,
-    })
+    } as ResolveMonsterActionAttackProfileInput)
     expect(profile.status).toBe('resolved')
     if (profile.status !== 'resolved') return
     expect(String(profile.value.primary.average)).toBe(block.attacks[0]?.damage)
@@ -1024,7 +1027,7 @@ describe('resolveMonsterActionAttackProfile', () => {
       equipmentCatalog,
       proficiencyBonus: 2,
       magicPropertyProvider: EMPTY_MAGIC_PROVIDER,
-    })
+    } as ResolveMonsterActionAttackProfileInput)
     expect(missing).toEqual({ status: 'unavailable', reason: 'missing-input' })
 
     const unlinked = resolveMonsterActionAttackProfile({
@@ -1033,7 +1036,131 @@ describe('resolveMonsterActionAttackProfile', () => {
       equipmentCatalog,
       proficiencyBonus: 2,
       magicPropertyProvider: EMPTY_MAGIC_PROVIDER,
-    })
+    } as ResolveMonsterActionAttackProfileInput)
     expect(unlinked).toEqual({ status: 'unavailable', reason: 'missing-reference' })
+  })
+
+  it('replaces the catalog base roll and still applies ability and equipment bonuses', () => {
+    const sword = weaponFromSeed('shortsword-override', {
+      name: 'Shortsword',
+      properties: ['finesse'],
+      damage: { dice: { count: 1, faces: 6 } },
+      damageType: 'piercing',
+    })
+    const catalog = new Map(equipmentCatalog)
+    catalog.set(sword.id, sword)
+    const entry = {
+      entryId: 'sword',
+      equipmentId: sword.id,
+      quantity: 1,
+      equipped: true,
+      adjustments: [
+        { effectId: 'atk', target: 'attack_roll' as const, bonus: 1 },
+        { effectId: 'dmg', target: 'damage_roll' as const, bonus: 1 },
+      ],
+    }
+    const monster = {
+      ...kobold,
+      abilityScores: { ...kobold.abilityScores, dex: 16 },
+      equipment: [entry],
+      proficiencies: {
+        ...kobold.proficiencies,
+        weapons: [{ weaponId: sword.id }],
+      },
+      actions: [
+        {
+          id: 'slash',
+          kind: 'weapon' as const,
+          equipmentEntryId: 'sword',
+          damage: { dice: { count: 2, faces: 6 } },
+        },
+      ],
+    }
+    const profile = resolveMonsterActionAttackProfile({
+      action: monster.actions[0]!,
+      monster,
+      equipmentCatalog: catalog,
+      proficiencyBonus: 2,
+      magicPropertyProvider: EMPTY_MAGIC_PROVIDER,
+    } as ResolveMonsterActionAttackProfileInput)
+    expect(profile.status).toBe('resolved')
+    if (profile.status !== 'resolved') return
+    expect(profile.value.primary.expression).toBe('2d6+4')
+    expect(profile.value.primary.damageTypeId).toBe('piercing')
+    expect(profile.value.attackBonus).toBe(6)
+
+    const flatOverride = resolveMonsterActionAttackProfile({
+      action: { ...monster.actions[0]!, damage: { flat: 1 } },
+      monster,
+      equipmentCatalog: catalog,
+      proficiencyBonus: 2,
+      magicPropertyProvider: EMPTY_MAGIC_PROVIDER,
+    } as ResolveMonsterActionAttackProfileInput)
+    expect(flatOverride.status).toBe('resolved')
+    if (flatOverride.status !== 'resolved') return
+    expect(flatOverride.value.primary.expression).toBe('5')
+    expect(flatOverride.value.primary.damageTypeId).toBe('piercing')
+
+    const incomplete = resolveMonsterActionAttackProfile({
+      action: { ...monster.actions[0]!, damage: { dice: { count: 2 } } },
+      monster,
+      equipmentCatalog: catalog,
+      proficiencyBonus: 2,
+      magicPropertyProvider: EMPTY_MAGIC_PROVIDER,
+    } as ResolveMonsterActionAttackProfileInput)
+    expect(incomplete.status).toBe('resolved')
+    if (incomplete.status !== 'resolved') return
+    expect(incomplete.value.primary.expression).toBe('1d6+4')
+
+    const blowgun = weaponFromSeed('blowgun-flat', {
+      name: 'Blowgun',
+      mode: 'ranged',
+      properties: [],
+      damage: { flat: 1 },
+      damageType: 'piercing',
+    })
+    catalog.set(blowgun.id, blowgun)
+    const flatCatalog = resolveMonsterActionAttackProfile({
+      action: { id: 'puff', kind: 'weapon', equipmentEntryId: 'puff' },
+      monster: {
+        ...monster,
+        equipment: [{ entryId: 'puff', equipmentId: blowgun.id, quantity: 1, equipped: true }],
+      },
+      equipmentCatalog: catalog,
+      proficiencyBonus: 2,
+      magicPropertyProvider: EMPTY_MAGIC_PROVIDER,
+    } as ResolveMonsterActionAttackProfileInput)
+    expect(flatCatalog.status).toBe('resolved')
+    if (flatCatalog.status !== 'resolved') return
+    expect(flatCatalog.value.primary.expression).toBe('4')
+    expect(flatCatalog.value.primary.damageTypeId).toBe('piercing')
+
+    const broken = resolveMonsterActionAttackProfile({
+      action: {
+        id: 'slash',
+        kind: 'weapon',
+        equipmentEntryId: 'missing',
+        damage: { dice: { count: 2, faces: 6 } },
+      },
+      monster,
+      equipmentCatalog: catalog,
+      proficiencyBonus: 2,
+      magicPropertyProvider: EMPTY_MAGIC_PROVIDER,
+    } as ResolveMonsterActionAttackProfileInput)
+    expect(broken).toEqual({ status: 'unavailable', reason: 'missing-reference' })
+
+    const { damage: _catalogDamage, ...undamaged } = sword
+    catalog.set(sword.id, undamaged)
+    const supplied = resolveMonsterActionAttackProfile({
+      action: monster.actions[0]!,
+      monster,
+      equipmentCatalog: catalog,
+      proficiencyBonus: 2,
+      magicPropertyProvider: EMPTY_MAGIC_PROVIDER,
+    } as ResolveMonsterActionAttackProfileInput)
+    expect(supplied.status).toBe('resolved')
+    if (supplied.status !== 'resolved') return
+    expect(supplied.value.primary.expression).toBe('2d6+4')
+    expect(supplied.value.primary.damageTypeId).toBe('piercing')
   })
 })

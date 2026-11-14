@@ -1,14 +1,26 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { resolveMonsterActionIdentity } from '@rpg/contracts'
 import { useFormContext, useWatch } from 'react-hook-form'
 
+import { masterDetailItemTitle } from '../../lib/master-detail/master-detail-constants'
 import { duplicateMasterDetailRow } from '../../lib/master-detail/duplicate-master-detail-row'
+import { MONSTER_ACTION_ITEM_NOUN } from '../lib/monster-form-labels'
 import { useMasterDetailArray } from '../../lib/master-detail/use-master-detail-array'
 import {
   createEquippedWeaponAcquisition,
   createMonsterActionFromAcquisition,
+  createBonusActionDraft,
+  createReactionActionDraft,
+  createSpellActionDraft,
   type MonsterActionAcquisitionChoice,
 } from '../lib/actions/monster-action-acquisition'
-import { actionAfterSectionMove, actionMoveDropsTrigger } from '../lib/actions/monster-action-kind'
+import { createLegendaryActionDraft } from '../lib/actions/monster-legendary-action-acquisition'
+import { monsterCastingDependentLabels } from '../lib/actions/monster-action-casting-summary'
+import {
+  actionAfterSectionMove,
+  actionMoveDropsTrigger,
+  monsterActionSectionMoveAllowed,
+} from '../lib/actions/monster-action-kind'
 import {
   multiattacksReferencingAction,
   stripMultiattackActionId,
@@ -23,7 +35,18 @@ import {
   MONSTER_ACTION_SECTIONS,
   type MonsterActionSection,
 } from '../lib/actions/monster-action-equipment-references'
-import { formatAddedEquipmentNotice } from '../lib/monster-form-labels'
+import {
+  formatAddedEquipmentNotice,
+  formatCastingSourceDeleteNotice,
+} from '../lib/monster-form-labels'
+
+function monsterActionReferenceTitle(action: MonsterActionDraftRow): string {
+  const identity = resolveMonsterActionIdentity({
+    action,
+    equipmentCatalogStatus: 'pending',
+  })
+  return identity.displayName.trim() || masterDetailItemTitle(undefined, MONSTER_ACTION_ITEM_NOUN)
+}
 import type { MonsterFormValues } from '../lib/monster-form-values'
 
 type TriggerPending = {
@@ -46,6 +69,13 @@ export type MonsterActionPending = TriggerPending | MultiattackPending
 
 function isPlainRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+/** Registration can leave `{ damage: { dice: { count: undefined } } }`. That is not authored data. */
+function hasDefinedLeaf(value: unknown): boolean {
+  if (Array.isArray(value)) return value.some(hasDefinedLeaf)
+  if (isPlainRecord(value)) return Object.values(value).some(hasDefinedLeaf)
+  return value !== undefined
 }
 
 type MissingPathEntry = { path: string; value: unknown }
@@ -90,11 +120,12 @@ function collectMissingRecordSnapshot(
 ) {
   const liveRecord = isPlainRecord(live) ? live : {}
   for (const [key, value] of Object.entries(snapshot)) {
+    if (key === 'limitedUse') continue
     const childPath = path ? `${path}.${key}` : key
     const liveValue = liveRecord[key]
     if (isPlainRecord(value) || Array.isArray(value)) {
       if (liveValue === undefined) {
-        missing.push({ path: childPath, value })
+        if (hasDefinedLeaf(value)) missing.push({ path: childPath, value })
         continue
       }
       collectMissingPaths(value, liveValue, childPath, missing)
@@ -119,12 +150,18 @@ function lostDefinedKeys(previous: unknown, next: unknown): boolean {
   if (isPlainRecord(previous)) {
     if (!isPlainRecord(next)) return true
     return Object.entries(previous).some(([key, value]) => {
-      if (value === undefined) return false
+      // The recharge editor owns this key and may clear or replace it.
+      if (key === 'limitedUse') return false
+      if (!hasDefinedLeaf(value)) return false
       if (next[key] === undefined) return true
       return lostDefinedKeys(value, next[key])
     })
   }
   return false
+}
+
+function legendaryUsesUnset(value: unknown): boolean {
+  return value === undefined || value === null || value === ''
 }
 
 function rowsOf(
@@ -154,9 +191,12 @@ export function useMonsterActionSections(entityId?: string) {
   const reactions = useMasterDetailArray('reactions', () =>
     createMonsterActionFromAcquisition({ type: 'create', kind: 'special' }),
   )
+  const legendaryActions = useMasterDetailArray('legendaryActions', () =>
+    createMonsterActionFromAcquisition({ type: 'create', kind: 'special' }),
+  )
   const editors = useMemo(
-    () => ({ actions, bonusActions, reactions }),
-    [actions, bonusActions, reactions],
+    () => ({ actions, bonusActions, reactions, legendaryActions }),
+    [actions, bonusActions, reactions, legendaryActions],
   )
   const [selectedActionId, setSelectedActionId] = useState<string | null>(null)
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null)
@@ -249,12 +289,30 @@ export function useMonsterActionSections(entityId?: string) {
       section: MonsterActionSection,
       choice: Exclude<MonsterActionAcquisitionChoice, { type: 'add-weapon' }>,
     ) => {
-      const row = createMonsterActionFromAcquisition(choice)
+      const row =
+        choice.type === 'legendary'
+          ? createLegendaryActionDraft(choice.category, getValues())
+          : choice.type === 'reaction'
+            ? createReactionActionDraft(choice.category, getValues())
+            : choice.type === 'bonus'
+              ? createBonusActionDraft(choice.category)
+              : choice.type === 'create' && choice.kind === 'spell'
+                ? createSpellActionDraft(section, getValues(), choice.spellAcquisition)
+                : createMonsterActionFromAcquisition(choice)
+      const before =
+        section === 'legendaryActions' ? rowsOf(getValues(), 'legendaryActions').length : 0
       editors[section].appendRow(row)
+      if (
+        section === 'legendaryActions' &&
+        before === 0 &&
+        legendaryUsesUnset(getValues('legendaryActionUses'))
+      ) {
+        setValue('legendaryActionUses', 3, { shouldDirty: true })
+      }
       setSelectedActionId(row.id)
       setNotice(null)
     },
-    [editors],
+    [editors, getValues, setValue],
   )
 
   const commitEquippedWeapon = useCallback(
@@ -262,7 +320,16 @@ export function useMonsterActionSections(entityId?: string) {
       const { entry, action } = createEquippedWeaponAcquisition(equipmentId)
       const equipment = [...(getValues('equipment') ?? []), entry]
       setValue('equipment', equipment, { shouldDirty: true })
+      const before =
+        section === 'legendaryActions' ? rowsOf(getValues(), 'legendaryActions').length : 0
       editors[section].appendRow(action)
+      if (
+        section === 'legendaryActions' &&
+        before === 0 &&
+        legendaryUsesUnset(getValues('legendaryActionUses'))
+      ) {
+        setValue('legendaryActionUses', 3, { shouldDirty: true })
+      }
       setSelectedActionId(action.id)
       setNotice(formatAddedEquipmentNotice(name))
     },
@@ -278,13 +345,28 @@ export function useMonsterActionSections(entityId?: string) {
         located.section,
         actionId,
       )
+      const legendaryBefore = rowsOf(getValues(), 'legendaryActions').length
       if (located.section === 'actions') {
         const actions = stripMultiattackActionId(rowsOf(getValues(), 'actions'), actionId).filter(
           (action) => action.id !== actionId,
         )
         setValue('actions', actions, { shouldDirty: true })
+        setValue(
+          'legendaryActions',
+          stripMultiattackActionId(rowsOf(getValues(), 'legendaryActions'), actionId),
+          { shouldDirty: true },
+        )
+        setValue(
+          'reactions',
+          stripMultiattackActionId(rowsOf(getValues(), 'reactions'), actionId),
+          { shouldDirty: true },
+        )
       } else {
         editors[located.section].removeAt(located.index)
+      }
+      if (located.section === 'legendaryActions' && legendaryBefore === 1) {
+        setValue('legendaryActionUses', undefined as never, { shouldDirty: true })
+        setValue('legendaryActionUsesInLair', undefined as never, { shouldDirty: true })
       }
       setSelectedActionId(nextSelection)
       setPending(null)
@@ -296,15 +378,27 @@ export function useMonsterActionSections(entityId?: string) {
     (actionId: string) => {
       const located = locate(actionId)
       if (!located) return
+      const castingDependents = monsterCastingDependentLabels(getValues(), actionId)
+      if (castingDependents.length > 0) {
+        setNotice(formatCastingSourceDeleteNotice(castingDependents))
+        return
+      }
       const references =
         located.section === 'actions'
-          ? multiattacksReferencingAction(rowsOf(getValues(), 'actions'), actionId)
+          ? multiattacksReferencingAction(
+              [
+                ...rowsOf(getValues(), 'actions'),
+                ...rowsOf(getValues(), 'legendaryActions'),
+                ...rowsOf(getValues(), 'reactions'),
+              ],
+              actionId,
+            )
           : []
       if (references.length > 0) {
         setPending({
           type: 'multiattack-delete',
           actionId,
-          names: references.map((action) => action.name?.trim() || 'Multiattack'),
+          names: references.map((action) => monsterActionReferenceTitle(action)),
           from: located.section,
           index: located.index,
         })
@@ -339,21 +433,22 @@ export function useMonsterActionSections(entityId?: string) {
   const requestMove = useCallback(
     (to: MonsterActionSection) => {
       const located = locate(selectedActionId)
-      if (!located || located.section === to) return
-      if (located.action.kind === 'multiattack' && to !== 'actions') return
+      if (!located || !monsterActionSectionMoveAllowed(located.action, located.section, to)) return
+      const referenceRows = [
+        ...rowsOf(getValues(), 'actions'),
+        ...rowsOf(getValues(), 'legendaryActions'),
+        ...rowsOf(getValues(), 'reactions'),
+      ]
       if (
         located.section === 'actions' &&
         to !== 'actions' &&
-        multiattacksReferencingAction(rowsOf(getValues(), 'actions'), located.action.id).length > 0
+        multiattacksReferencingAction(referenceRows, located.action.id).length > 0
       ) {
-        const references = multiattacksReferencingAction(
-          rowsOf(getValues(), 'actions'),
-          located.action.id,
-        )
+        const references = multiattacksReferencingAction(referenceRows, located.action.id)
         setPending({
           type: 'multiattack-move',
           actionId: located.action.id,
-          names: references.map((action) => action.name?.trim() || 'Multiattack'),
+          names: references.map((action) => monsterActionReferenceTitle(action)),
           from: located.section,
           to,
           index: located.index,

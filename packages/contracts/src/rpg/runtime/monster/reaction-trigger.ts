@@ -4,6 +4,8 @@ export type MonsterReferencedSpell = {
   name: string
   level?: number
   castingTime: SpellCastingTime
+  /** Present when the catalog spell has a structured resolution method. */
+  resolution?: { method?: { kind?: string } }
 }
 
 export type ReactionTriggerResolution =

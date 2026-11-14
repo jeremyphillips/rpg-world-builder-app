@@ -23,7 +23,7 @@ const items = [
     label: 'Movement bonus',
     metadata: 'Increase speed',
     groupId: 'combat-traits',
-    searchTerms: [{ text: 'walk', weight: 1, role: 'keyword' as const }],
+    searchTerms: ['walk'],
   },
 ]
 
@@ -48,5 +48,38 @@ describe('button-dropdown.lib', () => {
     expect(
       fields.some((field) => field.text === 'Proficiencies & training' && field.role === 'group'),
     ).toBe(true)
+  })
+
+  it('matches multi-word queries against grant-style labels', () => {
+    const weaponItem = {
+      id: 'weapon-proficiency',
+      label: 'Weapon proficiency',
+      metadata: 'Grant proficiency with specific weapons, a weapon category, or a player choice.',
+      groupId: 'proficiencies',
+      searchTerms: ['proficiency'],
+      search: { includeSupporting: true as const },
+    }
+
+    expect(
+      rankButtonDropdownItems([weaponItem], groups, 'weapon proficiency').map((item) => item.id),
+    ).toEqual(['weapon-proficiency'])
+  })
+
+  it('excludes metadata from search when search.includeSupporting is false', () => {
+    const withMetadataOnly = {
+      id: 'hold-breath',
+      label: 'Hold Breath',
+      metadata: 'Holds its breath for a set time.',
+      search: { includeSupporting: false as const },
+    }
+    const fields = buildButtonDropdownSearchFields(withMetadataOnly, new Map())
+    expect(fields.some((field) => field.role === 'description')).toBe(false)
+
+    const withKeyword = {
+      ...withMetadataOnly,
+      searchTerms: ['suffocate'],
+    }
+    expect(rankButtonDropdownItems([withKeyword], [], 'suffocate')).toHaveLength(1)
+    expect(rankButtonDropdownItems([withMetadataOnly], [], 'set time')).toHaveLength(0)
   })
 })

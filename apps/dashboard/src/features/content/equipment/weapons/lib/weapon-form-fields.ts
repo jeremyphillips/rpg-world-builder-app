@@ -26,11 +26,8 @@ import {
 import { buildActiveWeaponPropertyFieldOptions, vocabularyFieldLabel } from '@/features/vocabulary'
 
 import { labelsFromEntries } from '../../lib/equipment-form-field-helpers'
-import {
-  feetInputUnitField,
-  SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
-} from '../../../lib/forms/fields/content-identity-form-fields'
-import { weaponDamageFields } from '../../../lib/forms/mechanics/weapon-damage-fields'
+import { weaponAttackRangeGroup } from '../../../lib/forms/fields/weapon-attack-range-form-fields'
+import { damageFieldGroup } from '../../../lib/forms/mechanics/damage-field-group'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 
 const weaponCategoryOptions = toOptions(
@@ -41,9 +38,8 @@ const weaponModeOptions = toOptions(WEAPON_MODES, labelsFromEntries(WEAPON_MODE_
 const weaponMasteryOptions = toOptions(WEAPON_MASTERIES, labelsFromEntries(WEAPON_MASTERY_ENTRIES))
 function visibleWhenVersatile(): FieldVisibility {
   return {
-    dependsOn: ['properties', 'hasDamage'],
-    visibleWhen: (v) =>
-      v.hasDamage === true && Array.isArray(v.properties) && v.properties.includes('versatile'),
+    dependsOn: ['properties'],
+    visibleWhen: (v) => Array.isArray(v.properties) && v.properties.includes('versatile'),
   }
 }
 
@@ -105,7 +101,7 @@ export function weaponFormFieldGroup(ctx: ContentFormCtx): FormItem {
           {
             type: 'select',
             name: 'mode',
-            label: 'Mode',
+            label: 'Weapon type',
             options: weaponModeOptions,
             required: true,
           },
@@ -131,11 +127,12 @@ export function weaponFormFieldGroup(ctx: ContentFormCtx): FormItem {
         optionAvailability: weaponPropertyOptionAvailability,
         hint: { resolve: weaponPropertyDynamicHint },
       },
-      {
-        kind: 'group',
-        legend: 'Damage',
-        fields: [
-          ...weaponDamageFields({ ctx }),
+      damageFieldGroup({
+        ctx,
+        damageTypeName: 'damageType',
+        rollName: 'damage',
+        scope: 'physical',
+        trailingFields: [
           {
             kind: 'row',
             fields: [
@@ -152,32 +149,17 @@ export function weaponFormFieldGroup(ctx: ContentFormCtx): FormItem {
             ],
           },
         ],
-      },
-      {
-        kind: 'group',
-        legend: 'Range',
+      }),
+      weaponAttackRangeGroup({
+        normalName: 'range.normal',
+        longName: 'range.long',
         visibility: visibleWhenRangeFields(),
-        fields: [
-          {
-            kind: 'row',
-            fields: [
-              feetInputUnitField('rangeNormal', 'Normal', {
-                valueDigits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
-                width: 'auto',
-              }),
-              feetInputUnitField('rangeLong', 'Long', {
-                valueDigits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
-                width: 'auto',
-              }),
-            ],
-          },
-        ],
-      },
+      }),
       {
         type: 'textarea',
         name: 'specialRules',
         label: 'Special rules',
-        hint: 'Prose for special properties (lance, net, etc.)',
+        hint: 'Prose for special properties (lance, etc.)',
       },
     ],
   }

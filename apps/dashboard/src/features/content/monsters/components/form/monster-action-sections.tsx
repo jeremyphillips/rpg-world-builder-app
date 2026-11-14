@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import {
   getMonsterActionKindLabel,
   isWeaponEquipment,
@@ -26,6 +26,24 @@ import {
   MONSTER_ACTION_SECTIONS,
   type MonsterActionSection,
 } from '../../lib/actions/monster-action-equipment-references'
+import { primarySpellcastingProfile } from '../../lib/actions/monster-action-casting-summary'
+import { monsterActionEditorTitles } from '../../lib/actions/monster-action-editor-title'
+import { presentActionReference } from '../../lib/actions/monster-action-reference-presentation'
+import {
+  isLegendaryReferenceTarget,
+  legendaryActionCategory,
+} from '../../lib/actions/legendary-action-category'
+import {
+  LEGENDARY_ACTION_ACQUISITION_GROUPS,
+  legendaryActionAcquisitionItems,
+} from '../../lib/actions/monster-legendary-action-acquisition'
+import {
+  LEGENDARY_ACTION_CATEGORY_LABELS,
+  formatMoveReferencedActionBody,
+  formatRemoveReferencedActionBody,
+  MONSTER_MOVE_REFERENCED_ACTION_HEADLINE,
+  MONSTER_REMOVE_REFERENCED_ACTION_HEADLINE,
+} from '../../lib/monster-form-labels'
 import { multiattacksReferencingAction } from '../../lib/actions/monster-action-multiattack-references'
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
 import type { MonsterActionPending } from '../../hooks/use-monster-action-sections'
@@ -39,6 +57,7 @@ import {
 } from '../../lib/monster-form-derivation'
 import {
   MONSTER_ACTIONS_HEADING,
+  MONSTER_LEGENDARY_ACTIONS_HEADING,
   MONSTER_ADD_LABEL,
   MONSTER_BONUS_ACTIONS_HEADING,
   MONSTER_CANCEL_LABEL,
@@ -49,6 +68,7 @@ import {
 } from '../../lib/monster-form-labels'
 import { MONSTER_ACTION_ITEM_NOUN } from '../../lib/monster-form-labels'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
+import { monsterActionRowResolveFields } from '../../lib/monster-master-detail-validation-fields'
 import { useMonsterActionSections } from '../../hooks/use-monster-action-sections'
 import { MonsterActionDetail } from './monster-action-detail'
 
@@ -56,27 +76,73 @@ const SECTION_HEADINGS = {
   actions: MONSTER_ACTIONS_HEADING,
   bonusActions: MONSTER_BONUS_ACTIONS_HEADING,
   reactions: MONSTER_REACTIONS_HEADING,
-} as const
+  legendaryActions: MONSTER_LEGENDARY_ACTIONS_HEADING,
+} as const satisfies Record<MonsterActionSection, string>
 
-function mapActionListItem(row: unknown, index: number) {
+function mapActionListItem(
+  row: unknown,
+  index: number,
+  titles: ReadonlyMap<string, string>,
+  section: MonsterActionSection,
+  sourceTitles?: ReadonlyMap<string, string>,
+) {
   const action = row as MonsterActionDraftRow | undefined
+  const category = section === 'legendaryActions' ? legendaryActionCategory(action) : undefined
+  const reference =
+    action?.kind === 'action-reference' && sourceTitles
+      ? presentActionReference({
+          name: action.name,
+          actionIds: action.actionIds,
+          sourceTitles,
+        })
+      : undefined
   return {
-    title: action?.name?.trim() || `Action ${index + 1}`,
-    eyebrow: action ? getMonsterActionKindLabel(action.kind) : undefined,
+    title: action ? (titles.get(action.id) ?? `Action ${index + 1}`) : `Action ${index + 1}`,
+    kindLabel: category
+      ? LEGENDARY_ACTION_CATEGORY_LABELS[category]
+      : action
+        ? getMonsterActionKindLabel(action.kind)
+        : undefined,
+    ...(reference?.summary ? { summary: reference.summary } : {}),
   }
 }
 
 function MonsterActionAddMenu({
   section,
   weapons,
+  weaponActions,
   allowAddWeapon,
+  values,
+  ctx,
   onSelect,
 }: {
   section: MonsterActionSection
   weapons: readonly { entryId: string; label: string; equipped: boolean }[]
+  weaponActions: readonly { id: string; equipmentEntryId?: string }[]
   allowAddWeapon: boolean
+  values: MonsterFormValues
+  ctx: ContentFormCtx
   onSelect: (section: MonsterActionSection, choice: MonsterActionAcquisitionChoice) => void
 }) {
+  const items =
+    section === 'legendaryActions'
+      ? legendaryActionAcquisitionItems(values, ctx)
+      : monsterActionAcquisitionItems({
+          weapons,
+          weaponActions,
+          allowAddWeapon,
+          section,
+          primarySpellcasting: primarySpellcastingProfile(values) != null,
+          hasReferenceTargets: ((values.actions ?? []) as MonsterActionDraftRow[]).some(
+            isLegendaryReferenceTarget,
+          ),
+          spellCatalogReady: ctx.spellCatalogStatus === 'ready',
+        })
+  const groupSource =
+    section === 'legendaryActions' || section === 'reactions'
+      ? [...LEGENDARY_ACTION_ACQUISITION_GROUPS]
+      : [...MONSTER_ACTION_ACQUISITION_GROUPS]
+  const groups = groupSource.filter((group) => items.some((item) => item.groupId === group.id))
   return (
     <ButtonDropdown
       label={MONSTER_ADD_LABEL}
@@ -84,8 +150,8 @@ function MonsterActionAddMenu({
       width="fit"
       size="sm"
       variant="outline"
-      groups={[...MONSTER_ACTION_ACQUISITION_GROUPS]}
-      items={monsterActionAcquisitionItems({ weapons, allowAddWeapon })}
+      groups={groups}
+      items={items}
       onSelectItem={(id) => {
         const choice = parseMonsterActionAcquisitionId(id)
         if (choice) onSelect(section, choice)
@@ -101,15 +167,15 @@ function pendingConfirmCopy(pending: MonsterActionPending | null): {
   if (pending?.type === 'multiattack-delete') {
     const names = pending.names.join(', ')
     return {
-      headline: 'Remove referenced attack',
-      description: `This attack is used by ${names}. Removing it drops that reference and leaves the step count unchanged.`,
+      headline: MONSTER_REMOVE_REFERENCED_ACTION_HEADLINE,
+      description: formatRemoveReferencedActionBody(names),
     }
   }
   if (pending?.type === 'multiattack-move') {
     const names = pending.names.join(', ')
     return {
-      headline: 'Move referenced attack',
-      description: `${names} will be invalid until this attack is moved back to Actions.`,
+      headline: MONSTER_MOVE_REFERENCED_ACTION_HEADLINE,
+      description: formatMoveReferencedActionBody(names),
     }
   }
   return { headline: MONSTER_MOVE_TO_LABEL, description: formatDropTriggerBody() }
@@ -138,9 +204,102 @@ function equippedWeaponRows(
   })
 }
 
+function sectionTitles(
+  values: MonsterFormValues,
+  ctx: ContentFormCtx,
+  section: MonsterActionSection,
+) {
+  return monsterActionEditorTitles(
+    (values[section] ?? []) as MonsterActionDraftRow[],
+    values,
+    ctx,
+    section,
+  )
+}
+
+function weaponActionReferences(values: MonsterFormValues) {
+  return MONSTER_ACTION_SECTIONS.flatMap((actionSection) =>
+    ((values[actionSection] ?? []) as MonsterActionDraftRow[]).flatMap((action) =>
+      action.kind === 'weapon' && action.equipmentEntryId
+        ? [{ id: action.id, equipmentEntryId: action.equipmentEntryId }]
+        : [],
+    ),
+  )
+}
+
+function useMonsterActionDetailRows(
+  ctx: ContentFormCtx,
+  sections: ReturnType<typeof useMonsterActionSections>,
+  values: MonsterFormValues,
+) {
+  const makeActionResolver = useCallback(
+    (section: MonsterActionSection) =>
+      monsterActionRowResolveFields({ ctx, section, readValues: () => values }),
+    [ctx, values],
+  )
+  const actionTitles = sectionTitles(values, ctx, 'actions')
+  const bonusTitles = sectionTitles(values, ctx, 'bonusActions')
+  const reactionTitles = sectionTitles(values, ctx, 'reactions')
+  const legendaryTitles = sectionTitles(values, ctx, 'legendaryActions')
+  const shared = {
+    formCtx: ctx,
+    itemNoun: MONSTER_ACTION_ITEM_NOUN,
+    access: { kind: 'availability' as const, fieldName: 'available' as const },
+  }
+  const actionRows = useEmbeddedMasterDetailRows({
+    ...shared,
+    itemFields: { resolveItemFields: makeActionResolver('actions') },
+    fieldName: 'actions',
+    editor: sections.editors.actions,
+    sectionLabel: SECTION_HEADINGS.actions,
+    mapListItem: ({ row, index }) => mapActionListItem(row, index, actionTitles, 'actions'),
+  })
+  const bonusRows = useEmbeddedMasterDetailRows({
+    ...shared,
+    itemFields: { resolveItemFields: makeActionResolver('bonusActions') },
+    fieldName: 'bonusActions',
+    editor: sections.editors.bonusActions,
+    sectionLabel: SECTION_HEADINGS.bonusActions,
+    mapListItem: ({ row, index }) => mapActionListItem(row, index, bonusTitles, 'bonusActions'),
+  })
+  const reactionRows = useEmbeddedMasterDetailRows({
+    ...shared,
+    itemFields: { resolveItemFields: makeActionResolver('reactions') },
+    fieldName: 'reactions',
+    editor: sections.editors.reactions,
+    sectionLabel: SECTION_HEADINGS.reactions,
+    mapListItem: ({ row, index }) =>
+      mapActionListItem(row, index, reactionTitles, 'reactions', actionTitles),
+  })
+  const legendaryRows = useEmbeddedMasterDetailRows({
+    ...shared,
+    itemFields: { resolveItemFields: makeActionResolver('legendaryActions') },
+    fieldName: 'legendaryActions',
+    editor: sections.editors.legendaryActions,
+    sectionLabel: SECTION_HEADINGS.legendaryActions,
+    mapListItem: ({ row, index }) =>
+      mapActionListItem(row, index, legendaryTitles, 'legendaryActions', actionTitles),
+  })
+  return {
+    titlesBySection: {
+      actions: actionTitles,
+      bonusActions: bonusTitles,
+      reactions: reactionTitles,
+      legendaryActions: legendaryTitles,
+    },
+    rowsBySection: {
+      actions: actionRows,
+      bonusActions: bonusRows,
+      reactions: reactionRows,
+      legendaryActions: legendaryRows,
+    },
+    actionRows,
+  }
+}
+
 export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
   const sections = useMonsterActionSections(ctx.entityId)
-  const { getValues, formState } = useFormContext<MonsterFormValues>()
+  const { getValues } = useFormContext<MonsterFormValues>()
   const [weaponPickerSection, setWeaponPickerSection] = useState<MonsterActionSection | null>(null)
   const values = sections.values ?? getValues()
   const catalog = monsterEquipmentCatalog(ctx)
@@ -163,50 +322,17 @@ export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
 
   const weaponGrants = useMemo(() => resolveMonsterFormWeaponGrants(values), [values])
 
-  const actionRows = useEmbeddedMasterDetailRows({
-    formCtx: ctx,
-    fieldName: 'actions',
-    editor: sections.editors.actions,
-    itemFields: [],
-    itemNoun: MONSTER_ACTION_ITEM_NOUN,
-    mapListItem: ({ row, index }) => mapActionListItem(row, index),
-    access: { kind: 'availability', fieldName: 'available' },
-    resolveRowIssueCount: (index) =>
-      formState.submitCount > 0 && sections.hasRowError('actions', index) ? 1 : 0,
-  })
-  const bonusRows = useEmbeddedMasterDetailRows({
-    formCtx: ctx,
-    fieldName: 'bonusActions',
-    editor: sections.editors.bonusActions,
-    itemFields: [],
-    itemNoun: MONSTER_ACTION_ITEM_NOUN,
-    mapListItem: ({ row, index }) => mapActionListItem(row, index),
-    access: { kind: 'availability', fieldName: 'available' },
-    resolveRowIssueCount: (index) =>
-      formState.submitCount > 0 && sections.hasRowError('bonusActions', index) ? 1 : 0,
-  })
-  const reactionRows = useEmbeddedMasterDetailRows({
-    formCtx: ctx,
-    fieldName: 'reactions',
-    editor: sections.editors.reactions,
-    itemFields: [],
-    itemNoun: MONSTER_ACTION_ITEM_NOUN,
-    mapListItem: ({ row, index }) => mapActionListItem(row, index),
-    access: { kind: 'availability', fieldName: 'available' },
-    resolveRowIssueCount: (index) =>
-      formState.submitCount > 0 && sections.hasRowError('reactions', index) ? 1 : 0,
-  })
-  const rowsBySection = {
-    actions: actionRows,
-    bonusActions: bonusRows,
-    reactions: reactionRows,
-  }
+  const { titlesBySection, rowsBySection, actionRows } = useMonsterActionDetailRows(
+    ctx,
+    sections,
+    values,
+  )
   const availabilityItems = useMemo(
     () =>
-      [...actionRows.allRows, ...bonusRows.allRows, ...reactionRows.allRows].map(
-        (row) => row.availability,
+      MONSTER_ACTION_SECTIONS.flatMap((section) =>
+        rowsBySection[section].allRows.map((row) => row.availability),
       ),
-    [actionRows.allRows, bonusRows.allRows, reactionRows.allRows],
+    [rowsBySection],
   )
   const collection = useMasterDetailCollectionAvailability({
     items: availabilityItems,
@@ -226,19 +352,25 @@ export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
     )
   }, 0)
   const deleteLocated = sections.locate(sections.deleteTargetId)
-  const deleteReferences =
-    deleteLocated?.section === 'actions'
-      ? multiattacksReferencingAction(
-          (values.actions ?? []) as MonsterActionDraftRow[],
-          deleteLocated.action.id,
-        )
-      : []
+  const deleteReferences = deleteLocated
+    ? multiattacksReferencingAction(
+        [
+          ...((values.actions ?? []) as MonsterActionDraftRow[]),
+          ...((values.legendaryActions ?? []) as MonsterActionDraftRow[]),
+        ],
+        deleteLocated.action.id,
+      )
+    : []
+  const deleteNames = deleteReferences
+    .map((action) => {
+      const section = (values.legendaryActions ?? []).some((row) => row.id === action.id)
+        ? 'legendaryActions'
+        : 'actions'
+      return titlesBySection[section].get(action.id) ?? action.name ?? action.id
+    })
+    .join(', ')
   const deleteDescription =
-    deleteReferences.length > 0
-      ? `This attack is used by ${deleteReferences
-          .map((action) => action.name?.trim() || 'Multiattack')
-          .join(', ')}. Removing it drops that reference and leaves the step count unchanged.`
-      : undefined
+    deleteReferences.length > 0 ? formatRemoveReferencedActionBody(deleteNames) : undefined
 
   return (
     <>
@@ -257,10 +389,17 @@ export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
               <MonsterActionAddMenu
                 section={section}
                 weapons={weapons}
+                weaponActions={weaponActionReferences(values)}
                 allowAddWeapon={allowAddWeapon}
+                values={values}
+                ctx={ctx}
                 onSelect={(target, choice) => {
                   if (choice.type === 'add-weapon') {
                     setWeaponPickerSection(target)
+                    return
+                  }
+                  if (choice.type === 'focus-existing') {
+                    sections.selectAction(choice.actionId)
                     return
                   }
                   sections.addAcquisition(target, choice)

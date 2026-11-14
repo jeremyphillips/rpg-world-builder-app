@@ -51,7 +51,6 @@ describe('FieldLayout three-region anatomy', () => {
     const { container } = render(
       <Field.Root id="name" hint="Helper." hintPosition="below-control" error="Required." anatomy>
         <FieldLayout
-          hintPosition="below-control"
           label={<Field.Label>Name</Field.Label>}
           control={<input aria-label="Name" />}
         />

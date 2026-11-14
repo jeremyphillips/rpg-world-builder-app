@@ -6,7 +6,8 @@ import type {
 } from '@rpg/contracts'
 import { emptyContentMediaSchema, type ContentMedia } from '@rpg/contracts'
 import { Heading, Spinner, Text } from '@rpg/ui'
-import { type ReactNode } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { type ReactNode, useState } from 'react'
 import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 
@@ -23,7 +24,11 @@ import {
   type AnyContentFormDef,
   type ContentFormCtx,
 } from '../../registry/content-form-registry'
-import { findContentEditEntity, loadContentEditFormState } from './content-edit-load'
+import {
+  findContentEditEntity,
+  loadContentEditFormState,
+  replaceCachedContentEntity,
+} from './content-edit-load'
 import {
   ArmorClassAuthoringNotice,
   ArmorClassAuthoringProvider,
@@ -350,6 +355,29 @@ interface ContentEditFormBodyProps {
   ctx: ContentFormCtx
 }
 
+function useFrozenSystemOriginRowIds(
+  def: AnyContentFormDef,
+  entity: { id: string; catalogLayer: CatalogLayer },
+): ContentFormCtx['embeddedSystemOriginRowIds'] {
+  const [systemOrigin, setSystemOrigin] = useState<{
+    entityId: string
+    ids: ContentFormCtx['embeddedSystemOriginRowIds']
+  } | null>(() =>
+    entity.catalogLayer === 'system'
+      ? { entityId: entity.id, ids: def.extractEmbeddedSeedRowIds?.(entity as never) }
+      : null,
+  )
+  if (entity.catalogLayer === 'system' && systemOrigin?.entityId !== entity.id) {
+    setSystemOrigin({
+      entityId: entity.id,
+      ids: def.extractEmbeddedSeedRowIds?.(entity as never),
+    })
+  } else if (entity.catalogLayer !== 'system' && systemOrigin) {
+    setSystemOrigin(null)
+  }
+  return systemOrigin?.entityId === entity.id ? systemOrigin.ids : undefined
+}
+
 function ContentEditFormBody({
   def,
   entity,
@@ -361,13 +389,15 @@ function ContentEditFormBody({
   formCtx,
   ctx,
 }: ContentEditFormBodyProps) {
+  const queryClient = useQueryClient()
+  const systemOriginRowIds = useFrozenSystemOriginRowIds(def, entity)
   const mutation = useContentWriteMutation(def, campaignId, entityId)
   const authoring = useArmorClassAuthoringSession(
     Boolean(def.armorClassRulesSensitive),
     ctx.armorClassRules,
   )
 
-  const { layoutCtx, schema, validationIntent, defaultValues } = loadContentEditFormState({
+  const loaded = loadContentEditFormState({
     def,
     entity,
     optionsCtx: ctx,
@@ -376,6 +406,11 @@ function ContentEditFormBody({
     entityId,
     armorClassRules: authoring.snapshot,
   })
+  const layoutCtx = {
+    ...loaded.layoutCtx,
+    embeddedSystemOriginRowIds: systemOriginRowIds,
+  }
+  const { schema, validationIntent, defaultValues } = loaded
   const { onSubmit, formError } = useSubmitHandler({
     submit: async (values, form) => {
       if (
@@ -418,6 +453,9 @@ function ContentEditFormBody({
         throw new Error(CONTENT_MEDIA_STALE_FORM_MESSAGE, { cause: error })
       }
       const savedRecord = saved as typeof entity & { media?: ContentMedia }
+      queryClient.setQueryData(def.queryKey(campaignId), (current: unknown) =>
+        Array.isArray(current) ? replaceCachedContentEntity(current, savedRecord) : current,
+      )
       const baseline = stripEditEnvelopeFromFormDefaults(
         {
           ...def.toFormValues(saved, { armorClassRules: layoutCtx.armorClassRules }),

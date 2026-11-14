@@ -17,7 +17,7 @@ import { titleCase } from '../../../lib/utils/title-case'
 export function getWeaponStatRows(item: WeaponEquipment): ContentStatRowData[] {
   return [
     { label: 'Category', value: titleCase(item.category) },
-    { label: 'Mode', value: titleCase(item.mode) },
+    { label: 'Weapon type', value: titleCase(item.mode) },
     ...(item.damage && item.damageType
       ? [
           {

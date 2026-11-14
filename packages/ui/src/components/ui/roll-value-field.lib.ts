@@ -42,9 +42,13 @@ export function rollValuePartsHaveFlat(parts: RollValueFieldParts): boolean {
   return isRollFlatAmountPresent(parts.flatAmount)
 }
 
-/** Whether the dice core (`XdY`) should render for the current roll parts. */
+/**
+ * Whether the dice core should render.
+ * A roll with no stored dice atoms uses Add dice instead of a filled suggestion.
+ * A partial core stays visible so the missing atom is not painted as stored.
+ */
 export function shouldShowRollValueDiceFields(parts: RollValueFieldParts): boolean {
-  return rollValuePartsHaveDice(parts) || !rollValuePartsHaveFlat(parts)
+  return parts.diceCount !== undefined || parts.diceFaces !== undefined
 }
 
 /** Whether flat operator + amount controls should render. */
@@ -81,10 +85,11 @@ export type RollValueFieldPatchResult = {
   clearFlat?: boolean
 }
 
+/** Writes only the atom the author changed. Add dice commits both defaults separately. */
 export function applyRollValueFieldPatch(
-  parts: RollValueFieldParts,
+  _parts: RollValueFieldParts,
   patch: DiceFormulaPatch,
-  fieldDefaults: RollValueFieldDefaults,
+  _fieldDefaults: RollValueFieldDefaults,
 ): RollValueFieldPatchResult {
   if (patch.clearModifier) {
     return { clearFlat: true }
@@ -92,11 +97,8 @@ export function applyRollValueFieldPatch(
 
   const next: RollValueFieldPatchResult = {}
 
-  if (patch.count !== undefined || patch.faces !== undefined) {
-    const resolved = rollValuePartsToDiceFormula(parts, fieldDefaults)
-    next.diceCount = patch.count ?? resolved.count
-    next.diceFaces = patch.faces ?? resolved.faces
-  }
+  if (patch.count !== undefined) next.diceCount = patch.count
+  if (patch.faces !== undefined) next.diceFaces = patch.faces
 
   if (patch.modifier !== undefined) {
     next.flatOperator = patch.modifier.operator as RollFlatOperator

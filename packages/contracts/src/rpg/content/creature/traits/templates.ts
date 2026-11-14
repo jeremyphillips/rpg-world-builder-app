@@ -41,7 +41,12 @@ export type CreatureTraitTemplate = {
 const NO_CONFIG = z.object({}).strict()
 
 const legendaryResistanceConfigSchema = z.object({
-  uses: z.number().int().min(1),
+  uses: z
+    .number({
+      error: () => 'Uses is required.',
+    })
+    .int()
+    .min(1),
 })
 
 function legendaryResistanceLimitedUse(uses: number) {

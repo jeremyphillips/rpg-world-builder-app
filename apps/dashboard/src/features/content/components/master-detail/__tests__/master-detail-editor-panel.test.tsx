@@ -57,7 +57,7 @@ describe('MasterDetailEditorPanel', () => {
   const itemFields = [{ type: 'text' as const, name: 'name', label: 'Name' }]
   const selectedIdentity = {
     title: 'Rage',
-    meta: { eyebrow: 'Level 1', sourceLabel: 'System' },
+    meta: { eyebrow: 'Level 1', provenance: 'system', persistence: 'persisted' },
     deletable: true,
   }
 
@@ -113,6 +113,27 @@ describe('MasterDetailEditorPanel', () => {
     await user.click(screen.getByRole('menuitem', { name: /Duplicate trait/i }))
 
     expect(onDuplicate).toHaveBeenCalledOnce()
+  })
+
+  it('opens campaign availability from the overflow menu', async () => {
+    const user = userEvent.setup()
+    const onAvailabilityChange = vi.fn()
+
+    render(
+      <PanelShell
+        editor={makeEditor()}
+        itemFields={itemFields}
+        fieldName="traits"
+        idPrefix="species-trait"
+        itemNoun={TRAIT_MASTER_DETAIL_ITEM_NOUN}
+        selectedIdentity={{ ...selectedIdentity, onAvailabilityChange }}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: /Actions for Rage/i }))
+    await user.click(screen.getByRole('menuitem', { name: 'Campaign availability' }))
+
+    expect(onAvailabilityChange).toHaveBeenCalledOnce()
   })
 
   it('opens delete through the overflow menu', async () => {

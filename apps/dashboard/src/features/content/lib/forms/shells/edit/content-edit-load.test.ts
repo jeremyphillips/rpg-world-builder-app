@@ -6,6 +6,7 @@ import type { ContentFormDef, ContentFormCtx } from '../../registry/content-form
 import {
   findContentEditEntity,
   loadContentEditFormState,
+  replaceCachedContentEntity,
   resolveContentFormSchema,
   resolveContentPublishSchema,
 } from './content-edit-load'
@@ -140,5 +141,19 @@ describe('loadContentEditFormState', () => {
     })
 
     expect(result.defaultValues).toEqual({ name: 'Chain Mail' })
+  })
+})
+
+describe('replaceCachedContentEntity', () => {
+  it('replaces the matching entity and leaves the list untouched when ids differ', () => {
+    const current = [
+      { id: 'a', name: 'Old' },
+      { id: 'b', name: 'Other' },
+    ]
+    expect(replaceCachedContentEntity(current, { id: 'a', name: 'Saved' })).toEqual([
+      { id: 'a', name: 'Saved' },
+      { id: 'b', name: 'Other' },
+    ])
+    expect(replaceCachedContentEntity(undefined, { id: 'a', name: 'Saved' })).toBeUndefined()
   })
 })

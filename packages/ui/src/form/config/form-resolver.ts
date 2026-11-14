@@ -59,10 +59,9 @@ export function makeResolver<TFieldValues extends FieldValues>(
   schema: ZodType,
   items: FormItem[],
 ): Resolver<TFieldValues> {
-  const errorMap = makeFieldErrorMap(items)
-
   return (values, context, options) => {
     const hidden = hiddenFieldNames(items, values as Record<string, unknown>)
+    const errorMap = makeFieldErrorMap(items, values as Record<string, unknown>)
     // `zodResolver` over-constrains the schema's input type; the runtime schema
     // is correct, so widen the arguments at this one boundary.
     const resolver = zodResolver(omitHidden(schema, hidden) as never, {

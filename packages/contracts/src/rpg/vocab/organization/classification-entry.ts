@@ -10,5 +10,5 @@ export type OrganizationClassificationEntry = GameTermEntry & {
 export function getOrganizationClassificationDiscoveryTerms(
   entry: OrganizationClassificationEntry,
 ): readonly string[] {
-  return [entry.label, ...(entry.aliases ?? []), ...(entry.searchTerms ?? [])]
+  return [...(entry.aliases ?? []), ...(entry.searchTerms ?? [])]
 }

@@ -53,7 +53,6 @@ function PrototypeField({
       rowParticipation
     >
       <FieldLayout
-        hintPosition={hint ? 'below-control' : 'below-label'}
         label={labelNode}
         control={<Input placeholder={placeholder} defaultValue={defaultValue} />}
       />

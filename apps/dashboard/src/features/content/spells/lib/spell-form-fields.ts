@@ -7,6 +7,9 @@ import {
   damageTypeIdSchema,
   durationUnitSchema,
   effectConditionSchema,
+  SPELL_RANGE_DISTANCE_UNITS,
+  SPELL_RANGE_FEET,
+  SPELL_RANGE_MILES,
   slugSchema,
   parseSelectNumberInput,
   spellFormLevelSchema,
@@ -32,17 +35,18 @@ import {
 } from '@/features/vocabulary'
 
 import { withContentFormTabIcon } from '../../lib/forms/content-form-tab-icons'
+import { descriptionField } from '../../lib/forms/fields/content-identity-form-fields'
 import {
-  descriptionField,
-  feetInputUnitField,
-  SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
-} from '../../lib/forms/fields/content-identity-form-fields'
+  DISTANCE_FEET_UNIT_LABEL,
+  DISTANCE_MILE_UNIT_LABEL,
+  distanceAmountOptions,
+  distanceJoinedPairField,
+} from '../../lib/forms/fields/content-distance-form-fields'
 import { getContentTypeCollectionLabel, nounFromContentType } from '../../lib/content-type-labels'
 import {
   areaGeometryFormFields,
   areaGeometryFormSchema,
 } from '../../lib/forms/fields/area-geometry-form-fields'
-import { distanceInputSelectField } from '../../lib/forms/fields/content-speed-form-fields'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { referenceSpellcastingClassFieldOptions } from '../../lib/form-options/content-field-option.lib'
 import { draftOptionalSelect } from '../../lib/forms/validation/draft-form-schema-helpers'
@@ -163,7 +167,12 @@ const spellFormObjectSchema = z.object({
   }),
   range: z.object({
     kind: spellRangeKindSchema,
-    value: z.object({ value: z.coerce.number().min(0) }).optional(),
+    value: z
+      .object({
+        value: z.coerce.number().min(0).optional(),
+        unit: z.enum(SPELL_RANGE_DISTANCE_UNITS).optional(),
+      })
+      .optional(),
     description: z.string().optional(),
   }),
   duration: z.object({
@@ -433,11 +442,23 @@ function castingFields(): FormItem[] {
               required: true,
               width: 'lg',
             },
-            feetInputUnitField('range.value.value', 'Distance', {
-              valueDigits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
-              width: 'auto',
-              visibility: visibleWhenRangeDistance(),
+            distanceJoinedPairField({
+              amountName: 'range.value.value',
+              unitName: 'range.value.unit',
+              label: 'Distance',
+              presets: SPELL_RANGE_FEET,
+              unitOptions: [
+                { value: 'ft', label: DISTANCE_FEET_UNIT_LABEL },
+                { value: 'mi', label: DISTANCE_MILE_UNIT_LABEL },
+              ],
+              presetsByUnit: {
+                ft: distanceAmountOptions(SPELL_RANGE_FEET),
+                mi: distanceAmountOptions(SPELL_RANGE_MILES),
+              },
+              allowCustom: true,
+              clearAmountWhenUnitChanges: true,
               required: true,
+              visibility: visibleWhenRangeDistance(),
             }),
           ],
         },

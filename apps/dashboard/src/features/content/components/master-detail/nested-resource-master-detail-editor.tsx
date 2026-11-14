@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { fieldGroupFlexStackClasses } from '@rpg/ui'
 
 import type { DetailOverflowMenuEntry } from '../../lib/detail/detail-overflow-actions'
+import { MasterDetailDetailFormScope } from '../../lib/master-detail/master-detail-detail-form-scope'
 import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
 import {
   MasterDetailEditorShell,
@@ -65,7 +66,9 @@ export function NestedResourceMasterDetailEditor({
         onDuplicate={onDuplicate}
         overflowActions={overflowActions}
       >
-        {renderDetail({ rowId: selectedRowId })}
+        <MasterDetailDetailFormScope>
+          {renderDetail({ rowId: selectedRowId })}
+        </MasterDetailDetailFormScope>
       </MasterDetailEditorShell>
     ) : (
       <MasterDetailEditorShell itemNoun={itemNoun} />

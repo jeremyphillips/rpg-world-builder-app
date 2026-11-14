@@ -70,11 +70,11 @@ const longsword = weapon('longsword', {
   properties: ['versatile'],
   versatileDamage: { count: 1, faces: 10 },
 })
-const net = weapon('net', {
-  name: 'Net',
-  properties: ['thrown'],
+const noDamageWeapon = weapon('utility-weapon', {
+  name: 'Utility weapon',
   damage: undefined,
   damageType: undefined,
+  properties: [],
 })
 
 const armor = equipmentSchema.parse({
@@ -491,8 +491,8 @@ describe('resolveEquipmentRowSummary', () => {
 
   it('still reports to-hit for a weapon with no damage dice', () => {
     const summary = resolveEquipmentRowSummary(
-      entry(net),
-      net,
+      entry(noDamageWeapon),
+      noDamageWeapon,
       {
         abilityScores: { str: 12 },
         proficiencyBonus: 2,

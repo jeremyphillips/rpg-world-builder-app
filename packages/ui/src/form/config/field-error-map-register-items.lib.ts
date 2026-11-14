@@ -1,3 +1,4 @@
+import { readArrayItemRows, resolveArrayRowFields } from './array/array-resolve-fields.lib'
 import type { FormItem } from '../field-config'
 import { resolveColumnsCollapseSequence } from './form-columns-collapse.lib'
 import { arrayItemLabel } from './array/array-item-label.lib'
@@ -23,7 +24,13 @@ function registerArrayItem(
   registry: Map<string, RegistryEntry>,
   prefix: string,
   item: Extract<FormItem, { kind: 'array' }>,
-  registerItems: (registry: Map<string, RegistryEntry>, prefix: string, items: FormItem[]) => void,
+  registerItems: (
+    registry: Map<string, RegistryEntry>,
+    prefix: string,
+    items: FormItem[],
+    formValues?: Record<string, unknown>,
+  ) => void,
+  formValues?: Record<string, unknown>,
 ): void {
   const arrayKey = prefix ? `${prefix}.${item.name}` : item.name
   const arrayLabel = resolveArrayLabel(item)?.label ?? resolveArraySectionLabelForDisplay(item)
@@ -31,9 +38,55 @@ function registerArrayItem(
   registry.set(arrayKey, {
     label: arrayLabel,
     category: 'array',
+    role: 'array',
     itemLabel: arrayItemLabel(header, arrayLabel),
+    exactPath: true,
   })
-  registerItems(registry, `${arrayKey}.*`, item.fields)
+
+  if (item.item?.resolveFields) {
+    const rows = readArrayItemRows(formValues, arrayKey)
+    if (rows.length === 0) {
+      registerItems(
+        registry,
+        `${arrayKey}.0`,
+        resolveArrayRowFields(item, undefined, 0),
+        formValues,
+      )
+      return
+    }
+    rows.forEach((row, index) => {
+      registerItems(
+        registry,
+        `${arrayKey}.${index}`,
+        resolveArrayRowFields(item, row, index),
+        formValues,
+      )
+    })
+    return
+  }
+
+  registerItems(registry, `${arrayKey}.*`, item.fields, formValues)
+}
+
+function registerSlotIssuePathAliases(
+  registry: Map<string, RegistryEntry>,
+  prefix: string,
+  item: Extract<FormItem, { kind: 'slot' }>,
+): void {
+  if (!item.issuePaths?.length) return
+
+  const aliasLabel = item.heading?.label ?? item.label ?? item.name
+  for (const issuePath of item.issuePaths) {
+    const ownedKey = prefix ? `${prefix}.${issuePath}` : issuePath
+    if (registry.has(ownedKey)) continue
+    registry.set(ownedKey, {
+      label: aliasLabel,
+      category: 'text',
+      role: 'slotOwner',
+      exactPath: true,
+      labelOnly: true,
+    })
+  }
 }
 
 function registerSlotItem(
@@ -45,41 +98,58 @@ function registerSlotItem(
   registry.set(slotKey, {
     label: item.label ?? item.name,
     category: 'text',
+    role: item.issuePaths?.length ? 'slotOwner' : 'hostSlot',
+    exactPath: true,
   })
+  registerSlotIssuePathAliases(registry, prefix, item)
 }
 
 function registerDependentItem(
   registry: Map<string, RegistryEntry>,
   prefix: string,
   item: Extract<FormItem, { kind: 'dependent' }>,
-  registerItems: (registry: Map<string, RegistryEntry>, prefix: string, items: FormItem[]) => void,
+  registerItems: (
+    registry: Map<string, RegistryEntry>,
+    prefix: string,
+    items: FormItem[],
+    formValues?: Record<string, unknown>,
+  ) => void,
+  formValues?: Record<string, unknown>,
 ): void {
-  registerItems(registry, prefix, [item.controller])
-  registerItems(registry, prefix, item.dependents.fields as FormItem[])
+  registerItems(registry, prefix, [item.controller], formValues)
+  registerItems(registry, prefix, item.dependents.fields as FormItem[], formValues)
 }
 
 function registerContainerItem(
   registry: Map<string, RegistryEntry>,
   prefix: string,
   item: Extract<FormItem, { kind: 'group' | 'row' | 'columns' }>,
-  registerItems: (registry: Map<string, RegistryEntry>, prefix: string, items: FormItem[]) => void,
+  registerItems: (
+    registry: Map<string, RegistryEntry>,
+    prefix: string,
+    items: FormItem[],
+    formValues?: Record<string, unknown>,
+  ) => void,
+  formValues?: Record<string, unknown>,
 ): void {
   if (item.kind === 'columns') {
     registerItems(
       registry,
       prefix,
       resolveColumnsCollapseSequence(item.columns, item.collapseOrder),
+      formValues,
     )
     return
   }
 
-  registerItems(registry, prefix, item.fields as FormItem[])
+  registerItems(registry, prefix, item.fields as FormItem[], formValues)
 }
 
 export function registerFormItems(
   registry: Map<string, RegistryEntry>,
   prefix: string,
   items: FormItem[],
+  formValues?: Record<string, unknown>,
 ): void {
   for (const item of items) {
     if (!('kind' in item)) {
@@ -89,18 +159,18 @@ export function registerFormItems(
 
     switch (item.kind) {
       case 'array':
-        registerArrayItem(registry, prefix, item, registerFormItems)
+        registerArrayItem(registry, prefix, item, registerFormItems, formValues)
         break
       case 'slot':
         registerSlotItem(registry, prefix, item)
         break
       case 'dependent':
-        registerDependentItem(registry, prefix, item, registerFormItems)
+        registerDependentItem(registry, prefix, item, registerFormItems, formValues)
         break
       case 'group':
       case 'row':
       case 'columns':
-        registerContainerItem(registry, prefix, item, registerFormItems)
+        registerContainerItem(registry, prefix, item, registerFormItems, formValues)
         break
     }
   }

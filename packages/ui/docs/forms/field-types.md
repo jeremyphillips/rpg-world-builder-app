@@ -1,29 +1,48 @@
 # Field types
 
 Reference for specialized `<Form>` field configs beyond basic text/number/select. Config
-shapes: [`field-config.ts`](../../src/form/field-config.ts). Runnable examples: Storybook
+shapes: [`field-config/`](../../src/form/field-config/) (layered modules; barrel at
+[`index.ts`](../../src/form/field-config/index.ts)). Runnable examples: Storybook
 `Forms/*` and `FieldRow/*`.
 
 ## Standard leaf types (brief)
 
-| `type`            | Value     | Notes                                                                                             |
-| ----------------- | --------- | ------------------------------------------------------------------------------------------------- |
-| `text`            | `string`  | Optional `inputType`, `autoComplete`                                                              |
-| `textSuggestions` | `string`  | Free entry with inline advisory suggestions; optional `optionalDisclosure`                        |
-| `number`          | `number`  | `min`/`max` for Zod only; `digits`, `inputWidth`                                                  |
-| `textarea`        | `string`  | `rows`, optional `optionalDisclosure`                                                             |
-| `select`          | `string`  | `options`, optional `optionalDisclosure`                                                          |
-| `select`          | `string`  | Flat or grouped options; `optionAvailability`; `presentation.readOnlyWhen`; `presentation.change` |
-| `radio`           | `string`  | `orientation`, `labelHidden`                                                                      |
-| `radioCard`       | `string`  | Card-style options with `meta` / `badge`                                                          |
-| `checkbox`        | `boolean` |                                                                                                   |
-| `switch`          | `boolean` | `labelPosition`: `inline`, `above`, `settings`                                                    |
-| `select`          | `string`  | `labelPosition`: `inline`, `above`, `settings`                                                    |
-| `file`            | `File[]`  | `accept`, `multiple`, `maxFiles`, `maxSize`                                                       |
+| `type`             | Value     | Notes                                                                                             |
+| ------------------ | --------- | ------------------------------------------------------------------------------------------------- |
+| `text`             | `string`  | Optional `inputType`, `autoComplete`                                                              |
+| `textSuggestions`  | `string`  | Free entry with inline advisory suggestions; optional `optionalDisclosure`                        |
+| `number`           | `number`  | `min`/`max` for Zod only; `digits`, `inputWidth`                                                  |
+| `textarea`         | `string`  | `rows`, optional `optionalDisclosure`                                                             |
+| `select`           | `string`  | `options`, optional `optionalDisclosure`                                                          |
+| `select`           | `string`  | Flat or grouped options; `optionAvailability`; `presentation.readOnlyWhen`; `presentation.change` |
+| `radio`            | `string`  | `orientation`, `labelHidden`                                                                      |
+| `segmentedControl` | `string`  | `interactivity` for mounted-but-disabled; `defaultValue`                                          |
+| `radioCard`        | `string`  | Card-style options with `meta` / `badge`                                                          |
+| `checkbox`         | `boolean` |                                                                                                   |
+| `switch`           | `boolean` | `labelPosition`: `inline`, `above`, `settings`                                                    |
+| `select`           | `string`  | `labelPosition`: `inline`, `above`, `settings`                                                    |
+| `file`             | `File[]`  | `accept`, `multiple`, `maxFiles`, `maxSize`                                                       |
 
 `select` and `combobox` fields default to `Choose {label}…` when `placeholder` is omitted.
 Multi-select chips/combobox fields with `min` / `max` also derive constraint hints from the
 shared copy resolver unless an explicit `hint` is provided.
+
+#### Select option trailing (`FieldOption.trailing`)
+
+Select options may carry display-only trailing metadata rendered in the dropdown row and
+on the closed trigger:
+
+```ts
+{
+  label: 'Intelligence',
+  value: 'int',
+  trailing: { text: 'DC 15', variant: 'strong' },
+}
+```
+
+`variant` is `strong` (foreground, semibold weight) or `quiet` (default, muted supporting).
+`disabledReason` stays separate and takes precedence when an option is disabled. Combobox
+fields ignore `trailing` until a later mapping; do not persist trailing text in form values.
 
 ### Text suggestions (`textSuggestions`)
 
@@ -142,7 +161,9 @@ values, dirty state, validation, or serialization.
 - **`reserveSpace: true`** — reserves **one metadata line** so empty → populated does not
   shift layout. Does not reserve multi-line or multi-row height.
 - **`optionsResolve`** — dynamic select options from watched values; returned options replace
-  a static `options` list (use to exclude values that would be semantic no-ops).
+  a static `options` list (use to exclude values that would be semantic no-ops). Select
+  `optionsWhen` may return groups. Schema selects keep those group labels. Combobox
+  options stay flat.
 - **Row alignment** — when any sibling in a `kind: 'row'` uses `reserveSpace`, the row
   defaults to `align: 'start'` (`items-start`) so sibling controls stay top-aligned while
   metadata extends below one field. Override with `RowConfig.align` when needed.
@@ -155,9 +176,17 @@ Collapses empty optional fields behind a compact **+ Add …** control. When exp
 (or when populated and `expandWhenPopulated` is true), the field label and control render
 with a **Remove** action that clears the value and collapses back to the add control.
 
-**Implemented for:** `textarea`, `select`. `OPTIONAL_DISCLOSURE_FIELD_KINDS` also lists
-`text` and `richtext` for future enablement; dev guards log when
-`optionalDisclosure` is used on unimplemented kinds.
+**Implemented for:** `text`, `textSuggestions`, `textarea`, `richtext`, `select`, and
+`rollValue`. Dev guards log when `optionalDisclosure` is used on any other kind.
+
+`rollValue` treats the roll object as present even when dice or flat are incomplete.
+Add calls `seedWhen` and writes that value. Remove unsets the whole object. Set
+`labeled` to keep the section label and a `summary` line visible while collapsed.
+`addDisabled` disables only the add action. **`addGate`** watches `dependsOn` fields and
+disables the add action while collapsed when `disabledWhen` is true; optional
+`disabledReasonWhen` renders caption copy under the add control (for example when another field
+must be chosen first). Dice defaults are not written for a `rollValue` that uses
+`optionalDisclosure`.
 
 ```ts
 {
@@ -186,6 +215,9 @@ with a **Remove** action that clears the value and collapses back to the add con
 - **Collapsed fields unmount** — empty values take no vertical space; populated values stay
   expanded by default.
 - Primitive: `OptionalFieldDisclosure` in `@rpg/ui` for bespoke composition outside
+  schema renderers. Pass `message` when open in an anatomy-grid row so hints/errors
+  render in the row message track (not nested under the control region). Joined-pair
+  optional fields hoist automatically via `OptionalDisclosureJoinedPairFieldRenderer`.
   `<Form>`.
 
 ## Rich text (`richtext`)
@@ -361,6 +393,10 @@ species movement Speed above `[30 ▾][ft.]` while the sentence legend stays sr-
 Standalone `type: 'joinedPair'` fields bind RHF paths through occupant `name` values only — no
 wrapper `name`. Optional `controlId` sets control id segments when they must differ from the
 primary bound path. Arbitrary numeric authoring with optional unit select remains `inputSelect`.
+
+Select occupants may set **`optionsResolve`** (`dependsOn` + `optionsWhen`) to replace the
+static `options` list at render time. Stored amounts that are not in the resolved list remain
+visible in the select (same contract as `allowCustom` distance authoring).
 
 ### Deprecated inline composites
 

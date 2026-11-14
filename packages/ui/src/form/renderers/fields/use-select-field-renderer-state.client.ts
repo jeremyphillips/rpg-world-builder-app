@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo } from 'react'
-import { useController, useFormState } from 'react-hook-form'
+import { useController } from 'react-hook-form'
 
 import {
   applyArrayFilterSelectOptions,
@@ -11,14 +11,14 @@ import { useFieldErrorPresentation } from '../../context/array-item-presentation
 import { useFieldRowParticipation } from '../../../components/ui/field-row-anatomy.context'
 import { useFormSectionContext } from '../../context/form-section.context'
 import { useDependsOnValues } from '../../config/form-depends-on.client'
-import { resolveNestedFieldErrorMessage } from '../../errors/resolve-field-error-message'
 import type { SelectFieldConfig } from '../../field-config'
 import {
   fieldDefaultValue,
   collectFieldDynamicDependsOn,
+  filterSelectFieldOptionList,
+  flattenSelectFieldOptions,
   isSelectFieldReadOnly,
   resolveSelectFieldDisplayLabel,
-  resolveSelectFieldFlatOptions,
 } from '../../field-config'
 import { resolveFieldRenderConfig } from '../field-renderer-config.lib'
 import { soleSelectOptionValue } from './select-field-renderer.lib'
@@ -42,25 +42,19 @@ export function useSelectFieldRendererState(
     name: fullName,
     defaultValue: fieldDefaultValue(config),
   })
-  const { errors } = useFormState()
-  const validation = useFieldErrorPresentation(
-    fieldState.error?.message ?? resolveNestedFieldErrorMessage(errors, fullName),
-    fullName,
-  )
+  const validation = useFieldErrorPresentation(fieldState.error?.message, fullName)
 
   const resolvedOptions = useMemo(
     () =>
-      resolveSelectFieldFlatOptions(
-        renderConfig,
-        optionValues,
-        (options, fieldName) => applyArrayFilterSelectOptions(options, fieldName, arrayContext),
-        dynamicValues,
+      filterSelectFieldOptionList(renderConfig.options ?? [], (options) =>
+        applyArrayFilterSelectOptions(options, renderConfig.name, arrayContext),
       ),
-    [arrayContext, dynamicValues, optionValues, renderConfig],
+    [arrayContext, renderConfig.name, renderConfig.options],
   )
+  const flatOptions = useMemo(() => flattenSelectFieldOptions(resolvedOptions), [resolvedOptions])
 
-  const isReadOnly = isSelectFieldReadOnly(renderConfig, resolvedOptions)
-  const readOnlyValue = soleSelectOptionValue(resolvedOptions)
+  const isReadOnly = isSelectFieldReadOnly(renderConfig, flatOptions)
+  const readOnlyValue = soleSelectOptionValue(flatOptions)
 
   useEffect(() => {
     if (!isReadOnly || readOnlyValue == null || field.value === readOnlyValue) return
@@ -68,7 +62,7 @@ export function useSelectFieldRendererState(
   }, [field, isReadOnly, readOnlyValue])
 
   const displayValue =
-    resolveSelectFieldDisplayLabel(field.value, resolvedOptions) ?? String(field.value ?? '')
+    resolveSelectFieldDisplayLabel(field.value, flatOptions) ?? String(field.value ?? '')
 
   return {
     renderConfig,
@@ -78,6 +72,7 @@ export function useSelectFieldRendererState(
     field,
     validation,
     resolvedOptions,
+    flatOptions,
     isReadOnly,
     displayValue,
   }

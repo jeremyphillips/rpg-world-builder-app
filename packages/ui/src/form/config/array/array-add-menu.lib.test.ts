@@ -48,6 +48,7 @@ describe('array-add-menu.lib', () => {
         {
           id: 'movement-bonus',
           label: 'Movement bonus',
+          description: 'Increase speed',
           groupId: 'combat-traits',
           appendDefaults: { grantType: 'movement' },
           duplicatePolicy: 'block' as const,
@@ -64,5 +65,26 @@ describe('array-add-menu.lib', () => {
         note: 'Already added',
       }),
     ])
+  })
+
+  it('merges dynamic presentation when duplicate policy allows', () => {
+    const menu = {
+      groups: [{ id: 'g', label: 'G' }],
+      items: [
+        {
+          id: 'row',
+          label: 'Row',
+          appendDefaults: { kind: 'a' },
+        },
+      ],
+    }
+    const built = buildArrayAddMenuItems(menu, [], {
+      presentation: { row: { disabled: true, note: 'Only available for Creature targets' } },
+    })
+    expect(built[0]).toMatchObject({
+      disabled: true,
+      note: 'Only available for Creature targets',
+    })
+    expect(built[0]?.metadata).toBeUndefined()
   })
 })

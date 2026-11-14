@@ -16,6 +16,7 @@ export {
   resolutionSavingThrowMethodSchema,
   resolutionSelectionModeSchema,
   resolutionTargetProximitySchema,
+  DEFAULT_RESOLUTION_TARGET,
   resolutionTargetSchema,
   resolutionTemporaryHitPointsEffectSchema,
   validateEffectResolution,
@@ -62,13 +63,52 @@ export {
 } from './format-effect-lines'
 export { formatResolutionOutcomeLine, formatResolutionOutcomes } from './format-outcomes'
 export {
+  formatResolutionAffectedAreaCopy,
   formatResolutionSelectionSections,
   formatResolutionTarget,
   formatResolutionTargetFromParts,
   formatResolutionTargetProximityPhrase,
+  resolutionTargetCountSelectOptions,
   RESOLUTION_AFFECTED_AREA_COPY,
   type ResolutionSelectionSection,
 } from './format-target'
+export {
+  formatAreaOccupantCreaturePhrase,
+  formatTargetHeadNoun,
+  formatTargetQualifyingClauses,
+  formatTargetSightPhrase,
+} from './format-target-composition'
+export {
+  formatResolutionRequirementRowTitle,
+  type ResolutionRequirementRowTitleOptions,
+} from './format-requirement-row-title'
+export {
+  collectRequirementListIssues,
+  formatRequirementTargetMenuNote,
+  getRequirementAllowedPopulations,
+  getRequirementAppendListConflict,
+  getRequirementTargetIncompatibility,
+  isRequirementCompatibleWithTargetKind,
+  readRequirementCompatibilityInput,
+  refineRequirementRowsForTargetKind,
+  resolveRequirementAddMenuDisabledNote,
+  type RequirementCompatibilityInput,
+  type RequirementListIssueCode,
+  type RequirementPopulation,
+  type RequirementTargetIncompatibilityReason,
+} from './requirement-target-compatibility'
+export {
+  formatRequirementTargetIncompatibilityMessage,
+  RESOLUTION_REQUIREMENT_CREATURE_ONLY_VALIDATION,
+  type RequirementTargetMessageTone,
+} from './requirement-target-messages'
+export {
+  refineRequirementsForTargetKind,
+  resolutionTargetRequirementSchema,
+  resolutionTargetRequirementsSchema,
+  resolutionTargetRequirementValidationMessages,
+  type ResolutionTargetRequirement,
+} from './target-requirements'
 export {
   formatEffectResolutionSummary,
   formatEffectResolutionSummarySections,

@@ -59,6 +59,7 @@ export function RadioFieldShell({
       invalid={invalid}
       describedBy={describedBy}
       hint={hint}
+      hintPosition={hintPosition}
       required={required}
       size={size}
       width={resolveFieldAnatomyWidth(width, chrome)}
@@ -66,7 +67,6 @@ export function RadioFieldShell({
       anatomy
     >
       <FieldLayout
-        hintPosition={hintPosition}
         label={
           <FieldRadiogroupLabel
             id={labelId}

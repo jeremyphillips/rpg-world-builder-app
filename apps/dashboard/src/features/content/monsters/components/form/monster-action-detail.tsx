@@ -1,47 +1,82 @@
 import { useEffect, useMemo } from 'react'
 import { isWeaponEquipment, resolveEquipmentInstanceReferenceLabel } from '@rpg/contracts'
 import { SemanticText, Text } from '@rpg/ui'
-import { FormItems } from '@rpg/ui/form'
+import { FormItems, FormRhythmStack } from '@rpg/ui/form'
 import { useWatch } from 'react-hook-form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { MasterDetailEditorPanel } from '../../../components/master-detail/master-detail-editor-panel'
+import { masterDetailItemTitle } from '../../../lib/master-detail/master-detail-constants'
 import type { useEmbeddedMasterDetailRows } from '../../../lib/master-detail/use-embedded-master-detail-rows'
-import { collectMonsterFormAdvisories } from '../../lib/monster-form-advisories'
+import { sharedCastingOptions } from '../../lib/actions/monster-action-casting-summary'
+import { isLegendaryReferenceTarget } from '../../lib/actions/legendary-action-category'
+import { legendarySourceSpellOptions } from '../../lib/actions/monster-legendary-action-acquisition'
 import { monsterActionDetailFields } from '../../lib/actions/monster-action-detail-fields'
+import { monsterActionSectionMoveAllowed } from '../../lib/actions/monster-action-kind'
+import {
+  monsterActionHeaderName,
+  monsterActionEditorTitles,
+} from '../../lib/actions/monster-action-editor-title'
 import {
   MONSTER_ACTION_SECTIONS,
   type MonsterActionSection,
 } from '../../lib/actions/monster-action-equipment-references'
 import { MONSTER_MOVE_TO_LABEL } from '../../lib/monster-form-labels'
+
+function referenceOptionLabels(values: MonsterFormValues, ctx: ContentFormCtx) {
+  const actionRows = (values.actions ?? []) as MonsterActionDraftRow[]
+  const titles = monsterActionEditorTitles(actionRows, values, ctx, 'actions')
+  const unnamed = masterDetailItemTitle(undefined, MONSTER_ACTION_ITEM_NOUN)
+  return actionRows.filter(isLegendaryReferenceTarget).map((row) => ({
+    value: row.id,
+    label: titles.get(row.id) ?? unnamed,
+  }))
+}
+
+function moveOverflowActions(
+  located: { section: MonsterActionSection; action: MonsterActionDraftRow } | null | undefined,
+  requestMove: (section: MonsterActionSection) => void,
+) {
+  if (!located) return undefined
+  const items = MONSTER_ACTION_SECTIONS.filter((section) =>
+    monsterActionSectionMoveAllowed(located.action, located.section, section),
+  ).map((section) => ({
+    id: `move-${section}`,
+    label: monsterActionSectionHeading(section),
+    onSelect: () => requestMove(section),
+  }))
+  if (items.length === 0) return undefined
+  return [{ id: 'move-to', label: MONSTER_MOVE_TO_LABEL, items }]
+}
+import { MonsterSpellPickerHost } from './monster-spell-picker-host'
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
 import { monsterActionSectionHeading } from '../../lib/actions/monster-action-presets'
 import { MONSTER_ACTION_ITEM_NOUN } from '../../lib/monster-form-labels'
+import { collectMonsterFormAdvisories } from '../../lib/monster-form-advisories'
 import {
   monsterEquipmentCatalog,
   monsterMagicPropertyProvider,
 } from '../../lib/monster-form-derivation'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
 import type { useMonsterActionSections } from '../../hooks/use-monster-action-sections'
-import { MonsterActionAttackSummary } from './monster-action-attack-summary'
 
 type Sections = ReturnType<typeof useMonsterActionSections>
 type ActionRows = ReturnType<typeof useEmbeddedMasterDetailRows>
 
-function sharedCastingOptions(
-  values: MonsterFormValues,
+function attackChipOptions(
+  rows: readonly MonsterActionDraftRow[],
   actionId: string,
+  values: MonsterFormValues,
+  ctx: ContentFormCtx,
 ): { value: string; label: string }[] {
-  const rows = [
-    ...values.actions,
-    ...values.bonusActions,
-    ...values.reactions,
-  ] as MonsterActionDraftRow[]
-  return rows.flatMap((entry) => {
-    if (entry.kind !== 'spell' || entry.id === actionId) return []
-    if (entry.castingAbility?.kind !== 'ability' || !entry.name?.trim()) return []
-    return [{ value: entry.id, label: `Same as ${entry.name}` }]
-  })
+  const titles = monsterActionEditorTitles(rows, values, ctx)
+  return rows
+    .filter(
+      (row) =>
+        row.id !== actionId &&
+        (row.kind === 'weapon' || row.kind === 'natural-weapon' || row.kind === 'attack'),
+    )
+    .map((row) => ({ value: row.id, label: titles.get(row.id) ?? row.id }))
 }
 
 function equipmentOptions(
@@ -78,37 +113,60 @@ export function MonsterActionDetail({
   const values = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
   const action = located?.action
   const namePrefix = located ? `${located.section}.${located.index}` : ''
+  const sectionRows = (
+    located && values ? (values[located.section] ?? []) : []
+  ) as MonsterActionDraftRow[]
+  const liveAction =
+    located && values
+      ? ((values[located.section]?.[located.index] as MonsterActionDraftRow | undefined) ?? action)
+      : action
+  const headerName =
+    located && liveAction
+      ? monsterActionHeaderName({
+          action: liveAction,
+          sectionRows,
+          values,
+          ctx,
+          section: located.section,
+        })
+      : undefined
+  const editor = located ? sections.editors[located.section] : sections.editors.actions
+  const initialEdit = Boolean(
+    headerName?.mode === 'authored' &&
+    liveAction?.kind !== 'action-reference' &&
+    !liveAction?.name?.trim() &&
+    editor.lastAddedFieldId &&
+    editor.lastAddedFieldId === editor.selectedFieldId,
+  )
   const fields = useMemo(() => {
-    if (!located || !values || !action) return []
+    if (!located || !values || !action || !liveAction) return []
     return monsterActionDetailFields({
       ctx,
-      action,
+      action: liveAction,
       section: located.section,
       namePrefix,
       equipmentOptions: equipmentOptions(values, ctx),
+      equipment: values.equipment,
       sharedCastingOptions: sharedCastingOptions(values, action.id),
-      attackOptions: (values[located.section] ?? [])
-        .filter(
-          (row) =>
-            row.id !== action.id &&
-            (row.kind === 'weapon' || row.kind === 'natural-weapon' || row.kind === 'attack'),
-        )
-        .map((row) => ({ value: row.id, label: row.name?.trim() || row.kind })),
+      advisories: collectMonsterFormAdvisories(values, monsterEquipmentCatalog(ctx)),
+      onCastingSourceBlocked: sections.setNotice,
+      attackOptions: attackChipOptions(
+        (located.section === 'reactions'
+          ? (values.actions ?? [])
+          : (values[located.section] ?? [])) as MonsterActionDraftRow[],
+        action.id,
+        values,
+        ctx,
+      ),
+      referenceOptions: referenceOptionLabels(values, ctx),
+      sourceSpellOptions: legendarySourceSpellOptions(values, liveAction, ctx.spellCatalogById),
     })
-  }, [action, ctx, located, namePrefix, values])
+  }, [action, ctx, liveAction, located, namePrefix, sections.setNotice, values])
 
   useEffect(() => {
     if (sections.focusToken === 0 || !action) return
     document.getElementById(`monster-action-focus-${action.id}`)?.focus()
   }, [action, sections.focusToken])
-
-  const advisories =
-    located && values
-      ? collectMonsterFormAdvisories(values, monsterEquipmentCatalog(ctx))
-          .filter((advisory) => advisory.path.startsWith(`${located.section}.${located.index}`))
-          .map((advisory) => advisory.message)
-      : []
-  const editor = located ? sections.editors[located.section] : sections.editors.actions
 
   return (
     <MasterDetailEditorPanel
@@ -118,7 +176,33 @@ export function MonsterActionDetail({
       idPrefix="monster-action"
       itemNoun={MONSTER_ACTION_ITEM_NOUN}
       showSelectedDetail={Boolean(located && action)}
-      selectedIdentity={located ? rows.selectedIdentity : undefined}
+      selectedIdentity={
+        located && action && headerName
+          ? {
+              title: headerName.title,
+              rowKey: editor.selectedFieldId ?? action.id,
+              meta: rows.selectedIdentity?.meta,
+              ...(headerName.sourceName ? { sourceName: headerName.sourceName } : {}),
+              ...(headerName.editable === false
+                ? {}
+                : {
+                    inlineTitle: {
+                      field: 'name' as const,
+                      fallback: headerName.fallback,
+                      placeholder: headerName.placeholder,
+                      mode: headerName.mode,
+                      initialEdit,
+                      ...(headerName.resetLabel ? { resetLabel: headerName.resetLabel } : {}),
+                    },
+                  }),
+              deletable: rows.selectedIdentity?.deletable,
+              availability: rows.selectedIdentity?.availability,
+              onAvailabilityChange: rows.selectedIdentity?.onAvailabilityChange,
+              issueCount: rows.selectedIdentity?.issueCount,
+              headerIssues: rows.selectedIdentity?.headerIssues,
+            }
+          : undefined
+      }
       campaignId={ctx.campaignId}
       rowAvailability={rows.selectedRowAvailability}
       availabilityFormItems={rows.availabilityFormItems}
@@ -126,54 +210,34 @@ export function MonsterActionDetail({
       availabilityDialogRef={rows.availabilityDialogRef}
       onDelete={located ? () => sections.requestDelete(located.action.id) : undefined}
       onDuplicate={located ? sections.duplicateSelected : undefined}
-      overflowActions={
-        located
-          ? [
-              {
-                id: 'move-to',
-                label: MONSTER_MOVE_TO_LABEL,
-                items: MONSTER_ACTION_SECTIONS.filter(
-                  (section) =>
-                    section !== located.section &&
-                    !(located.action.kind === 'multiattack' && section !== 'actions'),
-                ).map((section) => ({
-                  id: `move-${section}`,
-                  label: monsterActionSectionHeading(section),
-                  onSelect: () => sections.requestMove(section),
-                })),
-              },
-            ]
-          : undefined
-      }
+      overflowActions={moveOverflowActions(located, sections.requestMove)}
       detailLeading={
-        located && action ? (
-          <div
-            id={`monster-action-focus-${action.id}`}
-            tabIndex={-1}
-            className="flex flex-col gap-4"
-          >
-            <MonsterActionAttackSummary ctx={ctx} action={action} />
-            {sections.notice ? (
-              <Text as="p" variant="supporting">
-                <SemanticText>{sections.notice}</SemanticText>
-              </Text>
-            ) : null}
-            {advisories.map((message) => (
-              <Text key={message} as="p" variant="supporting">
-                <SemanticText>{message}</SemanticText>
-              </Text>
-            ))}
+        sections.notice ? (
+          <div id={action ? `monster-action-focus-${action.id}` : undefined} tabIndex={-1}>
+            <Text as="p" variant="supporting">
+              <SemanticText>{sections.notice}</SemanticText>
+            </Text>
           </div>
+        ) : action ? (
+          <div id={`monster-action-focus-${action.id}`} tabIndex={-1} />
         ) : null
       }
       renderBody={
         located && action
           ? () => (
-              <FormItems
-                items={fields}
-                idPrefix={`monster-action-${action.id}`}
-                namePrefix={namePrefix}
-              />
+              <MonsterSpellPickerHost
+                enabled={action.kind === 'spell' && located.section !== 'legendaryActions'}
+                arrayName={`${namePrefix}.spells`}
+                catalog={ctx.spellCatalogById}
+              >
+                <FormRhythmStack>
+                  <FormItems
+                    items={fields}
+                    idPrefix={`monster-action-${action.id}`}
+                    namePrefix={namePrefix}
+                  />
+                </FormRhythmStack>
+              </MonsterSpellPickerHost>
             )
           : undefined
       }

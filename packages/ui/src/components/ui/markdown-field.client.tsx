@@ -89,6 +89,7 @@ export function MarkdownField({
       invalid={invalid}
       describedBy={describedBy}
       hint={hint}
+      hintPosition={hintPosition}
       required={required}
       width={width}
       size={size}
@@ -96,7 +97,6 @@ export function MarkdownField({
       anatomy
     >
       <FieldLayout
-        hintPosition={hintPosition}
         wrapControl={false}
         controlBand="content-sized"
         label={<FormFieldLabel label={label} info={info} required={required} />}

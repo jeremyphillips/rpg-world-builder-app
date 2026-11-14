@@ -8,7 +8,7 @@ import type { ArrayItemIssueGroup } from '../errors/form-issue.types'
 import { groupIssuesForItemPrefix } from '../errors/group-form-issues'
 import { prepareFormIssues } from '../errors/resolve-invalid-submit-navigation'
 import type { FormItem } from '../field-config'
-import { collectArraySections } from '../errors/resolve-field-order'
+import { collectArraySections, resolveSectionFieldOrder } from '../errors/resolve-field-order'
 import {
   collectInactiveFieldPaths,
   filterIssuesForPresentation,
@@ -61,7 +61,10 @@ export function useFormValidationPresentation(fieldsOverride?: FormItem[]) {
   const fields = fieldsOverride ?? contextFields
   const formValues = useWatch() as Record<string, unknown>
   const { errors, touchedFields } = useFormState()
-  const rhfIssues = React.useMemo(() => prepareFormIssues(errors, fields), [errors, fields])
+  const rhfIssues = React.useMemo(
+    () => prepareFormIssues(errors, fields, formValues ?? {}),
+    [errors, fields, formValues],
+  )
   const rawIssues =
     publishPresentationEnabled && hasAttemptedPublish ? publishPresentationIssues : rhfIssues
   const inactivePaths = React.useMemo(
@@ -122,10 +125,13 @@ export function useArrayItemIssues(
   itemIndex: number,
 ): ArrayItemIssueGroup {
   const { issues, fields } = useFormValidationPresentation()
+  const formValues = useWatch() as Record<string, unknown>
   const fieldOrder = React.useMemo(() => {
-    const section = collectArraySections(fields).find((entry) => entry.fullName === arrayPath)
-    return section?.fieldOrder ?? []
-  }, [fields, arrayPath])
+    const section = collectArraySections(fields, formValues ?? {}).find(
+      (entry) => entry.fullName === arrayPath,
+    )
+    return resolveSectionFieldOrder(section, itemIndex)
+  }, [arrayPath, fields, formValues, itemIndex])
 
   return React.useMemo(
     () => groupIssuesForItemPrefix(issues, itemPrefix, arrayPath, itemIndex, fieldOrder),

@@ -21,6 +21,10 @@ import { resolveArrayRequiredMarker } from './array-field-empty-state.lib'
 import { resolveArrayShowSectionHeader } from './resolve-array-show-section-header.lib'
 import { useArrayFieldAppendControls } from './use-array-field-append-controls.client'
 import {
+  isPresentationSessionExpanded,
+  type PresentationSessionFlags,
+} from '../../errors/resolve-field-error-presentation.lib'
+import {
   resolveArrayAppendAvailability,
   resolveArrayValidationCounts,
 } from './use-array-field-renderer-state.lib'
@@ -111,10 +115,18 @@ export function useArrayFieldRendererState({
     watchedItems,
     getItemValues,
   })
+  const validationCountSession: PresentationSessionFlags = {
+    validationPresentation: validation.validationPresentation,
+    hasAttemptedSubmit: validation.hasAttemptedSubmit,
+    hasAttemptedPublish: validation.hasAttemptedPublish,
+    publishPresentationEnabled: validation.publishPresentationEnabled,
+  }
+  const showValidationCounts = isPresentationSessionExpanded(validationCountSession)
+
   const { containerIssue, hasContainerIssue, invalidRowCount, arrayIssueCount } =
     resolveArrayValidationCounts({
       fullName,
-      hasAttemptedSubmit: validation.hasAttemptedSubmit,
+      showValidationCounts,
       issues: validation.issues,
     })
 
@@ -149,26 +161,32 @@ export function useArrayFieldRendererState({
   })
 
   const itemProps = React.useCallback(
-    (rhfField: Record<string, unknown>, index: number) => ({
-      config,
-      idPrefix,
-      fullName,
-      index,
-      itemId: resolveFieldArrayRowKey(rhfField, config.keyName),
-      legend: itemLegend,
-      itemBodyStackClasses,
-      canRemove,
-      showDefaultItemRemove,
-      showDragHandle: reorderConfigured,
-      fieldsLength: fields.length,
-      collapsible,
-      variant,
-      collapsedIds,
-      onToggleCollapse: toggleCollapse,
-      onRemove: () => {
-        remove(index)
-      },
-    }),
+    (rhfField: Record<string, unknown>, index: number) => {
+      const itemValues = (getValues(`${fullName}.${index}`) ?? {}) as Record<string, unknown>
+      const rowCollapsible =
+        collapsible &&
+        (itemConfig.resolveCollapsible ? itemConfig.resolveCollapsible(itemValues, index) : true)
+      return {
+        config,
+        idPrefix,
+        fullName,
+        index,
+        itemId: resolveFieldArrayRowKey(rhfField, config.keyName),
+        legend: itemLegend,
+        itemBodyStackClasses,
+        canRemove,
+        showDefaultItemRemove,
+        showDragHandle: reorderConfigured,
+        fieldsLength: fields.length,
+        collapsible: rowCollapsible,
+        variant,
+        collapsedIds,
+        onToggleCollapse: toggleCollapse,
+        onRemove: () => {
+          remove(index)
+        },
+      }
+    },
     [
       canRemove,
       showDefaultItemRemove,
@@ -177,11 +195,13 @@ export function useArrayFieldRendererState({
       config,
       fields.length,
       fullName,
+      getValues,
       idPrefix,
       itemBodyStackClasses,
-      sectionLabel,
+      itemConfig,
       remove,
       reorderConfigured,
+      sectionLabel,
       toggleCollapse,
       variant,
     ],

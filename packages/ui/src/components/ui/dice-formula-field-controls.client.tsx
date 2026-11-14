@@ -62,6 +62,16 @@ interface DiceFormulaControlsProps {
   controlLabels?: DiceFormulaControlLabels
   facesNotation?: boolean
   showDiceFields?: boolean
+  /**
+   * Stored dice atoms for a roll that must not display suggestions as values.
+   * `null` renders an empty control with the placeholder.
+   */
+  diceAtoms?: {
+    count: number | null
+    faces: number | null
+    countPlaceholder: string
+    facesPlaceholder: string
+  }
   onAddDice?: () => void
   addDiceLabel?: string
   labelPosition: DiceFormulaLabelPosition
@@ -102,6 +112,7 @@ function DiceFormulaCountControl({
   id,
   size,
   resolved,
+  diceAtoms,
   countMin,
   countMax,
   disabled,
@@ -114,6 +125,7 @@ function DiceFormulaCountControl({
   | 'id'
   | 'size'
   | 'resolved'
+  | 'diceAtoms'
   | 'countMin'
   | 'countMax'
   | 'disabled'
@@ -124,6 +136,8 @@ function DiceFormulaCountControl({
   countLabel?: string
 }) {
   const digits = fieldDigitsForMax(countMax)
+  const storedCount = diceAtoms ? diceAtoms.count : resolved.count
+  const value = storedCount ?? ''
 
   return (
     <DiceFormulaControlCell id={id} label={countLabel}>
@@ -138,9 +152,13 @@ function DiceFormulaCountControl({
         digits={digits}
         rootClassName={diceFormulaGroupedCountRootVariants}
         className={diceFormulaCountInputVariants}
-        value={resolved.count}
+        placeholder={diceAtoms && diceAtoms.count == null ? diceAtoms.countPlaceholder : undefined}
+        value={value}
         onChange={(event) => {
-          onUpdate({ count: parseInputInt(event.target.value, resolved.count, countMin, countMax) })
+          const raw = event.target.value
+          if (diceAtoms && diceAtoms.count == null && raw.trim() === '') return
+          const fallback = typeof storedCount === 'number' ? storedCount : countMin
+          onUpdate({ count: parseInputInt(raw, fallback, countMin, countMax) })
         }}
         onBlur={onBlur}
       />
@@ -152,6 +170,7 @@ function DiceFormulaFacesControl({
   id,
   size,
   resolved,
+  diceAtoms,
   faces,
   disabled,
   hasError,
@@ -161,18 +180,28 @@ function DiceFormulaFacesControl({
   onUpdate,
 }: Pick<
   DiceFormulaControlsProps,
-  'id' | 'size' | 'resolved' | 'faces' | 'disabled' | 'hasError' | 'onBlur' | 'onUpdate'
+  | 'id'
+  | 'size'
+  | 'resolved'
+  | 'diceAtoms'
+  | 'faces'
+  | 'disabled'
+  | 'hasError'
+  | 'onBlur'
+  | 'onUpdate'
 > & {
   facesLabel?: string
   facesNotation?: boolean
 }) {
   const maxFace = faces.reduce((max, face) => Math.max(max, face), 0)
   const digits = fieldDigitsForMax(maxFace)
+  const storedFace = diceAtoms ? diceAtoms.faces : resolved.faces
+  const faceLabel = storedFace == null ? undefined : formatDieFaceLabel(storedFace, facesNotation)
 
   return (
     <DiceFormulaControlCell id={id} label={facesLabel}>
       <Select
-        value={String(resolved.faces)}
+        value={storedFace == null ? '' : String(storedFace)}
         onValueChange={(next) => onUpdate({ faces: Number(next) })}
         disabled={disabled}
       >
@@ -184,7 +213,7 @@ function DiceFormulaFacesControl({
           aria-invalid={hasError || undefined}
           onBlur={onBlur}
         >
-          <SelectValue>{formatDieFaceLabel(resolved.faces, facesNotation)}</SelectValue>
+          <SelectValue placeholder={diceAtoms?.facesPlaceholder}>{faceLabel}</SelectValue>
         </SelectTrigger>
         <SelectContent>
           {faces.map((face) => (
@@ -203,6 +232,7 @@ function DiceFormulaCoreControls({
   facesId,
   size,
   resolved,
+  diceAtoms,
   faces,
   disabled,
   hasError,
@@ -218,6 +248,7 @@ function DiceFormulaCoreControls({
   facesId: string
   size: FieldSize
   resolved: DiceFormulaValue
+  diceAtoms?: DiceFormulaControlsProps['diceAtoms']
   faces: readonly number[]
   disabled: boolean
   hasError: boolean
@@ -235,6 +266,7 @@ function DiceFormulaCoreControls({
         id={countId}
         size={size}
         resolved={resolved}
+        diceAtoms={diceAtoms}
         countMin={countMin}
         countMax={countMax}
         disabled={disabled}
@@ -262,6 +294,7 @@ function DiceFormulaCoreControls({
         id={facesId}
         size={size}
         resolved={resolved}
+        diceAtoms={diceAtoms}
         faces={faces}
         disabled={disabled}
         hasError={hasError}
@@ -634,6 +667,7 @@ export function DiceFormulaControls({
   modifierMode,
   showModifierFields,
   showDiceFields = true,
+  diceAtoms,
   countMin,
   countMax,
   modifierMin,
@@ -675,6 +709,7 @@ export function DiceFormulaControls({
           facesId,
           size,
           resolved,
+          diceAtoms,
           faces,
           disabled,
           hasError,

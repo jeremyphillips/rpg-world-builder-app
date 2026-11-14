@@ -2,14 +2,20 @@ import { describe, expect, it } from 'vitest'
 import {
   CHALLENGE_RATING_MECHANICS,
   deriveMonsterStatBlock,
+  formatMonsterAttackAction,
   formatMonsterMultiattack,
+  formatMonsterParryResponse,
+  formatMonsterParryTrigger,
   formatMonsterSaveAction,
+  formatMonsterSpellEntry,
   resolveCreatureTraitGrants,
+  resolveMonsterActionIdentity,
   resolveTraitDisplay,
   systemDefaultArmorClassRules,
 } from '@rpg/contracts'
 
 import { loadSeedEquipment } from '../equipment'
+import { loadSeedSpells } from '../spells'
 import { loadSeedMonsters, seedMonsterSlugs } from './index'
 
 const RULESET = 'srd-cc-5.2.1'
@@ -18,10 +24,30 @@ describe('SRD 5.2.1 monster seed', () => {
   const monsters = loadSeedMonsters(RULESET)
 
   it('loads the system monster seeds validated against monsterSchema', () => {
-    expect(monsters).toHaveLength(5)
+    expect(monsters).toHaveLength(6)
     expect(seedMonsterSlugs(RULESET)).toEqual(
-      new Set(['kobold-warrior', 'skeleton', 'knight', 'mage', 'hell-hound']),
+      new Set(['kobold-warrior', 'skeleton', 'knight', 'mage', 'hell-hound', 'lich']),
     )
+  })
+
+  it('stores the repeated general traits as templates', () => {
+    const kobold = monsters.find((monster) => monster.slug === 'kobold-warrior')
+    const hound = monsters.find((monster) => monster.slug === 'hell-hound')
+    expect(kobold?.traits).toEqual([
+      expect.objectContaining({
+        id: 'pack-tactics',
+        kind: 'template',
+        templateId: 'pack-tactics',
+      }),
+      expect.objectContaining({
+        id: 'sunlight-sensitivity',
+        kind: 'template',
+        templateId: 'sunlight-sensitivity',
+      }),
+    ])
+    expect(hound?.traits).toEqual([
+      expect.objectContaining({ id: 'pack-tactics', kind: 'template', templateId: 'pack-tactics' }),
+    ])
   })
 
   it('derives kobold warrior AC and dagger attack from catalog equipment', () => {
@@ -39,12 +65,31 @@ describe('SRD 5.2.1 monster seed', () => {
       expect.objectContaining({ status: 'resolved', value: expect.objectContaining({ ac: 14 }) }),
     )
     expect(block.attacks.find((line) => line.id === 'dagger')?.attackBonus).toBe(4)
+    expect(formatMonsterAttackAction(block.attacks.find((line) => line.id === 'dagger')!)).toBe(
+      'Melee or Ranged Attack Roll: +4, reach 5 ft. or range 20/60 ft. Hit: 4 (1d4 + 2) Piercing damage.',
+    )
+    const skeleton = monsters.find((monster) => monster.slug === 'skeleton')
+    const skeletonBlock = deriveMonsterStatBlock({
+      monster: skeleton!,
+      equipmentCatalog,
+      skillCatalog: new Map(),
+      armorClassRules: systemDefaultArmorClassRules(),
+      magicPropertyProvider: () => undefined,
+    })
+    expect(
+      formatMonsterAttackAction(skeletonBlock.attacks.find((line) => line.id === 'shortsword')!),
+    ).toBe('Melee Attack Roll: +5, reach 5 ft. Hit: 6 (1d6 + 3) Piercing damage.')
+    expect(
+      formatMonsterAttackAction(skeletonBlock.attacks.find((line) => line.id === 'shortbow')!),
+    ).toBe('Ranged Attack Roll: +5, range 80/320 ft. Hit: 6 (1d6 + 3) Piercing damage.')
     expect(kobold!.traits.map((trait) => trait.kind)).toEqual(['template', 'template'])
+    expect(kobold!.traits[0]).not.toHaveProperty('descriptionOverride')
+    expect(kobold!.traits[1]).not.toHaveProperty('descriptionOverride')
     expect(resolveTraitDisplay(kobold!.traits[0]!).descriptionHtml).toContain(
-      'The kobold has Advantage',
+      'This creature has Advantage',
     )
     expect(resolveTraitDisplay(kobold!.traits[1]!).descriptionHtml).toContain(
-      'ability checks and attack rolls',
+      'this creature has Disadvantage',
     )
     const grants = resolveCreatureTraitGrants(
       kobold!.traits.map((trait) => ({ trait, source: trait.id })),
@@ -86,13 +131,21 @@ describe('SRD 5.2.1 monster seed', () => {
       attackBonus: 5,
       damage: '10',
       damageExpression: '2d6+3',
-      additionalDamage: [{ average: 4, expression: '1d8', damageTypeLabel: 'Radiant' }],
+      onHit: [
+        {
+          kind: 'damage',
+          source: 'action',
+          average: 4,
+          expression: '1d8',
+          damageTypeId: 'radiant',
+        },
+      ],
     })
     expect(knight.attacks.find((line) => line.id === 'heavy-crossbow')).toMatchObject({
       attackBonus: 2,
       damage: '11',
       damageExpression: '2d10',
-      additionalDamage: [{ average: 4, expression: '1d8' }],
+      onHit: [{ kind: 'damage', source: 'action', average: 4, expression: '1d8' }],
     })
 
     const mage = derive('mage')
@@ -106,6 +159,15 @@ describe('SRD 5.2.1 monster seed', () => {
       damage: '16',
       damageExpression: '3d8+3',
     })
+    expect(
+      formatMonsterAttackAction(mage.attacks.find((line) => line.id === 'arcane-burst')!),
+    ).toBe(
+      'Melee or Ranged Attack Roll: +6, reach 5 ft. or range 120 ft. Hit: 16 (3d8 + 3) Force damage.',
+    )
+    expect(mage.spellcasting.find((line) => line.id === 'spellcasting')).toMatchObject({
+      saveDc: 14,
+      attackBonus: 6,
+    })
 
     const hound = derive('hell-hound')
     expect(hound.initiativeLabel).toBe('+1 (11)')
@@ -117,8 +179,11 @@ describe('SRD 5.2.1 monster seed', () => {
       attackBonus: 5,
       damage: '7',
       damageExpression: '1d8+3',
-      additionalDamage: [{ average: 3, expression: '1d6' }],
+      onHit: [{ kind: 'damage', source: 'action', average: 3, expression: '1d6' }],
     })
+    expect(formatMonsterAttackAction(hound.attacks.find((line) => line.id === 'bite')!)).toBe(
+      'Melee Attack Roll: +5, reach 5 ft. Hit: 7 (1d8 + 3) Piercing damage plus 3 (1d6) Fire damage.',
+    )
   })
 
   it('keeps migrated action ids and generates the agreed stat-block text', () => {
@@ -129,7 +194,17 @@ describe('SRD 5.2.1 monster seed', () => {
     expect(
       knight?.actions.find((action) => action.id === 'parry' || action.kind === 'special'),
     ).toBeUndefined()
-    expect(knight?.reactions.find((action) => action.id === 'parry')?.kind).toBe('special')
+    const parry = knight?.reactions.find((action) => action.id === 'parry')
+    expect(parry).toMatchObject({ kind: 'parry', acBonus: 2 })
+    expect(parry && 'trigger' in parry).toBe(false)
+    if (parry?.kind === 'parry') {
+      expect(formatMonsterParryTrigger(knight?.name ?? '')).toBe(
+        'The knight is hit by a melee attack roll while holding a weapon.',
+      )
+      expect(
+        formatMonsterParryResponse({ monsterName: knight?.name ?? '', acBonus: parry.acBonus }),
+      ).toBe('The knight adds 2 to its AC against that attack, possibly causing it to miss.')
+    }
 
     const formatMultiattack = (monster: NonNullable<typeof knight>) => {
       const action = monster.actions.find((entry) => entry.kind === 'multiattack')
@@ -148,6 +223,34 @@ describe('SRD 5.2.1 monster seed', () => {
       'The knight makes two attacks, using Greatsword or Heavy Crossbow in any combination.',
     )
     expect(formatMultiattack(mage!)).toBe('The mage makes three Arcane Burst attacks.')
+    const spellcasting = mage?.actions.find((action) => action.id === 'spellcasting')
+    expect(spellcasting?.kind).toBe('spell')
+    if (spellcasting?.kind === 'spell' && mage) {
+      const spellsById = new Map(
+        loadSeedSpells(RULESET).map((spell) => [
+          spell.id,
+          {
+            name: spell.name,
+            level: spell.level,
+            castingTime: spell.castingTime,
+            resolution: spell.resolution,
+          },
+        ]),
+      )
+      const rendered = formatMonsterSpellEntry({
+        entry: spellcasting,
+        monsterName: mage.name,
+        section: 'actions',
+        spellsById,
+        catalogStatus: 'ready',
+        spellsInBody: new Map([[spellcasting.id, spellcasting]]),
+        saveDc: 14,
+      })
+      expect(rendered.bodyHtml).toContain(
+        'The mage casts one of the following spells, using Intelligence as the spellcasting ability (spell save DC 14):',
+      )
+      expect(rendered.bodyHtml).not.toContain('spell attack')
+    }
     expect(formatMultiattack(hound!)).toBe('The hell hound makes two Bite attacks.')
 
     const breath = hound?.actions.find((action) => action.id === 'fire-breath')
@@ -156,8 +259,13 @@ describe('SRD 5.2.1 monster seed', () => {
     expect(bite).toMatchObject({ kind: 'natural-weapon', form: 'bite' })
     expect(breath?.provenance?.excerpt?.excerptId).toBe('monsters/hell-hound/fire-breath')
     if (breath?.kind !== 'save' || !hound) return
+    const breathName = resolveMonsterActionIdentity({
+      action: breath,
+      equipmentCatalogStatus: 'ready',
+    }).displayName
     const formatted = formatMonsterSaveAction({
       action: breath,
+      name: breathName,
       abilityScores: hound.abilityScores,
       proficiencyBonus: CHALLENGE_RATING_MECHANICS[hound.challengeRating].proficiencyBonus,
     })
@@ -165,6 +273,70 @@ describe('SRD 5.2.1 monster seed', () => {
     expect(formatted.body).toBe(
       'Dexterity Saving Throw: DC 12, each creature in a 15-foot Cone. Failure: 17 (5d6) Fire damage. Success: Half damage.',
     )
+
+    const lich = monsters.find((monster) => monster.slug === 'lich')
+    expect(lich).toBeDefined()
+    if (lich) {
+      const lichBlock = deriveMonsterStatBlock({
+        monster: lich,
+        equipmentCatalog,
+        skillCatalog: new Map(),
+        armorClassRules: systemDefaultArmorClassRules(),
+        magicPropertyProvider: () => undefined,
+      })
+      expect(lichBlock.hp).toBe(315)
+      expect(lichBlock.ac).toEqual(
+        expect.objectContaining({
+          status: 'resolved',
+          value: expect.objectContaining({ ac: 20 }),
+        }),
+      )
+      expect(lichBlock.initiativeLabel).toBe('+3 (13)')
+      expect(
+        formatMonsterAttackAction(
+          lichBlock.attacks.find((line) => line.id === 'paralyzing-touch')!,
+        ),
+      ).toBe(
+        "Melee Attack Roll: +12, reach 5 ft. Hit: 15 (3d6 + 5) Cold damage, and the target has the Paralyzed condition until the start of the lich's next turn.",
+      )
+      expect(
+        formatMonsterAttackAction(lichBlock.attacks.find((line) => line.id === 'eldritch-burst')!),
+      ).toBe(
+        'Melee or Ranged Attack Roll: +12, reach 5 ft. or range 120 ft. Hit: 31 (4d12 + 5) Force damage.',
+      )
+      expect(formatMultiattack(lich)).toBe(
+        'The lich makes three attacks, using Eldritch Burst or Paralyzing Touch in any combination.',
+      )
+      const casting = lich.actions.find((action) => action.id === 'spellcasting')
+      expect(casting?.kind).toBe('spell')
+      if (casting?.kind === 'spell') {
+        expect(
+          casting.spells.find((spell) => spell.spellId.endsWith(':fireball'))?.castAtLevel,
+        ).toBe(5)
+        expect(
+          casting.spells.find((spell) => spell.spellId.endsWith(':lightning-bolt'))?.castAtLevel,
+        ).toBe(5)
+        expect(
+          casting.spells.find((spell) => spell.spellId.endsWith(':animate-dead'))?.limitedUse,
+        ).toMatchObject({
+          kind: 'uses',
+          count: { kind: 'fixed', value: 2 },
+        })
+        expect(
+          casting.spells.find((spell) => spell.spellId.endsWith(':chain-lightning'))?.limitedUse,
+        ).toMatchObject({
+          kind: 'uses',
+          count: { kind: 'fixed', value: 1 },
+        })
+        expect(casting.spells.some((spell) => spell.spellId.endsWith(':fear'))).toBe(false)
+      }
+      expect(lich.actions.some((action) => action.name === 'Frightening Gaze')).toBe(false)
+      expect(lich.reactions.find((action) => action.id === 'protective-magic')?.kind).toBe('spell')
+      expect(lichBlock.spellcasting.find((line) => line.id === 'spellcasting')).toMatchObject({
+        saveDc: 20,
+        attackBonus: 12,
+      })
+    }
 
     for (const monster of [knight, mage, hound]) {
       if (!monster) continue

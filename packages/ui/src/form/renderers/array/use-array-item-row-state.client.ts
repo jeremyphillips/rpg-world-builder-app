@@ -6,11 +6,15 @@ import { useWatch } from 'react-hook-form'
 import type { ArrayConfig, ArrayFilterSelectFn, ArrayItemConfig } from '../../field-config'
 import { useDependsOnValues } from '../../config/form-depends-on.client'
 import { resolveErrorPlacement } from '../../context/array-item-presentation.context'
+import { collectArraySections } from '../../errors/resolve-field-order'
 import {
   useArrayItemIssues,
   useFormValidationPresentation,
 } from '../../hooks/use-form-validation-presentation.client'
-import { resolveArrayItemIssueSummary } from './array-field-item-issue-summary.lib'
+import {
+  arrayItemIssueSummaries,
+  resolveArrayItemValidationPresentation,
+} from './array-field-item-issue-summary.lib'
 import { resolveShowArrayItemIssueBadge } from './resolve-show-array-item-issue-badge.lib'
 import { useArrayItemFocusIssue } from './use-array-item-focus-issue.client'
 import type { ArrayItemIssueSummaryProps } from './array-item-issue.client'
@@ -30,6 +34,7 @@ export interface UseArrayItemRowStateArgs {
   filterSelectDependsOn?: string[]
   filterSelectOptions?: ArrayFilterSelectFn
   onRemoveItem?: () => void
+  hasVisibleBodyFields?: boolean
 }
 
 export function useArrayItemRowState({
@@ -46,6 +51,7 @@ export function useArrayItemRowState({
   filterSelectDependsOn,
   filterSelectOptions,
   onRemoveItem,
+  hasVisibleBodyFields = true,
 }: UseArrayItemRowStateArgs) {
   const itemPrefix = `${fullName}.${index}`
   const arrayItems = useWatch({ name: fullName, defaultValue: [] }) as unknown[]
@@ -54,8 +60,15 @@ export function useArrayItemRowState({
   const titleId = `${idPrefix}-${fullName}-${itemId}-title`
   const bodyId = `${idPrefix}-${fullName}-${itemId}-body`
   const rowSummaryId = `${idPrefix}-${itemPrefix.replaceAll('.', '-')}-summary`
+  const fieldJoinSummaryId = `${rowSummaryId}-fields`
   const { addValidationSessionExpandKeys } = useFormUiContext()
   const validation = useFormValidationPresentation()
+  const fieldOrder = React.useMemo(() => {
+    const section = collectArraySections(validation.fields).find(
+      (entry) => entry.fullName === fullName,
+    )
+    return section?.fieldOrder ?? []
+  }, [validation.fields, fullName])
   const issueGroup = useArrayItemIssues(fullName, itemPrefix, index)
   const showIssueChrome = validation.shouldShowRowIssues(itemPrefix, issueGroup)
   const suppressFieldErrorText = resolveErrorPlacement(errorPlacement, variant, false)
@@ -85,15 +98,20 @@ export function useArrayItemRowState({
     arrayPattern,
   })
 
-  const issueSummary = resolveArrayItemIssueSummary({
+  const validationPresentation = resolveArrayItemValidationPresentation({
     showIssueChrome,
-    variant,
-    collapsed,
     suppressFieldErrorText,
+    hasVisibleBodyFields,
+    collapsed,
+    itemPrefix,
+    fieldOrder,
+    inactivePaths: validation.inactivePaths,
     issueGroup,
     rowSummaryId,
-    onFocusIssue: focusIssue,
+    fieldJoinSummaryId,
   })
+  const issueSummaries = arrayItemIssueSummaries(validationPresentation)
+  const issueSummary = issueSummaries[0]
   const showIssueBadge = resolveShowArrayItemIssueBadge({
     showIssueChrome,
     variant,
@@ -111,6 +129,9 @@ export function useArrayItemRowState({
     suppressFieldErrorText,
     focusIssue,
     issueSummary: issueSummary as ArrayItemIssueSummaryProps | undefined,
+    issueSummaries,
+    validationPresentation,
+    fieldJoinSummaryId,
     showIssueChrome,
     showIssueBadge,
     issueGroup,

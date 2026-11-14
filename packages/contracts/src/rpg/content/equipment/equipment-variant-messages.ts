@@ -6,6 +6,10 @@ import { defineMessage } from '../../../validation/define-message'
 // ---------------------------------------------------------------------------
 
 export const equipmentVariantValidationMessages = {
+  longRangeExceedsNormal: defineMessage(
+    'validation.equipmentVariant.longRangeExceedsNormal',
+    () => 'Long range must be greater than normal range.',
+  ),
   damageDamageTypeTogether: defineMessage(
     'validation.equipmentVariant.damageDamageTypeTogether',
     () => 'Damage and damage type must both be set or both be left empty.',

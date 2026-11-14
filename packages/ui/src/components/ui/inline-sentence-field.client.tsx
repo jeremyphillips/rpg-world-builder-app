@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { useMemo } from 'react'
 
-import { isFieldOptionGroup, type FieldOption } from '../../form/field-config'
+import { isFieldOptionGroup, type FieldOption } from '../../form/field-config/field-options'
 import { ChipsFieldOptions } from './chips-field.client'
 import type { FieldLabelVisibility } from '../../form/form-heading.lib'
 import type { ChipSize } from './chip.lib'
@@ -235,6 +235,10 @@ function InlineSentenceJoinedPairControl({
           placeholder={start.placeholder}
           hasError={startHasError}
           describedBy={control.describedBy}
+          allowCustom={start.allowCustom}
+          clearable={start.clearable}
+          customMin={start.customMin}
+          customMax={start.customMax}
           onValueChange={(next) => start.onChange?.(next)}
           onBlur={start.onBlur}
         />

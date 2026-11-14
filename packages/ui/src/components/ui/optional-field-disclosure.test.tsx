@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
+import { FieldRowAnatomyProvider } from './field-row-anatomy.context'
 import { TextareaField } from './textarea-field'
 import { OptionalFieldDisclosure } from './optional-field-disclosure.client'
 
@@ -75,11 +76,88 @@ describe('OptionalFieldDisclosure', () => {
     expect(screen.getByRole('textbox', { name: 'Additional behavior' })).toBeInTheDocument()
 
     const removeButton = screen.getByRole('button', { name: 'Remove Additional behavior' })
+    const label = screen.getByText('Additional behavior').closest('label')
     expect(removeButton).toHaveClass('text-foreground', 'text-action-standalone')
+    expect(label).toHaveClass('self-center')
+    expect(label).not.toHaveClass('self-start')
+    expect(label?.parentElement?.parentElement).toHaveClass('items-center')
     expect(container.querySelector('.flex.flex-col.gap-1')).toBeNull()
 
     await user.click(removeButton)
     expect(onRemove).toHaveBeenCalledOnce()
+  })
+
+  it('renders hoisted message content in the row message region when open', () => {
+    const { container } = render(
+      <FieldRowAnatomyProvider>
+        <OptionalFieldDisclosure
+          controlId="note-field"
+          fieldLabel="Long range"
+          addLabel="Add long range"
+          removeLabel="Remove"
+          open
+          onOpenChange={vi.fn()}
+          onRemove={vi.fn()}
+          size="md"
+          message={<p id="note-field-hint">Disadvantage beyond normal range.</p>}
+        >
+          <TextareaField
+            id="note-field"
+            label=""
+            aria-label="Long range"
+            rows={1}
+            width="full"
+            size="md"
+            value=""
+            onChange={vi.fn()}
+          />
+        </OptionalFieldDisclosure>
+      </FieldRowAnatomyProvider>,
+    )
+
+    const participant = container.querySelector('[data-field-row-participant]')
+    if (!participant) throw new Error('expected row participant')
+    const hint = screen.getByText('Disadvantage beyond normal range.')
+    expect(hint.closest('[data-field-message-region]')).not.toBeNull()
+    expect(hint.closest('[data-field-control-region]')).toBeNull()
+  })
+
+  it('places the open control on the row control track beside the label and remove action', () => {
+    const { container } = render(
+      <FieldRowAnatomyProvider>
+        <OptionalFieldDisclosure
+          controlId="note-field"
+          fieldLabel="Cast at level"
+          addLabel="Cast at a higher level"
+          removeLabel="Remove"
+          open
+          onOpenChange={vi.fn()}
+          onRemove={vi.fn()}
+          size="md"
+        >
+          <TextareaField
+            id="note-field"
+            label=""
+            aria-label="Cast at level"
+            rows={1}
+            width="full"
+            size="md"
+            value=""
+            onChange={vi.fn()}
+          />
+        </OptionalFieldDisclosure>
+      </FieldRowAnatomyProvider>,
+    )
+
+    const participant = container.querySelector('[data-field-row-participant]')
+    const labelRegion = container.querySelector('[data-field-label-region]')
+    const controlRegion = container.querySelector('[data-field-control-region]')
+    expect(participant).toHaveClass('row-span-3', 'grid-rows-subgrid')
+    expect(labelRegion).toContainElement(screen.getByText('Cast at level'))
+    expect(labelRegion).toContainElement(
+      screen.getByRole('button', { name: 'Remove Cast at level' }),
+    )
+    expect(controlRegion).toContainElement(screen.getByRole('textbox', { name: 'Cast at level' }))
   })
 
   it('has no accessibility violations when collapsed', async () => {

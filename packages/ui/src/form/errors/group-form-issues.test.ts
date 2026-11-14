@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { buildFieldSummaryText } from './group-form-issues'
+import { buildFieldSummaryText, buildHeaderIssuesSummaryText } from './group-form-issues'
 import type { FormIssue } from './form-issue.types'
 
 function fieldIssue(summaryMessage: string, path: string): FormIssue {
@@ -43,5 +43,29 @@ describe('buildFieldSummaryText', () => {
         fieldIssue('Missing type', 'grants.0.type'),
       ]),
     ).toBe('Missing rarity · Missing quantity · +2 more')
+  })
+})
+
+function headerIssue(message: string, summaryMessage?: string): FormIssue {
+  return {
+    path: 'items.0',
+    message,
+    summaryMessage,
+    severity: 'row',
+    scope: 'item',
+  }
+}
+
+describe('buildHeaderIssuesSummaryText', () => {
+  it('prefers summaryMessage over message', () => {
+    expect(buildHeaderIssuesSummaryText([headerIssue('Long field copy', 'Short row copy')])).toBe(
+      'Short row copy',
+    )
+  })
+
+  it('caps overflow the same way as field summaries', () => {
+    expect(
+      buildHeaderIssuesSummaryText([headerIssue('One'), headerIssue('Two'), headerIssue('Three')]),
+    ).toBe('One · Two · +1 more')
   })
 })

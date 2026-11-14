@@ -4,11 +4,13 @@ import { fieldGroupFlexStackClasses } from '@rpg/ui'
 import { buildItemDefaultValues, type FormItem } from '@rpg/ui/form'
 
 import type { Availability, AvailabilityReason } from '@/lib/availability'
+import type { EmbeddedArrayResolverFieldInput } from '../../lib/forms/validation/tabbed-form-resolver-fields'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { duplicateMasterDetailRow } from '../../lib/master-detail/duplicate-master-detail-row'
 import type { FormEmbeddedMasterDetailAccessConfig } from '../../lib/master-detail/master-detail-access.types'
 import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
 import { masterDetailItemNounLabel } from '../../lib/master-detail/master-detail-constants'
+import type { EmbeddedMasterDetailRow } from '../../lib/master-detail/build-embedded-master-detail-rows'
 import {
   useEmbeddedMasterDetailRows,
   type FormEmbeddedMasterDetailMapListItemContext,
@@ -31,7 +33,7 @@ export interface FormEmbeddedMasterDetailEditorProps {
   formCtx: ContentFormCtx
   /** Parent form field path, e.g. `traits`, `features`, or `heritage.options`. */
   fieldName: string
-  itemFields: FormItem[]
+  itemFields: FormItem[] | EmbeddedArrayResolverFieldInput
   /** Singular noun vocabulary for delete dialog, empty copy, and overflow actions. */
   itemNoun: MasterDetailItemNounTerm
   /** Visible collection title in the list header. */
@@ -39,11 +41,22 @@ export interface FormEmbeddedMasterDetailEditorProps {
   /** Accessible name for the list nav — must remain independent from `listTitle`. */
   ariaLabel: string
   addLabel: string
+  /** Replaces the default Add button without going through `renderAddControl`. */
+  addControl?: ReactNode
+  /** Row-specific detail fields. When omitted, every row uses `itemFields`. */
+  resolveItemFields?: (row: unknown) => FormItem[]
   /** Prefix for detail `FormItems` ids, e.g. `species-trait`. */
   idPrefix: string
   mapListItem: (
     ctx: FormEmbeddedMasterDetailMapListItemContext,
   ) => Pick<MasterDetailListItem, 'title'> & { eyebrow?: string }
+  /** Adjusts the selected detail header without a title render prop. */
+  resolveHeaderIdentity?: (ctx: {
+    row: unknown
+    index: number
+    fieldId: string
+    identity: MasterDetailEditorIdentity
+  }) => MasterDetailEditorIdentity
   /**
    * Optional pre-bound editor state. Pass when the parent must coordinate with
    * `useMasterDetailArray` (e.g. level normalization or cancel a pending delete
@@ -89,6 +102,39 @@ interface FormEmbeddedMasterDetailEditorBodyProps extends Omit<
   editor: UseMasterDetailArrayResult
 }
 
+function resolveEmbeddedDetailFields(
+  itemFields: FormItem[] | EmbeddedArrayResolverFieldInput,
+  resolveItemFields: ((row: unknown) => FormItem[]) | undefined,
+  selectedRow: EmbeddedMasterDetailRow | undefined,
+  rowAt: (index: number) => unknown,
+): FormItem[] {
+  if (!resolveItemFields) {
+    return Array.isArray(itemFields) ? itemFields : []
+  }
+  return resolveItemFields(selectedRow ? rowAt(selectedRow.formIndex) : undefined)
+}
+
+function embeddedCampaignAccessDialog(input: {
+  access: FormEmbeddedMasterDetailAccessConfig | undefined
+  formCtx: ContentFormCtx
+  fieldName: string
+  idPrefix: string
+  selectedRow: EmbeddedMasterDetailRow | undefined
+  dialogRef: RefObject<HTMLDivElement | null>
+}): ReactNode {
+  if (input.access?.kind !== 'campaignAccess' || !input.selectedRow) return null
+  return (
+    <MasterDetailBodyCampaignAccessDialogFields
+      access={input.access}
+      formCtx={input.formCtx}
+      fieldName={input.fieldName}
+      idPrefix={input.idPrefix}
+      selectedRow={input.selectedRow}
+      dialogRef={input.dialogRef}
+    />
+  )
+}
+
 function FormEmbeddedMasterDetailEditorBody({
   formCtx,
   fieldName,
@@ -97,8 +143,11 @@ function FormEmbeddedMasterDetailEditorBody({
   listTitle,
   ariaLabel,
   addLabel,
+  addControl: addControlProp,
+  resolveItemFields,
   idPrefix,
   mapListItem,
+  resolveHeaderIdentity,
   editor,
   showDelete = true,
   leadingContent,
@@ -170,18 +219,31 @@ function FormEmbeddedMasterDetailEditorBody({
     if (copy) editor.appendRow(copy)
   }, [editor, rows])
 
-  const addControl = renderAddControl?.({ append: editor.appendRow })
-  const campaignAccessDialog =
-    access?.kind === 'campaignAccess' && rows.selectedRow ? (
-      <MasterDetailBodyCampaignAccessDialogFields
-        access={access}
-        formCtx={formCtx}
-        fieldName={fieldName}
-        idPrefix={idPrefix}
-        selectedRow={rows.selectedRow}
-        dialogRef={rows.availabilityDialogRef}
-      />
-    ) : null
+  const selectedIdentity =
+    rows.selectedIdentity && resolveHeaderIdentity && rows.selectedRow
+      ? resolveHeaderIdentity({
+          row: rows.rowAt(rows.selectedRow.formIndex),
+          index: rows.selectedRow.formIndex,
+          fieldId: rows.selectedRow.fieldId,
+          identity: rows.selectedIdentity,
+        })
+      : rows.selectedIdentity
+
+  const detailFields = resolveEmbeddedDetailFields(
+    itemFields,
+    resolveItemFields,
+    rows.selectedRow,
+    rows.rowAt,
+  )
+  const addControl = addControlProp ?? renderAddControl?.({ append: editor.appendRow })
+  const campaignAccessDialog = embeddedCampaignAccessDialog({
+    access,
+    formCtx,
+    fieldName,
+    idPrefix,
+    selectedRow: rows.selectedRow,
+    dialogRef: rows.availabilityDialogRef,
+  })
 
   return (
     <EmbeddedMasterDetailLayout
@@ -198,11 +260,11 @@ function FormEmbeddedMasterDetailEditorBody({
       addControl={addControl}
       onAdd={editor.handleAdd}
       editor={editor}
-      itemFields={itemFields}
+      itemFields={detailFields}
       fieldName={fieldName}
       idPrefix={idPrefix}
       showSelectedDetail={isSelectedRowVisible}
-      selectedIdentity={rows.selectedIdentity}
+      selectedIdentity={selectedIdentity}
       campaignId={formCtx.campaignId}
       rowAvailability={rows.selectedRowAvailability}
       availabilityFormItems={rows.availabilityFormItems}
@@ -267,7 +329,7 @@ function EmbeddedMasterDetailLayout({
   addControl?: ReactNode
   onAdd: () => void
   editor: UseMasterDetailArrayResult
-  itemFields: FormItem[]
+  itemFields: FormItem[] | EmbeddedArrayResolverFieldInput
   fieldName: string
   idPrefix: string
   showSelectedDetail: boolean
@@ -344,7 +406,9 @@ function FormEmbeddedMasterDetailEditorWithHook({
   ...props
 }: Omit<FormEmbeddedMasterDetailEditorProps, 'editor'>) {
   const makeItemDefaults = useCallback(
-    () => makeItemDefaultsProp?.() ?? buildItemDefaultValues(props.itemFields),
+    () =>
+      makeItemDefaultsProp?.() ??
+      buildItemDefaultValues(Array.isArray(props.itemFields) ? props.itemFields : []),
     [makeItemDefaultsProp, props.itemFields],
   )
   const editor = useMasterDetailArray(props.fieldName, makeItemDefaults)

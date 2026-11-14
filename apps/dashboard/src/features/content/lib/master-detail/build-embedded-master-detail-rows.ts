@@ -34,9 +34,15 @@ export type BuildEmbeddedMasterDetailRowsParams = {
     row: unknown
     entityCatalogLayer: ContentFormCtx['entityCatalogLayer']
     getRowIssueCount: (index: number) => number
-  }) => Pick<MasterDetailListItem, 'title'> & { eyebrow?: string }
+  }) => Pick<MasterDetailListItem, 'title'> & {
+    eyebrow?: string
+    kindLabel?: string
+    summary?: string
+  }
   getRowIssueCount: (index: number) => number
-  seedRowIds?: ReadonlySet<string>
+  persistedRowIds?: ReadonlySet<string>
+  systemOriginRowIds?: ReadonlySet<string>
+  sectionLabel?: string
   resolveRowReasons?: (ctx: {
     row: unknown
     rowKey: string
@@ -75,7 +81,9 @@ export function buildEmbeddedMasterDetailRows({
   access,
   mapListItem,
   getRowIssueCount,
-  seedRowIds,
+  persistedRowIds,
+  systemOriginRowIds,
+  sectionLabel,
   resolveRowReasons,
 }: BuildEmbeddedMasterDetailRowsParams): EmbeddedMasterDetailRow[] {
   return fields.map((field, formIndex) => {
@@ -98,10 +106,14 @@ export function buildEmbeddedMasterDetailRows({
       index: formIndex,
       row: row as { id?: string } | undefined,
       entityCatalogLayer: formCtx.entityCatalogLayer,
-      seedRowIds,
+      persistedRowIds,
+      systemOriginRowIds,
       getRowIssueCount,
       title: masterDetailItemTitle(listDisplay.title, itemNoun),
       eyebrow: listDisplay.eyebrow,
+      kindLabel: listDisplay.kindLabel,
+      summary: listDisplay.summary,
+      sectionLabel,
       showDelete,
       extraReasons,
     })

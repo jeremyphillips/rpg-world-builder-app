@@ -1,4 +1,4 @@
-import { sortFormIssues } from './group-form-issues'
+import { countIssueClaimTargets, sortFormIssues } from './group-form-issues'
 import { collectArraySections } from './resolve-field-order'
 import type { FormIssue } from './form-issue.types'
 import type { FormItem } from '../field-config'
@@ -116,10 +116,19 @@ export function resolveTabValidationState(
     issuesByTab.set(tab.id, [])
   }
 
+  const orphanIssues: FormIssue[] = []
+
   for (const issue of issues) {
     const tabId = findOwningTabId(issue.path, tabs, tabPrefixes)
-    if (!tabId) continue
+    if (!tabId) {
+      orphanIssues.push(issue)
+      continue
+    }
     issuesByTab.get(tabId)?.push(issue)
+  }
+
+  if (orphanIssues.length > 0 && tabs.length > 0) {
+    issuesByTab.get(tabs[0]!.id)?.push(...orphanIssues)
   }
 
   return tabs.map((tab) => {
@@ -127,7 +136,7 @@ export function resolveTabValidationState(
     const sorted = sortIssuesForTab(tabIssues, fields)
     return {
       tabId: tab.id,
-      count: sorted.length,
+      count: countIssueClaimTargets(sorted),
       firstIssuePath: sorted[0]?.path,
       issues: sorted,
     }

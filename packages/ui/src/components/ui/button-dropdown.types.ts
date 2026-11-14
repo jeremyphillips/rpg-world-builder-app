@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react'
 
 import type { ButtonVariantProps } from './button.variants'
-import type { WeightedSearchField } from '../../lib/search'
+import type { PickerSearchOptions } from '../../lib/picker-search.types'
+
+export type { PickerSearchOptions } from '../../lib/picker-search.types'
 
 export type ButtonDropdownWidth = 'full' | 'fit'
 
@@ -10,7 +12,9 @@ export type ButtonDropdownItem = {
   label: string
   metadata?: string
   groupId?: string
-  searchTerms?: WeightedSearchField[]
+  searchTerms?: readonly string[]
+  aliases?: readonly string[]
+  search?: PickerSearchOptions
   disabled?: boolean
   note?: string
 }

@@ -5,6 +5,7 @@ import { activationTriggerSchema } from '../../primitives/activation-trigger'
 import { ACTION_ECONOMY_ENTRIES } from '../action-economy'
 import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
 import type { GameTermEntry, VocabularyTerm } from '../types'
+import { TIME_UNIT_ENTRIES } from '../time-unit'
 import { spellValidationMessages } from './spell-messages'
 
 // ---------------------------------------------------------------------------
@@ -22,8 +23,8 @@ export const CASTING_TIME_UNIT_TERM = {
 
 export const CASTING_TIME_UNIT_ENTRIES = {
   ...ACTION_ECONOMY_ENTRIES,
-  minute: { label: 'Minute', description: 'Casting takes one or more minutes.' },
-  hour: { label: 'Hour', description: 'Casting takes one or more hours.' },
+  minute: TIME_UNIT_ENTRIES.minute,
+  hour: TIME_UNIT_ENTRIES.hour,
 } as const satisfies Record<string, GameTermEntry>
 
 export type CastingTimeUnit = keyof typeof CASTING_TIME_UNIT_ENTRIES

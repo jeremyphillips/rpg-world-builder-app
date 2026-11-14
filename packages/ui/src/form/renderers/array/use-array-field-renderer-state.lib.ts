@@ -29,7 +29,7 @@ export function resolveArrayAppendAvailability(options: {
 
 export function resolveArrayValidationCounts(options: {
   fullName: string
-  hasAttemptedSubmit: boolean
+  showValidationCounts: boolean
   issues: readonly FormIssue[]
 }): {
   containerIssue: FormIssue | undefined
@@ -37,12 +37,12 @@ export function resolveArrayValidationCounts(options: {
   invalidRowCount: number
   arrayIssueCount: number
 } {
-  const { fullName, hasAttemptedSubmit, issues } = options
+  const { fullName, showValidationCounts, issues } = options
   const containerIssue = issues.find((issue) => issue.path === fullName)
   return {
     containerIssue,
     hasContainerIssue: containerIssue !== undefined,
-    invalidRowCount: hasAttemptedSubmit ? countInvalidArrayItems(issues, fullName) : 0,
-    arrayIssueCount: hasAttemptedSubmit ? countIssuesForArrayPath(issues, fullName) : 0,
+    invalidRowCount: showValidationCounts ? countInvalidArrayItems(issues, fullName) : 0,
+    arrayIssueCount: showValidationCounts ? countIssuesForArrayPath(issues, fullName) : 0,
   }
 }

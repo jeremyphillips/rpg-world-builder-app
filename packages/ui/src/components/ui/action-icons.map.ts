@@ -18,6 +18,7 @@ export const ACTION_ICON_VERBS = [
   'overflow',
   'overflowVertical',
   'overflowMenu',
+  'replace',
   'waypoints',
 ] as const
 
@@ -42,6 +43,7 @@ export const ACTION_ICONS = {
   overflow: 'ellipsis',
   overflowVertical: 'ellipsis-vertical',
   overflowMenu: 'ellipsis',
+  replace: 'arrow-left-right',
   waypoints: 'waypoints',
 } as const satisfies Record<ActionIconVerb, IconName>
 

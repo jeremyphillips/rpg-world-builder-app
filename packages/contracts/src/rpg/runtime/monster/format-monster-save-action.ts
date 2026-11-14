@@ -1,12 +1,14 @@
 import type { MonsterAction } from '../../content/monster/action'
+import { formatResolutionTargetFromParts } from '../../content/lib/resolution/format-target'
+import { formatAreaOccupantCreaturePhrase } from '../../content/lib/resolution/format-target-composition'
 import { formatAreaGeometry } from '../../primitives/area-geometry'
 import { limitedUseSchema } from '../../primitives/limited-use'
 import type { Ability } from '../../vocab/ability'
 import { getAbilityLabel } from '../../vocab/ability'
-import { getDamageTypeLabel } from '../../vocab/damage/vocabulary'
 import { abilityModifier } from '../creature/ability-modifier'
 import { abilitySaveDc } from '../creature/spell-dc'
 import { resolveStatBlockDamagePart } from '../creature/stat-block-average'
+import { formatStatBlockDamageComponent } from './format-stat-block-damage'
 import { formatMonsterLimitedUseHeading } from './spell-entry-presentation'
 
 type SaveAction = Extract<MonsterAction, { kind: 'save' }>
@@ -19,7 +21,7 @@ function saveDc(args: {
 }): number | undefined {
   const source = args.action.dcSource
   if (!source) return undefined
-  if (source.kind === 'spell') {
+  if (source.kind === 'spellcasting') {
     if (args.spellcastingAbilityScore === undefined) return undefined
     return abilitySaveDc(args.spellcastingAbilityScore, args.proficiencyBonus)
   }
@@ -35,7 +37,11 @@ function damageClause(
 ): string {
   if (amount === 'half') return 'Half damage.'
   const part = resolveStatBlockDamagePart(effect.roll, 0)
-  return `${part.average} (${part.expression}) ${getDamageTypeLabel(effect.damageType)} damage.`
+  return `${formatStatBlockDamageComponent({
+    average: part.average,
+    expression: part.expression,
+    damageTypeId: effect.damageType,
+  })}.`
 }
 
 function outcomeSentence(
@@ -58,17 +64,13 @@ function outcomeSentence(
 function selectionPhrase(action: SaveAction): string {
   const resolution = action.resolution
   if (resolution.selectionMode === 'self' && resolution.areaOfEffect) {
-    return `each creature in a ${formatAreaGeometry(resolution.areaOfEffect, 'stat-block')}`
+    const occupant = formatAreaOccupantCreaturePhrase(resolution.occupantRequirements)
+    return `each ${occupant} in a ${formatAreaGeometry(resolution.areaOfEffect, 'stat-block')}`
   }
   if (resolution.selectionMode === 'targets' && resolution.target) {
-    const proximity = resolution.target.proximity
-    const distance =
-      proximity.kind === 'distance'
-        ? `${proximity.distance.value} feet`
-        : proximity.kind === 'reach' && proximity.distance
-          ? `${proximity.distance.value} feet`
-          : 'reach'
-    return `one creature within ${distance}`
+    const sentence = formatResolutionTargetFromParts(resolution.target)
+    if (!sentence) return 'the target'
+    return sentence.charAt(0).toLowerCase() + sentence.slice(1)
   }
   return 'the target'
 }
@@ -76,6 +78,8 @@ function selectionPhrase(action: SaveAction): string {
 /** SRD stat-block heading and body for a monster saving-throw action. */
 export function formatMonsterSaveAction(args: {
   action: SaveAction
+  /** Resolved display name. Limited-use suffix is applied here and nowhere else. */
+  name: string
   abilityScores: Record<Ability, number>
   proficiencyBonus: number
   spellcastingAbilityScore?: number
@@ -88,7 +92,7 @@ export function formatMonsterSaveAction(args: {
       ? getAbilityLabel(resolution.method.ability)
       : 'Saving throw'
   const limitedUse = limitedUseSchema.safeParse(action.limitedUse).data
-  const heading = formatMonsterLimitedUseHeading(action.name, limitedUse)
+  const heading = formatMonsterLimitedUseHeading(args.name, limitedUse)
   const failed = resolution.outcomes.find((outcome) => outcome.result === 'failed-save')
   const saved = resolution.outcomes.find((outcome) => outcome.result === 'successful-save')
   const sentences = [

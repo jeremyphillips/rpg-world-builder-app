@@ -17,6 +17,7 @@ import { NumberStepper } from '../../components/ui/number-stepper.client'
 import { resolveNumberStepperSizeFromFieldSize } from '../../components/ui/number-stepper.variants'
 import { RadioCardField } from '../../components/ui/radio-card-field'
 import { RadioGroupField } from '../../components/ui/radio-group-field'
+import { SegmentedControlField } from '../../components/ui/segmented-control-field.client'
 import { SwitchField } from '../../components/ui/switch-field'
 import { TextareaField } from '../../components/ui/textarea-field'
 import { TextField } from '../../components/ui/text-field'
@@ -26,7 +27,7 @@ import type { FieldSize } from '../../components/ui/field.client'
 import { useFileFieldRemotePreview } from '../context/file-field-props.context'
 import { useFieldErrorPresentation } from '../context/array-item-presentation.context'
 import { resolveFieldConfigBoundNames } from '../field-config'
-import { resolveNestedFieldErrorMessage } from '../errors/resolve-field-error-message'
+import { mergeFieldConfigWithInteractivity } from './field-renderer-interactivity.lib'
 import { DiceFormulaFieldRenderer } from './fields/dice-formula-field-renderer.client'
 import {
   buildFieldRendererIds,
@@ -43,6 +44,7 @@ import { renderSpecializedField } from './fields/field-renderer-specialized.clie
 import {
   OptionalDisclosureRichTextFieldRenderer,
   OptionalDisclosureSelectFieldRenderer,
+  OptionalDisclosureTextFieldRenderer,
   OptionalDisclosureTextareaFieldRenderer,
   OptionalDisclosureTextSuggestionsFieldRenderer,
 } from './fields/optional-disclosure-field-renderer.client'
@@ -290,6 +292,36 @@ const fieldRenderers: {
       ref={field.ref}
       value={field.value ?? ''}
       onChange={field.onChange}
+      onBlur={field.onBlur}
+    />
+  ),
+  segmentedControl: ({
+    config,
+    controlSize,
+    field,
+    id,
+    hint,
+    hintPosition,
+    labelVisibility,
+    ...validation
+  }) => (
+    <SegmentedControlField
+      id={id}
+      {...pickFieldChromeProps(config)}
+      label={config.label}
+      labelVisibility={labelVisibility}
+      options={config.options}
+      {...fieldValidationProps(validation)}
+      hint={hint}
+      hintPosition={hintPosition}
+      info={config.info}
+      required={config.required}
+      width={config.width}
+      disabled={config.disabled}
+      size={controlSize}
+      fullWidth={config.fullWidth}
+      value={field.value != null && field.value !== '' ? String(field.value) : ''}
+      onValueChange={field.onChange}
       onBlur={field.onBlur}
     />
   ),
@@ -653,6 +685,11 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
   const resolved = resolveFieldRenderConfig(chromedConfig, density, dynamicValues, optionValues, {
     inAnatomyRow,
   })
+  const mergedRenderConfig = mergeFieldConfigWithInteractivity(
+    chromedConfig,
+    resolved.config,
+    dynamicValues,
+  )
 
   const specialized = renderSpecializedField({
     renderConfig: resolved.config,
@@ -721,7 +758,7 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
   return wrapFieldDerivedMetaPresentation(
     <StandardFieldRenderer
       config={chromedConfig}
-      renderConfig={resolved.config as StandardFieldConfig}
+      renderConfig={mergedRenderConfig as StandardFieldConfig}
       controlSize={resolved.controlSize}
       hint={resolved.hint}
       hintPosition={resolved.hintPosition}
@@ -777,7 +814,6 @@ function StandardFieldRenderer({
     defaultValue: fieldDefaultValue(config),
   })
   const formState = useFormState({ name: fullName, exact: true })
-  const { errors } = useFormState()
   const liveError = getFieldState(fullName, formState).error
   const boundPaths = React.useMemo(
     () =>
@@ -804,13 +840,25 @@ function StandardFieldRenderer({
   }
   const remotePreview = useFileFieldRemotePreview(resolveFieldConfigPrimaryName(config))
   const validation = useFieldErrorPresentation(
-    liveError?.message ??
-      fieldState.error?.message ??
-      resolveNestedFieldErrorMessage(errors, fullName),
+    liveError?.message ?? fieldState.error?.message,
     fullName,
   )
   assertOptionalDisclosureFieldConfig(config)
   const labelVisibility = resolveFieldLabelVisibility(config)
+
+  if (renderConfig.type === 'text' && renderConfig.optionalDisclosure) {
+    return (
+      <OptionalDisclosureTextFieldRenderer
+        config={renderConfig}
+        disclosure={renderConfig.optionalDisclosure}
+        field={progressiveField}
+        id={id}
+        hint={hint}
+        hintPosition={hintPosition}
+        {...validation}
+      />
+    )
+  }
 
   if (renderConfig.type === 'textarea' && renderConfig.optionalDisclosure) {
     return (

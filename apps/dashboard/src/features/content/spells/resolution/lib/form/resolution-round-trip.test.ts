@@ -76,14 +76,14 @@ describe('spell resolution round trips', () => {
     const formValues = resolutionToForm(ELDRITCH_BLAST_RESOLUTION)
     expect(formValues?.methodKind).toBe('attack')
     expect(formValues?.attackType).toBe('ranged-spell')
-    expect(formValues?.proximityKind).toBe('distance')
-    expect(formValues?.proximityDistanceFt).toBe(120)
+    expect(formValues?.target?.proximity.kind).toBe('distance')
+    expect(formValues?.target?.proximity.distance?.value).toBe(120)
   })
 
   it('chill-touch: preserves melee reach and hit outcome note in outcomes', () => {
     const formValues = resolutionToForm(CHILL_TOUCH_RESOLUTION)
     expect(formValues?.attackType).toBe('melee-spell')
-    expect(formValues?.proximityKind).toBe('reach')
+    expect(formValues?.target?.proximity.kind).toBe('reach')
     const hitOutcome = formValues?.outcomes?.find((outcome) => outcome.result === 'hit')
     expect(hitOutcome?.note).toContain("can't regain Hit Points")
     expect(formValues?.outcomes?.find((outcome) => outcome.result === 'miss')).toEqual({

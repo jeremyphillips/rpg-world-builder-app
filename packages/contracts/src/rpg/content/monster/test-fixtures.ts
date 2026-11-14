@@ -1,5 +1,11 @@
 import type { SpellCastingTime } from '../../vocab/spell/casting-time'
 
+type MonsterFixtureSpellRef = {
+  name: string
+  castingTime: SpellCastingTime
+  resolution?: { method?: { kind?: string } }
+}
+
 const RULESET = 'srd-cc-5.2.1'
 
 function castingTime(unit: SpellCastingTime['normal']['unit'], trigger?: string): SpellCastingTime {
@@ -47,10 +53,7 @@ export const MONSTER_FIXTURE_SPELLS = {
   mistyStep: spell('misty-step', 'Misty Step', 'bonus-action'),
 } as const
 
-export function monsterFixtureSpellLookup(): Map<
-  string,
-  { name: string; castingTime: SpellCastingTime }
-> {
+export function monsterFixtureSpellLookup(): Map<string, MonsterFixtureSpellRef> {
   return new Map(
     Object.values(MONSTER_FIXTURE_SPELLS).map((entry) => [
       entry.id,
@@ -109,6 +112,7 @@ export const PROFICIENCY_BONUS_ACTION = {
 export const SPELLCASTING_ACTION = {
   id: 'spellcasting',
   kind: 'spell' as const,
+  profile: 'primary' as const,
   name: 'Spellcasting',
   castingAbility: { kind: 'ability' as const, ability: 'int' as const },
   omittedComponents: ['material' as const],
@@ -148,4 +152,66 @@ export const SHIELD_CONDITION_REACTION = {
   castingAbility: { kind: 'shared' as const, entryId: 'spellcasting' },
   trigger: { text: 'The archmage can see the attacker.' },
   spells: [{ spellId: MONSTER_FIXTURE_SPELLS.shield.id }],
+}
+
+export const MONSTER_TEST_BODY = {
+  name: 'Test',
+  sizes: ['medium'],
+  creatureType: 'humanoid',
+  alignment: 'n',
+  abilityScores: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
+  armorClass: {},
+  hitPoints: { kind: 'hit-dice', count: 1 },
+  movement: { walk: 30 },
+  senses: [],
+  communication: {},
+  challengeRating: '0',
+  proficiencies: { savingThrows: [], skills: [], languages: [], weapons: [] },
+  defenses: {
+    vulnerabilities: [],
+    resistances: [],
+    immunities: [],
+    conditionImmunities: [],
+  },
+} as const
+
+export const MONSTER_TEST_INPUT = {
+  slug: 'test-monster',
+  ...MONSTER_TEST_BODY,
+} as const
+
+export const BITE_ACTION = {
+  id: 'bite',
+  kind: 'natural-weapon',
+  name: 'Bite',
+  mode: 'melee',
+  reach: 5,
+  damage: { dice: { count: 1, faces: 6 } },
+  damageType: 'piercing',
+}
+
+export const FIRE_DAMAGE = {
+  id: 'damage',
+  kind: 'damage' as const,
+  roll: { dice: { count: 2, faces: 6 } },
+  damageType: 'fire',
+}
+
+export const CONE_AREA = { shape: 'cone' as const, length: { value: 15, unit: 'ft' as const } }
+
+export function monsterSaveAction(resolution: Record<string, unknown>) {
+  return {
+    id: 'breath',
+    kind: 'save' as const,
+    name: 'Fire Breath',
+    dcSource: { kind: 'ability' as const, ability: 'con' as const, proficient: true },
+    resolution,
+  }
+}
+
+export function issueMessages(result: {
+  success: boolean
+  error?: { issues: { path: PropertyKey[]; message: string }[] }
+}) {
+  return result.success ? [] : (result.error?.issues ?? []).map((issue) => issue.message)
 }
