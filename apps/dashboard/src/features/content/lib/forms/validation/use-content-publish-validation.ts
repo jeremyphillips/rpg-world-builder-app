@@ -3,7 +3,7 @@ import { useFormContext, useWatch, type FieldValues } from 'react-hook-form'
 import type { ZodType } from 'zod'
 import {
   collectTabbedFormResolverItems,
-  formIssuesFromZodIssues,
+  prepareFormIssues,
   resolveTabValidationState,
   safeParseWithFieldErrors,
   type FormIssue,
@@ -31,7 +31,7 @@ function computePublishValidation<TValues extends FieldValues>(
     return { isPublishReady: true, issues: [], invalidTabIds: new Set() }
   }
 
-  const issues = formIssuesFromZodIssues(parsed.error.issues)
+  const issues = prepareFormIssues(parsed.error.issues, fields, values as Record<string, unknown>)
   const tabStates = resolveTabValidationState(issues, tabs, fields)
   return {
     isPublishReady: false,

@@ -10,6 +10,8 @@ import {
   type FormItem,
 } from '../field-config'
 import { buildFieldRegistry, makeFieldErrorMap } from '../config/field-error-map'
+import { prepareFormIssues } from '../errors/resolve-invalid-submit-navigation'
+import type { FormIssueClaim } from '../errors/form-issue.types'
 import { collectSchemaLeafPaths } from './collect-schema-paths.lib'
 
 /** Patterns that indicate Zod's built-in default copy slipped through. */
@@ -26,6 +28,22 @@ export const ZOD_DEFAULT_MESSAGE_PATTERNS: readonly RegExp[] = [
 export type ValidationIssue = {
   path: string
   message: string
+}
+
+export type IssueClaimReportEntry = {
+  path: string
+  message: string
+  presentationPath: string
+  claim: FormIssueClaim
+  severity: string
+}
+
+export type CollectIssueClaimReportOptions = {
+  schema: ZodType
+  values: unknown
+  fields: FormItem[]
+  /** When set, `fields` are relative and visibility reads this path in `values`. */
+  fieldPathPrefix?: string
 }
 
 export type AssertRegistryCoverageOptions = {
@@ -111,6 +129,29 @@ export function buildClearedRequiredDefaults(fields: FormItem[]): Record<string,
 
 export function parseWithFieldErrorMap(schema: ZodType, value: unknown, fields: FormItem[]) {
   return schema.safeParse(value, { error: makeFieldErrorMap(fields) })
+}
+
+export function collectIssueClaimReport(
+  options: CollectIssueClaimReportOptions,
+): IssueClaimReportEntry[] {
+  const result = parseWithFieldErrorMap(options.schema, options.values, options.fields)
+  if (result.success) return []
+
+  const formValues =
+    typeof options.values === 'object' && options.values !== null
+      ? (options.values as Record<string, unknown>)
+      : {}
+  const routed = prepareFormIssues(result.error.issues, options.fields, formValues, {
+    fieldPathPrefix: options.fieldPathPrefix,
+  })
+
+  return routed.map((issue) => ({
+    path: issue.path,
+    message: issue.message,
+    presentationPath: issue.presentationPath ?? issue.path,
+    claim: issue.claim ?? { kind: 'fallback', target: 'form' },
+    severity: issue.severity,
+  }))
 }
 
 export function collectValidationIssues(

@@ -552,6 +552,11 @@ export interface SlotConfig {
   className?: string
   /** When hidden, the slot unmounts and any registered values clear with `shouldUnregister`. */
   visibility?: FieldVisibility
+  /**
+   * Dot paths (same scope as sibling field `name`s) whose validation issues this slot
+   * displays — exact match or prefix ownership.
+   */
+  issuePaths?: readonly string[]
   render: () => ReactNode
   /** Trailing divider after this slot within a group/stack rhythm. */
   separator?: FieldSeparator

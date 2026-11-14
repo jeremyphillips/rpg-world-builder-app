@@ -38,7 +38,11 @@ function prefixFormItem(item: FormItem, prefix: string): FormItem {
   }
 
   if (item.kind === 'slot') {
-    return { ...item, name: joinFieldPath(prefix, item.name) }
+    return {
+      ...item,
+      name: joinFieldPath(prefix, item.name),
+      issuePaths: item.issuePaths?.map((issuePath) => joinFieldPath(prefix, issuePath)),
+    }
   }
 
   if (item.kind === 'row') {

@@ -1,6 +1,9 @@
 import { classifyFormIssues } from './classify-form-issue'
 import { flattenFormIssues } from './flatten-form-issues'
-import { enrichFormIssuesWithPresentationPaths } from './resolve-form-issue-presentation-path.lib'
+import { prefixFormItems } from '../config/prefix-form-items.lib'
+import { routeFormIssues } from './route-form-issues.lib'
+import type { FieldErrors } from 'react-hook-form'
+import { formIssuesFromZodIssues } from './flatten-form-issues'
 import { sortFormIssues } from './group-form-issues'
 import { collectArraySections } from './resolve-field-order'
 import { resolveIssueFocusControlId } from './resolve-issue-focus-target'
@@ -77,10 +80,10 @@ export function resolveInvalidSubmitNavigation(
   options: ResolveInvalidSubmitNavigationOptions,
 ): InvalidSubmitNavigation | undefined {
   const sections = collectArraySections(options.fields)
-  const flatIssues = flattenFormIssues(options.errors)
-  if (flatIssues.length === 0) return undefined
+  const preparedIssues = prepareFormIssues(options.errors, options.fields)
+  if (preparedIssues.length === 0) return undefined
 
-  const classified = flatIssues.map((issue) => {
+  const classified = preparedIssues.map((issue) => {
     const section = sections
       .filter(
         (entry) =>
@@ -117,12 +120,35 @@ export function resolveInvalidSubmitNavigation(
   return { firstIssue, expandKeys, focusControlId }
 }
 
-export function prepareFormIssues(
-  errors: Parameters<typeof flattenFormIssues>[0],
-  fields: FormItem[],
+function isZodIssueList(
+  source: FieldErrors | ReadonlyArray<{ path: PropertyKey[]; message: string }>,
+): source is ReadonlyArray<{ path: PropertyKey[]; message: string }> {
+  return Array.isArray(source)
+}
+
+function flattenIssuesFromSource(
+  source: FieldErrors | ReadonlyArray<{ path: PropertyKey[]; message: string }>,
 ): FormIssue[] {
-  const sections = collectArraySections(fields)
-  const flatIssues = enrichFormIssuesWithPresentationPaths(flattenFormIssues(errors), fields)
+  if (isZodIssueList(source)) {
+    return formIssuesFromZodIssues(source)
+  }
+  return flattenFormIssues(source)
+}
+
+export type PrepareFormIssuesOptions = {
+  fieldPathPrefix?: string
+}
+
+export function prepareFormIssues(
+  source: FieldErrors | ReadonlyArray<{ path: PropertyKey[]; message: string }>,
+  fields: FormItem[],
+  formValues: Record<string, unknown> = {},
+  options?: PrepareFormIssuesOptions,
+): FormIssue[] {
+  const sections = collectArraySections(
+    options?.fieldPathPrefix ? prefixFormItems(fields, options.fieldPathPrefix) : fields,
+  )
+  const flatIssues = routeFormIssues(flattenIssuesFromSource(source), fields, formValues, options)
 
   return flatIssues.map((issue) => {
     const section = sections

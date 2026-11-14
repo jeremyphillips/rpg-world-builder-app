@@ -1,5 +1,7 @@
 export type {
   FormIssue,
+  FormIssueClaim,
+  FormIssueClaimKind,
   FormIssueScope,
   FormIssueSeverity,
   ArrayItemIssueGroup,
@@ -43,6 +45,7 @@ export {
   enrichFormIssuesWithPresentationPaths,
   resolveFormIssuePresentationPath,
 } from './resolve-form-issue-presentation-path.lib'
+export { routeFormIssues, FORM_ISSUE_ROUTING_FALLBACK_LOG } from './route-form-issues.lib'
 export {
   buildValidationSessionExpandKey,
   resolveValidationExpandKeys,

@@ -61,7 +61,10 @@ export function useFormValidationPresentation(fieldsOverride?: FormItem[]) {
   const fields = fieldsOverride ?? contextFields
   const formValues = useWatch() as Record<string, unknown>
   const { errors, touchedFields } = useFormState()
-  const rhfIssues = React.useMemo(() => prepareFormIssues(errors, fields), [errors, fields])
+  const rhfIssues = React.useMemo(
+    () => prepareFormIssues(errors, fields, formValues ?? {}),
+    [errors, fields, formValues],
+  )
   const rawIssues =
     publishPresentationEnabled && hasAttemptedPublish ? publishPresentationIssues : rhfIssues
   const inactivePaths = React.useMemo(

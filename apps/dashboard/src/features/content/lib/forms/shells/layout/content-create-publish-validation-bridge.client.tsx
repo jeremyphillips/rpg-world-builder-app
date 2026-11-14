@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef } from 'react'
 import { useFormContext, type FieldValues } from 'react-hook-form'
 import type { ZodType } from 'zod'
-import { FormUiContext, type FormIssue, type FormItem } from '@rpg/ui/form'
+import { FormUiContext, prepareFormIssues, type FormItem } from '@rpg/ui/form'
 
 import { applyContentPublishValidation } from '../../validation/content-publish-validation.lib'
 
@@ -33,23 +33,27 @@ export function ContentCreatePublishValidationBridge({
 
     if (Object.keys(form.formState.errors).length === 0) return
 
-    const issues = applyContentPublishValidation(
+    const applied = applyContentPublishValidation(
       form,
       publishSchema,
       form.getValues(),
       publishFields,
     )
-    if (!issues) return
+    if (!applied) return
+
+    const values = form.getValues()
+    const issues = prepareFormIssues(
+      applied.map((issue) => ({
+        path: issue.path.split('.'),
+        message: issue.message,
+      })),
+      publishFields,
+      values as Record<string, unknown>,
+    )
 
     ui.markPublishAttempted()
     onPublishAttempted()
-    onPublishIssuesChange({
-      issues: issues.map((issue) => ({
-        path: issue.path,
-        message: issue.message,
-        severity: 'field',
-      })) satisfies FormIssue[],
-    })
+    onPublishIssuesChange({ issues })
   }, [
     form,
     onPublishAttempted,

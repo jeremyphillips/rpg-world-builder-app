@@ -34,6 +34,22 @@ function defaultScope(issue: FormIssue): FormIssueScope {
   return 'item'
 }
 
+function severityFromClaim(issue: FormIssue): FormIssueSeverity | undefined {
+  switch (issue.claim?.kind) {
+    case 'field':
+    case 'slot':
+      return 'field'
+    case 'row':
+    case 'section':
+      return 'row'
+    case 'form':
+    case 'fallback':
+      return 'row'
+    default:
+      return undefined
+  }
+}
+
 function defaultSeverity(issue: FormIssue, arrayPattern?: ArrayPatternConfig): FormIssueSeverity {
   if (!issue.relativePath) return 'row'
 
@@ -53,6 +69,7 @@ export function classifyFormIssue(
   options: ClassifyFormIssueOptions = {},
 ): FormIssue {
   const severity =
+    severityFromClaim(issue) ??
     options.arrayPattern?.classifyIssueSeverity?.(issue) ??
     defaultSeverity(issue, options.arrayPattern)
 

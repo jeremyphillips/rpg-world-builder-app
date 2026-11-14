@@ -21,6 +21,10 @@ import { resolveArrayRequiredMarker } from './array-field-empty-state.lib'
 import { resolveArrayShowSectionHeader } from './resolve-array-show-section-header.lib'
 import { useArrayFieldAppendControls } from './use-array-field-append-controls.client'
 import {
+  isPresentationSessionExpanded,
+  type PresentationSessionFlags,
+} from '../../errors/resolve-field-error-presentation.lib'
+import {
   resolveArrayAppendAvailability,
   resolveArrayValidationCounts,
 } from './use-array-field-renderer-state.lib'
@@ -111,10 +115,18 @@ export function useArrayFieldRendererState({
     watchedItems,
     getItemValues,
   })
+  const validationCountSession: PresentationSessionFlags = {
+    validationPresentation: validation.validationPresentation,
+    hasAttemptedSubmit: validation.hasAttemptedSubmit,
+    hasAttemptedPublish: validation.hasAttemptedPublish,
+    publishPresentationEnabled: validation.publishPresentationEnabled,
+  }
+  const showValidationCounts = isPresentationSessionExpanded(validationCountSession)
+
   const { containerIssue, hasContainerIssue, invalidRowCount, arrayIssueCount } =
     resolveArrayValidationCounts({
       fullName,
-      hasAttemptedSubmit: validation.hasAttemptedSubmit,
+      showValidationCounts,
       issues: validation.issues,
     })
 
