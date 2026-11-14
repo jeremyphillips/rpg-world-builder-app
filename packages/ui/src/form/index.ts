@@ -444,31 +444,31 @@ export {
   type ArrayItemActionsRailProps,
   type ArrayItemRemoveButtonProps,
   type ArrayItemShellProps,
-} from './renderers/array/array-item-shell.client'
+} from './renderers/array/item/array-item-shell.client'
 export {
   ArrayItemLeadingChromeColumn,
   type ArrayItemLeadingChromeColumnProps,
-} from './renderers/array/array-item-leading-chrome-column.client'
+} from './renderers/array/item/array-item-leading-chrome-column.client'
 export {
   ArrayItemInlineRow,
   type ArrayItemInlineRowProps,
-} from './renderers/array/array-item-inline-row.client'
+} from './renderers/array/item/array-item-inline-row.client'
 export {
   ArrayItemAnatomyGrid,
   type ArrayItemAnatomyGridProps,
-} from './renderers/array/array-item-anatomy-grid.client'
+} from './renderers/array/item/anatomy/array-item-anatomy-grid.client'
 export {
   ArrayItemRowShell,
   type ArrayItemRowShellProps,
-} from './renderers/array/array-item-row-shell.client'
+} from './renderers/array/item/array-item-row-shell.client'
 export {
   useArrayItemRowState,
   type UseArrayItemRowStateArgs,
-} from './renderers/array/use-array-item-row-state.client'
+} from './renderers/array/item/use-array-item-row-state.client'
 export {
   ArrayItemIssueSummary,
   type ArrayItemIssueSummaryProps,
-} from './renderers/array/array-item-issue.client'
+} from './renderers/array/item/issues/array-item-issue.client'
 export { buildFieldRendererIds } from './renderers/field-renderer-config.lib'
 export {
   RelationshipFieldProvider,

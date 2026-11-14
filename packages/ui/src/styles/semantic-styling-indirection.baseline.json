@@ -183,9 +183,9 @@
   "packages/ui/src/components/ui/status-icon.variants.ts:STATUS_ICON_OPTICAL_REDUCED_HEAVY_CLASS:single-semantic-alias",
   "packages/ui/src/form/presentation/form-section-header.variants.ts:formSectionHeaderActionLayoutAlignSingleLineClasses:single-utility-alias",
   "packages/ui/src/form/presentation/form-section-header.variants.ts:formSectionHeaderActionLayoutAlignWithHintClasses:single-utility-alias",
-  "packages/ui/src/form/renderers/array/array-item-anatomy-grid.variants.ts:ARRAY_ITEM_CHROME_GAP_CLASS:single-utility-alias",
-  "packages/ui/src/form/renderers/array/array-item-anatomy-grid.variants.ts:ARRAY_ITEM_FIELD_GAP_DEFAULT_CLASS:single-utility-alias",
-  "packages/ui/src/form/renderers/array/array-item-anatomy-grid.variants.ts:ARRAY_ITEM_FIELD_GAP_DENSE_CLASS:single-utility-alias",
-  "packages/ui/src/form/renderers/array/array-item-toolbar.variants.ts:arrayItemFlatShellRadiusClasses:single-utility-alias",
+  "packages/ui/src/form/renderers/array/item/anatomy/array-item-anatomy-grid.variants.ts:ARRAY_ITEM_CHROME_GAP_CLASS:single-utility-alias",
+  "packages/ui/src/form/renderers/array/item/anatomy/array-item-anatomy-grid.variants.ts:ARRAY_ITEM_FIELD_GAP_DEFAULT_CLASS:single-utility-alias",
+  "packages/ui/src/form/renderers/array/item/anatomy/array-item-anatomy-grid.variants.ts:ARRAY_ITEM_FIELD_GAP_DENSE_CLASS:single-utility-alias",
+  "packages/ui/src/form/renderers/array/item/array-item-toolbar.variants.ts:arrayItemFlatShellRadiusClasses:single-utility-alias",
   "packages/ui/src/form/shells/tabbed-form-error-summary.variants.ts:tabbedFormErrorSummaryMessageClasses:single-utility-alias"
 ]

@@ -10,7 +10,7 @@ import { useFieldArray, useFormContext, useWatch } from 'react-hook-form'
 
 import { registerArrayFieldMutators } from '../../context/array-field-mutators.registry'
 import type { ArrayConfig } from '../../field-config'
-import { type ArrayFieldItemContentProps } from './array-field-item-content.client'
+import { type ArrayFieldItemContentProps } from './item/content/array-field-item-content.client'
 import { ArrayFieldRendererFieldset } from './array-field-renderer-fieldset.client'
 import { useArrayFieldRendererState } from './use-array-field-renderer-state.client'
 

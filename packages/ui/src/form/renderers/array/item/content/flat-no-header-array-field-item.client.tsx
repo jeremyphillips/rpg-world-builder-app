@@ -1,0 +1,170 @@
+'use client'
+
+import * as React from 'react'
+import type { useSortable } from '@dnd-kit/sortable'
+
+import { ArrayFieldContext } from '../../../../context/array-field.context'
+import {
+  ArrayItemPresentationContext,
+  resolveErrorPlacement,
+} from '../../../../context/array-item-presentation.context'
+import type { ResolvedArrayItemHeader } from '../../../../config/array/array-item-config.lib'
+import type { RowConfig, RowFieldItem } from '../../../../field-config'
+import type { ArrayItemIssueSummaryProps } from '../issues/array-item-issue.client'
+import { ArrayItemIssueSummaries } from '../issues/array-item-issue-summaries.client'
+import type { SemanticSurfaceTone } from '../../../../../components/ui/field-surface.variants'
+import { ArrayItemShell } from '../array-item-shell.client'
+import { ArrayItemAnatomyInlineRow } from '../anatomy/array-item-anatomy-inline-row.client'
+import { ArrayItemCompactRow } from '../array-item-compact-row.client'
+import { ArrayItemDragHandleSlot } from '../array-item-drag-handle-slot.client'
+
+export interface FlatNoHeaderArrayFieldItemProps {
+  titleId: string
+  itemPrefix: string
+  reserveDragHandleSlot: boolean
+  collapsible: boolean
+  dragging?: boolean
+  shellClassName?: string
+  idPrefix: string
+  contentLayout: 'inline' | 'stacked'
+  inlineFields?: RowFieldItem[]
+  inlineRow?: RowConfig
+  header: ResolvedArrayItemHeader
+  sortableEnabled: boolean
+  suppressFieldErrorText: boolean
+  rowSummaryId: string
+  arrayContext: React.ComponentProps<typeof ArrayFieldContext.Provider>['value']
+  dragHandleProps?: {
+    attributes: ReturnType<typeof useSortable>['attributes']
+    listeners: ReturnType<typeof useSortable>['listeners']
+    isDragging: boolean
+  }
+  issueSummaries?: readonly ArrayItemIssueSummaryProps[]
+  shellTone?: SemanticSurfaceTone
+  fieldsNode: React.ReactNode
+  actionsRail: React.ReactNode
+}
+
+function FlatNoHeaderStackedContent({
+  issueSummaries,
+  fieldsNode,
+}: {
+  issueSummaries: readonly ArrayItemIssueSummaryProps[]
+  fieldsNode: React.ReactNode
+}) {
+  return (
+    <>
+      <ArrayItemIssueSummaries summaries={issueSummaries} />
+      {fieldsNode}
+    </>
+  )
+}
+
+export function FlatNoHeaderArrayFieldItem({
+  titleId,
+  itemPrefix,
+  reserveDragHandleSlot,
+  collapsible,
+  dragging,
+  shellClassName,
+  idPrefix,
+  itemPrefix: namePrefix,
+  contentLayout,
+  inlineFields,
+  inlineRow,
+  header,
+  sortableEnabled,
+  suppressFieldErrorText,
+  rowSummaryId,
+  arrayContext,
+  dragHandleProps,
+  issueSummaries = [],
+  shellTone,
+  fieldsNode,
+  actionsRail,
+}: FlatNoHeaderArrayFieldItemProps) {
+  const rowPresentation = React.useContext(ArrayItemPresentationContext)
+  const suppressRowFieldErrorText = resolveErrorPlacement(
+    inlineRow?.errorPlacement,
+    'compact',
+    true,
+  )
+  const rowPresentationValue = suppressRowFieldErrorText
+    ? { ...rowPresentation, suppressFieldErrorText: true }
+    : rowPresentation
+
+  const grip = (
+    <ArrayItemDragHandleSlot
+      reserveSlot={reserveDragHandleSlot}
+      sortableEnabled={sortableEnabled}
+      ariaLabel={`Drag to reorder ${header.ariaLabel}`}
+      attributes={dragHandleProps?.attributes}
+      listeners={dragHandleProps?.listeners}
+      compact
+    />
+  )
+
+  const inlineSummary =
+    contentLayout === 'inline' && issueSummaries.length > 0 ? (
+      <ArrayItemIssueSummaries summaries={issueSummaries} />
+    ) : undefined
+
+  const inlineMain =
+    contentLayout === 'inline' && inlineFields ? (
+      <ArrayItemPresentationContext.Provider value={{ suppressFieldErrorText, rowSummaryId }}>
+        <ArrayFieldContext.Provider value={arrayContext}>
+          <ArrayItemAnatomyInlineRow
+            titleId={titleId}
+            ariaLabel={header.ariaLabel}
+            showGrip={reserveDragHandleSlot}
+            inlineFields={inlineFields}
+            inlineRow={inlineRow}
+            idPrefix={idPrefix}
+            namePrefix={namePrefix}
+            rowPresentationValue={rowPresentationValue}
+            grip={grip}
+            actions={actionsRail}
+            summary={inlineSummary}
+          />
+        </ArrayFieldContext.Provider>
+      </ArrayItemPresentationContext.Provider>
+    ) : null
+
+  const stackedMain = (
+    <ArrayItemPresentationContext.Provider value={{ suppressFieldErrorText, rowSummaryId }}>
+      <ArrayFieldContext.Provider value={arrayContext}>
+        <ArrayItemCompactRow
+          titleId={titleId}
+          ariaLabel={header.ariaLabel}
+          showGrip={reserveDragHandleSlot}
+          grip={grip}
+          fields={
+            <div
+              className="min-w-0"
+              data-array-item-flat-no-header=""
+              data-array-item-content-layout={contentLayout}
+            >
+              <FlatNoHeaderStackedContent fieldsNode={fieldsNode} issueSummaries={issueSummaries} />
+            </div>
+          }
+          actions={actionsRail}
+        />
+      </ArrayFieldContext.Provider>
+    </ArrayItemPresentationContext.Provider>
+  )
+
+  return (
+    <ArrayItemShell
+      titleId={titleId}
+      itemPrefix={itemPrefix}
+      showDragHandle={reserveDragHandleSlot}
+      collapsible={collapsible}
+      dragging={dragging}
+      layout="compactRow"
+      hasItemHeader={false}
+      shellTone={shellTone}
+      className={shellClassName}
+      main={inlineMain ?? stackedMain}
+    />
+  )
+}

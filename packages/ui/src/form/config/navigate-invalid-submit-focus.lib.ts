@@ -1,6 +1,6 @@
 import { buildFieldControlId } from '../containers/form-conditional.client'
 import type { InvalidSubmitNavigation } from '../errors/resolve-invalid-submit-navigation'
-import { focusFirstEligibleArrayItemControl } from '../renderers/array/array-field-item-focus.lib'
+import { focusFirstEligibleArrayItemControl } from '../renderers/array/item/issues/array-field-item-focus.lib'
 
 export type InvalidSubmitFocusFallbacks = {
   tabPanelSelector?: string

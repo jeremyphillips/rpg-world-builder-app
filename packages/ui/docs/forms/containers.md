@@ -448,7 +448,7 @@ control or slot. The array path itself still claims container issues such as
 when `visibility` is set). Both render
 [`array-field-renderer.client.tsx`](../src/form/renderers/array/array-field-renderer.client.tsx)
 — the array entry component. Per-row chrome lives in
-[`array-field-item-content.client.tsx`](../src/form/renderers/array/array-field-item-content.client.tsx).
+[`array-field-item-content.client.tsx`](../src/form/renderers/array/item/content/array-field-item-content.client.tsx).
 See [Component entry files](#component-entry-files).
 
 ```ts

@@ -15130,7 +15130,7 @@
       "variantForms": ["singular"]
     },
     {
-      "path": "packages/ui/src/form/renderers/array/array-item-issue.variants.ts",
+      "path": "packages/ui/src/form/renderers/array/item/issues/array-item-issue.variants.ts",
       "line": 1,
       "column": 21,
       "context": "unknown",
@@ -15139,7 +15139,7 @@
       "variantForms": ["singular"]
     },
     {
-      "path": "packages/ui/src/form/renderers/array/array-item-toolbar.variants.test.ts",
+      "path": "packages/ui/src/form/renderers/array/item/array-item-toolbar.variants.test.ts",
       "line": 82,
       "column": 6,
       "context": "test_expectation",
@@ -15148,7 +15148,7 @@
       "variantForms": ["plural"]
     },
     {
-      "path": "packages/ui/src/form/renderers/array/array-item-toolbar.variants.ts",
+      "path": "packages/ui/src/form/renderers/array/item/array-item-toolbar.variants.ts",
       "line": 41,
       "column": 1,
       "context": "comment",

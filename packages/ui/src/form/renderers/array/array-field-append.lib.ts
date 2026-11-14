@@ -16,7 +16,7 @@ import { buildValidationSessionExpandKey, type ValidationSessionExpandKey } from
 import {
   focusFirstEligibleArrayItemControl,
   scrollArrayItemElementIntoView,
-} from './array-field-item-focus.lib'
+} from './item/issues/array-field-item-focus.lib'
 
 export type BuildVisibleItemDefaultsOptions = {
   /** Discriminator keys that must survive pruning even when their controls are hidden. */

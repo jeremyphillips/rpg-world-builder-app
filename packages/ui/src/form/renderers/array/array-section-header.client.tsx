@@ -12,7 +12,7 @@ import type { ArrayAddActionLayout, FieldHintConfig } from '../../field-config'
 import type { ArrayLabelMode } from '../../config/array/resolve-array-heading.lib'
 import { FormSectionHeader } from '../../presentation/form-section-header.client'
 import type { GroupHeadingScale } from '../../../components/ui/field.variants'
-import { ArrayIssueLink } from './array-item-issue.client'
+import { ArrayIssueLink } from './item/issues/array-item-issue.client'
 
 export interface ArraySectionHeaderProps {
   labelMode: ArrayLabelMode
