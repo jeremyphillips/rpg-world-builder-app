@@ -24,7 +24,7 @@ import {
   MONSTER_TRAIT_ITEM_NOUN,
   monsterTraitDetailFields,
 } from '../../lib/monster-trait-form-fields'
-import { monsterTraitResolverFields } from '../../lib/monster-validation-resolver-fields'
+import { monsterTraitRowResolveFields } from '../../lib/monster-master-detail-validation-fields'
 import {
   monsterTraitListTitle,
   resolveMonsterTraitHeaderIdentity,
@@ -35,13 +35,16 @@ import type { MonsterFormValues } from '../../lib/monster-form-values'
 const TEMPLATE_GROUP_ID = 'templates'
 
 export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
-  const traitItemFields = useMemo(() => monsterTraitResolverFields(ctx), [ctx])
+  const values = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
+  const traitResolver = useMemo(
+    () => ({ resolveItemFields: monsterTraitRowResolveFields({ ctx, readValues: () => values }) }),
+    [ctx, values],
+  )
   const makeItemDefaults = useCallback(
     () => ({ id: createMonsterRowId(), kind: 'custom' as const, name: '', description: '' }),
     [],
   )
   const editor = useMasterDetailArray('traits', makeItemDefaults)
-  const values = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
   const traits = values?.traits
   const monsterName = values?.name
   const templateIds = useMemo(
@@ -86,7 +89,7 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
       editor={editor}
       formCtx={ctx}
       fieldName="traits"
-      itemFields={traitItemFields}
+      itemFields={traitResolver}
       resolveItemFields={resolveItemFields}
       itemNoun={MONSTER_TRAIT_ITEM_NOUN}
       listTitle={MONSTER_TRAITS_HEADING}

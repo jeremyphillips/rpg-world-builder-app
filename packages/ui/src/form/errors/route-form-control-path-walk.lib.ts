@@ -1,3 +1,4 @@
+import { resolveArrayRowFields } from '../config/array/array-resolve-fields.lib'
 import {
   isContainer,
   resolveFieldConfigBoundNames,
@@ -78,17 +79,23 @@ function walkArrayItems(
   }
 
   const arrayItems = readValueAt(params.formValues, arrayPath)
-  const itemPrefixes =
-    Array.isArray(arrayItems) && arrayItems.length > 0
-      ? arrayItems.map((_, index) => `${arrayPath}.${index}`)
-      : [`${arrayPath}.0`]
+  const rows = Array.isArray(arrayItems) ? arrayItems : []
+  const indexes = rows.length > 0 ? rows.map((_, index) => index) : [0]
 
-  for (const itemPrefix of itemPrefixes) {
-    walkOrderedControlPaths(item.fields, itemPrefix, params)
+  for (const index of indexes) {
+    const itemPrefix = `${arrayPath}.${index}`
+    const rowFields = item.item?.resolveFields
+      ? resolveArrayRowFields(item, rows[index], index)
+      : item.fields
+    walkOrderedControlPaths(rowFields, itemPrefix, params)
   }
 }
 
-function walkContainerItem(item: FormItem, absolutePrefix: string, params: WalkParams): void {
+function walkContainerItem(
+  item: Extract<FormItem, { kind: string }>,
+  absolutePrefix: string,
+  params: WalkParams,
+): void {
   switch (item.kind) {
     case 'slot':
       registerSlotPath(item, absolutePrefix, params, params.inactivePaths)

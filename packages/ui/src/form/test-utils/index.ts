@@ -14,5 +14,6 @@ export {
   type IssueClaimReportEntry,
   type ValidationIssue,
 } from './form-validation-test-utils'
+export { allowFormIssueRoutingFallback } from './form-issue-routing-guard.lib'
 export { collectSchemaLeafPaths } from './collect-schema-paths.lib'
 export { submitAndExpectPayload, type SubmitAndExpectPayloadOptions } from './submit-test-utils'

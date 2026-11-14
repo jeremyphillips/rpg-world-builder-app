@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import {
   getMonsterActionKindLabel,
   isWeaponEquipment,
@@ -68,7 +68,7 @@ import {
 } from '../../lib/monster-form-labels'
 import { MONSTER_ACTION_ITEM_NOUN } from '../../lib/monster-form-labels'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
-import { monsterActionResolverFields } from '../../lib/monster-validation-resolver-fields'
+import { monsterActionRowResolveFields } from '../../lib/monster-master-detail-validation-fields'
 import { useMonsterActionSections } from '../../hooks/use-monster-action-sections'
 import { MonsterActionDetail } from './monster-action-detail'
 
@@ -232,19 +232,23 @@ function useMonsterActionDetailRows(
   sections: ReturnType<typeof useMonsterActionSections>,
   values: MonsterFormValues,
 ) {
-  const actionItemFields = useMemo(() => monsterActionResolverFields(ctx), [ctx])
+  const makeActionResolver = useCallback(
+    (section: MonsterActionSection) =>
+      monsterActionRowResolveFields({ ctx, section, readValues: () => values }),
+    [ctx, values],
+  )
   const actionTitles = sectionTitles(values, ctx, 'actions')
   const bonusTitles = sectionTitles(values, ctx, 'bonusActions')
   const reactionTitles = sectionTitles(values, ctx, 'reactions')
   const legendaryTitles = sectionTitles(values, ctx, 'legendaryActions')
   const shared = {
     formCtx: ctx,
-    itemFields: actionItemFields,
     itemNoun: MONSTER_ACTION_ITEM_NOUN,
     access: { kind: 'availability' as const, fieldName: 'available' as const },
   }
   const actionRows = useEmbeddedMasterDetailRows({
     ...shared,
+    itemFields: { resolveItemFields: makeActionResolver('actions') },
     fieldName: 'actions',
     editor: sections.editors.actions,
     sectionLabel: SECTION_HEADINGS.actions,
@@ -252,6 +256,7 @@ function useMonsterActionDetailRows(
   })
   const bonusRows = useEmbeddedMasterDetailRows({
     ...shared,
+    itemFields: { resolveItemFields: makeActionResolver('bonusActions') },
     fieldName: 'bonusActions',
     editor: sections.editors.bonusActions,
     sectionLabel: SECTION_HEADINGS.bonusActions,
@@ -259,6 +264,7 @@ function useMonsterActionDetailRows(
   })
   const reactionRows = useEmbeddedMasterDetailRows({
     ...shared,
+    itemFields: { resolveItemFields: makeActionResolver('reactions') },
     fieldName: 'reactions',
     editor: sections.editors.reactions,
     sectionLabel: SECTION_HEADINGS.reactions,
@@ -267,6 +273,7 @@ function useMonsterActionDetailRows(
   })
   const legendaryRows = useEmbeddedMasterDetailRows({
     ...shared,
+    itemFields: { resolveItemFields: makeActionResolver('legendaryActions') },
     fieldName: 'legendaryActions',
     editor: sections.editors.legendaryActions,
     sectionLabel: SECTION_HEADINGS.legendaryActions,

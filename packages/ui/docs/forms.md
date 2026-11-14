@@ -380,6 +380,18 @@ English defaults. See `field-error-map-fixture.stories.tsx` for a synthetic form
 covering each edge case. Tiers, naming, and copy style →
 [packages/contracts/docs/validation-messages.md](../../contracts/docs/validation-messages.md).
 
+### Issue routing (`prepareFormIssues`)
+
+Every Zod issue is routed to exactly one **claim** (`field`, `slot`, `row`, or form
+summary) before controls read it. Routing walks active controls in field order:
+exact path → `SlotConfig.issuePaths` ownership → ancestor/descendant control → row.
+
+- `useFieldIssue` / `useSlotIssues` — routed messages for leaves and slots.
+- `ArrayItemConfig.resolveFields` — per-row field trees for master-detail badges,
+  `makeFieldErrorMap`, and routing (heterogeneous array rows).
+- `collectIssueClaimReport` — publish/draft claim audits in tests (`allowFormIssueRoutingFallback`
+  opts out of the Vitest fallback guard).
+
 ### Field copy — placeholders and instructions
 
 Linguistic templates (`Choose …`, choice-count hints) live in

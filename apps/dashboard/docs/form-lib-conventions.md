@@ -312,7 +312,9 @@ paths. `errorPaths` drives tab UX; `resolverFields` drives validation message co
   `errorPaths` + `resolverFields` for a single embedded array (copy/paste onto the tab).
 - `prefixFormItems(items, prefix)` — prefix scalar/nested resolver fields (e.g.
   `heritage.name`).
-- `embeddedArrayResolverField(name, legend, itemFields)` — resolver-only array config.
+- `embeddedArrayResolverField(name, legend, { itemFields } | { resolveItemFields })` —
+  resolver-only array config. Prefer `item.resolveFields` on the array item for master-detail
+  rows (`monster-master-detail-validation-fields.ts`) instead of a parallel stub field tree.
 
 **Reference implementations:** `buildSpeciesTabs` and `buildClassTabs` in
 `species-form-fields.ts` / `class-form-fields.ts`. Section icons come from

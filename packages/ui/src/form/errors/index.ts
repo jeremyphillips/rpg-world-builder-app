@@ -29,6 +29,7 @@ export {
   resolveArrayItemFieldOrder,
   resolveFieldOrderIndex,
   collectArraySections,
+  resolveSectionFieldOrder,
   type ArraySectionMeta,
 } from './resolve-field-order'
 export {

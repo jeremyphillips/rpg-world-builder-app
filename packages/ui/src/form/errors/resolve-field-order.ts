@@ -1,3 +1,7 @@
+import {
+  readArrayItemRows,
+  resolveArrayRowFieldOrder,
+} from '../config/array/array-resolve-fields.lib'
 import type { ArrayConfig, FieldConfig, FormItem, RowConfig } from '../field-config'
 import { isContainer } from '../field-config'
 import { resolveColumnsCollapseSequence } from '../config/form-columns-collapse.lib'
@@ -114,31 +118,49 @@ export type ArraySectionMeta = {
   fullName: string
   config: ArrayConfig
   fieldOrder: string[]
+  /** Per-index field order when {@link ArrayItemConfig.resolveFields} is set. */
+  resolveItemFieldOrder?: (index: number) => string[]
 }
 
 function walkArraySections(
   items: Array<FormItem | RowConfig>,
   namePrefix: string,
   sections: ArraySectionMeta[],
+  formValues?: Record<string, unknown>,
 ): void {
   for (const item of items) {
     if (!isContainer(item)) continue
 
     if (item.kind === 'array') {
       const fullName = namePrefix ? `${namePrefix}.${item.name}` : item.name
-      sections.push({
-        fullName,
-        config: item,
-        fieldOrder: resolveArrayItemFieldOrder(item.fields),
-      })
-      walkArraySections(item.fields, fullName, sections)
+      if (item.item?.resolveFields) {
+        const rows = readArrayItemRows(formValues, fullName)
+        sections.push({
+          fullName,
+          config: item,
+          fieldOrder: [],
+          resolveItemFieldOrder: (index) => resolveArrayRowFieldOrder(item, rows[index], index),
+        })
+      } else {
+        sections.push({
+          fullName,
+          config: item,
+          fieldOrder: resolveArrayItemFieldOrder(item.fields),
+        })
+        walkArraySections(item.fields, fullName, sections, formValues)
+      }
       continue
     }
 
     if (item.kind === 'slot') continue
 
     if (item.kind === 'dependent') {
-      walkArraySections([item.controller, ...item.dependents.fields], namePrefix, sections)
+      walkArraySections(
+        [item.controller, ...item.dependents.fields],
+        namePrefix,
+        sections,
+        formValues,
+      )
       continue
     }
 
@@ -147,17 +169,34 @@ function walkArraySections(
         resolveColumnsCollapseSequence(item.columns, item.collapseOrder),
         namePrefix,
         sections,
+        formValues,
       )
       continue
     }
 
-    walkArraySections(item.fields, namePrefix, sections)
+    walkArraySections(item.fields, namePrefix, sections, formValues)
   }
 }
 
+function resolveSectionFieldOrder(
+  section: ArraySectionMeta | undefined,
+  itemIndex: number | undefined,
+): readonly string[] {
+  if (!section) return []
+  if (itemIndex !== undefined && section.resolveItemFieldOrder) {
+    return section.resolveItemFieldOrder(itemIndex)
+  }
+  return section.fieldOrder
+}
+
 /** Collect every array section in a form field tree with relative field order. */
-export function collectArraySections(items: FormItem[]): ArraySectionMeta[] {
+export function collectArraySections(
+  items: FormItem[],
+  formValues?: Record<string, unknown>,
+): ArraySectionMeta[] {
   const sections: ArraySectionMeta[] = []
-  walkArraySections(items, '', sections)
+  walkArraySections(items, '', sections, formValues)
   return sections
 }
+
+export { resolveSectionFieldOrder }

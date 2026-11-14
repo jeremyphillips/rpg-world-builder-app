@@ -128,7 +128,9 @@ export function buildClearedRequiredDefaults(fields: FormItem[]): Record<string,
 }
 
 export function parseWithFieldErrorMap(schema: ZodType, value: unknown, fields: FormItem[]) {
-  return schema.safeParse(value, { error: makeFieldErrorMap(fields) })
+  const formValues =
+    typeof value === 'object' && value !== null ? (value as Record<string, unknown>) : undefined
+  return schema.safeParse(value, { error: makeFieldErrorMap(fields, formValues) })
 }
 
 export function collectIssueClaimReport(

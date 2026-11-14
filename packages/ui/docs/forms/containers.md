@@ -637,6 +637,10 @@ Standard fields share one presentation policy via `resolvePresentedFieldError` /
 
 Tab switching alone does not suppress eligible fields — inactive tabs still validate on Save.
 
+**Heterogeneous rows:** set `item.resolveFields(row, index)` when each array item renders a
+different `FormItem[]` (monster actions, traits). Registry, error maps, legend counts, and issue
+routing expand one tree per stored row using current form values.
+
 ### Array validation presentation
 
 Array item validation chrome is generic in `@rpg/ui/form` and is driven by RHF/Zod errors:

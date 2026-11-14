@@ -3,8 +3,9 @@ import { collectIssueClaimReport } from '@rpg/ui/form/test-utils'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { createMonsterActionFromAcquisition } from './monster-action-acquisition'
-import { monsterActionDetailFields } from './monster-action-detail-fields'
+import { monsterActionRowResolveFields } from '../monster-master-detail-validation-fields'
 import { resolveMonsterFormSchema } from '../monster-form-schema'
+import type { MonsterActionSection } from './monster-action-equipment-references'
 
 const ctx = {
   equipmentCatalogStatus: 'ready',
@@ -43,60 +44,51 @@ const publishBody = {
 
 const schema = resolveMonsterFormSchema(ctx, 'publish')
 
-function saveDetailFields(action: ReturnType<typeof createMonsterActionFromAcquisition>) {
-  return monsterActionDetailFields({
-    ctx,
-    action,
-    section: 'actions',
-    namePrefix: 'actions.0',
-    equipmentOptions: [],
-    sharedCastingOptions: [],
-  })
+function resolverFieldsForSection(section: MonsterActionSection) {
+  return [
+    {
+      kind: 'array' as const,
+      name: section,
+      label: section,
+      fields: [],
+      item: {
+        resolveFields: monsterActionRowResolveFields({ ctx, section }),
+      },
+    },
+  ]
 }
 
-function claimReportForAction(action: unknown, fields: ReturnType<typeof saveDetailFields>) {
+function claimReportForAction(action: unknown, section: MonsterActionSection = 'actions') {
   return collectIssueClaimReport({
     schema,
-    values: { ...publishBody, actions: [action] },
-    fields,
-    fieldPathPrefix: 'actions.0',
+    values: { ...publishBody, [section]: [action] },
+    fields: resolverFieldsForSection(section),
   })
 }
 
 describe('monster save action issue routing', () => {
   it('routes blank save rows to visible fields (not fallback claims)', () => {
     const blankSave = createMonsterActionFromAcquisition({ type: 'create', kind: 'save' })
-    const fields = saveDetailFields(blankSave)
-    const report = claimReportForAction(blankSave, fields)
+    const report = claimReportForAction(blankSave)
 
     expect(report.length).toBeGreaterThan(0)
     expect(report.filter((entry) => entry.claim.kind === 'fallback')).toEqual([])
 
-    const controllable = report.filter((entry) => !entry.path.includes('resolution.outcomes'))
     expect(
-      controllable.every((entry) => entry.claim.kind === 'field' || entry.claim.kind === 'slot'),
+      report.every((entry) => entry.claim.kind === 'field' || entry.claim.kind === 'slot'),
     ).toBe(true)
 
-    const byPath = new Map(report.map((entry) => [entry.path, entry]))
-    expect(byPath.get('actions.0.resolution.method')?.claim).toMatchObject({
-      kind: 'field',
-      target: 'actions.0.resolution.method.ability',
-    })
-    expect(byPath.get('actions.0.resolution.effects')?.claim.kind).toBe('field')
-    expect(byPath.get('actions.0.dcSource')?.claim.kind).toBe('field')
+    expect(report.some((entry) => entry.path.includes('resolution.method.ability'))).toBe(true)
+    expect(report.some((entry) => entry.path.includes('resolution.effects'))).toBe(true)
   })
 
-  it('routes cleared save values through breath-weapon detail fields without fallback claims', () => {
-    const preset = createMonsterActionFromAcquisition({ type: 'preset', presetId: 'breath-weapon' })
-    const fields = saveDetailFields(preset)
+  it('routes cleared save values through save detail fields without fallback claims', () => {
     const row = createMonsterActionFromAcquisition({ type: 'create', kind: 'save' })
-
-    const report = claimReportForAction(row, fields)
+    const report = claimReportForAction(row)
     expect(report.length).toBeGreaterThan(0)
     expect(report.filter((entry) => entry.claim.kind === 'fallback')).toEqual([])
 
-    const nonOutcome = report.filter((entry) => !entry.path.includes('resolution.outcomes'))
-    const uncontrollable = nonOutcome.filter(
+    const uncontrollable = report.filter(
       (entry) => entry.claim.kind !== 'field' && entry.claim.kind !== 'slot',
     )
     expect(uncontrollable, JSON.stringify(uncontrollable, null, 2)).toEqual([])

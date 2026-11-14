@@ -5,7 +5,7 @@ import { routeFormIssues } from './route-form-issues.lib'
 import type { FieldErrors } from 'react-hook-form'
 import { formIssuesFromZodIssues } from './flatten-form-issues'
 import { sortFormIssues } from './group-form-issues'
-import { collectArraySections } from './resolve-field-order'
+import { collectArraySections, resolveSectionFieldOrder } from './resolve-field-order'
 import { resolveIssueFocusControlId } from './resolve-issue-focus-target'
 import type { FormIssue } from './form-issue.types'
 import type { ArrayConfig, FormItem } from '../field-config'
@@ -145,9 +145,10 @@ export function prepareFormIssues(
   formValues: Record<string, unknown> = {},
   options?: PrepareFormIssuesOptions,
 ): FormIssue[] {
-  const sections = collectArraySections(
-    options?.fieldPathPrefix ? prefixFormItems(fields, options.fieldPathPrefix) : fields,
-  )
+  const absoluteFields = options?.fieldPathPrefix
+    ? prefixFormItems(fields, options.fieldPathPrefix)
+    : fields
+  const sections = collectArraySections(absoluteFields, formValues)
   const flatIssues = routeFormIssues(flattenIssuesFromSource(source), fields, formValues, options)
 
   return flatIssues.map((issue) => {
@@ -160,7 +161,7 @@ export function prepareFormIssues(
 
     return classifyFormIssues([issue], {
       arrayPattern: section?.config.arrayPattern,
-      fieldOrder: section?.fieldOrder,
+      fieldOrder: resolveSectionFieldOrder(section, issue.itemIndex),
     })[0]!
   })
 }

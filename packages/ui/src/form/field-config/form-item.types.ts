@@ -11,6 +11,7 @@ import type {
 } from '../../components/ui/field-dependent.variants'
 import type { SurfaceConfig } from '../../components/ui/visual-vocabulary.types'
 import type { FieldSeparator, GroupHeadingScale } from '../../components/ui/field.variants'
+import type { ArrayResolveFieldsFn } from '../config/array/array-resolve-fields.lib'
 import type { ArrayAddMenuConfig } from '../config/array/array-add-menu.lib'
 import type { ArrayItemShellRenderProps } from '../config/array/array-item-shell-render.types'
 import type { FormColumnsCollapseOrder } from '../config/form-columns-collapse.lib'
@@ -393,6 +394,11 @@ export interface ArrayAddActionConfig {
 export type ArrayItemHeaderVisibility = 'auto' | 'hidden'
 
 export interface ArrayItemConfig {
+  /**
+   * When set, row badges, error maps, and issue routing expand one field tree per
+   * stored array item instead of the static {@link ArrayConfig.fields} template.
+   */
+  resolveFields?: ArrayResolveFieldsFn
   variant?: ArrayItemVariant
   /** @default raised */
   surface?: SurfaceConfig

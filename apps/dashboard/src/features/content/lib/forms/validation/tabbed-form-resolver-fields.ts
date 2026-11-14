@@ -2,6 +2,7 @@ import {
   isContainer,
   isRowSlotItem,
   prefixFieldConfig,
+  type ArrayResolveFieldsFn,
   type ColumnsConfig,
   type FormItem,
   type RowFieldItem,
@@ -75,29 +76,51 @@ function prefixFormItem(item: FormItem, prefix: string): FormItem {
   return { ...item, fields: prefixFormItems(item.fields, prefix) }
 }
 
+export type EmbeddedArrayResolverFieldInput =
+  | {
+      resolveItemFields: ArrayResolveFieldsFn
+      /** Optional static template; omit when rows are fully dynamic. */
+      itemFields?: readonly FormItem[]
+    }
+  | {
+      itemFields: readonly FormItem[]
+      resolveItemFields?: never
+    }
+
 /** Resolver-only array field config for master-detail tabs. */
 export function embeddedArrayResolverField(
   name: string,
   label: string,
-  itemFields: readonly FormItem[],
+  input: EmbeddedArrayResolverFieldInput,
 ): FormItem {
+  const resolveFields =
+    'resolveItemFields' in input && input.resolveItemFields ? input.resolveItemFields : undefined
+  const fields = 'itemFields' in input && input.itemFields ? [...input.itemFields] : []
+
   return {
     kind: 'array',
     name,
     label,
-    fields: [...itemFields],
+    fields,
+    ...(resolveFields ? { item: { resolveFields } } : {}),
   }
 }
 
-export type EmbeddedMasterDetailTabValidationConfig = {
-  /** Root RHF path — used for `errorPaths` and the resolver array `name`. */
-  path: string
-  /** Tier-1 array legend for validation copy (defaults to `itemLabel`, then `path`). */
-  legend?: string
-  /** Singular item label; used as legend fallback when `legend` is omitted. */
-  itemLabel?: string
-  fields: readonly FormItem[]
-}
+export type EmbeddedMasterDetailTabValidationConfig =
+  | {
+      path: string
+      legend?: string
+      itemLabel?: string
+      resolveItemFields: ArrayResolveFieldsFn
+      fields?: readonly FormItem[]
+    }
+  | {
+      path: string
+      legend?: string
+      itemLabel?: string
+      fields: readonly FormItem[]
+      resolveItemFields?: never
+    }
 
 /**
  * Returns paired `errorPaths` + `resolverFields` for embedded master-detail tabs.
@@ -106,11 +129,18 @@ export type EmbeddedMasterDetailTabValidationConfig = {
 export function embeddedMasterDetailTabValidation(
   config: EmbeddedMasterDetailTabValidationConfig,
 ): Required<Pick<TabbedFormTab, 'errorPaths' | 'resolverFields'>> {
-  const { path, fields } = config
+  const { path } = config
   const legend = config.legend ?? config.itemLabel ?? path
+  const resolverInput: EmbeddedArrayResolverFieldInput =
+    'resolveItemFields' in config && config.resolveItemFields
+      ? {
+          resolveItemFields: config.resolveItemFields,
+          itemFields: config.fields,
+        }
+      : { itemFields: config.fields }
 
   return {
     errorPaths: [path],
-    resolverFields: [embeddedArrayResolverField(path, legend, fields)],
+    resolverFields: [embeddedArrayResolverField(path, legend, resolverInput)],
   }
 }

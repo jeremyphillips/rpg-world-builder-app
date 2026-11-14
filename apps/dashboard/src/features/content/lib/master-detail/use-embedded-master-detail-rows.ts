@@ -2,6 +2,8 @@ import { useCallback, useMemo, useRef } from 'react'
 import { useWatch } from 'react-hook-form'
 import type { FormItem } from '@rpg/ui/form'
 
+import type { EmbeddedArrayResolverFieldInput } from '../forms/validation/tabbed-form-resolver-fields'
+
 import type { Availability, AvailabilityReason } from '@/lib/availability'
 import { openCampaignAvailabilityDialog } from '../campaign-access/open-campaign-availability-dialog.lib'
 import type { ContentFormCtx } from '../forms/registry/content-form-registry'
@@ -33,7 +35,7 @@ export interface UseEmbeddedMasterDetailRowsParams {
   formCtx: ContentFormCtx
   fieldName: string
   editor: UseMasterDetailArrayResult
-  itemFields: FormItem[]
+  itemFields: FormItem[] | EmbeddedArrayResolverFieldInput
   itemNoun: MasterDetailItemNounTerm
   mapListItem: (ctx: FormEmbeddedMasterDetailMapListItemContext) => Pick<
     MasterDetailListItem,

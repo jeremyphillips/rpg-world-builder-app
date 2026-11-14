@@ -319,6 +319,7 @@ export {
   type DiceFormulaValue,
 } from '../components/ui/dice-formula-field.lib'
 export type { FieldSize } from '../components/ui/field.client'
+export type { ArrayResolveFieldsFn } from './config/array/array-resolve-fields.lib'
 export {
   makeFieldErrorMap,
   safeParseWithFieldErrors,
@@ -347,6 +348,7 @@ export {
   countInvalidArrayItems,
   indexArrayItemIssues,
   collectArraySections,
+  resolveSectionFieldOrder,
   resolveArrayItemFieldOrder,
   resolveIssueFocusControlId,
   resolveIssueFocusFieldName,

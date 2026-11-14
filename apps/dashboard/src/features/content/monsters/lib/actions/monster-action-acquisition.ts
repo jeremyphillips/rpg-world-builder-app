@@ -1,6 +1,7 @@
 import {
   ACTION_PRESET_IDS,
   DEFAULT_RESOLUTION_TARGET,
+  RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
   getActionPreset,
   getActionVocabularyEntry,
   getActionVocabularySearchTerms,
@@ -503,6 +504,8 @@ export function createMonsterActionFromAcquisition(
         resolution: {
           selectionMode: 'targets',
           target: { ...DEFAULT_RESOLUTION_TARGET },
+          method: { kind: 'saving-throw' },
+          effects: [{ id: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, kind: 'damage' }],
         },
       } as MonsterActionDraftRow
     }

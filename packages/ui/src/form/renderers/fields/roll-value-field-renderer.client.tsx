@@ -207,9 +207,10 @@ function StoredRollValueField({
   )
 }
 
-/** Renders a roll from stored atoms. An absent roll stays unregistered until Add dice. */
+/** Renders a roll from stored atoms. Optional rolls stay unregistered until Add dice. */
 export function RollValueFieldRenderer(props: RollValueFieldRendererProps) {
   const watched = useWatch({ name: props.fullName })
+  if (props.config.required) return <StoredRollValueField {...props} />
   if (!rollRecordHasStoredAtom(watched)) return <UnstoredRollValueField {...props} />
   return <StoredRollValueField {...props} />
 }

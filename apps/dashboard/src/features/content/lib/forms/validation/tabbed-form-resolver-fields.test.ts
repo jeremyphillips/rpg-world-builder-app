@@ -48,9 +48,9 @@ describe('prefixFormItems', () => {
 
 describe('embeddedArrayResolverField', () => {
   it('builds a resolver-only array field config', () => {
-    const field = embeddedArrayResolverField('traits', 'Traits', [
-      { type: 'text', name: 'name', label: 'Name', required: true },
-    ])
+    const field = embeddedArrayResolverField('traits', 'Traits', {
+      itemFields: [{ type: 'text', name: 'name', label: 'Name', required: true }],
+    })
 
     expect(field).toMatchObject({
       kind: 'array',

@@ -82,7 +82,7 @@ function buildRouteContext(
 ): RouteFormIssuesContext {
   const fieldPathPrefix = options?.fieldPathPrefix
   const absoluteFields = fieldPathPrefix ? prefixFormItems(fields, fieldPathPrefix) : fields
-  const registry = buildFieldRegistry(absoluteFields)
+  const registry = buildFieldRegistry(absoluteFields, formValues)
   const inactivePaths = resolveScopedInactivePaths(fields, formValues, fieldPathPrefix)
   const orderedControlPaths: string[] = []
   const slotPaths = new Set<string>()

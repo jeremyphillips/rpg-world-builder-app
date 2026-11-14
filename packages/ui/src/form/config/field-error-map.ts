@@ -38,9 +38,12 @@ export interface RawZodIssueLike {
 }
 
 /** Field lookup keyed by dot-joined path with array indices normalized to `*`. */
-export function buildFieldRegistry(items: FormItem[]): Map<string, RegistryEntry> {
+export function buildFieldRegistry(
+  items: FormItem[],
+  formValues?: Record<string, unknown>,
+): Map<string, RegistryEntry> {
   const registry = new Map<string, RegistryEntry>()
-  registerFormItems(registry, '', items)
+  registerFormItems(registry, '', items, formValues)
   return registry
 }
 
@@ -306,8 +309,9 @@ function unlabeledEntry(issue: RawZodIssueLike): RegistryEntry {
  */
 export function makeFieldErrorMap(
   items: FormItem[],
+  formValues?: Record<string, unknown>,
 ): (issue: RawZodIssueLike) => string | undefined {
-  const registry = buildFieldRegistry(items)
+  const registry = buildFieldRegistry(items, formValues)
 
   return (issue) => {
     const path = issue.path ?? []
@@ -329,5 +333,7 @@ export function safeParseWithFieldErrors<T>(
   values: unknown,
   items: FormItem[],
 ) {
-  return schema.safeParse(values, { error: makeFieldErrorMap(items) })
+  const formValues =
+    typeof values === 'object' && values !== null ? (values as Record<string, unknown>) : undefined
+  return schema.safeParse(values, { error: makeFieldErrorMap(items, formValues) })
 }

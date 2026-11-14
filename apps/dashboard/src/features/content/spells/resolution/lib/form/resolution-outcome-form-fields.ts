@@ -119,7 +119,9 @@ export function resolutionOutcomeApplicationsResolverFields(): FormItem[] {
     embeddedArrayResolverField(
       outcomeApplicationsFieldPath(outcomeIndex),
       RESOLUTION_SECTION_LABELS.appliedEffects,
-      itemFields,
+      {
+        itemFields,
+      },
     ),
   )
 }

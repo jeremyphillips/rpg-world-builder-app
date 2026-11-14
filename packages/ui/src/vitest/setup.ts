@@ -2,6 +2,10 @@ import '@testing-library/jest-dom/vitest'
 import { afterEach, vi } from 'vitest'
 import { cleanup } from '@testing-library/react'
 
+import { installFormIssueRoutingFallbackGuard } from '../form/test-utils/form-issue-routing-guard.lib'
+
+installFormIssueRoutingFallbackGuard()
+
 // jsdom lacks ResizeObserver, which Radix primitives (via useSize) rely on.
 if (!('ResizeObserver' in globalThis)) {
   globalThis.ResizeObserver = class {

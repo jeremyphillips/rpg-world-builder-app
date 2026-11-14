@@ -515,11 +515,13 @@ function monsterActionSaveSection(
       {
         kind: 'slot',
         name: '_saveFailureNote',
+        issuePaths: ['resolution.outcomes'],
         render: () => <MonsterActionSaveFailureNoteField namePrefix={namePrefix} />,
       },
       {
         kind: 'slot',
         name: '_saveSuccessAmount',
+        issuePaths: ['resolution.outcomes'],
         render: () => <MonsterActionSaveSuccessAmountField namePrefix={namePrefix} />,
       },
     ],

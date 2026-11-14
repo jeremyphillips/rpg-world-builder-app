@@ -34,9 +34,9 @@ import {
 } from './monster-form-labels'
 import { MONSTER_FORM_TAB } from './monster-form-view'
 import {
-  monsterActionResolverFields,
-  monsterTraitResolverFields,
-} from './monster-validation-resolver-fields'
+  monsterActionRowResolveFields,
+  monsterTraitRowResolveFields,
+} from './monster-master-detail-validation-fields'
 import {
   embeddedArrayResolverField,
   embeddedMasterDetailTabValidation,
@@ -174,11 +174,11 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
     ownedSlot('legendaryActions'),
   ]
 
-  const actionItemFields = monsterActionResolverFields(ctx)
   const actionValidation = embeddedMasterDetailTabValidation({
     path: 'actions',
     legend: 'Actions',
-    fields: actionItemFields,
+    fields: [],
+    resolveItemFields: monsterActionRowResolveFields({ ctx, section: 'actions' }),
   })
 
   return [
@@ -193,7 +193,8 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       ...embeddedMasterDetailTabValidation({
         path: 'traits',
         legend: 'Traits',
-        fields: monsterTraitResolverFields(ctx),
+        fields: [],
+        resolveItemFields: monsterTraitRowResolveFields({ ctx }),
       }),
     },
     {
@@ -204,9 +205,15 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       errorPaths: ['actions', 'bonusActions', 'reactions', 'legendaryActions'],
       resolverFields: [
         ...actionValidation.resolverFields,
-        embeddedArrayResolverField('bonusActions', 'Bonus actions', actionItemFields),
-        embeddedArrayResolverField('reactions', 'Reactions', actionItemFields),
-        embeddedArrayResolverField('legendaryActions', 'Legendary Actions', actionItemFields),
+        embeddedArrayResolverField('bonusActions', 'Bonus actions', {
+          resolveItemFields: monsterActionRowResolveFields({ ctx, section: 'bonusActions' }),
+        }),
+        embeddedArrayResolverField('reactions', 'Reactions', {
+          resolveItemFields: monsterActionRowResolveFields({ ctx, section: 'reactions' }),
+        }),
+        embeddedArrayResolverField('legendaryActions', 'Legendary Actions', {
+          resolveItemFields: monsterActionRowResolveFields({ ctx, section: 'legendaryActions' }),
+        }),
       ],
     },
   ].map(withContentFormTabIcon)

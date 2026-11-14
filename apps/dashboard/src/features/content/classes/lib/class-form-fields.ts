@@ -261,7 +261,9 @@ export function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
         embeddedArrayResolverField(
           STARTING_EQUIPMENT_OPTIONS_FIELD_NAME,
           'Starting equipment packages',
-          startingEquipmentOptionItemFields(ctx),
+          {
+            itemFields: startingEquipmentOptionItemFields(ctx),
+          },
         ),
         ...characterCreationSkillChoiceFields(ctx),
         ...characterCreationToolChoiceFields(ctx),

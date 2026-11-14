@@ -4,6 +4,7 @@ import { fieldGroupFlexStackClasses } from '@rpg/ui'
 import { buildItemDefaultValues, type FormItem } from '@rpg/ui/form'
 
 import type { Availability, AvailabilityReason } from '@/lib/availability'
+import type { EmbeddedArrayResolverFieldInput } from '../../lib/forms/validation/tabbed-form-resolver-fields'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { duplicateMasterDetailRow } from '../../lib/master-detail/duplicate-master-detail-row'
 import type { FormEmbeddedMasterDetailAccessConfig } from '../../lib/master-detail/master-detail-access.types'
@@ -32,7 +33,7 @@ export interface FormEmbeddedMasterDetailEditorProps {
   formCtx: ContentFormCtx
   /** Parent form field path, e.g. `traits`, `features`, or `heritage.options`. */
   fieldName: string
-  itemFields: FormItem[]
+  itemFields: FormItem[] | EmbeddedArrayResolverFieldInput
   /** Singular noun vocabulary for delete dialog, empty copy, and overflow actions. */
   itemNoun: MasterDetailItemNounTerm
   /** Visible collection title in the list header. */
@@ -102,12 +103,14 @@ interface FormEmbeddedMasterDetailEditorBodyProps extends Omit<
 }
 
 function resolveEmbeddedDetailFields(
-  itemFields: FormItem[],
+  itemFields: FormItem[] | EmbeddedArrayResolverFieldInput,
   resolveItemFields: ((row: unknown) => FormItem[]) | undefined,
   selectedRow: EmbeddedMasterDetailRow | undefined,
   rowAt: (index: number) => unknown,
 ): FormItem[] {
-  if (!resolveItemFields) return itemFields
+  if (!resolveItemFields) {
+    return Array.isArray(itemFields) ? itemFields : []
+  }
   return resolveItemFields(selectedRow ? rowAt(selectedRow.formIndex) : undefined)
 }
 
@@ -326,7 +329,7 @@ function EmbeddedMasterDetailLayout({
   addControl?: ReactNode
   onAdd: () => void
   editor: UseMasterDetailArrayResult
-  itemFields: FormItem[]
+  itemFields: FormItem[] | EmbeddedArrayResolverFieldInput
   fieldName: string
   idPrefix: string
   showSelectedDetail: boolean
@@ -403,7 +406,9 @@ function FormEmbeddedMasterDetailEditorWithHook({
   ...props
 }: Omit<FormEmbeddedMasterDetailEditorProps, 'editor'>) {
   const makeItemDefaults = useCallback(
-    () => makeItemDefaultsProp?.() ?? buildItemDefaultValues(props.itemFields),
+    () =>
+      makeItemDefaultsProp?.() ??
+      buildItemDefaultValues(Array.isArray(props.itemFields) ? props.itemFields : []),
     [makeItemDefaultsProp, props.itemFields],
   )
   const editor = useMasterDetailArray(props.fieldName, makeItemDefaults)
