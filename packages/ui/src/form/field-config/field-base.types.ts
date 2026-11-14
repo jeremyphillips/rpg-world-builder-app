@@ -173,6 +173,7 @@ export const OPTIONAL_DISCLOSURE_FIELD_KINDS = [
   'textarea',
   'richtext',
   'select',
+  'combobox',
   'rollValue',
   'joinedPair',
 ] as const
@@ -229,6 +230,16 @@ export type OptionalDisclosureConfig = {
   addDisabled?: boolean
   /** Disables the add action from watched values; optional caption while collapsed. */
   addGate?: OptionalDisclosureAddGate
+  /**
+   * Optional object group only: root RHF paths that count as populated (OR). When
+   * omitted, the group's `name` object path is watched instead.
+   */
+  watchPaths?: readonly string[]
+  /**
+   * Optional object group only: root paths cleared on remove. Defaults to the
+   * group's `name` when `watchPaths` is omitted.
+   */
+  clearPaths?: readonly string[]
 }
 
 /** Attached trailing action on a text-like field — operation failure stays outside RHF validation. */

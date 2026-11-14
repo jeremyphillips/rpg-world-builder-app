@@ -176,8 +176,8 @@ Collapses empty optional fields behind a compact **+ Add …** control. When exp
 (or when populated and `expandWhenPopulated` is true), the field label and control render
 with a **Remove** action that clears the value and collapses back to the add control.
 
-**Implemented for:** `text`, `textSuggestions`, `textarea`, `richtext`, `select`, and
-`rollValue`. Dev guards log when `optionalDisclosure` is used on any other kind.
+**Implemented for:** `text`, `textSuggestions`, `textarea`, `richtext`, `select`,
+`combobox`, and `rollValue`. Dev guards log when `optionalDisclosure` is used on any other kind.
 
 `rollValue` treats the roll object as present even when dice or flat are incomplete.
 Add calls `seedWhen` and writes that value. Remove unsets the whole object. Set

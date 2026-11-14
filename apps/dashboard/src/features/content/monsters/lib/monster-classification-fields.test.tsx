@@ -54,6 +54,29 @@ describe('monster classification authoring', () => {
       expect.objectContaining({ value: draft.id, label: expect.stringContaining('Draft') }),
     ])
   })
+  it('hides each classification field until its add control is chosen', async () => {
+    const user = userEvent.setup()
+    render(
+      <Form
+        schema={schema}
+        fields={monsterClassificationFields(ctx)}
+        defaultValues={{ creatureType: 'fiend' }}
+        onSubmit={vi.fn()}
+      />,
+    )
+    expect(screen.queryByRole('combobox', { name: /creature famil/i })).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('combobox', { name: /class classifications/i }),
+    ).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Add families' }))
+    expect(screen.getByRole('combobox', { name: /creature famil/i })).toBeInTheDocument()
+    expect(
+      screen.queryByRole('combobox', { name: /class classifications/i }),
+    ).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Add class classifications' }))
+    expect(screen.getByRole('combobox', { name: /class classifications/i })).toBeInTheDocument()
+  })
+
   it('keeps authored families when the creature type changes in the live form', async () => {
     const user = userEvent.setup()
     const onSubmit = vi.fn()
@@ -97,7 +120,10 @@ describe('monster classification authoring', () => {
     render(
       <Form
         schema={publishSchema}
-        fields={monsterClassificationFields(ctx)}
+        fields={[
+          { type: 'text', name: 'creatureType', label: 'Creature type' },
+          ...monsterClassificationFields(ctx),
+        ]}
         defaultValues={{ creatureType: 'dragon', creatureFamilyIds: ['demon'] }}
         onSubmit={vi.fn()}
         footer={<button type="submit">Publish</button>}

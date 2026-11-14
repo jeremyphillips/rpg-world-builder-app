@@ -9,6 +9,7 @@ export const OPTIONAL_DISCLOSURE_IMPLEMENTED_KINDS = [
   'text',
   'textarea',
   'select',
+  'combobox',
   'textSuggestions',
   'richtext',
   'rollValue',

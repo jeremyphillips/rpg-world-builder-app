@@ -76,6 +76,40 @@ describe('group optionalDisclosure', () => {
     })
   })
 
+  it('opens when watchPaths have content and clears them on remove', async () => {
+    const user = userEvent.setup()
+    const watched = {
+      kind: 'group',
+      name: 'wrapper',
+      heading: { label: 'Wrapper' },
+      separator: 'subtle',
+      optionalDisclosure: {
+        addLabel: 'Add tags',
+        removeLabel: 'Remove',
+        watchPaths: ['tags', 'roles'],
+        clearPaths: ['tags', 'roles'],
+      },
+      fields: [
+        { type: 'text', name: 'tags', label: 'Tags' },
+        { type: 'text', name: 'roles', label: 'Roles' },
+      ],
+    } as const satisfies FormItem
+    function WatchHarness({ defaultValues }: { defaultValues?: Record<string, unknown> }) {
+      const form = useForm({ defaultValues, shouldUnregister: true })
+      return (
+        <FormProvider {...form}>
+          <FormItems items={[watched]} idPrefix="watch" />
+        </FormProvider>
+      )
+    }
+    render(<WatchHarness defaultValues={{ tags: ['demon'] }} />)
+    expect(screen.getByText('Tags')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Remove Wrapper' }))
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Add tags' })).toBeInTheDocument()
+    })
+  })
+
   it('writes seedWhen when the group opens', async () => {
     const user = userEvent.setup()
     const seeded = {

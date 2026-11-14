@@ -11,6 +11,22 @@ import {
 import type { FormItem, FieldOption } from '@rpg/ui/form'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 
+export const MONSTER_CREATURE_FAMILY_ADD_LABEL = 'Add families'
+export const MONSTER_CLASS_CLASSIFICATION_ADD_LABEL = 'Add class classifications'
+const MONSTER_CREATURE_FAMILY_PLACEHOLDER = 'Choose families…'
+const CLASS_CLASSIFICATION_LABEL = `${getContentTypeTerm('classes').label} classifications`
+
+const classificationDisclosure = (addLabel: string, removeLabel: string) => ({
+  addLabel,
+  removeLabel,
+  expandWhenPopulated: true,
+  confirmBeforeClear: {
+    headline: `Remove ${addLabel.replace(/^Add /, '').toLowerCase()}?`,
+    description: 'This clears the values you selected.',
+    confirmLabel: 'Remove',
+  },
+})
+
 export function monsterFamilyFieldOptions(
   ctx: ContentFormCtx,
   creatureType?: string,
@@ -72,38 +88,56 @@ export function monsterClassFieldOptions(
 }
 
 export function monsterClassificationFields(ctx: ContentFormCtx): FormItem[] {
+  const familyCopy = vocabularyTermFieldCopy(CREATURE_FAMILY_TERM, { multiple: true })
+
   return [
     {
-      type: 'combobox',
-      name: 'creatureFamilyIds',
-      multiple: true,
-      ...vocabularyTermFieldCopy(CREATURE_FAMILY_TERM, { multiple: true }),
-      options: monsterFamilyFieldOptions(ctx),
-      optionsResolve: {
-        dependsOn: ['creatureType', 'creatureFamilyIds'],
-        optionsWhen: (values) =>
-          monsterFamilyFieldOptions(
-            ctx,
-            values.creatureType as string | undefined,
-            values.creatureFamilyIds as string[] | undefined,
+      kind: 'row',
+      fields: [
+        {
+          type: 'combobox',
+          name: 'creatureFamilyIds',
+          multiple: true,
+          width: '1/2',
+          label: familyCopy.label,
+          placeholder: MONSTER_CREATURE_FAMILY_PLACEHOLDER,
+          optionalDisclosure: classificationDisclosure(
+            MONSTER_CREATURE_FAMILY_ADD_LABEL,
+            'Remove families',
           ),
-      },
-    },
-    {
-      type: 'combobox',
-      name: 'classIds',
-      multiple: true,
-      label: `${getContentTypeTerm('classes').label} classifications`,
-      hint: {
-        text: 'Classification only; does not grant levels or class features.',
-        position: 'below-control',
-      },
-      options: monsterClassFieldOptions(ctx),
-      optionsResolve: {
-        dependsOn: ['classIds'],
-        optionsWhen: (values) =>
-          monsterClassFieldOptions(ctx, values.classIds as string[] | undefined),
-      },
+          options: monsterFamilyFieldOptions(ctx),
+          optionsResolve: {
+            dependsOn: ['creatureType', 'creatureFamilyIds'],
+            optionsWhen: (values) =>
+              monsterFamilyFieldOptions(
+                ctx,
+                values.creatureType as string | undefined,
+                values.creatureFamilyIds as string[] | undefined,
+              ),
+          },
+        },
+        {
+          type: 'combobox',
+          name: 'classIds',
+          multiple: true,
+          width: '1/2',
+          label: CLASS_CLASSIFICATION_LABEL,
+          hint: {
+            text: 'Classification only; does not grant levels or class features.',
+            position: 'below-control',
+          },
+          optionalDisclosure: classificationDisclosure(
+            MONSTER_CLASS_CLASSIFICATION_ADD_LABEL,
+            'Remove class classifications',
+          ),
+          options: monsterClassFieldOptions(ctx),
+          optionsResolve: {
+            dependsOn: ['classIds'],
+            optionsWhen: (values) =>
+              monsterClassFieldOptions(ctx, values.classIds as string[] | undefined),
+          },
+        },
+      ],
     },
   ]
 }
