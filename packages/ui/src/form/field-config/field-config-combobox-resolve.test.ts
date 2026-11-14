@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
+import type { ComboboxFieldConfig } from './choice-fields.types'
 import {
   collectFieldDynamicDependsOn,
   resolveComboboxFieldConfig,
-  type ComboboxFieldConfig,
-} from './field-config'
+} from './field-dynamic-depends-on.lib'
 
 describe('resolveComboboxFieldConfig', () => {
   it('resolves dynamic filterSelects from watched form values', () => {

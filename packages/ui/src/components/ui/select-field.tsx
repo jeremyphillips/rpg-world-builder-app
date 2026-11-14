@@ -5,7 +5,10 @@ import { resolveFieldAnatomyWidth, type FieldChromeProps } from './field-chrome.
 import type { FieldWidth } from './field-control.variants'
 import { type FieldHintPosition, type FieldLabelPosition } from './field.variants'
 import type { FieldDigits } from './field-digit-metrics'
-import { type FieldOption, type SelectFieldOptionListItem } from '../../form/field-config'
+import {
+  type FieldOption,
+  type SelectFieldOptionListItem,
+} from '../../form/field-config/field-options'
 import {
   resolveFieldPlaceholder,
   type FieldPlaceholderPresentation,

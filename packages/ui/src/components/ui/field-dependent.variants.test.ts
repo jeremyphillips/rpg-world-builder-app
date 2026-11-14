@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { DEFAULT_DEPENDENT_CHROME } from '../../form/field-config'
+import { DEFAULT_DEPENDENT_CHROME } from '../../form/field-config/form-item.types'
 import {
   dependentNestMarginClasses,
   dependentSectionStackClasses,

@@ -1,7 +1,8 @@
 # Field types
 
 Reference for specialized `<Form>` field configs beyond basic text/number/select. Config
-shapes: [`field-config.ts`](../../src/form/field-config.ts). Runnable examples: Storybook
+shapes: [`field-config/`](../../src/form/field-config/) (layered modules; barrel at
+[`index.ts`](../../src/form/field-config/index.ts)). Runnable examples: Storybook
 `Forms/*` and `FieldRow/*`.
 
 ## Standard leaf types (brief)

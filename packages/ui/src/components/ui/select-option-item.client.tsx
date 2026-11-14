@@ -3,7 +3,7 @@
 import './select-option-item.css'
 
 import { SelectItem } from './select.client'
-import type { FieldOption } from '../../form/field-config'
+import type { FieldOption } from '../../form/field-config/field-options'
 import { SelectOptionRowContent } from './select-option-row-content.client'
 
 export function SelectOptionItem({

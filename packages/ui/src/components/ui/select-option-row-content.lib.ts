@@ -1,5 +1,5 @@
 import { cn } from '../../lib/utils'
-import type { SelectOptionTrailing } from '../../form/field-config'
+import type { SelectOptionTrailing } from '../../form/field-config/field-options'
 
 export function selectOptionTrailingClassName(
   variant: SelectOptionTrailing['variant'] | 'disabled-reason',

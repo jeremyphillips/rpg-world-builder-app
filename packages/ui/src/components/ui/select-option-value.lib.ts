@@ -1,6 +1,6 @@
 /** Radix Select item values are strings — encode typed option values to avoid collisions. */
 
-import type { SelectOptionTrailing } from '../../form/field-config'
+import type { SelectOptionTrailing } from '../../form/field-config/field-options'
 
 export type TypedSelectOptionValue = string | number
 

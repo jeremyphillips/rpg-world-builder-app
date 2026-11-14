@@ -206,7 +206,7 @@ placement band: **below label/hint, above the control**. Cardinality does not ch
 Pass `recommendation` on [`FormField`](../../packages/ui/src/components/ui/form-field.tsx),
 [`FieldLayout`](../../packages/ui/src/components/ui/field-layout.tsx), leaf wrappers such as
 [`ComboboxField`](../../packages/ui/src/components/ui/combobox-field.client.tsx), or schema-driven
-combobox fields via `recommendation` / `recommendationResolve` on [`ComboboxFieldConfig`](../../packages/ui/src/form/field-config.ts).
+combobox fields via `recommendation` / `recommendationResolve` on [`ComboboxFieldConfig`](../../packages/ui/src/form/field-config/choice-fields.types.ts).
 
 ```ts
 type FieldLayoutRecommendation = FieldRecommendation | FieldRecommendationGroup
@@ -294,8 +294,12 @@ Simple leaf types (`text`, `number`, `checkbox`, …) do not need helpers.
 `form-group`, `form-stack`, `form-columns`. Snippet comments reference inventory const names (`FIELD_WIDTHS`,
 `SEMANTIC_SURFACE_TONES`) — import from `@rpg/ui/form` when using those tokens in code.
 
-JSDoc on complex configs in [field-config.ts](../src/form/field-config.ts) documents
+JSDoc on complex configs in [field-config/](../src/form/field-config/) documents
 common options, defaults, and allowed values — especially `ArrayConfig.item.surface`.
+
+Layer map (imports flow one way): `field-options`, `field-visibility`, `field-dynamic.types`,
+`field-base.types` → leaf `*.types.ts` + `field-config.types` → `form-item.types` → runtime
+`*.lib.ts` → `index.ts` barrel.
 
 ### Vocabularies and hover documentation
 
@@ -336,7 +340,9 @@ Collapsible sections, separators, nested groups: [containers.md](./forms/contain
 Rich text, combobox, editable grid, dice formula, chips, input unit/select, etc.:
 [field-types.md](./forms/field-types.md).
 
-Config union source of truth: [field-config.ts](../src/form/field-config.ts).
+Config union source of truth: [field-config/](../src/form/field-config/) (`FieldConfig` in
+[`field-config.types.ts`](../src/form/field-config/field-config.types.ts); barrel
+[`index.ts`](../src/form/field-config/index.ts) preserves `./field-config` imports).
 
 ## Validation — contracts-first
 
@@ -577,12 +583,12 @@ Runnable recipes beat copying from docs. Start at `Forms/Form`, `Forms/TabbedFor
 
 ## Further reading
 
-| Doc                                                    | Contents                                              |
-| ------------------------------------------------------ | ----------------------------------------------------- |
-| [field-types.md](./forms/field-types.md)               | richtext, combobox, editableGrid, chips, inputUnit, … |
-| [containers.md](./forms/containers.md)                 | group, row, columns, stack, array, slot               |
-| [heading-hierarchy.md](./forms/heading-hierarchy.md)   | heading tiers, labelVisibility, migration notes       |
-| [sizing-and-spacing.md](./forms/sizing-and-spacing.md) | size, width, digits, rhythm tokens                    |
-| [patterns.md](./forms/patterns.md)                     | TabbedForm chrome, FormCard, wizard, Storybook index  |
-| [field-config.ts](../src/form/field-config.ts)         | Config types (source of truth)                        |
-| [README.md](../README.md)                              | Package overview, wizard pattern                      |
+| Doc                                                    | Contents                                               |
+| ------------------------------------------------------ | ------------------------------------------------------ |
+| [field-types.md](./forms/field-types.md)               | richtext, combobox, editableGrid, chips, inputUnit, …  |
+| [containers.md](./forms/containers.md)                 | group, row, columns, stack, array, slot                |
+| [heading-hierarchy.md](./forms/heading-hierarchy.md)   | heading tiers, labelVisibility, migration notes        |
+| [sizing-and-spacing.md](./forms/sizing-and-spacing.md) | size, width, digits, rhythm tokens                     |
+| [patterns.md](./forms/patterns.md)                     | TabbedForm chrome, FormCard, wizard, Storybook index   |
+| [field-config/](../src/form/field-config/)             | Config types — primitives → leaves → containers → libs |
+| [README.md](../README.md)                              | Package overview, wizard pattern                       |

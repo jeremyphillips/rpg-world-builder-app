@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
+import type { SelectFieldConfig } from './choice-fields.types'
+import { flattenSelectFieldOptions } from './field-options'
 import {
   filterSelectFieldOptionList,
-  flattenSelectFieldOptions,
   isSelectFieldReadOnly,
   resolveSelectFieldDisplayLabel,
-  type SelectFieldConfig,
-} from './field-config'
+} from './select-field-options.lib'
 
 describe('select read-only helpers', () => {
   const baseConfig = {

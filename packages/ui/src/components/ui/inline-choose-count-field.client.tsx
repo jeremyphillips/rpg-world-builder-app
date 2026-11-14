@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { useMemo } from 'react'
 
-import type { FieldOption } from '../../form/field-config'
+import type { FieldOption } from '../../form/field-config/field-options'
 import type { FieldSize } from './field.client'
 import type { FieldChrome } from './field-chrome.variants'
 import type { FieldWidth } from './field-control.variants'

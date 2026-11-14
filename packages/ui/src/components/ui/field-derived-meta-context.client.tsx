@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 
-import type { FieldDerivedMeta } from '../../form/field-config'
+import type { FieldDerivedMeta } from '../../form/field-config/field-base.types'
 
 export interface FieldDerivedMetaContextValue {
   meta?: FieldDerivedMeta

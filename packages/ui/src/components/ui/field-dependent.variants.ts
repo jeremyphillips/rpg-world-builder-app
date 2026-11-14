@@ -1,6 +1,9 @@
 import { cn } from '../../lib/utils'
-import type { DependentChrome, DependentDependentsConfig } from '../../form/field-config'
-import { DEFAULT_DEPENDENT_CHROME } from '../../form/field-config'
+import type {
+  DependentChrome,
+  DependentDependentsConfig,
+} from '../../form/field-config/form-item.types'
+import { DEFAULT_DEPENDENT_CHROME } from '../../form/field-config/form-item.types'
 import type { FieldRhythm } from './field.variants'
 import {
   resolveDependentNestRailClasses,

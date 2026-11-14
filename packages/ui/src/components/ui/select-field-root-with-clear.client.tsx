@@ -19,7 +19,7 @@ import {
   isFieldOptionGroup,
   type FieldOption,
   type SelectFieldOptionListItem,
-} from '../../form/field-config'
+} from '../../form/field-config/field-options'
 import { SelectOptionItem } from './select-option-item.client'
 import { SelectOptionRowContent } from './select-option-row-content.client'
 

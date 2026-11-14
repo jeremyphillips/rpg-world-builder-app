@@ -14,7 +14,7 @@ import type { FieldWidth } from './field-control.variants'
 import type { FieldHintPosition } from './field.variants'
 
 import type { FieldChrome } from './field-chrome.variants'
-import type { TrailingFieldActionConfig } from '../../form/field-config'
+import type { TrailingFieldActionConfig } from '../../form/field-config/field-base.types'
 
 export type TextFieldTrailingActionProps = {
   id: string

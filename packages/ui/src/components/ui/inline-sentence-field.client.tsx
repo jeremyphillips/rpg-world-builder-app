@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { useMemo } from 'react'
 
-import { isFieldOptionGroup, type FieldOption } from '../../form/field-config'
+import { isFieldOptionGroup, type FieldOption } from '../../form/field-config/field-options'
 import { ChipsFieldOptions } from './chips-field.client'
 import type { FieldLabelVisibility } from '../../form/form-heading.lib'
 import type { ChipSize } from './chip.lib'

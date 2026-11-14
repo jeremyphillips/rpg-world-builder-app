@@ -1,13 +1,15 @@
 import { describe, expect, it } from 'vitest'
 
+import { resolveFieldHint } from './field-hint.lib'
 import {
   applyOptionAvailabilityToFieldOptions,
   applyOptionAvailabilityToSelectOptions,
+} from './select-field-options.lib'
+import {
   areVisibilityDependenciesKnown,
   combineFieldVisibility,
   combineFieldVisibilityAll,
-  resolveFieldHint,
-} from './field-config'
+} from './field-visibility'
 
 describe('combineFieldVisibility', () => {
   it('merges dependsOn and ORs visibleWhen predicates', () => {
