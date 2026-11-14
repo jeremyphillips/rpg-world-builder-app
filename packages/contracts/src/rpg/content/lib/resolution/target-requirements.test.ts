@@ -91,7 +91,7 @@ describe('resolution target requirements', () => {
     expect(parsed.success).toBe(false)
     if (!parsed.success) {
       expect(parsed.error.issues.map((issue) => issue.message)).toContain(
-        'Creature size only applies to creatures. Select Creature targeting or remove this requirement.',
+        'Only applies to creatures. Select Creature targeting or remove this requirement.',
       )
       expect(parsed.error.issues.some((issue) => issue.path.join('.') === 'requirements.0')).toBe(
         true,

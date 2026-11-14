@@ -546,6 +546,37 @@ describe('monster action detail fields', () => {
     ).not.toHaveProperty('optionalDisclosure')
   })
 
+  it('marks save ability and dc source as required on save actions', () => {
+    const items = monsterActionDetailFields({
+      ctx: detailCtx,
+      action: {
+        id: 'breath',
+        kind: 'save',
+        name: 'Fire Breath',
+        preset: 'breath-weapon',
+      },
+      section: 'actions',
+      equipmentOptions: [],
+      sharedCastingOptions: [],
+      namePrefix: 'actions.0',
+    })
+    expect(findSelectField(items, 'resolution.method.ability')).toMatchObject({ required: true })
+    let dcSourceController: SelectFieldConfig | undefined
+    walkFormItems(items, (item) => {
+      if (
+        !dcSourceController &&
+        'kind' in item &&
+        item.kind === 'dependent' &&
+        'controller' in item &&
+        item.controller.name === 'dcSource.kind'
+      ) {
+        dcSourceController = item.controller as SelectFieldConfig
+      }
+    })
+    expect(dcSourceController).toMatchObject({ required: true })
+    expect(findSelectField(items, 'dcSource.ability')).toMatchObject({ required: true })
+  })
+
   it('places save configuration before resolution damage and outcomes', () => {
     const names = detailFields({
       id: 'breath',

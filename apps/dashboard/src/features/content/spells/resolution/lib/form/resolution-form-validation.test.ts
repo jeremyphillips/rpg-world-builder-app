@@ -72,7 +72,7 @@ describe('resolutionFormSchema', () => {
     expect(result.error.issues).toContainEqual(
       expect.objectContaining({
         path: ['target', 'requirements', 0],
-        message: expect.stringContaining('Creature size only applies to creatures'),
+        message: expect.stringContaining('Only applies to creatures'),
       }),
     )
   })

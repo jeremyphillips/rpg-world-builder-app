@@ -56,7 +56,7 @@ export function monsterTraitItemFields(input?: {
         renderCastingAbility: () => (
           <MonsterActionCastingAbilityField
             name={castingName}
-            required={false}
+            required
             hint={SAVING_THROW_SPELLCASTING_HINT}
             preview="save-dc"
           />

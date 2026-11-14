@@ -1,5 +1,6 @@
 import {
   addCustomRefinementIssue,
+  RESOLUTION_REQUIREMENT_CREATURE_ONLY_VALIDATION,
   type ResolutionTargetKind,
   refineRequirementRowsForTargetKind,
 } from '@rpg/contracts'
@@ -320,31 +321,10 @@ describe('production requirement authoring validation display', () => {
 
   it('surfaces target sight incompatibility on the production requirement row after save', async () => {
     const user = userEvent.setup()
-    const rowDisplaySchema = z
-      .object({
-        resolution: z.object({
-          selectionMode: z.literal('targets'),
-          target: z.object({
-            kind: z.string().optional(),
-            requirements: z.array(z.record(z.string(), z.unknown())).optional(),
-          }),
-        }),
-      })
-      .superRefine((values, ctx) => {
-        const target = values.resolution.target
-        const row = target?.requirements?.[0]
-        if (target?.kind !== 'object' || row?.kind !== 'sight') return
-        addCustomRefinementIssue(ctx, 'Sight requirements are only valid for creature targets.', [
-          'resolution',
-          'target',
-          'requirements',
-          0,
-        ])
-      })
     const onSubmit = vi.fn()
     render(
       <Form
-        schema={rowDisplaySchema}
+        schema={requirementOnlySchema}
         fields={productionDisplayFields}
         defaultValues={{
           resolution: {
@@ -369,7 +349,7 @@ describe('production requirement authoring validation display', () => {
       screen.getByRole('button', { name: /Review 1 issue in 1 row in Requirements/i }),
     ).toBeInTheDocument()
     expect(rowAlert).toHaveAttribute('data-array-item-issue-placement', 'rowAlert')
-    expect(rowAlert).toHaveTextContent('Sight requirements are only valid for creature targets.')
+    expect(rowAlert).toHaveTextContent(RESOLUTION_REQUIREMENT_CREATURE_ONLY_VALIDATION)
     expect(screen.getByText('It can see you', { exact: false })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Expand requirement/i })).not.toBeInTheDocument()
 

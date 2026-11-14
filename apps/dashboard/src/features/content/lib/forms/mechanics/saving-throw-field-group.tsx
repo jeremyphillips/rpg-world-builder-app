@@ -73,6 +73,7 @@ export function savingThrowFieldGroup(input: { renderCastingAbility: () => React
             options: abilityOptions(),
             width: '1/2',
             hint: SAVING_THROW_ABILITY_HINT,
+            required: true,
           },
           {
             type: 'select',
@@ -80,6 +81,7 @@ export function savingThrowFieldGroup(input: { renderCastingAbility: () => React
             label: SAVING_THROW_DC_SOURCE_LABEL,
             placeholder: 'Choose',
             width: '1/2',
+            required: true,
             options: [
               { value: 'fixed', label: 'Fixed' },
               { value: 'spellcasting', label: SAVING_THROW_DC_SOURCE_SPELLCASTING_OPTION_LABEL },

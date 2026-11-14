@@ -99,6 +99,7 @@ export {
 } from './requirement-target-compatibility'
 export {
   formatRequirementTargetIncompatibilityMessage,
+  RESOLUTION_REQUIREMENT_CREATURE_ONLY_VALIDATION,
   type RequirementTargetMessageTone,
 } from './requirement-target-messages'
 export {

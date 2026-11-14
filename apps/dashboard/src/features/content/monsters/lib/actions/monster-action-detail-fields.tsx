@@ -400,6 +400,7 @@ function monsterActionSaveDcDependent(namePrefix: string, currentActionId: strin
     currentActionId,
     dependentsChrome: 'none',
     spellcastingHint: SAVING_THROW_SPELLCASTING_HINT,
+    required: { controller: true, ability: true, castingAbility: true },
     abilityFields: [
       {
         kind: 'row',
@@ -411,6 +412,7 @@ function monsterActionSaveDcDependent(namePrefix: string, currentActionId: strin
             placeholder: 'Choose',
             options: abilityOptions(),
             width: '1/2',
+            required: true,
             hint: {
               resolve: {
                 dependsOn: ['dcSource.ability'],
@@ -505,6 +507,7 @@ function monsterActionSaveSection(
         label: SAVING_THROW_ABILITY_LABEL,
         options: abilityOptions(),
         hint: SAVING_THROW_ABILITY_HINT,
+        required: true,
       },
       monsterActionSaveDcDependent(namePrefix, currentActionId),
       monsterActionSaveSelectionDependent(ctx),
