@@ -45,7 +45,9 @@ export function buildSubclassFields(
     {
       kind: 'array',
       name: 'features',
-      label: vocabularyFieldLabel(CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN, { plural: true }),
+      heading: {
+        label: vocabularyFieldLabel(CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN, { plural: true }),
+      },
       addAction: { label: 'Add feature' },
       item: {
         collapsible: true,

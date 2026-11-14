@@ -9,7 +9,7 @@ import {
   cn,
   fieldAnatomyStackVariants,
 } from '@rpg/ui'
-import { ArrayLikeSectionHeader, resolveFormDensity, useFormSectionContext } from '@rpg/ui/form'
+import { FormSectionHeader, resolveFormDensity, useFormSectionContext } from '@rpg/ui/form'
 import type { SlotProgression } from '@rpg/contracts'
 
 import { TableBuilderModal, type TableBuilderFormValues } from '@/lib/table-builder'
@@ -54,7 +54,7 @@ export function SlotProgressionsField() {
   const createLabelId = useId()
   const form = useFormContext<SpellcastingRulesFormSlice>()
   const { density } = useFormSectionContext()
-  const { size } = resolveFormDensity(density)
+  const { rhythm, size } = resolveFormDensity(density)
 
   // useController (not useWatch) so the path registers with react-hook-form:
   // the schema Form shell mounts with `shouldUnregister: true`, and unregistered
@@ -159,10 +159,12 @@ export function SlotProgressionsField() {
         className={cn('min-w-0', fieldAnatomyStackVariants({ size }))}
         aria-labelledby="slot-progressions-heading"
       >
-        <ArrayLikeSectionHeader
+        <FormSectionHeader
           id="slot-progressions-heading"
           label="Slot progressions"
           hint="Spell slot tables shared by spellcasting classes."
+          headingScale="field"
+          rhythm={rhythm}
           size={size}
           action={
             <ActionButton
@@ -174,7 +176,6 @@ export function SlotProgressionsField() {
               Add custom
             </ActionButton>
           }
-          wrapper="none"
         />
         <div className="flex flex-col gap-2">
           {slotProgressions.map((progression) => (

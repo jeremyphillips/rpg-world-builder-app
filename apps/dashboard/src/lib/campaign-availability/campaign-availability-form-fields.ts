@@ -74,7 +74,7 @@ export function buildCampaignAvailabilityFields(ctx: CampaignAvailabilityFieldCt
     {
       kind: 'group',
       id: ctx.groupId,
-      legend: CAMPAIGN_ACCESS_SECTION_LEGEND,
+      heading: { label: CAMPAIGN_ACCESS_SECTION_LEGEND },
       density: ctx.groupDensity ?? 'compact',
       disclosure,
       fields: [ctx.availabilityField ?? defaultAvailabilitySwitchField(ctx.pending)],

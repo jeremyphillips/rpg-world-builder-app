@@ -242,7 +242,27 @@ const dashboardFormFieldGuards = {
       {
         selector:
           "ObjectExpression:has(> Property[key.name='kind'][value.value='group']) > Property[key.name='hint']",
-        message: 'Group-level hint is ignored — use description or heading.hint.',
+        message: 'Group-level hint is ignored — use heading.hint.',
+      },
+      {
+        selector:
+          "ObjectExpression:has(> Property[key.name='kind'][value.value='group']) > Property[key.name='legend']",
+        message: 'Use heading.label instead of legend on group configs.',
+      },
+      {
+        selector:
+          "ObjectExpression:has(> Property[key.name='kind'][value.value='group']) > Property[key.name='description']",
+        message: 'Use heading.hint instead of description on group configs.',
+      },
+      {
+        selector:
+          "ObjectExpression:has(> Property[key.name='kind'][value.value='array']) > Property[key.name='label']",
+        message: 'Use heading on named array configs instead of top-level label.',
+      },
+      {
+        selector:
+          "ObjectExpression:has(> Property[key.name='kind'][value.value='array']) > Property[key.name='hint']",
+        message: 'Use heading.hint on named array configs.',
       },
       {
         selector: 'Property[key.name="label"][value.type="Literal"][value.value=""]',

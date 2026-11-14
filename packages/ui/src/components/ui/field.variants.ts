@@ -28,7 +28,7 @@ import { type FieldSizeToken } from './field-sizing.variants'
  * - `formSectionStackClasses` — vertical gap between top-level form sections
  * - `fieldRowLayoutClasses` — deprecated alias (`gap-6`); prefer `resolveFieldRowClasses`
  * - `fieldChipWrapGapClasses` — chip pill row gap only (no vertical pad) inside `ChipsField`
- * - group/section hint typography is `text-style-field-group-description` (spacing lives on the legend header)
+ * - structural section hints use `text-style-field-section-description*` / `text-style-field-subsection-description*`
  * - `fieldGroupLegendHeaderStackClasses` — vertical gap between a group legend and its hint
  * - `fieldGroupLegendHeaderMarginVariants` — legacy legend bottom margin (HeadingPresentation, editable-grid — not FieldGroup body spacing)
  * - `fieldGroupBodyGapVariants` / `resolveFieldGroupBodyGap` — legend→body spacing scale for FieldGroup (applied on the body relationship)
@@ -295,22 +295,11 @@ export const fieldSettingsRowClasses =
 export type FieldRhythm = 'compact' | 'comfortable'
 
 /**
- * Closed group heading opt-in.
- * - `'field'` — field label / hint type scale (not structural tier).
- * - `'subsection'` — structural subsection legend at any named-group depth.
+ * Closed group heading presentation opt-in — typography only; does not change legendSize or body gaps.
+ * - `'section'` / `'subsection'` — structural legend + description pair for that tier.
+ * - `'field'` — field label + field-hint scale.
  */
-export type GroupHeadingScale = 'field' | 'subsection'
-
-/** Group legend description typography — follows form density (`rhythm`), not legend title scale. */
-export function resolveFieldGroupDescriptionTypography(
-  rhythm: FieldRhythm = 'comfortable',
-  headingScale?: GroupHeadingScale,
-): string {
-  if (headingScale === 'field') return 'text-style-caption'
-  return rhythm === 'compact'
-    ? 'text-style-field-group-description-compact'
-    : 'text-style-field-group-description'
-}
+export type GroupHeadingScale = 'section' | 'subsection' | 'field'
 
 export const fieldStackRhythmVariants = cva('flex flex-col', {
   variants: {
@@ -579,7 +568,7 @@ export const fieldGroupLegendVariants = cva('', {
     { size: 'section', rhythm: 'comfortable', class: 'text-style-field-legend' },
     { size: 'subsection', rhythm: 'comfortable', class: 'text-style-field-legend-sub' },
     { size: 'section', rhythm: 'compact', class: 'text-style-field-legend-compact' },
-    { size: 'subsection', rhythm: 'compact', class: 'text-style-field-legend-compact' },
+    { size: 'subsection', rhythm: 'compact', class: 'text-style-field-legend-sub-compact' },
   ],
   defaultVariants: {
     size: 'section',

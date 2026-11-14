@@ -14,7 +14,7 @@ describe('disableFormItems', () => {
             { type: 'text', name: 'formula', label: 'Formula' },
             {
               kind: 'group',
-              legend: 'Nested',
+              heading: { label: 'Nested' },
               fields: [{ type: 'number', name: 'bonus', label: 'Bonus' }],
             },
           ],
@@ -31,7 +31,7 @@ describe('disableFormItems', () => {
           { type: 'text', name: 'formula', label: 'Formula', disabled: true },
           {
             kind: 'group',
-            legend: 'Nested',
+            heading: { label: 'Nested' },
             fields: [{ type: 'number', name: 'bonus', label: 'Bonus', disabled: true }],
           },
         ],

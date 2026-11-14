@@ -81,7 +81,7 @@ function monsterDistanceFields(): FormItem {
 
   return {
     kind: 'group',
-    legend: MONSTER_ACTION_DISTANCE_SECTION_LEGEND,
+    heading: { label: MONSTER_ACTION_DISTANCE_SECTION_LEGEND },
     visibility: {
       dependsOn: ['modes'],
       visibleWhen: (values) =>

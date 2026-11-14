@@ -39,8 +39,7 @@ export function heritageScalarFields(ctx: ContentFormCtx): FormItem[] {
   return [
     {
       kind: 'group',
-      legend: HERITAGE_GROUP_LEGEND,
-      description: HERITAGE_GROUP_DESCRIPTION,
+      heading: { label: HERITAGE_GROUP_LEGEND, hint: HERITAGE_GROUP_DESCRIPTION },
       fields: [
         {
           kind: 'row',

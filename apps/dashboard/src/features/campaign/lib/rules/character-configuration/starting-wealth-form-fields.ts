@@ -185,7 +185,7 @@ export function buildStartingWealthTiersField(): LevelRangeArrayConfig {
       {
         kind: 'array',
         name: 'magicItemGrants',
-        label: 'Magic item grants',
+        heading: { label: 'Magic item grants' },
         addAction: { label: 'Add magic item grant' },
         min: 0,
         item: {

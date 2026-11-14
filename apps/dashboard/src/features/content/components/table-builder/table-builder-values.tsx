@@ -106,7 +106,7 @@ function TableBuilderValuesSectionChrome({
       <FormSectionHeader
         label={TABLE_BUILDER_VALUES_LABEL}
         hint={resolveTableBuilderValuesHint(values.hasNoColumns, values.includeLevel)}
-        labelPresentation="field-label"
+        headingScale="field"
         size="md"
         required
       />

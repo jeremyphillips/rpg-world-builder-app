@@ -136,8 +136,10 @@ export function levelZeroNpcsFields({
   return [
     {
       kind: 'group',
-      legend: 'Level 0 NPCs',
-      description: 'Baseline stats and proficiencies for classless Level 0 NPCs.',
+      heading: {
+        label: 'Level 0 NPCs',
+        hint: 'Baseline stats and proficiencies for classless Level 0 NPCs.',
+      },
       fields: [
         {
           kind: 'dependent',
@@ -232,9 +234,10 @@ export function levelZeroNpcsFields({
               },
               {
                 kind: 'group',
-                legend: 'Wealth tiers',
-                description:
-                  'Wealth tiers represent starting liquid funds, not total assets, property, income, or social class.',
+                heading: {
+                  label: 'Wealth tiers',
+                  hint: 'Wealth tiers represent starting liquid funds, not total assets, property, income, or social class.',
+                },
                 fields: NPC_WEALTH_TIER_IDS.map((tierId) => {
                   const [field] = wealthGrantMoneyField(LEVEL_ZERO_WEALTH_TIER_FIELD_PATHS[tierId])
                   return {

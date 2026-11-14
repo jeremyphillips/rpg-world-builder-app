@@ -389,7 +389,7 @@ function castingFields(): FormItem[] {
   return [
     {
       kind: 'group',
-      legend: 'Casting time',
+      heading: { label: 'Casting time' },
       fields: [
         {
           kind: 'row',
@@ -429,7 +429,7 @@ function castingFields(): FormItem[] {
     },
     {
       kind: 'group',
-      legend: 'Range',
+      heading: { label: 'Range' },
       fields: [
         {
           kind: 'row',
@@ -473,7 +473,7 @@ function castingFields(): FormItem[] {
     },
     {
       kind: 'group',
-      legend: 'Duration',
+      heading: { label: 'Duration' },
       fields: [
         {
           kind: 'row',
@@ -528,7 +528,7 @@ function castingFields(): FormItem[] {
     },
     {
       kind: 'group',
-      legend: 'Components',
+      heading: { label: 'Components' },
       fields: [
         {
           kind: 'row',

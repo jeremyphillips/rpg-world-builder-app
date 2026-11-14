@@ -6,7 +6,7 @@ import { resolveArrayFieldRendererChrome } from './resolve-array-field-renderer-
 const nestedGrantArray = {
   kind: 'array' as const,
   name: 'grants',
-  label: 'Grants',
+  heading: { label: 'Grants' },
   item: {
     collapsible: true,
     renderShell: (_props: ArrayItemShellRenderProps) => null,
@@ -21,7 +21,7 @@ describe('resolveArrayFieldRendererChrome', () => {
   it('keeps collapse wiring for renderShell arrays inside nested sections', () => {
     const chrome = resolveArrayFieldRendererChrome({
       config: nestedGrantArray,
-      density: 'comfortable',
+      parentDensity: 'comfortable',
       depth: 2,
       inRhythmStack: undefined,
       fieldsLength: 2,
@@ -36,11 +36,11 @@ describe('resolveArrayFieldRendererChrome', () => {
       config: {
         kind: 'array',
         name: 'examples',
-        label: 'Examples',
+        heading: { label: 'Examples' },
         item: { collapsible: true, variant: 'compact' },
         fields: [{ type: 'text', name: 'value', label: 'Value' }],
       },
-      density: 'comfortable',
+      parentDensity: 'comfortable',
       depth: 0,
       inRhythmStack: undefined,
       fieldsLength: 1,
@@ -49,18 +49,31 @@ describe('resolveArrayFieldRendererChrome', () => {
     expect(chrome.collapsible).toBe(true)
   })
 
-  it('uses legend density separately from compact item density', () => {
+  it('uses parent density for legend when the array omits density', () => {
     const chrome = resolveArrayFieldRendererChrome({
       config: nestedGrantArray,
-      density: 'compact',
-      legendDensity: 'comfortable',
+      parentDensity: 'comfortable',
       depth: 0,
       inRhythmStack: undefined,
       fieldsLength: 1,
     })
 
     expect(chrome.legendFieldSize).toBe('md')
+    expect(chrome.legendRhythm).toBe('comfortable')
     expect(chrome.itemBodyStackClasses).toContain('gap-4')
+  })
+
+  it('uses explicit array density for legend and item bodies', () => {
+    const chrome = resolveArrayFieldRendererChrome({
+      config: { ...nestedGrantArray, density: 'compact' },
+      parentDensity: 'comfortable',
+      depth: 0,
+      inRhythmStack: undefined,
+      fieldsLength: 1,
+    })
+
+    expect(chrome.legendFieldSize).toBe('sm')
+    expect(chrome.legendRhythm).toBe('compact')
   })
 
   it('does not enable collapse for compact nested arrays without renderShell', () => {
@@ -68,10 +81,10 @@ describe('resolveArrayFieldRendererChrome', () => {
       config: {
         kind: 'array',
         name: 'tags',
-        label: 'Tags',
+        heading: { label: 'Tags' },
         fields: [{ type: 'text', name: 'label', label: 'Label' }],
       },
-      density: 'comfortable',
+      parentDensity: 'comfortable',
       depth: 2,
       inRhythmStack: undefined,
       fieldsLength: 1,

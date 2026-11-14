@@ -23,7 +23,6 @@ export function toolFormFieldGroup(): FormItem[] {
   return [
     {
       kind: 'group',
-      legend: '',
       fields: [
         {
           kind: 'row',
@@ -57,7 +56,7 @@ export function toolFormFieldGroup(): FormItem[] {
     {
       kind: 'array',
       name: 'utilizes',
-      label: 'Utilize actions',
+      heading: { label: 'Utilize actions' },
       addAction: { label: 'Add utilize action', layout: 'inline' },
       min: 1,
       item: {

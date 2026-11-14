@@ -27,7 +27,11 @@ import {
   useFormSectionContext,
 } from '../context/form-section.context'
 import { useFormUiContext } from '../context/form-ui.context'
-import { resolveGroupLegendSize, resolveNamedGroupDepthAfterEntering } from '../form-heading.lib'
+import {
+  resolveGroupHeadingTier,
+  resolveGroupLegendSize,
+  resolveNamedGroupDepthAfterEntering,
+} from '../form-heading.lib'
 import { hasNamedGroupHeading, resolveGroupHeading } from '../resolve-container-heading.lib'
 import type {
   GroupConfig,
@@ -43,7 +47,6 @@ import type { FieldChrome } from '../../components/ui/field-chrome.variants'
 import {
   resolveGroupSectionDescription,
   resolveGroupSectionFieldChromeSuppressed,
-  resolveGroupSectionHeadingTier,
 } from './form-group-section.lib'
 
 interface GroupFieldSectionProps {
@@ -148,8 +151,8 @@ export function GroupFieldSection({
   const { control } = useFormContext()
   const heading = resolveGroupHeading(item)
   const hasNamedHeading = hasNamedGroupHeading(item)
-  const groupTier = resolveGroupSectionHeadingTier(item, parentContext.namedGroupDepth)
-  const legendSize = resolveGroupLegendSize(groupTier)
+  const structuralTier = resolveGroupHeadingTier(parentContext.namedGroupDepth)
+  const legendSize = resolveGroupLegendSize(structuralTier)
   const groupDensity = item.density ?? parentContext.density
   const { rhythm: groupRhythm, size: groupSize } = resolveFormDensity(groupDensity)
   const childNamedGroupDepth = resolveNamedGroupDepthAfterEntering(
@@ -169,7 +172,7 @@ export function GroupFieldSection({
         density: groupDensity,
         inGroup: true,
         namedGroupDepth: childNamedGroupDepth,
-        headingTier: hasNamedHeading ? groupTier : parentContext.headingTier,
+        headingTier: hasNamedHeading ? structuralTier : parentContext.headingTier,
         fieldChromeCascade: item.fieldChrome ?? parentContext.fieldChromeCascade,
         fieldChromeSuppressed: resolveGroupSectionFieldChromeSuppressed(
           groupFieldChrome,
@@ -181,16 +184,13 @@ export function GroupFieldSection({
       depth,
       groupDensity,
       childNamedGroupDepth,
-      groupTier,
+      structuralTier,
       hasNamedHeading,
       item.fieldChrome,
       groupFieldChrome,
     ],
   )
-  const description = React.useMemo(
-    () => resolveGroupSectionDescription(heading, item.description),
-    [heading, item.description],
-  )
+  const description = React.useMemo(() => resolveGroupSectionDescription(heading), [heading])
 
   const nestedFields = (
     <FormSectionContext.Provider value={childContext}>
@@ -231,7 +231,7 @@ export function GroupFieldSection({
   const group = (
     <FieldGroup
       id={item.id}
-      legend={heading?.label ?? item.legend}
+      legend={heading?.label}
       legendSrOnly={heading?.labelVisibility === 'srOnly'}
       legendAccessory={heading?.accessory}
       legendAction={heading?.action}

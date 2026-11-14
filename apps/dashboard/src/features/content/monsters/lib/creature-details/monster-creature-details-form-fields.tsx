@@ -168,7 +168,7 @@ export function creatureDetailsFields(ctx: ContentFormCtx): FormItem[] {
   return [
     {
       kind: 'group',
-      legend: 'Proficiencies',
+      heading: { label: 'Proficiencies' },
       fields: [
         {
           kind: 'slot',
@@ -186,8 +186,7 @@ export function creatureDetailsFields(ctx: ContentFormCtx): FormItem[] {
     },
     {
       kind: 'group',
-      legend: 'Senses',
-      description: MONSTER_SENSES_HINT,
+      heading: { label: 'Senses', hint: MONSTER_SENSES_HINT },
       fields: [
         {
           kind: 'slot',
@@ -198,7 +197,7 @@ export function creatureDetailsFields(ctx: ContentFormCtx): FormItem[] {
     },
     {
       kind: 'group',
-      legend: 'Communication',
+      heading: { label: 'Communication' },
       fields: [
         {
           kind: 'slot',
@@ -210,12 +209,11 @@ export function creatureDetailsFields(ctx: ContentFormCtx): FormItem[] {
     },
     {
       kind: 'group',
-      legend: 'Defenses',
+      heading: { label: 'Defenses' },
       fields: [
         {
           kind: 'group',
-          legend: 'Damage defenses',
-          description: MONSTER_DAMAGE_DEFENSES_HINT,
+          heading: { label: 'Damage defenses', hint: MONSTER_DAMAGE_DEFENSES_HINT },
           fields: [
             damageDefenseField(ctx, 'vulnerabilities'),
             damageDefenseField(ctx, 'resistances'),
@@ -224,8 +222,7 @@ export function creatureDetailsFields(ctx: ContentFormCtx): FormItem[] {
         },
         {
           kind: 'group',
-          legend: 'Condition immunities',
-          description: MONSTER_CONDITION_IMMUNITIES_HINT,
+          heading: { label: 'Condition immunities', hint: MONSTER_CONDITION_IMMUNITIES_HINT },
           fields: [
             {
               type: 'combobox',

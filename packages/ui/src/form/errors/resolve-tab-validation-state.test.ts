@@ -43,7 +43,7 @@ const grantsTab: TabValidationTab = {
     {
       kind: 'array',
       name: 'grants',
-      label: 'Grants',
+      heading: { label: 'Grants' },
       fields: [{ type: 'text', name: 'label', label: 'Label', required: true }],
     },
   ],

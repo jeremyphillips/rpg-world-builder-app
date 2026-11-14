@@ -79,7 +79,7 @@ function findGroup(fields: FormItem[], legend: string): GroupConfig | undefined 
   let found: GroupConfig | undefined
   walkNestedFormItems(fields, (field) => {
     if (!found && isContainer(field) && field.kind === 'group') {
-      const groupLegend = field.legend ?? field.heading?.label
+      const groupLegend = field.heading?.label
       if (groupLegend === legend) {
         found = field
       }
@@ -347,13 +347,13 @@ describe('spellFormDef resolution tab', () => {
     expect(findGroup(resolutionTab?.fields ?? [], 'Authored effects')).toBeDefined()
     const effectsArray = findArrayField(resolutionTab?.fields ?? [], 'resolution.effects')
     expect(effectsArray).toBeDefined()
-    expect('label' in (effectsArray ?? {}) ? effectsArray?.label : undefined).toBeUndefined()
+    expect(effectsArray?.heading).toBeUndefined()
     expect(effectsArray?.item?.variant).toBe('detailed')
     expect(effectsArray?.item?.collapsible).toBe(true)
     expect(effectsArray?.item?.header?.primary).toBeTypeOf('function')
     expect(effectsArray?.item?.header?.summary).toBeTypeOf('function')
     expect(findGroup(resolutionTab?.fields ?? [], 'Outcome branches')).toMatchObject({
-      description: RESOLUTION_SECTION_LABELS.outcomesHint,
+      heading: { hint: RESOLUTION_SECTION_LABELS.outcomesHint },
     })
   })
 })

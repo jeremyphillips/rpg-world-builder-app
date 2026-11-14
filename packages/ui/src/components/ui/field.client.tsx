@@ -299,11 +299,23 @@ interface FieldHintErrorContent {
   error?: string
 }
 
-export function FieldHintText({ id, children }: { id: string; children: string }) {
+export function FieldHintText({
+  id,
+  children,
+  size: sizeProp,
+}: {
+  id: string
+  children: string
+  size?: FieldSize
+}) {
+  const context = React.useContext(FieldContext)
+  const size = sizeProp ?? context?.size ?? 'md'
+  const hintClass =
+    size === 'sm' || size === 'xs' ? 'text-style-field-hint-compact' : 'text-style-field-hint'
   return (
-    <Text id={id} variant="caption">
+    <span id={id} className={hintClass}>
       {children}
-    </Text>
+    </span>
   )
 }
 

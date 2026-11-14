@@ -33,8 +33,10 @@ export function monsterArmorClassFields(ctx: ContentFormCtx): FormItem[] {
   return [
     {
       kind: 'group',
-      legend: MONSTER_ARMOR_CLASS_HEADING,
-      description: "Configure the creature's defenses and Armor Class.",
+      heading: {
+        label: MONSTER_ARMOR_CLASS_HEADING,
+        hint: "Configure the creature's defenses and Armor Class.",
+      },
       fields: [
         {
           kind: 'slot',

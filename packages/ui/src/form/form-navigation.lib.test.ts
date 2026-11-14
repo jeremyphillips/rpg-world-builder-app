@@ -17,7 +17,7 @@ describe('collectFormNavigationAnchors', () => {
         kind: 'row',
         id: 'creation-standard-array',
         navigation: { id: 'creation-standard-array' },
-        heading: { label: 'Standard array' },
+        label: 'Standard array',
         fields: [{ type: 'number', name: 'standardArray.0', label: 'Score 1' }],
       },
     ]
@@ -44,7 +44,7 @@ describe('collectFormNavigationAnchors', () => {
       {
         kind: 'array',
         name: 'items',
-        label: 'Items',
+        heading: { label: 'Items' },
         fields: [{ type: 'text', name: 'label', label: 'Label' }],
       },
       {
@@ -61,7 +61,7 @@ describe('collectFormNavigationAnchors', () => {
     const items: FormItem[] = [
       {
         kind: 'group',
-        legend: 'Outer',
+        heading: { label: 'Outer' },
         fields: [
           {
             kind: 'group',

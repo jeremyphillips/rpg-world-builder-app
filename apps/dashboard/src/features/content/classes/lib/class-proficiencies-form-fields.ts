@@ -178,7 +178,7 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
 
   const defensesGroup: FormItem = {
     kind: 'group',
-    legend: 'Defenses',
+    heading: { label: 'Defenses' },
     fields: [
       {
         type: 'chips',
@@ -217,7 +217,7 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
 
   const weaponsGroup: FormItem = {
     kind: 'group',
-    legend: 'Weapons',
+    heading: { label: 'Weapons' },
     fields: [
       {
         kind: 'slot',
@@ -247,7 +247,7 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
 
   const grantedSkillsGroup: FormItem = {
     kind: 'group',
-    legend: grantedSkillProficienciesLegend,
+    heading: { label: grantedSkillProficienciesLegend },
     fields: [
       {
         type: 'chips',
@@ -261,7 +261,7 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
 
   const grantedToolsGroup: FormItem = {
     kind: 'group',
-    legend: grantedToolProficienciesLegend,
+    heading: { label: grantedToolProficienciesLegend },
     fields: [
       {
         type: 'chips',

@@ -72,7 +72,6 @@ export type StandardFieldGroupBodyProps = {
   legendAction?: React.ReactNode
   legendSize: FieldGroupLegendSize
   headingScale?: GroupHeadingScale
-  legendTypography: string
   fieldSize: FieldSizeToken
   rhythm: FieldRhythm
   className?: string
@@ -94,7 +93,6 @@ export function StandardFieldGroupBody({
   legendAction,
   legendSize,
   headingScale,
-  legendTypography,
   fieldSize,
   rhythm,
   className,
@@ -153,7 +151,8 @@ export function StandardFieldGroupBody({
           description={description}
           legendAccessory={legendAccessory}
           legendAction={legendAction}
-          legendTypography={legendTypography}
+          legendSize={legendSize}
+          fieldSize={fieldSize}
           headingScale={headingScale}
           rhythm={rhythm}
           legendChromeClassName={chromeClasses.legend}

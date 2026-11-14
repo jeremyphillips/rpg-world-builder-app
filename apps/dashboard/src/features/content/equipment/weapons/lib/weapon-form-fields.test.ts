@@ -191,14 +191,14 @@ describe('weapon kindFieldGroups', () => {
     const weaponGroup = assertWeaponGroup(weaponFormFieldGroup(FORM_CTX))
     const rangeGroup = weaponGroup.fields.find(
       (field): field is Extract<(typeof weaponGroup.fields)[number], { kind: 'group' }> =>
-        'kind' in field && field.kind === 'group' && field.legend === 'Range',
+        'kind' in field && field.kind === 'group' && field.heading?.label === 'Range',
     )
     if (!rangeGroup || !('fields' in rangeGroup)) {
       throw new Error('expected Range group')
     }
 
     expect(rangeGroup).toMatchObject({
-      legend: 'Range',
+      heading: { label: 'Range' },
       visibility: {
         dependsOn: ['mode', 'properties'],
       },

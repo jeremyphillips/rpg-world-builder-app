@@ -61,7 +61,7 @@ export function buildSkillProficiencyFields(ctx: ContentFormCtx): FormItem[] {
         {
           kind: 'array',
           name: 'examples',
-          label: 'Examples',
+          heading: { label: 'Examples' },
           addAction: { label: 'Add example', layout: 'inline', size: 'sm' },
           min: 1,
           density: 'comfortable',

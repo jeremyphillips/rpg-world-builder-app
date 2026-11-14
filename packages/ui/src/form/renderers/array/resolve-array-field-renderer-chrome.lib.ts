@@ -5,10 +5,10 @@ import {
 import { assertArrayItemConfig } from '../../config/array/assert-array-item-config.lib'
 import { assertArrayLabelConfig } from '../../config/array/assert-array-label-config.lib'
 import {
-  resolveArrayLabel,
+  resolveArrayHeading,
   resolveArrayLabelMode,
   resolveArraySectionLabelForDisplay,
-} from '../../config/array/resolve-array-label.lib'
+} from '../../config/array/resolve-array-heading.lib'
 import {
   isNestedArraySection,
   resolveArrayAddAction,
@@ -18,13 +18,17 @@ import {
 } from '../../config/array/array-item-config.lib'
 import { resolveArrayItemPresentation } from '../../config/array/array-item-presentation.lib'
 import type { ArrayConfig } from '../../field-config'
-import { resolveFormDensity } from '../../form-density'
+import {
+  DEFAULT_ARRAY_SECTION_DENSITY,
+  resolveFormDensity,
+  resolveSectionDensity,
+} from '../../form-density'
 import { resolveArrayEmptyItemLabel } from './array-field-empty-state.lib'
 
 type ResolveArrayFieldRendererChromeInput = {
   config: ArrayConfig
-  density: Parameters<typeof resolveFormDensity>[0]
-  legendDensity?: Parameters<typeof resolveFormDensity>[0]
+  /** Parent section density before array item defaults apply. */
+  parentDensity: Parameters<typeof resolveFormDensity>[0]
   depth: number
   inRhythmStack: boolean | undefined
   fieldsLength: number
@@ -33,15 +37,20 @@ type ResolveArrayFieldRendererChromeInput = {
 
 export function resolveArrayFieldRendererChrome({
   config,
-  density,
-  legendDensity,
+  parentDensity,
   depth,
   inRhythmStack,
   fieldsLength,
   wrapSectionChrome = false,
 }: ResolveArrayFieldRendererChromeInput) {
-  const { rhythm, size } = resolveFormDensity(density)
-  const legendFieldSize = resolveFormDensity(legendDensity ?? density).size
+  const sectionDensity = resolveSectionDensity({
+    explicit: config.density,
+    inherited: parentDensity,
+    sectionDefault: DEFAULT_ARRAY_SECTION_DENSITY,
+  })
+  const { rhythm, size } = resolveFormDensity(sectionDensity)
+  const headerDensity = config.density ?? parentDensity
+  const { rhythm: legendRhythm, size: legendFieldSize } = resolveFormDensity(headerDensity)
   const itemConfig = resolveArrayItemConfig(config)
   const addAction = resolveArrayAddAction(config)
   const {
@@ -57,10 +66,10 @@ export function resolveArrayFieldRendererChrome({
     variant: 'outline' as const,
     layout: 'stacked' as const,
   }
-  const resolvedLabel = resolveArrayLabel(config)
-  const itemLegend = resolvedLabel?.label ?? ''
-  const sectionLabel = resolvedLabel?.label ?? resolveArraySectionLabelForDisplay(config)
-  const sectionHint = resolvedLabel?.hint
+  const resolvedHeading = resolveArrayHeading(config)
+  const itemLegend = resolvedHeading?.label ?? ''
+  const sectionLabel = resolvedHeading?.label ?? resolveArraySectionLabelForDisplay(config)
+  const sectionHint = resolvedHeading?.hint
   const labelMode = resolveArrayLabelMode(config)
   const { min = 0, max } = config
   const itemCollapsible = itemConfig.collapsible
@@ -108,6 +117,7 @@ export function resolveArrayFieldRendererChrome({
     sectionHint,
     labelMode,
     legendFieldSize,
+    legendRhythm,
     max,
     min,
     nested,

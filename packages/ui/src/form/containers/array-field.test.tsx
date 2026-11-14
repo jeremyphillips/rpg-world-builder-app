@@ -56,7 +56,7 @@ const collapsibleTraitFields: FormItem[] = [
   {
     kind: 'array',
     name: 'traits',
-    label: 'Traits',
+    heading: { label: 'Traits' },
     item: {
       variant: 'detailed',
       collapsible: true,
@@ -75,7 +75,7 @@ const collapsibleTraitFieldsSimpleHeader: FormItem[] = [
   {
     kind: 'array',
     name: 'traits',
-    label: 'Traits',
+    heading: { label: 'Traits' },
     item: {
       variant: 'detailed',
       collapsible: true,
@@ -94,7 +94,7 @@ const fields: FormItem[] = [
   {
     kind: 'array',
     name: 'traits',
-    label: 'Traits',
+    heading: { label: 'Traits' },
     fields: traitFields,
     addAction: { label: 'Add trait' },
   },
@@ -136,7 +136,7 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'traits',
-        label: 'Traits',
+        heading: { label: 'Traits' },
         fieldChrome: { variant: 'none' },
         fields: traitFields,
         addAction: { label: 'Add trait' },
@@ -183,7 +183,7 @@ describe('ArrayFieldRenderer', () => {
           {
             kind: 'array',
             name: 'traits',
-            label: 'Traits',
+            heading: { label: 'Traits' },
             emptyState: 'none',
             fields: traitFields,
             addAction: { label: 'Add trait' },
@@ -206,8 +206,7 @@ describe('ArrayFieldRenderer', () => {
           {
             kind: 'array',
             name: 'traits',
-            label: 'Traits',
-            labelVisibility: 'srOnly',
+            heading: { label: 'Traits', labelVisibility: 'srOnly' },
             fields: traitFields,
             addAction: { label: 'Add trait' },
           },
@@ -284,7 +283,7 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'traits',
-        label: 'Traits',
+        heading: { label: 'Traits' },
         item: { surface: { elevation: 'raised' } },
         fields: traitFields,
         addAction: { label: 'Add trait' },
@@ -314,7 +313,7 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'traits',
-        label: 'Traits',
+        heading: { label: 'Traits' },
         item: { surface: CANVAS_SURFACE, variant: 'compact', headerVisibility: 'hidden' },
         fields: traitFields,
         addAction: { label: 'Add trait', layout: 'inline' },
@@ -351,8 +350,7 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'traits',
-        label: 'Grants',
-        hint: 'Add the mechanical effects this feature provides.',
+        heading: { label: 'Grants', hint: 'Add the mechanical effects this feature provides.' },
         fields: traitFields,
         addAction: { label: 'Add grant', layout: 'inline' },
       },
@@ -385,7 +383,7 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'traits',
-        label: 'Movement',
+        heading: { label: 'Movement' },
         fields: traitFields,
         addAction: { label: 'Add speed', layout: 'inline' },
       },
@@ -435,7 +433,7 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'traits',
-        label: 'Traits',
+        heading: { label: 'Traits' },
         fields: traitFields,
         addAction: { label: 'Choose preset', icon: false },
       },
@@ -459,7 +457,7 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'traits',
-        label: 'Traits',
+        heading: { label: 'Traits' },
         fields: traitFields,
         addAction: { label: 'Add trait', size: 'sm' },
       },
@@ -483,7 +481,7 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'traits',
-        label: 'Traits',
+        heading: { label: 'Traits' },
         fields: traitFields,
         addAction: { label: 'Add trait', variant: 'secondary' },
       },
@@ -513,7 +511,7 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'grants',
-        label: 'Grants',
+        heading: { label: 'Grants' },
         addAction: {
           label: 'Add grant',
           variant: 'default',
@@ -591,7 +589,7 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'traits',
-        label: 'Traits',
+        heading: { label: 'Traits' },
         density: 'comfortable',
         item: {
           variant: 'detailed',
@@ -629,7 +627,7 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'traits',
-        label: 'Traits',
+        heading: { label: 'Traits' },
         density: 'comfortable',
         fields: traitFields,
         addAction: { label: 'Add trait' },
@@ -707,7 +705,7 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'modes',
-        label: 'Modes',
+        heading: { label: 'Modes' },
         fields: [{ type: 'select', name: 'mode', label: 'Mode', options: [] }],
         addAction: { label: 'Add mode' },
         resolveCanAppend: (items) =>
@@ -739,7 +737,7 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'traits',
-        label: 'Traits',
+        heading: { label: 'Traits' },
         fields: traitFields,
         addAction: { label: 'Add trait' },
         max: 1,
@@ -766,7 +764,7 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'traits',
-        label: 'Traits',
+        heading: { label: 'Traits' },
         fields: traitFields,
         addAction: { label: 'Add trait' },
         min: 1,
@@ -797,7 +795,7 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'traits',
-        label: 'Traits',
+        heading: { label: 'Traits' },
         fields: traitFields,
         addAction: { label: 'Add trait' },
         min: 1,
@@ -841,7 +839,7 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'rows',
-        label: 'Rows',
+        heading: { label: 'Rows' },
         keyName: '_fieldArrayKey',
         fields: [{ type: 'text', name: 'label', label: 'Label', required: true }],
         addAction: { label: 'Add row' },
@@ -874,7 +872,7 @@ describe('ArrayFieldRenderer', () => {
           {
             kind: 'array',
             name: 'traits',
-            label: 'Traits',
+            heading: { label: 'Traits' },
             fields: traitFields,
             addAction: { label: 'Add trait' },
             min: 1,
@@ -896,7 +894,7 @@ describe('ArrayFieldRenderer', () => {
           {
             kind: 'array',
             name: 'traits',
-            label: 'Traits',
+            heading: { label: 'Traits' },
             fields: traitFields,
             addAction: { label: 'Add trait' },
             min: 1,
@@ -918,7 +916,7 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'traits',
-        label: 'Traits',
+        heading: { label: 'Traits' },
         fields: traitFields,
         addAction: { label: 'Add trait' },
         item: { removable: false },
@@ -942,7 +940,7 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'traits',
-        label: 'Traits',
+        heading: { label: 'Traits' },
         fields: traitFields,
         addAction: { label: 'Add trait' },
         item: {
@@ -972,7 +970,7 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'traits',
-        label: 'Traits',
+        heading: { label: 'Traits' },
         fields: traitFields,
         addAction: { label: 'Add trait' },
         item: {
@@ -1013,7 +1011,7 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'grants',
-        label: 'Grants',
+        heading: { label: 'Grants' },
         addAction: { label: 'Add grant' },
         fields: [
           {
@@ -1034,7 +1032,7 @@ describe('ArrayFieldRenderer', () => {
           {
             kind: 'array',
             name: 'entries',
-            label: 'Spell entries',
+            heading: { label: 'Spell entries' },
             addAction: { label: 'Add entry' },
             visibility: {
               dependsOn: ['grantType'],
@@ -1076,7 +1074,7 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'entries',
-        label: 'Entries',
+        heading: { label: 'Entries' },
         fields: [
           { type: 'switch', name: 'enabled', label: 'Enabled' },
           {
@@ -1138,14 +1136,14 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'items',
-        label: 'Items',
+        heading: { label: 'Items' },
         addAction: { label: 'Add item' },
         fields: [
           { type: 'text', name: 'name', label: 'Name' },
           {
             kind: 'array',
             name: 'tags',
-            label: 'Tags',
+            heading: { label: 'Tags' },
             addAction: { label: 'Add tag' },
             fields: [{ type: 'text', name: 'label', label: 'Label' }],
           },
@@ -1175,7 +1173,7 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'traits',
-        label: 'Traits',
+        heading: { label: 'Traits' },
         item: { reorder: false },
         fields: traitFields,
         addAction: { label: 'Add trait' },
@@ -1240,10 +1238,10 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'rows',
-        label: 'Rows',
-        reorder: false,
+        heading: { label: 'Rows' },
         addAction: { label: 'Add row' },
         item: {
+          reorder: false,
           variant: 'detailed',
           header: {
             fallback: (index) => `Row ${index + 1}`,
@@ -1308,10 +1306,10 @@ describe('ArrayFieldRenderer', () => {
     ): FormItem => ({
       kind: 'array',
       name: 'requirements',
-      label: 'Requirements',
-      reorder: false,
+      heading: { label: 'Requirements' },
       addAction: { label: 'Add a requirement' },
       item: {
+        reorder: false,
         variant: 'detailed',
         collapsible: true,
         resolveCollapsible,
@@ -1592,7 +1590,7 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'traits',
-        label: 'Traits',
+        heading: { label: 'Traits' },
         item: {
           variant: 'compact',
           header: { fallback: (index) => `Trait ${index + 1}`, srOnly: true },
@@ -1633,7 +1631,7 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'grants',
-        label: 'Grants',
+        heading: { label: 'Grants' },
         item: {
           variant: 'compact',
           header: { fallback: (index) => `Grant ${index + 1}`, srOnly: true },
@@ -1682,7 +1680,7 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'utilizes',
-        label: 'Utilize actions',
+        heading: { label: 'Utilize actions' },
         item: {
           variant: 'compact',
           header: { fallback: (index) => `Action ${index + 1}`, primaryField: 'description' },
@@ -1742,7 +1740,7 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'examples',
-        label: 'Examples',
+        heading: { label: 'Examples' },
         item: {
           variant: 'compact',
           headerVisibility: 'hidden',
@@ -1960,7 +1958,7 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'grants',
-        label: 'Grants',
+        heading: { label: 'Grants' },
         item: {
           variant: 'compact',
           header: { fallback: (index) => `Grant ${index + 1}`, srOnly: true },
@@ -2024,7 +2022,7 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'items',
-        label: 'Items',
+        heading: { label: 'Items' },
         item: {
           variant: 'compact',
           collapsible: false,
@@ -2044,7 +2042,7 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'items',
-        label: 'Items',
+        heading: { label: 'Items' },
         item: {
           variant: 'compact',
           collapsible: false,
@@ -2114,7 +2112,7 @@ describe('ArrayFieldRenderer', () => {
         {
           kind: 'array',
           name: 'resolution.target.requirements',
-          label: 'Requirements',
+          heading: { label: 'Requirements' },
           item: {
             variant: 'compact',
             collapsible: false,
@@ -2191,11 +2189,11 @@ describe('ArrayFieldRenderer', () => {
         {
           kind: 'array',
           name: 'resolution.target.requirements',
-          label: 'Requirements',
-          reorder: false,
+          heading: { label: 'Requirements' },
           addAction: { label: 'Add a requirement' },
           min: 1,
           item: {
+            reorder: false,
             collapsible: true,
             resolveCollapsible: () => false,
             header: {
@@ -2317,7 +2315,7 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'grants',
-        label: 'Grants',
+        heading: { label: 'Grants' },
         errorPlacement: 'row',
         item: {
           variant: 'compact',
@@ -2371,7 +2369,7 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'grants',
-        label: 'Grants',
+        heading: { label: 'Grants' },
         addAction: {
           label: 'Add grant',
           menu: {
@@ -2438,7 +2436,7 @@ describe('ArrayFieldRenderer', () => {
       {
         kind: 'array',
         name: 'grants',
-        label: 'Grants',
+        heading: { label: 'Grants' },
         addAction: {
           label: 'Add grant',
           menu: {
@@ -2496,7 +2494,7 @@ describe('ArrayFieldRenderer', () => {
         {
           kind: 'array',
           name: 'movement',
-          label: 'Movement',
+          heading: { label: 'Movement' },
           item: {
             variant: 'compact',
             headerVisibility: 'hidden',
@@ -2542,7 +2540,7 @@ describe('ArrayFieldRenderer', () => {
             {
               kind: 'array',
               name: 'traits',
-              label: 'Traits',
+              heading: { label: 'Traits' },
               item: {
                 collapsible: true,
                 headerVisibility: 'hidden',
@@ -2604,7 +2602,7 @@ describe('ArrayFieldRenderer', () => {
               {
                 kind: 'array',
                 name: 'rows',
-                label: 'Rows',
+                heading: { label: 'Rows' },
                 item: baseItem,
                 fields,
                 addAction: { label: 'Add row' },
@@ -2636,7 +2634,7 @@ describe('ArrayFieldRenderer', () => {
         {
           kind: 'array',
           name: 'tags',
-          label: 'Tags',
+          heading: { label: 'Tags' },
           item: {
             variant: 'compact',
             headerVisibility: 'hidden',

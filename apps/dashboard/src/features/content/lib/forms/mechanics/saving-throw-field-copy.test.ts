@@ -11,7 +11,7 @@ import { savingThrowFieldGroup } from './saving-throw-field-group'
 describe('saving-throw-field-copy', () => {
   it('matches the optional saving-throw field group chrome', () => {
     const group = savingThrowFieldGroup({ renderCastingAbility: () => null })
-    expect(group.legend).toBe(SAVING_THROW_SECTION_LEGEND)
+    expect(group.heading?.label).toBe(SAVING_THROW_SECTION_LEGEND)
     const row = group.fields?.find((field) => field.kind === 'row')
     const rowFields = row && 'fields' in row ? row.fields : []
     const ability = rowFields.find(

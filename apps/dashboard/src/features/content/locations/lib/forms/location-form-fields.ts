@@ -252,8 +252,10 @@ export function buildSettlementStartingDistrictsFormItems(
   return [
     {
       kind: 'group',
-      legend: SETTLEMENT_STARTING_DISTRICTS_GROUP_LEGEND,
-      description: `${guidance.helper} ${guidance.emphasis}`,
+      heading: {
+        label: SETTLEMENT_STARTING_DISTRICTS_GROUP_LEGEND,
+        hint: `${guidance.helper} ${guidance.emphasis}`,
+      },
       fields: [
         {
           kind: 'slot',

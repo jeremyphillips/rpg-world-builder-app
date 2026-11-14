@@ -36,7 +36,11 @@ export function creatureTraitTemplateFields(): FormItem[] {
     return [
       {
         kind: 'group' as const,
-        description: template.formatDescription(config),
+        heading: {
+          label: template.label,
+          hint: template.formatDescription(config),
+          labelVisibility: 'srOnly',
+        },
         visibility: visibleForTemplateId(templateId),
         fields: [
           ...(templateId === 'legendary-resistance'

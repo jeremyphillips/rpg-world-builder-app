@@ -235,7 +235,7 @@ export function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       fields: [],
       ...embeddedMasterDetailTabValidation({
         path: 'features',
-        legend: 'Features',
+        itemLabel: 'Features',
         fields: classFeatureItemFields(ctx),
       }),
       header: createElement(ClassFeaturesTab, { formCtx: ctx }),

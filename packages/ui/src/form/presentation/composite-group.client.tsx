@@ -4,14 +4,13 @@ import * as React from 'react'
 
 import { cn } from '../../lib/utils'
 import type { FieldSize } from '../../components/ui/field.client'
-import { fieldAnatomyStackVariants } from '../../components/ui/field.variants'
+import {
+  fieldAnatomyStackVariants,
+  fieldSetInFlowLegendClasses,
+} from '../../components/ui/field.variants'
 import { normalizeFieldHint } from '../field-config'
 import type { FormHeading } from '../form-heading.lib'
-import { HeadingPresentation } from './heading-presentation.client'
-import {
-  formSectionHeaderActionSlotClasses,
-  resolveFormSectionHeaderActionLayoutClasses,
-} from './form-section-header.variants'
+import { FormSectionHeader } from './form-section-header.client'
 
 export interface CompositeGroupProps {
   heading: FormHeading
@@ -38,29 +37,20 @@ export function CompositeGroup({
   const headingId = React.useId()
   const hintText = normalizeFieldHint(heading.hint).text
   const titleOnlyHidden = heading.labelVisibility === 'srOnly' && !hintText && !heading.action
-  const presentation = (
-    <HeadingPresentation
-      tier="leaf"
+  const showVisibleLabel = heading.labelVisibility !== 'srOnly'
+
+  const header = (
+    <FormSectionHeader
       label={heading.label}
       hint={heading.hint}
-      id={headingId}
-      as={useFieldset ? 'legend' : 'span'}
+      headingScale="field"
       size={size}
-      labelVisibility={heading.labelVisibility}
+      showVisibleLabel={showVisibleLabel}
+      id={headingId}
+      action={heading.action}
     />
   )
-  const header = heading.action ? (
-    <div
-      className={resolveFormSectionHeaderActionLayoutClasses({
-        hasStackedHint: Boolean(normalizeFieldHint(heading.hint).text),
-      })}
-    >
-      <div className="min-w-0">{presentation}</div>
-      <div className={formSectionHeaderActionSlotClasses}>{heading.action}</div>
-    </div>
-  ) : (
-    presentation
-  )
+
   const stackClassName = cn(
     'min-w-0',
     titleOnlyHidden ? 'flex flex-col' : fieldAnatomyStackVariants({ size }),
@@ -70,7 +60,7 @@ export function CompositeGroup({
   if (useFieldset) {
     return (
       <fieldset id={id} className={cn('border-0 p-0', stackClassName)}>
-        {header}
+        <legend className={fieldSetInFlowLegendClasses}>{header}</legend>
         {children}
       </fieldset>
     )

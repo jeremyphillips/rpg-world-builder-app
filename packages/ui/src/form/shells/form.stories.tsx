@@ -21,8 +21,7 @@ type CharacterForm = z.infer<typeof schema>
 const fields: FormItem[] = [
   {
     kind: 'group',
-    legend: 'Character',
-    description: 'The basics that head your character sheet.',
+    heading: { label: 'Character', hint: 'The basics that head your character sheet.' },
     fields: [
       { type: 'text', name: 'name', label: 'Name', placeholder: 'Tasha', required: true },
       {

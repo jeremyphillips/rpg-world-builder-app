@@ -32,7 +32,7 @@ const flatFields: FormItem[] = [
   {
     kind: 'array',
     name: 'traits',
-    label: 'Traits',
+    heading: { label: 'Traits' },
     fields: [
       { type: 'text', name: 'name', label: 'Trait name', required: true },
       { type: 'textarea', name: 'description', label: 'Description', rows: 2 },
@@ -92,7 +92,7 @@ const conditionalFields: FormItem[] = [
   {
     kind: 'array',
     name: 'grants',
-    label: 'Grants',
+    heading: { label: 'Grants' },
     fields: [
       {
         type: 'select',
@@ -176,7 +176,7 @@ const boundedFields: FormItem[] = [
   {
     kind: 'array',
     name: 'tags',
-    label: 'Tags',
+    heading: { label: 'Tags' },
     fields: [{ type: 'text', name: 'label', label: 'Tag', required: true }],
     addAction: { label: 'Add tag' },
     min: 1,
@@ -217,7 +217,7 @@ const compactRowFields: FormItem[] = [
   {
     kind: 'array',
     name: 'grants',
-    label: 'Grants',
+    heading: { label: 'Grants' },
     item: {
       variant: 'compact',
       header: { fallback: (i) => `Grant ${i + 1}`, srOnly: true },
@@ -263,7 +263,7 @@ const detailedCollapsibleFields: FormItem[] = [
   {
     kind: 'array',
     name: 'traits',
-    label: 'Traits',
+    heading: { label: 'Traits' },
     item: {
       variant: 'detailed',
       collapsible: true,
@@ -319,7 +319,7 @@ const nestedCompactFields: FormItem[] = [
   {
     kind: 'array',
     name: 'packages',
-    label: 'Equipment packages',
+    heading: { label: 'Equipment packages' },
     item: {
       variant: 'detailed',
       collapsible: true,
@@ -333,7 +333,7 @@ const nestedCompactFields: FormItem[] = [
       {
         kind: 'array',
         name: 'items',
-        label: 'Items',
+        heading: { label: 'Items' },
         fields: [{ type: 'text', name: 'name', label: 'Item name', required: true }],
         addAction: { label: 'Add item' },
         item: { header: { fallback: (i) => `Item ${i + 1}`, primaryField: 'name' } },
@@ -378,7 +378,7 @@ const dragReorderFields: FormItem[] = [
   {
     kind: 'array',
     name: 'steps',
-    label: 'Steps',
+    heading: { label: 'Steps' },
     item: {
       variant: 'detailed',
       header: {
@@ -560,7 +560,7 @@ export const PresentationMatrixFlatWithHeader: StoryObj<Meta<object>> = {
         {
           kind: 'array',
           name: 'rows',
-          label: 'Entries',
+          heading: { label: 'Entries' },
           addAction: { label: 'Add entry' },
           item: {
             variant: 'compact',
@@ -592,7 +592,7 @@ export const PresentationMatrixDisclosureStacked: StoryObj<Meta<object>> = {
         {
           kind: 'array',
           name: 'rows',
-          label: 'Traits',
+          heading: { label: 'Traits' },
           addAction: { label: 'Add trait' },
           item: {
             collapsible: true,
@@ -659,7 +659,7 @@ const validationIssueFields: FormItem[] = [
   {
     kind: 'array',
     name: 'traits',
-    label: 'Traits',
+    heading: { label: 'Traits' },
     item: {
       variant: 'detailed',
       collapsible: true,

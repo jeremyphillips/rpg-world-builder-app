@@ -17,7 +17,7 @@ describe('vehicle kindFieldGroups', () => {
   it('buildFields composes name, kind group, economy, and description', () => {
     const fields = expectComposedKindGroups('vehicle', '')
     const kindGroup = fields.find(
-      (field) => 'kind' in field && field.kind === 'group' && field.legend === '',
+      (field) => 'kind' in field && field.kind === 'group' && field.heading?.label === '',
     )
     expect(kindGroup).toEqual(fieldGroupsForEquipmentKind('vehicle')?.[0])
   })
@@ -33,7 +33,7 @@ describe('vehicle kindFieldGroups', () => {
     )
     const combatGroup = group.fields.find(
       (field): field is GroupConfig =>
-        'kind' in field && field.kind === 'group' && field.legend === 'Combat',
+        'kind' in field && field.kind === 'group' && field.heading?.label === 'Combat',
     )
 
     const [statsRow] = rows
@@ -56,7 +56,7 @@ describe('vehicle kindFieldGroups', () => {
 
     expect(combatGroup).toMatchObject({
       kind: 'group',
-      legend: 'Combat',
+      heading: { label: 'Combat' },
     })
     expect(combatGroup).not.toHaveProperty('legendSize')
     expect(combatGroup.fields).toEqual([

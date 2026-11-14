@@ -480,19 +480,15 @@ export {
   type RelationshipFieldRegistry,
 } from './context/relationship-field.context'
 export {
-  ArrayLikeSectionHeader,
-  type ArrayLikeSectionHeaderProps,
-  type ArrayLikeSectionHeaderWrapper,
-} from './presentation/array-like-section-header.client'
-export {
   FormSectionHeader,
-  type FormSectionHeaderLabelPresentation,
   type FormSectionHeaderProps,
 } from './presentation/form-section-header.client'
 export {
-  HeadingPresentation,
-  type HeadingPresentationProps,
-} from './presentation/heading-presentation.client'
+  resolveEffectiveFormHeaderScale,
+  resolveEffectiveFormHeaderScaleFromLegendSize,
+  resolveFormHeaderStackTypography,
+  type FormHeaderPresentationScale,
+} from './presentation/form-header-stack-typography.lib'
 export {
   fieldArrayItemListClasses,
   type FieldGroupLegendSize,

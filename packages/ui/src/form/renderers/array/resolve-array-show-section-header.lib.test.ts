@@ -3,7 +3,12 @@ import { describe, expect, it } from 'vitest'
 import type { ArrayConfig } from '../../field-config'
 import { resolveArrayShowSectionHeader } from './resolve-array-show-section-header.lib'
 
-const baseConfig = { kind: 'array', name: 'items', label: 'Items', fields: [] } as ArrayConfig
+const baseConfig = {
+  kind: 'array',
+  name: 'items',
+  heading: { label: 'Items' },
+  fields: [],
+} satisfies ArrayConfig
 
 describe('resolveArrayShowSectionHeader', () => {
   it('is false for sr-only labels without chrome', () => {
@@ -14,7 +19,10 @@ describe('resolveArrayShowSectionHeader', () => {
         hasAddAction: true,
         arrayIssueCount: 0,
         hasContainerIssue: false,
-        config: { ...baseConfig, label: 'Items', labelVisibility: 'srOnly' },
+        config: {
+          ...baseConfig,
+          heading: { label: 'Items', labelVisibility: 'srOnly' },
+        },
       }),
     ).toBe(false)
   })
@@ -39,7 +47,10 @@ describe('resolveArrayShowSectionHeader', () => {
         hasAddAction: false,
         arrayIssueCount: 0,
         hasContainerIssue: false,
-        config: { ...baseConfig, label: 'Items', labelVisibility: 'srOnly', hint: 'Help' },
+        config: {
+          ...baseConfig,
+          heading: { label: 'Items', labelVisibility: 'srOnly', hint: 'Help' },
+        },
       }),
     ).toBe(true)
 

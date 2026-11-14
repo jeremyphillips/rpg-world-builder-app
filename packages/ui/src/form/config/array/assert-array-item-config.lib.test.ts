@@ -13,7 +13,7 @@ describe('assertArrayItemConfig', () => {
       {
         kind: 'array',
         name: 'examples',
-        label: 'Examples',
+        heading: { label: 'Examples' },
         item: { collapsible: true, variant: 'compact' },
         fields: [{ type: 'text', name: 'value', label: 'Value' }],
       },
@@ -30,7 +30,7 @@ describe('assertArrayItemConfig', () => {
       {
         kind: 'array',
         name: 'examples',
-        label: 'Examples',
+        heading: { label: 'Examples' },
         item: { collapsible: true, variant: 'compact' },
         fields: [{ type: 'text', name: 'value', label: 'Value' }],
       },
