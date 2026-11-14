@@ -172,7 +172,6 @@ export function GroupFieldSection({
         density: groupDensity,
         inGroup: true,
         namedGroupDepth: childNamedGroupDepth,
-        headingTier: hasNamedHeading ? structuralTier : parentContext.headingTier,
         fieldChromeCascade: item.fieldChrome ?? parentContext.fieldChromeCascade,
         fieldChromeSuppressed: resolveGroupSectionFieldChromeSuppressed(
           groupFieldChrome,
@@ -239,7 +238,7 @@ export function GroupFieldSection({
       headingScale={item.headingScale}
       rhythm={groupRhythm}
       size={groupSize}
-      description={description}
+      hint={description}
       className={cn(
         item.className,
         wrapEntireGroup && fieldSetChromeContainClasses,

@@ -8,13 +8,15 @@ import { shouldShowVisibleRequiredMarker } from '../../components/ui/field-requi
 import {
   fieldLabelVariants,
   type FieldRhythm,
-  type GroupHeadingScale,
+  type FormHeadingScale,
 } from '../../components/ui/field.variants'
 import { cn } from '../../lib/utils'
 import type { FieldHintConfig } from '../field-config'
 import { normalizeFieldHint } from '../field-config'
-import { resolveFormDensity, type FormDensity } from '../form-density'
+import { useFormSectionContext } from '../context/form-section.context'
+import type { FormDensity } from '../form-density'
 import { resolveFormHeaderStackTypography } from './form-header-stack-typography.lib'
+import { resolveFormSectionHeaderPresentation } from './resolve-form-section-header-presentation.lib'
 import {
   formSectionHeaderActionSlotClasses,
   formSectionHeaderLabelRowClasses,
@@ -24,7 +26,7 @@ import {
 export interface FormSectionHeaderProps {
   label: string
   hint?: string | FieldHintConfig
-  headingScale: GroupHeadingScale
+  headingScale: FormHeadingScale
   density?: FormDensity
   rhythm?: FieldRhythm
   size?: FieldSize
@@ -36,18 +38,6 @@ export interface FormSectionHeaderProps {
   showVisibleLabel?: boolean
   className?: string
   id?: string
-}
-
-function resolveHeaderDensity(
-  options: Pick<FormSectionHeaderProps, 'density' | 'rhythm' | 'size'>,
-): { rhythm: FieldRhythm; size: FieldSize } {
-  if (options.rhythm !== undefined || options.size !== undefined) {
-    return {
-      rhythm: options.rhythm ?? 'comfortable',
-      size: options.size ?? 'md',
-    }
-  }
-  return resolveFormDensity(options.density)
 }
 
 function hasStackedHint(hint: string | FieldHintConfig | undefined): boolean {
@@ -158,10 +148,12 @@ export function FormSectionHeader({
   className,
   id,
 }: FormSectionHeaderProps) {
-  const { rhythm, size } = resolveHeaderDensity({
+  const { density: inheritedDensity } = useFormSectionContext()
+  const { rhythm, size } = resolveFormSectionHeaderPresentation({
     density,
     rhythm: rhythmOverride,
     size: sizeOverride,
+    inheritedDensity,
   })
 
   const headingBlock = renderHeadingBlock({

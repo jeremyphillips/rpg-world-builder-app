@@ -69,15 +69,15 @@ whose parent shell already spaces siblings use that pattern instead of `FormFiel
 ```ts
 {
   kind: 'group',
-  legend: 'Weapon',
+  heading: { label: 'Weapon' },
   fields: [
     { /* … */ },
-    { kind: 'group', legend: 'Damage', fields: [/* … */] },
+    { kind: 'group', heading: { label: 'Damage' }, fields: [/* … */] },
   ],
 }
 ```
 
-`FieldGroup` (standalone) accepts the same heading/legend props, `size`, `chrome`, and `disclosure`.
+`FieldGroup` (standalone) accepts `legend`, optional `hint`, `headingScale`, `size`, `chrome`, and `disclosure`.
 Groups may declare `visibility` — hidden groups unmount and clear nested values.
 
 `density` on `GroupConfig` overrides inherited section density for the group subtree.
@@ -136,7 +136,7 @@ Optional open/collapse and summary behavior. Composes with `chrome`.
 ```ts
 {
   kind: 'group',
-  legend: 'Campaign availability',
+  heading: { label: 'Campaign availability' },
   disclosure: {
     variant: 'inline',
     defaultOpen: false,
@@ -366,8 +366,7 @@ Dependent stack with an array dependent — use `arrayItems` scope:
       {
         kind: 'array',
         name: 'caps',
-        legend: '',
-        addActionLabel: 'Add class limit',
+        addAction: { label: 'Add class limit' },
         fields: [/* … */],
       },
     ],
@@ -390,7 +389,7 @@ array **item rows** keep the existing item-shell model (subtle header + canvas b
 Nested arrays inside an array item or a chromed parent do not receive a second section wrap.
 
 **Label and hint sit inside the box; validation errors sit outside.** Groups wrap the
-borderless `<fieldset>` (legend, description, and field stack) in `FieldChromeShell`,
+borderless `<fieldset>` (legend, hint, and field stack) in `FieldChromeShell`,
 matching chip, choose-count, and `EditableGrid` fields — UA legend overlay cannot sit on
 the container border. Use `FieldsetChromeFrame` so `<legend>` stays a direct fieldset child.
 Summary-disclosure groups still wrap only the expanded field stack so collapsed summary
@@ -455,12 +454,12 @@ See [Component entry files](#component-entry-files).
 {
   kind: 'array',
   name: 'traits',
-  legend: 'Traits',
+  heading: { label: 'Traits' },
   fields: [
     { type: 'text', name: 'name', label: 'Trait name', required: true },
     { type: 'textarea', name: 'description', label: 'Description' },
   ],
-  addActionLabel: 'Add trait',
+  addAction: { label: 'Add trait' },
   min: 0,
   max: 10,
   addActionVariant: 'outline',
@@ -491,7 +490,7 @@ pick compact but disclosure chrome is still required without `itemCollapsible`.
 {
   kind: 'array',
   name: 'tiers',
-  legend: 'Wealth tiers',
+  heading: { label: 'Wealth tiers' },
   itemVariant: 'detailed',
   itemCollapsible: true,
   reorder: false,
@@ -573,8 +572,8 @@ rows.
 {
   kind: 'array',
   name: 'grants',
-  legend: 'Grants',
-  addActionLabel: 'Add grant',
+  heading: { label: 'Grants' },
+  addAction: { label: 'Add grant' },
   addActionMenu: {
     groups: [{ id: 'combat-traits', label: 'Combat & traits' }],
     items: [
@@ -682,7 +681,7 @@ to `localStorage`.
 {
   kind: 'array',
   name: 'tiers',
-  legend: 'Wealth tiers',
+  heading: { label: 'Wealth tiers' },
   arrayPattern: {
     kind: 'levelRange',
     levelKeys: { min: 'minLevel', max: 'maxLevel' },

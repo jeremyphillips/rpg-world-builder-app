@@ -34,8 +34,6 @@ export function FeatureTablesSection({ tables = [], onAddTable }: FeatureTablesS
         label={FEATURE_TABLES_SECTION_LABEL}
         hint={FEATURE_TABLES_SECTION_HINT}
         headingScale="field"
-        rhythm={rhythm}
-        size={size}
         action={addAction}
       />
       <div className="flex flex-col gap-2">

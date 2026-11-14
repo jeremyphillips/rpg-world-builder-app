@@ -107,7 +107,6 @@ function TableBuilderValuesSectionChrome({
         label={TABLE_BUILDER_VALUES_LABEL}
         hint={resolveTableBuilderValuesHint(values.hasNoColumns, values.includeLevel)}
         headingScale="field"
-        size="md"
         required
       />
       {valuesNotice ? (

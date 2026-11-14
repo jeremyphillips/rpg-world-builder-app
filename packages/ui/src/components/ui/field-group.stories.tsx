@@ -41,7 +41,7 @@ export const Default: Story = {
 export const WithDescription: Story = {
   args: {
     legend: 'Character basics',
-    description: 'These show on your character sheet header.',
+    hint: 'These show on your character sheet header.',
     children: <TextField id="char-name-2" label="Name" placeholder="Tasha" />,
   },
 }
@@ -57,7 +57,7 @@ export const FieldScale: Story = {
       <TextField id="weapon-name-field-scale" label="Name" placeholder="Longsword" />
       <FieldGroup
         legend="Damage"
-        description="Primary damage dice."
+        hint="Primary damage dice."
         legendSize="subsection"
         headingScale="field"
         size="md"
@@ -72,7 +72,7 @@ export const FieldScale: Story = {
 export const FieldScaleCollapsible: Story = {
   args: {
     legend: 'Advanced options',
-    description: 'Optional tuning for power users.',
+    hint: 'Optional tuning for power users.',
     legendSize: 'subsection',
     headingScale: 'field',
     size: 'md',
@@ -100,7 +100,7 @@ export const NestedSubgroup: Story = {
 export const InsetBorder: Story = {
   args: {
     legend: 'Effects & outcomes',
-    description: 'Define what the spell does, then choose when each effect applies.',
+    hint: 'Define what the spell does, then choose when each effect applies.',
     chrome: { variant: 'rail' },
     children: (
       <>
@@ -202,7 +202,7 @@ export const DividerBottom: Story = {
 export const CalloutInfo: Story = {
   args: {
     legend: 'Hybrid spell',
-    description: 'Resolution progression is authored on the resolution envelope.',
+    hint: 'Resolution progression is authored on the resolution envelope.',
     chrome: { variant: 'callout', tone: 'info' },
     children: <TextField id="callout-field" label="Workaround note" />,
   },
@@ -236,7 +236,7 @@ export const AccentLegendRail: Story = {
 export const Collapsible: Story = {
   args: {
     legend: 'Advanced options',
-    description: 'Optional tuning for power users.',
+    hint: 'Optional tuning for power users.',
     disclosure: { variant: 'legend', defaultOpen: false },
     children: sampleFields,
   },
@@ -376,7 +376,7 @@ export const ResolutionLayout: Story = {
       </FieldGroup>
       <FieldGroup
         legend="Effects & outcomes"
-        description="Define what the spell does, then choose when each effect applies."
+        hint="Define what the spell does, then choose when each effect applies."
         chrome={{ variant: 'rail' }}
       >
         <FieldGroup legend="Authored effects" legendSize="subsection">
@@ -385,7 +385,7 @@ export const ResolutionLayout: Story = {
         <FieldGroup
           legend="Outcome branches"
           legendSize="subsection"
-          description="Choose which effects apply to each branch."
+          hint="Choose which effects apply to each branch."
         >
           <TextField id="resolution-branch" label="Branch" />
         </FieldGroup>

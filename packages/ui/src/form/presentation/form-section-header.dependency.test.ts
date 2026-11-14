@@ -9,9 +9,8 @@ const headerSource = readFileSync(
 )
 
 describe('FormSectionHeader dependency boundary', () => {
-  it('stays free of react-hook-form and form section context', () => {
+  it('stays free of react-hook-form', () => {
     expect(headerSource).not.toMatch(/react-hook-form/)
-    expect(headerSource).not.toMatch(/form-section\.context/)
   })
 })
 

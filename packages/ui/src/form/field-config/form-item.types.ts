@@ -10,7 +10,7 @@ import type {
   SemanticSurfaceTone,
 } from '../../components/ui/field-dependent.variants'
 import type { SurfaceConfig } from '../../components/ui/visual-vocabulary.types'
-import type { FieldSeparator, GroupHeadingScale } from '../../components/ui/field.variants'
+import type { FieldSeparator, FormHeadingScale } from '../../components/ui/field.variants'
 import type { ArrayResolveFieldsFn } from '../config/array/array-resolve-fields.lib'
 import type { ArrayAddMenuConfig } from '../config/array/array-add-menu.lib'
 import type { ArrayItemShellRenderProps } from '../config/array/array-item-shell-render.types'
@@ -189,7 +189,7 @@ export interface GroupConfig {
    * only — spacing, disclosure, and legend semantics stay unchanged. There is
    * no separate legend or description size.
    */
-  headingScale?: GroupHeadingScale
+  headingScale?: FormHeadingScale
   fields: GroupFieldItem[]
   className?: string
   /** Optional DOM id on the fieldset — for in-page scroll anchors. */
@@ -486,7 +486,7 @@ interface ArrayConfigCore {
   /**
    * Section header presentation scale — defaults to `'field'` (field label + hint).
    */
-  headingScale?: GroupHeadingScale
+  headingScale?: FormHeadingScale
   /**
    * Section density for this array subtree. Defaults to `compact` when omitted.
    */

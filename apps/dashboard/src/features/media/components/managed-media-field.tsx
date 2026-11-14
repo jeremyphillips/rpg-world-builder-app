@@ -85,8 +85,6 @@ export function ManagedMediaField({
             id={headingId}
             label={label}
             headingScale="field"
-            rhythm={rhythm}
-            size={size}
             hint={
               summary.galleryCount > 0
                 ? resolveExpandedCapacityHint(summary.attachmentCount, maxItems)

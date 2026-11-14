@@ -13,10 +13,10 @@ import { isDialogDisclosure, isInlineDisclosure } from './field-group-disclosure
 import { FieldGroupDialogRoute } from './field-group-dialog-route.client'
 import { FieldGroupSummaryRoute } from './field-group-summary-route.client'
 import { StandardFieldGroupBody } from './field-group-standard-body.client'
-import type { FieldGroupLegendSize, FieldRhythm, GroupHeadingScale } from './field.variants'
+import type { FieldGroupLegendSize, FieldRhythm, FormHeadingScale } from './field.variants'
 import { resolveFormDensity } from '../../form/form-density'
 
-export type { FieldGroupLegendSize, GroupHeadingScale }
+export type { FieldGroupLegendSize, FormHeadingScale }
 
 export interface FieldGroupProps {
   /** Group heading rendered as the fieldset legend. Omit for layout-only wrappers. */
@@ -30,16 +30,16 @@ export interface FieldGroupProps {
   /** Legend type scale — use `subsection` for nested named groups. */
   legendSize?: FieldGroupLegendSize
   /**
-   * When `'field'`, legend and description use the field label and hint type scale
+   * When `'field'`, legend and hint use the field label and hint type scale
    * for `size`. Replaces structural legend type. Spacing uses field anatomy stack on
    * the fieldset; structural legend→body margins stay on `legendSize` only.
    */
-  headingScale?: GroupHeadingScale
+  headingScale?: FormHeadingScale
   /** Control + label scale — drives field label typography when `headingScale="field"`. */
   size?: FieldSize
   /** Vertical gap between sibling fields — defaults to `comfortable` (`gap-6`). */
   rhythm?: FieldRhythm
-  description?: string
+  hint?: string
   className?: string
   /** Optional DOM id on the fieldset — for in-page scroll anchors. */
   id?: string
@@ -78,7 +78,7 @@ export function FieldGroup({
   headingScale,
   size,
   rhythm = resolveFormDensity().rhythm,
-  description,
+  hint,
   className,
   id,
   chrome,
@@ -143,7 +143,7 @@ export function FieldGroup({
       id={id}
       legend={legend}
       legendSrOnly={legendSrOnly}
-      description={description}
+      hint={hint}
       legendAccessory={legendAccessory}
       legendAction={legendAction}
       legendSize={legendSize}

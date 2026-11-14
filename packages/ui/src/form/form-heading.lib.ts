@@ -4,7 +4,7 @@ import type { FieldGroupLegendSize } from '../components/ui/field.variants'
 import type { FieldHintConfig } from './field-config'
 
 /** Resolved typography tier — label and hint always share this tier. */
-export type FormHeadingTier = 'section' | 'subsection' | 'leaf'
+export type FormHeadingTier = 'section' | 'subsection'
 
 /**
  * Feature-level heading — tier is never authored on dashboard form JSON.

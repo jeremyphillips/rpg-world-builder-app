@@ -5,6 +5,7 @@ import {
   fieldAnatomyStackVariants,
   fieldSetInFlowLegendClasses,
 } from '../../components/ui/field.variants'
+import { FormSectionProvider } from '../context/form-section.context'
 import { FormSectionHeader } from './form-section-header.client'
 
 describe('FormSectionHeader', () => {
@@ -70,6 +71,24 @@ describe('FormSectionHeader', () => {
     expect(screen.getByText('Preview')).toHaveClass('text-style-field-legend-sub')
     expect(screen.getByText('Rendered values for this table.')).toHaveClass(
       'text-style-field-subsection-description',
+    )
+  })
+
+  it('inherits compact density from FormSectionProvider when overrides are omitted', () => {
+    render(
+      <FormSectionProvider density="compact">
+        <FormSectionHeader
+          label="Columns"
+          hint="Add the columns for this table."
+          headingScale="field"
+          required
+        />
+      </FormSectionProvider>,
+    )
+
+    expect(screen.getByText('Columns').parentElement).toHaveClass('text-style-field-label-sm')
+    expect(screen.getByText('Add the columns for this table.')).toHaveClass(
+      'text-style-field-hint-compact',
     )
   })
 

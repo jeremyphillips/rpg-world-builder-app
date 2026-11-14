@@ -422,8 +422,10 @@ this table when completing a form-lib alignment phase.
 panel/outline stacks) in feature components when `FormItem[]` can express it. Use `@rpg/ui/form`
 **`FormSectionHeader`** for standalone sections (`role="group"` + `id` for `aria-labelledby`).
 Named arrays and groups use renderer-owned headers; optional **`headingScale`** on group/array config
-changes presentation only (default array header scale is **`field`**). Pass `rhythm`/`size` from
-`resolveFormDensity(useFormSectionContext().density)` on custom dashboard fields.
+changes presentation only (default array header scale is **`field`**). Standalone headers inherit
+`rhythm`/`size` from the nearest **`FormSectionProvider`** (or schema `<Form>` context) — wrap
+modals and one-off editors once at the composition boundary instead of threading
+`resolveFormDensity` into every header. Arrays still pass explicit legend rhythm/size from chrome.
 
 - **Fields** — `type` / `kind: 'slot'` entries in `*-form-fields.ts`; labels, hints, `info`,
   `labelPosition`, `separator`, and disabled state live in config.

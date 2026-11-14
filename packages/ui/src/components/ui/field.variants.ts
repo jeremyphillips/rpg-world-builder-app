@@ -292,7 +292,7 @@ export type FieldRhythm = 'compact' | 'comfortable'
  * - `'section'` / `'subsection'` — structural legend + description pair for that tier.
  * - `'field'` — field label + field-hint scale.
  */
-export type GroupHeadingScale = 'section' | 'subsection' | 'field'
+export type FormHeadingScale = 'section' | 'subsection' | 'field'
 
 export const fieldStackRhythmVariants = cva('flex flex-col', {
   variants: {

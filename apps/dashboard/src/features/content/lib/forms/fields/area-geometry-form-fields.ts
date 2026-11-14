@@ -67,7 +67,7 @@ export function visibleWhenAreaShape(
 
 export function areaGeometryFormFields(input: {
   fieldPrefix: string
-  legend: string
+  headingLabel: string
   legendVisibility?: 'visible' | 'srOnly'
   shapeHint: string
   visibility?: FieldVisibility
@@ -77,7 +77,7 @@ export function areaGeometryFormFields(input: {
   /** Applies when `includeExplicitNoneOption` is false. Default true. */
   shapeRequired?: boolean
 }): FormItem[] {
-  const { fieldPrefix, legend, legendVisibility, shapeHint, visibility } = input
+  const { fieldPrefix, headingLabel, legendVisibility, shapeHint, visibility } = input
   const includeExplicitNone = input.includeExplicitNoneOption !== false
   const shapeOptions = resolveAreaGeometryShapeOptions({
     includeExplicitNoneOption: input.includeExplicitNoneOption,
@@ -87,7 +87,7 @@ export function areaGeometryFormFields(input: {
   return [
     {
       kind: 'group',
-      heading: { label: legend, labelVisibility: legendVisibility ?? 'visible' },
+      heading: { label: headingLabel, labelVisibility: legendVisibility ?? 'visible' },
       ...(visibility ? { visibility } : {}),
       fields: [
         {

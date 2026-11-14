@@ -307,3 +307,28 @@ row fields with `width: 'auto'` use `min-w-min` so grid columns honor child mini
 the composite minimum usable width, the **row** collapses or reflows — controls are not
 crushed below their declared minimum just to preserve multi-column layout. `max-w-full` on
 the intrinsic shell is not the responsiveness mechanism for digit+label pairs.
+
+## Array section density (header vs body)
+
+`resolveArrayFieldRendererChrome` splits array chrome density:
+
+| Region                                             | Resolver                                                  | Default when `density` omitted |
+| -------------------------------------------------- | --------------------------------------------------------- | ------------------------------ |
+| Section header (`FormSectionHeader` in `<legend>`) | `config.density ?? parent.density`                        | Follows parent section         |
+| Item list + child `FormSectionContext`             | `resolveSectionDensity` + `DEFAULT_ARRAY_SECTION_DENSITY` | **`compact`**                  |
+
+Explicit `density` on the array config aligns header and body. `labelMode` affects legend DOM only —
+it does not branch density. Label modes: see [array-field-authoring.md](./array-field-authoring.md).
+
+## Standalone section headers
+
+`FormSectionHeader` resolves presentation through
+[`resolveFormSectionHeaderPresentation`](../../src/form/presentation/resolve-form-section-header-presentation.lib.ts):
+
+1. Explicit `rhythm` or `size` props
+2. `density` prop
+3. Inherited `FormSectionContext.density`
+4. `DEFAULT_FORM_DENSITY`
+
+Wrap isolated editors (table builder modal, spellbook acquisition) in `FormSectionProvider` once
+instead of passing `resolveFormDensity` into every header.

@@ -13,15 +13,12 @@ import type { FieldChrome } from '../../components/ui/field-chrome.variants'
 import { cn } from '../../lib/utils'
 import { DEFAULT_FORM_DENSITY, resolveFormDensity, type FormDensity } from '../form-density'
 import { resolveFieldControlSize } from '../resolve-field-control-size.lib'
-import type { FormHeadingTier } from '../form-heading.lib'
 
 export interface FormSectionContextValue {
   /** Nesting depth for section density inheritance. */
   depth: number
   /** Count of named ancestor groups/arrays — anonymous layout groups are transparent. */
   namedGroupDepth: number
-  /** Resolved heading tier for the current section subtree. */
-  headingTier: FormHeadingTier
   /** Section density — rhythm and control scale resolve via {@link resolveFormDensity}. */
   density: FormDensity
   /** Surface config for array item shells — defaults to subtle when unset. */
@@ -43,7 +40,6 @@ export interface FormSectionContextValue {
 export const FormSectionContext = React.createContext<FormSectionContextValue>({
   depth: 0,
   namedGroupDepth: 0,
-  headingTier: 'section',
   density: DEFAULT_FORM_DENSITY,
 })
 
@@ -54,7 +50,6 @@ export function useFormSectionContext(): FormSectionContextValue {
 export interface FormSectionContextOverrides {
   density?: FormDensity
   namedGroupDepth?: number
-  headingTier?: FormHeadingTier
   arrayItemSurface?: SurfaceConfig
   arrayItemTone?: SemanticSurfaceTone
   inGroup?: boolean
@@ -77,7 +72,6 @@ function inheritSectionContextFields(
   const inherited = {
     density: parent.density,
     namedGroupDepth: parent.namedGroupDepth,
-    headingTier: parent.headingTier,
     arrayItemSurface: parent.arrayItemSurface,
     arrayItemTone: parent.arrayItemTone,
     inGroup: parent.inGroup,
@@ -138,7 +132,7 @@ export function FormSectionProvider({
   inRhythmStack,
 }: FormSectionProviderProps) {
   const value = React.useMemo(
-    () => ({ depth, namedGroupDepth: 0, headingTier: 'section' as const, density, inRhythmStack }),
+    () => ({ depth, namedGroupDepth: 0, density, inRhythmStack }),
     [depth, density, inRhythmStack],
   )
   return <FormSectionContext.Provider value={value}>{children}</FormSectionContext.Provider>

@@ -18,6 +18,7 @@ import {
 import {
   FormItems,
   FormSectionHeader,
+  FormSectionProvider,
   isFieldOptionGroup,
   type FormItem,
   type SelectFieldOptionListItem,
@@ -293,78 +294,79 @@ function ClassSpellbookAcquisitionModalContent({
           <Modal.Body stableBody>
             <DialogPanelScrollRegion inset="innerLeading">
               <form id={formId} onSubmit={handleSubmit} noValidate>
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-[minmax(0,16rem)_minmax(0,1fr)]">
-                  <div className="flex min-w-0 flex-col gap-3">
-                    <FormSectionHeader
-                      id={gainModeHeadingId}
-                      className="[&_p]:!text-sm"
-                      label={GAIN_MODE_LABEL}
-                      hint={GAIN_MODE_HINT}
-                      headingScale="field"
-                      size="md"
-                    />
-                    <RadioCard
-                      idPrefix="spellbook-gain-mode"
-                      aria-labelledby={gainModeHeadingId}
-                      density="compact"
-                      options={[...SPELLBOOK_GAIN_MODE_OPTIONS]}
-                      value={gainMode}
-                      onValueChange={(value) => handleGainModeChange(value as SpellbookGainMode)}
-                    />
-                  </div>
+                <FormSectionProvider density="compact">
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-[minmax(0,16rem)_minmax(0,1fr)]">
+                    <div className="flex min-w-0 flex-col gap-3">
+                      <FormSectionHeader
+                        id={gainModeHeadingId}
+                        label={GAIN_MODE_LABEL}
+                        hint={GAIN_MODE_HINT}
+                        headingScale="field"
+                      />
+                      <RadioCard
+                        idPrefix="spellbook-gain-mode"
+                        aria-labelledby={gainModeHeadingId}
+                        density="compact"
+                        options={[...SPELLBOOK_GAIN_MODE_OPTIONS]}
+                        value={gainMode}
+                        onValueChange={(value) => handleGainModeChange(value as SpellbookGainMode)}
+                      />
+                    </div>
 
-                  <div className="flex min-w-0 flex-col gap-4">
-                    {gainMode === SPELLBOOK_GAIN_MODE_REGULAR ? (
-                      <>
-                        <FormSectionHeader
-                          label={REGULAR_SECTION_LABEL}
-                          hint={REGULAR_SECTION_HINT}
-                          headingScale="field"
-                          size="md"
-                          required
-                        />
-                        <FormProvider {...regularForm}>
-                          <FormItems
-                            idPrefix={regularFieldsIdPrefix}
-                            items={regularFields(formCtx)}
+                    <div className="flex min-w-0 flex-col gap-4">
+                      {gainMode === SPELLBOOK_GAIN_MODE_REGULAR ? (
+                        <>
+                          <FormSectionHeader
+                            label={REGULAR_SECTION_LABEL}
+                            hint={REGULAR_SECTION_HINT}
+                            headingScale="field"
+                            required
                           />
-                        </FormProvider>
-                        {regularAlert ? (
+                          <FormProvider {...regularForm}>
+                            <FormItems
+                              idPrefix={regularFieldsIdPrefix}
+                              items={regularFields(formCtx)}
+                            />
+                          </FormProvider>
+                          {regularAlert ? (
+                            <Alert variant="default" density="compact">
+                              <Text as="span" variant="supporting">
+                                <SemanticText
+                                  tone="neutral"
+                                  icon={<Icon name="info" size="owner" />}
+                                >
+                                  {regularAlert}
+                                </SemanticText>
+                              </Text>
+                            </Alert>
+                          ) : null}
+                        </>
+                      ) : (
+                        <>
+                          <FormSectionHeader
+                            label={VARIABLE_SECTION_LABEL}
+                            hint={VARIABLE_SECTION_HINT}
+                            headingScale="field"
+                            required
+                          />
+                          <TableBuilderValuesPane
+                            form={tableForm}
+                            config={hostConfig}
+                            allowedLevels={allowedLevels}
+                            chrome="bare"
+                          />
                           <Alert variant="default" density="compact">
                             <Text as="span" variant="supporting">
                               <SemanticText tone="neutral" icon={<Icon name="info" size="owner" />}>
-                                {regularAlert}
+                                {VARIABLE_ALERT}
                               </SemanticText>
                             </Text>
                           </Alert>
-                        ) : null}
-                      </>
-                    ) : (
-                      <>
-                        <FormSectionHeader
-                          label={VARIABLE_SECTION_LABEL}
-                          hint={VARIABLE_SECTION_HINT}
-                          headingScale="field"
-                          size="md"
-                          required
-                        />
-                        <TableBuilderValuesPane
-                          form={tableForm}
-                          config={hostConfig}
-                          allowedLevels={allowedLevels}
-                          chrome="bare"
-                        />
-                        <Alert variant="default" density="compact">
-                          <Text as="span" variant="supporting">
-                            <SemanticText tone="neutral" icon={<Icon name="info" size="owner" />}>
-                              {VARIABLE_ALERT}
-                            </SemanticText>
-                          </Text>
-                        </Alert>
-                      </>
-                    )}
+                        </>
+                      )}
+                    </div>
                   </div>
-                </div>
+                </FormSectionProvider>
               </form>
             </DialogPanelScrollRegion>
           </Modal.Body>

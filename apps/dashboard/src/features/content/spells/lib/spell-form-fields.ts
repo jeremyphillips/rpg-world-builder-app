@@ -565,7 +565,7 @@ function castingFields(): FormItem[] {
     },
     ...areaGeometryFormFields({
       fieldPrefix: 'areaOfEffect',
-      legend: 'Area of effect',
+      headingLabel: 'Area of effect',
       shapeHint: 'Optional structured area geometry. Origin and movement are not modeled yet.',
     }),
     {

@@ -487,14 +487,17 @@ export {
   resolveEffectiveFormHeaderScale,
   resolveEffectiveFormHeaderScaleFromLegendSize,
   resolveFormHeaderStackTypography,
-  type FormHeaderPresentationScale,
 } from './presentation/form-header-stack-typography.lib'
+export {
+  resolveFormSectionHeaderPresentation,
+  type ResolveFormSectionHeaderPresentationInput,
+} from './presentation/resolve-form-section-header-presentation.lib'
 export {
   fieldArrayItemListClasses,
   type FieldGroupLegendSize,
   type FieldSeparator,
   type FieldRhythm,
-  type GroupHeadingScale,
+  type FormHeadingScale,
 } from '../components/ui/field.variants'
 export {
   FieldRowAnatomyProvider,

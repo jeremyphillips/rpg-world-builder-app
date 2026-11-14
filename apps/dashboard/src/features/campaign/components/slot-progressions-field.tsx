@@ -164,8 +164,6 @@ export function SlotProgressionsField() {
           label="Slot progressions"
           hint="Spell slot tables shared by spellcasting classes."
           headingScale="field"
-          rhythm={rhythm}
-          size={size}
           action={
             <ActionButton
               action="add"

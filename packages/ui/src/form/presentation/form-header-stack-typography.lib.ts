@@ -5,15 +5,13 @@ import {
   fieldLabelTypographyVariants,
   type FieldGroupLegendSize,
   type FieldRhythm,
-  type GroupHeadingScale,
+  type FormHeadingScale,
 } from '../../components/ui/field.variants'
-
-export type FormHeaderPresentationScale = 'section' | 'subsection' | 'field'
 
 export function resolveEffectiveFormHeaderScale(options: {
   namedGroupDepth: number
-  headingScale?: GroupHeadingScale
-}): FormHeaderPresentationScale {
+  headingScale?: FormHeadingScale
+}): FormHeadingScale {
   if (options.headingScale === 'field') return 'field'
   if (options.headingScale === 'section') return 'section'
   if (options.headingScale === 'subsection') return 'subsection'
@@ -23,8 +21,8 @@ export function resolveEffectiveFormHeaderScale(options: {
 /** FieldGroup / legend hosts without named-group depth — uses structural legend size. */
 export function resolveEffectiveFormHeaderScaleFromLegendSize(options: {
   legendSize: FieldGroupLegendSize
-  headingScale?: GroupHeadingScale
-}): FormHeaderPresentationScale {
+  headingScale?: FormHeadingScale
+}): FormHeadingScale {
   if (options.headingScale === 'field') return 'field'
   if (options.headingScale === 'section') return 'section'
   if (options.headingScale === 'subsection') return 'subsection'
@@ -58,7 +56,7 @@ function resolveStructuralDescriptionClass(
 }
 
 export function resolveFormHeaderStackTypography(options: {
-  headingScale: FormHeaderPresentationScale
+  headingScale: FormHeadingScale
   rhythm?: FieldRhythm
   size?: FieldSizeToken
 }): {

@@ -250,7 +250,7 @@ export function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
         },
         ...areaGeometryFormFields({
           fieldPrefix: `${RESOLUTION_PREFIX}.areaOfEffect`,
-          legend: RESOLUTION_FIELD_LABELS.areaOfEffect,
+          headingLabel: RESOLUTION_FIELD_LABELS.areaOfEffect,
           shapeHint: 'Mechanical area geometry for resolution preview and execution.',
           visibility: visibleWhenSelectionModeIsOneOf('self', 'point'),
         }),

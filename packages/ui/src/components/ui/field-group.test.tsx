@@ -79,7 +79,7 @@ describe('FieldGroup', () => {
 
   it('renders an optional description', () => {
     render(
-      <FieldGroup legend="Character basics" description="Shown on your sheet.">
+      <FieldGroup legend="Character basics" hint="Shown on your sheet.">
         <TextField id="name" label="Name" />
       </FieldGroup>,
     )
@@ -117,7 +117,7 @@ describe('FieldGroup', () => {
 
   it('uses subgroup body gap for subsection legends with a description', () => {
     render(
-      <FieldGroup legend="Damage" legendSize="subsection" description="Primary damage dice.">
+      <FieldGroup legend="Damage" legendSize="subsection" hint="Primary damage dice.">
         <TextField id="damage-dice" label="Dice" />
       </FieldGroup>,
     )
@@ -147,7 +147,7 @@ describe('FieldGroup', () => {
 
   it('applies compact legend typography, body spacing, and stack rhythm', () => {
     render(
-      <FieldGroup legend="Basics" rhythm="compact" description="Help copy.">
+      <FieldGroup legend="Basics" rhythm="compact" hint="Help copy.">
         <TextField id="name" label="Name" size="sm" />
       </FieldGroup>,
     )
@@ -172,7 +172,7 @@ describe('FieldGroup', () => {
         legend="Flat section"
         legendSize="section"
         headingScale="subsection"
-        description="Presentation-only subsection."
+        hint="Presentation-only subsection."
       >
         <TextField id="flat-section" label="Field" />
       </FieldGroup>,
@@ -202,7 +202,7 @@ describe('FieldGroup', () => {
     render(
       <FieldGroup
         legend="Advanced options"
-        description="Optional tuning."
+        hint="Optional tuning."
         legendSize="subsection"
         headingScale="field"
         size="md"
@@ -231,7 +231,7 @@ describe('FieldGroup', () => {
     render(
       <FieldGroup
         legend="Advanced options"
-        description="Optional tuning."
+        hint="Optional tuning."
         legendSize="subsection"
         headingScale="field"
         size="sm"
@@ -258,7 +258,7 @@ describe('FieldGroup', () => {
     render(
       <FieldGroup
         legend="Advanced options"
-        description="Optional tuning."
+        hint="Optional tuning."
         legendSize="subsection"
         headingScale="field"
         size="md"
@@ -398,7 +398,7 @@ describe('FieldGroup', () => {
     render(
       <FieldGroup
         legend="Optional details"
-        description="Member affinities and description"
+        hint="Member affinities and description"
         rhythm="compact"
         disclosure={{ variant: 'legend', defaultOpen: false }}
       >
@@ -427,7 +427,7 @@ describe('FieldGroup', () => {
     render(
       <FieldGroup
         legend="Optional details"
-        description="Support copy"
+        hint="Support copy"
         rhythm="compact"
         disclosure={{ variant: 'legend', defaultOpen: false }}
       >
@@ -467,7 +467,7 @@ describe('FieldGroup', () => {
     render(
       <FieldGroup
         legend="Optional details"
-        description="Member affinities and description"
+        hint="Member affinities and description"
         legendAccessory={
           <Badge tone="neutral" size="sm" appearance="soft" aria-hidden>
             Status

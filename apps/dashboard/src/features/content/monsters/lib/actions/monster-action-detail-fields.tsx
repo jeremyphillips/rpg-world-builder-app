@@ -465,7 +465,7 @@ function monsterActionSaveSelectionDependent(ctx: ContentFormCtx): FormItem {
           fields: [
             ...areaGeometryFormFields({
               fieldPrefix: 'resolution.areaOfEffect',
-              legend: 'Area',
+              headingLabel: 'Area',
               legendVisibility: 'srOnly',
               shapeHint: 'Area measured from the monster.',
               visibility: selfMode,

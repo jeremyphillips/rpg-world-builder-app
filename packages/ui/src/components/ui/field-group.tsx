@@ -2,7 +2,7 @@ export {
   FieldGroup,
   type FieldGroupLegendSize,
   type FieldGroupProps,
-  type GroupHeadingScale,
+  type FormHeadingScale,
 } from './field-group.client'
 
 export type { FieldGroupChrome } from './field-group-chrome.variants'

@@ -22,13 +22,14 @@ import {
   DEFAULT_ARRAY_SECTION_DENSITY,
   resolveFormDensity,
   resolveSectionDensity,
+  type FormDensity,
 } from '../../form-density'
 import { resolveArrayEmptyItemLabel } from './array-field-empty-state.lib'
 
 type ResolveArrayFieldRendererChromeInput = {
   config: ArrayConfig
   /** Parent section density before array item defaults apply. */
-  parentDensity: Parameters<typeof resolveFormDensity>[0]
+  parentDensity: FormDensity
   depth: number
   inRhythmStack: boolean | undefined
   fieldsLength: number
@@ -43,13 +44,15 @@ export function resolveArrayFieldRendererChrome({
   fieldsLength,
   wrapSectionChrome = false,
 }: ResolveArrayFieldRendererChromeInput) {
-  const sectionDensity = resolveSectionDensity({
+  // Header density: explicit config.density → parent context (label modes do not branch density).
+  const headerDensity = config.density ?? parentDensity
+  // Body density: resolveSectionDensity with array default compact when unset.
+  const arrayBodyDensity = resolveSectionDensity({
     explicit: config.density,
     inherited: parentDensity,
     sectionDefault: DEFAULT_ARRAY_SECTION_DENSITY,
   })
-  const { rhythm, size } = resolveFormDensity(sectionDensity)
-  const headerDensity = config.density ?? parentDensity
+  const { rhythm, size } = resolveFormDensity(arrayBodyDensity)
   const { rhythm: legendRhythm, size: legendFieldSize } = resolveFormDensity(headerDensity)
   const itemConfig = resolveArrayItemConfig(config)
   const addAction = resolveArrayAddAction(config)

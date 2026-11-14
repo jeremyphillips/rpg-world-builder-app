@@ -8,16 +8,18 @@
 | ----------------------------------------------------------- | ------------------------------------------- |
 | Named top-level group (`namedGroupDepth === 0`)             | `section`                                   |
 | Named group under a named ancestor (`namedGroupDepth >= 1`) | `subsection` (cap — no deeper visual tiers) |
-| Anonymous layout group (no `heading` / `legend`)            | Transparent — does not increment depth      |
+| Anonymous layout group (no `heading`)                       | Transparent — does not increment depth      |
 | `kind: 'columns'`                                           | Transparent — does not increment depth      |
-| `kind: 'slot'` or `kind: 'row'` with `heading`              | `leaf`                                      |
-| Leaf field                                                  | `leaf`                                      |
 
 Named `kind: 'array'` section headers use **`FormSectionHeader`** with default **`headingScale: 'field'`**
-(field label + field hint utilities). Legend **size** and **rhythm** resolve at render from
-`config.density ?? parent.density` (item bodies still default to compact section density when
-`density` is omitted). Optional `headingScale` on the array config can opt into structural
-section/subsection typography — there is no array-specific legend token or context channel.
+(field label + field hint utilities). Array **header** rhythm/size use `config.density ?? parent.density`;
+**item bodies** use `resolveSectionDensity` with `DEFAULT_ARRAY_SECTION_DENSITY` (`compact`) when
+`density` is omitted. Optional `headingScale` on the array config can opt into structural
+section/subsection typography (`FormHeadingScale`) — there is no array-specific legend token or context channel.
+
+Standalone **`FormSectionHeader`** instances (dashboard slots, table builder panes, modals) inherit
+parent **`FormSectionProvider`** density via {@link resolveFormSectionHeaderPresentation} unless
+`density` / `rhythm` / `size` overrides are passed explicitly.
 
 `headingScale: 'field'` replaces structural legend and description type with the field label and hint scale for that group's density, and applies `fieldAnatomyStackVariants` on the fieldset for legend→body spacing (including when a collapsible group is closed). It is not a `legendSize` and does not change tier resolution or disclosure.
 
