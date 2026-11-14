@@ -162,7 +162,6 @@ export function monsterActionOnHitFields(ctx: ContentFormCtx): FormItem {
     kind: 'array',
     name: 'onHit.effects',
     heading: { label: MONSTER_ON_HIT_LEGEND, hint: MONSTER_ON_HIT_HINT },
-    density: 'compact',
     addAction: {
       label: MONSTER_ON_HIT_ADD_LABEL,
       menu: {

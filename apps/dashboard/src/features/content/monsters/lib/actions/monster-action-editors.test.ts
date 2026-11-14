@@ -260,7 +260,6 @@ describe('monster action detail fields', () => {
     expect(onHit.kind).toBe('array')
     if (onHit.kind !== 'array') return
     expect(onHit).toMatchObject({
-      density: 'compact',
       addAction: {
         label: 'Add effect',
         menu: {
@@ -282,6 +281,7 @@ describe('monster action detail fields', () => {
         (field) => !('kind' in field) && resolveFieldConfigPrimaryName(field) === 'kind',
       ),
     ).toBeUndefined()
+    expect(onHit).not.toHaveProperty('density')
   })
 
   it('shows only the natural-weapon editors and keeps attack editors', () => {
