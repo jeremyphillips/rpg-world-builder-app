@@ -40,7 +40,8 @@ describe('damageFieldGroup', () => {
     expect(damage).toHaveClass('mb-0')
     expect(damage).not.toHaveClass('mb-8')
     expect(damage.querySelector('legend')).toHaveClass('sr-only')
-    expect(screen.getByRole('button', { name: 'Add dice' })).toBeInTheDocument()
+    expect(screen.getByLabelText('Number of dice')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Add dice' })).not.toBeInTheDocument()
   })
 
   it('does not put roll suggestions into form defaults', () => {

@@ -37,6 +37,22 @@ describe('RollValueField', () => {
     expect(onPartsChange).toHaveBeenLastCalledWith({ flatOperator: '+', flatAmount: 0 })
   })
 
+  it('shows empty dice controls when required and no dice atoms are stored', () => {
+    render(
+      <RollValueField
+        id="damage"
+        label="Damage roll"
+        parts={{}}
+        required
+        onPartsChange={() => undefined}
+      />,
+    )
+
+    expect(screen.getByLabelText('Number of dice')).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Die size' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Add dice' })).not.toBeInTheDocument()
+  })
+
   it('offers add dice when no dice atoms are stored', () => {
     const onPartsChange = vi.fn()
     render(

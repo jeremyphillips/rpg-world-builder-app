@@ -93,7 +93,7 @@ export function RollValueField({
     () => rollValuePartsToDiceFormula(parts, fieldDefaults),
     [fieldDefaults, parts],
   )
-  const showDiceFields = shouldShowRollValueDiceFields(parts)
+  const showDiceFields = required || shouldShowRollValueDiceFields(parts)
   const showModifierFields = shouldShowRollValueModifierFields(parts)
   const hintId = `${id}-hint`
   const errorId = `${id}-error`
@@ -134,6 +134,16 @@ export function RollValueField({
     onPartsChange(defaultRollValueDice(fieldDefaults))
   }, [fieldDefaults, onPartsChange])
 
+  const diceAtoms =
+    showDiceFields && (required || shouldShowRollValueDiceFields(parts))
+      ? {
+          count: typeof parts.diceCount === 'number' ? parts.diceCount : null,
+          faces: typeof parts.diceFaces === 'number' ? parts.diceFaces : null,
+          countPlaceholder: String(fieldDefaults.count),
+          facesPlaceholder: `d${fieldDefaults.faces}`,
+        }
+      : undefined
+
   const controls = (
     <DiceFormulaControls
       id={id}
@@ -145,16 +155,7 @@ export function RollValueField({
       modifierMode="optional"
       showModifierFields={showModifierFields}
       showDiceFields={showDiceFields}
-      diceAtoms={
-        showDiceFields
-          ? {
-              count: parts.diceCount ?? null,
-              faces: parts.diceFaces ?? null,
-              countPlaceholder: String(fieldDefaults.count),
-              facesPlaceholder: `d${fieldDefaults.faces}`,
-            }
-          : undefined
-      }
+      diceAtoms={diceAtoms}
       countMin={countMin}
       countMax={countMax}
       modifierMin={modifierMin}
@@ -162,7 +163,7 @@ export function RollValueField({
       modifierOperators={ROLL_VALUE_MODIFIER_OPERATORS}
       controlLabels={ROLL_VALUE_CONTROL_LABELS}
       facesNotation
-      onAddDice={handleAddDice}
+      onAddDice={required ? undefined : handleAddDice}
       addDiceLabel={ADD_DICE_LABEL}
       labelPosition="above"
       inlineLabelId={inlineLabelId}

@@ -504,7 +504,8 @@ function requirementArray(
       {
         type: 'select',
         name: 'mode',
-        label: 'Creature type',
+        label: 'Creature types',
+        width: 'sm',
         options: [
           { value: 'include', label: 'Is' },
           { value: 'exclude', label: "Isn't" },
@@ -516,7 +517,7 @@ function requirementArray(
         type: 'select',
         name: 'presence',
         label: 'Target conditions',
-        width: 'auto',
+        width: 'md',
         options: [
           { value: 'has', label: 'Has' },
           { value: 'lacks', label: "Doesn't have" },
@@ -549,7 +550,9 @@ function requirementArray(
       {
         type: 'combobox',
         name: 'ids',
-        label: 'Which ones',
+        label: 'Creature types',
+        labelVisibility: 'srOnly',
+        placeholder: 'Add types...',
         noun: { singular: 'option', plural: 'options' },
         multiple: true,
         options: [...creatureTypeOptions],
