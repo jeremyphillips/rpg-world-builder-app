@@ -128,7 +128,7 @@ export function TableBuilderPreview() {
       <FormSectionHeader
         label={TABLE_BUILDER_PREVIEW_TITLE}
         hint={TABLE_BUILDER_PREVIEW_DESCRIPTION}
-        tier="subsection"
+        headingScale="subsection"
       />
       {!hasColumns ? (
         <TableBuilderInsetGate description={TABLE_BUILDER_PREVIEW_NO_COLUMNS_DESCRIPTION} />

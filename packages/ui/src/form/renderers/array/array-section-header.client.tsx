@@ -3,12 +3,14 @@
 import type { ReactNode } from 'react'
 
 import type { FieldSizeToken } from '../../../components/ui/field-sizing.variants'
+import { fieldSetInFlowLegendClasses } from '../../../components/ui/field.variants'
+import { cn } from '../../../lib/utils'
 import type { ArrayAddActionLayout, FieldHintConfig } from '../../field-config'
 import type { ArrayLabelMode } from '../../config/array/resolve-array-heading.lib'
-import { ArrayLikeSectionHeader } from '../../presentation/array-like-section-header.client'
+import { FormSectionHeader } from '../../presentation/form-section-header.client'
 import { ArrayLegendIssueLink } from './array-item-issue.client'
 
-export interface ArrayFieldSectionHeaderProps {
+export interface ArraySectionHeaderProps {
   labelMode: ArrayLabelMode
   /** Gates visible chrome bands and fieldset anatomy stack — SSOT: resolveArrayShowSectionHeader. */
   showSectionHeader: boolean
@@ -24,7 +26,7 @@ export interface ArrayFieldSectionHeaderProps {
   addControl?: ReactNode
 }
 
-function resolveVisibleHeaderChrome(props: ArrayFieldSectionHeaderProps): {
+function resolveVisibleHeaderChrome(props: ArraySectionHeaderProps): {
   labelAccessory: ReactNode
   inlineAction: ReactNode | undefined
 } {
@@ -42,23 +44,35 @@ function resolveVisibleHeaderChrome(props: ArrayFieldSectionHeaderProps): {
 }
 
 /** Array fieldset section header — semantic legend, visible label/hint, and renderer chrome. */
-export function ArrayFieldSectionHeader(props: ArrayFieldSectionHeaderProps) {
+export function ArraySectionHeader(props: ArraySectionHeaderProps) {
   const { labelMode, showSectionHeader, sectionLabel, hint, legendFieldSize, required } = props
   const { labelAccessory, inlineAction } = resolveVisibleHeaderChrome(props)
+
+  const fieldHeader = (
+    <FormSectionHeader
+      label={sectionLabel}
+      hint={hint}
+      headingScale="field"
+      size={legendFieldSize}
+      action={inlineAction}
+      labelAccessory={labelAccessory}
+      required={required}
+    />
+  )
 
   if (labelMode === 'anonymous') {
     if (!showSectionHeader) return null
     return (
       <div className="w-full min-w-0">
-        <ArrayLikeSectionHeader
+        <FormSectionHeader
           label={sectionLabel}
           hint={hint}
+          headingScale="field"
           size={legendFieldSize}
           action={inlineAction}
           labelAccessory={labelAccessory}
           required={required}
           showVisibleLabel={false}
-          wrapper="none"
         />
       </div>
     )
@@ -70,15 +84,15 @@ export function ArrayFieldSectionHeader(props: ArrayFieldSectionHeaderProps) {
         <legend className="sr-only">{sectionLabel}</legend>
         {showSectionHeader ? (
           <div className="w-full min-w-0">
-            <ArrayLikeSectionHeader
+            <FormSectionHeader
               label={sectionLabel}
               hint={hint}
+              headingScale="field"
               size={legendFieldSize}
               action={inlineAction}
               labelAccessory={labelAccessory}
               required={required}
               showVisibleLabel={false}
-              wrapper="none"
             />
           </div>
         ) : null}
@@ -87,14 +101,6 @@ export function ArrayFieldSectionHeader(props: ArrayFieldSectionHeaderProps) {
   }
 
   return (
-    <ArrayLikeSectionHeader
-      label={sectionLabel}
-      hint={hint}
-      size={legendFieldSize}
-      action={inlineAction}
-      labelAccessory={labelAccessory}
-      required={required}
-      wrapper="legend"
-    />
+    <legend className={cn(fieldSetInFlowLegendClasses, 'w-full min-w-0')}>{fieldHeader}</legend>
   )
 }

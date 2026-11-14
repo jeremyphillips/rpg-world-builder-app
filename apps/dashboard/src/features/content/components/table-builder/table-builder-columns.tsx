@@ -181,7 +181,7 @@ export function TableBuilderColumns() {
       <FormSectionHeader
         label={TABLE_BUILDER_COLUMNS_LABEL}
         hint={kind === 'general' ? TABLE_BUILDER_GENERAL_COLUMNS_HINT : TABLE_BUILDER_COLUMNS_HINT}
-        labelPresentation="field-label"
+        headingScale="field"
         size="md"
         required
       />

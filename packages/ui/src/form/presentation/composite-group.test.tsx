@@ -35,7 +35,7 @@ describe('CompositeGroup', () => {
 
     const fieldset = container.querySelector('fieldset')
     const legend = screen.getByText('Speed').closest('legend')
-    expect(legend).toHaveClass('sr-only')
+    expect(screen.getByText('Speed').closest('.sr-only')).toBeTruthy()
     expect(fieldset).toHaveClass('flex', 'flex-col')
     expect(fieldset?.className).not.toContain('gap-y-')
     expect(screen.getByText('body')).toBeInTheDocument()
@@ -48,7 +48,9 @@ describe('CompositeGroup', () => {
       </CompositeGroup>,
     )
 
-    const labelLine = screen.getByText('Suggested ability scores').closest('div')
+    const labelLine = screen
+      .getByText('Suggested ability scores')
+      .closest('.text-style-field-label-md')
     expect(labelLine).toHaveClass(...fieldLabelVariants({ size: 'md' }).split(/\s+/))
   })
 

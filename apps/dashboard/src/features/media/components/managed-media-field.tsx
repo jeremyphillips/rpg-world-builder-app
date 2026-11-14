@@ -13,7 +13,7 @@ import {
   fieldAnatomyStackVariants,
   resolveExpandedCapacityHint,
 } from '@rpg/ui'
-import { ArrayLikeSectionHeader, resolveFormDensity, useFormSectionContext } from '@rpg/ui/form'
+import { FormSectionHeader, resolveFormDensity, useFormSectionContext } from '@rpg/ui/form'
 
 import { buildMediaFieldSummaryModel } from '../lib/build-media-field-summary-model'
 import { resolveMediaFieldCapacity, type MediaFieldConfig } from '../lib/media-field-config'
@@ -46,7 +46,7 @@ export function ManagedMediaField({
 }: ManagedMediaFieldProps) {
   const headingId = useId()
   const { density } = useFormSectionContext()
-  const { size } = resolveFormDensity(density)
+  const { rhythm, size } = resolveFormDensity(density)
   const form = useFormContext<FieldValues>()
   // useController (not useWatch) so the path registers with react-hook-form:
   // the schema Form shell mounts with `shouldUnregister: true`, and unregistered
@@ -81,10 +81,11 @@ export function ManagedMediaField({
           role="group"
           aria-labelledby={headingId}
         >
-          <ArrayLikeSectionHeader
-            wrapper="none"
+          <FormSectionHeader
             id={headingId}
             label={label}
+            headingScale="field"
+            rhythm={rhythm}
             size={size}
             hint={
               summary.galleryCount > 0

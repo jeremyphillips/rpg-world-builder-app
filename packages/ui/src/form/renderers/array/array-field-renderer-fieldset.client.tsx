@@ -13,7 +13,7 @@ import { resolveArrayFieldsetHeaderBodyStackClassName } from './resolve-array-fi
 import { ArrayFieldAddControl } from './array-field-add-control.client'
 import { ArrayFieldContainerError } from './array-field-container-error.client'
 import { ArrayFieldEmptyState } from './array-field-empty-state.client'
-import { ArrayFieldSectionHeader } from './array-field-legend.client'
+import { ArraySectionHeader } from './array-section-header.client'
 import { ArrayFieldItemList } from './array-field-item-list.client'
 import type { ArrayFieldSectionLayout } from './array-field-renderer.client'
 import type { useArrayFieldRendererState } from './use-array-field-renderer-state.client'
@@ -94,7 +94,7 @@ export function ArrayFieldRendererFieldset({
       aria-invalid={state.hasContainerIssue ? true : undefined}
     >
       {state.showSectionHeader || state.labelMode === 'srOnly' ? (
-        <ArrayFieldSectionHeader
+        <ArraySectionHeader
           labelMode={state.labelMode}
           showSectionHeader={state.showSectionHeader}
           sectionLabel={state.sectionLabel}

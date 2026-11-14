@@ -267,7 +267,9 @@ describe('group field container', () => {
       expect(parentTitle).toHaveClass(
         density === 'compact' ? 'text-style-field-legend-compact' : 'text-style-field-legend',
       )
-      const childTitle = screen.getByText('Advanced options')
+      const childTitle = screen
+        .getByText('Advanced options')
+        .closest('span.text-style-field-label-sm, span.text-style-field-label-md')
       expect(childTitle).toHaveClass(
         density === 'compact' ? 'text-style-field-label-sm' : 'text-style-field-label-md',
       )

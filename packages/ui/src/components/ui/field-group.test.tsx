@@ -89,7 +89,11 @@ describe('FieldGroup', () => {
     expect(legend).toHaveClass('w-full')
     expect(legend).not.toHaveClass('text-style-field-legend')
     expect(legendTitleTypographyNode('Character basics')).toHaveClass('text-style-field-legend')
-    expect(legend?.firstElementChild).toHaveClass('flex', 'flex-col', 'gap-2')
+    expect(screen.getByText('Shown on your sheet.').parentElement).toHaveClass(
+      'flex',
+      'flex-col',
+      'gap-2',
+    )
     expect(legend?.firstElementChild).not.toHaveClass('mb-5')
     expect(bodyRelationshipWrapper(fieldset)).toHaveClass('mt-5')
     expect(screen.getByText('Shown on your sheet.')).toHaveClass(
@@ -119,7 +123,7 @@ describe('FieldGroup', () => {
     )
 
     const fieldset = screen.getByRole('group', { name: /Damage/ })
-    expect(screen.getByText('Damage').closest('legend')?.firstElementChild).toHaveClass(
+    expect(screen.getByText('Primary damage dice.').parentElement).toHaveClass(
       'flex',
       'flex-col',
       'gap-2',
@@ -152,8 +156,7 @@ describe('FieldGroup', () => {
     const legend = screen.getByText('Basics').closest('legend')
     expect(legend).not.toHaveClass('text-style-field-legend-compact')
     expect(legendTitleTypographyNode('Basics')).toHaveClass('text-style-field-legend-compact')
-    expect(legend?.firstElementChild).toHaveClass('gap-1')
-    expect(legend?.firstElementChild).not.toHaveClass('mb-3')
+    expect(screen.getByText('Help copy.').parentElement).toHaveClass('gap-1')
     expect(bodyRelationshipWrapper(fieldset)).toHaveClass('mt-3')
     expect(screen.getByText('Help copy.')).toHaveClass(
       'text-style-field-section-description-compact',
@@ -218,8 +221,7 @@ describe('FieldGroup', () => {
       'text-style-field-subsection-description-compact',
       'text-style-body',
     )
-    const legend = screen.getByText('Advanced options').closest('legend')
-    expect(legend?.firstElementChild).toHaveClass('gap-2')
+    expect(screen.getByText('Optional tuning.').parentElement).toHaveClass('gap-0.5')
     const fieldset = screen.getByRole('group', { name: /Advanced options/ })
     expect(fieldset).toHaveClass(...fieldAnatomyStackVariants({ size: 'md' }).split(/\s+/))
     expect(bodyRelationshipWrapper(fieldset)).toBeNull()
@@ -245,8 +247,7 @@ describe('FieldGroup', () => {
     const description = screen.getByText('Optional tuning.')
     expect(description).toHaveClass('text-style-field-hint-compact')
     expect(description).not.toHaveClass('text-style-field-subsection-description-compact')
-    const legend = screen.getByText('Advanced options').closest('legend')
-    expect(legend?.firstElementChild).toHaveClass('gap-1')
+    expect(screen.getByText('Optional tuning.').parentElement).toHaveClass('gap-0.5')
     const fieldset = screen.getByRole('group', { name: /Advanced options/ })
     expect(fieldset).toHaveClass(...fieldAnatomyStackVariants({ size: 'sm' }).split(/\s+/))
     expect(bodyRelationshipWrapper(fieldset)).toBeNull()

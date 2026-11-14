@@ -300,7 +300,7 @@ function ClassSpellbookAcquisitionModalContent({
                       className="[&_p]:!text-sm"
                       label={GAIN_MODE_LABEL}
                       hint={GAIN_MODE_HINT}
-                      labelPresentation="field-label"
+                      headingScale="field"
                       size="md"
                     />
                     <RadioCard
@@ -319,7 +319,7 @@ function ClassSpellbookAcquisitionModalContent({
                         <FormSectionHeader
                           label={REGULAR_SECTION_LABEL}
                           hint={REGULAR_SECTION_HINT}
-                          labelPresentation="field-label"
+                          headingScale="field"
                           size="md"
                           required
                         />
@@ -344,7 +344,7 @@ function ClassSpellbookAcquisitionModalContent({
                         <FormSectionHeader
                           label={VARIABLE_SECTION_LABEL}
                           hint={VARIABLE_SECTION_HINT}
-                          labelPresentation="field-label"
+                          headingScale="field"
                           size="md"
                           required
                         />
