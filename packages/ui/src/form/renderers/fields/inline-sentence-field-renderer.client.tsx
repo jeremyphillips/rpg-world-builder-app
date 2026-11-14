@@ -303,7 +303,6 @@ export function InlineSentenceFieldRenderer({
   config,
   id,
   namePrefix,
-  error,
 }: InlineSentenceFieldRendererProps) {
   const inAnatomyRow = useFieldRowParticipation()
   const controlSize = useFieldControlSize(config.controlSizeOverride)
@@ -341,13 +340,11 @@ export function InlineSentenceFieldRenderer({
 
     for (const name of uniqueBoundNames) {
       const fullPath = resolveFullName(namePrefix, name)
-      const controller = controllerByName.get(name)
-      const rhfMessage = controller?.fieldState.error?.message
 
       validations.set(
         name,
         resolvePresentedFieldValidation(
-          rhfMessage,
+          undefined,
           fullPath,
           presentation,
           suppressFieldErrorText,
@@ -357,18 +354,10 @@ export function InlineSentenceFieldRenderer({
     }
 
     return validations
-  }, [
-    controllerByName,
-    namePrefix,
-    presentation,
-    rowSummaryId,
-    suppressFieldErrorText,
-    uniqueBoundNames,
-  ])
+  }, [namePrefix, presentation, rowSummaryId, suppressFieldErrorText, uniqueBoundNames])
 
   const combinedError = resolveFirstFieldErrorMessage(
     ...uniqueBoundNames.map((name) => boundValidations.get(name)?.error),
-    error,
   )
 
   const resolvedSelectOptionsBySegment = useMemo(() => {

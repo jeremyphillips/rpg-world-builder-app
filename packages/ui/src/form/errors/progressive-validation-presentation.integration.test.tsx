@@ -71,6 +71,7 @@ describe('progressive validation presentation', () => {
   it('suppresses inactive dependent paths after disable', async () => {
     const user = userEvent.setup()
     const fields: FormItem[] = [
+      { type: 'text', name: 'name', label: 'Name', required: true },
       defineDependentField({
         kind: 'dependent',
         controller: { type: 'switch', name: 'enabled', label: 'Enabled' },

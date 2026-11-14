@@ -35,8 +35,10 @@ export interface MasterDetailEditorIdentity {
   deletable?: boolean
   availability?: MasterDetailAvailabilityPresentation
   onAvailabilityChange?: () => void
-  /** Unique presentation-path issue count for the selected row. */
+  /** Distinct claim-target issue count for the selected row. */
   issueCount?: number
+  /** Issues claimed by the row itself, shown beside the count. */
+  headerIssues?: readonly { path: string; message: string }[]
   inlineTitle?: MasterDetailInlineTitle
 }
 
@@ -107,6 +109,7 @@ function MasterDetailEditorIdentityChrome({
           availability={identity.availability}
           onAvailabilityChange={identity.onAvailabilityChange}
           issueCount={identity.issueCount}
+          headerIssues={identity.headerIssues}
         />
       </div>
       {menuActions.length > 0 ? (

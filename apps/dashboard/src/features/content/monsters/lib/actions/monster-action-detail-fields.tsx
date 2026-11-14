@@ -114,6 +114,7 @@ import {
   MONSTER_TURN_LIMIT_LABEL,
   MONSTER_TURN_LIMIT_OPTION_LABEL,
   MONSTER_ATTACK_BONUS_LABEL,
+  MONSTER_SAVE_FAILURE_NOTE_LABEL,
 } from '../monster-form-labels'
 import type { MonsterActionSection } from '../../lib/actions/monster-action-equipment-references'
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
@@ -515,6 +516,7 @@ function monsterActionSaveSection(
       {
         kind: 'slot',
         name: '_saveFailureNote',
+        label: MONSTER_SAVE_FAILURE_NOTE_LABEL,
         issuePaths: ['resolution.outcomes'],
         render: () => <MonsterActionSaveFailureNoteField namePrefix={namePrefix} />,
       },

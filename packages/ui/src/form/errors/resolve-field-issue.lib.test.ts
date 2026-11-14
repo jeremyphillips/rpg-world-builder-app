@@ -16,23 +16,22 @@ const fieldIssue = (path: string, target: string, message: string): FormIssue =>
 })
 
 describe('resolve-field-issue.lib', () => {
-  it('prefers rhf messages over routed copy', () => {
+  it('shows only the issue claimed for the control', () => {
     const issues = [fieldIssue('grants.0.language', 'grants.0.language', 'Choose a language.')]
-    expect(resolveFieldIssueDisplayMessage('grants.0.language', issues, 'Structured payload')).toBe(
-      'Structured payload',
-    )
+    expect(resolveFieldIssueDisplayMessage('grants.0.language', issues)).toBe('Choose a language.')
+    expect(resolveFieldIssueDisplayMessage('grants.0.other', issues)).toBeUndefined()
   })
 
-  it('reads routed issues when rhf is empty', () => {
+  it('reads routed issues by claim target', () => {
     const issues = [
       fieldIssue('actions.0.resolution.method', 'actions.0.resolution.method.ability', 'Required.'),
     ]
     expect(
       findRoutedIssueForFieldPath(issues, 'actions.0.resolution.method.ability')?.message,
     ).toBe('Required.')
-    expect(
-      resolveFieldIssueDisplayMessage('actions.0.resolution.method.ability', issues, undefined),
-    ).toBe('Required.')
+    expect(resolveFieldIssueDisplayMessage('actions.0.resolution.method.ability', issues)).toBe(
+      'Required.',
+    )
   })
 
   it('resolves slot-owned issues by claim or declared paths', () => {

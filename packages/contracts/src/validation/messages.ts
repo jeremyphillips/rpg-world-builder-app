@@ -139,11 +139,6 @@ export const fieldValidationMessages = {
     'validation.field.invalidValue',
     ({ label }) => `${label} has an invalid value.`,
   ),
-  /** Discriminated union row missing required branch fields. */
-  incompleteUnionOption: defineMessage(
-    'validation.field.incompleteUnionOption',
-    () => 'Complete the required fields for this option.',
-  ),
   /** Array must contain exactly `count` entries. */
   exactItemsCount: defineMessage<{ itemsLabel: string; count: number }>(
     'validation.field.exactItemsCount',

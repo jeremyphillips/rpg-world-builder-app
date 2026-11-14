@@ -15,6 +15,7 @@ export {
 export { classifyFormIssue, classifyFormIssues } from './classify-form-issue'
 export {
   filterIssuesForItemPrefix,
+  countIssueClaimTargets,
   groupIssuesForItemPrefix,
   sortFormIssues,
   countInvalidArrayItems,

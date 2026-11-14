@@ -89,6 +89,7 @@ export function useEmbeddedMasterDetailRows({
   }, [formCtx.embeddedSystemOriginRowIds, fieldName])
 
   const validation = useMasterDetailRowValidation(fieldName, itemFields)
+  const { getRowHeaderIssues } = validation
   const getRowIssueCount = resolveRowIssueCount ?? validation.getRowIssueCount
   const showRowBadges = resolveRowIssueCount ? true : validation.showRowBadges
 
@@ -193,11 +194,13 @@ export function useEmbeddedMasterDetailRows({
   const selectedIdentity = useMemo((): MasterDetailEditorIdentity | undefined => {
     if (!selectedRow) return undefined
     const issueCount = showRowBadges ? (selectedRow.item.issueCount ?? 0) : 0
+    const headerIssues = getRowHeaderIssues(selectedRow.formIndex)
     return {
       title: selectedRow.item.title,
       meta: selectedRow.item.meta,
       deletable: selectedRow.item.deletable,
       ...(issueCount > 0 ? { issueCount } : {}),
+      ...(headerIssues.length > 0 ? { headerIssues } : {}),
       ...(access && selectedRow.availability
         ? {
             availability: selectedRow.availability,
@@ -205,7 +208,7 @@ export function useEmbeddedMasterDetailRows({
           }
         : {}),
     }
-  }, [access, openAvailabilityDialog, selectedRow, showRowBadges])
+  }, [access, getRowHeaderIssues, openAvailabilityDialog, selectedRow, showRowBadges])
 
   const availabilityFormItems = useMemo((): FormItem[] | undefined => {
     if (!access || !selectedRow || access.kind !== 'availability') return undefined

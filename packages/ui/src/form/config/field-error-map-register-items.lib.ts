@@ -38,6 +38,7 @@ function registerArrayItem(
   registry.set(arrayKey, {
     label: arrayLabel,
     category: 'array',
+    role: 'array',
     itemLabel: arrayItemLabel(header, arrayLabel),
     exactPath: true,
   })
@@ -67,6 +68,27 @@ function registerArrayItem(
   registerItems(registry, `${arrayKey}.*`, item.fields, formValues)
 }
 
+function registerSlotIssuePathAliases(
+  registry: Map<string, RegistryEntry>,
+  prefix: string,
+  item: Extract<FormItem, { kind: 'slot' }>,
+): void {
+  if (!item.issuePaths?.length) return
+
+  const aliasLabel = item.heading?.label ?? item.label ?? item.name
+  for (const issuePath of item.issuePaths) {
+    const ownedKey = prefix ? `${prefix}.${issuePath}` : issuePath
+    if (registry.has(ownedKey)) continue
+    registry.set(ownedKey, {
+      label: aliasLabel,
+      category: 'text',
+      role: 'slotOwner',
+      exactPath: true,
+      labelOnly: true,
+    })
+  }
+}
+
 function registerSlotItem(
   registry: Map<string, RegistryEntry>,
   prefix: string,
@@ -76,17 +98,10 @@ function registerSlotItem(
   registry.set(slotKey, {
     label: item.label ?? item.name,
     category: 'text',
+    role: item.issuePaths?.length ? 'slotOwner' : 'hostSlot',
     exactPath: true,
   })
-  if (!item.issuePaths?.length) return
-  for (const issuePath of item.issuePaths) {
-    const ownedKey = prefix ? `${prefix}.${issuePath}` : issuePath
-    registry.set(ownedKey, {
-      label: item.heading?.label ?? item.label ?? item.name,
-      category: 'text',
-      exactPath: true,
-    })
-  }
+  registerSlotIssuePathAliases(registry, prefix, item)
 }
 
 function registerDependentItem(

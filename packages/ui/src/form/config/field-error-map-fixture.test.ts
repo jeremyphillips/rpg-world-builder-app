@@ -40,9 +40,9 @@ describe('field-error-map golden path fixture', () => {
     )
   })
 
-  it('formats discriminated union rows with incompleteUnionOption', () => {
+  it('formats unlabeled discriminated unions with the field label', () => {
     expect(messageFor(goldenPathSchema, { grant: {} }, { path: ['grant', 'kind'] })).toBe(
-      'Complete the required fields for this option.',
+      'Grant has an invalid value.',
     )
   })
 

@@ -9,7 +9,13 @@ import type { ZodType } from 'zod'
 import type { FormItem } from '../field-config'
 import type { FieldMessageCategory } from './field-error-map-category.lib'
 import type { RegistryEntry } from './field-error-map-register.lib'
-import { registerFormItems } from './field-error-map-register-items.lib'
+import {
+  buildFieldRegistry,
+  lookupDescendantRegistryEntry,
+  lookupRegistryEntry,
+} from './field-registry.lib'
+
+export { buildFieldRegistry, collectRegisteredPaths } from './field-registry.lib'
 
 // ---------------------------------------------------------------------------
 // Field-aware Zod error map (tier 1 of the validation-message architecture).
@@ -37,21 +43,6 @@ export interface RawZodIssueLike {
   maximum?: number | bigint
 }
 
-/** Field lookup keyed by dot-joined path with array indices normalized to `*`. */
-export function buildFieldRegistry(
-  items: FormItem[],
-  formValues?: Record<string, unknown>,
-): Map<string, RegistryEntry> {
-  const registry = new Map<string, RegistryEntry>()
-  registerFormItems(registry, '', items, formValues)
-  return registry
-}
-
-/** Registered dot-path keys for a form field tree (array indices use `*`). */
-export function collectRegisteredPaths(items: FormItem[]): Set<string> {
-  return new Set(buildFieldRegistry(items).keys())
-}
-
 /**
  * Nearest-field lookup: exact path first, then trailing segments dropped one at
  * a time so subpaths of composite values (`bonusGold.baseGp`, grid cells, dice
@@ -61,16 +52,11 @@ function lookupEntry(
   registry: Map<string, RegistryEntry>,
   path: PropertyKey[],
 ): RegistryEntry | undefined {
-  const segments = path.map((segment) => (typeof segment === 'number' ? '*' : String(segment)))
-
-  for (let length = segments.length; length > 0; length--) {
-    const entry = registry.get(segments.slice(0, length).join('.'))
-    if (!entry) continue
-    if (entry.exactPath && length !== segments.length) continue
-    return entry
-  }
-
-  return undefined
+  const joined = path.map((segment) => String(segment)).join('.')
+  if (!joined) return undefined
+  const owner = lookupRegistryEntry(registry, joined, { mode: 'owner' })?.entry
+  if (owner && owner.label !== UNLABELED_FIELD_LABEL) return owner
+  return lookupDescendantRegistryEntry(registry, joined)?.entry ?? owner
 }
 
 function isEmptyInput(input: unknown): boolean {
@@ -236,11 +222,11 @@ function formatInvalidValue(issue: RawZodIssueLike, entry: RegistryEntry): strin
 }
 
 function formatInvalidUnion(issue: RawZodIssueLike, entry: RegistryEntry): string {
+  if (isEmptyInput(issue.input)) return formatRequired(entry)
   if (isChoiceCategory(entry.category)) {
-    return formatInvalidValue(issue, entry)
+    return fieldValidationMessages.invalidSelect({ label: choiceNounPhrase(entry) })
   }
-
-  return fieldValidationMessages.incompleteUnionOption()
+  return fieldValidationMessages.invalidValue({ label: entry.label })
 }
 
 function isSlugPath(path: PropertyKey[]): boolean {
@@ -296,6 +282,7 @@ function unlabeledEntry(issue: RawZodIssueLike): RegistryEntry {
   return {
     label: UNLABELED_FIELD_LABEL,
     category: inferUnlabeledCategory(issue),
+    role: 'control',
     itemLabel: UNLABELED_ITEM_LABEL,
   }
 }

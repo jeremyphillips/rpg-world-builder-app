@@ -382,15 +382,29 @@ covering each edge case. Tiers, naming, and copy style →
 
 ### Issue routing (`prepareFormIssues`)
 
-Every Zod issue is routed to exactly one **claim** (`field`, `slot`, `row`, or form
-summary) before controls read it. Routing walks active controls in field order:
-exact path → `SlotConfig.issuePaths` ownership → ancestor/descendant control → row.
+Every Zod issue is routed to exactly one **claim** before controls read it. Registry
+entries have a role: `control` (bound field), `slotOwner` (a slot that declares
+`issuePaths`), `hostSlot` (a slot with no issue paths), or `array` (the array
+container). Lookup tries each concrete array index before the `*` key.
+
+Claim order: exact `control` or `slotOwner` → slot `issuePaths` ownership → ancestor
+or descendant `control` / `slotOwner` → row → form. An array root claims only an
+issue on its own path (`too_small`). Host slots never claim descendants. An issue
+on an unregistered object uses the first descendant control's label. Roll and
+dice atoms are label-only, so `dice.count` and `dice.faces` both claim the roll
+control.
+
+Tab badges, row badges, array legends, and the tabbed error summary all count
+**distinct claim targets**. A control shows a message only when routing claimed
+that path.
 
 - `useFieldIssue` / `useSlotIssues` — routed messages for leaves and slots.
 - `ArrayItemConfig.resolveFields` — per-row field trees for master-detail badges,
   `makeFieldErrorMap`, and routing (heterogeneous array rows).
 - `collectIssueClaimReport` — publish/draft claim audits in tests (`allowFormIssueRoutingFallback`
-  opts out of the Vitest fallback guard).
+  opts out of the Vitest non-control guard). `expectIssuesClaimedByControls` fails
+  when a field-severity issue does not land on a `control`, a `slotOwner`, or the
+  array path that owns that issue.
 
 ### Field copy — placeholders and instructions
 
@@ -420,12 +434,12 @@ dashboard form modules — set `digits` on narrow selects or `presentation: 'com
 
 Co-located form tests import helpers from `@rpg/ui/form/test-utils`:
 
-| Helper                                                          | Purpose                                                                                       |
-| --------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| `assertFieldPathsRegistered(fields)`                            | Every `flattenFields` leaf path resolves in the error-map registry                            |
-| `assertRegistryCoverage(schema, fields, opts?)`                 | Schema leaf paths are registered (use `exemptPaths` for slug, slot tabs, grant unions)        |
-| `assertInvalidSubmitUsesRefinedMessages(schema, fields, opts?)` | Invalid payloads produce no Zod-default copy; optional `catchAllWhitelist` / `unionWhitelist` |
-| `expectNoDefaultZodMessages(messages)`                          | Standalone detector for `Invalid input`, `Too small:`, etc.                                   |
+| Helper                                                          | Purpose                                                                                |
+| --------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `assertFieldPathsRegistered(fields)`                            | Every `flattenFields` leaf path resolves in the error-map registry                     |
+| `assertRegistryCoverage(schema, fields, opts?)`                 | Schema leaf paths are registered (use `exemptPaths` for slug, slot tabs, grant unions) |
+| `assertInvalidSubmitUsesRefinedMessages(schema, fields, opts?)` | Invalid payloads produce no Zod-default copy; optional `catchAllWhitelist`             |
+| `expectNoDefaultZodMessages(messages)`                          | Standalone detector for `Invalid input`, `Too small:`, etc.                            |
 
 Pass a targeted `invalidValue` when `{}` parses successfully or triggers unrelated
 paths (tabbed forms, equipment kinds). Master-detail sub-forms (trait rows,

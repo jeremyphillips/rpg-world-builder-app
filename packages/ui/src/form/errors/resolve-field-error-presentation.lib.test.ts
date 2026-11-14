@@ -63,7 +63,14 @@ describe('resolve-field-error-presentation.lib', () => {
 
   it('resolvePresentedFieldError hides copy until touch when session is collapsed', () => {
     const presentation = {
-      issues: [],
+      issues: [
+        {
+          path: 'name',
+          message: 'Name is required.',
+          severity: 'field' as const,
+          claim: { kind: 'field' as const, target: 'name' },
+        },
+      ],
       hasAttemptedSubmit: false,
       hasAttemptedPublish: false,
       publishPresentationEnabled: false,
@@ -71,15 +78,13 @@ describe('resolve-field-error-presentation.lib', () => {
       inactivePaths: new Set<string>(),
       touchedPaths: [] as string[],
     }
+    expect(resolvePresentedFieldError('ignored', 'name', presentation).error).toBeUndefined()
     expect(
-      resolvePresentedFieldError('Name is required', 'name', presentation).error,
-    ).toBeUndefined()
-    expect(
-      resolvePresentedFieldError('Name is required', 'name', {
+      resolvePresentedFieldError('ignored', 'name', {
         ...presentation,
         touchedPaths: ['name'],
       }).error,
-    ).toBe('Name is required')
+    ).toBe('Name is required.')
   })
 
   it('treats interactivity-disabled fields as inactive for presentation', () => {

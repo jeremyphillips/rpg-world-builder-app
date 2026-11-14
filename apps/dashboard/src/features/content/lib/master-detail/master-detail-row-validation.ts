@@ -5,6 +5,7 @@ import {
   groupIssuesForItemPrefix,
   resolveSectionFieldOrder,
   useFormValidationPresentation,
+  type FormIssue,
   type FormItem,
 } from '@rpg/ui/form'
 
@@ -18,7 +19,7 @@ export function masterDetailRowValidationStateLabel(count: number): string {
   return `${count} ${count === 1 ? 'validation issue' : 'validation issues'}`
 }
 
-/** Per-row issue counts from unique presentation paths, gated like tab badges. */
+/** Per-row issue counts from distinct claim targets, gated like tab badges. */
 export function useMasterDetailRowValidation(
   fieldName: string,
   resolver: EmbeddedArrayResolverFieldInput | FormItem[],
@@ -46,14 +47,29 @@ export function useMasterDetailRowValidation(
     )
   }, [fieldName, formValues, resolverFields])
 
+  const rowGroup = useCallback(
+    (index: number) => {
+      const itemPrefix = `${fieldName}.${index}`
+      const fieldOrder = resolveSectionFieldOrder(arraySection, index)
+      return groupIssuesForItemPrefix(issues, itemPrefix, fieldName, index, fieldOrder)
+    },
+    [arraySection, fieldName, issues],
+  )
+
   const getRowIssueCount = useCallback(
     (index: number): number => {
       if (!showRowBadges) return 0
-      const itemPrefix = `${fieldName}.${index}`
-      const fieldOrder = resolveSectionFieldOrder(arraySection, index)
-      return groupIssuesForItemPrefix(issues, itemPrefix, fieldName, index, fieldOrder).totalCount
+      return rowGroup(index).totalCount
     },
-    [arraySection, fieldName, issues, showRowBadges],
+    [rowGroup, showRowBadges],
+  )
+
+  const getRowHeaderIssues = useCallback(
+    (index: number): FormIssue[] => {
+      if (!showRowBadges) return []
+      return rowGroup(index).headerIssues.filter((issue) => issue.claim?.kind === 'row')
+    },
+    [rowGroup, showRowBadges],
   )
 
   const hasRowValidationIssue = useCallback(
@@ -63,6 +79,7 @@ export function useMasterDetailRowValidation(
 
   return {
     getRowIssueCount,
+    getRowHeaderIssues,
     hasRowValidationIssue,
     showRowBadges,
   }

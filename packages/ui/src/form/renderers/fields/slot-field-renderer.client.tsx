@@ -118,5 +118,12 @@ export function SlotFormItemSection({
     )
   }
 
-  return <SlotFormItemSectionInner item={item} parentContext={parentContext} depth={depth} />
+  return (
+    <SlotFormItemSectionInner
+      item={item}
+      parentContext={parentContext}
+      depth={depth}
+      namePrefix={namePrefix}
+    />
+  )
 }

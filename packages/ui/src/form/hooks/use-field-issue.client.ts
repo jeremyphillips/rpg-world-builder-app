@@ -13,8 +13,6 @@ import {
 import { useFormValidationPresentation } from './use-form-validation-presentation.client'
 
 export type UseFieldIssueOptions = {
-  /** Raw RHF {@link FieldError.message} when the control is registered. */
-  rhfMessage?: string
   /** Whether the control should show invalid chrome when an issue exists. */
   eligible?: boolean
 }
@@ -38,11 +36,7 @@ export function useFieldIssue(
 
   const message = React.useMemo(() => {
     if (!fieldPath || !eligible) return undefined
-    const decoded = resolveFieldIssueDisplayMessage(
-      fieldPath,
-      presentation.issues,
-      options.rhfMessage,
-    )
+    const decoded = resolveFieldIssueDisplayMessage(fieldPath, presentation.issues)
     if (!decoded) return undefined
 
     const session = {
@@ -62,7 +56,6 @@ export function useFieldIssue(
   }, [
     eligible,
     fieldPath,
-    options.rhfMessage,
     presentation.hasAttemptedPublish,
     presentation.hasAttemptedSubmit,
     presentation.inactivePaths,
@@ -75,11 +68,10 @@ export function useFieldIssue(
   const hasIssue = React.useMemo(() => {
     if (!fieldPath || !eligible) return false
     return (
-      Boolean(
-        resolveFieldIssueDisplayMessage(fieldPath, presentation.issues, options.rhfMessage),
-      ) || findRoutedIssueForFieldPath(presentation.issues, fieldPath) !== undefined
+      Boolean(resolveFieldIssueDisplayMessage(fieldPath, presentation.issues)) ||
+      findRoutedIssueForFieldPath(presentation.issues, fieldPath) !== undefined
     )
-  }, [eligible, fieldPath, options.rhfMessage, presentation.issues])
+  }, [eligible, fieldPath, presentation.issues])
 
   return {
     message,

@@ -60,11 +60,10 @@ export function resolvePresentedFieldError(
   fieldPath: string | undefined,
   presentation: FieldValidationPresentationState,
 ): Pick<FieldErrorPresentation, 'error' | 'invalid'> & { hasError: boolean } {
-  const rhfMessage = typeof message === 'string' ? message : undefined
   const underlyingMessage =
     fieldPath !== undefined
-      ? resolveFieldIssueDisplayMessage(fieldPath, presentation.issues, rhfMessage)
-      : resolveFieldErrorMessage(rhfMessage)
+      ? resolveFieldIssueDisplayMessage(fieldPath, presentation.issues)
+      : resolveFieldErrorMessage(typeof message === 'string' ? message : undefined)
   const session = {
     validationPresentation: presentation.validationPresentation,
     hasAttemptedSubmit: presentation.hasAttemptedSubmit,
@@ -134,15 +133,12 @@ export function useFieldErrorPresentation(
 /** Combines multiple field errors with suppression semantics. */
 export function useCombinedFieldErrorPresentation(
   fieldPath: string | undefined,
-  ...messages: Array<unknown>
+  ..._messages: Array<unknown>
 ): FieldErrorPresentation {
   const { suppressFieldErrorText, rowSummaryId } = React.useContext(ArrayItemPresentationContext)
   const presentation = useFormValidationPresentation()
-  const resolvedMessages = messages
-    .map((message) => resolveFieldErrorMessage(typeof message === 'string' ? message : undefined))
-    .filter((message): message is string => Boolean(message))
   const { error, invalid, hasError } = resolvePresentedFieldError(
-    resolvedMessages[0],
+    undefined,
     fieldPath,
     presentation,
   )

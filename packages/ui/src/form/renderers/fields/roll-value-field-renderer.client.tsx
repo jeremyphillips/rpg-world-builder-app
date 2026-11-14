@@ -9,7 +9,6 @@ import { RollValueField } from '../../../components/ui/roll-value-field.client'
 import { pickFieldChromeProps } from '../../../components/ui/field-chrome.variants'
 import type { FieldHintPosition } from '../../../components/ui/field.variants'
 import type { RollValueFieldPatchResult } from '../../../components/ui/roll-value-field.lib'
-import { resolveFirstFieldErrorMessage } from '../../errors/resolve-field-error-message'
 import type { RollValueFieldConfig } from '../../field-config'
 import { resolveFieldLabelVisibility } from '../../form-heading.lib'
 import { useFieldControlSize } from '../../context/form-section.context'
@@ -76,13 +75,12 @@ function UnstoredRollValueField({
   config,
   fullName,
   id,
-  error,
   hint,
   hintPosition,
 }: RollValueFieldRendererProps) {
   const controlSize = useFieldControlSize(config.controlSizeOverride)
   const { setValue } = useFormContext()
-  const routed = useFieldIssue(fullName, { rhfMessage: error })
+  const routed = useFieldIssue(fullName)
   const names = {
     count: subPath(fullName, 'dice.count'),
     faces: subPath(fullName, 'dice.faces'),
@@ -100,7 +98,7 @@ function UnstoredRollValueField({
       label={config.label}
       labelVisibility={resolveFieldLabelVisibility(config)}
       parts={{}}
-      error={routed.message ?? error}
+      error={routed.message}
       hint={hint}
       hintPosition={hintPosition}
       info={config.info}
@@ -124,7 +122,6 @@ function StoredRollValueField({
   config,
   fullName,
   id,
-  error,
   hint,
   hintPosition,
 }: RollValueFieldRendererProps) {
@@ -163,15 +160,8 @@ function StoredRollValueField({
     setValue(name, value, ROLL_VALUE_SET_OPTIONS)
   }
 
-  const rhfError = resolveFirstFieldErrorMessage(
-    diceCount.fieldState.error?.message,
-    diceFaces.fieldState.error?.message,
-    flatOperator.fieldState.error?.message,
-    flatAmount.fieldState.error?.message,
-    error,
-  )
-  const routed = useFieldIssue(fullName, { rhfMessage: rhfError })
-  const combinedError = routed.message ?? rhfError
+  const routed = useFieldIssue(fullName)
+  const combinedError = routed.message
 
   const handleBlur = () => {
     diceCount.field.onBlur()

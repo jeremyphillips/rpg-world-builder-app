@@ -1,3 +1,4 @@
+import { lookupRegistryEntry } from '../config/field-registry.lib'
 import { buildFieldRegistry } from '../config/field-error-map'
 import type { RegistryEntry } from '../config/field-error-map-register.lib'
 import type { FormItem } from '../field-config'
@@ -15,7 +16,7 @@ import {
   type ControlPathWalkAccumulators,
 } from './route-form-control-path-walk.lib'
 
-const FORM_ISSUE_ROUTING_LOG = '[form-issue-routing] fallback claim'
+const FORM_ISSUE_ROUTING_LOG = '[form-issue-routing] non-control claim'
 
 export type RouteFormIssuesOptions = {
   /**
@@ -33,26 +34,19 @@ type RouteFormIssuesContext = {
   inactivePaths: ReadonlySet<string>
 }
 
-function normalizeRegistryKey(path: string): string {
-  return path
-    .split('.')
-    .map((segment) => (/^\d+$/.test(segment) ? '*' : segment))
-    .join('.')
+function registryEntryAt(registry: Map<string, RegistryEntry>, path: string) {
+  return lookupRegistryEntry(registry, path, { mode: 'exact' })
 }
 
-function registryEntryAt(
-  registry: Map<string, RegistryEntry>,
-  path: string,
-): { key: string; entry: RegistryEntry } | undefined {
-  const segments = path.split('.')
-  for (let length = segments.length; length > 0; length -= 1) {
-    const key = normalizeRegistryKey(segments.slice(0, length).join('.'))
-    const entry = registry.get(key)
-    if (!entry) continue
-    if (entry.exactPath && length !== segments.length) continue
-    return { key, entry }
-  }
-  return undefined
+function canClaimEntry(
+  entry: RegistryEntry,
+  mode: 'exact' | 'ancestor',
+  issuePath: string,
+  entryPath: string,
+): boolean {
+  if (entry.labelOnly || entry.role === 'hostSlot') return false
+  if (entry.role === 'array') return mode === 'exact' && issuePath === entryPath
+  return entry.role === 'control' || entry.role === 'slotOwner'
 }
 
 function pathOwnsIssuePath(ownerPath: string, issuePath: string): boolean {
@@ -102,8 +96,13 @@ function buildRouteContext(
   return { registry, orderedControlPaths, slotPaths, slotOwnerships, inactivePaths }
 }
 
-function claimKindForControl(path: string, slotPaths: Set<string>): FormIssueClaimKind {
-  return slotPaths.has(path) ? 'slot' : 'field'
+function claimKindForEntry(
+  path: string,
+  entry: RegistryEntry,
+  slotPaths: Set<string>,
+): FormIssueClaimKind {
+  if (entry.role === 'slotOwner' || (entry.role !== 'array' && slotPaths.has(path))) return 'slot'
+  return 'field'
 }
 
 function buildClaim(path: string, kind: FormIssueClaimKind): FormIssueClaim {
@@ -129,8 +128,9 @@ function findExactControlClaim(
   context: RouteFormIssuesContext,
 ): FormIssueClaim | undefined {
   if (!isFieldPathEligibleForPresentation(path, context.inactivePaths)) return undefined
-  if (!registryEntryAt(context.registry, path)) return undefined
-  return buildClaim(path, claimKindForControl(path, context.slotPaths))
+  const match = registryEntryAt(context.registry, path)
+  if (!match || !canClaimEntry(match.entry, 'exact', path, match.path)) return undefined
+  return buildClaim(path, claimKindForEntry(path, match.entry, context.slotPaths))
 }
 
 function findAncestorControlClaim(
@@ -141,8 +141,9 @@ function findAncestorControlClaim(
   for (let length = segments.length - 1; length > 0; length -= 1) {
     const candidate = segments.slice(0, length).join('.')
     if (!isFieldPathEligibleForPresentation(candidate, context.inactivePaths)) continue
-    if (!registryEntryAt(context.registry, candidate)) continue
-    return buildClaim(candidate, claimKindForControl(candidate, context.slotPaths))
+    const match = registryEntryAt(context.registry, candidate)
+    if (!match || !canClaimEntry(match.entry, 'ancestor', candidate, match.path)) continue
+    return buildClaim(candidate, claimKindForEntry(candidate, match.entry, context.slotPaths))
   }
   return undefined
 }
@@ -151,11 +152,15 @@ function findDescendantControlClaim(
   path: string,
   context: RouteFormIssuesContext,
 ): FormIssueClaim | undefined {
-  const descendant = context.orderedControlPaths.find(
-    (controlPath) => controlPath.startsWith(`${path}.`) && controlPath !== path,
-  )
+  const descendant = context.orderedControlPaths.find((controlPath) => {
+    if (!controlPath.startsWith(`${path}.`) || controlPath === path) return false
+    const match = registryEntryAt(context.registry, controlPath)
+    return match !== undefined && canClaimEntry(match.entry, 'ancestor', controlPath, match.path)
+  })
   if (!descendant) return undefined
-  return buildClaim(descendant, claimKindForControl(descendant, context.slotPaths))
+  const match = registryEntryAt(context.registry, descendant)
+  if (!match) return undefined
+  return buildClaim(descendant, claimKindForEntry(descendant, match.entry, context.slotPaths))
 }
 
 function findRowClaim(issue: FormIssue): FormIssueClaim | undefined {
@@ -177,12 +182,19 @@ function findRowClaim(issue: FormIssue): FormIssueClaim | undefined {
 function resolveFallbackClaim(issue: FormIssue): FormIssueClaim {
   const rowClaim = findRowClaim(issue)
   if (rowClaim) return rowClaim
-  return buildClaim('form', 'fallback')
+  return buildClaim('form', 'form')
 }
 
-function logFallbackClaim(issue: FormIssue, claim: FormIssueClaim): void {
-  if (claim.kind !== 'fallback') return
+function logNonControlClaim(
+  issue: FormIssue,
+  claim: FormIssueClaim,
+  context: RouteFormIssuesContext,
+): void {
   if (issue.severity !== 'field') return
+  if (claim.kind !== 'row' && claim.kind !== 'form' && claim.kind !== 'fallback') return
+  if (!isFieldPathEligibleForPresentation(issue.path, context.inactivePaths)) return
+  const match = registryEntryAt(context.registry, issue.path)
+  if (!match || !canClaimEntry(match.entry, 'exact', issue.path, match.path)) return
   if (typeof process !== 'undefined' && process.env.NODE_ENV === 'production') return
   console.error(FORM_ISSUE_ROUTING_LOG, issue.path)
 }
@@ -207,7 +219,7 @@ function routeSingleIssue(issue: FormIssue, context: RouteFormIssuesContext): Fo
         ? claim.target
         : resolveFormIssuePresentationPath(enriched.path, context.registry)
 
-  logFallbackClaim(enriched, claim)
+  logNonControlClaim(enriched, claim, context)
 
   return {
     ...enriched,

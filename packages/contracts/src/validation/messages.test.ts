@@ -205,11 +205,6 @@ describe('fieldValidationMessages', () => {
       'Mode has an invalid value.',
     ],
     [
-      'incompleteUnionOption',
-      formatFieldMessage(fieldValidationMessages.incompleteUnionOption()),
-      'Complete the required fields for this option.',
-    ],
-    [
       'exactItemsCount',
       formatFieldMessage(
         fieldValidationMessages.exactItemsCount({ itemsLabel: 'wealth tiers', count: 3 }),

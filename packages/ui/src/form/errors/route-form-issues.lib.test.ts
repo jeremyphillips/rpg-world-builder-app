@@ -113,9 +113,101 @@ describe('collectIssueClaimReport', () => {
     })
 
     expect(report.length).toBeGreaterThan(0)
-    expect(report.every((entry) => entry.claim.kind !== 'fallback')).toBe(true)
+    expect(report.every((entry) => entry.claim.kind !== 'form')).toBe(true)
     expect(report.find((entry) => entry.path.endsWith('resolution.method'))?.claim.kind).toBe(
       'field',
     )
+  })
+})
+
+describe('dependent field claims', () => {
+  it('claims an active dependent text field', () => {
+    const issues = prepareFormIssues(
+      {
+        enabled: { message: 'Required', type: 'custom' },
+        detail: { message: 'Detail is required', type: 'custom' },
+      },
+      [
+        {
+          kind: 'dependent',
+          controller: { type: 'switch', name: 'enabled', label: 'Enabled' },
+          dependents: {
+            fields: [{ type: 'text', name: 'detail', label: 'Detail', required: true }],
+          },
+        },
+      ],
+      { enabled: true, detail: '' },
+    )
+    expect(issues.map((issue) => issue.claim)).toEqual([
+      { kind: 'field', target: 'enabled' },
+      { kind: 'field', target: 'detail' },
+    ])
+  })
+})
+
+describe('registry claim eligibility', () => {
+  const rowFields: FormItem[] = [
+    {
+      kind: 'slot',
+      name: 'actions',
+      label: 'Actions',
+      render: () => null,
+    },
+    {
+      kind: 'array',
+      name: 'actions',
+      label: 'Actions',
+      fields: [],
+      item: {
+        resolveFields: () => [
+          { type: 'text', name: 'name', label: 'Name', required: true },
+          {
+            kind: 'slot',
+            name: '_note',
+            label: 'Note',
+            issuePaths: ['resolution.outcomes'],
+            render: () => null,
+          },
+        ],
+      },
+    },
+  ]
+
+  it('resolves per-row concrete keys and does not let the array or host slot claim leaves', () => {
+    const issues = prepareFormIssues(
+      { actions: [{ name: { message: 'Name is required.', type: 'custom' } }] } as never,
+      rowFields,
+      { actions: [{}] },
+    )
+
+    expect(issues[0]).toMatchObject({
+      path: 'actions.0.name',
+      claim: { kind: 'field', target: 'actions.0.name' },
+    })
+  })
+
+  it('claims an array issue only when it is on the array path', () => {
+    const issues = prepareFormIssues(
+      { actions: { message: 'Add at least one action.', type: 'custom' } } as never,
+      rowFields,
+      { actions: [] },
+    )
+
+    expect(issues[0]).toMatchObject({
+      path: 'actions',
+      claim: { kind: 'field', target: 'actions' },
+    })
+  })
+
+  it('prefixes slot issue paths with the row prefix', () => {
+    const issues = prepareFormIssues(
+      {
+        actions: [{ resolution: { outcomes: { message: 'Add an outcome.', type: 'custom' } } }],
+      } as never,
+      rowFields,
+      { actions: [{ resolution: { outcomes: [] } }] },
+    )
+
+    expect(issues[0]?.claim).toEqual({ kind: 'slot', target: 'actions.0._note' })
   })
 })

@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef } from 'react'
 import { useFormContext, type FieldValues } from 'react-hook-form'
 import type { ZodType } from 'zod'
-import { FormUiContext, prepareFormIssues, type FormItem } from '@rpg/ui/form'
+import { FormUiContext, prepareFormIssues, type FormIssue, type FormItem } from '@rpg/ui/form'
 
 import { applyContentPublishValidation } from '../../validation/content-publish-validation.lib'
 

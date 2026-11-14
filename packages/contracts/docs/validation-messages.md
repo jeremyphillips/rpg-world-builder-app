@@ -282,9 +282,9 @@ Intentionally **not** adopting helpers: `selectionSourceIdRequired` (action copy
 ## Tier 1: how the error map picks a message
 
 The form layer (`makeFieldErrorMap` in `@rpg/ui/form`) walks the form's
-`fields` config into a path registry (array indices normalized to `*`,
-composite subpaths resolved to the owning field) and formats by issue code and
-field category:
+`fields` config into a path registry (concrete array indexes and `*` keys both
+resolve; composite subpaths resolve to the owning field) and formats by issue
+code and field category:
 
 | Issue                                   | Field category          | Message                                                            |
 | --------------------------------------- | ----------------------- | ------------------------------------------------------------------ |
@@ -302,9 +302,9 @@ field category:
 | `too_small` array                       | array container         | `Add at least one {item label}.` (label singularized)              |
 | `invalid_value` / `invalid_union` empty | choice                  | `Choose {a label}.`                                                |
 | `invalid_value` / `invalid_union` empty | multi                   | `Choose at least one {item label}.`                                |
+| `invalid_value` / `invalid_union` empty | text / number / boolean | `{label} is required.`                                             |
 | `invalid_value` / `invalid_union` other | choice / multi          | `Choose a valid {label}.`                                          |
-| `invalid_value` other                   | text / number / boolean | `{label} has an invalid value.`                                    |
-| `invalid_union`                         | non-choice              | `Complete the required fields for this option.`                    |
+| `invalid_value` / `invalid_union` other | text / number / boolean | `{label} has an invalid value.`                                    |
 | `invalid_format` `email`                | any                     | `Enter a valid email address.`                                     |
 | `invalid_format` `url`                  | any                     | `Enter a valid URL.`                                               |
 | `invalid_format` `regex` on `slug`      | text                    | `Use lowercase letters, numbers, and hyphens only.`                |

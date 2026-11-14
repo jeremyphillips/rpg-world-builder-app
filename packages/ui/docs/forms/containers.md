@@ -438,6 +438,10 @@ overriding the default header.
 **Authoring guide:** [array-field-authoring.md](./array-field-authoring.md) — headers, chrome
 decision table, add menus, nested arrays, and common mistakes.
 
+Array roots do not claim issues on their items. An item issue routes to the row's
+control or slot. The array path itself still claims container issues such as
+`too_small`.
+
 **Implementation:** `form-item-node` dispatches `kind: 'array'` to
 [`array-form-item-section.client.tsx`](../src/form/renderers/array/array-form-item-section.client.tsx)
 (or [`conditional-array-field.client.tsx`](../src/form/renderers/array/conditional-array-field.client.tsx)

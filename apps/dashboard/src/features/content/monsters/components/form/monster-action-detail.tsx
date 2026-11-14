@@ -199,6 +199,7 @@ export function MonsterActionDetail({
               availability: rows.selectedIdentity?.availability,
               onAvailabilityChange: rows.selectedIdentity?.onAvailabilityChange,
               issueCount: rows.selectedIdentity?.issueCount,
+              headerIssues: rows.selectedIdentity?.headerIssues,
             }
           : undefined
       }

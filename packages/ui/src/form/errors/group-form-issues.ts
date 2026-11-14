@@ -58,12 +58,18 @@ function compareIssues(left: FormIssue, right: FormIssue, fieldOrder: readonly s
   return left.path.localeCompare(right.path)
 }
 
-function countUniquePresentationPaths(issues: readonly FormIssue[]): number {
-  const paths = new Set<string>()
+/** Distinct claim targets. Unrouted issues fall back to the presentation path. */
+export function countIssueClaimTargets(issues: readonly FormIssue[]): number {
+  const targets = new Set<string>()
   for (const issue of issues) {
-    paths.add(issue.presentationPath ?? issue.path)
+    targets.add(issue.claim?.target ?? issue.presentationPath ?? issue.path)
   }
-  return paths.size
+  return targets.size
+}
+
+function isRowHeaderIssue(issue: FormIssue): boolean {
+  if (issue.claim?.kind === 'row') return true
+  return issue.severity !== 'field'
 }
 
 function issueBelongsToArrayPath(issue: FormIssue, arrayPath: string): boolean {
@@ -92,16 +98,18 @@ function buildIssueGroup(
   fieldOrder: readonly string[],
 ): ArrayItemIssueGroup {
   const sortedIssues = [...issues].sort((left, right) => compareIssues(left, right, fieldOrder))
-  const fieldIssues = sortedIssues.filter((issue) => issue.severity === 'field')
+  const fieldIssues = sortedIssues.filter(
+    (issue) => issue.severity === 'field' && issue.claim?.kind !== 'row',
+  )
   const fieldSummary = buildFieldSummaryText(fieldIssues)
 
   return {
     itemPrefix,
     arrayPath,
     itemIndex,
-    totalCount: countUniquePresentationPaths(sortedIssues),
+    totalCount: countIssueClaimTargets(sortedIssues),
     sortedIssues,
-    headerIssues: sortedIssues.filter((issue) => issue.severity !== 'field'),
+    headerIssues: sortedIssues.filter((issue) => isRowHeaderIssue(issue)),
     fieldIssues,
     fieldSummary,
   }
@@ -181,11 +189,9 @@ export function countInvalidArrayItems(issues: readonly FormIssue[], arrayPath: 
   return indices.size
 }
 
-/** Count unique presentation paths under an array path (including nested descendants). */
+/** Count distinct claim targets under an array path (including nested descendants). */
 export function countIssuesForArrayPath(issues: readonly FormIssue[], arrayPath: string): number {
-  return countUniquePresentationPaths(
-    issues.filter((issue) => issueBelongsToArrayPath(issue, arrayPath)),
-  )
+  return countIssueClaimTargets(issues.filter((issue) => issueBelongsToArrayPath(issue, arrayPath)))
 }
 
 export type ArrayIssueIndex = Map<string, ArrayItemIssueGroup>

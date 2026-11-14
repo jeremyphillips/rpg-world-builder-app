@@ -1,4 +1,4 @@
-import { sortFormIssues } from './group-form-issues'
+import { countIssueClaimTargets, sortFormIssues } from './group-form-issues'
 import { collectArraySections } from './resolve-field-order'
 import type { FormIssue } from './form-issue.types'
 import type { FormItem } from '../field-config'
@@ -136,7 +136,7 @@ export function resolveTabValidationState(
     const sorted = sortIssuesForTab(tabIssues, fields)
     return {
       tabId: tab.id,
-      count: sorted.length,
+      count: countIssueClaimTargets(sorted),
       firstIssuePath: sorted[0]?.path,
       issues: sorted,
     }
