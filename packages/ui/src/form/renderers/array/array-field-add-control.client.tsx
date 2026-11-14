@@ -20,7 +20,10 @@ import type {
 import { resolveArrayAddButtonSize } from '../../../components/ui/field-sizing.variants'
 import { cn } from '../../../lib/utils'
 import { resolveFormDensity } from '../../form-density'
-import { useFormSectionContext } from '../../context/form-section.context'
+import {
+  resolveArraySectionDensityParent,
+  useFormSectionContext,
+} from '../../context/form-section.context'
 import type { ArrayAddActionConfig, ArrayAddActionLayout } from '../../field-config'
 import { resolveArrayAddDisabledProps } from './array-field-add-control.lib'
 
@@ -123,8 +126,8 @@ export function ArrayFieldAddControl({
   onAppendItem,
   onAppendFromMenu,
 }: ArrayFieldAddControlProps) {
-  const { density } = useFormSectionContext()
-  const { size } = resolveFormDensity(density)
+  const sectionContext = useFormSectionContext()
+  const { size } = resolveFormDensity(resolveArraySectionDensityParent(sectionContext).density)
   const buttonSize = resolveArrayAddButtonSize(
     size,
     addActionSize,

@@ -262,10 +262,11 @@ Slot `render()` components and hand-built editors should call `useFormSectionCon
 `density`, then `resolveFormDensity(density)` when threading `rhythm` / `size` into primitives
 (e.g. `RequirementEditor` → `FieldGroup`).
 
-**Array legends:** inherit parent section density unless the array sets `density` explicitly.
-Item **controls** and list/body stack gaps still default to compact via
-`FormSectionContext.defaultControlSize` and array chrome — not via presentation `density`.
-Legend and in-item **labels** follow inherited presentation density.
+**Array density split:** when an array omits `density`, the section legend and add control follow
+parent presentation density; item field labels, anatomy, spacing, and title metadata use compact
+context (`bodyLayoutDensity`). Item controls use `defaultControlSize: 'sm'` until the array sets
+`density` explicitly (which aligns header, body, and context). See
+[sizing-and-spacing.md](./forms/sizing-and-spacing.md#array-section-density-header-vs-body).
 
 **Presentation vs control:** `Field.Root` / `FormField` `size` is presentation (labels, hints).
 Optional `controlSize` (or section `defaultControlSize` + `controlSizeOverride`) sets control geometry.

@@ -12,7 +12,7 @@ const traitFields: FormItem[] = [
 ]
 
 describe('array density presentation', () => {
-  it('keeps comfortable presentation with compact controls when density is omitted', async () => {
+  it('keeps comfortable section chrome with compact item presentation when density is omitted', async () => {
     const schema = z.object({
       traits: z.array(z.object({ name: z.string(), description: z.string() })),
     })
@@ -37,7 +37,7 @@ describe('array density presentation', () => {
 
     expect(screen.getByText('Traits').parentElement).toHaveClass('text-style-field-label-md')
     const traitNameLabel = screen.getByText('Trait name').parentElement
-    expect(traitNameLabel).toHaveClass('text-style-field-label-md')
+    expect(traitNameLabel).toHaveClass('text-style-field-label-sm')
     expect(screen.getByRole('textbox', { name: 'Trait name' })).toHaveClass('ui-field-control--sm')
     expect(screen.getByRole('button', { name: 'Add trait' })).toHaveClass('ui-button--md')
 

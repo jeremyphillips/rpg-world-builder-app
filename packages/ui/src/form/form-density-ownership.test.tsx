@@ -110,6 +110,41 @@ describe('nested group density', () => {
   })
 })
 
+describe('array under comfortable parent', () => {
+  const schema = z.object({
+    traits: z.array(z.object({ name: z.string() })),
+    sibling: z.string(),
+  })
+
+  const fields: FormItem[] = [
+    {
+      kind: 'array',
+      name: 'traits',
+      heading: { label: 'Traits' },
+      fields: [{ type: 'text', name: 'name', label: 'Trait name' }],
+      addAction: { label: 'Add trait' },
+      item: { collapsible: true, header: { fallback: (i) => `Trait ${i + 1}` } },
+    },
+    { type: 'text', name: 'sibling', label: 'Sibling field' },
+  ]
+
+  it('uses compact item fields inside array without density while sibling stays comfortable', () => {
+    render(
+      <Form
+        schema={schema}
+        fields={fields}
+        defaultValues={{ traits: [{ name: '' }] }}
+        onSubmit={() => undefined}
+      />,
+    )
+
+    expect(screen.getByRole('textbox', { name: 'Trait name' })).toHaveClass('ui-field-control--sm')
+    expect(screen.getByRole('textbox', { name: 'Sibling field' })).toHaveClass(
+      'ui-field-control--md',
+    )
+  })
+})
+
 describe('row inheritance', () => {
   const schema = z.object({ left: z.string(), right: z.string() })
   const fields: FormItem[] = [

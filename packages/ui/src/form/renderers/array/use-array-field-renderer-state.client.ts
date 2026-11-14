@@ -11,7 +11,10 @@ import * as React from 'react'
 import type { UseFieldArrayReturn } from 'react-hook-form'
 
 import type { ArrayConfig } from '../../field-config'
-import { useFormSectionContext } from '../../context/form-section.context'
+import {
+  resolveArraySectionDensityParent,
+  useFormSectionContext,
+} from '../../context/form-section.context'
 import { useArrayItemCollapseState } from '../../hooks/use-array-item-collapse-state.client'
 import { useFormValidationPresentation } from '../../hooks/use-form-validation-presentation.client'
 import { useFormUiContext } from '../../context/form-ui.context'
@@ -55,11 +58,11 @@ export function useArrayFieldRendererState({
 }: UseArrayFieldRendererStateOptions) {
   const { addValidationSessionExpandKeys } = useFormUiContext()
   const validation = useFormValidationPresentation()
-  const parentContext = useFormSectionContext()
-  const { depth, inRhythmStack } = parentContext
+  const sectionContext = useFormSectionContext()
+  const { depth, inRhythmStack } = sectionContext
   const chrome = resolveArrayFieldRendererChrome({
     config,
-    parentContext,
+    parentContext: resolveArraySectionDensityParent(sectionContext),
     depth,
     inRhythmStack,
     fieldsLength: fields.length,

@@ -20,9 +20,11 @@ export function buildArraySectionChildContext(
     hasNamedHeading,
     parent.namedGroupDepth,
   )
-  const { presentationDensity, defaultControlSize } = resolveArraySectionDensities(config, parent)
+  const { presentationDensity, bodyLayoutDensity, defaultControlSize } =
+    resolveArraySectionDensities(config, parent)
   return buildFormSectionChildContext(parent, depth, {
-    density: presentationDensity,
+    density: bodyLayoutDensity,
+    arraySectionPresentationDensity: presentationDensity,
     defaultControlSize,
     arrayItemSurface: chrome.surface ?? parent.arrayItemSurface,
     arrayItemTone: chrome.tone ?? parent.arrayItemTone,
