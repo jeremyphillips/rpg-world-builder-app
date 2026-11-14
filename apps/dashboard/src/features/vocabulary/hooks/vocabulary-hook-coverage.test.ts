@@ -4,6 +4,7 @@ import { vocabularySetIdsWithBrowse } from '@rpg/contracts'
 
 import { useAttackResolutionModeVocabulary } from './use-attack-resolution-mode-vocabulary'
 import { useConditionVocabulary } from './use-condition-vocabulary'
+import { useCreatureFamilyVocabulary } from './use-creature-family-vocabulary'
 import { useCreatureTypeVocabulary } from './use-creature-type-vocabulary'
 import { useDamageTypeVocabulary } from './use-damage-type-vocabulary'
 import { useEditionPresetVocabulary } from './use-edition-preset-vocabulary'
@@ -27,6 +28,7 @@ const BROWSE_SET_HOOKS: Record<string, unknown> = {
 }
 
 const INTERNAL_ONLY_HOOKS = {
+  'creature-families': useCreatureFamilyVocabulary,
   'edition-presets': useEditionPresetVocabulary,
   'attack-resolution-modes': useAttackResolutionModeVocabulary,
 } as const
@@ -41,6 +43,7 @@ describe('vocabulary hook coverage', () => {
   it('documents internal-only set hooks separately from browse coverage', () => {
     expect(Object.keys(INTERNAL_ONLY_HOOKS).sort()).toEqual([
       'attack-resolution-modes',
+      'creature-families',
       'edition-presets',
     ])
   })

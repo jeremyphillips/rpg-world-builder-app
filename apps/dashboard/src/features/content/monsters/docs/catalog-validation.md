@@ -71,3 +71,12 @@ Monster (and species) forms author movement as row arrays via
 Hit points use `monsterHitPointsFields()` (Fixed switch, inline hit-dice sentence `N dY`,
 number stepper for fixed HP) with session stash via `_hitPointsStash` and `valueSyncs` on
 the monster form def — not the statistics panel slot. Die faces (`Y`) follow creature size.
+
+## Classification fields
+
+Monster Identity offers optional Creature families and Class classifications. Families
+use resolved vocabulary and direct type compatibility; classes use referenceable class
+content ids without PC progression. Type changes preserve existing selections and
+show incompatible/unresolved chips. Publish checks attach issues to
+`creatureFamilyIds.<index>` or `classIds.<index>`; drafts retain authored references.
+Detail and edit preview resolve the same classifications into the type phrase.

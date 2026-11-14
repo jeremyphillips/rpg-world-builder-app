@@ -8,7 +8,7 @@ import { indexRecordsByContentId } from './index-by-content-id'
 
 type LeanMonster = Pick<
   Monster,
-  'id' | 'slug' | 'name' | 'rulesetId' | 'equipment' | 'proficiencies'
+  'id' | 'slug' | 'name' | 'rulesetId' | 'equipment' | 'proficiencies' | 'classIds'
 >
 
 function extractEquipmentIds(monster: LeanMonster): readonly string[] {
@@ -41,6 +41,7 @@ async function loadCampaignMonsters(campaignId: string): Promise<LeanMonster[]> 
     name: monster.name,
     rulesetId: monster.rulesetId,
     equipment: monster.equipment,
+    classIds: monster.classIds,
     proficiencies: monster.proficiencies,
   }))
 }
@@ -81,4 +82,11 @@ export async function indexSystemMonsterEquipmentBlockers(
 
 export function monsterUsageLabel(): string {
   return getContentTypeTerm('monsters').label
+}
+
+export async function indexMonsterClassBlockersByContentId(
+  ctx: ContentUsageResolverContext,
+): Promise<Map<string, ContentUsageBlocker[]>> {
+  const monsters = await loadCampaignMonsters(ctx.campaignId)
+  return indexRecordsByContentId(monsters, (monster) => monster.classIds ?? [], toMonsterBlocker)
 }

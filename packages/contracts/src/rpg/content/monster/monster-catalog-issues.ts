@@ -1,3 +1,8 @@
+import {
+  collectMonsterClassificationIssues,
+  type MonsterClassification,
+  type MonsterClassificationCatalogs,
+} from './monster-classification'
 import type { ContentValidationIntent } from '../lib/content-validation-intent'
 import type { ContentValidationIssue } from '../lib/content-validation-issue'
 import {
@@ -58,7 +63,7 @@ type CatalogSkillEntry = {
   skill?: string
 }
 
-export type MonsterCatalogIssueBody = {
+export type MonsterCatalogIssueBody = MonsterClassification & {
   equipment?: readonly CatalogEquipmentEntry[]
   actions?: readonly CatalogAction[]
   bonusActions?: readonly CatalogAction[]
@@ -69,7 +74,7 @@ export type MonsterCatalogIssueBody = {
   }
 }
 
-export type MonsterCatalogs = {
+export type MonsterCatalogs = MonsterClassificationCatalogs & {
   equipmentById: ReadonlyMap<string, Equipment>
   skillBySlug: ReadonlyMap<string, SkillProficiency>
   equipmentCatalog?: MonsterCatalogLoadStatus
@@ -318,7 +323,11 @@ export function collectMonsterCatalogIssues(
   catalogs: MonsterCatalogs,
   intent: ContentValidationIntent,
 ): ContentValidationIssue[] {
-  const issues: ContentValidationIssue[] = []
+  const issues: ContentValidationIssue[] = collectMonsterClassificationIssues(
+    body,
+    catalogs,
+    intent,
+  )
   const equipment = body.equipment ?? []
   const equipmentReady = catalogStatus(catalogs.equipmentCatalog) === 'ready'
 

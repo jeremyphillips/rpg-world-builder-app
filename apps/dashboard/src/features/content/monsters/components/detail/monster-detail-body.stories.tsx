@@ -39,3 +39,20 @@ export const KoboldWarrior: Story = {
     }),
   },
 }
+
+const classifiedMonster = pickMonster('lich')
+export const WizardClassification: Story = {
+  args: {
+    name: classifiedMonster.name,
+    imageName: classifiedMonster.name,
+    campaignId: 'camp_story',
+    displayFallback: 'monster',
+    viewModel: buildMonsterDetailViewModel({
+      monster: classifiedMonster,
+      creatureTypeLabel: 'Undead',
+      classLabel: () => 'Wizard',
+      equipmentById: new Map(),
+      catalogState: 'pending',
+    }),
+  },
+}

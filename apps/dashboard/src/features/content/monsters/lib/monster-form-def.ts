@@ -96,7 +96,7 @@ export const monsterFormDef: ContentFormDef<Monster, MonsterFormValues, CreateMo
   useListQuery: useMonsters,
   queryKey: monstersQueryKey,
   preview: {
-    buildIdentity: (values) => buildMonsterPreviewIdentity(values),
+    buildIdentity: buildMonsterPreviewIdentity,
     buildSections: buildMonsterPreviewSections,
   },
 }

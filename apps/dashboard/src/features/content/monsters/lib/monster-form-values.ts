@@ -66,6 +66,8 @@ export type MonsterFormValues = FieldValues & {
   description?: string
   sizes?: Monster['sizes']
   creatureType?: Monster['creatureType']
+  creatureFamilyIds?: Monster['creatureFamilyIds']
+  classIds?: Monster['classIds']
   alignment?: Monster['alignment']
   abilityScores: Monster['abilityScores']
   armorClass: {
@@ -174,6 +176,8 @@ export function monsterToFormValues(
     description: entity.description,
     sizes: entity.sizes,
     creatureType: entity.creatureType,
+    creatureFamilyIds: entity.creatureFamilyIds,
+    classIds: entity.classIds,
     alignment: entity.alignment,
     abilityScores: entity.abilityScores,
     armorClass: {
@@ -235,6 +239,8 @@ function baselineFromEntity(entity: Monster | undefined): MonsterNormalizeBaseli
   if (!entity) return undefined
   return {
     hover: entity.hover,
+    creatureFamilyIds: entity.creatureFamilyIds,
+    classIds: entity.classIds,
     description: entity.description,
     experiencePointsOverride: entity.experiencePointsOverride,
   }

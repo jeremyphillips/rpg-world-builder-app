@@ -51,6 +51,10 @@ export function resolveVocabularySet(
       status: patch?.status ?? seedOption.status,
       ...(patch?.media !== undefined ? { media: patch.media } : {}),
       ...(languageAffinities !== undefined ? { languageAffinities } : {}),
+      ...(seedOption.parentId !== undefined ? { parentId: seedOption.parentId } : {}),
+      ...(seedOption.allowedCreatureTypes !== undefined
+        ? { allowedCreatureTypes: seedOption.allowedCreatureTypes }
+        : {}),
     }
   })
 

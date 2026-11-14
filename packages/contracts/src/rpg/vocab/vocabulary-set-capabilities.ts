@@ -89,6 +89,7 @@ const enabledManagementCapabilities = (): VocabularySetCapability => ({
  */
 export const VOCABULARY_SET_CAPABILITIES = {
   'creature-types': enabledManagementCapabilities(),
+  'creature-families': disabledCapabilities(),
   'damage-types': browseOnlyWithUsageResolutionCapabilities(),
   conditions: browseOnlyWithUsageResolutionCapabilities(),
   languages: browseOnlyWithUsageResolutionCapabilities(),

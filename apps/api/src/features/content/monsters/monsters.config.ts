@@ -35,6 +35,8 @@ function toHomebrewMonster(doc: HomebrewDoc): Monster {
     ...(record.description !== undefined && { description: record.description }),
     sizes: (record.sizes ?? []) as Monster['sizes'],
     creatureType: record.creatureType as string,
+    ...(record.creatureFamilyIds !== undefined && { creatureFamilyIds: record.creatureFamilyIds }),
+    ...(record.classIds !== undefined && { classIds: record.classIds }),
     alignment: record.alignment as Monster['alignment'],
     abilityScores: record.abilityScores as Monster['abilityScores'],
     armorClass: record.armorClass as Monster['armorClass'],
@@ -114,7 +116,13 @@ export const monstersWriteConfig: ContentWriteConfig<Monster> = {
   bodyFromCreateInput,
   validateBeforeWrite: monstersValidateBeforeWrite,
   patchReplaceKeys: [...MONSTER_PATCH_REPLACE_KEYS],
-  patchTombstoneKeys: ['experiencePointsOverride', 'hover', 'description'],
+  patchTombstoneKeys: [
+    'experiencePointsOverride',
+    'hover',
+    'description',
+    'creatureFamilyIds',
+    'classIds',
+  ],
 }
 
 export const monstersRegistration = {

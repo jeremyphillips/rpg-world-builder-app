@@ -7,6 +7,11 @@ import { isContentCampaignEligible, isContentReferenceable } from './content-res
  * A subject can only index the checks that subject supports.
  */
 export const CATALOG_REFERENCE_ISSUE_CODE = {
+  class: {
+    unknown: 'unknown_class',
+    notReferenceable: 'class_not_referenceable',
+    catalogUnavailable: 'class_catalog_unavailable',
+  },
   spell: {
     unknown: 'unknown_spell',
     notReferenceable: 'spell_not_referenceable',
@@ -129,6 +134,24 @@ export const monsterEquipmentEdge = {
   messages: {
     unknown: 'Unknown equipment.',
     catalogUnavailable: 'Equipment could not be loaded. Try again before publishing.',
+  },
+}
+
+/** Monster classifications reference class content without PC progression or playability. */
+export const monsterClassEdge = {
+  policy: {
+    subject: 'class',
+    checks: {
+      unknown: ['publish'],
+      notReferenceable: ['publish'],
+      catalogUnavailable: ['publish'],
+    },
+  } as const satisfies CatalogReferencePolicy<'class'>,
+  unavailablePlacement: { kind: 'per-ref' } as const,
+  messages: {
+    unknown: 'Choose a class classification from the catalog.',
+    notReferenceable: 'Publish this class before using it as a classification.',
+    catalogUnavailable: 'Class classifications could not be loaded. Try again before publishing.',
   },
 }
 

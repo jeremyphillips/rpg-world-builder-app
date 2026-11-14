@@ -1,4 +1,11 @@
-import { formatMonsterChallengeMetadata, getContentTypeTerm } from '@rpg/contracts'
+import {
+  formatMonsterClassification,
+  formatMonsterClassificationReference,
+  MONSTER_CLASSIFICATION_DISABLED,
+  MONSTER_CLASSIFICATION_DRAFT,
+  formatMonsterChallengeMetadata,
+  getContentTypeTerm,
+} from '@rpg/contracts'
 import type { PreviewRailFact } from '@rpg/ui'
 
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
@@ -18,9 +25,37 @@ function fact(label: string, value: string): PreviewRailFact {
   return { label, value }
 }
 
-export function buildMonsterPreviewIdentity(values: MonsterFormValues): ContentPreviewIdentity {
+export function buildMonsterPreviewIdentity(
+  values: MonsterFormValues,
+  ctx: ContentFormCtx = {},
+): ContentPreviewIdentity {
   const name = values.name.trim() || `Untitled ${getContentTypeTerm('monsters').label}`
-  return { name }
+  const classification = values.creatureType
+    ? formatMonsterClassification(values, {
+        creatureTypeLabel:
+          ctx.creatureTypeVocabulary?.labelById[values.creatureType] ?? values.creatureType,
+        familyLabel: (id) => {
+          const row = ctx.creatureFamilyVocabulary?.byId.get(id)
+          return formatMonsterClassificationReference(
+            id,
+            row?.label,
+            row?.status === 'disabled' ? MONSTER_CLASSIFICATION_DISABLED : undefined,
+          )
+        },
+        classLabel: (id) => {
+          const row = ctx.options?.classes?.visible.find((row) => row.id === id)
+          return formatMonsterClassificationReference(
+            id,
+            row?.name,
+            row?.status === 'draft' ? MONSTER_CLASSIFICATION_DRAFT : undefined,
+          )
+        },
+      })
+    : undefined
+  return {
+    name,
+    ...(classification ? { facts: [{ label: 'Classification', value: classification }] } : {}),
+  }
 }
 
 function unavailableText(

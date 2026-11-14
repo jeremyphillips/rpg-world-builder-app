@@ -20,6 +20,7 @@ import { resolveCampaignSpellcastingProgression } from '@/lib/campaign-spellcast
 import {
   useConditionVocabulary,
   useCreatureTypeVocabulary,
+  useCreatureFamilyVocabulary,
   useDamageTypeVocabulary,
   useLanguageVocabulary,
   useSenseVocabulary,
@@ -95,6 +96,57 @@ function isAnyError(...queries: QueryState[]): boolean {
   return queries.some((query) => query.isError)
 }
 
+function catalogQueryStatus(query: QueryState): 'error' | 'pending' | 'ready' {
+  if (query.isError) return 'error'
+  if (query.isPending) return 'pending'
+  return 'ready'
+}
+
+function buildContentFormCtx(input: {
+  campaignId: string | undefined
+  rulesetId: string
+  campaignRules: ContentFormCtx['campaignRules']
+  spellcastingProgression: ContentFormCtx['spellcastingProgression']
+  vocabulary: Pick<
+    ReturnType<typeof useContentFormVocabulary>,
+    Exclude<keyof ReturnType<typeof useContentFormVocabulary>, 'isPending' | 'isError' | 'queries'>
+  >
+  options: ContentFormOptionSets
+  classesQuery: QueryState
+  equipment?: Equipment[]
+  skills?: SkillProficiency[]
+  spells?: Spell[]
+  equipmentQuery: QueryState
+  skillsQuery: QueryState
+  spellsQuery: QueryState
+  armorClassRules: ContentFormCtx['armorClassRules']
+}): ContentFormCtx {
+  return {
+    campaignId: input.campaignId,
+    rulesetId: input.rulesetId,
+    campaignRules: input.campaignRules,
+    spellcastingProgression: input.spellcastingProgression,
+    creatureTypeVocabulary: input.vocabulary.creatureTypeVocabulary,
+    creatureFamilyVocabulary: input.vocabulary.creatureFamilyVocabulary,
+    classCatalogStatus: catalogQueryStatus(input.classesQuery),
+    damageTypeVocabulary: input.vocabulary.damageTypeVocabulary,
+    senseVocabulary: input.vocabulary.senseVocabulary,
+    languageVocabulary: input.vocabulary.languageVocabulary,
+    spellSchoolVocabulary: input.vocabulary.spellSchoolVocabulary,
+    sizeVocabulary: input.vocabulary.sizeVocabulary,
+    conditionVocabulary: input.vocabulary.conditionVocabulary,
+    weaponPropertyVocabulary: input.vocabulary.weaponPropertyVocabulary,
+    options: input.options,
+    equipmentCatalogById: new Map((input.equipment ?? []).map((item) => [item.id, item])),
+    skillCatalogBySlug: new Map((input.skills ?? []).map((skill) => [skill.slug, skill])),
+    spellCatalogById: new Map((input.spells ?? []).map((spell) => [spell.id, spell])),
+    equipmentCatalogStatus: catalogQueryStatus(input.equipmentQuery),
+    skillCatalogStatus: catalogQueryStatus(input.skillsQuery),
+    spellCatalogStatus: catalogQueryStatus(input.spellsQuery),
+    armorClassRules: input.armorClassRules,
+  }
+}
+
 function useContentCatalogLists(campaignId: string | undefined) {
   const classesQuery = useClasses(campaignId)
   const speciesQuery = useSpecies(campaignId)
@@ -126,12 +178,14 @@ function useContentCatalogLists(campaignId: string | undefined) {
     equipmentQuery,
     skillsQuery,
     spellsQuery,
+    classesQuery,
     queries,
   }
 }
 
 function useContentFormVocabulary(campaignId: string | undefined) {
   const creatureTypeQuery = useCreatureTypeVocabulary(campaignId)
+  const creatureFamilyQuery = useCreatureFamilyVocabulary(campaignId)
   const damageTypeQuery = useDamageTypeVocabulary(campaignId)
   const senseQuery = useSenseVocabulary(campaignId)
   const languageQuery = useLanguageVocabulary(campaignId)
@@ -141,6 +195,7 @@ function useContentFormVocabulary(campaignId: string | undefined) {
   const weaponPropertyQuery = useWeaponPropertyVocabulary(campaignId)
   const queries = [
     creatureTypeQuery,
+    creatureFamilyQuery,
     damageTypeQuery,
     senseQuery,
     languageQuery,
@@ -152,6 +207,7 @@ function useContentFormVocabulary(campaignId: string | undefined) {
 
   return {
     creatureTypeVocabulary: creatureTypeQuery.vocabulary,
+    creatureFamilyVocabulary: creatureFamilyQuery.vocabulary,
     damageTypeVocabulary: damageTypeQuery.vocabulary,
     senseVocabulary: senseQuery.vocabulary,
     languageVocabulary: languageQuery.vocabulary,
@@ -289,40 +345,23 @@ export function useContentFormOptions(campaignId: string | undefined): {
   )
 
   const ctx = useMemo(
-    (): ContentFormCtx => ({
-      campaignId,
-      rulesetId,
-      campaignRules,
-      spellcastingProgression,
-      creatureTypeVocabulary: vocabulary.creatureTypeVocabulary,
-      damageTypeVocabulary: vocabulary.damageTypeVocabulary,
-      senseVocabulary: vocabulary.senseVocabulary,
-      languageVocabulary: vocabulary.languageVocabulary,
-      spellSchoolVocabulary: vocabulary.spellSchoolVocabulary,
-      sizeVocabulary: vocabulary.sizeVocabulary,
-      conditionVocabulary: vocabulary.conditionVocabulary,
-      weaponPropertyVocabulary: vocabulary.weaponPropertyVocabulary,
-      options,
-      equipmentCatalogById: new Map((catalog.equipment ?? []).map((item) => [item.id, item])),
-      skillCatalogBySlug: new Map((catalog.skills ?? []).map((skill) => [skill.slug, skill])),
-      spellCatalogById: new Map((catalog.spells ?? []).map((spell) => [spell.id, spell])),
-      equipmentCatalogStatus: catalog.equipmentQuery.isError
-        ? 'error'
-        : catalog.equipmentQuery.isPending
-          ? 'pending'
-          : 'ready',
-      skillCatalogStatus: catalog.skillsQuery.isError
-        ? 'error'
-        : catalog.skillsQuery.isPending
-          ? 'pending'
-          : 'ready',
-      spellCatalogStatus: catalog.spellsQuery.isError
-        ? 'error'
-        : catalog.spellsQuery.isPending
-          ? 'pending'
-          : 'ready',
-      armorClassRules: rulesetPatch?.mechanics.armorClass,
-    }),
+    () =>
+      buildContentFormCtx({
+        campaignId,
+        rulesetId,
+        campaignRules,
+        spellcastingProgression,
+        vocabulary,
+        options,
+        classesQuery: catalog.classesQuery,
+        equipment: catalog.equipment,
+        skills: catalog.skills,
+        spells: catalog.spells,
+        equipmentQuery: catalog.equipmentQuery,
+        skillsQuery: catalog.skillsQuery,
+        spellsQuery: catalog.spellsQuery,
+        armorClassRules: rulesetPatch?.mechanics.armorClass,
+      }),
     [
       campaignId,
       rulesetId,
@@ -332,13 +371,11 @@ export function useContentFormOptions(campaignId: string | undefined): {
       options,
       catalog.equipment,
       catalog.skills,
-      catalog.equipmentQuery.isError,
-      catalog.equipmentQuery.isPending,
-      catalog.skillsQuery.isError,
-      catalog.skillsQuery.isPending,
       catalog.spells,
-      catalog.spellsQuery.isError,
-      catalog.spellsQuery.isPending,
+      catalog.classesQuery,
+      catalog.equipmentQuery,
+      catalog.skillsQuery,
+      catalog.spellsQuery,
       rulesetPatch?.mechanics.armorClass,
     ],
   )

@@ -19,6 +19,7 @@ import type { ResolvedCampaignRules, ResolvedSpellcastingProgressionConfig } fro
 import type {
   ConditionVocabulary,
   CreatureTypeVocabulary,
+  CreatureFamilyVocabulary,
   DamageTypeVocabulary,
   LanguageVocabulary,
   SenseVocabulary,
@@ -57,6 +58,8 @@ export type ContentFormCtx = {
   spellcastingProgression?: ResolvedSpellcastingProgressionConfig
   /** Campaign-resolved creature type labels and active ids. */
   creatureTypeVocabulary?: CreatureTypeVocabulary
+  creatureFamilyVocabulary?: CreatureFamilyVocabulary
+  classCatalogStatus?: 'pending' | 'ready' | 'error'
   /** Campaign-resolved damage type labels and active ids (elemental + planar). */
   damageTypeVocabulary?: DamageTypeVocabulary
   /** Campaign-resolved sense labels and active ids. */

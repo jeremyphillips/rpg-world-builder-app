@@ -475,3 +475,23 @@ getVocabularyTermLabel(MAGIC_ITEM_RARITY_TERM) // → "Magic Item Rarity"
 - [architecture.md](./architecture.md) — monorepo topology and feature boundaries
 - [content-types.md](./content-types.md) — catalog content vs reference vocab
 - [apps/api/src/features/vocabulary/README.md](../apps/api/src/features/vocabulary/README.md) — route table and persistence summary
+
+## Creature families
+
+`creature-families` supplies lightweight monster classifications without adding a
+content type or management application. Definitions have `id`, `label`, optional
+`description`, optional `parentId`, and optional `allowedCreatureTypes`. Catalog
+seed rows follow the existing required-description convention. The first set contains
+Angel, Chromatic, Demon, Devil, Dinosaur, Genie, Goblinoid, Lycanthrope, Metallic and
+Titan. Class classifications continue to reference class content, not this vocabulary.
+
+Family metadata survives catalog projection and campaign resolution. A present
+compatibility list is nonempty and unique; omission means unrestricted. Validation
+checks known creature types and missing/self/cyclic parents over the effective set.
+Parents do not imply ancestor membership, label selection, or compatible creature types.
+
+This set is internal to current monster consumers; Game Terms browse/CRUD and
+availability mutations are disabled. Monster-family usage sources are registered
+for future management guards. The current consumer uses resolved vocabulary reads,
+with seed fallback only for intentionally campaign-free authoring. No family hierarchy
+editor or inherited matching is introduced.

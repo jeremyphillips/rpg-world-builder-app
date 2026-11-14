@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { creatureFamilyIdSchema } from '../vocab/creature-family'
 
 import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
 import { abilitySchema } from '../vocab/ability'
@@ -281,6 +282,14 @@ export const monsterEquipmentEntrySchema = z.preprocess((value) => {
 export const monsterBodyFields = {
   sizes: creatureSizesSchema,
   creatureType: creatureTypeRefSchema,
+  creatureFamilyIds: z
+    .array(creatureFamilyIdSchema)
+    .refine((ids) => new Set(ids).size === ids.length, 'Creature families must be unique.')
+    .optional(),
+  classIds: z
+    .array(z.string().min(1))
+    .refine((ids) => new Set(ids).size === ids.length, 'Class classifications must be unique.')
+    .optional(),
   alignment: creatureAlignmentSchema,
   abilityScores: creatureAbilityScoresSchema,
   armorClass: monsterArmorClassSchema.default({}),
@@ -914,6 +923,8 @@ export const createMonsterDraftInputSchema = monsterDraftInputSchema.superRefine
 )
 
 export const updateMonsterInputSchema = monsterPublishInputSchema.partial().extend({
+  creatureFamilyIds: monsterBodyFields.creatureFamilyIds.nullable(),
+  classIds: monsterBodyFields.classIds.nullable(),
   experiencePointsOverride: z.number().int().min(0).nullable().optional(),
   hover: z.boolean().nullable().optional(),
   description: z.string().nullable().optional(),
@@ -923,6 +934,10 @@ export type UpdateMonsterInput = z.infer<typeof updateMonsterInputSchema>
 
 export const updateMonsterDraftInputSchema = monsterDraftInputSchema
   .partial()
+  .extend({
+    creatureFamilyIds: monsterBodyFields.creatureFamilyIds.nullable(),
+    classIds: monsterBodyFields.classIds.nullable(),
+  })
   .superRefine((input, ctx) => refineMonsterDraftBody(input as MonsterBodyDraft, ctx))
 
 export {
@@ -942,3 +957,5 @@ export const monsterPatchSchema = contentPatchBaseSchema.extend({
 })
 
 export type MonsterPatch = z.infer<typeof monsterPatchSchema>
+
+export * from './monster/monster-classification'

@@ -1,0 +1,62 @@
+[
+  {
+    "id": "angel",
+    "label": "Angel",
+    "description": "The Angel descriptive classification in SRD 5.2.1 monster stat blocks.",
+    "allowedCreatureTypes": ["celestial"]
+  },
+  {
+    "id": "chromatic",
+    "label": "Chromatic",
+    "description": "The Chromatic descriptive classification in SRD 5.2.1 monster stat blocks.",
+    "allowedCreatureTypes": ["dragon"]
+  },
+  {
+    "id": "demon",
+    "label": "Demon",
+    "description": "The Demon descriptive classification in SRD 5.2.1 monster stat blocks.",
+    "allowedCreatureTypes": ["fiend"]
+  },
+  {
+    "id": "devil",
+    "label": "Devil",
+    "description": "The Devil descriptive classification in SRD 5.2.1 monster stat blocks.",
+    "allowedCreatureTypes": ["fiend"]
+  },
+  {
+    "id": "dinosaur",
+    "label": "Dinosaur",
+    "description": "The Dinosaur descriptive classification in SRD 5.2.1 monster stat blocks.",
+    "allowedCreatureTypes": ["beast"]
+  },
+  {
+    "id": "genie",
+    "label": "Genie",
+    "description": "The Genie descriptive classification in SRD 5.2.1 monster stat blocks.",
+    "allowedCreatureTypes": ["elemental"]
+  },
+  {
+    "id": "goblinoid",
+    "label": "Goblinoid",
+    "description": "The Goblinoid descriptive classification in SRD 5.2.1 monster stat blocks.",
+    "allowedCreatureTypes": ["fey"]
+  },
+  {
+    "id": "lycanthrope",
+    "label": "Lycanthrope",
+    "description": "The Lycanthrope descriptive classification in SRD 5.2.1 monster stat blocks.",
+    "allowedCreatureTypes": ["monstrosity"]
+  },
+  {
+    "id": "metallic",
+    "label": "Metallic",
+    "description": "The Metallic descriptive classification in SRD 5.2.1 monster stat blocks.",
+    "allowedCreatureTypes": ["dragon"]
+  },
+  {
+    "id": "titan",
+    "label": "Titan",
+    "description": "The Titan descriptive classification in SRD 5.2.1 monster stat blocks.",
+    "allowedCreatureTypes": ["monstrosity"]
+  }
+]

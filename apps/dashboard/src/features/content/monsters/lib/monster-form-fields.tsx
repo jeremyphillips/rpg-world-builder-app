@@ -33,6 +33,7 @@ import {
   MONSTER_LEGENDARY_USES_LABEL,
   monsterEquipmentSectionLabel,
 } from './monster-form-labels'
+import { monsterClassificationFields } from './monster-classification-fields'
 import { MONSTER_FORM_TAB } from './monster-form-view'
 import {
   monsterActionRowResolveFields,
@@ -93,6 +94,7 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
           options: creatureTypeOptions(ctx),
           required: true,
         }),
+        ...monsterClassificationFields(ctx),
         {
           type: 'select',
           name: 'alignment',

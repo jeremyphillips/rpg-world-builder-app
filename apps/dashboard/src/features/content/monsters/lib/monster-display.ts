@@ -1,3 +1,4 @@
+import { formatMonsterClassification } from '@rpg/contracts'
 import {
   ABILITY_IDS,
   abilityModifier,
@@ -138,6 +139,8 @@ export type MonsterDetailViewModel = {
 export type BuildMonsterDetailViewModelInput = {
   monster: Monster
   creatureTypeLabel: string
+  familyLabel?: (id: string) => string
+  classLabel?: (id: string) => string
   equipmentById: Map<string, Equipment>
   catalogState: MonsterCatalogLoadState
   derived?: DerivedMonsterStatBlock | null
@@ -1038,6 +1041,8 @@ function mapMonsterTrait(
 export function buildMonsterDetailViewModel({
   monster,
   creatureTypeLabel,
+  familyLabel,
+  classLabel,
   equipmentById,
   catalogState,
   derived,
@@ -1066,7 +1071,10 @@ export function buildMonsterDetailViewModel({
   }
   const sizeLabel = formatCreatureSizeList(monster.sizes)
   const classificationLabel =
-    joinInlineMetadata([sizeLabel, creatureTypeLabel]) || creatureTypeLabel
+    joinInlineMetadata([
+      sizeLabel,
+      formatMonsterClassification(monster, { creatureTypeLabel, familyLabel, classLabel }),
+    ]) || creatureTypeLabel
 
   const statRows: ContentStatRowData[] = []
   if (catalogState === 'ready' && derived) {

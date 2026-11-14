@@ -1,7 +1,13 @@
 import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { createMagicPropertyDefinitionProvider } from '@rpg/catalog/magic-properties'
-import { type Monster, type SystemRulesetId } from '@rpg/contracts'
+import {
+  formatMonsterClassificationReference,
+  MONSTER_CLASSIFICATION_DISABLED,
+  MONSTER_CLASSIFICATION_DRAFT,
+  type Monster,
+  type SystemRulesetId,
+} from '@rpg/contracts'
 
 import { useRulesetPatch } from '@/features/homebrew'
 
@@ -10,7 +16,12 @@ import {
   formatContentNotFoundMessage,
 } from '@/features/content/lib/content-type-labels'
 import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
-import { buildSeedCreatureTypeVocabulary, getCreatureTypeLabel } from '@/features/vocabulary'
+import {
+  useCreatureFamilyVocabulary,
+  useCreatureTypeVocabulary,
+  getCreatureTypeLabel,
+} from '@/features/vocabulary'
+import { useClasses } from '../../classes/hooks/use-classes'
 import { useEquipment } from '../../equipment/hooks/use-equipment'
 import type { NonEmptyContentTypeKeys } from '../../lib/detail/page/content-detail-query-status.lib'
 import { contentEditHref } from '../../lib/detail/page/content-edit-href'
@@ -32,8 +43,6 @@ import {
   type MonsterCatalogLoadState,
 } from '../lib/monster-display'
 import { useMonsters } from '../hooks/use-monsters'
-
-const creatureTypeVocabulary = buildSeedCreatureTypeVocabulary()
 
 function failedMonsterCatalogSubjects(
   equipmentLoadingError: boolean,
@@ -60,6 +69,9 @@ export function MonsterDetailContent({
 }: MonsterDetailContentProps) {
   useSetBreadcrumbLabel(monster.name)
 
+  const { vocabulary: creatureTypeVocabulary } = useCreatureTypeVocabulary(campaignId)
+  const { vocabulary: familyVocabulary } = useCreatureFamilyVocabulary(campaignId)
+  const classesQuery = useClasses(campaignId)
   const equipmentQuery = useEquipment(campaignId)
   const skillsQuery = useSkillProficiencies(campaignId)
   const spellsQuery = useSpells(campaignId)
@@ -110,6 +122,22 @@ export function MonsterDetailContent({
       buildMonsterDetailViewModel({
         monster,
         creatureTypeLabel: getCreatureTypeLabel(creatureTypeVocabulary, monster.creatureType),
+        familyLabel: (id) => {
+          const row = familyVocabulary?.byId.get(id)
+          return formatMonsterClassificationReference(
+            id,
+            row?.label,
+            row?.status === 'disabled' ? MONSTER_CLASSIFICATION_DISABLED : undefined,
+          )
+        },
+        classLabel: (id) => {
+          const row = classesQuery.data?.find((row) => row.id === id)
+          return formatMonsterClassificationReference(
+            id,
+            row?.name,
+            row?.status === 'draft' ? MONSTER_CLASSIFICATION_DRAFT : undefined,
+          )
+        },
         equipmentById,
         catalogState: derived === null && catalogState === 'ready' ? 'error' : catalogState,
         derived,
@@ -123,6 +151,9 @@ export function MonsterDetailContent({
       }),
     [
       catalogState,
+      creatureTypeVocabulary,
+      familyVocabulary,
+      classesQuery.data,
       derived,
       equipmentById,
       monster,

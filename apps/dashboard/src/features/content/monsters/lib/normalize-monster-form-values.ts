@@ -29,6 +29,8 @@ import {
 import type { MonsterFormValues } from './monster-form-values'
 
 export type MonsterNormalizeBaseline = {
+  creatureFamilyIds?: readonly string[]
+  classIds?: readonly string[]
   hover?: boolean
   description?: string
   experiencePointsOverride?: number
@@ -456,6 +458,8 @@ export function normalizeMonsterFormValues(
     name: typeof values.name === 'string' ? values.name : '',
     sizes: values.sizes,
     creatureType: values.creatureType,
+    ...(values.creatureFamilyIds?.length ? { creatureFamilyIds: values.creatureFamilyIds } : {}),
+    ...(values.classIds?.length ? { classIds: values.classIds } : {}),
     alignment: values.alignment,
     abilityScores: values.abilityScores,
     armorClass: normalizeArmorClass(values.armorClass, options.armorClassRules),
@@ -503,6 +507,10 @@ function applyClearableNulls(
   baseline: NonNullable<NormalizeMonsterFormOptions['baseline']>,
   hasFly: boolean,
 ): void {
+  if (baseline.creatureFamilyIds !== undefined && normalized.creatureFamilyIds === undefined)
+    normalized.creatureFamilyIds = null
+  if (baseline.classIds !== undefined && normalized.classIds === undefined)
+    normalized.classIds = null
   if (baseline.description !== undefined && normalized.description === undefined) {
     normalized.description = null
   }

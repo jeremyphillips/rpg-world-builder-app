@@ -56,3 +56,6 @@ export {
   fetchVocabularyDisableAvailabilityBatch,
   updateVocabularyEntry,
 } from './api/vocabulary-api'
+
+export { useCreatureFamilyVocabulary } from './hooks/use-creature-family-vocabulary'
+export * from './lib/sets/creature-families'
