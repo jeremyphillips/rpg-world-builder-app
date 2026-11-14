@@ -190,6 +190,7 @@ export function monsterActionOnHitFields(ctx: ContentFormCtx): FormItem {
       },
     },
     item: {
+      collapsible: true,
       header: {
         fallback: (index) => `Effect ${index + 1}`,
         primary: (values, index) => onHitEffectTitle(values, index),
@@ -211,7 +212,7 @@ export function monsterActionOnHitFields(ctx: ContentFormCtx): FormItem {
         visibility: condition,
         options: EFFECT_CONDITION_IDS.map((id) => ({
           value: id,
-          heading: { label: getEffectConditionLabel(id) },
+          label: getEffectConditionLabel(id),
         })),
       },
       {

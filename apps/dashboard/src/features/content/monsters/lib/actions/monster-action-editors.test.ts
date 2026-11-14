@@ -259,6 +259,7 @@ describe('monster action detail fields', () => {
     const onHit = monsterActionOnHitFields(detailCtx)
     expect(onHit.kind).toBe('array')
     if (onHit.kind !== 'array') return
+    expect(onHit.item).toMatchObject({ collapsible: true })
     expect(onHit).toMatchObject({
       addAction: {
         label: 'Add effect',
