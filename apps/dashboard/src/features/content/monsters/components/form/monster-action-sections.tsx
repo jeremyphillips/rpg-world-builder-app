@@ -26,7 +26,6 @@ import {
   MONSTER_ACTION_SECTIONS,
   type MonsterActionSection,
 } from '../../lib/actions/references/monster-action-equipment-references'
-import { primarySpellcastingProfile } from '../../lib/actions/monster-action-casting-summary'
 import { monsterActionEditorTitles } from '../../lib/actions/monster-action-editor-title'
 import { presentActionReference } from '../../lib/actions/references/monster-action-reference-presentation'
 import {
@@ -132,7 +131,12 @@ function MonsterActionAddMenu({
           weaponActions,
           allowAddWeapon,
           section,
-          primarySpellcasting: primarySpellcastingProfile(values) != null,
+          sectionRows: {
+            actions: (values.actions ?? []) as MonsterActionDraftRow[],
+            bonusActions: (values.bonusActions ?? []) as MonsterActionDraftRow[],
+            reactions: (values.reactions ?? []) as MonsterActionDraftRow[],
+            legendaryActions: (values.legendaryActions ?? []) as MonsterActionDraftRow[],
+          },
           hasReferenceTargets: ((values.actions ?? []) as MonsterActionDraftRow[]).some(
             isLegendaryReferenceTarget,
           ),

@@ -64,7 +64,26 @@ anatomy, not a name.
 
 `form` on a natural weapon is anatomy (`bite`, `claw`, `slam`, `gore`, `ram`,
 `sting`, `tail`, `tentacle`, `talons`). It is optional and independent of
-`preset`.
+`preset`. When `form` is set, only one natural-weapon row per form is allowed on
+publish; repeat strikes belong in `multiattack` steps, not duplicate rows.
+
+## Action repeatability
+
+[`monster-action-repeatability.ts`](../src/rpg/content/monster/action/monster-action-repeatability.ts)
+is the contract SSOT shared with dashboard acquisition. Publish validation and
+the add menu read the same rules.
+
+| Constraint                                       | Basis                    | Notes                              |
+| ------------------------------------------------ | ------------------------ | ---------------------------------- |
+| Weapon                                           | `equipmentEntryId`       | One action per equipped entry      |
+| Natural weapon                                   | `form` when set          | Rows without `form` may repeat     |
+| Multiattack, Leap, Teleport, Take Actions, Parry | `kind`                   | Structural singleton               |
+| Constrict                                        | `preset === 'constrict'` | Breath Weapon preset is repeatable |
+| Primary Spellcasting                             | `profile: 'primary'`     | Existing spell refinements         |
+| Attack, Special, Spell, references               | —                        | Repeatable                         |
+
+Reaction and legendary `action-reference` rows are repeatable; within-row
+reference rules and global action `id` uniqueness are unchanged.
 
 Action identity and add-menu defaults live in
 `vocab/action/action-vocabulary.ts` and `content/action/action-presets.ts`.

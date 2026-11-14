@@ -32,6 +32,7 @@ import {
   naturalWeaponPropertySchema,
   type MonsterActionMode,
 } from './shared-fragments'
+import { ACTION_REFERENCE_CHOOSE_FROM_ACTIONS } from './reference-messages'
 import {
   monsterRichTextIsEmpty,
   RULES_OR_SAVING_THROW_MESSAGE,
@@ -86,7 +87,7 @@ export function monsterActionFields<M extends MonsterActionMode>(mode: M) {
   const actionIds =
     mode === 'draft'
       ? z.array(z.string().min(1)).default([])
-      : z.array(z.string().min(1)).min(1, 'Choose an attack or ability.')
+      : z.array(z.string().min(1)).min(1, ACTION_REFERENCE_CHOOSE_FROM_ACTIONS)
   const monsterAbilitySourceSchema = z.discriminatedUnion('kind', [
     z.object({ kind: z.literal('spellcasting'), castingAbility: castingAbilitySchema }),
     z.object({

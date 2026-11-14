@@ -33,7 +33,7 @@ describe('monster action references', () => {
           actions: [BITE_ACTION, multiattack([{ count: 1, actionIds: ['missing'] }])],
         }),
       ),
-    ).toContain('must reference an action in Actions')
+    ).toContain('Choose an attack from Actions.')
 
     expect(
       createMonsterDraftInputSchema.safeParse({
@@ -88,7 +88,7 @@ describe('monster action references', () => {
         ...MONSTER_TEST_INPUT,
         actions: [extra, multiattack([{ count: 1, actionIds: [extra.id] }])],
       })
-      expect(issueMessages(parsed)).toContain('invalid kind')
+      expect(issueMessages(parsed)).toContain('Choose an attack from Actions.')
     }
 
     expect(
@@ -99,7 +99,7 @@ describe('monster action references', () => {
           bonusActions: [{ id: 'bite', kind: 'special', name: 'Bite', description: 'A bite.' }],
         }),
       ),
-    ).toContain('must reference an action in Actions')
+    ).toContain('Choose an attack from Actions.')
 
     expect(
       createMonsterInputSchema.safeParse({
@@ -144,7 +144,7 @@ describe('monster action references', () => {
       })
 
     expect(issueMessages(withPool([BITE_ACTION], [reference([])]))).toContain(
-      'Choose an attack or ability.',
+      'Choose an attack or ability from Actions.',
     )
     expect(
       issueMessages(withPool([BITE_ACTION], [reference(['missing'])])).some((message) =>

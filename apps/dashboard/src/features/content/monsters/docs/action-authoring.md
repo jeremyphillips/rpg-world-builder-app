@@ -45,6 +45,11 @@ Cross-tab spellcasting source resolution lives under **`monsters/lib/casting/`**
 
 Section move **eligibility** and data-loss flags are pure helpers in `@rpg/contracts`; transforms and confirmations stay in `use-monster-action-sections.ts`.
 
+**Action repeatability:** publish rules and add-menu disable/focus states both read
+`collectRepeatabilityViolations` / `acquisitionStateForItem` from
+`monster-action-repeatability.ts`. A disabled add item uses the same message as
+publish validation; existing rows are never removed when a rule is violated.
+
 ## Regression harness
 
 Focused Vitest entry points after structural changes:
