@@ -100,6 +100,7 @@ export function ArrayFieldRendererFieldset({
           sectionLabel={state.sectionLabel}
           hint={state.sectionHint}
           legendFieldSize={state.legendFieldSize}
+          legendRhythm={state.legendRhythm}
           addActionLayout={state.addActionLayout}
           required={state.required}
           arrayIssueCount={state.arrayIssueCount}

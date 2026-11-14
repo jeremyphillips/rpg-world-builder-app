@@ -3,7 +3,10 @@
 import type { ReactNode } from 'react'
 
 import type { FieldSizeToken } from '../../../components/ui/field-sizing.variants'
-import { fieldSetInFlowLegendClasses } from '../../../components/ui/field.variants'
+import {
+  fieldSetInFlowLegendClasses,
+  type FieldRhythm,
+} from '../../../components/ui/field.variants'
 import { cn } from '../../../lib/utils'
 import type { ArrayAddActionLayout, FieldHintConfig } from '../../field-config'
 import type { ArrayLabelMode } from '../../config/array/resolve-array-heading.lib'
@@ -17,6 +20,7 @@ export interface ArraySectionHeaderProps {
   sectionLabel: string
   hint?: string | FieldHintConfig
   legendFieldSize: FieldSizeToken
+  legendRhythm: FieldRhythm
   addActionLayout: ArrayAddActionLayout
   required?: boolean
   arrayIssueCount: number
@@ -45,7 +49,15 @@ function resolveVisibleHeaderChrome(props: ArraySectionHeaderProps): {
 
 /** Array fieldset section header — semantic legend, visible label/hint, and renderer chrome. */
 export function ArraySectionHeader(props: ArraySectionHeaderProps) {
-  const { labelMode, showSectionHeader, sectionLabel, hint, legendFieldSize, required } = props
+  const {
+    labelMode,
+    showSectionHeader,
+    sectionLabel,
+    hint,
+    legendFieldSize,
+    legendRhythm,
+    required,
+  } = props
   const { labelAccessory, inlineAction } = resolveVisibleHeaderChrome(props)
 
   const fieldHeader = (
@@ -53,6 +65,7 @@ export function ArraySectionHeader(props: ArraySectionHeaderProps) {
       label={sectionLabel}
       hint={hint}
       headingScale="field"
+      rhythm={legendRhythm}
       size={legendFieldSize}
       action={inlineAction}
       labelAccessory={labelAccessory}
@@ -68,6 +81,7 @@ export function ArraySectionHeader(props: ArraySectionHeaderProps) {
           label={sectionLabel}
           hint={hint}
           headingScale="field"
+          rhythm={legendRhythm}
           size={legendFieldSize}
           action={inlineAction}
           labelAccessory={labelAccessory}
@@ -88,6 +102,7 @@ export function ArraySectionHeader(props: ArraySectionHeaderProps) {
               label={sectionLabel}
               hint={hint}
               headingScale="field"
+              rhythm={legendRhythm}
               size={legendFieldSize}
               action={inlineAction}
               labelAccessory={labelAccessory}

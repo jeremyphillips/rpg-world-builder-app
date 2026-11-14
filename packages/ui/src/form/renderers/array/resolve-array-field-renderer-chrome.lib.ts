@@ -18,13 +18,17 @@ import {
 } from '../../config/array/array-item-config.lib'
 import { resolveArrayItemPresentation } from '../../config/array/array-item-presentation.lib'
 import type { ArrayConfig } from '../../field-config'
-import { resolveFormDensity } from '../../form-density'
+import {
+  DEFAULT_ARRAY_SECTION_DENSITY,
+  resolveFormDensity,
+  resolveSectionDensity,
+} from '../../form-density'
 import { resolveArrayEmptyItemLabel } from './array-field-empty-state.lib'
 
 type ResolveArrayFieldRendererChromeInput = {
   config: ArrayConfig
-  density: Parameters<typeof resolveFormDensity>[0]
-  legendDensity?: Parameters<typeof resolveFormDensity>[0]
+  /** Parent section density before array item defaults apply. */
+  parentDensity: Parameters<typeof resolveFormDensity>[0]
   depth: number
   inRhythmStack: boolean | undefined
   fieldsLength: number
@@ -33,15 +37,20 @@ type ResolveArrayFieldRendererChromeInput = {
 
 export function resolveArrayFieldRendererChrome({
   config,
-  density,
-  legendDensity,
+  parentDensity,
   depth,
   inRhythmStack,
   fieldsLength,
   wrapSectionChrome = false,
 }: ResolveArrayFieldRendererChromeInput) {
-  const { rhythm, size } = resolveFormDensity(density)
-  const legendFieldSize = resolveFormDensity(legendDensity ?? density).size
+  const sectionDensity = resolveSectionDensity({
+    explicit: config.density,
+    inherited: parentDensity,
+    sectionDefault: DEFAULT_ARRAY_SECTION_DENSITY,
+  })
+  const { rhythm, size } = resolveFormDensity(sectionDensity)
+  const headerDensity = config.density ?? parentDensity
+  const { rhythm: legendRhythm, size: legendFieldSize } = resolveFormDensity(headerDensity)
   const itemConfig = resolveArrayItemConfig(config)
   const addAction = resolveArrayAddAction(config)
   const {
@@ -108,6 +117,7 @@ export function resolveArrayFieldRendererChrome({
     sectionHint,
     labelMode,
     legendFieldSize,
+    legendRhythm,
     max,
     min,
     nested,
