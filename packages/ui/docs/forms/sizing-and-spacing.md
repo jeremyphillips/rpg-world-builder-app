@@ -330,5 +330,5 @@ it does not branch density. Label modes: see [array-field-authoring.md](./array-
 3. Inherited `FormSectionContext.density`
 4. `DEFAULT_FORM_DENSITY`
 
-Wrap isolated editors (table builder modal, spellbook acquisition) in `FormSectionProvider` once
-instead of passing `resolveFormDensity` into every header.
+Wrap isolated editors (modals, one-off wizards) in `FormSectionProvider` once instead of passing
+`resolveFormDensity` into every header.

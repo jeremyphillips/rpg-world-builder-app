@@ -50,10 +50,10 @@ use the legend row for disclosure, and nested interactives corrupt fieldset nami
 Row, array, and slot headings ignore `accessory` and `action`.
 Nested named groups derive subsection typography from nesting depth — no `legendSize`
 override. `headingScale: 'field'` is the only authored type opt-in: it replaces that
-structural legend and description type with the field label and hint scale for the group's
-density (comfortable label `md`, compact label `sm`; description matches `Field.Hint`).
+structural legend and hint type with the field label and hint scale for the group's
+density (comfortable label `md`, compact label `sm`; hint matches `Field.Hint`).
 Spacing, disclosure, and legend semantics stay unchanged. There is no separate legend or
-description size. Nested groups omit `mb-8` — parent group rhythm (`gap-6` / `gap-3`) owns sibling
+hint size. Nested groups omit `mb-8` — parent group rhythm (`gap-6` / `gap-3`) owns sibling
 spacing, matching nested array sections. Top-level groups and arrays inside `<Form>` omit
 `mb-8` as well — the form's `FormRhythmStack` (`gap-6` / `gap-3`) owns sibling spacing.
 Standalone `FormItems` outside `<Form>` need rhythm from either `<Form>` (which wraps
@@ -163,11 +163,11 @@ Legend→body spacing for `FieldGroup` is owned by `StandardFieldGroupBody`: sec
 `resolveFieldGroupBodyGap` on a body-side wrapper when a body is visible; `headingScale="field"` applies
 `fieldAnatomyStackVariants` on the fieldset (stable when collapsible groups are closed). Array fieldsets gate the same
 stack with `showSectionHeader` (visible label band or chrome — not sr-only-only labels). `FieldGroupLegend`
-keeps title, description, and accessory anatomy only. Legacy legend header margin
+keeps title, hint, and accessory anatomy only. Legacy legend header margin
 (`fieldGroupLegendHeaderMarginVariants`) remains for non-FieldGroup headings. In-flow array legends use
 `fieldSetInFlowLegendClasses` and require a parent fieldset stack — never legend `mb-*`. `<legend>` is `w-full` and sits **outside** panel, outline, inset, and
 callout **group chrome** boxes. The default
-field container wraps the whole fieldset, including the legend and description — see
+field container wraps the whole fieldset, including the legend and hint — see
 [Field container chrome](#field-container-chrome-default). Divider and accent-top chrome
 apply to the `<fieldset>`. Section chrome classes live in `field-group-chrome.css`; props map in `field-group-chrome.variants.ts`.
 
@@ -471,8 +471,7 @@ See [Component entry files](#component-entry-files).
 }
 ```
 
-**Legend:** Omit or pass `''` when a parent switch/stack already labels the block (e.g.
-`dependent` stack dependents). Empty legends are not rendered — no phantom spacing.
+**Heading:** Omit `heading` for layout-only arrays (e.g. dependents inside a labeled stack). Named headings render through `FormSectionHeader` in the fieldset `<legend>`; omitting `heading` avoids phantom legend spacing.
 
 **Section margin:** Standalone `FieldGroup` fieldsets use `mb-8`. Arrays and groups inside
 `<Form>` omit it — `FormRhythmStack` gap controls sibling spacing. Nested arrays (inside
@@ -503,9 +502,9 @@ pick compact but disclosure chrome is still required without `itemCollapsible`.
 }
 ```
 
-**Legend scale:** Array legend typography inherits parent section density unless the array
-sets `density` explicitly; item bodies still default to `compact`. Prefer `heading.label`
-when authoring new arrays. Anonymous arrays omit `label`.
+**Header scale:** Array section header rhythm/size follow `config.density ?? parent.density`;
+item bodies still default to `compact` via `resolveSectionDensity`. Author with
+`heading: { label, hint?, labelVisibility? }` only — not top-level `label` / `hint`.
 
 ### Collapse defaults and persistence
 

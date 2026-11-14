@@ -17,13 +17,13 @@ Named `kind: 'array'` section headers use **`FormSectionHeader`** with default *
 `density` is omitted. Optional `headingScale` on the array config can opt into structural
 section/subsection typography (`FormHeadingScale`) — there is no array-specific legend token or context channel.
 
-Standalone **`FormSectionHeader`** instances (dashboard slots, table builder panes, modals) inherit
-parent **`FormSectionProvider`** density via {@link resolveFormSectionHeaderPresentation} unless
+Standalone **`FormSectionHeader`** instances (dashboard slots, modals) inherit parent
+**`FormSectionProvider`** density via {@link resolveFormSectionHeaderPresentation} unless
 `density` / `rhythm` / `size` overrides are passed explicitly.
 
-`headingScale: 'field'` replaces structural legend and description type with the field label and hint scale for that group's density, and applies `fieldAnatomyStackVariants` on the fieldset for legend→body spacing (including when a collapsible group is closed). It is not a `legendSize` and does not change tier resolution or disclosure.
+`headingScale: 'field'` replaces structural legend and hint type with the field label and hint scale for that group's density, and applies `fieldAnatomyStackVariants` on the fieldset for legend→body spacing (including when a collapsible group is closed). It is not a `legendSize` and does not change tier resolution or disclosure.
 
-`headingScale: 'subsection'` forces structural subsection legend typography when a flat sibling list would otherwise resolve as section (for example a named group at `namedGroupDepth === 0`). Description stays on the group description scale. Do not use this on shared field builders solely to fit master-detail detail rails — dashboard [`MasterDetailDetailFormScope`](../../../../apps/dashboard/src/features/content/lib/master-detail/master-detail-detail-form-scope.tsx) floors `namedGroupDepth` for those bodies instead (no SR-only nesting fieldsets).
+`headingScale: 'subsection'` forces structural subsection legend typography when a flat sibling list would otherwise resolve as section (for example a named group at `namedGroupDepth === 0`). Hint copy stays on the structural subsection hint scale. Do not use this on shared field builders solely to fit master-detail detail rails — dashboard [`MasterDetailDetailFormScope`](../../../../apps/dashboard/src/features/content/lib/master-detail/master-detail-detail-form-scope.tsx) floors `namedGroupDepth` for those bodies instead (no SR-only nesting fieldsets).
 
 ## Presentation vs hierarchy
 
@@ -40,7 +40,7 @@ Three axes stay independent:
 (groups, arrays, dashboard slots, `CompositeGroup`). Containers own `<legend>` / `role="group"` markup;
 the header component is presentation-only.
 
-`headingScale: 'field'` on a named group replaces structural legend + description utilities with field
+`headingScale: 'field'` on a named group replaces structural legend + hint utilities with field
 label + hint, and applies `fieldAnatomyStackVariants` on the fieldset body. It does **not** change
 `legendSize`, `namedGroupDepth`, or disclosure behavior.
 
@@ -65,8 +65,8 @@ An `srOnly` label stays in the accessibility tree and does not occupy the label 
 | `weapon-form-fields.ts`                                 | `legendSize: 'subsection'`                    | Structural heading   | Nest under named section group                             | —                                                |
 | `vehicle-form-fields.ts`                                | `legendSize: 'subsection'`                    | Structural heading   | Nest under named section group                             | —                                                |
 | `species-culture-form-fields.ts`                        | `legendSize: 'subsection'`                    | Structural heading   | Nest under named section group                             | —                                                |
-| `class-character-creation-proficiencies-form-fields.ts` | `legendSize: 'subsection'`, `hideLabel: true` | Structural + leaf    | Nest groups; `labelVisibility: 'srOnly'`                   | —                                                |
-| `language-proficiency-form-fields.ts`                   | `legendSize: 'subsection'`, `hideLabel: true` | Structural + leaf    | Nest groups; explicit sr-only labels                       | —                                                |
+| `class-character-creation-proficiencies-form-fields.ts` | `legendSize: 'subsection'`, `hideLabel: true` | Structural + sr-only | Nest groups; `labelVisibility: 'srOnly'`                   | —                                                |
+| `language-proficiency-form-fields.ts`                   | `legendSize: 'subsection'`, `hideLabel: true` | Structural + sr-only | Nest groups; explicit sr-only labels                       | —                                                |
 | `standard-array-form-fields.ts`                         | `legendSize: 'subsection'`, `label: ''`       | Composite + a11y gap | Row `heading` + six authored sr-only score labels          | —                                                |
 | `campaign-availability-form-fields.ts`                  | —                                             | Layout-only          | Summary disclosure owns legend typography                  | —                                                |
 | `grant-form-fields.ts`                                  | `label: ''`, `hideLabel: true`                | A11y gap             | Non-whitespace label + `labelVisibility: 'srOnly'`         | —                                                |

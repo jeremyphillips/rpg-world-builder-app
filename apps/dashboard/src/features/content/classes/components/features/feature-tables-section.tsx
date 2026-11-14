@@ -16,7 +16,7 @@ export type FeatureTablesSectionProps = {
 
 export function FeatureTablesSection({ tables = [], onAddTable }: FeatureTablesSectionProps) {
   const { density } = useFormSectionContext()
-  const { rhythm, size } = resolveFormDensity(density)
+  const { size } = resolveFormDensity(density)
 
   const addAction = onAddTable ? (
     <ActionButton action="add" variant="outline" size="sm" onClick={onAddTable}>

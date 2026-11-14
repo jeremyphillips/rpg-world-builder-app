@@ -46,7 +46,7 @@ export function ManagedMediaField({
 }: ManagedMediaFieldProps) {
   const headingId = useId()
   const { density } = useFormSectionContext()
-  const { rhythm, size } = resolveFormDensity(density)
+  const { size } = resolveFormDensity(density)
   const form = useFormContext<FieldValues>()
   // useController (not useWatch) so the path registers with react-hook-form:
   // the schema Form shell mounts with `shouldUnregister: true`, and unregistered

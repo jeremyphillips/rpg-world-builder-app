@@ -183,11 +183,11 @@ export interface GroupConfig {
   /** When set, names the fieldset legend; omit for layout-only wrappers. */
   heading?: FormHeading
   /**
-   * When `'field'`, legend and description use this group's field label and hint
+   * When `'field'`, legend and hint use this group's field label and hint
    * type scale. When `'subsection'`, legend uses structural subsection type at
    * any depth. Omit for structural legend type from nesting depth. Typography
    * only — spacing, disclosure, and legend semantics stay unchanged. There is
-   * no separate legend or description size.
+   * no separate legend or hint size.
    */
   headingScale?: FormHeadingScale
   fields: GroupFieldItem[]
@@ -209,7 +209,7 @@ export interface GroupConfig {
    */
   chrome?: FieldGroupChrome
   /**
-   * Shared field-container override for this group’s fieldset (legend, description,
+   * Shared field-container override for this group’s fieldset (legend, hint,
    * and field stack). Also cascades to descendants when the shared container is
    * opted out with `none`.
    */

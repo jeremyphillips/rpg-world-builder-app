@@ -54,7 +54,7 @@ export function SlotProgressionsField() {
   const createLabelId = useId()
   const form = useFormContext<SpellcastingRulesFormSlice>()
   const { density } = useFormSectionContext()
-  const { rhythm, size } = resolveFormDensity(density)
+  const { size } = resolveFormDensity(density)
 
   // useController (not useWatch) so the path registers with react-hook-form:
   // the schema Form shell mounts with `shouldUnregister: true`, and unregistered
