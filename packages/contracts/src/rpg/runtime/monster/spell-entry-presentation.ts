@@ -1,4 +1,4 @@
-import type { MonsterAction, MonsterReaction } from '../../content/monster/action'
+import type { MonsterAction, MonsterReaction } from '../../content/monster/action/index'
 import {
   describeLimitedUse,
   formatLimitedUseNotation,

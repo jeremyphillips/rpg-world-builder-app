@@ -12,8 +12,6 @@ import { EquipmentCategoryGroupedList, EquipmentInventorySectionHeader } from '@
 import { EquipmentPickerDrawer, buildEquipmentLoadoutRowViewModel } from '@/features/character'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
-import { resolveStrictCatalogWriteGateReason } from '../../../lib/forms/shells/layout/content-form-catalog-write-gate.lib'
-import { useReportContentFormWriteGate } from '../../../lib/forms/shells/layout/content-form-write-gate'
 import {
   groupMonsterEquipmentByKind,
   incrementMonsterPlainStack,
@@ -21,11 +19,7 @@ import {
   setMonsterPlainStackQuantity,
 } from '../../lib/equipment/monster-equipment-loadout.lib'
 import { buildMonsterLoadoutPickerItems } from '../../lib/equipment/monster-loadout-picker.lib'
-import {
-  MONSTER_EQUIPMENT_CATALOG_ERROR,
-  MONSTER_EQUIPMENT_EMPTY_MESSAGE,
-  MONSTER_LOADING_EQUIPMENT,
-} from '../../lib/monster-form-labels'
+import { MONSTER_EQUIPMENT_EMPTY_MESSAGE } from '../../lib/monster-form-labels'
 import { buildMonsterEquipmentRecommendationGroup } from '../../lib/equipment/monster-equipment-field-recommendation.lib'
 import type { MonsterEquipmentFormEntry } from '../../lib/monster-form-values'
 import { useMonsterEquipmentEntryActions } from './use-monster-equipment-entry-actions'
@@ -33,13 +27,6 @@ import { useMonsterEquipmentEntryActions } from './use-monster-equipment-entry-a
 export function MonsterEquipmentPanel({ ctx }: { ctx: ContentFormCtx }) {
   const actions = useMonsterEquipmentEntryActions(ctx)
   const [pickerOpen, setPickerOpen] = useState(false)
-  const status = ctx.equipmentCatalogStatus ?? 'ready'
-  const gateReason = resolveStrictCatalogWriteGateReason(status, {
-    loading: MONSTER_LOADING_EQUIPMENT,
-    error: MONSTER_EQUIPMENT_CATALOG_ERROR,
-  })
-  useReportContentFormWriteGate('strict', gateReason)
-
   const referenceOptions = ctx.options?.equipment?.forReference() ?? []
   const { equipment, updateEquipment, removeEntry, values, weaponGrants, rulesetId } = actions
 

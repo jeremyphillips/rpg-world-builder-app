@@ -17,7 +17,7 @@ import {
   SPELLCASTING_ABILITY_SHARED_HINT,
 } from '../../../lib/forms/mechanics/spellcasting-ability-field-copy'
 import { resolveMonsterCreateDefaultValues, type MonsterFormValues } from '../monster-form-values'
-import { monsterActionDetailFields } from './monster-action-detail-fields'
+import { monsterActionDetailFields } from './detail-fields/monster-action-detail-fields'
 import type { MonsterActionDraftRow } from './monster-action-presets'
 
 beforeAll(() => {

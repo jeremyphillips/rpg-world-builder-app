@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 
 import { resolveMonsterCreateDefaultValues } from '../monster-form-values'
 import { normalizeMonsterFormValues } from '../normalize-monster-form-values'
-import { createMonsterActionFromAcquisition } from './monster-action-acquisition'
+import { createMonsterActionFromAcquisition } from './acquisition/monster-action-acquisition'
 import type { MonsterActionDraftRow } from './monster-action-presets'
 
 function storedAction(action: MonsterActionDraftRow) {

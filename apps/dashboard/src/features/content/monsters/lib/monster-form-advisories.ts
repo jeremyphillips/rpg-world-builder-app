@@ -15,7 +15,7 @@ import { coerceCreatureWeaponProficienciesForForm } from './creature-details/mon
 import {
   MONSTER_ACTION_SECTIONS,
   type MonsterActionSection,
-} from './actions/monster-action-equipment-references'
+} from './actions/references/monster-action-equipment-references'
 import type { MonsterActionDraftRow } from './actions/monster-action-presets'
 import { readWalkSpeed, isLeapWholeFeet } from './actions/leap-distance-options'
 import type { MonsterFormValues } from './monster-form-values'

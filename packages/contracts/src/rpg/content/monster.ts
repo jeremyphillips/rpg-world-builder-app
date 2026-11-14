@@ -107,8 +107,13 @@ export type {
 export {
   ACTIONS_ONLY_PRESET_IDS,
   MONSTER_SECTION_KINDS,
+  monsterActionMoveDataLoss,
+  monsterActionSectionMoveEligibility,
   monsterSectionAllowsKind,
   monsterSectionAllowsPreset,
+  type MonsterActionSectionMoveDataLoss,
+  type MonsterActionSectionMoveEligibility,
+  type MonsterActionSectionMoveEligibilityReason,
 } from './monster/action-section-eligibility'
 import type { EquipmentInstance } from './equipment/instance/instance'
 import { normalizeEquipmentInstance } from './equipment/instance/normalize-equipment-instance'

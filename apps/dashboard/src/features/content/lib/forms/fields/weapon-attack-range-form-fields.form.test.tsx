@@ -5,13 +5,17 @@ import {
   weaponRangeSchema,
   WEAPON_MODES,
 } from '@rpg/contracts'
-import { combineFieldVisibilityAll, Form, type FormItem } from '@rpg/ui/form'
+import {
+  AnatomyFieldRowCluster,
+  combineFieldVisibilityAll,
+  Form,
+  type FormItem,
+} from '@rpg/ui/form'
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { z } from 'zod'
 
-import { MonsterAttackRangeClusterSlot } from '../../../monsters/lib/actions/monster-attack-range-cluster-slot.client'
 import {
   ATTACK_RANGE_LONG_FIELD_LABEL,
   ATTACK_RANGE_NORMAL_FIELD_LABEL,
@@ -103,9 +107,10 @@ function monsterDistanceFields(): FormItem {
             name: 'attackRangeCluster',
             width: '2/3' as const,
             render: () => (
-              <MonsterAttackRangeClusterSlot
+              <AnatomyFieldRowCluster
                 idPrefix="monster-distance"
                 fields={rangeFields.map((field) => ({ ...field, width: '1/2' as const }))}
+                gap="compact"
               />
             ),
           },

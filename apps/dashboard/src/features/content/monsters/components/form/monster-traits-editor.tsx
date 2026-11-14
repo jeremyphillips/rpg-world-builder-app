@@ -16,7 +16,7 @@ import {
   MONSTER_TRAIT_ACQUISITION_GROUPS,
   monsterTraitAcquisitionItems,
   parseMonsterTraitAcquisitionId,
-} from '../../lib/actions/monster-trait-acquisition'
+} from '../../lib/traits/monster-trait-acquisition'
 import { sharedCastingOptions } from '../../lib/actions/monster-action-casting-summary'
 import { collectMonsterFormAdvisories } from '../../lib/monster-form-advisories'
 import { MONSTER_ADD_LABEL, MONSTER_TRAITS_HEADING } from '../../lib/monster-form-labels'

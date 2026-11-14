@@ -4,7 +4,7 @@ import { resolveCreatureArmorSlot, type CreatureArmorSlot, type Equipment } from
 import {
   MONSTER_ACTION_SECTIONS,
   removeEquipmentEntryWithDependents,
-} from '../actions/monster-action-equipment-references'
+} from '../actions/references/monster-action-equipment-references'
 import type { MonsterFormValues } from '../monster-form-values'
 import { replaceMonsterArmorSlotEntry } from './monster-equipment-loadout.lib'
 import type { EquipmentRemovalDecision } from './resolve-equipment-removal-decision.lib'

@@ -21,14 +21,14 @@ import {
   monsterActionAcquisitionItems,
   parseMonsterActionAcquisitionId,
   type MonsterActionAcquisitionChoice,
-} from '../../lib/actions/monster-action-acquisition'
+} from '../../lib/actions/acquisition/monster-action-acquisition'
 import {
   MONSTER_ACTION_SECTIONS,
   type MonsterActionSection,
-} from '../../lib/actions/monster-action-equipment-references'
+} from '../../lib/actions/references/monster-action-equipment-references'
 import { primarySpellcastingProfile } from '../../lib/actions/monster-action-casting-summary'
 import { monsterActionEditorTitles } from '../../lib/actions/monster-action-editor-title'
-import { presentActionReference } from '../../lib/actions/monster-action-reference-presentation'
+import { presentActionReference } from '../../lib/actions/references/monster-action-reference-presentation'
 import {
   isLegendaryReferenceTarget,
   legendaryActionCategory,
@@ -36,7 +36,7 @@ import {
 import {
   LEGENDARY_ACTION_ACQUISITION_GROUPS,
   legendaryActionAcquisitionItems,
-} from '../../lib/actions/monster-legendary-action-acquisition'
+} from '../../lib/actions/acquisition/monster-legendary-action-acquisition'
 import {
   LEGENDARY_ACTION_CATEGORY_LABELS,
   formatMoveReferencedActionBody,
@@ -44,7 +44,7 @@ import {
   MONSTER_MOVE_REFERENCED_ACTION_HEADLINE,
   MONSTER_REMOVE_REFERENCED_ACTION_HEADLINE,
 } from '../../lib/monster-form-labels'
-import { multiattacksReferencingAction } from '../../lib/actions/monster-action-multiattack-references'
+import { multiattacksReferencingAction } from '../../lib/actions/references/monster-action-multiattack-references'
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
 import type { MonsterActionPending } from '../../hooks/use-monster-action-sections'
 import {
@@ -70,7 +70,7 @@ import { MONSTER_ACTION_ITEM_NOUN } from '../../lib/monster-form-labels'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
 import { monsterActionRowResolveFields } from '../../lib/monster-master-detail-validation-fields'
 import { useMonsterActionSections } from '../../hooks/use-monster-action-sections'
-import { MonsterActionDetail } from './monster-action-detail'
+import { MonsterActionDetail } from './actions/monster-action-detail'
 
 const SECTION_HEADINGS = {
   actions: MONSTER_ACTIONS_HEADING,
@@ -298,7 +298,9 @@ function useMonsterActionDetailRows(
 }
 
 export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
-  const sections = useMonsterActionSections(ctx.entityId)
+  const sections = useMonsterActionSections(ctx.entityId, {
+    equipmentCatalogStatus: ctx.equipmentCatalogStatus,
+  })
   const { getValues } = useFormContext<MonsterFormValues>()
   const [weaponPickerSection, setWeaponPickerSection] = useState<MonsterActionSection | null>(null)
   const values = sections.values ?? getValues()

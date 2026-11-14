@@ -1,5 +1,11 @@
 import { ACTION_PRESET_IDS, formatResolutionTargetFromParts, getActionPreset } from '@rpg/contracts'
-import type { ArrayConfig, FormItem, GroupConfig, SelectFieldConfig } from '@rpg/ui/form'
+import type {
+  ArrayConfig,
+  FormItem,
+  GroupConfig,
+  JoinedPairFieldConfig,
+  SelectFieldConfig,
+} from '@rpg/ui/form'
 import { describe, expect, it } from 'vitest'
 
 import { AREA_GEOMETRY_FORM_NONE } from '../../../lib/forms/fields/area-geometry-form-fields'
@@ -9,14 +15,14 @@ import { pickEquipment, pickMonster } from '@/test/fixtures/pick'
 import {
   createEquippedWeaponAcquisition,
   createMonsterActionFromAcquisition,
-} from './monster-action-acquisition'
+} from './acquisition/monster-action-acquisition'
 import {
   monsterActionActiveKeys,
   actionMoveDropsTrigger,
   actionAfterSectionMove,
   monsterActionSectionMoveAllowed,
 } from './monster-action-kind'
-import { monsterActionDetailFields } from './monster-action-detail-fields'
+import { monsterActionDetailFields } from './detail-fields/monster-action-detail-fields'
 import { monsterActionOnHitFields } from './monster-action-on-hit-fields'
 import type { MonsterActionDraftRow } from './monster-action-presets'
 import { createMonsterRowId } from '../monster-row-id'
@@ -101,11 +107,12 @@ describe('monster action acquisition', () => {
     expect(createMonsterActionFromAcquisition({ type: 'create', kind: 'special' }).kind).toBe(
       'special',
     )
-    expect(createMonsterActionFromAcquisition({ type: 'create', kind: 'save' })).toEqual({
-      id: expect.any(String),
+    expect(createMonsterActionFromAcquisition({ type: 'create', kind: 'save' })).toMatchObject({
       kind: 'save',
       resolution: {
         selectionMode: 'targets',
+        method: { kind: 'saving-throw' },
+        effects: [{ id: 'damage', kind: 'damage' }],
         target: expect.objectContaining({
           count: 1,
           kind: 'creature',
@@ -730,13 +737,13 @@ describe('monster action section moves', () => {
       equipmentOptions: [],
       sharedCastingOptions: [],
     })
-    const leapRow = leapFields.find((field) => 'kind' in field && field.kind === 'row')
+    const leapDistances = leapFields.filter(
+      (field): field is JoinedPairFieldConfig => 'type' in field && field.type === 'joinedPair',
+    )
     expect(
-      leapRow && 'fields' in leapRow
-        ? leapRow.fields.map((field) =>
-            'start' in field && field.start && 'name' in field.start ? field.start.name : undefined,
-          )
-        : [],
+      leapDistances.map((field) =>
+        field.start.kind === 'select' && 'name' in field.start ? field.start.name : undefined,
+      ),
     ).toEqual(['distanceFeet', 'movementFeet'])
     const take = detailFields(
       { id: 'nimble', kind: 'take-actions', standardActions: ['disengage', 'hide'] },

@@ -70,11 +70,11 @@ import {
 
 import type { ContentStatRowData } from '../../lib/detail/metadata/content-stat-rows'
 
-import { buildMonsterMultiattackSentence } from './actions/monster-action-multiattack-summary'
+import { buildMonsterMultiattackSentence } from './actions/previews/monster-action-multiattack-summary'
 import {
   nextDistinctTitle,
   presentActionReference,
-} from './actions/monster-action-reference-presentation'
+} from './actions/references/monster-action-reference-presentation'
 import { formatMonsterTemplateSentence } from './format-monster-template-sentence'
 import { MONSTER_HP_MINIMUM_NOTE } from './monster-form-labels'
 
