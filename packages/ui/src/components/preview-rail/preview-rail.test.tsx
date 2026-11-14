@@ -189,6 +189,24 @@ describe('PreviewRail', () => {
     expect(screen.getByText('Hit die')).toBeInTheDocument()
   })
 
+  it('does not wrap availability status in supporting paragraph typography', () => {
+    const { container } = render(
+      <PreviewRail>
+        <PreviewRail.Identity
+          name="Fighter"
+          status={
+            <PreviewRail.AvailabilityLine available statusLabel="Available" detail="DM only" />
+          }
+        />
+      </PreviewRail>,
+    )
+
+    const identity = container.querySelector('[data-slot="preview-rail-identity"]')
+    expect(identity).not.toBeNull()
+    expect(identity?.querySelector('.text-style-supporting')).toBeNull()
+    expect(identity?.querySelectorAll('p')).toHaveLength(1)
+  })
+
   it('does not turn repeated fact labels into document ids', () => {
     const facts = [{ label: 'Hit die', value: 'd8' }]
     const { container } = render(
