@@ -5,7 +5,7 @@ import { planEquipmentCatalogChange } from './monster-equipment-catalog-change'
 import {
   findActionsReferencingEntry,
   removeEquipmentEntryWithDependents,
-} from '../actions/monster-action-equipment-references'
+} from '../actions/references/monster-action-equipment-references'
 import { resolveEquipmentInstanceReferenceLabel } from '@rpg/contracts'
 import { resolveMonsterCreateDefaultValues } from '../monster-form-values'
 

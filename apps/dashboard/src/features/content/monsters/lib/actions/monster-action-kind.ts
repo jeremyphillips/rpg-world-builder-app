@@ -7,7 +7,7 @@ import {
   monsterReactionDraftSchema,
 } from '@rpg/contracts'
 
-import type { MonsterActionSection } from './monster-action-equipment-references'
+import type { MonsterActionSection } from './references/monster-action-equipment-references'
 import type { MonsterActionDraftRow } from './monster-action-presets'
 
 function variantKeys(schema: object, kind: string): readonly string[] {

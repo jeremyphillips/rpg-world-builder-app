@@ -15,7 +15,7 @@ import { ConfirmDialog } from '@rpg/ui'
 
 import { EquipmentInstanceEditorDrawer } from '../../../equipment/components/instance-editor/equipment-instance-editor-drawer'
 
-import { findActionsReferencingEntry } from '../../lib/actions/monster-action-equipment-references'
+import { findActionsReferencingEntry } from '../../lib/actions/references/monster-action-equipment-references'
 import {
   buildCreatureEquipmentRowSupportingMetadata,
   EQUIPMENT_ROW_UNMODIFIED_SUPPORTING_SEGMENT,

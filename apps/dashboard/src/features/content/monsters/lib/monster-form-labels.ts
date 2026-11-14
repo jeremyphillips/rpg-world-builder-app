@@ -45,7 +45,7 @@ import {
 } from '@/features/content/lib/content-type-labels'
 import { vocabularyFieldLabel } from '@/features/vocabulary'
 
-import type { MonsterActionSection } from './actions/monster-action-equipment-references'
+import type { MonsterActionSection } from './actions/references/monster-action-equipment-references'
 
 const armorClassLabel = CREATURE_ARMOR_CLASS_KIND_TERM.label
 

@@ -13,8 +13,8 @@ import {
   createReactionActionDraft,
   createSpellActionDraft,
   type MonsterActionAcquisitionChoice,
-} from '../lib/actions/monster-action-acquisition'
-import { createLegendaryActionDraft } from '../lib/actions/monster-legendary-action-acquisition'
+} from '../lib/actions/acquisition/monster-action-acquisition'
+import { createLegendaryActionDraft } from '../lib/actions/acquisition/monster-legendary-action-acquisition'
 import { monsterCastingDependentLabels } from '../lib/casting/monster-casting-dependents.lib'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import {
@@ -25,7 +25,7 @@ import {
 import {
   multiattacksReferencingAction,
   stripMultiattackActionId,
-} from '../lib/actions/monster-action-multiattack-references'
+} from '../lib/actions/references/monster-action-multiattack-references'
 import type { MonsterActionDraftRow } from '../lib/actions/monster-action-presets'
 import {
   firstMonsterActionId,
@@ -35,7 +35,7 @@ import {
 import {
   MONSTER_ACTION_SECTIONS,
   type MonsterActionSection,
-} from '../lib/actions/monster-action-equipment-references'
+} from '../lib/actions/references/monster-action-equipment-references'
 import {
   formatAddedEquipmentNotice,
   formatCastingSourceDeleteNotice,

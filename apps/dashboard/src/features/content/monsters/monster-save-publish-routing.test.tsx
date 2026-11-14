@@ -12,7 +12,7 @@ import {
 
 import { makeTestQueryClient } from '@/test/render'
 
-import { blankSaveAction } from './lib/actions/monster-action-claim-fixtures'
+import { blankSaveAction } from './lib/actions/validation/monster-action-claim-fixtures'
 import { makeContentFormCtx } from '../lib/fixtures/content-form-ctx'
 import { applyContentPublishValidation } from '../lib/forms/validation/content-publish-validation.lib'
 import { buildMonsterTabs } from './lib/monster-form-fields'

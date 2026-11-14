@@ -8,7 +8,7 @@ import {
 import {
   MONSTER_ACTION_SECTIONS,
   type MonsterActionSection,
-} from './monster-action-equipment-references'
+} from './references/monster-action-equipment-references'
 import type { MonsterActionDraftRow } from './monster-action-presets'
 import type { MonsterFormValues } from '../monster-form-values'
 

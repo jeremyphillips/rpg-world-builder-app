@@ -14,8 +14,8 @@ import {
   createLegendaryActionDraft,
   legendaryActionAcquisitionItems,
   legendarySourceSpellOptions,
-} from './monster-legendary-action-acquisition'
-import { parseMonsterActionAcquisitionId } from './monster-action-acquisition'
+} from './acquisition/monster-legendary-action-acquisition'
+import { parseMonsterActionAcquisitionId } from './acquisition/monster-action-acquisition'
 import { resolveMonsterCreateDefaultValues } from '../monster-form-values'
 
 const ctx = {

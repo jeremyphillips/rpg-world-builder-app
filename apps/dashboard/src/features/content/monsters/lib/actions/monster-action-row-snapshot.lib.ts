@@ -1,7 +1,7 @@
 import {
   MONSTER_ACTION_SECTIONS,
   type MonsterActionSection,
-} from './monster-action-equipment-references'
+} from './references/monster-action-equipment-references'
 import type { MonsterFormValues } from '../monster-form-values'
 
 function isPlainRecord(value: unknown): value is Record<string, unknown> {

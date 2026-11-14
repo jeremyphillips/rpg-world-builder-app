@@ -16,8 +16,11 @@ import {
   MONSTER_USE_DEFAULT_NAME_LABEL,
 } from '../monster-form-labels'
 import { legendaryActionCategory } from './legendary-action-category'
-import { nextDistinctTitle, presentActionReference } from './monster-action-reference-presentation'
-import type { MonsterActionSection } from './monster-action-equipment-references'
+import {
+  nextDistinctTitle,
+  presentActionReference,
+} from './references/monster-action-reference-presentation'
+import type { MonsterActionSection } from './references/monster-action-equipment-references'
 import type { MonsterFormValues } from '../monster-form-values'
 import type { MonsterActionDraftRow } from './monster-action-presets'
 import { resolveMonsterFormActionIdentity } from './monster-action-identity'
