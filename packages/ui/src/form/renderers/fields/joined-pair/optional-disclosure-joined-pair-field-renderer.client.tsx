@@ -8,6 +8,7 @@ import { useFieldRowParticipation } from '../../../../components/ui/field-row-an
 import { useFieldControlSize } from '../../../context/form-section.context'
 import type { JoinedPairFieldConfig, OptionalDisclosureConfig } from '../../../field-config'
 import { useDependsOnValues } from '../../../config/form-depends-on.client'
+import { optionalDisclosureLeafFieldConfig } from '../../../config/optional-disclosure-config.lib'
 import { useConfirmBeforeClear } from '../../../config/use-confirm-before-clear.client'
 import { JoinedPairFieldRenderer } from './joined-pair-field-renderer.client'
 import { JoinedPairDisclosureRowMessage } from './joined-pair-disclosure-row-message.client'
@@ -38,10 +39,7 @@ export function OptionalDisclosureJoinedPairFieldRenderer({
   const expandWhenPopulated = disclosure.expandWhenPopulated !== false
   const open = manualOpen || (expandWhenPopulated && hasAmount(watchedAmount))
   const controlSize = useFieldControlSize(config.controlSizeOverride)
-  const disclosureConfig = useMemo(
-    () => ({ ...config, labelVisibility: 'srOnly' as const }),
-    [config],
-  )
+  const disclosureConfig = useMemo(() => optionalDisclosureLeafFieldConfig(config), [config])
   const hoistRowMessage = inAnatomyRow && open
   const rowMessage = hoistRowMessage ? (
     <JoinedPairDisclosureRowMessage config={disclosureConfig} id={id} namePrefix={namePrefix} />

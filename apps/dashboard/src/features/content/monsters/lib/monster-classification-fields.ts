@@ -11,7 +11,7 @@ import {
 import type { FormItem, FieldOption } from '@rpg/ui/form'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 
-export const MONSTER_CREATURE_FAMILY_ADD_LABEL = 'Add families'
+export const MONSTER_CREATURE_FAMILY_ADD_LABEL = 'Add creature families'
 export const MONSTER_CLASS_CLASSIFICATION_ADD_LABEL = 'Add class classifications'
 const MONSTER_CREATURE_FAMILY_PLACEHOLDER = 'Choose families…'
 const CLASS_CLASSIFICATION_LABEL = `${getContentTypeTerm('classes').label} classifications`

@@ -6,8 +6,11 @@ import type { ControllerRenderProps } from 'react-hook-form'
 import type { FieldHintPosition } from '../../../../components/ui/field.variants'
 import type { FieldSize } from '../../../../components/ui/field.client'
 import { OptionalFieldDisclosure } from '../../../../components/ui/optional-field-disclosure.client'
+import { OptionalDisclosureRowMessage } from '../../../../components/ui/optional-disclosure-row-message.client'
+import { useFieldRowParticipation } from '../../../../components/ui/field-row-anatomy.context'
 import type { ComboboxFieldConfig, OptionalDisclosureConfig } from '../../../field-config'
 import type { FieldValidationProps } from '../../../../components/ui/field-validation-props'
+import { optionalDisclosureLeafFieldConfig } from '../../../config/optional-disclosure-config.lib'
 import { useConfirmBeforeClear } from '../../../config/use-confirm-before-clear.client'
 import { ComboboxFieldRenderer } from '../combobox/combobox-field-renderer.client'
 
@@ -43,10 +46,22 @@ export function OptionalDisclosureComboboxFieldRenderer({
   namePrefix,
   ...validation
 }: OptionalDisclosureComboboxFieldRendererProps) {
+  const inAnatomyRow = useFieldRowParticipation()
   const [manualOpen, setManualOpen] = useState(false)
   const expandWhenPopulated = disclosure.expandWhenPopulated !== false
   const hasValue = comboboxFieldHasValue(field.value, config.multiple)
   const open = manualOpen || (expandWhenPopulated && hasValue)
+  const leafConfig = optionalDisclosureLeafFieldConfig(config)
+  const hoistRowMessage = inAnatomyRow && open
+  const rowMessage = hoistRowMessage ? (
+    <OptionalDisclosureRowMessage
+      controlId={id}
+      size={controlSize}
+      error={validation.error}
+      hint={hint}
+      hintPosition={hintPosition}
+    />
+  ) : undefined
 
   const clearValue = () => {
     field.onChange(config.multiple ? [] : '')
@@ -71,14 +86,15 @@ export function OptionalDisclosureComboboxFieldRenderer({
         onOpenChange={setManualOpen}
         onRemove={attemptClear}
         size={controlSize}
+        message={rowMessage}
       >
         <ComboboxFieldRenderer
-          config={{ ...config, labelVisibility: 'srOnly' }}
+          config={leafConfig}
           presentationSize={presentationSize}
           controlSize={controlSize}
           field={field}
           id={id}
-          hint={hint}
+          hint={hoistRowMessage ? undefined : hint}
           hintPosition={hintPosition}
           namePrefix={namePrefix}
           {...validation}

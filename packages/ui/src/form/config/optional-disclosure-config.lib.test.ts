@@ -1,7 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import type { FieldConfig } from '../field-config'
-import { assertOptionalDisclosureFieldConfig } from './optional-disclosure-config.lib'
+import {
+  assertOptionalDisclosureFieldConfig,
+  optionalDisclosureLeafFieldConfig,
+} from './optional-disclosure-config.lib'
 
 function textareaField(
   overrides: Partial<Extract<FieldConfig, { type: 'textarea' }>> = {},
@@ -25,6 +28,25 @@ function selectField(
     ...overrides,
   }
 }
+
+describe('optionalDisclosureLeafFieldConfig', () => {
+  it('hoists the label and fills the disclosure column', () => {
+    expect(
+      optionalDisclosureLeafFieldConfig({
+        type: 'combobox',
+        name: 'classIds',
+        label: 'Classes',
+        width: '1/2',
+        options: [],
+      }),
+    ).toEqual(
+      expect.objectContaining({
+        labelVisibility: 'srOnly',
+        width: 'full',
+      }),
+    )
+  })
+})
 
 describe('assertOptionalDisclosureFieldConfig', () => {
   afterEach(() => {
@@ -84,7 +106,7 @@ describe('assertOptionalDisclosureFieldConfig', () => {
 
     expect(error).toHaveBeenCalledWith(
       expect.stringContaining(
-        'only allowed for text, textSuggestions, textarea, richtext, select, rollValue',
+        'only allowed for text, textSuggestions, textarea, richtext, select, combobox, rollValue, joinedPair',
       ),
     )
   })

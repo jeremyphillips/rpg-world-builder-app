@@ -66,4 +66,71 @@ describe('FormItems combobox optionalDisclosure', () => {
       expect(screen.getByRole('button', { name: 'Add families' })).toBeInTheDocument()
     })
   })
+
+  it('fills the anatomy row column when width is a row fraction', () => {
+    render(
+      <Harness
+        defaultValues={{ creatureFamilyIds: ['demon'] }}
+        items={[
+          {
+            kind: 'row',
+            fields: [
+              {
+                type: 'combobox',
+                name: 'creatureFamilyIds',
+                label: 'Creature families',
+                multiple: true,
+                width: '1/2',
+                options: [{ value: 'demon', label: 'Demon' }],
+                optionalDisclosure: { addLabel: 'Add families', removeLabel: 'Remove families' },
+              },
+              {
+                type: 'combobox',
+                name: 'filler',
+                label: 'Filler',
+                width: '1/2',
+                options: [],
+              },
+            ],
+          },
+        ]}
+      />,
+    )
+
+    const combobox = screen.getByRole('combobox', { name: 'Creature families' })
+    const leafRoot = combobox.closest('[data-field-anatomy]')
+    expect(leafRoot).toBeTruthy()
+    expect(leafRoot).toHaveClass('ui-field-control--width-full')
+    expect(leafRoot).not.toHaveClass('ui-field-control--width-1/2')
+  })
+
+  it('hoists below-control hints to the row message region in anatomy rows', () => {
+    const { container } = render(
+      <Harness
+        defaultValues={{ creatureFamilyIds: ['demon'] }}
+        items={[
+          {
+            kind: 'row',
+            fields: [
+              {
+                type: 'combobox',
+                name: 'creatureFamilyIds',
+                label: 'Creature families',
+                multiple: true,
+                width: '1/2',
+                hint: { text: 'Pick one or more.', position: 'below-control' },
+                options: [{ value: 'demon', label: 'Demon' }],
+                optionalDisclosure: { addLabel: 'Add families', removeLabel: 'Remove families' },
+              },
+            ],
+          },
+        ]}
+      />,
+    )
+
+    const hint = container.querySelector('#test-creatureFamilyIds-hint')
+    expect(hint).toHaveTextContent('Pick one or more.')
+    expect(hint?.closest('[data-field-message-region]')).not.toBeNull()
+    expect(hint?.closest('[data-field-control-region]')).toBeNull()
+  })
 })

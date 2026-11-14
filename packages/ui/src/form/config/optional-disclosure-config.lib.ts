@@ -1,9 +1,26 @@
+import type { FieldWidth } from '../../components/ui/field-control.variants'
+import type { FieldLabelVisibility } from '../form-heading.lib'
 import {
   OPTIONAL_DISCLOSURE_FIELD_KINDS,
   type FieldConfig,
   type OptionalDisclosureFieldKind,
   resolveFieldConfigPrimaryName,
 } from '../field-config'
+
+type OptionalDisclosureLeafFieldInput = {
+  labelVisibility?: FieldLabelVisibility
+  width?: FieldWidth
+}
+
+/**
+ * Leaf field config for optional disclosure: row fractions apply to the
+ * disclosure shell, not the nested control (participation is suppressed).
+ */
+export function optionalDisclosureLeafFieldConfig<T extends OptionalDisclosureLeafFieldInput>(
+  config: T,
+): T {
+  return { ...config, labelVisibility: 'srOnly', width: 'full' }
+}
 
 export const OPTIONAL_DISCLOSURE_IMPLEMENTED_KINDS = [
   'text',
