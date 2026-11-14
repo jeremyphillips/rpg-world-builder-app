@@ -10,7 +10,7 @@ import {
 
 import { CheckboxField } from '../../components/ui/checkbox-field'
 import { ChipsField } from '../../components/ui/chips-field.client'
-import { ComboboxFieldRenderer } from './fields/combobox-field-renderer.client'
+import { ComboboxFieldRenderer } from './fields/combobox/combobox-field-renderer.client'
 import { FormField } from '../../components/ui/form-field'
 import { NumberField } from '../../components/ui/number-field'
 import { NumberStepper } from '../../components/ui/number-stepper.client'
@@ -47,8 +47,8 @@ import {
   OptionalDisclosureTextFieldRenderer,
   OptionalDisclosureTextareaFieldRenderer,
   OptionalDisclosureTextSuggestionsFieldRenderer,
-} from './fields/optional-disclosure-field-renderer.client'
-import { SelectFieldRenderer } from './fields/select-field-renderer.client'
+} from './fields/optional-disclosure/optional-disclosure-field-renderer.client'
+import { SelectFieldRenderer } from './fields/select/select-field-renderer.client'
 import { TextSuggestionsFieldRenderer } from './fields/text-suggestions-field-renderer.client'
 import { LazyFieldSuspense, lazyFieldComponent } from './lazy-field.client'
 import type {

@@ -6,13 +6,13 @@ import {
   chooseFromChipsToInlineSentence,
   inlineChooseCountToInlineSentence,
 } from '../../config/inline-sentence-legacy-config.lib'
-import { InlineSentenceFieldRenderer } from './inline-sentence-field-renderer.client'
+import { InlineSentenceFieldRenderer } from './inline-sentence/inline-sentence-field-renderer.client'
 import { InputSelectFieldRenderer } from './input-select-field-renderer.client'
 import { InputUnitFieldRenderer } from './input-unit-field-renderer.client'
 import { LevelRangeFieldRenderer } from './level-range-field-renderer.client'
-import { JoinedPairFieldRenderer } from './joined-pair-field-renderer.client'
-import { OptionalDisclosureJoinedPairFieldRenderer } from './optional-disclosure-joined-pair-field-renderer.client'
-import { OptionalDisclosureRollValueFieldRenderer } from './optional-disclosure-roll-value-field-renderer.client'
+import { JoinedPairFieldRenderer } from './joined-pair/joined-pair-field-renderer.client'
+import { OptionalDisclosureJoinedPairFieldRenderer } from './joined-pair/optional-disclosure-joined-pair-field-renderer.client'
+import { OptionalDisclosureRollValueFieldRenderer } from './optional-disclosure/optional-disclosure-roll-value-field-renderer.client'
 import { RollValueFieldRenderer } from './roll-value-field-renderer.client'
 
 type SpecializedFieldRendererProps = {

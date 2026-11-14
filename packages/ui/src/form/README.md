@@ -5,17 +5,17 @@ subpaths under this directory.
 
 ## Subdirectories
 
-| Directory           | Role                                                                                                 |
-| ------------------- | ---------------------------------------------------------------------------------------------------- |
-| `config/`           | Resolver, `dependsOn` hook, pure helpers                                                             |
-| `config/array/`     | Array row labels, collapse persistence, add menu                                                     |
-| `context/`          | Section rhythm/size context (`FormSectionProvider`)                                                  |
-| `renderers/`        | Core `FieldRenderer` registry (`field-renderer.client.tsx`, lazy loading)                            |
-| `renderers/array/`  | Array section renderer; row chrome under `renderers/array/item/` (`content/`, `anatomy/`, `issues/`) |
-| `renderers/fields/` | Specialized leaf field adapters (inline sentence, input select, slot, …)                             |
-| `containers/`       | Structural items: groups, rows, columns, stacks, arrays, conditionals                                |
-| `shells/`           | Top-level `<Form>`, `<TabbedForm>`, wizard step wrapper                                              |
-| `chrome/`           | Save footer, actions bar, sticky tab chrome                                                          |
+| Directory           | Role                                                                                                                      |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `config/`           | Resolver, `dependsOn` hook, pure helpers                                                                                  |
+| `config/array/`     | Array row labels, collapse persistence, add menu                                                                          |
+| `context/`          | Section rhythm/size context (`FormSectionProvider`)                                                                       |
+| `renderers/`        | Core `FieldRenderer` registry (`field-renderer.client.tsx`, lazy loading)                                                 |
+| `renderers/array/`  | Array section renderer; row chrome under `renderers/array/item/` (`content/`, `anatomy/`, `issues/`)                      |
+| `renderers/fields/` | Specialized leaf adapters; families in `select/`, `combobox/`, `joined-pair/`, `optional-disclosure/`, `inline-sentence/` |
+| `containers/`       | Structural items: groups, rows, columns, stacks, arrays, conditionals                                                     |
+| `shells/`           | Top-level `<Form>`, `<TabbedForm>`, wizard step wrapper                                                                   |
+| `chrome/`           | Save footer, actions bar, sticky tab chrome                                                                               |
 
 Root-level [`field-config.ts`](./field-config.ts) is the config type SSOT (heavily linked in docs).
 
