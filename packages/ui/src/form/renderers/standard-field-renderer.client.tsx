@@ -103,6 +103,8 @@ export function StandardFieldRenderer({ resolved }: { resolved: ResolvedFieldRen
         id={resolved.id}
         hint={resolved.hint}
         hintPosition={resolved.hintPosition}
+        presentationSize={resolved.presentationSize}
+        controlSize={resolved.controlSize}
         {...validation}
       />
     )

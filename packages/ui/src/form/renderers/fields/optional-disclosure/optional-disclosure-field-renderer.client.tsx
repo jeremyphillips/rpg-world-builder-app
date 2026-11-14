@@ -17,7 +17,6 @@ import type { FieldHintPosition } from '../../../../components/ui/field.variants
 import type { FieldSize } from '../../../../components/ui/field.client'
 import { useDependsOnValues } from '../../../config/form-depends-on.client'
 import { useFieldErrorPresentation } from '../../../context/array-item-presentation.context'
-import { useFieldControlSize } from '../../../context/form-section.context'
 import type {
   OptionalDisclosureConfig,
   RichTextFieldConfig,
@@ -249,23 +248,33 @@ export function OptionalDisclosureSelectFieldRenderer({
   const expandWhenPopulated = disclosure.expandWhenPopulated !== false
   const hasValue = selectFieldHasValue(state.field.value)
   const open = manualOpen || (expandWhenPopulated && hasValue)
-  const chrome = {
-    ...buildFieldShellProps(
-      {
-        config: state.renderConfig,
-        id: resolved.id,
-        hint: state.hint,
-        hintPosition: state.hintPosition,
-        presentationSize: state.presentationSize,
-        controlSize: state.controlSize,
-      },
-      state.validation,
-      { sizes: 'both', label: 'visible' },
-    ),
+  const shellSource = {
+    config: state.renderConfig,
+    id: resolved.id,
+    hint: state.hint,
+    hintPosition: state.hintPosition,
+    presentationSize: state.presentationSize,
+    controlSize: state.controlSize,
+  }
+  const selectExtras = {
     digits: state.renderConfig.digits,
     sizingLabel: state.renderConfig.sizingLabel,
     sizingLabels: state.renderConfig.sizingLabels,
     labelPosition: state.renderConfig.labelPosition,
+  }
+  const readOnlyChrome = {
+    ...buildFieldShellProps(shellSource, state.validation, {
+      sizes: 'both',
+      label: 'visible',
+    }),
+    ...selectExtras,
+  }
+  const editorChrome = {
+    ...buildFieldShellProps(shellSource, state.validation, {
+      sizes: 'both',
+      label: 'accessible-name',
+    }),
+    ...selectExtras,
   }
 
   const clearValue = () => {
@@ -282,7 +291,7 @@ export function OptionalDisclosureSelectFieldRenderer({
     return (
       <FieldReadOnlyValueField
         displayValue={state.displayValue}
-        {...chrome}
+        {...readOnlyChrome}
         {...state.validation}
       />
     )
@@ -308,9 +317,7 @@ export function OptionalDisclosureSelectFieldRenderer({
           value={normalizedSelectFieldValue(state.field.value)}
           onValueChange={state.field.onChange}
           onBlur={state.field.onBlur}
-          {...chrome}
-          label=""
-          aria-label={state.renderConfig.label}
+          {...editorChrome}
           {...state.validation}
         />
       </OptionalFieldDisclosure>
@@ -404,7 +411,7 @@ export function OptionalDisclosureTextSuggestionsFieldRenderer({
               controlSize: resolved.controlSize,
             },
             validation,
-            { sizes: 'presentation', label: 'accessible-name' },
+            { sizes: 'both', label: 'accessible-name' },
           )}
           suggestions={suggestions}
           placeholder={config.placeholder}
@@ -429,6 +436,8 @@ type OptionalDisclosureRichTextRendererProps = {
   describedBy?: string
   hint?: string
   hintPosition?: FieldHintPosition
+  presentationSize: FieldSize
+  controlSize: FieldSize
 }
 
 /** Collapses empty rich text. Clearing the editor does not close it; reset does. */
@@ -442,8 +451,9 @@ export function OptionalDisclosureRichTextFieldRenderer({
   describedBy,
   hint,
   hintPosition,
+  presentationSize,
+  controlSize,
 }: OptionalDisclosureRichTextRendererProps) {
-  const controlSize = useFieldControlSize(config.controlSizeOverride)
   const { value, onChange, onBlur, name } = field
   const expandWhenPopulated = disclosure.expandWhenPopulated !== false
   const [open, setOpen] = useState(() => expandWhenPopulated && richTextHtml(value).length > 0)
@@ -491,14 +501,13 @@ export function OptionalDisclosureRichTextFieldRenderer({
                 id,
                 hint,
                 hintPosition,
-                presentationSize: controlSize,
+                presentationSize,
                 controlSize,
               },
               { error, invalid, describedBy },
-              { sizes: 'none', label: 'visible' },
+              { sizes: 'both', label: 'visible' },
             )}
             labelVisibility="srOnly"
-            size={controlSize}
             linkable={config.linkable}
             codeBlocks={config.codeBlocks}
             tables={config.tables}

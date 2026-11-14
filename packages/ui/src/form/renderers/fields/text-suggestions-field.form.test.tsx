@@ -76,4 +76,39 @@ describe('Form textSuggestions field', () => {
 
     await submitAndExpectPayload(user, onSubmit, { refinement: 'coaching inn', driver: 'inn' })
   })
+
+  it('inherits compact density for both the label and the input', () => {
+    render(
+      <Form
+        schema={schema}
+        fields={fields}
+        density="compact"
+        defaultValues={{ driver: '' }}
+        onSubmit={() => {}}
+      />,
+    )
+
+    expect(screen.getByText('Refinement').closest('label')).toHaveClass('text-style-field-label-sm')
+    expect(screen.getByRole('textbox', { name: 'Refinement' })).toHaveClass('ui-field-control--sm')
+  })
+
+  it('applies controlSizeOverride without changing the presentation label', () => {
+    const overrideFields: FormItem[] = [
+      {
+        ...fields[0]!,
+        controlSizeOverride: 'lg',
+      },
+    ]
+    render(
+      <Form
+        schema={schema}
+        fields={overrideFields}
+        defaultValues={{ driver: '' }}
+        onSubmit={() => {}}
+      />,
+    )
+
+    expect(screen.getByText('Refinement').closest('label')).toHaveClass('text-style-field-label-md')
+    expect(screen.getByRole('textbox', { name: 'Refinement' })).toHaveClass('ui-field-control--lg')
+  })
 })

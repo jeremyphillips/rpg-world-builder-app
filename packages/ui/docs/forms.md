@@ -349,7 +349,9 @@ It does not bind React Hook Form. Four families own registration:
 - **Text suggestions** — its own controller, without progressive validation, including when wrapped in disclosure. Suggestion strings come from the parent resolution.
 - **Multi-controller** — `inputSelect`, `inputUnit`, `levelRange`, `inlineSentence`, `inlineChooseCount`, `chooseFromChips`, `joinedPair`, and `rollValue`. Each keeps its own controllers.
 
-Leaf chrome goes through `buildFieldShellProps`. `disabledWhen` is applied on the resolved config for every family and does not unregister the field.
+Leaf chrome goes through `buildFieldShellProps`. `size` is field presentation and `controlSize` is control geometry; an omitted `controlSize` falls back to `size`. `disabledWhen` is applied on the resolved config for every family and does not unregister the field.
+
+Intentional sizing exceptions: file dropzones have no control scale; radio item glyphs and radio-card density stay on their own props; editable-grid geometry is fixed by the grid primitive.
 
 Still deferred: `hintIcon` beyond the number stepper; `invalid`, `describedBy`, and refs on dice formula and editable grid; progressive validation for select, text suggestions, and multi-controller fields; joined-pair shell copy stays on the start path.
 

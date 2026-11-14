@@ -3,7 +3,7 @@
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
-import { Field, useFieldRootContext } from './field.client'
+import { Field, useFieldRootContext, type FieldSize } from './field.client'
 import { FieldLayout } from './field-layout'
 import { resolveFieldAnatomyWidth, type FieldChrome } from './field-chrome.variants'
 import type { FieldHintPosition } from './field.variants'
@@ -26,7 +26,10 @@ export interface TextSuggestionsFieldProps {
   info?: React.ReactNode
   required?: boolean
   disabled?: boolean
-  size?: React.ComponentProps<typeof Field.Root>['size']
+  /** Field presentation. Standalone default is `md`. */
+  size?: FieldSize
+  /** Input geometry. Falls back to `size`. */
+  controlSize?: FieldSize
   width?: React.ComponentProps<typeof Field.Root>['width']
   chrome?: FieldChrome
   onBlur?: () => void
@@ -85,6 +88,7 @@ export function TextSuggestionsField({
   required = false,
   disabled = false,
   size = 'md',
+  controlSize,
   width = 'full',
   chrome,
   onBlur,
@@ -104,12 +108,14 @@ export function TextSuggestionsField({
       hintPosition={hintPosition}
       required={required}
       size={size}
+      controlSize={controlSize}
       width={rootWidth}
       anatomy
     >
       <FieldLayout
         chrome={chrome}
         size={size}
+        controlSize={controlSize}
         label={
           showLabel ? (
             <Field.Label id={`${id}-label`} htmlFor={id}>
@@ -121,7 +127,7 @@ export function TextSuggestionsField({
           <div className={cn(fieldAnatomyStackClasses, 'gap-2')}>
             <TextSuggestionsInput
               id={id}
-              size={size}
+              size={controlSize ?? size}
               disabled={disabled}
               placeholder={placeholder}
               value={field.displayValue}

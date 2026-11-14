@@ -55,7 +55,7 @@ function BoundTextSuggestionsField({
           controlSize: resolved.controlSize,
         },
         validation,
-        { sizes: 'presentation', label: 'visible' },
+        { sizes: 'both', label: 'visible' },
       )}
       suggestions={suggestions}
       placeholder={config.placeholder}

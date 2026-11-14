@@ -374,6 +374,7 @@ export const fieldRenderers: {
       hint={args.hint}
       hintPosition={args.hintPosition}
       presentationSize={args.presentationSize}
+      controlSize={args.controlSize}
       error={args.error}
       namePrefix={namePrefix}
     />

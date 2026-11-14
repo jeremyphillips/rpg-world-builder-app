@@ -21,6 +21,7 @@ export interface DiceFormulaFieldRendererProps {
   hint?: string
   hintPosition?: FieldHintPosition
   presentationSize: FieldSize
+  controlSize: FieldSize
   namePrefix?: string
 }
 
@@ -33,6 +34,7 @@ export function DiceFormulaFieldRenderer({
   hint,
   hintPosition,
   presentationSize,
+  controlSize,
   namePrefix,
 }: DiceFormulaFieldRendererProps) {
   const currencyConfig = config.currencyUnit
@@ -62,10 +64,10 @@ export function DiceFormulaFieldRenderer({
           hint,
           hintPosition,
           presentationSize,
-          controlSize: presentationSize,
+          controlSize,
         },
         { error },
-        { sizes: 'presentation', label: 'visible' },
+        { sizes: 'both', label: 'visible' },
       )}
       labelPosition={config.labelPosition}
       modifierMode={config.modifierMode}
