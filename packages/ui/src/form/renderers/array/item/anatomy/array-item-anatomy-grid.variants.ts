@@ -1,20 +1,11 @@
-import type { CSSProperties } from 'react'
-
 import type { FieldWidth } from '../../../../../components/ui/field-control.variants'
 import { resolveFieldRowColumnTracks } from '../../../../../components/ui/field-row-column-tracks.lib'
-import {
-  buildCollapsibleListItemLeadingChromeStyle,
-  LEADING_CHROME_SIZE_VAR,
-} from '../../../../../components/ui/collapsible-list-item/collapsible-list-item-leading-chrome.lib'
 import { collapsibleListItemChromeColumnClasses } from '../../../../../components/ui/collapsible-list-item/collapsible-list-item-leading-chrome.lib'
 import { FIELD_ANATOMY_GRID_ROW_SPAN } from '../../../../../components/ui/field-row-anatomy.context'
 import { cn } from '../../../../../lib/utils'
 
 /** Shared anatomy row index for the control track (1-based grid row). */
 export const ARRAY_ITEM_ANATOMY_CONTROL_TRACK_ROW = 2 as const
-
-/** Grip column track — fixed to the leading-chrome hit target, not free `auto` space. */
-export const ARRAY_ITEM_ANATOMY_GRIP_COLUMN_TRACK = `var(${LEADING_CHROME_SIZE_VAR})`
 
 /** Field columns span all three anatomy tracks via subgrid. */
 export const ARRAY_ITEM_ANATOMY_FIELD_GRID_ROW = FIELD_ANATOMY_GRID_ROW_SPAN
@@ -65,14 +56,6 @@ export function resolveArrayItemAnatomyFieldColumnTracks(
   )
 }
 
-/** Parent template: `[grip?] fieldsCluster [actions]`. */
-export function buildArrayItemAnatomyTwoTierParentTemplateColumns(options: {
-  showGrip: boolean
-}): string {
-  const gripColumn = options.showGrip ? `${ARRAY_ITEM_ANATOMY_GRIP_COLUMN_TRACK} ` : ''
-  return `${gripColumn}minmax(0, 1fr) max-content`
-}
-
 /** Field tracks inside the fields cluster. */
 export function buildArrayItemAnatomyFieldsClusterTemplateColumns(
   fieldWidths: readonly FieldWidth[],
@@ -110,7 +93,6 @@ export function resolveArrayItemAnatomyGridPresentation(
   } = {},
 ): {
   className: string
-  style: CSSProperties
   fieldGapClass: string
 } {
   const showGrip = options.showGrip ?? true
@@ -118,15 +100,12 @@ export function resolveArrayItemAnatomyGridPresentation(
   const fieldGapClass = resolveArrayItemFieldGapClass(fieldGap)
 
   return {
-    className: cn(arrayItemAnatomyGridVariants, ARRAY_ITEM_CHROME_GAP_CLASS),
-    style: {
-      ...buildCollapsibleListItemLeadingChromeStyle({
-        showDragHandle: showGrip,
-        reserveDragHandleSlot: showGrip,
-        collapsible: false,
-      }),
-      gridTemplateColumns: buildArrayItemAnatomyTwoTierParentTemplateColumns({ showGrip }),
-    } as CSSProperties,
+    className: cn(
+      arrayItemAnatomyGridVariants,
+      'ui-array-item-anatomy',
+      showGrip && 'ui-array-item-anatomy--grip',
+      ARRAY_ITEM_CHROME_GAP_CLASS,
+    ),
     fieldGapClass,
   }
 }

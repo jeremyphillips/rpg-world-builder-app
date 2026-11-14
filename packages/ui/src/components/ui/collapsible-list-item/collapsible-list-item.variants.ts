@@ -5,8 +5,8 @@ import { cardSurfaceVariants } from '../card.variants'
 import { dragHandleVariants } from '../drag-handle.variants'
 import { dragSurfaceVariants } from '../drag-surface.variants'
 import { iconGhostControlVariants } from '../icon-ghost-control.variants'
-import { establishSurfaceCurrent } from '../surface-current.lib'
 import {
+  collapsibleListItemBodyInsetClasses,
   resolveCollapsibleListItemLeadingChrome,
   type CollapsibleListItemLeadingChromeOptions,
 } from './collapsible-list-item-leading-chrome.lib'
@@ -15,13 +15,9 @@ export type CollapsibleListItemShellPreset = 'default' | 'catalog'
 
 export {
   collapsibleListItemChromeColumnClasses,
+  collapsibleListItemBodyInsetClasses,
+  collapsibleListItemSummaryClasses,
   resolveCollapsibleListItemLeadingChrome,
-  buildCollapsibleListItemLeadingChromeStyle,
-  collapsibleListItemContentColumnIndentClasses,
-  collapsibleListItemContentInlineStartClasses,
-  LEADING_CHROME_COUNT_VAR,
-  CONTENT_COLUMN_INDENT_VAR,
-  CONTENT_INLINE_START_VAR,
   type CollapsibleListItemLeadingChromeOptions,
   type ResolvedCollapsibleListItemLeadingChrome,
 } from './collapsible-list-item-leading-chrome.lib'
@@ -38,8 +34,8 @@ export {
  */
 export const collapsibleListItemShellInsetClasses = 'calc(var(--spacing) * 2)'
 
-/** Flat array item shell padding — 8px block axis (`py-2`). */
-export const collapsibleListItemFlatShellPaddingClasses = cn('pl-2 pr-3 py-2')
+/** Flat array item shell — block padding. Inline inset stays on the block. */
+export const collapsibleListItemFlatShellPaddingClasses = 'ui-collapsible-list-item--flat'
 
 /** @deprecated Use {@link collapsibleListItemFlatShellPaddingClasses}. */
 export const collapsibleListItemShellPaddingClasses = collapsibleListItemFlatShellPaddingClasses
@@ -48,7 +44,8 @@ export const collapsibleListItemShellPaddingClasses = collapsibleListItemFlatShe
  * Disclosure shell padding — inline inset only; bottom pad is owned by the body wash
  * (default array items and catalog picker rows).
  */
-export const collapsibleListItemDisclosureShellPaddingClasses = cn('pl-2 pr-3 pt-0 pb-0')
+/** Disclosure inset is the block default (no extra class). */
+export const collapsibleListItemDisclosureShellPaddingClasses = ''
 
 /** Shared 24×24 hit target for grip, collapse caret, and remove (WCAG 2.2 AA minimum). */
 export const collapsibleListItemChromeButtonClasses = iconGhostControlVariants({
@@ -79,35 +76,17 @@ export type CollapsibleListItemRowLayout = 'default' | 'entity-card'
 /** Catalog row chrome — quiet card tone for raw picker rows (no Tailwind border/radius utilities). */
 export const collapsibleListItemCatalogChromeClasses = cardSurfaceVariants({ tone: 'quiet' })
 
-/** Shared body divider and vertical rhythm — no surface tone. */
-export const collapsibleListItemBodyFrameClasses = 'border-t border-border-subtle py-3'
+/** Divider, bleed, canvas fill, and content inset live on `ui-collapsible-list-item__body`. */
+export const collapsibleListItemBodyFrameClasses = collapsibleListItemBodyInsetClasses
 
-/**
- * Expanded catalog panel — bleeds to shell edges; inner details restore copy alignment.
- */
-export const collapsibleListItemCatalogBodyClasses = cn(
-  collapsibleListItemBodyFrameClasses,
-  'bg-surface-muted -ml-2 -mr-3',
-  establishSurfaceCurrent('surface-muted'),
-)
+/** Catalog fill is `ui-collapsible-list-item--catalog` on the shell. */
+export const collapsibleListItemCatalogBodyClasses = collapsibleListItemBodyInsetClasses
 
-/**
- * Expanded array-item body — canvas content plane under a subtle header.
- */
-export const collapsibleListItemBackgroundBodyClasses = cn(
-  collapsibleListItemBodyFrameClasses,
-  'bg-background',
-  establishSurfaceCurrent('background'),
-)
+/** Canvas fill is the `__body` default. */
+export const collapsibleListItemBackgroundBodyClasses = collapsibleListItemBodyInsetClasses
 
-/**
- * Default disclosure body — bleeds to shell edges; inner fields restore copy alignment
- * with the title column via `--content-inline-start`.
- */
-export const collapsibleListItemDefaultBodyClasses = cn(
-  collapsibleListItemBackgroundBodyClasses,
-  '-ml-2 -mr-3',
-)
+/** Default disclosure body. */
+export const collapsibleListItemDefaultBodyClasses = collapsibleListItemBodyInsetClasses
 
 export function collapsibleListItemHeaderRowClassesForRowLayout(
   rowLayout: CollapsibleListItemRowLayout = 'default',
@@ -117,23 +96,21 @@ export function collapsibleListItemHeaderRowClassesForRowLayout(
     : collapsibleListItemHeaderRowClasses
 }
 
-/** Item shell — border and shell padding; actions rail sits inside padded box on row 1. */
-export const collapsibleListItemShellVariants = cva(cn('relative overflow-hidden'), {
+/** Item shell — perimeter, fill, and disclosure padding live on `ui-collapsible-list-item`. */
+export const collapsibleListItemShellVariants = cva('', {
   variants: {
     layout: {
-      default: cn(
-        'grid grid-cols-[minmax(0,1fr)_auto] items-start',
-        collapsibleListItemShellPaddingClasses,
-      ),
-      headerActions: 'flex flex-col',
+      default: 'ui-collapsible-list-item--actions-rail',
+      headerActions: '',
       compactRow: collapsibleListItemFlatShellPaddingClasses,
       entityCardHeaderActions: collapsibleListItemEntityCardShellClasses,
     },
     preset: {
       /** Entity-card hosts — perimeter lives on EntityCardFrame; CLI is structural only. */
       none: '',
-      default: cn('rounded-md border border-border'),
+      default: '',
       catalog: cn(
+        'ui-collapsible-list-item--catalog',
         collapsibleListItemCatalogChromeClasses,
         collapsibleListItemCatalogShellExtraClasses,
       ),
@@ -155,7 +132,7 @@ export function collapsibleListItemShellPresetClasses(
 /** Default shell classes — backward-compatible alias for tests and non-context usage. */
 export const collapsibleListItemShellClasses = cn(
   collapsibleListItemShellVariants(),
-  'border-border',
+  'ui-border--default',
 )
 
 /** Main content column — vertical rhythm owned by shell padding. */
@@ -263,17 +240,7 @@ export function collapsibleListItemBodyClasses(
     return collapsibleListItemEntityCardBodyClasses
   }
 
-  const leadingChrome: CollapsibleListItemLeadingChromeOptions = {
-    showDragHandle: options.showDragHandle ?? false,
-    collapsible: options.collapsible ?? false,
-  }
-  const resolved = resolveCollapsibleListItemLeadingChrome(leadingChrome)
-
-  if (options.preset === 'catalog') {
-    return cn(collapsibleListItemCatalogBodyClasses, resolved.contentInlineStartClasses, 'pr-3')
-  }
-
-  return cn(collapsibleListItemDefaultBodyClasses, resolved.contentInlineStartClasses, 'pr-3')
+  return collapsibleListItemBodyInsetClasses
 }
 
 /**

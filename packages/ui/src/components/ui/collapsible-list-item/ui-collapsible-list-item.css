@@ -1,4 +1,93 @@
 @layer components {
+  .ui-collapsible-list-item {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--radius-md);
+    border-width: 1px;
+    border-style: solid;
+    padding: 0 calc(var(--spacing) * 3) 0 calc(var(--spacing) * 2);
+    background-color: var(--surface-subtle);
+    --surface-current: var(--surface-subtle);
+    --ui-collapsible-list-item-chrome-size: calc(var(--spacing) * 6);
+    --ui-collapsible-list-item-chrome-gap: calc(var(--spacing) * 1);
+    --ui-collapsible-list-item-shell-inline-start: calc(var(--spacing) * 2);
+    --ui-collapsible-list-item-caret: 0;
+    --ui-collapsible-list-item-grip: 0;
+    --ui-collapsible-list-item-column-indent: calc(
+      (var(--ui-collapsible-list-item-caret) + var(--ui-collapsible-list-item-grip)) *
+        var(--ui-collapsible-list-item-chrome-size) +
+        min(1, var(--ui-collapsible-list-item-caret) + var(--ui-collapsible-list-item-grip)) *
+        var(--ui-collapsible-list-item-chrome-gap)
+    );
+  }
+
+  .ui-collapsible-list-item--caret {
+    --ui-collapsible-list-item-caret: 1;
+  }
+
+  .ui-collapsible-list-item--grip {
+    --ui-collapsible-list-item-grip: 1;
+  }
+
+  /** Header with no body — block padding on the flat shell. */
+  .ui-collapsible-list-item--flat {
+    padding-block: calc(var(--spacing) * 2);
+  }
+
+  /** Actions sit in a trailing column instead of the stacked header row. */
+  .ui-collapsible-list-item--actions-rail {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    padding-block: calc(var(--spacing) * 2);
+  }
+
+  /** Catalog rows wear `ui-card`; that surface owns fill, radius, and border color. */
+  .ui-card.ui-collapsible-list-item {
+    border-radius: var(--radius-card);
+    background-color: var(--ui-surface-bg);
+    --surface-current: var(--ui-surface-bg);
+  }
+
+  .ui-collapsible-list-item__chrome {
+    display: flex;
+    width: var(--ui-collapsible-list-item-chrome-size);
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ui-collapsible-list-item--caret .ui-collapsible-list-item__title,
+  .ui-collapsible-list-item--grip .ui-collapsible-list-item__title {
+    padding-inline-start: var(--ui-collapsible-list-item-chrome-gap);
+  }
+
+  .ui-collapsible-list-item__summary {
+    min-width: 0;
+    padding-inline-start: var(--ui-collapsible-list-item-column-indent);
+  }
+
+  .ui-collapsible-list-item__body {
+    margin-inline: calc(var(--spacing) * -2) calc(var(--spacing) * -3);
+    border-top: 1px solid
+      color-mix(in oklch, var(--foreground) var(--mix-border-subtle), var(--surface-current));
+    padding-block: calc(var(--spacing) * 3);
+    padding-inline: calc(
+        var(--ui-collapsible-list-item-shell-inline-start) +
+          var(--ui-collapsible-list-item-column-indent)
+      )
+      calc(var(--spacing) * 3);
+    background-color: var(--background);
+    --surface-current: var(--background);
+  }
+
+  .ui-collapsible-list-item--catalog .ui-collapsible-list-item__body {
+    background-color: var(--surface-muted);
+    --surface-current: var(--surface-muted);
+  }
+
   .ui-collapsible-list-item--entity-card {
     position: relative;
     overflow: hidden;
@@ -7,7 +96,9 @@
     padding: 0;
     border-width: 0;
     border-radius: 0;
+    background-color: transparent;
     box-shadow: none;
+    --surface-current: inherit;
   }
 
   .ui-collapsible-list-item__header {

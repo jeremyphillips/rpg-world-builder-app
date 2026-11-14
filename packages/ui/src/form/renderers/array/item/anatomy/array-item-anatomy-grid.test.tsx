@@ -102,8 +102,8 @@ describe('ArrayItemAnatomyGrid', () => {
     const fieldsCluster = document.querySelector('[data-array-item-fields-cluster]')
     expect(fieldsCluster).toBeTruthy()
     expect(fieldsCluster).toHaveClass('gap-x-3')
-    expect(grip).toHaveClass('items-center')
-    expect(actions).toHaveClass('items-center')
+    expect(grip).toHaveClass('ui-collapsible-list-item__chrome')
+    expect(actions).toHaveClass('ui-collapsible-list-item__chrome')
     expect(grip?.querySelector('button')).toBeTruthy()
     expect(actions?.querySelector('button')).toBeTruthy()
 
@@ -117,8 +117,8 @@ describe('ArrayItemAnatomyGrid', () => {
     expect((fields?.[0] as HTMLElement).style.gridRow).toBe('1 / -1')
     expect((fields?.[1] as HTMLElement).style.gridColumn).toBe('2')
 
-    expect((grid as HTMLElement).style.gridTemplateColumns).toContain('var(--leading-chrome-size)')
-    expect((grid as HTMLElement).style.gridTemplateColumns).not.toContain('9rem')
+    expect(grid).toHaveClass('ui-array-item-anatomy--grip')
+    expect((grid as HTMLElement).style.gridTemplateColumns).toBe('')
     expect(screen.getByText('Mode')).toBeVisible()
     expect(screen.getByText('Speed')).toBeVisible()
   })

@@ -184,6 +184,7 @@ export function useArrayFieldRendererState({
         showDragHandle: reorderConfigured,
         fieldsLength: fields.length,
         collapsible: rowCollapsible,
+        reserveCaretSlot: collapsible,
         variant,
         collapsedIds,
         onToggleCollapse: toggleCollapse,

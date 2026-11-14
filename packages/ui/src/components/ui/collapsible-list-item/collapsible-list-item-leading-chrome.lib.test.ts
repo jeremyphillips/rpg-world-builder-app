@@ -1,51 +1,39 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  buildCollapsibleListItemGeometryStyle,
-  buildCollapsibleListItemLeadingChromeStyle,
-  CONTENT_COLUMN_INDENT_VAR,
-  CONTENT_INLINE_START_VAR,
-  LEADING_CHROME_COUNT_VAR,
-  LEADING_CHROME_SIZE_VAR,
+  COLLAPSIBLE_LIST_ITEM_CARET_CLASS,
+  COLLAPSIBLE_LIST_ITEM_GRIP_CLASS,
+  collapsibleListItemBodyInsetClasses,
+  collapsibleListItemChromeColumnClasses,
+  collapsibleListItemSummaryClasses,
+  collapsibleListItemTitleClasses,
   resolveCollapsibleListItemLeadingChrome,
-  SHELL_INLINE_START_VAR,
 } from './collapsible-list-item-leading-chrome.lib'
 
 describe('resolveCollapsibleListItemLeadingChrome', () => {
-  it('exposes content inset classes derived from CSS variables', () => {
+  it('names the caret and grip columns instead of publishing an inline style', () => {
     const resolved = resolveCollapsibleListItemLeadingChrome({
-      showDragHandle: false,
+      showDragHandle: true,
       collapsible: true,
     })
 
-    expect(resolved.contentColumnIndentClasses).toBe('pl-[var(--content-column-indent)]')
-    expect(resolved.contentInlineStartClasses).toBe('pl-[var(--content-inline-start)]')
-  })
-})
-
-describe('buildCollapsibleListItemLeadingChromeStyle', () => {
-  it('computes count-based content inline start from chrome size and gap tokens', () => {
-    const style = buildCollapsibleListItemLeadingChromeStyle({
-      showDragHandle: true,
-      collapsible: true,
-    }) as Record<string, string | number>
-
-    expect(style[LEADING_CHROME_COUNT_VAR]).toBe(2)
-    expect(style[CONTENT_COLUMN_INDENT_VAR]).toContain('var(--leading-chrome-size)')
-    expect(style[CONTENT_INLINE_START_VAR]).toContain('var(--shell-inline-start)')
-    expect(style[CONTENT_INLINE_START_VAR]).toContain(`var(${CONTENT_COLUMN_INDENT_VAR})`)
+    expect(resolved.chromeCount).toBe(2)
+    expect(resolved.shellModifierClasses).toContain(COLLAPSIBLE_LIST_ITEM_CARET_CLASS)
+    expect(resolved.shellModifierClasses).toContain(COLLAPSIBLE_LIST_ITEM_GRIP_CLASS)
+    expect(resolved.chromeColumnClasses).toBe(collapsibleListItemChromeColumnClasses)
+    expect(resolved.toolbarContentGapClasses).toBe(collapsibleListItemTitleClasses)
+    expect(resolved.contentColumnIndentClasses).toBe(collapsibleListItemSummaryClasses)
+    expect(resolved.contentInlineStartClasses).toBe(collapsibleListItemBodyInsetClasses)
   })
 
-  it('omits content-column indent vars for entity-card geometry style', () => {
-    const style = buildCollapsibleListItemGeometryStyle({
-      showDragHandle: true,
-      collapsible: true,
-    }) as Record<string, string | number>
+  it('reserves only the caret modifier when the list keeps the column without a grip', () => {
+    const resolved = resolveCollapsibleListItemLeadingChrome({
+      showDragHandle: false,
+      collapsible: false,
+      reserveCaretSlot: true,
+    })
 
-    expect(style[LEADING_CHROME_COUNT_VAR]).toBe(2)
-    expect(style[LEADING_CHROME_SIZE_VAR]).toContain('spacing')
-    expect(style[CONTENT_COLUMN_INDENT_VAR]).toBeUndefined()
-    expect(style[CONTENT_INLINE_START_VAR]).toBeUndefined()
-    expect(style[SHELL_INLINE_START_VAR]).toBeUndefined()
+    expect(resolved.chromeCount).toBe(1)
+    expect(resolved.shellModifierClasses).toBe(COLLAPSIBLE_LIST_ITEM_CARET_CLASS)
   })
 })

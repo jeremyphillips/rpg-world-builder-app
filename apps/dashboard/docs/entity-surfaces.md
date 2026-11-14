@@ -327,7 +327,7 @@ Applies to CollapsibleListItem-based rows:
 - Add card inset wrappers around disclosure `EntityCard`
 - Calculate grip/caret indentation or compensate with negative margins
 - Position trailing controls outside EntityAnatomyHost anatomy
-- Rely on CLI `--content-column-indent` or duplicate body vertical padding on adapter wrappers
+- Rely on CLI column indent or duplicate body vertical padding on adapter wrappers
 
 ### CollapsibleListItem entity-card mode
 
@@ -343,7 +343,7 @@ inset ownership follows from `rowLayout` alone.
 CLI entity-card mode must contribute **no competing**:
 
 - `pl` / `pr` / `pt` / `pb` on the body slot
-- `--content-column-indent` / `--content-inline-start` on the shell
+- `--caret` / `--grip` modifiers or `__body` inset on the shell
 
 Disclosure body wash owns all horizontal and block inset.
 
@@ -355,7 +355,7 @@ Disclosure body wash owns all horizontal and block inset.
 
 - Collapse behavior, ARIA ids, keyboard disclosure
 - Structural shell (`p-0`, header row flex) for entity-card layout
-- Geometry tokens (`--leading-chrome-size`, `--leading-chrome-count`) without indent vars
+- Collapse chrome in the toolbar when the host asks for it; entity-card rows leave grip and caret to `EntityLeadingRail`
 
 ### Does not own
 
@@ -363,8 +363,9 @@ Disclosure body wash owns all horizontal and block inset.
 - Entity-card body inset
 - Entity content offset (disclosure frame root publishes `--entity-content-offset`)
 
-Non-entity ArrayItem rows (`rowLayout="default"`) retain legacy content-column indent
-via CLI — that path is for anonymous form arrays, not entity-backed disclosure cards.
+Non-entity ArrayItem rows (`rowLayout="default"`) indent summary and body through
+`ui-collapsible-list-item--caret` and `--grip`. That path is for anonymous form arrays,
+not entity-backed disclosure cards.
 
 ---
 

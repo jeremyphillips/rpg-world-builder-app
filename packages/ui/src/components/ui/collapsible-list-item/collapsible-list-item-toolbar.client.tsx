@@ -14,7 +14,10 @@ import {
   collapsibleListItemToolbarRowClasses,
   type CollapsibleListItemLeadingChromeOptions,
 } from './collapsible-list-item.variants'
-import { resolveCollapsibleListItemReserveDragHandleSlot } from './collapsible-list-item-leading-chrome.lib'
+import {
+  resolveCollapsibleListItemReserveCaretSlot,
+  resolveCollapsibleListItemReserveDragHandleSlot,
+} from './collapsible-list-item-leading-chrome.lib'
 
 export interface CollapsibleListItemDragHandleProps {
   ariaLabel: string
@@ -78,6 +81,67 @@ export function CollapsibleListItemCollapseButton({
 
 export type CollapsibleListItemToolbarLeadingChromePlacement = 'toolbar' | 'none'
 
+function CollapsibleListItemGripColumn({
+  reserveDragHandleSlot,
+  gripVisible,
+  dragHandleProps,
+  toolbarAriaLabel,
+  compact,
+}: {
+  reserveDragHandleSlot: boolean
+  gripVisible: boolean
+  dragHandleProps?: CollapsibleListItemDragHandleProps
+  toolbarAriaLabel: string
+  compact: boolean
+}) {
+  if (!reserveDragHandleSlot) return null
+  if (gripVisible && dragHandleProps) {
+    return (
+      <div className={collapsibleListItemChromeColumnClasses}>
+        <CollapsibleListItemDragHandle
+          {...dragHandleProps}
+          compact={compact}
+          ariaLabel={`Drag to reorder ${toolbarAriaLabel}`}
+        />
+      </div>
+    )
+  }
+  return <CollapsibleListItemDragHandlePlaceholder compact={compact} />
+}
+
+function CollapsibleListItemCaretColumn({
+  reserveCaretSlot,
+  collapsible,
+  collapsed,
+  bodyId,
+  toolbarAriaLabel,
+  onToggleCollapse,
+}: {
+  reserveCaretSlot: boolean
+  collapsible: boolean
+  collapsed: boolean
+  bodyId: string
+  toolbarAriaLabel: string
+  onToggleCollapse: () => void
+}) {
+  if (!reserveCaretSlot) return null
+  return (
+    <div
+      className={collapsibleListItemChromeColumnClasses}
+      aria-hidden={collapsible ? undefined : true}
+    >
+      {collapsible ? (
+        <CollapsibleListItemCollapseButton
+          collapsed={collapsed}
+          bodyId={bodyId}
+          ariaLabel={toolbarAriaLabel}
+          onToggleCollapse={onToggleCollapse}
+        />
+      ) : null}
+    </div>
+  )
+}
+
 function CollapsibleListItemDragHandlePlaceholder({ compact = false }: { compact?: boolean }) {
   return (
     <div className={collapsibleListItemChromeColumnClasses} aria-hidden>
@@ -128,6 +192,7 @@ export function CollapsibleListItemToolbar({
   summary,
 }: CollapsibleListItemToolbarProps) {
   const reserveDragHandleSlot = resolveCollapsibleListItemReserveDragHandleSlot(leadingChrome)
+  const reserveCaretSlot = resolveCollapsibleListItemReserveCaretSlot(leadingChrome)
   const renderLeadingChromeInToolbar = leadingChromePlacement === 'toolbar'
   const headerContentClasses = cn(
     'flex min-w-0 flex-1',
@@ -139,28 +204,24 @@ export function CollapsibleListItemToolbar({
 
   const titleRow = (
     <div className={collapsibleListItemToolbarRowClasses({ ...leadingChrome, compact })}>
-      {renderLeadingChromeInToolbar && reserveDragHandleSlot ? (
-        gripVisible && dragHandleProps ? (
-          <div className={collapsibleListItemChromeColumnClasses}>
-            <CollapsibleListItemDragHandle
-              {...dragHandleProps}
-              compact={compact}
-              ariaLabel={`Drag to reorder ${toolbarAriaLabel}`}
-            />
-          </div>
-        ) : (
-          <CollapsibleListItemDragHandlePlaceholder compact={compact} />
-        )
+      {renderLeadingChromeInToolbar ? (
+        <CollapsibleListItemGripColumn
+          reserveDragHandleSlot={reserveDragHandleSlot}
+          gripVisible={gripVisible}
+          dragHandleProps={dragHandleProps}
+          toolbarAriaLabel={toolbarAriaLabel}
+          compact={compact}
+        />
       ) : null}
-      {renderLeadingChromeInToolbar && collapsible ? (
-        <div className={collapsibleListItemChromeColumnClasses}>
-          <CollapsibleListItemCollapseButton
-            collapsed={collapsed}
-            bodyId={bodyId}
-            ariaLabel={toolbarAriaLabel}
-            onToggleCollapse={onToggleCollapse}
-          />
-        </div>
+      {renderLeadingChromeInToolbar ? (
+        <CollapsibleListItemCaretColumn
+          reserveCaretSlot={reserveCaretSlot}
+          collapsible={collapsible}
+          collapsed={collapsed}
+          bodyId={bodyId}
+          toolbarAriaLabel={toolbarAriaLabel}
+          onToggleCollapse={onToggleCollapse}
+        />
       ) : null}
       <div id={titleId} className={headerContentClasses}>
         {header}

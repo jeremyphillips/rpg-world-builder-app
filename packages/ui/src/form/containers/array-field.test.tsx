@@ -554,14 +554,13 @@ describe('ArrayFieldRenderer', () => {
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
 
     const itemShell = screen.getByRole('group', { name: 'Trait #1' })
-    expect(itemShell).toHaveClass('bg-surface-subtle')
-    expect(itemShell).toHaveClass('border-border')
+    expect(itemShell).toHaveClass('ui-collapsible-list-item', 'ui-border--default')
     expect(itemShell).not.toHaveClass('bg-card')
     expect(itemShell).not.toHaveClass('shadow-surface-raised')
 
     const body = itemShell.querySelector('[id$="-body"]')
-    expect(body).toHaveClass('bg-background')
-    expect(body).toHaveClass('border-t')
+    expect(body).toHaveClass('ui-collapsible-list-item__body')
+    expect(body).not.toHaveClass('bg-background', 'border-t')
   })
 
   it('uses tighter disclosure gaps between collapsible array items', async () => {
@@ -660,14 +659,8 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.getByRole('textbox', { name: 'Trait name' })).toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: 'Trait name' })).toHaveClass('ui-field-control--sm')
     expect(screen.getByRole('group', { name: 'Trait #1' })).toHaveClass(
-      'rounded-sm',
-      'border',
-      'border-border',
-      'bg-surface-subtle',
-      'pl-2',
-      'pr-3',
-      'pt-0',
-      'pb-0',
+      'ui-collapsible-list-item',
+      'ui-border--default',
     )
   })
 
@@ -1196,7 +1189,7 @@ describe('ArrayFieldRenderer', () => {
 
     expect(screen.queryByRole('button', { name: /Drag to reorder Traits/ })).not.toBeInTheDocument()
     expect(screen.getAllByRole('button', { name: /Remove Traits · Trait #/ })).toHaveLength(2)
-    expect(screen.getByRole('group', { name: 'Trait #1' })).toHaveClass('pl-2')
+    expect(screen.getByRole('group', { name: 'Trait #1' })).toHaveClass('ui-collapsible-list-item')
     expect(screen.getByRole('group', { name: 'Trait #1' })).not.toHaveClass('pl-10')
   })
 
@@ -1215,14 +1208,13 @@ describe('ArrayFieldRenderer', () => {
     await user.click(screen.getByRole('button', { name: 'Add trait' }))
 
     const itemShell = screen.getByRole('group', { name: 'Trait 1' })
-    expect(itemShell).toHaveClass('pb-0')
+    expect(itemShell).toHaveClass('ui-collapsible-list-item', 'ui-collapsible-list-item--caret')
+    expect(itemShell).not.toHaveClass('ui-collapsible-list-item--flat')
     const body = itemShell.querySelector('[id$="-body"]')
     expect(body).not.toBeNull()
-    expect(body).toHaveClass('bg-background')
-    expect(body).toHaveClass('-ml-2')
-    expect(body).toHaveClass('-mr-3')
-    expect(body).toHaveClass('pl-[var(--content-inline-start)]')
-    expect(body).not.toHaveClass('pl-[var(--content-column-indent)]')
+    expect(body).toHaveClass('ui-collapsible-list-item__body')
+    expect(body).not.toHaveClass('bg-background', '-ml-2', '-mr-3')
+    expect(body).not.toHaveClass('ui-collapsible-list-item__summary')
   })
 
   it('omits collapsible list item body chrome when no item fields are visible', () => {
@@ -1348,6 +1340,61 @@ describe('ArrayFieldRenderer', () => {
         ?.querySelector('[id$="-body"]'),
     ).toBeNull()
     willingView.unmount()
+  })
+
+  it('keeps summary titles on the caret column when the list mixes expandable rows', () => {
+    const requirementFields: FormItem[] = [
+      {
+        kind: 'row',
+        visibility: {
+          dependsOn: ['kind'],
+          visibleWhen: (values) => values.kind === 'size',
+        },
+        fields: [{ type: 'select', name: 'bound', label: 'Size', options: [] }],
+      },
+    ]
+
+    render(
+      <Form
+        schema={z.object({
+          requirements: z.array(z.object({ kind: z.string(), bound: z.string().optional() })),
+        })}
+        fields={[
+          {
+            kind: 'array',
+            name: 'requirements',
+            heading: { label: 'Requirements' },
+            addAction: { label: 'Add a requirement' },
+            item: {
+              reorder: false,
+              collapsible: true,
+              resolveCollapsible: (_values: Record<string, unknown>, index: number) => index === 1,
+              header: {
+                fallback: (index) => `Requirement ${index + 1}`,
+                primary: (_values, index) => (index === 1 ? 'Creature size' : 'You can see it'),
+              },
+            },
+            fields: requirementFields,
+          },
+        ]}
+        defaultValues={{
+          requirements: [{ kind: 'sight' }, { kind: 'size' }],
+        }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const summaryTitle = screen.getByText('You can see it').closest('[id$="-title"]')
+    const summaryColumn = summaryTitle?.previousElementSibling
+    expect(
+      screen.queryByRole('button', { name: /^(Expand|Collapse) Requirements · You can see it$/ }),
+    ).not.toBeInTheDocument()
+    expect(summaryColumn).toHaveAttribute('aria-hidden', 'true')
+    expect(summaryColumn).toHaveClass('ui-collapsible-list-item__chrome')
+    expect(
+      screen.getByRole('button', { name: /^(Expand|Collapse) Requirements · Creature size$/ }),
+    ).toBeInTheDocument()
   })
 
   it('stacks summary subheadlines with a 2px gap below the title row', async () => {
@@ -1777,8 +1824,12 @@ describe('ArrayFieldRenderer', () => {
     expect(document.querySelector('[data-array-item-anatomy-grid]')).toBeInTheDocument()
     expect(document.querySelector('[data-field-row-anatomy]')).toBeNull()
 
-    expect(document.querySelector('[data-array-item-anatomy-grip]')).toHaveClass('items-center')
-    expect(document.querySelector('[data-array-item-anatomy-actions]')).toHaveClass('items-center')
+    expect(document.querySelector('[data-array-item-anatomy-grip]')).toHaveClass(
+      'ui-collapsible-list-item__chrome',
+    )
+    expect(document.querySelector('[data-array-item-anatomy-actions]')).toHaveClass(
+      'ui-collapsible-list-item__chrome',
+    )
   })
 
   it('keeps movement-shaped inline chrome on the anatomy grid when the message track grows', async () => {
@@ -1823,7 +1874,7 @@ describe('ArrayFieldRenderer', () => {
 
       expect(document.querySelector('[data-array-item-anatomy-grip]')).toBeNull()
       expect(actions).toHaveStyle({ gridRow: '1 / -1' })
-      expect(actions).toHaveClass('items-center')
+      expect(actions).toHaveClass('ui-collapsible-list-item__chrome')
       expect(anatomyGrid).toContainElement(actions)
     }
 
@@ -2652,21 +2703,19 @@ describe('ArrayFieldRenderer', () => {
       await user.click(screen.getByRole('button', { name: 'Add tag' }))
       const anatomyGrid = document.querySelector('[data-array-item-anatomy-grid]') as HTMLElement
       expect(anatomyGrid).toBeInTheDocument()
-      expect(anatomyGrid.style.gridTemplateColumns).not.toContain('var(--leading-chrome-size)')
+      expect(anatomyGrid).not.toHaveClass('ui-array-item-anatomy--grip')
       expect(anatomyGrid.querySelector('[aria-hidden="true"][class*="opacity-0"]')).toBeNull()
 
       await user.click(screen.getByRole('button', { name: 'Add tag' }))
       expect(screen.getAllByLabelText(/Drag to reorder/i)).toHaveLength(2)
-      expect(
-        (document.querySelector('[data-array-item-anatomy-grid]') as HTMLElement).style
-          .gridTemplateColumns,
-      ).toContain('var(--leading-chrome-size)')
+      expect(document.querySelector('[data-array-item-anatomy-grid]')).toHaveClass(
+        'ui-array-item-anatomy--grip',
+      )
 
       await user.click(screen.getAllByRole('button', { name: /Remove/i })[1]!)
-      expect(
-        (document.querySelector('[data-array-item-anatomy-grid]') as HTMLElement).style
-          .gridTemplateColumns,
-      ).not.toContain('var(--leading-chrome-size)')
+      expect(document.querySelector('[data-array-item-anatomy-grid]')).not.toHaveClass(
+        'ui-array-item-anatomy--grip',
+      )
     })
   })
 })

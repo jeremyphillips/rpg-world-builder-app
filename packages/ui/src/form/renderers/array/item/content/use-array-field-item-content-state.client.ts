@@ -34,6 +34,7 @@ interface UseArrayFieldItemContentStateArgs {
   collapsed: boolean
   fieldsLength: number
   collapsible: boolean
+  reserveCaretSlot?: boolean
   dragHandleProps?: {
     attributes: ReturnType<typeof useSortable>['attributes']
     listeners: ReturnType<typeof useSortable>['listeners']
@@ -53,6 +54,7 @@ export function useArrayFieldItemContentState({
   collapsed,
   fieldsLength,
   collapsible,
+  reserveCaretSlot = false,
   dragHandleProps,
   onRemoveItem,
 }: UseArrayFieldItemContentStateArgs) {
@@ -107,6 +109,7 @@ export function useArrayFieldItemContentState({
   const gripVisible = reserveDragHandleSlot && sortableEnabled && Boolean(dragHandleProps)
   const leadingChrome = {
     reserveDragHandleSlot,
+    reserveCaretSlot,
     showDragHandle: reserveDragHandleSlot,
     collapsible,
   }
@@ -120,6 +123,7 @@ export function useArrayFieldItemContentState({
     titleId: rowState.titleId,
     itemPrefix: rowState.itemPrefix,
     reserveDragHandleSlot,
+    reserveCaretSlot,
     gripVisible,
     collapsible,
     dragging: dragHandleProps?.isDragging,

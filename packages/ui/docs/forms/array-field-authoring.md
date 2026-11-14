@@ -109,7 +109,7 @@ Author with `heading: { label, hint?, labelVisibility? }` — see
 **Detailed collapsible items compose `CollapsibleListItem`** — the same header / summary /
 body / actions slots as catalog picker rows. The header plane defaults to
 `bg-surface-subtle`; the disclosure body bleeds to the shell edge on `bg-background` with
-field content aligned via `--content-inline-start`.
+field content aligned via `ui-collapsible-list-item__body`.
 
 Do not override neutral `item.surface` / `item.tone` per row unless a semantic callout is
 required — defaults avoid stacked-beige-card noise.

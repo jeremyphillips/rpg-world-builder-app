@@ -18,6 +18,7 @@ export interface ArrayFieldItemChromeProps {
   titleId: string
   itemPrefix: string
   reserveDragHandleSlot: boolean
+  reserveCaretSlot: boolean
   gripVisible: boolean
   collapsible: boolean
   dragging?: boolean
@@ -50,6 +51,7 @@ function FlatLabeledArrayFieldItem({
   itemPrefix,
   itemId,
   reserveDragHandleSlot,
+  reserveCaretSlot,
   dragging,
   shellClassName,
   header,
@@ -74,6 +76,7 @@ function FlatLabeledArrayFieldItem({
         collapsed={false}
         leadingChrome={{
           reserveDragHandleSlot,
+          reserveCaretSlot,
           showDragHandle: reserveDragHandleSlot,
           collapsible: false,
         }}
@@ -88,6 +91,7 @@ function FlatLabeledArrayFieldItem({
       toolbarAriaLabel={header.ariaLabel}
       collapsible={false}
       collapsed={false}
+      reserveCaretSlot={reserveCaretSlot}
       showDragHandle={reserveDragHandleSlot}
       dragHandleProps={
         sortableEnabled && dragHandleProps
@@ -129,7 +133,12 @@ export interface DetailedArrayFieldItemProps extends ArrayFieldItemChromeProps {
   issueSummaries?: readonly ArrayItemIssueSummaryProps[]
   shellTone?: SemanticSurfaceTone
   itemBody?: React.ReactNode
-  leadingChrome: { reserveDragHandleSlot: boolean; showDragHandle: boolean; collapsible: boolean }
+  leadingChrome: {
+    reserveDragHandleSlot: boolean
+    reserveCaretSlot: boolean
+    showDragHandle: boolean
+    collapsible: boolean
+  }
   actionsRail: React.ReactNode
 }
 
@@ -178,6 +187,7 @@ function DetailedArrayFieldItem({
       collapsible={collapsible}
       collapsed={collapsed}
       onToggleCollapse={onToggleCollapse}
+      reserveCaretSlot={leadingChrome.reserveCaretSlot}
       showDragHandle={reserveDragHandleSlot}
       dragHandleProps={
         sortableEnabled && dragHandleProps

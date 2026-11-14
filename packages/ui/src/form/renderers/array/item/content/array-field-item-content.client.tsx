@@ -27,6 +27,8 @@ export interface ArrayFieldItemContentProps {
   showDragHandle: boolean
   fieldsLength: number
   collapsible: boolean
+  /** List-level caret column. Summary rows keep the inset when a sibling can expand. */
+  reserveCaretSlot?: boolean
   variant: 'compact' | 'detailed'
   collapsed: boolean
   onToggleCollapse: () => void
@@ -119,6 +121,7 @@ export function ArrayFieldItemContent({
   showDragHandle: _showDragHandle,
   fieldsLength,
   collapsible,
+  reserveCaretSlot = false,
   variant,
   collapsed,
   onToggleCollapse,
@@ -165,6 +168,7 @@ export function ArrayFieldItemContent({
     collapsed,
     fieldsLength,
     collapsible,
+    reserveCaretSlot,
     dragHandleProps,
     onRemoveItem: onRemove,
   })

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  collapsibleListItemContentColumnIndentClasses,
-  collapsibleListItemContentInlineStartClasses,
+  collapsibleListItemBodyInsetClasses,
+  collapsibleListItemSummaryClasses,
 } from './collapsible-list-item-leading-chrome.lib'
 import {
   collapsibleListItemBackgroundBodyClasses,
@@ -16,9 +16,12 @@ import {
 } from './collapsible-list-item.variants'
 
 describe('collapsibleListItemShellVariants', () => {
-  it('keeps headerActions layout padding in dedicated shell padding tokens', () => {
-    expect(collapsibleListItemShellVariants({ layout: 'headerActions' })).toContain('flex-col')
-    expect(collapsibleListItemDisclosureShellPaddingClasses).toContain('pb-0')
+  it('keeps headerActions layout on the block and flat padding on a modifier', () => {
+    expect(collapsibleListItemShellVariants({ layout: 'headerActions' })).not.toContain('flex-col')
+    expect(collapsibleListItemShellVariants({ layout: 'compactRow' })).toContain(
+      'ui-collapsible-list-item--flat',
+    )
+    expect(collapsibleListItemDisclosureShellPaddingClasses).toBe('')
   })
 
   it('omits preset border chrome when preset is none for entity-card hosts', () => {
@@ -44,8 +47,8 @@ describe('collapsibleListItemHeaderVerticalPaddingVariants', () => {
 })
 
 describe('collapsibleListItemBodyFrameClasses', () => {
-  it('owns divider and symmetric vertical rhythm without surface tone', () => {
-    expect(collapsibleListItemBodyFrameClasses).toBe('border-t border-border-subtle py-3')
+  it('points at the body element that owns divider, bleed, and fill', () => {
+    expect(collapsibleListItemBodyFrameClasses).toBe('ui-collapsible-list-item__body')
   })
 })
 
@@ -73,12 +76,8 @@ describe('collapsibleListItemBodyClasses', () => {
       collapsible: true,
     })
 
-    expect(classes).toContain(collapsibleListItemContentInlineStartClasses)
-    expect(classes).toContain(collapsibleListItemBodyFrameClasses)
-    expect(classes).toContain('-ml-2')
-    expect(classes).toContain('-mr-3')
-    expect(classes).toContain('bg-background')
-    expect(classes).not.toContain(collapsibleListItemContentColumnIndentClasses)
+    expect(classes).toBe(collapsibleListItemBodyInsetClasses)
+    expect(classes).not.toContain(collapsibleListItemSummaryClasses)
   })
 
   it('retains catalog body bleed for catalog preset on default row layout', () => {
@@ -88,17 +87,11 @@ describe('collapsibleListItemBodyClasses', () => {
       collapsible: true,
     })
 
-    expect(classes).toContain(collapsibleListItemContentInlineStartClasses)
-    expect(classes).toContain(collapsibleListItemBodyFrameClasses)
-    expect(classes).toContain('pr-3')
+    expect(classes).toBe(collapsibleListItemBodyInsetClasses)
   })
 
   it('uses the canvas plane for default array-item body wash', () => {
-    expect(collapsibleListItemBackgroundBodyClasses).toContain('bg-background')
-    expect(collapsibleListItemBackgroundBodyClasses).toContain(collapsibleListItemBodyFrameClasses)
-    expect(collapsibleListItemBackgroundBodyClasses).toContain(
-      '[--surface-current:var(--background)]',
-    )
+    expect(collapsibleListItemBackgroundBodyClasses).toBe(collapsibleListItemBodyInsetClasses)
   })
 
   it('uses pointer cursor on collapse caret controls', () => {

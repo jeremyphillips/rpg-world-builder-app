@@ -1,36 +1,28 @@
-import type { CSSProperties } from 'react'
-
 /**
- * Leading chrome layout — grip and/or collapse caret columns before content.
+ * Leading chrome — grip and caret columns before the title.
  *
- * Shell exposes CSS variables (see `buildCollapsibleListItemLeadingChromeStyle`):
- * - `--leading-chrome-size` — hit target / column width (`spacing * 6`, 24px default)
- * - `--leading-chrome-gap` — gap before content text when chrome is visible
- * - `--leading-chrome-count` — number of leading chrome columns (0–2)
- * - `--shell-inline-start` — shell inline-start padding (`spacing * 2`)
- * - `--content-column-indent` — chrome columns + gap (for bodies inside shell padding)
- * - `--content-inline-start` — shell padding + chrome indent (for catalog body bleed)
+ * The shell wears `ui-collapsible-list-item` plus `--grip` and `--caret`.
+ * Column width, title gap, summary indent, and body inset live in
+ * `ui-collapsible-list-item.css`.
  */
 
-export const LEADING_CHROME_SIZE_VAR = '--leading-chrome-size'
-export const LEADING_CHROME_GAP_VAR = '--leading-chrome-gap'
-export const LEADING_CHROME_COUNT_VAR = '--leading-chrome-count'
-export const SHELL_INLINE_START_VAR = '--shell-inline-start'
-export const CONTENT_COLUMN_INDENT_VAR = '--content-column-indent'
-export const CONTENT_INLINE_START_VAR = '--content-inline-start'
+export const COLLAPSIBLE_LIST_ITEM_BLOCK_CLASS = 'ui-collapsible-list-item'
+export const COLLAPSIBLE_LIST_ITEM_CARET_CLASS = 'ui-collapsible-list-item--caret'
+export const COLLAPSIBLE_LIST_ITEM_GRIP_CLASS = 'ui-collapsible-list-item--grip'
 
-/** @deprecated Use {@link LEADING_CHROME_COUNT_VAR}. */
-export const ARRAY_ITEM_CHROME_COUNT_VAR = '--array-item-chrome-count'
-
-export const COLLAPSIBLE_LIST_ITEM_CHROME_SIZE = 'calc(var(--spacing)*6)'
-
-export const collapsibleListItemLeadingChromeSizeValue = COLLAPSIBLE_LIST_ITEM_CHROME_SIZE
-export const collapsibleListItemLeadingChromeGapValue = 'calc(var(--spacing)*1)'
-export const collapsibleListItemShellInlineStartValue = 'calc(var(--spacing)*2)'
+export const collapsibleListItemChromeColumnClasses = 'ui-collapsible-list-item__chrome'
+export const collapsibleListItemTitleClasses = 'ui-collapsible-list-item__title'
+export const collapsibleListItemSummaryClasses = 'ui-collapsible-list-item__summary'
+export const collapsibleListItemBodyInsetClasses = 'ui-collapsible-list-item__body'
 
 export interface CollapsibleListItemLeadingChromeOptions {
   /** When true, reserves leading grip column geometry in the shell. */
   reserveDragHandleSlot?: boolean
+  /**
+   * When true, reserves the caret column even when this row does not render a button.
+   * Mixed lists keep every title on the same inset.
+   */
+  reserveCaretSlot?: boolean
   /** @deprecated Prefer {@link reserveDragHandleSlot}. */
   showDragHandle: boolean
   collapsible: boolean
@@ -42,82 +34,46 @@ export function resolveCollapsibleListItemReserveDragHandleSlot(
   return options.reserveDragHandleSlot ?? options.showDragHandle
 }
 
+/** Caret column is list chrome. A row without a button still keeps the column when the list reserves it. */
+export function resolveCollapsibleListItemReserveCaretSlot(
+  options: CollapsibleListItemLeadingChromeOptions,
+): boolean {
+  return Boolean(options.reserveCaretSlot) || options.collapsible
+}
+
 export interface ResolvedCollapsibleListItemLeadingChrome {
   /** Number of leading chrome columns (0–2). */
   chromeCount: number
   /** Fixed-width wrapper for one grip or caret control in the toolbar flex row. */
   chromeColumnClasses: string
-  /** Padding before toolbar header content when chrome columns precede it. */
+  /** Title element. Gap is owned by `--caret` / `--grip` on the shell. */
   toolbarContentGapClasses: string
-  /** Padding that aligns summary/body with the toolbar content column (inside shell padding). */
+  /** Summary indent. Zero when the shell reserves neither column. */
   contentColumnIndentClasses: string
-  /** Full inline-start inset from shell border (shell padding + chrome indent). */
+  /** Body inset from the shell border. */
   contentInlineStartClasses: string
+  /** Shell modifiers for the reserved columns. */
+  shellModifierClasses: string
 }
-
-/** Fixed-width column for one leading chrome control (grip or caret). */
-export const collapsibleListItemChromeColumnClasses =
-  'flex w-[var(--leading-chrome-size)] shrink-0 items-center justify-center'
-
-export const collapsibleListItemContentColumnIndentClasses = 'pl-[var(--content-column-indent)]'
-
-export const collapsibleListItemContentInlineStartClasses = 'pl-[var(--content-inline-start)]'
 
 export function resolveCollapsibleListItemLeadingChrome(
   options: CollapsibleListItemLeadingChromeOptions,
 ): ResolvedCollapsibleListItemLeadingChrome {
-  const { collapsible } = options
   const reserveDragHandleSlot = resolveCollapsibleListItemReserveDragHandleSlot(options)
-  const chromeCount = (reserveDragHandleSlot ? 1 : 0) + (collapsible ? 1 : 0)
-
-  const toolbarContentGapClasses = chromeCount > 0 ? `pl-[var(${LEADING_CHROME_GAP_VAR})]` : ''
-
-  const contentColumnIndentClasses =
-    chromeCount > 0 ? collapsibleListItemContentColumnIndentClasses : ''
-
-  const contentInlineStartClasses = collapsibleListItemContentInlineStartClasses
+  const reserveCaretSlot = resolveCollapsibleListItemReserveCaretSlot(options)
+  const chromeCount = (reserveDragHandleSlot ? 1 : 0) + (reserveCaretSlot ? 1 : 0)
 
   return {
     chromeCount,
     chromeColumnClasses: collapsibleListItemChromeColumnClasses,
-    toolbarContentGapClasses,
-    contentColumnIndentClasses,
-    contentInlineStartClasses,
+    toolbarContentGapClasses: collapsibleListItemTitleClasses,
+    contentColumnIndentClasses: collapsibleListItemSummaryClasses,
+    contentInlineStartClasses: collapsibleListItemBodyInsetClasses,
+    shellModifierClasses: [
+      reserveCaretSlot ? COLLAPSIBLE_LIST_ITEM_CARET_CLASS : '',
+      reserveDragHandleSlot ? COLLAPSIBLE_LIST_ITEM_GRIP_CLASS : '',
+    ]
+      .filter(Boolean)
+      .join(' '),
   }
-}
-
-/** Restores shell inline padding when catalog body wash bleeds with negative margin. */
-export const collapsibleListItemShellInlineStartClasses = `pl-[var(${SHELL_INLINE_START_VAR})]`
-
-export function buildCollapsibleListItemLeadingChromeStyle(
-  options: CollapsibleListItemLeadingChromeOptions,
-): CSSProperties {
-  const { chromeCount } = resolveCollapsibleListItemLeadingChrome(options)
-
-  return {
-    [LEADING_CHROME_SIZE_VAR]: collapsibleListItemLeadingChromeSizeValue,
-    [LEADING_CHROME_GAP_VAR]: collapsibleListItemLeadingChromeGapValue,
-    [LEADING_CHROME_COUNT_VAR]: chromeCount,
-    [ARRAY_ITEM_CHROME_COUNT_VAR]: chromeCount,
-    [SHELL_INLINE_START_VAR]: collapsibleListItemShellInlineStartValue,
-    [CONTENT_COLUMN_INDENT_VAR]: `calc(${chromeCount} * var(${LEADING_CHROME_SIZE_VAR}) + min(1, ${chromeCount}) * var(${LEADING_CHROME_GAP_VAR}))`,
-    [CONTENT_INLINE_START_VAR]: `calc(var(${SHELL_INLINE_START_VAR}) + var(${CONTENT_COLUMN_INDENT_VAR}))`,
-  } as CSSProperties
-}
-
-/**
- * Geometry tokens only — for entity-card hosts where an outer surface (disclosure EntityCard) owns
- * header/body inset and `--entity-leading-offset`. Omits content-column indent vars.
- */
-export function buildCollapsibleListItemGeometryStyle(
-  options: CollapsibleListItemLeadingChromeOptions,
-): CSSProperties {
-  const { chromeCount } = resolveCollapsibleListItemLeadingChrome(options)
-
-  return {
-    [LEADING_CHROME_SIZE_VAR]: collapsibleListItemLeadingChromeSizeValue,
-    [LEADING_CHROME_GAP_VAR]: collapsibleListItemLeadingChromeGapValue,
-    [LEADING_CHROME_COUNT_VAR]: chromeCount,
-    [ARRAY_ITEM_CHROME_COUNT_VAR]: chromeCount,
-  } as CSSProperties
 }
