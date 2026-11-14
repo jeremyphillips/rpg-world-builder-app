@@ -8,12 +8,17 @@ import {
   resolveFormSectionHeaderActionLayoutClasses,
 } from '../../form/presentation/form-section-header.variants'
 import {
+  resolveEffectiveFormHeaderScaleFromLegendSize,
+  resolveFormHeaderStackTypography,
+} from '../../form/presentation/form-header-stack-typography.lib'
+import {
   fieldGroupLegendDisclosureTriggerVariants,
   fieldGroupLegendHeaderStackVariants,
-  resolveFieldGroupDescriptionTypography,
+  type FieldGroupLegendSize,
   type FieldRhythm,
   type GroupHeadingScale,
 } from './field.variants'
+import type { FieldSize } from './field.client'
 
 const legendChromeClasses = 'w-full min-w-0'
 
@@ -25,9 +30,8 @@ export type FieldGroupLegendProps = {
   legendAccessory?: React.ReactNode
   /** Trailing compact inline action on the legend row end. */
   legendAction?: React.ReactNode
-  /** Resolved title scale — applied to the label only, not the `<legend>` wrapper. */
-  legendTypography: string
-  /** When `'field'`, description uses field-hint type instead of group description type. */
+  legendSize: FieldGroupLegendSize
+  fieldSize?: FieldSize
   headingScale?: GroupHeadingScale
   legendChromeClassName: string
   collapsible: boolean
@@ -198,7 +202,8 @@ export function FieldGroupLegend({
   description,
   legendAccessory,
   legendAction,
-  legendTypography,
+  legendSize,
+  fieldSize = 'md',
   headingScale,
   legendChromeClassName,
   collapsible,
@@ -206,7 +211,15 @@ export function FieldGroupLegend({
   open,
   onToggle,
 }: FieldGroupLegendProps) {
-  const descriptionTypography = resolveFieldGroupDescriptionTypography(rhythm, headingScale)
+  const presentationScale = resolveEffectiveFormHeaderScaleFromLegendSize({
+    legendSize,
+    headingScale,
+  })
+  const stackTypography = resolveFormHeaderStackTypography({
+    headingScale: presentationScale,
+    rhythm,
+    size: fieldSize,
+  })
 
   const contentOptions: LegendContentOptions = {
     legend,
@@ -214,8 +227,8 @@ export function FieldGroupLegend({
     legendAccessory,
     collapsible,
     rhythm,
-    legendTypography,
-    descriptionTypography,
+    legendTypography: stackTypography.labelClass,
+    descriptionTypography: stackTypography.hintClass,
   }
   const legendContent = resolveLegendContent(contentOptions)
   const hasStackedHint = Boolean(description)

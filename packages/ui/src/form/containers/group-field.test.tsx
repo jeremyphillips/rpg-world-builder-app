@@ -275,10 +275,12 @@ describe('group field container', () => {
       )
       expect(childTitle.className).not.toMatch(/text-style-field-legend/)
       const description = screen.getByText('Optional tuning.')
-      expect(description).toHaveClass('text-style-caption')
+      expect(description).toHaveClass(
+        density === 'compact' ? 'text-style-field-hint-compact' : 'text-style-field-hint',
+      )
       expect(description).not.toHaveClass(
-        'text-style-field-group-description',
-        'text-style-field-group-description-compact',
+        'text-style-field-subsection-description',
+        'text-style-field-subsection-description-compact',
       )
     },
   )

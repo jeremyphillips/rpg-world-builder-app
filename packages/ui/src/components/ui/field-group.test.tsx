@@ -22,12 +22,13 @@ function legendTitleTypographyNode(labelText: string): HTMLElement {
     label.classList.contains('text-style-field-legend') ||
     label.classList.contains('text-style-field-legend-sub') ||
     label.classList.contains('text-style-field-legend-compact') ||
+    label.classList.contains('text-style-field-legend-sub-compact') ||
     label.classList.contains('text-style-field-label-sm') ||
     label.classList.contains('text-style-field-label-md') ||
     label.classList.contains('text-style-field-label-lg')
       ? label
       : label.closest(
-          '.text-style-field-legend, .text-style-field-legend-sub, .text-style-field-legend-compact, .text-style-field-label-sm, .text-style-field-label-md, .text-style-field-label-lg',
+          '.text-style-field-legend, .text-style-field-legend-sub, .text-style-field-legend-compact, .text-style-field-legend-sub-compact, .text-style-field-label-sm, .text-style-field-label-md, .text-style-field-label-lg',
         )
   expect(titled).toBeTruthy()
   return titled as HTMLElement
@@ -92,7 +93,7 @@ describe('FieldGroup', () => {
     expect(legend?.firstElementChild).not.toHaveClass('mb-5')
     expect(bodyRelationshipWrapper(fieldset)).toHaveClass('mt-5')
     expect(screen.getByText('Shown on your sheet.')).toHaveClass(
-      'text-style-field-group-description',
+      'text-style-field-section-description',
     )
     expect(screen.getByText('Shown on your sheet.')).not.toHaveClass('text-style-body')
     expect(screen.getByText('Shown on your sheet.')).not.toHaveClass('mb-3')
@@ -123,6 +124,9 @@ describe('FieldGroup', () => {
       'flex-col',
       'gap-2',
     )
+    expect(screen.getByText('Primary damage dice.')).toHaveClass(
+      'text-style-field-subsection-description',
+    )
     expect(bodyRelationshipWrapper(fieldset)).toHaveClass('mt-4')
   })
 
@@ -151,10 +155,32 @@ describe('FieldGroup', () => {
     expect(legend?.firstElementChild).toHaveClass('gap-1')
     expect(legend?.firstElementChild).not.toHaveClass('mb-3')
     expect(bodyRelationshipWrapper(fieldset)).toHaveClass('mt-3')
-    expect(screen.getByText('Help copy.')).toHaveClass('text-style-field-group-description-compact')
+    expect(screen.getByText('Help copy.')).toHaveClass(
+      'text-style-field-section-description-compact',
+    )
 
     const stack = fieldStack(fieldset)
     expect(stack).toHaveClass('flex', 'flex-col', 'gap-4')
+  })
+
+  it('applies subsection presentation without changing section body spacing', () => {
+    render(
+      <FieldGroup
+        legend="Flat section"
+        legendSize="section"
+        headingScale="subsection"
+        description="Presentation-only subsection."
+      >
+        <TextField id="flat-section" label="Field" />
+      </FieldGroup>,
+    )
+
+    const fieldset = screen.getByRole('group', { name: /Flat section/ })
+    expect(legendTitleTypographyNode('Flat section')).toHaveClass('text-style-field-legend-sub')
+    expect(screen.getByText('Presentation-only subsection.')).toHaveClass(
+      'text-style-field-subsection-description',
+    )
+    expect(bodyRelationshipWrapper(fieldset)).toHaveClass('mt-5')
   })
 
   it('renders a subsection legend at the smaller type scale', () => {
@@ -186,10 +212,10 @@ describe('FieldGroup', () => {
     expect(title).toHaveClass('text-style-field-label-md')
     expect(title.className).not.toMatch(/text-style-field-legend/)
     const description = screen.getByText('Optional tuning.')
-    expect(description).toHaveClass('text-style-caption')
+    expect(description).toHaveClass('text-style-field-hint')
     expect(description).not.toHaveClass(
-      'text-style-field-group-description',
-      'text-style-field-group-description-compact',
+      'text-style-field-subsection-description',
+      'text-style-field-subsection-description-compact',
       'text-style-body',
     )
     const legend = screen.getByText('Advanced options').closest('legend')
@@ -217,8 +243,8 @@ describe('FieldGroup', () => {
     expect(title).toHaveClass('text-style-field-label-sm')
     expect(title.className).not.toMatch(/text-style-field-legend/)
     const description = screen.getByText('Optional tuning.')
-    expect(description).toHaveClass('text-style-caption')
-    expect(description).not.toHaveClass('text-style-field-group-description-compact')
+    expect(description).toHaveClass('text-style-field-hint-compact')
+    expect(description).not.toHaveClass('text-style-field-subsection-description-compact')
     const legend = screen.getByText('Advanced options').closest('legend')
     expect(legend?.firstElementChild).toHaveClass('gap-1')
     const fieldset = screen.getByRole('group', { name: /Advanced options/ })
@@ -244,7 +270,7 @@ describe('FieldGroup', () => {
     const title = legendTitleTypographyNode('Advanced options')
     expect(title).toHaveClass('text-style-field-label-md')
     expect(title.className).not.toMatch(/text-style-field-legend/)
-    expect(screen.getByText('Optional tuning.')).toHaveClass('text-style-caption')
+    expect(screen.getByText('Optional tuning.')).toHaveClass('text-style-field-hint')
     const trigger = screen.getByRole('button', { name: /Advanced options/i })
     expect(trigger).toHaveAttribute('aria-expanded', 'false')
     expect(trigger).toHaveClass(

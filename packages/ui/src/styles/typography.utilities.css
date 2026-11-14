@@ -231,29 +231,37 @@
 }
 
 @utility text-style-field-legend {
-  font-size: var(--text-field-group-legend);
+  font-size: var(--text-field-section-legend);
   line-height: 1;
   font-weight: var(--font-weight-heading);
   color: var(--foreground);
 }
 
 @utility text-style-field-legend-sub {
-  font-size: var(--text-field-subgroup-legend);
+  font-size: var(--text-field-subsection-legend);
   line-height: 1;
   font-weight: var(--font-weight-heading);
   color: var(--foreground);
 }
 
 @utility text-style-field-legend-compact {
-  font-size: var(--text-md);
-  line-height: 1;
+  font-size: var(--text-base);
+  line-height: var(--text-base--line-height);
+  font-weight: var(--font-weight-heading);
+  color: var(--foreground);
+}
+
+@utility text-style-field-legend-sub-compact {
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
   font-weight: var(--font-weight-heading);
   color: var(--foreground);
 }
 
 @utility text-style-field-hint {
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
   font-weight: var(--font-weight-normal);
-  line-height: var(--leading-normal);
   color: var(--muted-foreground);
 }
 
@@ -264,14 +272,28 @@
   color: var(--muted-foreground);
 }
 
-@utility text-style-field-group-description {
+@utility text-style-field-section-description {
+  font-size: var(--text-md);
+  line-height: var(--text-md--line-height);
+  font-weight: var(--font-weight-normal);
+  color: var(--muted-foreground);
+}
+
+@utility text-style-field-section-description-compact {
+  font-size: var(--text-fine-md);
+  line-height: var(--leading-normal);
+  font-weight: var(--font-weight-normal);
+  color: var(--muted-foreground);
+}
+
+@utility text-style-field-subsection-description {
   font-size: var(--text-sm);
   line-height: var(--text-sm--line-height);
   font-weight: var(--font-weight-normal);
   color: var(--muted-foreground);
 }
 
-@utility text-style-field-group-description-compact {
+@utility text-style-field-subsection-description-compact {
   font-size: var(--text-xs);
   line-height: var(--text-xs--line-height);
   font-weight: var(--font-weight-normal);

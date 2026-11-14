@@ -13,13 +13,7 @@ import { isDialogDisclosure, isInlineDisclosure } from './field-group-disclosure
 import { FieldGroupDialogRoute } from './field-group-dialog-route.client'
 import { FieldGroupSummaryRoute } from './field-group-summary-route.client'
 import { StandardFieldGroupBody } from './field-group-standard-body.client'
-import {
-  fieldGroupLegendVariants,
-  fieldLabelTypographyVariants,
-  type FieldGroupLegendSize,
-  type FieldRhythm,
-  type GroupHeadingScale,
-} from './field.variants'
+import type { FieldGroupLegendSize, FieldRhythm, GroupHeadingScale } from './field.variants'
 import { resolveFormDensity } from '../../form/form-density'
 
 export type { FieldGroupLegendSize, GroupHeadingScale }
@@ -97,10 +91,6 @@ export function FieldGroup({
   children,
 }: FieldGroupProps) {
   const resolvedFieldSize = size ?? resolveFormDensity('compact').size
-  const legendTypography =
-    headingScale === 'field'
-      ? fieldLabelTypographyVariants({ size: resolvedFieldSize })
-      : fieldGroupLegendVariants({ size: legendSize, rhythm })
   const chromeClasses = resolveFieldGroupChromeClassNames(chrome, { rhythm })
   const resolvedCollapseKey = resolveFieldGroupCollapseKey({
     disclosure,
@@ -158,7 +148,6 @@ export function FieldGroup({
       legendAction={legendAction}
       legendSize={legendSize}
       headingScale={headingScale}
-      legendTypography={legendTypography}
       fieldSize={resolvedFieldSize}
       rhythm={rhythm}
       className={className}

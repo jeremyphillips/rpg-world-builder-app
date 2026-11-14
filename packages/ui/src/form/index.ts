@@ -490,6 +490,12 @@ export {
   type FormSectionHeaderProps,
 } from './presentation/form-section-header.client'
 export {
+  resolveEffectiveFormHeaderScale,
+  resolveEffectiveFormHeaderScaleFromLegendSize,
+  resolveFormHeaderStackTypography,
+  type FormHeaderPresentationScale,
+} from './presentation/form-header-stack-typography.lib'
+export {
   HeadingPresentation,
   type HeadingPresentationProps,
 } from './presentation/heading-presentation.client'
