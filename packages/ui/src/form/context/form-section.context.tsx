@@ -13,19 +13,19 @@ import type { FieldChrome } from '../../components/ui/field-chrome.variants'
 import { cn } from '../../lib/utils'
 import { DEFAULT_FORM_DENSITY, resolveFormDensity, type FormDensity } from '../form-density'
 import { resolveFieldControlSize } from '../resolve-field-control-size.lib'
-import type { FormHeadingTier } from '../form-heading.lib'
 
 export interface FormSectionContextValue {
   /** Nesting depth for section density inheritance. */
   depth: number
   /** Count of named ancestor groups/arrays — anonymous layout groups are transparent. */
   namedGroupDepth: number
-  /** Resolved heading tier for the current section subtree. */
-  headingTier: FormHeadingTier
-  /** Section density — rhythm and control scale resolve via {@link resolveFormDensity}. */
+  /** Presentation density — labels, hints, section headers, rhythm stacks that read context. */
   density: FormDensity
-  /** Array section legend scale — inherits parent unless the array sets `density`. */
-  arrayLegendDensity?: FormDensity
+  /**
+   * Inherited control default when presentation density must not imply control scale
+   * (e.g. compact array item fields under a comfortable parent).
+   */
+  defaultControlSize?: FieldSize
   /** Surface config for array item shells — defaults to subtle when unset. */
   arrayItemSurface?: SurfaceConfig
   /** Optional semantic wash for array item shells. */
@@ -45,7 +45,6 @@ export interface FormSectionContextValue {
 export const FormSectionContext = React.createContext<FormSectionContextValue>({
   depth: 0,
   namedGroupDepth: 0,
-  headingTier: 'section',
   density: DEFAULT_FORM_DENSITY,
 })
 
@@ -55,9 +54,8 @@ export function useFormSectionContext(): FormSectionContextValue {
 
 export interface FormSectionContextOverrides {
   density?: FormDensity
-  arrayLegendDensity?: FormDensity
+  defaultControlSize?: FieldSize
   namedGroupDepth?: number
-  headingTier?: FormHeadingTier
   arrayItemSurface?: SurfaceConfig
   arrayItemTone?: SemanticSurfaceTone
   inGroup?: boolean
@@ -79,9 +77,8 @@ function inheritSectionContextFields(
 ): Omit<FormSectionContextValue, 'depth'> {
   const inherited = {
     density: parent.density,
-    arrayLegendDensity: parent.arrayLegendDensity,
+    defaultControlSize: parent.defaultControlSize,
     namedGroupDepth: parent.namedGroupDepth,
-    headingTier: parent.headingTier,
     arrayItemSurface: parent.arrayItemSurface,
     arrayItemTone: parent.arrayItemTone,
     inGroup: parent.inGroup,
@@ -94,14 +91,22 @@ function inheritSectionContextFields(
   return overrides ? { ...inherited, ...filterUndefined(overrides) } : inherited
 }
 
-/** Child section context — inherits density unless overridden. */
+/** Child section context — inherits presentation and control defaults unless overridden. */
 export function buildFormSectionChildContext(
   parent: FormSectionContextValue,
   depth: number,
   overrides?: FormSectionContextOverrides,
 ): FormSectionContextValue {
+  const inherited = inheritSectionContextFields(parent, overrides)
+  let defaultControlSize = inherited.defaultControlSize
+  if (overrides?.density !== undefined) {
+    defaultControlSize = overrides.defaultControlSize
+  } else if (overrides?.defaultControlSize !== undefined) {
+    defaultControlSize = overrides.defaultControlSize
+  }
   return {
-    ...inheritSectionContextFields(parent, overrides),
+    ...inherited,
+    defaultControlSize,
     depth: depth + 1,
   }
 }
@@ -142,7 +147,7 @@ export function FormSectionProvider({
   inRhythmStack,
 }: FormSectionProviderProps) {
   const value = React.useMemo(
-    () => ({ depth, namedGroupDepth: 0, headingTier: 'section' as const, density, inRhythmStack }),
+    () => ({ depth, namedGroupDepth: 0, density, inRhythmStack }),
     [depth, density, inRhythmStack],
   )
   return <FormSectionContext.Provider value={value}>{children}</FormSectionContext.Provider>
@@ -150,6 +155,10 @@ export function FormSectionProvider({
 
 /** Resolves control scale from section context and an optional leaf override. */
 export function useFieldControlSize(controlSizeOverride?: FieldSize): FieldSize {
-  const { density } = useFormSectionContext()
-  return resolveFieldControlSize({ density, override: controlSizeOverride })
+  const { density, defaultControlSize } = useFormSectionContext()
+  return resolveFieldControlSize({
+    density,
+    defaultControlSize,
+    override: controlSizeOverride,
+  })
 }

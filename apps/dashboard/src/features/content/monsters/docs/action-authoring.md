@@ -32,16 +32,16 @@ content/lib/forms (shared resolution, equipment range, requirement syncs)
 
 Cross-tab spellcasting source resolution lives under **`monsters/lib/casting/`** (traits and actions both consume it). Do not nest that hub under `lib/actions/casting/`.
 
-| Area | Path | Role |
-|------|------|------|
-| Casting sources & dependents | `lib/casting/` | Shared spell ability sources, labels, summaries re-exported for traits |
-| Acquisition | `lib/actions/acquisition/` | Draft rows when adding kinds/presets |
-| Previews | `lib/actions/previews/` | Stat-block sentences and attack summaries (lib builders) |
-| References | `lib/actions/references/` | Equipment links, multiattack graph, list titles |
-| Validation fixtures | `lib/actions/validation/` | Claim coverage and issue-routing harness |
-| Detail composition | `lib/actions/detail-fields/` | `monsterActionDetailFields` and per-region composers |
-| Form surfaces | `components/form/actions/` | Preview/detail JSX; `monster-action-sections.tsx` stays at form root |
-| Traits | `lib/traits/` | Trait acquisition (not action workflow) |
+| Area                         | Path                         | Role                                                                   |
+| ---------------------------- | ---------------------------- | ---------------------------------------------------------------------- |
+| Casting sources & dependents | `lib/casting/`               | Shared spell ability sources, labels, summaries re-exported for traits |
+| Acquisition                  | `lib/actions/acquisition/`   | Draft rows when adding kinds/presets                                   |
+| Previews                     | `lib/actions/previews/`      | Stat-block sentences and attack summaries (lib builders)               |
+| References                   | `lib/actions/references/`    | Equipment links, multiattack graph, list titles                        |
+| Validation fixtures          | `lib/actions/validation/`    | Claim coverage and issue-routing harness                               |
+| Detail composition           | `lib/actions/detail-fields/` | `monsterActionDetailFields` and per-region composers                   |
+| Form surfaces                | `components/form/actions/`   | Preview/detail JSX; `monster-action-sections.tsx` stays at form root   |
+| Traits                       | `lib/traits/`                | Trait acquisition (not action workflow)                                |
 
 Section move **eligibility** and data-loss flags are pure helpers in `@rpg/contracts`; transforms and confirmations stay in `use-monster-action-sections.ts`.
 

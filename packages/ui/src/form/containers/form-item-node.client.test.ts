@@ -22,8 +22,8 @@ describe('formItemKey', () => {
     expect(formItemKey({ kind: 'columns', columns: [{ fields: [] }, { fields: [] }] }, 0)).toBe(
       'columns-0',
     )
-    expect(formItemKey({ kind: 'group', legend: 'Basics', fields: [] }, 2, 'panel')).toBe(
-      'panel.group-2',
-    )
+    expect(
+      formItemKey({ kind: 'group', heading: { label: 'Basics' }, fields: [] }, 2, 'panel'),
+    ).toBe('panel.group-2')
   })
 })

@@ -24,6 +24,7 @@ export interface RichTextFieldProps
   required?: boolean
   width?: FieldWidth
   size?: FieldSize
+  controlSize?: FieldSize
   linkable?: boolean
   /** Opt in to inline/code-block marks, toolbar buttons, and backtick input rules (off by default). */
   codeBlocks?: boolean
@@ -55,6 +56,7 @@ export function RichTextField({
   required,
   width,
   size = 'md',
+  controlSize,
   linkable,
   codeBlocks,
   tables,
@@ -77,6 +79,7 @@ export function RichTextField({
       required={required}
       width={width}
       size={size}
+      controlSize={controlSize}
       labelVisibility={labelVisibility}
       anatomy
     >
@@ -85,7 +88,7 @@ export function RichTextField({
         control={
           <RichTextEditor
             aria-label={label}
-            size={size}
+            size={controlSize ?? size}
             linkable={linkable}
             codeBlocks={codeBlocks}
             tables={tables}
@@ -99,6 +102,7 @@ export function RichTextField({
         }
         chrome={chrome}
         size={size}
+        controlSize={controlSize}
         controlBand="content-sized"
       />
     </Field.Root>

@@ -63,7 +63,7 @@ export function monsterHitPointsFields(): FormItem[] {
   return [
     {
       kind: 'group',
-      legend: MONSTER_HIT_POINTS_HEADING,
+      heading: { label: MONSTER_HIT_POINTS_HEADING },
       density: 'comfortable',
       fields: [
         {

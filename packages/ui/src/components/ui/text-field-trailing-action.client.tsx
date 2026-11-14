@@ -28,6 +28,7 @@ export type TextFieldTrailingActionProps = {
   required?: boolean
   width?: FieldWidth
   size?: FieldSize
+  controlSize?: FieldSize
   chrome?: FieldChrome
   trailingAction: TrailingFieldActionConfig
   disabled?: boolean
@@ -141,6 +142,7 @@ export const TextFieldTrailingAction = React.forwardRef<
       required,
       width,
       size = 'md',
+      controlSize,
       chrome,
       trailingAction,
       disabled,
@@ -163,6 +165,7 @@ export const TextFieldTrailingAction = React.forwardRef<
         hintPosition={hintPosition}
         required={required}
         size={size}
+        controlSize={controlSize}
         width={width}
         anatomy
       >
@@ -177,7 +180,7 @@ export const TextFieldTrailingAction = React.forwardRef<
             <TextFieldTrailingActionControl
               ref={ref}
               id={id}
-              size={size}
+              size={controlSize ?? size}
               inputInvalid={inputInvalid}
               disabled={disabled}
               fieldDescribedBy={fieldDescribedBy}
@@ -191,6 +194,7 @@ export const TextFieldTrailingAction = React.forwardRef<
           }
           chrome={chrome}
           size={size}
+          controlSize={controlSize}
         />
       </Field.Root>
     )

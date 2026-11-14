@@ -89,7 +89,7 @@ export function cultureFields(ctx: ContentFormCtx): FormItem {
 
   return {
     kind: 'group',
-    legend: 'Culture',
+    heading: { label: 'Culture' },
     fields: [
       {
         type: 'switch',

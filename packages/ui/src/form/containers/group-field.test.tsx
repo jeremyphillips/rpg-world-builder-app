@@ -20,8 +20,7 @@ describe('group field container', () => {
     const fields: FormItem[] = [
       {
         kind: 'group',
-        legend: 'Defenses',
-        description: 'Saving throws and armor training.',
+        heading: { label: 'Defenses', hint: 'Saving throws and armor training.' },
         fields: [
           {
             type: 'chips',
@@ -70,7 +69,7 @@ describe('group field container', () => {
     const fields: FormItem[] = [
       {
         kind: 'group',
-        legend: 'Granted skills & tools',
+        heading: { label: 'Granted skills & tools' },
         fields: [
           {
             type: 'chips',
@@ -80,7 +79,7 @@ describe('group field container', () => {
           },
           {
             kind: 'group',
-            legend: 'Tools',
+            heading: { label: 'Tools' },
             fields: [
               {
                 type: 'chips',
@@ -120,7 +119,7 @@ describe('group field container', () => {
     const fields: FormItem[] = [
       {
         kind: 'group',
-        legend: 'Weapons',
+        heading: { label: 'Weapons' },
         fields: [
           {
             kind: 'dependent',
@@ -169,7 +168,7 @@ describe('group field container', () => {
     const fields: FormItem[] = [
       {
         kind: 'group',
-        legend: 'Notes',
+        heading: { label: 'Notes' },
         fieldChrome: { variant: 'none' },
         fields: [
           {
@@ -200,7 +199,7 @@ describe('group field container', () => {
       {
         kind: 'group',
         id: 'availability',
-        legend: 'Campaign availability',
+        heading: { label: 'Campaign availability' },
         disclosure: {
           variant: 'inline',
           defaultOpen: true,
@@ -242,12 +241,11 @@ describe('group field container', () => {
       const fields: FormItem[] = [
         {
           kind: 'group',
-          legend: 'Armor',
+          heading: { label: 'Armor' },
           fields: [
             {
               kind: 'group',
-              legend: 'Advanced options',
-              description: 'Optional tuning.',
+              heading: { label: 'Advanced options', hint: 'Optional tuning.' },
               headingScale: 'field',
               fields: [{ type: 'text', name: 'note', label: 'Note' }],
             },
@@ -269,16 +267,20 @@ describe('group field container', () => {
       expect(parentTitle).toHaveClass(
         density === 'compact' ? 'text-style-field-legend-compact' : 'text-style-field-legend',
       )
-      const childTitle = screen.getByText('Advanced options')
+      const childTitle = screen
+        .getByText('Advanced options')
+        .closest('span.text-style-field-label-sm, span.text-style-field-label-md')
       expect(childTitle).toHaveClass(
         density === 'compact' ? 'text-style-field-label-sm' : 'text-style-field-label-md',
       )
       expect(childTitle.className).not.toMatch(/text-style-field-legend/)
       const description = screen.getByText('Optional tuning.')
-      expect(description).toHaveClass('text-style-caption')
+      expect(description).toHaveClass(
+        density === 'compact' ? 'text-style-field-hint-compact' : 'text-style-field-hint',
+      )
       expect(description).not.toHaveClass(
-        'text-style-field-group-description',
-        'text-style-field-group-description-compact',
+        'text-style-field-subsection-description',
+        'text-style-field-subsection-description-compact',
       )
     },
   )

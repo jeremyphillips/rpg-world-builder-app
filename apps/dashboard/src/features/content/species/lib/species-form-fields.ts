@@ -198,7 +198,7 @@ export function buildSpeciesTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       fields: [],
       ...embeddedMasterDetailTabValidation({
         path: 'traits',
-        legend: 'Traits',
+        itemLabel: 'Traits',
         fields: traitItemFields(ctx),
       }),
       header: createElement(SpeciesTraitsTab, { formCtx: ctx }),

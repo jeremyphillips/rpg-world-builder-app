@@ -28,6 +28,7 @@ export interface SegmentedControlFieldProps
   info?: ReactNode
   required?: boolean
   size?: FieldSize
+  controlSize?: FieldSize
   width?: FieldWidth
   disabled?: boolean
   labelVisibility?: FieldLabelVisibility
@@ -50,6 +51,7 @@ export function SegmentedControlField({
   info,
   required,
   size,
+  controlSize,
   width,
   disabled,
   value,
@@ -73,6 +75,7 @@ export function SegmentedControlField({
       info={info}
       required={required}
       size={size}
+      controlSize={controlSize}
       width={fullWidth ? 'full' : width}
       labelVisibility={labelVisibility}
       chrome={chrome}
@@ -90,7 +93,7 @@ export function SegmentedControlField({
             disabled={disabled}
             fullWidth={fullWidth}
             segmentWidth={fullWidth ? 'equal' : 'auto'}
-            size={resolveSegmentedControlSize(size)}
+            size={resolveSegmentedControlSize(controlSize ?? size)}
             onValueChange={(next) => {
               onValueChange?.(next)
             }}

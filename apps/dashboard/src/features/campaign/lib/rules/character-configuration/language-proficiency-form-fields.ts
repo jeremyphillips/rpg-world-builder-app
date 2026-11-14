@@ -49,7 +49,7 @@ export function languageProficiencyFields(
   return [
     {
       kind: 'group',
-      legend: 'Languages',
+      heading: { label: 'Languages' },
       ...(navigation?.id ? { id: navigation.id } : {}),
       ...(navigation ? { navigation } : {}),
       ...(navigation ? { className: SCROLL_SECTION_ANCHOR_CLASS } : {}),

@@ -267,7 +267,7 @@ describe('monster publish validation messages', () => {
   it('puts legendary uses on a two-digit row', () => {
     const actions = buildMonsterTabs(ctx).find((tab) => tab.id === 'actions')
     const group = actions?.fields.find(
-      (field) => 'legend' in field && field.legend === 'Legendary Actions',
+      (field) => 'heading' in field && field.heading?.label === 'Legendary Actions',
     )
     const row =
       group && 'fields' in group

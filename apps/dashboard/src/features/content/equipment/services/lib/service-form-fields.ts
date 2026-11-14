@@ -42,7 +42,6 @@ function serviceDurationField(): FieldConfig {
 export function serviceFormFieldGroup(): FormItem {
   return {
     kind: 'group',
-    legend: '',
     fields: [
       {
         kind: 'row',

@@ -108,7 +108,7 @@ export function attackRangeClusterRow(options: AttackRangeRowOptions): RowConfig
 export function weaponAttackRangeGroup(options: AttackRangeRowOptions): FormItem {
   return {
     kind: 'group',
-    legend: 'Range',
+    heading: { label: 'Range' },
     visibility: options.visibility,
     fields: [attackRangeRow(options)],
   }

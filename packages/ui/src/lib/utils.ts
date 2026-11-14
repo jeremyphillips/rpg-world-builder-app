@@ -84,10 +84,13 @@ const TEXT_STYLE_UTILITIES = [
   'text-style-field-legend',
   'text-style-field-legend-sub',
   'text-style-field-legend-compact',
+  'text-style-field-legend-sub-compact',
   'text-style-field-hint',
   'text-style-field-hint-compact',
-  'text-style-field-group-description',
-  'text-style-field-group-description-compact',
+  'text-style-field-section-description',
+  'text-style-field-section-description-compact',
+  'text-style-field-subsection-description',
+  'text-style-field-subsection-description-compact',
   'text-style-field-error',
 ] as const
 

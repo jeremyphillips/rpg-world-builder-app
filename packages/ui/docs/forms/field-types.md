@@ -402,11 +402,10 @@ visible in the select (same contract as `allowCustom` distance authoring).
 
 These still render (they delegate to `inlineSentence`) but prefer migrating configs:
 
-| Legacy type         | Replacement                                                 |
-| ------------------- | ----------------------------------------------------------- |
-| `chooseFromChips`   | `inlineSentence` + `below: { kind: 'chips', … }`            |
-| `inlineChooseCount` | `inlineSentence` with `number` / `select` segments          |
-| `inputUnit`         | `inlineSentence` with `number` + trailing `text` (`ft.`, …) |
+| Legacy type         | Replacement                                        |
+| ------------------- | -------------------------------------------------- |
+| `chooseFromChips`   | `inlineSentence` + `below: { kind: 'chips', … }`   |
+| `inlineChooseCount` | `inlineSentence` with `number` / `select` segments |
 
 ## Input select (`inputSelect`)
 

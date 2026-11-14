@@ -21,7 +21,7 @@ export function seedEquipmentOfKind(kind: EquipmentKind): Equipment[] {
 export function collectGroupLegends(fields: readonly FormItem[]): string[] {
   return fields
     .filter((field): field is GroupConfig => 'kind' in field && field.kind === 'group')
-    .flatMap((field) => (field.legend !== undefined ? [field.legend] : []))
+    .flatMap((field) => (field.heading?.label !== undefined ? [field.heading.label] : []))
 }
 
 /**
@@ -40,7 +40,7 @@ export function expectComposedKindGroups(
   expect(fields.at(-1)).toMatchObject({ name: 'description' })
   const kindGroup = fields.find(
     (field): field is GroupConfig =>
-      'kind' in field && field.kind === 'group' && field.legend === kindLegend,
+      'kind' in field && field.kind === 'group' && field.heading?.label === kindLegend,
   )
   expect(kindGroup).toBeDefined()
   return fields

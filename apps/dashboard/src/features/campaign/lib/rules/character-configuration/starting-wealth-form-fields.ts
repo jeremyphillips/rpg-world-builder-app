@@ -113,7 +113,6 @@ export function buildStartingWealthTiersField(): LevelRangeArrayConfig {
     label: STARTING_WEALTH_TIERS_LEGEND,
     min: STARTING_WEALTH_TIER_COUNT,
     max: STARTING_WEALTH_TIER_COUNT,
-    density: 'comfortable',
     itemVariant: 'detailed',
     itemCollapsible: true,
     itemHeader: {
@@ -185,7 +184,7 @@ export function buildStartingWealthTiersField(): LevelRangeArrayConfig {
       {
         kind: 'array',
         name: 'magicItemGrants',
-        label: 'Magic item grants',
+        heading: { label: 'Magic item grants' },
         addAction: { label: 'Add magic item grant' },
         min: 0,
         item: {

@@ -1,10 +1,10 @@
 import { arrayItemLabel } from '../../config/array/array-item-label.lib'
 import { resolveArrayItemHeader } from '../../config/array/array-item-config.lib'
-import { resolveArrayLabel } from '../../config/array/resolve-array-label.lib'
+import { resolveArrayHeading } from '../../config/array/resolve-array-heading.lib'
 import type { ArrayConfig } from '../../field-config'
 
 export function resolveArrayEmptyItemLabel(config: ArrayConfig): string {
-  const itemLegend = resolveArrayLabel(config)?.label ?? ''
+  const itemLegend = resolveArrayHeading(config)?.label ?? ''
   const header = resolveArrayItemHeader(config, itemLegend)
   return arrayItemLabel(header, itemLegend)
 }

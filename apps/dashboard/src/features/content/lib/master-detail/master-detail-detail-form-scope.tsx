@@ -18,11 +18,9 @@ export function MasterDetailDetailFormScope({ children }: { children: ReactNode 
       parent.namedGroupDepth,
       MASTER_DETAIL_DETAIL_NAMED_GROUP_DEPTH_FLOOR,
     )
-    const headingTier = namedGroupDepth === 0 ? ('section' as const) : ('subsection' as const)
     return {
       ...parent,
       namedGroupDepth,
-      headingTier,
     }
   }, [parent])
 

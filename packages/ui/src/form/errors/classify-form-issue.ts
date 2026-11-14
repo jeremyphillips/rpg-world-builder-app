@@ -1,24 +1,10 @@
+import { resolveLevelRangeKeys } from '../config/array/resolve-level-range-keys.lib'
 import type { ArrayPatternConfig } from '../field-config'
 import type { FormIssue, FormIssueScope, FormIssueSeverity } from './form-issue.types'
 
 export type ClassifyFormIssueOptions = {
   arrayPattern?: ArrayPatternConfig
   fieldOrder?: readonly string[]
-}
-
-function resolveLevelRangeKeys(arrayPattern: ArrayPatternConfig | undefined): {
-  min: string
-  max: string
-} {
-  if (arrayPattern?.kind !== 'levelRange') {
-    return { min: 'minLevel', max: 'maxLevel' }
-  }
-
-  const levelKeys = arrayPattern.levelKeys as { min?: string; max?: string } | undefined
-  return {
-    min: levelKeys?.min ?? 'minLevel',
-    max: levelKeys?.max ?? 'maxLevel',
-  }
 }
 
 function isLeafRelativePath(relativePath: string): boolean {

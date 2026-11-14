@@ -27,6 +27,7 @@ export interface FieldLayoutProps {
   wrapControl?: boolean
   chrome?: FieldChrome
   size?: FieldSize
+  controlSize?: FieldSize
   /** Default `single-line`. Use `content-sized` for multiline / compound shells. */
   controlBand?: FieldControlBand
   /**
@@ -59,17 +60,20 @@ export function FieldLayout({
   wrapControl = true,
   chrome,
   size = 'md',
+  controlSize,
   controlBand = 'single-line',
   labelVisibility,
   showMessageRegion = true,
 }: FieldLayoutProps) {
-  const { hintPosition } = useFieldRootContext('FieldLayout')
+  const { hintPosition, controlSize: contextControlSize } = useFieldRootContext('FieldLayout')
+  const resolvedControlSize = controlSize ?? contextControlSize
   const visibility = useOwnedLabelVisibility(labelVisibility)
   const resolvedRecommendation = resolveFieldLayoutRecommendation(hintPosition, recommendation)
   const showVisibleLabel = Boolean(label) && visibility !== 'srOnly'
   const accessibleLabel = visibility === 'srOnly' ? label : null
   const presentation = resolveFieldPresentation({
     size,
+    controlSize: resolvedControlSize,
     labelLayout: showVisibleLabel ? 'stacked' : 'hidden',
     controlBand,
   })

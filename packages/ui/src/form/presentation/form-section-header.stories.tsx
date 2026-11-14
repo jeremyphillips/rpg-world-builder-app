@@ -18,7 +18,7 @@ const meta = {
   parameters: { layout: 'padded' },
   args: {
     label: 'Tables',
-    tier: 'subsection',
+    headingScale: 'subsection',
   },
 } satisfies Meta<typeof FormSectionHeader>
 
@@ -48,7 +48,7 @@ export const TwoLineHintWithAction: Story = {
 export const FieldLabelWithAction: Story = {
   args: {
     hint: 'Add the mechanical effects this feature provides.',
+    headingScale: 'field',
     action: addAction,
-    labelPresentation: 'field-label',
   },
 }

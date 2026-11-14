@@ -10,6 +10,22 @@ import {
 } from './dice-formula-field.lib'
 
 describe('DiceFormulaField', () => {
+  it('uses presentation size for the label and control size for the segments', () => {
+    const { container } = render(
+      <DiceFormulaField
+        id="roll"
+        label="Roll"
+        size="md"
+        controlSize="sm"
+        modifierMode="optional"
+      />,
+    )
+
+    expect(screen.getByText('Roll').closest('label')).toHaveClass('text-style-field-label-md')
+    expect(container.querySelector('.ui-field-group--sm')).toBeInTheDocument()
+    expect(container.querySelector('.ui-field-group--md')).not.toBeInTheDocument()
+  })
+
   it('renders the label and dice controls', () => {
     render(<DiceFormulaField id="roll" label="Roll" modifierMode="optional" />)
 

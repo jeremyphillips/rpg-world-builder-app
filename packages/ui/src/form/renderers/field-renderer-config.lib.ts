@@ -2,7 +2,12 @@
  * Pure helpers that prepare a `FieldConfig` for `FieldRenderer`.
  */
 import type { FieldSize } from '../../components/ui/field.client'
-import type { FieldConfig, FieldDerivedMeta, JoinedPairFieldConfig } from '../field-config'
+import type {
+  FieldConfig,
+  FieldDerivedMeta,
+  JoinedPairFieldConfig,
+  TextSuggestionsFieldConfig,
+} from '../field-config'
 import { resolveFieldConfigPrimaryName } from '../field-config'
 import { resolveFieldCopyContext } from '../config/field-copy-context.lib'
 import { resolveFieldInstruction } from '../config/field-instruction.lib'
@@ -14,7 +19,7 @@ import {
   resolveComboboxFieldConfig,
   resolveSelectFieldConfigOptions,
 } from '../field-config'
-import type { FormDensity } from '../form-density'
+import { resolveFormDensity, type FormDensity } from '../form-density'
 import { resolveFieldControlSize } from '../resolve-field-control-size.lib'
 
 export function buildFieldRendererIds(
@@ -48,14 +53,29 @@ export function buildJoinedPairRendererIds(
   return { fullName, id, boundNames }
 }
 
+export type FormSectionFieldSizing = {
+  density: FormDensity
+  defaultControlSize?: FieldSize
+}
+
 export interface ResolvedFieldRenderConfig {
   config: FieldConfig
+  presentationSize: FieldSize
   controlSize: FieldSize
   hint?: string
   hintPosition: ReturnType<typeof resolveFieldHintPresentation>['position']
   hintIcon?: ReturnType<typeof resolveFieldHintPresentation>['icon']
   derivedMeta?: FieldDerivedMeta
   derivedMetaReserveSpace?: boolean
+  /** Text-suggestion strings resolved from `suggestions.suggestionsWhen`. */
+  resolvedSuggestions?: readonly string[]
+}
+
+function resolveTextSuggestions(
+  config: TextSuggestionsFieldConfig,
+  values: Record<string, unknown>,
+): readonly string[] {
+  return config.suggestions.suggestionsWhen(values)
 }
 
 function resolveDerivedMetaPresentation(
@@ -79,13 +99,15 @@ export type ResolveFieldRenderConfigOptions = {
 // fallow-ignore-next-line complexity
 export function resolveFieldRenderConfig(
   config: FieldConfig,
-  density: FormDensity,
+  sectionSizing: FormSectionFieldSizing,
   dynamicValues: Record<string, unknown>,
   optionValues: Record<string, unknown>,
   options: ResolveFieldRenderConfigOptions = {},
 ): ResolvedFieldRenderConfig {
+  const presentationSize = resolveFormDensity(sectionSizing.density).size
   const controlSize = resolveFieldControlSize({
-    density,
+    density: sectionSizing.density,
+    defaultControlSize: sectionSizing.defaultControlSize,
     override: config.controlSizeOverride,
   })
   const hintPresentation = options.inAnatomyRow
@@ -96,6 +118,7 @@ export function resolveFieldRenderConfig(
     hintPresentation.text ?? resolveFieldInstruction(resolveFieldCopyContext(config))
 
   const basePresentation = {
+    presentationSize,
     controlSize,
     hint: resolvedHint,
     hintPosition: hintPresentation.position,
@@ -139,6 +162,14 @@ export function resolveFieldRenderConfig(
         ...(resolvedOptions !== undefined ? { options: resolvedOptions } : {}),
       } as FieldConfig,
       ...basePresentation,
+    }
+  }
+
+  if (config.type === 'textSuggestions') {
+    return {
+      config,
+      ...basePresentation,
+      resolvedSuggestions: resolveTextSuggestions(config, dynamicValues),
     }
   }
 

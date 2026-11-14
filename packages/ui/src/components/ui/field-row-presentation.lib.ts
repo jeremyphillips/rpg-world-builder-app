@@ -24,6 +24,7 @@ export type FieldLabelLayout = 'hidden' | 'stacked' | 'inline' | 'settings'
 
 export type FieldPresentationConfig = {
   size: FieldSizeToken
+  controlSize?: FieldSizeToken
   labelLayout: FieldLabelLayout
   controlBand?: FieldControlBand
 }
@@ -83,13 +84,14 @@ function resolveAlignmentAnchorClassName(
  */
 export function resolveFieldPresentation(config: FieldPresentationConfig): FieldRowPresentation {
   const { size, labelLayout } = config
+  const controlSize = config.controlSize ?? size
   const controlBand = config.controlBand ?? 'single-line'
 
   return {
     groupClassName: resolveGroupClassName(labelLayout),
-    controlBandClassName: fieldControlBandVariants({ size, band: controlBand }),
+    controlBandClassName: fieldControlBandVariants({ size: controlSize, band: controlBand }),
     labelClassName: fieldLabelVariants({ size }),
-    controlSize: size,
+    controlSize,
     /** @deprecated Prefer three-region anatomy; retained for settings / legacy anchors. */
     alignmentAnchorClassName: resolveAlignmentAnchorClassName(labelLayout, size),
   }

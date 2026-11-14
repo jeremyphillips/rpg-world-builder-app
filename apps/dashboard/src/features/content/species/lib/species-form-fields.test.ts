@@ -16,7 +16,7 @@ function speciesBasicsColumns(fields?: FormItem[]) {
 
 function columnItemKey(field: FormItem): string | undefined {
   if ('name' in field) return field.name
-  if ('legend' in field) return field.legend
+  if ('heading' in field) return field.heading?.label
   return undefined
 }
 

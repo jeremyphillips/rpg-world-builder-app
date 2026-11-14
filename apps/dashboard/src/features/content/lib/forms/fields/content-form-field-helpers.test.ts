@@ -155,7 +155,7 @@ describe('weightToForm', () => {
 describe('wealthGrantFields', () => {
   it('renders cp, sp, gp, and pp under the given prefix', () => {
     const [group] = wealthGrantFields('wealth')
-    expect(group).toMatchObject({ kind: 'group', legend: 'Wealth' })
+    expect(group).toMatchObject({ kind: 'group', heading: { label: 'Wealth' } })
     if (group && 'fields' in group && group.fields[0] && 'fields' in group.fields[0]) {
       expect(group.fields[0]).toMatchObject({ kind: 'row' })
       expect(group.fields[0]).not.toHaveProperty('layout')

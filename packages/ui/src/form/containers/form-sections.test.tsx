@@ -17,13 +17,13 @@ const schema = z.object({
 const fields: FormItem[] = [
   {
     kind: 'group',
-    legend: 'Identity',
+    heading: { label: 'Identity' },
     fields: [{ type: 'text', name: 'title', label: 'Title' }],
   },
   {
     kind: 'array',
     name: 'tags',
-    label: 'Tags',
+    heading: { label: 'Tags' },
     fields: [{ type: 'text', name: 'label', label: 'Label' }],
     addAction: { label: 'Add tag' },
   },
@@ -54,12 +54,12 @@ describe('Form section rendering', () => {
     const nestedGroupFields: FormItem[] = [
       {
         kind: 'group',
-        legend: 'Weapon',
+        heading: { label: 'Weapon' },
         fields: [
           { type: 'text', name: 'title', label: 'Title' },
           {
             kind: 'group',
-            legend: 'Damage',
+            heading: { label: 'Damage' },
             fields: [{ type: 'text', name: 'damageDice', label: 'Dice' }],
           },
         ],
@@ -81,7 +81,7 @@ describe('Form section rendering', () => {
     const anonymousWrapperFields: FormItem[] = [
       {
         kind: 'group',
-        legend: 'Weapon',
+        heading: { label: 'Weapon' },
         fields: [
           {
             kind: 'group',
@@ -89,7 +89,7 @@ describe('Form section rendering', () => {
           },
           {
             kind: 'group',
-            legend: 'Damage',
+            heading: { label: 'Damage' },
             fields: [{ type: 'text', name: 'damageDice', label: 'Dice' }],
           },
         ],
@@ -113,7 +113,7 @@ describe('Form section rendering', () => {
       {
         kind: 'group',
         id: 'summary-group',
-        legend: 'Campaign availability',
+        label: 'Campaign availability',
         disclosure: {
           variant: 'inline',
           defaultOpen: false,

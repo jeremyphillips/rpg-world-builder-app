@@ -202,6 +202,43 @@ describe('TextSuggestionsField', () => {
     expect(hint.compareDocumentPosition(recommended)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
   })
 
+  it('uses presentation size for the label and control size for the input', () => {
+    render(
+      <TextSuggestionsField
+        id="specialization"
+        label="Specialization"
+        value=""
+        suggestions={[]}
+        size="md"
+        controlSize="sm"
+        onValueChange={() => {}}
+      />,
+    )
+
+    expect(screen.getByText('Specialization').closest('label')).toHaveClass(
+      'text-style-field-label-md',
+    )
+    expect(screen.getByRole('textbox', { name: 'Specialization' })).toHaveClass(
+      'ui-field-control--sm',
+    )
+  })
+
+  it('falls back to size when controlSize is omitted', () => {
+    render(
+      <TextSuggestionsField
+        id="specialization"
+        label="Specialization"
+        value=""
+        suggestions={[]}
+        onValueChange={() => {}}
+      />,
+    )
+
+    expect(screen.getByRole('textbox', { name: 'Specialization' })).toHaveClass(
+      'ui-field-control--md',
+    )
+  })
+
   itAxe('passes axe checks', async () => {
     const { container } = render(
       <TextSuggestionsField

@@ -90,7 +90,7 @@ export type EmbeddedArrayResolverFieldInput =
 /** Resolver-only array field config for master-detail tabs. */
 export function embeddedArrayResolverField(
   name: string,
-  label: string,
+  sectionLabel: string,
   input: EmbeddedArrayResolverFieldInput,
 ): FormItem {
   const resolveFields =
@@ -100,7 +100,7 @@ export function embeddedArrayResolverField(
   return {
     kind: 'array',
     name,
-    label,
+    heading: { label: sectionLabel },
     fields,
     ...(resolveFields ? { item: { resolveFields } } : {}),
   }
@@ -109,14 +109,12 @@ export function embeddedArrayResolverField(
 export type EmbeddedMasterDetailTabValidationConfig =
   | {
       path: string
-      legend?: string
       itemLabel?: string
       resolveItemFields: ArrayResolveFieldsFn
       fields?: readonly FormItem[]
     }
   | {
       path: string
-      legend?: string
       itemLabel?: string
       fields: readonly FormItem[]
       resolveItemFields?: never
@@ -130,7 +128,7 @@ export function embeddedMasterDetailTabValidation(
   config: EmbeddedMasterDetailTabValidationConfig,
 ): Required<Pick<TabbedFormTab, 'errorPaths' | 'resolverFields'>> {
   const { path } = config
-  const legend = config.legend ?? config.itemLabel ?? path
+  const sectionLabel = config.itemLabel ?? path
   const resolverInput: EmbeddedArrayResolverFieldInput =
     'resolveItemFields' in config && config.resolveItemFields
       ? {
@@ -141,6 +139,6 @@ export function embeddedMasterDetailTabValidation(
 
   return {
     errorPaths: [path],
-    resolverFields: [embeddedArrayResolverField(path, legend, resolverInput)],
+    resolverFields: [embeddedArrayResolverField(path, sectionLabel, resolverInput)],
   }
 }

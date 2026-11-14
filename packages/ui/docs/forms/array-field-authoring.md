@@ -14,7 +14,7 @@ Ticket code references — compact rows, `primaryField` title, no collapse:
 defineArrayField({
   kind: 'array',
   name: 'codeRefs',
-  label: 'Code references',
+  heading: { label: 'Code references' },
   addAction: { label: 'Add code reference' },
   item: {
     header: {
@@ -45,7 +45,7 @@ Species/class grant rows — detailed items, template add menu, domain header fo
 defineArrayField({
   kind: 'array',
   name: 'grants',
-  label: 'Grants',
+  heading: { label: 'Grants' },
   addAction: {
     label: 'Add grant',
     menu: buildGrantArrayAddMenu(grantTypes),
@@ -68,7 +68,7 @@ Wealth tiers — fixed order, no reorder, collapse with summary:
 defineArrayField({
   kind: 'array',
   name: 'tiers',
-  label: 'Wealth tiers',
+  heading: { label: 'Wealth tiers' },
   item: {
     variant: 'detailed',
     collapsible: true,
@@ -85,7 +85,7 @@ defineArrayField({
 })
 ```
 
-## `label` / `hint` presentation
+## `heading` presentation
 
 Array section headers use the same **leaf field label line** (`fieldLabelVariants`) and
 **below-label hint** (`Text variant="caption"`) as scalar fields. The fieldset
@@ -93,7 +93,7 @@ Array section headers use the same **leaf field label line** (`fieldLabelVariant
 into hints or inline add controls. Section/subsection legend scale belongs on named
 **groups**, not on `kind: 'array'`.
 
-Author with `label`, optional `hint`, and optional `labelVisibility` — see
+Author with `heading: { label, hint?, labelVisibility? }` — see
 [heading-hierarchy.md](./heading-hierarchy.md).
 
 ## `item.variant` / `item.surface` / `item.collapsible`
@@ -224,7 +224,7 @@ add clicks to the vocabulary adapter registered on `RelationshipFieldProvider`.
 defineArrayField({
   kind: 'array',
   name: 'organizations',
-  label: 'Organizations',
+  heading: { label: 'Organizations' },
   addAction: {
     label: 'Add organization',
     layout: 'inline',

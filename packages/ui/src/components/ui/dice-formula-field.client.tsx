@@ -39,7 +39,10 @@ export interface DiceFormulaFieldProps {
   info?: React.ReactNode
   required?: boolean
   disabled?: boolean
+  /** Field presentation. Standalone default is `md`. */
   size?: FieldSize
+  /** Segment geometry. Falls back to `size`. */
+  controlSize?: FieldSize
   width?: FieldWidth
   chrome?: FieldChrome
   labelVisibility?: FieldLabelVisibility
@@ -73,6 +76,7 @@ export function DiceFormulaField({
   required = false,
   disabled = false,
   size = 'md',
+  controlSize,
   width = 'full',
   chrome,
   labelVisibility = 'visible',
@@ -111,10 +115,11 @@ export function DiceFormulaField({
     [modifierMode, modifierOperators, onChange, resolved],
   )
 
+  const segmentSize = controlSize ?? size
   const controls = (
     <DiceFormulaControls
       id={id}
-      size={size}
+      size={segmentSize}
       resolved={resolved}
       faces={faces}
       disabled={disabled}
@@ -168,6 +173,7 @@ export function DiceFormulaField({
       hintPosition={hintPosition}
       required={required}
       size={size}
+      controlSize={controlSize}
       width={rootWidth}
       labelVisibility={labelVisibility}
       anatomy

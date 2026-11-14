@@ -113,7 +113,7 @@ describe('weaponAttackRangeGroup', () => {
 
     expect(group).toMatchObject({
       kind: 'group',
-      legend: 'Range',
+      heading: { label: 'Range' },
     })
     expect(group).not.toHaveProperty('description')
     if (!('kind' in group) || group.kind !== 'group') return

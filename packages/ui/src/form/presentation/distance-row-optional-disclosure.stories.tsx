@@ -78,7 +78,7 @@ function DistanceRowFixture() {
         fields={[
           {
             kind: 'group',
-            legend: 'Distance',
+            heading: { label: 'Distance' },
             fields: [
               {
                 kind: 'row',

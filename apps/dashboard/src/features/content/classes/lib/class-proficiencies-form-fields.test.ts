@@ -20,14 +20,12 @@ describe('proficienciesFields', () => {
     expect(columns.columns).toHaveLength(2)
 
     const [left, right] = columns.columns
-    expect(left?.fields.map((field) => ('legend' in field ? field.legend : undefined))).toEqual([
-      'Defenses',
-      `Granted ${getProficiencyDomainSentenceForm('skill', 2)}`,
-    ])
-    expect(right?.fields.map((field) => ('legend' in field ? field.legend : undefined))).toEqual([
-      'Weapons',
-      `Granted ${getProficiencyDomainSentenceForm('tool', 2)}`,
-    ])
+    expect(
+      left?.fields.map((field) => ('heading' in field ? field.heading?.label : undefined)),
+    ).toEqual(['Defenses', `Granted ${getProficiencyDomainSentenceForm('skill', 2)}`])
+    expect(
+      right?.fields.map((field) => ('heading' in field ? field.heading?.label : undefined)),
+    ).toEqual(['Weapons', `Granted ${getProficiencyDomainSentenceForm('tool', 2)}`])
   })
 
   it('keeps armor grant-set inside Defenses after saving throws', () => {
@@ -85,7 +83,7 @@ describe('proficienciesFields', () => {
 
     expect(toolsGroup).toMatchObject({
       kind: 'group',
-      legend: `Granted ${getProficiencyDomainSentenceForm('tool', 2)}`,
+      heading: { label: `Granted ${getProficiencyDomainSentenceForm('tool', 2)}` },
     })
     expect(toolsGroup).not.toHaveProperty('fieldChrome')
     expect(toolsGroup.fields.map((field) => ('name' in field ? field.name : undefined))).toEqual([

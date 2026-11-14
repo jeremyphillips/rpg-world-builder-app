@@ -56,7 +56,7 @@ function narrativeArrayField(
   return {
     kind: 'array',
     name: `narrative.${name}`,
-    label,
+    heading: { label },
     min: 1,
     density: 'comfortable',
     fields: [

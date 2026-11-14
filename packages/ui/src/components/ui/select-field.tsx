@@ -39,6 +39,7 @@ export interface SelectFieldProps
   required?: boolean
   width?: FieldWidth
   size?: FieldSize
+  controlSize?: FieldSize
   digits?: FieldDigits
   sizingLabel?: string
   sizingLabels?: readonly string[]
@@ -61,12 +62,13 @@ export interface SelectFieldProps
 function buildSelectFieldControl(props: SelectFieldProps, resolvedPlaceholder: string | undefined) {
   const resolvedValue =
     typeof props.value === 'string' && props.value.length > 0 ? props.value : undefined
-  const size = props.size ?? 'md'
+  const presentationSize = props.size ?? 'md'
+  const controlSize = props.controlSize ?? presentationSize
 
   return (
     <SelectRootWithClear
       label={props.label}
-      size={size}
+      size={controlSize}
       resolvedValue={resolvedValue}
       defaultValue={props.defaultValue}
       name={props.name}
@@ -78,7 +80,7 @@ function buildSelectFieldControl(props: SelectFieldProps, resolvedPlaceholder: s
       onOpenChange={props.onOpenChange}
       triggerConfig={{
         id: props.labelPosition === 'settings' ? props.id : undefined,
-        size,
+        size: controlSize,
         digits: props.digits,
         sizingLabel: props.sizingLabel,
         sizingLabels: props.sizingLabels,
@@ -98,6 +100,7 @@ export function SelectField(props: SelectFieldProps) {
     label,
     width,
     size = 'md',
+    controlSize,
     labelPosition,
     placeholder,
     noun,
@@ -126,6 +129,7 @@ export function SelectField(props: SelectFieldProps) {
     required: props.required,
     width: rootWidth,
     size,
+    controlSize,
     chrome,
     control,
   }

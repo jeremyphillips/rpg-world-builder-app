@@ -36,7 +36,7 @@ const fields: FormItem[] = [
   {
     kind: 'slot',
     name: 'notes',
-    label: 'Notes',
+    heading: { label: 'Notes' },
     hint: 'Optional author notes.',
     render: () => <NotesSlot />,
   },
@@ -86,7 +86,7 @@ describe('SlotFieldRenderer', () => {
       {
         kind: 'slot',
         name: 'notes',
-        label: 'Notes',
+        heading: { label: 'Notes' },
         render: () => <SlotDensityProbe />,
       },
     ]
@@ -111,7 +111,7 @@ describe('SlotFieldRenderer', () => {
       {
         kind: 'slot',
         name: 'notes',
-        label: 'Notes',
+        heading: { label: 'Notes' },
         hint: 'Optional author notes.',
         render: () => <SlotDensityProbe />,
       },
@@ -210,7 +210,7 @@ describe('SlotFieldRenderer', () => {
       {
         kind: 'slot',
         name: 'notes',
-        label: 'Notes',
+        heading: { label: 'Notes' },
         separator: 'subtle',
         render: () => <NotesSlot />,
       },
@@ -238,13 +238,13 @@ describe('SlotFieldRenderer', () => {
     const compactGroupFields: FormItem[] = [
       {
         kind: 'group',
-        legend: 'Campaign access',
+        heading: { label: 'Campaign access' },
         density: 'compact',
         fields: [
           {
             kind: 'slot',
             name: 'notes',
-            label: 'Notes',
+            heading: { label: 'Notes' },
             separator: 'subtle',
             render: () => <NotesSlot />,
           },
@@ -340,7 +340,7 @@ describe('SlotFieldRenderer', () => {
       {
         kind: 'slot',
         name: 'notes',
-        label: 'Notes',
+        heading: { label: 'Notes' },
         visibility: {
           dependsOn: ['showNotes'],
           visibleWhen: (values) => values.showNotes === true,

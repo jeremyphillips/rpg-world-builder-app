@@ -20,7 +20,7 @@ describe('array-item-config.lib', () => {
         {
           kind: 'array',
           name: 'tags',
-          label: 'Tags',
+          heading: { label: 'Tags' },
           fields: [{ type: 'text', name: 'label', label: 'Label' }],
         },
         { nested: true },
@@ -48,7 +48,7 @@ describe('array-item-config.lib', () => {
         {
           kind: 'array',
           name: 'entries',
-          label: 'Entries',
+          heading: { label: 'Entries' },
           item: { collapsible: true },
           fields: [{ type: 'text', name: 'label', label: 'Label' }],
         },
@@ -61,7 +61,7 @@ describe('array-item-config.lib', () => {
         {
           kind: 'array',
           name: 'examples',
-          label: 'Examples',
+          heading: { label: 'Examples' },
           item: { collapsible: true, variant: 'compact' },
           fields: [{ type: 'text', name: 'label', label: 'Label' }],
         },
@@ -74,7 +74,7 @@ describe('array-item-config.lib', () => {
     const config = {
       kind: 'array' as const,
       name: 'utilizes',
-      label: 'Utilize actions',
+      heading: { label: 'Utilize actions' },
       fields: [
         {
           kind: 'row' as const,
@@ -106,7 +106,7 @@ describe('array-item-config.lib', () => {
     const config = {
       kind: 'array' as const,
       name: 'traits',
-      label: 'Traits',
+      heading: { label: 'Traits' },
       fields: [
         { type: 'text' as const, name: 'name', label: 'Name', required: true },
         { type: 'textarea' as const, name: 'description', label: 'Description' },
@@ -171,7 +171,7 @@ describe('array-item-config.lib', () => {
       resolveArrayAddAction({
         kind: 'array',
         name: 'traits',
-        label: 'Traits',
+        heading: { label: 'Traits' },
         fields: [],
         addAction: { label: 'Add trait', layout: 'inline' },
       }),

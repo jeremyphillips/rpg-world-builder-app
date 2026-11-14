@@ -18,7 +18,7 @@ export function buildSpellcastingFeatureAvailabilityFormFields(
     {
       kind: 'group',
       id: `md-availability-${fieldId}`,
-      legend: CAMPAIGN_ACCESS_SECTION_LEGEND,
+      label: CAMPAIGN_ACCESS_SECTION_LEGEND,
       density: 'compact',
       disclosure: {
         variant: 'dialog',

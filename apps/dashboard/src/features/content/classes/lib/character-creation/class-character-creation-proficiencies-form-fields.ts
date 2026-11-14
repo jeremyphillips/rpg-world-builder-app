@@ -127,16 +127,16 @@ export function characterCreationProficienciesFields(
   return [
     {
       kind: 'group',
-      legend: 'Proficiencies',
+      heading: { label: 'Proficiencies' },
       fields: [
         {
           kind: 'group',
-          legend: SKILL_PROFICIENCY_PLURAL_LABEL,
+          heading: { label: SKILL_PROFICIENCY_PLURAL_LABEL },
           fields: characterCreationSkillChoiceFields(ctx),
         },
         {
           kind: 'group',
-          legend: 'Tool Proficiencies',
+          heading: { label: 'Tool Proficiencies' },
           id: 'class-character-creation-tool-proficiencies',
           fields: characterCreationToolChoiceFields(ctx, toolChoiceExtraFields),
         },

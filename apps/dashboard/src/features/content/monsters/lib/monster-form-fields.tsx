@@ -80,7 +80,7 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
     },
     {
       kind: 'group',
-      legend: 'Identity',
+      heading: { label: 'Identity' },
       density: 'comfortable',
       fields: [
         descriptionField(ctx),
@@ -111,7 +111,7 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
     movementWithHoverGroup(),
     {
       kind: 'group',
-      legend: MONSTER_CHALLENGE_HEADING,
+      heading: { label: MONSTER_CHALLENGE_HEADING },
       fields: [
         {
           type: 'select',
@@ -144,7 +144,7 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
   const actions: FormItem[] = [
     {
       kind: 'group',
-      legend: MONSTER_LEGENDARY_ACTIONS_HEADING,
+      heading: { label: MONSTER_LEGENDARY_ACTIONS_HEADING },
       visibility: {
         dependsOn: ['legendaryActions'],
         visibleWhen: (values) =>
@@ -182,7 +182,7 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
 
   const actionValidation = embeddedMasterDetailTabValidation({
     path: 'actions',
-    legend: 'Actions',
+    itemLabel: 'Actions',
     fields: [],
     resolveItemFields: monsterActionRowResolveFields({ ctx, section: 'actions' }),
   })
@@ -198,7 +198,7 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       fields: traits,
       ...embeddedMasterDetailTabValidation({
         path: 'traits',
-        legend: 'Traits',
+        itemLabel: 'Traits',
         fields: [],
         resolveItemFields: monsterTraitRowResolveFields({ ctx }),
       }),

@@ -13,6 +13,7 @@ import {
   type TableBuilderHostConfig,
   type TableBuilderMode,
 } from '../../lib/table-builder/table-builder-host-config'
+import { FormSectionProvider } from '@rpg/ui/form'
 import { TableBuilderHostConfigProvider } from '../../lib/table-builder/table-builder-host-context'
 import {
   tableBuilderAuthoringPaneClasses,
@@ -75,7 +76,9 @@ export function TableBuilder({ form, config, mode, withProviders = true }: Table
 
   return (
     <TableBuilderHostConfigProvider config={config}>
-      <FormProvider {...form}>{content}</FormProvider>
+      <FormProvider {...form}>
+        <FormSectionProvider density="compact">{content}</FormSectionProvider>
+      </FormProvider>
     </TableBuilderHostConfigProvider>
   )
 }

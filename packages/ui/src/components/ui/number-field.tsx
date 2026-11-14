@@ -26,6 +26,7 @@ export interface NumberFieldProps
   /** Container layout width. Defaults to `full`. */
   width?: FieldWidth
   size?: FieldSize
+  controlSize?: FieldSize
   /** `above` (default) — label over control. `settings` — label + hint left, control right. */
   labelPosition?: FieldLabelPosition
   /**
@@ -52,6 +53,7 @@ export const NumberField = React.forwardRef<HTMLInputElement, NumberFieldProps>(
       width = 'full',
       inputWidth,
       size = 'md',
+      controlSize,
       labelPosition,
       chrome,
       className,
@@ -59,6 +61,7 @@ export const NumberField = React.forwardRef<HTMLInputElement, NumberFieldProps>(
     },
     ref,
   ) => {
+    const resolvedControlSize = controlSize ?? size
     return (
       <FormField
         id={id}
@@ -73,13 +76,14 @@ export const NumberField = React.forwardRef<HTMLInputElement, NumberFieldProps>(
         required={required}
         width={width}
         size={size}
+        controlSize={controlSize}
         labelPosition={labelPosition}
         chrome={chrome}
       >
         <NumberInput
           ref={ref}
           id={id}
-          size={size}
+          size={resolvedControlSize}
           className={cn(
             inputWidth ? fieldWidthVariants({ width: inputWidth }) : undefined,
             className,

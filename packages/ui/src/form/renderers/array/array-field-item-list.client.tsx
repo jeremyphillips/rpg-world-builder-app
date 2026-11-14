@@ -22,7 +22,7 @@ import { CSS } from '@dnd-kit/utilities'
 import {
   ArrayFieldItemContent,
   type ArrayFieldItemContentProps,
-} from './array-field-item-content.client'
+} from './item/content/array-field-item-content.client'
 import { resolveSortableArrayMove } from './sortable-array-list.lib'
 import { resolveFieldArrayRowKey } from './resolve-field-array-row-key.lib'
 

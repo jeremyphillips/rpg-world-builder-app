@@ -42,7 +42,7 @@ export const inviteMembersFields: FormItem[] = [
   {
     kind: 'array',
     name: 'inviteEmails',
-    label: 'Email addresses',
+    heading: { label: 'Email addresses' },
     fields: [
       {
         type: 'text',

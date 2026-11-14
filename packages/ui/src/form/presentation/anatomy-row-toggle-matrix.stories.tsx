@@ -9,7 +9,7 @@ import { z } from 'zod'
 import { cn } from '../../lib/utils'
 import type { FormItem } from '../field-config'
 import { Form } from '../shells/form.client'
-import { queryControlTopByFieldName } from '../renderers/array/array-item-anatomy-track-probe.lib'
+import { queryControlTopByFieldName } from '../renderers/array/item/anatomy/array-item-anatomy-track-probe.lib'
 
 const spellcastingRowSchema = z.object({
   spellAbility: z.string(),

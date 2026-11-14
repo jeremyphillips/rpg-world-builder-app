@@ -15,7 +15,7 @@ import { useFormSectionContext } from '../../context/form-section.context'
 import { useArrayItemCollapseState } from '../../hooks/use-array-item-collapse-state.client'
 import { useFormValidationPresentation } from '../../hooks/use-form-validation-presentation.client'
 import { useFormUiContext } from '../../context/form-ui.context'
-import { useFocusFirstArrayIssue } from './use-focus-first-array-issue.client'
+import { useFocusFirstArrayIssue } from './use-array-focus-first-issue.client'
 import { resolveArrayFieldRendererChrome } from './resolve-array-field-renderer-chrome.lib'
 import { resolveArrayRequiredMarker } from './array-field-empty-state.lib'
 import { resolveArrayShowSectionHeader } from './resolve-array-show-section-header.lib'
@@ -55,11 +55,11 @@ export function useArrayFieldRendererState({
 }: UseArrayFieldRendererStateOptions) {
   const { addValidationSessionExpandKeys } = useFormUiContext()
   const validation = useFormValidationPresentation()
-  const { density, arrayLegendDensity, depth, inRhythmStack } = useFormSectionContext()
+  const parentContext = useFormSectionContext()
+  const { depth, inRhythmStack } = parentContext
   const chrome = resolveArrayFieldRendererChrome({
     config,
-    density,
-    legendDensity: arrayLegendDensity,
+    parentContext,
     depth,
     inRhythmStack,
     fieldsLength: fields.length,
@@ -84,6 +84,8 @@ export function useArrayFieldRendererState({
     sectionHint,
     labelMode,
     legendFieldSize,
+    legendRhythm,
+    headingScale,
     max,
     nested,
     omitSectionBottomMargin,
@@ -239,6 +241,8 @@ export function useArrayFieldRendererState({
     sectionHint,
     labelMode,
     legendFieldSize,
+    legendRhythm,
+    headingScale,
     nested,
     omitSectionBottomMargin,
     showSectionHeader: resolveArrayShowSectionHeader({

@@ -81,7 +81,7 @@ function editionPresetOptionsWithRecommendedBadge(options: FieldOption[]): Field
 function editionPresetGroup(editionPresetOptions: FieldOption[]): FormItem {
   return {
     kind: 'group',
-    legend: vocabularyFieldLabel(EDITION_PRESET_TERM),
+    heading: { label: vocabularyFieldLabel(EDITION_PRESET_TERM) },
     id: 'edition-preset',
     className: SCROLL_SECTION_ANCHOR_CLASS,
     fields: [
@@ -106,11 +106,12 @@ function editionPresetGroup(editionPresetOptions: FieldOption[]): FormItem {
 function mechanicsKnobsGroup(attackResolutionModeOptions: FieldOption[]): FormItem {
   return {
     kind: 'group',
-    legend: 'Mechanics knobs',
+    heading: {
+      label: 'Mechanics knobs',
+      hint: 'Fine-tune armor class and attack resolution. The server tracks whether these differ from your selected preset.',
+    },
     id: 'mechanics-knobs',
     className: SCROLL_SECTION_ANCHOR_CLASS,
-    description:
-      'Fine-tune armor class and attack resolution. The server tracks whether these differ from your selected preset.',
     fields: [
       {
         type: 'radio',

@@ -41,7 +41,6 @@ const visibleWhenFocusStaff: FieldVisibility = {
 export function adventuringGearFormFieldGroup(): FormItem {
   return {
     kind: 'group',
-    legend: '',
     fields: [
       {
         type: 'select',

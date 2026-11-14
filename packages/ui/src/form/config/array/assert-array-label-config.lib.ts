@@ -5,36 +5,29 @@ function warnInvalidArrayLabel(path: string, message: string): void {
   console.warn(`[Form] "${path}": ${message}`)
 }
 
-function hasArrayConfigKey<K extends keyof ArrayConfig>(
-  config: ArrayConfig,
-  key: K,
-): config is ArrayConfig & Record<K, NonNullable<ArrayConfig[K]>> {
-  return key in config && config[key] !== undefined
-}
-
 const INVALID_WHITESPACE_LABEL_MESSAGE =
-  'array label must be omitted or a non-whitespace string — empty or whitespace-only labels are invalid.'
-const HINT_REQUIRES_LABEL_MESSAGE = 'array hint requires a non-whitespace label.'
-const VISIBILITY_REQUIRES_LABEL_MESSAGE = 'array labelVisibility requires a non-whitespace label.'
+  'named array heading.label must be a non-whitespace string — empty or whitespace-only labels are invalid.'
+const HINT_REQUIRES_LABEL_MESSAGE = 'array heading.hint requires heading.label.'
+const VISIBILITY_REQUIRES_LABEL_MESSAGE = 'array heading.labelVisibility requires heading.label.'
 
 export function collectArrayLabelConfigIssues(config: ArrayConfig): string[] {
   const issues: string[] = []
-  const hasLabel = hasArrayConfigKey(config, 'label')
+  const heading = 'heading' in config ? config.heading : undefined
 
-  if (hasLabel && !isNonWhitespaceLabel(config.label)) {
+  if (heading !== undefined && !isNonWhitespaceLabel(heading.label)) {
     issues.push(INVALID_WHITESPACE_LABEL_MESSAGE)
   }
-  if (hasArrayConfigKey(config, 'hint') && !hasLabel) {
+  if (heading?.hint !== undefined && !isNonWhitespaceLabel(heading.label)) {
     issues.push(HINT_REQUIRES_LABEL_MESSAGE)
   }
-  if (hasArrayConfigKey(config, 'labelVisibility') && !hasLabel) {
+  if (heading?.labelVisibility !== undefined && !isNonWhitespaceLabel(heading.label)) {
     issues.push(VISIBILITY_REQUIRES_LABEL_MESSAGE)
   }
 
   return issues
 }
 
-/** Dev-only guard for invalid array label / hint combinations. */
+/** Dev-only guard for invalid array heading combinations. */
 export function assertArrayLabelConfig(config: ArrayConfig): void {
   if (process.env.NODE_ENV === 'production') return
 

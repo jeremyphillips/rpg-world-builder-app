@@ -126,6 +126,7 @@ export interface ChipsFieldProps extends SelectFieldValueProps, FieldLabelPresen
   introText?: React.ReactNode
   /** Label type scale — matches other field wrappers (default `md`). */
   size?: FieldSize
+  controlSize?: FieldSize
   /** Pill padding/type scale — defaults to `size` when omitted. */
   chipSize?: ChipSize
   width?: FieldWidth
@@ -177,13 +178,14 @@ export function ChipsField({
   required,
   disabled,
   size = 'md',
+  controlSize,
   chipSize,
   width,
   chrome,
   showSelectedCheckmark,
 }: ChipsFieldProps) {
   const inAnatomyRow = useFieldRowParticipation()
-  const resolvedChipSize = chipSize ?? size
+  const resolvedChipSize = chipSize ?? controlSize ?? size
   const resolvedHintPosition = inAnatomyRow ? 'below-control' : hintPosition
   const legendId = `${id}-legend`
   const hintId = `${id}-hint`
@@ -315,6 +317,7 @@ export function ChipsFormField(props: ChipsFieldProps) {
       required={props.required}
       width={resolveFieldAnatomyWidth(props.width, props.chrome)}
       size={props.size}
+      controlSize={props.controlSize}
     >
       <ChipsField {...props} />
     </Field.Root>

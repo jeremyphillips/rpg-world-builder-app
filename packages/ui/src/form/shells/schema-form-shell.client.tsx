@@ -231,10 +231,7 @@ export function SchemaFormShell<TFieldValues extends FieldValues>({
   externalFooterContent,
   children,
 }: SchemaFormShellProps<TFieldValues>) {
-  const sectionContext = React.useMemo(
-    () => ({ depth: 0, namedGroupDepth: 0, headingTier: 'section' as const, density }),
-    [density],
-  )
+  const sectionContext = React.useMemo(() => ({ depth: 0, namedGroupDepth: 0, density }), [density])
 
   return (
     <FormProvider {...form}>

@@ -658,7 +658,7 @@ export {
   type FieldGroupDialogDisclosure,
   type FieldGroupLegendSize,
   type FieldGroupProps,
-  type GroupHeadingScale,
+  type FormHeadingScale,
 } from './components/ui/field-group'
 export {
   resolveChromeAccentClasses,

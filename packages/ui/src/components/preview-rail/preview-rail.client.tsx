@@ -200,7 +200,13 @@ function PreviewRailIdentity({ media, name, status, facts }: PreviewRailIdentity
                 <IdentityRowHeadingLine heading={name} />
               </div>
             </div>
-            {status ? <Text variant="supporting">{status}</Text> : null}
+            {status ? (
+              typeof status === 'string' ? (
+                <Text variant="supporting">{status}</Text>
+              ) : (
+                status
+              )
+            ) : null}
           </div>
         </div>
         {facts && facts.length > 0 ? (

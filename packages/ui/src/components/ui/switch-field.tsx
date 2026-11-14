@@ -39,6 +39,7 @@ export interface SwitchFieldProps
   required?: boolean
   width?: FieldWidth
   size?: FieldSize
+  controlSize?: FieldSize
   /**
    * `inline` (default) — switch left, label right.
    * `above` — label over the switch.
@@ -87,6 +88,7 @@ export function SwitchField({
   required,
   width,
   size = 'md',
+  controlSize,
   labelPosition = 'inline',
   chrome,
   ...switchProps
@@ -120,6 +122,7 @@ export function SwitchField({
         required={required}
         width={rootWidth}
         size={size}
+        controlSize={controlSize}
         labelPosition="settings"
         chrome={chrome}
       >
@@ -139,6 +142,7 @@ export function SwitchField({
         required={required}
         width={rootWidth}
         size={size}
+        controlSize={controlSize}
         labelVisibility={labelVisibility}
         anatomy
       >
@@ -147,6 +151,7 @@ export function SwitchField({
           control={<Switch {...switchProps} />}
           chrome={chrome}
           size={size}
+          controlSize={controlSize}
         />
       </Field.Root>
     )
@@ -154,6 +159,7 @@ export function SwitchField({
 
   const presentation = resolveFieldPresentation({
     size,
+    controlSize,
     labelLayout: 'inline',
     controlBand: inAnatomyRow ? 'single-line' : 'content-sized',
   })
@@ -195,6 +201,7 @@ export function SwitchField({
       required={required}
       width={rootWidth}
       size={size}
+      controlSize={controlSize}
       anatomy
     >
       <FieldChromeShell chrome={chrome} size={size} className={cn('flex flex-col')}>

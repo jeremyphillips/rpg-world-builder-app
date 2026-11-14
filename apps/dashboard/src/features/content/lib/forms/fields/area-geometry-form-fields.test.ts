@@ -45,7 +45,7 @@ describe('resolveAreaGeometryShapeOptions', () => {
 describe('areaGeometryFormFields', () => {
   const base = {
     fieldPrefix: 'resolution.areaOfEffect',
-    legend: 'Area',
+    headingLabel: 'Area',
     shapeHint: 'Hint',
   }
 

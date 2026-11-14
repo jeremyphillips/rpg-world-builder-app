@@ -66,11 +66,10 @@ describe('ClassSpellbookAcquisitionModal', () => {
     expect(
       screen.getByText('Start with 6 spells. Gain 2 spells at each later level through level 20.'),
     ).toBeInTheDocument()
-    let gainModeHeader: HTMLElement | null = screen.getByText('How are spells gained?')
-    while (gainModeHeader && !gainModeHeader.classList.contains('[&_p]:!text-sm')) {
-      gainModeHeader = gainModeHeader.parentElement
-    }
-    expect(gainModeHeader).not.toBeNull()
+    const gainModeHint = screen.getByText(
+      'Choose whether this class gains the same number of spells each level or a variable amount by level.',
+    )
+    expect(gainModeHint).toHaveClass('text-style-field-hint-compact')
   })
 
   it('switches to the variable pane when varies by level is selected', async () => {

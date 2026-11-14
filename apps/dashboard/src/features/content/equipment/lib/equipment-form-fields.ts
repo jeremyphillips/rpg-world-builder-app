@@ -657,7 +657,7 @@ export const equipmentFormDraftSchema = z
 function economyGroup(ctx?: ContentFormCtx): FormItem {
   return {
     kind: 'group',
-    legend: 'Economy',
+    heading: { label: 'Economy' },
     fields: economyFields({ kind: ctx?.equipmentKind }),
   }
 }

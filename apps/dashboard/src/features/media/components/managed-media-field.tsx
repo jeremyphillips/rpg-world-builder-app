@@ -13,7 +13,7 @@ import {
   fieldAnatomyStackVariants,
   resolveExpandedCapacityHint,
 } from '@rpg/ui'
-import { ArrayLikeSectionHeader, resolveFormDensity, useFormSectionContext } from '@rpg/ui/form'
+import { FormSectionHeader, resolveFormDensity, useFormSectionContext } from '@rpg/ui/form'
 
 import { buildMediaFieldSummaryModel } from '../lib/build-media-field-summary-model'
 import { resolveMediaFieldCapacity, type MediaFieldConfig } from '../lib/media-field-config'
@@ -81,11 +81,10 @@ export function ManagedMediaField({
           role="group"
           aria-labelledby={headingId}
         >
-          <ArrayLikeSectionHeader
-            wrapper="none"
+          <FormSectionHeader
             id={headingId}
             label={label}
-            size={size}
+            headingScale="field"
             hint={
               summary.galleryCount > 0
                 ? resolveExpandedCapacityHint(summary.attachmentCount, maxItems)

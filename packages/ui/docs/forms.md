@@ -263,8 +263,12 @@ Slot `render()` components and hand-built editors should call `useFormSectionCon
 (e.g. `RequirementEditor` → `FieldGroup`).
 
 **Array legends:** inherit parent section density unless the array sets `density` explicitly.
-Item bodies still default to `compact`. Legend typography follows the legend scale
-(`compact`/`sm` → `text-xs`; `comfortable`/`md` → `text-md`).
+Item **controls** and list/body stack gaps still default to compact via
+`FormSectionContext.defaultControlSize` and array chrome — not via presentation `density`.
+Legend and in-item **labels** follow inherited presentation density.
+
+**Presentation vs control:** `Field.Root` / `FormField` `size` is presentation (labels, hints).
+Optional `controlSize` (or section `defaultControlSize` + `controlSizeOverride`) sets control geometry.
 
 Dense chip fields stack full-width — don't cram many options into a `FieldRow`.
 
@@ -334,6 +338,22 @@ not as a renderer requirement.
 | `slot`    | Custom `render()` region         | [containers.md](./forms/containers.md#slot-fields)  |
 
 Collapsible sections, separators, nested groups: [containers.md](./forms/containers.md).
+
+## Renderer ownership
+
+`FieldRenderer` resolves chrome, options, hints, sizes, and text-suggestion strings once.
+It does not bind React Hook Form. Four families own registration:
+
+- **Standard** — one controller and progressive blur/change validation. Scalar disclosure wraps that binding.
+- **Select** — its own controller, without progressive validation. It owns array filtering, read-only commit, and select disclosure, and consumes the parent resolution.
+- **Text suggestions** — its own controller, without progressive validation, including when wrapped in disclosure. Suggestion strings come from the parent resolution.
+- **Multi-controller** — `inputSelect`, `inputUnit`, `levelRange`, `inlineSentence`, `inlineChooseCount`, `chooseFromChips`, `joinedPair`, and `rollValue`. Each keeps its own controllers.
+
+Leaf chrome goes through `buildFieldShellProps`. `size` is field presentation and `controlSize` is control geometry; an omitted `controlSize` falls back to `size`. `disabledWhen` is applied on the resolved config for every family and does not unregister the field.
+
+Intentional sizing exceptions: file dropzones have no control scale; radio item glyphs and radio-card density stay on their own props; editable-grid geometry is fixed by the grid primitive.
+
+Still deferred: `hintIcon` beyond the number stepper; `invalid`, `describedBy`, and refs on dice formula and editable grid; progressive validation for select, text suggestions, and multi-controller fields; joined-pair shell copy stays on the start path.
 
 ## Specialized field types
 

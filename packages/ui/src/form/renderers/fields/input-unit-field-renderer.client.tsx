@@ -5,7 +5,7 @@ import { useWatch } from 'react-hook-form'
 import { resolveValueDigitsFromConfig } from '../../config/input-field-value-digits.lib'
 import { inputUnitToInlineSentence } from '../../config/inline-sentence-legacy-config.lib'
 import type { InputUnitFieldConfig } from '../../field-config'
-import { InlineSentenceFieldRenderer } from './inline-sentence-field-renderer.client'
+import { InlineSentenceFieldRenderer } from './inline-sentence/inline-sentence-field-renderer.client'
 
 export interface InputUnitFieldRendererProps {
   config: InputUnitFieldConfig

@@ -21,6 +21,7 @@ export interface BaseRadioFieldProps extends FieldValidationProps, FieldLabelPre
   info?: ReactNode
   required?: boolean
   size?: FieldSize
+  controlSize?: FieldSize
   width?: FieldWidth
   labelVisibility?: FieldLabelVisibility
   chrome?: FieldChrome
@@ -44,6 +45,7 @@ export function RadioFieldShell({
   info,
   required,
   size,
+  controlSize,
   width,
   labelVisibility,
   chrome,
@@ -62,6 +64,7 @@ export function RadioFieldShell({
       hintPosition={hintPosition}
       required={required}
       size={size}
+      controlSize={controlSize}
       width={resolveFieldAnatomyWidth(width, chrome)}
       labelVisibility={labelVisibility}
       anatomy
@@ -79,6 +82,7 @@ export function RadioFieldShell({
         control={children(labelId)}
         chrome={chrome}
         size={size}
+        controlSize={controlSize}
         controlBand={controlBand}
       />
     </Field.Root>

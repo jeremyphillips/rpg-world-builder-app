@@ -98,7 +98,6 @@ export function outcomeBranchBodyFields(
   return [
     {
       kind: 'group',
-      legend: '',
       fields: [
         {
           kind: 'slot',

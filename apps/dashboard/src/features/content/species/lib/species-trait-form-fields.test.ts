@@ -30,7 +30,7 @@ describe('species trait field configuration', () => {
       (field) =>
         'kind' in field &&
         field.kind === 'group' &&
-        field.description === TRAIT_DERIVED_DISPLAY_DESCRIPTION,
+        field.heading?.hint === TRAIT_DERIVED_DISPLAY_DESCRIPTION,
     )
     expect(derivedGroup).toBeDefined()
     expect(JSON.stringify(fields)).toContain(TRAIT_OVERRIDE_DISPLAY_LABEL)

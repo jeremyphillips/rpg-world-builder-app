@@ -23,7 +23,6 @@ export function vehicleFormFieldGroup(rules?: ArmorClassRules): FormItem {
   const bounds = rules ? fixedAcDisplayBounds(rules) : undefined
   return {
     kind: 'group',
-    legend: '',
     fields: [
       {
         type: 'select',
@@ -36,7 +35,7 @@ export function vehicleFormFieldGroup(rules?: ArmorClassRules): FormItem {
       ...vehicleCargoSpeedFields(),
       {
         kind: 'group',
-        legend: 'Combat',
+        heading: { label: 'Combat' },
         fields: [
           {
             kind: 'row',

@@ -17,7 +17,7 @@ describe('resolveFieldRenderConfig', () => {
       },
     }
 
-    const resolved = resolveFieldRenderConfig(config, 'comfortable', {}, {})
+    const resolved = resolveFieldRenderConfig(config, { density: 'comfortable' }, {}, {})
 
     expect(resolved.hint).toBe('Choose up to 2 primary abilities.')
   })
@@ -32,8 +32,25 @@ describe('resolveFieldRenderConfig', () => {
       hint: 'Pick your two best stats.',
     }
 
-    const resolved = resolveFieldRenderConfig(config, 'comfortable', {}, {})
+    const resolved = resolveFieldRenderConfig(config, { density: 'comfortable' }, {}, {})
 
     expect(resolved.hint).toBe('Pick your two best stats.')
+  })
+
+  it('resolves text suggestion strings from watched values', () => {
+    const config: FieldConfig = {
+      type: 'textSuggestions',
+      name: 'refinement',
+      label: 'Refinement',
+      suggestions: {
+        dependsOn: ['driver'],
+        suggestionsWhen: (values) => (values.driver === 'inn' ? ['coaching inn'] : []),
+      },
+    }
+
+    expect(
+      resolveFieldRenderConfig(config, { density: 'comfortable' }, { driver: 'inn' }, {})
+        .resolvedSuggestions,
+    ).toEqual(['coaching inn'])
   })
 })

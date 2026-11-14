@@ -3,12 +3,11 @@
 import { useController } from 'react-hook-form'
 
 import { DiceFormulaField } from '../../../components/ui/dice-formula-field.client'
-import { pickFieldChromeProps } from '../../../components/ui/field-chrome.variants'
+import { buildFieldShellProps } from '../field-shell-props.lib'
 import type { DiceFormulaValue } from '../../../components/ui/dice-formula-field.lib'
 import type { FieldHintPosition } from '../../../components/ui/field.variants'
 import type { DiceFormulaFieldConfig } from '../../field-config'
-import { resolveFieldLabelVisibility } from '../../form-heading.lib'
-import { useFieldControlSize } from '../../context/form-section.context'
+import type { FieldSize } from '../../../components/ui/field.client'
 
 export interface DiceFormulaFieldRendererProps {
   config: DiceFormulaFieldConfig
@@ -21,6 +20,8 @@ export interface DiceFormulaFieldRendererProps {
   error?: string
   hint?: string
   hintPosition?: FieldHintPosition
+  presentationSize: FieldSize
+  controlSize: FieldSize
   namePrefix?: string
 }
 
@@ -32,9 +33,10 @@ export function DiceFormulaFieldRenderer({
   error,
   hint,
   hintPosition,
+  presentationSize,
+  controlSize,
   namePrefix,
 }: DiceFormulaFieldRendererProps) {
-  const controlSize = useFieldControlSize(config.controlSizeOverride)
   const currencyConfig = config.currencyUnit
   const currencyName =
     currencyConfig && namePrefix ? `${namePrefix}.${currencyConfig.name ?? 'currency'}` : undefined
@@ -55,18 +57,18 @@ export function DiceFormulaFieldRenderer({
 
   return (
     <DiceFormulaField
-      id={id}
-      {...pickFieldChromeProps(config)}
-      label={config.label}
-      labelVisibility={resolveFieldLabelVisibility(config)}
-      error={error}
-      hint={hint}
-      hintPosition={hintPosition}
-      info={config.info}
-      required={config.required}
-      width={config.width}
-      size={controlSize}
-      disabled={config.disabled}
+      {...buildFieldShellProps(
+        {
+          config,
+          id,
+          hint,
+          hintPosition,
+          presentationSize,
+          controlSize,
+        },
+        { error },
+        { sizes: 'both', label: 'visible' },
+      )}
       labelPosition={config.labelPosition}
       modifierMode={config.modifierMode}
       faces={config.faces}

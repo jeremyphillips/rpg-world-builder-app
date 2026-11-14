@@ -29,6 +29,7 @@ export type SelectFieldLayoutSharedProps = FieldValidationProps & {
   required?: boolean
   width?: FieldWidth
   size: FieldSize
+  controlSize?: FieldSize
   chrome?: FieldChrome
   control: ReactElement | ReactNode
 }
@@ -46,6 +47,7 @@ export function SelectFieldSettingsLayout({
   required,
   width,
   size,
+  controlSize,
   chrome,
   control,
 }: SelectFieldLayoutSharedProps) {
@@ -63,6 +65,7 @@ export function SelectFieldSettingsLayout({
       required={required}
       width={width}
       size={size}
+      controlSize={controlSize}
       labelPosition="settings"
       chrome={chrome}
     >
@@ -84,6 +87,7 @@ export function SelectFieldInlineLayout({
   required,
   width,
   size,
+  controlSize,
   chrome,
   control,
 }: SelectFieldLayoutSharedProps) {
@@ -98,6 +102,7 @@ export function SelectFieldInlineLayout({
       required={required}
       width={width}
       size={size}
+      controlSize={controlSize}
       labelVisibility={labelVisibility}
     >
       {hasActiveFieldChrome(chrome) ? (
@@ -174,6 +179,7 @@ export function SelectFieldDefaultLayout({
   required,
   width,
   size,
+  controlSize,
   chrome,
   control,
 }: SelectFieldLayoutSharedProps) {
@@ -188,6 +194,7 @@ export function SelectFieldDefaultLayout({
       required={required}
       width={width}
       size={size}
+      controlSize={controlSize}
       labelVisibility={labelVisibility}
       anatomy
     >
@@ -197,6 +204,7 @@ export function SelectFieldDefaultLayout({
         control={control}
         chrome={chrome}
         size={size}
+        controlSize={controlSize}
       />
     </Field.Root>
   )

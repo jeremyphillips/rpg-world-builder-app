@@ -48,7 +48,7 @@ export function OptionalDisclosureGroup({
     <OptionalDisclosureGroupBody
       disclosure={disclosure}
       objectName={objectName}
-      fieldLabel={item.heading?.label ?? item.legend ?? 'Saving throw'}
+      fieldLabel={item.heading?.label ?? 'Saving throw'}
       fields={item.fields}
       idPrefix={idPrefix}
       namePrefix={namePrefix}

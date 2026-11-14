@@ -1,3 +1,4 @@
+import { resolveLevelRangeKeys } from '../config/array/resolve-level-range-keys.lib'
 import type { ArrayErrorFocusContext, ArrayPatternConfig } from '../field-config'
 import type { FormIssue } from './form-issue.types'
 
@@ -9,21 +10,6 @@ export function buildFieldControlId(
 ): string {
   const fullName = namePrefix ? `${namePrefix}.${fieldName}` : fieldName
   return `${idPrefix}-${fullName.replaceAll('.', '-')}`
-}
-
-function resolveLevelRangeKeys(arrayPattern: ArrayPatternConfig | undefined): {
-  min: string
-  max: string
-} {
-  if (arrayPattern?.kind !== 'levelRange') {
-    return { min: 'minLevel', max: 'maxLevel' }
-  }
-
-  const levelKeys = arrayPattern.levelKeys as { min?: string; max?: string } | undefined
-  return {
-    min: levelKeys?.min ?? 'minLevel',
-    max: levelKeys?.max ?? 'maxLevel',
-  }
 }
 
 function defaultLevelRangeFocusTarget(

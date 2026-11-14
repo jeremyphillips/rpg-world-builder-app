@@ -4,6 +4,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 import type { FieldPath } from 'react-hook-form'
 import type { GeneralTable, ProgressionTable } from '@rpg/contracts'
 import { ActionButton, Button, ConfirmDialog, DialogPanelScrollRegion, Modal } from '@rpg/ui'
+import { FormSectionProvider } from '@rpg/ui/form'
 
 import { useUnsavedChangesConfirm } from '@/lib/use-unsaved-changes-confirm'
 
@@ -167,7 +168,14 @@ function TableBuilderModalContent({
                 <div className="relative flex min-h-0 flex-1 flex-col">
                   <DialogPanelScrollRegion inset="innerLeading" viewportClassName="pb-0">
                     <form id={formId} onSubmit={handleSubmit} noValidate>
-                      <TableBuilder form={form} config={config} mode={mode} withProviders={false} />
+                      <FormSectionProvider density="compact">
+                        <TableBuilder
+                          form={form}
+                          config={config}
+                          mode={mode}
+                          withProviders={false}
+                        />
+                      </FormSectionProvider>
                     </form>
                   </DialogPanelScrollRegion>
                   <TableBuilderExtendedProgressionDock />

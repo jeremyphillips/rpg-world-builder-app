@@ -1,68 +1,67 @@
 'use client'
 
-import { useController, useFormState } from 'react-hook-form'
+import { useController } from 'react-hook-form'
 
 import { TextSuggestionsField } from '../../../components/ui/text-suggestions-field.client'
-import { pickFieldChromeProps } from '../../../components/ui/field-chrome.variants'
-import { useDependsOnValues } from '../../config/form-depends-on.client'
 import { useFieldErrorPresentation } from '../../context/array-item-presentation.context'
-import { resolveNestedFieldErrorMessage } from '../../errors/resolve-field-error-message'
-import {
-  fieldDefaultValue,
-  resolveFieldHintPresentation,
-  type TextSuggestionsFieldConfig,
-} from '../../field-config'
-import { useFieldControlSize } from '../../context/form-section.context'
+import { fieldDefaultValue, type TextSuggestionsFieldConfig } from '../../field-config'
+import { assertOptionalDisclosureFieldConfig } from '../../config/optional-disclosure-config.lib'
+import { buildFieldShellProps } from '../field-shell-props.lib'
+import type { ResolvedFieldRender } from '../field-resolved-render.types'
+import { OptionalDisclosureTextSuggestionsFieldRenderer } from './optional-disclosure/optional-disclosure-field-renderer.client'
 
-interface TextSuggestionsFieldRendererProps {
-  config: TextSuggestionsFieldConfig
-  fullName: string
-  id: string
-  namePrefix?: string
+export function TextSuggestionsFieldRenderer({ resolved }: { resolved: ResolvedFieldRender }) {
+  const config = resolved.config as TextSuggestionsFieldConfig
+  const suggestions = resolved.resolvedSuggestions ?? []
+
+  if (config.optionalDisclosure) {
+    assertOptionalDisclosureFieldConfig(config)
+    return (
+      <OptionalDisclosureTextSuggestionsFieldRenderer
+        config={config}
+        disclosure={config.optionalDisclosure}
+        suggestions={suggestions}
+        resolved={resolved}
+      />
+    )
+  }
+
+  return <BoundTextSuggestionsField resolved={resolved} suggestions={suggestions} />
 }
 
-export function TextSuggestionsFieldRenderer({
-  config,
-  fullName,
-  id,
-  namePrefix,
-}: TextSuggestionsFieldRendererProps) {
-  const suggestionValues = useDependsOnValues(config.suggestions.dependsOn, namePrefix)
-  const hintDependsOn =
-    typeof config.hint === 'object' && config.hint?.resolve ? config.hint.resolve.dependsOn : []
-  const hintValues = useDependsOnValues(hintDependsOn, namePrefix)
-  const suggestions = config.suggestions.suggestionsWhen(suggestionValues)
-  const hintPresentation = resolveFieldHintPresentation(config, hintValues)
-  const controlSize = useFieldControlSize(config.controlSizeOverride)
-
-  const { field, fieldState } = useController({
-    name: fullName,
-    defaultValue: fieldDefaultValue(config),
+function BoundTextSuggestionsField({
+  resolved,
+  suggestions,
+}: {
+  resolved: ResolvedFieldRender
+  suggestions: readonly string[]
+}) {
+  const config = resolved.config as TextSuggestionsFieldConfig
+  const { field } = useController({
+    name: resolved.fullName,
+    defaultValue: fieldDefaultValue(resolved.authored),
   })
-  const { errors } = useFormState()
-  const validation = useFieldErrorPresentation(
-    fieldState.error?.message ?? resolveNestedFieldErrorMessage(errors, fullName),
-    fullName,
-  )
+  const validation = useFieldErrorPresentation(undefined, resolved.fullName)
 
   return (
     <TextSuggestionsField
-      id={id}
-      {...pickFieldChromeProps(config)}
-      label={config.label}
+      {...buildFieldShellProps(
+        {
+          config,
+          id: resolved.id,
+          hint: resolved.hint,
+          hintPosition: resolved.hintPosition,
+          presentationSize: resolved.presentationSize,
+          controlSize: resolved.controlSize,
+        },
+        validation,
+        { sizes: 'both', label: 'visible' },
+      )}
       suggestions={suggestions}
       placeholder={config.placeholder}
-      hint={hintPresentation.text}
-      hintPosition={hintPresentation.position}
-      info={config.info}
-      required={config.required}
-      disabled={config.disabled}
-      size={controlSize}
-      width={config.width}
       value={field.value ?? fieldDefaultValue(config)}
       onValueChange={field.onChange}
       onBlur={field.onBlur}
-      {...validation}
     />
   )
 }

@@ -20,7 +20,8 @@ const configRulesSchema = buildRulesSchemaForSurface('config')
 describe('buildStartingWealthTiersField', () => {
   it('formats tier item headers as Wealth tier — {label}', () => {
     const tiersField = buildStartingWealthTiersField()
-    const { item, label } = tiersField
+    const { item } = tiersField
+    const label = tiersField.heading?.label
     const itemHeader = item?.header
 
     expect(itemHeader).toBeDefined()

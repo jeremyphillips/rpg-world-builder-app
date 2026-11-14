@@ -2,7 +2,7 @@ import type { ArrayItemResolvedPresentation } from './array-item-presentation.li
 import {
   arrayItemFlatMergedShellClasses,
   arrayItemFlatShellRadiusClasses,
-} from '../../renderers/array/array-item-toolbar.variants'
+} from '../../renderers/array/item/array-item-toolbar.variants'
 
 export type ArrayItemFlatStackPosition = 'only' | 'first' | 'middle' | 'last'
 

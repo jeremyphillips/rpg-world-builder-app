@@ -174,8 +174,10 @@ function monsterActionSaveSelectionDependent(ctx: ContentFormCtx): FormItem {
   const creatureTypeOptions = buildActiveCreatureTypeFieldOptions(ctx.creatureTypeVocabulary)
   return {
     kind: 'group',
-    heading: { label: MONSTER_SAVE_TARGETING_LEGEND },
-    description: MONSTER_SAVE_TARGETING_DESCRIPTION,
+    heading: {
+      label: MONSTER_SAVE_TARGETING_LEGEND,
+      hint: MONSTER_SAVE_TARGETING_DESCRIPTION,
+    },
     fieldChrome: { variant: 'panel', elevation: 'canvas' },
     fields: [
       {
@@ -198,7 +200,7 @@ function monsterActionSaveSelectionDependent(ctx: ContentFormCtx): FormItem {
           fields: [
             ...areaGeometryFormFields({
               fieldPrefix: 'resolution.areaOfEffect',
-              legend: 'Area',
+              headingLabel: 'Area',
               legendVisibility: 'srOnly',
               shapeHint: 'Area measured from the monster.',
               visibility: selfMode,
@@ -233,8 +235,10 @@ export function monsterActionSaveSection(
 ): FormItem {
   return {
     kind: 'group',
-    heading: { label: SAVING_THROW_SECTION_LEGEND },
-    description: MONSTER_SAVE_THROW_SECTION_DESCRIPTION,
+    heading: {
+      label: SAVING_THROW_SECTION_LEGEND,
+      hint: MONSTER_SAVE_THROW_SECTION_DESCRIPTION,
+    },
     fields: [
       {
         type: 'select',

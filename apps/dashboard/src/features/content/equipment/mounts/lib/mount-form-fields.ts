@@ -13,7 +13,6 @@ import { mountCapacitySpeedFields } from '../../../lib/forms/fields/content-spee
 export function mountFormFieldGroup(): FormItem {
   return {
     kind: 'group',
-    legend: '',
     fields: mountCapacitySpeedFields(),
   }
 }

@@ -266,7 +266,8 @@ describe('organization form projection', () => {
     })
     expect(
       quick.some(
-        (item) => 'kind' in item && item.kind === 'group' && item.legend === 'Organization profile',
+        (item) =>
+          'kind' in item && item.kind === 'group' && item.heading?.label === 'Organization profile',
       ),
     ).toBe(false)
 
@@ -275,7 +276,7 @@ describe('organization form projection', () => {
     })
     const profileGroup = followOn.find(
       (item): item is Extract<FormItem, { kind: 'group' }> =>
-        'kind' in item && item.kind === 'group' && item.legend === 'Organization profile',
+        'kind' in item && item.kind === 'group' && item.heading?.label === 'Organization profile',
     )
     expect(
       profileGroup?.fields.map((field) => ('separator' in field ? field.separator : undefined)),

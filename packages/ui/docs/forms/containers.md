@@ -38,7 +38,7 @@ wrapper resolves section context and RHF name prefixes, then renders the entry r
 ## Groups
 
 Semantic `<fieldset>` + `<legend>`. Prefer `heading: { label, hint?, accessory?, action? }` for
-new config; `legend` + `description` remain supported and resolve through `resolveGroupHeading`.
+Named groups and arrays use `heading: { label, hint?, labelVisibility?, accessory?, action? }` only — no top-level `legend`, `description`, or array `label`/`hint`.
 
 `heading.accessory` is **group-only**: non-interactive status beside the legend label (badges,
 static text). Do not pass buttons, links, or other focusable controls — collapsible groups
@@ -50,10 +50,10 @@ use the legend row for disclosure, and nested interactives corrupt fieldset nami
 Row, array, and slot headings ignore `accessory` and `action`.
 Nested named groups derive subsection typography from nesting depth — no `legendSize`
 override. `headingScale: 'field'` is the only authored type opt-in: it replaces that
-structural legend and description type with the field label and hint scale for the group's
-density (comfortable label `md`, compact label `sm`; description matches `Field.Hint`).
+structural legend and hint type with the field label and hint scale for the group's
+density (comfortable label `md`, compact label `sm`; hint matches `Field.Hint`).
 Spacing, disclosure, and legend semantics stay unchanged. There is no separate legend or
-description size. Nested groups omit `mb-8` — parent group rhythm (`gap-6` / `gap-3`) owns sibling
+hint size. Nested groups omit `mb-8` — parent group rhythm (`gap-6` / `gap-3`) owns sibling
 spacing, matching nested array sections. Top-level groups and arrays inside `<Form>` omit
 `mb-8` as well — the form's `FormRhythmStack` (`gap-6` / `gap-3`) owns sibling spacing.
 Standalone `FormItems` outside `<Form>` need rhythm from either `<Form>` (which wraps
@@ -69,15 +69,15 @@ whose parent shell already spaces siblings use that pattern instead of `FormFiel
 ```ts
 {
   kind: 'group',
-  legend: 'Weapon',
+  heading: { label: 'Weapon' },
   fields: [
     { /* … */ },
-    { kind: 'group', legend: 'Damage', fields: [/* … */] },
+    { kind: 'group', heading: { label: 'Damage' }, fields: [/* … */] },
   ],
 }
 ```
 
-`FieldGroup` (standalone) accepts the same heading/legend props, `size`, `chrome`, and `disclosure`.
+`FieldGroup` (standalone) accepts `legend`, optional `hint`, `headingScale`, `size`, `chrome`, and `disclosure`.
 Groups may declare `visibility` — hidden groups unmount and clear nested values.
 
 `density` on `GroupConfig` overrides inherited section density for the group subtree.
@@ -136,7 +136,7 @@ Optional open/collapse and summary behavior. Composes with `chrome`.
 ```ts
 {
   kind: 'group',
-  legend: 'Campaign availability',
+  heading: { label: 'Campaign availability' },
   disclosure: {
     variant: 'inline',
     defaultOpen: false,
@@ -163,11 +163,11 @@ Legend→body spacing for `FieldGroup` is owned by `StandardFieldGroupBody`: sec
 `resolveFieldGroupBodyGap` on a body-side wrapper when a body is visible; `headingScale="field"` applies
 `fieldAnatomyStackVariants` on the fieldset (stable when collapsible groups are closed). Array fieldsets gate the same
 stack with `showSectionHeader` (visible label band or chrome — not sr-only-only labels). `FieldGroupLegend`
-keeps title, description, and accessory anatomy only. Legacy legend header margin
+keeps title, hint, and accessory anatomy only. Legacy legend header margin
 (`fieldGroupLegendHeaderMarginVariants`) remains for non-FieldGroup headings. In-flow array legends use
 `fieldSetInFlowLegendClasses` and require a parent fieldset stack — never legend `mb-*`. `<legend>` is `w-full` and sits **outside** panel, outline, inset, and
 callout **group chrome** boxes. The default
-field container wraps the whole fieldset, including the legend and description — see
+field container wraps the whole fieldset, including the legend and hint — see
 [Field container chrome](#field-container-chrome-default). Divider and accent-top chrome
 apply to the `<fieldset>`. Section chrome classes live in `field-group-chrome.css`; props map in `field-group-chrome.variants.ts`.
 
@@ -366,8 +366,7 @@ Dependent stack with an array dependent — use `arrayItems` scope:
       {
         kind: 'array',
         name: 'caps',
-        legend: '',
-        addActionLabel: 'Add class limit',
+        addAction: { label: 'Add class limit' },
         fields: [/* … */],
       },
     ],
@@ -390,7 +389,7 @@ array **item rows** keep the existing item-shell model (subtle header + canvas b
 Nested arrays inside an array item or a chromed parent do not receive a second section wrap.
 
 **Label and hint sit inside the box; validation errors sit outside.** Groups wrap the
-borderless `<fieldset>` (legend, description, and field stack) in `FieldChromeShell`,
+borderless `<fieldset>` (legend, hint, and field stack) in `FieldChromeShell`,
 matching chip, choose-count, and `EditableGrid` fields — UA legend overlay cannot sit on
 the container border. Use `FieldsetChromeFrame` so `<legend>` stays a direct fieldset child.
 Summary-disclosure groups still wrap only the expanded field stack so collapsed summary
@@ -448,19 +447,19 @@ control or slot. The array path itself still claims container issues such as
 when `visibility` is set). Both render
 [`array-field-renderer.client.tsx`](../src/form/renderers/array/array-field-renderer.client.tsx)
 — the array entry component. Per-row chrome lives in
-[`array-field-item-content.client.tsx`](../src/form/renderers/array/array-field-item-content.client.tsx).
+[`array-field-item-content.client.tsx`](../src/form/renderers/array/item/content/array-field-item-content.client.tsx).
 See [Component entry files](#component-entry-files).
 
 ```ts
 {
   kind: 'array',
   name: 'traits',
-  legend: 'Traits',
+  heading: { label: 'Traits' },
   fields: [
     { type: 'text', name: 'name', label: 'Trait name', required: true },
     { type: 'textarea', name: 'description', label: 'Description' },
   ],
-  addActionLabel: 'Add trait',
+  addAction: { label: 'Add trait' },
   min: 0,
   max: 10,
   addActionVariant: 'outline',
@@ -472,8 +471,7 @@ See [Component entry files](#component-entry-files).
 }
 ```
 
-**Legend:** Omit or pass `''` when a parent switch/stack already labels the block (e.g.
-`dependent` stack dependents). Empty legends are not rendered — no phantom spacing.
+**Heading:** Omit `heading` for layout-only arrays (e.g. dependents inside a labeled stack). Named headings render through `FormSectionHeader` in the fieldset `<legend>`; omitting `heading` avoids phantom legend spacing.
 
 **Section margin:** Standalone `FieldGroup` fieldsets use `mb-8`. Arrays and groups inside
 `<Form>` omit it — `FormRhythmStack` gap controls sibling spacing. Nested arrays (inside
@@ -491,7 +489,7 @@ pick compact but disclosure chrome is still required without `itemCollapsible`.
 {
   kind: 'array',
   name: 'tiers',
-  legend: 'Wealth tiers',
+  heading: { label: 'Wealth tiers' },
   itemVariant: 'detailed',
   itemCollapsible: true,
   reorder: false,
@@ -504,9 +502,9 @@ pick compact but disclosure chrome is still required without `itemCollapsible`.
 }
 ```
 
-**Legend scale:** Array legend typography inherits parent section density unless the array
-sets `density` explicitly; item bodies still default to `compact`. Prefer `heading.label`
-when authoring new arrays. Anonymous arrays omit `label`.
+**Header scale:** Array section header rhythm/size follow `config.density ?? parent.density`;
+item bodies still default to `compact` via `resolveSectionDensity`. Author with
+`heading: { label, hint?, labelVisibility? }` only — not top-level `label` / `hint`.
 
 ### Collapse defaults and persistence
 
@@ -573,8 +571,8 @@ rows.
 {
   kind: 'array',
   name: 'grants',
-  legend: 'Grants',
-  addActionLabel: 'Add grant',
+  heading: { label: 'Grants' },
+  addAction: { label: 'Add grant' },
   addActionMenu: {
     groups: [{ id: 'combat-traits', label: 'Combat & traits' }],
     items: [
@@ -682,7 +680,7 @@ to `localStorage`.
 {
   kind: 'array',
   name: 'tiers',
-  legend: 'Wealth tiers',
+  heading: { label: 'Wealth tiers' },
   arrayPattern: {
     kind: 'levelRange',
     levelKeys: { min: 'minLevel', max: 'maxLevel' },

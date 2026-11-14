@@ -43,7 +43,7 @@ describe('outcomeBranchBodyFields', () => {
   it('wraps application section slot and note in a rhythm group', () => {
     const group = findGroup(outcomeBranchBodyFields(1, true))
 
-    expect(group.legend).toBe('')
+    expect(group.heading?.label).toBe('')
     expect(group.fields).toHaveLength(2)
     expect(group.fields[0]).toMatchObject({
       kind: 'slot',
@@ -100,7 +100,7 @@ describe('resolutionOutcomeApplicationsResolverFields', () => {
       `${RESOLUTION_FIELD_NAME}.outcomes.2.applications`,
     ])
     expect(resolverFields[0]).toMatchObject({
-      label: RESOLUTION_SECTION_LABELS.appliedEffects,
+      heading: { label: RESOLUTION_SECTION_LABELS.appliedEffects },
     })
   })
 })

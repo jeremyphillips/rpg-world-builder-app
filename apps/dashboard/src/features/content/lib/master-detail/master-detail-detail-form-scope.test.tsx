@@ -43,7 +43,6 @@ function FormItemsHarness({
           value={{
             depth: parentDepth,
             namedGroupDepth: parentDepth,
-            headingTier: 'subsection',
             density: DEFAULT_FORM_DENSITY,
           }}
         >

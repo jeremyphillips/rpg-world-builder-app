@@ -80,7 +80,7 @@ export function outcomeBranchBodyFields(
   return [
     {
       kind: 'group',
-      legend: '', // no phantom legend spacing
+      // layout-only group — omit heading to avoid phantom legend spacing
       fields: [
         ...(includeApplications ? outcomeApplicationsArrayFields() : []),
         {

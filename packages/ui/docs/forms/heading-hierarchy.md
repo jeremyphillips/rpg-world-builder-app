@@ -8,23 +8,44 @@
 | ----------------------------------------------------------- | ------------------------------------------- |
 | Named top-level group (`namedGroupDepth === 0`)             | `section`                                   |
 | Named group under a named ancestor (`namedGroupDepth >= 1`) | `subsection` (cap — no deeper visual tiers) |
-| Anonymous layout group (no `heading` / `legend`)            | Transparent — does not increment depth      |
+| Anonymous layout group (no `heading`)                       | Transparent — does not increment depth      |
 | `kind: 'columns'`                                           | Transparent — does not increment depth      |
-| `kind: 'slot'` or `kind: 'row'` with `heading`              | `leaf`                                      |
-| Leaf field                                                  | `leaf`                                      |
 
-Array legend typography derives from **parent** named-group depth plus section `density` (compact → smaller array legend). No feature-level `legendSize` / `arrayLegendTier` knobs at steady state.
+Named `kind: 'array'` section headers use **`FormSectionHeader`** with default **`headingScale: 'field'`**
+(field label + field hint utilities). Array **header** rhythm/size use `config.density ?? parent.density`;
+**item bodies** use `resolveSectionDensity` with `DEFAULT_ARRAY_SECTION_DENSITY` (`compact`) when
+`density` is omitted. Optional `headingScale` on the array config can opt into structural
+section/subsection typography (`FormHeadingScale`) — there is no array-specific legend token or context channel.
 
-`headingScale: 'field'` replaces structural legend and description type with the field label and hint scale for that group's density, and applies `fieldAnatomyStackVariants` on the fieldset for legend→body spacing (including when a collapsible group is closed). It is not a `legendSize` and does not change tier resolution or disclosure.
+Standalone **`FormSectionHeader`** instances (dashboard slots, modals) inherit parent
+**`FormSectionProvider`** density via {@link resolveFormSectionHeaderPresentation} unless
+`density` / `rhythm` / `size` overrides are passed explicitly.
 
-`headingScale: 'subsection'` forces structural subsection legend typography when a flat sibling list would otherwise resolve as section (for example a named group at `namedGroupDepth === 0`). Description stays on the group description scale. Do not use this on shared field builders solely to fit master-detail detail rails — dashboard [`MasterDetailDetailFormScope`](../../../../apps/dashboard/src/features/content/lib/master-detail/master-detail-detail-form-scope.tsx) floors `namedGroupDepth` for those bodies instead (no SR-only nesting fieldsets).
+`headingScale: 'field'` replaces structural legend and hint type with the field label and hint scale for that group's density, and applies `fieldAnatomyStackVariants` on the fieldset for legend→body spacing (including when a collapsible group is closed). It is not a `legendSize` and does not change tier resolution or disclosure.
 
-## Semantic layers
+`headingScale: 'subsection'` forces structural subsection legend typography when a flat sibling list would otherwise resolve as section (for example a named group at `namedGroupDepth === 0`). Hint copy stays on the structural subsection hint scale. Do not use this on shared field builders solely to fit master-detail detail rails — dashboard [`MasterDetailDetailFormScope`](../../../../apps/dashboard/src/features/content/lib/master-detail/master-detail-detail-form-scope.tsx) floors `namedGroupDepth` for those bodies instead (no SR-only nesting fieldsets).
 
-1. **Typography** — `resolveHeadingTypography` / `HeadingPresentation`
-2. **Container semantics** — `FieldGroup` (fieldset), `CompositeGroup` (fieldset or `role="group"`), `FormFieldLabel` (control labels)
+## Presentation vs hierarchy
 
-Heading presentation does not force container choice. Slots use leaf-tier `CompositeGroup` with `useFieldset={false}`. Leaf headings use `fieldLabelHintStackClasses` for label→hint and the shared anatomy token for heading cluster→body (same 6px comfortable gap as fields).
+Three axes stay independent:
+
+| Axis             | Source                                              | Affects                                                 |
+| ---------------- | --------------------------------------------------- | ------------------------------------------------------- |
+| **Presentation** | `headingScale` → `resolveFormHeaderStackTypography` | Legend label + hint utilities, in-header stack gap      |
+| **Hierarchy**    | `namedGroupDepth` / `legendSize`                    | Body gaps, fieldset anatomy, child tier bookkeeping     |
+| **Density**      | `density` / `resolveFormDensity`                    | Control `size`, structural `rhythm`, field-hint compact |
+
+**Typography SSOT:** [`resolveFormHeaderStackTypography`](../../src/form/presentation/form-header-stack-typography.lib.ts) +
+[`FormSectionHeader`](../../src/form/presentation/form-section-header.client.tsx) for all section headers
+(groups, arrays, dashboard slots, `CompositeGroup`). Containers own `<legend>` / `role="group"` markup;
+the header component is presentation-only.
+
+`headingScale: 'field'` on a named group replaces structural legend + hint utilities with field
+label + hint, and applies `fieldAnatomyStackVariants` on the fieldset body. It does **not** change
+`legendSize`, `namedGroupDepth`, or disclosure behavior.
+
+Explicit `headingScale: 'subsection'` at depth `0` changes **type only** — section body gap and
+`legendSize` stay on the section tier unless nesting warrants subsection spacing.
 
 ## Label visibility
 
@@ -44,8 +65,8 @@ An `srOnly` label stays in the accessibility tree and does not occupy the label 
 | `weapon-form-fields.ts`                                 | `legendSize: 'subsection'`                    | Structural heading   | Nest under named section group                             | —                                                |
 | `vehicle-form-fields.ts`                                | `legendSize: 'subsection'`                    | Structural heading   | Nest under named section group                             | —                                                |
 | `species-culture-form-fields.ts`                        | `legendSize: 'subsection'`                    | Structural heading   | Nest under named section group                             | —                                                |
-| `class-character-creation-proficiencies-form-fields.ts` | `legendSize: 'subsection'`, `hideLabel: true` | Structural + leaf    | Nest groups; `labelVisibility: 'srOnly'`                   | —                                                |
-| `language-proficiency-form-fields.ts`                   | `legendSize: 'subsection'`, `hideLabel: true` | Structural + leaf    | Nest groups; explicit sr-only labels                       | —                                                |
+| `class-character-creation-proficiencies-form-fields.ts` | `legendSize: 'subsection'`, `hideLabel: true` | Structural + sr-only | Nest groups; `labelVisibility: 'srOnly'`                   | —                                                |
+| `language-proficiency-form-fields.ts`                   | `legendSize: 'subsection'`, `hideLabel: true` | Structural + sr-only | Nest groups; explicit sr-only labels                       | —                                                |
 | `standard-array-form-fields.ts`                         | `legendSize: 'subsection'`, `label: ''`       | Composite + a11y gap | Row `heading` + six authored sr-only score labels          | —                                                |
 | `campaign-availability-form-fields.ts`                  | —                                             | Layout-only          | Summary disclosure owns legend typography                  | —                                                |
 | `grant-form-fields.ts`                                  | `label: ''`, `hideLabel: true`                | A11y gap             | Non-whitespace label + `labelVisibility: 'srOnly'`         | —                                                |

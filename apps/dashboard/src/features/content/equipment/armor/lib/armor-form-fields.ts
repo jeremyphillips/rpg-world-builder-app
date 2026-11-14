@@ -83,7 +83,6 @@ export function armorFormFieldGroup(rules?: ArmorClassRules): FormItem {
   const baseBounds = rules ? armorBaseAcDisplayBounds(rules) : undefined
   return {
     kind: 'group',
-    legend: '',
     fields: [
       {
         kind: 'row',

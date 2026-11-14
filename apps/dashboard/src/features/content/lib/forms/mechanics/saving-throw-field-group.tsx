@@ -50,7 +50,7 @@ export function savingThrowFieldGroup(input: { renderCastingAbility: () => React
   return {
     kind: 'group',
     name: 'savingThrow',
-    legend: SAVING_THROW_SECTION_LEGEND,
+    heading: { label: SAVING_THROW_SECTION_LEGEND },
     separator: 'subtle',
     optionalDisclosure: {
       addLabel: SAVING_THROW_ADD_LABEL,

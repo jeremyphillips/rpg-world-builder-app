@@ -3,12 +3,11 @@
 import { useController, useWatch } from 'react-hook-form'
 
 import { InputSelectField } from '../../../components/ui/input-select-field.client'
-import { pickFieldChromeProps } from '../../../components/ui/field-chrome.variants'
+import { buildFieldShellProps } from '../field-shell-props.lib'
 import type { FieldHintPosition } from '../../../components/ui/field.variants'
 import { resolveValueDigitsFromConfig } from '../../config/input-field-value-digits.lib'
 import { resolveFirstFieldErrorMessage } from '../../errors/resolve-field-error-message'
 import { fieldDefaultValue, type InputSelectFieldConfig } from '../../field-config'
-import { resolveFieldLabelVisibility } from '../../form-heading.lib'
 import { useFieldControlSize } from '../../context/form-section.context'
 
 function asRecord(value: unknown): Record<string, unknown> {
@@ -98,25 +97,26 @@ export function InputSelectFieldRenderer({
 
   return (
     <InputSelectField
-      id={id}
-      {...pickFieldChromeProps(config)}
-      label={config.label}
-      labelVisibility={resolveFieldLabelVisibility(config)}
+      {...buildFieldShellProps(
+        {
+          config,
+          id,
+          hint,
+          hintPosition,
+          presentationSize: controlSize,
+          controlSize,
+        },
+        { error },
+        { sizes: 'none', label: 'visible' },
+      )}
       inputType={config.inputType}
       options={config.options ?? []}
       searchable={config.searchable}
       unitPlaceholder={config.unitPlaceholder}
-      error={error}
-      hint={hint}
-      hintPosition={hintPosition}
-      info={config.info}
-      required={config.required}
-      disabled={config.disabled}
       unitDisabled={config.unitDisabled}
       unitMode={isFixedUnit ? 'label' : 'select'}
       fixedUnit={config.fixedUnit}
       size={controlSize}
-      width={config.width}
       min={config.min}
       max={config.max}
       step={config.step}

@@ -10,7 +10,7 @@ import type {
   SemanticSurfaceTone,
 } from '../../components/ui/field-dependent.variants'
 import type { SurfaceConfig } from '../../components/ui/visual-vocabulary.types'
-import type { FieldSeparator, GroupHeadingScale } from '../../components/ui/field.variants'
+import type { FieldSeparator, FormHeadingScale } from '../../components/ui/field.variants'
 import type { ArrayResolveFieldsFn } from '../config/array/array-resolve-fields.lib'
 import type { ArrayAddMenuConfig } from '../config/array/array-add-menu.lib'
 import type { ArrayItemShellRenderProps } from '../config/array/array-item-shell-render.types'
@@ -23,7 +23,6 @@ import type { FieldWidth } from '../../components/ui/field-control.variants'
 
 import type {
   ConfirmBeforeClearConfig,
-  FieldHintConfig,
   FormNavigationAnchor,
   OptionalDisclosureConfig,
 } from './field-base.types'
@@ -166,14 +165,14 @@ export interface DependentConfig {
 /**
  * Named fieldset subsection (`kind: 'group'`).
  *
- * Common options: `legend`, `fields`, `density`, `chrome`, `disclosure`,
- * `description`, `headingScale`, `visibility`.
+ * Common options: `heading`, `fields`, `density`, `chrome`, `disclosure`,
+ * `headingScale`, `visibility`.
  * Use `defineGroupField()` for completion.
  *
  * @example
  * defineGroupField({
  *   kind: 'group',
- *   legend: 'Damage',
+ *   heading: { label: 'Damage' },
  *   fields: [
  *     { type: 'text', name: 'dice', label: 'Dice', required: true },
  *   ],
@@ -181,19 +180,16 @@ export interface DependentConfig {
  */
 export interface GroupConfig {
   kind: 'group'
-  /** Preferred heading API — tier resolves from named-group nesting depth. */
+  /** When set, names the fieldset legend; omit for layout-only wrappers. */
   heading?: FormHeading
-  /** When omitted, renders as a layout/visibility wrapper without a legend. */
-  legend?: string
-  description?: string
   /**
-   * When `'field'`, legend and description use this group's field label and hint
+   * When `'field'`, legend and hint use this group's field label and hint
    * type scale. When `'subsection'`, legend uses structural subsection type at
    * any depth. Omit for structural legend type from nesting depth. Typography
    * only — spacing, disclosure, and legend semantics stay unchanged. There is
-   * no separate legend or description size.
+   * no separate legend or hint size.
    */
-  headingScale?: GroupHeadingScale
+  headingScale?: FormHeadingScale
   fields: GroupFieldItem[]
   className?: string
   /** Optional DOM id on the fieldset — for in-page scroll anchors. */
@@ -213,7 +209,7 @@ export interface GroupConfig {
    */
   chrome?: FieldGroupChrome
   /**
-   * Shared field-container override for this group’s fieldset (legend, description,
+   * Shared field-container override for this group’s fieldset (legend, hint,
    * and field stack). Also cascades to descendants when the shared container is
    * opted out with `none`.
    */
@@ -476,7 +472,7 @@ export type ArrayCanAppendResult = {
  * defineArrayField({
  *   kind: 'array',
  *   name: 'traits',
- *   label: 'Traits',
+ *   heading: { label: 'Traits' },
  *   addAction: { label: 'Add trait' },
  *   item: {
  *     header: { fallback: (i) => `Trait ${i + 1}`, primaryField: 'name' },
@@ -487,6 +483,10 @@ export type ArrayCanAppendResult = {
 interface ArrayConfigCore {
   kind: 'array'
   name: string
+  /**
+   * Section header presentation scale — defaults to `'field'` (field label + hint).
+   */
+  headingScale?: FormHeadingScale
   /**
    * Section density for this array subtree. Defaults to `compact` when omitted.
    */
@@ -520,18 +520,14 @@ interface ArrayConfigCore {
   errorPlacement?: 'auto' | 'field' | 'row'
 }
 
-/** Anonymous repeatable list — omit `label`, `hint`, and `labelVisibility`. */
+/** Anonymous repeatable list — omit `heading`. */
 type AnonymousArrayConfig = ArrayConfigCore & {
-  label?: never
-  hint?: never
-  labelVisibility?: never
+  heading?: never
 }
 
-/** Named repeatable list — `hint` and `labelVisibility` require a non-whitespace `label`. */
+/** Named repeatable list — `heading.label` must be non-whitespace. */
 type NamedArrayConfig = ArrayConfigCore & {
-  label: string
-  hint?: string | FieldHintConfig
-  labelVisibility?: FieldLabelVisibility
+  heading: FormHeading
 }
 
 export type ArrayConfig = AnonymousArrayConfig | NamedArrayConfig
@@ -544,12 +540,8 @@ export type ArrayConfig = AnonymousArrayConfig | NamedArrayConfig
 export interface SlotConfig {
   kind: 'slot'
   name: string
-  /** Preferred leaf-tier heading API for the slot composite surface. */
+  /** Leaf-tier heading for the slot composite surface. */
   heading?: FormHeading
-  /** @deprecated Use `heading.label`. */
-  label?: string
-  /** @deprecated Use `heading.hint`. */
-  hint?: string
   /**
    * Width of the slot wrapper within a `kind: 'row'` — same tokens as leaf
    * `width`. Ignored outside a row.

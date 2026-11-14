@@ -218,8 +218,10 @@ function bonusAuthoringFields(input: {
       {
         kind: 'group',
         name: 'passenger',
-        legend: MONSTER_TELEPORT_PASSENGER_LEGEND,
-        description: MONSTER_TELEPORT_PASSENGER_HINT,
+        heading: {
+          label: MONSTER_TELEPORT_PASSENGER_LEGEND,
+          hint: MONSTER_TELEPORT_PASSENGER_HINT,
+        },
         optionalDisclosure: {
           addLabel: MONSTER_TELEPORT_PASSENGER_ADD_LABEL,
           seedWhen: () => ({ withinFeet: TELEPORT_WITHIN_DEFAULT }),

@@ -4,13 +4,9 @@ import {
   type FormSectionContextValue,
 } from '../context/form-section.context'
 import type { ArrayConfig } from '../field-config'
-import {
-  DEFAULT_ARRAY_SECTION_DENSITY,
-  resolveArrayLegendDensity,
-  resolveSectionDensity,
-} from '../form-density'
 import { resolveNamedGroupDepthAfterEntering } from '../form-heading.lib'
-import { hasNamedArrayLabel } from '../config/array/resolve-array-label.lib'
+import { hasNamedArrayHeading } from '../config/array/resolve-array-heading.lib'
+import { resolveArraySectionDensities } from '../config/array/resolve-array-section-densities.lib'
 
 export function buildArraySectionChildContext(
   parent: FormSectionContextValue,
@@ -19,25 +15,18 @@ export function buildArraySectionChildContext(
   options?: { sectionChromeActive?: boolean },
 ): FormSectionContextValue {
   const chrome = resolveArrayItemChrome(config)
-  const hasNamedHeading = hasNamedArrayLabel(config)
+  const hasNamedHeading = hasNamedArrayHeading(config)
   const childNamedGroupDepth = resolveNamedGroupDepthAfterEntering(
     hasNamedHeading,
     parent.namedGroupDepth,
   )
+  const { presentationDensity, defaultControlSize } = resolveArraySectionDensities(config, parent)
   return buildFormSectionChildContext(parent, depth, {
-    density: resolveSectionDensity({
-      explicit: config.density,
-      inherited: parent.density,
-      sectionDefault: DEFAULT_ARRAY_SECTION_DENSITY,
-    }),
-    arrayLegendDensity: resolveArrayLegendDensity({
-      explicit: config.density,
-      inherited: parent.density,
-    }),
+    density: presentationDensity,
+    defaultControlSize,
     arrayItemSurface: chrome.surface ?? parent.arrayItemSurface,
     arrayItemTone: chrome.tone ?? parent.arrayItemTone,
     namedGroupDepth: childNamedGroupDepth,
-    headingTier: hasNamedHeading ? 'leaf' : parent.headingTier,
     fieldChromeCascade: config.fieldChrome ?? parent.fieldChromeCascade,
     fieldChromeSuppressed: options?.sectionChromeActive || parent.fieldChromeSuppressed || true,
   })

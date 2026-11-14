@@ -15,7 +15,7 @@ const fields: FormItem[] = [
   {
     kind: 'array',
     name: 'items',
-    label: 'Items',
+    heading: { label: 'Items' },
     fields: [{ type: 'text', name: 'label', label: 'Item label', required: true }],
   },
 ]

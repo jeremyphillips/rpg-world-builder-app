@@ -80,7 +80,7 @@ export function wealthGrantFields(namePrefix: string): FormItem[] {
   return [
     {
       kind: 'group',
-      legend: 'Wealth',
+      heading: { label: 'Wealth' },
       fields: [{ kind: 'row', fields }],
     },
   ]

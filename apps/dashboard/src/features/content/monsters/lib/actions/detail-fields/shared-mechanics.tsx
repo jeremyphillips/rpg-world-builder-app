@@ -183,7 +183,7 @@ function monsterActionBonusSourceDependent(namePrefix: string, currentActionId: 
       },
       {
         kind: 'group',
-        legend: MONSTER_ATTACK_BONUS_ADVANCED_LEGEND,
+        heading: { label: MONSTER_ATTACK_BONUS_ADVANCED_LEGEND },
         headingScale: 'field',
         disclosure: { variant: 'legend', defaultOpen: false, persistOpen: false },
         fields: [
@@ -259,7 +259,7 @@ function monsterAttackDistanceFields(
   }
   return {
     kind: 'group',
-    legend: MONSTER_ACTION_DISTANCE_SECTION_LEGEND,
+    heading: { label: MONSTER_ACTION_DISTANCE_SECTION_LEGEND },
     visibility: distanceVisibility(modeField),
     fields: [
       {
@@ -347,7 +347,7 @@ function monsterActionSpellMechanics(input: {
     {
       kind: 'array',
       name: 'spells',
-      label: getContentTypeTerm('spells').label,
+      heading: { label: getContentTypeTerm('spells').label },
       addAction: { label: 'Add spell', intercept: MONSTER_SPELL_PICKER_INTERCEPT },
       item: {
         collapsible: true,
@@ -489,7 +489,7 @@ export function monsterActionMechanicFields(input: {
     kindFields.push({
       kind: 'array',
       name: 'steps',
-      label: 'Steps',
+      heading: { label: 'Steps' },
       addAction: { label: 'Add step' },
       item: { header: { fallback: (index) => `Step ${index + 1}` } },
       fields: [
