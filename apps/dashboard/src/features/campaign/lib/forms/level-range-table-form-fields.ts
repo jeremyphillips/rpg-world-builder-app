@@ -64,7 +64,7 @@ export function buildLevelRangeTiersArrayField(
   return {
     kind: 'array',
     name: options.name,
-    label: options.label,
+    heading: { label: options.label },
     min: options.min,
     max: options.max,
     density: options.density,

@@ -28,7 +28,7 @@ const fields: FormItem[] = [
     kind: 'array',
     item: { reorder: false },
     name: 'tiers',
-    label: 'Tiers',
+    heading: { label: 'Tiers' },
     arrayPattern: { kind: 'levelRange', levelKeys: { min: 'minLevel', max: 'maxLevel' } },
     filterSelect: {
       dependsOn: [],

@@ -85,12 +85,12 @@ describe('nested group density', () => {
   const fields: FormItem[] = [
     {
       kind: 'group',
-      legend: 'Outer',
+      heading: { label: 'Outer' },
       fields: [
         { type: 'text', name: 'outer', label: 'Outer field' },
         {
           kind: 'group',
-          legend: 'Inner',
+          heading: { label: 'Inner' },
           density: 'compact',
           fields: [{ type: 'text', name: 'inner', label: 'Inner field' }],
         },
@@ -115,7 +115,7 @@ describe('row inheritance', () => {
   const fields: FormItem[] = [
     {
       kind: 'group',
-      legend: 'Compact group',
+      heading: { label: 'Compact group' },
       density: 'compact',
       fields: [
         {

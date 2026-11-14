@@ -64,7 +64,8 @@ describe('levelZeroNpcsFields', () => {
     )
 
     const wealthGroup = allow.dependents.fields.find(
-      (field) => isContainer(field) && field.kind === 'group' && field.legend === 'Wealth tiers',
+      (field) =>
+        isContainer(field) && field.kind === 'group' && field.heading?.label === 'Wealth tiers',
     )
     expect(wealthGroup).toBeDefined()
     if (!wealthGroup || !isContainer(wealthGroup) || wealthGroup.kind !== 'group') {

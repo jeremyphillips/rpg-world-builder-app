@@ -29,7 +29,7 @@ describe('damageFieldGroup', () => {
         fields={[
           {
             kind: 'group',
-            legend: 'Authored effects',
+            heading: { label: 'Authored effects' },
             fields: [spellDamageGroup()],
           },
         ]}

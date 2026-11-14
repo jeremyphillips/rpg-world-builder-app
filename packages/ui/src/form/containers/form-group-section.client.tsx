@@ -190,10 +190,7 @@ export function GroupFieldSection({
       groupFieldChrome,
     ],
   )
-  const description = React.useMemo(
-    () => resolveGroupSectionDescription(heading, item.description),
-    [heading, item.description],
-  )
+  const description = React.useMemo(() => resolveGroupSectionDescription(heading), [heading])
 
   const nestedFields = (
     <FormSectionContext.Provider value={childContext}>
@@ -234,7 +231,7 @@ export function GroupFieldSection({
   const group = (
     <FieldGroup
       id={item.id}
-      legend={heading?.label ?? item.legend}
+      legend={heading?.label}
       legendSrOnly={heading?.labelVisibility === 'srOnly'}
       legendAccessory={heading?.accessory}
       legendAction={heading?.action}

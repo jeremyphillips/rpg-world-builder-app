@@ -38,7 +38,7 @@ wrapper resolves section context and RHF name prefixes, then renders the entry r
 ## Groups
 
 Semantic `<fieldset>` + `<legend>`. Prefer `heading: { label, hint?, accessory?, action? }` for
-new config; `legend` + `description` remain supported and resolve through `resolveGroupHeading`.
+Named groups and arrays use `heading: { label, hint?, labelVisibility?, accessory?, action? }` only — no top-level `legend`, `description`, or array `label`/`hint`.
 
 `heading.accessory` is **group-only**: non-interactive status beside the legend label (badges,
 static text). Do not pass buttons, links, or other focusable controls — collapsible groups

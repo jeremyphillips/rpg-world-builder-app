@@ -25,7 +25,6 @@ const magicItemCategoryOptions = toOptions(
 export function magicItemFormFieldGroup(): FormItem {
   return {
     kind: 'group',
-    legend: '',
     fields: [
       {
         kind: 'row',

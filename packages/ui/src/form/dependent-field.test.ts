@@ -52,7 +52,7 @@ describe('DependentConfig helpers', () => {
           {
             kind: 'array',
             name: 'items',
-            label: 'Items',
+            heading: { label: 'Items' },
             fields: [{ type: 'text', name: 'label', label: 'Label' }],
           },
         ],

@@ -367,7 +367,7 @@ function allowedCharacterCreatureTypesField(creatureTypeOptions: FieldOption[]):
 function progressionGroup(): FormItem {
   return {
     kind: 'group',
-    legend: 'Progression',
+    heading: { label: 'Progression' },
     fields: [
       withNavigationAnchor(
         {
@@ -434,8 +434,10 @@ function progressionGroup(): FormItem {
       withNavigationAnchor(
         {
           kind: 'group',
-          legend: 'Experience thresholds',
-          description: 'Experience required to reach each character level.',
+          heading: {
+            label: 'Experience thresholds',
+            hint: 'Experience required to reach each character level.',
+          },
           fields: [
             {
               kind: 'slot',
@@ -449,9 +451,10 @@ function progressionGroup(): FormItem {
       withNavigationAnchor(
         {
           kind: 'group',
-          legend: 'Spellcasting',
-          description:
-            'Spell slot tables shared by spellcasting classes. Selection rules and capacity curves are authored on each class.',
+          heading: {
+            label: 'Spellcasting',
+            hint: 'Spell slot tables shared by spellcasting classes. Selection rules and capacity curves are authored on each class.',
+          },
           fields: [
             {
               kind: 'slot',
@@ -469,7 +472,7 @@ function progressionGroup(): FormItem {
 function multiclassingGroup(): FormItem {
   return {
     kind: 'group',
-    legend: 'Multiclassing',
+    heading: { label: 'Multiclassing' },
     fields: [
       {
         type: 'switch',
@@ -533,7 +536,7 @@ function multiclassingGroup(): FormItem {
 function subclassesGroup(): FormItem {
   return {
     kind: 'group',
-    legend: 'Subclasses',
+    heading: { label: 'Subclasses' },
     fields: [
       {
         type: 'switch',
@@ -619,7 +622,7 @@ function creationSectionItems({
   return [
     {
       kind: 'group',
-      legend: 'Creation',
+      heading: { label: 'Creation' },
       fields: [
         withNavigationAnchor(
           {
@@ -643,9 +646,10 @@ function creationSectionItems({
         withNavigationAnchor(
           {
             kind: 'group',
-            legend: 'Starting wealth by level',
-            description:
-              'Adds or replaces the class’s baseline starting equipment for characters created at higher levels.',
+            heading: {
+              label: 'Starting wealth by level',
+              hint: 'Adds or replaces the class’s baseline starting equipment for characters created at higher levels.',
+            },
             fields: [
               {
                 type: 'text',
@@ -793,7 +797,7 @@ export function buildRulesFieldsForSurface(
     return [
       {
         kind: 'group',
-        legend: 'Basic',
+        heading: { label: 'Basic' },
         fields: [
           {
             kind: 'row',

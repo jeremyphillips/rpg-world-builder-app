@@ -59,7 +59,7 @@ describe('equipmentFormDef kind-scoped fields', () => {
     const economyGroupFields = equipmentFormDef
       .buildFields({ equipmentKind: 'service' })
       .filter(isGroupField)
-      .find((group) => group.legend === 'Economy')?.fields
+      .find((group) => group.heading?.label === 'Economy')?.fields
     expect(economyGroupFields?.some((field) => 'name' in field && field.name === 'weight')).toBe(
       false,
     )

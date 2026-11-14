@@ -57,7 +57,7 @@ const requirementIntegrationFields: FormItem[] = [
   {
     kind: 'array',
     name: 'resolution.target.requirements',
-    label: 'Requirements',
+    heading: { label: 'Requirements' },
     item: {
       variant: 'compact',
       collapsible: false,

@@ -18,7 +18,7 @@ describe('Form heading hierarchy a11y', () => {
     const fields: FormItem[] = [
       {
         kind: 'group',
-        legend: 'Starting level',
+        heading: { label: 'Starting level' },
         fields: [
           {
             type: 'number',

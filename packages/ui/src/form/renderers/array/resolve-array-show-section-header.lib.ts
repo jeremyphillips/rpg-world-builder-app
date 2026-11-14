@@ -1,6 +1,6 @@
 import type { FieldHintConfig } from '../../field-config'
 import type { ArrayAddActionLayout, ArrayConfig } from '../../field-config'
-import type { ArrayLabelMode } from '../../config/array/resolve-array-label.lib'
+import type { ArrayLabelMode } from '../../config/array/resolve-array-heading.lib'
 import { resolveArrayRequiredMarker } from './array-field-empty-state.lib'
 
 /** Whether the array fieldset renders a visible header cluster (and anatomy stack gap). */

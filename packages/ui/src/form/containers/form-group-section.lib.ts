@@ -1,13 +1,11 @@
 import { hasActiveFieldChrome, type FieldChrome } from '../../components/ui/field-chrome.variants'
-import type { GroupConfig } from '../field-config'
 import { normalizeFieldHint } from '../field-config'
 import type { FormHeading } from '../form-heading.lib'
 
 export function resolveGroupSectionDescription(
   heading: FormHeading | undefined,
-  legacyDescription: GroupConfig['description'],
 ): string | undefined {
-  const hint = heading?.hint ?? legacyDescription
+  const hint = heading?.hint
   if (!hint) return undefined
   return typeof hint === 'string' ? hint : normalizeFieldHint(hint).text
 }

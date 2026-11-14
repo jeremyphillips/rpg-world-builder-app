@@ -162,8 +162,7 @@ export function monsterActionOnHitFields(ctx: ContentFormCtx): FormItem {
   return {
     kind: 'array',
     name: 'onHit.effects',
-    label: MONSTER_ON_HIT_LEGEND,
-    hint: MONSTER_ON_HIT_HINT,
+    heading: { label: MONSTER_ON_HIT_LEGEND, hint: MONSTER_ON_HIT_HINT },
     addAction: {
       label: MONSTER_ON_HIT_ADD_LABEL,
       menu: {
@@ -224,7 +223,7 @@ export function monsterActionOnHitFields(ctx: ContentFormCtx): FormItem {
         visibility: condition,
         options: EFFECT_CONDITION_IDS.map((id) => ({
           value: id,
-          label: getEffectConditionLabel(id),
+          heading: { label: getEffectConditionLabel(id) },
         })),
       },
       {

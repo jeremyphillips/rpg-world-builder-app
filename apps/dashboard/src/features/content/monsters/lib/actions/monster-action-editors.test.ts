@@ -182,7 +182,7 @@ function findGroupByHeading(items: readonly FormItem[], label: string): GroupCon
       !found &&
       'kind' in item &&
       item.kind === 'group' &&
-      (item.heading?.label === label || item.legend === label)
+      (item.heading?.label === label || item.heading?.label === label)
     ) {
       found = item
     }
@@ -408,7 +408,8 @@ describe('monster action detail fields', () => {
       ),
     ).toMatchObject({ kind: 'slot' })
     const advanced = attackBonusDependents.find(
-      (field) => 'kind' in field && field.kind === 'group' && field.legend === 'Advanced options',
+      (field) =>
+        'kind' in field && field.kind === 'group' && field.heading?.label === 'Advanced options',
     )
     const proficiency =
       advanced && 'fields' in advanced
@@ -425,7 +426,7 @@ describe('monster action detail fields', () => {
       required: true,
     })
     const distanceGroup = attackItems.find(
-      (item) => 'kind' in item && item.kind === 'group' && item.legend === 'Distance',
+      (item) => 'kind' in item && item.kind === 'group' && item.heading?.label === 'Distance',
     )
     if (!distanceGroup || !('fields' in distanceGroup)) {
       throw new Error('expected Distance group')
@@ -644,7 +645,7 @@ describe('monster action detail fields', () => {
     expect(shape?.required).toBe(true)
     expect(shape?.placeholder).toBe('Choose a shape…')
     const occupants = findArrayField(items, 'resolution.occupantRequirements')
-    expect(occupants?.hint).toBe(MONSTER_SAVE_AREA_OCCUPANT_REQUIREMENTS_HINT)
+    expect(occupants?.heading?.hint).toBe(MONSTER_SAVE_AREA_OCCUPANT_REQUIREMENTS_HINT)
     expect(occupants?.visibility?.dependsOn).toEqual(['resolution.selectionMode'])
     expect(occupants?.fieldChrome).toEqual({ variant: 'panel', emphasis: 'faint' })
     const targetRequirements = findArrayField(items, 'resolution.target.requirements')

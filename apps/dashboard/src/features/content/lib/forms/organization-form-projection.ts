@@ -359,8 +359,10 @@ function buildOrganizationProfileGroup(options: {
           },
         }
       : {
-          legend: ORGANIZATION_PROFILE_GROUP_LEGEND,
-          description: ORGANIZATION_PROFILE_GROUP_DESCRIPTION,
+          heading: {
+            label: ORGANIZATION_PROFILE_GROUP_LEGEND,
+            hint: ORGANIZATION_PROFILE_GROUP_DESCRIPTION,
+          },
         }),
     fields: ctx.mode === 'edit' ? [editFamiliarTypeField, ...profileFields] : profileFields,
   }
@@ -404,8 +406,10 @@ function buildOrganizationOptionalDetailsGroup(
     fields: [
       {
         kind: 'group',
-        legend: ORGANIZATION_MEMBER_AFFINITIES_GROUP_LEGEND,
-        description: ORGANIZATION_MEMBER_AFFINITIES_GROUP_DESCRIPTION,
+        heading: {
+          label: ORGANIZATION_MEMBER_AFFINITIES_GROUP_LEGEND,
+          hint: ORGANIZATION_MEMBER_AFFINITIES_GROUP_DESCRIPTION,
+        },
         fields: memberAffinityFields,
       },
       buildOrganizationMembershipTitlesField(prefix),
@@ -455,8 +459,10 @@ export function buildOrganizationQuickCreateFollowOnFields(
       }),
       {
         kind: 'group',
-        legend: ORGANIZATION_MEMBER_AFFINITIES_GROUP_LEGEND,
-        description: ORGANIZATION_MEMBER_AFFINITIES_GROUP_DESCRIPTION,
+        heading: {
+          label: ORGANIZATION_MEMBER_AFFINITIES_GROUP_LEGEND,
+          hint: ORGANIZATION_MEMBER_AFFINITIES_GROUP_DESCRIPTION,
+        },
         fields: memberAffinityFields,
       },
     ]

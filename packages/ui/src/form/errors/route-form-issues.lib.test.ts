@@ -16,7 +16,7 @@ const saveFields: FormItem[] = [
   {
     kind: 'array',
     name: 'resolution.effects',
-    label: 'Effects',
+    heading: { label: 'Effects' },
     fields: [
       {
         type: 'select',
@@ -86,7 +86,7 @@ describe('routeFormIssues via prepareFormIssues', () => {
         {
           kind: 'array',
           name: 'tiers',
-          label: 'Tiers',
+          heading: { label: 'Tiers' },
           fields: [{ type: 'text', name: 'label', label: 'Label', required: true }],
         },
       ],
@@ -150,13 +150,13 @@ describe('registry claim eligibility', () => {
     {
       kind: 'slot',
       name: 'actions',
-      label: 'Actions',
+      heading: { label: 'Actions' },
       render: () => null,
     },
     {
       kind: 'array',
       name: 'actions',
-      label: 'Actions',
+      heading: { label: 'Actions' },
       fields: [],
       item: {
         resolveFields: () => [
@@ -164,7 +164,7 @@ describe('registry claim eligibility', () => {
           {
             kind: 'slot',
             name: '_note',
-            label: 'Note',
+            heading: { label: 'Note' },
             issuePaths: ['resolution.outcomes'],
             render: () => null,
           },

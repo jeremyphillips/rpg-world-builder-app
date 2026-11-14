@@ -5,10 +5,10 @@ import {
 import { assertArrayItemConfig } from '../../config/array/assert-array-item-config.lib'
 import { assertArrayLabelConfig } from '../../config/array/assert-array-label-config.lib'
 import {
-  resolveArrayLabel,
+  resolveArrayHeading,
   resolveArrayLabelMode,
   resolveArraySectionLabelForDisplay,
-} from '../../config/array/resolve-array-label.lib'
+} from '../../config/array/resolve-array-heading.lib'
 import {
   isNestedArraySection,
   resolveArrayAddAction,
@@ -57,10 +57,10 @@ export function resolveArrayFieldRendererChrome({
     variant: 'outline' as const,
     layout: 'stacked' as const,
   }
-  const resolvedLabel = resolveArrayLabel(config)
-  const itemLegend = resolvedLabel?.label ?? ''
-  const sectionLabel = resolvedLabel?.label ?? resolveArraySectionLabelForDisplay(config)
-  const sectionHint = resolvedLabel?.hint
+  const resolvedHeading = resolveArrayHeading(config)
+  const itemLegend = resolvedHeading?.label ?? ''
+  const sectionLabel = resolvedHeading?.label ?? resolveArraySectionLabelForDisplay(config)
+  const sectionHint = resolvedHeading?.hint
   const labelMode = resolveArrayLabelMode(config)
   const { min = 0, max } = config
   const itemCollapsible = itemConfig.collapsible

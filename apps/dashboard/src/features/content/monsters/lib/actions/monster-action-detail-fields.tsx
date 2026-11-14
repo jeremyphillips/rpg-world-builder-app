@@ -375,7 +375,7 @@ function monsterActionBonusSourceDependent(namePrefix: string, currentActionId: 
       },
       {
         kind: 'group',
-        legend: MONSTER_ATTACK_BONUS_ADVANCED_LEGEND,
+        heading: { label: MONSTER_ATTACK_BONUS_ADVANCED_LEGEND },
         headingScale: 'field',
         disclosure: { variant: 'legend', defaultOpen: false, persistOpen: false },
         fields: [
@@ -439,8 +439,10 @@ function monsterActionSaveSelectionDependent(ctx: ContentFormCtx): FormItem {
   const creatureTypeOptions = buildActiveCreatureTypeFieldOptions(ctx.creatureTypeVocabulary)
   return {
     kind: 'group',
-    heading: { label: MONSTER_SAVE_TARGETING_LEGEND },
-    description: MONSTER_SAVE_TARGETING_DESCRIPTION,
+    heading: {
+      label: MONSTER_SAVE_TARGETING_LEGEND,
+      hint: MONSTER_SAVE_TARGETING_DESCRIPTION,
+    },
     fieldChrome: { variant: 'panel', elevation: 'canvas' },
     fields: [
       {
@@ -499,7 +501,7 @@ function monsterActionSaveSection(
   return {
     kind: 'group',
     heading: { label: SAVING_THROW_SECTION_LEGEND },
-    description: MONSTER_SAVE_THROW_SECTION_DESCRIPTION,
+    heading: { label: MONSTER_SAVE_THROW_SECTION_DESCRIPTION },
     fields: [
       {
         type: 'select',
@@ -587,7 +589,7 @@ function monsterAttackDistanceFields(
   }
   return {
     kind: 'group',
-    legend: MONSTER_ACTION_DISTANCE_SECTION_LEGEND,
+    heading: { label: MONSTER_ACTION_DISTANCE_SECTION_LEGEND },
     visibility: distanceVisibility(modeField),
     fields: [
       {
@@ -746,7 +748,7 @@ function monsterActionSpellMechanics(input: {
     {
       kind: 'array',
       name: 'spells',
-      label: getContentTypeTerm('spells').label,
+      heading: { label: getContentTypeTerm('spells').label },
       addAction: { label: 'Add spell', intercept: MONSTER_SPELL_PICKER_INTERCEPT },
       item: {
         collapsible: true,
@@ -888,7 +890,7 @@ function monsterActionMechanicFields(input: {
     kindFields.push({
       kind: 'array',
       name: 'steps',
-      label: 'Steps',
+      heading: { label: 'Steps' },
       addAction: { label: 'Add step' },
       item: { header: { fallback: (index) => `Step ${index + 1}` } },
       fields: [
@@ -960,8 +962,10 @@ function bonusAuthoringFields(input: {
       {
         kind: 'group',
         name: 'passenger',
-        legend: MONSTER_TELEPORT_PASSENGER_LEGEND,
-        description: MONSTER_TELEPORT_PASSENGER_HINT,
+        heading: {
+          label: MONSTER_TELEPORT_PASSENGER_LEGEND,
+          hint: MONSTER_TELEPORT_PASSENGER_HINT,
+        },
         optionalDisclosure: {
           addLabel: MONSTER_TELEPORT_PASSENGER_ADD_LABEL,
           seedWhen: () => ({ withinFeet: TELEPORT_WITHIN_DEFAULT }),

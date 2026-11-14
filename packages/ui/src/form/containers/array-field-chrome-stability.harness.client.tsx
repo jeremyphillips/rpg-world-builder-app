@@ -41,7 +41,7 @@ export const movementChromeStabilityFields: FormItem[] = [
   {
     kind: 'array',
     name: 'movement',
-    label: 'Movement',
+    heading: { label: 'Movement' },
     addAction: { label: 'Add movement', layout: 'inline', size: 'sm' },
     min: 1,
     appendDefaults: () => ({ mode: '', feet: undefined }),
@@ -93,7 +93,7 @@ export const examplesUnlabeledInlineFields: FormItem[] = [
   {
     kind: 'array',
     name: 'examples',
-    label: 'Examples',
+    heading: { label: 'Examples' },
     item: {
       variant: 'compact',
       headerVisibility: 'hidden',

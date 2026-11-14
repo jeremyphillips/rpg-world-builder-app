@@ -14,7 +14,7 @@ describe('service kindFieldGroups', () => {
   it('buildFields composes name, kind group, economy, and description', () => {
     const fields = expectComposedKindGroups('service', '')
     const kindGroup = fields.find(
-      (field) => 'kind' in field && field.kind === 'group' && field.legend === '',
+      (field) => 'kind' in field && field.kind === 'group' && field.heading?.label === '',
     )
     expect(kindGroup).toEqual(fieldGroupsForEquipmentKind('service')?.[0])
   })

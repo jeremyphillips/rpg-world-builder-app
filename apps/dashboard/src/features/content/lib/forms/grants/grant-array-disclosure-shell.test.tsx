@@ -39,7 +39,7 @@ const grantFields: FormItem[] = [
   {
     kind: 'array',
     name: 'grants',
-    label: 'Grants',
+    heading: { label: 'Grants' },
     item: {
       collapsible: true,
       header: {

@@ -82,7 +82,7 @@ export function movementArrayField(): ArrayConfig {
   return {
     kind: 'array',
     name: 'movement',
-    label: 'Movement',
+    heading: { label: 'Movement' },
     addAction: { label: 'Add movement', layout: 'inline', size: 'sm' },
     min: 1,
     max: MOVEMENT_MODES.length,
@@ -178,7 +178,7 @@ export function movementWithHoverGroup(): FormItem {
   const movementField = movementArrayField()
   return {
     kind: 'group',
-    legend: 'Movement',
+    heading: { label: 'Movement' },
     density: 'comfortable',
     fields: [movementField, creatureFlyHoverSwitchField()],
   }

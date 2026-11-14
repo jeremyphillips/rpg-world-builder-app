@@ -4,7 +4,7 @@ import type { ReactNode } from 'react'
 
 import type { FieldSizeToken } from '../../../components/ui/field-sizing.variants'
 import type { ArrayAddActionLayout, FieldHintConfig } from '../../field-config'
-import type { ArrayLabelMode } from '../../config/array/resolve-array-label.lib'
+import type { ArrayLabelMode } from '../../config/array/resolve-array-heading.lib'
 import { ArrayLikeSectionHeader } from '../../presentation/array-like-section-header.client'
 import { ArrayLegendIssueLink } from './array-item-issue.client'
 

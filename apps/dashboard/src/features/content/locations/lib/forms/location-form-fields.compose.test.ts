@@ -90,8 +90,10 @@ describe('buildSettlementStartingDistrictsFormItems', () => {
     expect(items).toHaveLength(1)
     expect(items[0]).toMatchObject({
       kind: 'group',
-      legend: SETTLEMENT_STARTING_DISTRICTS_GROUP_LEGEND,
-      description: expect.stringContaining(guidance.helper),
+      heading: {
+        label: SETTLEMENT_STARTING_DISTRICTS_GROUP_LEGEND,
+        hint: expect.stringContaining(guidance.helper),
+      },
     })
 
     const group = items[0] as Extract<FormItem, { kind: 'group' }>

@@ -90,12 +90,12 @@ export function buildFeatFields(ctx: ContentFormCtx): FormItem[] {
     descriptionField(ctx),
     {
       kind: 'group',
-      legend: 'Prerequisites',
+      heading: { label: 'Prerequisites' },
       fields: [
         {
           kind: 'slot',
           name: 'prerequisiteEditor',
-          label: 'Prerequisites',
+          heading: { label: 'Prerequisites' },
           render: () =>
             createElement(RequirementEditor, {
               name: 'prerequisiteEditor',
@@ -114,7 +114,6 @@ export function buildFeatFields(ctx: ContentFormCtx): FormItem[] {
     },
     {
       kind: 'group',
-      legend: '',
       fields: [
         {
           type: 'switch',

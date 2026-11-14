@@ -16,7 +16,7 @@ const movementFields: FormItem[] = [
   {
     kind: 'array',
     name: 'movement',
-    label: 'Movement',
+    heading: { label: 'Movement' },
     addAction: { label: 'Add movement' },
     fields: [
       {

@@ -20,8 +20,7 @@ describe('group field container', () => {
     const fields: FormItem[] = [
       {
         kind: 'group',
-        legend: 'Defenses',
-        description: 'Saving throws and armor training.',
+        heading: { label: 'Defenses', hint: 'Saving throws and armor training.' },
         fields: [
           {
             type: 'chips',
@@ -70,7 +69,7 @@ describe('group field container', () => {
     const fields: FormItem[] = [
       {
         kind: 'group',
-        legend: 'Granted skills & tools',
+        heading: { label: 'Granted skills & tools' },
         fields: [
           {
             type: 'chips',
@@ -80,7 +79,7 @@ describe('group field container', () => {
           },
           {
             kind: 'group',
-            legend: 'Tools',
+            heading: { label: 'Tools' },
             fields: [
               {
                 type: 'chips',
@@ -120,7 +119,7 @@ describe('group field container', () => {
     const fields: FormItem[] = [
       {
         kind: 'group',
-        legend: 'Weapons',
+        heading: { label: 'Weapons' },
         fields: [
           {
             kind: 'dependent',
@@ -169,7 +168,7 @@ describe('group field container', () => {
     const fields: FormItem[] = [
       {
         kind: 'group',
-        legend: 'Notes',
+        heading: { label: 'Notes' },
         fieldChrome: { variant: 'none' },
         fields: [
           {
@@ -200,7 +199,7 @@ describe('group field container', () => {
       {
         kind: 'group',
         id: 'availability',
-        legend: 'Campaign availability',
+        heading: { label: 'Campaign availability' },
         disclosure: {
           variant: 'inline',
           defaultOpen: true,
@@ -242,12 +241,11 @@ describe('group field container', () => {
       const fields: FormItem[] = [
         {
           kind: 'group',
-          legend: 'Armor',
+          heading: { label: 'Armor' },
           fields: [
             {
               kind: 'group',
-              legend: 'Advanced options',
-              description: 'Optional tuning.',
+              heading: { label: 'Advanced options', hint: 'Optional tuning.' },
               headingScale: 'field',
               fields: [{ type: 'text', name: 'note', label: 'Note' }],
             },

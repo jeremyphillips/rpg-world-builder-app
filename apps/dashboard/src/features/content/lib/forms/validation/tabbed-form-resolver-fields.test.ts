@@ -28,7 +28,7 @@ describe('prefixFormItems', () => {
         {
           kind: 'array',
           name: 'options',
-          label: 'Options',
+          heading: { label: 'Options' },
           fields: [{ type: 'text', name: 'label', label: 'Label', required: true }],
         },
       ],
@@ -38,7 +38,7 @@ describe('prefixFormItems', () => {
     expect(items[0]).toMatchObject({
       kind: 'array',
       name: 'heritage.options',
-      label: 'Options',
+      heading: { label: 'Options' },
     })
     expect(items[0]).toMatchObject({
       fields: [{ type: 'text', name: 'label', label: 'Label', required: true }],
@@ -55,7 +55,7 @@ describe('embeddedArrayResolverField', () => {
     expect(field).toMatchObject({
       kind: 'array',
       name: 'traits',
-      label: 'Traits',
+      heading: { label: 'Traits' },
     })
   })
 })
@@ -67,7 +67,7 @@ describe('embeddedMasterDetailTabValidation', () => {
     expect(
       embeddedMasterDetailTabValidation({
         path: 'traits',
-        legend: 'Traits',
+        itemLabel: 'Traits',
         fields: itemFields,
       }),
     ).toEqual({
@@ -76,19 +76,19 @@ describe('embeddedMasterDetailTabValidation', () => {
         {
           kind: 'array',
           name: 'traits',
-          label: 'Traits',
+          heading: { label: 'Traits' },
           fields: itemFields,
         },
       ],
     })
   })
 
-  it('defaults legend from itemLabel then path', () => {
+  it('defaults section label from itemLabel then path', () => {
     const wiring = embeddedMasterDetailTabValidation({
       path: 'traits',
       itemLabel: 'Trait',
       fields: itemFields,
     })
-    expect(wiring.resolverFields[0]).toMatchObject({ label: 'Trait' })
+    expect(wiring.resolverFields[0]).toMatchObject({ heading: { label: 'Trait' } })
   })
 })

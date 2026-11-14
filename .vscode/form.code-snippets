@@ -32,7 +32,7 @@
       "defineArrayField({",
       "  kind: 'array',",
       "  name: '${1:fieldName}',",
-      "  label: '${2:Section title}',",
+      "  heading: { label: '${2:Section title}' },",
       "  addActionLabel: '${3:Add item}',",
       "  item: { surface: { emphasis: '${4|subtle,default,strong|}' } },",
       "  min: ${5:0},",
@@ -55,7 +55,7 @@
     "body": [
       "defineGroupField({",
       "  kind: 'group',",
-      "  legend: '${1:Section title}',",
+      "  heading: { label: '${1:Section title}' },",
       "  rhythm: '${2|comfortable,compact|}',",
       "  fields: [",
       "    $0",

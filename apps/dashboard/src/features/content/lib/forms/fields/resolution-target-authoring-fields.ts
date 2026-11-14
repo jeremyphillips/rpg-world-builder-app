@@ -479,8 +479,10 @@ function requirementArray(
   const field: ArrayConfig = {
     kind: 'array',
     name: requirementsPath,
-    label: options?.label ?? 'Requirements',
-    hint: options?.hint ?? REQUIREMENT_STAT_BLOCK_HINT,
+    heading: {
+      label: options?.label ?? 'Requirements',
+      hint: options?.hint ?? REQUIREMENT_STAT_BLOCK_HINT,
+    },
     ...(options?.fieldChrome ? { fieldChrome: options.fieldChrome } : {}),
     emptyState: 'none',
     addAction: {
@@ -650,8 +652,10 @@ export function resolutionOccupantRequirementsFields(options: {
   return [
     {
       kind: 'group',
-      legend: options.legend ?? 'Creatures in the area',
-      description: options.description ?? REQUIREMENT_STAT_BLOCK_HINT,
+      heading: {
+        label: options.legend ?? 'Creatures in the area',
+        hint: options.description ?? REQUIREMENT_STAT_BLOCK_HINT,
+      },
       visibility: options.visibility,
       fields: [requirementField],
     },

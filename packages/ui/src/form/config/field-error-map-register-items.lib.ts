@@ -4,9 +4,9 @@ import { resolveColumnsCollapseSequence } from './form-columns-collapse.lib'
 import { arrayItemLabel } from './array/array-item-label.lib'
 import { resolveArrayItemHeader } from './array/array-item-config.lib'
 import {
-  resolveArrayLabel,
+  resolveArrayHeading,
   resolveArraySectionLabelForDisplay,
-} from './array/resolve-array-label.lib'
+} from './array/resolve-array-heading.lib'
 import type { RegistryEntry } from './field-error-map-register.lib'
 import { registerFieldPaths } from './field-error-map-register.lib'
 import { fieldCategory } from './field-error-map-category.lib'
@@ -33,7 +33,7 @@ function registerArrayItem(
   formValues?: Record<string, unknown>,
 ): void {
   const arrayKey = prefix ? `${prefix}.${item.name}` : item.name
-  const arrayLabel = resolveArrayLabel(item)?.label ?? resolveArraySectionLabelForDisplay(item)
+  const arrayLabel = resolveArrayHeading(item)?.label ?? resolveArraySectionLabelForDisplay(item)
   const header = resolveArrayItemHeader(item, arrayLabel)
   registry.set(arrayKey, {
     label: arrayLabel,
@@ -75,7 +75,7 @@ function registerSlotIssuePathAliases(
 ): void {
   if (!item.issuePaths?.length) return
 
-  const aliasLabel = item.heading?.label ?? item.label ?? item.name
+  const aliasLabel = item.heading?.label ?? item.name
   for (const issuePath of item.issuePaths) {
     const ownedKey = prefix ? `${prefix}.${issuePath}` : issuePath
     if (registry.has(ownedKey)) continue
@@ -96,7 +96,7 @@ function registerSlotItem(
 ): void {
   const slotKey = prefix ? `${prefix}.${item.name}` : item.name
   registry.set(slotKey, {
-    label: item.label ?? item.name,
+    label: item.heading?.label ?? item.name,
     category: 'text',
     role: item.issuePaths?.length ? 'slotOwner' : 'hostSlot',
     exactPath: true,

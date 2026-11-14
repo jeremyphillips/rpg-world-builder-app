@@ -10,7 +10,7 @@ import {
   resolveSectionDensity,
 } from '../form-density'
 import { resolveNamedGroupDepthAfterEntering } from '../form-heading.lib'
-import { hasNamedArrayLabel } from '../config/array/resolve-array-label.lib'
+import { hasNamedArrayHeading } from '../config/array/resolve-array-heading.lib'
 
 export function buildArraySectionChildContext(
   parent: FormSectionContextValue,
@@ -19,7 +19,7 @@ export function buildArraySectionChildContext(
   options?: { sectionChromeActive?: boolean },
 ): FormSectionContextValue {
   const chrome = resolveArrayItemChrome(config)
-  const hasNamedHeading = hasNamedArrayLabel(config)
+  const hasNamedHeading = hasNamedArrayHeading(config)
   const childNamedGroupDepth = resolveNamedGroupDepthAfterEntering(
     hasNamedHeading,
     parent.namedGroupDepth,

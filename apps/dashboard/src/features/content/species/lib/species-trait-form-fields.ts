@@ -157,7 +157,11 @@ export function traitItemFields(ctx: ContentFormCtx): FormItem[] {
     },
     {
       kind: 'group',
-      description: TRAIT_DERIVED_DISPLAY_DESCRIPTION,
+      heading: {
+        label: TRAIT_OVERRIDE_DISPLAY_LABEL,
+        hint: TRAIT_DERIVED_DISPLAY_DESCRIPTION,
+        labelVisibility: 'srOnly',
+      },
       visibility: visibleForTraitKind('grant'),
       fields: [
         {
