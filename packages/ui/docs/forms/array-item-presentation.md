@@ -29,6 +29,10 @@ collapsible: true  →  disclosure === 'collapsible'
 Variant (`compact` / `detailed`) controls density only. `resolveArrayFieldRendererChrome` passes
 `item.collapsible` through without gating on variant.
 
+Row-level validation (`headerIssues`) uses `rowAlert` placement and a destructive item-shell
+border independent of variant and anatomy. Field-level join summaries use `compactSummary` when
+inline copy is suppressed or body fields are not rendered.
+
 ## Anatomies
 
 | Anatomy          | Trigger                             |

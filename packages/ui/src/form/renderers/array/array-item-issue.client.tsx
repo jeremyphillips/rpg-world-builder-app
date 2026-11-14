@@ -69,9 +69,11 @@ export interface ArrayItemIssueSummaryProps {
   group: Pick<ArrayItemIssueGroup, 'totalCount' | 'sortedIssues' | 'headerIssues' | 'fieldSummary'>
   onPrimaryPress?: () => void
   onMorePress?: () => void
-  placement?: 'collapsed' | 'expanded' | 'compactSummary'
+  placement?: 'collapsed' | 'expanded' | 'compactSummary' | 'rowAlert'
   /** Stable id for compact row summaries — wired to suppressed field `aria-describedby`. */
   summaryId?: string
+  /** Resolver-owned compact copy; falls back to {@link group.fieldSummary}. */
+  compactSummaryText?: string
   className?: string
 }
 
@@ -81,12 +83,13 @@ export function ArrayItemIssueSummary({
   onMorePress,
   placement = 'collapsed',
   summaryId,
+  compactSummaryText,
   className,
 }: ArrayItemIssueSummaryProps) {
   if (group.totalCount <= 0) return null
 
-  if (placement === 'compactSummary') {
-    if (!group.fieldSummary) return null
+  if (placement === 'rowAlert') {
+    if (!compactSummaryText) return null
 
     return (
       <p
@@ -95,8 +98,27 @@ export function ArrayItemIssueSummary({
         aria-live="polite"
         className={cn(arrayItemIssueSummaryClasses({ placement }), className)}
         data-array-item-issue-summary
+        data-array-item-issue-placement={placement}
       >
-        {group.fieldSummary}
+        {compactSummaryText}
+      </p>
+    )
+  }
+
+  if (placement === 'compactSummary') {
+    const summaryText = compactSummaryText ?? group.fieldSummary
+    if (!summaryText) return null
+
+    return (
+      <p
+        id={summaryId}
+        role="alert"
+        aria-live="polite"
+        className={cn(arrayItemIssueSummaryClasses({ placement }), className)}
+        data-array-item-issue-summary
+        data-array-item-issue-placement={placement}
+      >
+        {summaryText}
       </p>
     )
   }

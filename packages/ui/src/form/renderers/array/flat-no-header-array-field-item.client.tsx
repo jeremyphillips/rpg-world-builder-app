@@ -11,7 +11,8 @@ import {
 import type { ResolvedArrayItemHeader } from '../../config/array/array-item-config.lib'
 import type { RowConfig, RowFieldItem } from '../../field-config'
 import type { ArrayItemIssueSummaryProps } from './array-item-issue.client'
-import { ArrayItemIssueSummary } from './array-item-issue.client'
+import { ArrayItemIssueSummaries } from './array-item-issue-summaries.client'
+import type { SemanticSurfaceTone } from '../../../components/ui/field-surface.variants'
 import { ArrayItemShell } from './array-item-shell.client'
 import { ArrayItemAnatomyInlineRow } from './array-item-anatomy-inline-row.client'
 import { ArrayItemCompactRow } from './array-item-compact-row.client'
@@ -38,24 +39,23 @@ export interface FlatNoHeaderArrayFieldItemProps {
     listeners: ReturnType<typeof useSortable>['listeners']
     isDragging: boolean
   }
-  issueSummary?: ArrayItemIssueSummaryProps
+  issueSummaries?: readonly ArrayItemIssueSummaryProps[]
+  shellTone?: SemanticSurfaceTone
   fieldsNode: React.ReactNode
   actionsRail: React.ReactNode
 }
 
 function FlatNoHeaderStackedContent({
+  issueSummaries,
   fieldsNode,
-  issueSummary,
 }: {
+  issueSummaries: readonly ArrayItemIssueSummaryProps[]
   fieldsNode: React.ReactNode
-  issueSummary?: ArrayItemIssueSummaryProps
 }) {
   return (
     <>
+      <ArrayItemIssueSummaries summaries={issueSummaries} />
       {fieldsNode}
-      {issueSummary?.placement === 'compactSummary' ? (
-        <ArrayItemIssueSummary {...issueSummary} />
-      ) : null}
     </>
   )
 }
@@ -78,7 +78,8 @@ export function FlatNoHeaderArrayFieldItem({
   rowSummaryId,
   arrayContext,
   dragHandleProps,
-  issueSummary,
+  issueSummaries = [],
+  shellTone,
   fieldsNode,
   actionsRail,
 }: FlatNoHeaderArrayFieldItemProps) {
@@ -104,8 +105,8 @@ export function FlatNoHeaderArrayFieldItem({
   )
 
   const inlineSummary =
-    contentLayout === 'inline' && issueSummary?.placement === 'compactSummary' ? (
-      <ArrayItemIssueSummary {...issueSummary} />
+    contentLayout === 'inline' && issueSummaries.length > 0 ? (
+      <ArrayItemIssueSummaries summaries={issueSummaries} />
     ) : undefined
 
   const inlineMain =
@@ -143,7 +144,7 @@ export function FlatNoHeaderArrayFieldItem({
               data-array-item-flat-no-header=""
               data-array-item-content-layout={contentLayout}
             >
-              <FlatNoHeaderStackedContent fieldsNode={fieldsNode} issueSummary={issueSummary} />
+              <FlatNoHeaderStackedContent fieldsNode={fieldsNode} issueSummaries={issueSummaries} />
             </div>
           }
           actions={actionsRail}
@@ -161,6 +162,7 @@ export function FlatNoHeaderArrayFieldItem({
       dragging={dragging}
       layout="compactRow"
       hasItemHeader={false}
+      shellTone={shellTone}
       className={shellClassName}
       main={inlineMain ?? stackedMain}
     />

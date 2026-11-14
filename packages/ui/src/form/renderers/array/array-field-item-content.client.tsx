@@ -4,19 +4,14 @@ import * as React from 'react'
 import type { useSortable } from '@dnd-kit/sortable'
 
 import { ArrayFieldContext } from '../../context/array-field.context'
-import { ArrayItemPresentationContext } from '../../context/array-item-presentation.context'
-import type { ArrayItemPresentationAnatomy } from '../../config/array/array-item-presentation.lib'
 import type { ResolvedArrayItemHeader } from '../../config/array/array-item-config.lib'
-import type { ArrayConfig, ArrayItemConfig } from '../../field-config'
-import { FormSectionContext, useFormSectionContext } from '../../context/form-section.context'
-import { NestedFormItems } from '../../containers/form-item-node.client'
-import { CollapsibleListItem } from '../../../components/ui/collapsible-list-item'
-import { resolveArrayItemShellSurface } from '../../config/array/resolve-array-item-shell-surface.lib'
-import { ArrayItemHeaderContent, ArrayItemHeaderSummary } from './array-item-header.client'
+import type { ArrayConfig } from '../../field-config'
+import { useFormSectionContext } from '../../context/form-section.context'
 import { ArrayItemActionsContent, ArrayItemActionsRail } from './array-item-shell.client'
-import type { ArrayItemIssueSummaryProps } from './array-item-issue.client'
-import { FlatNoHeaderArrayFieldItem } from './flat-no-header-array-field-item.client'
-import { arrayItemHasVisibleBodyFields } from '../../config/array/array-item-visible-body.lib'
+import type { SemanticSurfaceTone } from '../../../components/ui/field-surface.variants'
+import { buildArrayFieldItemAnatomyProps } from './array-field-item-anatomy-props.lib'
+import { renderArrayFieldItemByAnatomy } from './array-field-item-content-anatomy.client'
+import { renderArrayFieldItemFieldsNode } from './array-field-item-fields-node.client'
 import { useArrayFieldItemContentState } from './use-array-field-item-content-state.client'
 
 export interface ArrayFieldItemContentProps {
@@ -41,16 +36,6 @@ export interface ArrayFieldItemContentProps {
     listeners: ReturnType<typeof useSortable>['listeners']
     isDragging: boolean
   }
-}
-
-interface ArrayFieldItemChromeProps {
-  titleId: string
-  itemPrefix: string
-  reserveDragHandleSlot: boolean
-  gripVisible: boolean
-  collapsible: boolean
-  dragging?: boolean
-  shellClassName?: string
 }
 
 interface ArrayFieldItemActionsRailProps {
@@ -103,192 +88,12 @@ function ArrayFieldItemActionsRailSlot({
   return <ArrayItemActionsRail {...contentProps} embedded={embedded} />
 }
 
-interface FlatLabeledArrayFieldItemProps extends ArrayFieldItemChromeProps {
-  itemId: string
-  header: ResolvedArrayItemHeader
-  headerConfig: ArrayItemConfig['header']
-  itemValues: Record<string, unknown>
-  index: number
-  watchedSummaryContext?: Record<string, unknown>
-  sortableEnabled: boolean
-  dragHandleProps?: ArrayFieldItemContentProps['dragHandleProps']
-  issueSummary?: ArrayItemIssueSummaryProps
-  itemBody?: React.ReactNode
-  actionsRail: React.ReactNode
-}
-
-function FlatLabeledArrayFieldItem({
-  titleId,
-  itemPrefix,
-  itemId,
-  reserveDragHandleSlot,
-  dragging,
-  shellClassName,
-  header,
-  headerConfig,
-  itemValues,
-  index,
-  watchedSummaryContext,
-  sortableEnabled,
-  dragHandleProps,
-  issueSummary,
-  itemBody,
-  actionsRail,
-}: FlatLabeledArrayFieldItemProps) {
-  const { arrayItemSurface, arrayItemTone } = useFormSectionContext()
-  const summary = headerConfig?.summary?.(itemValues, index, watchedSummaryContext) ?? undefined
-  const summaryNode =
-    summary || issueSummary ? (
-      <ArrayItemHeaderSummary
-        summary={summary}
-        issueSummary={issueSummary}
-        collapsed={false}
-        leadingChrome={{
-          reserveDragHandleSlot,
-          showDragHandle: reserveDragHandleSlot,
-          collapsible: false,
-        }}
-      />
-    ) : undefined
-
-  return (
-    <CollapsibleListItem
-      itemId={itemId}
-      titleId={titleId}
-      itemPrefix={itemPrefix}
-      toolbarAriaLabel={header.ariaLabel}
-      collapsible={false}
-      collapsed={false}
-      showDragHandle={reserveDragHandleSlot}
-      dragHandleProps={
-        sortableEnabled && dragHandleProps
-          ? {
-              attributes: dragHandleProps.attributes,
-              listeners: dragHandleProps.listeners,
-              isDragging: dragHandleProps.isDragging,
-            }
-          : undefined
-      }
-      dragging={dragging}
-      surface={resolveArrayItemShellSurface({
-        explicit: arrayItemSurface,
-        collapsible: false,
-        hasItemHeader: true,
-      })}
-      tone={arrayItemTone}
-      className={shellClassName}
-      header={<ArrayItemHeaderContent header={header} />}
-      summary={summaryNode}
-      body={itemBody}
-      actions={actionsRail}
-    />
-  )
-}
-
-interface DetailedArrayFieldItemProps extends ArrayFieldItemChromeProps {
-  itemId: string
-  header: ResolvedArrayItemHeader
-  headerConfig: ArrayItemConfig['header']
-  itemValues: Record<string, unknown>
-  index: number
-  watchedSummaryContext?: Record<string, unknown>
-  sortableEnabled: boolean
-  dragHandleProps?: ArrayFieldItemContentProps['dragHandleProps']
-  collapsed: boolean
-  onToggleCollapse: () => void
-  bodyId: string
-  issueSummary?: ArrayItemIssueSummaryProps
-  itemBody?: React.ReactNode
-  leadingChrome: { reserveDragHandleSlot: boolean; showDragHandle: boolean; collapsible: boolean }
-  actionsRail: React.ReactNode
-}
-
-function DetailedArrayFieldItem({
-  titleId,
-  itemPrefix,
-  itemId,
-  reserveDragHandleSlot,
-  collapsible,
-  dragging,
-  header,
-  headerConfig,
-  itemValues,
-  index,
-  watchedSummaryContext,
-  sortableEnabled,
-  dragHandleProps,
-  collapsed,
-  onToggleCollapse,
-  bodyId,
-  issueSummary,
-  itemBody,
-  leadingChrome,
-  actionsRail,
-}: DetailedArrayFieldItemProps) {
-  const { arrayItemSurface, arrayItemTone } = useFormSectionContext()
-  const summary = headerConfig?.summary?.(itemValues, index, watchedSummaryContext) ?? undefined
-  const summaryNode =
-    summary || issueSummary ? (
-      <ArrayItemHeaderSummary
-        summary={summary}
-        issueSummary={issueSummary}
-        collapsed={collapsed}
-        leadingChrome={leadingChrome}
-      />
-    ) : undefined
-
-  return (
-    <CollapsibleListItem
-      itemId={itemId}
-      titleId={titleId}
-      bodyId={bodyId}
-      itemPrefix={itemPrefix}
-      toolbarAriaLabel={header.ariaLabel}
-      collapsible={collapsible}
-      collapsed={collapsed}
-      onToggleCollapse={onToggleCollapse}
-      showDragHandle={reserveDragHandleSlot}
-      dragHandleProps={
-        sortableEnabled && dragHandleProps
-          ? {
-              attributes: dragHandleProps.attributes,
-              listeners: dragHandleProps.listeners,
-              isDragging: dragHandleProps.isDragging,
-            }
-          : undefined
-      }
-      dragging={dragging}
-      surface={resolveArrayItemShellSurface({
-        explicit: arrayItemSurface,
-        collapsible,
-      })}
-      tone={arrayItemTone}
-      header={<ArrayItemHeaderContent header={header} />}
-      summary={summaryNode}
-      body={itemBody}
-      actions={actionsRail}
-    />
-  )
-}
-
-function renderArrayFieldItemByAnatomy(
-  anatomy: ArrayItemPresentationAnatomy,
-  props: {
-    flatNoHeader: React.ComponentProps<typeof FlatNoHeaderArrayFieldItem>
-    flatWithHeader: FlatLabeledArrayFieldItemProps
-    disclosure: DetailedArrayFieldItemProps
-  },
-) {
-  switch (anatomy) {
-    case 'flatNoHeader':
-      return <FlatNoHeaderArrayFieldItem {...props.flatNoHeader} />
-    case 'flatWithHeader':
-      return <FlatLabeledArrayFieldItem {...props.flatWithHeader} />
-    case 'disclosure':
-      return <DetailedArrayFieldItem {...props.disclosure} />
-    default:
-      return null
-  }
+function resolveArrayItemShellTone(
+  sectionTone: SemanticSurfaceTone | undefined,
+  showRowInvalidBorder: boolean,
+): SemanticSurfaceTone | undefined {
+  if (showRowInvalidBorder) return 'destructive'
+  return sectionTone
 }
 
 function renderArrayItemUtilitySlot(
@@ -338,7 +143,9 @@ export function ArrayFieldItemContent({
     leadingChrome,
     rowLabel,
     focusIssue,
-    issueSummary,
+    issueSummaries,
+    validationPresentation,
+    fieldJoinSummaryId,
     normalizedContent,
     chromeProps,
     showIssueBadge,
@@ -362,24 +169,24 @@ export function ArrayFieldItemContent({
     onRemoveItem: onRemove,
   })
 
-  const fieldsNode = (
-    <ArrayItemPresentationContext.Provider value={{ suppressFieldErrorText, rowSummaryId }}>
-      <ArrayFieldContext.Provider value={arrayContext}>
-        <FormSectionContext.Provider value={arrayItemFieldContext}>
-          <div className={itemBodyStackClasses}>
-            <NestedFormItems
-              items={config.fields}
-              idPrefix={idPrefix}
-              namePrefix={itemPrefix}
-              depth={1}
-            />
-          </div>
-        </FormSectionContext.Provider>
-      </ArrayFieldContext.Provider>
-    </ArrayItemPresentationContext.Provider>
+  const shellTone = resolveArrayItemShellTone(
+    parentContext.arrayItemTone,
+    validationPresentation.showRowInvalidBorder,
   )
+  const presentationRowSummaryId =
+    suppressFieldErrorText && validationPresentation.fieldJoin ? fieldJoinSummaryId : rowSummaryId
 
-  const itemBody = arrayItemHasVisibleBodyFields(config.fields, itemValues) ? fieldsNode : undefined
+  const { fieldsNode, itemBody } = renderArrayFieldItemFieldsNode({
+    config,
+    idPrefix,
+    itemPrefix,
+    itemBodyStackClasses,
+    suppressFieldErrorText,
+    presentationRowSummaryId,
+    arrayContext,
+    arrayItemFieldContext,
+    itemValues,
+  })
 
   const customRemove = renderArrayItemUtilitySlot(itemConfig.removeSlot, arrayContext)
   const beforeRemove = renderArrayItemUtilitySlot(itemConfig.beforeRemove, arrayContext)
@@ -421,55 +228,34 @@ export function ArrayFieldItemContent({
     })
   }
 
-  return renderArrayFieldItemByAnatomy(anatomy, {
-    flatNoHeader: {
-      ...chromeProps,
+  return renderArrayFieldItemByAnatomy(
+    anatomy,
+    buildArrayFieldItemAnatomyProps({
       idPrefix,
       itemPrefix,
-      contentLayout: presentation.contentLayout,
-      inlineFields: normalizedContent?.inlineFields,
-      inlineRow: normalizedContent?.inlineRow,
+      index,
+      itemId,
+      chromeProps,
+      presentation,
+      normalizedContent,
       header,
+      headerConfig,
+      itemValues,
+      watchedSummaryContext,
       sortableEnabled,
-      suppressFieldErrorText,
-      rowSummaryId,
-      arrayContext,
       dragHandleProps,
-      issueSummary,
+      issueSummaries,
+      shellTone,
+      itemBody,
       fieldsNode,
       actionsRail,
-    },
-    flatWithHeader: {
-      ...chromeProps,
-      itemId,
-      header,
-      headerConfig,
-      itemValues,
-      index,
-      watchedSummaryContext,
-      sortableEnabled,
-      dragHandleProps,
-      issueSummary,
-      itemBody,
-      actionsRail,
-    },
-    disclosure: {
-      ...chromeProps,
-      itemId,
-      header,
-      headerConfig,
-      itemValues,
-      index,
-      watchedSummaryContext,
-      sortableEnabled,
-      dragHandleProps,
       collapsed,
       onToggleCollapse,
       bodyId,
-      issueSummary,
-      itemBody,
       leadingChrome,
-      actionsRail,
-    },
-  })
+      suppressFieldErrorText,
+      rowSummaryId,
+      arrayContext,
+    }),
+  )
 }

@@ -2006,6 +2006,302 @@ describe('ArrayFieldRenderer', () => {
     ).not.toBeInTheDocument()
   })
 
+  describe('compact row-level validation display', () => {
+    const compactItemSchema = z.object({
+      token: z.string().optional(),
+      note: z.string().optional(),
+    })
+
+    const compactRowIssueSchema = z
+      .object({ items: z.array(compactItemSchema).min(1) })
+      .superRefine((values, ctx) => {
+        if (values.items[0]?.token !== 'ok') {
+          addCustomRefinementIssue(ctx, 'Row incompatible', ['items', 0])
+        }
+      })
+
+    const flatNoHeaderCompactFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'items',
+        label: 'Items',
+        item: {
+          variant: 'compact',
+          collapsible: false,
+          header: {
+            fallback: (index) => `Item ${index + 1}`,
+            primary: () => 'Summary line',
+            srOnly: true,
+          },
+        },
+        fields: [{ type: 'text', name: 'token', label: 'Token' }],
+        addAction: { label: 'Add item' },
+        min: 1,
+      },
+    ]
+
+    const flatWithHeaderCompactFields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'items',
+        label: 'Items',
+        item: {
+          variant: 'compact',
+          collapsible: false,
+          header: {
+            fallback: (index) => `Item ${index + 1}`,
+            primary: () => 'Visible item title',
+          },
+        },
+        fields: [
+          { type: 'text', name: 'token', label: 'Token' },
+          { type: 'text', name: 'note', label: 'Note' },
+        ],
+        addAction: { label: 'Add item' },
+        min: 1,
+      },
+    ]
+
+    async function expectCompactRowIssueAfterSubmit(
+      fields: FormItem[],
+      options?: { primaryText?: string },
+    ) {
+      const user = userEvent.setup()
+      render(
+        <Form
+          schema={compactRowIssueSchema}
+          fields={fields}
+          defaultValues={{ items: [{ token: '', note: '' }] }}
+          onSubmit={vi.fn()}
+          footer={<button type="submit">Save</button>}
+        />,
+      )
+
+      if (options?.primaryText) {
+        expect(screen.getByText(options.primaryText)).toBeInTheDocument()
+      }
+
+      await user.click(screen.getByRole('button', { name: 'Save' }))
+
+      expect(
+        screen.getByRole('button', { name: 'Review 1 issue in 1 row in Items' }),
+      ).toBeInTheDocument()
+      expect(screen.getByRole('alert')).toHaveTextContent('Row incompatible')
+      expect(screen.queryByRole('button', { name: /Expand/i })).not.toBeInTheDocument()
+    }
+
+    it('surfaces nested array row issues after failed submit', async () => {
+      const user = userEvent.setup()
+      const nestedSchema = z
+        .object({
+          resolution: z.object({
+            target: z.object({
+              requirements: z.array(compactItemSchema).min(1),
+            }),
+          }),
+        })
+        .superRefine((values, ctx) => {
+          if (values.resolution.target.requirements[0]?.token !== 'ok') {
+            addCustomRefinementIssue(ctx, 'Row incompatible', [
+              'resolution',
+              'target',
+              'requirements',
+              0,
+            ])
+          }
+        })
+      const nestedFields: FormItem[] = [
+        {
+          kind: 'array',
+          name: 'resolution.target.requirements',
+          label: 'Requirements',
+          item: {
+            variant: 'compact',
+            collapsible: false,
+            header: {
+              fallback: (index) => `Requirement ${index + 1}`,
+              primary: () => 'It can see you',
+              srOnly: true,
+            },
+          },
+          fields: [{ type: 'text', name: 'token', label: 'Token' }],
+          addAction: { label: 'Add requirement' },
+          min: 1,
+        },
+      ]
+
+      render(
+        <Form
+          schema={nestedSchema}
+          fields={nestedFields}
+          defaultValues={{
+            resolution: { target: { requirements: [{ token: '' }] } },
+          }}
+          onSubmit={vi.fn()}
+          footer={<button type="submit">Save</button>}
+        />,
+      )
+
+      await user.click(screen.getByRole('button', { name: 'Save' }))
+
+      expect(
+        screen.getByRole('button', { name: 'Review 1 issue in 1 row in Requirements' }),
+      ).toBeInTheDocument()
+      expect(screen.getByRole('alert')).toHaveTextContent('Row incompatible')
+    })
+
+    it('surfaces index-only row issues on flatNoHeader compact rows after failed submit', async () => {
+      await expectCompactRowIssueAfterSubmit(flatNoHeaderCompactFields)
+    })
+
+    it('surfaces index-only row issues on flatWithHeader compact rows after failed submit', async () => {
+      await expectCompactRowIssueAfterSubmit(flatWithHeaderCompactFields, {
+        primaryText: 'Visible item title',
+      })
+    })
+
+    it('surfaces index-only row issues on detailed flat requirement-shaped rows', async () => {
+      const user = userEvent.setup()
+      const requirementRowSchema = z.object({
+        kind: z.string().optional(),
+        who: z.string().optional(),
+      })
+      const detailedRequirementSchema = z
+        .object({
+          resolution: z.object({
+            target: z.object({
+              requirements: z
+                .array(requirementRowSchema.extend({ token: z.string().optional() }))
+                .min(1),
+            }),
+          }),
+        })
+        .superRefine((values, ctx) => {
+          if (values.resolution.target.requirements[0]?.token !== 'ok') {
+            addCustomRefinementIssue(ctx, 'Row incompatible', [
+              'resolution',
+              'target',
+              'requirements',
+              0,
+            ])
+          }
+        })
+
+      const detailedRequirementFields: FormItem[] = [
+        {
+          kind: 'array',
+          name: 'resolution.target.requirements',
+          label: 'Requirements',
+          reorder: false,
+          addAction: { label: 'Add a requirement' },
+          min: 1,
+          item: {
+            collapsible: true,
+            resolveCollapsible: () => false,
+            header: {
+              fallback: (index) => `Requirement ${index + 1}`,
+              primary: () => 'It can see you',
+            },
+          },
+          fields: [{ type: 'text', name: 'token', label: 'Token' }],
+        },
+      ]
+
+      render(
+        <Form
+          schema={detailedRequirementSchema}
+          fields={detailedRequirementFields}
+          defaultValues={{
+            resolution: {
+              target: { requirements: [{ kind: 'sight', who: 'target', token: '' }] },
+            },
+          }}
+          onSubmit={vi.fn()}
+          footer={<button type="submit">Save</button>}
+        />,
+      )
+
+      await user.click(screen.getByRole('button', { name: 'Save' }))
+
+      expect(
+        screen.getByRole('button', { name: 'Review 1 issue in 1 row in Requirements' }),
+      ).toBeInTheDocument()
+      const alert = screen.getByRole('alert')
+      expect(alert).toHaveAttribute('data-array-item-issue-placement', 'rowAlert')
+      expect(alert).toHaveTextContent('Row incompatible')
+      expect(
+        document
+          .querySelector('[data-array-item-prefix="resolution.target.requirements.0"]')
+          ?.closest('[class*="border-destructive"]'),
+      ).toBeTruthy()
+    })
+
+    it('clears compact row issues when the row becomes valid again', async () => {
+      const user = userEvent.setup()
+      const onSubmit = vi.fn()
+      render(
+        <Form
+          schema={compactRowIssueSchema}
+          fields={flatNoHeaderCompactFields}
+          defaultValues={{ items: [{ token: '', note: '' }] }}
+          onSubmit={onSubmit}
+          footer={<button type="submit">Save</button>}
+        />,
+      )
+
+      await user.click(screen.getByRole('button', { name: 'Save' }))
+      expect(screen.getByRole('alert')).toHaveTextContent('Row incompatible')
+
+      await user.type(screen.getByRole('textbox', { name: 'Token' }), 'ok')
+      await user.click(screen.getByRole('button', { name: 'Save' }))
+
+      await waitFor(() => expect(onSubmit).toHaveBeenCalled())
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: /Review .*issue/i })).not.toBeInTheDocument()
+    })
+
+    it('scrolls fieldless compact rows into view from the legend issue link', async () => {
+      const user = userEvent.setup()
+      const scrollIntoView = vi.fn()
+      Element.prototype.scrollIntoView = scrollIntoView
+
+      render(
+        <Form
+          schema={compactRowIssueSchema}
+          fields={flatNoHeaderCompactFields}
+          defaultValues={{ items: [{ token: '', note: '' }] }}
+          onSubmit={vi.fn()}
+          footer={<button type="submit">Save</button>}
+        />,
+      )
+
+      await user.click(screen.getByRole('button', { name: 'Save' }))
+      scrollIntoView.mockClear()
+
+      await user.click(screen.getByRole('button', { name: 'Review 1 issue in 1 row in Items' }))
+
+      await waitFor(() => expect(scrollIntoView).toHaveBeenCalled())
+    })
+
+    it('omits issue summary chrome on valid compact rows', async () => {
+      const user = userEvent.setup()
+      const onSubmit = vi.fn()
+      render(
+        <Form
+          schema={compactRowIssueSchema}
+          fields={flatNoHeaderCompactFields}
+          defaultValues={{ items: [{ token: 'ok', note: '' }] }}
+          onSubmit={onSubmit}
+          footer={<button type="submit">Save</button>}
+        />,
+      )
+
+      await user.click(screen.getByRole('button', { name: 'Save' }))
+      await waitFor(() => expect(onSubmit).toHaveBeenCalled())
+      expect(document.querySelector('[data-array-item-issue-summary]')).not.toBeInTheDocument()
+    })
+  })
+
   it('surfaces a joined row summary on compact rows when errorPlacement is row', async () => {
     const user = userEvent.setup()
     const grantSchema = z.object({

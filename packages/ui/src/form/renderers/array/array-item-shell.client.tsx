@@ -7,6 +7,7 @@ import { CollapsibleListItemShell } from '../../../components/ui/collapsible-lis
 import { resolveCollapsibleListItemHeaderActionsPlacement } from '../../../components/ui/collapsible-list-item/collapsible-list-item-root.lib'
 import { resolveArrayItemShellSurface } from '../../config/array/resolve-array-item-shell-surface.lib'
 import { useFormSectionContext } from '../../context/form-section.context'
+import type { SemanticSurfaceTone } from '../../../components/ui/field-surface.variants'
 import {
   arrayItemActionsRailClasses,
   arrayItemRemoveButtonClasses,
@@ -137,6 +138,8 @@ export interface ArrayItemShellProps extends ArrayItemLeadingChromeOptions {
   layout?: 'default' | 'compactRow'
   hasItemHeader?: boolean
   className?: string
+  /** Overrides section tone when the row has row-level validation issues. */
+  shellTone?: SemanticSurfaceTone
   main: React.ReactNode
   actions?: React.ReactNode
 }
@@ -151,10 +154,12 @@ export function ArrayItemShell({
   layout = 'default',
   hasItemHeader,
   className,
+  shellTone,
   main,
   actions,
 }: ArrayItemShellProps) {
   const { arrayItemSurface, arrayItemTone } = useFormSectionContext()
+  const tone = shellTone ?? arrayItemTone
 
   return (
     <CollapsibleListItemShell
@@ -170,7 +175,7 @@ export function ArrayItemShell({
         collapsible: collapsible ?? false,
         hasItemHeader,
       })}
-      tone={arrayItemTone}
+      tone={tone}
       className={className}
       main={main}
       actions={actions}

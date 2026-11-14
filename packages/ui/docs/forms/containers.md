@@ -644,12 +644,20 @@ Array item validation chrome is generic in `@rpg/ui/form` and is driven by RHF/Z
 - Before the first failed submit, progressive presentation shows row issue chrome only for
   touched rows.
 - After the first failed submit, all invalid rows in the form are flagged live.
-- Detailed collapsed rows show an issue badge in the actions rail plus the first issue message
-  in the header. Expanded detailed rows omit the badge; row/cross-row messages stay in the
-  header and field messages stay with their controls.
-- Compact flat rows omit the badge and show per-field validation copy under each control
-  (same hint/error swap as standalone fields). Set `errorPlacement: 'row'` to opt into a joined
-  row summary instead. Descendant errors still count toward the nearest detailed ancestor row.
+- **Row-level** issues (`headerIssues` — index errors and cross-row issues) use a persistent
+  `rowAlert` under the item heading, or at the top of the item when there is no heading.
+  Row-level invalidation also applies a destructive border on the item shell. This is independent
+  of `compact` vs `detailed` variant and of collapsible vs flat anatomy.
+- **Field-level** issues stay on their controls when a matching eligible control is visible in an
+  expanded row. When field copy is suppressed (`errorPlacement: 'row'`), no body field is rendered,
+  the row is collapsed with a body, or an issue path has no inline control, joined field text uses
+  `compactSummary` below any row alert — never duplicated on inline controls.
+- Detailed collapsed rows still show an issue badge in the actions rail; row alerts remain visible
+  outside the disclosure body. Expanded detailed rows omit the badge.
+- Compact flat rows omit the badge and show the same row/field split as detailed flat rows.
+  `flatNoHeader` items may still show a primary summary line from `item.header.primary` — that is
+  not the same as item header chrome. Descendant errors still count toward the nearest detailed
+  ancestor row.
 - The array legend shows an invalid-row link after a failed submit. Clicking it jumps to the
   first invalid row in that array.
 

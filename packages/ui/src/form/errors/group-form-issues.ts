@@ -8,19 +8,38 @@ import { FORM_ISSUE_SEVERITY_ORDER } from './form-issue.types'
 
 const MAX_NAMED_FIELD_SUMMARY_PARTS = 2
 
-/** Joins field issue summaries with a 2-label cap and "+N more" overflow. */
-export function buildFieldSummaryText(
-  fieldIssues: FormIssue[],
+function buildCappedIssueSummaryText(
+  parts: readonly string[],
   maxNamed = MAX_NAMED_FIELD_SUMMARY_PARTS,
 ): string | undefined {
-  if (fieldIssues.length === 0) return undefined
-
-  const parts = fieldIssues.map((issue) => issue.message)
+  if (parts.length === 0) return undefined
   if (parts.length <= maxNamed) return joinArrayItemSummaryParts(parts)
 
   const named = parts.slice(0, maxNamed)
   const extra = parts.length - maxNamed
   return joinInlineMetadata([joinArrayItemSummaryParts(named), `+${extra} more`])
+}
+
+/** Joins field issue summaries with a 2-label cap and "+N more" overflow. */
+export function buildFieldSummaryText(
+  fieldIssues: FormIssue[],
+  maxNamed = MAX_NAMED_FIELD_SUMMARY_PARTS,
+): string | undefined {
+  return buildCappedIssueSummaryText(
+    fieldIssues.map((issue) => issue.message),
+    maxNamed,
+  )
+}
+
+/** Joins row/cross-row issue summaries with the same cap as field summaries. */
+export function buildHeaderIssuesSummaryText(
+  headerIssues: FormIssue[],
+  maxNamed = MAX_NAMED_FIELD_SUMMARY_PARTS,
+): string | undefined {
+  return buildCappedIssueSummaryText(
+    headerIssues.map((issue) => issue.summaryMessage ?? issue.message),
+    maxNamed,
+  )
 }
 
 function compareIssues(left: FormIssue, right: FormIssue, fieldOrder: readonly string[]): number {

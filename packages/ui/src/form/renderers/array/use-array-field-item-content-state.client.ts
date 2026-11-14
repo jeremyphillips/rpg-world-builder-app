@@ -20,6 +20,7 @@ import {
   resolveArrayItemPresentationAnatomy,
 } from '../../config/array/array-item-presentation.lib'
 import type { ArrayConfig } from '../../field-config'
+import { arrayItemHasVisibleBodyFields } from '../../config/array/array-item-visible-body.lib'
 import { useArrayItemRowState } from './use-array-item-row-state.client'
 
 interface UseArrayFieldItemContentStateArgs {
@@ -64,6 +65,7 @@ export function useArrayFieldItemContentState({
     disabled: !primaryField,
   })
   const itemValues = (useWatch({ name: `${fullName}.${index}` }) ?? {}) as Record<string, unknown>
+  const hasVisibleBodyFields = arrayItemHasVisibleBodyFields(config.fields, itemValues)
 
   const itemConfig = resolveArrayItemConfig(config)
   const rowState = useArrayItemRowState({
@@ -80,6 +82,7 @@ export function useArrayFieldItemContentState({
     filterSelectDependsOn: config.filterSelect?.dependsOn,
     filterSelectOptions: config.filterSelect?.filter,
     onRemoveItem,
+    hasVisibleBodyFields,
   })
 
   const header = resolveArrayItemHeaderLabels(
@@ -140,6 +143,10 @@ export function useArrayFieldItemContentState({
     rowLabel,
     focusIssue: rowState.focusIssue,
     issueSummary: rowState.issueSummary,
+    issueSummaries: rowState.issueSummaries,
+    validationPresentation: rowState.validationPresentation,
+    fieldJoinSummaryId: rowState.fieldJoinSummaryId,
+    hasVisibleBodyFields,
     normalizedContent,
     chromeProps,
     showIssueChrome: rowState.showIssueChrome,
