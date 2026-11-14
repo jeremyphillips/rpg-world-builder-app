@@ -14,10 +14,10 @@ import { TextField } from '../../../../components/ui/text-field'
 import { TextareaField } from '../../../../components/ui/textarea-field'
 import { TextSuggestionsField } from '../../../../components/ui/text-suggestions-field.client'
 import type { FieldHintPosition } from '../../../../components/ui/field.variants'
+import type { FieldSize } from '../../../../components/ui/field.client'
 import { useDependsOnValues } from '../../../config/form-depends-on.client'
 import { useFieldErrorPresentation } from '../../../context/array-item-presentation.context'
 import { useFieldControlSize } from '../../../context/form-section.context'
-import { resolveNestedFieldErrorMessage } from '../../../errors/resolve-field-error-message'
 import type {
   OptionalDisclosureConfig,
   RichTextFieldConfig,
@@ -28,7 +28,7 @@ import type {
 } from '../../../field-config'
 import { LazyFieldSuspense } from '../../lazy-field.client'
 import { LazyRichTextField } from '../lazy-rich-text-field.client'
-import { fieldDefaultValue, resolveFieldHintPresentation } from '../../../field-config'
+import { fieldDefaultValue } from '../../../field-config'
 import { useConfirmBeforeClear } from '../../../config/use-confirm-before-clear.client'
 import { normalizedSelectFieldValue } from '../select/select-field-renderer.lib'
 import { useSelectFieldRendererState } from '../select/use-select-field-renderer-state.client'
@@ -54,6 +54,8 @@ type OptionalDisclosureTextareaRendererProps = {
   describedBy?: string
   hint?: string
   hintPosition?: FieldHintPosition
+  presentationSize: FieldSize
+  controlSize: FieldSize
 }
 
 export function OptionalDisclosureTextareaFieldRenderer({
@@ -66,8 +68,9 @@ export function OptionalDisclosureTextareaFieldRenderer({
   describedBy,
   hint,
   hintPosition,
+  presentationSize,
+  controlSize,
 }: OptionalDisclosureTextareaRendererProps) {
-  const controlSize = useFieldControlSize(config.controlSizeOverride)
   const { ref: registerRef, value, onChange, onBlur } = field
   const [manualOpen, setManualOpen] = useState(false)
   const hasValue = Boolean(String(value ?? '').trim())
@@ -103,13 +106,12 @@ export function OptionalDisclosureTextareaFieldRenderer({
               id,
               hint,
               hintPosition,
-              presentationSize: controlSize,
+              presentationSize,
               controlSize,
             },
             { error, invalid, describedBy },
-            { sizes: 'none', label: 'accessible-name' },
+            { sizes: 'both', label: 'accessible-name' },
           )}
-          size={controlSize}
           placeholder={config.placeholder}
           rows={config.rows}
           disabled={config.disabled}
@@ -134,6 +136,8 @@ type OptionalDisclosureTextRendererProps = {
   describedBy?: string
   hint?: string
   hintPosition?: FieldHintPosition
+  presentationSize: FieldSize
+  controlSize: FieldSize
 }
 
 /** Collapses an empty single-line field. Opening an empty value does not write form state. */
@@ -147,8 +151,9 @@ export function OptionalDisclosureTextFieldRenderer({
   describedBy,
   hint,
   hintPosition,
+  presentationSize,
+  controlSize,
 }: OptionalDisclosureTextRendererProps) {
-  const controlSize = useFieldControlSize(config.controlSizeOverride)
   const { ref: registerRef, value, onChange, onBlur, name } = field
   const [manualOpen, setManualOpen] = useState(false)
   const hasValue = Boolean(String(value ?? '').trim())
@@ -196,13 +201,12 @@ export function OptionalDisclosureTextFieldRenderer({
               id,
               hint,
               hintPosition,
-              presentationSize: controlSize,
+              presentationSize,
               controlSize,
             },
             { error, invalid, describedBy },
-            { sizes: 'none', label: 'accessible-name' },
+            { sizes: 'both', label: 'accessible-name' },
           )}
-          size={controlSize}
           placeholder={config.placeholder}
           disabled={config.disabled}
           ref={registerRef}
@@ -256,9 +260,8 @@ export function OptionalDisclosureSelectFieldRenderer({
         controlSize: state.controlSize,
       },
       state.validation,
-      { sizes: 'none', label: 'visible' },
+      { sizes: 'both', label: 'visible' },
     ),
-    size: state.controlSize,
     digits: state.renderConfig.digits,
     sizingLabel: state.renderConfig.sizingLabel,
     sizingLabels: state.renderConfig.sizingLabels,
@@ -320,9 +323,7 @@ export type OptionalDisclosureTextSuggestionsFieldRendererProps = {
   config: TextSuggestionsFieldConfig
   disclosure: OptionalDisclosureConfig
   suggestions: readonly string[]
-  fullName: string
-  id: string
-  namePrefix?: string
+  resolved: ResolvedFieldRender
 }
 
 /** Optional-disclosure wrapper for schema-driven text-suggestions fields. */
@@ -330,27 +331,16 @@ export function OptionalDisclosureTextSuggestionsFieldRenderer({
   config,
   disclosure,
   suggestions,
-  fullName,
-  id,
-  namePrefix,
+  resolved,
 }: OptionalDisclosureTextSuggestionsFieldRendererProps) {
-  const suggestionValues = useDependsOnValues(config.suggestions.dependsOn, namePrefix)
+  const suggestionValues = useDependsOnValues(config.suggestions.dependsOn, resolved.namePrefix)
   const suggestionValuesKey = JSON.stringify(suggestionValues)
-  const hintDependsOn =
-    typeof config.hint === 'object' && config.hint?.resolve ? config.hint.resolve.dependsOn : []
-  const hintValues = useDependsOnValues(hintDependsOn, namePrefix)
-  const hintPresentation = resolveFieldHintPresentation(config, hintValues)
-  const controlSize = useFieldControlSize(config.controlSizeOverride)
 
-  const { field, fieldState } = useController({
-    name: fullName,
-    defaultValue: fieldDefaultValue(config),
+  const { field } = useController({
+    name: resolved.fullName,
+    defaultValue: fieldDefaultValue(resolved.authored),
   })
-  const { errors } = useFormState()
-  const validation = useFieldErrorPresentation(
-    fieldState.error?.message ?? resolveNestedFieldErrorMessage(errors, fullName),
-    fullName,
-  )
+  const validation = useFieldErrorPresentation(undefined, resolved.fullName)
 
   const [manualOpen, setManualOpen] = useState(false)
   const [dependencyCollapsed, setDependencyCollapsed] = useState(false)
@@ -394,31 +384,30 @@ export function OptionalDisclosureTextSuggestionsFieldRenderer({
   return (
     <>
       <OptionalFieldDisclosure
-        controlId={id}
+        controlId={resolved.id}
         fieldLabel={config.label}
         addLabel={disclosure.addLabel}
         removeLabel={disclosure.removeLabel}
         open={open}
         onOpenChange={handleOpenChange}
         onRemove={attemptClear}
-        size={controlSize}
+        size={resolved.controlSize}
       >
         <TextSuggestionsField
           {...buildFieldShellProps(
             {
               config,
-              id,
-              hint: hintPresentation.text,
-              hintPosition: hintPresentation.position,
-              presentationSize: controlSize,
-              controlSize,
+              id: resolved.id,
+              hint: resolved.hint,
+              hintPosition: resolved.hintPosition,
+              presentationSize: resolved.presentationSize,
+              controlSize: resolved.controlSize,
             },
             validation,
-            { sizes: 'none', label: 'accessible-name' },
+            { sizes: 'presentation', label: 'accessible-name' },
           )}
           suggestions={suggestions}
           placeholder={config.placeholder}
-          size={controlSize}
           value={field.value ?? fieldDefaultValue(config)}
           onValueChange={field.onChange}
           onBlur={field.onBlur}

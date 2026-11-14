@@ -9,7 +9,6 @@ import type {
 
 type BoundControllerField = UseControllerReturn<Record<string, unknown>>['field']
 import type { FieldErrorPresentation } from '../../../context/array-item-presentation.context'
-import { resolveFirstFieldErrorMessage } from '../../../errors/resolve-field-error-message'
 import { resolveFieldPlaceholder } from '../../../config/field-placeholder.lib'
 
 /** Drops the amount when the unit changes so 120 ft does not become 120 miles. */
@@ -164,14 +163,6 @@ export function resolveJoinedPairControlIds(
         ? `${id}-${config.end.name.replaceAll('.', '-')}`
         : `${id}-label`,
   }
-}
-
-export function resolveJoinedPairCombinedError(
-  startError: FieldError | undefined,
-  endError: FieldError | undefined,
-  endPath: string | undefined,
-): string | undefined {
-  return resolveFirstFieldErrorMessage(startError?.message, endPath ? endError?.message : undefined)
 }
 
 export function buildJoinedPairControls(

@@ -42,11 +42,11 @@ export function useSelectFieldRendererState({
   const arrayContext = useArrayFieldContext()
   const renderConfig = config
 
-  const { field, fieldState } = useController({
+  const { field } = useController({
     name: fullName,
     defaultValue: fieldDefaultValue(config),
   })
-  const validation = useFieldErrorPresentation(fieldState.error?.message, fullName)
+  const validation = useFieldErrorPresentation(undefined, fullName)
 
   const resolvedOptions = useMemo(
     () =>

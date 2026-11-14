@@ -37,7 +37,6 @@ function selectStateInput(resolved: ResolvedFieldRender): SelectFieldResolvedSta
 function selectChrome(
   resolved: ResolvedFieldRender,
   state: ReturnType<typeof useSelectFieldRendererState>,
-  sizes: 'both' | 'none',
 ): SelectFieldChromeProps {
   const shell = buildFieldShellProps(
     {
@@ -49,11 +48,10 @@ function selectChrome(
       controlSize: state.controlSize,
     },
     state.validation,
-    { sizes, label: 'visible' },
+    { sizes: 'both', label: 'visible' },
   )
   return {
     ...shell,
-    ...(sizes === 'none' ? { size: state.controlSize } : {}),
     digits: state.renderConfig.digits,
     sizingLabel: state.renderConfig.sizingLabel,
     sizingLabels: state.renderConfig.sizingLabels,
@@ -81,7 +79,7 @@ export function SelectFieldRenderer({ resolved }: SelectFieldRendererProps) {
 function BoundSelectField({ resolved }: SelectFieldRendererProps) {
   const state = useSelectFieldRendererState(selectStateInput(resolved))
   const copyContext = resolveFieldCopyContext(state.renderConfig)
-  const chrome = selectChrome(resolved, state, 'both')
+  const chrome = selectChrome(resolved, state)
   const changeLabel = state.renderConfig.presentation?.change?.label
   const changePresentation = useSelectFieldChangePresentation({
     changeLabel,

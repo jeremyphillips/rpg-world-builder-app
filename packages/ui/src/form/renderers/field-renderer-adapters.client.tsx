@@ -103,7 +103,6 @@ function shellFor<K extends FieldType>(
 }
 
 const bothSizes: FieldShellOptions = { sizes: 'both', label: 'visible' }
-const noSizes: FieldShellOptions = { sizes: 'none', label: 'visible' }
 
 /**
  * Typed adapter registry. A new standard field type fails this map until an entry exists.
@@ -206,7 +205,7 @@ export const fieldRenderers: {
     const validation = { error: args.error, invalid: args.invalid, describedBy: args.describedBy }
     return (
       <RadioGroupField
-        {...shellFor({ config, field, ...args }, validation, noSizes)}
+        {...shellFor({ config, field, ...args }, validation, bothSizes)}
         options={config.options}
         orientation={config.orientation}
         value={field.value ?? ''}
@@ -219,7 +218,7 @@ export const fieldRenderers: {
     const validation = { error: args.error, invalid: args.invalid, describedBy: args.describedBy }
     return (
       <RadioCardField
-        {...shellFor({ config, field, ...args }, validation, noSizes)}
+        {...shellFor({ config, field, ...args }, validation, bothSizes)}
         options={config.options}
         value={field.value ?? ''}
         onValueChange={field.onChange}
@@ -306,7 +305,10 @@ export const fieldRenderers: {
     return (
       <LazyFieldSuspense>
         <LazyFileField
-          {...shellFor({ config, field, remotePreview, ...args }, validation, noSizes)}
+          {...shellFor({ config, field, remotePreview, ...args }, validation, {
+            sizes: 'presentation',
+            label: 'visible',
+          })}
           accept={config.accept}
           multiple={config.multiple}
           maxFiles={config.maxFiles}
@@ -371,6 +373,7 @@ export const fieldRenderers: {
       id={args.id}
       hint={args.hint}
       hintPosition={args.hintPosition}
+      presentationSize={args.presentationSize}
       error={args.error}
       namePrefix={namePrefix}
     />

@@ -339,6 +339,20 @@ not as a renderer requirement.
 
 Collapsible sections, separators, nested groups: [containers.md](./forms/containers.md).
 
+## Renderer ownership
+
+`FieldRenderer` resolves chrome, options, hints, sizes, and text-suggestion strings once.
+It does not bind React Hook Form. Four families own registration:
+
+- **Standard** — one controller and progressive blur/change validation. Scalar disclosure wraps that binding.
+- **Select** — its own controller, without progressive validation. It owns array filtering, read-only commit, and select disclosure, and consumes the parent resolution.
+- **Text suggestions** — its own controller, without progressive validation, including when wrapped in disclosure. Suggestion strings come from the parent resolution.
+- **Multi-controller** — `inputSelect`, `inputUnit`, `levelRange`, `inlineSentence`, `inlineChooseCount`, `chooseFromChips`, `joinedPair`, and `rollValue`. Each keeps its own controllers.
+
+Leaf chrome goes through `buildFieldShellProps`. `disabledWhen` is applied on the resolved config for every family and does not unregister the field.
+
+Still deferred: `hintIcon` beyond the number stepper; `invalid`, `describedBy`, and refs on dice formula and editable grid; progressive validation for select, text suggestions, and multi-controller fields; joined-pair shell copy stays on the start path.
+
 ## Specialized field types
 
 Rich text, combobox, editable grid, dice formula, chips, input unit/select, etc.:

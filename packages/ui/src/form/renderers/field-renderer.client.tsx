@@ -8,7 +8,6 @@ import { useFieldRowParticipation } from '../../components/ui/field-row-anatomy.
 import { collectFieldDynamicDependsOn, type FieldConfig } from '../field-config'
 import { useDependsOnValues } from '../config/form-depends-on.client'
 import { useFormSectionContext } from '../context/form-section.context'
-import { mergeFieldConfigWithInteractivity } from './field-renderer-interactivity.lib'
 import {
   buildFieldRendererIds,
   buildJoinedPairRendererIds,
@@ -82,9 +81,13 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
     optionValues,
     { inAnatomyRow },
   )
+  const interactivityDisabled = config.interactivity?.disabledWhen(dynamicValues) ?? false
   const resolved: ResolvedFieldRender = {
     authored: config,
-    config: resolvedConfig.config,
+    config: {
+      ...resolvedConfig.config,
+      disabled: Boolean(config.disabled) || interactivityDisabled,
+    } as FieldConfig,
     presentationSize: resolvedConfig.presentationSize,
     controlSize: resolvedConfig.controlSize,
     hint: resolvedConfig.hint,
@@ -98,16 +101,11 @@ export function FieldRenderer({ config, idPrefix, namePrefix }: FieldRendererPro
     namePrefix,
   }
 
-  const node = renderResolvedField(resolved, () =>
-    mergeFieldConfigWithInteractivity(chromedConfig, resolved.config, dynamicValues),
-  )
+  const node = renderResolvedField(resolved)
   return wrapFieldDerivedMetaPresentation(node, resolved)
 }
 
-function renderResolvedField(
-  resolved: ResolvedFieldRender,
-  mergeStandardConfig: () => FieldConfig,
-): React.ReactElement {
+function renderResolvedField(resolved: ResolvedFieldRender): React.ReactElement {
   if (isMultiControllerField(resolved.config)) {
     return renderSpecializedField({ resolved: { ...resolved, config: resolved.config } })
   }
@@ -120,5 +118,5 @@ function renderResolvedField(
     return <TextSuggestionsFieldRenderer resolved={resolved} />
   }
 
-  return <StandardFieldRenderer resolved={{ ...resolved, config: mergeStandardConfig() }} />
+  return <StandardFieldRenderer resolved={resolved} />
 }

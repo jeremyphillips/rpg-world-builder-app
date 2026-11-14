@@ -29,12 +29,11 @@ import {
 export function StandardFieldRenderer({ resolved }: { resolved: ResolvedFieldRender }) {
   const renderConfig = resolved.config as StandardRegistryFieldConfig
   const { getFieldState, trigger } = useFormContext()
-  const { field, fieldState } = useController({
+  const { field } = useController({
     name: resolved.fullName,
     defaultValue: fieldDefaultValue(resolved.authored),
   })
   const formState = useFormState({ name: resolved.fullName, exact: true })
-  const liveError = getFieldState(resolved.fullName, formState).error
   const boundPaths = React.useMemo(
     () =>
       resolveFieldConfigBoundNames(renderConfig).map((name) =>
@@ -59,10 +58,7 @@ export function StandardFieldRenderer({ resolved }: { resolved: ResolvedFieldRen
     },
   }
   const remotePreview = useFileFieldRemotePreview(resolveFieldConfigPrimaryName(resolved.authored))
-  const validation = useFieldErrorPresentation(
-    liveError?.message ?? fieldState.error?.message,
-    resolved.fullName,
-  )
+  const validation = useFieldErrorPresentation(undefined, resolved.fullName)
   assertOptionalDisclosureFieldConfig(resolved.authored)
   const labelVisibility = resolveFieldLabelVisibility(renderConfig)
 
@@ -75,6 +71,8 @@ export function StandardFieldRenderer({ resolved }: { resolved: ResolvedFieldRen
         id={resolved.id}
         hint={resolved.hint}
         hintPosition={resolved.hintPosition}
+        presentationSize={resolved.presentationSize}
+        controlSize={resolved.controlSize}
         {...validation}
       />
     )
@@ -89,6 +87,8 @@ export function StandardFieldRenderer({ resolved }: { resolved: ResolvedFieldRen
         id={resolved.id}
         hint={resolved.hint}
         hintPosition={resolved.hintPosition}
+        presentationSize={resolved.presentationSize}
+        controlSize={resolved.controlSize}
         {...validation}
       />
     )

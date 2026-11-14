@@ -1,18 +1,11 @@
 'use client'
 
-import { useController, useFormState } from 'react-hook-form'
+import { useController } from 'react-hook-form'
 
 import { TextSuggestionsField } from '../../../components/ui/text-suggestions-field.client'
-import { useDependsOnValues } from '../../config/form-depends-on.client'
 import { useFieldErrorPresentation } from '../../context/array-item-presentation.context'
-import { resolveNestedFieldErrorMessage } from '../../errors/resolve-field-error-message'
-import {
-  fieldDefaultValue,
-  resolveFieldHintPresentation,
-  type TextSuggestionsFieldConfig,
-} from '../../field-config'
+import { fieldDefaultValue, type TextSuggestionsFieldConfig } from '../../field-config'
 import { assertOptionalDisclosureFieldConfig } from '../../config/optional-disclosure-config.lib'
-import { useFieldControlSize } from '../../context/form-section.context'
 import { buildFieldShellProps } from '../field-shell-props.lib'
 import type { ResolvedFieldRender } from '../field-resolved-render.types'
 import { OptionalDisclosureTextSuggestionsFieldRenderer } from './optional-disclosure/optional-disclosure-field-renderer.client'
@@ -28,9 +21,7 @@ export function TextSuggestionsFieldRenderer({ resolved }: { resolved: ResolvedF
         config={config}
         disclosure={config.optionalDisclosure}
         suggestions={suggestions}
-        fullName={resolved.fullName}
-        id={resolved.id}
-        namePrefix={resolved.namePrefix}
+        resolved={resolved}
       />
     )
   }
@@ -46,21 +37,11 @@ function BoundTextSuggestionsField({
   suggestions: readonly string[]
 }) {
   const config = resolved.config as TextSuggestionsFieldConfig
-  const hintDependsOn =
-    typeof config.hint === 'object' && config.hint?.resolve ? config.hint.resolve.dependsOn : []
-  const hintValues = useDependsOnValues(hintDependsOn, resolved.namePrefix)
-  const hintPresentation = resolveFieldHintPresentation(config, hintValues)
-  const controlSize = useFieldControlSize(config.controlSizeOverride)
-
-  const { field, fieldState } = useController({
+  const { field } = useController({
     name: resolved.fullName,
     defaultValue: fieldDefaultValue(resolved.authored),
   })
-  const { errors } = useFormState()
-  const validation = useFieldErrorPresentation(
-    fieldState.error?.message ?? resolveNestedFieldErrorMessage(errors, resolved.fullName),
-    resolved.fullName,
-  )
+  const validation = useFieldErrorPresentation(undefined, resolved.fullName)
 
   return (
     <TextSuggestionsField
@@ -68,17 +49,16 @@ function BoundTextSuggestionsField({
         {
           config,
           id: resolved.id,
-          hint: hintPresentation.text,
-          hintPosition: hintPresentation.position,
+          hint: resolved.hint,
+          hintPosition: resolved.hintPosition,
           presentationSize: resolved.presentationSize,
-          controlSize,
+          controlSize: resolved.controlSize,
         },
         validation,
-        { sizes: 'none', label: 'visible' },
+        { sizes: 'presentation', label: 'visible' },
       )}
       suggestions={suggestions}
       placeholder={config.placeholder}
-      size={controlSize}
       value={field.value ?? fieldDefaultValue(config)}
       onValueChange={field.onChange}
       onBlur={field.onBlur}

@@ -14,7 +14,6 @@ import {
   amountAfterJoinedPairUnitChange,
   buildJoinedPairControls,
   resolveJoinedPairBoundPaths,
-  resolveJoinedPairCombinedError,
   resolveJoinedPairControlIds,
   resolveJoinedPairStartOccupant,
 } from './joined-pair-field-renderer.lib'
@@ -79,12 +78,7 @@ export function useJoinedPairFieldRendererState(
     },
   }
 
-  const combinedError = resolveJoinedPairCombinedError(
-    startController.fieldState.error,
-    endController.fieldState.error,
-    endPath,
-  )
-  const validation = useFieldErrorPresentation(combinedError, startPath)
+  const validation = useFieldErrorPresentation(undefined, startPath)
   const hintPresentation = resolveRowAwareFieldHintPresentation(config, hintValues, rowAwareHints)
   const labelVisibility = resolveFieldLabelVisibility(config)
   const controls = buildJoinedPairControls(

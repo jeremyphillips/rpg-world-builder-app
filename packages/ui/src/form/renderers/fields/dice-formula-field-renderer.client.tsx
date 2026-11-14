@@ -7,7 +7,7 @@ import { buildFieldShellProps } from '../field-shell-props.lib'
 import type { DiceFormulaValue } from '../../../components/ui/dice-formula-field.lib'
 import type { FieldHintPosition } from '../../../components/ui/field.variants'
 import type { DiceFormulaFieldConfig } from '../../field-config'
-import { useFieldControlSize } from '../../context/form-section.context'
+import type { FieldSize } from '../../../components/ui/field.client'
 
 export interface DiceFormulaFieldRendererProps {
   config: DiceFormulaFieldConfig
@@ -20,6 +20,7 @@ export interface DiceFormulaFieldRendererProps {
   error?: string
   hint?: string
   hintPosition?: FieldHintPosition
+  presentationSize: FieldSize
   namePrefix?: string
 }
 
@@ -31,9 +32,9 @@ export function DiceFormulaFieldRenderer({
   error,
   hint,
   hintPosition,
+  presentationSize,
   namePrefix,
 }: DiceFormulaFieldRendererProps) {
-  const controlSize = useFieldControlSize(config.controlSizeOverride)
   const currencyConfig = config.currencyUnit
   const currencyName =
     currencyConfig && namePrefix ? `${namePrefix}.${currencyConfig.name ?? 'currency'}` : undefined
@@ -60,13 +61,12 @@ export function DiceFormulaFieldRenderer({
           id,
           hint,
           hintPosition,
-          presentationSize: controlSize,
-          controlSize,
+          presentationSize,
+          controlSize: presentationSize,
         },
         { error },
-        { sizes: 'none', label: 'visible' },
+        { sizes: 'presentation', label: 'visible' },
       )}
-      size={controlSize}
       labelPosition={config.labelPosition}
       modifierMode={config.modifierMode}
       faces={config.faces}
