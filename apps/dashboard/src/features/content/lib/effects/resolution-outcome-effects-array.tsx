@@ -1,10 +1,17 @@
+import { useController, useFormContext } from 'react-hook-form'
 import {
   CONDITION_TERM,
   formatDamageValue,
   planLinkedEffectAdd,
   type ResolutionApplicationAmount,
 } from '@rpg/contracts'
-import type { ArrayConfig, FormItem } from '@rpg/ui/form'
+import type {
+  ArrayAddMenuConfig,
+  ArrayConfig,
+  ArrayFilterSelectConfig,
+  FieldConfig,
+  FormItem,
+} from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../forms/registry/content-form-registry'
 import { applicationAmountField } from './application-row-fields'
@@ -14,6 +21,20 @@ import { orderedEffectRowFields } from './ordered-effect-row-fields'
 import { ResolutionEffectDefinitionSlot } from './resolution-effect-definition-slot'
 import { vocabularyFieldLabel } from '@/features/vocabulary'
 
+type LibraryReferenceRole = {
+  role: 'library'
+  /** Built-in add menu, including `resolveItems` for one entry per library row. */
+  menu: ArrayAddMenuConfig
+  addActionLabel: string
+  headingLabel: string
+  amountField: FieldConfig
+  primary: NonNullable<NonNullable<ArrayConfig['item']>['header']>['primary']
+  summary?: NonNullable<NonNullable<ArrayConfig['item']>['header']>['summary']
+  primaryDependsOn?: string[]
+  summaryDependsOn?: string[]
+  filterSelect?: ArrayFilterSelectConfig
+}
+
 type ReferenceRole =
   | {
       role: 'owner'
@@ -21,6 +42,13 @@ type ReferenceRole =
     }
   | { role: 'linked'; amounts: readonly ResolutionApplicationAmount[] }
   | { role: 'none' }
+  | LibraryReferenceRole
+
+function PersistRowEffectId({ path }: { path: string }) {
+  const { control } = useFormContext()
+  useController({ control, name: `${rowPath(path)}.effectId` })
+  return null
+}
 
 function effectIds(library: unknown): string[] {
   if (!Array.isArray(library)) return []
@@ -43,13 +71,61 @@ function damageSummary(effectId: unknown, library: unknown): string {
 }
 
 function rowPath(slotPath: string): string {
-  const marker = '._definition'
-  return slotPath.endsWith(marker) ? slotPath.slice(0, -marker.length) : slotPath
+  return slotPath.replace(/\._(definition|effectId)$/, '')
+}
+
+function libraryOutcomeEffectsArray(
+  options: Parameters<typeof resolutionOutcomeEffectsArray>[0] & {
+    references: LibraryReferenceRole
+  },
+): ArrayConfig {
+  const { references } = options
+  const amountVisibility = {
+    dependsOn: ['kind'],
+    visibleWhen: (values: Record<string, unknown>) => values.kind === 'effect-reference',
+  }
+  return {
+    kind: 'array',
+    name: options.name,
+    emptyState: 'none',
+    heading: { label: references.headingLabel },
+    addAction: {
+      label: references.addActionLabel,
+      menu: references.menu,
+    },
+    filterSelect: references.filterSelect,
+    item: {
+      collapsible: true,
+      resolveCollapsible: () => false,
+      header: {
+        fallback: () => EFFECT_DAMAGE_LABEL,
+        primary: references.primary,
+        primaryDependsOn: references.primaryDependsOn,
+        summary: references.summary,
+        summaryDependsOn: references.summaryDependsOn,
+      },
+    },
+    fields: [
+      {
+        kind: 'slot',
+        name: '_effectId',
+        visibility: amountVisibility,
+        render: ({ path }) => <PersistRowEffectId path={rowPath(path)} />,
+      },
+      {
+        ...references.amountField,
+        visibility: references.amountField.visibility ?? amountVisibility,
+      },
+      ...orderedEffectRowFields({
+        kinds: options.inlineKinds,
+      }),
+    ],
+  }
 }
 
 /** Outcome effect list. Owner rows edit definitions; linked rows only choose an amount. */
 export function resolutionOutcomeEffectsArray(options: {
-  ctx: ContentFormCtx
+  ctx?: ContentFormCtx
   name: string
   listPath: string
   libraryPath: string
@@ -57,6 +133,9 @@ export function resolutionOutcomeEffectsArray(options: {
   references: ReferenceRole
   precedingEffectsPath?: string
 }): ArrayConfig {
+  if (options.references.role === 'library') {
+    return libraryOutcomeEffectsArray({ ...options, references: options.references })
+  }
   const { references } = options
   const damageMenu =
     references.role === 'owner'
@@ -102,7 +181,7 @@ export function resolutionOutcomeEffectsArray(options: {
               <ResolutionEffectDefinitionSlot
                 path={rowPath(path)}
                 libraryPath={options.libraryPath}
-                fields={damageDefinitionFields({ ctx: options.ctx })}
+                fields={damageDefinitionFields({ ctx: options.ctx as ContentFormCtx })}
               />
             ),
           },

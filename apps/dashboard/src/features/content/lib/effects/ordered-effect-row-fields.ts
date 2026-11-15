@@ -54,7 +54,7 @@ function replaceConditionField(precedingEffectsPath: string): SelectFieldConfig 
 
 /** Condition and note rows, plus the shared damage definition group when `kinds` includes damage. */
 export function orderedEffectRowFields(options: {
-  ctx: ContentFormCtx
+  ctx?: ContentFormCtx
   kinds: readonly OrderedEffectKind[]
   legendVisibility?: 'visible' | 'srOnly'
   precedingEffectsPath?: string
@@ -65,7 +65,7 @@ export function orderedEffectRowFields(options: {
     const damage = kindVisible('damage')
     fields.push(
       ...damageDefinitionFields({
-        ctx: options.ctx,
+        ctx: options.ctx ?? ({} as ContentFormCtx),
         legendVisibility: options.legendVisibility ?? 'srOnly',
         visibility: damage,
       }),

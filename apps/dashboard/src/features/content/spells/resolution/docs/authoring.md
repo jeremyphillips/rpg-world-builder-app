@@ -14,10 +14,17 @@ contracts — do not redefine them here.
 | `resolution-form-values.ts`         | Entity ↔ form round-trip, defaults |
 | `resolution-form-visibility.ts`     | Mode-driven field visibility       |
 | `resolution-form-slots.ts`          | Slot registry wiring               |
+| `spell-outcome-effects-array.ts`    | Outcome list on the shared array   |
 | `resolution-target-form-fields.ts`  | Selection panel field definitions  |
 | `resolution-progression-*.ts`       | Progression schema slice + presets |
 | `spell-resolution-progression.tsx`  | Progression section UI             |
 | `use-resolution-change-confirm.tsx` | Confirm-first change planning      |
+
+## Outcome effects
+
+The library stays on `resolution.effects` and is still the definition editor. Each outcome branch mounts `resolutionOutcomeEffectsArray` with the `library` role (`spell-outcome-effects-array.ts`). A row is a reference or a note. **Add applied effect** can create damage, healing, or temporary hit points (definition plus reference), add a note, or apply an existing complete effect. Incomplete effects stay in the menu, disabled, with the completeness reason. Amount choices are Full effect and Half effect. Removing a definition uses the library row's confirm path, which also drops outcome references.
+
+The spell content form, the isolated resolution editor, and the outcome stories use `<TabbedForm>`. That shell keeps structural values. Nested field arrays on `<Form>` (`shouldUnregister: true`) do not.
 
 ## Progression section
 

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Form } from '@rpg/ui/form'
+import { TabbedForm } from '@rpg/ui/form'
 import { z } from 'zod'
 
 import { RESOLUTION_FORM_FIXTURES } from '../../fixtures'
@@ -13,9 +13,9 @@ const outcomesSchema = z.object({
 
 function OutcomesStory({ defaultResolution }: { defaultResolution?: ResolutionFormValues }) {
   return (
-    <Form
+    <TabbedForm
       schema={outcomesSchema}
-      fields={resolutionOutcomeBranchesFields()}
+      tabs={[{ id: 'outcomes', label: 'Outcomes', fields: resolutionOutcomeBranchesFields() }]}
       defaultValues={{ resolution: defaultResolution }}
       onSubmit={() => undefined}
       density="compact"

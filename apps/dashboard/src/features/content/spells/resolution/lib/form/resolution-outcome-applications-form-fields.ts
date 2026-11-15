@@ -60,16 +60,20 @@ export function createOutcomeApplicationAppendValue(
   return { kind: 'effect-reference' as const, effectId, amount }
 }
 
+const SPELL_OUTCOME_AMOUNT_OPTIONS = RESOLUTION_OUTCOME_AMOUNT_OPTIONS.filter(
+  (option) => option.value !== 'none',
+)
+
 export function amountOptionsForEffect(
   effect: ResolutionEffectFormItem | undefined,
 ): FieldOption[] {
   if (!effect || !supportsPartialApplicationForEffectKind(effect.kind)) {
-    return RESOLUTION_OUTCOME_AMOUNT_OPTIONS.filter((option) => option.value === 'full').map(
+    return SPELL_OUTCOME_AMOUNT_OPTIONS.filter((option) => option.value === 'full').map(
       (option) => ({ ...option }),
     )
   }
 
-  return RESOLUTION_OUTCOME_AMOUNT_OPTIONS.map((option) => ({ ...option }))
+  return SPELL_OUTCOME_AMOUNT_OPTIONS.map((option) => ({ ...option }))
 }
 
 export function outcomeApplicationsFieldPath(
@@ -98,5 +102,6 @@ export function outcomeApplicationAmountOptions({
 
   const effects = (watchedValues[RESOLUTION_EFFECTS_FIELD] as ResolutionEffectFormItem[]) ?? []
   const effect = findResolutionEffectById(effects, row.effectId)
-  return amountOptionsForEffect(effect)
+  const allowed = new Set(amountOptionsForEffect(effect).map((option) => option.value))
+  return options.filter((option) => allowed.has(String(option.value)))
 }

@@ -22,10 +22,14 @@ describe('outcomeBranchBodyFields', () => {
   it('renders the outcome effect section', () => {
     const group = findGroup(outcomeBranchBodyFields(1, true))
 
-    expect(group.fields).toHaveLength(1)
+    expect(group.fields).toHaveLength(2)
     expect(group.fields[0]).toMatchObject({
       kind: 'slot',
-      name: '_outcomeApplicationSection',
+      name: '_outcomeApplicationStatus',
+    })
+    expect(group.fields[1]).toMatchObject({
+      kind: 'array',
+      name: 'effects',
     })
   })
 })

@@ -703,6 +703,8 @@ Hidden item fields clear via `shouldUnregister` — mark them `z.optional()` in 
 `ArrayConfig.fields` may contain nested arrays. Name scoping cascades (`root.0.sub.1.name`).
 Avoid three+ levels for UX.
 
+Nested `useFieldArray` under `shouldUnregister: true` is unsupported. `<Form>` uses that flag, so an array mount can drop sibling values that were only on `defaultValues`. `<TabbedForm>` keeps the default tree. Lists that share a structural object with sibling fields, including spell outcome effects, belong on `<TabbedForm>`. See [forms.md](../forms.md).
+
 ## Slot fields
 
 Custom UI inside `FormProvider`. `name` aligns with a form value; defaults from form

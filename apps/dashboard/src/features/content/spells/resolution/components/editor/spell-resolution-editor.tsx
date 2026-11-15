@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { Form } from '@rpg/ui/form'
+import { TabbedForm } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import { resolutionFields } from '../../lib/form/resolution-form-fields'
@@ -19,9 +19,9 @@ export type SpellResolutionEditorProps = {
 /** Resolution tab shell for Storybook and isolated tests. */
 export function SpellResolutionEditor({ formCtx, defaultResolution }: SpellResolutionEditorProps) {
   return (
-    <Form
+    <TabbedForm
       schema={spellResolutionEditorSchema}
-      fields={resolutionFields(formCtx)}
+      tabs={[{ id: 'resolution', label: 'Resolution', fields: resolutionFields(formCtx) }]}
       defaultValues={{ resolution: defaultResolution }}
       onSubmit={() => undefined}
       density="compact"

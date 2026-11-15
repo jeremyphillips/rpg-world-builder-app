@@ -492,6 +492,10 @@ import { toOptions } from '@rpg/ui/form'
 - `dependsOn` — exact field names the predicate reads (`useWatch`, not whole-form re-render).
 - Hidden → control unmounts, value clears (`shouldUnregister`).
 
+`<Form>` hardcodes `shouldUnregister: true`. Unmounting a control drops its value, which is what hidden conditionals, optional disclosures, and array-item fields rely on. `<TabbedForm>` does not pass the flag, so React Hook Form keeps the default value tree, including structural values that have no mounted input. Inactive tabs stay mounted. Spell, monster, class, and species editors use `<TabbedForm>` and depend on that retention. Clear obsolete data with `unregister`, `setValue(undefined)`, field-array mutators, or the editor's normalizer.
+
+Nested `useFieldArray` under `shouldUnregister: true` is unsupported. The array mount writes its path into an empty value store and can drop unregistered siblings. Do not mount outcome or effect lists on `<Form>`. There is no per-form flag to change this. A configurable policy, and moving other `<Form>` consumers, is deferred.
+
 **Hidden = not required.** Resolver strips hidden keys before validate/submit.
 
 > Caveat: strip uses Zod `.omit` on plain objects. Refined/transformed schemas can't omit —

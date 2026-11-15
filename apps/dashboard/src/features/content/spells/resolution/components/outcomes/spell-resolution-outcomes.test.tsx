@@ -1,6 +1,7 @@
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { Form } from '@rpg/ui/form'
+import { TabbedForm } from '@rpg/ui/form'
+import type { UseFormReturn } from 'react-hook-form'
 import { z } from 'zod'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it } from 'vitest'
@@ -19,15 +20,25 @@ const outcomesSchema = z.object({
 })
 
 function renderOutcomes(defaultResolution: ResolutionFormValues) {
-  return render(
-    <Form
+  const formRef: { current: UseFormReturn<z.infer<typeof outcomesSchema>> | null } = {
+    current: null,
+  }
+  const view = render(
+    <TabbedForm
       schema={outcomesSchema}
-      fields={resolutionOutcomeBranchesFields()}
+      tabs={[{ id: 'outcomes', label: 'Outcomes', fields: resolutionOutcomeBranchesFields() }]}
       defaultValues={{ resolution: defaultResolution }}
-      onSubmit={() => undefined}
+      onSubmit={(values) => {
+        formRef.current?.reset(values)
+      }}
+      header={(form) => {
+        formRef.current = form
+        return null
+      }}
       density="compact"
     />,
   )
+  return { ...view, formRef }
 }
 
 function outcomePanel(headingName: string | RegExp): HTMLElement {
@@ -266,6 +277,142 @@ describe('SpellResolutionOutcomes', () => {
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: 'On failed save' })).toBeInTheDocument()
       expect(screen.getByRole('heading', { name: 'On successful save' })).toBeInTheDocument()
+    })
+  })
+
+  it('keeps structural resolution values when outcome arrays mount', async () => {
+    const resolution = RESOLUTION_FORM_FIXTURES.eldritchBlast
+    const { formRef } = renderOutcomes(resolution)
+
+    await waitFor(() => {
+      expect(formRef.current?.getValues('resolution.effects')).toEqual(resolution.effects)
+      expect(formRef.current?.getValues('resolution.outcomes.0.result')).toBe(
+        resolution.outcomes?.[0]?.result,
+      )
+      expect(formRef.current?.getValues('resolution.outcomes.0.effects')).toMatchObject(
+        resolution.outcomes?.[0]?.effects ?? [],
+      )
+    })
+  })
+
+  it('appends each new applied effect', async () => {
+    const user = userEvent.setup()
+    const resolution: ResolutionFormValues = {
+      ...RESOLUTION_FORM_FIXTURES.eldritchBlast,
+      effects: [],
+      outcomes: [{ result: 'hit', effects: [] }],
+    }
+    const { formRef } = renderOutcomes(resolution)
+
+    const add = await screen.findByRole('button', {
+      name: RESOLUTION_SECTION_LABELS.addAppliedEffect,
+    })
+    await user.click(add)
+    await user.click(await screen.findByRole('menuitem', { name: /^Damage$/ }))
+    await user.click(add)
+    await user.click(await screen.findByRole('menuitem', { name: /^Damage$/ }))
+
+    await waitFor(() => {
+      const effects = formRef.current?.getValues('resolution.outcomes.0.effects')
+      expect(Array.isArray(effects) ? effects : []).toHaveLength(2)
+      expect(formRef.current?.getValues('resolution.effects')).toHaveLength(2)
+    })
+  })
+
+  it('removes an outcome reference without removing the library effect', async () => {
+    const user = userEvent.setup()
+    const { formRef } = renderOutcomes(RESOLUTION_FORM_FIXTURES.eldritchBlast)
+    const section = await screen.findByRole('group', { name: /Damage — 1d10 Force damage/i })
+
+    await user.click(within(section).getByRole('button', { name: /^Remove / }))
+
+    await waitFor(() => {
+      expect(formRef.current?.getValues('resolution.outcomes.0.effects')).toEqual([])
+      expect(formRef.current?.getValues('resolution.effects')).toEqual(
+        RESOLUTION_FORM_FIXTURES.eldritchBlast.effects,
+      )
+    })
+  })
+
+  it('exposes reorder controls for populated outcome rows', async () => {
+    const resolution: ResolutionFormValues = {
+      ...RESOLUTION_FORM_FIXTURES.eldritchBlast,
+      outcomes: [
+        {
+          result: 'hit',
+          effects: [
+            { kind: 'note', description: 'First note' },
+            { kind: 'note', description: 'Second note' },
+          ],
+        },
+      ],
+    }
+    renderOutcomes(resolution)
+
+    expect(await screen.findAllByRole('button', { name: /Drag to reorder/i })).toHaveLength(2)
+  })
+
+  it('marks the form dirty when an application amount changes and saves that value', async () => {
+    const user = userEvent.setup()
+    const submitted: { current: unknown } = { current: null }
+    const resolution: ResolutionFormValues = {
+      ...RESOLUTION_FORM_FIXTURES.eldritchBlast,
+      outcomes: [
+        {
+          result: 'hit',
+          effects: [{ kind: 'effect-reference', effectId: 'damage', amount: 'full' }],
+        },
+      ],
+    }
+    const formRef: { current: UseFormReturn<z.infer<typeof outcomesSchema>> | null } = {
+      current: null,
+    }
+    render(
+      <TabbedForm
+        schema={outcomesSchema}
+        tabs={[{ id: 'outcomes', label: 'Outcomes', fields: resolutionOutcomeBranchesFields() }]}
+        defaultValues={{ resolution }}
+        header={(form) => {
+          formRef.current = form
+          return null
+        }}
+        footer={<button type="submit">Save resolution</button>}
+        onSubmit={(values) => {
+          submitted.current = values
+        }}
+        density="compact"
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Outcomes' })).toHaveAttribute('aria-pressed', 'true')
+    expect(await screen.findByRole('combobox', { name: 'Amount' })).toHaveTextContent('Full effect')
+    expect(document.body.textContent).toContain('Half effect')
+
+    formRef.current?.setValue('resolution.outcomes.0.effects.0.amount', 'half', {
+      shouldDirty: true,
+      shouldTouch: true,
+    })
+
+    await waitFor(() => {
+      expect(formRef.current?.getFieldState('resolution.outcomes.0.effects.0.amount').isDirty).toBe(
+        true,
+      )
+    })
+
+    await user.click(screen.getByRole('button', { name: 'Save resolution' }))
+
+    await waitFor(() => {
+      expect(submitted.current).toMatchObject({
+        resolution: {
+          effects: resolution.effects,
+          outcomes: [
+            {
+              result: 'hit',
+              effects: [{ kind: 'effect-reference', effectId: 'damage', amount: 'half' }],
+            },
+          ],
+        },
+      })
     })
   })
 
