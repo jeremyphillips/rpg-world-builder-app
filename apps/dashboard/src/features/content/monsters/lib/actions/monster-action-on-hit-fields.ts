@@ -10,12 +10,15 @@ import type { FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { damageFieldGroup } from '../../../lib/forms/mechanics/damage-field-group'
+import { effectEndFormFields } from '../../../lib/forms/mechanics/effect-end-form-fields'
 import { vocabularyFieldLabel } from '@/features/vocabulary'
 import {
   MONSTER_LIMIT_ADD_LABEL,
   MONSTER_LIMIT_RECHARGES_ON_LABEL,
   monsterLimitRechargesOnHint,
   MONSTER_ON_HIT_ADD_LABEL,
+  MONSTER_ON_HIT_CONDITION_DETAILS_HINT,
+  MONSTER_ON_HIT_CONDITION_DETAILS_PLACEHOLDER,
   MONSTER_ON_HIT_DETAILS_ADD_LABEL,
   MONSTER_ON_HIT_DETAILS_LABEL,
   MONSTER_ON_HIT_HINT,
@@ -153,10 +156,10 @@ export function monsterActionOnHitFields(ctx: ContentFormCtx): FormItem {
   const damage = effectKindVisible('damage')
   const condition = effectKindVisible('condition')
   const note = effectKindVisible('note')
-  const qualified = {
+  const damageDetails = effectKindVisible('damage')
+  const conditionDetails = {
     dependsOn: ['kind'],
-    visibleWhen: (values: Record<string, unknown>) =>
-      values.kind === 'damage' || values.kind === 'condition',
+    visibleWhen: (values: Record<string, unknown>) => values.kind === 'condition',
   }
   return {
     kind: 'array',
@@ -215,12 +218,22 @@ export function monsterActionOnHitFields(ctx: ContentFormCtx): FormItem {
           label: getEffectConditionLabel(id),
         })),
       },
+      ...effectEndFormFields({ visibility: condition }),
       {
         type: 'text',
         name: 'description',
         label: MONSTER_ON_HIT_DETAILS_LABEL,
-        visibility: qualified,
+        visibility: damageDetails,
         optionalDisclosure: { addLabel: MONSTER_ON_HIT_DETAILS_ADD_LABEL },
+      },
+      {
+        type: 'text',
+        name: 'description',
+        label: MONSTER_ON_HIT_DETAILS_LABEL,
+        visibility: conditionDetails,
+        optionalDisclosure: { addLabel: MONSTER_ON_HIT_DETAILS_ADD_LABEL },
+        hint: MONSTER_ON_HIT_CONDITION_DETAILS_HINT,
+        placeholder: MONSTER_ON_HIT_CONDITION_DETAILS_PLACEHOLDER,
       },
       {
         type: 'text',

@@ -4720,6 +4720,101 @@
               ],
               "description": "blinded | charmed | deafened | exhaustion | frightened | grappled | incapacitated | invisible | paralyzed | petrified | poisoned | prone | restrained | stunned | unconscious"
             },
+            "end": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "turn-bound",
+                      "description": "turn-bound"
+                    },
+                    "participant": {
+                      "type": "string",
+                      "enum": [
+                        "source",
+                        "target"
+                      ],
+                      "description": "source | target"
+                    },
+                    "boundary": {
+                      "type": "string",
+                      "enum": [
+                        "start",
+                        "end"
+                      ],
+                      "description": "start | end"
+                    },
+                    "which": {
+                      "type": "string",
+                      "enum": [
+                        "next",
+                        "current"
+                      ],
+                      "description": "next | current"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "participant",
+                    "boundary",
+                    "which"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "timed",
+                      "description": "timed"
+                    },
+                    "value": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 9007199254740991
+                    },
+                    "unit": {
+                      "type": "string",
+                      "enum": [
+                        "round",
+                        "minute",
+                        "hour",
+                        "day"
+                      ],
+                      "description": "round | minute | hour | day"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "value",
+                    "unit"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "custom",
+                      "description": "custom"
+                    },
+                    "text": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "text"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            },
             "description": {
               "$ref": "#/definitions/__schema177"
             }

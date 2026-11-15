@@ -28,7 +28,12 @@ export function MonsterActionAttackSummary({
     const draft = findMonsterFormActionDraft(values, ctx, action.id)
     const profile = resolveMonsterFormActionAttackProfile(values, ctx, action.id)
     const unavailableContext = draft ? { ctx, values, action: draft } : undefined
-    return buildMonsterActionAttackPreview(profile, values.abilityScores, unavailableContext)
+    return buildMonsterActionAttackPreview(
+      profile,
+      values.abilityScores,
+      unavailableContext,
+      values.name,
+    )
   }, [action.id, action.kind, ctx, values])
 
   if (!preview) return null

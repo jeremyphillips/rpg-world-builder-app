@@ -15,7 +15,12 @@ describe('attackOnHitSchema', () => {
         {
           kind: 'condition',
           conditionId: 'paralyzed',
-          description: " until the start of the lich's next turn ",
+          end: {
+            kind: 'turn-bound',
+            participant: 'source',
+            boundary: 'start',
+            which: 'next',
+          },
         },
         { kind: 'note', description: ' The target starts burning ' },
       ],
@@ -30,7 +35,12 @@ describe('attackOnHitSchema', () => {
       {
         kind: 'condition',
         conditionId: 'paralyzed',
-        description: "until the start of the lich's next turn",
+        end: {
+          kind: 'turn-bound',
+          participant: 'source',
+          boundary: 'start',
+          which: 'next',
+        },
       },
       { kind: 'note', description: 'The target starts burning' },
     ])

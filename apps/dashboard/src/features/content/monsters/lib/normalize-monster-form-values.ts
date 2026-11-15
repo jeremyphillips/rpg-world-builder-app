@@ -18,6 +18,7 @@ import { normalizeMonsterSaveOutcomes } from './actions/monster-action-save-outc
 import { withDefaultSaveResolutionTarget } from './actions/monster-save-resolution-target.lib'
 import { weaponActionDamageToDraft } from './actions/monster-weapon-damage-form'
 
+import { applyEffectEndAuthoringToRow } from '../../lib/forms/mechanics/normalize-effect-end-authoring'
 import { movementRowsToRecordForPreview } from '../../lib/forms/fields/content-movement-form-fields'
 
 import { weaponProficiencyGrantSetFromMode } from '@/lib/forms/grant-sets/weapon-proficiency-grant-mode.lib'
@@ -124,6 +125,8 @@ function effectRowHasInput(row: unknown): boolean {
   if (typeof row.kind === 'string') return true
   if (row.damageType !== undefined || row.conditionId !== undefined) return true
   if (typeof row.description === 'string') return true
+  if (typeof row.effectEndOption === 'string' && row.effectEndOption.length > 0) return true
+  if (isRecord(row.end) && Object.keys(row.end).length > 0) return true
   return rollHasInput(row.roll)
 }
 
@@ -139,9 +142,12 @@ function effectRowForKind(row: Record<string, unknown>): Record<string, unknown>
     }
   }
   if (row.kind === 'condition') {
+    const normalized = { ...row }
+    applyEffectEndAuthoringToRow(normalized)
     return {
       kind: 'condition',
-      ...(row.conditionId !== undefined ? { conditionId: row.conditionId } : {}),
+      ...(normalized.conditionId !== undefined ? { conditionId: normalized.conditionId } : {}),
+      ...(normalized.end !== undefined ? { end: normalized.end } : {}),
       ...(description !== undefined ? { description } : {}),
     }
   }

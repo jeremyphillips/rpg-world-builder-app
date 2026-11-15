@@ -14,6 +14,7 @@ import type {
 import type { MagicPropertyDefinitionProvider } from '../../content/equipment/instance/magic-property'
 import { resolveEquipmentMagicProperties } from '../../content/equipment/instance/resolve-equipment-magic-properties'
 import type { WeaponDamage } from '../../content/equipment/weapon-variant'
+import { effectEndSchema, type EffectEnd } from '../../primitives/mechanics/effect-end'
 import { type RollValue } from '../../primitives/mechanics/roll'
 import type { Ability } from '../../vocab/ability'
 import type { WeaponProperty } from '../../vocab/weapon/property'
@@ -66,6 +67,7 @@ export type ResolvedOnHitDamage = ResolvedOnHitOwner & {
 export type ResolvedOnHitCondition = ResolvedOnHitOwner & {
   kind: 'condition'
   conditionId: string
+  end?: EffectEnd
   description?: string
 }
 
@@ -162,6 +164,7 @@ type OnHitEffectRow = {
   roll?: unknown
   damageType?: unknown
   conditionId?: unknown
+  end?: unknown
   description?: unknown
 }
 
@@ -186,16 +189,23 @@ function resolveDamageOnHit(
   }
 }
 
+function parseEffectEnd(value: unknown): EffectEnd | undefined {
+  const parsed = effectEndSchema.safeParse(value)
+  return parsed.success ? parsed.data : undefined
+}
+
 function resolveConditionOnHit(
   row: OnHitEffectRow,
   owner: ResolvedOnHitOwner,
   description: string | undefined,
 ): ResolvedOnHitCondition | undefined {
   if (typeof row.conditionId !== 'string' || !row.conditionId) return undefined
+  const end = parseEffectEnd(row.end)
   return {
     ...onHitOwner(owner),
     kind: 'condition',
     conditionId: row.conditionId,
+    ...(end ? { end } : {}),
     ...(description ? { description } : {}),
   }
 }

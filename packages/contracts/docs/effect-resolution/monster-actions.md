@@ -29,7 +29,7 @@ is no per-option cost.
 
 ## On hit
 
-`onHit.effects` is an ordered list on those attack kinds: `damage`, `condition`, or `note`. Primary damage stays on the attack. The attack profile resolves damage riders once and carries conditions and notes for the same sentence. They do not change the attack bonus or the damage total. A condition description is a qualification, not a duration model. A note is presentation only.
+`onHit.effects` is an ordered list on those attack kinds: `damage`, `condition`, or `note`. Primary damage stays on the attack. The attack profile resolves damage riders once and carries conditions and notes for the same sentence. They do not change the attack bonus or the damage total. Condition `end` is the shared effect lifetime model ([`effect-end.md`](../primitives/effect-end.md)); `description` is a non-temporal qualification. A note is presentation only.
 
 A weapon magic-property preset may carry the same object when the rider always applies. Conditional activation, including Flame Tongue while ablaze, stays in the property description and is not added to the attack.
 

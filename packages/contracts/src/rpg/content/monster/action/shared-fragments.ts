@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { effectEndSchema } from '../../../primitives/mechanics/effect-end'
 import { damageTypeIdSchema } from '../../../vocab/damage'
 import { weaponDamageDraftSchema } from '../../equipment/weapon-variant'
 import { resolutionTargetRequirementsSchema } from '../../lib/resolution/target-requirements'
@@ -34,6 +35,7 @@ const attackOnHitDraftEffectSchema = z.discriminatedUnion('kind', [
   z.object({
     kind: z.literal('condition'),
     conditionId: z.string().optional(),
+    end: effectEndSchema.optional(),
     description: draftEffectDescriptionSchema,
   }),
   z.object({

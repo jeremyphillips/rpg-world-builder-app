@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { effectConditionSchema } from '../../vocab/effect-condition'
+import { effectEndSchema } from './effect-end'
 import { damageRollValueSchema } from './effect-value'
 
 const optionalEffectDescriptionSchema = z.string().trim().min(1).optional()
@@ -13,6 +14,7 @@ const damageEffectSchema = damageRollValueSchema.extend({
 const conditionEffectSchema = z.object({
   kind: z.literal('condition'),
   conditionId: effectConditionSchema,
+  end: effectEndSchema.optional(),
   description: optionalEffectDescriptionSchema,
 })
 
