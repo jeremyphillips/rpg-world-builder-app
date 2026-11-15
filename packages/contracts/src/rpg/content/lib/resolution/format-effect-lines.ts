@@ -1,4 +1,5 @@
 import { formatRollValue } from '../../../primitives/mechanics/roll'
+import type { ResolutionApplicationAmount } from '../../../vocab/resolution'
 import { resolutionEffectFormatOptions } from './effect-context'
 import {
   formatDamageValue,
@@ -93,8 +94,9 @@ export function formatResolutionDamageRoll(resolution: ResolutionFormatInput): s
 export function formatResolutionApplicationSentence(
   resolution: ResolutionFormatInput,
   effectId: string,
-  amount: 'full' | 'half',
+  amount: ResolutionApplicationAmount,
 ): string {
+  if (amount === 'none') return ''
   const effect = resolution.effects.find((entry) => entry.id === effectId)
   if (!effect) return ''
 

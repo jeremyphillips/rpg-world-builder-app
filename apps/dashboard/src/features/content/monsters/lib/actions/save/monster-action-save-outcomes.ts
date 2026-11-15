@@ -222,22 +222,6 @@ export function monsterSaveFailureOrSuccessOutcomeIndex(
   return index >= 0 ? index : undefined
 }
 
-export function precedingConditionIdsFromEffects(effects: unknown): string[] {
-  if (!Array.isArray(effects)) return []
-  const ids = new Set<string>()
-  for (const entry of effects) {
-    if (
-      entry &&
-      typeof entry === 'object' &&
-      (entry as OrderedEffect).kind === 'condition' &&
-      typeof (entry as { conditionId?: string }).conditionId === 'string'
-    ) {
-      ids.add((entry as { conditionId: string }).conditionId)
-    }
-  }
-  return [...ids]
-}
-
 export function firstFailureOrderedEffectsIncludeCondition(effects: unknown): boolean {
   return orderedEffectsIncludeKind(effects, 'condition')
 }

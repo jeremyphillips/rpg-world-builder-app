@@ -159,6 +159,14 @@ export {
   stripEffectFromOutcomes,
   type OutcomeMethodChangePlan,
 } from './outcome-change-plan'
+export { DAMAGE_APPLICATION_AMOUNT_PRESENTATION } from './damage-application-labels'
+export {
+  planLinkedEffectAdd,
+  type LinkedEffectAddPlan,
+  type LinkedEffectPlacement,
+  type LinkedEffectReference,
+} from './linked-effect-plan'
+export { nextResolutionEffectId } from './resolution-effect-id-alloc'
 export { mapOutcomeResultBetweenMethodKinds } from './outcome-method-map'
 export {
   getSelectionMethodCapabilityRequired,

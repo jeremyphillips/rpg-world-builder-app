@@ -1,4 +1,7 @@
-import { RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID } from '@rpg/contracts'
+import {
+  precedingConditionIdsFromEffects,
+  RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+} from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -8,7 +11,6 @@ import {
   isUnusedSaveEffect,
   nextMonsterSaveDamageEffectId,
   normalizeMonsterSaveOutcomes,
-  precedingConditionIdsFromEffects,
   shouldShowSaveRepeatSaveAuthoring,
   stripMonsterSaveEffectReferences,
 } from './monster-action-save-outcomes'

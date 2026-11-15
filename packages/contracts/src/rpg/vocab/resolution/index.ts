@@ -95,7 +95,8 @@ export const RESOLUTION_OUTCOME_RESULTS = Object.keys(RESOLUTION_OUTCOME_RESULT_
 
 export const RESOLUTION_APPLICATION_AMOUNT_TERM = {
   label: 'Application Amount',
-  description: 'Whether a resolution outcome applies full or half of an effect value.',
+  description:
+    'Whether a resolution outcome applies the full effect value, half of it, or none of it.',
   sentence: {
     singular: 'application amount',
     plural: 'application amounts',
@@ -110,6 +111,10 @@ export const RESOLUTION_APPLICATION_AMOUNT_ENTRIES = {
   half: {
     label: 'Half effect',
     description: 'Apply half the effect value (rounded down).',
+  },
+  none: {
+    label: 'None',
+    description: 'Apply none of the effect value.',
   },
 } as const satisfies Record<string, GameTermEntry>
 

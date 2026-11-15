@@ -1,4 +1,5 @@
 import type { MonsterAction } from '../../content/monster/action/index'
+import { DAMAGE_APPLICATION_AMOUNT_PRESENTATION } from '../../content/lib/resolution/damage-application-labels'
 import { formatResolutionOutcomeLine } from '../../content/lib/resolution/format-outcomes'
 import {
   formatOrderedOutcomeEffects,
@@ -37,17 +38,46 @@ function saveDc(args: {
   return abilitySaveDc(score, args.proficiencyBonus)
 }
 
-function damageClause(
-  effect: Extract<SaveAction['resolution']['effects'][number], { kind: 'damage' }>,
-  amount: 'full' | 'half',
-): string {
-  if (amount === 'half') return 'Half damage.'
+type DamageEffect = Extract<SaveAction['resolution']['effects'][number], { kind: 'damage' }>
+
+function damagePhrase(effect: DamageEffect, amount: 'full' | 'half'): string {
   const part = resolveStatBlockDamagePart(effect.roll, 0)
-  return `${formatStatBlockDamageComponent({
+  const clause = formatStatBlockDamageComponent({
     average: part.average,
     expression: part.expression,
     damageTypeId: effect.damageType,
-  })}.`
+  })
+  if (amount === 'half') return `half of ${clause}`
+  return clause
+}
+
+type DamagePrint = { effect: DamageEffect; amount: 'full' | 'half' }
+
+function damagePrintForRow(
+  row: NonNullable<SaveOutcome['effects']>[number],
+  effectById: Map<string, SaveAction['resolution']['effects'][number]>,
+): DamagePrint | undefined {
+  if (row.kind !== 'effect-reference') return undefined
+  const effect = effectById.get(row.effectId)
+  if (!effect || effect.kind !== 'damage') return undefined
+  if (row.amount !== 'full' && row.amount !== 'half') return undefined
+  return { effect, amount: row.amount }
+}
+
+function joinDamagePhrases(prints: readonly DamagePrint[]): string | undefined {
+  if (prints.length === 0) return undefined
+  return `${prints.map((print) => damagePhrase(print.effect, print.amount)).join(' plus ')}.`
+}
+
+function everyDamageIsHalf(
+  rows: NonNullable<SaveOutcome['effects']>,
+  effectById: Map<string, SaveAction['resolution']['effects'][number]>,
+): boolean {
+  const prints = rows.flatMap((row) => {
+    const print = damagePrintForRow(row, effectById)
+    return print ? [print] : []
+  })
+  return prints.length > 0 && prints.every((print) => print.amount === 'half')
 }
 
 function outcomeEffectClauses(
@@ -55,18 +85,39 @@ function outcomeEffectClauses(
   effects: SaveAction['resolution']['effects'],
 ): string[] {
   const effectById = new Map(effects.map((effect) => [effect.id, effect]))
-  return (rows ?? []).flatMap((row) => {
+  const list = rows ?? []
+  const collapseHalf = everyDamageIsHalf(list, effectById)
+  const clauses: string[] = []
+  let damageRun: DamagePrint[] = []
+  let emittedHalf = false
+
+  const flushDamage = () => {
+    const sentence = joinDamagePhrases(damageRun)
+    if (sentence) clauses.push(sentence)
+    damageRun = []
+  }
+
+  for (const row of list) {
     if (row.kind === 'effect-reference') {
-      const effect = effectById.get(row.effectId)
-      if (!effect || effect.kind !== 'damage') return []
-      if (row.amount !== 'full' && row.amount !== 'half') return []
-      return [damageClause(effect, row.amount)]
+      const damage = damagePrintForRow(row, effectById)
+      if (!damage) continue
+      if (collapseHalf) {
+        if (!emittedHalf) {
+          clauses.push(`${DAMAGE_APPLICATION_AMOUNT_PRESENTATION.half}.`)
+          emittedHalf = true
+        }
+        continue
+      }
+      damageRun.push(damage)
+      continue
     }
+    flushDamage()
     if (row.kind === 'condition' || row.kind === 'note') {
-      return formatOrderedOutcomeEffects([row])
+      clauses.push(...formatOrderedOutcomeEffects([row]))
     }
-    return []
-  })
+  }
+  flushDamage()
+  return clauses
 }
 
 function outcomeBodyClauses(
@@ -80,10 +131,14 @@ function outcomeSentence(
   label: string,
   outcome: SaveOutcome,
   effects: SaveAction['resolution']['effects'],
-): string {
+): string | undefined {
   const clauses = outcomeBodyClauses(outcome, effects)
   const body = clauses.join(' ')
-  return body ? `${label}: ${body}` : `${label}:`
+  return body ? `${label}: ${body}` : undefined
+}
+
+function compactSentence(sentence: string | undefined): string[] {
+  return sentence ? [sentence] : []
 }
 
 function proseSentence(text: string | undefined): string | undefined {
@@ -169,9 +224,9 @@ export function formatMonsterSaveAction(args: {
 
   const sentences = [
     `${ability} Saving Throw: DC ${dc ?? '—'}, ${selectionPhrase(action)}.`,
-    ...(failed ? [outcomeSentence(failureLabel, failed, resolution.effects)] : []),
+    ...(failed ? compactSentence(outcomeSentence(failureLabel, failed, resolution.effects)) : []),
     ...(failed ? repeatSaveSentences(failed, resolution.effects) : []),
-    ...(saved ? [outcomeSentence('Success', saved, resolution.effects)] : []),
+    ...(saved ? compactSentence(outcomeSentence('Success', saved, resolution.effects)) : []),
     ...(failureOrSuccess ? [formatResolutionOutcomeLine(failureOrSuccess, resolution)] : []),
   ]
   return { heading, body: sentences.join(' ') }

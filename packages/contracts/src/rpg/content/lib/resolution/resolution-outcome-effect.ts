@@ -7,7 +7,7 @@ import {
 import { RESOLUTION_APPLICATION_AMOUNTS } from '../../../vocab/resolution'
 import { resolutionEffectIdSchema } from './resolution-effect-id'
 
-/** Points at one library entry. Amount is full or half; half is damage-only. */
+/** Points at one library entry. `half` is damage-only; `none` is valid for every kind. */
 export const resolutionEffectReferenceSchema = z.object({
   kind: z.literal('effect-reference'),
   effectId: resolutionEffectIdSchema,

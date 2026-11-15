@@ -6180,9 +6180,10 @@
               "type": "string",
               "enum": [
                 "full",
-                "half"
+                "half",
+                "none"
               ],
-              "description": "full | half"
+              "description": "full | half | none"
             }
           },
           "required": [

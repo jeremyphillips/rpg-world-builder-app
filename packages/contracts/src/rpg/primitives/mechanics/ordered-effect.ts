@@ -36,6 +36,23 @@ export const orderedEffectSchema = z.discriminatedUnion('kind', [
 
 export const orderedEffectsSchema = z.array(orderedEffectSchema)
 
+/** Condition ids already present on an ordered effect list, in first-seen order. */
+export function precedingConditionIdsFromEffects(effects: unknown): string[] {
+  if (!Array.isArray(effects)) return []
+  const ids = new Set<string>()
+  for (const entry of effects) {
+    if (
+      entry &&
+      typeof entry === 'object' &&
+      (entry as { kind?: string }).kind === 'condition' &&
+      typeof (entry as { conditionId?: string }).conditionId === 'string'
+    ) {
+      ids.add((entry as { conditionId: string }).conditionId)
+    }
+  }
+  return [...ids]
+}
+
 export type OrderedEffect = z.infer<typeof orderedEffectSchema>
 export type OrderedDamageEffect = z.infer<typeof orderedDamageEffectSchema>
 export type OrderedConditionEffect = z.infer<typeof orderedConditionEffectSchema>

@@ -196,4 +196,118 @@ describe('formatMonsterSaveAction save outcome extensions', () => {
     expect(formatted.body).toContain('Failure or Success:')
     expect(formatted.body).toContain("Being underwater doesn't grant Resistance")
   })
+
+  it('joins consecutive damage with plus and phrases mixed success amounts per definition', () => {
+    const parsed = monsterActionSchema.parse({
+      id: 'constrict',
+      kind: 'save',
+      name: 'Constrict',
+      dcSource: { kind: 'ability', ability: 'str', proficient: true },
+      resolution: {
+        selectionMode: 'targets',
+        target: {
+          count: 1,
+          kind: 'creature',
+          proximity: { kind: 'reach', distance: { value: 5, unit: 'ft' } },
+        },
+        method: { kind: 'saving-throw', ability: 'str' },
+        effects: [
+          {
+            id: 'bludgeoning',
+            kind: 'damage',
+            roll: { dice: { count: 2, faces: 6 }, flat: 4 },
+            damageType: 'bludgeoning',
+          },
+          {
+            id: 'fire-full',
+            kind: 'damage',
+            roll: { dice: { count: 2, faces: 6 } },
+            damageType: 'fire',
+          },
+          {
+            id: 'fire-half',
+            kind: 'damage',
+            roll: { dice: { count: 1, faces: 6 } },
+            damageType: 'fire',
+          },
+        ],
+        outcomes: [
+          {
+            result: 'failed-save',
+            effects: [
+              { kind: 'effect-reference', effectId: 'bludgeoning', amount: 'full' },
+              { kind: 'effect-reference', effectId: 'fire-full', amount: 'full' },
+              { kind: 'effect-reference', effectId: 'fire-half', amount: 'full' },
+            ],
+          },
+          {
+            result: 'successful-save',
+            effects: [
+              { kind: 'effect-reference', effectId: 'bludgeoning', amount: 'none' },
+              { kind: 'effect-reference', effectId: 'fire-full', amount: 'full' },
+              { kind: 'effect-reference', effectId: 'fire-half', amount: 'half' },
+            ],
+          },
+        ],
+      },
+    })
+    if (parsed.kind !== 'save') throw new Error('expected a save')
+    const formatted = formatMonsterSaveAction({
+      action: parsed,
+      name: 'Constrict',
+      abilityScores: scores,
+      proficiencyBonus: 2,
+    })
+    expect(formatted.body).toContain(
+      'Failure: 11 (2d6 + 4) Bludgeoning damage plus 7 (2d6) Fire damage plus 3 (1d6) Fire damage.',
+    )
+    expect(formatted.body).toContain(
+      'Success: 7 (2d6) Fire damage plus half of 3 (1d6) Fire damage.',
+    )
+    expect(formatted.body).not.toContain('Success: No damage')
+  })
+
+  it('omits a success sentence when every damage reference is none', () => {
+    const parsed = monsterActionSchema.parse({
+      id: 'bite',
+      kind: 'save',
+      name: 'Bite',
+      dcSource: { kind: 'ability', ability: 'str', proficient: true },
+      resolution: {
+        selectionMode: 'targets',
+        target: {
+          count: 1,
+          kind: 'creature',
+          proximity: { kind: 'reach' },
+        },
+        method: { kind: 'saving-throw', ability: 'con' },
+        effects: [
+          {
+            id: 'piercing',
+            kind: 'damage',
+            roll: { dice: { count: 1, faces: 4 }, flat: 4 },
+            damageType: 'piercing',
+          },
+        ],
+        outcomes: [
+          {
+            result: 'failed-save',
+            effects: [{ kind: 'effect-reference', effectId: 'piercing', amount: 'full' }],
+          },
+          {
+            result: 'successful-save',
+            effects: [{ kind: 'effect-reference', effectId: 'piercing', amount: 'none' }],
+          },
+        ],
+      },
+    })
+    if (parsed.kind !== 'save') throw new Error('expected a save')
+    const formatted = formatMonsterSaveAction({
+      action: parsed,
+      name: 'Bite',
+      abilityScores: scores,
+      proficiencyBonus: 2,
+    })
+    expect(formatted.body).not.toContain('Success:')
+  })
 })

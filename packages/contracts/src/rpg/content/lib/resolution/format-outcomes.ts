@@ -12,11 +12,7 @@ function formatOutcomeEffectClause(
   resolution: ResolutionFormatInput,
 ): string | undefined {
   if (effect.kind === 'effect-reference') {
-    const sentence = formatResolutionApplicationSentence(
-      resolution,
-      effect.effectId,
-      effect.amount === 'half' ? 'half' : 'full',
-    )
+    const sentence = formatResolutionApplicationSentence(resolution, effect.effectId, effect.amount)
     return sentence ? `${sentence}.` : undefined
   }
   return formatOrderedOutcomeEffects([effect])[0]

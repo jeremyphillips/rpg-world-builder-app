@@ -113,7 +113,11 @@ describe('monster action acquisition', () => {
       resolution: {
         selectionMode: 'targets',
         method: { kind: 'saving-throw' },
-        effects: [{ id: 'damage', kind: 'damage' }],
+        effects: [],
+        outcomes: [
+          { result: 'failed-save', effects: [] },
+          { result: 'successful-save', effects: [] },
+        ],
         target: expect.objectContaining({
           count: 1,
           kind: 'creature',
