@@ -33,11 +33,11 @@ describe('formatMonsterSaveAction target requirements', () => {
         outcomes: [
           {
             result: 'failed-save',
-            applications: [{ effectId: 'damage', amount: 'full' }],
+            effects: [{ kind: 'effect-reference', effectId: 'damage', amount: 'full' }],
           },
           {
             result: 'successful-save',
-            applications: [{ effectId: 'damage', amount: 'half' }],
+            effects: [{ kind: 'effect-reference', effectId: 'damage', amount: 'half' }],
           },
         ],
       },
@@ -79,11 +79,11 @@ describe('formatMonsterSaveAction save outcome extensions', () => {
         outcomes: [
           {
             result: 'failed-save',
-            applications: [{ effectId: 'damage', amount: 'full' }],
+            effects: [{ kind: 'effect-reference', effectId: 'damage', amount: 'full' }],
           },
           {
             result: 'successful-save',
-            applications: [{ effectId: 'damage', amount: 'half' }],
+            effects: [{ kind: 'effect-reference', effectId: 'damage', amount: 'half' }],
           },
         ],
       },
@@ -114,7 +114,6 @@ describe('formatMonsterSaveAction save outcome extensions', () => {
         outcomes: [
           {
             result: 'failed-save',
-            applications: [],
             effects: [{ kind: 'condition', conditionId: 'restrained' }],
             repeatSave: {
               timing: { participant: 'target', boundary: 'end', which: 'next' },
@@ -129,7 +128,7 @@ describe('formatMonsterSaveAction save outcome extensions', () => {
               },
             },
           },
-          { result: 'successful-save', applications: [] },
+          { result: 'successful-save', effects: [] },
         ],
       },
     })
@@ -169,16 +168,20 @@ describe('formatMonsterSaveAction save outcome extensions', () => {
         outcomes: [
           {
             result: 'failed-save',
-            applications: [{ effectId: 'damage', amount: 'full' }],
+            effects: [{ kind: 'effect-reference', effectId: 'damage', amount: 'full' }],
           },
           {
             result: 'successful-save',
-            applications: [{ effectId: 'damage', amount: 'half' }],
+            effects: [{ kind: 'effect-reference', effectId: 'damage', amount: 'half' }],
           },
           {
             result: 'failed-or-successful-save',
-            applications: [],
-            note: "Being underwater doesn't grant Resistance to this Fire damage.",
+            effects: [
+              {
+                kind: 'note',
+                description: "Being underwater doesn't grant Resistance to this Fire damage.",
+              },
+            ],
           },
         ],
       },

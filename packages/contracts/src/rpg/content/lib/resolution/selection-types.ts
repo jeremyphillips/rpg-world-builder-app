@@ -1,4 +1,4 @@
-import type { OrderedEffect } from '../../../primitives/mechanics/ordered-effect'
+import type { ResolutionOutcomeEffect } from './resolution-outcome-effect'
 import type {
   ResolutionMethodKind,
   ResolutionOutcomeResult,
@@ -33,9 +33,7 @@ export type ResolutionEffectRef = {
 /** Minimal outcome row for selection policy and change planning. */
 export type ResolutionOutcomeRef = {
   result: ResolutionOutcomeResult
-  applications: readonly { effectId: string; amount: string }[]
-  note?: string
-  effects?: readonly OrderedEffect[]
+  effects?: readonly ResolutionOutcomeEffect[]
   repeatSave?: RepeatSave
 }
 

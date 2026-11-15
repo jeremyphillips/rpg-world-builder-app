@@ -70,21 +70,21 @@ describe('getOutcomeEffectAvailability', () => {
 
 describe('resolveOutcomeApplicationAddState', () => {
   it('returns precise add-state kinds', () => {
-    expect(resolveOutcomeApplicationAddState([], { applications: [] }, 'hit')).toEqual({
+    expect(resolveOutcomeApplicationAddState([], { effects: [] }, 'hit')).toEqual({
       kind: 'no-authored-effects',
     })
 
     expect(
       resolveOutcomeApplicationAddState(
         [completeDamage],
-        { applications: [{ effectId: 'damage', amount: 'full' }] },
+        { effects: [{ kind: 'effect-reference', effectId: 'damage', amount: 'full' }] },
         'hit',
       ),
     ).toEqual({ kind: 'all-applied' })
 
     const allIncomplete = resolveOutcomeApplicationAddState(
       [incompleteDamage],
-      { applications: [] },
+      { effects: [] },
       'hit',
     )
     expect(allIncomplete.kind).toBe('all-incomplete')
@@ -99,7 +99,7 @@ describe('resolveOutcomeApplicationAddState', () => {
 
     const ready = resolveOutcomeApplicationAddState(
       [completeDamage, incompleteDamage],
-      { applications: [] },
+      { effects: [] },
       'hit',
     )
     expect(ready.kind).toBe('ready')

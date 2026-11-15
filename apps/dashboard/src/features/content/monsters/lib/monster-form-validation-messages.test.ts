@@ -89,7 +89,7 @@ describe('monster publish validation messages', () => {
               damageType: 'fire',
             },
           ],
-          outcomes: [{ result: 'failed-save', applications: [] }],
+          outcomes: [{ result: 'failed-save', effects: [] }],
         },
       },
     ])

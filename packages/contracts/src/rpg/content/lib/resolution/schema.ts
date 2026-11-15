@@ -6,7 +6,6 @@ import { rollSchema } from '../../../primitives/mechanics/roll'
 import { abilitySchema } from '../../../vocab/ability'
 import { damageTypeIdSchema } from '../../../vocab/damage/vocabulary'
 import {
-  RESOLUTION_APPLICATION_AMOUNTS,
   RESOLUTION_OUTCOME_RESULTS,
   RESOLUTION_SELECTION_MODES,
   RESOLUTION_TARGET_COUNT_KINDS,
@@ -18,7 +17,18 @@ import {
 } from '../../../vocab/resolution'
 import { isEffectKindAllowedForTarget } from './effect-target-compatibility'
 import type { OrderedConditionEffect } from '../../../primitives/mechanics/ordered-effect'
-import { orderedEffectSchema } from '../../../primitives/mechanics/ordered-effect'
+import {
+  resolutionOutcomeEffectSchema,
+  type ResolutionOutcomeEffect,
+} from './resolution-outcome-effect'
+
+export {
+  resolutionEffectReferenceSchema,
+  resolutionOutcomeEffectSchema,
+  type ResolutionEffectReference,
+  type ResolutionOutcomeEffect,
+} from './resolution-outcome-effect'
+import { resolutionEffectIdSchema, type ResolutionEffectId } from './resolution-effect-id'
 import {
   getAllowedOutcomeResultsForMethod,
   hasMeaningfulOutcomeContent,
@@ -59,9 +69,7 @@ export const effectResolutionMethodSchema = z.discriminatedUnion('kind', [
 
 export type EffectResolutionMethod = z.infer<typeof effectResolutionMethodSchema>
 
-export const resolutionEffectIdSchema = z.string().min(1).brand<'ResolutionEffectId'>()
-
-export type ResolutionEffectId = z.infer<typeof resolutionEffectIdSchema>
+export { resolutionEffectIdSchema, type ResolutionEffectId } from './resolution-effect-id'
 
 export const resolutionTargetProximitySchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('touch') }),
@@ -112,18 +120,9 @@ export const resolutionEffectSchema = z.discriminatedUnion('kind', [
 
 export type ResolutionEffect = z.infer<typeof resolutionEffectSchema>
 
-export const resolutionApplicationSchema = z.object({
-  effectId: resolutionEffectIdSchema,
-  amount: z.enum(RESOLUTION_APPLICATION_AMOUNTS),
-})
-
-export type ResolutionApplication = z.infer<typeof resolutionApplicationSchema>
-
 export const resolutionOutcomeSchema = z.object({
   result: z.enum(RESOLUTION_OUTCOME_RESULTS),
-  note: z.string().trim().optional(),
-  applications: z.array(resolutionApplicationSchema).default([]),
-  effects: z.array(orderedEffectSchema).optional(),
+  effects: z.array(resolutionOutcomeEffectSchema).default([]),
   repeatSave: repeatSaveSchema.optional(),
 })
 
@@ -183,9 +182,7 @@ export type EffectResolutionValidationInput = {
   effects: readonly ResolutionEffect[]
   outcomes: readonly {
     result: ResolutionOutcomeResult
-    applications: readonly { effectId: ResolutionEffectId; amount: string }[]
-    note?: string
-    effects?: readonly z.infer<typeof orderedEffectSchema>[]
+    effects?: readonly ResolutionOutcomeEffect[]
     repeatSave?: RepeatSave
   }[]
 }
@@ -211,9 +208,73 @@ function refineOccupantRequirementsFields(
   refineRequirementsForTargetKind('creature', requirements, ctx, ['occupantRequirements'])
 }
 
+type EffectResolutionValidationOptions = {
+  /** Publish rejects dangling effect ids. Draft normalize leaves them in place. */
+  requireKnownEffectIds?: boolean
+}
+
+function outcomeEffectLists(outcome: EffectResolutionValidationInput['outcomes'][number]): Array<{
+  effects: readonly ResolutionOutcomeEffect[]
+  path: (string | number)[]
+}> {
+  return [
+    { effects: outcome.effects ?? [], path: ['effects'] },
+    {
+      effects: outcome.repeatSave?.secondFailure.effects ?? [],
+      path: ['repeatSave', 'secondFailure', 'effects'],
+    },
+  ]
+}
+
+function validateOutcomeEffectList(
+  outcomeIndex: number,
+  effects: readonly ResolutionOutcomeEffect[],
+  path: (string | number)[],
+  effectById: Map<ResolutionEffectId, ResolutionEffect>,
+  ctx: z.RefinementCtx,
+  options: EffectResolutionValidationOptions,
+): void {
+  const seenReferenceIds = new Set<string>()
+  effects.forEach((effect, effectIndex) => {
+    if (effect.kind !== 'effect-reference') return
+    if (seenReferenceIds.has(effect.effectId)) {
+      addCustomRefinementIssue(
+        ctx,
+        spellResolutionValidationMessages.duplicateOutcomeApplicationEffectId(),
+        ['outcomes', outcomeIndex, ...path],
+      )
+    }
+    seenReferenceIds.add(effect.effectId)
+
+    const definition = effectById.get(effect.effectId)
+    if (!definition) {
+      if (options.requireKnownEffectIds === false) return
+      addCustomRefinementIssue(
+        ctx,
+        spellResolutionValidationMessages.unknownEffectReference({
+          effectId: effect.effectId,
+        }),
+        ['outcomes', outcomeIndex, ...path, effectIndex, 'effectId'],
+      )
+      return
+    }
+
+    if (effect.amount === 'half' && !supportsPartialApplicationForEffectKind(definition.kind)) {
+      addCustomRefinementIssue(
+        ctx,
+        spellResolutionValidationMessages.halfNotSupportedForEffectKind({
+          kind: definition.kind,
+        }),
+        ['outcomes', outcomeIndex, ...path, effectIndex, 'amount'],
+      )
+    }
+  })
+}
+
 export function validateEffectResolution(
   resolution: EffectResolutionValidationInput,
   ctx: z.RefinementCtx,
+  options: EffectResolutionValidationOptions = {},
 ): void {
   validateResolutionModeFields(resolution, ctx)
   refineOccupantRequirementsFields(resolution, ctx)
@@ -290,46 +351,8 @@ export function validateEffectResolution(
       )
     }
 
-    const applicationEffectIds = outcome.applications.map((application) => application.effectId)
-    const uniqueApplicationEffectIds = new Set(applicationEffectIds)
-    if (uniqueApplicationEffectIds.size !== applicationEffectIds.length) {
-      addCustomRefinementIssue(
-        ctx,
-        spellResolutionValidationMessages.duplicateOutcomeApplicationEffectId(),
-        ['outcomes', outcomeIndex, 'applications'],
-      )
-    }
-
-    outcome.applications.forEach((application, applicationIndex) => {
-      const effect = effectById.get(application.effectId)
-      if (!effect) {
-        addCustomRefinementIssue(
-          ctx,
-          spellResolutionValidationMessages.unknownEffectReference({
-            effectId: application.effectId,
-          }),
-          ['outcomes', outcomeIndex, 'applications', applicationIndex, 'effectId'],
-        )
-        return
-      }
-
-      if (application.amount === 'half' && !supportsPartialApplicationForEffectKind(effect.kind)) {
-        addCustomRefinementIssue(
-          ctx,
-          spellResolutionValidationMessages.halfNotSupportedForEffectKind({
-            kind: effect.kind,
-          }),
-          ['outcomes', outcomeIndex, 'applications', applicationIndex, 'amount'],
-        )
-      }
-    })
-
-    if (outcome.result === 'failed-or-successful-save' && outcome.applications.length > 0) {
-      addCustomRefinementIssue(
-        ctx,
-        spellResolutionValidationMessages.failedOrSuccessfulSaveApplicationsForbidden(),
-        ['outcomes', outcomeIndex, 'applications'],
-      )
+    for (const list of outcomeEffectLists(outcome)) {
+      validateOutcomeEffectList(outcomeIndex, list.effects, list.path, effectById, ctx, options)
     }
 
     if (outcome.repeatSave && outcome.result !== 'failed-save') {
@@ -339,20 +362,6 @@ export function validateEffectResolution(
         ['outcomes', outcomeIndex, 'repeatSave'],
       )
     }
-
-    const referencesEnvelopeDamage = outcome.applications.some((application) => {
-      const effect = effectById.get(application.effectId)
-      return effect?.kind === 'damage'
-    })
-    ;(outcome.effects ?? []).forEach((effect, effectIndex) => {
-      if (effect.kind === 'damage' && referencesEnvelopeDamage) {
-        addCustomRefinementIssue(
-          ctx,
-          spellResolutionValidationMessages.outcomeDamageForbiddenWithEnvelopeApplication(),
-          ['outcomes', outcomeIndex, 'effects', effectIndex, 'kind'],
-        )
-      }
-    })
 
     outcome.repeatSave?.secondFailure.effects?.forEach((effect, effectIndex) => {
       if (effect.kind !== 'condition' || !effect.replacesConditionId) return

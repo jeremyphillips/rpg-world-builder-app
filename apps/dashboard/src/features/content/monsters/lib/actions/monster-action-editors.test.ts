@@ -615,16 +615,17 @@ describe('monster action detail fields', () => {
       name: 'Fire Breath',
       preset: 'breath-weapon',
     })
-    const damageTypeIndex = names.indexOf('resolution.effects.0.damageType')
     const failedEffectsPath = names.find((name) => name.includes('resolution.outcomes.0.effects'))
     expect(names[0]).toBe('buildAdvisories')
     expect(names.indexOf('resolution.method.ability')).toBeLessThan(
       names.indexOf('resolution.selectionMode'),
     )
     expect(failedEffectsPath).toBeDefined()
-    expect(damageTypeIndex).toBeGreaterThan(names.indexOf('resolution.selectionMode'))
+    expect(names.indexOf(failedEffectsPath!)).toBeGreaterThan(
+      names.indexOf('resolution.selectionMode'),
+    )
     expect(names.indexOf('_saveFailureOrSuccess')).toBeLessThan(names.indexOf('_turnLimit'))
-    expect(names.indexOf('_saveSuccessAmount')).toBeLessThan(names.indexOf('_saveFailureOrSuccess'))
+    expect(names).not.toContain('_saveSuccessAmount')
     expect(names).not.toContain('onceUntilNextTurn')
     expect(names.at(-1)).toBe('description')
     expect(names).not.toContain('limitedUse.kind')

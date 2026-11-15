@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { ELDRITCH_BLAST_RESOLUTION, RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID } from '@rpg/contracts'
+import {
+  ELDRITCH_BLAST_RESOLUTION,
+  RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+  type SpellResolution,
+} from '@rpg/contracts'
 
 import {
   formOutcomesToStoredShape,
@@ -15,7 +19,7 @@ describe('resolution outcome slot adapters', () => {
     const slots = storedOutcomesToFormSlots(method, ELDRITCH_BLAST_RESOLUTION.outcomes)
 
     expect(slots.map((slot) => slot.result)).toEqual(['hit', 'miss'])
-    expect(slots[1]).toEqual({ result: 'miss', applications: [] })
+    expect(slots[1]).toEqual({ result: 'miss', effects: [] })
   })
 
   it('strips empty slots when converting form outcomes to stored shape', () => {
@@ -23,9 +27,15 @@ describe('resolution outcome slot adapters', () => {
     const formSlots = hydrateOutcomeFormSlots(method, [
       {
         result: 'hit',
-        applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
+        effects: [
+          {
+            kind: 'effect-reference',
+            effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+            amount: 'full',
+          },
+        ],
       },
-      { result: 'miss', applications: [] },
+      { result: 'miss', effects: [] },
     ])
 
     expect(formOutcomesToStoredShape(method, formSlots)).toEqual(ELDRITCH_BLAST_RESOLUTION.outcomes)
@@ -36,8 +46,12 @@ describe('resolution outcome slot adapters', () => {
     const stored = [
       {
         result: 'miss' as const,
-        applications: [],
-        note: 'The projectile creates a cloud at the point of impact.',
+        effects: [
+          {
+            kind: 'note' as const,
+            description: 'The projectile creates a cloud at the point of impact.',
+          },
+        ],
       },
     ]
 
@@ -54,8 +68,14 @@ describe('resolution outcome slot adapters', () => {
     const stored = [
       {
         result: 'failed-save' as const,
-        applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' as const }],
-        effects: [{ kind: 'condition' as const, conditionId: 'unconscious' as const }],
+        effects: [
+          {
+            kind: 'effect-reference' as const,
+            effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+            amount: 'full' as const,
+          },
+          { kind: 'condition' as const, conditionId: 'unconscious' as const },
+        ],
         repeatSave: {
           timing: {
             participant: 'target' as const,
@@ -68,16 +88,23 @@ describe('resolution outcome slot adapters', () => {
       },
       {
         result: 'successful-save' as const,
-        applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'half' as const }],
+        effects: [
+          {
+            kind: 'effect-reference',
+            effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+            amount: 'half',
+          },
+        ],
       },
       {
         result: 'failed-or-successful-save' as const,
-        applications: [],
-        note: 'Being underwater does not grant resistance.',
+        effects: [
+          { kind: 'note' as const, description: 'Being underwater does not grant resistance.' },
+        ],
       },
     ]
 
-    const slots = storedOutcomesToFormSlots(method, stored)
+    const slots = storedOutcomesToFormSlots(method, stored as SpellResolution['outcomes'])
     expect(slots).toHaveLength(3)
     expect(formOutcomesToStoredShape(method, slots)).toEqual(stored)
   })

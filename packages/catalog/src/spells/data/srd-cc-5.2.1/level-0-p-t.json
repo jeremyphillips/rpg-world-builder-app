@@ -69,8 +69,9 @@
       "outcomes": [
         {
           "result": "hit",
-          "applications": [
+          "effects": [
             {
+              "kind": "effect-reference",
               "effectId": "damage",
               "amount": "full"
             }
@@ -315,8 +316,9 @@
       "outcomes": [
         {
           "result": "failed-save",
-          "applications": [
+          "effects": [
             {
+              "kind": "effect-reference",
               "effectId": "damage",
               "amount": "full"
             }
@@ -324,8 +326,9 @@
         },
         {
           "result": "successful-save",
-          "applications": [
+          "effects": [
             {
+              "kind": "effect-reference",
               "effectId": "damage",
               "amount": "half"
             }

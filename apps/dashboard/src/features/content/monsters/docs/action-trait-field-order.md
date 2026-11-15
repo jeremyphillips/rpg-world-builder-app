@@ -13,8 +13,10 @@ Regions, in order. An empty region renders nothing.
 
 Casting ability is mechanics. It does not belong in Source.
 
-Save actions keep one Saving Throw group. Inside it, order is: save ability and DC, targeting, **Failed save** (outcome effects, optional repeat save ladder, envelope damage when used), **Successful save** (success amount when envelope damage exists, outcome effects), optional **Failure or success** outcome, then optional boolean **Turn limit** (`onceUntilNextTurn`). Global turn-limit disclosure is omitted on save actions because it lives on this tail.
+Save actions keep one Saving Throw group. Inside it, order is: save ability and DC, targeting, **Failed save** (one ordered effect list, then repeat save), **Successful save** (one ordered effect list), optional **Failure or success**, then **Turn limit**. Turn limit is the presence of `onceUntilNextTurn`. Global turn-limit disclosure is omitted on save actions because it lives on this tail.
 
-Repeat save stays hidden until the first-failure outcome lists a condition or note, or repeat save is already authored. Envelope-only damage breaths do not surface repeat save until a condition or note is added to the failed outcome.
+Damage, healing, and temporary hit points are library entries on `resolution.effects`. Each save list prints `effect-reference`, condition, and note rows. **Damage** creates a new definition and a full reference. **Use existing effect** adds a full reference to a definition this list does not already use, including orphans, and can delete an orphan. Amount stays on the reference. The row edits the library roll and damage type. When another outcome uses the same id, the row says the definition is shared. Monster menus do not offer healing.
+
+Repeat save stays hidden until the first-failure outcome lists a condition, or a repeat shell is already open. A note or damage row alone does not reveal it. Opening repeat writes the fixed end-of-next-turn timing and shows First failure and Second failure as field labels before the second tier has effects. Eligibility is an optional note on that shell. Recurring saves stay note effects.
 
 Do not apply this order to species traits or class features. Their descriptions are the primary authored content, and grant summaries are a different region.

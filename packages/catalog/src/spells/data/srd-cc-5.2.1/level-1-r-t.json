@@ -74,11 +74,15 @@
       "outcomes": [
         {
           "result": "hit",
-          "note": "On a hit, the target has the Poisoned condition until the end of your next turn.",
-          "applications": [
+          "effects": [
             {
+              "kind": "effect-reference",
               "effectId": "damage",
               "amount": "full"
+            },
+            {
+              "kind": "note",
+              "description": "On a hit, the target has the Poisoned condition until the end of your next turn."
             }
           ]
         }
@@ -486,8 +490,9 @@
       "outcomes": [
         {
           "result": "failed-save",
-          "applications": [
+          "effects": [
             {
+              "kind": "effect-reference",
               "effectId": "damage",
               "amount": "full"
             }
@@ -495,8 +500,9 @@
         },
         {
           "result": "successful-save",
-          "applications": [
+          "effects": [
             {
+              "kind": "effect-reference",
               "effectId": "damage",
               "amount": "half"
             }

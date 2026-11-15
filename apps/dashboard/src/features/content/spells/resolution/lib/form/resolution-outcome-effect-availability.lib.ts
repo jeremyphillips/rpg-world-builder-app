@@ -22,10 +22,10 @@ import { readOutcomeApplications } from './resolution-outcome-applications.lib'
 import type { ResolutionEffectFormItem, ResolutionOutcomeFormItem } from './resolution-form-schema'
 
 function appliedEffectIdsForOutcome(
-  outcome: Pick<ResolutionOutcomeFormItem, 'applications'>,
+  outcome: Pick<ResolutionOutcomeFormItem, 'effects'>,
 ): Set<string> {
   return new Set(
-    readOutcomeApplications(outcome.applications).map((application) => application.effectId),
+    readOutcomeApplications(outcome.effects).map((application) => application.effectId),
   )
 }
 
@@ -124,7 +124,7 @@ function toEligibleMenuItem(
 
 export function resolveOutcomeApplicationAddState(
   effects: readonly ResolutionEffectFormItem[],
-  outcome: Pick<ResolutionOutcomeFormItem, 'applications'>,
+  outcome: Pick<ResolutionOutcomeFormItem, 'effects'>,
   outcomeResult: ResolutionOutcomeResult,
   selectionContext?: EffectTargetCompatibilityContext,
 ): OutcomeApplicationAddState {

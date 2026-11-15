@@ -11,7 +11,7 @@ const orderedDamageEffectSchema = damageRollValueSchema.extend({
   description: optionalEffectDescriptionSchema,
 })
 
-const orderedConditionEffectSchema = z.object({
+export const orderedConditionEffectSchema = z.object({
   kind: z.literal('condition'),
   conditionId: effectConditionSchema,
   end: effectEndSchema.optional(),
@@ -19,7 +19,7 @@ const orderedConditionEffectSchema = z.object({
   replacesConditionId: effectConditionSchema.optional(),
 })
 
-const orderedNoteEffectSchema = z.object({
+export const orderedNoteEffectSchema = z.object({
   kind: z.literal('note'),
   description: z.string().trim().min(1),
 })

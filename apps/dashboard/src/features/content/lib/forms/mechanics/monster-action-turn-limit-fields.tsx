@@ -1,12 +1,13 @@
 'use client'
 
-import { SwitchField, OptionalFieldDisclosure } from '@rpg/ui'
+import { OptionalFieldDisclosure, Text } from '@rpg/ui'
 import type { FormItem } from '@rpg/ui/form'
 import { useFieldControlSize } from '@rpg/ui/form'
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import {
   MONSTER_TURN_LIMIT_ADD_LABEL,
+  MONSTER_TURN_LIMIT_LABEL,
   MONSTER_TURN_LIMIT_OPTION_LABEL,
 } from '../../../monsters/lib/monster-form-labels'
 
@@ -21,7 +22,7 @@ function MonsterActionTurnLimitControl({ name }: { name: string }) {
   return (
     <OptionalFieldDisclosure
       controlId={fieldId}
-      fieldLabel={MONSTER_TURN_LIMIT_OPTION_LABEL}
+      fieldLabel={MONSTER_TURN_LIMIT_LABEL}
       addLabel={MONSTER_TURN_LIMIT_ADD_LABEL}
       open={enabled}
       onOpenChange={(next) => {
@@ -30,16 +31,9 @@ function MonsterActionTurnLimitControl({ name }: { name: string }) {
       onRemove={() => setValue(name as never, undefined as never, WRITE_OPTIONS)}
       size={controlSize}
     >
-      <SwitchField
-        id={fieldId}
-        label={MONSTER_TURN_LIMIT_OPTION_LABEL}
-        labelVisibility="srOnly"
-        size={controlSize}
-        checked={enabled}
-        onCheckedChange={(checked) => {
-          setValue(name as never, (checked ? true : undefined) as never, WRITE_OPTIONS)
-        }}
-      />
+      <Text as="p" variant="caption">
+        {MONSTER_TURN_LIMIT_OPTION_LABEL}
+      </Text>
     </OptionalFieldDisclosure>
   )
 }

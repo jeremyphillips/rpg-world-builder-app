@@ -1,8 +1,5 @@
-'use client'
-
-import { SelectField, TextareaField } from '@rpg/ui'
-import { toOptions, useFieldControlSize, useSlotIssues } from '@rpg/ui/form'
-import { OptionalFieldDisclosure } from '@rpg/ui'
+import { Button, ConfirmDialog, OptionalFieldDisclosure, TextareaField } from '@rpg/ui'
+import { useFieldControlSize } from '@rpg/ui/form'
 import { useEffect, useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
@@ -10,26 +7,22 @@ import {
   MONSTER_SAVE_FAILURE_OR_SUCCESS_ADD_LABEL,
   MONSTER_SAVE_FAILURE_OR_SUCCESS_NOTE_LABEL,
   MONSTER_SAVE_REPEAT_ADD_LABEL,
-  MONSTER_SAVE_REPEAT_ELIGIBILITY_LABEL,
-  MONSTER_SAVE_REPEAT_REMOVE_LABEL,
-  MONSTER_SAVE_REPEAT_TIMING_LABEL,
 } from '../monster-form-labels'
-import {
-  REPEAT_SAVE_TIMING_OPTIONS,
-  repeatSaveTimingFromOptionId,
-  repeatSaveTimingOptionId,
-} from './monster-action-repeat-save-timing.lib'
 import {
   defaultRepeatSaveShell,
   ensureMonsterSaveOutcomeSlots,
+  MONSTER_SAVE_FAILED_EFFECTS_PATH,
+  MONSTER_SAVE_REPEAT_PATH,
   monsterSaveFailureOrSuccessNote,
   readMonsterSaveOutcomes,
+  repeatSaveRemovalNeedsConfirm,
+  repeatSaveShellIsOpen,
   shouldShowSaveRepeatSaveAuthoring,
   withMonsterSaveFailureOrSuccessOutcome,
   withMonsterSaveRepeatSave,
   type MonsterSaveOutcome,
 } from './monster-action-save-outcomes'
-import { findOutcomeByResult, type RepeatSave } from '@rpg/contracts'
+import { findOutcomeByResult } from '@rpg/contracts'
 
 const WRITE_OPTIONS = { shouldDirty: true, shouldTouch: true, shouldValidate: true } as const
 
@@ -37,8 +30,8 @@ function outcomesPath(namePrefix: string): string {
   return `${namePrefix}.resolution.outcomes`
 }
 
-const FAILED_EFFECTS_SUFFIX = 'resolution.outcomes.0.effects'
-const REPEAT_SAVE_SUFFIX = 'resolution.outcomes.0.repeatSave'
+const FAILED_EFFECTS_SUFFIX = MONSTER_SAVE_FAILED_EFFECTS_PATH
+const REPEAT_SAVE_SUFFIX = MONSTER_SAVE_REPEAT_PATH
 
 function watchPath(namePrefix: string, suffix: string): string {
   return namePrefix ? `${namePrefix}.${suffix}` : suffix
@@ -65,76 +58,95 @@ export function MonsterActionSaveEnsureOutcomeSlotsField({ namePrefix }: { nameP
   return null
 }
 
+export function MonsterActionSaveRepeatAdd({
+  namePrefix,
+  visible,
+  open,
+  onAdd,
+}: {
+  namePrefix: string
+  visible: boolean
+  open: boolean
+  onAdd: () => void
+}) {
+  if (!visible || open) return null
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      onClick={onAdd}
+      id={`${namePrefix.replaceAll('.', '-')}-repeat-save`}
+    >
+      {MONSTER_SAVE_REPEAT_ADD_LABEL}
+    </Button>
+  )
+}
+
+export function MonsterActionSaveRepeatRemove({ namePrefix }: { namePrefix: string }) {
+  const { setValue } = useFormContext()
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const outcomes = readMonsterSaveOutcomes(useWatch({ name: outcomesPath(namePrefix) }))
+  const repeatSave = outcomes.find((outcome) => outcome.result === 'failed-save')?.repeatSave
+  const clear = () => {
+    setValue(
+      outcomesPath(namePrefix),
+      withMonsterSaveRepeatSave(outcomes, undefined),
+      WRITE_OPTIONS,
+    )
+  }
+  return (
+    <>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={() => {
+          if (repeatSaveRemovalNeedsConfirm(repeatSave)) {
+            setConfirmOpen(true)
+            return
+          }
+          clear()
+        }}
+      >
+        Remove
+      </Button>
+      <ConfirmDialog
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        headline="Remove repeat save?"
+        description="This removes the second failure and any eligibility note."
+        confirmLabel="Remove"
+        onConfirm={() => {
+          setConfirmOpen(false)
+          clear()
+        }}
+      />
+    </>
+  )
+}
+
 export function MonsterActionSaveRepeatSaveField({ namePrefix }: { namePrefix: string }) {
-  const controlSize = useFieldControlSize()
   const { setValue } = useFormContext()
   const outcomes = readMonsterSaveOutcomes(useWatch({ name: outcomesPath(namePrefix) }))
   const failedEffects = useWatch({ name: watchPath(namePrefix, FAILED_EFFECTS_SUFFIX) })
-  const repeatSave = useWatch({ name: watchPath(namePrefix, REPEAT_SAVE_SUFFIX) }) as
-    | RepeatSave
-    | undefined
-  const outcomesPathValue = outcomesPath(namePrefix)
+  const repeatSave = useWatch({ name: watchPath(namePrefix, REPEAT_SAVE_SUFFIX) })
   const visible = shouldShowSaveRepeatSaveAuthoring(failedEffects, repeatSave)
-  if (!visible) return null
-
-  const open = repeatSave != null
-  const fieldId = `${namePrefix.replaceAll('.', '-')}-repeat-save`
-  const timingOptions = toOptions(
-    REPEAT_SAVE_TIMING_OPTIONS.map((option) => option.id),
-    Object.fromEntries(REPEAT_SAVE_TIMING_OPTIONS.map((option) => [option.id, option.label])),
-  )
-
-  const writeRepeat = (next: RepeatSave | undefined) => {
-    setValue(outcomesPathValue, withMonsterSaveRepeatSave(outcomes, next), WRITE_OPTIONS)
-  }
+  const open = repeatSaveShellIsOpen(repeatSave)
 
   return (
-    <OptionalFieldDisclosure
-      controlId={fieldId}
-      fieldLabel={MONSTER_SAVE_REPEAT_ADD_LABEL}
-      addLabel={MONSTER_SAVE_REPEAT_ADD_LABEL}
-      removeLabel={MONSTER_SAVE_REPEAT_REMOVE_LABEL}
+    <MonsterActionSaveRepeatAdd
+      namePrefix={namePrefix}
+      visible={visible}
       open={open}
-      onOpenChange={(next) => {
-        if (next && !repeatSave) writeRepeat(defaultRepeatSaveShell())
+      onAdd={() => {
+        if (open) return
+        setValue(
+          outcomesPath(namePrefix),
+          withMonsterSaveRepeatSave(outcomes, defaultRepeatSaveShell()),
+          WRITE_OPTIONS,
+        )
       }}
-      onRemove={() => writeRepeat(undefined)}
-      size={controlSize}
-    >
-      <SelectField
-        id={`${fieldId}-timing`}
-        label={MONSTER_SAVE_REPEAT_TIMING_LABEL}
-        placeholder="Choose"
-        size={controlSize}
-        width="full"
-        options={timingOptions}
-        value={repeatSaveTimingOptionId(repeatSave?.timing) ?? ''}
-        onValueChange={(next) => {
-          const timing = repeatSaveTimingFromOptionId(next)
-          if (!timing || !repeatSave) return
-          writeRepeat({ ...repeatSave, timing })
-        }}
-      />
-      <TextareaField
-        id={`${fieldId}-eligibility`}
-        label={MONSTER_SAVE_REPEAT_ELIGIBILITY_LABEL}
-        rows={2}
-        width="full"
-        size={controlSize}
-        value={repeatSave?.eligibilityNote ?? ''}
-        onChange={(event) => {
-          if (!repeatSave) return
-          const eligibilityNote = event.target.value
-          const trimmed = eligibilityNote.trim()
-          if (!trimmed) {
-            const { eligibilityNote: _removed, ...rest } = repeatSave
-            writeRepeat(rest)
-            return
-          }
-          writeRepeat({ ...repeatSave, eligibilityNote: trimmed })
-        }}
-      />
-    </OptionalFieldDisclosure>
+    />
   )
 }
 
@@ -162,7 +174,7 @@ export function MonsterActionSaveFailureOrSuccessField({ namePrefix }: { namePre
             path,
             [
               ...slotted,
-              { result: 'failed-or-successful-save', applications: [] },
+              { result: 'failed-or-successful-save', effects: [] },
             ] as MonsterSaveOutcome[],
             WRITE_OPTIONS,
           )

@@ -104,11 +104,15 @@ const BREATH_WEAPON_RESOLUTION = effectResolutionSchema.parse({
   outcomes: [
     {
       result: 'failed-save',
-      applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
+      effects: [
+        { kind: 'effect-reference', effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' },
+      ],
     },
     {
       result: 'successful-save',
-      applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'half' }],
+      effects: [
+        { kind: 'effect-reference', effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'half' },
+      ],
     },
   ],
 })
@@ -132,8 +136,8 @@ const CONSTRICT_RESOLUTION = effectResolutionSchema.parse({
   outcomes: [
     {
       result: 'failed-save',
-      applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
       effects: [
+        { kind: 'effect-reference', effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' },
         {
           kind: 'note',
           description: 'The target is Grappled (escape DC equals the save DC).',

@@ -14,7 +14,7 @@ import {
   outcomeApplicationsFieldPath,
   outcomeApplicationsResolverItemFields,
 } from './resolution-outcome-applications-form-fields'
-import { RESOLUTION_FIELD_LABELS, RESOLUTION_SECTION_LABELS } from './resolution-form-labels'
+import { RESOLUTION_SECTION_LABELS } from './resolution-form-labels'
 import type { ResolutionEffectFormItem, ResolutionOutcomeFormItem } from './resolution-form-schema'
 
 const MAX_OUTCOME_BRANCHES = 3
@@ -37,17 +37,17 @@ export {
 } from './resolution-outcome-applications-form-fields'
 
 export function appliedEffectIdsForOutcome(
-  outcome: Pick<ResolutionOutcomeFormItem, 'applications'>,
+  outcome: Pick<ResolutionOutcomeFormItem, 'effects'>,
 ): Set<string> {
   return new Set(
-    readOutcomeApplications(outcome.applications).map((application) => application.effectId),
+    readOutcomeApplications(outcome.effects).map((application) => application.effectId),
   )
 }
 
 /** Effects available to add via the application menu for one outcome branch. */
 export function eligibleEffectsForOutcomeApplication(
   effects: readonly ResolutionEffectFormItem[],
-  outcome: Pick<ResolutionOutcomeFormItem, 'applications'>,
+  outcome: Pick<ResolutionOutcomeFormItem, 'effects'>,
 ): ResolutionEffectFormItem[] {
   const applied = appliedEffectIdsForOutcome(outcome)
   return effects.filter((effect) => !applied.has(effect.id))
@@ -55,7 +55,7 @@ export function eligibleEffectsForOutcomeApplication(
 
 export function buildOutcomeEffectApplicationMenuItems(
   effects: readonly ResolutionEffectFormItem[],
-  outcome: Pick<ResolutionOutcomeFormItem, 'applications'>,
+  outcome: Pick<ResolutionOutcomeFormItem, 'effects'>,
 ): ResolutionOutcomeEffectMenuItem[] {
   return eligibleEffectsForOutcomeApplication(effects, outcome).map((effect) => ({
     id: effect.id,
@@ -71,26 +71,7 @@ export function findOutcomeIndexByResult(
   return outcomes.findIndex((outcome) => outcome.result === result)
 }
 
-/** Optional prose for one outcome branch (`resolution.outcomes[n].note`). */
-export function outcomeNoteFields(): FormItem[] {
-  return [
-    {
-      type: 'textarea',
-      name: 'note',
-      label: RESOLUTION_FIELD_LABELS.hitNote,
-      placeholder: RESOLUTION_SECTION_LABELS.outcomeNotePlaceholder,
-      rows: 3,
-      width: 'full',
-      optionalDisclosure: {
-        addLabel: RESOLUTION_SECTION_LABELS.addOutcomeNote,
-        removeLabel: 'Remove',
-        expandWhenPopulated: true,
-      },
-    },
-  ]
-}
-
-/** Applications section, optional note for one outcome branch body. */
+/** Applications section for one outcome branch body. */
 export function outcomeBranchBodyFields(
   outcomeIndex: number,
   _includeApplications: boolean,
@@ -104,7 +85,6 @@ export function outcomeBranchBodyFields(
           name: '_outcomeApplicationSection',
           render: () => createElement(SpellResolutionOutcomeApplicationSection, { outcomeIndex }),
         },
-        ...outcomeNoteFields(),
       ],
     },
   ]

@@ -8,15 +8,19 @@ import {
 import type {
   ResolutionEffectFormItem,
   ResolutionFormValues,
-  ResolutionOutcomeApplicationFormItem,
+  ResolutionOutcomeEffectReferenceFormItem,
+  ResolutionOutcomeFormItem,
 } from './resolution-form-schema'
 import { RESOLUTION_FIELD_NAME } from './resolution-form-values'
 import type { ResolutionOutcomeResult } from '@rpg/contracts'
 
 export function readOutcomeApplications(
-  applications: ResolutionOutcomeApplicationFormItem[] | undefined,
-): ResolutionOutcomeApplicationFormItem[] {
-  return applications ?? []
+  effects: ResolutionOutcomeFormItem['effects'] | undefined,
+): ResolutionOutcomeEffectReferenceFormItem[] {
+  return (effects ?? []).filter(
+    (effect): effect is ResolutionOutcomeEffectReferenceFormItem =>
+      effect.kind === 'effect-reference',
+  )
 }
 
 export function appendOutcomeApplication(
@@ -38,8 +42,8 @@ export function appendOutcomeApplication(
     index === outcomeIndex
       ? {
           ...entry,
-          applications: [
-            ...readOutcomeApplications(entry.applications),
+          effects: [
+            ...(entry.effects ?? []),
             createOutcomeApplicationAppendValue(effectId, outcomeResult, effects),
           ],
         }

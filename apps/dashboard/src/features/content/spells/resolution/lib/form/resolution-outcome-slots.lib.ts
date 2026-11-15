@@ -27,8 +27,31 @@ export function getOutcomeResultsForFormMethod(
   return getOutcomeResultsForMethod(method)
 }
 
+function toStoredOutcomeEffects(
+  effects: ResolutionOutcomeFormItem['effects'] | undefined,
+): SpellResolution['outcomes'][number]['effects'] {
+  const stored: SpellResolution['outcomes'][number]['effects'] = []
+  for (const effect of effects ?? []) {
+    if (effect.kind === 'effect-reference') {
+      stored.push({
+        kind: 'effect-reference',
+        effectId: parseEffectId(effect.effectId),
+        amount: effect.amount,
+      })
+      continue
+    }
+    if (effect.kind === 'note') {
+      const description = effect.description.trim()
+      if (description) stored.push({ kind: 'note', description })
+      continue
+    }
+    stored.push(effect)
+  }
+  return stored
+}
+
 function createEmptyOutcomeSlot(result: ResolutionOutcomeResult): ResolutionOutcomeFormItem {
-  return { result, applications: [] }
+  return { result, effects: [] }
 }
 
 export function hydrateOutcomeFormSlots(
@@ -44,12 +67,11 @@ export function storedOutcomesToFormSlots(
 ): ResolutionOutcomeFormItem[] {
   const mapped = outcomes.map((outcome) => ({
     result: outcome.result,
-    ...(outcome.note ? { note: outcome.note } : {}),
-    applications: outcome.applications.map((application) => ({
-      effectId: application.effectId,
-      amount: application.amount,
-    })),
-    ...(outcome.effects?.length ? { effects: outcome.effects } : {}),
+    effects: (outcome.effects ?? []).map((effect) =>
+      effect.kind === 'effect-reference'
+        ? { kind: 'effect-reference' as const, effectId: effect.effectId, amount: effect.amount }
+        : effect,
+    ),
     ...(outcome.repeatSave ? { repeatSave: outcome.repeatSave } : {}),
   }))
 
@@ -69,12 +91,7 @@ export function formOutcomesToStoredShape(
 
   return meaningful.map((outcome) => ({
     result: outcome.result,
-    ...(outcome.note?.trim() ? { note: outcome.note.trim() } : {}),
-    applications: outcome.applications.map((application) => ({
-      effectId: parseEffectId(application.effectId),
-      amount: application.amount,
-    })),
-    ...(outcome.effects?.length ? { effects: outcome.effects } : {}),
+    effects: toStoredOutcomeEffects(outcome.effects),
     ...(outcome.repeatSave ? { repeatSave: outcome.repeatSave } : {}),
   }))
 }
@@ -88,11 +105,11 @@ export function buildDefaultOutcomeFormSlots(
 
   return buildDefaultOutcomeSlots(method, primaryEffectId).map((outcome) => ({
     result: outcome.result,
-    applications: outcome.applications.map((application) => ({
-      effectId: application.effectId,
-      amount: application.amount,
+    effects: outcome.effects.map((effect) => ({
+      kind: 'effect-reference' as const,
+      effectId: effect.effectId,
+      amount: effect.amount,
     })),
-    ...(outcome.note ? { note: outcome.note } : {}),
   }))
 }
 
@@ -111,6 +128,6 @@ export function resolutionOutcomeApplicationFieldPath(
   outcomeIndex: number,
   applicationIndex: number,
   suffix: 'effectId' | 'amount',
-): `${typeof RESOLUTION_OUTCOMES_FIELD}.${number}.applications.${number}.${typeof suffix}` {
-  return `${RESOLUTION_OUTCOMES_FIELD}.${outcomeIndex}.applications.${applicationIndex}.${suffix}`
+): `${typeof RESOLUTION_OUTCOMES_FIELD}.${number}.effects.${number}.${typeof suffix}` {
+  return `${RESOLUTION_OUTCOMES_FIELD}.${outcomeIndex}.effects.${applicationIndex}.${suffix}`
 }

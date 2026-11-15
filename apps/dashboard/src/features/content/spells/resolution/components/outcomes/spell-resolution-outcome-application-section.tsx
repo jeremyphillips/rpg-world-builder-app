@@ -2,14 +2,18 @@ import { useId } from 'react'
 import { Eyebrow, Text } from '@rpg/ui'
 import { useFormContext, useWatch } from 'react-hook-form'
 
+import { getArrayFieldMutators } from '@rpg/ui/form'
+
+import { createResolutionEffectAppendDefaults } from '../../lib/effects/resolution-effect-add-menu.lib'
+import type { ResolutionEffectKind } from '../../lib/effects/resolution-effect-add-menu.lib'
 import { resolveOutcomeApplicationAddState } from '../../lib/form/resolution-outcome-effect-availability.lib'
 import { resolveOutcomeApplicationSectionChrome } from '../../lib/form/resolution-outcome-application-section.lib'
-import {
-  appendOutcomeApplicationSelection,
-  readOutcomeApplications,
-} from '../../lib/form/resolution-outcome-applications.lib'
+import { appendOutcomeApplicationSelection } from '../../lib/form/resolution-outcome-applications.lib'
 import { RESOLUTION_SECTION_LABELS } from '../../lib/form/resolution-form-labels'
-import type { ResolutionFormValues } from '../../lib/form/resolution-form-schema'
+import type {
+  ResolutionFormValues,
+  ResolutionOutcomeFormItem,
+} from '../../lib/form/resolution-form-schema'
 import { RESOLUTION_FIELD_NAME } from '../../lib/form/resolution-form-values'
 import { resolutionFormToSelectionContext } from '../../lib/selection/resolution-selection-context.lib'
 import { SpellResolutionOutcomeApplicationAddTrigger } from './spell-resolution-outcome-application-add-trigger'
@@ -29,24 +33,60 @@ export function SpellResolutionOutcomeApplicationSection({
   const resolution = useWatch({ name: RESOLUTION_FIELD_NAME }) as ResolutionFormValues | undefined
   const outcome = resolution?.outcomes?.[outcomeIndex]
   const effects = resolution?.effects ?? []
-  const applications = readOutcomeApplications(outcome?.applications)
+  const effectCount = outcome?.effects?.length ?? 0
   const outcomeResult = outcome?.result ?? 'hit'
   const selectionContext = resolutionFormToSelectionContext(resolution)
   const addState = resolveOutcomeApplicationAddState(
     effects,
-    { applications },
+    { effects: (outcome?.effects ?? []) as ResolutionOutcomeFormItem['effects'] },
     outcomeResult,
     selectionContext,
   )
-  const chrome = resolveOutcomeApplicationSectionChrome(applications.length, addState)
+  const chrome = resolveOutcomeApplicationSectionChrome(effectCount, addState)
 
-  const appendApplication = (effectId: string) => {
+  const appendApplication = (itemId: string) => {
+    if (itemId === 'note') {
+      const outcomes = getValues(RESOLUTION_FIELD_NAME)?.outcomes
+      const current = outcomes?.[outcomeIndex]
+      if (!outcomes || !current) return
+      const next = outcomes.map(
+        (entry: NonNullable<ResolutionFormValues['outcomes']>[number], index: number) =>
+          index === outcomeIndex
+            ? {
+                ...entry,
+                effects: [...(entry.effects ?? []), { kind: 'note' as const, description: 'Note' }],
+              }
+            : entry,
+      )
+      setValue(`${RESOLUTION_FIELD_NAME}.outcomes`, next, {
+        shouldDirty: true,
+        shouldValidate: false,
+      })
+      return
+    }
+    if (itemId.startsWith('create:')) {
+      const definition = createResolutionEffectAppendDefaults(
+        itemId.slice(7) as ResolutionEffectKind,
+      )
+      const effectId = String(definition.id)
+      getArrayFieldMutators(control, `${RESOLUTION_FIELD_NAME}.effects`)?.append(definition)
+      appendOutcomeApplicationSelection(
+        control,
+        getValues,
+        setValue,
+        outcomeIndex,
+        effectId,
+        outcomeResult,
+        [...effects, definition as (typeof effects)[number]],
+      )
+      return
+    }
     appendOutcomeApplicationSelection(
       control,
       getValues,
       setValue,
       outcomeIndex,
-      effectId,
+      itemId,
       outcomeResult,
       effects,
     )
@@ -58,7 +98,7 @@ export function SpellResolutionOutcomeApplicationSection({
         {RESOLUTION_SECTION_LABELS.appliedEffects}
       </Eyebrow>
 
-      {applications.length > 0 ? (
+      {effectCount > 0 ? (
         <div className="mt-2">
           <SpellResolutionOutcomeApplicationsList outcomeIndex={outcomeIndex} />
         </div>

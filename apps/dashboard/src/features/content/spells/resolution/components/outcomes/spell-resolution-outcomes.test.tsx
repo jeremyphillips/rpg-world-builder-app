@@ -74,7 +74,7 @@ describe('SpellResolutionOutcomes', () => {
       const expandedMissSection = outcomePanel('On miss')
       expect(
         within(expandedMissSection).getByRole('button', {
-          name: RESOLUTION_SECTION_LABELS.addOutcomeNote,
+          name: RESOLUTION_SECTION_LABELS.addAppliedEffect,
         }),
       ).toBeInTheDocument()
       expect(
@@ -83,19 +83,16 @@ describe('SpellResolutionOutcomes', () => {
     })
   })
 
-  it('shows add additional behavior disclosure on empty hit outcomes', async () => {
+  it('keeps add available on a hit outcome that already applies damage', async () => {
     renderOutcomes(RESOLUTION_FORM_FIXTURES.eldritchBlast)
 
     await waitFor(() => {
       const section = hitSection()
       expect(
         within(section).getByRole('button', {
-          name: RESOLUTION_SECTION_LABELS.addOutcomeNote,
+          name: RESOLUTION_SECTION_LABELS.addAppliedEffect,
         }),
       ).toBeInTheDocument()
-      expect(
-        within(section).queryByLabelText(RESOLUTION_SECTION_LABELS.hitNote),
-      ).not.toBeInTheDocument()
     })
   })
 
@@ -132,7 +129,7 @@ describe('SpellResolutionOutcomes', () => {
     expect(screen.queryByRole('menuitem', { name: /1d4\+1 Force damage/i })).not.toBeInTheDocument()
   })
 
-  it('hides the add trigger when all effects are already applied', async () => {
+  it('keeps add available when every library effect is already applied', async () => {
     renderOutcomes(RESOLUTION_FORM_FIXTURES.eldritchBlast)
 
     await waitFor(() => {
@@ -140,20 +137,19 @@ describe('SpellResolutionOutcomes', () => {
       expect(
         screen.getByText(RESOLUTION_SECTION_LABELS.outcomeAllEffectsApplied),
       ).toBeInTheDocument()
+      expect(
+        screen.getAllByRole('button', { name: RESOLUTION_SECTION_LABELS.addAppliedEffect }).length,
+      ).toBeGreaterThan(0)
     })
-
-    expect(
-      screen.queryByRole('button', { name: RESOLUTION_SECTION_LABELS.addAppliedEffect }),
-    ).not.toBeInTheDocument()
   })
 
-  it('shows no-authored-effects copy without an add trigger', async () => {
+  it('shows no-authored-effects copy and still offers add', async () => {
     const resolution: ResolutionFormValues = {
       ...RESOLUTION_FORM_FIXTURES.eldritchBlast,
       effects: [],
       outcomes: RESOLUTION_FORM_FIXTURES.eldritchBlast.outcomes?.map((outcome) => ({
         ...outcome,
-        applications: [],
+        effects: [],
       })),
     }
 
@@ -169,11 +165,11 @@ describe('SpellResolutionOutcomes', () => {
     })
 
     expect(
-      screen.queryByRole('button', { name: RESOLUTION_SECTION_LABELS.addAppliedEffect }),
-    ).not.toBeInTheDocument()
+      screen.getAllByRole('button', { name: RESOLUTION_SECTION_LABELS.addAppliedEffect }).length,
+    ).toBeGreaterThan(0)
   })
 
-  it('disables the add trigger with aria-describedby when all effects are incomplete', async () => {
+  it('keeps add enabled when every library effect is incomplete', async () => {
     const resolution: ResolutionFormValues = {
       ...RESOLUTION_FORM_FIXTURES.eldritchBlast,
       effects: [
@@ -184,7 +180,7 @@ describe('SpellResolutionOutcomes', () => {
           damageType: 'force',
         },
       ],
-      outcomes: [{ result: 'hit', applications: [] }],
+      outcomes: [{ result: 'hit', effects: [] }],
     }
 
     renderOutcomes(resolution)
@@ -192,13 +188,13 @@ describe('SpellResolutionOutcomes', () => {
     const addButton = await screen.findByRole('button', {
       name: RESOLUTION_SECTION_LABELS.addAppliedEffect,
     })
-    expect(addButton).toBeDisabled()
-    expect(addButton).toHaveAttribute('aria-describedby')
-
-    const hint = document.getElementById(addButton.getAttribute('aria-describedby')!)
-    expect(hint).not.toBeNull()
-    expect(hint).toHaveTextContent(RESOLUTION_SECTION_LABELS.outcomeNoCompleteEffectsAvailable)
-    expect(hint).toHaveTextContent(RESOLUTION_SECTION_LABELS.outcomeCompleteEffectsHint)
+    expect(addButton).toBeEnabled()
+    expect(
+      screen.getByText(RESOLUTION_SECTION_LABELS.outcomeNoCompleteEffectsAvailable),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(RESOLUTION_SECTION_LABELS.outcomeCompleteEffectsHint),
+    ).toBeInTheDocument()
   })
 
   it('partitions unavailable effects in the add menu', async () => {
@@ -219,7 +215,7 @@ describe('SpellResolutionOutcomes', () => {
           damageType: 'force',
         },
       ],
-      outcomes: [{ result: 'hit', applications: [] }],
+      outcomes: [{ result: 'hit', effects: [] }],
     }
 
     renderOutcomes(resolution)
@@ -249,7 +245,7 @@ describe('SpellResolutionOutcomes', () => {
       outcomes: [
         {
           result: 'hit',
-          applications: [{ effectId: 'incomplete', amount: 'full' }],
+          effects: [{ kind: 'effect-reference', effectId: 'incomplete', amount: 'full' }],
         },
       ],
     }

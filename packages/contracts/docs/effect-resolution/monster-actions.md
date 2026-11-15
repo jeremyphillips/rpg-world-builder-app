@@ -55,15 +55,31 @@ A future no-check effect would be its own kind holding the same envelope with
 
 ### Save outcomes (v1)
 
-Each outcome may carry ordered **`effects`** (damage, condition, note) and,
-on `failed-save` only, optional **`repeatSave`** with a second-failure tier.
-Envelope **`effects`** plus **`applications`** remain the authoritative path for
-classic damage breaths (Hell Hound). Do not duplicate envelope damage in
-`outcome.effects` when applications reference it.
+Envelope **`effects`** stores every damage, healing, and temporary-hit-point
+definition. Each outcome **`effects`** array is the print order: an
+`effect-reference` (`effectId` plus `amount` of `full` or `half`), a
+`condition`, or a `note`. `half` is valid only for damage. The same definition
+can be full on a failed save and half on a successful save. A list references
+a definition at most once. Removing a reference leaves the definition. Deleting
+a definition removes every reference to that id. A dangling id is a publish
+error. On-hit stays inline `damage`, `condition`, and `note` and does not use
+`effect-reference`.
+
+On `failed-save` only, optional **`repeatSave`** carries a second-failure tier
+with the same effect union.
+
+`repeatSave.timing` for a new shell is the target’s next turn end. Authors do
+not edit timing. `successOnRepeatEndsEffect` defaults to true and is separate
+from a condition’s `end`. `eligibilityNote` qualifies when the target may
+repeat (for example, only while Restrained). Recurring saves, wake-on-damage,
+and other termination rules stay in note effects and must not contradict the
+generated one-save transition. An opened shell with an empty second failure is
+a valid draft. Publish still requires a meaningful second failure.
 
 Optional outcome **`failed-or-successful-save`** appends a third branch
-(Failure or Success) with `note` and/or `effects`. **`onceUntilNextTurn`**
-stays on the action row and prints after the save body.
+(Failure or Success) whose prose is a `note` row in `effects`. **`onceUntilNextTurn`**
+stays on the action row and prints after the save body. On a save action that
+sentence is prefixed with **Failure or Success:**.
 
 ## Inherited from base
 

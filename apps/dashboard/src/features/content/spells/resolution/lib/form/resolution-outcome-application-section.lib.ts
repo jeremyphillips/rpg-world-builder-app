@@ -22,7 +22,7 @@ export function resolveOutcomeApplicationSectionChrome(
   return {
     showPrimaryEmptySummary,
     supportingCopyVisible: addState.kind !== 'ready',
-    showAddTrigger: addState.kind !== 'no-authored-effects' && addState.kind !== 'all-applied',
+    showAddTrigger: true,
     hintContainerClassName: outcomeApplicationHintContainerClassName(
       addState,
       showPrimaryEmptySummary,

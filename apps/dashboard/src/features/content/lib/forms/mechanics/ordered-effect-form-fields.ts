@@ -1,9 +1,9 @@
 import { CONDITION_TERM, EFFECT_CONDITION_IDS, getEffectConditionLabel } from '@rpg/contracts'
 import type {
   ArrayConfig,
-  FieldConfig,
   FieldLabelVisibility,
   FieldVisibility,
+  FormItem,
   SelectFieldConfig,
 } from '@rpg/ui/form'
 
@@ -23,8 +23,6 @@ import {
 } from '../../../monsters/lib/monster-form-labels'
 import { precedingConditionIdsFromEffects } from '../../../monsters/lib/actions/monster-action-save-outcomes'
 
-const DEFAULT_ORDERED_EFFECT_KINDS = ['damage', 'condition', 'note'] as const
-
 function effectKindVisible(kind: 'damage' | 'condition' | 'note'): FieldVisibility {
   return {
     dependsOn: ['kind'],
@@ -42,7 +40,49 @@ function orderedEffectTitle(values: Record<string, unknown>, index: number): str
   return `Effect ${index + 1}`
 }
 
-type OrderedEffectKind = 'damage' | 'condition' | 'note'
+export type OrderedEffectKind = 'damage' | 'condition' | 'note'
+
+const ORDERED_EFFECT_KINDS = [
+  'damage',
+  'condition',
+  'note',
+] as const satisfies readonly OrderedEffectKind[]
+
+export function buildOrderedEffectAddMenu(allowedEffectKinds?: readonly OrderedEffectKind[]) {
+  const allowed = new Set<OrderedEffectKind>(allowedEffectKinds ?? ORDERED_EFFECT_KINDS)
+  return [
+    ...(allowed.has('damage')
+      ? [
+          {
+            id: 'damage',
+            label: MONSTER_ACTION_DAMAGE_FIELD_LABEL,
+            appendDefaults: {
+              kind: 'damage',
+              roll: { dice: { count: 1, faces: 6 } },
+            },
+          },
+        ]
+      : []),
+    ...(allowed.has('condition')
+      ? [
+          {
+            id: 'condition',
+            label: vocabularyFieldLabel(CONDITION_TERM),
+            appendDefaults: { kind: 'condition' },
+          },
+        ]
+      : []),
+    ...(allowed.has('note')
+      ? [
+          {
+            id: 'note',
+            label: MONSTER_ON_HIT_NOTE_LABEL,
+            appendDefaults: { kind: 'note' },
+          },
+        ]
+      : []),
+  ]
+}
 
 export type OrderedEffectFormFieldsOptions = {
   ctx: ContentFormCtx
@@ -56,47 +96,10 @@ export type OrderedEffectFormFieldsOptions = {
   }
   legendVisibility?: 'visible' | 'srOnly'
   visibility?: FieldVisibility
-  /** Omits damage from the add menu when envelope damage owns failed/success amounts. */
+  /** Omits kinds from the add menu. */
   allowedEffectKinds?: readonly OrderedEffectKind[]
-}
-
-function allowedEffectKindSet(
-  allowedEffectKinds: readonly OrderedEffectKind[] | undefined,
-): Set<OrderedEffectKind> {
-  return new Set(allowedEffectKinds ?? DEFAULT_ORDERED_EFFECT_KINDS)
-}
-
-export function buildOrderedEffectAddMenuItems(allowed: Set<OrderedEffectKind>) {
-  const items: Array<{
-    id: OrderedEffectKind
-    label: string
-    appendDefaults: Record<string, unknown>
-  }> = []
-  if (allowed.has('damage')) {
-    items.push({
-      id: 'damage',
-      label: MONSTER_ACTION_DAMAGE_FIELD_LABEL,
-      appendDefaults: {
-        kind: 'damage',
-        roll: { dice: { count: 1, faces: 6 } },
-      },
-    })
-  }
-  if (allowed.has('condition')) {
-    items.push({
-      id: 'condition',
-      label: vocabularyFieldLabel(CONDITION_TERM),
-      appendDefaults: { kind: 'condition' },
-    })
-  }
-  if (allowed.has('note')) {
-    items.push({
-      id: 'note',
-      label: MONSTER_ON_HIT_NOTE_LABEL,
-      appendDefaults: { kind: 'note' },
-    })
-  }
-  return items
+  /** When false, a parent composer owns the only add menu. */
+  showAddAction?: boolean
 }
 
 function buildReplaceConditionField(
@@ -133,7 +136,7 @@ function buildOrderedEffectRowFields(options: {
   condition: FieldVisibility
   note: FieldVisibility
   replaceConditionField?: SelectFieldConfig
-}): FieldConfig[] {
+}): FormItem[] {
   const conditionDetails = effectKindVisible('condition')
   const damageDetails = effectKindVisible('damage')
 
@@ -184,13 +187,35 @@ function buildOrderedEffectRowFields(options: {
   ]
 }
 
+export function orderedEffectItemFields(options: {
+  ctx: ContentFormCtx
+  kind: 'condition' | 'note'
+  precedingEffectsPath?: string
+  legendVisibility?: 'visible' | 'srOnly'
+}): FormItem[] {
+  const condition = effectKindVisible('condition')
+  const note = effectKindVisible('note')
+  const damage = effectKindVisible('damage')
+  return buildOrderedEffectRowFields({
+    ctx: options.ctx,
+    legendVisibility: options.legendVisibility ?? 'srOnly',
+    damage,
+    condition:
+      options.kind === 'condition' ? condition : { dependsOn: ['kind'], visibleWhen: () => false },
+    note: options.kind === 'note' ? note : { dependsOn: ['kind'], visibleWhen: () => false },
+    replaceConditionField:
+      options.kind === 'condition' && options.precedingEffectsPath
+        ? buildReplaceConditionField(options.precedingEffectsPath, condition)
+        : undefined,
+  })
+}
+
 /** Context-neutral ordered damage / condition / note array for on-hit and save outcomes. */
 export function orderedEffectFormFields(options: OrderedEffectFormFieldsOptions): ArrayConfig {
   const damage = effectKindVisible('damage')
   const condition = effectKindVisible('condition')
   const note = effectKindVisible('note')
-  const allowed = allowedEffectKindSet(options.allowedEffectKinds)
-  const menuItems = buildOrderedEffectAddMenuItems(allowed)
+  const menuItems = buildOrderedEffectAddMenu(options.allowedEffectKinds)
   const replaceConditionField = options.precedingEffectsPath
     ? buildReplaceConditionField(options.precedingEffectsPath, condition)
     : undefined
@@ -211,14 +236,18 @@ export function orderedEffectFormFields(options: OrderedEffectFormFieldsOptions)
           },
         }
       : {}),
-    addAction: {
-      label: MONSTER_ON_HIT_ADD_LABEL,
-      menu: {
-        groups: [],
-        enableSearch: false,
-        items: menuItems,
-      },
-    },
+    ...(options.showAddAction === false
+      ? { addAction: false as const }
+      : {
+          addAction: {
+            label: MONSTER_ON_HIT_ADD_LABEL,
+            menu: {
+              groups: [],
+              enableSearch: false,
+              items: menuItems,
+            },
+          },
+        }),
     item: {
       collapsible: true,
       header: {

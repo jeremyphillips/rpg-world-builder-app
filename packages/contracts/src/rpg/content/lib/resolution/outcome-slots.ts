@@ -1,5 +1,5 @@
-import type { OrderedEffect } from '../../../primitives/mechanics/ordered-effect'
-import type { ResolutionApplication, ResolutionEffectId } from './schema'
+import type { ResolutionEffectReference } from './resolution-outcome-effect'
+import type { ResolutionEffectId } from './resolution-effect-id'
 import type { RepeatSave } from './repeat-save'
 import { hasMeaningfulRepeatSave } from './repeat-save'
 import type { ResolutionEffectKind } from './selection-types'
@@ -13,9 +13,7 @@ type ResolutionMethodRef = { kind: ResolutionMethodKind }
 
 export type OutcomeLike = {
   result: ResolutionOutcomeResult
-  applications: readonly unknown[]
-  note?: string
-  effects?: readonly OrderedEffect[]
+  effects?: readonly unknown[]
   repeatSave?: RepeatSave
 }
 
@@ -52,16 +50,14 @@ export function getAllowedOutcomeResultsForMethod(method: {
   return [...getOutcomeResultsForMethod(method), ...getOptionalOutcomeResultsForMethod(method)]
 }
 
-/** True when an outcome has at least one application, prose, ordered effect, or repeat save. */
+/** True when an outcome has at least one effect row or a repeat save. */
 export function hasMeaningfulOutcomeContent(outcome: OutcomeLike): boolean {
-  if (outcome.applications.length > 0) return true
-  if (Boolean(outcome.note?.trim())) return true
   if (outcome.effects && outcome.effects.length > 0) return true
   if (hasMeaningfulRepeatSave(outcome.repeatSave)) return true
   return false
 }
 
-/** True when an outcome has neither applications nor prose. */
+/** True when an outcome has no effect rows and no repeat save. */
 export function isOutcomeEmpty(outcome: OutcomeLike): boolean {
   return !hasMeaningfulOutcomeContent(outcome)
 }
@@ -128,17 +124,17 @@ export function supportsPartialApplicationForEffectKind(kind: string): boolean {
   return effectKindsSupportingPartialApplication().includes(kind as ResolutionEffectKind)
 }
 
-function defaultApplicationsForResult(
+function defaultEffectReferencesForResult(
   result: ResolutionOutcomeResult,
   primaryEffectId: ResolutionEffectId,
-): ResolutionApplication[] {
+): ResolutionEffectReference[] {
   switch (result) {
     case 'applied':
     case 'hit':
     case 'failed-save':
-      return [{ effectId: primaryEffectId, amount: 'full' }]
+      return [{ kind: 'effect-reference', effectId: primaryEffectId, amount: 'full' }]
     case 'successful-save':
-      return [{ effectId: primaryEffectId, amount: 'half' }]
+      return [{ kind: 'effect-reference', effectId: primaryEffectId, amount: 'half' }]
     case 'miss':
     case 'failed-or-successful-save':
       return []
@@ -155,12 +151,11 @@ export function buildDefaultOutcomeSlots(
   primaryEffectId: ResolutionEffectId,
 ): Array<{
   result: ResolutionOutcomeResult
-  applications: ResolutionApplication[]
-  note?: string
+  effects: ResolutionEffectReference[]
 }> {
   return getOutcomeResultsForMethod(method).map((result) => ({
     result,
-    applications: defaultApplicationsForResult(result, primaryEffectId),
+    effects: defaultEffectReferencesForResult(result, primaryEffectId),
   }))
 }
 

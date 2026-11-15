@@ -71,7 +71,6 @@ describe('effectResolutionSchema', () => {
       outcomes: [
         {
           result: 'failed-save',
-          applications: [],
           effects: [
             {
               kind: 'condition',
@@ -80,44 +79,78 @@ describe('effectResolutionSchema', () => {
             },
           ],
         },
-        { result: 'successful-save', applications: [] },
+        { result: 'successful-save', effects: [] },
       ],
     })
     expect(parsed.effects).toEqual([])
     expect(parsed.outcomes[0]?.effects).toHaveLength(1)
   })
 
-  it('rejects duplicate envelope and outcome damage on the same save branch', () => {
+  it('accepts the same damage definition at full and half and rejects a repeated reference', () => {
     const {
       applicationPattern: _pattern,
       progression: _progression,
       ...envelope
     } = BURNING_HANDS_RESOLUTION
+    expect(effectResolutionSchema.safeParse(envelope).success).toBe(true)
     expect(
       effectResolutionSchema.safeParse({
         ...envelope,
         outcomes: [
           {
             result: 'failed-save',
-            applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
             effects: [
               {
-                kind: 'damage',
-                roll: { dice: { count: 1, faces: 6 } },
-                damageType: 'fire',
+                kind: 'effect-reference',
+                effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+                amount: 'full',
+              },
+              {
+                kind: 'effect-reference',
+                effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+                amount: 'half',
               },
             ],
           },
           {
             result: 'successful-save',
-            applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'half' }],
+            effects: [
+              {
+                kind: 'effect-reference',
+                effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+                amount: 'half',
+              },
+            ],
           },
         ],
       }).success,
     ).toBe(false)
   })
 
-  it('allows failed-or-successful-save notes without applications', () => {
+  it('rejects half amount for a healing definition', () => {
+    expect(
+      effectResolutionSchema.safeParse({
+        selectionMode: 'targets',
+        target: { count: 1, kind: 'creature', proximity: { kind: 'touch' } },
+        method: { kind: 'automatic' },
+        effects: [
+          {
+            id: 'healing',
+            kind: 'healing',
+            roll: { dice: { count: 1, faces: 8 } },
+          },
+        ],
+        outcomes: [
+          {
+            result: 'applied',
+            effects: [{ kind: 'effect-reference', effectId: 'healing', amount: 'half' }],
+          },
+        ],
+      }).success,
+    ).toBe(false)
+  })
+
+  it('allows failed-or-successful-save notes as effect rows', () => {
     const {
       applicationPattern: _pattern,
       progression: _progression,
@@ -129,8 +162,12 @@ describe('effectResolutionSchema', () => {
         ...envelope.outcomes,
         {
           result: 'failed-or-successful-save',
-          applications: [],
-          note: 'Being underwater does not grant resistance to this fire damage.',
+          effects: [
+            {
+              kind: 'note',
+              description: 'Being underwater does not grant resistance to this fire damage.',
+            },
+          ],
         },
       ],
     })
@@ -154,14 +191,13 @@ describe('effectResolutionSchema', () => {
           outcomes: [
             {
               result: 'failed-save',
-              applications: [],
               effects: [{ kind: 'condition', conditionId: 'unconscious' }],
               repeatSave: {
                 timing: { participant: 'target', boundary: 'end', which: 'next' },
                 secondFailure: {},
               },
             },
-            { result: 'successful-save', applications: [] },
+            { result: 'successful-save', effects: [] },
           ],
         },
       }).success,
@@ -182,14 +218,13 @@ describe('effectResolutionSchema', () => {
         outcomes: [
           {
             result: 'failed-save',
-            applications: [],
             effects: [{ kind: 'condition', conditionId: 'unconscious' }],
             repeatSave: {
               timing: { participant: 'target', boundary: 'end', which: 'next' },
               secondFailure: {},
             },
           },
-          { result: 'successful-save', applications: [] },
+          { result: 'successful-save', effects: [] },
         ],
       },
     })

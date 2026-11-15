@@ -62,7 +62,7 @@ export const AllIncompleteEffects: Story = {
           damageType: 'force',
         },
       ],
-      outcomes: [{ result: 'hit', applications: [] }],
+      outcomes: [{ result: 'hit', effects: [] }],
     },
   },
 }
@@ -83,7 +83,7 @@ export const IncompleteApplicationRow: Story = {
       outcomes: [
         {
           result: 'hit',
-          applications: [{ effectId: 'incomplete', amount: 'full' }],
+          effects: [{ kind: 'effect-reference', effectId: 'incomplete', amount: 'full' }],
         },
       ],
     },

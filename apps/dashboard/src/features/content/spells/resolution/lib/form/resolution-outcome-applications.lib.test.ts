@@ -23,13 +23,8 @@ const effects: ResolutionFormValues['effects'] = [
   },
 ]
 
-const baseResolution: ResolutionFormValues = {
+const baseResolution = {
   selectionMode: 'targets',
-  targetCount: 1,
-  targetKind: 'creature-or-object',
-  proximityKind: 'distance',
-  proximityDistanceFt: 120,
-  areaOfEffect: { shape: 'none' },
   methodKind: 'attack',
   attackType: 'ranged-spell',
   applicationPatternKind: 'none',
@@ -37,11 +32,11 @@ const baseResolution: ResolutionFormValues = {
   outcomes: [
     {
       result: 'hit',
-      applications: [createOutcomeApplicationAppendValue('damage', 'hit', effects)],
+      effects: [createOutcomeApplicationAppendValue('damage', 'hit', effects)],
     },
-    { result: 'miss', applications: [] },
+    { result: 'miss', effects: [] },
   ],
-}
+} as ResolutionFormValues
 
 describe('resolution outcome application helpers', () => {
   it('reads empty applications as an empty array', () => {
@@ -60,7 +55,7 @@ describe('resolution outcome application helpers', () => {
         baseResolution.outcomes![0],
         {
           result: 'miss',
-          applications: [createOutcomeApplicationAppendValue('bonus-force', 'miss', effects)],
+          effects: [createOutcomeApplicationAppendValue('bonus-force', 'miss', effects)],
         },
       ],
       { shouldDirty: true, shouldValidate: false },

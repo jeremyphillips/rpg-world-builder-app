@@ -5,7 +5,7 @@ import {
   EFFECT_END_PARTICIPANTS,
   EFFECT_END_WHICH,
 } from '../../../primitives/mechanics/effect-end'
-import { orderedEffectSchema } from '../../../primitives/mechanics/ordered-effect'
+import { resolutionOutcomeEffectSchema } from './resolution-outcome-effect'
 
 export const repeatSaveTimingSchema = z.object({
   participant: z.enum(EFFECT_END_PARTICIPANTS),
@@ -16,7 +16,7 @@ export const repeatSaveTimingSchema = z.object({
 export type RepeatSaveTiming = z.infer<typeof repeatSaveTimingSchema>
 
 export const repeatSaveSecondFailureSchema = z.object({
-  effects: z.array(orderedEffectSchema).optional(),
+  effects: z.array(resolutionOutcomeEffectSchema).optional(),
   note: z.string().trim().optional(),
 })
 

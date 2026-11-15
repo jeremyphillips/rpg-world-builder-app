@@ -1,4 +1,4 @@
-import { ABILITY_IDS, getAbilityLabel, hasMeaningfulRepeatSave } from '@rpg/contracts'
+import { ABILITY_IDS, getAbilityLabel } from '@rpg/contracts'
 import type {
   FieldConfig,
   FieldSeparator,
@@ -16,9 +16,7 @@ import {
   resolutionOccupantRequirementsFields,
   resolutionTargetAuthoringFields,
 } from '../../../../lib/forms/fields/resolution-target-authoring-fields'
-import { damageFieldGroup } from '../../../../lib/forms/mechanics/damage-field-group'
 import { monsterActionTurnLimitField } from '../../../../lib/forms/mechanics/monster-action-turn-limit-fields'
-import { orderedEffectFormFields } from '../../../../lib/forms/mechanics/ordered-effect-form-fields'
 import {
   SAVING_THROW_ABILITY_HINT,
   SAVING_THROW_ABILITY_LABEL,
@@ -33,6 +31,8 @@ import {
   MONSTER_SAVE_DC_PROFICIENCY_LABEL,
   MONSTER_SAVE_FAILED_LEGEND,
   MONSTER_SAVE_FIRST_FAILURE_LEGEND,
+  MONSTER_SAVE_REPEAT_ELIGIBILITY_ADD_LABEL,
+  MONSTER_SAVE_REPEAT_ELIGIBILITY_LABEL,
   MONSTER_SAVE_SECOND_FAILURE_LEGEND,
   MONSTER_SAVE_SUCCESSFUL_LEGEND,
   MONSTER_SAVE_THROW_SECTION_DESCRIPTION,
@@ -45,20 +45,20 @@ import {
 } from '../../monster-form-labels'
 import { MonsterActionCastingAbilityField } from '../monster-action-casting-fields'
 import { monsterSaveDcAbilityHintWhen } from '../monster-action-save-field-hints'
-import { MonsterActionSaveSuccessAmountField } from '../monster-action-save-outcome-fields'
 import {
   MonsterActionSaveEnsureOutcomeSlotsField,
   MonsterActionSaveFailureOrSuccessField,
+  MonsterActionSaveRepeatRemove,
   MonsterActionSaveRepeatSaveField,
 } from '../monster-action-save-form-slots'
-
-function monsterSaveResolutionDamageGroup(ctx: ContentFormCtx): FormItem {
-  return damageFieldGroup({
-    ctx,
-    damageTypeName: 'resolution.effects.0.damageType',
-    rollName: 'resolution.effects.0.roll',
-  })
-}
+import { monsterSaveOutcomeEffectsFields } from '../monster-action-save-outcome-effects'
+import {
+  MONSTER_SAVE_FAILED_EFFECTS_PATH,
+  MONSTER_SAVE_REPEAT_PATH,
+  MONSTER_SAVE_SECOND_FAILURE_EFFECTS_PATH,
+  MONSTER_SAVE_SUCCESS_EFFECTS_PATH,
+  repeatSaveShellIsOpen,
+} from '../monster-action-save-outcomes'
 
 function whenFieldEquals(field: string, value: string): FieldVisibility {
   return {
@@ -77,38 +77,11 @@ function whenFieldIsOneOf(field: string, allowed: readonly string[]): FieldVisib
   }
 }
 
-function resolutionEnvelopeHasDamage(values: Record<string, unknown>): boolean {
-  const effects = values['resolution.effects']
-  if (!Array.isArray(effects)) return false
-  return effects.some(
-    (effect) =>
-      effect && typeof effect === 'object' && (effect as { kind?: string }).kind === 'damage',
-  )
+const repeatSaveShellVisibility: FieldVisibility = {
+  dependsOn: [MONSTER_SAVE_REPEAT_PATH],
+  visibleWhen: (values) => repeatSaveShellIsOpen(values[MONSTER_SAVE_REPEAT_PATH]),
 }
 
-const envelopeDamageVisibility: FieldVisibility = {
-  dependsOn: ['resolution.effects'],
-  visibleWhen: (values) => resolutionEnvelopeHasDamage(values),
-}
-
-const noEnvelopeDamageVisibility: FieldVisibility = {
-  dependsOn: ['resolution.effects'],
-  visibleWhen: (values) => !resolutionEnvelopeHasDamage(values),
-}
-
-const SR_ONLY_EFFECTS_HEADING = { label: 'Effects', labelVisibility: 'srOnly' as const }
-
-const repeatSaveMeaningfulVisibility: FieldVisibility = {
-  dependsOn: ['resolution.outcomes.0.repeatSave'],
-  visibleWhen: (values) => {
-    const repeatSave = values['resolution.outcomes.0.repeatSave']
-    return hasMeaningfulRepeatSave(repeatSave as Parameters<typeof hasMeaningfulRepeatSave>[0])
-  },
-}
-
-const FAILED_OUTCOME_EFFECTS_PATH = 'resolution.outcomes.0.effects'
-const SECOND_FAILURE_EFFECTS_PATH = 'resolution.outcomes.0.repeatSave.secondFailure.effects'
-const SUCCESS_OUTCOME_EFFECTS_PATH = 'resolution.outcomes.1.effects'
 /** From a second-failure effect row, reach first-failure `effects`. */
 const PRECEDING_FAILED_EFFECTS_PATH = '../../../../effects'
 
@@ -352,23 +325,13 @@ function monsterSaveFailedSubsection(ctx: ContentFormCtx, namePrefix: string): F
         kind: 'group',
         heading: { label: MONSTER_SAVE_FIRST_FAILURE_LEGEND },
         headingScale: 'field',
-        visibility: repeatSaveMeaningfulVisibility,
+        visibility: repeatSaveShellVisibility,
         fields: [],
       },
-      orderedEffectFormFields({
+      ...monsterSaveOutcomeEffectsFields({
         ctx,
-        arrayName: FAILED_OUTCOME_EFFECTS_PATH,
-        heading: SR_ONLY_EFFECTS_HEADING,
-        legendVisibility: 'srOnly',
-        allowedEffectKinds: ['condition', 'note'],
-        visibility: envelopeDamageVisibility,
-      }),
-      orderedEffectFormFields({
-        ctx,
-        arrayName: FAILED_OUTCOME_EFFECTS_PATH,
-        heading: SR_ONLY_EFFECTS_HEADING,
-        legendVisibility: 'srOnly',
-        visibility: noEnvelopeDamageVisibility,
+        namePrefix,
+        arrayName: MONSTER_SAVE_FAILED_EFFECTS_PATH,
       }),
       {
         kind: 'slot',
@@ -376,24 +339,28 @@ function monsterSaveFailedSubsection(ctx: ContentFormCtx, namePrefix: string): F
         render: () => <MonsterActionSaveRepeatSaveField namePrefix={namePrefix} />,
       },
       {
-        kind: 'group',
-        heading: { label: MONSTER_SAVE_SECOND_FAILURE_LEGEND },
-        headingScale: 'field',
-        visibility: repeatSaveMeaningfulVisibility,
-        fields: [
-          orderedEffectFormFields({
-            ctx,
-            arrayName: SECOND_FAILURE_EFFECTS_PATH,
-            heading: SR_ONLY_EFFECTS_HEADING,
-            legendVisibility: 'srOnly',
-            precedingEffectsPath: PRECEDING_FAILED_EFFECTS_PATH,
-            allowedEffectKinds: ['condition', 'note'],
-          }),
-        ],
+        type: 'textarea',
+        name: `${MONSTER_SAVE_REPEAT_PATH}.eligibilityNote`,
+        label: MONSTER_SAVE_REPEAT_ELIGIBILITY_LABEL,
+        visibility: repeatSaveShellVisibility,
+        optionalDisclosure: { addLabel: MONSTER_SAVE_REPEAT_ELIGIBILITY_ADD_LABEL },
       },
       {
-        ...monsterSaveResolutionDamageGroup(ctx),
-        visibility: envelopeDamageVisibility,
+        kind: 'group',
+        heading: {
+          label: MONSTER_SAVE_SECOND_FAILURE_LEGEND,
+          action: <MonsterActionSaveRepeatRemove namePrefix={namePrefix} />,
+        },
+        headingScale: 'field',
+        visibility: repeatSaveShellVisibility,
+        fields: [
+          ...monsterSaveOutcomeEffectsFields({
+            ctx,
+            namePrefix,
+            arrayName: MONSTER_SAVE_SECOND_FAILURE_EFFECTS_PATH,
+            precedingEffectsPath: PRECEDING_FAILED_EFFECTS_PATH,
+          }),
+        ],
       },
     ],
   }
@@ -405,19 +372,10 @@ function monsterSaveSuccessfulSubsection(ctx: ContentFormCtx, namePrefix: string
     heading: { label: MONSTER_SAVE_SUCCESSFUL_LEGEND },
     headingScale: 'subsection',
     fields: [
-      {
-        kind: 'slot',
-        name: '_saveSuccessAmount',
-        issuePaths: ['resolution.outcomes'],
-        visibility: envelopeDamageVisibility,
-        render: () => <MonsterActionSaveSuccessAmountField namePrefix={namePrefix} />,
-      },
-      orderedEffectFormFields({
+      ...monsterSaveOutcomeEffectsFields({
         ctx,
-        arrayName: SUCCESS_OUTCOME_EFFECTS_PATH,
-        heading: SR_ONLY_EFFECTS_HEADING,
-        legendVisibility: 'srOnly',
-        allowedEffectKinds: ['condition', 'note'],
+        namePrefix,
+        arrayName: MONSTER_SAVE_SUCCESS_EFFECTS_PATH,
       }),
     ],
   }

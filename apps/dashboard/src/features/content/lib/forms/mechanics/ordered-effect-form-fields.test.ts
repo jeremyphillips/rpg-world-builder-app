@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 
 import { buildSeedDamageTypeVocabulary } from '@/features/vocabulary'
 
-import { orderedEffectFormFields } from './ordered-effect-form-fields'
+import { buildOrderedEffectAddMenu, orderedEffectFormFields } from './ordered-effect-form-fields'
 
 function asArrayField(field: ReturnType<typeof orderedEffectFormFields>): ArrayConfig {
   expect(field.kind).toBe('array')
@@ -11,6 +11,14 @@ function asArrayField(field: ReturnType<typeof orderedEffectFormFields>): ArrayC
 }
 
 describe('orderedEffectFormFields', () => {
+  it('offers damage, condition, and note from the shared menu', () => {
+    expect(buildOrderedEffectAddMenu().map((item) => item.id)).toEqual([
+      'damage',
+      'condition',
+      'note',
+    ])
+  })
+
   it('limits save outcome menus when damage is envelope-owned', () => {
     const field = asArrayField(
       orderedEffectFormFields({

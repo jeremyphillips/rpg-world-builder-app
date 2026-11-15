@@ -481,13 +481,13 @@
             "$ref": "#/definitions/__schema56"
           },
           "method": {
-            "$ref": "#/definitions/__schema60"
+            "$ref": "#/definitions/__schema59"
           },
           "applicationPattern": {
-            "$ref": "#/definitions/__schema61"
+            "$ref": "#/definitions/__schema60"
           },
           "progression": {
-            "$ref": "#/definitions/__schema62"
+            "$ref": "#/definitions/__schema61"
           }
         },
         "required": [
@@ -502,7 +502,7 @@
         "type": "object",
         "properties": {
           "reviewedAt": {
-            "$ref": "#/definitions/__schema67"
+            "$ref": "#/definitions/__schema66"
           },
           "status": {
             "type": "string",
@@ -515,10 +515,10 @@
             "description": "meaningful-partial | sufficient-for-display | sufficient-for-character-sheet | mechanics-ready"
           },
           "blocker": {
-            "$ref": "#/definitions/__schema69"
+            "$ref": "#/definitions/__schema68"
           },
           "gaps": {
-            "$ref": "#/definitions/__schema71"
+            "$ref": "#/definitions/__schema70"
           }
         },
         "additionalProperties": false
@@ -1732,35 +1732,8 @@
           ],
           "description": "hit | miss | failed-save | successful-save | failed-or-successful-save | applied"
         },
-        "note": {
-          "type": "string"
-        },
-        "applications": {
-          "default": [],
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "effectId": {
-                "$ref": "#/definitions/__schema52"
-              },
-              "amount": {
-                "type": "string",
-                "enum": [
-                  "full",
-                  "half"
-                ],
-                "description": "full | half"
-              }
-            },
-            "required": [
-              "effectId",
-              "amount"
-            ],
-            "additionalProperties": false
-          }
-        },
         "effects": {
+          "default": [],
           "type": "array",
           "items": {
             "$ref": "#/definitions/__schema58"
@@ -1837,7 +1810,7 @@
       },
       "required": [
         "result",
-        "applications"
+        "effects"
       ],
       "additionalProperties": false
     },
@@ -1846,25 +1819,27 @@
         {
           "type": "object",
           "properties": {
-            "roll": {
-              "$ref": "#/definitions/__schema53"
-            },
-            "damageType": {
-              "$ref": "#/definitions/__schema10"
-            },
             "kind": {
               "type": "string",
-              "const": "damage",
-              "description": "damage"
+              "const": "effect-reference",
+              "description": "effect-reference"
             },
-            "description": {
-              "$ref": "#/definitions/__schema59"
+            "effectId": {
+              "$ref": "#/definitions/__schema52"
+            },
+            "amount": {
+              "type": "string",
+              "enum": [
+                "full",
+                "half"
+              ],
+              "description": "full | half"
             }
           },
           "required": [
-            "roll",
-            "damageType",
-            "kind"
+            "kind",
+            "effectId",
+            "amount"
           ],
           "additionalProperties": false
         },
@@ -1993,7 +1968,8 @@
               ]
             },
             "description": {
-              "$ref": "#/definitions/__schema59"
+              "type": "string",
+              "minLength": 1
             },
             "replacesConditionId": {
               "allOf": [
@@ -2049,10 +2025,6 @@
       ]
     },
     "__schema59": {
-      "type": "string",
-      "minLength": 1
-    },
-    "__schema60": {
       "oneOf": [
         {
           "type": "object",
@@ -2120,7 +2092,7 @@
         }
       ]
     },
-    "__schema61": {
+    "__schema60": {
       "oneOf": [
         {
           "type": "object",
@@ -2183,7 +2155,7 @@
         }
       ]
     },
-    "__schema62": {
+    "__schema61": {
       "type": "object",
       "properties": {
         "basis": {
@@ -2198,7 +2170,7 @@
           "minItems": 1,
           "type": "array",
           "items": {
-            "$ref": "#/definitions/__schema63"
+            "$ref": "#/definitions/__schema62"
           }
         }
       },
@@ -2208,7 +2180,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema63": {
+    "__schema62": {
       "oneOf": [
         {
           "type": "object",
@@ -2219,13 +2191,13 @@
               "description": "thresholds"
             },
             "reference": {
-              "$ref": "#/definitions/__schema64"
+              "$ref": "#/definitions/__schema63"
             },
             "entries": {
               "minItems": 1,
               "type": "array",
               "items": {
-                "$ref": "#/definitions/__schema65"
+                "$ref": "#/definitions/__schema64"
               }
             }
           },
@@ -2245,10 +2217,10 @@
               "description": "linear"
             },
             "reference": {
-              "$ref": "#/definitions/__schema64"
+              "$ref": "#/definitions/__schema63"
             },
             "increment": {
-              "$ref": "#/definitions/__schema66"
+              "$ref": "#/definitions/__schema65"
             }
           },
           "required": [
@@ -2260,7 +2232,7 @@
         }
       ]
     },
-    "__schema64": {
+    "__schema63": {
       "type": "object",
       "properties": {
         "subject": {
@@ -2330,7 +2302,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema65": {
+    "__schema64": {
       "type": "object",
       "properties": {
         "threshold": {
@@ -2339,7 +2311,7 @@
           "maximum": 9007199254740991
         },
         "value": {
-          "$ref": "#/definitions/__schema66"
+          "$ref": "#/definitions/__schema65"
         }
       },
       "required": [
@@ -2348,7 +2320,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema66": {
+    "__schema65": {
       "oneOf": [
         {
           "type": "object",
@@ -2390,12 +2362,12 @@
         }
       ]
     },
-    "__schema67": {
+    "__schema66": {
       "type": "string",
       "format": "date-time",
       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
     },
-    "__schema68": {
+    "__schema67": {
       "type": "string",
       "enum": [
         "meaningful-partial",
@@ -2405,14 +2377,14 @@
       ],
       "description": "meaningful-partial | sufficient-for-display | sufficient-for-character-sheet | mechanics-ready"
     },
-    "__schema69": {
+    "__schema68": {
       "allOf": [
         {
-          "$ref": "#/definitions/__schema70"
+          "$ref": "#/definitions/__schema69"
         }
       ]
     },
-    "__schema70": {
+    "__schema69": {
       "type": "object",
       "properties": {
         "code": {
@@ -2431,10 +2403,10 @@
       ],
       "additionalProperties": false
     },
-    "__schema71": {
+    "__schema70": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/__schema70"
+        "$ref": "#/definitions/__schema69"
       }
     }
   }

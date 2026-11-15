@@ -50,21 +50,30 @@ function damageClause(
   })}.`
 }
 
+function outcomeEffectClauses(
+  rows: SaveOutcome['effects'] | undefined,
+  effects: SaveAction['resolution']['effects'],
+): string[] {
+  const effectById = new Map(effects.map((effect) => [effect.id, effect]))
+  return (rows ?? []).flatMap((row) => {
+    if (row.kind === 'effect-reference') {
+      const effect = effectById.get(row.effectId)
+      if (!effect || effect.kind !== 'damage') return []
+      if (row.amount !== 'full' && row.amount !== 'half') return []
+      return [damageClause(effect, row.amount)]
+    }
+    if (row.kind === 'condition' || row.kind === 'note') {
+      return formatOrderedOutcomeEffects([row])
+    }
+    return []
+  })
+}
+
 function outcomeBodyClauses(
   outcome: SaveOutcome,
   effects: SaveAction['resolution']['effects'],
 ): string[] {
-  const effectById = new Map(effects.map((effect) => [effect.id, effect]))
-  const applicationClauses = outcome.applications.flatMap((application) => {
-    const effect = effectById.get(application.effectId)
-    if (!effect || effect.kind !== 'damage') return []
-    if (application.amount !== 'full' && application.amount !== 'half') return []
-    return [damageClause(effect, application.amount)]
-  })
-  const orderedClauses = formatOrderedOutcomeEffects(outcome.effects)
-  const note = outcome.note?.trim()
-  const noteClause = note ? [`${note.endsWith('.') ? note : `${note}.`}`] : []
-  return [...applicationClauses, ...orderedClauses, ...noteClause]
+  return outcomeEffectClauses(outcome.effects, effects)
 }
 
 function outcomeSentence(
@@ -83,11 +92,14 @@ function proseSentence(text: string | undefined): string | undefined {
   return trimmed.endsWith('.') ? trimmed : `${trimmed}.`
 }
 
-function secondFailureSentence(outcome: SaveOutcome): string | undefined {
+function secondFailureSentence(
+  outcome: SaveOutcome,
+  effects: SaveAction['resolution']['effects'],
+): string | undefined {
   const repeatSave = outcome.repeatSave
   if (!repeatSave) return undefined
   const clauses = [
-    ...formatOrderedOutcomeEffects(repeatSave.secondFailure.effects),
+    ...outcomeEffectClauses(repeatSave.secondFailure.effects, effects),
     ...(proseSentence(repeatSave.secondFailure.note)
       ? [proseSentence(repeatSave.secondFailure.note)!]
       : []),
@@ -96,10 +108,13 @@ function secondFailureSentence(outcome: SaveOutcome): string | undefined {
   return `Second Failure: ${clauses.join(' ')}`
 }
 
-function repeatSaveSentences(outcome: SaveOutcome): string[] {
+function repeatSaveSentences(
+  outcome: SaveOutcome,
+  effects: SaveAction['resolution']['effects'],
+): string[] {
   const repeatSave = outcome.repeatSave
   if (!repeatSave) return []
-  const second = secondFailureSentence(outcome)
+  const second = secondFailureSentence(outcome, effects)
   return [
     formatRepeatSaveTransition(repeatSave.timing),
     ...(proseSentence(repeatSave.eligibilityNote)
@@ -155,7 +170,7 @@ export function formatMonsterSaveAction(args: {
   const sentences = [
     `${ability} Saving Throw: DC ${dc ?? '—'}, ${selectionPhrase(action)}.`,
     ...(failed ? [outcomeSentence(failureLabel, failed, resolution.effects)] : []),
-    ...(failed ? repeatSaveSentences(failed) : []),
+    ...(failed ? repeatSaveSentences(failed, resolution.effects) : []),
     ...(saved ? [outcomeSentence('Success', saved, resolution.effects)] : []),
     ...(failureOrSuccess ? [formatResolutionOutcomeLine(failureOrSuccess, resolution)] : []),
   ]

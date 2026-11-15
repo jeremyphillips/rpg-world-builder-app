@@ -1,7 +1,11 @@
 import * as React from 'react'
-import { useFieldArray, useFormContext, useWatch } from 'react-hook-form'
+import { useController, useFieldArray, useFormContext, useWatch } from 'react-hook-form'
 
+import { Textarea } from '@rpg/ui'
 import {
+  ArrayItemActionsRail,
+  ArrayItemInlineRow,
+  ArrayItemLeadingChromeColumn,
   buildFormSectionChildContext,
   fieldArrayItemListClasses,
   FormSectionContext,
@@ -17,6 +21,44 @@ import { resolutionFormToSelectionContext } from '../../lib/selection/resolution
 import { outcomeApplicationsIdPrefix } from './outcome-applications-id-prefix'
 import { SpellResolutionOutcomeApplicationRow } from './spell-resolution-outcome-application-row'
 
+function OutcomeNoteEffectRow({
+  fullName,
+  index,
+  onRemove,
+}: {
+  fullName: string
+  index: number
+  onRemove: () => void
+}) {
+  const { control } = useFormContext()
+  const descriptionName = `${fullName}.${index}.description`
+  const { field } = useController({ control, name: descriptionName })
+  const titleId = `${fullName}-${index}-note-title`
+
+  return (
+    <ArrayItemInlineRow
+      showLeading
+      leading={
+        <ArrayItemLeadingChromeColumn>
+          <span id={titleId} className="text-style-supporting">
+            Note
+          </span>
+        </ArrayItemLeadingChromeColumn>
+      }
+      content={<Textarea {...field} value={field.value ?? ''} rows={2} aria-labelledby={titleId} />}
+      actions={
+        <ArrayItemActionsRail
+          removeAriaLabel="Remove note"
+          canRemove
+          onRemove={onRemove}
+          compact
+          embedded
+        />
+      }
+    />
+  )
+}
+
 export type SpellResolutionOutcomeApplicationsListProps = {
   outcomeIndex: number
 }
@@ -30,6 +72,7 @@ export function SpellResolutionOutcomeApplicationsList({
   const fullName = outcomeApplicationsFieldPath(outcomeIndex)
   const idPrefix = outcomeApplicationsIdPrefix(outcomeIndex)
   const { fields, remove } = useFieldArray({ name: fullName })
+  const rows = (useWatch({ name: fullName }) ?? []) as Array<{ kind?: string }>
   const resolution = useWatch({ name: RESOLUTION_FIELD_NAME }) as ResolutionFormValues | undefined
   const effects = resolution?.effects ?? []
   const selectionContext = resolutionFormToSelectionContext(resolution)
@@ -62,19 +105,28 @@ export function SpellResolutionOutcomeApplicationsList({
   return (
     <FormSectionContext.Provider value={listContext}>
       <div className={listClasses}>
-        {fields.map((field, index) => (
-          <SpellResolutionOutcomeApplicationRow
-            key={field.id}
-            outcomeIndex={outcomeIndex}
-            itemId={field.id}
-            index={index}
-            idPrefix={idPrefix}
-            fullName={fullName}
-            effects={effects}
-            selectionContext={selectionContext}
-            onRemove={() => remove(index)}
-          />
-        ))}
+        {fields.map((field, index) =>
+          rows[index]?.kind === 'note' ? (
+            <OutcomeNoteEffectRow
+              key={field.id}
+              fullName={fullName}
+              index={index}
+              onRemove={() => remove(index)}
+            />
+          ) : (
+            <SpellResolutionOutcomeApplicationRow
+              key={field.id}
+              outcomeIndex={outcomeIndex}
+              itemId={field.id}
+              index={index}
+              idPrefix={idPrefix}
+              fullName={fullName}
+              effects={effects}
+              selectionContext={selectionContext}
+              onRemove={() => remove(index)}
+            />
+          ),
+        )}
       </div>
     </FormSectionContext.Provider>
   )

@@ -5,7 +5,8 @@ export {
   effectResolutionFieldShape,
   effectResolutionMethodSchema,
   effectResolutionSchema,
-  resolutionApplicationSchema,
+  resolutionEffectReferenceSchema,
+  resolutionOutcomeEffectSchema,
   resolutionAutomaticMethodSchema,
   resolutionDamageEffectSchema,
   resolutionEffectIdSchema,
@@ -24,7 +25,8 @@ export {
   type EffectResolution,
   type EffectResolutionMethod,
   type EffectResolutionValidationInput,
-  type ResolutionApplication,
+  type ResolutionEffectReference,
+  type ResolutionOutcomeEffect,
   type ResolutionDamageEffect,
   type ResolutionEffect,
   type ResolutionEffectId,
@@ -152,7 +154,7 @@ export {
   type OutcomeLike,
 } from './outcome-slots'
 export {
-  outcomeApplicationsReferenceEffect,
+  outcomeReferencesEffect,
   planOutcomeMethodChange,
   stripEffectFromOutcomes,
   type OutcomeMethodChangePlan,

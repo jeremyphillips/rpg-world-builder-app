@@ -71,17 +71,17 @@ describe('resolveOutcomeApplicationSectionChrome', () => {
     })
   })
 
-  it('shows hints without add trigger for terminal states', () => {
+  it('keeps the add trigger when every library effect is already used or none exist', () => {
     expect(resolveOutcomeApplicationSectionChrome(0, { kind: 'all-applied' })).toMatchObject({
       showPrimaryEmptySummary: false,
       supportingCopyVisible: true,
-      showAddTrigger: false,
+      showAddTrigger: true,
     })
     expect(
       resolveOutcomeApplicationSectionChrome(0, { kind: 'no-authored-effects' }),
     ).toMatchObject({
       supportingCopyVisible: true,
-      showAddTrigger: false,
+      showAddTrigger: true,
     })
   })
 })

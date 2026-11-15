@@ -58,7 +58,7 @@ describe('SpellResolutionOutcomeApplicationRow', () => {
     ]
     const firstOutcome = resolution.outcomes?.[0]
     if (!firstOutcome) throw new Error('Expected outcome fixture')
-    firstOutcome.applications = [{ effectId: 'healing', amount: 'full' }]
+    firstOutcome.effects = [{ kind: 'effect-reference', effectId: 'healing', amount: 'full' }]
 
     render(<ApplicationsListHarness defaultResolution={resolution} />)
 
@@ -87,8 +87,10 @@ describe('SpellResolutionOutcomeApplicationRow', () => {
 
   it('renders unknown effect copy and hides amount for missing references', async () => {
     const resolution = structuredClone(RESOLUTION_FORM_FIXTURES.eldritchBlast)
-    const firstApplication = resolution.outcomes?.[0]?.applications?.[0]
-    if (!firstApplication) throw new Error('Expected application fixture')
+    const firstApplication = resolution.outcomes?.[0]?.effects?.[0]
+    if (!firstApplication || firstApplication.kind !== 'effect-reference') {
+      throw new Error('Expected application fixture')
+    }
     firstApplication.effectId = 'missing-effect'
 
     render(<ApplicationsListHarness defaultResolution={resolution} />)
@@ -136,7 +138,7 @@ describe('SpellResolutionOutcomeApplicationsList ids', () => {
 
     expect(idPrefix).toBe('resolution-outcome-2-applications')
     expect(`${idPrefix}-${itemPrefix.replaceAll('.', '-')}-amount`).toBe(
-      'resolution-outcome-2-applications-resolution-outcomes-2-applications-0-amount',
+      'resolution-outcome-2-applications-resolution-outcomes-2-effects-0-amount',
     )
   })
 })

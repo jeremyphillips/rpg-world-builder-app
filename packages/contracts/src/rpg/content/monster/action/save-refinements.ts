@@ -30,7 +30,16 @@ export const monsterSaveResolutionSchema = monsterSaveResolutionCore.superRefine
   refineRepeatSaveSecondFailureForPublish,
 )
 
-export const monsterSaveResolutionDraftSchema = monsterSaveResolutionCore
+export const monsterSaveResolutionDraftSchema = z
+  .object({
+    ...effectResolutionFieldShape,
+    selectionMode: z.enum(RESOLUTION_SELECTION_MODES, monsterSaveSelectionMessage),
+    method: effectResolutionMethodSchema,
+  })
+  .strict()
+  .superRefine((value, ctx) =>
+    validateEffectResolution(value, ctx, { requireKnownEffectIds: false }),
+  )
 
 export function saveResolutionSchema<M extends MonsterActionMode>(mode: M) {
   const published = monsterSaveResolutionSchema

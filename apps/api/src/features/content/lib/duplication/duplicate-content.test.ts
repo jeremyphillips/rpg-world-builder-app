@@ -176,7 +176,7 @@ describe('transformDuplicateSource', () => {
 
     const resolution = parsed.resolution as typeof ELDRITCH_BLAST_RESOLUTION
     expect(resolution.effects[0]?.id).not.toBe(RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID)
-    expect(resolution.outcomes[0]?.applications[0]?.effectId).toBe(resolution.effects[0]?.id)
+    expect(resolution.outcomes[0]?.effects?.[0]?.effectId).toBe(resolution.effects[0]?.id)
   })
 
   it('parses create input without modeling overlay', () => {

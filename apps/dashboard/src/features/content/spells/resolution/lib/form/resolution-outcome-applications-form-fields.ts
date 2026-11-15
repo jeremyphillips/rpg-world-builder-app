@@ -57,7 +57,7 @@ export function createOutcomeApplicationAppendValue(
   const effect = findResolutionEffectById(effects, effectId)
   const amount = effect ? defaultApplicationAmountForOutcome(effect, outcomeResult) : 'full'
 
-  return { effectId, amount }
+  return { kind: 'effect-reference' as const, effectId, amount }
 }
 
 export function amountOptionsForEffect(
@@ -74,8 +74,8 @@ export function amountOptionsForEffect(
 
 export function outcomeApplicationsFieldPath(
   outcomeIndex: number,
-): `${typeof RESOLUTION_FIELD_NAME}.outcomes.${number}.applications` {
-  return `${RESOLUTION_FIELD_NAME}.outcomes.${outcomeIndex}.applications`
+): `${typeof RESOLUTION_FIELD_NAME}.outcomes.${number}.effects` {
+  return `${RESOLUTION_FIELD_NAME}.outcomes.${outcomeIndex}.effects`
 }
 
 export function outcomeApplicationAmountOptions({

@@ -41,18 +41,25 @@ function methodOptionToMethod(
 function copyOutcome<T extends OutcomeLike>(outcome: T): ResolutionOutcomeRef {
   return {
     result: outcome.result,
-    applications: outcome.applications.map((application) => {
-      const entry = application as { effectId: string; amount: string }
-      return { effectId: entry.effectId, amount: entry.amount }
-    }),
-    ...(outcome.note?.trim() ? { note: outcome.note.trim() } : {}),
-    ...(outcome.effects?.length ? { effects: [...outcome.effects] } : {}),
+    ...(outcome.effects?.length
+      ? { effects: structuredClone(outcome.effects) as ResolutionOutcomeRef['effects'] }
+      : { effects: [] }),
     ...(outcome.repeatSave ? { repeatSave: structuredClone(outcome.repeatSave) } : {}),
   }
 }
 
 function emptyOutcome(result: ResolutionOutcomeResult): ResolutionOutcomeRef {
-  return { result, applications: [] }
+  return { result, effects: [] }
+}
+
+function withoutEffectReference<T extends { kind: string; effectId?: string }>(
+  effects: readonly T[] | undefined,
+  effectId: string,
+): T[] | undefined {
+  if (!effects) return effects
+  return effects.filter(
+    (effect) => effect.kind !== 'effect-reference' || effect.effectId !== effectId,
+  )
 }
 
 function mapOutcomeBetweenMethods(
@@ -120,14 +127,25 @@ export function planOutcomeMethodChange(
   return { discardedBranches, mappedOutcomes }
 }
 
-export function outcomeApplicationsReferenceEffect(
+function listReferencesEffect(
+  effects: readonly { kind: string; effectId?: string }[] | undefined,
+  effectId: string,
+): boolean {
+  return Boolean(
+    effects?.some((effect) => effect.kind === 'effect-reference' && effect.effectId === effectId),
+  )
+}
+
+export function outcomeReferencesEffect(
   outcomes: readonly ResolutionOutcomeRef[] | undefined,
   effectId: string,
 ): boolean {
   if (!outcomes?.length) return false
 
-  return outcomes.some((outcome) =>
-    outcome.applications.some((application) => application.effectId === effectId),
+  return outcomes.some(
+    (outcome) =>
+      listReferencesEffect(outcome.effects, effectId) ||
+      listReferencesEffect(outcome.repeatSave?.secondFailure.effects, effectId),
   )
 }
 
@@ -137,6 +155,17 @@ export function stripEffectFromOutcomes(
 ): ResolutionOutcomeRef[] {
   return outcomes.map((outcome) => ({
     ...outcome,
-    applications: outcome.applications.filter((application) => application.effectId !== effectId),
+    effects: withoutEffectReference(outcome.effects, effectId),
+    ...(outcome.repeatSave
+      ? {
+          repeatSave: {
+            ...outcome.repeatSave,
+            secondFailure: {
+              ...outcome.repeatSave.secondFailure,
+              effects: withoutEffectReference(outcome.repeatSave.secondFailure.effects, effectId),
+            },
+          },
+        }
+      : {}),
   }))
 }

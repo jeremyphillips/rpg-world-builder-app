@@ -10,7 +10,7 @@ export {
   toMethodOption,
 } from './selection-availability'
 export {
-  outcomeApplicationsReferenceEffect,
+  outcomeReferencesEffect,
   planOutcomeMethodChange,
   stripEffectFromOutcomes,
   type OutcomeMethodChangePlan,

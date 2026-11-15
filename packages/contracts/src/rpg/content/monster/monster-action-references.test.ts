@@ -23,7 +23,12 @@ describe('monster action references', () => {
       areaOfEffect: CONE_AREA,
       method: { kind: 'saving-throw', ability: 'dex' },
       effects: [FIRE_DAMAGE],
-      outcomes: [{ result: 'failed-save', applications: [{ effectId: 'damage', amount: 'full' }] }],
+      outcomes: [
+        {
+          result: 'failed-save',
+          effects: [{ kind: 'effect-reference', effectId: 'damage', amount: 'full' }],
+        },
+      ],
     })
 
     expect(
@@ -131,7 +136,12 @@ describe('monster action references', () => {
       areaOfEffect: CONE_AREA,
       method: { kind: 'saving-throw', ability: 'dex' },
       effects: [FIRE_DAMAGE],
-      outcomes: [{ result: 'failed-save', applications: [{ effectId: 'damage', amount: 'full' }] }],
+      outcomes: [
+        {
+          result: 'failed-save',
+          effects: [{ kind: 'effect-reference', effectId: 'damage', amount: 'full' }],
+        },
+      ],
     })
     const special = { id: 'glare', kind: 'special', name: 'Dreadful Glare', description: 'A gaze.' }
     const withPool = (actions: unknown[], legendaryActions: unknown[], bonusActions?: unknown[]) =>

@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
+import { resolutionEffectIdSchema } from './resolution-effect-id'
 import { planOutcomeMethodChange } from './outcome-change-plan'
 import type { ResolutionSelectionState } from './selection-types'
+
+const damageId = resolutionEffectIdSchema.parse('damage')
 
 function attackState(overrides: Partial<ResolutionSelectionState> = {}): ResolutionSelectionState {
   return {
@@ -16,12 +19,11 @@ function attackState(overrides: Partial<ResolutionSelectionState> = {}): Resolut
     outcomes: [
       {
         result: 'hit',
-        applications: [{ effectId: 'damage', amount: 'full' }],
+        effects: [{ kind: 'effect-reference', effectId: damageId, amount: 'full' }],
       },
       {
         result: 'miss',
-        applications: [],
-        note: 'Creates a cloud at the point of impact.',
+        effects: [{ kind: 'note', description: 'Creates a cloud at the point of impact.' }],
       },
     ],
     ...overrides,
@@ -41,8 +43,10 @@ function saveState(overrides: Partial<ResolutionSelectionState> = {}): Resolutio
     outcomes: [
       {
         result: 'failed-save',
-        applications: [{ effectId: 'damage', amount: 'full' }],
-        effects: [{ kind: 'condition', conditionId: 'restrained' }],
+        effects: [
+          { kind: 'effect-reference', effectId: damageId, amount: 'full' },
+          { kind: 'condition', conditionId: 'restrained' },
+        ],
         repeatSave: {
           timing: { participant: 'target', boundary: 'end', which: 'next' },
           successOnRepeatEndsEffect: true,
@@ -57,7 +61,10 @@ function saveState(overrides: Partial<ResolutionSelectionState> = {}): Resolutio
           },
         },
       },
-      { result: 'successful-save', applications: [{ effectId: 'damage', amount: 'half' }] },
+      {
+        result: 'successful-save',
+        effects: [{ kind: 'effect-reference', effectId: damageId, amount: 'half' }],
+      },
     ],
     ...overrides,
   }
@@ -70,11 +77,11 @@ describe('planOutcomeMethodChange', () => {
     expect(plan.discardedBranches).toEqual(['miss'])
     expect(plan.mappedOutcomes.find((outcome) => outcome.result === 'failed-save')).toMatchObject({
       result: 'failed-save',
-      applications: [{ effectId: 'damage', amount: 'full' }],
+      effects: [{ kind: 'effect-reference', effectId: damageId, amount: 'full' }],
     })
     expect(plan.mappedOutcomes.find((outcome) => outcome.result === 'successful-save')).toEqual({
       result: 'successful-save',
-      applications: [],
+      effects: [],
     })
   })
 
@@ -93,7 +100,10 @@ describe('planOutcomeMethodChange', () => {
 
     expect(plan.mappedOutcomes.find((outcome) => outcome.result === 'hit')).toMatchObject({
       result: 'hit',
-      effects: [{ kind: 'condition', conditionId: 'restrained' }],
+      effects: [
+        { kind: 'effect-reference', effectId: damageId, amount: 'full' },
+        { kind: 'condition', conditionId: 'restrained' },
+      ],
       repeatSave: {
         timing: { participant: 'target', boundary: 'end', which: 'next' },
         secondFailure: {

@@ -2,101 +2,75 @@ import { RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import {
-  monsterSaveOutcomeAmount,
+  countMonsterSaveEffectReferences,
+  createMonsterSaveDamageDefinition,
+  eligibleExistingSaveEffects,
+  isUnusedSaveEffect,
+  nextMonsterSaveDamageEffectId,
   normalizeMonsterSaveOutcomes,
   precedingConditionIdsFromEffects,
   shouldShowSaveRepeatSaveAuthoring,
-  withMonsterSaveOutcomeAmount,
+  stripMonsterSaveEffectReferences,
 } from './monster-action-save-outcomes'
+
+const fire = createMonsterSaveDamageDefinition(RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID)
 
 const constrictOutcomes = [
   {
     result: 'failed-save' as const,
-    applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' as const }],
-    effects: [{ kind: 'note' as const, description: 'The target is Grappled.' }],
+    effects: [
+      {
+        kind: 'effect-reference' as const,
+        effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+        amount: 'full' as const,
+      },
+      { kind: 'note' as const, description: 'The target is Grappled.' },
+    ],
   },
 ]
 
 describe('monster save outcomes', () => {
-  it('adds a successful-save slot with the damage effect when an amount is chosen', () => {
-    const next = withMonsterSaveOutcomeAmount(
-      constrictOutcomes,
-      'half',
-      RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
-    )
+  it('creates a new damage definition and keeps it when one reference is removed', () => {
+    const effectId = nextMonsterSaveDamageEffectId([])
+    const secondId = nextMonsterSaveDamageEffectId([fire])
+    expect(effectId).toBe(RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID)
+    expect(secondId).not.toBe(effectId)
+    expect(createMonsterSaveDamageDefinition(effectId).kind).toBe('damage')
 
-    expect(next.map((outcome) => outcome.result)).toEqual(['failed-save', 'successful-save'])
-    expect(next[1]).toEqual({
-      result: 'successful-save',
-      applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'half' }],
-    })
-    expect(monsterSaveOutcomeAmount(next)).toBe('half')
-  })
-
-  it('migrates legacy failed-save notes into ordered note effects', () => {
-    const legacy = [
+    const outcomes = [
       {
         result: 'failed-save' as const,
-        applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' as const }],
-        note: 'The target is Grappled (escape DC equals the save DC).',
+        effects: [{ kind: 'effect-reference' as const, effectId, amount: 'full' as const }],
+      },
+      {
+        result: 'successful-save' as const,
+        effects: [{ kind: 'effect-reference' as const, effectId, amount: 'half' as const }],
       },
     ]
-    expect(normalizeMonsterSaveOutcomes(legacy)).toEqual([
-      {
-        result: 'failed-save',
-        applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
-        effects: [
-          {
-            kind: 'note',
-            description: 'The target is Grappled (escape DC equals the save DC).',
-          },
-        ],
-      },
+    const removed = stripMonsterSaveEffectReferences([outcomes[0]!], effectId)
+    expect(removed[0]?.effects).toEqual([])
+    expect(outcomes[1]?.effects).toEqual([{ kind: 'effect-reference', effectId, amount: 'half' }])
+    expect(countMonsterSaveEffectReferences(outcomes, effectId)).toBe(2)
+  })
+
+  it('offers unused definitions, including orphans, and hides ones already on the list', () => {
+    const cold = createMonsterSaveDamageDefinition('cold')
+    const list = constrictOutcomes[0]?.effects
+    expect(eligibleExistingSaveEffects([fire, cold], list).map((effect) => effect.id)).toEqual([
+      'cold',
     ])
+    expect(isUnusedSaveEffect('cold', constrictOutcomes)).toBe(true)
+    expect(isUnusedSaveEffect(RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, constrictOutcomes)).toBe(false)
+    expect(eligibleExistingSaveEffects([fire], list)).toEqual([])
   })
 
-  it('stores a chosen successful-save amount and drops an empty one', () => {
-    const chosen = withMonsterSaveOutcomeAmount(
-      constrictOutcomes,
-      'full',
-      RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
-    )
-    expect(normalizeMonsterSaveOutcomes(chosen)).toHaveLength(2)
-    expect(normalizeMonsterSaveOutcomes(constrictOutcomes)).toEqual(constrictOutcomes)
-  })
-
-  it('surfaces repeat save authoring for condition-first failures', () => {
-    expect(
-      shouldShowSaveRepeatSaveAuthoring(
-        [{ kind: 'condition', conditionId: 'restrained' }],
-        undefined,
-      ),
-    ).toBe(true)
-    expect(
-      shouldShowSaveRepeatSaveAuthoring([], {
-        timing: { participant: 'target', boundary: 'end', which: 'next' },
-        secondFailure: { effects: [{ kind: 'condition', conditionId: 'petrified' }] },
-      }),
-    ).toBe(true)
-    expect(shouldShowSaveRepeatSaveAuthoring([], undefined)).toBe(false)
-  })
-
-  it('collects condition ids for replace-condition options', () => {
-    expect(
-      precedingConditionIdsFromEffects([
-        { kind: 'damage', roll: { dice: { count: 1, faces: 6 } } },
-        { kind: 'condition', conditionId: 'restrained' },
-        { kind: 'condition', conditionId: 'restrained' },
-      ]),
-    ).toEqual(['restrained'])
-  })
-
-  it('preserves outcome effects and strips incomplete repeat save shells', () => {
-    const withEffects = [
+  it('keeps a dangling reference, an empty repeat shell, and an unreferenced id', () => {
+    const dangling = [
       {
         result: 'failed-save' as const,
-        applications: [],
-        effects: [{ kind: 'condition' as const, conditionId: 'restrained' as const }],
+        effects: [
+          { kind: 'effect-reference' as const, effectId: 'missing', amount: 'full' as const },
+        ],
         repeatSave: {
           timing: {
             participant: 'target' as const,
@@ -106,24 +80,41 @@ describe('monster save outcomes', () => {
           secondFailure: {},
         },
       },
-      {
-        result: 'failed-or-successful-save' as const,
-        applications: [],
-        note: 'Environmental rider.',
-      },
     ]
+    expect(normalizeMonsterSaveOutcomes(dangling)).toEqual(dangling)
+    expect(normalizeMonsterSaveOutcomes(constrictOutcomes)).toEqual(constrictOutcomes)
+  })
 
-    expect(normalizeMonsterSaveOutcomes(withEffects)).toEqual([
-      {
-        result: 'failed-save',
-        applications: [],
-        effects: [{ kind: 'condition', conditionId: 'restrained' }],
-      },
-      {
-        result: 'failed-or-successful-save',
-        applications: [],
-        note: 'Environmental rider.',
-      },
-    ])
+  it('surfaces repeat save authoring for a condition or an existing shell', () => {
+    expect(
+      shouldShowSaveRepeatSaveAuthoring(
+        [{ kind: 'condition', conditionId: 'restrained' }],
+        undefined,
+      ),
+    ).toBe(true)
+    expect(
+      shouldShowSaveRepeatSaveAuthoring(
+        [{ kind: 'note', description: 'Still asleep.' }],
+        undefined,
+      ),
+    ).toBe(false)
+    expect(
+      shouldShowSaveRepeatSaveAuthoring([], {
+        timing: { participant: 'target', boundary: 'end', which: 'next' },
+        secondFailure: {},
+      }),
+    ).toBe(true)
+    expect(shouldShowSaveRepeatSaveAuthoring([], {})).toBe(false)
+    expect(shouldShowSaveRepeatSaveAuthoring([], undefined)).toBe(false)
+  })
+
+  it('collects condition ids for replace-condition options', () => {
+    expect(
+      precedingConditionIdsFromEffects([
+        { kind: 'effect-reference', effectId: 'damage', amount: 'full' },
+        { kind: 'condition', conditionId: 'restrained' },
+        { kind: 'condition', conditionId: 'restrained' },
+      ]),
+    ).toEqual(['restrained'])
   })
 })

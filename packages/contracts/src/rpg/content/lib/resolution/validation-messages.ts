@@ -21,13 +21,9 @@ export const spellResolutionValidationMessages = {
     'validation.spellResolution.outcomeResultNotAllowedForMethod',
     ({ result }) => `Outcome result "${result}" is not allowed for this resolution method.`,
   ),
-  outcomeRequiresApplicationOrNote: defineMessage(
-    'validation.spellResolution.outcomeRequiresApplicationOrNote',
-    () => 'Add an effect application or describe the outcome.',
-  ),
   resolutionRequiresMeaningfulOutcome: defineMessage(
     'validation.spellResolution.resolutionRequiresMeaningfulOutcome',
-    () => 'Add at least one outcome with an effect application or additional behavior.',
+    () => 'Add at least one outcome with an effect.',
   ),
   duplicateOutcomeApplicationEffectId: defineMessage(
     'validation.spellResolution.duplicateOutcomeApplicationEffectId',
@@ -65,15 +61,6 @@ export const spellResolutionValidationMessages = {
   occupantRequirementsRequireArea: defineMessage(
     'validation.spellResolution.occupantRequirementsRequireArea',
     () => 'Area occupant requirements are only allowed when an area of effect is present.',
-  ),
-  outcomeDamageForbiddenWithEnvelopeApplication: defineMessage(
-    'validation.spellResolution.outcomeDamageForbiddenWithEnvelopeApplication',
-    () =>
-      'Remove outcome damage rows when this branch already applies envelope damage via applications.',
-  ),
-  failedOrSuccessfulSaveApplicationsForbidden: defineMessage(
-    'validation.spellResolution.failedOrSuccessfulSaveApplicationsForbidden',
-    () => 'Failure or Success outcomes cannot reference envelope effect applications.',
   ),
   repeatSaveOnlyOnFailedSave: defineMessage(
     'validation.spellResolution.repeatSaveOnlyOnFailedSave',
