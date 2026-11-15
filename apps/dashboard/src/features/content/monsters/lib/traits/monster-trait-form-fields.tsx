@@ -2,24 +2,24 @@ import { formatCreatureTrait, formatMonsterStatBlockSubject } from '@rpg/contrac
 import {
   SAVING_THROW_SPELLCASTING_HINT,
   savingThrowFieldGroup,
-} from '../../lib/forms/mechanics/saving-throw-field-group'
-import { MonsterActionCastingAbilityField } from './actions/monster-action-casting-fields'
+} from '../../../lib/forms/mechanics/saving-throw-field-group'
+import { MonsterActionCastingAbilityField } from '../actions/spell/monster-action-casting-fields'
 import { RulesPreview } from '@rpg/ui'
 import type { FieldVisibility, FormItem } from '@rpg/ui/form'
 
-import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
-import { defineMasterDetailItemNoun } from '../../lib/master-detail/master-detail-item-noun'
-import { WaterBreathingToggle } from '../components/form/water-breathing-toggle'
-import { formatMonsterTemplateSentence } from './format-monster-template-sentence'
-import type { MonsterFormAdvisory } from './monster-form-advisories'
-import { monsterFormAdvisorySlot } from './monster-form-advisory-presentation'
+import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
+import { defineMasterDetailItemNoun } from '../../../lib/master-detail/master-detail-item-noun'
+import { WaterBreathingToggle } from '../../components/form/water-breathing-toggle'
+import { formatMonsterTemplateSentence } from '../format-monster-template-sentence'
+import type { MonsterFormAdvisory } from '../monster-form-advisories'
+import { monsterFormAdvisorySlot } from '../monster-form-advisory-presentation'
 import {
   MONSTER_CUSTOM_DESCRIPTION_ADD_LABEL,
   MONSTER_CUSTOM_DESCRIPTION_HINT,
   MONSTER_CUSTOM_DESCRIPTION_LABEL,
   MONSTER_RULES_TEXT_LABEL,
   MONSTER_TRAIT_PREVIEW_LABEL,
-} from './monster-form-labels'
+} from '../monster-form-labels'
 import {
   monsterTraitPresetFields,
   waterBreathingDurationEnabled,

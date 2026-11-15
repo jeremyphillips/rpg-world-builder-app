@@ -31,7 +31,7 @@ import { presentActionReference } from '../../lib/actions/references/monster-act
 import {
   isLegendaryReferenceTarget,
   legendaryActionCategory,
-} from '../../lib/actions/legendary-action-category'
+} from '../../lib/actions/legendary/legendary-action-category'
 import {
   LEGENDARY_ACTION_ACQUISITION_GROUPS,
   legendaryActionAcquisitionItems,

@@ -23,7 +23,7 @@ import {
 import { resolveMonsterCreateDefaultValues, type MonsterFormValues } from '../monster-form-values'
 import { monsterActionDetailFields } from './detail-fields/monster-action-detail-fields'
 import type { MonsterActionDraftRow } from './monster-action-presets'
-import { monsterSaveDcAbilityHintWhen } from './monster-action-save-field-hints'
+import { monsterSaveDcAbilityHintWhen } from './save/monster-action-save-field-hints'
 
 beforeAll(() => {
   if (!HTMLElement.prototype.hasPointerCapture) {

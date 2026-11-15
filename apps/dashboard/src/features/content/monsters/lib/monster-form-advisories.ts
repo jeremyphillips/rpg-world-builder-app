@@ -10,7 +10,7 @@ import {
 
 import { movementRowsToRecordForPreview } from '../../lib/forms/fields/content-movement-form-fields'
 import type { MovementRowDraftFormValues } from '../../lib/forms/fields/content-movement-form-fields'
-import { equipmentEntryBaseName } from './equipment/monster-equipment-labels'
+import { equipmentEntryBaseName } from './equipment/monster-equipment-entry-name'
 import { coerceCreatureWeaponProficienciesForForm } from './creature-details/monster-weapon-proficiencies-form.lib'
 import {
   MONSTER_ACTION_SECTIONS,

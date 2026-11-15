@@ -7,18 +7,21 @@ import { beforeAll, describe, expect, it } from 'vitest'
 
 import { buildSeedDamageTypeVocabulary } from '@/features/vocabulary'
 
-import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
+import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import {
   MONSTER_ATTACK_BONUS_SOURCE_SPELL_HINT,
   MONSTER_ATTACK_BONUS_SOURCE_SPELL_LABEL,
-} from '../monster-form-labels'
+} from '../../monster-form-labels'
 import {
   SPELLCASTING_ABILITY_PRIMARY_HINT,
   SPELLCASTING_ABILITY_SHARED_HINT,
-} from '../../../lib/forms/mechanics/spellcasting-ability-field-copy'
-import { resolveMonsterCreateDefaultValues, type MonsterFormValues } from '../monster-form-values'
-import { monsterActionDetailFields } from './detail-fields/monster-action-detail-fields'
-import type { MonsterActionDraftRow } from './monster-action-presets'
+} from '../../../../lib/forms/mechanics/spellcasting-ability-field-copy'
+import {
+  resolveMonsterCreateDefaultValues,
+  type MonsterFormValues,
+} from '../../monster-form-values'
+import { monsterActionDetailFields } from '../detail-fields/monster-action-detail-fields'
+import type { MonsterActionDraftRow } from '../monster-action-presets'
 
 beforeAll(() => {
   if (!HTMLElement.prototype.hasPointerCapture) {

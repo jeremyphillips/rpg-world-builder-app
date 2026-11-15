@@ -12,7 +12,7 @@ import {
   formatCastingSourceChangeNotice,
   MONSTER_LEGENDARY_SPELLCASTING_FIELD_HINT,
   MONSTER_LEGENDARY_SPELLCASTING_FIELD_LABEL,
-} from '../monster-form-labels'
+} from '../../monster-form-labels'
 import {
   legendarySpellcastingActionOptions,
   monsterCastingDependentLabels,
@@ -25,8 +25,8 @@ import {
   SPELLCASTING_ABILITY_FIELD_LABEL,
   SPELLCASTING_ABILITY_PRIMARY_HINT,
   SPELLCASTING_ABILITY_SHARED_HINT,
-} from '../../../lib/forms/mechanics/spellcasting-ability-field-copy'
-import type { MonsterFormValues } from '../monster-form-values'
+} from '../../../../lib/forms/mechanics/spellcasting-ability-field-copy'
+import type { MonsterFormValues } from '../../monster-form-values'
 
 function castingAbilityValue(value: unknown): string {
   if (!value || typeof value !== 'object') return ''

@@ -15,11 +15,11 @@ import {
   vocabularyComboboxFieldForTerm,
 } from '@/features/vocabulary'
 
-import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
+import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import {
   distanceAmountOptions,
   distanceJoinedPairField,
-} from '../../lib/forms/fields/content-distance-form-fields'
+} from '../../../lib/forms/fields/content-distance-form-fields'
 
 const LEGENDARY_RESISTANCE_USES = standardFeet(1, 6, 1)
 const HOLD_BREATH_MINUTES = [1, 5, 10, 15, 30] as const

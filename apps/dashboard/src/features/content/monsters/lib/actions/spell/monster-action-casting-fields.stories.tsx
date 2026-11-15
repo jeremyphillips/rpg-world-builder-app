@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { FormProvider, useForm } from 'react-hook-form'
 
-import { resolveMonsterCreateDefaultValues, type MonsterFormValues } from '../monster-form-values'
+import {
+  resolveMonsterCreateDefaultValues,
+  type MonsterFormValues,
+} from '../../monster-form-values'
 import { MonsterLegendarySpellcastingActionField } from './monster-action-casting-fields'
 
 const meta = {

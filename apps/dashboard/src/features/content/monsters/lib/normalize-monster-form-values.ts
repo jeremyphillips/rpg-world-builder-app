@@ -14,9 +14,9 @@ import {
 
 import { normalizeLimitedUse } from '../../lib/forms/limited-use/normalize-limited-use'
 import { monsterActionActiveKeys, monsterActionTriggerText } from './actions/monster-action-kind'
-import { normalizeMonsterSaveOutcomes } from './actions/monster-action-save-outcomes'
-import { withDefaultSaveResolutionTarget } from './actions/monster-save-resolution-target.lib'
-import { weaponActionDamageToDraft } from './actions/monster-weapon-damage-form'
+import { normalizeMonsterSaveOutcomes } from './actions/save/monster-action-save-outcomes'
+import { withDefaultSaveResolutionTarget } from './actions/save/monster-save-resolution-target.lib'
+import { weaponActionDamageToDraft } from './actions/weapon/monster-weapon-damage-form'
 
 import { applyEffectEndAuthoringToRow } from '../../lib/forms/mechanics/normalize-effect-end-authoring'
 import { movementRowsToRecordForPreview } from '../../lib/forms/fields/content-movement-form-fields'

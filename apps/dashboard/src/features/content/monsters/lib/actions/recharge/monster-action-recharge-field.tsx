@@ -6,7 +6,7 @@ import {
   MONSTER_LIMIT_RECHARGES_ON_LABEL,
   MONSTER_RECHARGE_ADD_LABEL,
   monsterLimitRechargesOnHint,
-} from '../monster-form-labels'
+} from '../../monster-form-labels'
 import {
   completeRecharge,
   MONSTER_RECHARGE_SEED,

@@ -24,7 +24,7 @@ import {
 import type { MonsterFormValues } from '../../monster-form-values'
 import { createSpellActionDraft } from './monster-action-acquisition'
 import { createMonsterRowId } from '../../monster-row-id'
-import { isLegendaryReferenceTarget } from '../legendary-action-category'
+import { isLegendaryReferenceTarget } from '../legendary/legendary-action-category'
 import type { MonsterActionDraftRow } from '../monster-action-presets'
 
 export const LEGENDARY_ACTION_ACQUISITION_GROUPS = [

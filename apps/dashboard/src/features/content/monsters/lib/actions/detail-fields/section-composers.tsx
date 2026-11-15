@@ -57,9 +57,9 @@ import type { MonsterActionSection } from '../references/monster-action-equipmen
 import type { MonsterActionDraftRow } from '../monster-action-presets'
 import type { MonsterFormAdvisory } from '../../monster-form-advisories'
 import { monsterFormAdvisorySlot } from '../../monster-form-advisory-presentation'
-import { legendaryActionCategory } from '../legendary-action-category'
+import { legendaryActionCategory } from '../legendary/legendary-action-category'
 import { leapDistanceFields } from '../leap-distance-options'
-import { legendaryActionDetailFields } from '../monster-legendary-action-fields'
+import { legendaryActionDetailFields } from '../legendary/monster-legendary-action-fields'
 import type { MonsterFormValues } from '../../monster-form-values'
 import {
   monsterActionMechanicFields,

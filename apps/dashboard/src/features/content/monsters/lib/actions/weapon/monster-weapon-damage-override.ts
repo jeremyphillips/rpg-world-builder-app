@@ -8,9 +8,9 @@ import {
 } from '@rpg/contracts'
 import type { FieldConfig } from '@rpg/ui/form'
 
-import { rollToFormShape } from '../../../lib/forms/mechanics/roll-form-values'
-import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
-import { monsterEquipmentCatalog } from '../monster-form-derivation'
+import { rollToFormShape } from '../../../../lib/forms/mechanics/roll-form-values'
+import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
+import { monsterEquipmentCatalog } from '../../monster-form-derivation'
 import {
   MONSTER_BASE_DAMAGE_OVERRIDE_LABEL,
   MONSTER_DAMAGE_OVERRIDE_ADD_LABEL,
@@ -19,7 +19,7 @@ import {
   MONSTER_WEAPON_DAMAGE_REPLACING_LABEL,
   MONSTER_WEAPON_DAMAGE_UNAVAILABLE_LABEL,
   MONSTER_WEAPON_DAMAGE_USING_LABEL,
-} from '../monster-form-labels'
+} from '../../monster-form-labels'
 import { catalogBaseRoll } from './monster-weapon-damage-form'
 
 const OVERRIDE_DEPENDS_ON = ['equipmentEntryId', '../../equipment'] as const

@@ -7,8 +7,11 @@ import type { MonsterFormValues } from './monster-form-values'
 import { monsterActionDetailFields } from './actions/detail-fields/monster-action-detail-fields'
 import type { MonsterActionSection } from './actions/references/monster-action-equipment-references'
 import type { MonsterActionDraftRow } from './actions/monster-action-presets'
-import { sharedCastingOptions } from './actions/monster-action-casting-summary'
-import { monsterTraitDetailFields, monsterTraitItemFields } from './monster-trait-form-fields'
+import { sharedCastingOptions } from './actions/spell/monster-action-casting-summary'
+import {
+  monsterTraitDetailFields,
+  monsterTraitItemFields,
+} from './traits/monster-trait-form-fields'
 
 function resolveMonsterActionRowId(action: MonsterActionDraftRow, index: number): string {
   if (typeof action.id === 'string' && action.id.length > 0) return action.id

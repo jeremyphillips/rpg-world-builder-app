@@ -21,7 +21,7 @@ import {
   EQUIPMENT_ROW_UNMODIFIED_SUPPORTING_SEGMENT,
 } from '../../../equipment/lib/inventory/resolve-creature-equipment-row-projection.lib'
 import { resolveLoadoutEquipmentIsProficient } from '../../../equipment/lib/loadout/equipment-loadout-picker.lib'
-import { equipmentEntryBaseName } from '../../lib/equipment/monster-equipment-labels'
+import { equipmentEntryBaseName } from '../../lib/equipment/monster-equipment-entry-name'
 import { resolveMonsterEquipmentRowProjection } from '../../lib/equipment/resolve-monster-equipment-row-projection.lib'
 import { resolveMonsterEquipmentRowStatus } from '../../lib/equipment/resolve-monster-equipment-row-status.lib'
 import { type monsterEquipmentCatalog } from '../../lib/monster-form-derivation'

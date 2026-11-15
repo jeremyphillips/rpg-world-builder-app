@@ -9,9 +9,9 @@ import type { FieldVisibility, FormItem } from '@rpg/ui/form'
 import {
   MonsterActionCastingAbilityField,
   MonsterLegendarySpellcastingActionField,
-} from './monster-action-casting-fields'
-import { monsterSpellCastAtLevelField } from './monster-spell-cast-at-level-form-fields'
-import { monsterSpellComponentRequirementsField } from './monster-spell-component-form-fields'
+} from '../spell/monster-action-casting-fields'
+import { monsterSpellCastAtLevelField } from '../spell/monster-spell-cast-at-level-form-fields'
+import { monsterSpellComponentRequirementsField } from '../spell/monster-spell-component-form-fields'
 import {
   MONSTER_CAST_SPELL_HINT,
   MONSTER_MOVEMENT_ADD_LABEL,
@@ -22,7 +22,7 @@ import {
   MONSTER_REFERENCE_ACTION_HINT,
   MONSTER_REFERENCE_ACTION_LABEL,
   MONSTER_SPELLCASTING_SPELL_HINT,
-} from '../monster-form-labels'
+} from '../../monster-form-labels'
 import type { LegendaryActionCategory } from './legendary-action-category'
 
 export function monsterSpellIdField(

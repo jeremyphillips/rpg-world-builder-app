@@ -1,22 +1,22 @@
 import { describe, expect, it } from 'vitest'
 import { formatSpellCastAtLevelName, getMonsterActionKindLabel } from '@rpg/contracts'
 
-import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
+import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import {
   LEGENDARY_ACTION_CATEGORY_LABELS,
   LEGENDARY_CAST_SPELL_DISABLED_NOTE,
   LEGENDARY_REFERENCE_DISABLED_NOTE,
   LEGENDARY_SPELLCASTING_DISABLED_NOTE,
-} from '../monster-form-labels'
-import type { MonsterFormValues } from '../monster-form-values'
-import { monsterActionDetailFields } from './detail-fields/monster-action-detail-fields'
+} from '../../monster-form-labels'
+import type { MonsterFormValues } from '../../monster-form-values'
+import { monsterActionDetailFields } from '../detail-fields/monster-action-detail-fields'
 import {
   createLegendaryActionDraft,
   legendaryActionAcquisitionItems,
   legendarySourceSpellOptions,
-} from './acquisition/monster-legendary-action-acquisition'
-import { parseMonsterActionAcquisitionId } from './acquisition/monster-action-acquisition'
-import { resolveMonsterCreateDefaultValues } from '../monster-form-values'
+} from '../acquisition/monster-legendary-action-acquisition'
+import { parseMonsterActionAcquisitionId } from '../acquisition/monster-action-acquisition'
+import { resolveMonsterCreateDefaultValues } from '../../monster-form-values'
 
 const ctx = {
   spellCatalogStatus: 'pending',

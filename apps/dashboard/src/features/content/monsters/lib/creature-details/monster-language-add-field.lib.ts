@@ -1,10 +1,10 @@
 import { useCallback, useMemo, useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
-import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
+import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { resolveMonsterLanguageAddFieldVocabulary } from './monster-language-add-field-options.lib'
 import { buildMonsterLanguageFieldRecommendation } from './monster-language-field-recommendation.lib'
-import type { MonsterFormValues } from './monster-form-values'
+import type { MonsterFormValues } from '../monster-form-values'
 
 export function useMonsterLanguageAddField(ctx: ContentFormCtx) {
   const form = useFormContext<MonsterFormValues>()

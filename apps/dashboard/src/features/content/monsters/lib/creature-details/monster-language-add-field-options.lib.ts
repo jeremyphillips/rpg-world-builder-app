@@ -1,6 +1,6 @@
 import { getCreatureTypeLabel } from '@/features/vocabulary'
 
-import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
+import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { prepareMonsterLanguageComboboxOptions } from './monster-language-combobox-options.lib'
 
 export function resolveMonsterLanguageAddFieldVocabulary(

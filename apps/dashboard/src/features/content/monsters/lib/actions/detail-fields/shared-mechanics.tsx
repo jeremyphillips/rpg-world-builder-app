@@ -44,16 +44,16 @@ import {
 import type { MonsterActionSection } from '../references/monster-action-equipment-references'
 import type { MonsterActionDraftRow } from '../monster-action-presets'
 import { MonsterActionAttackAbilityField } from '../monster-attack-ability-field'
-import { MonsterActionCastingAbilityField } from '../monster-action-casting-fields'
-import { MonsterActionRechargeField } from '../monster-action-recharge-field'
+import { MonsterActionCastingAbilityField } from '../spell/monster-action-casting-fields'
+import { MonsterActionRechargeField } from '../recharge/monster-action-recharge-field'
 import {
   monsterActionLimitedUseFields,
   monsterActionOnHitFields,
 } from '../monster-action-on-hit-fields'
-import { monsterSpellComponentRequirementsField } from '../monster-spell-component-form-fields'
-import { monsterWeaponDamageOverrideField } from '../monster-weapon-damage-override'
+import { monsterSpellComponentRequirementsField } from '../spell/monster-spell-component-form-fields'
+import { monsterWeaponDamageOverrideField } from '../weapon/monster-weapon-damage-override'
 import type { MonsterFormValues } from '../../monster-form-values'
-import { monsterSpellCastAtLevelField } from '../monster-spell-cast-at-level-form-fields'
+import { monsterSpellCastAtLevelField } from '../spell/monster-spell-cast-at-level-form-fields'
 import { MONSTER_SPELL_PICKER_INTERCEPT } from '../../../components/form/monster-spell-picker-context'
 import {
   MonsterSpellChangeAction,

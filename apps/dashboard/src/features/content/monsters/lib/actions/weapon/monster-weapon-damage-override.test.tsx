@@ -5,9 +5,9 @@ import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm, useFormContext, useWatch } from 'react-hook-form'
 import { describe, expect, it } from 'vitest'
 
-import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
-import type { MonsterActionDraftRow } from './monster-action-presets'
-import { buildMonsterInput, resolveMonsterCreateDefaultValues } from '../monster-form-values'
+import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
+import type { MonsterActionDraftRow } from '../monster-action-presets'
+import { buildMonsterInput, resolveMonsterCreateDefaultValues } from '../../monster-form-values'
 import { mapWeaponActionDamageToForm } from './monster-weapon-damage-form'
 import {
   monsterWeaponDamageOverrideAddDisabled,

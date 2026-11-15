@@ -7,7 +7,7 @@ import {
   MONSTER_SAVE_FAILURE_OR_SUCCESS_ADD_LABEL,
   MONSTER_SAVE_FAILURE_OR_SUCCESS_NOTE_LABEL,
   MONSTER_SAVE_REPEAT_ADD_LABEL,
-} from '../monster-form-labels'
+} from '../../monster-form-labels'
 import {
   defaultRepeatSaveShell,
   ensureMonsterSaveOutcomeSlots,

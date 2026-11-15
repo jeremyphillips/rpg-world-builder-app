@@ -1,6 +1,6 @@
 import type { FormValueSync } from '@rpg/ui/form'
 
-import { reconcileResolutionTargetRequirementRows } from '../../lib/forms/fields/resolution-target-requirement-form-sync.lib'
+import { reconcileResolutionTargetRequirementRows } from '../../../lib/forms/fields/resolution-target-requirement-form-sync.lib'
 
 function isPlainRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value)

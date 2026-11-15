@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import type { MonsterActionDraftRow } from './monster-action-presets'
+import type { MonsterActionDraftRow } from '../monster-action-presets'
 import {
   formatSpellcastingActionOptionLabel,
   legendarySpellcastingActionOptions,

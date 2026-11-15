@@ -4,7 +4,7 @@ import type { SelectFieldConfig } from '@rpg/ui/form'
 import {
   MONSTER_SPELL_CAST_HIGHER_LEVEL_LABEL,
   MONSTER_SPELL_CAST_LEVEL_PLACEHOLDER,
-} from '../monster-form-labels'
+} from '../../monster-form-labels'
 import { higherCastLevelOptions, spellAllowsHigherCastLevel } from './monster-spell-frequency'
 
 function spellIdFromValues(values: Record<string, unknown>, field: string): string {

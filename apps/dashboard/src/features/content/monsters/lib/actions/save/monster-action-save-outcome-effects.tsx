@@ -9,9 +9,9 @@ import {
 } from '@rpg/ui/form'
 import { useFormContext, useWatch } from 'react-hook-form'
 
-import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
-import { damageFieldGroup } from '../../../lib/forms/mechanics/damage-field-group'
-import { orderedEffectItemFields } from '../../../lib/forms/mechanics/ordered-effect-form-fields'
+import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
+import { damageFieldGroup } from '../../../../lib/forms/mechanics/damage-field-group'
+import { orderedEffectItemFields } from '../../../../lib/forms/mechanics/ordered-effect-form-fields'
 import { vocabularyFieldLabel } from '@/features/vocabulary'
 import { CONDITION_TERM } from '@rpg/contracts'
 import {
@@ -22,7 +22,7 @@ import {
   MONSTER_SAVE_EFFECT_AMOUNT_LABEL,
   MONSTER_SAVE_SHARED_EFFECT_LABEL,
   MONSTER_SAVE_USE_EXISTING_EFFECT_LABEL,
-} from '../monster-form-labels'
+} from '../../monster-form-labels'
 import {
   countMonsterSaveEffectReferences,
   createMonsterSaveDamageDefinition,

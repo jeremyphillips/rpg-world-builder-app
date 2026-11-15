@@ -6,7 +6,7 @@ import { beforeAll, describe, expect, it } from 'vitest'
 import type { MonsterFormValues } from '../monster-form-values'
 import { resolveMonsterCreateDefaultValues } from '../monster-form-values'
 import { MonsterActionAttackAbilityField } from './monster-attack-ability-field'
-import { MonsterActionCastingAbilityField } from './monster-action-casting-fields'
+import { MonsterActionCastingAbilityField } from './spell/monster-action-casting-fields'
 
 beforeAll(() => {
   if (!HTMLElement.prototype.hasPointerCapture) {

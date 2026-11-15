@@ -4,9 +4,9 @@ export {
   legendarySpellcastingActionOptions,
   primarySpellcastingProfile,
   sharedCastingOptions,
-} from '../casting/spellcasting-sources.lib'
+} from '../../casting/spellcasting-sources.lib'
 export {
   formatSharedCastingOptionLabel,
   formatSpellcastingActionOptionLabel,
-} from '../casting/spellcasting-source-labels.lib'
-export { monsterCastingDependentLabels } from '../casting/monster-casting-dependents.lib'
+} from '../../casting/spellcasting-source-labels.lib'
+export { monsterCastingDependentLabels } from '../../casting/monster-casting-dependents.lib'

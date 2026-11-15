@@ -15,7 +15,7 @@ import {
 } from '@rpg/contracts'
 import type { FieldOption, SelectFieldOptionListItem, SelectOptionTrailing } from '@rpg/ui/form'
 
-import type { MonsterFormValues } from '../monster-form-values'
+import type { MonsterFormValues } from '../../monster-form-values'
 import {
   MONSTER_CASTING_SHARE_GROUP_LABEL,
   sharedCastingOptions,

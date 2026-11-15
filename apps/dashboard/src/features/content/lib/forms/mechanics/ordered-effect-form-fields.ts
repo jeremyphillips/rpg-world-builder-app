@@ -21,7 +21,7 @@ import {
   MONSTER_ON_HIT_NOTE_LABEL,
   MONSTER_ORDERED_EFFECT_REPLACE_CONDITION_ADD_LABEL,
 } from '../../../monsters/lib/monster-form-labels'
-import { precedingConditionIdsFromEffects } from '../../../monsters/lib/actions/monster-action-save-outcomes'
+import { precedingConditionIdsFromEffects } from '../../../monsters/lib/actions/save/monster-action-save-outcomes'
 
 function effectKindVisible(kind: 'damage' | 'condition' | 'note'): FieldVisibility {
   return {

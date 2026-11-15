@@ -24,7 +24,7 @@ import {
   spellEntryFrequencyLabel,
   spellFrequencyControlIsShared,
   spellFrequencyOptions,
-} from '../../lib/actions/monster-spell-frequency'
+} from '../../lib/actions/spell/monster-spell-frequency'
 
 const WRITE_OPTIONS = { shouldDirty: true, shouldTouch: true, shouldValidate: true } as const
 

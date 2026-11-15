@@ -9,7 +9,7 @@ import { EntityDisclosureArrayItemShell } from '../../../lib/entity/surfaces/car
 import {
   spellEntryCatalogMetadata,
   spellEntryFrequencyMetadata,
-} from '../../lib/actions/monster-spell-frequency'
+} from '../../lib/actions/spell/monster-spell-frequency'
 import { MONSTER_SPELL_CHANGE_LABEL } from '../../lib/monster-form-labels'
 import { useMonsterSpellPicker } from './monster-spell-picker-context'
 import {

@@ -1,4 +1,4 @@
-import type { MonsterActionDraftRow } from './monster-action-presets'
+import type { MonsterActionDraftRow } from '../monster-action-presets'
 
 export const LEGENDARY_ACTION_CATEGORIES = [
   'reference',

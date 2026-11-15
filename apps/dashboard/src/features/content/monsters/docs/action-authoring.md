@@ -40,15 +40,21 @@ Cross-tab spellcasting source resolution lives under **`monsters/lib/casting/`**
 | References                   | `lib/actions/references/`    | Equipment links, multiattack graph, list titles                        |
 | Validation fixtures          | `lib/actions/validation/`    | Claim coverage and issue-routing harness                               |
 | Detail composition           | `lib/actions/detail-fields/` | `monsterActionDetailFields` and per-region composers                   |
+| Save pipeline                | `lib/actions/save/`          | Outcomes, slots, resolution target, round-trip harness                 |
+| Spell rows (action-local)    | `lib/actions/spell/`         | Spell frequency, cast level, casting fields — not `lib/casting/`       |
+| Legendary row fields         | `lib/actions/legendary/`     | Legendary detail fields and category helpers                           |
+| Weapon damage override       | `lib/actions/weapon/`        | Catalog damage mapping and override field                              |
+| Recharge limited use         | `lib/actions/recharge/`      | Recharge value + detail field                                          |
 | Form surfaces                | `components/form/actions/`   | Preview/detail JSX; `monster-action-sections.tsx` stays at form root   |
-| Traits                       | `lib/traits/`                | Trait acquisition (not action workflow)                                |
+| Traits tab lib               | `lib/traits/`                | Trait acquisition, form fields, editor title                           |
 
 Section move **eligibility** and data-loss flags are pure helpers in `@rpg/contracts`; transforms and confirmations stay in `use-monster-action-sections.ts`.
 
 **Action repeatability:** publish rules and add-menu disable/focus states both read
 `collectRepeatabilityViolations` / `acquisitionStateForItem` from
-`monster-action-repeatability.ts`. A disabled add item uses the same message as
-publish validation; existing rows are never removed when a rule is violated.
+[`packages/contracts/src/rpg/content/monster/action/monster-action-repeatability.ts`](../../../../../packages/contracts/src/rpg/content/monster/action/monster-action-repeatability.ts).
+A disabled add item uses the same message as publish validation; existing rows are never
+removed when a rule is violated.
 
 ## Regression harness
 
@@ -57,6 +63,6 @@ Focused Vitest entry points after structural changes:
 - `lib/actions/monster-action-editors.test.ts` — field matrix and visibility
 - `lib/actions/validation/monster-action-*-routing.test.ts` / `claim-coverage.test.ts`
 - `lib/actions/monster-action-editor-title.test.ts`
-- `lib/actions/monster-action-save-round-trip.test.ts`
+- `lib/actions/save/monster-action-save-round-trip.test.ts`
 - `lib/normalize-monster-form-values.test.ts`
 - `lib/actions/monster-action-row-snapshot.lib.test.ts`

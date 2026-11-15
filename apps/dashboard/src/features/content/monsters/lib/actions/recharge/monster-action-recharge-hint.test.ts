@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { monsterLimitRechargesOnHint } from '../monster-form-labels'
+import { monsterLimitRechargesOnHint } from '../../monster-form-labels'
 
 describe('monsterLimitRechargesOnHint', () => {
   it('reflects the recharge threshold in the recharges-on clause', () => {

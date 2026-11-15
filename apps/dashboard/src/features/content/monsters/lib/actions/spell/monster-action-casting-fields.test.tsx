@@ -3,9 +3,9 @@ import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm, useWatch } from 'react-hook-form'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 
-import { SPELLCASTING_ABILITY_FIELD_LABEL } from '../../../lib/forms/mechanics/spellcasting-ability-field-copy'
-import type { MonsterFormValues } from '../monster-form-values'
-import { resolveMonsterCreateDefaultValues } from '../monster-form-values'
+import { SPELLCASTING_ABILITY_FIELD_LABEL } from '../../../../lib/forms/mechanics/spellcasting-ability-field-copy'
+import type { MonsterFormValues } from '../../monster-form-values'
+import { resolveMonsterCreateDefaultValues } from '../../monster-form-values'
 import {
   MonsterActionCastingAbilityField,
   MonsterLegendarySpellcastingActionField,

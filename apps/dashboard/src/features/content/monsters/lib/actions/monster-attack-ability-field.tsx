@@ -7,7 +7,7 @@ import {
 import { useEffect, useMemo } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
-import { monsterAttackAbilitySelectOptions } from './monster-casting-ability-options'
+import { monsterAttackAbilitySelectOptions } from './spell/monster-casting-ability-options'
 import type { MonsterFormValues } from '../monster-form-values'
 
 export function MonsterActionAttackAbilityField({

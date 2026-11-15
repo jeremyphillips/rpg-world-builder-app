@@ -2,7 +2,7 @@ import { BooleanField } from '@rpg/ui'
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import type { MonsterFormValues } from '../../lib/monster-form-values'
-import { waterBreathingDurationEnabled } from '../../lib/monster-trait-preset-fields'
+import { waterBreathingDurationEnabled } from '../../lib/traits/monster-trait-preset-fields'
 
 const WATER_BREATHING_TOGGLE_LABEL = 'Hold breath outside water'
 

@@ -35,8 +35,8 @@ import {
   slugForInputParse,
 } from '../../lib/forms/registry/content-form-key-helpers'
 import { hydrateOnHitInActionList } from '../../lib/forms/mechanics/hydrate-effect-end-authoring'
-import { mapWeaponActionDamageToForm } from './actions/monster-weapon-damage-form'
-import { withDefaultSaveResolutionTarget } from './actions/monster-save-resolution-target.lib'
+import { mapWeaponActionDamageToForm } from './actions/weapon/monster-weapon-damage-form'
+import { withDefaultSaveResolutionTarget } from './actions/save/monster-save-resolution-target.lib'
 import {
   normalizeMonsterFormValues,
   type MonsterNormalizeBaseline,

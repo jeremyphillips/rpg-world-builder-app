@@ -18,7 +18,7 @@ import {
   type ActionPresetId,
   type MonsterActionSectionRows,
 } from '@rpg/contracts'
-import { conventionalSpellcastingSources } from '../monster-action-casting-summary'
+import { conventionalSpellcastingSources } from '../spell/monster-action-casting-summary'
 import type { MonsterActionSection } from '../references/monster-action-equipment-references'
 
 import {
