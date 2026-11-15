@@ -66,6 +66,28 @@ export const spellResolutionValidationMessages = {
     'validation.spellResolution.occupantRequirementsRequireArea',
     () => 'Area occupant requirements are only allowed when an area of effect is present.',
   ),
+  outcomeDamageForbiddenWithEnvelopeApplication: defineMessage(
+    'validation.spellResolution.outcomeDamageForbiddenWithEnvelopeApplication',
+    () =>
+      'Remove outcome damage rows when this branch already applies envelope damage via applications.',
+  ),
+  failedOrSuccessfulSaveApplicationsForbidden: defineMessage(
+    'validation.spellResolution.failedOrSuccessfulSaveApplicationsForbidden',
+    () => 'Failure or Success outcomes cannot reference envelope effect applications.',
+  ),
+  repeatSaveOnlyOnFailedSave: defineMessage(
+    'validation.spellResolution.repeatSaveOnlyOnFailedSave',
+    () => 'Repeat save is only allowed on a failed save outcome.',
+  ),
+  repeatSaveRequiresSecondFailure: defineMessage(
+    'validation.spellResolution.repeatSaveRequiresSecondFailure',
+    () => 'Add a second failure effect or note when repeat save is authored.',
+  ),
+  invalidConditionReplacementReference: defineMessage<{ conditionId: string }>(
+    'validation.spellResolution.invalidConditionReplacementReference',
+    ({ conditionId }) =>
+      `Condition replacement must reference an earlier condition on the first failure ("${conditionId}" was not found).`,
+  ),
   methodIncompatibleWithSelectionMode: defineMessage<{
     compatibility: 'deferred' | 'unsupported'
     reasonCode: string

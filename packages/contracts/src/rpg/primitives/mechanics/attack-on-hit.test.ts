@@ -46,6 +46,20 @@ describe('attackOnHitSchema', () => {
     ])
   })
 
+  it('rejects condition replacement on attack on-hit', () => {
+    expect(
+      attackOnHitSchema.safeParse({
+        effects: [
+          {
+            kind: 'condition',
+            conditionId: 'petrified',
+            replacesConditionId: 'restrained',
+          },
+        ],
+      }).success,
+    ).toBe(false)
+  })
+
   it('rejects a missing condition and a blank note', () => {
     expect(
       attackOnHitSchema.safeParse({

@@ -46,6 +46,8 @@ function copyOutcome<T extends OutcomeLike>(outcome: T): ResolutionOutcomeRef {
       return { effectId: entry.effectId, amount: entry.amount }
     }),
     ...(outcome.note?.trim() ? { note: outcome.note.trim() } : {}),
+    ...(outcome.effects?.length ? { effects: [...outcome.effects] } : {}),
+    ...(outcome.repeatSave ? { repeatSave: structuredClone(outcome.repeatSave) } : {}),
   }
 }
 

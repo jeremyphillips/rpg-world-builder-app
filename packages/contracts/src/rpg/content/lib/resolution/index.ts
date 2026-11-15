@@ -19,6 +19,7 @@ export {
   DEFAULT_RESOLUTION_TARGET,
   resolutionTargetSchema,
   resolutionTemporaryHitPointsEffectSchema,
+  refineRepeatSaveSecondFailureForPublish,
   validateEffectResolution,
   type EffectResolution,
   type EffectResolutionMethod,
@@ -62,6 +63,21 @@ export {
   formatResolutionApplicationSentence,
 } from './format-effect-lines'
 export { formatResolutionOutcomeLine, formatResolutionOutcomes } from './format-outcomes'
+export {
+  formatConditionReplacementSentence,
+  formatOrderedOutcomeEffects,
+  formatRepeatSaveTransition,
+} from './format-ordered-outcome-effects'
+export {
+  hasMeaningfulRepeatSave,
+  hasMeaningfulRepeatSaveSecondFailure,
+  repeatSaveSchema,
+  repeatSaveSecondFailureSchema,
+  repeatSaveTimingSchema,
+  type RepeatSave,
+  type RepeatSaveSecondFailure,
+  type RepeatSaveTiming,
+} from './repeat-save'
 export {
   formatResolutionAffectedAreaCopy,
   formatResolutionSelectionSections,
@@ -125,6 +141,8 @@ export {
   effectKindsSupportingPartialApplication,
   ensureOutcomeSlotsForMethod,
   findOutcomeByResult,
+  getAllowedOutcomeResultsForMethod,
+  getOptionalOutcomeResultsForMethod,
   getOutcomeResultsForMethod,
   hasMeaningfulOutcomeContent,
   isOutcomeEmpty,

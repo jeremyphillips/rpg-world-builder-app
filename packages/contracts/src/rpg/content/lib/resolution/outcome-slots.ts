@@ -1,4 +1,7 @@
+import type { OrderedEffect } from '../../../primitives/mechanics/ordered-effect'
 import type { ResolutionApplication, ResolutionEffectId } from './schema'
+import type { RepeatSave } from './repeat-save'
+import { hasMeaningfulRepeatSave } from './repeat-save'
 import type { ResolutionEffectKind } from './selection-types'
 import type { ResolutionMethodKind, ResolutionOutcomeResult } from '../../../vocab/resolution'
 
@@ -12,9 +15,11 @@ export type OutcomeLike = {
   result: ResolutionOutcomeResult
   applications: readonly unknown[]
   note?: string
+  effects?: readonly OrderedEffect[]
+  repeatSave?: RepeatSave
 }
 
-/** Outcome results rendered for a resolution method, in stable display order. */
+/** Required outcome slots created for a resolution method, in stable display order. */
 export function getOutcomeResultsForMethod(method: {
   kind: ResolutionMethodKind
 }): readonly ResolutionOutcomeResult[] {
@@ -32,9 +37,28 @@ export function getOutcomeResultsForMethod(method: {
   }
 }
 
-/** True when an outcome has at least one application or non-empty prose. */
+/** Optional save outcomes appended after required slots when present in storage. */
+export function getOptionalOutcomeResultsForMethod(method: {
+  kind: ResolutionMethodKind
+}): readonly ResolutionOutcomeResult[] {
+  if (method.kind === 'saving-throw') return ['failed-or-successful-save']
+  return []
+}
+
+/** Structural allowlist for validation and normalization. */
+export function getAllowedOutcomeResultsForMethod(method: {
+  kind: ResolutionMethodKind
+}): readonly ResolutionOutcomeResult[] {
+  return [...getOutcomeResultsForMethod(method), ...getOptionalOutcomeResultsForMethod(method)]
+}
+
+/** True when an outcome has at least one application, prose, ordered effect, or repeat save. */
 export function hasMeaningfulOutcomeContent(outcome: OutcomeLike): boolean {
-  return outcome.applications.length > 0 || Boolean(outcome.note?.trim())
+  if (outcome.applications.length > 0) return true
+  if (Boolean(outcome.note?.trim())) return true
+  if (outcome.effects && outcome.effects.length > 0) return true
+  if (hasMeaningfulRepeatSave(outcome.repeatSave)) return true
+  return false
 }
 
 /** True when an outcome has neither applications nor prose. */
@@ -49,19 +73,24 @@ export function findOutcomeByResult<T extends OutcomeLike>(
   return outcomes.find((outcome) => outcome.result === result)
 }
 
-/** Reorders outcomes to match method-defined slot order; drops results outside the method. */
+/** Reorders outcomes to match method slot order; keeps optional save outcomes when present. */
 export function normalizeOutcomeOrder<T extends OutcomeLike>(
   method: ResolutionMethodRef,
   outcomes: readonly T[],
 ): T[] {
-  const allowed = new Set(getOutcomeResultsForMethod(method))
+  const allowed = new Set(getAllowedOutcomeResultsForMethod(method))
   const byResult = new Map(
     outcomes
       .filter((outcome) => allowed.has(outcome.result))
       .map((outcome) => [outcome.result, outcome]),
   )
 
-  return getOutcomeResultsForMethod(method)
+  const order = [
+    ...getOutcomeResultsForMethod(method),
+    ...getOptionalOutcomeResultsForMethod(method),
+  ]
+
+  return order
     .map((result) => byResult.get(result))
     .filter((outcome): outcome is T => outcome !== undefined)
 }
@@ -72,16 +101,22 @@ export function ensureOutcomeSlotsForMethod<T extends OutcomeLike>(
   outcomes: readonly T[],
   createEmptySlot: (result: ResolutionOutcomeResult) => T,
 ): T[] {
-  const allowed = new Set(getOutcomeResultsForMethod(method))
+  const optional = getOptionalOutcomeResultsForMethod(method)
+  const storableResults = new Set([...getOutcomeResultsForMethod(method), ...optional])
   const byResult = new Map(
     outcomes
-      .filter((outcome) => allowed.has(outcome.result))
+      .filter((outcome) => storableResults.has(outcome.result))
       .map((outcome) => [outcome.result, outcome]),
   )
 
-  return getOutcomeResultsForMethod(method).map(
+  const requiredSlots = getOutcomeResultsForMethod(method).map(
     (result) => byResult.get(result) ?? createEmptySlot(result),
   )
+  const optionalSlots = optional
+    .map((result) => byResult.get(result))
+    .filter((outcome): outcome is T => outcome !== undefined)
+
+  return [...requiredSlots, ...optionalSlots]
 }
 
 /** Effect kinds that support `amount: 'half'` in the resolution MVP. */
@@ -105,6 +140,7 @@ function defaultApplicationsForResult(
     case 'successful-save':
       return [{ effectId: primaryEffectId, amount: 'half' }]
     case 'miss':
+    case 'failed-or-successful-save':
       return []
     default: {
       const _exhaustive: never = result

@@ -5,6 +5,8 @@ import {
   buildDefaultOutcomeSlots,
   ensureOutcomeSlotsForMethod,
   findOutcomeByResult,
+  getAllowedOutcomeResultsForMethod,
+  getOptionalOutcomeResultsForMethod,
   getOutcomeResultsForMethod,
   hasMeaningfulOutcomeContent,
   isOutcomeEmpty,
@@ -23,6 +25,17 @@ describe('getOutcomeResultsForMethod', () => {
       'successful-save',
     ])
   })
+
+  it('lists optional save outcomes separately from required slots', () => {
+    expect(getOptionalOutcomeResultsForMethod({ kind: 'saving-throw' })).toEqual([
+      'failed-or-successful-save',
+    ])
+    expect(getAllowedOutcomeResultsForMethod({ kind: 'saving-throw' })).toEqual([
+      'failed-save',
+      'successful-save',
+      'failed-or-successful-save',
+    ])
+  })
 })
 
 describe('outcome slot helpers', () => {
@@ -32,6 +45,26 @@ describe('outcome slot helpers', () => {
       applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' as const }],
     },
   ]
+
+  it('preserves optional failure-or-success without auto-creating the slot', () => {
+    const method = { kind: 'saving-throw' as const, ability: 'con' as const }
+    const hydrated = ensureOutcomeSlotsForMethod(method, [], (result) => ({
+      result,
+      applications: [],
+    }))
+    expect(hydrated.map((outcome) => outcome.result)).toEqual(['failed-save', 'successful-save'])
+
+    const withOptional = ensureOutcomeSlotsForMethod(
+      method,
+      [{ result: 'failed-or-successful-save', applications: [], note: 'Rider.' }],
+      (result) => ({ result, applications: [] }),
+    )
+    expect(withOptional.map((outcome) => outcome.result)).toEqual([
+      'failed-save',
+      'successful-save',
+      'failed-or-successful-save',
+    ])
+  })
 
   it('hydrates empty miss slot without dropping stored hit outcome', () => {
     const method = { kind: 'attack' as const, attackType: 'ranged-spell' as const }
@@ -53,6 +86,52 @@ describe('outcome slot helpers', () => {
     }))
 
     expect(stripEmptyOutcomeSlots(formSlots)).toEqual(attackOutcomes)
+  })
+
+  it('treats outcome effects and repeat save as meaningful content', () => {
+    expect(
+      hasMeaningfulOutcomeContent({
+        result: 'failed-save',
+        applications: [],
+        effects: [{ kind: 'condition', conditionId: 'restrained' }],
+      }),
+    ).toBe(true)
+    expect(
+      hasMeaningfulOutcomeContent({
+        result: 'failed-save',
+        applications: [],
+        repeatSave: {
+          timing: { participant: 'target', boundary: 'end', which: 'next' },
+          successOnRepeatEndsEffect: true,
+          secondFailure: { note: 'Second tier.' },
+        },
+      }),
+    ).toBe(true)
+    expect(stripEmptyOutcomeSlots([])).toEqual([])
+  })
+
+  it('orders optional failure-or-success after required save slots', () => {
+    const method = { kind: 'saving-throw' as const, ability: 'con' as const }
+    const ordered = normalizeOutcomeOrder(method, [
+      {
+        result: 'failed-or-successful-save',
+        applications: [],
+        note: 'Underwater rider.',
+      },
+      {
+        result: 'successful-save',
+        applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'half' as const }],
+      },
+      {
+        result: 'failed-save',
+        applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' as const }],
+      },
+    ])
+    expect(ordered.map((outcome) => outcome.result)).toEqual([
+      'failed-save',
+      'successful-save',
+      'failed-or-successful-save',
+    ])
   })
 
   it('preserves miss-only prose in stored shape', () => {

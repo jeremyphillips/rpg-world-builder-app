@@ -74,11 +74,7 @@
           "type": "object",
           "properties": {
             "effects": {
-              "minItems": 1,
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/__schema2"
-              }
+              "$ref": "#/definitions/__schema2"
             }
           },
           "required": [
@@ -107,6 +103,13 @@
       "description": "weapon | armor | shield"
     },
     "__schema2": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/__schema3"
+      }
+    },
+    "__schema3": {
       "oneOf": [
         {
           "type": "object",
@@ -115,10 +118,10 @@
               "type": "object",
               "properties": {
                 "dice": {
-                  "$ref": "#/definitions/__schema3"
+                  "$ref": "#/definitions/__schema4"
                 },
                 "flat": {
-                  "$ref": "#/definitions/__schema4"
+                  "$ref": "#/definitions/__schema5"
                 }
               },
               "additionalProperties": false
@@ -133,7 +136,7 @@
               "description": "damage"
             },
             "description": {
-              "$ref": "#/definitions/__schema5"
+              "$ref": "#/definitions/__schema6"
             }
           },
           "required": [
@@ -268,7 +271,32 @@
               ]
             },
             "description": {
-              "$ref": "#/definitions/__schema5"
+              "$ref": "#/definitions/__schema6"
+            },
+            "replacesConditionId": {
+              "allOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "blinded",
+                    "charmed",
+                    "deafened",
+                    "exhaustion",
+                    "frightened",
+                    "grappled",
+                    "incapacitated",
+                    "invisible",
+                    "paralyzed",
+                    "petrified",
+                    "poisoned",
+                    "prone",
+                    "restrained",
+                    "stunned",
+                    "unconscious"
+                  ],
+                  "description": "blinded | charmed | deafened | exhaustion | frightened | grappled | incapacitated | invisible | paralyzed | petrified | poisoned | prone | restrained | stunned | unconscious"
+                }
+              ]
             }
           },
           "required": [
@@ -298,7 +326,7 @@
         }
       ]
     },
-    "__schema3": {
+    "__schema4": {
       "type": "object",
       "properties": {
         "count": {
@@ -345,14 +373,35 @@
       ],
       "additionalProperties": false
     },
-    "__schema4": {
+    "__schema5": {
       "type": "integer",
       "minimum": -9007199254740991,
       "maximum": 9007199254740991
     },
-    "__schema5": {
+    "__schema6": {
       "type": "string",
       "minLength": 1
+    },
+    "__schema7": {
+      "type": "string",
+      "enum": [
+        "blinded",
+        "charmed",
+        "deafened",
+        "exhaustion",
+        "frightened",
+        "grappled",
+        "incapacitated",
+        "invisible",
+        "paralyzed",
+        "petrified",
+        "poisoned",
+        "prone",
+        "restrained",
+        "stunned",
+        "unconscious"
+      ],
+      "description": "blinded | charmed | deafened | exhaustion | frightened | grappled | incapacitated | invisible | paralyzed | petrified | poisoned | prone | restrained | stunned | unconscious"
     }
   }
 }

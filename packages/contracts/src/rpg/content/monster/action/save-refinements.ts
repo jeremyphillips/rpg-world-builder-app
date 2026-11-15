@@ -4,7 +4,7 @@ import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-
 import {
   effectResolutionFieldShape,
   effectResolutionMethodSchema,
-  effectResolutionSchema,
+  refineRepeatSaveSecondFailureForPublish,
   validateEffectResolution,
 } from '../../lib/resolution/schema'
 import { RESOLUTION_SELECTION_MODES } from '../../../vocab/resolution'
@@ -17,7 +17,7 @@ import type { MonsterActionMode } from './shared-fragments'
 const monsterSaveSelectionMessage =
   'Saving throw actions select an area from self or creatures in reach or at a distance.'
 
-export const monsterSaveResolutionSchema = z
+const monsterSaveResolutionCore = z
   .object({
     ...effectResolutionFieldShape,
     selectionMode: z.enum(RESOLUTION_SELECTION_MODES, monsterSaveSelectionMessage),
@@ -26,9 +26,15 @@ export const monsterSaveResolutionSchema = z
   .strict()
   .superRefine(validateEffectResolution)
 
+export const monsterSaveResolutionSchema = monsterSaveResolutionCore.superRefine(
+  refineRepeatSaveSecondFailureForPublish,
+)
+
+export const monsterSaveResolutionDraftSchema = monsterSaveResolutionCore
+
 export function saveResolutionSchema<M extends MonsterActionMode>(mode: M) {
   const published = monsterSaveResolutionSchema
-  const draft = effectResolutionSchema.optional()
+  const draft = monsterSaveResolutionDraftSchema.optional()
   return (mode === 'draft' ? draft : published) as M extends 'draft'
     ? typeof draft
     : typeof published
@@ -40,7 +46,11 @@ export function savingThrowFieldSchema(mode: MonsterActionMode) {
     : savingThrowEffectSchema.optional()
 }
 
-const MONSTER_SAVE_OUTCOME_RESULTS = new Set(['failed-save', 'successful-save'])
+const MONSTER_SAVE_OUTCOME_RESULTS = new Set([
+  'failed-save',
+  'successful-save',
+  'failed-or-successful-save',
+])
 
 /** Rich-text shells such as `<p></p>` are not authored rules text. */
 export const RULES_OR_SAVING_THROW_MESSAGE = 'Enter rules text or a saving throw.'

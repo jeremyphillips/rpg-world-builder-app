@@ -17,11 +17,18 @@ import {
   type ResolutionSelectionMode,
 } from '../../../vocab/resolution'
 import { isEffectKindAllowedForTarget } from './effect-target-compatibility'
+import type { OrderedConditionEffect } from '../../../primitives/mechanics/ordered-effect'
+import { orderedEffectSchema } from '../../../primitives/mechanics/ordered-effect'
 import {
-  getOutcomeResultsForMethod,
+  getAllowedOutcomeResultsForMethod,
   hasMeaningfulOutcomeContent,
   supportsPartialApplicationForEffectKind,
 } from './outcome-slots'
+import {
+  hasMeaningfulRepeatSaveSecondFailure,
+  repeatSaveSchema,
+  type RepeatSave,
+} from './repeat-save'
 import { validateResolutionMethodCompatibility } from './selection-method-compatibility'
 import { validateResolutionModeFields } from './selection-mode-validation'
 import { isResolutionEffectKind } from './selection-availability'
@@ -112,15 +119,13 @@ export const resolutionApplicationSchema = z.object({
 
 export type ResolutionApplication = z.infer<typeof resolutionApplicationSchema>
 
-export const resolutionOutcomeSchema = z
-  .object({
-    result: z.enum(RESOLUTION_OUTCOME_RESULTS),
-    note: z.string().trim().optional(),
-    applications: z.array(resolutionApplicationSchema).default([]),
-  })
-  .refine((value) => value.applications.length > 0 || Boolean(value.note?.trim()), {
-    message: spellResolutionValidationMessages.outcomeRequiresApplicationOrNote(),
-  })
+export const resolutionOutcomeSchema = z.object({
+  result: z.enum(RESOLUTION_OUTCOME_RESULTS),
+  note: z.string().trim().optional(),
+  applications: z.array(resolutionApplicationSchema).default([]),
+  effects: z.array(orderedEffectSchema).optional(),
+  repeatSave: repeatSaveSchema.optional(),
+})
 
 export type ResolutionOutcome = z.infer<typeof resolutionOutcomeSchema>
 
@@ -164,7 +169,7 @@ export const effectResolutionFieldShape = {
   origin: resolutionOriginSchema.optional(),
   areaOfEffect: areaGeometrySchema.optional(),
   occupantRequirements: resolutionTargetRequirementsSchema.optional(),
-  effects: z.array(resolutionEffectSchema).min(1),
+  effects: z.array(resolutionEffectSchema),
   outcomes: z.array(resolutionOutcomeSchema).min(1),
 }
 
@@ -180,6 +185,8 @@ export type EffectResolutionValidationInput = {
     result: ResolutionOutcomeResult
     applications: readonly { effectId: ResolutionEffectId; amount: string }[]
     note?: string
+    effects?: readonly z.infer<typeof orderedEffectSchema>[]
+    repeatSave?: RepeatSave
   }[]
 }
 
@@ -264,7 +271,13 @@ export function validateEffectResolution(
     ])
   }
 
-  const allowedResults = getOutcomeResultsForMethod(resolution.method)
+  const allowedResults = getAllowedOutcomeResultsForMethod(resolution.method)
+  const failedSaveOutcome = resolution.outcomes.find((outcome) => outcome.result === 'failed-save')
+  const firstFailureConditionIds = new Set(
+    (failedSaveOutcome?.effects ?? [])
+      .filter((effect): effect is OrderedConditionEffect => effect.kind === 'condition')
+      .map((effect) => effect.conditionId),
+  )
 
   resolution.outcomes.forEach((outcome, outcomeIndex) => {
     if (!allowedResults.includes(outcome.result)) {
@@ -310,6 +323,76 @@ export function validateEffectResolution(
         )
       }
     })
+
+    if (outcome.result === 'failed-or-successful-save' && outcome.applications.length > 0) {
+      addCustomRefinementIssue(
+        ctx,
+        spellResolutionValidationMessages.failedOrSuccessfulSaveApplicationsForbidden(),
+        ['outcomes', outcomeIndex, 'applications'],
+      )
+    }
+
+    if (outcome.repeatSave && outcome.result !== 'failed-save') {
+      addCustomRefinementIssue(
+        ctx,
+        spellResolutionValidationMessages.repeatSaveOnlyOnFailedSave(),
+        ['outcomes', outcomeIndex, 'repeatSave'],
+      )
+    }
+
+    const referencesEnvelopeDamage = outcome.applications.some((application) => {
+      const effect = effectById.get(application.effectId)
+      return effect?.kind === 'damage'
+    })
+    ;(outcome.effects ?? []).forEach((effect, effectIndex) => {
+      if (effect.kind === 'damage' && referencesEnvelopeDamage) {
+        addCustomRefinementIssue(
+          ctx,
+          spellResolutionValidationMessages.outcomeDamageForbiddenWithEnvelopeApplication(),
+          ['outcomes', outcomeIndex, 'effects', effectIndex, 'kind'],
+        )
+      }
+    })
+
+    outcome.repeatSave?.secondFailure.effects?.forEach((effect, effectIndex) => {
+      if (effect.kind !== 'condition' || !effect.replacesConditionId) return
+      if (!firstFailureConditionIds.has(effect.replacesConditionId)) {
+        addCustomRefinementIssue(
+          ctx,
+          spellResolutionValidationMessages.invalidConditionReplacementReference({
+            conditionId: effect.replacesConditionId,
+          }),
+          [
+            'outcomes',
+            outcomeIndex,
+            'repeatSave',
+            'secondFailure',
+            'effects',
+            effectIndex,
+            'replacesConditionId',
+          ],
+        )
+      }
+    })
+  })
+}
+
+/** Publish-only: repeat-save must include a meaningful second failure tier. */
+export function refineRepeatSaveSecondFailureForPublish(
+  resolution: EffectResolutionValidationInput,
+  ctx: z.RefinementCtx,
+): void {
+  resolution.outcomes.forEach((outcome, outcomeIndex) => {
+    if (
+      outcome.repeatSave &&
+      !hasMeaningfulRepeatSaveSecondFailure(outcome.repeatSave.secondFailure)
+    ) {
+      addCustomRefinementIssue(
+        ctx,
+        spellResolutionValidationMessages.repeatSaveRequiresSecondFailure(),
+        ['outcomes', outcomeIndex, 'repeatSave', 'secondFailure'],
+      )
+    }
   })
 }
 
@@ -320,6 +403,7 @@ export const effectResolutionSchema = z
   })
   .strict()
   .superRefine(validateEffectResolution)
+  .superRefine(refineRepeatSaveSecondFailureForPublish)
 
 export type EffectResolution = z.infer<typeof effectResolutionSchema>
 

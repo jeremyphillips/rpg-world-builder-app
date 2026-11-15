@@ -1,4 +1,9 @@
 import type { MonsterAction } from '../../content/monster/action/index'
+import { formatResolutionOutcomeLine } from '../../content/lib/resolution/format-outcomes'
+import {
+  formatOrderedOutcomeEffects,
+  formatRepeatSaveTransition,
+} from '../../content/lib/resolution/format-ordered-outcome-effects'
 import { formatResolutionTargetFromParts } from '../../content/lib/resolution/format-target'
 import { formatAreaOccupantCreaturePhrase } from '../../content/lib/resolution/format-target-composition'
 import { formatAreaGeometry } from '../../primitives/area-geometry'
@@ -12,6 +17,7 @@ import { formatStatBlockDamageComponent } from './format-stat-block-damage'
 import { formatMonsterLimitedUseHeading } from './spell-entry-presentation'
 
 type SaveAction = Extract<MonsterAction, { kind: 'save' }>
+type SaveOutcome = SaveAction['resolution']['outcomes'][number]
 
 function saveDc(args: {
   action: SaveAction
@@ -44,21 +50,66 @@ function damageClause(
   })}.`
 }
 
-function outcomeSentence(
-  label: 'Failure' | 'Success',
-  outcome: SaveAction['resolution']['outcomes'][number],
+function outcomeBodyClauses(
+  outcome: SaveOutcome,
   effects: SaveAction['resolution']['effects'],
-): string {
+): string[] {
   const effectById = new Map(effects.map((effect) => [effect.id, effect]))
-  const clauses = outcome.applications.flatMap((application) => {
+  const applicationClauses = outcome.applications.flatMap((application) => {
     const effect = effectById.get(application.effectId)
     if (!effect || effect.kind !== 'damage') return []
     if (application.amount !== 'full' && application.amount !== 'half') return []
     return [damageClause(effect, application.amount)]
   })
+  const orderedClauses = formatOrderedOutcomeEffects(outcome.effects)
   const note = outcome.note?.trim()
-  const body = [...clauses, ...(note ? [`${note}.`] : [])].join(' ')
+  const noteClause = note ? [`${note.endsWith('.') ? note : `${note}.`}`] : []
+  return [...applicationClauses, ...orderedClauses, ...noteClause]
+}
+
+function outcomeSentence(
+  label: string,
+  outcome: SaveOutcome,
+  effects: SaveAction['resolution']['effects'],
+): string {
+  const clauses = outcomeBodyClauses(outcome, effects)
+  const body = clauses.join(' ')
   return body ? `${label}: ${body}` : `${label}:`
+}
+
+function proseSentence(text: string | undefined): string | undefined {
+  const trimmed = text?.trim()
+  if (!trimmed) return undefined
+  return trimmed.endsWith('.') ? trimmed : `${trimmed}.`
+}
+
+function secondFailureSentence(outcome: SaveOutcome): string | undefined {
+  const repeatSave = outcome.repeatSave
+  if (!repeatSave) return undefined
+  const clauses = [
+    ...formatOrderedOutcomeEffects(repeatSave.secondFailure.effects),
+    ...(proseSentence(repeatSave.secondFailure.note)
+      ? [proseSentence(repeatSave.secondFailure.note)!]
+      : []),
+  ]
+  if (clauses.length === 0) return undefined
+  return `Second Failure: ${clauses.join(' ')}`
+}
+
+function repeatSaveSentences(outcome: SaveOutcome): string[] {
+  const repeatSave = outcome.repeatSave
+  if (!repeatSave) return []
+  const second = secondFailureSentence(outcome)
+  return [
+    formatRepeatSaveTransition(repeatSave.timing),
+    ...(proseSentence(repeatSave.eligibilityNote)
+      ? [proseSentence(repeatSave.eligibilityNote)!]
+      : []),
+    ...(repeatSave.successOnRepeatEndsEffect
+      ? ['On a success, the target ends the effect on itself.']
+      : []),
+    ...(second ? [second] : []),
+  ]
 }
 
 function selectionPhrase(action: SaveAction): string {
@@ -95,10 +146,18 @@ export function formatMonsterSaveAction(args: {
   const heading = formatMonsterLimitedUseHeading(args.name, limitedUse)
   const failed = resolution.outcomes.find((outcome) => outcome.result === 'failed-save')
   const saved = resolution.outcomes.find((outcome) => outcome.result === 'successful-save')
+  const failureOrSuccess = resolution.outcomes.find(
+    (outcome) => outcome.result === 'failed-or-successful-save',
+  )
+
+  const failureLabel = failed?.repeatSave ? 'First Failure' : 'Failure'
+
   const sentences = [
     `${ability} Saving Throw: DC ${dc ?? '—'}, ${selectionPhrase(action)}.`,
-    ...(failed ? [outcomeSentence('Failure', failed, resolution.effects)] : []),
+    ...(failed ? [outcomeSentence(failureLabel, failed, resolution.effects)] : []),
+    ...(failed ? repeatSaveSentences(failed) : []),
     ...(saved ? [outcomeSentence('Success', saved, resolution.effects)] : []),
+    ...(failureOrSuccess ? [formatResolutionOutcomeLine(failureOrSuccess, resolution)] : []),
   ]
   return { heading, body: sentences.join(' ') }
 }

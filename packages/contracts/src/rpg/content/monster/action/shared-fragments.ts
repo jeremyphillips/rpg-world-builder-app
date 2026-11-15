@@ -37,6 +37,7 @@ const attackOnHitDraftEffectSchema = z.discriminatedUnion('kind', [
     conditionId: z.string().optional(),
     end: effectEndSchema.optional(),
     description: draftEffectDescriptionSchema,
+    replacesConditionId: z.string().optional(),
   }),
   z.object({
     kind: z.literal('note'),

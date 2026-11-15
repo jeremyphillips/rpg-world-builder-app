@@ -76,6 +76,10 @@ export const RESOLUTION_OUTCOME_RESULT_ENTRIES = {
     label: 'Successful save',
     description: 'The target succeeded on its saving throw.',
   },
+  'failed-or-successful-save': {
+    label: 'Failure or Success',
+    description: 'Applies whether the target failed or succeeded on the saving throw.',
+  },
   applied: {
     label: 'Applied',
     description: 'The effect applies automatically without an attack or saving throw.',
