@@ -13,6 +13,8 @@ Regions, in order. An empty region renders nothing.
 
 Casting ability is mechanics. It does not belong in Source.
 
-Save actions keep one Saving Throw group. Ability, DC, and selection come first, then resolution damage, then the failure note and success amount.
+Save actions keep one Saving Throw group. Inside it, order is: save ability and DC, targeting, **Failed save** (outcome effects, optional repeat save ladder, envelope damage when used), **Successful save** (success amount when envelope damage exists, outcome effects), optional **Failure or success** outcome, then optional boolean **Turn limit** (`onceUntilNextTurn`). Global turn-limit disclosure is omitted on save actions because it lives on this tail.
+
+Repeat save stays hidden until the first-failure outcome lists a condition or note, or repeat save is already authored. Envelope-only damage breaths do not surface repeat save until a condition or note is added to the failed outcome.
 
 Do not apply this order to species traits or class features. Their descriptions are the primary authored content, and grant summaries are a different region.

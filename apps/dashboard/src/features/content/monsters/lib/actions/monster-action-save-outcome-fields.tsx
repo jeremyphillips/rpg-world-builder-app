@@ -3,20 +3,15 @@ import {
   RESOLUTION_APPLICATION_AMOUNTS,
   type ResolutionApplicationAmount,
 } from '@rpg/contracts'
-import { SelectField, TextareaField } from '@rpg/ui'
+import { SelectField } from '@rpg/ui'
 import { toOptions, useFieldControlSize, useSlotIssues } from '@rpg/ui/form'
 import { useFormContext, useWatch } from 'react-hook-form'
 
-import {
-  MONSTER_SAVE_FAILURE_NOTE_LABEL,
-  MONSTER_SAVE_SUCCESS_AMOUNT_LABEL,
-} from '../monster-form-labels'
+import { MONSTER_SAVE_SUCCESS_AMOUNT_LABEL } from '../monster-form-labels'
 import {
   monsterSaveDamageEffectId,
-  monsterSaveFailureNote,
   monsterSaveOutcomeAmount,
   readMonsterSaveOutcomes,
-  withMonsterSaveFailureNote,
   withMonsterSaveOutcomeAmount,
 } from './monster-action-save-outcomes'
 
@@ -32,32 +27,6 @@ const SAVE_AMOUNT_OPTIONS = toOptions(
 
 function outcomesPath(namePrefix: string): string {
   return `${namePrefix}.resolution.outcomes`
-}
-
-export function MonsterActionSaveFailureNoteField({ namePrefix }: { namePrefix: string }) {
-  const controlSize = useFieldControlSize()
-  const slotIssues = useSlotIssues()
-  const { setValue } = useFormContext()
-  const outcomes = readMonsterSaveOutcomes(useWatch({ name: outcomesPath(namePrefix) }))
-  const path = outcomesPath(namePrefix)
-
-  return (
-    <TextareaField
-      id={`${namePrefix.replaceAll('.', '-')}-save-failure-note`}
-      label={MONSTER_SAVE_FAILURE_NOTE_LABEL}
-      rows={2}
-      width="full"
-      size={controlSize}
-      error={slotIssues.message}
-      value={monsterSaveFailureNote(outcomes)}
-      onChange={(event) => {
-        setValue(path, withMonsterSaveFailureNote(outcomes, event.target.value), {
-          shouldDirty: true,
-          shouldValidate: true,
-        })
-      }}
-    />
-  )
 }
 
 export function MonsterActionSaveSuccessAmountField({ namePrefix }: { namePrefix: string }) {

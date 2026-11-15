@@ -608,7 +608,7 @@ describe('monster action detail fields', () => {
     expect(findSelectField(items, 'dcSource.ability')).toMatchObject({ required: true })
   })
 
-  it('places save configuration before resolution damage and outcomes', () => {
+  it('orders save subsection fields before supplemental prose and omits global turn limit', () => {
     const names = detailFields({
       id: 'breath',
       kind: 'save',
@@ -616,19 +616,18 @@ describe('monster action detail fields', () => {
       preset: 'breath-weapon',
     })
     const damageTypeIndex = names.indexOf('resolution.effects.0.damageType')
-    const rollIndex = names.indexOf('resolution.effects.0.roll')
+    const failedEffectsPath = names.find((name) => name.includes('resolution.outcomes.0.effects'))
     expect(names[0]).toBe('buildAdvisories')
-    expect(names.indexOf('_saveSuccessAmount')).toBeLessThan(names.indexOf('limitedUse'))
     expect(names.indexOf('resolution.method.ability')).toBeLessThan(
       names.indexOf('resolution.selectionMode'),
     )
-    expect(names.indexOf('resolution.selectionMode')).toBeLessThan(damageTypeIndex)
-    expect(rollIndex).toBe(damageTypeIndex + 1)
-    expect(damageTypeIndex).toBeLessThan(names.indexOf('_saveFailureNote'))
-    expect(names.indexOf('_saveFailureNote')).toBeLessThan(names.indexOf('_saveSuccessAmount'))
+    expect(failedEffectsPath).toBeDefined()
+    expect(damageTypeIndex).toBeGreaterThan(names.indexOf('resolution.selectionMode'))
+    expect(names.indexOf('_saveFailureOrSuccess')).toBeLessThan(names.indexOf('_turnLimit'))
+    expect(names.indexOf('_saveSuccessAmount')).toBeLessThan(names.indexOf('_saveFailureOrSuccess'))
+    expect(names).not.toContain('onceUntilNextTurn')
     expect(names.at(-1)).toBe('description')
     expect(names).not.toContain('limitedUse.kind')
-    expect(names).not.toContain('attackPreview')
     const constrict = detailFields({
       id: 'squeeze',
       kind: 'save',

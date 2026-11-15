@@ -133,7 +133,12 @@ const CONSTRICT_RESOLUTION = effectResolutionSchema.parse({
     {
       result: 'failed-save',
       applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
-      note: 'The target is Grappled (escape DC equals the save DC).',
+      effects: [
+        {
+          kind: 'note',
+          description: 'The target is Grappled (escape DC equals the save DC).',
+        },
+      ],
     },
   ],
 })

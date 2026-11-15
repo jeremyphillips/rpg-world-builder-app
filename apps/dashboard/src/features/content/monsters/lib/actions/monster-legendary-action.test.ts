@@ -173,7 +173,7 @@ describe('legendary action fields', () => {
       'actionIds',
       'movement.allowance',
       'movement.withoutOpportunityAttacks',
-      'onceUntilNextTurn',
+      '_turnLimit',
     ])
 
     const spellcasting = names(
@@ -198,7 +198,7 @@ describe('legendary action fields', () => {
       'buildAdvisories',
       'castingAbility',
       'spells.0.spellId',
-      'onceUntilNextTurn',
+      '_turnLimit',
     ])
 
     const cast = monsterActionDetailFields({
@@ -215,7 +215,7 @@ describe('legendary action fields', () => {
       'spells.0.spellId',
       'spells.0.castAtLevel',
       'omittedComponents',
-      'onceUntilNextTurn',
+      '_turnLimit',
     ])
     expect(JSON.stringify(cast)).not.toContain('Lead')
     expect(JSON.stringify(cast)).not.toContain('Casting sentence')
@@ -230,7 +230,7 @@ describe('legendary action fields', () => {
     })
     const custom = names(customFields as { name?: string }[])
     expect(custom).toContain('description')
-    expect(custom).toContain('onceUntilNextTurn')
+    expect(custom).toContain('_turnLimit')
     expect(JSON.stringify(customFields)).toContain('limitedUse')
     expect(JSON.stringify(customFields)).not.toContain('Casting sentence')
     expect(values.actions).toHaveLength(3)

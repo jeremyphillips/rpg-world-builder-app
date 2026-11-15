@@ -53,6 +53,18 @@ A future no-check effect would be its own kind holding the same envelope with
 
 `preset` is provenance only. A missing or unknown id still parses.
 
+### Save outcomes (v1)
+
+Each outcome may carry ordered **`effects`** (damage, condition, note) and,
+on `failed-save` only, optional **`repeatSave`** with a second-failure tier.
+Envelope **`effects`** plus **`applications`** remain the authoritative path for
+classic damage breaths (Hell Hound). Do not duplicate envelope damage in
+`outcome.effects` when applications reference it.
+
+Optional outcome **`failed-or-successful-save`** appends a third branch
+(Failure or Success) with `note` and/or `effects`. **`onceUntilNextTurn`**
+stays on the action row and prints after the save body.
+
 ## Inherited from base
 
 See [base.md](./base.md). Spell progression, spell attack types, and projectiles

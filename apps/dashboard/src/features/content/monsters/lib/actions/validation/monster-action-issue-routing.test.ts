@@ -29,7 +29,9 @@ describe('monster save action issue routing', () => {
       arrayPath: 'actions',
       expectedCount: 5,
     })
-    expect(actionIssues.some((entry) => entry.claim.target.endsWith('_saveFailureNote'))).toBe(true)
+    expect(actionIssues.some((entry) => entry.claim.target.endsWith('_saveSuccessAmount'))).toBe(
+      true,
+    )
     expect(actionIssues.some((entry) => entry.message === 'Required.')).toBe(false)
   })
 

@@ -4,7 +4,8 @@ import { describe, expect, it } from 'vitest'
 import {
   monsterSaveOutcomeAmount,
   normalizeMonsterSaveOutcomes,
-  withMonsterSaveFailureNote,
+  precedingConditionIdsFromEffects,
+  shouldShowSaveRepeatSaveAuthoring,
   withMonsterSaveOutcomeAmount,
 } from './monster-action-save-outcomes'
 
@@ -12,7 +13,7 @@ const constrictOutcomes = [
   {
     result: 'failed-save' as const,
     applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' as const }],
-    note: 'The target is Grappled.',
+    effects: [{ kind: 'note' as const, description: 'The target is Grappled.' }],
   },
 ]
 
@@ -32,13 +33,24 @@ describe('monster save outcomes', () => {
     expect(monsterSaveOutcomeAmount(next)).toBe('half')
   })
 
-  it('keeps a missing successful save out of the stored draft', () => {
-    const edited = withMonsterSaveFailureNote(constrictOutcomes, 'Still grappled.')
-    expect(normalizeMonsterSaveOutcomes(edited)).toEqual([
+  it('migrates legacy failed-save notes into ordered note effects', () => {
+    const legacy = [
+      {
+        result: 'failed-save' as const,
+        applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' as const }],
+        note: 'The target is Grappled (escape DC equals the save DC).',
+      },
+    ]
+    expect(normalizeMonsterSaveOutcomes(legacy)).toEqual([
       {
         result: 'failed-save',
         applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
-        note: 'Still grappled.',
+        effects: [
+          {
+            kind: 'note',
+            description: 'The target is Grappled (escape DC equals the save DC).',
+          },
+        ],
       },
     ])
   })
@@ -51,6 +63,32 @@ describe('monster save outcomes', () => {
     )
     expect(normalizeMonsterSaveOutcomes(chosen)).toHaveLength(2)
     expect(normalizeMonsterSaveOutcomes(constrictOutcomes)).toEqual(constrictOutcomes)
+  })
+
+  it('surfaces repeat save authoring for condition-first failures', () => {
+    expect(
+      shouldShowSaveRepeatSaveAuthoring(
+        [{ kind: 'condition', conditionId: 'restrained' }],
+        undefined,
+      ),
+    ).toBe(true)
+    expect(
+      shouldShowSaveRepeatSaveAuthoring([], {
+        timing: { participant: 'target', boundary: 'end', which: 'next' },
+        secondFailure: { effects: [{ kind: 'condition', conditionId: 'petrified' }] },
+      }),
+    ).toBe(true)
+    expect(shouldShowSaveRepeatSaveAuthoring([], undefined)).toBe(false)
+  })
+
+  it('collects condition ids for replace-condition options', () => {
+    expect(
+      precedingConditionIdsFromEffects([
+        { kind: 'damage', roll: { dice: { count: 1, faces: 6 } } },
+        { kind: 'condition', conditionId: 'restrained' },
+        { kind: 'condition', conditionId: 'restrained' },
+      ]),
+    ).toEqual(['restrained'])
   })
 
   it('preserves outcome effects and strips incomplete repeat save shells', () => {

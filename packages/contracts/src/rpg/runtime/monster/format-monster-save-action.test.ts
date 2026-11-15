@@ -147,4 +147,50 @@ describe('formatMonsterSaveAction save outcome extensions', () => {
     )
     expect(formatted.body).toContain('Second Failure:')
   })
+
+  it('renders failure or success and keeps envelope-only saves compact', () => {
+    const underwater = monsterActionSchema.parse({
+      id: 'fire-breath-rider',
+      kind: 'save',
+      name: 'Fire Breath',
+      dcSource: { kind: 'ability', ability: 'dex', proficient: true },
+      resolution: {
+        selectionMode: 'self',
+        areaOfEffect: CONE_AREA,
+        method: { kind: 'saving-throw', ability: 'dex' },
+        effects: [
+          {
+            id: 'damage',
+            kind: 'damage',
+            roll: { dice: { count: 4, faces: 6 } },
+            damageType: 'fire',
+          },
+        ],
+        outcomes: [
+          {
+            result: 'failed-save',
+            applications: [{ effectId: 'damage', amount: 'full' }],
+          },
+          {
+            result: 'successful-save',
+            applications: [{ effectId: 'damage', amount: 'half' }],
+          },
+          {
+            result: 'failed-or-successful-save',
+            applications: [],
+            note: "Being underwater doesn't grant Resistance to this Fire damage.",
+          },
+        ],
+      },
+    })
+    if (underwater.kind !== 'save') throw new Error('expected save')
+    const formatted = formatMonsterSaveAction({
+      action: underwater,
+      name: 'Fire Breath',
+      abilityScores: scores,
+      proficiencyBonus: 3,
+    })
+    expect(formatted.body).toContain('Failure or Success:')
+    expect(formatted.body).toContain("Being underwater doesn't grant Resistance")
+  })
 })
