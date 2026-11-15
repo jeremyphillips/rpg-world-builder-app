@@ -19,16 +19,11 @@ describe('orderedEffectFormFields', () => {
     ])
   })
 
-  it('limits save outcome menus when damage is envelope-owned', () => {
-    const field = asArrayField(
-      orderedEffectFormFields({
-        ctx: { damageTypeVocabulary: buildSeedDamageTypeVocabulary() },
-        arrayName: 'actions.0.resolution.outcomes.0.effects',
-        allowedEffectKinds: ['condition', 'note'],
-      }),
-    )
-    if (!field.addAction) throw new Error('expected add action')
-    expect(field.addAction.menu?.items.map((item) => item.id)).toEqual(['condition', 'note'])
+  it('can omit damage from a menu that only adds conditions and notes', () => {
+    expect(buildOrderedEffectAddMenu(['condition', 'note']).map((item) => item.id)).toEqual([
+      'condition',
+      'note',
+    ])
   })
 
   it('exposes replace condition when a preceding stage path is set', () => {

@@ -11,7 +11,7 @@ import { useFormContext, useWatch } from 'react-hook-form'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import { damageFieldGroup } from '../../../../lib/forms/mechanics/damage-field-group'
-import { orderedEffectItemFields } from '../../../../lib/forms/mechanics/ordered-effect-form-fields'
+import { orderedEffectRowFields } from '../../../../lib/effects/ordered-effect-row-fields'
 import { vocabularyFieldLabel } from '@/features/vocabulary'
 import { CONDITION_TERM } from '@rpg/contracts'
 import {
@@ -280,14 +280,14 @@ export function monsterSaveOutcomeEffectsArray(options: {
           />
         ),
       },
-      ...orderedEffectItemFields({
+      ...orderedEffectRowFields({
         ctx: options.ctx,
-        kind: 'condition',
+        kinds: ['condition'],
         precedingEffectsPath: options.precedingEffectsPath,
       }),
-      ...orderedEffectItemFields({
+      ...orderedEffectRowFields({
         ctx: options.ctx,
-        kind: 'note',
+        kinds: ['note'],
       }),
     ],
   }
