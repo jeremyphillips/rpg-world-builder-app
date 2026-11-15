@@ -48,4 +48,37 @@ describe('resolution outcome slot adapters', () => {
 
     expect(resolutionToStored(form)?.outcomes).toEqual(stored)
   })
+
+  it('round-trips save outcome effects, repeat save, and failure-or-success', () => {
+    const method = { kind: 'saving-throw' as const, ability: 'con' as const }
+    const stored = [
+      {
+        result: 'failed-save' as const,
+        applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' as const }],
+        effects: [{ kind: 'condition' as const, conditionId: 'unconscious' as const }],
+        repeatSave: {
+          timing: {
+            participant: 'target' as const,
+            boundary: 'end' as const,
+            which: 'next' as const,
+          },
+          successOnRepeatEndsEffect: true,
+          secondFailure: { note: 'Second tier note.' },
+        },
+      },
+      {
+        result: 'successful-save' as const,
+        applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'half' as const }],
+      },
+      {
+        result: 'failed-or-successful-save' as const,
+        applications: [],
+        note: 'Being underwater does not grant resistance.',
+      },
+    ]
+
+    const slots = storedOutcomesToFormSlots(method, stored)
+    expect(slots).toHaveLength(3)
+    expect(formOutcomesToStoredShape(method, slots)).toEqual(stored)
+  })
 })

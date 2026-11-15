@@ -52,4 +52,40 @@ describe('monster save outcomes', () => {
     expect(normalizeMonsterSaveOutcomes(chosen)).toHaveLength(2)
     expect(normalizeMonsterSaveOutcomes(constrictOutcomes)).toEqual(constrictOutcomes)
   })
+
+  it('preserves outcome effects and strips incomplete repeat save shells', () => {
+    const withEffects = [
+      {
+        result: 'failed-save' as const,
+        applications: [],
+        effects: [{ kind: 'condition' as const, conditionId: 'restrained' as const }],
+        repeatSave: {
+          timing: {
+            participant: 'target' as const,
+            boundary: 'end' as const,
+            which: 'next' as const,
+          },
+          secondFailure: {},
+        },
+      },
+      {
+        result: 'failed-or-successful-save' as const,
+        applications: [],
+        note: 'Environmental rider.',
+      },
+    ]
+
+    expect(normalizeMonsterSaveOutcomes(withEffects)).toEqual([
+      {
+        result: 'failed-save',
+        applications: [],
+        effects: [{ kind: 'condition', conditionId: 'restrained' }],
+      },
+      {
+        result: 'failed-or-successful-save',
+        applications: [],
+        note: 'Environmental rider.',
+      },
+    ])
+  })
 })

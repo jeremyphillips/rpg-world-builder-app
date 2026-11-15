@@ -1,6 +1,8 @@
 import {
   abilitySchema,
   damageTypeIdSchema,
+  orderedEffectSchema,
+  repeatSaveSchema,
   RESOLUTION_APPLICATION_AMOUNTS,
   SPELL_RESOLUTION_ATTACK_TYPES,
   RESOLUTION_PROXIMITY_KINDS,
@@ -64,6 +66,8 @@ export const resolutionOutcomeFormItemSchema = z.object({
   result: z.enum(RESOLUTION_OUTCOME_RESULTS),
   note: z.string().optional(),
   applications: z.array(resolutionOutcomeApplicationFormSchema).default([]),
+  effects: z.array(orderedEffectSchema).optional(),
+  repeatSave: repeatSaveSchema.optional(),
 })
 
 export type ResolutionOutcomeFormItem = z.infer<typeof resolutionOutcomeFormItemSchema>

@@ -1,9 +1,12 @@
 import {
   ensureOutcomeSlotsForMethod,
   findOutcomeByResult,
+  hasMeaningfulRepeatSaveSecondFailure,
   normalizeOutcomeOrder,
   RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
   stripEmptyOutcomeSlots,
+  type OrderedEffect,
+  type RepeatSave,
   type ResolutionApplicationAmount,
   type ResolutionOutcomeResult,
 } from '@rpg/contracts'
@@ -12,6 +15,8 @@ export type MonsterSaveOutcome = {
   result: ResolutionOutcomeResult
   applications: { effectId: string; amount: ResolutionApplicationAmount }[]
   note?: string
+  effects?: OrderedEffect[]
+  repeatSave?: RepeatSave
 }
 
 const SAVING_THROW_METHOD = { kind: 'saving-throw' } as const
@@ -92,9 +97,16 @@ export function withMonsterSaveFailureNote(
   })
 }
 
+function stripIncompleteRepeatSave(outcome: MonsterSaveOutcome): MonsterSaveOutcome {
+  if (!outcome.repeatSave) return outcome
+  if (hasMeaningfulRepeatSaveSecondFailure(outcome.repeatSave.secondFailure)) return outcome
+  const { repeatSave: _removed, ...rest } = outcome
+  return rest
+}
+
 /** Drops empty method slots and restores saving-throw order before draft validation. */
 export function normalizeMonsterSaveOutcomes(value: unknown): MonsterSaveOutcome[] {
   return stripEmptyOutcomeSlots(
     normalizeOutcomeOrder(SAVING_THROW_METHOD, readMonsterSaveOutcomes(value)),
-  )
+  ).map(stripIncompleteRepeatSave)
 }

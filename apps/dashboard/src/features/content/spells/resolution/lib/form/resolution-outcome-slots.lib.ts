@@ -49,6 +49,8 @@ export function storedOutcomesToFormSlots(
       effectId: application.effectId,
       amount: application.amount,
     })),
+    ...(outcome.effects?.length ? { effects: outcome.effects } : {}),
+    ...(outcome.repeatSave ? { repeatSave: outcome.repeatSave } : {}),
   }))
 
   return hydrateOutcomeFormSlots(method, mapped)
@@ -72,6 +74,8 @@ export function formOutcomesToStoredShape(
       effectId: parseEffectId(application.effectId),
       amount: application.amount,
     })),
+    ...(outcome.effects?.length ? { effects: outcome.effects } : {}),
+    ...(outcome.repeatSave ? { repeatSave: outcome.repeatSave } : {}),
   }))
 }
 
