@@ -411,6 +411,13 @@ treats bare leaves and row wraps equivalently.
 8. **Row wrapper for chrome** — use `kind: 'row'` only when fields should share a horizontal row,
    not to pass inline-eligibility gates.
 
+## Acquisition and removal hooks
+
+- Menu item `select(ctx)` writes extra paths through `ctx.append` (registered field-array mutators, otherwise `setValue`). Return a row to append on the current array.
+- `item.remove(ctx)` replaces the default removal. Call `ctx.removeAt` for each list that should lose a row.
+- `item.removable` may be a function `(row, index) => boolean` so some rows have no remove control.
+- Slot `render` receives `{ namePrefix, path }` for the slot's form path.
+
 ## Related
 
 - [containers.md — Array fields](./containers.md#array-fields)

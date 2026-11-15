@@ -36,7 +36,10 @@ import {
 } from '../../lib/forms/registry/content-form-key-helpers'
 import { hydrateOnHitInActionList } from '../../lib/forms/mechanics/hydrate-effect-end-authoring'
 import { mapWeaponActionDamageToForm } from './actions/weapon/monster-weapon-damage-form'
-import { withDefaultSaveResolutionTarget } from './actions/save/monster-save-resolution-target.lib'
+import {
+  withDefaultSaveResolutionTarget,
+  withSaveOutcomeSlots,
+} from './actions/save/monster-save-resolution-target.lib'
 import {
   normalizeMonsterFormValues,
   type MonsterNormalizeBaseline,
@@ -211,22 +214,30 @@ export function monsterToFormValues(
     actions: hydrateOnHitInActionList(
       entity.actions
         .map(mapWeaponActionDamageToForm)
-        .map((action) => withDefaultSaveResolutionTarget(action as Record<string, unknown>)),
+        .map((action) =>
+          withSaveOutcomeSlots(withDefaultSaveResolutionTarget(action as Record<string, unknown>)),
+        ),
     ),
     bonusActions: hydrateOnHitInActionList(
       entity.bonusActions
         .map(mapWeaponActionDamageToForm)
-        .map((action) => withDefaultSaveResolutionTarget(action as Record<string, unknown>)),
+        .map((action) =>
+          withSaveOutcomeSlots(withDefaultSaveResolutionTarget(action as Record<string, unknown>)),
+        ),
     ),
     reactions: hydrateOnHitInActionList(
       entity.reactions
         .map(mapWeaponActionDamageToForm)
-        .map((action) => withDefaultSaveResolutionTarget(action as Record<string, unknown>)),
+        .map((action) =>
+          withSaveOutcomeSlots(withDefaultSaveResolutionTarget(action as Record<string, unknown>)),
+        ),
     ),
     legendaryActions: hydrateOnHitInActionList(
       entity.legendaryActions
         .map(mapWeaponActionDamageToForm)
-        .map((action) => withDefaultSaveResolutionTarget(action as Record<string, unknown>)),
+        .map((action) =>
+          withSaveOutcomeSlots(withDefaultSaveResolutionTarget(action as Record<string, unknown>)),
+        ),
     ),
     ...(entity.legendaryActionUses !== undefined
       ? { legendaryActionUses: entity.legendaryActionUses }

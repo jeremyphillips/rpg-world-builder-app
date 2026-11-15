@@ -429,8 +429,19 @@ export interface ArrayItemConfig {
   resolveCollapsible?: (values: Record<string, unknown>, index: number) => boolean
   /** @default dragHandle */
   reorder?: ArrayItemReorder
-  /** @default true */
-  removable?: boolean
+  /** @default true. A function hides remove for specific rows. */
+  removable?: boolean | ((row: Record<string, unknown>, index: number) => boolean)
+  /**
+   * Replaces the default row removal. Call `removeAt` for this array when the row
+   * should still disappear.
+   */
+  remove?: (ctx: {
+    index: number
+    row: unknown
+    getValues: (path: string) => unknown
+    removeAt: (path: string, index: number) => void
+    setValue: (path: string, value: unknown) => void
+  }) => void
   removeSlot?: Pick<SlotConfig, 'name' | 'render' | 'visibility'>
   /**
    * Extra utility rendered immediately before the default remove button.
@@ -555,7 +566,7 @@ export interface SlotConfig {
    * displays — exact match or prefix ownership.
    */
   issuePaths?: readonly string[]
-  render: () => ReactNode
+  render: (ctx: { namePrefix?: string; path: string }) => ReactNode
   /** Trailing divider after this slot within a group/stack rhythm. */
   separator?: FieldSeparator
   /** Panel or outline shell around slot content. */

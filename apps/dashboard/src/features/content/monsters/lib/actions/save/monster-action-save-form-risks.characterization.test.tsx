@@ -222,7 +222,7 @@ async function expandFailedSaveDamageRows(user: ReturnType<typeof userEvent.setu
     name: new RegExp(MONSTER_SAVE_FAILED_LEGEND, 'i'),
   })
   const damageHeaders = within(failedGroup).getAllByRole('button', {
-    name: /Expand Effects · Damage/i,
+    name: /Expand Damage/i,
   })
   for (const header of damageHeaders) {
     await user.click(header)

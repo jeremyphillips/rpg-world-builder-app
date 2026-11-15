@@ -87,11 +87,44 @@ function applyReactionTriggerDraft(
   else delete cleaned.trigger
 }
 
+function referencedEffectIds(outcomes: readonly unknown[]): Set<string> {
+  const referenced = new Set<string>()
+  for (const outcome of outcomes) {
+    if (!isRecord(outcome)) continue
+    const lists = [outcome.effects]
+    if (isRecord(outcome.repeatSave) && isRecord(outcome.repeatSave.secondFailure)) {
+      lists.push(outcome.repeatSave.secondFailure.effects)
+    }
+    for (const list of lists) {
+      if (!Array.isArray(list)) continue
+      for (const entry of list) {
+        if (!isRecord(entry) || entry.kind !== 'effect-reference') continue
+        if (typeof entry.effectId === 'string') referenced.add(entry.effectId)
+      }
+    }
+  }
+  return referenced
+}
+
+function pruneUnreferencedDamage(effects: unknown[], referenced: ReadonlySet<string>): unknown[] {
+  return effects.filter(
+    (effect) =>
+      !isRecord(effect) ||
+      effect.kind !== 'damage' ||
+      (typeof effect.id === 'string' && referenced.has(effect.id)),
+  )
+}
+
 function applySaveOutcomeDraft(cleaned: Record<string, unknown>): void {
   if (cleaned.kind !== 'save' || !isRecord(cleaned.resolution)) return
   const resolution = cleaned.resolution
   if (!Array.isArray(resolution.outcomes)) return
   resolution.outcomes = normalizeMonsterSaveOutcomes(resolution.outcomes)
+  if (!Array.isArray(resolution.effects)) return
+  resolution.effects = pruneUnreferencedDamage(
+    resolution.effects,
+    referencedEffectIds(resolution.outcomes),
+  )
 }
 
 function applySaveTargetDraft(cleaned: Record<string, unknown>): void {

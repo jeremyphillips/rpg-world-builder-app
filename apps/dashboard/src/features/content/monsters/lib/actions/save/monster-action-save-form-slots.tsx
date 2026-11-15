@@ -1,6 +1,6 @@
 import { Button, ConfirmDialog, OptionalFieldDisclosure, TextareaField } from '@rpg/ui'
 import { useFieldControlSize } from '@rpg/ui/form'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import {
@@ -22,8 +22,6 @@ import {
   withMonsterSaveRepeatSave,
   type MonsterSaveOutcome,
 } from './monster-action-save-outcomes'
-import { findOutcomeByResult } from '@rpg/contracts'
-
 const WRITE_OPTIONS = { shouldDirty: true, shouldTouch: true, shouldValidate: true } as const
 
 function outcomesPath(namePrefix: string): string {
@@ -35,27 +33,6 @@ const REPEAT_SAVE_SUFFIX = MONSTER_SAVE_REPEAT_PATH
 
 function watchPath(namePrefix: string, suffix: string): string {
   return namePrefix ? `${namePrefix}.${suffix}` : suffix
-}
-
-export function MonsterActionSaveEnsureOutcomeSlotsField({ namePrefix }: { namePrefix: string }) {
-  const { setValue, getValues } = useFormContext()
-  const path = outcomesPath(namePrefix)
-  const outcomes = useWatch({ name: path })
-
-  useEffect(() => {
-    const current = readMonsterSaveOutcomes(getValues(path))
-    const slotted = ensureMonsterSaveOutcomeSlots(current)
-    const optional = findOutcomeByResult(current, 'failed-or-successful-save')
-    const merged = optional ? [...slotted, optional] : slotted
-    if (JSON.stringify(merged) !== JSON.stringify(current)) {
-      setValue(path, merged as MonsterSaveOutcome[], {
-        shouldDirty: false,
-        shouldValidate: false,
-      })
-    }
-  }, [getValues, namePrefix, outcomes, path, setValue])
-
-  return null
 }
 
 export function MonsterActionSaveRepeatAdd({

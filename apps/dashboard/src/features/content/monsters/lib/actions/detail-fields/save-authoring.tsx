@@ -46,7 +46,6 @@ import {
 import { MonsterActionCastingAbilityField } from '../spell/monster-action-casting-fields'
 import { monsterSaveDcAbilityHintWhen } from '../save/monster-action-save-field-hints'
 import {
-  MonsterActionSaveEnsureOutcomeSlotsField,
   MonsterActionSaveFailureOrSuccessField,
   MonsterActionSaveRepeatRemove,
   MonsterActionSaveRepeatSaveField,
@@ -393,11 +392,6 @@ export function monsterActionSaveSection(
       hint: MONSTER_SAVE_THROW_SECTION_DESCRIPTION,
     },
     fields: [
-      {
-        kind: 'slot',
-        name: '_saveEnsureOutcomeSlots',
-        render: () => <MonsterActionSaveEnsureOutcomeSlotsField namePrefix={namePrefix} />,
-      },
       {
         kind: 'group',
         headingScale: 'subsection',

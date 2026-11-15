@@ -9,6 +9,13 @@ import type { PickerSearchOptions } from '../../../lib/picker-search.types'
 
 export type ArrayAddMenuDuplicatePolicy = 'allow' | 'warn' | 'block'
 
+export type ArrayAddMenuSelectContext = {
+  rows: unknown[]
+  getValues: (path: string) => unknown
+  /** Appends through registered field-array mutators, or `setValue` when that path is not mounted. */
+  append: (path: string, row: Record<string, unknown>) => void
+}
+
 export type ArrayAddMenuItemConfig = {
   id: string
   label: string
@@ -18,7 +25,13 @@ export type ArrayAddMenuItemConfig = {
   searchTerms?: readonly string[]
   aliases?: readonly string[]
   search?: PickerSearchOptions
-  appendDefaults: Record<string, unknown> | (() => Record<string, unknown>)
+  /** Required unless `select` writes the new row itself. */
+  appendDefaults?: Record<string, unknown> | (() => Record<string, unknown>)
+  /**
+   * Custom acquisition. Return a row to append on this array, or `undefined` when
+   * `ctx.append` already wrote every list.
+   */
+  select?: (ctx: ArrayAddMenuSelectContext) => Record<string, unknown> | undefined
   isDuplicate?: (items: unknown[]) => boolean
   duplicatePolicy?: ArrayAddMenuDuplicatePolicy
 }
@@ -40,8 +53,9 @@ export type ArrayAddMenuConfig = {
 }
 
 export function resolveArrayAddMenuAppendDefaults(
-  appendDefaults: Record<string, unknown> | (() => Record<string, unknown>),
+  appendDefaults: Record<string, unknown> | (() => Record<string, unknown>) | undefined,
 ): Record<string, unknown> {
+  if (!appendDefaults) return {}
   return typeof appendDefaults === 'function' ? appendDefaults() : appendDefaults
 }
 

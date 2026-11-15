@@ -9,6 +9,7 @@
  */
 import * as React from 'react'
 import type { UseFieldArrayAppend, UseFieldArrayReturn } from 'react-hook-form'
+import { useFormContext } from 'react-hook-form'
 
 import type { ArrayAddMenuPresentationMap } from '../../config/array/array-add-menu.lib'
 import { buildArrayAddMenuItems } from '../../config/array/array-add-menu.lib'
@@ -16,6 +17,7 @@ import { useDependsOnValues } from '../../config/form-depends-on.client'
 import { resolveArrayAddAction } from '../../config/array/array-item-config.lib'
 import type { ValidationSessionExpandKey } from '../../errors'
 import type { ArrayConfig } from '../../field-config'
+import { getArrayFieldMutators } from '../../context/array-field-mutators.registry'
 import {
   assertAppendPayload,
   buildArrayAddMenuExpandKeys,
@@ -24,6 +26,8 @@ import {
   resolveArrayAppendDefaults,
   scheduleArrayItemFocus,
 } from './array-field-append.lib'
+
+const ARRAY_WRITE = { shouldDirty: true, shouldTouch: true, shouldValidate: true } as const
 
 type UseArrayFieldAppendOptions = {
   config: ArrayConfig
@@ -92,14 +96,40 @@ export function useArrayFieldAppend({
     ],
   )
 
+  const { control, setValue } = useFormContext()
+
+  const appendAtPath = React.useCallback(
+    (path: string, row: Record<string, unknown>) => {
+      const mutators = getArrayFieldMutators(control, path)
+      if (mutators) {
+        mutators.append(row)
+        return
+      }
+      const current = getValues(path)
+      const next = Array.isArray(current) ? [...current, row] : [row]
+      setValue(path, next, ARRAY_WRITE)
+    },
+    [control, getValues, setValue],
+  )
+
   const appendFromAddMenu = React.useCallback(
     (itemId: string) => {
       const menuItem = resolveArrayAddAction(config)?.menu?.items.find((item) => item.id === itemId)
       if (!menuItem) return
+      if (menuItem.select) {
+        const rows = (getValues(fullName) as unknown[]) ?? []
+        const row = menuItem.select({
+          rows,
+          getValues: (path) => getValues(path),
+          append: appendAtPath,
+        })
+        if (row) appendItemWithDefaults(row)
+        return
+      }
 
       appendItemWithDefaults(mergeArrayAddMenuDefaults(menuItem, staticItemDefaults, config.fields))
     },
-    [appendItemWithDefaults, config, staticItemDefaults],
+    [appendAtPath, appendItemWithDefaults, config, fullName, getValues, staticItemDefaults],
   )
 
   const addActionMenu = resolveArrayAddAction(config)?.menu
