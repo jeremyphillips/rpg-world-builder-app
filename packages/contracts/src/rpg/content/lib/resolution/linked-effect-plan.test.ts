@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { planLinkedEffectAdd } from './linked-effect-plan'
-import { stripEffectFromOutcomes } from './outcome-change-plan'
+import { planLinkedEffectAdd, planLinkedEffectRemove } from './linked-effect-plan'
 import { nextResolutionEffectId } from './resolution-effect-id-alloc'
 import { resolutionEffectIdSchema } from './resolution-effect-id'
 
@@ -39,15 +38,30 @@ describe('planLinkedEffectAdd', () => {
       },
     ])
   })
+})
 
-  it('strips every reference to a removed id', () => {
+describe('planLinkedEffectRemove', () => {
+  it('removes the definition and every outcome reference while preserving unrelated rows', () => {
     const keep = resolutionEffectIdSchema.parse('keep')
     const drop = resolutionEffectIdSchema.parse('drop')
-    const outcomes = stripEffectFromOutcomes(
-      [
+    const plan = planLinkedEffectRemove({
+      library: [
+        { id: drop, kind: 'damage' },
+        { id: keep, kind: 'damage' },
+      ],
+      outcomes: [
         {
           result: 'failed-save',
-          effects: [{ kind: 'effect-reference', effectId: keep, amount: 'full' }],
+          effects: [
+            { kind: 'effect-reference', effectId: drop, amount: 'full' },
+            { kind: 'effect-reference', effectId: keep, amount: 'full' },
+          ],
+          repeatSave: {
+            timing: { participant: 'target', boundary: 'end', which: 'next' },
+            secondFailure: {
+              effects: [{ kind: 'effect-reference', effectId: drop, amount: 'full' }],
+            },
+          },
         },
         {
           result: 'successful-save',
@@ -57,9 +71,14 @@ describe('planLinkedEffectAdd', () => {
           ],
         },
       ],
-      drop,
-    )
-    expect(outcomes[1]?.effects).toEqual([
+      effectId: drop,
+    })
+    expect(plan.library).toEqual([{ id: keep, kind: 'damage' }])
+    expect(plan.outcomes[0]?.effects).toEqual([
+      { kind: 'effect-reference', effectId: keep, amount: 'full' },
+    ])
+    expect(plan.outcomes[0]?.repeatSave?.secondFailure.effects).toEqual([])
+    expect(plan.outcomes[1]?.effects).toEqual([
       { kind: 'effect-reference', effectId: keep, amount: 'half' },
     ])
   })

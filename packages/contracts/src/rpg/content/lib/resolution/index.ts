@@ -162,9 +162,11 @@ export {
 export { DAMAGE_APPLICATION_AMOUNT_PRESENTATION } from './damage-application-labels'
 export {
   planLinkedEffectAdd,
+  planLinkedEffectRemove,
   type LinkedEffectAddPlan,
   type LinkedEffectPlacement,
   type LinkedEffectReference,
+  type LinkedEffectRemovePlan,
 } from './linked-effect-plan'
 export { nextResolutionEffectId } from './resolution-effect-id-alloc'
 export { mapOutcomeResultBetweenMethodKinds } from './outcome-method-map'

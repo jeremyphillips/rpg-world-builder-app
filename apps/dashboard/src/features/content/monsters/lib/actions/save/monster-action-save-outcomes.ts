@@ -5,7 +5,6 @@ import {
   hasMeaningfulOutcomeContent,
   hasMeaningfulRepeatSaveSecondFailure,
   normalizeOutcomeOrder,
-  RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
   stripEmptyOutcomeSlots,
   type OrderedEffect,
   type RepeatSave,
@@ -63,65 +62,6 @@ function slotSavingThrowOutcomes(outcomes: readonly MonsterSaveOutcome[]): Monst
   }))
 }
 
-export function effectReferencesIn(effects: unknown): MonsterSaveEffectReference[] {
-  if (!Array.isArray(effects)) return []
-  return effects.filter(
-    (entry): entry is MonsterSaveEffectReference =>
-      Boolean(entry) &&
-      typeof entry === 'object' &&
-      (entry as MonsterSaveEffectReference).kind === 'effect-reference' &&
-      typeof (entry as MonsterSaveEffectReference).effectId === 'string',
-  )
-}
-
-function outcomeLists(outcome: MonsterSaveOutcome): unknown[] {
-  return [outcome.effects, outcome.repeatSave?.secondFailure.effects]
-}
-
-export function countMonsterSaveEffectReferences(
-  outcomes: readonly MonsterSaveOutcome[],
-  effectId: string,
-): number {
-  return outcomes.reduce((count, outcome) => {
-    const lists = outcomeLists(outcome).reduce((listCount: number, effects) => {
-      return (
-        listCount +
-        effectReferencesIn(effects).filter((reference) => reference.effectId === effectId).length
-      )
-    }, 0)
-    return count + lists
-  }, 0)
-}
-
-export function stripMonsterSaveEffectReferences(
-  outcomes: readonly MonsterSaveOutcome[],
-  effectId: string,
-): MonsterSaveOutcome[] {
-  const strip = <T extends { kind: string }>(effects: readonly T[] | undefined): T[] | undefined =>
-    effects?.filter((effect) => {
-      if (effect.kind !== 'effect-reference') return true
-      return (effect as { effectId?: string }).effectId !== effectId
-    })
-
-  return outcomes.map((outcome) => {
-    const next: MonsterSaveOutcome = {
-      ...outcome,
-      effects: strip(outcome.effects),
-    }
-    if (!outcome.repeatSave) return next
-    return {
-      ...next,
-      repeatSave: {
-        ...outcome.repeatSave,
-        secondFailure: {
-          ...outcome.repeatSave.secondFailure,
-          effects: strip(outcome.repeatSave.secondFailure.effects),
-        },
-      },
-    }
-  })
-}
-
 type LibraryEffect = { id?: string; kind?: string; damageType?: string }
 
 export function readResolutionEffects(effects: unknown): LibraryEffect[] {
@@ -129,49 +69,6 @@ export function readResolutionEffects(effects: unknown): LibraryEffect[] {
   return effects.filter(
     (effect): effect is LibraryEffect => Boolean(effect) && typeof effect === 'object',
   )
-}
-
-/** Always a new id. The first damage definition may use the primary id. */
-export function nextMonsterSaveDamageEffectId(effects: unknown): string {
-  const ids = new Set(
-    readResolutionEffects(effects)
-      .map((effect) => effect.id)
-      .filter((id): id is string => typeof id === 'string' && id.length > 0),
-  )
-  if (!ids.has(RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID)) return RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID
-  let index = 2
-  while (ids.has(`damage-${index}`)) index += 1
-  return `damage-${index}`
-}
-
-export function createMonsterSaveDamageDefinition(effectId: string) {
-  return {
-    id: effectId,
-    kind: 'damage' as const,
-    roll: { dice: { count: 1, faces: 6 } },
-    damageType: 'fire',
-  }
-}
-
-export function referencedEffectIds(effects: unknown): Set<string> {
-  return new Set(effectReferencesIn(effects).map((reference) => reference.effectId))
-}
-
-export function eligibleExistingSaveEffects(
-  library: unknown,
-  listEffects: unknown,
-): LibraryEffect[] {
-  const used = referencedEffectIds(listEffects)
-  return readResolutionEffects(library).filter(
-    (effect) => typeof effect.id === 'string' && effect.id.length > 0 && !used.has(effect.id),
-  )
-}
-
-export function isUnusedSaveEffect(
-  effectId: string,
-  outcomes: readonly MonsterSaveOutcome[],
-): boolean {
-  return countMonsterSaveEffectReferences(outcomes, effectId) === 0
 }
 
 function orderedEffectsIncludeKind(effects: unknown, kind: string): boolean {

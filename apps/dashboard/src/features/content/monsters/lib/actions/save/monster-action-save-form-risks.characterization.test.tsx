@@ -7,6 +7,7 @@
 import { useEffect } from 'react'
 import { act, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { planLinkedEffectRemove } from '@rpg/contracts'
 import { FormItems, getArrayFieldMutators } from '@rpg/ui/form'
 import { FormProvider, useController, useForm, type UseFormReturn } from 'react-hook-form'
 import { beforeAll, describe, expect, it } from 'vitest'
@@ -33,7 +34,6 @@ import {
   ensureMonsterSaveOutcomeSlots,
   readMonsterSaveOutcomes,
   readResolutionEffects,
-  stripMonsterSaveEffectReferences,
 } from './monster-action-save-outcomes'
 
 beforeAll(() => {
@@ -138,7 +138,13 @@ function dualDamageSaveAction(): MonsterActionDraftRow {
           result: 'failed-save',
           effects: [effectReference(DAMAGE_A), effectReference(DAMAGE_B)],
         },
-        { result: 'successful-save', effects: [] },
+        {
+          result: 'successful-save',
+          effects: [
+            { kind: 'effect-reference', effectId: DAMAGE_A, amount: 'none' },
+            { kind: 'effect-reference', effectId: DAMAGE_B, amount: 'half' },
+          ],
+        },
       ]),
       target: {
         count: 1,
@@ -253,17 +259,13 @@ describe('monster save form risks (Phase 2 characterization)', () => {
       await act(async () => {
         const form = formRef.current!
         getArrayFieldMutators(form.control, failedPath)?.remove(0)
-        const outcomes = readMonsterSaveOutcomes(form.getValues(outcomesPath))
-        form.setValue(outcomesPath, stripMonsterSaveEffectReferences(outcomes, DAMAGE_A), {
-          shouldDirty: true,
-          shouldValidate: false,
+        const plan = planLinkedEffectRemove({
+          library: readResolutionEffects(form.getValues(libraryPath)),
+          outcomes: readMonsterSaveOutcomes(form.getValues(outcomesPath)),
+          effectId: DAMAGE_A,
         })
-        const library = readResolutionEffects(form.getValues(libraryPath))
-        form.setValue(
-          libraryPath,
-          library.filter((effect) => effect.id !== DAMAGE_A),
-          { shouldDirty: true, shouldValidate: false },
-        )
+        form.setValue(outcomesPath, plan.outcomes, { shouldDirty: true, shouldValidate: false })
+        form.setValue(libraryPath, plan.library, { shouldDirty: true, shouldValidate: false })
       })
 
       await waitFor(() => {
@@ -372,9 +374,37 @@ describe('monster save form risks (Phase 2 characterization)', () => {
   })
 })
 
-describe.skip('spell resolution risks parked for Phase 8', () => {
-  it.todo('R2 — spell outcome second add is a no-op (append: () => undefined on the custom list)')
-  it.todo(
-    'P4 — useFieldArray at resolution.outcomes.N.effects wipes sibling resolution.effects and outcome result. Blocks mounting resolutionOutcomeEffectsArray until fixed without private RHF state.',
-  )
+describe('owner damage row remove (Phase 7)', () => {
+  it('removes the library definition and every linked outcome reference via the array remove control', async () => {
+    const user = userEvent.setup()
+    const formRef: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }
+    render(<SaveActionFormHost action={dualDamageSaveAction()} formRef={formRef} />)
+    await configureSaveDcSource(user)
+    await waitForMountedDamageLibrary(formRef, 2)
+    await expandFailedSaveDamageRows(user)
+
+    const failedList = screen.getByRole('group', {
+      name: new RegExp(MONSTER_SAVE_FAILED_LEGEND, 'i'),
+    })
+    const removeButtons = within(failedList).getAllByRole('button', { name: /^Remove Damage/i })
+    await user.click(removeButtons[0]!)
+
+    await waitFor(() => {
+      const library = readResolutionEffects(
+        formRef.current!.getValues('actions.0.resolution.effects'),
+      )
+      expect(library).toHaveLength(1)
+      expect(library[0]?.id).toBe(DAMAGE_B)
+
+      const outcomes = readMonsterSaveOutcomes(
+        formRef.current!.getValues('actions.0.resolution.outcomes'),
+      )
+      const failed = outcomes.find((outcome) => outcome.result === 'failed-save')
+      const success = outcomes.find((outcome) => outcome.result === 'successful-save')
+      expect(failed?.effects).toEqual([effectReference(DAMAGE_B)])
+      expect(success?.effects).toEqual([
+        { kind: 'effect-reference', effectId: DAMAGE_B, amount: 'half' },
+      ])
+    })
+  })
 })

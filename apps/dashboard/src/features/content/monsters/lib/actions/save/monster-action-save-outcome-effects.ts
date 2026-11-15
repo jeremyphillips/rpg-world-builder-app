@@ -22,6 +22,9 @@ export function monsterSaveOutcomeEffectsFields(options: {
   const successPath = options.namePrefix
     ? `${options.namePrefix}.${MONSTER_SAVE_SUCCESS_EFFECTS_PATH}`
     : MONSTER_SAVE_SUCCESS_EFFECTS_PATH
+  const outcomesPath = options.namePrefix
+    ? `${options.namePrefix}.resolution.outcomes`
+    : 'resolution.outcomes'
   const references =
     options.arrayName === MONSTER_SAVE_FAILED_EFFECTS_PATH
       ? { role: 'owner' as const, linked: [{ path: successPath, amount: 'none' as const }] }
@@ -35,6 +38,8 @@ export function monsterSaveOutcomeEffectsFields(options: {
       name: options.arrayName,
       listPath,
       libraryPath,
+      outcomesPath:
+        options.arrayName === MONSTER_SAVE_FAILED_EFFECTS_PATH ? outcomesPath : undefined,
       inlineKinds: ['condition', 'note'],
       references,
       precedingEffectsPath: options.precedingEffectsPath,
