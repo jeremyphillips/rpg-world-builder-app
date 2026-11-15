@@ -141,7 +141,7 @@ export function ArrayFieldRendererFieldset({
             ) : null}
           </>
         )}
-        {!inlineAddInHeader ? (
+        {!inlineAddInHeader && state.showAddControl ? (
           <div className={state.addActionLayout === 'stacked' ? 'mt-4' : undefined}>
             {addControl}
           </div>

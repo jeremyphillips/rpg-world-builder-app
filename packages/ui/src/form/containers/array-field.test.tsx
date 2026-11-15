@@ -428,6 +428,32 @@ describe('ArrayFieldRenderer', () => {
     expect(addButton.querySelector('svg')).toBeTruthy()
   })
 
+  it('omits the stacked add wrapper when addAction is false', () => {
+    const noBuiltinAddFields: FormItem[] = [
+      { type: 'text', name: 'name', label: 'Name', required: true },
+      {
+        kind: 'array',
+        name: 'traits',
+        heading: { label: 'Traits' },
+        fields: traitFields,
+        addAction: false,
+      },
+    ]
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={noBuiltinAddFields}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    const fieldset = screen.getByRole('group', { name: /Traits/i })
+    expect(fieldset.querySelector('.mt-4')).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Add trait' })).toBeNull()
+  })
+
   it('omits the add icon when showAddIcon is false', () => {
     const noIconFields: FormItem[] = [
       {
