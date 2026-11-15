@@ -329,7 +329,16 @@ export interface ArrayItemHeaderConfig {
    * Computed primary label; overrides `primaryField` when set.
    * Use for grant rows, tier summaries, or multi-field titles.
    */
-  primary?: (values: Record<string, unknown>, index: number) => string | undefined
+  primary?: (
+    values: Record<string, unknown>,
+    index: number,
+    watched?: Record<string, unknown>,
+  ) => string | undefined
+  /**
+   * Root-relative paths passed as `watched` to `primary`. Set when the title reads
+   * values the row does not own.
+   */
+  primaryDependsOn?: string[]
   /**
    * Fallback title when the primary is empty — also used for aria labels.
    * Required; typically `Item ${index + 1}` or a domain label like `Grant ${index + 1}`.

@@ -61,7 +61,8 @@ export function useArrayFieldItemContentState({
   const headerConfig = resolveArrayItemHeader(config, legend)
   const primaryField = headerConfig.primaryField
   const summaryDependsOn = headerConfig.summaryDependsOn ?? []
-  const watchedSummaryContext = useDependsOnValues(summaryDependsOn)
+  const headerDependsOn = [...summaryDependsOn, ...(headerConfig.primaryDependsOn ?? [])]
+  const watchedSummaryContext = useDependsOnValues(headerDependsOn)
   const watchedPrimary = useWatch({
     name: primaryField ? `${fullName}.${index}.${primaryField}` : `${fullName}.${index}`,
     disabled: !primaryField,
@@ -93,6 +94,7 @@ export function useArrayFieldItemContentState({
     index,
     watchedPrimary,
     legend,
+    watchedSummaryContext,
   )
   const reorder = resolveArrayItemReorder(config)
   const presentation = resolveArrayItemPresentation({

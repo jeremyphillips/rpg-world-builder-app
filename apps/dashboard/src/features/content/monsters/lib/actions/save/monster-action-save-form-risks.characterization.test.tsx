@@ -373,6 +373,8 @@ describe('monster save form risks (Phase 2 characterization)', () => {
 })
 
 describe.skip('spell resolution risks parked for Phase 8', () => {
-  it.todo('R2 — spell outcome second add is a no-op')
-  it.todo('P4 — empty nested field array corrupts spell outcomes')
+  it.todo('R2 — spell outcome second add is a no-op (append: () => undefined on the custom list)')
+  it.todo(
+    'P4 — useFieldArray at resolution.outcomes.N.effects wipes sibling resolution.effects and outcome result. Blocks mounting resolutionOutcomeEffectsArray until fixed without private RHF state.',
+  )
 })

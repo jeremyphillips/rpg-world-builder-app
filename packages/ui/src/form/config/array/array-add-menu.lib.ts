@@ -32,6 +32,8 @@ export type ArrayAddMenuItemConfig = {
    * `ctx.append` already wrote every list.
    */
   select?: (ctx: ArrayAddMenuSelectContext) => Record<string, unknown> | undefined
+  disabled?: boolean
+  note?: string
   isDuplicate?: (items: unknown[]) => boolean
   duplicatePolicy?: ArrayAddMenuDuplicatePolicy
 }
@@ -50,6 +52,11 @@ export type ArrayAddMenuConfig = {
     watched: Record<string, unknown>,
     items: unknown[],
   ) => ArrayAddMenuPresentationMap | undefined
+  /**
+   * Rebuilds the menu from watched values. Use when the item list itself changes
+   * (for example one entry per unused library row). Static `items` are the fallback.
+   */
+  resolveItems?: (watched: Record<string, unknown>, rows: unknown[]) => ArrayAddMenuItemConfig[]
 }
 
 export function resolveArrayAddMenuAppendDefaults(
@@ -85,8 +92,10 @@ export function buildArrayAddMenuItems(
   return addActionMenu.items.map((item) => {
     const presentation = resolveArrayAddMenuItemPresentation(item, currentItems)
     const dynamic = context?.presentation?.[item.id]
-    const disabled = presentation.disabled || Boolean(dynamic?.disabled)
-    const note = presentation.disabled ? presentation.note : (dynamic?.note ?? presentation.note)
+    const disabled = presentation.disabled || Boolean(item.disabled) || Boolean(dynamic?.disabled)
+    const note = presentation.disabled
+      ? presentation.note
+      : (dynamic?.note ?? item.note ?? presentation.note)
     return {
       id: item.id,
       label: item.label,

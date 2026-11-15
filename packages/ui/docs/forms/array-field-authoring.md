@@ -351,6 +351,12 @@ arrayPattern: {
 },
 ```
 
+## Dynamic add menus and titles
+
+`addAction.menu.items` is a fixed list. `presentationWhen` only changes disabled state and notes. When the list itself depends on form state (one entry per unused library row), set `menu.resolveItems(watched, rows)`. The click handler reads that resolved list, so `select` on a dynamic item still runs.
+
+`header.primary` receives row values. Set `header.primaryDependsOn` when the title must read a path the row does not own. Those values arrive as the third argument. `summaryDependsOn` is unchanged and still feeds `summary`.
+
 ## Presentation model
 
 Array items resolve to **three structural anatomies**:

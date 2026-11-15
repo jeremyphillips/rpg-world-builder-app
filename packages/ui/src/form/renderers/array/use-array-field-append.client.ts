@@ -112,10 +112,21 @@ export function useArrayFieldAppend({
     [control, getValues, setValue],
   )
 
+  const addActionMenu = resolveArrayAddAction(config)?.menu
+  const menuContextValues = useDependsOnValues(addActionMenu?.contextDependsOn ?? [], fullName)
+  const resolvedMenuItems = React.useMemo(() => {
+    if (!addActionMenu) return []
+    return (
+      addActionMenu.resolveItems?.(menuContextValues, watchedItems ?? []) ?? addActionMenu.items
+    )
+  }, [addActionMenu, menuContextValues, watchedItems])
+  const resolvedMenuItemsRef = React.useRef(resolvedMenuItems)
+  resolvedMenuItemsRef.current = resolvedMenuItems
+
   const appendFromAddMenu = React.useCallback(
     (itemId: string) => {
-      const menuItem = resolveArrayAddAction(config)?.menu?.items.find((item) => item.id === itemId)
-      if (!menuItem) return
+      const menuItem = resolvedMenuItemsRef.current.find((item) => item.id === itemId)
+      if (!menuItem || menuItem.disabled) return
       if (menuItem.select) {
         const rows = (getValues(fullName) as unknown[]) ?? []
         const row = menuItem.select({
@@ -129,11 +140,8 @@ export function useArrayFieldAppend({
 
       appendItemWithDefaults(mergeArrayAddMenuDefaults(menuItem, staticItemDefaults, config.fields))
     },
-    [appendAtPath, appendItemWithDefaults, config, fullName, getValues, staticItemDefaults],
+    [appendAtPath, appendItemWithDefaults, config.fields, fullName, getValues, staticItemDefaults],
   )
-
-  const addActionMenu = resolveArrayAddAction(config)?.menu
-  const menuContextValues = useDependsOnValues(addActionMenu?.contextDependsOn ?? [], fullName)
 
   const addActionMenuItems = React.useMemo(() => {
     if (!addActionMenu) return []
@@ -141,8 +149,12 @@ export function useArrayFieldAppend({
     if (addActionMenu.presentationWhen) {
       presentation = addActionMenu.presentationWhen(menuContextValues, watchedItems ?? [])
     }
-    return buildArrayAddMenuItems(addActionMenu, watchedItems ?? [], { presentation })
-  }, [addActionMenu, menuContextValues, watchedItems])
+    return buildArrayAddMenuItems(
+      { ...addActionMenu, items: resolvedMenuItems },
+      watchedItems ?? [],
+      { presentation },
+    )
+  }, [addActionMenu, menuContextValues, resolvedMenuItems, watchedItems])
 
   return { appendItem, appendItemWithDefaults, appendFromAddMenu, addActionMenuItems }
 }
