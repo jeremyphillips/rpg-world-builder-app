@@ -28,6 +28,8 @@ import { monsterArmorClassFields } from './statistics/monster-armor-class-fields
 import { monsterHitPointsFields } from './statistics/monster-hit-points-form-fields'
 import {
   MONSTER_CHALLENGE_HEADING,
+  MONSTER_ALTERNATE_FORM_APPEARANCE_LABEL,
+  MONSTER_ALTERNATE_FORM_NAME_LABEL,
   MONSTER_LEGENDARY_ACTIONS_HEADING,
   MONSTER_LEGENDARY_LAIR_USES_LABEL,
   MONSTER_LEGENDARY_USES_LABEL,
@@ -44,6 +46,7 @@ import {
   embeddedArrayResolverField,
   embeddedMasterDetailTabValidation,
 } from '../../lib/forms/validation/tabbed-form-resolver-fields'
+import { monsterAlternateFormRowResolveFields } from './forms/monster-forms-validation-fields'
 
 const alignmentOptions = toOptions(
   Object.keys(ALIGNMENT_ENTRIES),
@@ -135,6 +138,25 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
   ]
 
   const creatureDetails: FormItem[] = creatureDetailsFields(ctx)
+  const formsValidation = embeddedMasterDetailTabValidation({
+    path: 'forms.alternates',
+    itemLabel: 'Alternate forms',
+    fields: [],
+    resolveItemFields: monsterAlternateFormRowResolveFields(ctx),
+  })
+  const trueFormResolverFields: FormItem[] = [
+    {
+      type: 'text',
+      name: 'forms.trueForm.name',
+      label: MONSTER_ALTERNATE_FORM_NAME_LABEL,
+      required: true,
+    },
+    {
+      type: 'text',
+      name: 'forms.trueForm.appearance',
+      label: MONSTER_ALTERNATE_FORM_APPEARANCE_LABEL,
+    },
+  ]
 
   const equipment: FormItem[] = [
     { kind: 'slot', name: 'equipment', render: () => <MonsterEquipmentPanel ctx={ctx} /> },
@@ -195,7 +217,13 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
   return [
     { id: MONSTER_FORM_TAB.identity, label: 'Identity', fields: identity },
     { id: MONSTER_FORM_TAB.statistics, label: 'Statistics', fields: statistics },
-    { id: MONSTER_FORM_TAB.creatureDetails, label: 'Creature Details', fields: creatureDetails },
+    {
+      id: MONSTER_FORM_TAB.creatureDetails,
+      label: 'Creature Details',
+      fields: creatureDetails,
+      errorPaths: ['forms'],
+      resolverFields: [...trueFormResolverFields, ...formsValidation.resolverFields],
+    },
     { id: MONSTER_FORM_TAB.equipment, label: monsterEquipmentSectionLabel(), fields: equipment },
     {
       id: MONSTER_FORM_TAB.traits,

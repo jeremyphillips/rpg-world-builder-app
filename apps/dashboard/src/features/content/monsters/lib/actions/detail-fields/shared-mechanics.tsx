@@ -3,6 +3,9 @@ import {
   getWeaponModeLabel,
   isPrimarySpellcastingAction,
   monsterActionUsageCapability,
+  SHAPE_SHIFT_EQUIPMENT,
+  SHAPE_SHIFT_EQUIPMENT_ENTRIES,
+  type ShapeShiftEquipment,
   WEAPON_MODES,
   REACH_FEET,
 } from '@rpg/contracts'
@@ -11,6 +14,7 @@ import {
   type FieldVisibility,
   type FormItem,
   type JoinedPairFieldConfig,
+  toOptions,
 } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
@@ -40,6 +44,10 @@ import {
   MONSTER_ATTACK_BONUS_LABEL,
   MONSTER_TRIGGER_LABEL,
   MONSTER_TRIGGER_PLACEHOLDER,
+  MONSTER_SHAPE_SHIFT_EQUIPMENT_LABEL,
+  MONSTER_SHAPE_SHIFT_PREREQUISITE_ADD_LABEL,
+  MONSTER_SHAPE_SHIFT_PREREQUISITE_HINT,
+  MONSTER_SHAPE_SHIFT_PREREQUISITE_LABEL,
 } from '../../monster-form-labels'
 import type { MonsterActionSection } from '../references/monster-action-equipment-references'
 import type { MonsterActionDraftRow } from '../monster-action-presets'
@@ -436,6 +444,28 @@ export function monsterActionMechanicFields(input: {
         ]
       : []
   const kindFields: FormItem[] = []
+  if (action.kind === 'shape-shift') {
+    kindFields.push(
+      {
+        type: 'radio',
+        name: `${namePrefix}.equipment`,
+        label: MONSTER_SHAPE_SHIFT_EQUIPMENT_LABEL,
+        options: toOptions(
+          SHAPE_SHIFT_EQUIPMENT,
+          Object.fromEntries(
+            SHAPE_SHIFT_EQUIPMENT.map((id) => [id, SHAPE_SHIFT_EQUIPMENT_ENTRIES[id].label]),
+          ) as Record<ShapeShiftEquipment, string>,
+        ),
+      },
+      {
+        type: 'text',
+        name: `${namePrefix}.prerequisite`,
+        label: MONSTER_SHAPE_SHIFT_PREREQUISITE_LABEL,
+        hint: MONSTER_SHAPE_SHIFT_PREREQUISITE_HINT,
+        optionalDisclosure: { addLabel: MONSTER_SHAPE_SHIFT_PREREQUISITE_ADD_LABEL },
+      },
+    )
+  }
   if (action.kind === 'weapon') {
     kindFields.push(
       monsterWeaponDamageOverrideField({

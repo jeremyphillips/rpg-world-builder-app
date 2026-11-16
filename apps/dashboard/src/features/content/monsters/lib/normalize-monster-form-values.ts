@@ -338,6 +338,11 @@ function normalizeAction(
   applyReactionTriggerDraft(cleaned, section)
   applyTurnAndInvocationDraft(cleaned, section)
   applyLimitedUseDraft(cleaned)
+  if (cleaned.kind === 'shape-shift' && typeof cleaned.prerequisite === 'string') {
+    const prerequisite = normalizePrerequisite(cleaned.prerequisite)
+    if (prerequisite) cleaned.prerequisite = prerequisite
+    else delete cleaned.prerequisite
+  }
   applySpellEntryDraft(cleaned)
   omitTakeActionsCombination(cleaned, intent)
   normalizeWeaponActionDamage(cleaned)
@@ -487,15 +492,12 @@ function normalizedActionSections(
   }
 }
 
-export function normalizeMonsterFormValues(
+function normalizedMonsterCore(
   values: MonsterFormValues,
   options: NormalizeMonsterFormOptions,
+  movement: Record<string, number>,
 ): Record<string, unknown> {
-  const movementRecord = movementRowsToRecordForPreview(values.movement ?? [])
-  const hasFly = typeof movementRecord.fly === 'number'
-  const challengeRating = values.challengeRating
-
-  const normalized: Record<string, unknown> = {
+  return {
     name: typeof values.name === 'string' ? values.name : '',
     sizes: values.sizes,
     creatureType: values.creatureType,
@@ -505,7 +507,7 @@ export function normalizeMonsterFormValues(
     abilityScores: values.abilityScores,
     armorClass: normalizeArmorClass(values.armorClass, options.armorClassRules),
     hitPoints: normalizeHitPoints(values.hitPoints),
-    movement: movementRecord,
+    movement,
     senses: values.senses ?? [],
     communication: normalizeCommunication(values.communication),
     proficiencies: normalizeProficiencies(
@@ -515,8 +517,20 @@ export function normalizeMonsterFormValues(
     defenses: values.defenses,
     equipment: values.equipment,
     traits: normalizeTraitRichText(omitEmptyStrings(values.traits)),
+    ...(values.forms ? { forms: normalizeMonsterForms(values.forms) } : {}),
     ...normalizedActionSections(values, options.intent),
   }
+}
+
+export function normalizeMonsterFormValues(
+  values: MonsterFormValues,
+  options: NormalizeMonsterFormOptions,
+): Record<string, unknown> {
+  const movementRecord = movementRowsToRecordForPreview(values.movement ?? [])
+  const hasFly = typeof movementRecord.fly === 'number'
+  const challengeRating = values.challengeRating
+
+  const normalized = normalizedMonsterCore(values, options, movementRecord)
 
   applyOptionalScalars(normalized, values, challengeRating, hasFly)
   if (options.mode === 'update' && options.baseline) {
@@ -535,6 +549,31 @@ export function normalizeMonsterDraftForPreview(
   options: NormalizeMonsterFormOptions,
 ): Monster {
   return normalizeMonsterFormValues(values, options) as Monster
+}
+
+function normalizePrerequisite(value: string): string {
+  return value
+    .trim()
+    .replace(/[,.]+$/u, '')
+    .trim()
+}
+
+function normalizeMonsterForms(forms: NonNullable<MonsterFormValues['forms']>) {
+  const cleaned = omitEmptyStrings(forms)
+  if (!isRecord(cleaned)) return cleaned
+  const shape = cleaned
+  const alternates = Array.isArray(shape.alternates) ? shape.alternates : []
+  return {
+    ...shape,
+    alternates: alternates.map((entry) => {
+      if (!isRecord(entry)) return entry
+      const overrides = isRecord(entry.overrides) ? entry.overrides : undefined
+      return {
+        ...entry,
+        ...(overrides && Object.keys(overrides).length > 0 ? { overrides } : {}),
+      }
+    }),
+  }
 }
 
 function applyOptionalScalars(

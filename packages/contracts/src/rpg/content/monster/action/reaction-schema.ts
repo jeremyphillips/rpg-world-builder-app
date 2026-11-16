@@ -46,6 +46,7 @@ function extendReactionSources<T extends { shape: { kind: z.ZodType } }>(options
     'attack',
     'save',
     'multiattack',
+    'shape-shift',
     'action-reference',
   ]).map((option) => (option as unknown as z.ZodObject).extend(reactionTriggerField))
 }

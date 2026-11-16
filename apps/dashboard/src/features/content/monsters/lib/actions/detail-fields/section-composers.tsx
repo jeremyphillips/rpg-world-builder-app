@@ -21,6 +21,7 @@ import { MonsterActionBonusSummary } from '../../../components/form/actions/mons
 import { MonsterActionParrySummary } from '../../../components/form/actions/monster-action-parry-summary'
 import { MonsterActionMultiattackSummary } from '../../../components/form/actions/monster-action-multiattack-summary'
 import { MonsterActionSpellSummary } from '../../../components/form/actions/monster-action-spell-summary'
+import { MonsterActionShapeShiftSummary } from '../../../components/form/actions/monster-action-shape-shift-summary'
 import {
   MONSTER_RULES_TEXT_LABEL,
   MONSTER_CUSTOM_DESCRIPTION_ADD_LABEL,
@@ -55,6 +56,7 @@ import {
 } from '../../monster-form-labels'
 import type { MonsterActionSection } from '../references/monster-action-equipment-references'
 import type { MonsterActionDraftRow } from '../monster-action-presets'
+import { monsterActionActiveKeys } from '../monster-action-kind'
 import type { MonsterFormAdvisory } from '../../monster-form-advisories'
 import { monsterFormAdvisorySlot } from '../../monster-form-advisory-presentation'
 import { legendaryActionCategory } from '../legendary/legendary-action-category'
@@ -134,6 +136,14 @@ function monsterActionAuthoringPreviewSlots(
       return [monsterActionSpellPreviewSlot(ctx, action, section)]
     case 'multiattack':
       return [monsterActionMultiattackPreviewSlot(ctx, action)]
+    case 'shape-shift':
+      return [
+        {
+          kind: 'slot',
+          name: 'shapeShiftSummary',
+          render: () => <MonsterActionShapeShiftSummary ctx={ctx} action={action} />,
+        },
+      ]
     default:
       return []
   }
@@ -421,7 +431,9 @@ function sharedAuthoringFields(input: {
       equipment: input.equipment ?? [],
       onCastingSourceBlocked: input.onCastingSourceBlocked,
     }),
-    ...(action.kind !== 'save' ? [turnLimitField()] : []),
+    ...(monsterActionActiveKeys(action.kind, section).includes('onceUntilNextTurn')
+      ? [turnLimitField()]
+      : []),
     ...supplemental,
   ]
 }

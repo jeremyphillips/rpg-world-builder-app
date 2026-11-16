@@ -9,7 +9,7 @@ import type { GameTermEntry, VocabularyTerm } from './types'
 export const MONSTER_ACTION_KIND_TERM = {
   label: 'Monster Action Kind',
   description:
-    'Whether a monster action uses equipment, a natural weapon, an authored attack, a saving throw, a multiattack, a reference, a parry, a leap, a teleport, a set of standard actions, special prose, or referenced spells.',
+    'Whether a monster action uses equipment, a natural weapon, an authored attack, a saving throw, a multiattack, a shape-shift, a reference, a parry, a leap, a teleport, a set of standard actions, special prose, or referenced spells.',
   sentence: {
     singular: 'monster action kind',
     plural: 'monster action kinds',
@@ -57,6 +57,10 @@ export const MONSTER_ACTION_KIND_ENTRIES = {
   'take-actions': {
     label: 'Take actions',
     description: 'Takes the Dash, Disengage, or Hide action.',
+  },
+  'shape-shift': {
+    label: 'Shape-Shift',
+    description: 'Changes among the creature’s alternate forms. The description is generated.',
   },
   special: {
     label: 'Special',

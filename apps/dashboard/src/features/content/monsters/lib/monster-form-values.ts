@@ -4,6 +4,7 @@ import {
   type ArmorClassRules,
   type ContentValidationIntent,
   type CreateMonsterInput,
+  type CreatureFormsDraft,
   type CreatureWeaponProficiencies,
   type Monster,
   type MonsterActionDraft,
@@ -91,6 +92,7 @@ export type MonsterFormValues = FieldValues & {
   defenses: Monster['defenses']
   equipment: MonsterEquipmentFormEntry[]
   traits: Monster['traits']
+  forms?: CreatureFormsDraft
   /** Action rows mirror Zod draft schemas; save normalization parses to publish shape. */
   actions: MonsterActionDraft[]
   bonusActions: MonsterBonusActionDraft[]
@@ -214,6 +216,7 @@ export function monsterToFormValues(
     defenses: entity.defenses,
     equipment: entity.equipment,
     traits: entity.traits,
+    ...(entity.forms ? { forms: entity.forms } : {}),
     actions: hydrateOnHitInActionList(
       entity.actions
         .map(mapWeaponActionDamageToForm)

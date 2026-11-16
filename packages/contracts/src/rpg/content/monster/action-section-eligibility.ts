@@ -4,8 +4,26 @@ import type { MonsterActionSection } from './action-sections'
 
 /** Kinds a section may store. Menus and Move to read this list. */
 export const MONSTER_SECTION_KINDS = {
-  actions: ['weapon', 'natural-weapon', 'attack', 'save', 'spell', 'special', 'multiattack'],
-  bonusActions: ['attack', 'save', 'spell', 'special', 'leap', 'teleport', 'take-actions'],
+  actions: [
+    'weapon',
+    'natural-weapon',
+    'attack',
+    'save',
+    'spell',
+    'special',
+    'multiattack',
+    'shape-shift',
+  ],
+  bonusActions: [
+    'attack',
+    'save',
+    'spell',
+    'special',
+    'leap',
+    'teleport',
+    'take-actions',
+    'shape-shift',
+  ],
   reactions: ['parry', 'action-reference', 'spell', 'special'],
   legendaryActions: ['action-reference', 'spell', 'special'],
 } as const satisfies Record<MonsterActionSection, readonly string[]>

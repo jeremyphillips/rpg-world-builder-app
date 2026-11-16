@@ -8,7 +8,7 @@ Regions, in order. An empty region renders nothing.
 2. **Preview** — read-only attack summary, multiattack stat-block sentence, spellcasting stat-block sentence, or trait sentence.
 3. **Advisory** — `buildAdvisories` for the selected row.
 4. **Primary prose** — Rules text on a custom ability and a custom trait. It can be omitted when a saving throw is present.
-5. **Mechanics** — optional Saving throw on a custom ability or custom trait, then trigger, usage, configuration, primary damage, and secondary effects. Spellcasting keeps its action-level limit after omitted components. Per-spell limits stay inside each spell row.
+5. **Mechanics** — optional Saving throw on a custom ability or custom trait, then trigger, usage, configuration, primary damage, and secondary effects. Shape-Shift puts equipment and the prerequisite in this region. Spellcasting keeps its action-level limit after omitted components. Per-spell limits stay inside each spell row.
 6. **Supplemental prose** — optional Additional details. The editor stays in this position when the disclosure is open.
 
 Casting ability is mechanics. It does not belong in Source.

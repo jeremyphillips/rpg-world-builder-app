@@ -225,6 +225,64 @@ export function monsterActionSectionHeading(section: MonsterActionSection): stri
 
 export const MONSTER_ADD_LABEL = 'Add'
 
+export const MONSTER_ALTERNATE_FORMS_HEADING = 'Alternate forms'
+export const MONSTER_TRUE_FORM_HEADING = 'True form'
+export const MONSTER_ALTERNATE_FORMS_ADD_LABEL = 'Add alternate forms'
+export const MONSTER_ALTERNATE_FORMS_ADD_FORM_LABEL = 'Add form'
+export const MONSTER_ALTERNATE_FORMS_REMOVE_LABEL = 'Remove alternate forms…'
+export const MONSTER_ALTERNATE_FORMS_REMOVE_HEADLINE = 'Remove alternate forms?'
+export const MONSTER_ALTERNATE_FORMS_REMOVE_CONFIRM_LABEL = 'Remove alternate forms'
+export const MONSTER_ALTERNATE_FORMS_CANCEL_LABEL = 'Cancel'
+export const MONSTER_ALTERNATE_FORM_UNTITLED_TITLE = 'Untitled form'
+export const MONSTER_ALTERNATE_FORM_ITEM_NOUN_LABEL = 'Form'
+export const MONSTER_ALTERNATE_FORM_ITEM_NOUN_PLURAL = 'forms'
+export const MONSTER_ALTERNATE_FORM_NAME_LABEL = 'Name'
+export const MONSTER_ALTERNATE_FORM_APPEARANCE_LABEL = 'Appearance'
+export const MONSTER_ALTERNATE_FORM_SIZE_HINT = 'Use base size'
+export const MONSTER_ALTERNATE_FORM_NOTES_LABEL = 'Notes'
+export const MONSTER_ALTERNATE_FORM_NOTES_ADD_LABEL = 'Add notes'
+export const MONSTER_ALTERNATE_FORM_NOTES_HINT = 'Completes the sentence: While in this form, …'
+export const MONSTER_SHAPE_SHIFT_EQUIPMENT_LABEL = 'Equipment'
+export const MONSTER_SHAPE_SHIFT_PREREQUISITE_LABEL = 'Prerequisite'
+export const MONSTER_SHAPE_SHIFT_PREREQUISITE_ADD_LABEL = 'Add prerequisite'
+export const MONSTER_SHAPE_SHIFT_PREREQUISITE_HINT =
+  'Completes the sentence: If …, it shape-shifts.'
+export const MONSTER_SHAPE_SHIFT_DESTINATIONS_LABEL = 'Destinations'
+export const MONSTER_SHAPE_SHIFT_PREVIEW_LABEL = 'Preview'
+export const MONSTER_SHAPE_SHIFT_ACQUISITION_DESCRIPTION =
+  'Changes among this creature’s alternate forms.'
+export const MONSTER_SHAPE_SHIFT_REQUIRES_ALTERNATE_FORM_NOTE = 'Add an alternate form'
+
+export function formatMonsterFormsRemovalSummary(summary: {
+  unrestricted: readonly { name?: string }[]
+  deletedShapeShifts: readonly { hadPrerequisite: boolean; hadDescription: boolean }[]
+  strippedReferences: readonly { name?: string }[]
+  indirectlyAffectedReferences: readonly { name?: string }[]
+  deletedNotes: readonly string[]
+}): string {
+  const sentences: string[] = []
+  if (summary.unrestricted.length > 0) {
+    sentences.push(
+      `Become unrestricted: ${summary.unrestricted.map((row) => row.name || 'Untitled row').join(', ')}.`,
+    )
+  }
+  if (summary.deletedShapeShifts.length > 0) {
+    sentences.push(
+      `Deleted Shape-Shift action${summary.deletedShapeShifts.length === 1 ? '' : 's'}: ${summary.deletedShapeShifts.length}.`,
+    )
+  }
+  if (summary.strippedReferences.length > 0) {
+    sentences.push(`References removed: ${summary.strippedReferences.length}.`)
+  }
+  if (summary.indirectlyAffectedReferences.length > 0) {
+    sentences.push(`Also affected: ${summary.indirectlyAffectedReferences.length} referenced rows.`)
+  }
+  if (summary.deletedNotes.length > 0) {
+    sentences.push(`Deleted notes: ${summary.deletedNotes.join(', ')}.`)
+  }
+  return sentences.join(' ') || 'This removes the alternate forms configuration.'
+}
+
 export const MONSTER_LIMIT_ADD_LABEL = 'Add limit'
 export const MONSTER_RECHARGE_ADD_LABEL = 'Add recharge'
 export const MONSTER_ACQUISITION_SAVE_DESCRIPTION = 'Saving throw effect'

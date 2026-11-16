@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
 import {
+  actionsReferencingAction,
   getMonsterActionKindLabel,
   isWeaponEquipment,
   resolveEquipmentInstanceReferenceLabel,
@@ -43,7 +44,6 @@ import {
   MONSTER_MOVE_REFERENCED_ACTION_HEADLINE,
   MONSTER_REMOVE_REFERENCED_ACTION_HEADLINE,
 } from '../../lib/monster-form-labels'
-import { multiattacksReferencingAction } from '../../lib/actions/references/monster-action-multiattack-references'
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
 import { monsterFormSectionRows } from '../../lib/actions/monster-action-section-access'
 import type { MonsterActionPending } from '../../hooks/use-monster-action-sections'
@@ -132,6 +132,7 @@ function MonsterActionAddMenu({
           weaponActions,
           allowAddWeapon,
           section,
+          hasAlternateForm: (values.forms?.alternates.length ?? 0) > 0,
           sectionRows: {
             actions: values.actions ?? [],
             bonusActions: values.bonusActions ?? [],
@@ -357,7 +358,7 @@ export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
   }, 0)
   const deleteLocated = sections.locate(sections.deleteTargetId)
   const deleteReferences = deleteLocated
-    ? multiattacksReferencingAction(
+    ? actionsReferencingAction(
         [
           ...((values.actions ?? []) as MonsterActionDraftRow[]),
           ...monsterFormSectionRows(values, 'legendaryActions'),

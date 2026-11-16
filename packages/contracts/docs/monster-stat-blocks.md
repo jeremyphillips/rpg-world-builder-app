@@ -4,7 +4,7 @@ Monster records in `@rpg/contracts` store authored stat-block inputs. **`deriveM
 
 ## Fidelity principle
 
-Derived values follow SRD 5.2.1 table math unless the body explicitly overrides a field (for example CR 0 `experiencePointsOverride`). Hit dice averages use the shared `averageStatBlockHitPoints` helper (full dice pool average plus Constitution per die, floored). Hit die faces come from `CREATURE_SIZE_HIT_DIE`. When more than one size is permitted, `resolveMonsterHitPoints` uses the largest. That matches the current SRD stat blocks in this catalog. It is an application convention, not a claim that every future creature derives hit points the same way.
+Derived values follow SRD 5.2.1 table math unless the body explicitly overrides a field (for example CR 0 `experiencePointsOverride`). Hit dice averages use the shared `averageStatBlockHitPoints` helper (full dice pool average plus Constitution per die, floored). Hit die faces come from `CREATURE_SIZE_HIT_DIE`. When more than one size is permitted, `resolveMonsterHitPoints` uses the largest base size. Alternate-form sizes are not an input, so a Werebear stays 18d8 and a Vampire stays 23d8. That matches the current SRD stat blocks in this catalog. It is an application convention, not a claim that every future creature derives hit points the same way.
 
 ## Resolver policies
 

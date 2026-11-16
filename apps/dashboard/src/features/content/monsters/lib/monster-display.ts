@@ -37,8 +37,11 @@ import {
   formatMonsterParryTrigger,
   formatMonsterTakeActions,
   formatMonsterTeleport,
-  formatLegendaryActionUsesIntro,
+  formatMonsterAlternateForms,
+  formatMonsterShapeShift,
+  shapeShiftRows,
   monsterActionSectionRows,
+  formatLegendaryActionUsesIntro,
   formatOnceUntilNextTurnSentence,
   resolveCreatureSenses,
   resolveCreatureTraitGrants,
@@ -466,6 +469,25 @@ function mapSaveActionItem(
   }
 }
 
+function alternateFormsTrait(monster: Monster): MonsterTraitItemViewModel[] {
+  if (!monster.forms || monster.forms.alternates.length === 0) return []
+  if (shapeShiftRows(monster).length > 0) return []
+  const text = formatMonsterAlternateForms({
+    monsterName: monster.name,
+    baseSizes: monster.sizes,
+    trueForm: monster.forms.trueForm,
+    alternates: monster.forms.alternates,
+  })
+  if (!text) return []
+  return [
+    {
+      id: 'alternate-forms',
+      name: 'Alternate Forms',
+      descriptionHtml: `<p>${escapeStatBlockText(text)}</p>`,
+    },
+  ]
+}
+
 function escapeStatBlockText(value: string): string {
   return value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
 }
@@ -693,6 +715,49 @@ function mapAttackActionItem(
   }
 }
 
+function mapShapeShiftActionItem(
+  action: Extract<
+    MonsterAction | MonsterBonusAction | MonsterReaction | MonsterLegendaryAction,
+    { kind: 'shape-shift' }
+  >,
+  name: string,
+  spells: SpellDisplayContext,
+): MonsterActionItemViewModel {
+  const generated = formatMonsterShapeShift({
+    monsterName: spells.monsterName,
+    baseSizes: spells.monster.sizes,
+    trueForm: spells.monster.forms?.trueForm ?? { id: 'true' },
+    alternates: spells.monster.forms?.alternates ?? [],
+    equipment: action.equipment,
+    prerequisite: action.prerequisite,
+  })
+  const description = [generated, action.description].filter(Boolean).join(' ')
+  return { id: action.id, name, descriptionHtml: `<p>${escapeStatBlockText(description)}</p>` }
+}
+
+function mapStructuredActionItem(
+  action: MonsterAction | MonsterBonusAction | MonsterReaction | MonsterLegendaryAction,
+  name: string,
+  identityName: string,
+  derived: DerivedMonsterStatBlock | null | undefined,
+  catalogState: MonsterCatalogLoadState,
+  spells: SpellDisplayContext,
+): MonsterActionItemViewModel | undefined {
+  if (action.kind === 'shape-shift') return mapShapeShiftActionItem(action, name, spells)
+  if (action.kind === 'special') return mapSpecialActionItem(action, name, derived, spells)
+  if (action.kind === 'save') {
+    return mapSaveActionItem(action, name, derived, catalogState, spells, identityName)
+  }
+  if (action.kind === 'action-reference') return mapActionReferenceItem(action, name, spells)
+  if (isGeneratedBonusAction(action))
+    return mapGeneratedBonusAction(action, name, spells.monsterName)
+  if (action.kind === 'parry') return mapParryActionItem(action, name, spells)
+  if (action.kind === 'multiattack') {
+    return mapMultiattackActionItem(action, name, derived, catalogState, spells)
+  }
+  return undefined
+}
+
 function mapActionItemBody(
   action: MonsterAction | MonsterBonusAction | MonsterReaction | MonsterLegendaryAction,
   section: DerivedMonsterAttackLine['section'],
@@ -705,17 +770,15 @@ function mapActionItemBody(
   if (action.kind === 'spell') {
     return mapSpellActionItem(action, section, derived, spells, identityName)
   }
-  if (action.kind === 'special') return mapSpecialActionItem(action, name, derived, spells)
-  if (action.kind === 'save') {
-    return mapSaveActionItem(action, name, derived, catalogState, spells, identityName)
-  }
-  if (action.kind === 'action-reference') return mapActionReferenceItem(action, name, spells)
-  if (isGeneratedBonusAction(action))
-    return mapGeneratedBonusAction(action, name, spells.monsterName)
-  if (action.kind === 'parry') return mapParryActionItem(action, name, spells)
-  if (action.kind === 'multiattack') {
-    return mapMultiattackActionItem(action, name, derived, catalogState, spells)
-  }
+  const structured = mapStructuredActionItem(
+    action,
+    name,
+    identityName,
+    derived,
+    catalogState,
+    spells,
+  )
+  if (structured) return structured
   return mapAttackActionItem(action, section, name, derived, catalogState, spells)
 }
 
@@ -1117,12 +1180,15 @@ export function buildMonsterDetailViewModel({
     statRows,
     abilities,
     detailsLeaves: buildDetailsLeaves(monster, derived, equipmentById, catalogState),
-    traits: monster.traits
-      .filter((trait) => {
-        const available = (trait as { available?: boolean }).available
-        return available !== false
-      })
-      .map((trait) => mapMonsterTrait(trait, monster, derived)),
+    traits: [
+      ...monster.traits
+        .filter((trait) => {
+          const available = (trait as { available?: boolean }).available
+          return available !== false
+        })
+        .map((trait) => mapMonsterTrait(trait, monster, derived)),
+      ...alternateFormsTrait(monster),
+    ],
     actions: mapActionItems(
       availableBodyRows(monster.actions),
       'actions',

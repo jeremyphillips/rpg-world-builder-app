@@ -41,6 +41,17 @@ export function formatCardinalWord(n: number): string {
   return CARDINAL_WORDS[n] ?? String(n)
 }
 
+/**
+ * Indefinite article from the first letter. "Medium" → "a Medium", "object" → "an object".
+ * Size labels come first in destination phrases, so the article follows that word.
+ */
+export function withIndefiniteArticle(phrase: string): string {
+  const trimmed = phrase.trim()
+  if (!trimmed) return trimmed
+  const article = 'aeiou'.includes(trimmed.charAt(0).toLowerCase()) ? 'an' : 'a'
+  return `${article} ${trimmed}`
+}
+
 /** English ordinal suffix for integers (1 → 1st, 11 → 11th). */
 export function formatOrdinal(n: number): string {
   const mod100 = n % 100
