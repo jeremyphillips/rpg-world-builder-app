@@ -3,7 +3,6 @@ import {
   isPrimarySpellcastingAction,
   MONSTER_ACTION_UNRESOLVED_REFERENCE,
   MONSTER_SPELLCASTING_ACTION_NAME,
-  monsterActionAuthoring,
   type ResolvedMonsterActionIdentity,
 } from '@rpg/contracts'
 
@@ -14,7 +13,6 @@ import {
   MONSTER_ACTION_EDITOR_FALLBACK_TITLES,
   MONSTER_ACTION_ITEM_NOUN,
   MONSTER_CAST_SPELL_LABEL,
-  MONSTER_USE_DEFAULT_NAME_LABEL,
 } from '../monster-form-labels'
 import { legendaryActionCategory } from './legendary/legendary-action-category'
 import {
@@ -39,17 +37,6 @@ const AUTHORED_FALLBACK_BASE = {
   'spell-standalone': MONSTER_CAST_SPELL_LABEL,
   multiattack: getMonsterActionKindLabel('multiattack'),
 } as const
-
-export interface MonsterActionHeaderName {
-  title: string
-  fallback: string
-  placeholder: string
-  mode: 'authored' | 'override'
-  /** Primary Spellcasting renders the canonical name with no editor. */
-  editable?: boolean
-  resetLabel?: string
-  sourceName?: string
-}
 
 function actionOrdinalLabel(base: string, ordinal: number): string {
   return ordinal === 1 ? base : `${base} ${ordinal}`
@@ -177,84 +164,4 @@ export function monsterActionEditorTitles(
     taken.add(label)
   }
   return titles
-}
-
-function withBlankName(action: MonsterActionDraftRow): MonsterActionDraftRow {
-  const next = { ...action }
-  delete next.name
-  return next
-}
-
-function authoredHeaderName(input: {
-  action: MonsterActionDraftRow
-  sectionRows: readonly MonsterActionDraftRow[]
-  values: MonsterFormValues | undefined
-  ctx: ContentFormCtx
-  section?: MonsterActionSection
-  title: string
-}): MonsterActionHeaderName {
-  const clearedRows = input.sectionRows.map((row) =>
-    row.id === input.action.id ? withBlankName(row) : row,
-  )
-  const fallback =
-    monsterActionEditorTitles(clearedRows, input.values, input.ctx, input.section).get(
-      input.action.id,
-    ) ?? input.title
-  const storedReferenceName =
-    input.action.kind === 'action-reference' ? input.action.name?.trim() : undefined
-  return {
-    title: input.title,
-    fallback,
-    placeholder: fallback,
-    mode: 'authored',
-    ...(storedReferenceName ? { resetLabel: MONSTER_USE_DEFAULT_NAME_LABEL } : {}),
-  }
-}
-
-function overrideHeaderName(
-  identity: ReturnType<typeof resolveMonsterFormActionIdentity>,
-  title: string,
-): MonsterActionHeaderName {
-  const sourceName = identity.defaultName
-  const stored = identity.customName
-  return {
-    title,
-    fallback: sourceName || title,
-    placeholder: sourceName || '',
-    mode: 'override',
-    ...(stored ? { resetLabel: MONSTER_USE_DEFAULT_NAME_LABEL } : {}),
-    ...(stored && sourceName && stored !== sourceName ? { sourceName } : {}),
-  }
-}
-
-/** Header binding for one action. Fallbacks stay out of the stored name. */
-export function monsterActionHeaderName(input: {
-  action: MonsterActionDraftRow
-  sectionRows: readonly MonsterActionDraftRow[]
-  values: MonsterFormValues | undefined
-  ctx: ContentFormCtx
-  section?: MonsterActionSection
-}): MonsterActionHeaderName {
-  if (isPrimarySpellcastingAction(input.action)) {
-    return {
-      title: MONSTER_SPELLCASTING_ACTION_NAME,
-      fallback: MONSTER_SPELLCASTING_ACTION_NAME,
-      placeholder: MONSTER_SPELLCASTING_ACTION_NAME,
-      mode: 'authored',
-      editable: false,
-    }
-  }
-  const identity = resolveMonsterFormActionIdentity(input.action, input.values, input.ctx)
-  const titles = monsterActionEditorTitles(
-    input.sectionRows,
-    input.values,
-    input.ctx,
-    input.section,
-  )
-  const title =
-    titles.get(input.action.id) ?? masterDetailItemTitle(undefined, MONSTER_ACTION_ITEM_NOUN)
-  if (monsterActionAuthoring(input.action).name === 'authored') {
-    return authoredHeaderName({ ...input, title })
-  }
-  return overrideHeaderName(identity, title)
 }

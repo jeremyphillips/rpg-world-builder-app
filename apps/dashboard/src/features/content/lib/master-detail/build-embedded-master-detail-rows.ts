@@ -10,7 +10,7 @@ import { buildMasterDetailAvailabilityPresentation } from './master-detail-avail
 import type { MasterDetailAvailabilityPresentation } from './master-detail-availability.types'
 import type { FormEmbeddedMasterDetailAccessConfig } from './master-detail-access.types'
 import type { MasterDetailItemNounTerm } from './master-detail-item-noun'
-import { masterDetailItemTitle } from './master-detail-constants'
+import { embeddedListItemTitle, type EmbeddedListDisplay } from './resolve-embedded-list-display'
 import { readRowLocalCampaignAccess } from './master-detail-effective-access.lib'
 
 export type EmbeddedMasterDetailRow = {
@@ -28,17 +28,13 @@ export type BuildEmbeddedMasterDetailRowsParams = {
   itemNoun: MasterDetailItemNounTerm
   showDelete: boolean
   access: FormEmbeddedMasterDetailAccessConfig
-  mapListItem: (ctx: {
+  resolveListDisplay: (ctx: {
     field: { id: string }
     index: number
     row: unknown
     entityCatalogLayer: ContentFormCtx['entityCatalogLayer']
     getRowIssueCount: (index: number) => number
-  }) => Pick<MasterDetailListItem, 'title'> & {
-    eyebrow?: string
-    kindLabel?: string
-    summary?: string
-  }
+  }) => EmbeddedListDisplay
   getRowIssueCount: (index: number) => number
   persistedRowIds?: ReadonlySet<string>
   systemOriginRowIds?: ReadonlySet<string>
@@ -79,7 +75,7 @@ export function buildEmbeddedMasterDetailRows({
   itemNoun,
   showDelete,
   access,
-  mapListItem,
+  resolveListDisplay,
   getRowIssueCount,
   persistedRowIds,
   systemOriginRowIds,
@@ -88,7 +84,7 @@ export function buildEmbeddedMasterDetailRows({
 }: BuildEmbeddedMasterDetailRowsParams): EmbeddedMasterDetailRow[] {
   return fields.map((field, formIndex) => {
     const row = watched?.[formIndex]
-    const listDisplay = mapListItem({
+    const listDisplay = resolveListDisplay({
       field,
       index: formIndex,
       row,
@@ -109,7 +105,7 @@ export function buildEmbeddedMasterDetailRows({
       persistedRowIds,
       systemOriginRowIds,
       getRowIssueCount,
-      title: masterDetailItemTitle(listDisplay.title, itemNoun),
+      title: embeddedListItemTitle(listDisplay, itemNoun),
       eyebrow: listDisplay.eyebrow,
       kindLabel: listDisplay.kindLabel,
       summary: listDisplay.summary,

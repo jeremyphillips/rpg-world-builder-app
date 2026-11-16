@@ -13,10 +13,7 @@ import { isLegendaryReferenceTarget } from '../../../lib/actions/legendary/legen
 import { legendarySourceSpellOptions } from '../../../lib/actions/acquisition/monster-legendary-action-acquisition'
 import { monsterActionDetailFields } from '../../../lib/actions/detail-fields/monster-action-detail-fields'
 import { monsterActionSectionMoveAllowed } from '../../../lib/actions/monster-action-kind'
-import {
-  monsterActionHeaderName,
-  monsterActionEditorTitles,
-} from '../../../lib/actions/monster-action-editor-title'
+import { monsterActionEditorTitles } from '../../../lib/actions/monster-action-editor-title'
 import {
   MONSTER_ACTION_SECTIONS,
   type MonsterActionSection,
@@ -119,29 +116,11 @@ export function MonsterActionDetail({
   const namePrefix = located
     ? `${monsterFormSectionRowNamePrefix(located.section)}.${located.index}`
     : ''
-  const sectionRows = located && values ? monsterFormSectionRows(values, located.section) : []
   const liveAction =
     located && values
       ? (monsterFormSectionRows(values, located.section)[located.index] ?? action)
       : action
-  const headerName =
-    located && liveAction
-      ? monsterActionHeaderName({
-          action: liveAction,
-          sectionRows,
-          values,
-          ctx,
-          section: located.section,
-        })
-      : undefined
   const editor = located ? sections.editors[located.section] : sections.editors.actions
-  const initialEdit = Boolean(
-    headerName?.mode === 'authored' &&
-    liveAction?.kind !== 'action-reference' &&
-    !liveAction?.name?.trim() &&
-    editor.lastAddedFieldId &&
-    editor.lastAddedFieldId === editor.selectedFieldId,
-  )
   const fields = useMemo(() => {
     if (!located || !values || !action || !liveAction) return []
     return monsterActionDetailFields({
@@ -181,29 +160,10 @@ export function MonsterActionDetail({
       itemNoun={MONSTER_ACTION_ITEM_NOUN}
       showSelectedDetail={Boolean(located && action)}
       selectedIdentity={
-        located && action && headerName
+        located && action && rows.selectedIdentity
           ? {
-              title: headerName.title,
-              rowKey: editor.selectedFieldId ?? action.id,
-              meta: rows.selectedIdentity?.meta,
-              ...(headerName.sourceName ? { sourceName: headerName.sourceName } : {}),
-              ...(headerName.editable === false
-                ? {}
-                : {
-                    inlineTitle: {
-                      field: 'name' as const,
-                      fallback: headerName.fallback,
-                      placeholder: headerName.placeholder,
-                      mode: headerName.mode,
-                      initialEdit,
-                      ...(headerName.resetLabel ? { resetLabel: headerName.resetLabel } : {}),
-                    },
-                  }),
-              deletable: rows.selectedIdentity?.deletable,
-              availability: rows.selectedIdentity?.availability,
-              onAvailabilityChange: rows.selectedIdentity?.onAvailabilityChange,
-              issueCount: rows.selectedIdentity?.issueCount,
-              headerIssues: rows.selectedIdentity?.headerIssues,
+              ...rows.selectedIdentity,
+              rowKey: action.id ?? rows.selectedIdentity.rowKey,
             }
           : undefined
       }

@@ -26,7 +26,6 @@ function traitNames(row: unknown) {
   return namesOf(
     monsterTraitDetailFields({
       row,
-      rowPath: 'traits.0',
       advisories: [],
       monsterName: 'Owl',
       ctx,

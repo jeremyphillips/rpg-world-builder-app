@@ -14,14 +14,19 @@ import {
   type EmbeddedMasterDetailRow,
 } from './build-embedded-master-detail-rows'
 import { resolveMasterDetailRowKey } from './content-campaign-availability'
+import { buildSelectedMasterDetailIdentity } from './build-selected-master-detail-identity'
 import type { FormEmbeddedMasterDetailAccessConfig } from './master-detail-access.types'
 import { buildMasterDetailAvailabilityFormFields } from './master-detail-availability-form-fields'
 import { useMasterDetailRowValidation } from './master-detail-row-validation'
 import type { MasterDetailItemNounTerm } from './master-detail-item-noun'
-import { masterDetailItemTitle } from './master-detail-constants'
 import type { UseMasterDetailArrayResult } from './use-master-detail-array'
 import type { MasterDetailListItem } from '../../components/master-detail/master-detail-list-panel'
 import type { MasterDetailEditorIdentity } from '../../components/master-detail/master-detail-editor-shell'
+import { embeddedListItemTitle, resolveEmbeddedListDisplay } from './resolve-embedded-list-display'
+import type {
+  MasterDetailListMetaInput,
+  MasterDetailRowTitleConfig,
+} from './master-detail-row-title'
 
 export interface FormEmbeddedMasterDetailMapListItemContext {
   field: { id: string }
@@ -31,20 +36,16 @@ export interface FormEmbeddedMasterDetailMapListItemContext {
   getRowIssueCount: (index: number) => number
 }
 
-export interface UseEmbeddedMasterDetailRowsParams {
+type MapListItemFn = (
+  ctx: FormEmbeddedMasterDetailMapListItemContext,
+) => Pick<MasterDetailListItem, 'title'> & MasterDetailListMetaInput
+
+interface UseEmbeddedMasterDetailRowsBase {
   formCtx: ContentFormCtx
   fieldName: string
   editor: UseMasterDetailArrayResult
   itemFields: FormItem[] | EmbeddedArrayResolverFieldInput
   itemNoun: MasterDetailItemNounTerm
-  mapListItem: (ctx: FormEmbeddedMasterDetailMapListItemContext) => Pick<
-    MasterDetailListItem,
-    'title'
-  > & {
-    eyebrow?: string
-    kindLabel?: string
-    summary?: string
-  }
   access?: FormEmbeddedMasterDetailAccessConfig
   resolveRowReasons?: (ctx: {
     row: unknown
@@ -63,20 +64,39 @@ export interface UseEmbeddedMasterDetailRowsParams {
   sectionLabel?: string
 }
 
-export function useEmbeddedMasterDetailRows({
+export type UseEmbeddedMasterDetailRowsParams<TRow = Record<string, unknown>> =
+  UseEmbeddedMasterDetailRowsBase &
+    (
+      | {
+          rowTitle: MasterDetailRowTitleConfig<TRow>
+          resolveListMeta?: (
+            ctx: FormEmbeddedMasterDetailMapListItemContext,
+          ) => MasterDetailListMetaInput
+          mapListItem?: never
+        }
+      | {
+          rowTitle?: never
+          resolveListMeta?: never
+          mapListItem: MapListItemFn
+        }
+    )
+
+export function useEmbeddedMasterDetailRows<TRow = Record<string, unknown>>({
   formCtx,
   fieldName,
   editor,
   itemFields,
   itemNoun,
   mapListItem,
+  rowTitle,
+  resolveListMeta,
   access,
   resolveRowReasons,
   resolveAvailabilityFormItems,
   resolveRowIssueCount,
   showDelete = true,
   sectionLabel,
-}: UseEmbeddedMasterDetailRowsParams) {
+}: UseEmbeddedMasterDetailRowsParams<TRow>) {
   const watched = useWatch({ name: fieldName }) as unknown[] | undefined
   const availabilityDialogRef = useRef<HTMLDivElement>(null)
   const persistedRowIds = useMemo(() => {
@@ -93,6 +113,22 @@ export function useEmbeddedMasterDetailRows({
   const getRowIssueCount = resolveRowIssueCount ?? validation.getRowIssueCount
   const showRowBadges = resolveRowIssueCount ? true : validation.showRowBadges
 
+  const rowsSnapshot = (watched ?? []) as readonly TRow[]
+
+  const resolveListDisplay = useCallback(
+    (mapCtx: FormEmbeddedMasterDetailMapListItemContext) =>
+      resolveEmbeddedListDisplay({
+        rowTitle,
+        mapListItem,
+        resolveListMeta,
+        mapCtx,
+        rows: rowsSnapshot,
+        itemNoun,
+        lastAddedFieldId: editor.lastAddedFieldId,
+      }),
+    [editor.lastAddedFieldId, itemNoun, mapListItem, resolveListMeta, rowTitle, rowsSnapshot],
+  )
+
   const allRows = useMemo((): EmbeddedMasterDetailRow[] => {
     if (access) {
       return buildEmbeddedMasterDetailRows({
@@ -102,7 +138,7 @@ export function useEmbeddedMasterDetailRows({
         itemNoun,
         showDelete,
         access,
-        mapListItem,
+        resolveListDisplay,
         getRowIssueCount,
         persistedRowIds,
         systemOriginRowIds,
@@ -113,7 +149,7 @@ export function useEmbeddedMasterDetailRows({
 
     return editor.fields.map((field, formIndex) => {
       const row = watched?.[formIndex]
-      const listDisplay = mapListItem({
+      const listDisplay = resolveListDisplay({
         field,
         index: formIndex,
         row,
@@ -128,7 +164,7 @@ export function useEmbeddedMasterDetailRows({
         persistedRowIds,
         systemOriginRowIds,
         getRowIssueCount,
-        title: masterDetailItemTitle(listDisplay.title, itemNoun),
+        title: embeddedListItemTitle(listDisplay, itemNoun),
         eyebrow: listDisplay.eyebrow,
         kindLabel: listDisplay.kindLabel,
         summary: listDisplay.summary,
@@ -158,7 +194,7 @@ export function useEmbeddedMasterDetailRows({
     formCtx,
     getRowIssueCount,
     itemNoun,
-    mapListItem,
+    resolveListDisplay,
     resolveRowReasons,
     persistedRowIds,
     systemOriginRowIds,
@@ -193,22 +229,34 @@ export function useEmbeddedMasterDetailRows({
 
   const selectedIdentity = useMemo((): MasterDetailEditorIdentity | undefined => {
     if (!selectedRow) return undefined
-    const issueCount = showRowBadges ? (selectedRow.item.issueCount ?? 0) : 0
-    const headerIssues = getRowHeaderIssues(selectedRow.formIndex)
-    return {
-      title: selectedRow.item.title,
-      meta: selectedRow.item.meta,
-      deletable: selectedRow.item.deletable,
-      ...(issueCount > 0 ? { issueCount } : {}),
-      ...(headerIssues.length > 0 ? { headerIssues } : {}),
-      ...(access && selectedRow.availability
-        ? {
-            availability: selectedRow.availability,
-            onAvailabilityChange: openAvailabilityDialog,
-          }
-        : {}),
-    }
-  }, [access, getRowHeaderIssues, openAvailabilityDialog, selectedRow, showRowBadges])
+    const row = watched?.[selectedRow.formIndex]
+    const listDisplay = resolveListDisplay({
+      field: { id: selectedRow.fieldId },
+      index: selectedRow.formIndex,
+      row,
+      entityCatalogLayer: formCtx.entityCatalogLayer,
+      getRowIssueCount,
+    })
+    return buildSelectedMasterDetailIdentity({
+      selectedRow,
+      row,
+      listDisplay,
+      issueCount: showRowBadges ? (selectedRow.item.issueCount ?? 0) : 0,
+      headerIssues: getRowHeaderIssues(selectedRow.formIndex),
+      availability: access ? selectedRow.availability : undefined,
+      onAvailabilityChange: access ? openAvailabilityDialog : undefined,
+    })
+  }, [
+    access,
+    formCtx.entityCatalogLayer,
+    getRowHeaderIssues,
+    getRowIssueCount,
+    openAvailabilityDialog,
+    resolveListDisplay,
+    selectedRow,
+    showRowBadges,
+    watched,
+  ])
 
   const availabilityFormItems = useMemo((): FormItem[] | undefined => {
     if (!access || !selectedRow || access.kind !== 'availability') return undefined
@@ -228,19 +276,26 @@ export function useEmbeddedMasterDetailRows({
     return `${fieldName}.${selectedRow.formIndex}`
   }, [access, fieldName, selectedRow])
 
-  const deleteName =
-    editor.deleteIndex !== null
-      ? masterDetailItemTitle(
-          mapListItem({
-            field: editor.fields[editor.deleteIndex]!,
-            index: editor.deleteIndex,
-            row: watched?.[editor.deleteIndex],
-            entityCatalogLayer: formCtx.entityCatalogLayer,
-            getRowIssueCount,
-          }).title,
-          itemNoun,
-        )
-      : ''
+  const deleteName = useMemo(() => {
+    if (editor.deleteIndex === null) return ''
+    const mapCtx = {
+      field: editor.fields[editor.deleteIndex]!,
+      index: editor.deleteIndex,
+      row: watched?.[editor.deleteIndex],
+      entityCatalogLayer: formCtx.entityCatalogLayer,
+      getRowIssueCount,
+    }
+    const listDisplay = resolveListDisplay(mapCtx)
+    return embeddedListItemTitle(listDisplay, itemNoun)
+  }, [
+    editor.deleteIndex,
+    editor.fields,
+    formCtx.entityCatalogLayer,
+    getRowIssueCount,
+    itemNoun,
+    resolveListDisplay,
+    watched,
+  ])
 
   const rowAt = useCallback((index: number) => watched?.[index], [watched])
 

@@ -1,12 +1,19 @@
+import { useContext } from 'react'
 import { BooleanField } from '@rpg/ui'
 import { useFormContext, useWatch } from 'react-hook-form'
 
+import { MasterDetailRowPrefixContext } from '../../../lib/master-detail/use-master-detail-row-prefix'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
 import { waterBreathingDurationEnabled } from '../../lib/traits/monster-trait-preset-fields'
 
 const WATER_BREATHING_TOGGLE_LABEL = 'Hold breath outside water'
 
-export function WaterBreathingToggle({ namePrefix }: { namePrefix: string }) {
+export function WaterBreathingToggle({ namePrefix: namePrefixProp }: { namePrefix?: string }) {
+  const rowPrefix = useContext(MasterDetailRowPrefixContext)
+  const namePrefix = namePrefixProp ?? rowPrefix
+  if (!namePrefix) {
+    throw new Error('WaterBreathingToggle requires namePrefix or MasterDetailRowPrefixProvider')
+  }
   const form = useFormContext<MonsterFormValues>()
   const amount = useWatch({ name: `${namePrefix}.outsideWaterBreathAmount` as never })
   const unit = useWatch({ name: `${namePrefix}.outsideWaterBreathUnit` as never })

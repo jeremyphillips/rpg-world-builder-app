@@ -25,10 +25,7 @@ import {
   monsterTraitDetailFields,
 } from '../../lib/traits/monster-trait-form-fields'
 import { monsterTraitRowResolveFields } from '../../lib/monster-master-detail-validation-fields'
-import {
-  monsterTraitListTitle,
-  resolveMonsterTraitHeaderIdentity,
-} from '../../lib/traits/monster-trait-editor-title'
+import { resolveMonsterTraitRowTitleConfig } from '../../lib/traits/monster-trait-row-title'
 import { monsterTraitPresetDefaults } from '../../lib/traits/monster-trait-preset-fields'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
 
@@ -71,17 +68,21 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
     [values],
   )
 
+  const traitRowTitle = useMemo(
+    () => resolveMonsterTraitRowTitleConfig(monsterName ?? ''),
+    [monsterName],
+  )
+
   const resolveItemFields = useCallback(
     (row: unknown) =>
       monsterTraitDetailFields({
         row,
-        rowPath: editor.selectedIndex === null ? '' : `traits.${editor.selectedIndex}`,
         advisories,
         monsterName: monsterName ?? '',
         ctx,
         sharedCastingOptions: values ? sharedCastingOptions(values, '') : [],
       }),
-    [advisories, ctx, editor.selectedIndex, monsterName, values],
+    [advisories, ctx, monsterName, values],
   )
 
   return (
@@ -137,20 +138,7 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
       idPrefix="monster-trait"
       makeItemDefaults={makeItemDefaults}
       access={{ kind: 'availability', fieldName: 'available' }}
-      mapListItem={({ row, index }) => ({
-        title: monsterTraitListTitle(row, traits ?? [], monsterName ?? '', index),
-      })}
-      resolveHeaderIdentity={({ row, index, fieldId, identity }) =>
-        resolveMonsterTraitHeaderIdentity({
-          row,
-          rows: traits ?? [],
-          monsterName: monsterName ?? '',
-          index,
-          fieldId,
-          lastAddedFieldId: editor.lastAddedFieldId,
-          identity,
-        })
-      }
+      rowTitle={traitRowTitle}
     />
   )
 }

@@ -11,6 +11,10 @@ import type { FormEmbeddedMasterDetailAccessConfig } from '../../lib/master-deta
 import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
 import { masterDetailItemNounLabel } from '../../lib/master-detail/master-detail-constants'
 import type { EmbeddedMasterDetailRow } from '../../lib/master-detail/build-embedded-master-detail-rows'
+import type {
+  MasterDetailListMetaInput,
+  MasterDetailRowTitleConfig,
+} from '../../lib/master-detail/master-detail-row-title'
 import {
   useEmbeddedMasterDetailRows,
   type FormEmbeddedMasterDetailMapListItemContext,
@@ -29,7 +33,7 @@ import { MasterDetailListPanel, type MasterDetailListItem } from './master-detai
 
 export type { FormEmbeddedMasterDetailMapListItemContext }
 
-export interface FormEmbeddedMasterDetailEditorProps {
+type FormEmbeddedMasterDetailEditorBase = {
   formCtx: ContentFormCtx
   /** Parent form field path, e.g. `traits`, `features`, or `heritage.options`. */
   fieldName: string
@@ -47,16 +51,6 @@ export interface FormEmbeddedMasterDetailEditorProps {
   resolveItemFields?: (row: unknown) => FormItem[]
   /** Prefix for detail `FormItems` ids, e.g. `species-trait`. */
   idPrefix: string
-  mapListItem: (
-    ctx: FormEmbeddedMasterDetailMapListItemContext,
-  ) => Pick<MasterDetailListItem, 'title'> & { eyebrow?: string }
-  /** Adjusts the selected detail header without a title render prop. */
-  resolveHeaderIdentity?: (ctx: {
-    row: unknown
-    index: number
-    fieldId: string
-    identity: MasterDetailEditorIdentity
-  }) => MasterDetailEditorIdentity
   /**
    * Optional pre-bound editor state. Pass when the parent must coordinate with
    * `useMasterDetailArray` (e.g. level normalization or cancel a pending delete
@@ -95,8 +89,35 @@ export interface FormEmbeddedMasterDetailEditorProps {
   renderAddControl?: (ctx: { append: (row: Record<string, unknown>) => void }) => ReactNode
 }
 
-interface FormEmbeddedMasterDetailEditorBodyProps extends Omit<
-  FormEmbeddedMasterDetailEditorProps,
+export type FormEmbeddedMasterDetailEditorProps<TRow = Record<string, unknown>> =
+  FormEmbeddedMasterDetailEditorBase &
+    (
+      | {
+          rowTitle: MasterDetailRowTitleConfig<TRow>
+          resolveListMeta?: (
+            ctx: FormEmbeddedMasterDetailMapListItemContext,
+          ) => MasterDetailListMetaInput
+          mapListItem?: never
+          resolveHeaderIdentity?: never
+        }
+      | {
+          rowTitle?: never
+          resolveListMeta?: never
+          mapListItem: (
+            ctx: FormEmbeddedMasterDetailMapListItemContext,
+          ) => Pick<MasterDetailListItem, 'title'> & MasterDetailListMetaInput
+          /** Adjusts the selected detail header without a title render prop. */
+          resolveHeaderIdentity?: (ctx: {
+            row: unknown
+            index: number
+            fieldId: string
+            identity: MasterDetailEditorIdentity
+          }) => MasterDetailEditorIdentity
+        }
+    )
+
+interface FormEmbeddedMasterDetailEditorBodyProps<TRow = Record<string, unknown>> extends Omit<
+  FormEmbeddedMasterDetailEditorProps<TRow>,
   'editor' | 'makeItemDefaults'
 > {
   editor: UseMasterDetailArrayResult
@@ -135,7 +156,7 @@ function embeddedCampaignAccessDialog(input: {
   )
 }
 
-function FormEmbeddedMasterDetailEditorBody({
+function FormEmbeddedMasterDetailEditorBody<TRow = Record<string, unknown>>({
   formCtx,
   fieldName,
   itemFields,
@@ -147,6 +168,8 @@ function FormEmbeddedMasterDetailEditorBody({
   resolveItemFields,
   idPrefix,
   mapListItem,
+  rowTitle,
+  resolveListMeta,
   resolveHeaderIdentity,
   editor,
   showDelete = true,
@@ -155,19 +178,35 @@ function FormEmbeddedMasterDetailEditorBody({
   resolveAvailabilityFormItems,
   access,
   renderAddControl,
-}: FormEmbeddedMasterDetailEditorBodyProps) {
-  const rows = useEmbeddedMasterDetailRows({
-    formCtx,
-    fieldName,
-    editor,
-    itemFields,
-    itemNoun,
-    mapListItem,
-    access,
-    resolveRowReasons,
-    resolveAvailabilityFormItems,
-    showDelete,
-  })
+}: FormEmbeddedMasterDetailEditorBodyProps<TRow>) {
+  const rows = useEmbeddedMasterDetailRows<TRow>(
+    rowTitle
+      ? {
+          formCtx,
+          fieldName,
+          editor,
+          itemFields,
+          itemNoun,
+          rowTitle,
+          resolveListMeta,
+          access,
+          resolveRowReasons,
+          resolveAvailabilityFormItems,
+          showDelete,
+        }
+      : {
+          formCtx,
+          fieldName,
+          editor,
+          itemFields,
+          itemNoun,
+          mapListItem: mapListItem!,
+          access,
+          resolveRowReasons,
+          resolveAvailabilityFormItems,
+          showDelete,
+        },
+  )
 
   const availabilityItems = useMemo(
     () => (access ? rows.allRows.map((row) => row.availability) : []),
@@ -220,7 +259,7 @@ function FormEmbeddedMasterDetailEditorBody({
   }, [editor, rows])
 
   const selectedIdentity =
-    rows.selectedIdentity && resolveHeaderIdentity && rows.selectedRow
+    !rowTitle && rows.selectedIdentity && resolveHeaderIdentity && rows.selectedRow
       ? resolveHeaderIdentity({
           row: rows.rowAt(rows.selectedRow.formIndex),
           index: rows.selectedRow.formIndex,
@@ -401,10 +440,10 @@ function EmbeddedMasterDetailLayout({
   )
 }
 
-function FormEmbeddedMasterDetailEditorWithHook({
+function FormEmbeddedMasterDetailEditorWithHook<TRow = Record<string, unknown>>({
   makeItemDefaults: makeItemDefaultsProp,
   ...props
-}: Omit<FormEmbeddedMasterDetailEditorProps, 'editor'>) {
+}: Omit<FormEmbeddedMasterDetailEditorProps<TRow>, 'editor'>) {
   const makeItemDefaults = useCallback(
     () =>
       makeItemDefaultsProp?.() ??
@@ -412,20 +451,22 @@ function FormEmbeddedMasterDetailEditorWithHook({
     [makeItemDefaultsProp, props.itemFields],
   )
   const editor = useMasterDetailArray(props.fieldName, makeItemDefaults)
-  return <FormEmbeddedMasterDetailEditorBody {...props} editor={editor} />
+  return <FormEmbeddedMasterDetailEditorBody<TRow> {...props} editor={editor} />
 }
 
 /**
  * Master-detail editor for an embedded parent-form field array: list on the
  * left, selected row `FormItems` on the right, shared delete-confirm flow.
  */
-export function FormEmbeddedMasterDetailEditor({
+export function FormEmbeddedMasterDetailEditor<TRow = Record<string, unknown>>({
   editor,
   makeItemDefaults,
   ...props
-}: FormEmbeddedMasterDetailEditorProps) {
+}: FormEmbeddedMasterDetailEditorProps<TRow>) {
   if (editor) {
-    return <FormEmbeddedMasterDetailEditorBody {...props} editor={editor} />
+    return <FormEmbeddedMasterDetailEditorBody<TRow> {...props} editor={editor} />
   }
-  return <FormEmbeddedMasterDetailEditorWithHook makeItemDefaults={makeItemDefaults} {...props} />
+  return (
+    <FormEmbeddedMasterDetailEditorWithHook<TRow> makeItemDefaults={makeItemDefaults} {...props} />
+  )
 }

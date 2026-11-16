@@ -181,4 +181,31 @@ describe('FormEmbeddedMasterDetailEditor', () => {
       })
     })
   })
+
+  it('omits the body name field when rowTitle supplies an inline header editor', async () => {
+    const user = userEvent.setup()
+    render(
+      <TestFormShell defaultValues={{ traits: [] }}>
+        <FormEmbeddedMasterDetailEditor<{ name?: string }>
+          formCtx={{}}
+          fieldName="traits"
+          itemFields={[{ type: 'text', name: 'name', label: 'Name' }]}
+          itemNoun={TRAIT_MASTER_DETAIL_ITEM_NOUN}
+          listTitle="Traits"
+          ariaLabel="Traits"
+          addLabel="Add trait"
+          idPrefix="species-trait"
+          rowTitle={{ strategy: 'authored', field: 'name' }}
+        />
+      </TestFormShell>,
+    )
+
+    await user.click(screen.getByRole('button', { name: /Add trait/i }))
+
+    await waitFor(() => {
+      expect(screen.getByTestId('detail-traits-0')).toBeInTheDocument()
+    })
+    expect(screen.getAllByLabelText('Name')).toHaveLength(1)
+    expect(screen.getAllByText('Unnamed Trait').length).toBeGreaterThan(0)
+  })
 })

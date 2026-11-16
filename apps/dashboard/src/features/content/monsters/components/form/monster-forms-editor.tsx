@@ -10,13 +10,14 @@ import { useMonsterFormsLifecycle } from '../../hooks/use-monster-forms-lifecycl
 import {
   MONSTER_FORM_ITEM_NOUN_LABEL,
   MONSTER_FORM_ITEM_NOUN_PLURAL,
-  MONSTER_FORM_UNTITLED_TITLE,
   MONSTER_FORMS_ADD_FORM_LABEL,
   MONSTER_FORMS_ADD_LABEL,
   MONSTER_FORMS_REMOVE_LABEL,
 } from '../../lib/monster-form-labels'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
+import { monsterDefinedFormListMeta } from '../../lib/forms/monster-defined-form-list-meta'
 import { monsterDefinedFormDetailFields } from '../../lib/forms/monster-forms-form-fields'
+import type { MonsterDefinedFormDraft } from '../../lib/forms/monster-forms-form-values'
 import { makeEmptyMonsterDefinedForm } from '../../lib/forms/monster-forms-form-values'
 import { monsterDefinedFormRowResolveFields } from '../../lib/forms/monster-forms-validation-fields'
 
@@ -37,26 +38,16 @@ export function MonsterFormsEditor({ ctx }: { ctx: ContentFormCtx }) {
     [ctx],
   )
   const resolveItemFields = useCallback(() => {
-    const fields = monsterDefinedFormDetailFields({
-      rowPath:
-        editor.selectedIndex === null
-          ? 'forms.definedForms.0'
-          : `forms.definedForms.${editor.selectedIndex}`,
-      ctx,
-    })
+    const fields = monsterDefinedFormDetailFields(ctx)
     const selected =
       editor.selectedIndex === null ? undefined : forms?.definedForms[editor.selectedIndex]
     const designated = forms?.trueForm.kind === 'defined' && forms.trueForm.formId === selected?.id
     if (!designated) return fields
     return [
-      ...fields.filter(
-        (field) =>
-          !('name' in field) ||
-          field.name !== `forms.definedForms.${editor.selectedIndex}.overrides.sizes`,
-      ),
+      ...fields.filter((field) => !('name' in field) || field.name !== 'overrides.sizes'),
       {
         kind: 'slot' as const,
-        name: `forms.definedForms.${editor.selectedIndex}.baseStatistics`,
+        name: 'baseStatistics',
         render: () => (
           <div>
             <p>This form uses the creature's base statistics.</p>
@@ -109,7 +100,7 @@ export function MonsterFormsEditor({ ctx }: { ctx: ContentFormCtx }) {
 
   return (
     <>
-      <FormEmbeddedMasterDetailEditor
+      <FormEmbeddedMasterDetailEditor<MonsterDefinedFormDraft>
         editor={lifecycleEditor}
         formCtx={ctx}
         fieldName="forms.definedForms"
@@ -122,18 +113,8 @@ export function MonsterFormsEditor({ ctx }: { ctx: ContentFormCtx }) {
         addControl={addControl}
         idPrefix="monster-defined-form"
         makeItemDefaults={makeDefaults}
-        mapListItem={({ row }) => ({
-          title:
-            typeof (row as { name?: unknown })?.name === 'string' &&
-            (row as { name: string }).name.trim()
-              ? (row as { name: string }).name.trim()
-              : MONSTER_FORM_UNTITLED_TITLE,
-          eyebrow:
-            forms.trueForm.kind === 'defined' &&
-            forms.trueForm.formId === (row as { id?: string } | undefined)?.id
-              ? 'True form · Base statistics'
-              : undefined,
-        })}
+        rowTitle={{ strategy: 'authored', field: 'name' }}
+        resolveListMeta={(mapCtx) => monsterDefinedFormListMeta(forms, mapCtx)}
       />
       <Button type="button" variant="ghost" onClick={lifecycle.requestRemoveAll}>
         {MONSTER_FORMS_REMOVE_LABEL}

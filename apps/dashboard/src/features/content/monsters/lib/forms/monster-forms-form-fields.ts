@@ -17,25 +17,15 @@ import {
   MONSTER_TRUE_FORM_HEADING,
 } from '../monster-form-labels'
 
-export function monsterDefinedFormDetailFields(input: {
-  rowPath: string
-  ctx: ContentFormCtx
-}): FormItem[] {
-  const { rowPath, ctx } = input
+export function monsterDefinedFormDetailFields(ctx: ContentFormCtx): FormItem[] {
   const sizes = createCreatureSizesFieldConfig({
     hint: MONSTER_FORM_SIZE_HINT,
     options: buildActiveSizeFieldOptions(ctx.sizeVocabulary, ctx.creatureSizesSeedIds),
   })
   return [
     {
-      type: 'text',
-      name: `${rowPath}.name`,
-      label: MONSTER_FORM_NAME_LABEL,
-      required: true,
-    },
-    {
       ...sizes,
-      name: `${rowPath}.overrides.sizes`,
+      name: 'overrides.sizes',
       required: false,
       optionalDisclosure: {
         addLabel: MONSTER_FORM_SIZE_HINT,
@@ -44,7 +34,7 @@ export function monsterDefinedFormDetailFields(input: {
     },
     {
       type: 'textarea',
-      name: `${rowPath}.notes`,
+      name: 'notes',
       label: MONSTER_FORM_NOTES_LABEL,
       hint: MONSTER_FORM_NOTES_HINT,
       optionalDisclosure: {

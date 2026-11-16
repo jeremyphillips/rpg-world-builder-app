@@ -1,16 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import type { MasterDetailEditorIdentity } from '../../../components/master-detail/master-detail-editor-shell'
-import {
-  monsterCustomTraitFallbacks,
-  monsterTraitListTitle,
-  resolveMonsterTraitHeaderIdentity,
-} from './monster-trait-editor-title'
-
-const identity = {
-  title: 'Trait',
-  meta: { provenance: 'homebrew', persistence: 'persisted' },
-} satisfies MasterDetailEditorIdentity
+import { TRAIT_MASTER_DETAIL_ITEM_NOUN } from '../../../species/lib/species-trait-form-labels'
+import { resolveMasterDetailRowTitle } from '../../../lib/master-detail/master-detail-row-title'
+import { monsterCustomTraitFallbacks } from './monster-trait-editor-title'
+import { resolveMonsterTraitRowTitleConfig } from './monster-trait-row-title'
 
 describe('monster trait editor titles', () => {
   it('numbers only empty custom traits and leaves presets alone', () => {
@@ -26,19 +19,40 @@ describe('monster trait editor titles', () => {
         ['second', 'Trait 3'],
       ]),
     )
-    expect(monsterTraitListTitle(rows[1], rows, 'Owl', 1)).toBe('Trait 2')
-    expect(monsterTraitListTitle(rows[2], rows, 'Owl', 2)).toBe('Trait 1')
+
+    const config = resolveMonsterTraitRowTitleConfig('Owl')
+    expect(
+      resolveMasterDetailRowTitle(config, {
+        row: rows[1]!,
+        rows,
+        index: 1,
+        fieldId: 'first',
+        lastAddedFieldId: null,
+        itemNoun: TRAIT_MASTER_DETAIL_ITEM_NOUN,
+      }).displayTitle,
+    ).toBe('Trait 2')
+    expect(
+      resolveMasterDetailRowTitle(config, {
+        row: rows[2]!,
+        rows,
+        index: 2,
+        fieldId: 'named',
+        lastAddedFieldId: null,
+        itemNoun: TRAIT_MASTER_DETAIL_ITEM_NOUN,
+      }).displayTitle,
+    ).toBe('Trait 1')
   })
 
   it('auto-edits a new empty custom trait and keeps template overrides optional', () => {
-    const custom = resolveMonsterTraitHeaderIdentity({
+    const config = resolveMonsterTraitRowTitleConfig('Owl')
+
+    const custom = resolveMasterDetailRowTitle(config, {
       row: { id: 'new', kind: 'custom', name: '' },
       rows: [{ id: 'new', kind: 'custom', name: '' }],
-      monsterName: 'Owl',
       index: 0,
       fieldId: 'field-1',
       lastAddedFieldId: 'field-1',
-      identity,
+      itemNoun: TRAIT_MASTER_DETAIL_ITEM_NOUN,
     })
     expect(custom.inlineTitle).toMatchObject({
       field: 'name',
@@ -48,25 +62,23 @@ describe('monster trait editor titles', () => {
       initialEdit: true,
     })
 
-    const reopened = resolveMonsterTraitHeaderIdentity({
+    const reopened = resolveMasterDetailRowTitle(config, {
       row: { id: 'new', kind: 'custom', name: '' },
       rows: [{ id: 'new', kind: 'custom', name: '' }],
-      monsterName: 'Owl',
       index: 0,
       fieldId: 'field-1',
       lastAddedFieldId: null,
-      identity,
+      itemNoun: TRAIT_MASTER_DETAIL_ITEM_NOUN,
     })
     expect(reopened.inlineTitle?.initialEdit).toBeFalsy()
 
-    const template = resolveMonsterTraitHeaderIdentity({
+    const template = resolveMasterDetailRowTitle(config, {
       row: { id: 'pack', kind: 'template', templateId: 'pack-tactics', nameOverride: 'Allies' },
       rows: [{ id: 'pack', kind: 'template', templateId: 'pack-tactics', nameOverride: 'Allies' }],
-      monsterName: 'Kobold',
       index: 0,
       fieldId: 'field-2',
       lastAddedFieldId: 'field-2',
-      identity,
+      itemNoun: TRAIT_MASTER_DETAIL_ITEM_NOUN,
     })
     expect(template.inlineTitle).toMatchObject({
       field: 'nameOverride',
@@ -75,6 +87,6 @@ describe('monster trait editor titles', () => {
     })
     expect(template.inlineTitle?.initialEdit).toBeUndefined()
     expect(template.sourceName).toBeTruthy()
-    expect(template.title).toBe('Allies')
+    expect(template.displayTitle).toBe('Allies')
   })
 })

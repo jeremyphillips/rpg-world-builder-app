@@ -29,6 +29,7 @@ import {
   type MonsterActionSection,
 } from '../../lib/actions/references/monster-action-equipment-references'
 import { monsterActionEditorTitles } from '../../lib/actions/monster-action-editor-title'
+import { createMonsterActionRowTitleConfig } from '../../lib/actions/monster-action-row-title'
 import { presentActionReference } from '../../lib/actions/references/monster-action-reference-presentation'
 import {
   isLegendaryReferenceTarget,
@@ -80,10 +81,8 @@ const SECTION_HEADINGS = {
   legendaryActions: MONSTER_LEGENDARY_ACTIONS_HEADING,
 } as const satisfies Record<MonsterActionSection, string>
 
-function mapActionListItem(
+function resolveActionListMeta(
   row: unknown,
-  index: number,
-  titles: ReadonlyMap<string, string>,
   section: MonsterActionSection,
   sourceTitles?: ReadonlyMap<string, string>,
 ) {
@@ -98,7 +97,6 @@ function mapActionListItem(
         })
       : undefined
   return {
-    title: action ? (titles.get(action.id) ?? `Action ${index + 1}`) : `Action ${index + 1}`,
     kindLabel: category
       ? LEGENDARY_ACTION_CATEGORY_LABELS[category]
       : action
@@ -266,13 +264,30 @@ function useMonsterActionDetailRows(
     itemNoun: MONSTER_ACTION_ITEM_NOUN,
     access: { kind: 'availability' as const, fieldName: 'available' as const },
   }
+  const actionRowTitle = useMemo(
+    () => createMonsterActionRowTitleConfig({ section: 'actions', values, ctx }),
+    [ctx, values],
+  )
+  const bonusRowTitle = useMemo(
+    () => createMonsterActionRowTitleConfig({ section: 'bonusActions', values, ctx }),
+    [ctx, values],
+  )
+  const reactionRowTitle = useMemo(
+    () => createMonsterActionRowTitleConfig({ section: 'reactions', values, ctx }),
+    [ctx, values],
+  )
+  const legendaryRowTitle = useMemo(
+    () => createMonsterActionRowTitleConfig({ section: 'legendaryActions', values, ctx }),
+    [ctx, values],
+  )
   const actionRows = useEmbeddedMasterDetailRows({
     ...shared,
     itemFields: { resolveItemFields: makeActionResolver('actions') },
     fieldName: 'actions',
     editor: sections.editors.actions,
     sectionLabel: SECTION_HEADINGS.actions,
-    mapListItem: ({ row, index }) => mapActionListItem(row, index, actionTitles, 'actions'),
+    rowTitle: actionRowTitle,
+    resolveListMeta: ({ row }) => resolveActionListMeta(row, 'actions'),
   })
   const bonusRows = useEmbeddedMasterDetailRows({
     ...shared,
@@ -280,7 +295,8 @@ function useMonsterActionDetailRows(
     fieldName: 'bonusActions',
     editor: sections.editors.bonusActions,
     sectionLabel: SECTION_HEADINGS.bonusActions,
-    mapListItem: ({ row, index }) => mapActionListItem(row, index, bonusTitles, 'bonusActions'),
+    rowTitle: bonusRowTitle,
+    resolveListMeta: ({ row }) => resolveActionListMeta(row, 'bonusActions'),
   })
   const reactionRows = useEmbeddedMasterDetailRows({
     ...shared,
@@ -288,8 +304,8 @@ function useMonsterActionDetailRows(
     fieldName: 'reactions',
     editor: sections.editors.reactions,
     sectionLabel: SECTION_HEADINGS.reactions,
-    mapListItem: ({ row, index }) =>
-      mapActionListItem(row, index, reactionTitles, 'reactions', actionTitles),
+    rowTitle: reactionRowTitle,
+    resolveListMeta: ({ row }) => resolveActionListMeta(row, 'reactions', actionTitles),
   })
   const legendaryRows = useEmbeddedMasterDetailRows({
     ...shared,
@@ -297,8 +313,8 @@ function useMonsterActionDetailRows(
     fieldName: 'legendaryActions.actions',
     editor: sections.editors.legendaryActions,
     sectionLabel: SECTION_HEADINGS.legendaryActions,
-    mapListItem: ({ row, index }) =>
-      mapActionListItem(row, index, legendaryTitles, 'legendaryActions', actionTitles),
+    rowTitle: legendaryRowTitle,
+    resolveListMeta: ({ row }) => resolveActionListMeta(row, 'legendaryActions', actionTitles),
   })
   return {
     titlesBySection: {

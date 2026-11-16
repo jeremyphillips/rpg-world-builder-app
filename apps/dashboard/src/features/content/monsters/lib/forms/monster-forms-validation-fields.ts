@@ -9,11 +9,11 @@ const EMPTY_DEFINED_FORM_FIELDS: FormItem[] = [
 ]
 
 export function monsterDefinedFormRowResolveFields(ctx: ContentFormCtx): ArrayResolveFieldsFn {
-  return (row, index) =>
+  return (row, _index) =>
     row == null
       ? EMPTY_DEFINED_FORM_FIELDS
-      : monsterDefinedFormDetailFields({
-          rowPath: `forms.definedForms.${index}`,
-          ctx,
-        })
+      : [
+          { type: 'text', name: 'name', label: MONSTER_FORM_NAME_LABEL, required: true },
+          ...monsterDefinedFormDetailFields(ctx),
+        ]
 }
