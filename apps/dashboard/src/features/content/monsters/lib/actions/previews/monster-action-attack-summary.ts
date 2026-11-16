@@ -25,6 +25,8 @@ import {
   type MonsterActionAttackProfile,
   type MonsterActionAttackRoll,
   type MonsterActionDraft,
+  monsterActionSectionRows,
+  type MonsterActionSectionBody,
   type ResolveMonsterActionAttackProfileInput,
 } from '@rpg/contracts'
 
@@ -82,8 +84,8 @@ export function findMonsterFormActionDraft(
   })
   const sections = ['actions', 'bonusActions', 'reactions', 'legendaryActions'] as const
   for (const section of sections) {
-    const rows = normalized[section]
-    if (!Array.isArray(rows)) continue
+    const rows = monsterActionSectionRows(normalized as MonsterActionSectionBody, section)
+    if (rows.length === 0) continue
     const match = rows.find((row) => {
       return Boolean(row) && typeof row === 'object' && 'id' in row && row.id === actionId
     })

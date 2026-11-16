@@ -1,3 +1,4 @@
+import type { MonsterLegendaryActionDraft } from '@rpg/contracts'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { FormProvider, useForm } from 'react-hook-form'
 
@@ -6,10 +7,8 @@ import { buildSeedDamageTypeVocabulary } from '@/features/vocabulary'
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import { useMonsterActionSections } from '../../../hooks/use-monster-action-sections'
 import type { MonsterActionDraftRow } from '../../../lib/actions/monster-action-presets'
-import {
-  resolveMonsterCreateDefaultValues,
-  type MonsterFormValues,
-} from '../../../lib/monster-form-values'
+import { monsterFormTestValues } from '../../../lib/monster-form-test-values'
+import type { MonsterFormValues } from '../../../lib/monster-form-values'
 import { MONSTER_ACTION_ITEM_NOUN } from '../../../lib/monster-form-labels'
 import { useEmbeddedMasterDetailRows } from '../../../../lib/master-detail/use-embedded-master-detail-rows'
 import { MonsterActionDetail } from './monster-action-detail'
@@ -37,23 +36,31 @@ function Host({
   action: MonsterActionDraftRow
   section?: 'actions' | 'legendaryActions'
 }) {
-  const values = resolveMonsterCreateDefaultValues()
-  if (section === 'legendaryActions') {
-    values.legendaryActionUses = 3
-    values.actions = [
-      {
-        id: 'rend',
-        kind: 'natural-weapon',
-        name: 'Rend',
-        mode: 'melee',
-        damageType: 'slashing',
-      },
-    ]
-    values.legendaryActions = [action]
-  } else {
-    values.actions = [action]
-  }
-  const form = useForm<MonsterFormValues>({ shouldUnregister: true, defaultValues: values })
+  const form = useForm<MonsterFormValues>({
+    shouldUnregister: true,
+    defaultValues:
+      section === 'legendaryActions'
+        ? monsterFormTestValues({
+            name: 'Legendary detail story',
+            actions: [
+              {
+                id: 'rend',
+                kind: 'natural-weapon',
+                name: 'Rend',
+                mode: 'melee',
+                damageType: 'slashing',
+              },
+            ] as MonsterFormValues['actions'],
+            legendaryActions: {
+              uses: 3,
+              actions: [action as MonsterLegendaryActionDraft],
+            },
+          })
+        : monsterFormTestValues({
+            name: 'Action detail story',
+            actions: [action] as MonsterFormValues['actions'],
+          }),
+  })
   return (
     <FormProvider {...form}>
       <Detail actionId={action.id} />

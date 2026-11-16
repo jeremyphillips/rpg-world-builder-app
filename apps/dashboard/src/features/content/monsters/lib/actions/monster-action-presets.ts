@@ -5,7 +5,7 @@ import type {
   MonsterReactionDraft,
 } from '@rpg/contracts'
 
-/** Editor row for an action section before normalization. */
+/** Editor row before normalization; union across all action sections. */
 export type MonsterActionDraftRow =
   | MonsterActionDraft
   | MonsterBonusActionDraft

@@ -10,6 +10,7 @@ import {
 } from '@rpg/contracts'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
+import { monsterFormSectionRows } from '../monster-action-section-access'
 import {
   monsterArmorClassRules,
   monsterEquipmentCatalog,
@@ -41,7 +42,8 @@ function spellCatalogStatus(ctx: ContentFormCtx): 'ready' | 'unavailable' {
 export function buildMonsterSpellsInBody(
   values: MonsterFormValues,
 ): ReadonlyMap<string, Extract<MonsterAction | MonsterLegendaryAction, { kind: 'spell' }>> {
-  const rows = availableBodyRows(SPELL_SECTIONS.flatMap((section) => values[section] ?? [])).filter(
+  const sectionRows = SPELL_SECTIONS.flatMap((section) => monsterFormSectionRows(values, section))
+  const rows = availableBodyRows(sectionRows).filter(
     (row): row is Extract<MonsterAction | MonsterLegendaryAction, { kind: 'spell' }> =>
       row.kind === 'spell',
   )
@@ -169,8 +171,7 @@ function renderSpellPreviewBody(input: {
     mode: 'create',
     armorClassRules,
   })
-  const equipmentCatalogStatus =
-    input.ctx.equipmentCatalogStatus === 'ready' ? 'ready' : 'pending'
+  const equipmentCatalogStatus = input.ctx.equipmentCatalogStatus === 'ready' ? 'ready' : 'pending'
   const identity = resolveMonsterActionIdentity({
     action: input.draft,
     equipment: normalized.equipment,

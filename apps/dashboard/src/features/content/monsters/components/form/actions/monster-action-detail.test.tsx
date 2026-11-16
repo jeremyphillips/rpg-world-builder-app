@@ -13,10 +13,8 @@ import { useEmbeddedMasterDetailRows } from '../../../../lib/master-detail/use-e
 import { useMonsterActionSections } from '../../../hooks/use-monster-action-sections'
 import { MONSTER_ACTION_ITEM_NOUN } from '../../../lib/monster-form-labels'
 import type { MonsterActionDraftRow } from '../../../lib/actions/monster-action-presets'
-import {
-  resolveMonsterCreateDefaultValues,
-  type MonsterFormValues,
-} from '../../../lib/monster-form-values'
+import { monsterFormTestValues } from '../../../lib/monster-form-test-values'
+import type { MonsterFormValues } from '../../../lib/monster-form-values'
 import { MonsterActionDetail } from './monster-action-detail'
 
 const shortbow = pickEquipment('shortbow')
@@ -30,12 +28,15 @@ function Host({
   equipped: boolean
   catalogReady: boolean
 }) {
-  const values = resolveMonsterCreateDefaultValues()
-  values.challengeRating = '1'
-  values.abilityScores = { str: 16, dex: 14, con: 13, int: 8, wis: 11, cha: 8 }
-  values.equipment = [{ entryId: 'bow', equipmentId: 'shortbow', quantity: 1, equipped }]
-  values.actions = [action]
-  const form = useForm<MonsterFormValues>({ defaultValues: values })
+  const form = useForm<MonsterFormValues>({
+    defaultValues: monsterFormTestValues({
+      name: 'Detail test',
+      challengeRating: '1',
+      abilityScores: { str: 16, dex: 14, con: 13, int: 8, wis: 11, cha: 8 },
+      equipment: [{ entryId: 'bow', equipmentId: 'shortbow', quantity: 1, equipped }],
+      actions: [action] as MonsterFormValues['actions'],
+    }),
+  })
   const ctx = {
     entityCatalogLayer: 'homebrew',
     equipmentCatalogStatus: catalogReady ? 'ready' : 'pending',

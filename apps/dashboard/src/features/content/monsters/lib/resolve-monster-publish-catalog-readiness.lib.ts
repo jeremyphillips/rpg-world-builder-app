@@ -10,6 +10,7 @@ import {
   MONSTER_SPELL_CATALOG_ERROR,
 } from './monster-form-labels'
 import type { MonsterFormValues } from './monster-form-values'
+import { monsterFormSectionRows } from './actions/monster-action-section-access'
 
 const MONSTER_ACTION_SECTION_KEYS = [
   'actions',
@@ -26,8 +27,7 @@ function actionRows(
   values: MonsterFormValues,
   section: (typeof MONSTER_ACTION_SECTION_KEYS)[number],
 ) {
-  const rows = values[section]
-  return Array.isArray(rows) ? rows : []
+  return monsterFormSectionRows(values, section)
 }
 
 function hasSpellReferences(values: MonsterFormValues): boolean {

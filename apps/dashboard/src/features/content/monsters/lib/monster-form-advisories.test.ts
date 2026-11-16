@@ -84,10 +84,12 @@ describe('collectMonsterFormAdvisories', () => {
       },
     ])
 
-    values.bonusActions = [{ ...leap, movementFeet: 10 }]
+    values.bonusActions = [{ ...leap, movementFeet: 10 }] as MonsterFormValues['bonusActions']
     expect(collectMonsterFormAdvisories(values, new Map())).toEqual([])
 
-    values.bonusActions = [{ ...leap, distanceFeet: undefined }]
+    values.bonusActions = [
+      { ...leap, distanceFeet: undefined },
+    ] as MonsterFormValues['bonusActions']
     values.movement = []
     expect(collectMonsterFormAdvisories(values, new Map())).toEqual([])
 

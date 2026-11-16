@@ -1,4 +1,8 @@
 import type { ContentTypeKey } from '../../primitives/content/content-type-keys'
+import {
+  mergeLegendaryActionsBlock,
+  readLegendaryActionsBlockFromUnknown,
+} from '../monster/action-section-access'
 import { MONSTER_ACTION_SECTIONS } from '../monster/action-sections'
 
 /** Nested entry arrays (keyed by stable `id`) that may carry entry provenance. */
@@ -98,6 +102,18 @@ export function provenanceEntryHostsFor(
   return CONTENT_TYPE_CAPABILITIES[contentType].provenanceEntryHosts
 }
 
+function writeLegendaryProvenanceHost(
+  body: Record<string, unknown>,
+  entries: unknown,
+): Record<string, unknown> {
+  const preserved = readLegendaryActionsBlockFromUnknown(body.legendaryActions)
+  const actions = Array.isArray(entries) ? entries : []
+  return {
+    ...body,
+    legendaryActions: mergeLegendaryActionsBlock(preserved, actions),
+  }
+}
+
 /** Reads one registered host. Paths are a closed switch, not a generic walk. */
 export function readProvenanceHostEntries(
   body: Record<string, unknown>,
@@ -111,7 +127,10 @@ export function readProvenanceHostEntries(
     case 'reactions':
       return body.reactions
     case 'legendaryActions':
-      return body.legendaryActions
+      return (
+        readLegendaryActionsBlockFromUnknown(body.legendaryActions)?.actions ??
+        body.legendaryActions
+      )
     case 'traits':
       return body.traits
   }
@@ -130,7 +149,7 @@ export function writeProvenanceHostEntries(
     case 'reactions':
       return { ...body, reactions: entries }
     case 'legendaryActions':
-      return { ...body, legendaryActions: entries }
+      return writeLegendaryProvenanceHost(body, entries)
     case 'traits':
       return { ...body, traits: entries }
   }

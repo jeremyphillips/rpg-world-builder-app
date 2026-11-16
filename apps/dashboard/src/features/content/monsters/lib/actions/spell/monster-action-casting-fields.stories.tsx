@@ -27,25 +27,27 @@ function Host() {
       spells: [{ spellId: 'srd:fireball', castAtLevel: 5 }, { spellId: 'srd:mage-hand' }],
     },
   ]
-  values.legendaryActions = [
-    {
-      id: 'presence',
-      kind: 'spell',
-      name: 'Commanding Presence',
-      spellInvocation: 'use-entry',
-      castingAbility: { kind: 'shared', entryId: 'spellcasting' },
-      spells: [{ spellId: 'srd:fireball' }],
-    },
-  ]
+  values.legendaryActions = {
+    actions: [
+      {
+        id: 'presence',
+        kind: 'spell',
+        name: 'Commanding Presence',
+        spellInvocation: 'use-entry',
+        castingAbility: { kind: 'shared', entryId: 'spellcasting' },
+        spells: [{ spellId: 'srd:fireball' }],
+      },
+    ],
+  }
   const form = useForm<MonsterFormValues>({ defaultValues: values })
   return (
     <FormProvider {...form}>
-      <MonsterLegendarySpellcastingActionField name="legendaryActions.0.castingAbility" />
+      <MonsterLegendarySpellcastingActionField name="legendaryActions.actions.0.castingAbility" />
     </FormProvider>
   )
 }
 
 export const Selected: Story = {
-  args: { name: 'legendaryActions.0.castingAbility' },
+  args: { name: 'legendaryActions.actions.0.castingAbility' },
   render: () => <Host />,
 }

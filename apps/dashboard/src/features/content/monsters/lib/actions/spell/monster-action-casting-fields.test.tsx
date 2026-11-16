@@ -154,16 +154,18 @@ describe('MonsterActionCastingAbilityField', () => {
         spells: [{ spellId: 'srd:fireball' }, { spellId: 'srd:mage-hand' }],
       },
     ]
-    defaults.legendaryActions = [
-      {
-        id: 'presence',
-        kind: 'spell',
-        spellInvocation: 'use-entry',
-        spells: [{ spellId: undefined }],
-      },
-    ]
+    defaults.legendaryActions = {
+      actions: [
+        {
+          id: 'presence',
+          kind: 'spell',
+          spellInvocation: 'use-entry',
+          spells: [{ spellId: undefined }],
+        },
+      ],
+    }
     function Selected() {
-      const value = useWatch({ name: 'legendaryActions.0.castingAbility' })
+      const value = useWatch({ name: 'legendaryActions.actions.0.castingAbility' })
       return <output data-testid="casting-ability">{JSON.stringify(value ?? null)}</output>
     }
     function Host() {
@@ -171,7 +173,7 @@ describe('MonsterActionCastingAbilityField', () => {
       return (
         <FormProvider {...form}>
           <Selected />
-          <MonsterLegendarySpellcastingActionField name="legendaryActions.0.castingAbility" />
+          <MonsterLegendarySpellcastingActionField name="legendaryActions.actions.0.castingAbility" />
         </FormProvider>
       )
     }

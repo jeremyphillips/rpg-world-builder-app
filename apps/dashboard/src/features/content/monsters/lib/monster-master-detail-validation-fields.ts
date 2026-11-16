@@ -6,6 +6,7 @@ import { monsterEquipmentCatalog } from './monster-form-derivation'
 import type { MonsterFormValues } from './monster-form-values'
 import { monsterActionDetailFields } from './actions/detail-fields/monster-action-detail-fields'
 import type { MonsterActionSection } from './actions/references/monster-action-equipment-references'
+import { monsterFormSectionRowNamePrefix } from './actions/monster-action-section-access'
 import type { MonsterActionDraftRow } from './actions/monster-action-presets'
 import { sharedCastingOptions } from './actions/spell/monster-action-casting-summary'
 import {
@@ -44,7 +45,7 @@ export function monsterActionRowResolveFields(
     const values = readValues?.()
     const action = row
     const actionId = resolveMonsterActionRowId(action, index)
-    const namePrefix = `${section}.${index}`
+    const namePrefix = `${monsterFormSectionRowNamePrefix(section)}.${index}`
     return monsterActionDetailFields({
       ctx,
       action,
@@ -52,7 +53,7 @@ export function monsterActionRowResolveFields(
       namePrefix,
       equipmentOptions: [],
       equipment: values?.equipment,
-      sharedCastingOptions: sharedCastingOptions(values ?? {}, actionId),
+      sharedCastingOptions: sharedCastingOptions(values ?? ({} as MonsterFormValues), actionId),
       advisories: values ? collectMonsterFormAdvisories(values, monsterEquipmentCatalog(ctx)) : [],
       attackOptions: [],
       referenceOptions: [],

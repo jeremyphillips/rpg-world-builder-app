@@ -58,14 +58,16 @@ describe('findSpellCastingSource', () => {
     expect(
       listDirectSpellCastingSources({
         ...sections,
-        legendaryActions: [
-          {
-            id: 'beguile',
-            kind: 'spell',
-            name: 'Beguile',
-            castingAbility: { kind: 'ability', ability: 'cha' },
-          },
-        ],
+        legendaryActions: {
+          actions: [
+            {
+              id: 'beguile',
+              kind: 'spell',
+              name: 'Beguile',
+              castingAbility: { kind: 'ability', ability: 'cha' },
+            },
+          ],
+        },
       }).map((source) => source.id),
     ).toEqual(['spellcasting', 'charm'])
   })

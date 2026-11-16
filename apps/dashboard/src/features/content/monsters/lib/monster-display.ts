@@ -38,6 +38,7 @@ import {
   formatMonsterTakeActions,
   formatMonsterTeleport,
   formatLegendaryActionUsesIntro,
+  monsterActionSectionRows,
   formatOnceUntilNextTurnSentence,
   resolveCreatureSenses,
   resolveCreatureTraitGrants,
@@ -1038,6 +1039,23 @@ function mapMonsterTrait(
   )
 }
 
+function formatLegendaryActionsIntro(monster: Monster): string | undefined {
+  const block = monster.legendaryActions
+  if (
+    availableBodyRows(monsterActionSectionRows<MonsterLegendaryAction>(monster, 'legendaryActions'))
+      .length === 0 ||
+    block?.uses === undefined
+  ) {
+    return undefined
+  }
+  return formatLegendaryActionUsesIntro({
+    monsterName: monster.name,
+    uses: block.uses,
+    usesInLair: block.usesInLair,
+  })
+}
+
+// fallow-ignore-next-line complexity
 export function buildMonsterDetailViewModel({
   monster,
   creatureTypeLabel,
@@ -1063,7 +1081,7 @@ export function buildMonsterDetailViewModel({
         ...monster.actions,
         ...monster.bonusActions,
         ...monster.reactions,
-        ...monster.legendaryActions,
+        ...monsterActionSectionRows<MonsterLegendaryAction>(monster, 'legendaryActions'),
       ])
         .filter((action) => action.kind === 'spell')
         .map((action) => [action.id, action]),
@@ -1126,21 +1144,15 @@ export function buildMonsterDetailViewModel({
       spellContext,
     ),
     legendaryActions: mapActionItems(
-      availableBodyRows(monster.legendaryActions),
+      availableBodyRows(
+        monsterActionSectionRows<MonsterLegendaryAction>(monster, 'legendaryActions'),
+      ),
       'legendaryActions',
       derived,
       catalogState,
       spellContext,
     ),
-    legendaryActionsIntro:
-      availableBodyRows(monster.legendaryActions).length > 0 &&
-      monster.legendaryActionUses !== undefined
-        ? formatLegendaryActionUsesIntro({
-            monsterName: monster.name,
-            uses: monster.legendaryActionUses,
-            usesInLair: monster.legendaryActionUsesInLair,
-          })
-        : undefined,
+    legendaryActionsIntro: formatLegendaryActionsIntro(monster),
   }
 }
 

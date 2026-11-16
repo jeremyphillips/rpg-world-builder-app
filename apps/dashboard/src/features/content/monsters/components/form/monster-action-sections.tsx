@@ -45,6 +45,7 @@ import {
 } from '../../lib/monster-form-labels'
 import { multiattacksReferencingAction } from '../../lib/actions/references/monster-action-multiattack-references'
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
+import { monsterFormSectionRows } from '../../lib/actions/monster-action-section-access'
 import type { MonsterActionPending } from '../../hooks/use-monster-action-sections'
 import {
   buildMonsterLoadoutPickerItems,
@@ -132,10 +133,12 @@ function MonsterActionAddMenu({
           allowAddWeapon,
           section,
           sectionRows: {
-            actions: (values.actions ?? []) as MonsterActionDraftRow[],
-            bonusActions: (values.bonusActions ?? []) as MonsterActionDraftRow[],
-            reactions: (values.reactions ?? []) as MonsterActionDraftRow[],
-            legendaryActions: (values.legendaryActions ?? []) as MonsterActionDraftRow[],
+            actions: values.actions ?? [],
+            bonusActions: values.bonusActions ?? [],
+            reactions: values.reactions ?? [],
+            ...(values.legendaryActions
+              ? { legendaryActions: { actions: values.legendaryActions.actions } }
+              : {}),
           },
           hasReferenceTargets: ((values.actions ?? []) as MonsterActionDraftRow[]).some(
             isLegendaryReferenceTarget,
@@ -213,17 +216,12 @@ function sectionTitles(
   ctx: ContentFormCtx,
   section: MonsterActionSection,
 ) {
-  return monsterActionEditorTitles(
-    (values[section] ?? []) as MonsterActionDraftRow[],
-    values,
-    ctx,
-    section,
-  )
+  return monsterActionEditorTitles(monsterFormSectionRows(values, section), values, ctx, section)
 }
 
 function weaponActionReferences(values: MonsterFormValues) {
   return MONSTER_ACTION_SECTIONS.flatMap((actionSection) =>
-    ((values[actionSection] ?? []) as MonsterActionDraftRow[]).flatMap((action) =>
+    monsterFormSectionRows(values, actionSection).flatMap((action) =>
       action.kind === 'weapon' && action.equipmentEntryId
         ? [{ id: action.id, equipmentEntryId: action.equipmentEntryId }]
         : [],
@@ -278,7 +276,7 @@ function useMonsterActionDetailRows(
   const legendaryRows = useEmbeddedMasterDetailRows({
     ...shared,
     itemFields: { resolveItemFields: makeActionResolver('legendaryActions') },
-    fieldName: 'legendaryActions',
+    fieldName: 'legendaryActions.actions',
     editor: sections.editors.legendaryActions,
     sectionLabel: SECTION_HEADINGS.legendaryActions,
     mapListItem: ({ row, index }) =>
@@ -362,14 +360,16 @@ export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
     ? multiattacksReferencingAction(
         [
           ...((values.actions ?? []) as MonsterActionDraftRow[]),
-          ...((values.legendaryActions ?? []) as MonsterActionDraftRow[]),
+          ...monsterFormSectionRows(values, 'legendaryActions'),
         ],
         deleteLocated.action.id,
       )
     : []
   const deleteNames = deleteReferences
     .map((action) => {
-      const section = (values.legendaryActions ?? []).some((row) => row.id === action.id)
+      const section = monsterFormSectionRows(values, 'legendaryActions').some(
+        (row) => row.id === action.id,
+      )
         ? 'legendaryActions'
         : 'actions'
       return titlesBySection[section].get(action.id) ?? action.name ?? action.id

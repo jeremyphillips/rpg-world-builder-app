@@ -12,10 +12,8 @@ import { pickEquipment } from '@/test/fixtures/pick'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import type { MonsterActionDraftRow } from '../../../lib/actions/monster-action-presets'
-import {
-  resolveMonsterCreateDefaultValues,
-  type MonsterFormValues,
-} from '../../../lib/monster-form-values'
+import { monsterFormTestValues } from '../../../lib/monster-form-test-values'
+import type { MonsterFormValues } from '../../../lib/monster-form-values'
 import { MonsterActionSections } from '../monster-action-sections'
 
 const shortbow = pickEquipment('shortbow')
@@ -56,13 +54,17 @@ function RetainedMonsterPath({ name }: { name: (typeof RETAINED_FORM_PATHS)[numb
 }
 
 function Host({ formRef }: { formRef: { current: UseFormReturn<MonsterFormValues> | null } }) {
-  const values = resolveMonsterCreateDefaultValues()
-  values.equipment = [{ entryId: 'bow', equipmentId: shortbow.id, quantity: 1, equipped: true }]
-  values.actions = [
-    weapon,
-    { id: 'parry', kind: 'special', name: 'Parry', description: '<p>Block</p>' },
-  ]
-  const form = useForm<MonsterFormValues>({ shouldUnregister: true, defaultValues: values })
+  const form = useForm<MonsterFormValues>({
+    shouldUnregister: true,
+    defaultValues: monsterFormTestValues({
+      name: 'Field order test',
+      equipment: [{ entryId: 'bow', equipmentId: shortbow.id, quantity: 1, equipped: true }],
+      actions: [
+        weapon,
+        { id: 'parry', kind: 'special', name: 'Parry', description: '<p>Block</p>' },
+      ] as MonsterFormValues['actions'],
+    }),
+  })
   useEffect(() => {
     formRef.current = form
   })

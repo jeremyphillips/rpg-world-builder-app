@@ -1,4 +1,5 @@
 import { availableBodyRows } from '../../content/lib/campaign-access/body-row-availability'
+import { monsterActionSectionRows } from '../../content/monster/action-section-access'
 import type {
   MonsterAction,
   MonsterActionSection,
@@ -299,7 +300,7 @@ function deriveSpellcastingLines(
   const sections = ['actions', 'bonusActions', 'reactions', 'legendaryActions'] as const
   const lines: DerivedMonsterSpellcastingLine[] = []
   for (const section of sections) {
-    const rows = monster[section] as readonly (
+    const rows = monsterActionSectionRows(monster, section) as readonly (
       | MonsterAction
       | MonsterBonusAction
       | MonsterReaction
@@ -353,7 +354,7 @@ type DraftMonsterSource = {
   actions?: MonsterAction[]
   bonusActions?: MonsterBonusAction[]
   reactions?: MonsterReaction[]
-  legendaryActions?: MonsterLegendaryAction[]
+  legendaryActions?: MonsterBody['legendaryActions']
 }
 
 function draftAttackResult(args: {

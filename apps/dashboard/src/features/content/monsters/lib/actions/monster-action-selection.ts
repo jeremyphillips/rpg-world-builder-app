@@ -11,13 +11,16 @@ import {
 } from './references/monster-action-equipment-references'
 import type { MonsterActionDraftRow } from './monster-action-presets'
 import type { MonsterFormValues } from '../monster-form-values'
+import {
+  monsterFormSectionRows,
+  monsterFormSectionRowsFieldName,
+} from './monster-action-section-access'
 
 function sectionRows(
-  values: Pick<MonsterFormValues, MonsterActionSection>,
+  values: Pick<MonsterFormValues, MonsterActionSection | 'legendaryActions'>,
   section: MonsterActionSection,
 ): MonsterActionDraftRow[] {
-  const rows = values[section]
-  return Array.isArray(rows) ? (rows as MonsterActionDraftRow[]) : []
+  return monsterFormSectionRows(values, section)
 }
 
 export function resolveFirstInvalidActionPath(
@@ -25,9 +28,10 @@ export function resolveFirstInvalidActionPath(
   values: Pick<MonsterFormValues, MonsterActionSection>,
 ): { section: MonsterActionSection; index: number; id: string } | null {
   for (const section of MONSTER_ACTION_SECTIONS) {
-    const index = findFirstInvalidRowIndex(errors, section)
+    const index = findFirstInvalidRowIndex(errors, monsterFormSectionRowsFieldName(section))
     if (index === null) continue
-    const id = sectionRows(values, section)[index]?.id
+    const row = sectionRows(values, section)[index]
+    const id = row && 'id' in row && typeof row.id === 'string' ? row.id : undefined
     if (typeof id === 'string' && id.length > 0) return { section, index, id }
   }
   return null

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { resolveMonsterActionIdentity } from '@rpg/contracts'
-import { useFormContext, useWatch } from 'react-hook-form'
+import { mergeLegendaryActionsBlock, resolveMonsterActionIdentity } from '@rpg/contracts'
+import { useFormContext, useWatch, type UseFormSetValue } from 'react-hook-form'
 
 import { masterDetailItemTitle } from '../../lib/master-detail/master-detail-constants'
 import { duplicateMasterDetailRow } from '../../lib/master-detail/duplicate-master-detail-row'
@@ -44,7 +44,13 @@ import {
   collectMonsterActionSnapshotMissing,
   lostDefinedKeys,
 } from '../lib/actions/monster-action-row-snapshot.lib'
+import type { MonsterLegendaryActionDraft } from '@rpg/contracts'
+
 import type { MonsterFormValues } from '../lib/monster-form-values'
+import {
+  monsterFormSectionRows,
+  monsterFormSectionRowsFieldName,
+} from '../lib/actions/monster-action-section-access'
 
 type UseMonsterActionSectionsOptions = {
   equipmentCatalogStatus?: ContentFormCtx['equipmentCatalogStatus']
@@ -83,12 +89,63 @@ function legendaryUsesUnset(value: unknown): boolean {
   return value === undefined || value === null || value === ''
 }
 
+function acquisitionRowForChoice(
+  section: MonsterActionSection,
+  choice: Exclude<MonsterActionAcquisitionChoice, { type: 'add-weapon' }>,
+  getValues: () => MonsterFormValues,
+): MonsterActionDraftRow {
+  if (choice.type === 'legendary') return createLegendaryActionDraft(choice.category, getValues())
+  if (choice.type === 'reaction') return createReactionActionDraft(choice.category, getValues())
+  if (choice.type === 'bonus') return createBonusActionDraft(choice.category)
+  if (choice.type === 'create' && choice.kind === 'spell') {
+    return createSpellActionDraft(section, getValues(), choice.spellAcquisition)
+  }
+  return createMonsterActionFromAcquisition(choice)
+}
+
+function seedLegendaryUsesIfFirst(
+  section: MonsterActionSection,
+  before: number,
+  getValues: () => MonsterFormValues,
+  setValue: UseFormSetValue<MonsterFormValues>,
+): void {
+  if (section !== 'legendaryActions' || before !== 0) return
+  if (!legendaryUsesUnset(getValues().legendaryActions?.uses)) return
+  const block = getValues().legendaryActions
+  setValue(
+    'legendaryActions',
+    mergeLegendaryActionsBlock({ ...block, uses: 3 }, block?.actions ?? []),
+    { shouldDirty: true },
+  )
+}
+
 function rowsOf(
   values: MonsterFormValues | undefined,
   section: MonsterActionSection,
 ): MonsterActionDraftRow[] {
-  const rows = values?.[section]
-  return Array.isArray(rows) ? (rows as MonsterActionDraftRow[]) : []
+  return monsterFormSectionRows(values, section)
+}
+
+function ensureLegendaryBlock(
+  getValues: () => MonsterFormValues,
+  setValue: ReturnType<typeof useFormContext<MonsterFormValues>>['setValue'],
+): void {
+  const block = getValues().legendaryActions
+  if (block && typeof block === 'object' && Array.isArray(block.actions)) return
+  setValue('legendaryActions', { actions: [] }, { shouldDirty: true })
+}
+
+function setLegendaryActions(
+  setValue: ReturnType<typeof useFormContext<MonsterFormValues>>['setValue'],
+  getValues: () => MonsterFormValues,
+  actions: MonsterLegendaryActionDraft[],
+): void {
+  const block = getValues().legendaryActions
+  if (actions.length === 0) {
+    setValue('legendaryActions', undefined as never, { shouldDirty: true })
+    return
+  }
+  setValue('legendaryActions', mergeLegendaryActionsBlock(block, actions), { shouldDirty: true })
 }
 
 export function useMonsterActionSections(
@@ -114,11 +171,16 @@ export function useMonsterActionSections(
   const reactions = useMasterDetailArray('reactions', () =>
     createMonsterActionFromAcquisition({ type: 'create', kind: 'special' }),
   )
-  const legendaryActions = useMasterDetailArray('legendaryActions', () =>
+  const legendaryActions = useMasterDetailArray('legendaryActions.actions', () =>
     createMonsterActionFromAcquisition({ type: 'create', kind: 'special' }),
   )
   const editors = useMemo(
-    () => ({ actions, bonusActions, reactions, legendaryActions }),
+    () => ({
+      actions,
+      bonusActions,
+      reactions,
+      legendaryActions,
+    }),
     [actions, bonusActions, reactions, legendaryActions],
   )
   const [selectedActionId, setSelectedActionId] = useState<string | null>(null)
@@ -209,26 +271,12 @@ export function useMonsterActionSections(
       section: MonsterActionSection,
       choice: Exclude<MonsterActionAcquisitionChoice, { type: 'add-weapon' }>,
     ) => {
-      const row =
-        choice.type === 'legendary'
-          ? createLegendaryActionDraft(choice.category, getValues())
-          : choice.type === 'reaction'
-            ? createReactionActionDraft(choice.category, getValues())
-            : choice.type === 'bonus'
-              ? createBonusActionDraft(choice.category)
-              : choice.type === 'create' && choice.kind === 'spell'
-                ? createSpellActionDraft(section, getValues(), choice.spellAcquisition)
-                : createMonsterActionFromAcquisition(choice)
+      const row = acquisitionRowForChoice(section, choice, getValues)
       const before =
         section === 'legendaryActions' ? rowsOf(getValues(), 'legendaryActions').length : 0
+      if (section === 'legendaryActions') ensureLegendaryBlock(getValues, setValue)
       editors[section].appendRow(row)
-      if (
-        section === 'legendaryActions' &&
-        before === 0 &&
-        legendaryUsesUnset(getValues('legendaryActionUses'))
-      ) {
-        setValue('legendaryActionUses', 3, { shouldDirty: true })
-      }
+      seedLegendaryUsesIfFirst(section, before, getValues, setValue)
       setSelectedActionId(row.id)
       setNotice(null)
     },
@@ -242,13 +290,19 @@ export function useMonsterActionSections(
       setValue('equipment', equipment, { shouldDirty: true })
       const before =
         section === 'legendaryActions' ? rowsOf(getValues(), 'legendaryActions').length : 0
+      if (section === 'legendaryActions') ensureLegendaryBlock(getValues, setValue)
       editors[section].appendRow(action)
       if (
         section === 'legendaryActions' &&
         before === 0 &&
-        legendaryUsesUnset(getValues('legendaryActionUses'))
+        legendaryUsesUnset(getValues().legendaryActions?.uses)
       ) {
-        setValue('legendaryActionUses', 3, { shouldDirty: true })
+        const block = getValues().legendaryActions
+        setValue(
+          'legendaryActions',
+          mergeLegendaryActionsBlock({ ...block, uses: 3 }, block?.actions ?? []),
+          { shouldDirty: true },
+        )
       }
       setSelectedActionId(action.id)
       setNotice(formatAddedEquipmentNotice(name))
@@ -270,23 +324,25 @@ export function useMonsterActionSections(
         const actions = stripMultiattackActionId(rowsOf(getValues(), 'actions'), actionId).filter(
           (action) => action.id !== actionId,
         )
-        setValue('actions', actions, { shouldDirty: true })
-        setValue(
-          'legendaryActions',
-          stripMultiattackActionId(rowsOf(getValues(), 'legendaryActions'), actionId),
-          { shouldDirty: true },
+        setValue('actions', actions as MonsterFormValues['actions'], { shouldDirty: true })
+        const nextLegendary = stripMultiattackActionId(
+          rowsOf(getValues(), 'legendaryActions'),
+          actionId,
         )
+        setLegendaryActions(setValue, getValues, nextLegendary as MonsterLegendaryActionDraft[])
         setValue(
           'reactions',
-          stripMultiattackActionId(rowsOf(getValues(), 'reactions'), actionId),
+          stripMultiattackActionId(
+            rowsOf(getValues(), 'reactions'),
+            actionId,
+          ) as MonsterFormValues['reactions'],
           { shouldDirty: true },
         )
       } else {
         editors[located.section].removeAt(located.index)
       }
       if (located.section === 'legendaryActions' && legendaryBefore === 1) {
-        setValue('legendaryActionUses', undefined as never, { shouldDirty: true })
-        setValue('legendaryActionUsesInLair', undefined as never, { shouldDirty: true })
+        setValue('legendaryActions', undefined as never, { shouldDirty: true })
       }
       setSelectedActionId(nextSelection)
       setPending(null)
@@ -307,7 +363,7 @@ export function useMonsterActionSections(
         setNotice(formatCastingSourceDeleteNotice(castingDependents))
         return
       }
-      const references =
+      const referenceRows =
         located.section === 'actions'
           ? multiattacksReferencingAction(
               [
@@ -318,11 +374,11 @@ export function useMonsterActionSections(
               actionId,
             )
           : []
-      if (references.length > 0) {
+      if (referenceRows.length > 0) {
         setPending({
           type: 'multiattack-delete',
           actionId,
-          names: references.map((action) =>
+          names: referenceRows.map((action) =>
             monsterActionReferenceTitle(action, equipmentCatalogStatus),
           ),
           from: located.section,
@@ -332,7 +388,7 @@ export function useMonsterActionSections(
       }
       commitRemove(actionId)
     },
-    [commitRemove, getValues, locate],
+    [commitRemove, equipmentCatalogStatus, getValues, locate],
   )
 
   const commitMove = useCallback(
@@ -340,20 +396,34 @@ export function useMonsterActionSections(
       const values = getValues()
       const action = rowsOf(values, from)[index]
       if (!action) return
+      const fromField = monsterFormSectionRowsFieldName(from)
+      const toField = monsterFormSectionRowsFieldName(to)
       const presented =
         editors[from].hasRowError(index) &&
-        (formState.submitCount > 0 || formState.touchedFields[from]?.[index] != null)
-      clearErrors(`${from}.${index}`)
+        (formState.submitCount > 0 ||
+          (formState.touchedFields as Record<string, Record<number, unknown>>)[fromField]?.[
+            index
+          ] != null)
+      clearErrors(`${fromField}.${index}`)
       const nextRow = actionAfterSectionMove(action, to)
       const targetIndex = rowsOf(values, to).length
+      if (to === 'legendaryActions') ensureLegendaryBlock(getValues, setValue)
       editors[from].removeAt(index)
       editors[to].appendRow(nextRow)
-      if (presented) void trigger(`${to}.${targetIndex}`)
+      if (presented) void trigger(`${toField}.${targetIndex}`)
       setSelectedActionId(action.id)
       setFocusToken((token) => token + 1)
       setPending(null)
     },
-    [clearErrors, editors, formState.submitCount, formState.touchedFields, getValues, trigger],
+    [
+      clearErrors,
+      editors,
+      formState.submitCount,
+      formState.touchedFields,
+      getValues,
+      setValue,
+      trigger,
+    ],
   )
 
   const requestMove = useCallback(
@@ -389,7 +459,7 @@ export function useMonsterActionSections(
       }
       commitMove(located.section, located.index, to)
     },
-    [commitMove, getValues, locate, selectedActionId],
+    [commitMove, equipmentCatalogStatus, getValues, locate, selectedActionId],
   )
 
   const selectAction = useCallback(
@@ -423,9 +493,10 @@ export function useMonsterActionSections(
     if (!located) return
     const copy = duplicateMasterDetailRow(located.action)
     if (!copy || typeof copy.id !== 'string') return
+    if (located.section === 'legendaryActions') ensureLegendaryBlock(getValues, setValue)
     editors[located.section].appendRow(copy)
     setSelectedActionId(copy.id)
-  }, [editors, locate, selectedActionId])
+  }, [editors, getValues, locate, selectedActionId, setValue])
 
   const confirmPending = useCallback(() => {
     if (!pending) return

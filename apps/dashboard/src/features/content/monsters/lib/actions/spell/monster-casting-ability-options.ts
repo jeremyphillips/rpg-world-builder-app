@@ -7,6 +7,7 @@ import {
   findSpellCastingSource,
   formatSignedModifier,
   getAbilityLabel,
+  mergeLegendaryActionsBlock,
   spellAttackBonus,
   weaponAttackBonus,
   type Ability,
@@ -44,12 +45,13 @@ function abilityScore(values: MonsterFormValues, ability: Ability): number | und
 }
 
 function spellCastingSections(values: MonsterFormValues): SpellCastingSections {
+  const block = values.legendaryActions
   return {
     actions: values.actions,
     bonusActions: values.bonusActions,
     reactions: values.reactions,
-    legendaryActions: values.legendaryActions,
-  } as SpellCastingSections
+    ...(block ? { legendaryActions: mergeLegendaryActionsBlock(block, block.actions ?? []) } : {}),
+  }
 }
 
 function formatSaveDcTrailing(dc: number): SelectOptionTrailing {

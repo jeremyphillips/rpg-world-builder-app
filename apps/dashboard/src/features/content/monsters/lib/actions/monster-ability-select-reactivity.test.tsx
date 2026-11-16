@@ -3,8 +3,8 @@ import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm } from 'react-hook-form'
 import { beforeAll, describe, expect, it } from 'vitest'
 
+import { monsterFormTestValues } from '../monster-form-test-values'
 import type { MonsterFormValues } from '../monster-form-values'
-import { resolveMonsterCreateDefaultValues } from '../monster-form-values'
 import { MonsterActionAttackAbilityField } from './monster-attack-ability-field'
 import { MonsterActionCastingAbilityField } from './spell/monster-action-casting-fields'
 
@@ -22,20 +22,22 @@ beforeAll(() => {
 describe('monster ability select reactivity', () => {
   it('updates an attack bonus in a reaction from root scores and proficiency', async () => {
     const user = userEvent.setup()
-    const defaults = resolveMonsterCreateDefaultValues()
-    defaults.challengeRating = '5'
-    defaults.abilityScores.str = 20
-    defaults.reactions = [
-      {
-        id: 'slash',
-        kind: 'attack',
-        name: 'Slash',
-        bonusSource: { kind: 'ability', ability: 'str', proficient: true },
-      },
-    ]
+    const defaultValues = monsterFormTestValues({
+      name: 'Reaction ability test',
+      challengeRating: '5',
+      abilityScores: { str: 20, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
+      reactions: [
+        {
+          id: 'slash',
+          kind: 'attack',
+          name: 'Slash',
+          bonusSource: { kind: 'ability', ability: 'str', proficient: true },
+        },
+      ] as unknown as MonsterFormValues['reactions'],
+    })
 
     function Host() {
-      const form = useForm<MonsterFormValues>({ defaultValues: defaults })
+      const form = useForm<MonsterFormValues>({ defaultValues })
       return (
         <FormProvider {...form}>
           <button type="button" onClick={() => form.setValue('abilityScores.str', 10)}>
@@ -61,20 +63,22 @@ describe('monster ability select reactivity', () => {
 
   it('previews the default proficiency bonus before the switch is toggled', async () => {
     const user = userEvent.setup()
-    const defaults = resolveMonsterCreateDefaultValues()
-    defaults.challengeRating = '5'
-    defaults.abilityScores.str = 20
-    defaults.reactions = [
-      {
-        id: 'slash',
-        kind: 'attack',
-        name: 'Slash',
-        bonusSource: { kind: 'ability', ability: 'str' },
-      },
-    ]
+    const defaultValues = monsterFormTestValues({
+      name: 'Reaction proficiency preview',
+      challengeRating: '5',
+      abilityScores: { str: 20, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
+      reactions: [
+        {
+          id: 'slash',
+          kind: 'attack',
+          name: 'Slash',
+          bonusSource: { kind: 'ability', ability: 'str' },
+        },
+      ] as unknown as MonsterFormValues['reactions'],
+    })
 
     function Host() {
-      const form = useForm<MonsterFormValues>({ defaultValues: defaults })
+      const form = useForm<MonsterFormValues>({ defaultValues })
       return (
         <FormProvider {...form}>
           <MonsterActionAttackAbilityField
@@ -92,22 +96,23 @@ describe('monster ability select reactivity', () => {
 
   it('updates a trait save dc when the referenced spellcasting ability changes', async () => {
     const user = userEvent.setup()
-    const defaults = resolveMonsterCreateDefaultValues()
-    defaults.challengeRating = '5'
-    defaults.abilityScores.int = 16
-    defaults.abilityScores.wis = 12
-    defaults.actions = [
-      {
-        id: 'spellcasting',
-        kind: 'spell',
-        name: 'Spellcasting',
-        castingAbility: { kind: 'ability', ability: 'int' },
-        spells: [],
-      },
-    ]
+    const defaultValues = monsterFormTestValues({
+      name: 'Trait save dc source',
+      challengeRating: '5',
+      abilityScores: { str: 10, dex: 10, con: 10, int: 16, wis: 12, cha: 10 },
+      actions: [
+        {
+          id: 'spellcasting',
+          kind: 'spell',
+          name: 'Spellcasting',
+          castingAbility: { kind: 'ability', ability: 'int' },
+          spells: [],
+        },
+      ] as MonsterFormValues['actions'],
+    })
 
     function Host() {
-      const form = useForm<MonsterFormValues>({ defaultValues: defaults })
+      const form = useForm<MonsterFormValues>({ defaultValues })
       return (
         <FormProvider {...form}>
           <button

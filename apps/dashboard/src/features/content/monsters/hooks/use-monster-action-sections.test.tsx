@@ -3,6 +3,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { describe, expect, it } from 'vitest'
 
 import { formatCastingSourceDeleteNotice } from '../lib/monster-form-labels'
+import { monsterFormTestValues } from '../lib/monster-form-test-values'
 import {
   resolveMonsterCreateDefaultValues,
   type MonsterFormValues,
@@ -12,7 +13,9 @@ import { useMonsterActionSections } from './use-monster-action-sections'
 function wrapper(initial?: Partial<MonsterFormValues>) {
   return function Wrapper({ children }: { children: React.ReactNode }) {
     const form = useForm<MonsterFormValues>({
-      defaultValues: { ...resolveMonsterCreateDefaultValues(), ...initial },
+      defaultValues: initial
+        ? monsterFormTestValues({ name: 'Hook test', ...initial })
+        : resolveMonsterCreateDefaultValues(),
     })
     return <FormProvider {...form}>{children}</FormProvider>
   }
@@ -102,7 +105,7 @@ describe('useMonsterActionSections', () => {
               castingAbility: { kind: 'shared', entryId: 'spellcasting' },
             },
           },
-        ],
+        ] as MonsterFormValues['bonusActions'],
         reactions: [
           {
             id: 'shield',
@@ -129,12 +132,12 @@ describe('useMonsterActionSections', () => {
     act(() => {
       result.current.addAcquisition('legendaryActions', { type: 'create', kind: 'special' })
     })
-    expect(result.current.values?.legendaryActionUses).toBe(3)
+    expect(result.current.values?.legendaryActions?.uses).toBe(3)
     act(() => {
       result.current.addAcquisition('legendaryActions', { type: 'create', kind: 'special' })
     })
-    expect(result.current.values?.legendaryActionUses).toBe(3)
-    const ids = (result.current.values?.legendaryActions ?? []).flatMap((action) =>
+    expect(result.current.values?.legendaryActions?.uses).toBe(3)
+    const ids = (result.current.values?.legendaryActions?.actions ?? []).flatMap((action) =>
       action && typeof action === 'object' && 'id' in action && typeof action.id === 'string'
         ? [action.id]
         : [],
@@ -142,9 +145,7 @@ describe('useMonsterActionSections', () => {
     act(() => {
       for (const id of ids) result.current.removeAction(id)
     })
-    expect(result.current.values?.legendaryActions).toEqual([])
-    expect(result.current.values?.legendaryActionUses).toBeUndefined()
-    expect(result.current.values?.legendaryActionUsesInLair).toBeUndefined()
+    expect(result.current.values?.legendaryActions).toBeUndefined()
   })
 
   it('does not move a row into Legendary Actions', () => {
@@ -165,10 +166,12 @@ describe('useMonsterActionSections', () => {
     const { result } = renderHook(() => useMonsterActionSections(), {
       wrapper: wrapper({
         actions: [{ id: 'bite', kind: 'special', name: 'Bite', description: '<p>Bites.</p>' }],
-        legendaryActionUses: 3,
-        legendaryActions: [
-          { id: 'pounce', kind: 'action-reference', name: 'Pounce', actionIds: ['bite'] },
-        ],
+        legendaryActions: {
+          uses: 3,
+          actions: [
+            { id: 'pounce', kind: 'action-reference', name: 'Pounce', actionIds: ['bite'] },
+          ],
+        },
       }),
     })
     act(() => {
@@ -181,15 +184,17 @@ describe('useMonsterActionSections', () => {
     act(() => {
       result.current.confirmPending()
     })
-    expect(result.current.values?.legendaryActions?.[0]).toMatchObject({ actionIds: [] })
+    expect(result.current.values?.legendaryActions?.actions?.[0]).toMatchObject({ actionIds: [] })
 
     const move = renderHook(() => useMonsterActionSections(), {
       wrapper: wrapper({
         actions: [{ id: 'bite', kind: 'special', name: 'Bite', description: '<p>Bites.</p>' }],
-        legendaryActionUses: 3,
-        legendaryActions: [
-          { id: 'pounce', kind: 'action-reference', name: 'Pounce', actionIds: ['bite'] },
-        ],
+        legendaryActions: {
+          uses: 3,
+          actions: [
+            { id: 'pounce', kind: 'action-reference', name: 'Pounce', actionIds: ['bite'] },
+          ],
+        },
       }),
     })
     act(() => {

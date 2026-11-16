@@ -275,12 +275,12 @@ describe('monster publish validation messages', () => {
         : undefined
     expect(row && 'fields' in row ? row.fields : []).toEqual([
       expect.objectContaining({
-        name: 'legendaryActionUses',
+        name: 'legendaryActions.uses',
         digits: 2,
         width: 'auto',
       }),
       expect.objectContaining({
-        name: 'legendaryActionUsesInLair',
+        name: 'legendaryActions.usesInLair',
         digits: 2,
         width: 'auto',
       }),

@@ -17,7 +17,7 @@ Other kinds do not. See [action-architecture.md](../action-architecture.md) and
 
 The section places the row. Legendary Actions accept only `action-reference`,
 `spell`, and `special`. Rows do not move into or out of that section. Each
-legendary row spends one use from `legendaryActionUses`. `onceUntilNextTurn` is
+legendary row spends one use from `legendaryActions.uses`. `onceUntilNextTurn` is
 a stat-block sentence, not `limitedUse` and not encounter state. A legendary
 `spell` row stores exactly one spell. `spellInvocation: 'use-entry'` is valid
 only there and requires the spell on the referenced Spellcasting action.

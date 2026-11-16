@@ -5,10 +5,8 @@ import { systemDefaultArmorClassRules } from '@rpg/contracts'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import type { MonsterActionDraftRow } from '../../../lib/actions/monster-action-presets'
-import {
-  resolveMonsterCreateDefaultValues,
-  type MonsterFormValues,
-} from '../../../lib/monster-form-values'
+import { monsterFormTestValues } from '../../../lib/monster-form-test-values'
+import type { MonsterFormValues } from '../../../lib/monster-form-values'
 import { MonsterActionBonusSummary } from './monster-action-bonus-summary'
 
 const leap: MonsterActionDraftRow = {
@@ -27,10 +25,12 @@ const meta = {
 export default meta
 
 function Host() {
-  const values = resolveMonsterCreateDefaultValues()
-  values.name = 'Hezrou'
-  values.bonusActions = [leap]
-  const form = useForm<MonsterFormValues>({ defaultValues: values })
+  const form = useForm<MonsterFormValues>({
+    defaultValues: monsterFormTestValues({
+      name: 'Hezrou',
+      bonusActions: [leap] as MonsterFormValues['bonusActions'],
+    }),
+  })
   const ctx = {
     entityCatalogLayer: 'homebrew',
     equipmentCatalogStatus: 'ready',

@@ -3,6 +3,10 @@ import {
   type MonsterActionSection,
 } from './references/monster-action-equipment-references'
 import type { MonsterFormValues } from '../monster-form-values'
+import {
+  monsterFormSectionRows,
+  monsterFormSectionRowsFieldName,
+} from './monster-action-section-access'
 
 function isPlainRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -102,7 +106,13 @@ export function collectMonsterActionSnapshotMissing(
 ): MissingPathEntry[] {
   const missing: MissingPathEntry[] = []
   for (const section of MONSTER_ACTION_SECTIONS) {
-    collectMissingPaths(snapshot[section], live[section], section, missing)
+    const fieldName = monsterFormSectionRowsFieldName(section)
+    collectMissingPaths(
+      monsterFormSectionRows(snapshot, section),
+      monsterFormSectionRows(live, section),
+      fieldName,
+      missing,
+    )
   }
   return missing
 }

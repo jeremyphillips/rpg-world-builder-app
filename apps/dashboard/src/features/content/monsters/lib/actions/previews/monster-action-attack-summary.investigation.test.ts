@@ -6,10 +6,8 @@ import { describe, expect, it } from 'vitest'
 import { resolveMonsterActionAttackProfile } from '@rpg/contracts'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
-import {
-  resolveMonsterCreateDefaultValues,
-  type MonsterFormValues,
-} from '../../monster-form-values'
+import { monsterFormTestValues } from '../../monster-form-test-values'
+import type { MonsterFormValues } from '../../monster-form-values'
 import { normalizeMonsterFormValues } from '../../normalize-monster-form-values'
 import { resolveMonsterFormActionAttackProfile } from './monster-action-attack-summary'
 
@@ -37,16 +35,16 @@ function authoredAttack(
 
 function formWithAction(
   action: MonsterFormValues['actions'][number],
-  formOverrides: Partial<MonsterFormValues> = {},
+  formOverrides: Partial<MonsterFormValues> & Pick<MonsterFormValues, 'name'> = {
+    name: 'Investigation',
+  },
 ): MonsterFormValues {
-  const base = resolveMonsterCreateDefaultValues()
-  return {
-    ...base,
+  return monsterFormTestValues({
     challengeRating: '1',
     abilityScores: { str: 16, dex: 14, con: 13, int: 8, wis: 11, cha: 8 },
     actions: [action],
     ...formOverrides,
-  }
+  })
 }
 
 function profileStatus(values: MonsterFormValues) {
@@ -132,11 +130,11 @@ describe('attack summary investigation (authored attack guards)', () => {
   })
 
   it('documents natural-weapon form-adapter path when mode is dropped by normalization', () => {
-    const natural = {
+    const natural: MonsterFormValues['actions'][number] = {
       id: 'bite',
-      kind: 'natural-weapon' as const,
+      kind: 'natural-weapon',
       name: 'Bite',
-      mode: 'melee' as const,
+      mode: 'melee',
       damageType: 'piercing',
       damage: { dice: { count: 1, faces: 8 } },
     }

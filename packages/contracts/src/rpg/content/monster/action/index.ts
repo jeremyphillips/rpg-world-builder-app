@@ -3,6 +3,7 @@ export {
   monsterActionDraftSchema,
   type MonsterAction,
   type MonsterActionDraft,
+  type MonsterActionDraftInput,
 } from './actions-schema'
 export {
   monsterBonusActionSchema,
@@ -10,19 +11,26 @@ export {
   bonusTeleportPassengerSchema,
   type MonsterBonusAction,
   type MonsterBonusActionDraft,
+  type MonsterBonusActionDraftInput,
   type BonusTeleportPassenger,
 } from './bonus-schema'
 export {
   monsterLegendaryActionSchema,
   monsterLegendaryActionDraftSchema,
+  monsterLegendaryActionsBlockSchema,
+  monsterLegendaryActionsBlockDraftSchema,
   type MonsterLegendaryAction,
   type MonsterLegendaryActionDraft,
+  type MonsterLegendaryActionDraftInput,
+  type MonsterLegendaryActionsBlock,
+  type MonsterLegendaryActionsBlockDraft,
 } from './legendary-schema'
 export {
   monsterReactionSchema,
   monsterReactionDraftSchema,
   type MonsterReaction,
   type MonsterReactionDraft,
+  type MonsterReactionDraftInput,
 } from './reaction-schema'
 export {
   PARRY_AC_BONUS_MIN,

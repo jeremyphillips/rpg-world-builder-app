@@ -20,7 +20,8 @@ import {
   MONSTER_ATTACK_BONUS_INCLUDE_PROFICIENCY_LABEL,
   MONSTER_SAVE_DC_PROFICIENCY_LABEL,
 } from '../monster-form-labels'
-import { resolveMonsterCreateDefaultValues, type MonsterFormValues } from '../monster-form-values'
+import { monsterFormTestValues } from '../monster-form-test-values'
+import type { MonsterFormValues } from '../monster-form-values'
 import { monsterActionDetailFields } from './detail-fields/monster-action-detail-fields'
 import type { MonsterActionDraftRow } from './monster-action-presets'
 import { monsterSaveDcAbilityHintWhen } from './save/monster-action-save-field-hints'
@@ -62,10 +63,11 @@ function Host({
   action: MonsterActionDraftRow
   formRef: { current: UseFormReturn<MonsterFormValues> | null }
 }) {
-  const defaults = resolveMonsterCreateDefaultValues()
-  defaults.actions = [action]
   const form = useForm<MonsterFormValues>({
-    defaultValues: defaults,
+    defaultValues: monsterFormTestValues({
+      name: 'Ability source test',
+      actions: [action] as MonsterFormValues['actions'],
+    }),
     shouldUnregister: true,
   })
   useEffect(() => {

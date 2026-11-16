@@ -32,8 +32,8 @@ const TAB_BY_PREFIX: Record<string, string> = {
   bonusActions: MONSTER_FORM_TAB.actions,
   reactions: MONSTER_FORM_TAB.actions,
   legendaryActions: MONSTER_FORM_TAB.actions,
-  legendaryActionUses: MONSTER_FORM_TAB.actions,
-  legendaryActionUsesInLair: MONSTER_FORM_TAB.actions,
+  'legendaryActions.uses': MONSTER_FORM_TAB.actions,
+  'legendaryActions.usesInLair': MONSTER_FORM_TAB.actions,
 }
 
 /** Maps a body issue path to a monster form tab. Saving throws stay on Statistics. */

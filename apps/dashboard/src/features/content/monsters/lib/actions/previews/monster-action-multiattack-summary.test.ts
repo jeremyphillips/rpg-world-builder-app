@@ -5,7 +5,8 @@ import {
   MONSTER_MULTIATTACK_STEPS_LABEL,
   formatMonsterActionMultiattackPreviewConfigureHint,
 } from '../../monster-form-labels'
-import { resolveMonsterCreateDefaultValues } from '../../monster-form-values'
+import { monsterFormTestValues } from '../../monster-form-test-values'
+import type { MonsterFormValues } from '../../monster-form-values'
 import { buildMonsterActionMultiattackPreview } from './monster-action-multiattack-summary'
 
 function readyCtx(): ContentFormCtx {
@@ -24,13 +25,12 @@ function readyCtx(): ContentFormCtx {
 describe('buildMonsterActionMultiattackPreview', () => {
   it('prints stat-block prose from formatMonsterMultiattack', () => {
     const ctx = readyCtx()
-    const values = {
-      ...resolveMonsterCreateDefaultValues(),
+    const values = monsterFormTestValues({
       name: 'Wolf',
       actions: [
         {
           id: 'bite',
-          kind: 'natural-weapon' as const,
+          kind: 'natural-weapon',
           name: 'Bite',
           mode: 'melee',
           damageType: 'piercing',
@@ -38,12 +38,12 @@ describe('buildMonsterActionMultiattackPreview', () => {
         },
         {
           id: 'multiattack',
-          kind: 'multiattack' as const,
+          kind: 'multiattack',
           name: 'Multiattack',
           steps: [{ count: 1, actionIds: ['bite'] }],
         },
-      ],
-    }
+      ] as MonsterFormValues['actions'],
+    })
 
     const preview = buildMonsterActionMultiattackPreview({
       values,
@@ -58,17 +58,17 @@ describe('buildMonsterActionMultiattackPreview', () => {
 
   it('returns steps guidance when no steps are configured', () => {
     const ctx = readyCtx()
-    const values = {
-      ...resolveMonsterCreateDefaultValues(),
+    const values = monsterFormTestValues({
+      name: 'Multiattack preview',
       actions: [
         {
           id: 'multiattack',
-          kind: 'multiattack' as const,
+          kind: 'multiattack',
           name: 'Multiattack',
           steps: [],
         },
-      ],
-    }
+      ] as MonsterFormValues['actions'],
+    })
 
     expect(
       buildMonsterActionMultiattackPreview({

@@ -6,9 +6,10 @@ import {
   type CreateMonsterInput,
   type CreatureWeaponProficiencies,
   type Monster,
-  type MonsterAction,
-  type MonsterLegendaryAction,
-  type MonsterReaction,
+  type MonsterActionDraft,
+  type MonsterBonusActionDraft,
+  type MonsterLegendaryActionDraft,
+  type MonsterReactionDraft,
 } from '@rpg/contracts'
 import type { DiceFormulaValue } from '@rpg/ui'
 import type { FieldValues } from 'react-hook-form'
@@ -90,12 +91,15 @@ export type MonsterFormValues = FieldValues & {
   defenses: Monster['defenses']
   equipment: MonsterEquipmentFormEntry[]
   traits: Monster['traits']
-  actions: Array<MonsterAction | Record<string, unknown>>
-  bonusActions: Array<MonsterAction | Record<string, unknown>>
-  reactions: Array<MonsterReaction | Record<string, unknown>>
-  legendaryActions: Array<MonsterLegendaryAction | Record<string, unknown>>
-  legendaryActionUses?: number
-  legendaryActionUsesInLair?: number
+  /** Action rows mirror Zod draft schemas; save normalization parses to publish shape. */
+  actions: MonsterActionDraft[]
+  bonusActions: MonsterBonusActionDraft[]
+  reactions: MonsterReactionDraft[]
+  legendaryActions?: {
+    uses?: number
+    usesInLair?: number
+    actions: MonsterLegendaryActionDraft[]
+  }
   [MONSTER_HIT_POINTS_USE_FIXED_FIELD]?: boolean
   [MONSTER_HIT_POINTS_DICE_FIELD]?: DiceFormulaValue
   [MONSTER_HIT_POINTS_STASH_FIELD]?: MonsterHitPointStash
@@ -134,7 +138,6 @@ export function resolveMonsterCreateDefaultValues(): MonsterFormValues {
     actions: [],
     bonusActions: [],
     reactions: [],
-    legendaryActions: [],
     weaponProficiencyMode: MONSTER_DEFAULT_WEAPON_PROFICIENCY_MODE,
     weaponProficiencyReconciliationPending: false,
   }
@@ -214,36 +217,32 @@ export function monsterToFormValues(
     actions: hydrateOnHitInActionList(
       entity.actions
         .map(mapWeaponActionDamageToForm)
-        .map((action) =>
-          withSaveOutcomeSlots(withDefaultSaveResolutionTarget(action as Record<string, unknown>)),
-        ),
+        .map((action) => withSaveOutcomeSlots(withDefaultSaveResolutionTarget(action))),
     ),
     bonusActions: hydrateOnHitInActionList(
       entity.bonusActions
         .map(mapWeaponActionDamageToForm)
-        .map((action) =>
-          withSaveOutcomeSlots(withDefaultSaveResolutionTarget(action as Record<string, unknown>)),
-        ),
+        .map((action) => withSaveOutcomeSlots(withDefaultSaveResolutionTarget(action))),
     ),
     reactions: hydrateOnHitInActionList(
       entity.reactions
         .map(mapWeaponActionDamageToForm)
-        .map((action) =>
-          withSaveOutcomeSlots(withDefaultSaveResolutionTarget(action as Record<string, unknown>)),
-        ),
+        .map((action) => withSaveOutcomeSlots(withDefaultSaveResolutionTarget(action))),
     ),
-    legendaryActions: hydrateOnHitInActionList(
-      entity.legendaryActions
-        .map(mapWeaponActionDamageToForm)
-        .map((action) =>
-          withSaveOutcomeSlots(withDefaultSaveResolutionTarget(action as Record<string, unknown>)),
-        ),
-    ),
-    ...(entity.legendaryActionUses !== undefined
-      ? { legendaryActionUses: entity.legendaryActionUses }
-      : {}),
-    ...(entity.legendaryActionUsesInLair !== undefined
-      ? { legendaryActionUsesInLair: entity.legendaryActionUsesInLair }
+    ...(entity.legendaryActions
+      ? {
+          legendaryActions: {
+            uses: entity.legendaryActions.uses,
+            ...(entity.legendaryActions.usesInLair !== undefined
+              ? { usesInLair: entity.legendaryActions.usesInLair }
+              : {}),
+            actions: hydrateOnHitInActionList(
+              entity.legendaryActions.actions
+                .map(mapWeaponActionDamageToForm)
+                .map((action) => withSaveOutcomeSlots(withDefaultSaveResolutionTarget(action))),
+            ),
+          },
+        }
       : {}),
     ...(() => {
       const hydration = weaponProficiencyHydrationFromWeapons(weapons)

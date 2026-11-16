@@ -147,10 +147,9 @@ describe('monster action references', () => {
     const withPool = (actions: unknown[], legendaryActions: unknown[], bonusActions?: unknown[]) =>
       createMonsterInputSchema.safeParse({
         ...MONSTER_TEST_INPUT,
-        legendaryActionUses: 3,
         actions,
         ...(bonusActions ? { bonusActions } : {}),
-        legendaryActions,
+        legendaryActions: { uses: 3, actions: legendaryActions },
       })
 
     expect(issueMessages(withPool([BITE_ACTION], [reference([])]))).toContain(
@@ -214,7 +213,7 @@ describe('monster action references', () => {
     expect(
       createMonsterDraftInputSchema.safeParse({
         ...MONSTER_TEST_INPUT,
-        legendaryActions: [{ ...reference([]), actionIds: [] }],
+        legendaryActions: { actions: [{ ...reference([]), actionIds: [] }] },
       }).success,
     ).toBe(true)
   })
@@ -223,9 +222,11 @@ describe('monster action references', () => {
     expect(
       createMonsterInputSchema.safeParse({
         ...MONSTER_TEST_INPUT,
-        legendaryActionUses: 3,
         actions: [BITE_ACTION],
-        legendaryActions: [{ id: 'pounce', kind: 'action-reference', actionIds: ['bite'] }],
+        legendaryActions: {
+          uses: 3,
+          actions: [{ id: 'pounce', kind: 'action-reference', actionIds: ['bite'] }],
+        },
       }).success,
     ).toBe(true)
     expect(

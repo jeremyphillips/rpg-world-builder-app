@@ -7,10 +7,8 @@ import { describe, expect, it } from 'vitest'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import type { MonsterActionDraftRow } from '../../../lib/actions/monster-action-presets'
-import {
-  resolveMonsterCreateDefaultValues,
-  type MonsterFormValues,
-} from '../../../lib/monster-form-values'
+import { monsterFormTestValues } from '../../../lib/monster-form-test-values'
+import type { MonsterFormValues } from '../../../lib/monster-form-values'
 import { MonsterActionAttackSummary } from './monster-action-attack-summary'
 
 const bite: MonsterActionDraftRow = {
@@ -26,14 +24,13 @@ const bite: MonsterActionDraftRow = {
 }
 
 function Host({ action }: { action: MonsterActionDraftRow }) {
-  const defaults = resolveMonsterCreateDefaultValues()
   const form = useForm<MonsterFormValues>({
-    defaultValues: {
-      ...defaults,
+    defaultValues: monsterFormTestValues({
+      name: 'Attack summary test',
       challengeRating: '1',
       abilityScores: { str: 16, dex: 14, con: 13, int: 8, wis: 11, cha: 8 },
-      actions: [action],
-    },
+      actions: [action] as MonsterFormValues['actions'],
+    }),
   })
   const ctx = {
     entityCatalogLayer: 'homebrew',
@@ -68,7 +65,6 @@ describe('MonsterActionAttackSummary', () => {
   })
 
   it('does not preview a typed attack until a roll is stored', () => {
-    const defaults = resolveMonsterCreateDefaultValues()
     const customAttack: MonsterActionDraftRow = {
       id: 'slash',
       kind: 'attack',
@@ -80,12 +76,12 @@ describe('MonsterActionAttackSummary', () => {
 
     function ReadyHost() {
       const form = useForm<MonsterFormValues>({
-        defaultValues: {
-          ...defaults,
+        defaultValues: monsterFormTestValues({
+          name: 'Ready attack test',
           challengeRating: '1',
           abilityScores: { str: 16, dex: 14, con: 13, int: 8, wis: 11, cha: 8 },
-          actions: [customAttack],
-        },
+          actions: [customAttack] as MonsterFormValues['actions'],
+        }),
       })
       const ctx = {
         entityCatalogLayer: 'homebrew',
@@ -107,7 +103,6 @@ describe('MonsterActionAttackSummary', () => {
   })
 
   it('keeps unavailable guidance inside the attack preview panel', () => {
-    const defaults = resolveMonsterCreateDefaultValues()
     const customAttack: MonsterActionDraftRow = {
       id: 'slash',
       kind: 'attack',
@@ -119,12 +114,12 @@ describe('MonsterActionAttackSummary', () => {
 
     function UnavailableHost() {
       const form = useForm<MonsterFormValues>({
-        defaultValues: {
-          ...defaults,
+        defaultValues: monsterFormTestValues({
+          name: 'Unavailable attack test',
           challengeRating: '1',
           abilityScores: { str: 16, dex: 14, con: 13, int: 8, wis: 11, cha: 8 },
-          actions: [customAttack],
-        },
+          actions: [customAttack] as MonsterFormValues['actions'],
+        }),
       })
       const ctx = {
         entityCatalogLayer: 'homebrew',

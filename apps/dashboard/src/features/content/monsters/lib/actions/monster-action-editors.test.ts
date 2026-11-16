@@ -735,13 +735,7 @@ describe('monster action section moves', () => {
     const profile = { id: 'spellcasting', kind: 'spell', profile: 'primary' }
     expect(monsterActionSectionMoveAllowed(profile, 'actions', 'bonusActions')).toBe(false)
     expect(monsterActionSectionMoveAllowed(profile, 'actions', 'reactions')).toBe(false)
-    expect(
-      monsterActionSectionMoveAllowed(
-        { kind: 'spell' },
-        'bonusActions',
-        'actions',
-      ),
-    ).toBe(true)
+    expect(monsterActionSectionMoveAllowed({ kind: 'spell' }, 'bonusActions', 'actions')).toBe(true)
   })
 
   it('derives active keys from the draft schema', () => {
@@ -909,11 +903,11 @@ describe('monster action draft round trip', () => {
         mode: 'melee',
         equipmentEntryId: 'stale',
       },
-    ]
+    ] as unknown as MonsterFormValues['actions']
     values.bonusActions = [{ id: 'note', kind: 'special', name: 'N' }]
     values.reactions = [
       { id: 'parry', kind: 'special', trigger: { text: 'When' } },
-      { id: 'legacy', kind: 'special', trigger: 'Still' },
+      { id: 'legacy', kind: 'special', trigger: { text: 'Still' } },
       { id: 'blank', kind: 'special', trigger: { text: '   ' } },
     ]
     const input = buildMonsterInput(values, undefined, 'draft')
@@ -960,7 +954,7 @@ describe('monster action draft round trip', () => {
         spellAcquisition: 'standalone',
       }),
       createMonsterActionFromAcquisition({ type: 'create', kind: 'special' }),
-    ]
+    ] as MonsterFormValues['actions']
     const input = buildMonsterInput(values, undefined, 'draft')
     const reloaded = monsterToFormValues({
       ...input,
