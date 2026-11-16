@@ -268,22 +268,19 @@ describe('primary Spellcasting acquisition', () => {
       metadata: MONSTER_ACQUISITION_SPELL_STANDALONE_DESCRIPTION,
     })
 
+    const spellcasting = {
+      id: 'spellcasting',
+      kind: 'spell',
+      profile: PRIMARY_SPELLCASTING_PROFILE,
+      name: MONSTER_SPELLCASTING_ACTION_NAME,
+      castingAbility: { kind: 'ability', ability: 'int' },
+      spells: [{ spellId: 'srd:fire-bolt' }],
+    }
     const taken = monsterActionAcquisitionItems({
       weapons: [],
       allowAddWeapon: true,
       section: 'actions',
-      sectionRows: {
-        actions: [
-          {
-            id: 'spellcasting',
-            kind: 'spell',
-            profile: PRIMARY_SPELLCASTING_PROFILE,
-            name: MONSTER_SPELLCASTING_ACTION_NAME,
-            castingAbility: { kind: 'ability', ability: 'int' },
-            spells: [{ spellId: 'srd:fire-bolt' }],
-          },
-        ],
-      },
+      sectionRows: { actions: [spellcasting] },
     })
     expect(taken.find((item) => item.id === 'create:spell')).toMatchObject({
       disabled: true,

@@ -1,6 +1,7 @@
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { TabbedForm } from '@rpg/ui/form'
+import { resolutionEffectIdSchema } from '@rpg/contracts'
 import type { UseFormReturn } from 'react-hook-form'
 import { z } from 'zod'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
@@ -256,7 +257,7 @@ describe('SpellResolutionOutcomes', () => {
       outcomes: [
         {
           result: 'hit',
-          effects: [{ kind: 'effect-reference', effectId: 'incomplete', amount: 'full' }],
+          effects: [{ kind: 'effect-reference', effectId: resolutionEffectIdSchema.parse('incomplete'), amount: 'full' }],
         },
       ],
     }
@@ -360,7 +361,7 @@ describe('SpellResolutionOutcomes', () => {
       outcomes: [
         {
           result: 'hit',
-          effects: [{ kind: 'effect-reference', effectId: 'damage', amount: 'full' }],
+          effects: [{ kind: 'effect-reference', effectId: resolutionEffectIdSchema.parse('damage'), amount: 'full' }],
         },
       ],
     }
@@ -408,7 +409,7 @@ describe('SpellResolutionOutcomes', () => {
           outcomes: [
             {
               result: 'hit',
-              effects: [{ kind: 'effect-reference', effectId: 'damage', amount: 'half' }],
+              effects: [{ kind: 'effect-reference', effectId: resolutionEffectIdSchema.parse('damage'), amount: 'half' }],
             },
           ],
         },

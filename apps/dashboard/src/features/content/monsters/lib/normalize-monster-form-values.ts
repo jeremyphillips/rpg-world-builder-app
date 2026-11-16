@@ -10,6 +10,7 @@ import {
   monsterReactionDraftSchema,
   type ArmorClassRules,
   type ContentValidationIntent,
+  type Monster,
 } from '@rpg/contracts'
 
 import { normalizeLimitedUse } from '../../lib/forms/limited-use/normalize-limited-use'
@@ -119,12 +120,10 @@ function applySaveOutcomeDraft(cleaned: Record<string, unknown>): void {
   if (cleaned.kind !== 'save' || !isRecord(cleaned.resolution)) return
   const resolution = cleaned.resolution
   if (!Array.isArray(resolution.outcomes)) return
-  resolution.outcomes = normalizeMonsterSaveOutcomes(resolution.outcomes)
+  const outcomes = normalizeMonsterSaveOutcomes(resolution.outcomes)
+  resolution.outcomes = outcomes
   if (!Array.isArray(resolution.effects)) return
-  resolution.effects = pruneUnreferencedDamage(
-    resolution.effects,
-    referencedEffectIds(resolution.outcomes),
-  )
+  resolution.effects = pruneUnreferencedDamage(resolution.effects, referencedEffectIds(outcomes))
 }
 
 function applySaveTargetDraft(cleaned: Record<string, unknown>): void {
@@ -523,6 +522,17 @@ export function normalizeMonsterFormValues(
   }
 
   return omitEmptyStrings(normalized) as Record<string, unknown>
+}
+
+/**
+ * Draft normalization read as a monster for stat-block derivation and prose previews.
+ * Draft intent may omit required fields; derivation callers already tolerate that.
+ */
+export function normalizeMonsterDraftForPreview(
+  values: MonsterFormValues,
+  options: NormalizeMonsterFormOptions,
+): Monster {
+  return normalizeMonsterFormValues(values, options) as Monster
 }
 
 function applyOptionalScalars(

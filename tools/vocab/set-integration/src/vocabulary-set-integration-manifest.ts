@@ -35,6 +35,10 @@ export const VOCABULARY_SET_INTEGRATION_MANIFEST: VocabularySetIntegrationManife
       overviewShell: true,
     },
   },
+  'creature-families': {
+    owner: 'catalog',
+    notes: 'Lightweight monster family tags; vocabulary-only (no hub CRUD).',
+  },
   'damage-types': {
     owner: 'catalog',
     notes: 'Spell + species damage references; composed usage resolver.',

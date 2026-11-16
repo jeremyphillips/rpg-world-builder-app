@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- array config and slot component share module */
 import { useController, useFormContext } from 'react-hook-form'
 import {
   CONDITION_TERM,
@@ -68,7 +69,10 @@ function damageSummary(effectId: unknown, library: unknown): string {
     | { roll?: { dice?: { count: number; faces: number }; flat?: number }; damageType?: string }
     | undefined
   if (!effect?.roll || !effect.damageType) return EFFECT_DAMAGE_LABEL
-  return formatDamageValue(effect.roll, effect.damageType)
+  return formatDamageValue(
+    effect.roll as Parameters<typeof formatDamageValue>[0],
+    effect.damageType,
+  )
 }
 
 function rowPath(slotPath: string): string {

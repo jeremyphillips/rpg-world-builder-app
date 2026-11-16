@@ -1,4 +1,4 @@
-import { supportsPartialApplicationForEffectKind } from '@rpg/contracts'
+import { resolutionEffectIdSchema, supportsPartialApplicationForEffectKind } from '@rpg/contracts'
 import type { ResolutionOutcomeResult } from '@rpg/contracts'
 import type { FieldConfig, FieldOption, FormItem } from '@rpg/ui/form'
 
@@ -57,7 +57,11 @@ export function createOutcomeApplicationAppendValue(
   const effect = findResolutionEffectById(effects, effectId)
   const amount = effect ? defaultApplicationAmountForOutcome(effect, outcomeResult) : 'full'
 
-  return { kind: 'effect-reference' as const, effectId, amount }
+  return {
+    kind: 'effect-reference' as const,
+    effectId: resolutionEffectIdSchema.parse(effectId),
+    amount,
+  }
 }
 
 const SPELL_OUTCOME_AMOUNT_OPTIONS = RESOLUTION_OUTCOME_AMOUNT_OPTIONS.filter(

@@ -43,7 +43,7 @@ function Host() {
     armorClassRules: { mode: 'ascending', base: 10 },
     options: { skills: { visible: [] } },
     rulesetId: 'srd-cc-5.2.1',
-  } as ContentFormCtx
+  } as unknown as ContentFormCtx
   return (
     <FormProvider {...form}>
       <MonsterActionSpellSummary ctx={ctx} action={spellcasting} section="actions" />
@@ -73,7 +73,7 @@ function ReactionHost() {
     armorClassRules: { mode: 'ascending', base: 10 },
     options: { skills: { visible: [] } },
     rulesetId: 'srd-cc-5.2.1',
-  } as ContentFormCtx
+  } as unknown as ContentFormCtx
   return (
     <FormProvider {...form}>
       <MonsterActionSpellSummary ctx={ctx} action={reactionSpell} section="reactions" />

@@ -109,7 +109,7 @@ export function resolveSelectFieldDisplayLabel(
 /** Option label for a stored value; omits raw ids when no option matches (Change mode). */
 export function resolveSelectFieldOptionLabel(
   value: unknown,
-  options: FieldOption[],
+  options: readonly FieldOption[],
 ): string | undefined {
   const normalized = value != null && value !== '' ? String(value) : undefined
   if (!normalized) return undefined

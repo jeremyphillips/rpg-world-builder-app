@@ -51,7 +51,7 @@ describe('equipmentFormDef kind-scoped fields', () => {
 
   it('service route shows kind panel and Economy groups only', () => {
     expect(collectGroupLegends(equipmentFormDef.buildFields({ equipmentKind: 'service' }))).toEqual(
-      ['', 'Economy'],
+      ['Economy'],
     )
   })
 
@@ -86,14 +86,12 @@ describe('equipmentFormDef kind-scoped fields', () => {
 
   it('mount route shows kind panel and Economy groups only', () => {
     expect(collectGroupLegends(equipmentFormDef.buildFields({ equipmentKind: 'mount' }))).toEqual([
-      '',
       'Economy',
     ])
   })
 
   it('tool route shows kind panel and Economy groups only', () => {
     expect(collectGroupLegends(equipmentFormDef.buildFields({ equipmentKind: 'tool' }))).toEqual([
-      '',
       'Economy',
     ])
   })
@@ -101,31 +99,29 @@ describe('equipmentFormDef kind-scoped fields', () => {
   it('magic item route shows kind panel and Economy groups only', () => {
     expect(
       collectGroupLegends(equipmentFormDef.buildFields({ equipmentKind: 'magic_item' })),
-    ).toEqual(['', 'Economy'])
+    ).toEqual(['Economy'])
   })
 
   it('adventuring gear route shows kind panel and Economy groups only', () => {
     expect(
       collectGroupLegends(equipmentFormDef.buildFields({ equipmentKind: 'adventuring_gear' })),
-    ).toEqual(['', 'Economy'])
+    ).toEqual(['Economy'])
   })
 
   it('vehicle route shows kind panel and Economy groups only', () => {
     expect(collectGroupLegends(equipmentFormDef.buildFields({ equipmentKind: 'vehicle' }))).toEqual(
-      ['', 'Economy'],
+      ['Economy'],
     )
   })
 
   it('armor route shows kind panel and Economy groups only', () => {
     expect(collectGroupLegends(equipmentFormDef.buildFields({ equipmentKind: 'armor' }))).toEqual([
-      '',
       'Economy',
     ])
   })
 
   it('weapon route shows weapon panel and Economy groups only', () => {
     expect(collectGroupLegends(equipmentFormDef.buildFields({ equipmentKind: 'weapon' }))).toEqual([
-      '',
       'Economy',
     ])
   })

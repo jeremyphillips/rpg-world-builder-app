@@ -65,7 +65,7 @@ export const resolutionFormValueSyncs: FormValueSync[] = [
   {
     dependsOn: [...RESOLUTION_SYNC_DEPENDS_ON],
     apply: (values, changedKeys) => {
-      const resolutionKeys = [...RESOLUTION_SYNC_DEPENDS_ON]
+      const resolutionKeys: readonly string[] = RESOLUTION_SYNC_DEPENDS_ON
       if (!changedKeys.some((key) => resolutionKeys.includes(key))) return undefined
       return applyResolutionFormStructuralCleanup(values)
     },

@@ -27,7 +27,9 @@ function followUpAttackName(
   followUpActionId: string | undefined,
 ): string | undefined {
   if (!followUpActionId) return undefined
-  const target = (values.actions ?? []).find((row) => row.id === followUpActionId)
+  const target = ((values.actions ?? []) as MonsterActionDraftRow[]).find(
+    (row) => row.id === followUpActionId,
+  )
   if (!target || !isMonsterActionAttackKind(target.kind)) return undefined
   const identity = resolveMonsterActionIdentity({
     action: target,

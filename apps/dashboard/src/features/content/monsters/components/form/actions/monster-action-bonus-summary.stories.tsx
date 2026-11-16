@@ -1,6 +1,8 @@
 import type { Meta } from '@storybook/react-vite'
 import { FormProvider, useForm } from 'react-hook-form'
 
+import { systemDefaultArmorClassRules } from '@rpg/contracts'
+
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import type { MonsterActionDraftRow } from '../../../lib/actions/monster-action-presets'
 import {
@@ -35,7 +37,7 @@ function Host() {
     equipmentCatalogById: new Map(),
     spellCatalogStatus: 'ready',
     spellCatalogById: new Map(),
-    armorClassRules: { mode: 'ascending', base: 10 },
+    armorClassRules: systemDefaultArmorClassRules(),
     options: { skills: { visible: [] } },
     rulesetId: 'srd-cc-5.2.1',
   } as unknown as ContentFormCtx

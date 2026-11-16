@@ -7,7 +7,7 @@ const meta = {
   title: 'Forms/Controls/SelectOptionItem',
   component: SelectOptionItem,
   render: () => (
-    <Select defaultOpen>
+    <Select open>
       <SelectTrigger aria-label="Movement mode" className="w-56">
         <SelectValue placeholder="Choose a mode…" />
       </SelectTrigger>
@@ -30,9 +30,11 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 /** Strong (`DC 15`) and quiet (`4 spells`) trailing on list rows and closed value. */
-export const TrailingVariants: Story = {
+export const TrailingVariants = {
+  args: { option: { label: 'Stub', value: 'stub' } },
   render: () => (
-    <Select defaultValue="int" defaultOpen className="w-80 max-w-md">
+    <div className="w-80 max-w-md">
+      <Select defaultValue="int" open>
       <SelectTrigger aria-label="Spellcasting ability">
         <SelectValue placeholder="Choose" />
       </SelectTrigger>
@@ -66,13 +68,16 @@ export const TrailingVariants: Story = {
           }}
         />
       </SelectContent>
-    </Select>
+      </Select>
+    </div>
   ),
-}
+} satisfies Story
 
-export const TrailingMetadata: Story = {
+export const TrailingMetadata = {
+  args: { option: { label: 'Stub', value: 'stub' } },
   render: () => (
-    <Select defaultValue="int" defaultOpen className="w-72">
+    <div className="w-72">
+      <Select defaultValue="int" open>
       <SelectTrigger aria-label="Spellcasting ability">
         <SelectValue placeholder="Choose">
           <span className="ui-select-option-row">
@@ -108,9 +113,10 @@ export const TrailingMetadata: Story = {
           }}
         />
       </SelectContent>
-    </Select>
+      </Select>
+    </div>
   ),
-}
+} satisfies Story
 
 export const DisabledWithReason: Story = {
   args: {

@@ -17,7 +17,7 @@ import {
   MONSTER_MULTIATTACK_STEPS_LABEL,
 } from '../../monster-form-labels'
 import type { MonsterFormValues } from '../../monster-form-values'
-import { normalizeMonsterFormValues } from '../../normalize-monster-form-values'
+import { normalizeMonsterDraftForPreview } from '../../normalize-monster-form-values'
 import { findMonsterFormActionDraft } from './monster-action-attack-summary'
 import {
   monsterArmorClassRules,
@@ -92,16 +92,16 @@ function renderMultiattackProse(
   action: Extract<MonsterActionDraft, { kind: 'multiattack' }>,
 ): string {
   const armorClassRules = monsterArmorClassRules(ctx)
-  const normalized = normalizeMonsterFormValues(values, {
+  const normalized = normalizeMonsterDraftForPreview(values, {
     intent: 'draft',
     mode: 'create',
     armorClassRules,
   })
   return buildMonsterMultiattackSentence({
     monsterName: normalized.name?.trim() || 'Creature',
-    action,
-    actions: (normalized.actions ?? []) as MonsterAction[],
-    equipment: (normalized.equipment ?? []) as EquipmentInstance[],
+    action: action as MultiattackActionShape,
+    actions: normalized.actions ?? [],
+    equipment: normalized.equipment ?? [],
     equipmentCatalog: monsterEquipmentCatalog(ctx),
     magicPropertyProvider: monsterMagicPropertyProvider(ctx),
   })

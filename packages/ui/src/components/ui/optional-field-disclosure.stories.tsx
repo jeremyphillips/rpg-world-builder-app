@@ -3,6 +3,7 @@ import { action } from 'storybook/actions'
 import { useState } from 'react'
 
 import { FieldRowAnatomyProvider } from './field-row-anatomy.context'
+import { Text } from './text'
 import { TextareaField } from './textarea-field'
 import { OptionalFieldDisclosure } from './optional-field-disclosure.client'
 
@@ -86,9 +87,9 @@ export const OpenInAnatomyRowWithMessage: Story = {
           onRemove={action('onRemove')}
           size="md"
           message={
-            <p id="story-long-range-hint" className="text-style-caption min-w-0">
+            <Text id="story-long-range-hint" variant="caption" className="min-w-0">
               Disadvantage beyond normal range.
-            </p>
+            </Text>
           }
         >
           <TextareaField

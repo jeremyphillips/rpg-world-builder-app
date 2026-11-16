@@ -64,27 +64,27 @@ describe('monster action repeatability', () => {
   })
 
   it('does not flag repeatable attack rows or duplicate natural weapons without form', () => {
+    const clawAttack = {
+      id: 'claw',
+      kind: 'attack',
+      modes: ['melee'],
+      reach: 5,
+      damage: { dice: { count: 1, faces: 6 } },
+      damageType: 'slashing',
+      bonusSource: { kind: 'ability', ability: 'str', proficient: true },
+    }
+    const hookWeapon = {
+      id: 'claw2',
+      kind: 'natural-weapon',
+      mode: 'melee',
+      damage: { dice: { count: 1, faces: 6 } },
+      damageType: 'piercing',
+    }
     const violations = collectRepeatabilityViolations({
       actions: [
         BITE_ACTION,
-        {
-          id: 'claw',
-          kind: 'attack',
-          name: 'Claw',
-          modes: ['melee'],
-          reach: 5,
-          damage: { dice: { count: 1, faces: 6 } },
-          damageType: 'slashing',
-          bonusSource: { kind: 'ability', ability: 'str', proficient: true },
-        },
-        {
-          id: 'claw2',
-          kind: 'natural-weapon',
-          name: 'Hook',
-          mode: 'melee',
-          damage: { dice: { count: 1, faces: 6 } },
-          damageType: 'piercing',
-        },
+        clawAttack,
+        hookWeapon,
         { id: 'br1', kind: 'save', preset: 'breath-weapon' },
         { id: 'br2', kind: 'save', preset: 'breath-weapon' },
       ],

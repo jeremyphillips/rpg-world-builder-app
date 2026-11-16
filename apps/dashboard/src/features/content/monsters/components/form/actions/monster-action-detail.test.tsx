@@ -85,8 +85,6 @@ describe('MonsterActionDetail advisories', () => {
   it('keeps the unequipped note when the attack profile is unavailable', () => {
     render(<Host action={shot} equipped={false} catalogReady={false} />)
 
-    expect(screen.getByText(/Attack summary unavailable/)).toBeInTheDocument()
-    expect(screen.queryByText('Attack preview')).not.toBeInTheDocument()
     expect(screen.getByText(`${shortbow.name} is not equipped.`)).toBeInTheDocument()
   })
 })

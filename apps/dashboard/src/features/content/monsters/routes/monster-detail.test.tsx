@@ -11,6 +11,8 @@ import { pickEquipment, pickMonster, pickSkillProficiency } from '@/test/fixture
 import type * as UseEquipmentModule from '../../equipment/hooks/use-equipment'
 import type * as UseSkillProficienciesModule from '../../skill-proficiencies/hooks/use-skill-proficiencies'
 import type * as UseSpellsModule from '../../spells/hooks/use-spells'
+import type * as VocabularyModule from '@/features/vocabulary'
+import type * as UseClassesModule from '../../classes/hooks/use-classes'
 
 vi.mock('@/components/layout/breadcrumb/use-breadcrumb-label', () => ({
   useSetBreadcrumbLabel: vi.fn(),
@@ -32,7 +34,7 @@ vi.mock('@/features/homebrew', async () => {
   }
 })
 vi.mock('@/features/vocabulary', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/features/vocabulary')>()
+  const actual = await importOriginal<typeof VocabularyModule>()
   return {
     ...actual,
     useCreatureTypeVocabulary: vi.fn(() => ({
@@ -44,7 +46,7 @@ vi.mock('@/features/vocabulary', async (importOriginal) => {
   }
 })
 vi.mock('../../classes/hooks/use-classes', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../../classes/hooks/use-classes')>()
+  const actual = await importOriginal<typeof UseClassesModule>()
   const { loadSeedClasses } = await import('@rpg/catalog/classes')
   return {
     ...actual,

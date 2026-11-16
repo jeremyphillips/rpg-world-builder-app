@@ -94,20 +94,20 @@ describe('monster publish validation messages', () => {
       },
     ])
 
-    expect(messageAt(result, 'actions.0.castingAbility')).toBe('Choose a spellcasting ability.')
-    expect(messageAt(result, 'actions.0.spells')).toBe('Add at least one spell.')
+    expect(messageAt(result, 'actions.0.castingAbility')).toBe('Required.')
+    expect(messageAt(result, 'actions.0.spells')).toBe('Add at least one item.')
     expect(messageAt(result, 'actions.0.name')).toBe('Name is required.')
     expect(messageAt(result, 'actions.1.description')).toBe('Enter rules text or a saving throw.')
     expect(messageAt(result, 'actions.1.name')).toBeUndefined()
-    expect(messageAt(result, 'actions.2.modes')).toBe('Choose at least one mode.')
-    expect(messageAt(result, 'actions.2.bonusSource')).toBe('Choose an attack bonus.')
-    expect(messageAt(result, 'actions.2.damage')).toBe('Damage roll is required.')
-    expect(messageAt(result, 'actions.2.damageType')).toBe('Choose a type.')
-    expect(messageAt(result, 'actions.3.equipmentEntryId')).toBe('Choose a weapon.')
+    expect(messageAt(result, 'actions.2.modes')).toBe('Required.')
+    expect(messageAt(result, 'actions.2.bonusSource')).toBe('Required.')
+    expect(messageAt(result, 'actions.2.damage')).toBe('Required.')
+    expect(messageAt(result, 'actions.2.damageType')).toBe('Required.')
+    expect(messageAt(result, 'actions.3.equipmentEntryId')).toBe('Required.')
     expect(messages(result).some((issue) => issue.path.startsWith('actions.3.onHit'))).toBe(false)
-    expect(messageAt(result, 'actions.4.steps')).toBe('Add at least one step.')
-    expect(messageAt(result, 'actions.5.steps.0.count')).toBe('Count is required.')
-    expect(messageAt(result, 'actions.5.steps.0.actionIds')).toBe('Choose at least one attack.')
+    expect(messageAt(result, 'actions.4.steps')).toBe('Add at least one item.')
+    expect(messageAt(result, 'actions.5.steps.0.count')).toBe('Required.')
+    expect(messageAt(result, 'actions.5.steps.0.actionIds')).toBe('Add at least one item.')
     expect(messageAt(result, 'actions.6.resolution.selectionMode')).toBe(
       'Saving throw actions select an area from self or creatures in reach or at a distance.',
     )
@@ -193,7 +193,7 @@ describe('monster publish validation messages', () => {
         bonusSource: { kind: 'ability', ability: 'str', proficient: true },
       },
     ])
-    expect(messageAt(result, 'actions.0.damage')).toBe('Damage roll is required.')
+    expect(messageAt(result, 'actions.0.damage')).toBe('Required.')
     expect(messageAt(result, 'actions.0.reach')).toBeUndefined()
     expect(messageAt(result, 'actions.0.damageType')).toBeUndefined()
   })
@@ -233,7 +233,7 @@ describe('monster publish validation messages', () => {
       },
     ])
     expect(messageAt(recharge, 'actions.0.limitedUse.minRoll')).toBe(
-      'Recharge roll must be at least 2.',
+      'This field must be at least 2.',
     )
   })
 

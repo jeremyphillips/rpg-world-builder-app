@@ -26,9 +26,11 @@ import {
 } from '../../monster-form-labels'
 import { SPELLCASTING_ABILITY_FIELD_LABEL } from '../../../../lib/forms/mechanics/spellcasting-ability-field-copy'
 import type { MonsterFormValues } from '../../monster-form-values'
-import { normalizeMonsterFormValues } from '../../normalize-monster-form-values'
+import { normalizeMonsterDraftForPreview } from '../../normalize-monster-form-values'
 import type { MonsterActionSection } from '../references/monster-action-equipment-references'
 import { findMonsterFormActionDraft } from './monster-action-attack-summary'
+
+type SpellEntry = Extract<MonsterAction, { kind: 'spell' }>
 
 const SPELL_SECTIONS = ['actions', 'bonusActions', 'reactions', 'legendaryActions'] as const
 
@@ -110,7 +112,7 @@ function tryDeriveSpellLine(
 ) {
   const armorClassRules = monsterArmorClassRules(ctx)
   if (!armorClassRules || ctx.equipmentCatalogStatus !== 'ready') return undefined
-  const normalized = normalizeMonsterFormValues(values, {
+  const normalized = normalizeMonsterDraftForPreview(values, {
     intent: 'draft',
     mode: 'create',
     armorClassRules,
@@ -162,13 +164,13 @@ function renderSpellPreviewBody(input: {
   spellsInBody: ReturnType<typeof buildMonsterSpellsInBody>
 }): string {
   const armorClassRules = monsterArmorClassRules(input.ctx)!
-  const normalized = normalizeMonsterFormValues(input.values, {
+  const normalized = normalizeMonsterDraftForPreview(input.values, {
     intent: 'draft',
     mode: 'create',
     armorClassRules,
   })
   const equipmentCatalogStatus =
-    input.ctx.equipmentCatalogStatus === 'ready' ? 'ready' : 'unavailable'
+    input.ctx.equipmentCatalogStatus === 'ready' ? 'ready' : 'pending'
   const identity = resolveMonsterActionIdentity({
     action: input.draft,
     equipment: normalized.equipment,
@@ -178,7 +180,7 @@ function renderSpellPreviewBody(input: {
   })
   const saveDc = tryDeriveSpellLine(input.values, input.ctx, input.actionId, input.section)?.saveDc
   return formatMonsterSpellEntry({
-    entry: { ...input.draft, name: identity.displayName },
+    entry: { ...input.draft, name: identity.displayName } as SpellEntry,
     monsterName: normalized.name?.trim() || 'Creature',
     section: input.section,
     spellsById: input.ctx.spellCatalogById,

@@ -38,13 +38,17 @@ function methodOptionToMethod(
   return { kind: 'attack', attackType: option }
 }
 
+function cloneJson<T>(value: T): T {
+  return JSON.parse(JSON.stringify(value)) as T
+}
+
 function copyOutcome<T extends OutcomeLike>(outcome: T): ResolutionOutcomeRef {
   return {
     result: outcome.result,
     ...(outcome.effects?.length
-      ? { effects: structuredClone(outcome.effects) as ResolutionOutcomeRef['effects'] }
+      ? { effects: cloneJson(outcome.effects) as ResolutionOutcomeRef['effects'] }
       : { effects: [] }),
-    ...(outcome.repeatSave ? { repeatSave: structuredClone(outcome.repeatSave) } : {}),
+    ...(outcome.repeatSave ? { repeatSave: cloneJson(outcome.repeatSave) } : {}),
   }
 }
 

@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { FormProvider, useForm } from 'react-hook-form'
 
+import { systemDefaultArmorClassRules } from '@rpg/contracts'
+
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import type { MonsterActionDraftRow } from '../../../lib/actions/monster-action-presets'
 import {
@@ -16,9 +18,24 @@ const parry: MonsterActionDraftRow = {
   acBonus: 2,
 }
 
+const storyCtx = {
+  entityCatalogLayer: 'homebrew',
+  equipmentCatalogStatus: 'ready',
+  equipmentCatalogById: new Map(),
+  spellCatalogStatus: 'ready',
+  spellCatalogById: new Map(),
+  armorClassRules: systemDefaultArmorClassRules(),
+  options: { skills: { visible: [] } },
+  rulesetId: 'srd-cc-5.2.1',
+} as unknown as ContentFormCtx
+
 const meta = {
   title: 'Dashboard/Content/Monsters/MonsterActionParrySummary',
   component: MonsterActionParrySummary,
+  args: {
+    ctx: storyCtx,
+    action: parry,
+  },
 } satisfies Meta<typeof MonsterActionParrySummary>
 
 export default meta
@@ -30,19 +47,9 @@ function Host() {
   values.name = 'Knight'
   values.reactions = [parry]
   const form = useForm<MonsterFormValues>({ defaultValues: values })
-  const ctx = {
-    entityCatalogLayer: 'homebrew',
-    equipmentCatalogStatus: 'ready',
-    equipmentCatalogById: new Map(),
-    spellCatalogStatus: 'ready',
-    spellCatalogById: new Map(),
-    armorClassRules: { mode: 'ascending', base: 10 },
-    options: { skills: { visible: [] } },
-    rulesetId: 'srd-cc-5.2.1',
-  } as ContentFormCtx
   return (
     <FormProvider {...form}>
-      <MonsterActionParrySummary ctx={ctx} action={parry} />
+      <MonsterActionParrySummary ctx={storyCtx} action={parry} />
     </FormProvider>
   )
 }

@@ -4,7 +4,7 @@ import { FormStickyScrollBody, formStickyScrollShellWithDockedFooterClasses } fr
 
 import { CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN } from '../../../classes/lib/class-feature-form-labels'
 import { MasterDetailGrid } from '../master-detail-grid'
-import { MasterDetailListPanel } from '../master-detail-list-panel'
+import { MasterDetailListPanel, type MasterDetailListItem } from '../master-detail-list-panel'
 
 const meta = {
   title: 'Content/MasterDetailListPanel',
@@ -27,7 +27,7 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-const items = [
+const items: MasterDetailListItem[] = [
   {
     id: 'a',
     title: 'Rage',
@@ -45,13 +45,13 @@ const items = [
   },
 ]
 
-const longItems = Array.from({ length: 20 }, (_, index) => ({
+const longItems: MasterDetailListItem[] = Array.from({ length: 20 }, (_, index) => ({
   id: `feature-${index}`,
   title: `Feature ${index + 1}`,
   meta: {
     eyebrow: `Level ${index + 1}`,
     provenance: 'homebrew',
-    persistence: 'persisted' as const,
+    persistence: 'persisted',
   },
 }))
 

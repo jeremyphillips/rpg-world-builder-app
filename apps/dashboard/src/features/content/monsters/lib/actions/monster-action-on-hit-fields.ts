@@ -1,5 +1,5 @@
 import { REST_KIND_ENTRIES, REST_KINDS, PROFICIENCY_BONUS_TERM } from '@rpg/contracts'
-import type { FormItem } from '@rpg/ui/form'
+import type { ArrayConfig, FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { orderedEffectFormFields } from '../../../lib/forms/mechanics/ordered-effect-form-fields'
@@ -120,7 +120,7 @@ export function monsterActionLimitedUseFields(options?: { addDisabled?: boolean 
   ]
 }
 
-export function monsterActionOnHitFields(ctx: ContentFormCtx): FormItem {
+export function monsterActionOnHitFields(ctx: ContentFormCtx): ArrayConfig {
   return orderedEffectFormFields({
     ctx,
     arrayName: 'onHit.effects',

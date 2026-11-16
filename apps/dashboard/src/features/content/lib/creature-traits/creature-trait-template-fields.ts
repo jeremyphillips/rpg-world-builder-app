@@ -39,7 +39,7 @@ export function creatureTraitTemplateFields(): FormItem[] {
         heading: {
           label: template.label,
           hint: template.formatDescription(config),
-          labelVisibility: 'srOnly',
+          labelVisibility: 'srOnly' as const,
         },
         visibility: visibleForTemplateId(templateId),
         fields: [

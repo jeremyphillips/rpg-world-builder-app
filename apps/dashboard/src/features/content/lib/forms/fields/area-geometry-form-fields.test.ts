@@ -1,4 +1,4 @@
-import type { FormItem, SelectFieldConfig } from '@rpg/ui/form'
+import { flattenSelectFieldOptions, type FormItem, type SelectFieldConfig } from '@rpg/ui/form'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -51,7 +51,7 @@ describe('areaGeometryFormFields', () => {
 
   it('keeps spell defaults with an explicit None option', () => {
     const shape = findShapeSelect(areaGeometryFormFields(base))
-    expect(shape?.options?.[0]?.value).toBe(AREA_GEOMETRY_FORM_NONE)
+    expect(flattenSelectFieldOptions(shape?.options ?? [])[0]?.value).toBe(AREA_GEOMETRY_FORM_NONE)
     expect(shape).not.toHaveProperty('placeholder')
     expect(shape?.required).toBeUndefined()
   })
@@ -63,7 +63,11 @@ describe('areaGeometryFormFields', () => {
         includeExplicitNoneOption: false,
       }),
     )
-    expect(shape?.options?.some((option) => option.value === AREA_GEOMETRY_FORM_NONE)).toBe(false)
+    expect(
+      flattenSelectFieldOptions(shape?.options ?? []).some(
+        (option) => option.value === AREA_GEOMETRY_FORM_NONE,
+      ),
+    ).toBe(false)
     expect(shape?.placeholder).toBe(AREA_GEOMETRY_SHAPE_PLACEHOLDER)
     expect(shape?.required).toBe(true)
   })

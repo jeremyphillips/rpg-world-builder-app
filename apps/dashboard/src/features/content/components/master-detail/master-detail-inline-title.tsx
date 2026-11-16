@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { get, useFormContext, useFormState, useWatch, type FieldErrors } from 'react-hook-form'
-import { ActionButton, cn, Input } from '@rpg/ui'
+import { ActionButton, cn, Input, Text } from '@rpg/ui'
 import { useFieldErrorPresentation, useFormValidationPresentation } from '@rpg/ui/form'
 
 export interface MasterDetailInlineTitle {
@@ -183,9 +183,9 @@ export function MasterDetailInlineTitleEditor({
         />
       </div>
       {validation.error ? (
-        <p id={errorId} role="alert" className="text-style-field-error">
+        <Text id={errorId} role="alert" variant="caption" className="text-destructive-muted">
           {validation.error}
-        </p>
+        </Text>
       ) : null}
     </div>
   )

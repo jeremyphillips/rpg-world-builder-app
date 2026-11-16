@@ -21,9 +21,13 @@ import type { FieldSize } from '../../components/ui/field.client'
 import type { JsonFieldProps } from '../../components/ui/json-field.client'
 import type { FileFieldProps } from '../../components/ui/file-field.client'
 import type { FieldValidationProps } from '../../components/ui/field-validation-props'
-import { fieldDefaultValue, type FieldConfig, type FieldType } from '../field-config'
+import {
+  fieldDefaultValue,
+  type FieldConfig,
+  type FieldType,
+  type FileFieldRemotePreview,
+} from '../field-config'
 import type { FieldLabelVisibility } from '../form-heading.lib'
-import { useFileFieldRemotePreview } from '../context/file-field-props.context'
 import { ComboboxFieldRenderer } from './fields/combobox/combobox-field-renderer.client'
 import { DiceFormulaFieldRenderer } from './fields/dice-formula-field-renderer.client'
 import type { EditableGridFieldRendererProps } from './fields/editable-grid-field-renderer.client'
@@ -79,7 +83,7 @@ export interface RenderArgs<K extends FieldType> {
   error?: string
   invalid?: boolean
   describedBy?: string
-  remotePreview?: ReturnType<typeof useFileFieldRemotePreview>
+  remotePreview?: FileFieldRemotePreview
   namePrefix?: string
 }
 

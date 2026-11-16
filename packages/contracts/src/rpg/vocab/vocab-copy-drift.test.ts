@@ -48,6 +48,7 @@ const COPY_DERIVATION_BASELINE = [
   '1 packages/contracts/src/rpg/content/lib/grants/equipment-grant.ts label-identifier',
   '1 packages/contracts/src/rpg/content/lib/relationship/organization-location-connection-location-occupancy.ts label-getter',
   '2 packages/contracts/src/rpg/content/lib/resolution/effect-sentence.ts label-getter',
+  '1 packages/contracts/src/rpg/content/lib/resolution/format-target-composition.ts naive-plural',
   '1 packages/contracts/src/rpg/content/spell/format-spell-metadata-core.ts label-identifier',
   '1 packages/contracts/src/rpg/runtime/character-builder/format-choice-step-copy.ts label-member',
   '2 packages/contracts/src/rpg/runtime/character-builder/messages/character-builder-messages.ts label-getter',

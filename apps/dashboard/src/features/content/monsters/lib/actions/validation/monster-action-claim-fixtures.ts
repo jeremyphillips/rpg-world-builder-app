@@ -6,15 +6,13 @@ import {
   type FormIssue,
 } from '@rpg/ui/form'
 import { collectIssueClaimReport, toRegisteredFormShape } from '@rpg/ui/form/test-utils'
+import type { ZodType } from 'zod'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import { buildMonsterTabs } from '../../monster-form-fields'
 import { resolveMonsterFormSchema } from '../../monster-form-schema'
 import { monsterActionRowResolveFields } from '../../monster-master-detail-validation-fields'
-import {
-  createMonsterActionFromAcquisition,
-  type MonsterActionAcquisitionChoice,
-} from '../acquisition/monster-action-acquisition'
+import { createMonsterActionFromAcquisition } from '../acquisition/monster-action-acquisition'
 import type { MonsterActionSection } from '../references/monster-action-equipment-references'
 
 export const monsterClaimCtx = {
@@ -53,9 +51,12 @@ const publishBody = {
 
 export const monsterClaimFields = collectTabbedFormResolverItems(buildMonsterTabs(monsterClaimCtx))
 export const monsterClaimTabs = buildMonsterTabs(monsterClaimCtx)
-export const monsterClaimSchema = resolveMonsterFormSchema(monsterClaimCtx, 'publish')
+export const monsterClaimSchema: ZodType = resolveMonsterFormSchema(monsterClaimCtx, 'publish')
 
-const CREATE_CHOICES: MonsterActionAcquisitionChoice[] = [
+/** Choices that create a row; excludes menu-only choices such as add-weapon. */
+type CreatableMonsterActionChoice = Parameters<typeof createMonsterActionFromAcquisition>[0]
+
+const CREATE_CHOICES: CreatableMonsterActionChoice[] = [
   { type: 'create', kind: 'attack' },
   { type: 'create', kind: 'special' },
   { type: 'create', kind: 'save' },
@@ -67,7 +68,7 @@ const CREATE_CHOICES: MonsterActionAcquisitionChoice[] = [
   ),
 ]
 
-export function monsterActionChoices(): MonsterActionAcquisitionChoice[] {
+export function monsterActionChoices(): CreatableMonsterActionChoice[] {
   return CREATE_CHOICES
 }
 
@@ -82,7 +83,7 @@ export function monsterClaimValues(
 ) {
   const row =
     shape === 'registered'
-      ? toRegisteredFormShape(action, monsterActionRowFields(action, section))
+      ? toRegisteredFormShape(action, [...monsterActionRowFields(action, section)])
       : action
   return { ...publishBody, [section]: [row] }
 }

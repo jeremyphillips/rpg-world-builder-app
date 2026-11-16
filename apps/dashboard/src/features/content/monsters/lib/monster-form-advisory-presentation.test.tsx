@@ -38,7 +38,7 @@ describe('monster form advisory presentation', () => {
       'actions.0',
     )
     const advisorySlot = slot as SlotConfig
-    render(<>{advisorySlot.render()}</>)
+    render(<>{advisorySlot.render({ path: 'actions.0' })}</>)
     const note = screen.getByText('Still shown.')
     expect(note.closest('.ui-alert')).toHaveClass('ui-alert--warning')
   })
@@ -68,6 +68,6 @@ describe('monster form advisory presentation', () => {
   it('renders nothing when the row has no match and does not collect', () => {
     const slot = monsterFormAdvisorySlot(weaponNotes, 'actions.2') as SlotConfig
     expect(slot.name).toBe('buildAdvisories')
-    expect(slot.render()).toBeNull()
+    expect(slot.render({ path: 'actions.2' })).toBeNull()
   })
 })

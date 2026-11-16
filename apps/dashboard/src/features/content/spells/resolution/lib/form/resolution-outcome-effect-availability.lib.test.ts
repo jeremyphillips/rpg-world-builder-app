@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import { resolutionEffectIdSchema } from '@rpg/contracts'
+
 import {
   getOutcomeEffectAvailability,
   resolveOutcomeApplicationAddState,
@@ -77,7 +79,7 @@ describe('resolveOutcomeApplicationAddState', () => {
     expect(
       resolveOutcomeApplicationAddState(
         [completeDamage],
-        { effects: [{ kind: 'effect-reference', effectId: 'damage', amount: 'full' }] },
+        { effects: [{ kind: 'effect-reference', effectId: resolutionEffectIdSchema.parse('damage'), amount: 'full' }] },
         'hit',
       ),
     ).toEqual({ kind: 'all-applied' })

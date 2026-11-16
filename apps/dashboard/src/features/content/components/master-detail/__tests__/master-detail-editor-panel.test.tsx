@@ -11,6 +11,7 @@ import {
   masterDetailEmptySelectionSubhead,
 } from '../../../lib/master-detail/master-detail-constants'
 import type { UseMasterDetailArrayResult } from '../../../lib/master-detail/use-master-detail-array'
+import type { MasterDetailEditorIdentity } from '../master-detail-editor-shell'
 import { MasterDetailEditorPanel } from '../master-detail-editor-panel'
 
 vi.mock('@rpg/ui/form', async (importOriginal) => {
@@ -55,7 +56,7 @@ function PanelShell(props: ComponentProps<typeof MasterDetailEditorPanel>) {
 
 describe('MasterDetailEditorPanel', () => {
   const itemFields = [{ type: 'text' as const, name: 'name', label: 'Name' }]
-  const selectedIdentity = {
+  const selectedIdentity: MasterDetailEditorIdentity = {
     title: 'Rage',
     meta: { eyebrow: 'Level 1', provenance: 'system', persistence: 'persisted' },
     deletable: true,

@@ -15,10 +15,7 @@ const MOUNT_SEEDS = seedEquipmentOfKind('mount')
 describe('mount kindFieldGroups', () => {
   it('buildFields composes name, kind group, economy, and description', () => {
     const fields = expectComposedKindGroups('mount', '')
-    const kindGroup = fields.find(
-      (field) => 'kind' in field && field.kind === 'group' && field.heading?.label === '',
-    )
-    expect(kindGroup).toEqual(fieldGroupsForEquipmentKind('mount')?.[0])
+    expect(fields[0]).toEqual(fieldGroupsForEquipmentKind('mount')?.[0])
   })
 })
 

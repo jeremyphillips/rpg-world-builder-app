@@ -329,7 +329,7 @@ function EmbeddedMasterDetailLayout({
   addControl?: ReactNode
   onAdd: () => void
   editor: UseMasterDetailArrayResult
-  itemFields: FormItem[] | EmbeddedArrayResolverFieldInput
+  itemFields: FormItem[]
   fieldName: string
   idPrefix: string
   showSelectedDetail: boolean

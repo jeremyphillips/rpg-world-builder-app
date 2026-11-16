@@ -1,8 +1,6 @@
 'use client'
 import { Icon } from './icon/icon'
 
-import './select-option-item.css'
-
 import * as React from 'react'
 import * as SelectPrimitive from '@radix-ui/react-select'
 import { cn } from '../../lib/utils'

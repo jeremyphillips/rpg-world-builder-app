@@ -62,7 +62,6 @@ export type EffectEndFormFieldsOptions = {
 /** Shared Ends control for structured effect lifetimes. First consumer: on-hit conditions. */
 export function effectEndFormFields(options?: EffectEndFormFieldsOptions): FormItem[] {
   const rootVisibility = options?.visibility
-  const timed = visibleWhenEffectEndOption(EFFECT_END_TIMING_OPTION_IDS.timed)
   const custom = visibleWhenEffectEndOption(EFFECT_END_TIMING_OPTION_IDS.custom)
   return [
     {

@@ -32,17 +32,19 @@ export function collectGroupLegends(fields: readonly FormItem[]): string[] {
 export function expectComposedKindGroups(
   equipmentKind: EquipmentKind,
   kindLegend: string,
-  expectedLegends: readonly string[] = [kindLegend, 'Economy'],
+  expectedLegends: readonly string[] = kindLegend ? [kindLegend, 'Economy'] : ['Economy'],
 ): FormItem[] {
   const fields = equipmentFormDef.buildFields({ equipmentKind })
   expect(collectGroupLegends(fields)).toEqual(expectedLegends)
   expect(equipmentFormDef.nameField({ equipmentKind })).toMatchObject({ name: 'name' })
   expect(fields.at(-1)).toMatchObject({ name: 'description' })
-  const kindGroup = fields.find(
-    (field): field is GroupConfig =>
-      'kind' in field && field.kind === 'group' && field.heading?.label === kindLegend,
-  )
-  expect(kindGroup).toBeDefined()
+  if (kindLegend) {
+    const kindGroup = fields.find(
+      (field): field is GroupConfig =>
+        'kind' in field && field.kind === 'group' && field.heading?.label === kindLegend,
+    )
+    expect(kindGroup).toBeDefined()
+  }
   return fields
 }
 

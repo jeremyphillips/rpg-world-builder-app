@@ -9,12 +9,13 @@ import {
   type OrderedEffect,
   type RepeatSave,
   type ResolutionApplicationAmount,
+  type ResolutionEffectId,
   type ResolutionOutcomeResult,
 } from '@rpg/contracts'
 
 export type MonsterSaveEffectReference = {
   kind: 'effect-reference'
-  effectId: string
+  effectId: ResolutionEffectId
   amount: ResolutionApplicationAmount
 }
 
@@ -201,7 +202,7 @@ export function defaultRepeatSaveShell(): RepeatSave {
 
 export function repeatSaveRemovalNeedsConfirm(repeatSave: RepeatSave | undefined): boolean {
   if (!repeatSave) return false
-  if (Boolean(repeatSave.eligibilityNote?.trim())) return true
+  if (repeatSave.eligibilityNote?.trim()) return true
   return hasMeaningfulRepeatSaveSecondFailure(repeatSave.secondFailure)
 }
 

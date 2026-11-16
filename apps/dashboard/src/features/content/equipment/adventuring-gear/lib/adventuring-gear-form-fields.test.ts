@@ -13,10 +13,7 @@ const ADVENTURING_GEAR_SEEDS = seedEquipmentOfKind('adventuring_gear')
 describe('adventuring gear kindFieldGroups', () => {
   it('buildFields composes name, kind group, economy, and description', () => {
     const fields = expectComposedKindGroups('adventuring_gear', '')
-    const kindGroup = fields.find(
-      (field) => 'kind' in field && field.kind === 'group' && field.heading?.label === '',
-    )
-    expect(kindGroup).toEqual(fieldGroupsForEquipmentKind('adventuring_gear')?.[0])
+    expect(fields[0]).toEqual(fieldGroupsForEquipmentKind('adventuring_gear')?.[0])
   })
 })
 

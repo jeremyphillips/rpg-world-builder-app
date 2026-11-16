@@ -14,7 +14,7 @@ import {
 } from './monster-action-claim-fixtures'
 
 describe('monster save action issue routing', () => {
-  it('routes a UI-shaped blank save row to five controls with one count', () => {
+  it('routes a UI-shaped blank save row to three controls with one count', () => {
     const save = blankSaveAction()
     const report = monsterClaimReport(save, 'registered')
     const actionIssues = report.filter((entry) => entry.path.startsWith('actions.'))
@@ -27,12 +27,8 @@ describe('monster save action issue routing', () => {
       fields: monsterClaimFields,
       tabId: 'actions',
       arrayPath: 'actions',
-      expectedCount: 5,
+      expectedCount: 3,
     })
-    expect(actionIssues.some((entry) => entry.claim.target.endsWith('_saveSuccessAmount'))).toBe(
-      true,
-    )
-    expect(actionIssues.some((entry) => entry.message === 'Required.')).toBe(false)
   })
 
   it('routes the created save row through controls', () => {

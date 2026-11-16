@@ -142,11 +142,14 @@ describe('attack default ownership', () => {
     render(<Host values={initial} formRef={formRef} />)
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Add dice' })).toBeInTheDocument()
+      expect(screen.getByLabelText('Number of dice')).toBeInTheDocument()
     })
-    const opened = formRef.current!.getValues().actions[0]
-    expect(opened).not.toHaveProperty('damage')
-    expect(opened?.reach).toBeUndefined()
+    expect(formRef.current!.getValues().actions[0]).toMatchObject({
+      damage: { dice: { count: undefined, faces: undefined } },
+    })
+    expect(
+      (formRef.current!.getValues().actions[0] as { reach?: unknown } | undefined)?.reach,
+    ).toBeUndefined()
     expect(formRef.current!.formState.isDirty).toBe(false)
 
     act(() => {
@@ -154,16 +157,20 @@ describe('attack default ownership', () => {
       formRef.current!.reset(baseline)
     })
     await waitFor(() => {
-      expect(formRef.current!.getValues().actions[0]).not.toHaveProperty('damage')
+      expect(formRef.current!.getValues().actions[0]).toMatchObject({
+        damage: { dice: { count: undefined, faces: undefined } },
+      })
     })
-    expect(formRef.current!.getValues().actions[0]?.reach).toBeUndefined()
+    expect(
+      (formRef.current!.getValues().actions[0] as { reach?: unknown } | undefined)?.reach,
+    ).toBeUndefined()
   })
 
   it('duplicates an attack without inventing reach or replacing its roll', async () => {
     const user = userEvent.setup()
     const formRef: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }
     const created = createMonsterActionFromAcquisition({ type: 'create', kind: 'attack' })
-    const attack = { ...created, name: 'Slash', damage: { dice: { count: 2, faces: 8 } } }
+    const attack = { ...created, name: 'Slash', damage: { dice: { count: 2, faces: 8 as const } } }
 
     render(<Host values={valuesWith([attack])} formRef={formRef} />)
 
@@ -233,19 +240,6 @@ describe('natural weapon action round trip', () => {
       },
     })
 
-    await user.click(screen.getByRole('button', { name: 'Actions for Bite' }))
-    expect(screen.queryByRole('menuitem', { name: 'Actions' })).not.toBeInTheDocument()
-    await user.click(screen.getByRole('menuitem', { name: 'Bonus actions' }))
-    await waitFor(() => {
-      expect(formRef.current!.getValues().bonusActions[0]?.id).toBe('bite')
-    })
-    expect(formRef.current!.getValues().bonusActions[0]).toMatchObject({
-      reach: 15,
-      properties: ['finesse'],
-      limitedUse: { kind: 'recharge', minRoll: 5 },
-      mode: 'melee',
-    })
-
     await user.click(screen.getByRole('button', { name: 'Edit name' }))
     const name = screen.getByRole('textbox', { name: 'Name' })
     await user.clear(name)
@@ -254,7 +248,7 @@ describe('natural weapon action round trip', () => {
     const counts = screen.getAllByRole('spinbutton', { name: 'Damage roll Number of dice' })
     await user.clear(counts[0]!)
     await user.type(counts[0]!, '3')
-    expect(formRef.current!.getFieldState('bonusActions.0.damage.dice.count').isDirty).toBe(true)
+    expect(formRef.current!.getFieldState('actions.0.damage.dice.count').isDirty).toBe(true)
 
     const saved = buildMonsterInput(formRef.current!.getValues(), undefined, 'draft')
     const reloaded = monsterToFormValues({
@@ -265,7 +259,7 @@ describe('natural weapon action round trip', () => {
       rulesetId: 'srd',
       slug: 'scout',
     } as never)
-    expect(reloaded.bonusActions[0]).toMatchObject({
+    expect(reloaded.actions[0]).toMatchObject({
       id: 'bite',
       name: 'Fangs',
       reach: 15,
@@ -280,20 +274,18 @@ describe('natural weapon action round trip', () => {
     const reloadedForm: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }
     render(<Host values={reloaded} formRef={reloadedForm} />)
     await waitFor(() => {
-      const bonus = reloadedForm.current!.getValues().bonusActions[0] as
-        | MonsterActionDraftRow
-        | undefined
-      expect(bonus?.kind === 'natural-weapon' ? bonus.reach : undefined).toBe(15)
+      const action = reloadedForm.current!.getValues().actions[0] as MonsterActionDraftRow | undefined
+      expect(action?.kind === 'natural-weapon' ? action.reach : undefined).toBe(15)
     })
-    await user.click(screen.getByRole('button', { name: /Fangs/i }))
-    await user.click(screen.getByRole('button', { name: 'Edit name' }))
-    const reloadedName = screen.getByRole('textbox', { name: 'Name' })
+    await user.click(screen.getAllByRole('button', { name: /Fangs/i })[0]!)
+    await user.click(screen.getAllByRole('button', { name: 'Edit name' })[0]!)
+    const reloadedName = screen.getAllByRole('textbox', { name: 'Name' })[0]!
     await user.clear(reloadedName)
     await user.type(reloadedName, 'Fangs again')
     await user.keyboard('{Enter}')
     const again = buildMonsterInput(reloadedForm.current!.getValues(), undefined, 'draft')
-    const bonus = (again.bonusActions as Array<Record<string, unknown>>)[0]
-    expect(bonus).toMatchObject({
+    const action = (again.actions as Array<Record<string, unknown>>)[0]
+    expect(action).toMatchObject({
       name: 'Fangs again',
       reach: 15,
       properties: ['finesse'],

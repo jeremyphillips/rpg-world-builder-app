@@ -106,7 +106,7 @@ describe('monsterActionSpellMechanics spellcasting hints', () => {
   })
 
   it('shows the shared hint on bonus action and reaction spell rows', () => {
-    const spell = { id: 'shield', kind: 'spell' as const, spells: [] as const }
+    const spell: MonsterActionDraftRow = { id: 'shield', kind: 'spell', spells: [] }
 
     const { unmount } = renderActionDetail(spell, 'bonusActions')
     expect(screen.getByText(SPELLCASTING_ABILITY_SHARED_HINT)).toBeInTheDocument()
@@ -124,7 +124,7 @@ describe('monsterActionSpellMechanics spellcasting hints', () => {
         kind: 'attack',
         name: 'Eye rays',
         damage: { dice: { count: 1, faces: 6 } },
-      },
+      } as MonsterActionDraftRow,
       'actions',
     )
 

@@ -8,6 +8,9 @@ const MONSTER_FORM_ADVISORY_TONE = {
   'weapon-not-proficient': 'info',
   'tunneler-missing-burrow-speed': 'warning',
   'flyby-missing-fly-speed': 'warning',
+  'leap-missing-walk-speed': 'warning',
+  'leap-zero-walk-speed': 'warning',
+  'leap-movement-exceeds-walk-speed': 'warning',
   'multiattack-unavailable-action': 'warning',
 } as const satisfies Record<MonsterFormAdvisory['code'], AdvisoryTone>
 

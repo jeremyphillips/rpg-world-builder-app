@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- add-menu config helpers ship with the menu component */
 import {
   DEFAULT_SYSTEM_RULESET_ID,
   getCreatureTraitTemplate,

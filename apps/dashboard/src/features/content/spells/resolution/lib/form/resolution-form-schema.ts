@@ -4,6 +4,7 @@ import {
   orderedConditionEffectSchema,
   orderedNoteEffectSchema,
   repeatSaveSchema,
+  resolutionEffectIdSchema,
   RESOLUTION_APPLICATION_AMOUNTS,
   SPELL_RESOLUTION_ATTACK_TYPES,
   RESOLUTION_PROXIMITY_KINDS,
@@ -56,7 +57,7 @@ export type ResolutionEffectFormItem = z.infer<typeof resolutionEffectFormItemSc
 
 export const resolutionOutcomeEffectReferenceFormSchema = z.object({
   kind: z.literal('effect-reference'),
-  effectId: z.string().min(1),
+  effectId: resolutionEffectIdSchema,
   amount: z.enum(RESOLUTION_APPLICATION_AMOUNTS),
 })
 

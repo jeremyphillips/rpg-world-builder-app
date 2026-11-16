@@ -18,6 +18,7 @@ const CLASS_SLUG_GLOB =
 const VOCABULARY_SEED_FILE_GLOBS = [
   'attack-resolution-modes',
   'conditions',
+  'creature-families',
   'damage-types',
   'edition-presets',
   'equipment-categories',

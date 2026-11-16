@@ -21,5 +21,11 @@ export function ResolutionEffectDefinitionSlot({
     typeof effectId === 'string' ? effectId : undefined,
   )
   if (!definitionPath) return null
-  return <FormItems namePrefix={definitionPath} items={fields} />
+  return (
+    <FormItems
+      idPrefix={definitionPath.replace(/[^a-zA-Z0-9_-]/g, '-')}
+      namePrefix={definitionPath}
+      items={fields}
+    />
+  )
 }

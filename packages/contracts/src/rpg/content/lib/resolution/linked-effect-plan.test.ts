@@ -58,6 +58,7 @@ describe('planLinkedEffectRemove', () => {
           ],
           repeatSave: {
             timing: { participant: 'target', boundary: 'end', which: 'next' },
+            successOnRepeatEndsEffect: true,
             secondFailure: {
               effects: [{ kind: 'effect-reference', effectId: drop, amount: 'full' }],
             },

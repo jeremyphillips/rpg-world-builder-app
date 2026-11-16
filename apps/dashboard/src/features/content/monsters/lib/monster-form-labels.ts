@@ -4,7 +4,6 @@ import {
   type Ability,
   CHALLENGE_RATING_TERM,
   CREATURE_ARMOR_CLASS_KIND_TERM,
-  getActionEconomyLabel,
   getActionEconomySectionLabel,
   getMonsterActionKindLabel,
   getSpellAtomicEffectKindLabel,
@@ -22,7 +21,6 @@ import {
   getTermLabelSingular,
   HIT_POINTS_TERM,
   LANGUAGE_TERM,
-  MONSTER_SPELLCASTING_ACTION_NAME,
   PASSIVE_PERCEPTION_TERM,
   PROFICIENCY_TERM,
   RECHARGE_DIE_FACES,
@@ -449,7 +447,7 @@ export const MONSTER_TAKE_ACTIONS_DESCRIPTION = 'Take Dash, Disengage, or Hide.'
 export const MONSTER_TAKE_ACTIONS_ACTIONS_LABEL = 'Actions'
 export const MONSTER_TAKE_ACTIONS_CHOICE_LABEL = 'Action behavior'
 export const MONSTER_TAKE_ACTIONS_BEHAVIOR_HINT_DISABLED =
-  'Select at least two actions to configure behavior.'
+  'Choose at least two actions to configure behavior.'
 export const MONSTER_TAKE_ACTIONS_CHOICE_ONE = 'Chooses one'
 export const MONSTER_TAKE_ACTIONS_CHOICE_EACH = 'Uses each'
 export const MONSTER_TAKE_ACTIONS_RESTRICTION_ADD_LABEL = 'Add restriction'

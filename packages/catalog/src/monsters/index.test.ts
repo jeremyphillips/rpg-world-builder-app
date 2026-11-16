@@ -82,17 +82,18 @@ describe('SRD 5.2.1 monster seed', () => {
     expect(
       formatMonsterAttackAction(skeletonBlock.attacks.find((line) => line.id === 'shortbow')!),
     ).toBe('Ranged Attack Roll: +5, range 80/320 ft. Hit: 6 (1d6 + 3) Piercing damage.')
-    expect(kobold!.traits.map((trait) => trait.kind)).toEqual(['template', 'template'])
-    expect(kobold!.traits[0]).not.toHaveProperty('descriptionOverride')
-    expect(kobold!.traits[1]).not.toHaveProperty('descriptionOverride')
-    expect(resolveTraitDisplay(kobold!.traits[0]!).descriptionHtml).toContain(
+    const koboldTraits = kobold!.traits as Parameters<typeof resolveTraitDisplay>[0][]
+    expect(koboldTraits.map((trait) => trait.kind)).toEqual(['template', 'template'])
+    expect(koboldTraits[0]).not.toHaveProperty('descriptionOverride')
+    expect(koboldTraits[1]).not.toHaveProperty('descriptionOverride')
+    expect(resolveTraitDisplay(koboldTraits[0]!).descriptionHtml).toContain(
       'This creature has Advantage',
     )
-    expect(resolveTraitDisplay(kobold!.traits[1]!).descriptionHtml).toContain(
+    expect(resolveTraitDisplay(koboldTraits[1]!).descriptionHtml).toContain(
       'this creature has Disadvantage',
     )
     const grants = resolveCreatureTraitGrants(
-      kobold!.traits.map((trait) => ({ trait, source: trait.id })),
+      koboldTraits.map((trait) => ({ trait, source: trait.id })),
     )
     expect(grants.map((row) => row.templateId)).toEqual(['pack-tactics', 'sunlight-sensitivity'])
     expect(grants[0]?.grant).toMatchObject({
@@ -311,24 +312,24 @@ describe('SRD 5.2.1 monster seed', () => {
       expect(casting?.kind).toBe('spell')
       if (casting?.kind === 'spell') {
         expect(
-          casting.spells.find((spell) => spell.spellId.endsWith(':fireball'))?.castAtLevel,
+          casting.spells.find((spell) => spell.spellId?.endsWith(':fireball'))?.castAtLevel,
         ).toBe(5)
         expect(
-          casting.spells.find((spell) => spell.spellId.endsWith(':lightning-bolt'))?.castAtLevel,
+          casting.spells.find((spell) => spell.spellId?.endsWith(':lightning-bolt'))?.castAtLevel,
         ).toBe(5)
         expect(
-          casting.spells.find((spell) => spell.spellId.endsWith(':animate-dead'))?.limitedUse,
+          casting.spells.find((spell) => spell.spellId?.endsWith(':animate-dead'))?.limitedUse,
         ).toMatchObject({
           kind: 'uses',
           count: { kind: 'fixed', value: 2 },
         })
         expect(
-          casting.spells.find((spell) => spell.spellId.endsWith(':chain-lightning'))?.limitedUse,
+          casting.spells.find((spell) => spell.spellId?.endsWith(':chain-lightning'))?.limitedUse,
         ).toMatchObject({
           kind: 'uses',
           count: { kind: 'fixed', value: 1 },
         })
-        expect(casting.spells.some((spell) => spell.spellId.endsWith(':fear'))).toBe(false)
+        expect(casting.spells.some((spell) => spell.spellId?.endsWith(':fear'))).toBe(false)
       }
       expect(lich.actions.some((action) => action.name === 'Frightening Gaze')).toBe(false)
       expect(lich.reactions.find((action) => action.id === 'protective-magic')?.kind).toBe('spell')

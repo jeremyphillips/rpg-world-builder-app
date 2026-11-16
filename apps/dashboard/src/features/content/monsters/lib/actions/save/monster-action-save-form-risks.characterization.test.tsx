@@ -7,7 +7,7 @@
 import { useEffect } from 'react'
 import { act, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { planLinkedEffectRemove } from '@rpg/contracts'
+import { planLinkedEffectRemove, resolutionEffectIdSchema } from '@rpg/contracts'
 import { FormItems, getArrayFieldMutators } from '@rpg/ui/form'
 import { FormProvider, useController, useForm, type UseFormReturn } from 'react-hook-form'
 import { beforeAll, describe, expect, it } from 'vitest'
@@ -51,11 +51,16 @@ const ctx = {
   damageTypeVocabulary: buildSeedDamageTypeVocabulary(),
 } as ContentFormCtx
 
-const DAMAGE_A = 'damage-a'
-const DAMAGE_B = 'damage-b'
-const DAMAGE_C = 'damage-c'
+const DAMAGE_A = resolutionEffectIdSchema.parse('damage-a')
+const DAMAGE_B = resolutionEffectIdSchema.parse('damage-b')
+const DAMAGE_C = resolutionEffectIdSchema.parse('damage-c')
 
-function effectReference(effectId: string) {
+type LinkedEffectRemoveInput = Parameters<typeof planLinkedEffectRemove>[0]
+
+/** Resolution slice read through the loose `actions` form typing. */
+type SaveResolutionSlice = { outcomes?: unknown; effects?: unknown }
+
+function effectReference(effectId: typeof DAMAGE_A) {
   return { kind: 'effect-reference' as const, effectId, amount: 'full' as const }
 }
 
@@ -253,15 +258,20 @@ describe('monster save form risks (Phase 2 characterization)', () => {
 
       const namePrefix = 'actions.0'
       const failedPath = `${namePrefix}.${MONSTER_SAVE_FAILED_EFFECTS_PATH}`
-      const libraryPath = `${namePrefix}.resolution.effects`
-      const outcomesPath = `${namePrefix}.resolution.outcomes`
+      // Widened so `setValue` accepts the plan output without per-path typing.
+      const libraryPath: string = `${namePrefix}.resolution.effects`
+      const outcomesPath: string = `${namePrefix}.resolution.outcomes`
 
       await act(async () => {
         const form = formRef.current!
         getArrayFieldMutators(form.control, failedPath)?.remove(0)
         const plan = planLinkedEffectRemove({
-          library: readResolutionEffects(form.getValues(libraryPath)),
-          outcomes: readMonsterSaveOutcomes(form.getValues(outcomesPath)),
+          library: readResolutionEffects(
+            form.getValues(libraryPath),
+          ) as LinkedEffectRemoveInput['library'],
+          outcomes: readMonsterSaveOutcomes(
+            form.getValues(outcomesPath),
+          ) as LinkedEffectRemoveInput['outcomes'],
           effectId: DAMAGE_A,
         })
         form.setValue(outcomesPath, plan.outcomes, { shouldDirty: true, shouldValidate: false })
@@ -290,7 +300,9 @@ describe('monster save form risks (Phase 2 characterization)', () => {
       await waitForMountedDamageLibrary(formRef, 3)
 
       const resolutionPath = 'actions.0.resolution' as const
-      const snapshotBefore = structuredClone(formRef.current!.getValues(resolutionPath))
+      const snapshotBefore = structuredClone(
+        formRef.current!.getValues(resolutionPath),
+      ) as SaveResolutionSlice
       const failedEffectsBefore =
         readMonsterSaveOutcomes(snapshotBefore.outcomes).find(
           (outcome) => outcome.result === 'failed-save',
@@ -303,7 +315,7 @@ describe('monster save form risks (Phase 2 characterization)', () => {
       await user.type(note, 'Applies whether the target succeeds or fails.')
 
       await waitFor(() => {
-        const resolution = formRef.current!.getValues(resolutionPath)
+        const resolution = formRef.current!.getValues(resolutionPath) as SaveResolutionSlice
         const failedEffectsAfter =
           readMonsterSaveOutcomes(resolution.outcomes).find(
             (outcome) => outcome.result === 'failed-save',

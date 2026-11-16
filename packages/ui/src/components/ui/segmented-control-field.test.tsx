@@ -5,7 +5,7 @@ import { SegmentedControlField } from './segmented-control-field.client'
 
 describe('SegmentedControlField fullWidth', () => {
   it('stretches the control shell and segment track to the field column', () => {
-    const { container } = render(
+    render(
       <SegmentedControlField
         id="mode"
         label="Targeting mode"
