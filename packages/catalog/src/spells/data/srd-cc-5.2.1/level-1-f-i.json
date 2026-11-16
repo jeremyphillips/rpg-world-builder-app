@@ -57,8 +57,9 @@
       "outcomes": [
         {
           "result": "applied",
-          "applications": [
+          "effects": [
             {
+              "kind": "effect-reference",
               "effectId": "temporary-hit-points",
               "amount": "full"
             }
@@ -90,7 +91,9 @@
       "normal": {
         "value": 1,
         "unit": "reaction",
-        "trigger": { "text": "when you or a creature you can see within 60 feet of you falls" }
+        "trigger": {
+          "text": "when you or a creature you can see within 60 feet of you falls"
+        }
       },
       "canBeCastAsRitual": false
     },
@@ -310,8 +313,9 @@
       "outcomes": [
         {
           "result": "failed-save",
-          "applications": [
+          "effects": [
             {
+              "kind": "effect-reference",
               "effectId": "damage",
               "amount": "full"
             }
@@ -319,8 +323,9 @@
         },
         {
           "result": "successful-save",
-          "applications": [
+          "effects": [
             {
+              "kind": "effect-reference",
               "effectId": "damage",
               "amount": "half"
             }
@@ -612,13 +617,17 @@
       "outcomes": [
         {
           "result": "hit",
-          "applications": [
+          "effects": [
             {
+              "kind": "effect-reference",
               "effectId": "piercing",
               "amount": "full"
+            },
+            {
+              "kind": "note",
+              "description": "Hit or miss, the shard explodes: each creature within 5 feet makes a Dexterity saving throw or takes the cold burst damage."
             }
-          ],
-          "note": "Hit or miss, the shard explodes: each creature within 5 feet makes a Dexterity saving throw or takes the cold burst damage."
+          ]
         }
       ]
     },

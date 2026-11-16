@@ -221,7 +221,7 @@ describe('resolveArrayItemPresentation', () => {
     }
   })
 
-  it('reserves drag handle geometry before sortable is active', () => {
+  it('reserves a drag handle column only while a handle is shown', () => {
     const oneItem = resolveArrayItemPresentation({
       config: {
         kind: 'array',
@@ -234,7 +234,7 @@ describe('resolveArrayItemPresentation', () => {
       fieldsLength: 1,
     })
 
-    expect(oneItem.reserveDragHandleSlot).toBe(true)
+    expect(oneItem.reserveDragHandleSlot).toBe(false)
     expect(oneItem.sortableEnabled).toBe(false)
 
     const twoItems = resolveArrayItemPresentation({

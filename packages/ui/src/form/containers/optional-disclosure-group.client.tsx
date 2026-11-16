@@ -21,9 +21,25 @@ function objectHasContent(value: unknown): boolean {
 }
 
 function watchedHasContent(value: unknown): boolean {
+  if (Array.isArray(value)) return value.length > 0
   if (typeof value === 'number') return Number.isFinite(value)
   if (typeof value === 'string') return value.trim().length > 0
   return objectHasContent(value)
+}
+
+function rootPathHasContent(values: Record<string, unknown>, path: string): boolean {
+  return watchedHasContent(values[path])
+}
+
+function optionalGroupPopulated(
+  values: Record<string, unknown>,
+  disclosure: NonNullable<GroupConfig['optionalDisclosure']>,
+  watched: unknown,
+): boolean {
+  if (disclosure.watchPaths && disclosure.watchPaths.length > 0) {
+    return disclosure.watchPaths.some((path) => rootPathHasContent(values, path))
+  }
+  return watchedHasContent(watched)
 }
 
 type OptionalDisclosureGroupProps = {
@@ -76,9 +92,14 @@ function OptionalDisclosureGroupBody({
   children: ReactNode
 }) {
   const fullName = namePrefix ? `${namePrefix}.${objectName}` : objectName
-  const { setValue, unregister } = useFormContext()
+  const { setValue, unregister, getValues } = useFormContext()
   const watched = useWatch({ name: fullName })
-  const populated = watchedHasContent(watched)
+  const formValues = useWatch()
+  const populated = optionalGroupPopulated(
+    (formValues ?? getValues()) as Record<string, unknown>,
+    disclosure,
+    watched,
+  )
   const [manualOpen, setManualOpen] = useState(false)
   const { defaultValues } = useFormState({ name: fullName })
   const defaultsRef = useRef(defaultValues)
@@ -91,13 +112,23 @@ function OptionalDisclosureGroupBody({
   const controlId = `${idPrefix}-${fullName.replaceAll('.', '-')}`
 
   const clear = () => {
-    unregister(fullName, { keepDefaultValue: true, keepDirty: false })
+    const pathsToClear =
+      disclosure.clearPaths && disclosure.clearPaths.length > 0
+        ? disclosure.clearPaths
+        : disclosure.watchPaths && disclosure.watchPaths.length > 0
+          ? disclosure.watchPaths
+          : [fullName]
+    for (const path of pathsToClear) {
+      unregister(path, { keepDefaultValue: true, keepDirty: false })
+    }
     setTimeout(() => {
-      setValue(fullName, undefined, {
-        shouldDirty: true,
-        shouldTouch: true,
-        shouldValidate: true,
-      })
+      for (const path of pathsToClear) {
+        setValue(path, undefined, {
+          shouldDirty: true,
+          shouldTouch: true,
+          shouldValidate: true,
+        })
+      }
     }, 0)
     setManualOpen(false)
   }

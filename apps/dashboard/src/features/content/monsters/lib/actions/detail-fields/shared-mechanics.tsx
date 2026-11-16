@@ -44,16 +44,16 @@ import {
 import type { MonsterActionSection } from '../references/monster-action-equipment-references'
 import type { MonsterActionDraftRow } from '../monster-action-presets'
 import { MonsterActionAttackAbilityField } from '../monster-attack-ability-field'
-import { MonsterActionCastingAbilityField } from '../monster-action-casting-fields'
-import { MonsterActionRechargeField } from '../monster-action-recharge-field'
+import { MonsterActionCastingAbilityField } from '../spell/monster-action-casting-fields'
+import { MonsterActionRechargeField } from '../recharge/monster-action-recharge-field'
 import {
   monsterActionLimitedUseFields,
   monsterActionOnHitFields,
 } from '../monster-action-on-hit-fields'
-import { monsterSpellComponentRequirementsField } from '../monster-spell-component-form-fields'
-import { monsterWeaponDamageOverrideField } from '../monster-weapon-damage-override'
+import { monsterSpellComponentRequirementsField } from '../spell/monster-spell-component-form-fields'
+import { monsterWeaponDamageOverrideField } from '../weapon/monster-weapon-damage-override'
 import type { MonsterFormValues } from '../../monster-form-values'
-import { monsterSpellCastAtLevelField } from '../monster-spell-cast-at-level-form-fields'
+import { monsterSpellCastAtLevelField } from '../spell/monster-spell-cast-at-level-form-fields'
 import { MONSTER_SPELL_PICKER_INTERCEPT } from '../../../components/form/monster-spell-picker-context'
 import {
   MonsterSpellChangeAction,
@@ -150,6 +150,8 @@ function monsterActionBonusSourceDependent(namePrefix: string, currentActionId: 
     sourcePath: 'bonusSource',
     namePrefix,
     controllerLabel: MONSTER_ATTACK_BONUS_LABEL,
+    controllerVariant: 'segmentedControl',
+    sectionLegend: { headingScale: 'subsection', separator: 'subtle' },
     currentActionId,
     dependentsChrome: 'none',
     sourceOptions: [
@@ -261,6 +263,7 @@ function monsterAttackDistanceFields(
     kind: 'group',
     heading: { label: MONSTER_ACTION_DISTANCE_SECTION_LEGEND },
     visibility: distanceVisibility(modeField),
+    separator: 'subtle',
     fields: [
       {
         kind: 'row',
@@ -479,7 +482,10 @@ export function monsterActionMechanicFields(input: {
         damageTypeName: 'damageType',
         rollName: 'damage',
       }),
-      monsterActionOnHitFields(ctx),
+      {
+        ...monsterActionOnHitFields(ctx),
+        separator: 'subtle',
+      },
     )
   }
   if (action.kind === 'save') {

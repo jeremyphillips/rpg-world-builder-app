@@ -64,7 +64,7 @@ const FIELD_CONTENT_CHECKERS: Partial<Record<FieldConfig['type'], FieldContentCh
   textSuggestions: stringLikeValueHasContent,
   select: stringLikeValueHasContent,
   radio: stringLikeValueHasContent,
-  combobox: stringLikeValueHasContent,
+  combobox: (value) => (Array.isArray(value) ? value.length > 0 : stringLikeValueHasContent(value)),
   file: stringLikeValueHasContent,
 }
 

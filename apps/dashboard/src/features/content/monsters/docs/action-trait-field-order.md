@@ -13,6 +13,10 @@ Regions, in order. An empty region renders nothing.
 
 Casting ability is mechanics. It does not belong in Source.
 
-Save actions keep one Saving Throw group. Ability, DC, and selection come first, then resolution damage, then the failure note and success amount.
+Save actions keep one Saving Throw group. Inside it, order is: save ability and DC, targeting, **Failed save** (one ordered effect list, then repeat save), **Successful save** (one ordered effect list), optional **Failure or success**, then **Turn limit**. Turn limit is the presence of `onceUntilNextTurn`. Global turn-limit disclosure is omitted on save actions because it lives on this tail.
+
+Failed save is an ordered list of Damage, Condition, and Note rows. Each Damage row is the editor of its `resolution.effects` definition. Adding Damage creates that definition, a full reference on the failed save, and a success reference that defaults to no damage. Successful save shows those references: a read-only roll and type, plus a damage amount (No damage, Half damage, or Full damage). Those rows are not added or removed on their own. Removing the failed-save Damage row removes the definition and every reference to it. When another outcome uses the same id, the row says the definition is shared. Monster menus do not offer healing.
+
+Repeat save stays hidden until the first-failure outcome lists a condition, or a repeat shell is already open. A note or damage row alone does not reveal it. Opening repeat writes the fixed end-of-next-turn timing and shows First failure and Second failure as field labels before the second tier has effects. Eligibility is an optional note on that shell. Recurring saves stay note effects.
 
 Do not apply this order to species traits or class features. Their descriptions are the primary authored content, and grant summaries are a different region.

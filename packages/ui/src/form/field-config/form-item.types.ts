@@ -329,7 +329,16 @@ export interface ArrayItemHeaderConfig {
    * Computed primary label; overrides `primaryField` when set.
    * Use for grant rows, tier summaries, or multi-field titles.
    */
-  primary?: (values: Record<string, unknown>, index: number) => string | undefined
+  primary?: (
+    values: Record<string, unknown>,
+    index: number,
+    watched?: Record<string, unknown>,
+  ) => string | undefined
+  /**
+   * Root-relative paths passed as `watched` to `primary`. Set when the title reads
+   * values the row does not own.
+   */
+  primaryDependsOn?: string[]
   /**
    * Fallback title when the primary is empty — also used for aria labels.
    * Required; typically `Item ${index + 1}` or a domain label like `Grant ${index + 1}`.
@@ -429,8 +438,19 @@ export interface ArrayItemConfig {
   resolveCollapsible?: (values: Record<string, unknown>, index: number) => boolean
   /** @default dragHandle */
   reorder?: ArrayItemReorder
-  /** @default true */
-  removable?: boolean
+  /** @default true. A function hides remove for specific rows. */
+  removable?: boolean | ((row: Record<string, unknown>, index: number) => boolean)
+  /**
+   * Replaces the default row removal. Call `removeAt` for this array when the row
+   * should still disappear.
+   */
+  remove?: (ctx: {
+    index: number
+    row: unknown
+    getValues: (path: string) => unknown
+    removeAt: (path: string, index: number) => void
+    setValue: (path: string, value: unknown) => void
+  }) => void
   removeSlot?: Pick<SlotConfig, 'name' | 'render' | 'visibility'>
   /**
    * Extra utility rendered immediately before the default remove button.
@@ -555,7 +575,7 @@ export interface SlotConfig {
    * displays — exact match or prefix ownership.
    */
   issuePaths?: readonly string[]
-  render: () => ReactNode
+  render: (ctx: { namePrefix?: string; path: string }) => ReactNode
   /** Trailing divider after this slot within a group/stack rhythm. */
   separator?: FieldSeparator
   /** Panel or outline shell around slot content. */

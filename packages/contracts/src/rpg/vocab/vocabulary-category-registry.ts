@@ -5,6 +5,7 @@ import { VOCABULARY_OPTION_SET_IDS, type VocabularyOptionSetId } from './vocabul
 
 /** Sets excluded from Game Terms — reachable only via internal consumers (rules config, etc.). */
 export const VOCABULARY_INTERNAL_ONLY_SET_IDS = [
+  'creature-families',
   'edition-presets',
   'attack-resolution-modes',
 ] as const satisfies readonly VocabularyOptionSetId[]

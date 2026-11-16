@@ -14,6 +14,7 @@ import type {
 import { fieldDefaultValue } from '../../../field-config'
 import type { FieldValidationProps } from '../../../../components/ui/field-validation-props'
 import { buildFieldShellProps } from '../../field-shell-props.lib'
+import { resolveFieldLabelVisibility } from '../../../form-heading.lib'
 import { ComboboxFilterToolbar } from './combobox-filter-toolbar.client'
 import type { ResolveComboboxFilteredOptions } from '../../../../components/ui/combobox-field.types'
 import {
@@ -125,7 +126,10 @@ export function ComboboxFieldRenderer({
           controlSize,
         },
         validation,
-        { sizes: 'both', label: 'visible' },
+        {
+          sizes: 'both',
+          label: resolveFieldLabelVisibility(config) === 'srOnly' ? 'accessible-name' : 'visible',
+        },
       )}
       options={comboboxOptions}
       multiple={config.multiple}

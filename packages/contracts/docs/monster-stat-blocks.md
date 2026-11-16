@@ -31,3 +31,27 @@ Derived values follow SRD 5.2.1 table math unless the body explicitly overrides 
 System monsters default to **DM-only** campaign visibility via `CONTENT_ACCESS_CAPABILITIES.monsters.defaultVisibilityMode`.
 
 See also `docs/runtime-resolution-boundaries.md`, [srd-mechanical-coverage.md](./srd-mechanical-coverage.md), [creature-trait-inventory.md](./creature-trait-inventory.md), and `apps/api/docs/campaign-access-enforcement.md`.
+
+## Family and class classifications
+
+Monster bodies optionally store `creatureFamilyIds` and `classIds` beside the existing
+`creatureType`. Family ids resolve the lightweight `creature-families` vocabulary; class
+ids resolve existing class content (for example `srd-cc-5.2.1:wizard`). These are explicit
+printed classifications, not character levels, grants, spellcasting progression, or
+inferred capabilities. Lycanthrope and Titan are Monstrosity-compatible families;
+Chromatic and Metallic are Dragon-compatible families.
+
+`formatMonsterClassification` composes the type and direct family/class labels, in
+authored order with families first: `Undead (Wizard)` or `Dragon (Chromatic)`. Empty
+lists omit parentheses. Unknown references remain visible; disabled/draft references
+retain diagnostics. Detail and edit preview share this formatter.
+
+Publish checks validate family status/type compatibility and class referenceability.
+Drafts retain incomplete or incompatible selections. Changing creature type never
+clears classifications. Empty new lists are omitted; clearing existing lists uses
+explicit API tombstones so previous values do not return after save. Family parent
+metadata never adds ancestor membership, inherited compatibility, or printed labels.
+
+SRD seed backfill: Mage → Wizard (printed p. 305), Lich → Wizard (p. 304), verified
+against the [official SRD 5.2.1](https://media.dndbeyond.com/compendium-images/srd/5.2/SRD_CC_v5.2.1.pdf).
+Only classification ids were added; other monster data was retained.

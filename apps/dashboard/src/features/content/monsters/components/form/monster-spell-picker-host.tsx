@@ -3,7 +3,7 @@ import type { Spell } from '@rpg/contracts'
 import { ArrayAddActionInterceptProvider, getArrayFieldMutators } from '@rpg/ui/form'
 import { useFormContext, useWatch } from 'react-hook-form'
 
-import { replaceMonsterSpellRow } from '../../lib/actions/monster-spell-frequency'
+import { replaceMonsterSpellRow } from '../../lib/actions/spell/monster-spell-frequency'
 import {
   MONSTER_SPELL_PICKER_INTERCEPT,
   MonsterSpellPickerContext,

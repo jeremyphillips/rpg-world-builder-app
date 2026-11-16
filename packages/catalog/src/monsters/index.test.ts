@@ -352,3 +352,15 @@ describe('SRD 5.2.1 monster seed', () => {
     }
   })
 })
+
+it('stores source-assigned Wizard classifications without changing generic monsters', () => {
+  const monsters = loadSeedMonsters(RULESET)
+  for (const slug of ['mage', 'lich']) {
+    expect(monsters.find((monster) => monster.slug === slug)?.classIds).toEqual([
+      'srd-cc-5.2.1:wizard',
+    ])
+  }
+  expect(
+    monsters.find((monster) => monster.slug === 'hell-hound')?.creatureFamilyIds,
+  ).toBeUndefined()
+})

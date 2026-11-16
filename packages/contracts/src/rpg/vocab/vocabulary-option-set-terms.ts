@@ -1,5 +1,6 @@
 import { CONDITION_TERM } from './effect-condition'
 import { CREATURE_SIZE_TERM } from './creature-size'
+import { CREATURE_FAMILY_TERM } from './creature-family'
 import { CREATURE_TYPE_TERM } from './creature-type'
 import { DAMAGE_TYPE_TERM } from './damage/vocabulary'
 import { EQUIPMENT_CATEGORY_TERM } from './equipment/equipment-category'
@@ -15,6 +16,7 @@ import { WEAPON_PROPERTY_TERM } from './weapon/property'
 /** Taxonomy concepts for product-configurable vocabulary option sets. */
 export const VOCABULARY_OPTION_SET_TERMS = {
   'creature-types': CREATURE_TYPE_TERM,
+  'creature-families': CREATURE_FAMILY_TERM,
   'damage-types': DAMAGE_TYPE_TERM,
   conditions: CONDITION_TERM,
   languages: LANGUAGE_TERM,

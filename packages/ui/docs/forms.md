@@ -262,10 +262,11 @@ Slot `render()` components and hand-built editors should call `useFormSectionCon
 `density`, then `resolveFormDensity(density)` when threading `rhythm` / `size` into primitives
 (e.g. `RequirementEditor` → `FieldGroup`).
 
-**Array legends:** inherit parent section density unless the array sets `density` explicitly.
-Item **controls** and list/body stack gaps still default to compact via
-`FormSectionContext.defaultControlSize` and array chrome — not via presentation `density`.
-Legend and in-item **labels** follow inherited presentation density.
+**Array density split:** when an array omits `density`, the section legend and add control follow
+parent presentation density; item field labels, anatomy, spacing, and title metadata use compact
+context (`bodyLayoutDensity`). Item controls use `defaultControlSize: 'sm'` until the array sets
+`density` explicitly (which aligns header, body, and context). See
+[sizing-and-spacing.md](./forms/sizing-and-spacing.md#array-section-density-header-vs-body).
 
 **Presentation vs control:** `Field.Root` / `FormField` `size` is presentation (labels, hints).
 Optional `controlSize` (or section `defaultControlSize` + `controlSizeOverride`) sets control geometry.
@@ -490,6 +491,10 @@ import { toOptions } from '@rpg/ui/form'
 
 - `dependsOn` — exact field names the predicate reads (`useWatch`, not whole-form re-render).
 - Hidden → control unmounts, value clears (`shouldUnregister`).
+
+`<Form>` hardcodes `shouldUnregister: true`. Unmounting a control drops its value, which is what hidden conditionals, optional disclosures, and array-item fields rely on. `<TabbedForm>` does not pass the flag, so React Hook Form keeps the default value tree, including structural values that have no mounted input. Inactive tabs stay mounted. Spell, monster, class, and species editors use `<TabbedForm>` and depend on that retention. Clear obsolete data with `unregister`, `setValue(undefined)`, field-array mutators, or the editor's normalizer.
+
+Nested `useFieldArray` under `shouldUnregister: true` is unsupported. The array mount writes its path into an empty value store and can drop unregistered siblings. Do not mount outcome or effect lists on `<Form>`. There is no per-form flag to change this. A configurable policy, and moving other `<Form>` consumers, is deferred.
 
 **Hidden = not required.** Resolver strips hidden keys before validate/submit.
 

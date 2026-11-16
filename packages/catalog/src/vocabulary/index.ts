@@ -4,6 +4,9 @@ import {
   CONDITION_SET_ID,
   CREATURE_SIZE_SET_ID,
   CREATURE_TYPE_SET_ID,
+  CREATURE_FAMILY_SET_ID,
+  creatureFamilySeedOptionSchema,
+  validateCreatureFamilyDefinitions,
   DAMAGE_TYPE_SET_ID,
   EDITION_PRESET_SET_ID,
   EQUIPMENT_CATEGORY_SET_ID,
@@ -30,6 +33,7 @@ import { getById } from '../lib/get-by-id'
 import attackResolutionModesRaw from './data/srd-cc-5.2.1/attack-resolution-modes.json'
 import conditionsRaw from './data/srd-cc-5.2.1/conditions.json'
 import creatureTypesRaw from './data/srd-cc-5.2.1/creature-types.json'
+import creatureFamiliesRaw from './data/srd-cc-5.2.1/creature-families.json'
 import damageTypesRaw from './data/srd-cc-5.2.1/damage-types.json'
 import editionPresetsRaw from './data/srd-cc-5.2.1/edition-presets.json'
 import equipmentCategoriesRaw from './data/srd-cc-5.2.1/equipment-categories.json'
@@ -67,6 +71,11 @@ function parseCreatureTypeSeedOptions(raw: unknown, label: string): CreatureType
 // Validate the shipped catalog against the contract at module load so malformed
 // seed data fails fast (and in CI) rather than at request time.
 const SRD_521_CREATURE_TYPES = parseCreatureTypeSeedOptions(creatureTypesRaw, CREATURE_TYPE_SET_ID)
+const SRD_521_CREATURE_FAMILIES = z.array(creatureFamilySeedOptionSchema).parse(creatureFamiliesRaw)
+validateCreatureFamilyDefinitions(
+  SRD_521_CREATURE_FAMILIES,
+  new Set(SRD_521_CREATURE_TYPES.map((row) => row.id)),
+)
 const SRD_521_DAMAGE_TYPES = parseSeedOptions(damageTypesRaw, DAMAGE_TYPE_SET_ID)
 const SRD_521_CONDITIONS = parseSeedOptions(conditionsRaw, CONDITION_SET_ID)
 const SRD_521_SIZES = parseSeedOptions(sizesRaw, CREATURE_SIZE_SET_ID)
@@ -87,6 +96,7 @@ const SRD_521_ATTACK_RESOLUTION_MODES = parseSeedOptions(
 const SEED_SETS_BY_RULESET = {
   'srd-cc-5.2.1': {
     [CREATURE_TYPE_SET_ID]: SRD_521_CREATURE_TYPES,
+    [CREATURE_FAMILY_SET_ID]: SRD_521_CREATURE_FAMILIES,
     [DAMAGE_TYPE_SET_ID]: SRD_521_DAMAGE_TYPES,
     [CONDITION_SET_ID]: SRD_521_CONDITIONS,
     [CREATURE_SIZE_SET_ID]: SRD_521_SIZES,
@@ -115,6 +125,11 @@ function toResolvedSet(
       description: seed.description,
       source: 'system',
       status: 'active',
+      ...(setId === CREATURE_FAMILY_SET_ID
+        ? creatureFamilySeedOptionSchema
+            .pick({ parentId: true, allowedCreatureTypes: true })
+            .parse(seed)
+        : {}),
     })),
   }
 }

@@ -42,7 +42,9 @@ export const ELDRITCH_BLAST_RESOLUTION: SpellResolution = {
   outcomes: [
     {
       result: 'hit',
-      applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
+      effects: [
+        { kind: 'effect-reference', effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' },
+      ],
     },
   ],
 }
@@ -68,8 +70,10 @@ export const CHILL_TOUCH_RESOLUTION: SpellResolution = {
   outcomes: [
     {
       result: 'hit',
-      applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
-      note: CHILL_TOUCH_NO_HEAL_NOTE,
+      effects: [
+        { kind: 'effect-reference', effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' },
+        { kind: 'note', description: CHILL_TOUCH_NO_HEAL_NOTE },
+      ],
     },
   ],
 }
@@ -95,11 +99,15 @@ export const INFlict_WOUNDS_RESOLUTION: SpellResolution = {
   outcomes: [
     {
       result: 'failed-save',
-      applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
+      effects: [
+        { kind: 'effect-reference', effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' },
+      ],
     },
     {
       result: 'successful-save',
-      applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'half' }],
+      effects: [
+        { kind: 'effect-reference', effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'half' },
+      ],
     },
   ],
 }
@@ -124,7 +132,13 @@ export const CURE_WOUNDS_RESOLUTION: SpellResolution = {
   outcomes: [
     {
       result: 'applied',
-      applications: [{ effectId: RESOLUTION_PRIMARY_HEALING_EFFECT_ID, amount: 'full' }],
+      effects: [
+        {
+          kind: 'effect-reference',
+          effectId: RESOLUTION_PRIMARY_HEALING_EFFECT_ID,
+          amount: 'full',
+        },
+      ],
     },
   ],
 }
@@ -143,8 +157,12 @@ export const FALSE_LIFE_RESOLUTION: SpellResolution = {
   outcomes: [
     {
       result: 'applied',
-      applications: [
-        { effectId: RESOLUTION_PRIMARY_TEMPORARY_HIT_POINTS_EFFECT_ID, amount: 'full' },
+      effects: [
+        {
+          kind: 'effect-reference',
+          effectId: RESOLUTION_PRIMARY_TEMPORARY_HIT_POINTS_EFFECT_ID,
+          amount: 'full',
+        },
       ],
     },
   ],
@@ -169,11 +187,15 @@ export const FIREBALL_RESOLUTION: SpellResolution = {
   outcomes: [
     {
       result: 'failed-save',
-      applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
+      effects: [
+        { kind: 'effect-reference', effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' },
+      ],
     },
     {
       result: 'successful-save',
-      applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'half' }],
+      effects: [
+        { kind: 'effect-reference', effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'half' },
+      ],
     },
   ],
 }
@@ -194,11 +216,15 @@ export const BURNING_HANDS_RESOLUTION: SpellResolution = {
   outcomes: [
     {
       result: 'failed-save',
-      applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
+      effects: [
+        { kind: 'effect-reference', effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' },
+      ],
     },
     {
       result: 'successful-save',
-      applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'half' }],
+      effects: [
+        { kind: 'effect-reference', effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'half' },
+      ],
     },
   ],
 }
@@ -230,8 +256,14 @@ export const ICE_KNIFE_RESOLUTION: SpellResolution = {
   outcomes: [
     {
       result: 'hit',
-      applications: [{ effectId: ICE_KNIFE_PIERCING_EFFECT_ID, amount: 'full' }],
-      note: 'Hit or miss, the shard explodes: each creature within 5 feet makes a Dexterity saving throw or takes the cold burst damage.',
+      effects: [
+        { kind: 'effect-reference', effectId: ICE_KNIFE_PIERCING_EFFECT_ID, amount: 'full' },
+        {
+          kind: 'note',
+          description:
+            'Hit or miss, the shard explodes: each creature within 5 feet makes a Dexterity saving throw or takes the cold burst damage.',
+        },
+      ],
     },
   ],
 }
@@ -263,8 +295,13 @@ export const ARCANE_HAND_RESOLUTION: SpellResolution = {
   outcomes: [
     {
       result: 'hit',
-      note: 'Choose Clenched Fist or Grasping Hand crush when commanding the hand; apply the matching effect on a hit.',
-      applications: [],
+      effects: [
+        {
+          kind: 'note',
+          description:
+            'Choose Clenched Fist or Grasping Hand crush when commanding the hand; apply the matching effect on a hit.',
+        },
+      ],
     },
   ],
 }
@@ -289,7 +326,13 @@ export const MASS_HEALING_WORD_RESOLUTION: SpellResolution = {
   outcomes: [
     {
       result: 'applied',
-      applications: [{ effectId: RESOLUTION_PRIMARY_HEALING_EFFECT_ID, amount: 'full' }],
+      effects: [
+        {
+          kind: 'effect-reference',
+          effectId: RESOLUTION_PRIMARY_HEALING_EFFECT_ID,
+          amount: 'full',
+        },
+      ],
     },
   ],
 }
@@ -321,7 +364,9 @@ export const MAGIC_MISSILE_RESOLUTION: SpellResolution = {
   outcomes: [
     {
       result: 'applied',
-      applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
+      effects: [
+        { kind: 'effect-reference', effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' },
+      ],
     },
   ],
 }

@@ -5,10 +5,9 @@ import {
   amountOptionsForEffect,
   outcomeApplicationsResolverItemFields,
   outcomeBranchBodyFields,
-  outcomeNoteFields,
   resolutionOutcomeApplicationsResolverFields,
 } from './resolution-outcome-form-fields'
-import { RESOLUTION_FIELD_LABELS, RESOLUTION_SECTION_LABELS } from './resolution-form-labels'
+import { RESOLUTION_SECTION_LABELS } from './resolution-form-labels'
 import { RESOLUTION_FIELD_NAME } from './resolution-form-values'
 
 function findGroup(fields: FormItem[]): GroupConfig {
@@ -19,37 +18,19 @@ function findGroup(fields: FormItem[]): GroupConfig {
   return groupField
 }
 
-describe('outcomeNoteFields', () => {
-  it('exposes the additional behavior textarea behind optional disclosure', () => {
-    expect(outcomeNoteFields()).toEqual([
-      {
-        type: 'textarea',
-        name: 'note',
-        label: RESOLUTION_FIELD_LABELS.hitNote,
-        placeholder: RESOLUTION_SECTION_LABELS.outcomeNotePlaceholder,
-        rows: 3,
-        width: 'full',
-        optionalDisclosure: {
-          addLabel: RESOLUTION_SECTION_LABELS.addOutcomeNote,
-          removeLabel: 'Remove',
-          expandWhenPopulated: true,
-        },
-      },
-    ])
-  })
-})
-
 describe('outcomeBranchBodyFields', () => {
-  it('wraps application section slot and note in a rhythm group', () => {
+  it('renders the outcome effect section', () => {
     const group = findGroup(outcomeBranchBodyFields(1, true))
 
-    expect(group.heading?.label).toBe('')
     expect(group.fields).toHaveLength(2)
     expect(group.fields[0]).toMatchObject({
       kind: 'slot',
-      name: '_outcomeApplicationSection',
+      name: '_outcomeApplicationStatus',
     })
-    expect(group.fields[1]).toEqual(outcomeNoteFields()[0])
+    expect(group.fields[1]).toMatchObject({
+      kind: 'array',
+      name: 'effects',
+    })
   })
 })
 
@@ -95,9 +76,9 @@ describe('resolutionOutcomeApplicationsResolverFields', () => {
 
     expect(resolverFields).toHaveLength(3)
     expect(resolverFields.map(resolverArrayName)).toEqual([
-      `${RESOLUTION_FIELD_NAME}.outcomes.0.applications`,
-      `${RESOLUTION_FIELD_NAME}.outcomes.1.applications`,
-      `${RESOLUTION_FIELD_NAME}.outcomes.2.applications`,
+      `${RESOLUTION_FIELD_NAME}.outcomes.0.effects`,
+      `${RESOLUTION_FIELD_NAME}.outcomes.1.effects`,
+      `${RESOLUTION_FIELD_NAME}.outcomes.2.effects`,
     ])
     expect(resolverFields[0]).toMatchObject({
       heading: { label: RESOLUTION_SECTION_LABELS.appliedEffects },

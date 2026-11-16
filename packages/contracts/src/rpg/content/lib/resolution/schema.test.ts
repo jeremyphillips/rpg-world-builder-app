@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
+import { monsterActionDraftSchema, monsterActionSchema } from '../../monster/action/index'
 import { BURNING_HANDS_RESOLUTION, CURE_WOUNDS_RESOLUTION } from '../../spell/resolution/fixtures'
-import { effectResolutionSchema } from './schema'
+import { CONE_AREA } from '../../monster/test-fixtures'
+import { RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, effectResolutionSchema } from './schema'
 
 describe('effectResolutionSchema', () => {
   it('accepts a saving-throw area resolution without spell progression', () => {
@@ -54,5 +56,178 @@ describe('effectResolutionSchema', () => {
         progression: { basis: 'spell-slot-level', tracks: [] },
       }).success,
     ).toBe(false)
+  })
+
+  it('accepts condition-only saves with ordered outcome effects', () => {
+    const parsed = effectResolutionSchema.parse({
+      selectionMode: 'targets',
+      target: {
+        count: 1,
+        kind: 'creature',
+        proximity: { kind: 'distance', distance: { value: 60, unit: 'ft' } },
+      },
+      method: { kind: 'saving-throw', ability: 'wis' },
+      effects: [],
+      outcomes: [
+        {
+          result: 'failed-save',
+          effects: [
+            {
+              kind: 'condition',
+              conditionId: 'unconscious',
+              end: { kind: 'turn-bound', participant: 'target', boundary: 'end', which: 'next' },
+            },
+          ],
+        },
+        { result: 'successful-save', effects: [] },
+      ],
+    })
+    expect(parsed.effects).toEqual([])
+    expect(parsed.outcomes[0]?.effects).toHaveLength(1)
+  })
+
+  it('accepts the same damage definition at full and half and rejects a repeated reference', () => {
+    const {
+      applicationPattern: _pattern,
+      progression: _progression,
+      ...envelope
+    } = BURNING_HANDS_RESOLUTION
+    expect(effectResolutionSchema.safeParse(envelope).success).toBe(true)
+    expect(
+      effectResolutionSchema.safeParse({
+        ...envelope,
+        outcomes: [
+          {
+            result: 'failed-save',
+            effects: [
+              {
+                kind: 'effect-reference',
+                effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+                amount: 'full',
+              },
+              {
+                kind: 'effect-reference',
+                effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+                amount: 'half',
+              },
+            ],
+          },
+          {
+            result: 'successful-save',
+            effects: [
+              {
+                kind: 'effect-reference',
+                effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+                amount: 'half',
+              },
+            ],
+          },
+        ],
+      }).success,
+    ).toBe(false)
+  })
+
+  it('rejects half amount for a healing definition', () => {
+    expect(
+      effectResolutionSchema.safeParse({
+        selectionMode: 'targets',
+        target: { count: 1, kind: 'creature', proximity: { kind: 'touch' } },
+        method: { kind: 'automatic' },
+        effects: [
+          {
+            id: 'healing',
+            kind: 'healing',
+            roll: { dice: { count: 1, faces: 8 } },
+          },
+        ],
+        outcomes: [
+          {
+            result: 'applied',
+            effects: [{ kind: 'effect-reference', effectId: 'healing', amount: 'half' }],
+          },
+        ],
+      }).success,
+    ).toBe(false)
+  })
+
+  it('allows failed-or-successful-save notes as effect rows', () => {
+    const {
+      applicationPattern: _pattern,
+      progression: _progression,
+      ...envelope
+    } = BURNING_HANDS_RESOLUTION
+    const parsed = effectResolutionSchema.parse({
+      ...envelope,
+      outcomes: [
+        ...envelope.outcomes,
+        {
+          result: 'failed-or-successful-save',
+          effects: [
+            {
+              kind: 'note',
+              description: 'Being underwater does not grant resistance to this fire damage.',
+            },
+          ],
+        },
+      ],
+    })
+    expect(parsed.outcomes.some((outcome) => outcome.result === 'failed-or-successful-save')).toBe(
+      true,
+    )
+  })
+
+  it('rejects publish saves with incomplete repeat save second failure', () => {
+    expect(
+      monsterActionSchema.safeParse({
+        id: 'sleep-breath',
+        kind: 'save',
+        name: 'Sleep Breath',
+        dcSource: { kind: 'ability', ability: 'con', proficient: true },
+        resolution: {
+          selectionMode: 'self',
+          areaOfEffect: CONE_AREA,
+          method: { kind: 'saving-throw', ability: 'con' },
+          effects: [],
+          outcomes: [
+            {
+              result: 'failed-save',
+              effects: [{ kind: 'condition', conditionId: 'unconscious' }],
+              repeatSave: {
+                timing: { participant: 'target', boundary: 'end', which: 'next' },
+                secondFailure: {},
+              },
+            },
+            { result: 'successful-save', effects: [] },
+          ],
+        },
+      }).success,
+    ).toBe(false)
+  })
+
+  it('allows draft saves with incomplete repeat save until normalization', () => {
+    const parsed = monsterActionDraftSchema.parse({
+      id: 'sleep-breath',
+      kind: 'save',
+      name: 'Sleep Breath',
+      dcSource: { kind: 'ability', ability: 'con', proficient: true },
+      resolution: {
+        selectionMode: 'self',
+        areaOfEffect: CONE_AREA,
+        method: { kind: 'saving-throw', ability: 'con' },
+        effects: [],
+        outcomes: [
+          {
+            result: 'failed-save',
+            effects: [{ kind: 'condition', conditionId: 'unconscious' }],
+            repeatSave: {
+              timing: { participant: 'target', boundary: 'end', which: 'next' },
+              secondFailure: {},
+            },
+          },
+          { result: 'successful-save', effects: [] },
+        ],
+      },
+    })
+    expect(parsed.kind).toBe('save')
   })
 })

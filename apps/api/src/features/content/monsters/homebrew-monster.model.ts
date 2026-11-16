@@ -14,6 +14,8 @@ const homebrewMonsterSchema = new Schema(
     ...homebrewContentIdentityFields,
     sizes: { type: [{ type: String, enum: [...CREATURE_SIZES] }], default: [] },
     creatureType: { type: String },
+    creatureFamilyIds: { type: [String], default: undefined },
+    classIds: { type: [String], default: undefined },
     alignment: { type: String },
     abilityScores: { type: Schema.Types.Mixed },
     armorClass: { type: Schema.Types.Mixed },

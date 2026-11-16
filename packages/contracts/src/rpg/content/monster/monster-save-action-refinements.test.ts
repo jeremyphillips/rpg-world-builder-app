@@ -24,9 +24,9 @@ describe('monster save refinements', () => {
           outcomes: [
             {
               result: 'failed-save',
-              applications: [
-                { effectId: 'damage', amount: 'full' },
-                { effectId: 'cold', amount: 'full' },
+              effects: [
+                { kind: 'effect-reference', effectId: 'damage', amount: 'full' },
+                { kind: 'effect-reference', effectId: 'cold', amount: 'full' },
               ],
             },
           ],
@@ -46,7 +46,10 @@ describe('monster save refinements', () => {
         method: { kind: 'saving-throw', ability: 'dex' },
         effects: [FIRE_DAMAGE],
         outcomes: [
-          { result: 'failed-save', applications: [{ effectId: 'damage', amount: 'full' }] },
+          {
+            result: 'failed-save',
+            effects: [{ kind: 'effect-reference', effectId: 'damage', amount: 'full' }],
+          },
         ],
       }),
       monsterSaveAction({
@@ -54,7 +57,10 @@ describe('monster save refinements', () => {
         method: { kind: 'saving-throw', ability: 'dex' },
         effects: [FIRE_DAMAGE],
         outcomes: [
-          { result: 'failed-save', applications: [{ effectId: 'damage', amount: 'full' }] },
+          {
+            result: 'failed-save',
+            effects: [{ kind: 'effect-reference', effectId: 'damage', amount: 'full' }],
+          },
         ],
       }),
       monsterSaveAction({
@@ -63,7 +69,10 @@ describe('monster save refinements', () => {
         method: { kind: 'saving-throw', ability: 'dex' },
         effects: [{ id: 'healing', kind: 'healing', roll: { dice: { count: 1, faces: 8 } } }],
         outcomes: [
-          { result: 'failed-save', applications: [{ effectId: 'healing', amount: 'full' }] },
+          {
+            result: 'failed-save',
+            effects: [{ kind: 'effect-reference', effectId: 'healing', amount: 'full' }],
+          },
         ],
       }),
       monsterSaveAction({
@@ -80,7 +89,9 @@ describe('monster save refinements', () => {
         outcomes: [
           {
             result: 'failed-save',
-            applications: [{ effectId: 'temporary-hit-points', amount: 'full' }],
+            effects: [
+              { kind: 'effect-reference', effectId: 'temporary-hit-points', amount: 'full' },
+            ],
           },
         ],
       }),
@@ -89,7 +100,12 @@ describe('monster save refinements', () => {
         areaOfEffect: CONE_AREA,
         method: { kind: 'automatic' },
         effects: [FIRE_DAMAGE],
-        outcomes: [{ result: 'applied', applications: [{ effectId: 'damage', amount: 'full' }] }],
+        outcomes: [
+          {
+            result: 'applied',
+            effects: [{ kind: 'effect-reference', effectId: 'damage', amount: 'full' }],
+          },
+        ],
       }),
     ]
     const messages = [

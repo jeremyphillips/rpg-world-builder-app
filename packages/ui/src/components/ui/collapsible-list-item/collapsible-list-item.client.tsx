@@ -45,6 +45,8 @@ export interface CollapsibleListItemProps {
   /** Uncontrolled initial state when `collapsed` is omitted. Defaults to collapsed. */
   defaultCollapsed?: boolean
   showDragHandle?: boolean
+  /** Keep the caret column when this row does not render a collapse button. */
+  reserveCaretSlot?: boolean
   dragHandleProps?: CollapsibleListItemDragHandleConfig
   preset?: CollapsibleListItemShellPreset
   /** Catalog row layout — `entity-card` drops content inset for embedded entity cards. */
@@ -128,6 +130,7 @@ function CollapsibleListItemRoot({
   onToggleCollapse,
   defaultCollapsed = true,
   showDragHandle = false,
+  reserveCaretSlot = false,
   dragHandleProps,
   preset = 'default',
   rowLayout = 'default',
@@ -158,7 +161,11 @@ function CollapsibleListItemRoot({
   const reserveDragHandleSlot = showDragHandle
   const gripVisible = Boolean(dragHandleProps)
   const headerActionsPlacement = resolveCollapsibleListItemHeaderActionsPlacement(layout, rowLayout)
-  const leadingChrome = buildCollapsibleListItemLeadingChrome(reserveDragHandleSlot, collapsible)
+  const leadingChrome = buildCollapsibleListItemLeadingChrome(
+    reserveDragHandleSlot,
+    collapsible,
+    reserveCaretSlot,
+  )
   const resolvedDragHandleProps = resolveCollapsibleListItemDragHandleProps(
     toolbarAriaLabel,
     dragHandleProps,
@@ -214,6 +221,7 @@ function CollapsibleListItemRoot({
         titleId={titleId}
         itemPrefix={itemPrefix}
         showDragHandle={reserveDragHandleSlot}
+        reserveCaretSlot={reserveCaretSlot}
         collapsible={collapsible}
         dragging={contextValue.dragging}
         layout={layout}
@@ -290,7 +298,11 @@ function CollapsibleListItemCompoundRoot({
       titleId,
       bodyId: resolvedBodyId,
       toolbarAriaLabel: props.toolbarAriaLabel,
-      leadingChrome: buildCollapsibleListItemLeadingChrome(reserveDragHandleSlot, collapsible),
+      leadingChrome: buildCollapsibleListItemLeadingChrome(
+        reserveDragHandleSlot,
+        collapsible,
+        props.reserveCaretSlot ?? false,
+      ),
       collapsible,
       collapsed,
       onToggleCollapse: handleToggleCollapse,
@@ -326,6 +338,7 @@ function CollapsibleListItemCompoundRoot({
         titleId={titleId}
         itemPrefix={props.itemPrefix}
         showDragHandle={reserveDragHandleSlot}
+        reserveCaretSlot={props.reserveCaretSlot}
         collapsible={collapsible}
         dragging={contextValue.dragging}
         layout={layout}

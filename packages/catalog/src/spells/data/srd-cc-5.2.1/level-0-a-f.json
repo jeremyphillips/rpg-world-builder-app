@@ -76,8 +76,9 @@
       "outcomes": [
         {
           "result": "failed-save",
-          "applications": [
+          "effects": [
             {
+              "kind": "effect-reference",
               "effectId": "damage",
               "amount": "full"
             }
@@ -85,8 +86,9 @@
         },
         {
           "result": "successful-save",
-          "applications": [
+          "effects": [
             {
+              "kind": "effect-reference",
               "effectId": "damage",
               "amount": "half"
             }
@@ -164,13 +166,17 @@
       "outcomes": [
         {
           "result": "hit",
-          "applications": [
+          "effects": [
             {
+              "kind": "effect-reference",
               "effectId": "damage",
               "amount": "full"
+            },
+            {
+              "kind": "note",
+              "description": "The target can't regain Hit Points until the end of your next turn."
             }
-          ],
-          "note": "The target can't regain Hit Points until the end of your next turn."
+          ]
         }
       ],
       "progression": {
@@ -442,8 +448,9 @@
       "outcomes": [
         {
           "result": "hit",
-          "applications": [
+          "effects": [
             {
+              "kind": "effect-reference",
               "effectId": "damage",
               "amount": "full"
             }
@@ -621,11 +628,15 @@
       "outcomes": [
         {
           "result": "hit",
-          "note": "A flammable object hit by this spell starts burning if it isn't being worn or carried.",
-          "applications": [
+          "effects": [
             {
+              "kind": "effect-reference",
               "effectId": "damage",
               "amount": "full"
+            },
+            {
+              "kind": "note",
+              "description": "A flammable object hit by this spell starts burning if it isn't being worn or carried."
             }
           ]
         }

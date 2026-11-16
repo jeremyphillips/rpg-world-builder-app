@@ -142,9 +142,10 @@ export function resolveArrayItemPrimaryLabel(
   values: Record<string, unknown>,
   index: number,
   watchedPrimary: unknown,
+  watched?: Record<string, unknown>,
 ): string | undefined {
   if (header.primary) {
-    return header.primary(values, index)
+    return header.primary(values, index, watched)
   }
 
   if (header.primaryField === undefined) return undefined
@@ -175,8 +176,9 @@ export function resolveArrayItemHeaderLabels(
   index: number,
   watchedPrimary: unknown,
   legend: string,
+  watched?: Record<string, unknown>,
 ): ResolvedArrayItemHeader {
-  const primary = resolveArrayItemPrimaryLabel(header, values, index, watchedPrimary)
+  const primary = resolveArrayItemPrimaryLabel(header, values, index, watchedPrimary, watched)
   const fallback = header.fallback(index)
   const showFallbackInHeader = header.showFallbackInHeader ?? false
   const showFallbackInTitle = showFallbackInHeader && Boolean(primary)

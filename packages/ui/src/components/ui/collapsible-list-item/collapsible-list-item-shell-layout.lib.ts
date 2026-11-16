@@ -28,9 +28,10 @@ export function resolveCollapsibleListItemHeaderActionsPaddingClasses(
   shellLayout: ReturnType<typeof resolveCollapsibleListItemShellLayout>,
   collapsible: boolean,
   preset: CollapsibleListItemShellPreset,
+  hasBody = false,
 ): string | undefined {
   if (shellLayout !== 'headerActions') return undefined
-  if (collapsible || preset === 'catalog') {
+  if (collapsible || hasBody || preset === 'catalog') {
     return collapsibleListItemDisclosureShellPaddingClasses
   }
   return collapsibleListItemFlatShellPaddingClasses

@@ -15,6 +15,7 @@ function line(overrides: Partial<DerivedMonsterAttackLine>): DerivedMonsterAttac
     damageTypeId: 'piercing',
     modes: ['melee'],
     reach: 5,
+    sourceName: 'Test creature',
     ...overrides,
   }
 }
@@ -93,10 +94,72 @@ describe('formatMonsterAttackAction', () => {
               kind: 'condition',
               source: 'action',
               conditionId: 'paralyzed',
-              description: "until the start of the lich's next turn",
+              end: {
+                kind: 'turn-bound',
+                participant: 'source',
+                boundary: 'start',
+                which: 'next',
+              },
+            },
+          ],
+          sourceName: 'Lich',
+        }),
+      ),
+    ).toBe(
+      "Melee Attack Roll: +12, reach 5 ft. Hit: 15 (3d6 + 5) Cold damage, and the target has the Paralyzed condition until the start of the lich's next turn.",
+    )
+  })
+
+  it('appends description qualifications after a structured end', () => {
+    expect(
+      formatMonsterAttackAction(
+        line({
+          onHit: [
+            {
+              kind: 'condition',
+              source: 'action',
+              conditionId: 'grappled',
+              end: {
+                kind: 'turn-bound',
+                participant: 'source',
+                boundary: 'start',
+                which: 'next',
+              },
+              description: '(escape DC 12)',
+            },
+          ],
+          sourceName: 'Beholder',
+        }),
+      ),
+    ).toBe(
+      "Melee Attack Roll: +5, reach 5 ft. Hit: 6 (1d6 + 3) Piercing damage, and the target has the Grappled condition until the start of the beholder's next turn (escape DC 12).",
+    )
+  })
+
+  it('prints a note after the hit clause', () => {
+    expect(
+      formatMonsterAttackAction(
+        line({
+          attackBonus: 12,
+          attackBonusLabel: '+12',
+          damage: '15',
+          damageExpression: '3d6+5',
+          damageTypeId: 'cold',
+          onHit: [
+            {
+              kind: 'condition',
+              source: 'action',
+              conditionId: 'paralyzed',
+              end: {
+                kind: 'turn-bound',
+                participant: 'source',
+                boundary: 'start',
+                which: 'next',
+              },
             },
             { kind: 'note', source: 'action', description: 'The target starts burning' },
           ],
+          sourceName: 'Lich',
         }),
       ),
     ).toBe(

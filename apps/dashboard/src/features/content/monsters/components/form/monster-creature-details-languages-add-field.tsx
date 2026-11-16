@@ -2,7 +2,7 @@ import { LANGUAGE_TERM, nounFromTerm } from '@rpg/contracts'
 import { ComboboxField } from '@rpg/ui'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
-import { useMonsterLanguageAddField } from '../../lib/monster-language-add-field.lib'
+import { useMonsterLanguageAddField } from '../../lib/creature-details/monster-language-add-field.lib'
 import {
   MONSTER_LANGUAGES_FIELD_HINT,
   MONSTER_LANGUAGES_FIELD_LABEL,

@@ -53,7 +53,7 @@ function CollapsibleListItemCenterActionsContent({
   const headerRowPadding =
     rowLayout === 'entity-card'
       ? undefined
-      : leadingChrome.collapsible
+      : leadingChrome.collapsible || body != null
         ? collapsibleListItemHeaderVerticalPaddingVariants({ density })
         : undefined
 

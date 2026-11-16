@@ -34,6 +34,7 @@ interface UseArrayFieldItemContentStateArgs {
   collapsed: boolean
   fieldsLength: number
   collapsible: boolean
+  reserveCaretSlot?: boolean
   dragHandleProps?: {
     attributes: ReturnType<typeof useSortable>['attributes']
     listeners: ReturnType<typeof useSortable>['listeners']
@@ -53,13 +54,15 @@ export function useArrayFieldItemContentState({
   collapsed,
   fieldsLength,
   collapsible,
+  reserveCaretSlot = false,
   dragHandleProps,
   onRemoveItem,
 }: UseArrayFieldItemContentStateArgs) {
   const headerConfig = resolveArrayItemHeader(config, legend)
   const primaryField = headerConfig.primaryField
   const summaryDependsOn = headerConfig.summaryDependsOn ?? []
-  const watchedSummaryContext = useDependsOnValues(summaryDependsOn)
+  const headerDependsOn = [...summaryDependsOn, ...(headerConfig.primaryDependsOn ?? [])]
+  const watchedSummaryContext = useDependsOnValues(headerDependsOn)
   const watchedPrimary = useWatch({
     name: primaryField ? `${fullName}.${index}.${primaryField}` : `${fullName}.${index}`,
     disabled: !primaryField,
@@ -91,6 +94,7 @@ export function useArrayFieldItemContentState({
     index,
     watchedPrimary,
     legend,
+    watchedSummaryContext,
   )
   const reorder = resolveArrayItemReorder(config)
   const presentation = resolveArrayItemPresentation({
@@ -107,6 +111,7 @@ export function useArrayFieldItemContentState({
   const gripVisible = reserveDragHandleSlot && sortableEnabled && Boolean(dragHandleProps)
   const leadingChrome = {
     reserveDragHandleSlot,
+    reserveCaretSlot,
     showDragHandle: reserveDragHandleSlot,
     collapsible,
   }
@@ -120,6 +125,7 @@ export function useArrayFieldItemContentState({
     titleId: rowState.titleId,
     itemPrefix: rowState.itemPrefix,
     reserveDragHandleSlot,
+    reserveCaretSlot,
     gripVisible,
     collapsible,
     dragging: dragHandleProps?.isDragging,

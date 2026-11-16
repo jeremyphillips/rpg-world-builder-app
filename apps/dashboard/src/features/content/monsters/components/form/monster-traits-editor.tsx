@@ -17,19 +17,19 @@ import {
   monsterTraitAcquisitionItems,
   parseMonsterTraitAcquisitionId,
 } from '../../lib/traits/monster-trait-acquisition'
-import { sharedCastingOptions } from '../../lib/actions/monster-action-casting-summary'
+import { sharedCastingOptions } from '../../lib/actions/spell/monster-action-casting-summary'
 import { collectMonsterFormAdvisories } from '../../lib/monster-form-advisories'
 import { MONSTER_ADD_LABEL, MONSTER_TRAITS_HEADING } from '../../lib/monster-form-labels'
 import {
   MONSTER_TRAIT_ITEM_NOUN,
   monsterTraitDetailFields,
-} from '../../lib/monster-trait-form-fields'
+} from '../../lib/traits/monster-trait-form-fields'
 import { monsterTraitRowResolveFields } from '../../lib/monster-master-detail-validation-fields'
 import {
   monsterTraitListTitle,
   resolveMonsterTraitHeaderIdentity,
-} from '../../lib/monster-trait-editor-title'
-import { monsterTraitPresetDefaults } from '../../lib/monster-trait-preset-fields'
+} from '../../lib/traits/monster-trait-editor-title'
+import { monsterTraitPresetDefaults } from '../../lib/traits/monster-trait-preset-fields'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
 
 const TEMPLATE_GROUP_ID = 'templates'

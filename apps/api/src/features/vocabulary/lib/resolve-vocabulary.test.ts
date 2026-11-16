@@ -181,3 +181,32 @@ describe('resolveVocabularySet', () => {
     ])
   })
 })
+
+it('preserves family metadata through campaign label and status overrides', () => {
+  const result = resolveVocabularySet(
+    {
+      id: 'creature-families',
+      options: [
+        {
+          id: 'red',
+          label: 'Red',
+          description: 'Red family',
+          source: 'system',
+          status: 'active',
+          parentId: 'chromatic',
+          allowedCreatureTypes: ['dragon'],
+        },
+      ],
+    },
+    {
+      setId: 'creature-families',
+      systemEntryPatches: [{ id: 'red', label: 'Custom red', status: 'disabled' }],
+    },
+  )
+  expect(result[0]).toMatchObject({
+    label: 'Custom red',
+    status: 'disabled',
+    parentId: 'chromatic',
+    allowedCreatureTypes: ['dragon'],
+  })
+})

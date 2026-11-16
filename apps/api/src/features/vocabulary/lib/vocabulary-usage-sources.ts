@@ -165,3 +165,12 @@ export const speciesSenseSource = deferredCatalogSource(async () => {
     extractIds: (record: Species) => extractSpeciesSenseTypeIdsFromRecord(record),
   }
 })
+
+export const monsterFamilySource = deferredCatalogSource(async () => {
+  const { monstersWriteConfig } = await import('../../content')
+  return {
+    readConfig: monstersWriteConfig.readConfig,
+    contentTypeKey: 'monsters',
+    extractIds: (record: Monster) => record.creatureFamilyIds ?? [],
+  }
+})

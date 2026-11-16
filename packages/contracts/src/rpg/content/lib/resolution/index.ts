@@ -5,7 +5,8 @@ export {
   effectResolutionFieldShape,
   effectResolutionMethodSchema,
   effectResolutionSchema,
-  resolutionApplicationSchema,
+  resolutionEffectReferenceSchema,
+  resolutionOutcomeEffectSchema,
   resolutionAutomaticMethodSchema,
   resolutionDamageEffectSchema,
   resolutionEffectIdSchema,
@@ -19,11 +20,13 @@ export {
   DEFAULT_RESOLUTION_TARGET,
   resolutionTargetSchema,
   resolutionTemporaryHitPointsEffectSchema,
+  refineRepeatSaveSecondFailureForPublish,
   validateEffectResolution,
   type EffectResolution,
   type EffectResolutionMethod,
   type EffectResolutionValidationInput,
-  type ResolutionApplication,
+  type ResolutionEffectReference,
+  type ResolutionOutcomeEffect,
   type ResolutionDamageEffect,
   type ResolutionEffect,
   type ResolutionEffectId,
@@ -62,6 +65,21 @@ export {
   formatResolutionApplicationSentence,
 } from './format-effect-lines'
 export { formatResolutionOutcomeLine, formatResolutionOutcomes } from './format-outcomes'
+export {
+  formatConditionReplacementSentence,
+  formatOrderedOutcomeEffects,
+  formatRepeatSaveTransition,
+} from './format-ordered-outcome-effects'
+export {
+  hasMeaningfulRepeatSave,
+  hasMeaningfulRepeatSaveSecondFailure,
+  repeatSaveSchema,
+  repeatSaveSecondFailureSchema,
+  repeatSaveTimingSchema,
+  type RepeatSave,
+  type RepeatSaveSecondFailure,
+  type RepeatSaveTiming,
+} from './repeat-save'
 export {
   formatResolutionAffectedAreaCopy,
   formatResolutionSelectionSections,
@@ -125,6 +143,8 @@ export {
   effectKindsSupportingPartialApplication,
   ensureOutcomeSlotsForMethod,
   findOutcomeByResult,
+  getAllowedOutcomeResultsForMethod,
+  getOptionalOutcomeResultsForMethod,
   getOutcomeResultsForMethod,
   hasMeaningfulOutcomeContent,
   isOutcomeEmpty,
@@ -134,11 +154,21 @@ export {
   type OutcomeLike,
 } from './outcome-slots'
 export {
-  outcomeApplicationsReferenceEffect,
+  outcomeReferencesEffect,
   planOutcomeMethodChange,
   stripEffectFromOutcomes,
   type OutcomeMethodChangePlan,
 } from './outcome-change-plan'
+export { DAMAGE_APPLICATION_AMOUNT_PRESENTATION } from './damage-application-labels'
+export {
+  planLinkedEffectAdd,
+  planLinkedEffectRemove,
+  type LinkedEffectAddPlan,
+  type LinkedEffectPlacement,
+  type LinkedEffectReference,
+  type LinkedEffectRemovePlan,
+} from './linked-effect-plan'
+export { nextResolutionEffectId } from './resolution-effect-id-alloc'
 export { mapOutcomeResultBetweenMethodKinds } from './outcome-method-map'
 export {
   getSelectionMethodCapabilityRequired,

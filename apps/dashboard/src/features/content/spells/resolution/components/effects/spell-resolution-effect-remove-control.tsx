@@ -1,4 +1,4 @@
-import { outcomeApplicationsReferenceEffect } from '@rpg/contracts'
+import { outcomeReferencesEffect } from '@rpg/contracts'
 import { ArrayItemRemoveButton, useArrayFieldContext } from '@rpg/ui/form'
 import { useWatch } from 'react-hook-form'
 
@@ -29,7 +29,7 @@ export function SpellResolutionEffectRemoveControl() {
       ariaLabel={`Remove ${label}`}
       canRemove
       onRemove={() => {
-        if (!outcomeApplicationsReferenceEffect(resolution?.outcomes, effectId)) {
+        if (!outcomeReferencesEffect(resolution?.outcomes, effectId)) {
           arrayContext.removeItem?.()
           return
         }

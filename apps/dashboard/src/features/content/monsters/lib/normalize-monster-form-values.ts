@@ -14,10 +14,11 @@ import {
 
 import { normalizeLimitedUse } from '../../lib/forms/limited-use/normalize-limited-use'
 import { monsterActionActiveKeys, monsterActionTriggerText } from './actions/monster-action-kind'
-import { normalizeMonsterSaveOutcomes } from './actions/monster-action-save-outcomes'
-import { withDefaultSaveResolutionTarget } from './actions/monster-save-resolution-target.lib'
-import { weaponActionDamageToDraft } from './actions/monster-weapon-damage-form'
+import { normalizeMonsterSaveOutcomes } from './actions/save/monster-action-save-outcomes'
+import { withDefaultSaveResolutionTarget } from './actions/save/monster-save-resolution-target.lib'
+import { weaponActionDamageToDraft } from './actions/weapon/monster-weapon-damage-form'
 
+import { applyEffectEndAuthoringToRow } from '../../lib/forms/mechanics/normalize-effect-end-authoring'
 import { movementRowsToRecordForPreview } from '../../lib/forms/fields/content-movement-form-fields'
 
 import { weaponProficiencyGrantSetFromMode } from '@/lib/forms/grant-sets/weapon-proficiency-grant-mode.lib'
@@ -29,6 +30,8 @@ import {
 import type { MonsterFormValues } from './monster-form-values'
 
 export type MonsterNormalizeBaseline = {
+  creatureFamilyIds?: readonly string[]
+  classIds?: readonly string[]
   hover?: boolean
   description?: string
   experiencePointsOverride?: number
@@ -84,11 +87,44 @@ function applyReactionTriggerDraft(
   else delete cleaned.trigger
 }
 
+function referencedEffectIds(outcomes: readonly unknown[]): Set<string> {
+  const referenced = new Set<string>()
+  for (const outcome of outcomes) {
+    if (!isRecord(outcome)) continue
+    const lists = [outcome.effects]
+    if (isRecord(outcome.repeatSave) && isRecord(outcome.repeatSave.secondFailure)) {
+      lists.push(outcome.repeatSave.secondFailure.effects)
+    }
+    for (const list of lists) {
+      if (!Array.isArray(list)) continue
+      for (const entry of list) {
+        if (!isRecord(entry) || entry.kind !== 'effect-reference') continue
+        if (typeof entry.effectId === 'string') referenced.add(entry.effectId)
+      }
+    }
+  }
+  return referenced
+}
+
+function pruneUnreferencedDamage(effects: unknown[], referenced: ReadonlySet<string>): unknown[] {
+  return effects.filter(
+    (effect) =>
+      !isRecord(effect) ||
+      effect.kind !== 'damage' ||
+      (typeof effect.id === 'string' && referenced.has(effect.id)),
+  )
+}
+
 function applySaveOutcomeDraft(cleaned: Record<string, unknown>): void {
   if (cleaned.kind !== 'save' || !isRecord(cleaned.resolution)) return
   const resolution = cleaned.resolution
   if (!Array.isArray(resolution.outcomes)) return
   resolution.outcomes = normalizeMonsterSaveOutcomes(resolution.outcomes)
+  if (!Array.isArray(resolution.effects)) return
+  resolution.effects = pruneUnreferencedDamage(
+    resolution.effects,
+    referencedEffectIds(resolution.outcomes),
+  )
 }
 
 function applySaveTargetDraft(cleaned: Record<string, unknown>): void {
@@ -122,6 +158,8 @@ function effectRowHasInput(row: unknown): boolean {
   if (typeof row.kind === 'string') return true
   if (row.damageType !== undefined || row.conditionId !== undefined) return true
   if (typeof row.description === 'string') return true
+  if (typeof row.effectEndOption === 'string' && row.effectEndOption.length > 0) return true
+  if (isRecord(row.end) && Object.keys(row.end).length > 0) return true
   return rollHasInput(row.roll)
 }
 
@@ -137,9 +175,12 @@ function effectRowForKind(row: Record<string, unknown>): Record<string, unknown>
     }
   }
   if (row.kind === 'condition') {
+    const normalized = { ...row }
+    applyEffectEndAuthoringToRow(normalized)
     return {
       kind: 'condition',
-      ...(row.conditionId !== undefined ? { conditionId: row.conditionId } : {}),
+      ...(normalized.conditionId !== undefined ? { conditionId: normalized.conditionId } : {}),
+      ...(normalized.end !== undefined ? { end: normalized.end } : {}),
       ...(description !== undefined ? { description } : {}),
     }
   }
@@ -456,6 +497,8 @@ export function normalizeMonsterFormValues(
     name: typeof values.name === 'string' ? values.name : '',
     sizes: values.sizes,
     creatureType: values.creatureType,
+    ...(values.creatureFamilyIds?.length ? { creatureFamilyIds: values.creatureFamilyIds } : {}),
+    ...(values.classIds?.length ? { classIds: values.classIds } : {}),
     alignment: values.alignment,
     abilityScores: values.abilityScores,
     armorClass: normalizeArmorClass(values.armorClass, options.armorClassRules),
@@ -503,6 +546,10 @@ function applyClearableNulls(
   baseline: NonNullable<NormalizeMonsterFormOptions['baseline']>,
   hasFly: boolean,
 ): void {
+  if (baseline.creatureFamilyIds !== undefined && normalized.creatureFamilyIds === undefined)
+    normalized.creatureFamilyIds = null
+  if (baseline.classIds !== undefined && normalized.classIds === undefined)
+    normalized.classIds = null
   if (baseline.description !== undefined && normalized.description === undefined) {
     normalized.description = null
   }

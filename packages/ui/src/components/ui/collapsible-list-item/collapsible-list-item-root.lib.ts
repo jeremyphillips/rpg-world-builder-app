@@ -45,10 +45,12 @@ export function resolveCollapsibleListItemDragHandleProps(
 export function buildCollapsibleListItemLeadingChrome(
   reserveDragHandleSlot: boolean,
   collapsible: boolean,
+  reserveCaretSlot = false,
 ): CollapsibleListItemLeadingChromeOptions {
   return {
     reserveDragHandleSlot,
     showDragHandle: reserveDragHandleSlot,
+    reserveCaretSlot,
     collapsible,
   }
 }

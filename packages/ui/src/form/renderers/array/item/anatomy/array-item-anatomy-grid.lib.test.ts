@@ -2,16 +2,13 @@ import { describe, expect, it } from 'vitest'
 
 import type { FieldWidth } from '../../../../../components/ui/field-control.variants'
 import { resolveFieldRowColumnTracks } from '../../../../../components/ui/field-row-column-tracks.lib'
-import { LEADING_CHROME_SIZE_VAR } from '../../../../../components/ui/collapsible-list-item/collapsible-list-item-leading-chrome.lib'
 import {
   ARRAY_ITEM_ANATOMY_CONTROL_TRACK_ROW,
-  ARRAY_ITEM_ANATOMY_GRIP_COLUMN_TRACK,
   ARRAY_ITEM_CHROME_GAP_CLASS,
   ARRAY_ITEM_FIELD_GAP_DENSE_CLASS,
   ARRAY_ITEM_FIELD_GAP_DEFAULT_CLASS,
   arrayItemAnatomyGridVariants,
   buildArrayItemAnatomyFieldsClusterTemplateColumns,
-  buildArrayItemAnatomyTwoTierParentTemplateColumns,
   resolveArrayItemAnatomyFieldGridColumn,
   resolveArrayItemAnatomyParentChromeColumn,
   resolveArrayItemAnatomyGridPresentation,
@@ -51,15 +48,9 @@ describe('array-item-anatomy-grid', () => {
     expect(resolved[2]).toBe('minmax(0, 1fr)')
   })
 
-  it('builds two-tier parent and fields-cluster column tracks', () => {
+  it('builds fields-cluster column tracks', () => {
     const widths: FieldWidth[] = ['md', 'auto']
 
-    expect(buildArrayItemAnatomyTwoTierParentTemplateColumns({ showGrip: true })).toBe(
-      `${ARRAY_ITEM_ANATOMY_GRIP_COLUMN_TRACK} minmax(0, 1fr) max-content`,
-    )
-    expect(buildArrayItemAnatomyTwoTierParentTemplateColumns({ showGrip: false })).toBe(
-      'minmax(0, 1fr) max-content',
-    )
     expect(buildArrayItemAnatomyFieldsClusterTemplateColumns(widths)).toBe(
       '9rem minmax(min-content, max-content)',
     )
@@ -79,12 +70,7 @@ describe('array-item-anatomy-grid', () => {
     })
 
     expect(presentation.className).toContain(ARRAY_ITEM_CHROME_GAP_CLASS)
+    expect(presentation.className).toContain('ui-array-item-anatomy--grip')
     expect(presentation.fieldGapClass).toBe(ARRAY_ITEM_FIELD_GAP_DENSE_CLASS)
-    expect(presentation.style.gridTemplateColumns).toBe(
-      buildArrayItemAnatomyTwoTierParentTemplateColumns({ showGrip: true }),
-    )
-    expect(presentation.style[LEADING_CHROME_SIZE_VAR as keyof typeof presentation.style]).toBe(
-      'calc(var(--spacing)*6)',
-    )
   })
 })

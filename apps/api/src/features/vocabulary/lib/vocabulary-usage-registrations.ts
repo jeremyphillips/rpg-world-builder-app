@@ -2,6 +2,7 @@ import {
   CONDITION_SET_ID,
   CREATURE_SIZE_SET_ID,
   CREATURE_TYPE_SET_ID,
+  CREATURE_FAMILY_SET_ID,
   DAMAGE_TYPE_SET_ID,
   EQUIPMENT_CATEGORY_SET_ID,
   LANGUAGE_SET_ID,
@@ -22,6 +23,7 @@ import {
   speciesLanguageSource,
   speciesSenseSource,
   monsterSizeSource,
+  monsterFamilySource,
   speciesSizeSource,
   spellConditionSource,
   spellDamageTypeSource,
@@ -30,6 +32,11 @@ import {
 } from './vocabulary-usage-sources'
 
 const VOCABULARY_USAGE_REGISTRATIONS_LIST = [
+  defineVocabularyUsage({
+    setId: CREATURE_FAMILY_SET_ID,
+    sources: [{ source: monsterFamilySource, entry: true, batch: true }],
+    summaryLabels: { singular: 'monster', plural: 'monsters' },
+  }),
   defineVocabularyUsage({
     setId: CREATURE_TYPE_SET_ID,
     sources: [{ source: speciesCreatureTypeSource, entry: true, batch: true }],

@@ -28,10 +28,10 @@ describe('array item shell variants', () => {
   })
 
   it('uses a two-column grid with top-aligned actions and shell padding', () => {
-    expect(arrayItemShellClasses).toContain('grid-cols-[minmax(0,1fr)_auto]')
-    expect(arrayItemShellClasses).toContain('items-start')
-    expect(arrayItemShellClasses).toContain('pr-3')
-    expect(arrayItemShellClasses).toContain('py-2')
+    expect(arrayItemShellClasses).toContain('ui-collapsible-list-item--actions-rail')
+    expect(arrayItemShellClasses).toContain('ui-border--default')
+    expect(arrayItemShellClasses).not.toContain('pr-3')
+    expect(arrayItemShellClasses).not.toContain('py-2')
     expect(arrayItemMainClasses).not.toContain('pt-[calc(var(--spacing)*2)]')
     expect(arrayItemActionsRailClasses()).toContain('self-start')
     expect(arrayItemActionsRailClasses()).toContain('mt-2')
@@ -68,7 +68,7 @@ describe('array item shell variants', () => {
     })
 
     expect(gripOnly).toBe(caretOnly)
-    expect(gripOnly).toContain('pl-[var(--leading-chrome-gap)]')
+    expect(gripOnly).toContain('ui-collapsible-list-item__title')
   })
 
   it('uses flex for the leading toolbar row so chrome aligns with title copy', () => {
@@ -82,22 +82,22 @@ describe('array item shell variants', () => {
 
   it('bleeds detailed bodies to the shell edge with inline-start content inset', () => {
     expect(arrayItemBodyClasses({ showDragHandle: true, collapsible: false })).toContain(
-      '--content-inline-start',
+      'ui-collapsible-list-item__body',
     )
     expect(arrayItemBodyClasses({ showDragHandle: true, collapsible: true })).toContain(
-      '--content-inline-start',
+      'ui-collapsible-list-item__body',
     )
-    expect(arrayItemBodyClasses({ showDragHandle: true, collapsible: true })).toContain('-ml-2')
+    expect(arrayItemBodyClasses({ showDragHandle: true, collapsible: true })).toBe(
+      'ui-collapsible-list-item__body',
+    )
     expect(arrayItemBodyClasses({ showDragHandle: true, collapsible: true })).not.toContain(
-      '--content-column-indent',
+      'ui-collapsible-list-item__summary',
     )
   })
 
   it('paints the collapsible body on the canvas content plane', () => {
     const classes = arrayItemBodyClasses({ showDragHandle: true, collapsible: true })
-    expect(classes).toContain('bg-background')
-    expect(classes).toContain('border-t')
-    expect(classes).toContain('[--surface-current:var(--background)]')
+    expect(classes).toBe('ui-collapsible-list-item__body')
   })
 
   it('applies shared surface classes for array item chrome', () => {
@@ -111,8 +111,10 @@ describe('array item shell variants', () => {
   })
 
   it('uses a single-column shell for compact inline rows', () => {
-    expect(arrayItemShellVariants({ layout: 'compactRow' })).toContain('pr-3')
-    expect(arrayItemShellVariants({ layout: 'compactRow' })).toContain('py-2')
+    expect(arrayItemShellVariants({ layout: 'compactRow' })).toContain(
+      'ui-collapsible-list-item--flat',
+    )
+    expect(arrayItemShellVariants({ layout: 'compactRow' })).not.toContain('py-2')
     expect(arrayItemShellVariants({ layout: 'compactRow' })).not.toContain('grid-cols-')
   })
 

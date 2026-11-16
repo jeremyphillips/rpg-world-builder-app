@@ -137,8 +137,12 @@ export const BLESS_PROGRESSION_FIXTURE_RESOLUTION: SpellResolution = {
   outcomes: [
     {
       result: 'applied',
-      note: 'Targets gain +1d4 to attack rolls and saving throws.',
-      applications: [],
+      effects: [
+        {
+          kind: 'note',
+          description: 'Targets gain +1d4 to attack rolls and saving throws.',
+        },
+      ],
     },
   ],
 }
@@ -165,7 +169,13 @@ export const SPELL_RESOLUTION_PROGRESSION_FIXTURES = {
       outcomes: [
         {
           result: 'hit',
-          applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
+          effects: [
+            {
+              kind: 'effect-reference',
+              effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+              amount: 'full',
+            },
+          ],
         },
       ],
     } satisfies SpellResolution,

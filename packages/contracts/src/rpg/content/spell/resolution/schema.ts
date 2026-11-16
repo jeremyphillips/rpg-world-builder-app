@@ -6,10 +6,10 @@ import {
   resolutionSavingThrowMethodSchema,
   validateEffectResolution,
   type ResolutionEffect,
-  type ResolutionEffectId,
   type ResolutionOrigin,
   type ResolutionTarget,
 } from '../../lib/resolution/schema'
+import type { ResolutionOutcomeEffect } from '../../lib/resolution/resolution-outcome-effect'
 import type { ResolutionOutcomeResult, ResolutionSelectionMode } from '../../../vocab/resolution'
 import { SPELL_RESOLUTION_ATTACK_TYPES } from './vocab'
 import { spellResolutionProgressionSchema } from './progression/schema'
@@ -71,8 +71,7 @@ export type SpellResolutionValidationInput = {
   effects: readonly ResolutionEffect[]
   outcomes: readonly {
     result: ResolutionOutcomeResult
-    applications: readonly { effectId: ResolutionEffectId; amount: string }[]
-    note?: string
+    effects?: readonly ResolutionOutcomeEffect[]
   }[]
   progression?: z.infer<typeof spellResolutionProgressionSchema>
 }

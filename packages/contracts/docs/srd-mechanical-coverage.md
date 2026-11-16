@@ -44,12 +44,11 @@ Keep the evidence when a gap is verified. Deficiency types are not interchangeab
 ### `save-conditions`
 
 - Concept: a saving-throw outcome that applies a condition such as grappled, restrained, or paralyzed.
-- Deficiency: missing structured capability on the shared effect envelope.
-- Evidence: monster saves accept damage only. Grapple or restraint stays in an outcome `note`. The spell roadmap already names the `condition` capability in [effect-capability-roadmap.md](./effect-resolution/effect-capability-roadmap.md).
-- Current fallback: outcome `note` for a rider. An on-hit condition id with a prose qualification is a separate stored rider and does not close this gap.
+- **Implementation: partial (v1).** Shared ordered outcome effects (`outcome.effects`), `repeatSave` with second-stage condition replacement (`replacesConditionId`), and optional `failed-or-successful-save` notes ship on the shared resolution envelope — see [monster-actions.md](./effect-resolution/monster-actions.md).
+- Remaining deferrals: play-time repeat enforcement, Aboleth-style layered removal, escape DC modeling as structured fields, and spell save UI for repeat-save (persist-only today).
 - Importance: essential when the condition is the feature's main effect.
-- Owner: not chosen. The shared effect envelope is a candidate, along with spell outcomes and on-hit damage. A condition effect would also need duration, removal, repeat saves, and escape, which that envelope does not express. Monsters, spells, characters, and other creature abilities are all possible consumers. Dire Wolf's bite applies Prone on a hit, which is an on-hit consumer rather than a save. Do not add a monster-only condition effect.
-- Approval: open. Implementation: not started. Research only. No owner has been selected.
+- Owner: shared effect envelope + ordered-effect primitive (monsters and spells).
+- Approval: open for remaining deferrals.
 
 ### `trait-spellcasting`
 

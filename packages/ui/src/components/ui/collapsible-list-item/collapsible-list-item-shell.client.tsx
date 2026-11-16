@@ -9,7 +9,10 @@ import {
   type SemanticSurfaceTone,
 } from '../field-surface.variants'
 import type { SurfaceConfig } from '../visual-vocabulary.types'
-import { buildCollapsibleListItemLeadingChromeStyle } from './collapsible-list-item-leading-chrome.lib'
+import {
+  COLLAPSIBLE_LIST_ITEM_BLOCK_CLASS,
+  resolveCollapsibleListItemLeadingChrome,
+} from './collapsible-list-item-leading-chrome.lib'
 import { CollapsibleListItemShellContent } from './collapsible-list-item-shell-content.client'
 import {
   resolveCollapsibleListItemHeaderActionsPaddingClasses,
@@ -53,6 +56,14 @@ export interface CollapsibleListItemShellProps extends CollapsibleListItemLeadin
   actions?: React.ReactNode
 }
 
+function isDefaultShellSurface(surface: SurfaceConfig | undefined): boolean {
+  if (surface === undefined) return true
+  return (
+    (surface.emphasis === undefined || surface.emphasis === 'subtle') &&
+    (surface.elevation === undefined || surface.elevation === 'flat')
+  )
+}
+
 function resolveShellChromeClasses({
   preset = 'default',
   surface,
@@ -61,8 +72,8 @@ function resolveShellChromeClasses({
   if (preset === 'catalog') {
     return ''
   }
-  if (preset === 'default' && surface === undefined && tone === undefined) {
-    return 'border-border'
+  if (preset === 'default' && tone === undefined && isDefaultShellSurface(surface)) {
+    return 'ui-border--default'
   }
   return resolveFieldContainerChromeClasses(
     { surface: surface ?? DEFAULT_ARRAY_ITEM_SURFACE, tone },
@@ -75,6 +86,7 @@ export function CollapsibleListItemShell({
   titleId,
   itemPrefix,
   showDragHandle,
+  reserveCaretSlot,
   collapsible,
   dragging = false,
   layout = 'default',
@@ -93,13 +105,14 @@ export function CollapsibleListItemShell({
 }: CollapsibleListItemShellProps) {
   const leadingChrome: CollapsibleListItemLeadingChromeOptions = {
     showDragHandle,
+    reserveCaretSlot,
     collapsible,
   }
 
-  const leadingChromeStyle =
+  const leadingChromeModifiers =
     rowLayout === 'entity-card'
       ? undefined
-      : buildCollapsibleListItemLeadingChromeStyle(leadingChrome)
+      : resolveCollapsibleListItemLeadingChrome(leadingChrome).shellModifierClasses
 
   const shellLayout = resolveCollapsibleListItemShellLayout({
     layout,
@@ -114,6 +127,7 @@ export function CollapsibleListItemShell({
     shellLayout,
     collapsible,
     preset,
+    resolvedBody != null,
   )
 
   return (
@@ -122,16 +136,17 @@ export function CollapsibleListItemShell({
       aria-labelledby={titleId}
       data-array-item-prefix={itemPrefix}
       className={cn(
+        COLLAPSIBLE_LIST_ITEM_BLOCK_CLASS,
         collapsibleListItemShellVariants({
           layout: shellLayout,
           preset: rowLayout === 'entity-card' ? 'none' : preset,
         }),
+        leadingChromeModifiers,
         headerActionsPaddingClasses,
         chromeClasses,
         dragging && collapsibleListItemDraggingClasses,
         className,
       )}
-      style={leadingChromeStyle ?? undefined}
     >
       <CollapsibleListItemShellContent
         layout={layout}

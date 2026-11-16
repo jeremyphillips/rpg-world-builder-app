@@ -1,7 +1,7 @@
 import { formatRollValue, type RollValue } from '../../../primitives/mechanics/roll'
 import { getDamageTypeLabel } from '../../../vocab/damage/vocabulary'
 import { HIT_POINTS_TERM } from '../../../vocab/mechanics/hit-points'
-import type { ResolutionTargetKind } from '../../../vocab/resolution'
+import type { ResolutionApplicationAmount, ResolutionTargetKind } from '../../../vocab/resolution'
 import { vocabularyTermLabel } from '../../../vocab/types'
 
 /** Recipient wording for effect sentence formatters — not persisted on effects. */
@@ -14,7 +14,7 @@ export type EffectRowFormatOptions = {
   targetKind?: ResolutionTargetKind
   /** Authoring rows vs player-facing resolution preview copy. */
   register?: EffectSentenceRegister
-  applicationAmount?: 'full' | 'half'
+  applicationAmount?: ResolutionApplicationAmount
 }
 
 export type EffectRowParts = {
@@ -78,9 +78,10 @@ function formatAuthoringDamageSentence(parts: EffectRowParts): string {
 function formatPreviewDamageSentence(
   parts: EffectRowParts,
   recipient: EffectRecipient,
-  applicationAmount?: 'full' | 'half',
+  applicationAmount?: ResolutionApplicationAmount,
 ): string {
   if (!parts.damageType) return ''
+  if (applicationAmount === 'none') return ''
   if (applicationAmount === 'half') {
     return `${previewSubject(recipient)} takes half as much damage.`
   }

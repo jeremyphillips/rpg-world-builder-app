@@ -1,29 +1,17 @@
-import type { ResolutionOutcomeResult } from '@rpg/contracts'
 import { createElement } from 'react'
 import type { FormItem } from '@rpg/ui/form'
 
-import { SpellResolutionOutcomeApplicationSection } from '../../components/outcomes/spell-resolution-outcome-application-section'
+import { SpellOutcomeApplicationStatus } from '../../components/outcomes/spell-outcome-application-status'
 
 import { embeddedArrayResolverField } from '../../../../lib/forms/validation/tabbed-form-resolver-fields'
-import { readOutcomeApplications } from './resolution-outcome-applications.lib'
-import {
-  formatEffectReferenceTitle,
-  resolveEffectReference,
-} from './resolution-effect-reference.lib'
+import { spellOutcomeEffectsArray } from './spell-outcome-effects-array'
 import {
   outcomeApplicationsFieldPath,
   outcomeApplicationsResolverItemFields,
 } from './resolution-outcome-applications-form-fields'
-import { RESOLUTION_FIELD_LABELS, RESOLUTION_SECTION_LABELS } from './resolution-form-labels'
-import type { ResolutionEffectFormItem, ResolutionOutcomeFormItem } from './resolution-form-schema'
+import { RESOLUTION_SECTION_LABELS } from './resolution-form-labels'
 
 const MAX_OUTCOME_BRANCHES = 3
-
-export type ResolutionOutcomeEffectMenuItem = {
-  id: string
-  label: string
-  effectId: string
-}
 
 export {
   amountOptionsForEffect,
@@ -36,61 +24,7 @@ export {
   outcomeApplicationAmountOptions,
 } from './resolution-outcome-applications-form-fields'
 
-export function appliedEffectIdsForOutcome(
-  outcome: Pick<ResolutionOutcomeFormItem, 'applications'>,
-): Set<string> {
-  return new Set(
-    readOutcomeApplications(outcome.applications).map((application) => application.effectId),
-  )
-}
-
-/** Effects available to add via the application menu for one outcome branch. */
-export function eligibleEffectsForOutcomeApplication(
-  effects: readonly ResolutionEffectFormItem[],
-  outcome: Pick<ResolutionOutcomeFormItem, 'applications'>,
-): ResolutionEffectFormItem[] {
-  const applied = appliedEffectIdsForOutcome(outcome)
-  return effects.filter((effect) => !applied.has(effect.id))
-}
-
-export function buildOutcomeEffectApplicationMenuItems(
-  effects: readonly ResolutionEffectFormItem[],
-  outcome: Pick<ResolutionOutcomeFormItem, 'applications'>,
-): ResolutionOutcomeEffectMenuItem[] {
-  return eligibleEffectsForOutcomeApplication(effects, outcome).map((effect) => ({
-    id: effect.id,
-    effectId: effect.id,
-    label: formatEffectReferenceTitle(resolveEffectReference(effect)),
-  }))
-}
-
-export function findOutcomeIndexByResult(
-  outcomes: readonly ResolutionOutcomeFormItem[],
-  result: ResolutionOutcomeResult,
-): number {
-  return outcomes.findIndex((outcome) => outcome.result === result)
-}
-
-/** Optional prose for one outcome branch (`resolution.outcomes[n].note`). */
-export function outcomeNoteFields(): FormItem[] {
-  return [
-    {
-      type: 'textarea',
-      name: 'note',
-      label: RESOLUTION_FIELD_LABELS.hitNote,
-      placeholder: RESOLUTION_SECTION_LABELS.outcomeNotePlaceholder,
-      rows: 3,
-      width: 'full',
-      optionalDisclosure: {
-        addLabel: RESOLUTION_SECTION_LABELS.addOutcomeNote,
-        removeLabel: 'Remove',
-        expandWhenPopulated: true,
-      },
-    },
-  ]
-}
-
-/** Applications section, optional note for one outcome branch body. */
+/** Applications section for one outcome branch body. */
 export function outcomeBranchBodyFields(
   outcomeIndex: number,
   _includeApplications: boolean,
@@ -101,10 +35,10 @@ export function outcomeBranchBodyFields(
       fields: [
         {
           kind: 'slot',
-          name: '_outcomeApplicationSection',
-          render: () => createElement(SpellResolutionOutcomeApplicationSection, { outcomeIndex }),
+          name: '_outcomeApplicationStatus',
+          render: () => createElement(SpellOutcomeApplicationStatus, { outcomeIndex }),
         },
-        ...outcomeNoteFields(),
+        spellOutcomeEffectsArray(outcomeIndex),
       ],
     },
   ]

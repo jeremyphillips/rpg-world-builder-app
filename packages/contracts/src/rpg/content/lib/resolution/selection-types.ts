@@ -1,3 +1,4 @@
+import type { ResolutionOutcomeEffect } from './resolution-outcome-effect'
 import type {
   ResolutionMethodKind,
   ResolutionOutcomeResult,
@@ -6,6 +7,7 @@ import type {
   ResolutionTargetCountKind,
   ResolutionTargetKind,
 } from '../../../vocab/resolution'
+import type { RepeatSave } from './repeat-save'
 import type { SpellResolutionAttackType } from '../../spell/resolution/vocab'
 
 import type { SelectionMethodCompatibilityReasonCode } from './selection-method-compatibility'
@@ -31,8 +33,8 @@ export type ResolutionEffectRef = {
 /** Minimal outcome row for selection policy and change planning. */
 export type ResolutionOutcomeRef = {
   result: ResolutionOutcomeResult
-  applications: readonly { effectId: string; amount: string }[]
-  note?: string
+  effects?: readonly ResolutionOutcomeEffect[]
+  repeatSave?: RepeatSave
 }
 
 /** Flattened resolution slice used by availability predicates and change planning. */

@@ -611,3 +611,55 @@ describe('promotion smoke', () => {
     ).toBe('published')
   })
 })
+
+describe('monster classification persistence', () => {
+  it('persists, reads, and explicitly clears family and class classifications', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(monstersWriteConfig, campaign.id, {
+      ...minimalHomebrewMonsterInput,
+      slug: 'classified-monster',
+      creatureType: 'monstrosity',
+      creatureFamilyIds: ['titan', 'lycanthrope'],
+      classIds: ['srd-cc-5.2.1:wizard'],
+    })
+    expect(created).toMatchObject({
+      creatureFamilyIds: ['titan', 'lycanthrope'],
+      classIds: ['srd-cc-5.2.1:wizard'],
+    })
+    const catalog = await resolveCatalogForCampaign(monstersWriteConfig.readConfig, campaign.id)
+    expect(catalog.find((row) => row.id === created.id)).toMatchObject({
+      creatureFamilyIds: ['titan', 'lycanthrope'],
+      classIds: ['srd-cc-5.2.1:wizard'],
+    })
+    const cleared = await updateContentEntity(monstersWriteConfig, campaign.id, created.id, {
+      creatureFamilyIds: null,
+      classIds: null,
+    })
+    expect(cleared.creatureFamilyIds).toBeUndefined()
+    expect(cleared.classIds).toBeUndefined()
+  })
+  it('clears a seeded class classification with a system patch tombstone', async () => {
+    const campaign = await makeTestCampaign()
+    const id = 'srd-cc-5.2.1:mage'
+    await updateContentEntity(monstersWriteConfig, campaign.id, id, { classIds: null })
+    const catalog = await resolveCatalogForCampaign(monstersWriteConfig.readConfig, campaign.id)
+    expect(catalog.find((row) => row.id === id)?.classIds).toBeUndefined()
+  })
+
+  it('rejects an incompatible family at its field path on publish', async () => {
+    const campaign = await makeTestCampaign()
+    await expect(
+      createHomebrewContent(monstersWriteConfig, campaign.id, {
+        ...minimalHomebrewMonsterInput,
+        slug: 'bad-classification',
+        creatureType: 'dragon',
+        creatureFamilyIds: ['titan'],
+      }),
+    ).rejects.toMatchObject({
+      status: 400,
+      details: {
+        issues: expect.arrayContaining([expect.objectContaining({ path: 'creatureFamilyIds.0' })]),
+      },
+    })
+  })
+})

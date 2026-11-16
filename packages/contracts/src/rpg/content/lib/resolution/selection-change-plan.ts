@@ -9,7 +9,7 @@ import type {
   ResolutionWarning,
 } from './selection-types'
 import {
-  outcomeApplicationsReferenceEffect,
+  outcomeReferencesEffect,
   planOutcomeMethodChange,
   stripEffectFromOutcomes,
 } from './outcome-change-plan'
@@ -241,7 +241,7 @@ function findEffectRemovalTargets(
 ): ResolutionEffectRef[] {
   const effect = state.effects?.find((entry) => entry.id === effectId)
   if (!effect) return []
-  if (!outcomeApplicationsReferenceEffect(state.outcomes, effectId)) return []
+  if (!outcomeReferencesEffect(state.outcomes, effectId)) return []
   return [effect]
 }
 

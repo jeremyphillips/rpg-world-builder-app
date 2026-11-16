@@ -54,6 +54,7 @@ export type DerivedMonsterAttackLine = {
   modes: Array<'melee' | 'ranged'>
   reach?: number
   range?: { normal: number; long?: number }
+  sourceName: string
 }
 
 export type DerivedMonsterStatBlock = {
@@ -153,11 +154,13 @@ function attackLineFromProfile(
   profile: MonsterActionAttackProfile,
   id: string,
   section: DerivedMonsterAttackLine['section'],
+  sourceName: string,
 ): DerivedMonsterAttackLine {
   return {
     id,
     section,
     name: profile.name,
+    sourceName,
     attackBonus: profile.attackBonus,
     attackBonusLabel: formatSignedModifier(profile.attackBonus),
     damage: String(profile.primary.average),
@@ -180,6 +183,7 @@ function appendAttackLines(
   )[],
   args: Omit<ResolveMonsterActionAttackProfileInput, 'action'>,
   section: DerivedMonsterAttackLine['section'],
+  sourceName: string,
 ): void {
   for (const action of actions) {
     if (!isMonsterActionAttackKind(action.kind)) continue
@@ -190,7 +194,7 @@ function appendAttackLines(
     if (profile.status !== 'resolved') {
       throw new Error(`Monster attack ${action.id} is unavailable.`)
     }
-    target.push(attackLineFromProfile(profile.value, action.id, section))
+    target.push(attackLineFromProfile(profile.value, action.id, section, sourceName))
   }
 }
 
@@ -242,14 +246,28 @@ export function deriveMonsterStatBlock({
 
   const attacks: DerivedMonsterAttackLine[] = []
   const attackLineArgs = { monster, equipmentCatalog, proficiencyBonus, magicPropertyProvider }
-  appendAttackLines(attacks, availableBodyRows(monster.actions), attackLineArgs, 'actions')
+  const sourceName = monster.name
+  appendAttackLines(
+    attacks,
+    availableBodyRows(monster.actions),
+    attackLineArgs,
+    'actions',
+    sourceName,
+  )
   appendAttackLines(
     attacks,
     availableBodyRows(monster.bonusActions),
     attackLineArgs,
     'bonusActions',
+    sourceName,
   )
-  appendAttackLines(attacks, availableBodyRows(monster.reactions), attackLineArgs, 'reactions')
+  appendAttackLines(
+    attacks,
+    availableBodyRows(monster.reactions),
+    attackLineArgs,
+    'reactions',
+    sourceName,
+  )
 
   return {
     ac: armor,
@@ -351,7 +369,9 @@ function draftAttackResult(args: {
     action: args.action as MonsterAction,
   })
   if (profile.status === 'unavailable') return profile
-  return resolvedField(attackLineFromProfile(profile.value, args.action.id, args.section))
+  return resolvedField(
+    attackLineFromProfile(profile.value, args.action.id, args.section, args.monster.name),
+  )
 }
 
 function draftAttacks(

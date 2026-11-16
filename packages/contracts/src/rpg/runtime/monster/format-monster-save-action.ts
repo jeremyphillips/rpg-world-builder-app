@@ -1,4 +1,10 @@
 import type { MonsterAction } from '../../content/monster/action/index'
+import { DAMAGE_APPLICATION_AMOUNT_PRESENTATION } from '../../content/lib/resolution/damage-application-labels'
+import { formatResolutionOutcomeLine } from '../../content/lib/resolution/format-outcomes'
+import {
+  formatOrderedOutcomeEffects,
+  formatRepeatSaveTransition,
+} from '../../content/lib/resolution/format-ordered-outcome-effects'
 import { formatResolutionTargetFromParts } from '../../content/lib/resolution/format-target'
 import { formatAreaOccupantCreaturePhrase } from '../../content/lib/resolution/format-target-composition'
 import { formatAreaGeometry } from '../../primitives/area-geometry'
@@ -12,6 +18,7 @@ import { formatStatBlockDamageComponent } from './format-stat-block-damage'
 import { formatMonsterLimitedUseHeading } from './spell-entry-presentation'
 
 type SaveAction = Extract<MonsterAction, { kind: 'save' }>
+type SaveOutcome = SaveAction['resolution']['outcomes'][number]
 
 function saveDc(args: {
   action: SaveAction
@@ -31,34 +38,148 @@ function saveDc(args: {
   return abilitySaveDc(score, args.proficiencyBonus)
 }
 
-function damageClause(
-  effect: Extract<SaveAction['resolution']['effects'][number], { kind: 'damage' }>,
-  amount: 'full' | 'half',
-): string {
-  if (amount === 'half') return 'Half damage.'
+type DamageEffect = Extract<SaveAction['resolution']['effects'][number], { kind: 'damage' }>
+
+function damagePhrase(effect: DamageEffect, amount: 'full' | 'half'): string {
   const part = resolveStatBlockDamagePart(effect.roll, 0)
-  return `${formatStatBlockDamageComponent({
+  const clause = formatStatBlockDamageComponent({
     average: part.average,
     expression: part.expression,
     damageTypeId: effect.damageType,
-  })}.`
+  })
+  if (amount === 'half') return `half of ${clause}`
+  return clause
+}
+
+type DamagePrint = { effect: DamageEffect; amount: 'full' | 'half' }
+
+function damagePrintForRow(
+  row: NonNullable<SaveOutcome['effects']>[number],
+  effectById: Map<string, SaveAction['resolution']['effects'][number]>,
+): DamagePrint | undefined {
+  if (row.kind !== 'effect-reference') return undefined
+  const effect = effectById.get(row.effectId)
+  if (!effect || effect.kind !== 'damage') return undefined
+  if (row.amount !== 'full' && row.amount !== 'half') return undefined
+  return { effect, amount: row.amount }
+}
+
+function joinDamagePhrases(prints: readonly DamagePrint[]): string | undefined {
+  if (prints.length === 0) return undefined
+  return `${prints.map((print) => damagePhrase(print.effect, print.amount)).join(' plus ')}.`
+}
+
+function everyDamageIsHalf(
+  rows: NonNullable<SaveOutcome['effects']>,
+  effectById: Map<string, SaveAction['resolution']['effects'][number]>,
+): boolean {
+  const prints = rows.flatMap((row) => {
+    const print = damagePrintForRow(row, effectById)
+    return print ? [print] : []
+  })
+  return prints.length > 0 && prints.every((print) => print.amount === 'half')
+}
+
+function outcomeEffectClauses(
+  rows: SaveOutcome['effects'] | undefined,
+  effects: SaveAction['resolution']['effects'],
+): string[] {
+  const effectById = new Map(effects.map((effect) => [effect.id, effect]))
+  const list = rows ?? []
+  const collapseHalf = everyDamageIsHalf(list, effectById)
+  const clauses: string[] = []
+  let damageRun: DamagePrint[] = []
+  let emittedHalf = false
+
+  const flushDamage = () => {
+    const sentence = joinDamagePhrases(damageRun)
+    if (sentence) clauses.push(sentence)
+    damageRun = []
+  }
+
+  for (const row of list) {
+    if (row.kind === 'effect-reference') {
+      const damage = damagePrintForRow(row, effectById)
+      if (!damage) continue
+      if (collapseHalf) {
+        if (!emittedHalf) {
+          clauses.push(`${DAMAGE_APPLICATION_AMOUNT_PRESENTATION.half}.`)
+          emittedHalf = true
+        }
+        continue
+      }
+      damageRun.push(damage)
+      continue
+    }
+    flushDamage()
+    if (row.kind === 'condition' || row.kind === 'note') {
+      clauses.push(...formatOrderedOutcomeEffects([row]))
+    }
+  }
+  flushDamage()
+  return clauses
+}
+
+function outcomeBodyClauses(
+  outcome: SaveOutcome,
+  effects: SaveAction['resolution']['effects'],
+): string[] {
+  return outcomeEffectClauses(outcome.effects, effects)
 }
 
 function outcomeSentence(
-  label: 'Failure' | 'Success',
-  outcome: SaveAction['resolution']['outcomes'][number],
+  label: string,
+  outcome: SaveOutcome,
   effects: SaveAction['resolution']['effects'],
-): string {
-  const effectById = new Map(effects.map((effect) => [effect.id, effect]))
-  const clauses = outcome.applications.flatMap((application) => {
-    const effect = effectById.get(application.effectId)
-    if (!effect || effect.kind !== 'damage') return []
-    if (application.amount !== 'full' && application.amount !== 'half') return []
-    return [damageClause(effect, application.amount)]
-  })
-  const note = outcome.note?.trim()
-  const body = [...clauses, ...(note ? [`${note}.`] : [])].join(' ')
-  return body ? `${label}: ${body}` : `${label}:`
+): string | undefined {
+  const clauses = outcomeBodyClauses(outcome, effects)
+  const body = clauses.join(' ')
+  return body ? `${label}: ${body}` : undefined
+}
+
+function compactSentence(sentence: string | undefined): string[] {
+  return sentence ? [sentence] : []
+}
+
+function proseSentence(text: string | undefined): string | undefined {
+  const trimmed = text?.trim()
+  if (!trimmed) return undefined
+  return trimmed.endsWith('.') ? trimmed : `${trimmed}.`
+}
+
+function secondFailureSentence(
+  outcome: SaveOutcome,
+  effects: SaveAction['resolution']['effects'],
+): string | undefined {
+  const repeatSave = outcome.repeatSave
+  if (!repeatSave) return undefined
+  const clauses = [
+    ...outcomeEffectClauses(repeatSave.secondFailure.effects, effects),
+    ...(proseSentence(repeatSave.secondFailure.note)
+      ? [proseSentence(repeatSave.secondFailure.note)!]
+      : []),
+  ]
+  if (clauses.length === 0) return undefined
+  return `Second Failure: ${clauses.join(' ')}`
+}
+
+function repeatSaveSentences(
+  outcome: SaveOutcome,
+  effects: SaveAction['resolution']['effects'],
+): string[] {
+  const repeatSave = outcome.repeatSave
+  if (!repeatSave) return []
+  const second = secondFailureSentence(outcome, effects)
+  return [
+    formatRepeatSaveTransition(repeatSave.timing),
+    ...(proseSentence(repeatSave.eligibilityNote)
+      ? [proseSentence(repeatSave.eligibilityNote)!]
+      : []),
+    ...(repeatSave.successOnRepeatEndsEffect
+      ? ['On a success, the target ends the effect on itself.']
+      : []),
+    ...(second ? [second] : []),
+  ]
 }
 
 function selectionPhrase(action: SaveAction): string {
@@ -95,10 +216,18 @@ export function formatMonsterSaveAction(args: {
   const heading = formatMonsterLimitedUseHeading(args.name, limitedUse)
   const failed = resolution.outcomes.find((outcome) => outcome.result === 'failed-save')
   const saved = resolution.outcomes.find((outcome) => outcome.result === 'successful-save')
+  const failureOrSuccess = resolution.outcomes.find(
+    (outcome) => outcome.result === 'failed-or-successful-save',
+  )
+
+  const failureLabel = failed?.repeatSave ? 'First Failure' : 'Failure'
+
   const sentences = [
     `${ability} Saving Throw: DC ${dc ?? '—'}, ${selectionPhrase(action)}.`,
-    ...(failed ? [outcomeSentence('Failure', failed, resolution.effects)] : []),
-    ...(saved ? [outcomeSentence('Success', saved, resolution.effects)] : []),
+    ...(failed ? compactSentence(outcomeSentence(failureLabel, failed, resolution.effects)) : []),
+    ...(failed ? repeatSaveSentences(failed, resolution.effects) : []),
+    ...(saved ? compactSentence(outcomeSentence('Success', saved, resolution.effects)) : []),
+    ...(failureOrSuccess ? [formatResolutionOutcomeLine(failureOrSuccess, resolution)] : []),
   ]
   return { heading, body: sentences.join(' ') }
 }

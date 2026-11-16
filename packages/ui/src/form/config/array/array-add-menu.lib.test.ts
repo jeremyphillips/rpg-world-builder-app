@@ -87,4 +87,23 @@ describe('array-add-menu.lib', () => {
     })
     expect(built[0]?.metadata).toBeUndefined()
   })
+
+  it('honors disabled and note set on the menu item', () => {
+    const built = buildArrayAddMenuItems(
+      {
+        groups: [],
+        items: [
+          {
+            id: 'healing',
+            label: 'Healing',
+            appendDefaults: { kind: 'healing' },
+            disabled: true,
+            note: 'Incomplete effect',
+          },
+        ],
+      },
+      [],
+    )
+    expect(built[0]).toMatchObject({ disabled: true, note: 'Incomplete effect' })
+  })
 })

@@ -76,7 +76,12 @@ describe('resolveMonsterActionAttackProfile on-hit effects', () => {
             {
               kind: 'condition',
               conditionId: 'paralyzed',
-              description: "until the start of the lich's next turn",
+              end: {
+                kind: 'turn-bound',
+                participant: 'source',
+                boundary: 'start',
+                which: 'next',
+              },
             },
           ],
         },
@@ -102,7 +107,12 @@ describe('resolveMonsterActionAttackProfile on-hit effects', () => {
         kind: 'condition',
         source: 'action',
         conditionId: 'paralyzed',
-        description: "until the start of the lich's next turn",
+        end: {
+          kind: 'turn-bound',
+          participant: 'source',
+          boundary: 'start',
+          which: 'next',
+        },
       },
     ])
     expect(
@@ -114,6 +124,7 @@ describe('resolveMonsterActionAttackProfile on-hit effects', () => {
         modes: profile.value.modes,
         reach: profile.value.reach,
         onHit: profile.value.onHit,
+        sourceName: 'Lich',
       }),
     ).toBe(
       "Melee Attack Roll: +12, reach 5 ft. Hit: 15 (3d6 + 5) Cold damage, and the target has the Paralyzed condition until the start of the lich's next turn.",

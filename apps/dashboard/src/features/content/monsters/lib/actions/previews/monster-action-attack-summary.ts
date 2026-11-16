@@ -4,8 +4,10 @@ import {
   derivedFieldReasonLabel,
   CHALLENGE_RATING_MECHANICS,
   formatProficiencyBonus,
+  formatEffectEnd,
   formatMonsterAttackAction,
   formatSignedModifier,
+  type EffectEnd,
   getAbilityCompactLabel,
   getContentTypeTerm,
   getDamageTypeLabel,
@@ -275,19 +277,39 @@ function damagePreviewRow(id: string, label: string, roll: MonsterActionAttackRo
   }
 }
 
+function formatConditionPreviewSecondary(
+  effect: Extract<MonsterActionAttackProfile['onHit'][number], { kind: 'condition' }>,
+  sourceName: string | undefined,
+): string | undefined {
+  const parts: string[] = []
+  if (effect.end) {
+    parts.push(
+      formatEffectEnd(effect.end as EffectEnd, {
+        voice: 'monster-stat-block',
+        ...(sourceName ? { sourceName } : {}),
+      }),
+    )
+  }
+  if (effect.description) parts.push(effect.description)
+  if (parts.length === 0) return undefined
+  return parts.join(' · ')
+}
+
 function onHitPreviewRow(
   effect: MonsterActionAttackProfile['onHit'][number],
   index: number,
+  sourceName?: string,
 ): MonsterActionAttackPreviewRow {
   if (effect.kind === 'damage') {
     return damagePreviewRow(`on-hit-${index}`, MONSTER_ACTION_ATTACK_PREVIEW_EXTRA_LABEL, effect)
   }
   if (effect.kind === 'condition') {
+    const secondary = formatConditionPreviewSecondary(effect, sourceName)
     return {
       id: `on-hit-${index}`,
       label: vocabularyFieldLabel(CONDITION_TERM),
       primary: getEffectConditionLabel(effect.conditionId),
-      ...(effect.description ? { secondary: effect.description } : {}),
+      ...(secondary ? { secondary } : {}),
     }
   }
   return {
@@ -330,7 +352,10 @@ function attackDistanceRows(value: MonsterActionAttackProfile): MonsterActionAtt
   return rows
 }
 
-function attackPreviewSentence(value: MonsterActionAttackProfile): string | undefined {
+function attackPreviewSentence(
+  value: MonsterActionAttackProfile,
+  sourceName?: string,
+): string | undefined {
   return formatMonsterAttackAction({
     attackBonusLabel: formatSignedModifier(value.attackBonus),
     damage: String(value.primary.average),
@@ -340,6 +365,7 @@ function attackPreviewSentence(value: MonsterActionAttackProfile): string | unde
     ...(value.reach !== undefined ? { reach: value.reach } : {}),
     ...(value.range ? { range: value.range } : {}),
     ...(value.onHit.length > 0 ? { onHit: value.onHit } : {}),
+    ...(sourceName ? { sourceName } : {}),
   })
 }
 
@@ -347,6 +373,7 @@ export function buildMonsterActionAttackPreview(
   profile: DerivedField<MonsterActionAttackProfile>,
   abilityScores: Partial<Record<Ability, number>> | undefined,
   unavailableContext?: MonsterActionAttackPreviewUnavailableContext,
+  sourceName?: string,
 ): MonsterActionAttackPreview {
   if (profile.status === 'unavailable') {
     return {
@@ -369,11 +396,11 @@ export function buildMonsterActionAttackPreview(
   ]
 
   value.onHit.forEach((effect, index) => {
-    rows.push(onHitPreviewRow(effect, index))
+    rows.push(onHitPreviewRow(effect, index, sourceName))
   })
   rows.push(...attackDistanceRows(value))
 
-  const sentence = attackPreviewSentence(value)
+  const sentence = attackPreviewSentence(value, sourceName)
 
   return {
     status: 'ready',

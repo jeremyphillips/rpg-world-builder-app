@@ -283,6 +283,8 @@ describe('FieldGroup', () => {
     const chevron = trigger.querySelector('[data-icon="chevron-down"]')
     expect(chevron).toBeTruthy()
     expect(chevron).not.toHaveClass('rotate-180')
+    expect(trigger).toHaveClass('items-start')
+    expect(trigger).not.toHaveClass('items-center')
     const fieldset = screen.getByRole('group', { name: /Advanced options/ })
     expect(fieldset).toHaveClass(...fieldAnatomyStackVariants({ size: 'md' }).split(/\s+/))
     expect(bodyRelationshipWrapper(fieldset)).toBeNull()
@@ -292,6 +294,24 @@ describe('FieldGroup', () => {
     expect(chevron).toHaveClass('rotate-180')
     expect(fieldset).toHaveClass(...fieldAnatomyStackVariants({ size: 'md' }).split(/\s+/))
     expect(bodyRelationshipWrapper(fieldset)).toBeNull()
+  })
+
+  it('vertically centers the legend disclosure caret for single-line legends', () => {
+    render(
+      <FieldGroup
+        legend="Advanced options"
+        legendSize="subsection"
+        headingScale="field"
+        size="md"
+        disclosure={{ variant: 'legend', defaultOpen: false }}
+      >
+        <TextField id="proficient" label="Include proficiency bonus" />
+      </FieldGroup>,
+    )
+
+    const trigger = screen.getByRole('button', { name: /Advanced options/i })
+    expect(trigger).toHaveClass('items-center')
+    expect(trigger).not.toHaveClass('items-start')
   })
 
   it('applies field anatomy stack on the fieldset when headingScale is field', () => {
@@ -414,7 +434,8 @@ describe('FieldGroup', () => {
     )
     expect(legend?.firstElementChild?.querySelector('.flex.flex-col.gap-1')).toBeTruthy()
     const trigger = screen.getByRole('button', { name: /Optional details/i })
-    expect(trigger).toHaveClass('py-0')
+    expect(trigger).toHaveClass('py-0', 'items-start')
+    expect(trigger).not.toHaveClass('items-center')
     expect(trigger).not.toHaveClass('text-style-field-legend')
     expect(bodyRelationshipWrapper(fieldset)).toBeNull()
     const content = fieldset.querySelector('[data-state]')

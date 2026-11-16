@@ -10,6 +10,7 @@ export const SPELL_RESOLUTION_OUTCOME_AUTHORING_LABELS = {
   miss: 'On miss',
   'failed-save': 'On failed save',
   'successful-save': 'On successful save',
+  'failed-or-successful-save': 'On failure or success',
 } as const satisfies Record<ResolutionOutcomeResult, string>
 
 /** Visible label for an outcome group in the resolution authoring UI. */

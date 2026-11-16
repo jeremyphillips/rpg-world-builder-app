@@ -7,7 +7,6 @@ import { Button } from '../button.client'
 import { Text } from '../text'
 import { CollapsibleListItem } from './collapsible-list-item.client'
 import {
-  collapsibleListItemDisclosureShellPaddingClasses,
   collapsibleListItemFlatShellPaddingClasses,
   collapsibleListItemHeaderStackSummaryGapClasses,
   collapsibleListItemHeaderVerticalPaddingVariants,
@@ -30,7 +29,59 @@ describe('CollapsibleListItem', () => {
 
     expect(screen.getByText('Alpha header')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add' })).toBeInTheDocument()
-    expect(container.firstChild).toHaveClass('flex-col', collapsibleListItemFlatShellPaddingClasses)
+    expect(container.firstChild).toHaveClass(
+      'ui-collapsible-list-item',
+      collapsibleListItemFlatShellPaddingClasses,
+    )
+    expect(container.firstChild).not.toHaveClass('flex-col')
+  })
+
+  it('reserves the caret column on a row that does not render a button', () => {
+    render(
+      <CollapsibleListItem
+        itemId="aligned"
+        titleId="aligned-title"
+        toolbarAriaLabel="Aligned item"
+        collapsible={false}
+        reserveCaretSlot
+        header={<span>You can see it</span>}
+      />,
+    )
+
+    const title = screen.getByText('You can see it')
+    const column = title.parentElement?.previousElementSibling
+    expect(screen.queryByRole('button', { name: /Aligned item/ })).not.toBeInTheDocument()
+    expect(column).toHaveAttribute('aria-hidden', 'true')
+    expect(column).toHaveClass('ui-collapsible-list-item__chrome')
+  })
+
+  it('keeps disclosure padding when a body is mounted without a caret', () => {
+    const { container } = render(
+      <CollapsibleListItem
+        itemId="alpha-body"
+        titleId="alpha-body-title"
+        toolbarAriaLabel="Alpha body item"
+        collapsible={false}
+        collapsed={false}
+        onToggleCollapse={vi.fn()}
+        header={<span>Alpha header</span>}
+        body={<p>Expanded details</p>}
+        actions={<Button type="button">Remove</Button>}
+      />,
+    )
+
+    const shell = container.firstChild as HTMLElement
+    const headerRow = shell.firstElementChild as HTMLElement
+    const body = screen.getByText('Expanded details').parentElement
+
+    expect(shell).toHaveClass('ui-collapsible-list-item', 'ui-border--default')
+    expect(shell).not.toHaveClass('ui-collapsible-list-item--flat')
+    expect(shell).not.toHaveClass('py-2')
+    expect(headerRow).toHaveClass(
+      collapsibleListItemHeaderVerticalPaddingVariants({ density: 'compact' }),
+    )
+    expect(body).toHaveClass('ui-collapsible-list-item__body')
+    expect(body).not.toHaveClass('bg-background', '-ml-2')
   })
 
   it('wires collapse button aria attributes and toggles expanded body', async () => {
@@ -53,6 +104,7 @@ describe('CollapsibleListItem', () => {
     const collapseButton = screen.getByRole('button', { name: 'Expand Beta item' })
     expect(collapseButton).toHaveAttribute('aria-expanded', 'false')
     expect(collapseButton).toHaveAttribute('aria-controls', 'beta-body')
+    expect(collapseButton.querySelector('svg')).toHaveClass('-rotate-90')
     expect(screen.getByText('Expanded details').parentElement).toHaveAttribute('hidden')
 
     await user.click(collapseButton)
@@ -101,8 +153,8 @@ describe('CollapsibleListItem', () => {
     const body = screen.getByText('Expanded details').parentElement
     const summary = screen.getByText('Warning badge').parentElement
 
-    expect(shell).toHaveClass('flex-col', collapsibleListItemDisclosureShellPaddingClasses)
-    expect(shell).toHaveClass('pb-0')
+    expect(shell).toHaveClass('ui-collapsible-list-item', 'ui-border--default')
+    expect(shell).not.toHaveClass('ui-collapsible-list-item--flat')
     expect(shell).not.toHaveClass('grid-cols-[minmax(0,1fr)_auto]')
     expect(headerRow).toHaveClass('flex', 'items-center')
     expect(headerRow).toHaveClass(
@@ -110,10 +162,10 @@ describe('CollapsibleListItem', () => {
     )
     expect(headerStack).toHaveClass(collapsibleListItemHeaderStackSummaryGapClasses)
     expect(headerRow.contains(addButton)).toBe(true)
-    expect(summary).toHaveClass('pl-[var(--content-column-indent)]')
-    expect(body).toHaveClass('pl-[var(--content-inline-start)]')
-    expect(body).toHaveClass('-ml-2')
-    expect(body).toHaveClass('bg-background')
+    expect(summary).toHaveClass('ui-collapsible-list-item__summary')
+    expect(body).toHaveClass('ui-collapsible-list-item__body')
+    expect(body).toHaveClass('ui-collapsible-list-item__body')
+    expect(body).not.toHaveClass('-ml-2', 'bg-background')
     expect(screen.getByRole('group', { name: 'Item actions' })).toBeInTheDocument()
   })
 
@@ -131,10 +183,8 @@ describe('CollapsibleListItem', () => {
       />,
     )
 
-    expect(container.firstChild).toHaveClass(
-      'flex-col',
-      collapsibleListItemDisclosureShellPaddingClasses,
-    )
+    expect(container.firstChild).toHaveClass('ui-collapsible-list-item', 'ui-border--default')
+    expect(container.firstChild).not.toHaveClass('ui-collapsible-list-item--flat')
   })
 
   it('keeps header row rhythm invariant when summary is visible but body is collapsed', () => {
@@ -248,7 +298,13 @@ describe('CollapsibleListItem', () => {
     )
 
     const shell = container.firstChild
-    expect(shell).toHaveClass('ui-card', 'ui-card--quiet', 'ui-card--static', 'pb-0')
+    expect(shell).toHaveClass(
+      'ui-card',
+      'ui-card--quiet',
+      'ui-card--static',
+      'ui-collapsible-list-item--catalog',
+      'pb-0',
+    )
     expect(shell).not.toHaveClass('rounded-md')
   })
 
@@ -265,8 +321,11 @@ describe('CollapsibleListItem', () => {
     )
 
     const body = screen.getByText('Catalog details').parentElement
-    expect(body).toHaveClass('border-t', 'bg-surface-muted')
-    expect(body).toHaveClass('pl-[var(--content-inline-start)]')
+    expect(body).toHaveClass('ui-collapsible-list-item__body')
+    expect(body).not.toHaveClass('border-t', 'bg-surface-muted')
+    expect(body?.closest('.ui-collapsible-list-item')).toHaveClass(
+      'ui-collapsible-list-item--catalog',
+    )
   })
 
   itAxe('has no axe accessibility violations', async () => {

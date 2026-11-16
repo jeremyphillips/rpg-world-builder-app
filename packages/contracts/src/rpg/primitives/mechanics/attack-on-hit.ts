@@ -1,40 +1,32 @@
 import { z } from 'zod'
 
-import { effectConditionSchema } from '../../vocab/effect-condition'
-import { damageRollValueSchema } from './effect-value'
-
-const optionalEffectDescriptionSchema = z.string().trim().min(1).optional()
-
-const damageEffectSchema = damageRollValueSchema.extend({
-  kind: z.literal('damage'),
-  description: optionalEffectDescriptionSchema,
-})
-
-const conditionEffectSchema = z.object({
-  kind: z.literal('condition'),
-  conditionId: effectConditionSchema,
-  description: optionalEffectDescriptionSchema,
-})
-
-const noteEffectSchema = z.object({
-  kind: z.literal('note'),
-  description: z.string().trim().min(1),
-})
+import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
+import { orderedEffectSchema, orderedEffectsSchema } from './ordered-effect'
 
 /**
  * Additional effects that apply when an attack hits, in authored order.
  * Primary attack damage stays on the attack. Conditions and notes do not
  * change the attack bonus or the damage total.
  */
-export const attackOnHitEffectSchema = z.discriminatedUnion('kind', [
-  damageEffectSchema,
-  conditionEffectSchema,
-  noteEffectSchema,
-])
+export const attackOnHitEffectSchema = orderedEffectSchema
 
-export const attackOnHitSchema = z.object({
-  effects: z.array(attackOnHitEffectSchema).min(1),
-})
-
+/** @deprecated Use {@link orderedEffectSchema} — retained for one release slice. */
 export type AttackOnHitEffect = z.infer<typeof attackOnHitEffectSchema>
+
+export const attackOnHitSchema = z
+  .object({
+    effects: orderedEffectsSchema.min(1),
+  })
+  .superRefine((value, ctx) => {
+    value.effects.forEach((effect, index) => {
+      if (effect.kind !== 'condition') return
+      if (!effect.replacesConditionId) return
+      addCustomRefinementIssue(
+        ctx,
+        'Condition replacement is not allowed on attack on-hit effects.',
+        ['effects', index, 'replacesConditionId'],
+      )
+    })
+  })
+
 export type AttackOnHit = z.infer<typeof attackOnHitSchema>

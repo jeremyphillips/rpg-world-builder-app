@@ -1,4 +1,10 @@
-import { getMonsterActionKindLabel, PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE } from '@rpg/contracts'
+import {
+  getMonsterActionKindLabel,
+  MONSTER_SPELLCASTING_ACTION_NAME,
+  monsterSingletonKindMessage,
+  PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE,
+  PRIMARY_SPELLCASTING_PROFILE,
+} from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -266,7 +272,18 @@ describe('primary Spellcasting acquisition', () => {
       weapons: [],
       allowAddWeapon: true,
       section: 'actions',
-      primarySpellcasting: true,
+      sectionRows: {
+        actions: [
+          {
+            id: 'spellcasting',
+            kind: 'spell',
+            profile: PRIMARY_SPELLCASTING_PROFILE,
+            name: MONSTER_SPELLCASTING_ACTION_NAME,
+            castingAbility: { kind: 'ability', ability: 'int' },
+            spells: [{ spellId: 'srd:fire-bolt' }],
+          },
+        ],
+      },
     })
     expect(taken.find((item) => item.id === 'create:spell')).toMatchObject({
       disabled: true,
@@ -280,5 +297,38 @@ describe('primary Spellcasting acquisition', () => {
     })
     expect(bonus.find((item) => item.id === 'create:spell')).toBeUndefined()
     expect(bonus.find((item) => item.id === 'create:spell-standalone')?.label).toBe('Cast a spell')
+  })
+})
+
+describe('repeatability acquisition', () => {
+  it('disables singleton menu entries and restores them when rows are removed', () => {
+    const occupied = monsterActionAcquisitionItems({
+      weapons: [],
+      allowAddWeapon: true,
+      section: 'actions',
+      sectionRows: { actions: [{ id: 'ma', kind: 'multiattack' }] },
+    })
+    expect(occupied.find((item) => item.id === 'preset:multiattack')).toMatchObject({
+      disabled: true,
+      note: monsterSingletonKindMessage('multiattack'),
+    })
+
+    const open = monsterActionAcquisitionItems({
+      weapons: [],
+      allowAddWeapon: true,
+      section: 'actions',
+      sectionRows: { actions: [] },
+    })
+    expect(open.find((item) => item.id === 'preset:multiattack')?.disabled).toBeUndefined()
+
+    const natural = monsterActionAcquisitionItems({
+      weapons: [],
+      allowAddWeapon: true,
+      section: 'actions',
+      sectionRows: { actions: [{ id: 'bite', kind: 'natural-weapon', form: 'bite' }] },
+    })
+    expect(natural.find((item) => item.id === 'focus-action:bite')).toMatchObject({
+      note: MONSTER_ACTION_ALREADY_ADDED_NOTE,
+    })
   })
 })

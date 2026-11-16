@@ -23,6 +23,7 @@ export function buildArrayFieldItemAnatomyProps(options: {
     titleId: string
     itemPrefix: string
     reserveDragHandleSlot: boolean
+    reserveCaretSlot: boolean
     gripVisible: boolean
     collapsible: boolean
     dragging?: boolean
@@ -44,7 +45,12 @@ export function buildArrayFieldItemAnatomyProps(options: {
   collapsed: boolean
   onToggleCollapse: () => void
   bodyId: string
-  leadingChrome: { reserveDragHandleSlot: boolean; showDragHandle: boolean; collapsible: boolean }
+  leadingChrome: {
+    reserveDragHandleSlot: boolean
+    reserveCaretSlot: boolean
+    showDragHandle: boolean
+    collapsible: boolean
+  }
   suppressFieldErrorText: boolean
   rowSummaryId: string
   arrayContext: ArrayFieldContextValue

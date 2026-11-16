@@ -22,6 +22,11 @@ export interface FormSectionContextValue {
   /** Presentation density — labels, hints, section headers, rhythm stacks that read context. */
   density: FormDensity
   /**
+   * When an array omits `density`, legends and section chrome follow this while item
+   * fields use `density` (typically compact). Internal — set at array boundaries only.
+   */
+  arraySectionPresentationDensity?: FormDensity
+  /**
    * Inherited control default when presentation density must not imply control scale
    * (e.g. compact array item fields under a comfortable parent).
    */
@@ -52,8 +57,16 @@ export function useFormSectionContext(): FormSectionContextValue {
   return React.useContext(FormSectionContext)
 }
 
+/** Parent density leg for array section chrome when item fields use a denser context. */
+export function resolveArraySectionDensityParent(
+  context: Pick<FormSectionContextValue, 'density' | 'arraySectionPresentationDensity'>,
+): Pick<FormSectionContextValue, 'density'> {
+  return { density: context.arraySectionPresentationDensity ?? context.density }
+}
+
 export interface FormSectionContextOverrides {
   density?: FormDensity
+  arraySectionPresentationDensity?: FormDensity
   defaultControlSize?: FieldSize
   namedGroupDepth?: number
   arrayItemSurface?: SurfaceConfig
@@ -77,6 +90,7 @@ function inheritSectionContextFields(
 ): Omit<FormSectionContextValue, 'depth'> {
   const inherited = {
     density: parent.density,
+    arraySectionPresentationDensity: parent.arraySectionPresentationDensity,
     defaultControlSize: parent.defaultControlSize,
     namedGroupDepth: parent.namedGroupDepth,
     arrayItemSurface: parent.arrayItemSurface,

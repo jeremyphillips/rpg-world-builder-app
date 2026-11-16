@@ -28,6 +28,7 @@ import type {
 import { LazyFieldSuspense } from '../../lazy-field.client'
 import { LazyRichTextField } from '../lazy-rich-text-field.client'
 import { fieldDefaultValue } from '../../../field-config'
+import { optionalDisclosureLeafFieldConfig } from '../../../config/optional-disclosure-config.lib'
 import { useConfirmBeforeClear } from '../../../config/use-confirm-before-clear.client'
 import { normalizedSelectFieldValue } from '../select/select-field-renderer.lib'
 import { useSelectFieldRendererState } from '../select/use-select-field-renderer-state.client'
@@ -101,7 +102,7 @@ export function OptionalDisclosureTextareaFieldRenderer({
         <TextareaField
           {...buildFieldShellProps(
             {
-              config,
+              config: optionalDisclosureLeafFieldConfig(config),
               id,
               hint,
               hintPosition,
@@ -196,7 +197,7 @@ export function OptionalDisclosureTextFieldRenderer({
         <TextField
           {...buildFieldShellProps(
             {
-              config,
+              config: optionalDisclosureLeafFieldConfig(config),
               id,
               hint,
               hintPosition,
@@ -248,14 +249,17 @@ export function OptionalDisclosureSelectFieldRenderer({
   const expandWhenPopulated = disclosure.expandWhenPopulated !== false
   const hasValue = selectFieldHasValue(state.field.value)
   const open = manualOpen || (expandWhenPopulated && hasValue)
+  const leafConfig = optionalDisclosureLeafFieldConfig(state.renderConfig)
+  const readOnlyShellConfig = { ...state.renderConfig, width: 'full' as const }
   const shellSource = {
-    config: state.renderConfig,
+    config: leafConfig,
     id: resolved.id,
     hint: state.hint,
     hintPosition: state.hintPosition,
     presentationSize: state.presentationSize,
     controlSize: state.controlSize,
   }
+  const readOnlyShellSource = { ...shellSource, config: readOnlyShellConfig }
   const selectExtras = {
     digits: state.renderConfig.digits,
     sizingLabel: state.renderConfig.sizingLabel,
@@ -263,7 +267,7 @@ export function OptionalDisclosureSelectFieldRenderer({
     labelPosition: state.renderConfig.labelPosition,
   }
   const readOnlyChrome = {
-    ...buildFieldShellProps(shellSource, state.validation, {
+    ...buildFieldShellProps(readOnlyShellSource, state.validation, {
       sizes: 'both',
       label: 'visible',
     }),
@@ -403,7 +407,7 @@ export function OptionalDisclosureTextSuggestionsFieldRenderer({
         <TextSuggestionsField
           {...buildFieldShellProps(
             {
-              config,
+              config: optionalDisclosureLeafFieldConfig(config),
               id: resolved.id,
               hint: resolved.hint,
               hintPosition: resolved.hintPosition,
@@ -497,7 +501,7 @@ export function OptionalDisclosureRichTextFieldRenderer({
           <LazyRichTextField
             {...buildFieldShellProps(
               {
-                config,
+                config: optionalDisclosureLeafFieldConfig(config),
                 id,
                 hint,
                 hintPosition,

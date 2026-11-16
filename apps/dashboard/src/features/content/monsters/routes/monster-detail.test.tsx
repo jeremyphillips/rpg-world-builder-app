@@ -31,6 +31,30 @@ vi.mock('@/features/homebrew', async () => {
     })),
   }
 })
+vi.mock('@/features/vocabulary', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/features/vocabulary')>()
+  return {
+    ...actual,
+    useCreatureTypeVocabulary: vi.fn(() => ({
+      vocabulary: actual.buildSeedCreatureTypeVocabulary(),
+    })),
+    useCreatureFamilyVocabulary: vi.fn(() => ({
+      vocabulary: actual.buildSeedCreatureFamilyVocabulary(),
+    })),
+  }
+})
+vi.mock('../../classes/hooks/use-classes', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../classes/hooks/use-classes')>()
+  const { loadSeedClasses } = await import('@rpg/catalog/classes')
+  return {
+    ...actual,
+    useClasses: vi.fn(() => ({
+      data: loadSeedClasses('srd-cc-5.2.1'),
+      isPending: false,
+      isError: false,
+    })),
+  }
+})
 vi.mock('../../equipment/hooks/use-equipment', async (importOriginal) => {
   const actual = await importOriginal<typeof UseEquipmentModule>()
   return {
@@ -83,6 +107,18 @@ describe('MonsterDetailContent authoring', () => {
       isPending: false,
       isError: false,
     } as ReturnType<typeof useSkillProficiencies>)
+  })
+
+  it('resolves class classification labels on the detail route', () => {
+    const monster = pickMonster('lich')
+    render(
+      <MemoryRouter>
+        <PageChromeActionsProvider>
+          <MonsterDetailContent monster={monster} campaignId="camp_1" monsterId={monster.id} />
+        </PageChromeActionsProvider>
+      </MemoryRouter>,
+    )
+    expect(screen.getByText(/Undead \(Wizard\)/)).toBeInTheDocument()
   })
 
   it('renders derived stats and an edit affordance for managers', () => {

@@ -420,3 +420,15 @@ describe('monster-display', () => {
     expect(viewModel.reactions[0]?.descriptionHtml).toContain('makes one Antennae attack')
   })
 })
+
+it('prints resolved class labels in the shared detail classification phrase', () => {
+  const monster = pickMonster('lich')
+  const viewModel = buildMonsterDetailViewModel({
+    monster,
+    creatureTypeLabel: 'Undead',
+    classLabel: () => 'Wizard',
+    equipmentById: new Map(),
+    catalogState: 'pending',
+  })
+  expect(viewModel.classificationLabel).toContain('Undead (Wizard)')
+})

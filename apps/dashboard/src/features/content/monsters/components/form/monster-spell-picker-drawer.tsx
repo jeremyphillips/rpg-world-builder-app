@@ -11,7 +11,7 @@ import {
   MONSTER_SPELL_PICKER_NO_RESULTS,
   MONSTER_SPELL_PICKER_SEARCH_PLACEHOLDER,
 } from '../../lib/monster-form-labels'
-import { spellEntryCatalogMetadata } from '../../lib/actions/monster-spell-frequency'
+import { spellEntryCatalogMetadata } from '../../lib/actions/spell/monster-spell-frequency'
 
 const ADD_SPELL_LABEL = 'Add spell'
 

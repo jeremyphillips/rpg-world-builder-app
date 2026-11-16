@@ -66,7 +66,13 @@ describe('deriveResolutionFromSpell (Tier A)', () => {
     expect(resolution.outcomes).toEqual([
       {
         result: 'hit',
-        applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
+        effects: [
+          {
+            kind: 'effect-reference',
+            effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+            amount: 'full',
+          },
+        ],
       },
     ])
   })

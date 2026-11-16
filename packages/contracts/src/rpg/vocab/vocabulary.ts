@@ -32,6 +32,7 @@ export type VocabularyOptionStatus = z.infer<typeof vocabularyOptionStatusSchema
 /** Known vocabulary set ids — only some sets are implemented in product UI. */
 export const VOCABULARY_OPTION_SET_IDS = [
   'creature-types',
+  'creature-families',
   'damage-types',
   'conditions',
   'languages',
@@ -65,6 +66,9 @@ export const vocabularyOptionSchema = z.object({
   source: vocabularyOptionSourceSchema,
   status: vocabularyOptionStatusSchema,
   media: contentMediaSchema.optional(),
+  /** Family metadata; no inherited membership or compatibility. */
+  parentId: vocabularyOptionIdSchema.optional(),
+  allowedCreatureTypes: z.array(vocabularyOptionIdSchema).min(1).optional(),
   /** Creature-type seed or patch only — recommended monster languages. */
   languageAffinities: z.array(vocabularyOptionIdSchema).optional(),
 })

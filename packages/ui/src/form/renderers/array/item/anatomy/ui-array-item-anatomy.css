@@ -1,0 +1,10 @@
+@layer components {
+  .ui-array-item-anatomy {
+    --ui-collapsible-list-item-chrome-size: calc(var(--spacing) * 6);
+    grid-template-columns: minmax(0, 1fr) max-content;
+  }
+
+  .ui-array-item-anatomy--grip {
+    grid-template-columns: var(--ui-collapsible-list-item-chrome-size) minmax(0, 1fr) max-content;
+  }
+}

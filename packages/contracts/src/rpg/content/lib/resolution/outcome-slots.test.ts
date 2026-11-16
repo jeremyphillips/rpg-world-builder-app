@@ -5,6 +5,8 @@ import {
   buildDefaultOutcomeSlots,
   ensureOutcomeSlotsForMethod,
   findOutcomeByResult,
+  getAllowedOutcomeResultsForMethod,
+  getOptionalOutcomeResultsForMethod,
   getOutcomeResultsForMethod,
   hasMeaningfulOutcomeContent,
   isOutcomeEmpty,
@@ -23,44 +25,139 @@ describe('getOutcomeResultsForMethod', () => {
       'successful-save',
     ])
   })
+
+  it('lists optional save outcomes separately from required slots', () => {
+    expect(getOptionalOutcomeResultsForMethod({ kind: 'saving-throw' })).toEqual([
+      'failed-or-successful-save',
+    ])
+    expect(getAllowedOutcomeResultsForMethod({ kind: 'saving-throw' })).toEqual([
+      'failed-save',
+      'successful-save',
+      'failed-or-successful-save',
+    ])
+  })
 })
 
 describe('outcome slot helpers', () => {
   const attackOutcomes: OutcomeLike[] = [
     {
       result: 'hit' as const,
-      applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' as const }],
+      effects: [
+        { kind: 'effect-reference', effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' },
+      ],
     },
   ]
+
+  it('preserves optional failure-or-success without auto-creating the slot', () => {
+    const method = { kind: 'saving-throw' as const, ability: 'con' as const }
+    const hydrated = ensureOutcomeSlotsForMethod(method, [], (result) => ({
+      result,
+      effects: [],
+    }))
+    expect(hydrated.map((outcome) => outcome.result)).toEqual(['failed-save', 'successful-save'])
+
+    const withOptional = ensureOutcomeSlotsForMethod(
+      method,
+      [
+        {
+          result: 'failed-or-successful-save',
+          effects: [{ kind: 'note' as const, description: 'Rider.' }],
+        },
+      ],
+      (result): OutcomeLike => ({ result, effects: [] }),
+    )
+    expect(withOptional.map((outcome) => outcome.result)).toEqual([
+      'failed-save',
+      'successful-save',
+      'failed-or-successful-save',
+    ])
+  })
 
   it('hydrates empty miss slot without dropping stored hit outcome', () => {
     const method = { kind: 'attack' as const, attackType: 'ranged-spell' as const }
     const hydrated = ensureOutcomeSlotsForMethod(method, attackOutcomes, (result) => ({
       result,
-      applications: [],
+      effects: [],
     }))
 
     expect(hydrated).toHaveLength(2)
     expect(hydrated[0]?.result).toBe('hit')
-    expect(hydrated[1]).toEqual({ result: 'miss', applications: [] })
+    expect(hydrated[1]).toEqual({ result: 'miss', effects: [] })
   })
 
   it('strips empty form slots before stored normalization', () => {
     const method = { kind: 'attack' as const, attackType: 'ranged-spell' as const }
     const formSlots = ensureOutcomeSlotsForMethod(method, attackOutcomes, (result) => ({
       result,
-      applications: [],
+      effects: [],
     }))
 
     expect(stripEmptyOutcomeSlots(formSlots)).toEqual(attackOutcomes)
+  })
+
+  it('treats outcome effects and repeat save as meaningful content', () => {
+    expect(
+      hasMeaningfulOutcomeContent({
+        result: 'failed-save',
+        effects: [{ kind: 'condition', conditionId: 'restrained' }],
+      }),
+    ).toBe(true)
+    expect(
+      hasMeaningfulOutcomeContent({
+        result: 'failed-save',
+        effects: [],
+        repeatSave: {
+          timing: { participant: 'target', boundary: 'end', which: 'next' },
+          successOnRepeatEndsEffect: true,
+          secondFailure: { note: 'Second tier.' },
+        },
+      }),
+    ).toBe(true)
+    expect(stripEmptyOutcomeSlots([])).toEqual([])
+  })
+
+  it('orders optional failure-or-success after required save slots', () => {
+    const method = { kind: 'saving-throw' as const, ability: 'con' as const }
+    const ordered = normalizeOutcomeOrder(method, [
+      {
+        result: 'failed-or-successful-save',
+        effects: [{ kind: 'note', description: 'Underwater rider.' }],
+      },
+      {
+        result: 'successful-save',
+        effects: [
+          {
+            kind: 'effect-reference',
+            effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+            amount: 'half',
+          },
+        ],
+      },
+      {
+        result: 'failed-save',
+        effects: [
+          {
+            kind: 'effect-reference',
+            effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+            amount: 'full',
+          },
+        ],
+      },
+    ])
+    expect(ordered.map((outcome) => outcome.result)).toEqual([
+      'failed-save',
+      'successful-save',
+      'failed-or-successful-save',
+    ])
   })
 
   it('preserves miss-only prose in stored shape', () => {
     const missOnly = [
       {
         result: 'miss' as const,
-        applications: [],
-        note: 'Creates a cloud at the point of impact.',
+        effects: [
+          { kind: 'note' as const, description: 'Creates a cloud at the point of impact.' },
+        ],
       },
     ]
 
@@ -74,11 +171,23 @@ describe('outcome slot helpers', () => {
     const shuffled = [
       {
         result: 'successful-save' as const,
-        applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'half' as const }],
+        effects: [
+          {
+            kind: 'effect-reference',
+            effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+            amount: 'half',
+          },
+        ],
       },
       {
         result: 'failed-save' as const,
-        applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' as const }],
+        effects: [
+          {
+            kind: 'effect-reference',
+            effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+            amount: 'full',
+          },
+        ],
       },
     ]
 
@@ -89,7 +198,7 @@ describe('outcome slot helpers', () => {
   })
 
   it('finds outcomes by result', () => {
-    expect(findOutcomeByResult(attackOutcomes, 'hit')?.applications).toHaveLength(1)
+    expect(findOutcomeByResult(attackOutcomes, 'hit')?.effects).toHaveLength(1)
     expect(findOutcomeByResult(attackOutcomes, 'miss')).toBeUndefined()
   })
 })
@@ -99,17 +208,26 @@ describe('buildDefaultOutcomeSlots', () => {
     const effectId = RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID
 
     expect(buildDefaultOutcomeSlots({ kind: 'automatic' }, effectId)).toEqual([
-      { result: 'applied', applications: [{ effectId, amount: 'full' }] },
+      {
+        result: 'applied',
+        effects: [{ kind: 'effect-reference', effectId, amount: 'full' }],
+      },
     ])
 
     expect(buildDefaultOutcomeSlots({ kind: 'attack' }, effectId)).toEqual([
-      { result: 'hit', applications: [{ effectId, amount: 'full' }] },
-      { result: 'miss', applications: [] },
+      { result: 'hit', effects: [{ kind: 'effect-reference', effectId, amount: 'full' }] },
+      { result: 'miss', effects: [] },
     ])
 
     expect(buildDefaultOutcomeSlots({ kind: 'saving-throw' }, effectId)).toEqual([
-      { result: 'failed-save', applications: [{ effectId, amount: 'full' }] },
-      { result: 'successful-save', applications: [{ effectId, amount: 'half' }] },
+      {
+        result: 'failed-save',
+        effects: [{ kind: 'effect-reference', effectId, amount: 'full' }],
+      },
+      {
+        result: 'successful-save',
+        effects: [{ kind: 'effect-reference', effectId, amount: 'half' }],
+      },
     ])
   })
 })

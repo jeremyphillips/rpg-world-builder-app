@@ -69,17 +69,18 @@ function validateResolutionFormOutcomeApplications(
   outcomeIndex: number,
   ctx: z.RefinementCtx,
 ): void {
-  const applicationEffectIds = outcome.applications.map((application) => application.effectId)
+  const references = (outcome.effects ?? []).filter((effect) => effect.kind === 'effect-reference')
+  const applicationEffectIds = references.map((application) => application.effectId)
   const uniqueApplicationEffectIds = new Set(applicationEffectIds)
   if (uniqueApplicationEffectIds.size !== applicationEffectIds.length) {
     addCustomRefinementIssue(
       ctx,
       resolutionFormValidationMessages.duplicateOutcomeApplicationEffectId(),
-      ['outcomes', outcomeIndex, 'applications'],
+      ['outcomes', outcomeIndex, 'effects'],
     )
   }
 
-  outcome.applications.forEach((application, applicationIndex) => {
+  references.forEach((application, applicationIndex) => {
     const effect = findResolutionEffectById(values.effects, application.effectId)
     if (!effect) {
       addCustomRefinementIssue(
@@ -87,7 +88,7 @@ function validateResolutionFormOutcomeApplications(
         resolutionFormValidationMessages.unknownEffectReference({
           effectId: application.effectId,
         }),
-        ['outcomes', outcomeIndex, 'applications', applicationIndex, 'effectId'],
+        ['outcomes', outcomeIndex, 'effects', applicationIndex, 'effectId'],
       )
       return
     }
@@ -98,7 +99,7 @@ function validateResolutionFormOutcomeApplications(
         resolutionFormValidationMessages.halfNotSupportedForEffectKind({
           kind: effect.kind,
         }),
-        ['outcomes', outcomeIndex, 'applications', applicationIndex, 'amount'],
+        ['outcomes', outcomeIndex, 'effects', applicationIndex, 'amount'],
       )
     }
   })

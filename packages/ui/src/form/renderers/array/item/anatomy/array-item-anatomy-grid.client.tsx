@@ -73,7 +73,7 @@ export function ArrayItemAnatomyGrid({
       <div
         data-array-item-anatomy-grid=""
         className={cn(presentation.className, className)}
-        style={{ ...presentation.style, ...style }}
+        style={style}
         {...props}
       >
         {showGrip ? (

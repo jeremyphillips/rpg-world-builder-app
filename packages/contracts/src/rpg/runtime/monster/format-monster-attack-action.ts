@@ -1,3 +1,4 @@
+import { formatEffectEnd, type EffectEndFormatContext } from '../../primitives/mechanics/effect-end'
 import { getEffectConditionLabel } from '../../vocab/effect-condition'
 import { formatStatBlockDamageComponent } from './format-stat-block-damage'
 import type { ResolvedOnHitEffect } from './resolve-monster-action-attack-profile'
@@ -11,6 +12,8 @@ export type FormattableMonsterAttack = {
   reach?: number
   range?: { normal: number; long?: number }
   onHit?: ResolvedOnHitEffect[]
+  /** Creature name for source-bound effect-end phrasing. */
+  sourceName?: string
 }
 
 function attackPrefix(modes: readonly ('melee' | 'ranged')[]): string | undefined {
@@ -34,10 +37,21 @@ function distanceClause(line: FormattableMonsterAttack): string | undefined {
   return parts.join(' or ')
 }
 
-function conditionClause(effect: Extract<ResolvedOnHitEffect, { kind: 'condition' }>): string {
+function effectEndFormatContext(line: FormattableMonsterAttack): EffectEndFormatContext {
+  return {
+    voice: 'monster-stat-block',
+    ...(line.sourceName ? { sourceName: line.sourceName } : {}),
+  }
+}
+
+function conditionClause(
+  effect: Extract<ResolvedOnHitEffect, { kind: 'condition' }>,
+  line: FormattableMonsterAttack,
+): string {
   const label = getEffectConditionLabel(effect.conditionId)
+  const timing = effect.end ? ` ${formatEffectEnd(effect.end, effectEndFormatContext(line))}` : ''
   const qualification = effect.description ? ` ${effect.description}` : ''
-  return `the target has the ${label} condition${qualification}`
+  return `the target has the ${label} condition${timing}${qualification}`
 }
 
 function hitClause(line: FormattableMonsterAttack): string | undefined {
@@ -57,7 +71,7 @@ function hitClause(line: FormattableMonsterAttack): string | undefined {
   ]
   const conditions = (line.onHit ?? [])
     .filter((effect) => effect.kind === 'condition')
-    .map((effect) => conditionClause(effect))
+    .map((effect) => conditionClause(effect, line))
   const notes = (line.onHit ?? [])
     .filter((effect) => effect.kind === 'note')
     .map((effect) => effect.description)

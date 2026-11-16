@@ -14,7 +14,10 @@ Monsters / stat block entries. Part of the [`content`](../README.md) feature; se
 | Actions tab UI                        | [`components/form/monster-action-sections.tsx`](./components/form/monster-action-sections.tsx)                             |
 | Weapon action mode audit              | [`docs/weapon-action-modes.md`](./docs/weapon-action-modes.md)                                                             |
 | Statistics tab lib                    | [`lib/statistics/`](./lib/statistics/)                                                                                     |
-| Creature details tab lib              | [`lib/creature-details/`](./lib/creature-details/)                                                                         |
+| Creature details tab lib              | [`lib/creature-details/`](./lib/creature-details/) (skills, languages, defenses)                                           |
+| Traits tab lib                        | [`lib/traits/`](./lib/traits/)                                                                                             |
+| Cross-tab spellcasting                | [`lib/casting/`](./lib/casting/) — shared ability sources; see [action-authoring.md](./docs/action-authoring.md)           |
+| Action authoring map                  | [action-authoring.md](./docs/action-authoring.md) — `actions/{save,spell,legendary,weapon,recharge,…}`                     |
 | Detail read model                     | [`lib/monster-display.ts`](./lib/monster-display.ts)                                                                       |
 | Catalog validation / write gates      | [`docs/catalog-validation.md`](./docs/catalog-validation.md)                                                               |
 | Equipment catalog-item swap (planned) | [`.cursor/plans/monster-equipment-catalog-swap.plan.md`](../../../../.cursor/plans/monster-equipment-catalog-swap.plan.md) |

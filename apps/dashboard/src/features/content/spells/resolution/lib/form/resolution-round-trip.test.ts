@@ -59,15 +59,15 @@ describe('spell resolution round trips', () => {
     const storedShape = formOutcomesToStoredShape(method, [
       {
         result: 'hit',
-        applications: [{ effectId: 'damage', amount: 'full' }],
+        effects: [{ kind: 'effect-reference', effectId: 'damage', amount: 'full' }],
       },
-      { result: 'miss', applications: [] },
+      { result: 'miss', effects: [] },
     ])
 
     expect(storedShape).toEqual([
       {
         result: 'hit',
-        applications: [{ effectId: 'damage', amount: 'full' }],
+        effects: [{ kind: 'effect-reference', effectId: 'damage', amount: 'full' }],
       },
     ])
   })
@@ -85,10 +85,11 @@ describe('spell resolution round trips', () => {
     expect(formValues?.attackType).toBe('melee-spell')
     expect(formValues?.target?.proximity.kind).toBe('reach')
     const hitOutcome = formValues?.outcomes?.find((outcome) => outcome.result === 'hit')
-    expect(hitOutcome?.note).toContain("can't regain Hit Points")
+    const hitNote = hitOutcome?.effects?.find((effect) => effect.kind === 'note')
+    expect(hitNote?.kind === 'note' ? hitNote.description : '').toContain("can't regain Hit Points")
     expect(formValues?.outcomes?.find((outcome) => outcome.result === 'miss')).toEqual({
       result: 'miss',
-      applications: [],
+      effects: [],
     })
   })
 

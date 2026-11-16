@@ -25,16 +25,18 @@ import { buildSlotFieldBody, wrapSlotFieldBody } from './slot-field-renderer.lib
 
 export interface SlotFieldRendererProps {
   config: SlotConfig
+  namePrefix?: string
+  path?: string
 }
 
 /** Renders custom form UI supplied by the field config inside `FormProvider`. */
-export function SlotFieldRenderer({ config }: SlotFieldRendererProps) {
+export function SlotFieldRenderer({ config, namePrefix, path }: SlotFieldRendererProps) {
   const sectionContext = useFormSectionContext()
   const inAnatomyRow = useFieldRowParticipation()
   const { density } = sectionContext
   const { rhythm, size } = resolveFormDensity(density)
   const { chrome: resolvedChrome } = resolveFieldChromeProps(config, sectionContext)
-  const content = config.render()
+  const content = config.render({ namePrefix, path: path ?? namePrefix ?? config.name })
 
   if (inAnatomyRow) {
     if (content == null) return null
@@ -88,7 +90,7 @@ function SlotFormItemSectionInner({
   return (
     <SlotIssueContext.Provider value={slotIssueContext}>
       <FormSectionContext.Provider value={slotChildContext}>
-        <SlotFieldRenderer config={item} />
+        <SlotFieldRenderer config={item} namePrefix={namePrefix} path={slotPath} />
       </FormSectionContext.Provider>
     </SlotIssueContext.Provider>
   )

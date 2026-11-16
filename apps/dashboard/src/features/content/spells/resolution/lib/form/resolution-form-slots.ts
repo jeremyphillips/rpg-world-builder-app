@@ -3,7 +3,6 @@ import type { FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import { SpellResolutionEffectRemoveControl } from '../../components/effects/spell-resolution-effect-remove-control'
-import { SpellResolutionEffectAddControl } from '../../components/effects/spell-resolution-effect-add-control'
 import { SpellResolutionEffectsApplicationLabel } from '../../components/effects/spell-resolution-effects-application-label'
 import { SpellResolutionHowItResolves } from '../../components/method/spell-resolution-how-it-resolves'
 import { SpellResolutionProjectilesPreview } from '../../components/method/spell-resolution-how-it-resolves-projectiles'
@@ -23,8 +22,13 @@ import {
   resolutionTargetAuthoringFields,
 } from '../../../../lib/forms/fields/resolution-target-authoring-fields'
 import { formatEffectRowPrimary, formatEffectRowSummary } from '../../../lib/effects/effect-display'
+import { buildResolutionEffectArrayAddMenu } from '../effects/resolution-effect-add-menu.lib'
 import { resolutionEffectItemFields } from '../effects/resolution-effect-form-fields'
-import { resolutionSelectionContextFromWatched } from '../selection/resolution-selection-context.lib'
+import { buildResolutionEffectAddMenuItems } from '../selection/resolution-selection-options.lib'
+import {
+  resolutionFormToSelectionContext,
+  resolutionSelectionContextFromWatched,
+} from '../selection/resolution-selection-context.lib'
 import { RESOLUTION_FIELD_LABELS, RESOLUTION_SECTION_LABELS } from './resolution-form-labels'
 import {
   combineFieldVisibility,
@@ -33,6 +37,7 @@ import {
   visibleWhenSelectionMode,
   visibleWhenSelectionModeIsOneOf,
 } from './resolution-form-visibility'
+import type { ResolutionFormValues } from './resolution-form-schema'
 import { RESOLUTION_FIELD_NAME } from './resolution-form-values'
 import { visibleWhenApplicationPatternKind } from './resolution-target-form-fields'
 import { areaGeometryFormFields } from '../../../../lib/forms/fields/area-geometry-form-fields'
@@ -53,10 +58,29 @@ const RESOLUTION_SUMMARY_DEPENDS_ON = [
 // Effect row summaries (e.g. "1d10 force") react to target/method changes above.
 
 function resolutionEffectsArrayField(ctx: ContentFormCtx): FormItem {
+  const menu = buildResolutionEffectArrayAddMenu()
   return {
     kind: 'array',
     name: `${RESOLUTION_PREFIX}.effects`,
-    addAction: false,
+    addAction: {
+      label: RESOLUTION_SECTION_LABELS.addAuthoredEffect,
+      menu: {
+        ...menu,
+        contextDependsOn: [RESOLUTION_PREFIX],
+        presentationWhen: (watched) => {
+          const resolution = watched[RESOLUTION_PREFIX] as ResolutionFormValues | undefined
+          const items = buildResolutionEffectAddMenuItems(
+            resolutionFormToSelectionContext(resolution),
+          )
+          return Object.fromEntries(
+            items.map((item) => [
+              item.id,
+              { disabled: item.disabled, ...(item.note ? { note: item.note } : {}) },
+            ]),
+          )
+        },
+      },
+    },
     item: {
       variant: 'detailed',
       removable: false,
@@ -176,11 +200,6 @@ function resolutionEffectsAndOutcomesGroup(ctx: ContentFormCtx): FormItem {
                 render: () => createElement(SpellResolutionEffectsApplicationLabel),
               },
               resolutionEffectsArrayField(ctx),
-              {
-                kind: 'slot',
-                name: '_resolutionEffectAddControl',
-                render: () => createElement(SpellResolutionEffectAddControl),
-              },
             ],
           },
         ],

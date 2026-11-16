@@ -26,6 +26,7 @@ import {
 import { indexCampaignPrimaryWorldBlockersByContentId } from './reference-sources/campaign-settings'
 import {
   indexMonsterEquipmentBlockersByContentId,
+  indexMonsterClassBlockersByContentId,
   indexMonsterSkillProficiencyBlockersByContentId,
 } from './reference-sources/monsters'
 import { indexContentSpellReferenceBlockersByContentId } from './reference-sources/spell-references'
@@ -111,4 +112,8 @@ export const monsterSkillProficiencySource: ContentUsageSource = {
 /** Placeholder until encounter surfaces reference monsters in usage reads. */
 export const emptyContentUsageSource: ContentUsageSource = {
   loadBlockerIndex: async () => new Map(),
+}
+
+export const monsterClassSource: ContentUsageSource = {
+  loadBlockerIndex: (ctx) => indexMonsterClassBlockersByContentId(ctx),
 }

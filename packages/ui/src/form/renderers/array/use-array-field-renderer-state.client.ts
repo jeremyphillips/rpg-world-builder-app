@@ -8,10 +8,13 @@
  * renderer stays a thin fieldset shell.
  */
 import * as React from 'react'
-import type { UseFieldArrayReturn } from 'react-hook-form'
+import { useFormContext, type UseFieldArrayReturn } from 'react-hook-form'
 
 import type { ArrayConfig } from '../../field-config'
-import { useFormSectionContext } from '../../context/form-section.context'
+import {
+  resolveArraySectionDensityParent,
+  useFormSectionContext,
+} from '../../context/form-section.context'
 import { useArrayItemCollapseState } from '../../hooks/use-array-item-collapse-state.client'
 import { useFormValidationPresentation } from '../../hooks/use-form-validation-presentation.client'
 import { useFormUiContext } from '../../context/form-ui.context'
@@ -29,6 +32,7 @@ import {
   resolveArrayValidationCounts,
 } from './use-array-field-renderer-state.lib'
 import { resolveFieldArrayRowKey } from './resolve-field-array-row-key.lib'
+import { getArrayFieldMutators } from '../../context/array-field-mutators.registry'
 
 type UseArrayFieldRendererStateOptions = {
   config: ArrayConfig
@@ -53,13 +57,14 @@ export function useArrayFieldRendererState({
   watchedItems,
   wrapSectionChrome,
 }: UseArrayFieldRendererStateOptions) {
+  const { control, setValue } = useFormContext()
   const { addValidationSessionExpandKeys } = useFormUiContext()
   const validation = useFormValidationPresentation()
-  const parentContext = useFormSectionContext()
-  const { depth, inRhythmStack } = parentContext
+  const sectionContext = useFormSectionContext()
+  const { depth, inRhythmStack } = sectionContext
   const chrome = resolveArrayFieldRendererChrome({
     config,
-    parentContext,
+    parentContext: resolveArraySectionDensityParent(sectionContext),
     depth,
     inRhythmStack,
     fieldsLength: fields.length,
@@ -165,6 +170,10 @@ export function useArrayFieldRendererState({
   const itemProps = React.useCallback(
     (rhfField: Record<string, unknown>, index: number) => {
       const itemValues = (getValues(`${fullName}.${index}`) ?? {}) as Record<string, unknown>
+      const rowRemovable =
+        typeof itemConfig.removable === 'function'
+          ? itemConfig.removable(itemValues, index)
+          : itemConfig.removable
       const rowCollapsible =
         collapsible &&
         (itemConfig.resolveCollapsible ? itemConfig.resolveCollapsible(itemValues, index) : true)
@@ -176,22 +185,49 @@ export function useArrayFieldRendererState({
         itemId: resolveFieldArrayRowKey(rhfField, config.keyName),
         legend: itemLegend,
         itemBodyStackClasses,
-        canRemove,
-        showDefaultItemRemove,
+        canRemove: rowRemovable && !itemConfig.removeSlot,
+        showDefaultItemRemove: rowRemovable && !itemConfig.removeSlot,
         showDragHandle: reorderConfigured,
         fieldsLength: fields.length,
         collapsible: rowCollapsible,
+        reserveCaretSlot: collapsible,
         variant,
         collapsedIds,
         onToggleCollapse: toggleCollapse,
         onRemove: () => {
+          if (itemConfig.remove) {
+            itemConfig.remove({
+              index,
+              row: getValues(`${fullName}.${index}`),
+              getValues: (path) => getValues(path),
+              removeAt: (path, rowIndex) => {
+                const mutators = getArrayFieldMutators(control, path)
+                if (mutators) {
+                  mutators.remove(rowIndex)
+                  return
+                }
+                const current = getValues(path)
+                if (!Array.isArray(current)) return
+                setValue(
+                  path,
+                  current.filter((_, entryIndex) => entryIndex !== rowIndex),
+                  { shouldDirty: true, shouldTouch: true, shouldValidate: true },
+                )
+              },
+              setValue: (path, value) =>
+                setValue(path, value, {
+                  shouldDirty: true,
+                  shouldTouch: true,
+                  shouldValidate: true,
+                }),
+            })
+            return
+          }
           remove(index)
         },
       }
     },
     [
-      canRemove,
-      showDefaultItemRemove,
       collapsedIds,
       collapsible,
       config,
@@ -200,8 +236,10 @@ export function useArrayFieldRendererState({
       getValues,
       idPrefix,
       itemBodyStackClasses,
+      control,
       itemConfig,
       remove,
+      setValue,
       reorderConfigured,
       sectionLabel,
       toggleCollapse,

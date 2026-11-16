@@ -34,8 +34,12 @@ import {
   finalizeContentInput,
   slugForInputParse,
 } from '../../lib/forms/registry/content-form-key-helpers'
-import { mapWeaponActionDamageToForm } from './actions/monster-weapon-damage-form'
-import { withDefaultSaveResolutionTarget } from './actions/monster-save-resolution-target.lib'
+import { hydrateOnHitInActionList } from '../../lib/forms/mechanics/hydrate-effect-end-authoring'
+import { mapWeaponActionDamageToForm } from './actions/weapon/monster-weapon-damage-form'
+import {
+  withDefaultSaveResolutionTarget,
+  withSaveOutcomeSlots,
+} from './actions/save/monster-save-resolution-target.lib'
 import {
   normalizeMonsterFormValues,
   type MonsterNormalizeBaseline,
@@ -66,6 +70,8 @@ export type MonsterFormValues = FieldValues & {
   description?: string
   sizes?: Monster['sizes']
   creatureType?: Monster['creatureType']
+  creatureFamilyIds?: Monster['creatureFamilyIds']
+  classIds?: Monster['classIds']
   alignment?: Monster['alignment']
   abilityScores: Monster['abilityScores']
   armorClass: {
@@ -174,6 +180,8 @@ export function monsterToFormValues(
     description: entity.description,
     sizes: entity.sizes,
     creatureType: entity.creatureType,
+    creatureFamilyIds: entity.creatureFamilyIds,
+    classIds: entity.classIds,
     alignment: entity.alignment,
     abilityScores: entity.abilityScores,
     armorClass: {
@@ -203,18 +211,34 @@ export function monsterToFormValues(
     defenses: entity.defenses,
     equipment: entity.equipment,
     traits: entity.traits,
-    actions: entity.actions
-      .map(mapWeaponActionDamageToForm)
-      .map((action) => withDefaultSaveResolutionTarget(action as Record<string, unknown>)),
-    bonusActions: entity.bonusActions
-      .map(mapWeaponActionDamageToForm)
-      .map((action) => withDefaultSaveResolutionTarget(action as Record<string, unknown>)),
-    reactions: entity.reactions
-      .map(mapWeaponActionDamageToForm)
-      .map((action) => withDefaultSaveResolutionTarget(action as Record<string, unknown>)),
-    legendaryActions: entity.legendaryActions
-      .map(mapWeaponActionDamageToForm)
-      .map((action) => withDefaultSaveResolutionTarget(action as Record<string, unknown>)),
+    actions: hydrateOnHitInActionList(
+      entity.actions
+        .map(mapWeaponActionDamageToForm)
+        .map((action) =>
+          withSaveOutcomeSlots(withDefaultSaveResolutionTarget(action as Record<string, unknown>)),
+        ),
+    ),
+    bonusActions: hydrateOnHitInActionList(
+      entity.bonusActions
+        .map(mapWeaponActionDamageToForm)
+        .map((action) =>
+          withSaveOutcomeSlots(withDefaultSaveResolutionTarget(action as Record<string, unknown>)),
+        ),
+    ),
+    reactions: hydrateOnHitInActionList(
+      entity.reactions
+        .map(mapWeaponActionDamageToForm)
+        .map((action) =>
+          withSaveOutcomeSlots(withDefaultSaveResolutionTarget(action as Record<string, unknown>)),
+        ),
+    ),
+    legendaryActions: hydrateOnHitInActionList(
+      entity.legendaryActions
+        .map(mapWeaponActionDamageToForm)
+        .map((action) =>
+          withSaveOutcomeSlots(withDefaultSaveResolutionTarget(action as Record<string, unknown>)),
+        ),
+    ),
     ...(entity.legendaryActionUses !== undefined
       ? { legendaryActionUses: entity.legendaryActionUses }
       : {}),
@@ -235,6 +259,8 @@ function baselineFromEntity(entity: Monster | undefined): MonsterNormalizeBaseli
   if (!entity) return undefined
   return {
     hover: entity.hover,
+    creatureFamilyIds: entity.creatureFamilyIds,
+    classIds: entity.classIds,
     description: entity.description,
     experiencePointsOverride: entity.experiencePointsOverride,
   }

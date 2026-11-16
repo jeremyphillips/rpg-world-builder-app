@@ -6,7 +6,6 @@ import { rollSchema } from '../../../primitives/mechanics/roll'
 import { abilitySchema } from '../../../vocab/ability'
 import { damageTypeIdSchema } from '../../../vocab/damage/vocabulary'
 import {
-  RESOLUTION_APPLICATION_AMOUNTS,
   RESOLUTION_OUTCOME_RESULTS,
   RESOLUTION_SELECTION_MODES,
   RESOLUTION_TARGET_COUNT_KINDS,
@@ -17,11 +16,29 @@ import {
   type ResolutionSelectionMode,
 } from '../../../vocab/resolution'
 import { isEffectKindAllowedForTarget } from './effect-target-compatibility'
+import type { OrderedConditionEffect } from '../../../primitives/mechanics/ordered-effect'
 import {
-  getOutcomeResultsForMethod,
+  resolutionOutcomeEffectSchema,
+  type ResolutionOutcomeEffect,
+} from './resolution-outcome-effect'
+
+export {
+  resolutionEffectReferenceSchema,
+  resolutionOutcomeEffectSchema,
+  type ResolutionEffectReference,
+  type ResolutionOutcomeEffect,
+} from './resolution-outcome-effect'
+import { resolutionEffectIdSchema, type ResolutionEffectId } from './resolution-effect-id'
+import {
+  getAllowedOutcomeResultsForMethod,
   hasMeaningfulOutcomeContent,
   supportsPartialApplicationForEffectKind,
 } from './outcome-slots'
+import {
+  hasMeaningfulRepeatSaveSecondFailure,
+  repeatSaveSchema,
+  type RepeatSave,
+} from './repeat-save'
 import { validateResolutionMethodCompatibility } from './selection-method-compatibility'
 import { validateResolutionModeFields } from './selection-mode-validation'
 import { isResolutionEffectKind } from './selection-availability'
@@ -52,9 +69,7 @@ export const effectResolutionMethodSchema = z.discriminatedUnion('kind', [
 
 export type EffectResolutionMethod = z.infer<typeof effectResolutionMethodSchema>
 
-export const resolutionEffectIdSchema = z.string().min(1).brand<'ResolutionEffectId'>()
-
-export type ResolutionEffectId = z.infer<typeof resolutionEffectIdSchema>
+export { resolutionEffectIdSchema, type ResolutionEffectId } from './resolution-effect-id'
 
 export const resolutionTargetProximitySchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('touch') }),
@@ -105,22 +120,11 @@ export const resolutionEffectSchema = z.discriminatedUnion('kind', [
 
 export type ResolutionEffect = z.infer<typeof resolutionEffectSchema>
 
-export const resolutionApplicationSchema = z.object({
-  effectId: resolutionEffectIdSchema,
-  amount: z.enum(RESOLUTION_APPLICATION_AMOUNTS),
+export const resolutionOutcomeSchema = z.object({
+  result: z.enum(RESOLUTION_OUTCOME_RESULTS),
+  effects: z.array(resolutionOutcomeEffectSchema).default([]),
+  repeatSave: repeatSaveSchema.optional(),
 })
-
-export type ResolutionApplication = z.infer<typeof resolutionApplicationSchema>
-
-export const resolutionOutcomeSchema = z
-  .object({
-    result: z.enum(RESOLUTION_OUTCOME_RESULTS),
-    note: z.string().trim().optional(),
-    applications: z.array(resolutionApplicationSchema).default([]),
-  })
-  .refine((value) => value.applications.length > 0 || Boolean(value.note?.trim()), {
-    message: spellResolutionValidationMessages.outcomeRequiresApplicationOrNote(),
-  })
 
 export type ResolutionOutcome = z.infer<typeof resolutionOutcomeSchema>
 
@@ -164,7 +168,7 @@ export const effectResolutionFieldShape = {
   origin: resolutionOriginSchema.optional(),
   areaOfEffect: areaGeometrySchema.optional(),
   occupantRequirements: resolutionTargetRequirementsSchema.optional(),
-  effects: z.array(resolutionEffectSchema).min(1),
+  effects: z.array(resolutionEffectSchema),
   outcomes: z.array(resolutionOutcomeSchema).min(1),
 }
 
@@ -178,8 +182,8 @@ export type EffectResolutionValidationInput = {
   effects: readonly ResolutionEffect[]
   outcomes: readonly {
     result: ResolutionOutcomeResult
-    applications: readonly { effectId: ResolutionEffectId; amount: string }[]
-    note?: string
+    effects?: readonly ResolutionOutcomeEffect[]
+    repeatSave?: RepeatSave
   }[]
 }
 
@@ -204,9 +208,73 @@ function refineOccupantRequirementsFields(
   refineRequirementsForTargetKind('creature', requirements, ctx, ['occupantRequirements'])
 }
 
+type EffectResolutionValidationOptions = {
+  /** Publish rejects dangling effect ids. Draft normalize leaves them in place. */
+  requireKnownEffectIds?: boolean
+}
+
+function outcomeEffectLists(outcome: EffectResolutionValidationInput['outcomes'][number]): Array<{
+  effects: readonly ResolutionOutcomeEffect[]
+  path: (string | number)[]
+}> {
+  return [
+    { effects: outcome.effects ?? [], path: ['effects'] },
+    {
+      effects: outcome.repeatSave?.secondFailure.effects ?? [],
+      path: ['repeatSave', 'secondFailure', 'effects'],
+    },
+  ]
+}
+
+function validateOutcomeEffectList(
+  outcomeIndex: number,
+  effects: readonly ResolutionOutcomeEffect[],
+  path: (string | number)[],
+  effectById: Map<ResolutionEffectId, ResolutionEffect>,
+  ctx: z.RefinementCtx,
+  options: EffectResolutionValidationOptions,
+): void {
+  const seenReferenceIds = new Set<string>()
+  effects.forEach((effect, effectIndex) => {
+    if (effect.kind !== 'effect-reference') return
+    if (seenReferenceIds.has(effect.effectId)) {
+      addCustomRefinementIssue(
+        ctx,
+        spellResolutionValidationMessages.duplicateOutcomeApplicationEffectId(),
+        ['outcomes', outcomeIndex, ...path],
+      )
+    }
+    seenReferenceIds.add(effect.effectId)
+
+    const definition = effectById.get(effect.effectId)
+    if (!definition) {
+      if (options.requireKnownEffectIds === false) return
+      addCustomRefinementIssue(
+        ctx,
+        spellResolutionValidationMessages.unknownEffectReference({
+          effectId: effect.effectId,
+        }),
+        ['outcomes', outcomeIndex, ...path, effectIndex, 'effectId'],
+      )
+      return
+    }
+
+    if (effect.amount === 'half' && !supportsPartialApplicationForEffectKind(definition.kind)) {
+      addCustomRefinementIssue(
+        ctx,
+        spellResolutionValidationMessages.halfNotSupportedForEffectKind({
+          kind: definition.kind,
+        }),
+        ['outcomes', outcomeIndex, ...path, effectIndex, 'amount'],
+      )
+    }
+  })
+}
+
 export function validateEffectResolution(
   resolution: EffectResolutionValidationInput,
   ctx: z.RefinementCtx,
+  options: EffectResolutionValidationOptions = {},
 ): void {
   validateResolutionModeFields(resolution, ctx)
   refineOccupantRequirementsFields(resolution, ctx)
@@ -264,7 +332,13 @@ export function validateEffectResolution(
     ])
   }
 
-  const allowedResults = getOutcomeResultsForMethod(resolution.method)
+  const allowedResults = getAllowedOutcomeResultsForMethod(resolution.method)
+  const failedSaveOutcome = resolution.outcomes.find((outcome) => outcome.result === 'failed-save')
+  const firstFailureConditionIds = new Set(
+    (failedSaveOutcome?.effects ?? [])
+      .filter((effect): effect is OrderedConditionEffect => effect.kind === 'condition')
+      .map((effect) => effect.conditionId),
+  )
 
   resolution.outcomes.forEach((outcome, outcomeIndex) => {
     if (!allowedResults.includes(outcome.result)) {
@@ -277,39 +351,57 @@ export function validateEffectResolution(
       )
     }
 
-    const applicationEffectIds = outcome.applications.map((application) => application.effectId)
-    const uniqueApplicationEffectIds = new Set(applicationEffectIds)
-    if (uniqueApplicationEffectIds.size !== applicationEffectIds.length) {
+    for (const list of outcomeEffectLists(outcome)) {
+      validateOutcomeEffectList(outcomeIndex, list.effects, list.path, effectById, ctx, options)
+    }
+
+    if (outcome.repeatSave && outcome.result !== 'failed-save') {
       addCustomRefinementIssue(
         ctx,
-        spellResolutionValidationMessages.duplicateOutcomeApplicationEffectId(),
-        ['outcomes', outcomeIndex, 'applications'],
+        spellResolutionValidationMessages.repeatSaveOnlyOnFailedSave(),
+        ['outcomes', outcomeIndex, 'repeatSave'],
       )
     }
 
-    outcome.applications.forEach((application, applicationIndex) => {
-      const effect = effectById.get(application.effectId)
-      if (!effect) {
+    outcome.repeatSave?.secondFailure.effects?.forEach((effect, effectIndex) => {
+      if (effect.kind !== 'condition' || !effect.replacesConditionId) return
+      if (!firstFailureConditionIds.has(effect.replacesConditionId)) {
         addCustomRefinementIssue(
           ctx,
-          spellResolutionValidationMessages.unknownEffectReference({
-            effectId: application.effectId,
+          spellResolutionValidationMessages.invalidConditionReplacementReference({
+            conditionId: effect.replacesConditionId,
           }),
-          ['outcomes', outcomeIndex, 'applications', applicationIndex, 'effectId'],
-        )
-        return
-      }
-
-      if (application.amount === 'half' && !supportsPartialApplicationForEffectKind(effect.kind)) {
-        addCustomRefinementIssue(
-          ctx,
-          spellResolutionValidationMessages.halfNotSupportedForEffectKind({
-            kind: effect.kind,
-          }),
-          ['outcomes', outcomeIndex, 'applications', applicationIndex, 'amount'],
+          [
+            'outcomes',
+            outcomeIndex,
+            'repeatSave',
+            'secondFailure',
+            'effects',
+            effectIndex,
+            'replacesConditionId',
+          ],
         )
       }
     })
+  })
+}
+
+/** Publish-only: repeat-save must include a meaningful second failure tier. */
+export function refineRepeatSaveSecondFailureForPublish(
+  resolution: EffectResolutionValidationInput,
+  ctx: z.RefinementCtx,
+): void {
+  resolution.outcomes.forEach((outcome, outcomeIndex) => {
+    if (
+      outcome.repeatSave &&
+      !hasMeaningfulRepeatSaveSecondFailure(outcome.repeatSave.secondFailure)
+    ) {
+      addCustomRefinementIssue(
+        ctx,
+        spellResolutionValidationMessages.repeatSaveRequiresSecondFailure(),
+        ['outcomes', outcomeIndex, 'repeatSave', 'secondFailure'],
+      )
+    }
   })
 }
 
@@ -320,6 +412,7 @@ export const effectResolutionSchema = z
   })
   .strict()
   .superRefine(validateEffectResolution)
+  .superRefine(refineRepeatSaveSecondFailureForPublish)
 
 export type EffectResolution = z.infer<typeof effectResolutionSchema>
 

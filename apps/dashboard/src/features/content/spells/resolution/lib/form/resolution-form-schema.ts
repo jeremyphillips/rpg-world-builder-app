@@ -1,6 +1,9 @@
 import {
   abilitySchema,
   damageTypeIdSchema,
+  orderedConditionEffectSchema,
+  orderedNoteEffectSchema,
+  repeatSaveSchema,
   RESOLUTION_APPLICATION_AMOUNTS,
   SPELL_RESOLUTION_ATTACK_TYPES,
   RESOLUTION_PROXIMITY_KINDS,
@@ -51,19 +54,31 @@ export const resolutionEffectFormItemSchema = z.discriminatedUnion('kind', [
 
 export type ResolutionEffectFormItem = z.infer<typeof resolutionEffectFormItemSchema>
 
-export const resolutionOutcomeApplicationFormSchema = z.object({
+export const resolutionOutcomeEffectReferenceFormSchema = z.object({
+  kind: z.literal('effect-reference'),
   effectId: z.string().min(1),
   amount: z.enum(RESOLUTION_APPLICATION_AMOUNTS),
 })
 
-export type ResolutionOutcomeApplicationFormItem = z.infer<
-  typeof resolutionOutcomeApplicationFormSchema
+export type ResolutionOutcomeEffectReferenceFormItem = z.infer<
+  typeof resolutionOutcomeEffectReferenceFormSchema
 >
+
+export const resolutionOutcomeEffectFormSchema = z.discriminatedUnion('kind', [
+  resolutionOutcomeEffectReferenceFormSchema,
+  orderedConditionEffectSchema,
+  orderedNoteEffectSchema,
+])
+
+export type ResolutionOutcomeEffectFormItem = z.infer<typeof resolutionOutcomeEffectFormSchema>
+
+/** @deprecated Reference rows live in `effects`. */
+export type ResolutionOutcomeApplicationFormItem = ResolutionOutcomeEffectReferenceFormItem
 
 export const resolutionOutcomeFormItemSchema = z.object({
   result: z.enum(RESOLUTION_OUTCOME_RESULTS),
-  note: z.string().optional(),
-  applications: z.array(resolutionOutcomeApplicationFormSchema).default([]),
+  effects: z.array(resolutionOutcomeEffectFormSchema).default([]),
+  repeatSave: repeatSaveSchema.optional(),
 })
 
 export type ResolutionOutcomeFormItem = z.infer<typeof resolutionOutcomeFormItemSchema>

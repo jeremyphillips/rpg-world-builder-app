@@ -38,7 +38,7 @@ describe('SpellResolutionEditor', () => {
 
     await waitFor(() => {
       expect(screen.getAllByText('Ranged spell attack').length).toBeGreaterThan(0)
-      expect(screen.getAllByText('1d10 Force damage').length).toBeGreaterThan(0)
+      expect(screen.getAllByText('Damage — 1d10 Force damage').length).toBeGreaterThan(0)
     })
   })
 
@@ -56,7 +56,12 @@ describe('SpellResolutionEditor', () => {
       expect(screen.getByText('Applied once per beam')).toBeInTheDocument()
       expect(screen.getByRole('button', { name: /(Collapse|Expand) Damage/ })).toBeInTheDocument()
       expect(screen.getByText('Inflicts 1d10 Force damage.')).toBeInTheDocument()
-      expect(screen.getAllByRole('button', { name: /Remove Damage/i })).toHaveLength(2)
+      expect(
+        screen.getByRole('button', { name: 'Remove Damage — 1d10 Force damage' }),
+      ).toBeInTheDocument()
+      expect(
+        screen.getByRole('button', { name: 'Remove Applied effects · Damage — 1d10 Force damage' }),
+      ).toBeInTheDocument()
     })
   })
 
@@ -114,6 +119,30 @@ describe('SpellResolutionEditor', () => {
     expect(requestResolutionChange).toHaveBeenCalledWith({
       field: 'removeEffect',
       effectId: 'damage',
+    })
+  })
+
+  it('removes the effect definition and its outcome references after confirm', async () => {
+    const user = userEvent.setup()
+    render(
+      <SpellResolutionEditor
+        formCtx={formCtx}
+        defaultResolution={RESOLUTION_FORM_FIXTURES.inflictWounds}
+      />,
+    )
+
+    const authoredEffects = await screen.findByRole('group', { name: /^Authored effects/ })
+    await user.click(
+      within(authoredEffects).getByRole('button', {
+        name: /Remove Damage — 2d10 Necrotic damage/i,
+      }),
+    )
+    await user.click(await screen.findByRole('button', { name: 'Change resolution' }))
+
+    await waitFor(() => {
+      expect(
+        screen.queryByRole('group', { name: /Damage — 2d10 Necrotic damage/i }),
+      ).not.toBeInTheDocument()
     })
   })
 
@@ -236,7 +265,7 @@ describe('SpellResolutionEditor', () => {
       expect(screen.getAllByText('Projectiles').length).toBeGreaterThan(0)
       expect(screen.getAllByText('Creates 3 darts.').length).toBeGreaterThan(0)
       expect(screen.getByText('Applied once per dart')).toBeInTheDocument()
-      expect(screen.getAllByText('1d4+1 Force damage').length).toBeGreaterThan(0)
+      expect(screen.getAllByText(/1d4\+1 Force damage/).length).toBeGreaterThan(0)
     })
   })
 

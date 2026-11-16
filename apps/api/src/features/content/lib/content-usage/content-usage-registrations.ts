@@ -21,6 +21,7 @@ import {
   campaignPrimaryWorldReferenceSource,
   emptyContentUsageSource,
   monsterEquipmentSource,
+  monsterClassSource,
   monsterSkillProficiencySource,
 } from './content-usage-sources'
 
@@ -32,6 +33,7 @@ export const CONTENT_USAGE_REGISTRATIONS_LIST = [
     sources: [
       { source: characterClassSource, entry: true, batch: true },
       { source: organizationMemberClassAffinitySource, entry: true, batch: true },
+      { source: monsterClassSource, entry: true, batch: false },
     ],
     summaryLabels: CHARACTER_SUMMARY_LABELS,
     overviewUsageScope: 'characters',

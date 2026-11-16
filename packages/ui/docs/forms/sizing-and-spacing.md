@@ -312,15 +312,20 @@ the intrinsic shell is not the responsiveness mechanism for digit+label pairs.
 
 `resolveArrayFieldRendererChrome` splits array chrome density:
 
-| Region                                             | Resolver                                               | Default when `density` omitted       |
-| -------------------------------------------------- | ------------------------------------------------------ | ------------------------------------ |
-| Section header (`FormSectionHeader` in `<legend>`) | `config.density ?? parent.density`                     | Follows parent section               |
-| Item list + body stack gaps (chrome)               | `resolveArraySectionDensities` → `bodyLayoutDensity`   | **`compact`** when `density` omitted |
-| Child `FormSectionContext` presentation            | `resolveArraySectionDensities` → `presentationDensity` | Inherits parent                      |
-| Child `defaultControlSize`                         | SSOT helper when array omits `density`                 | **`sm`**                             |
+| Region                                             | Resolver / context                                                        | Default when `density` omitted       |
+| -------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------ |
+| Section header (`FormSectionHeader` in `<legend>`) | `resolveArraySectionDensities` → `presentationDensity`                    | Follows parent section               |
+| Section add control                                | `resolveArraySectionDensityParent` → `arraySectionPresentationDensity`    | Same as section header               |
+| Item list + body stack gaps (chrome)               | `resolveArraySectionDensities` → `bodyLayoutDensity`                      | **`compact`** when `density` omitted |
+| Item field labels, anatomy, title metadata         | Child `FormSectionContext.density` = `bodyLayoutDensity`                  | **`compact`** when `density` omitted |
+| Item controls                                      | `defaultControlSize` + `controlSizeOverride` (not presentation `density`) | **`sm`** when array omits `density`  |
 
-Explicit `density` on the array config aligns header and body. `labelMode` affects legend DOM only —
-it does not branch density. Label modes: see [array-field-authoring.md](./array-field-authoring.md).
+At array boundaries, `buildArraySectionChildContext` sets `arraySectionPresentationDensity` so
+chrome resolvers inside the array fieldset still see the parent presentation leg while item fields
+read compact context. Explicit `density` on the array config aligns header, body, and context.
+
+`labelMode` affects legend DOM only — it does not branch density. Label modes:
+[array-field-authoring.md](./array-field-authoring.md).
 
 ## Standalone section headers
 

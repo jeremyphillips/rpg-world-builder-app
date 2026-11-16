@@ -21,13 +21,9 @@ export const spellResolutionValidationMessages = {
     'validation.spellResolution.outcomeResultNotAllowedForMethod',
     ({ result }) => `Outcome result "${result}" is not allowed for this resolution method.`,
   ),
-  outcomeRequiresApplicationOrNote: defineMessage(
-    'validation.spellResolution.outcomeRequiresApplicationOrNote',
-    () => 'Add an effect application or describe the outcome.',
-  ),
   resolutionRequiresMeaningfulOutcome: defineMessage(
     'validation.spellResolution.resolutionRequiresMeaningfulOutcome',
-    () => 'Add at least one outcome with an effect application or additional behavior.',
+    () => 'Add at least one outcome with an effect.',
   ),
   duplicateOutcomeApplicationEffectId: defineMessage(
     'validation.spellResolution.duplicateOutcomeApplicationEffectId',
@@ -65,6 +61,19 @@ export const spellResolutionValidationMessages = {
   occupantRequirementsRequireArea: defineMessage(
     'validation.spellResolution.occupantRequirementsRequireArea',
     () => 'Area occupant requirements are only allowed when an area of effect is present.',
+  ),
+  repeatSaveOnlyOnFailedSave: defineMessage(
+    'validation.spellResolution.repeatSaveOnlyOnFailedSave',
+    () => 'Repeat save is only allowed on a failed save outcome.',
+  ),
+  repeatSaveRequiresSecondFailure: defineMessage(
+    'validation.spellResolution.repeatSaveRequiresSecondFailure',
+    () => 'Add a second failure effect or note when repeat save is authored.',
+  ),
+  invalidConditionReplacementReference: defineMessage<{ conditionId: string }>(
+    'validation.spellResolution.invalidConditionReplacementReference',
+    ({ conditionId }) =>
+      `Condition replacement must reference an earlier condition on the first failure ("${conditionId}" was not found).`,
   ),
   methodIncompatibleWithSelectionMode: defineMessage<{
     compatibility: 'deferred' | 'unsupported'

@@ -1,7 +1,6 @@
 import {
   ACTION_PRESET_IDS,
   DEFAULT_RESOLUTION_TARGET,
-  RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
   getActionPreset,
   getActionVocabularyEntry,
   getActionVocabularySearchTerms,
@@ -12,12 +11,13 @@ import {
   listSpecialMenuActionPresetIds,
   MONSTER_SPELLCASTING_ACTION_NAME,
   PARRY_AC_BONUS_DEFAULT,
-  PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE,
   PRIMARY_SPELLCASTING_PROFILE,
+  acquisitionStateForItem,
   monsterSectionAllowsPreset,
   type ActionPresetId,
+  type MonsterActionSectionRows,
 } from '@rpg/contracts'
-import { conventionalSpellcastingSources } from '../monster-action-casting-summary'
+import { conventionalSpellcastingSources } from '../spell/monster-action-casting-summary'
 import type { MonsterActionSection } from '../references/monster-action-equipment-references'
 
 import {
@@ -173,22 +173,55 @@ export function parseMonsterActionAcquisitionId(
 
 export const MONSTER_ACTION_ALREADY_ADDED_NOTE = 'Already added'
 
+function withAcquisitionPolicy(
+  item: MonsterActionAcquisitionItem,
+  sectionRows: MonsterActionSectionRows,
+): MonsterActionAcquisitionItem {
+  const state = acquisitionStateForItem(item.id, sectionRows)
+  if (state.focusActionId) {
+    return {
+      ...item,
+      id: `focus-action:${state.focusActionId}`,
+      note: state.note ?? MONSTER_ACTION_ALREADY_ADDED_NOTE,
+    }
+  }
+  if (state.disabled) {
+    return { ...item, disabled: true, note: state.note }
+  }
+  return item
+}
+
+function applyAcquisitionPolicies(
+  items: MonsterActionAcquisitionItem[],
+  sectionRows: MonsterActionSectionRows,
+): MonsterActionAcquisitionItem[] {
+  return items.map((item) => withAcquisitionPolicy(item, sectionRows))
+}
+
 export function monsterActionAcquisitionItems(input: {
   weapons: readonly { entryId: string; label: string; equipped: boolean }[]
   allowAddWeapon: boolean
   /** Weapon actions in section order. The first match is the row Already added opens. */
   weaponActions?: readonly { id: string; equipmentEntryId?: string }[]
   section?: MonsterActionSection
-  /** True when the monster already has its Actions Spellcasting profile. */
-  primarySpellcasting?: boolean
+  sectionRows?: MonsterActionSectionRows
   /** Actions rows a reaction reference can use. */
   hasReferenceTargets?: boolean
   spellCatalogReady?: boolean
 }): MonsterActionAcquisitionItem[] {
+  const sectionRows: MonsterActionSectionRows = input.sectionRows ?? {
+    actions: [],
+    bonusActions: [],
+    reactions: [],
+    legendaryActions: [],
+  }
   if (input.section === 'reactions') {
-    return reactionAcquisitionItems(
-      input.hasReferenceTargets === true,
-      input.spellCatalogReady !== false,
+    return applyAcquisitionPolicies(
+      reactionAcquisitionItems(
+        input.hasReferenceTargets === true,
+        input.spellCatalogReady !== false,
+      ),
+      sectionRows,
     )
   }
   const bonusMovement =
@@ -264,29 +297,32 @@ export function monsterActionAcquisitionItems(input: {
       }
     })
   const weaponsAllowed = input.section === undefined || input.section === 'actions'
-  return [
-    ...(weaponsAllowed
-      ? [
-          ...equipped,
-          {
-            id: 'add-weapon',
-            label: monsterAddWeaponShortcut(),
-            groupId: 'equipped' as const,
-            disabled: !input.allowAddWeapon,
-            note: input.allowAddWeapon ? undefined : 'Equipment catalog is not ready',
-          },
-          ...natural,
-          {
-            id: 'natural:other',
-            label: 'Other natural attack',
-            groupId: 'natural' as const,
-          },
-        ]
-      : []),
-    ...special,
-    ...bonusMovement,
-    ...generalAcquisitionItems(input.section, input.primarySpellcasting === true),
-  ]
+  return applyAcquisitionPolicies(
+    [
+      ...(weaponsAllowed
+        ? [
+            ...equipped,
+            {
+              id: 'add-weapon',
+              label: monsterAddWeaponShortcut(),
+              groupId: 'equipped' as const,
+              disabled: !input.allowAddWeapon,
+              note: input.allowAddWeapon ? undefined : 'Equipment catalog is not ready',
+            },
+            ...natural,
+            {
+              id: 'natural:other',
+              label: 'Other natural attack',
+              groupId: 'natural' as const,
+            },
+          ]
+        : []),
+      ...special,
+      ...bonusMovement,
+      ...generalAcquisitionItems(input.section),
+    ],
+    sectionRows,
+  )
 }
 
 function reactionAcquisitionItems(
@@ -327,7 +363,6 @@ function reactionAcquisitionItems(
 
 function generalAcquisitionItems(
   section: MonsterActionSection | undefined,
-  primarySpellcasting: boolean,
 ): MonsterActionAcquisitionItem[] {
   const standalone = OTHER_ITEMS.filter((item) => item.id === 'create:spell-standalone')
   const rest = OTHER_ITEMS.filter(
@@ -354,20 +389,7 @@ function generalAcquisitionItems(
     ]
   }
   if (section === 'reactions') return []
-  return [
-    ...rest,
-    ...(spellcasting
-      ? [
-          {
-            ...spellcasting,
-            ...(primarySpellcasting
-              ? { disabled: true, note: PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE }
-              : {}),
-          },
-        ]
-      : []),
-    ...standalone,
-  ]
+  return [...rest, ...(spellcasting ? [spellcasting] : []), ...standalone]
 }
 
 /** Starting damage for a new Attack or Other natural attack. Not applied to loaded rows. */
@@ -505,7 +527,11 @@ export function createMonsterActionFromAcquisition(
           selectionMode: 'targets',
           target: { ...DEFAULT_RESOLUTION_TARGET },
           method: { kind: 'saving-throw' },
-          effects: [{ id: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, kind: 'damage' }],
+          effects: [],
+          outcomes: [
+            { result: 'failed-save', effects: [] },
+            { result: 'successful-save', effects: [] },
+          ],
         },
       } as MonsterActionDraftRow
     }

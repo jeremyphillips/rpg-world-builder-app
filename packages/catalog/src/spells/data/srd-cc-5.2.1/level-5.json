@@ -156,8 +156,12 @@
       "outcomes": [
         {
           "result": "hit",
-          "note": "Choose Clenched Fist or Grasping Hand crush when commanding the hand; apply the matching effect on a hit.",
-          "applications": []
+          "effects": [
+            {
+              "kind": "note",
+              "description": "Choose Clenched Fist or Grasping Hand crush when commanding the hand; apply the matching effect on a hit."
+            }
+          ]
         }
       ]
     },
@@ -196,18 +200,43 @@
     "school": "evocation",
     "level": 5,
     "classIds": ["sorcerer", "wizard"],
-    "tags": { "damageTypes": ["cold"], "roles": ["damage"] },
-    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
-    "range": { "kind": "self" },
-    "areaOfEffect": { "shape": "cone", "length": { "value": 60, "unit": "ft" } },
-    "duration": { "kind": "instantaneous" },
+    "tags": {
+      "damageTypes": ["cold"],
+      "roles": ["damage"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "self"
+    },
+    "areaOfEffect": {
+      "shape": "cone",
+      "length": {
+        "value": 60,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
     "components": {
       "verbal": true,
       "somatic": true,
-      "material": { "description": "a small crystal cone" }
+      "material": {
+        "description": "a small crystal cone"
+      }
     },
     "higherLevelSlotEffect": "<p>The damage increases by 1d8 for each spell slot level above 5.</p>",
-    "modeling": { "blocker": { "code": "effect-schema-missing" } }
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing"
+      }
+    }
   },
   {
     "id": "srd-cc-5.2.1:greater-restoration",
@@ -329,8 +358,9 @@
       "outcomes": [
         {
           "result": "applied",
-          "applications": [
+          "effects": [
             {
+              "kind": "effect-reference",
               "effectId": "healing",
               "amount": "full"
             }
@@ -435,20 +465,88 @@
         "name": "Reincarnation",
         "kind": "general",
         "columns": [
-          { "id": "roll", "label": "1d10", "valueType": "number" },
-          { "id": "species", "label": "Species", "valueType": "text" }
+          {
+            "id": "roll",
+            "label": "1d10",
+            "valueType": "number"
+          },
+          {
+            "id": "species",
+            "label": "Species",
+            "valueType": "text"
+          }
         ],
         "rows": [
-          { "id": "row-1", "cells": { "roll": 1, "species": "Roll again." } },
-          { "id": "row-2", "cells": { "roll": 2, "species": "Dragonborn" } },
-          { "id": "row-3", "cells": { "roll": 3, "species": "Dwarf" } },
-          { "id": "row-4", "cells": { "roll": 4, "species": "Elf" } },
-          { "id": "row-5", "cells": { "roll": 5, "species": "Gnome" } },
-          { "id": "row-6", "cells": { "roll": 6, "species": "Goliath" } },
-          { "id": "row-7", "cells": { "roll": 7, "species": "Halfling" } },
-          { "id": "row-8", "cells": { "roll": 8, "species": "Human" } },
-          { "id": "row-9", "cells": { "roll": 9, "species": "Orc" } },
-          { "id": "row-10", "cells": { "roll": 10, "species": "Tiefling" } }
+          {
+            "id": "row-1",
+            "cells": {
+              "roll": 1,
+              "species": "Roll again."
+            }
+          },
+          {
+            "id": "row-2",
+            "cells": {
+              "roll": 2,
+              "species": "Dragonborn"
+            }
+          },
+          {
+            "id": "row-3",
+            "cells": {
+              "roll": 3,
+              "species": "Dwarf"
+            }
+          },
+          {
+            "id": "row-4",
+            "cells": {
+              "roll": 4,
+              "species": "Elf"
+            }
+          },
+          {
+            "id": "row-5",
+            "cells": {
+              "roll": 5,
+              "species": "Gnome"
+            }
+          },
+          {
+            "id": "row-6",
+            "cells": {
+              "roll": 6,
+              "species": "Goliath"
+            }
+          },
+          {
+            "id": "row-7",
+            "cells": {
+              "roll": 7,
+              "species": "Halfling"
+            }
+          },
+          {
+            "id": "row-8",
+            "cells": {
+              "roll": 8,
+              "species": "Human"
+            }
+          },
+          {
+            "id": "row-9",
+            "cells": {
+              "roll": 9,
+              "species": "Orc"
+            }
+          },
+          {
+            "id": "row-10",
+            "cells": {
+              "roll": 10,
+              "species": "Tiefling"
+            }
+          }
         ]
       }
     ],
@@ -504,7 +602,7 @@
     "createdAt": "2024-05-21T00:00:00.000Z",
     "updatedAt": "2024-05-21T00:00:00.000Z",
     "name": "Scrying",
-    "description": "<p>You can see and hear a creature you choose that is on the same plane of existence as you. The target makes a Wisdom saving throw, which is modified by how well you know the target and the sort of physical connection you have to it. The target doesn't know what it is making the save against, only that it feels uneasy.</p><p><strong>Knowledge.</strong> Secondhand (you have heard of the target): +5. Firsthand (you have met the target): +0. Extensive (you know the target well): \u22125.</p><p><strong>Connection.</strong> Picture or other likeness: \u22122. Garment or other possession: \u22124. Body part, lock of hair, or bit of nail: \u221210.</p><p>On a successful save, the target isn't affected, and you can't use this spell on it again for 24 hours.</p><p>On a failed save, the spell creates an Invisible, intangible sensor within 10 feet of the target. You can see and hear through the sensor as if you were there. The sensor moves with the target, remaining within 10 feet of it for the duration. If something can see the sensor, it appears as a luminous orb about the size of your fist.</p><p>Instead of targeting a creature, you can target a location you have seen. When you do so, the sensor appears at that location and doesn't move.</p>",
+    "description": "<p>You can see and hear a creature you choose that is on the same plane of existence as you. The target makes a Wisdom saving throw, which is modified by how well you know the target and the sort of physical connection you have to it. The target doesn't know what it is making the save against, only that it feels uneasy.</p><p><strong>Knowledge.</strong> Secondhand (you have heard of the target): +5. Firsthand (you have met the target): +0. Extensive (you know the target well): −5.</p><p><strong>Connection.</strong> Picture or other likeness: −2. Garment or other possession: −4. Body part, lock of hair, or bit of nail: −10.</p><p>On a successful save, the target isn't affected, and you can't use this spell on it again for 24 hours.</p><p>On a failed save, the spell creates an Invisible, intangible sensor within 10 feet of the target. You can see and hear through the sensor as if you were there. The sensor moves with the target, remaining within 10 feet of it for the duration. If something can see the sensor, it appears as a luminous orb about the size of your fist.</p><p>Instead of targeting a creature, you can target a location you have seen. When you do so, the sensor appears at that location and doesn't move.</p>",
     "school": "divination",
     "level": 5,
     "classIds": ["bard", "cleric", "druid", "warlock", "wizard"],

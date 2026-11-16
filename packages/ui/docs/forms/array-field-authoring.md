@@ -109,7 +109,7 @@ Author with `heading: { label, hint?, labelVisibility? }` — see
 **Detailed collapsible items compose `CollapsibleListItem`** — the same header / summary /
 body / actions slots as catalog picker rows. The header plane defaults to
 `bg-surface-subtle`; the disclosure body bleeds to the shell edge on `bg-background` with
-field content aligned via `--content-inline-start`.
+field content aligned via `ui-collapsible-list-item__body`.
 
 Do not override neutral `item.surface` / `item.tone` per row unless a semantic callout is
 required — defaults avoid stacked-beige-card noise.
@@ -351,6 +351,12 @@ arrayPattern: {
 },
 ```
 
+## Dynamic add menus and titles
+
+`addAction.menu.items` is a fixed list. `presentationWhen` only changes disabled state and notes. When the list itself depends on form state (one entry per unused library row), set `menu.resolveItems(watched, rows)`. The click handler reads that resolved list, so `select` on a dynamic item still runs.
+
+`header.primary` receives row values. Set `header.primaryDependsOn` when the title must read a path the row does not own. Those values arrive as the third argument. `summaryDependsOn` is unchanged and still feeds `summary`.
+
 ## Presentation model
 
 Array items resolve to **three structural anatomies**:
@@ -410,6 +416,13 @@ treats bare leaves and row wraps equivalently.
 7. **Resolver `.omit` in nested items** — works on top-level keys only, not inside array items.
 8. **Row wrapper for chrome** — use `kind: 'row'` only when fields should share a horizontal row,
    not to pass inline-eligibility gates.
+
+## Acquisition and removal hooks
+
+- Menu item `select(ctx)` writes extra paths through `ctx.append` (registered field-array mutators, otherwise `setValue`). Return a row to append on the current array.
+- `item.remove(ctx)` replaces the default removal. Call `ctx.removeAt` for each list that should lose a row.
+- `item.removable` may be a function `(row, index) => boolean` so some rows have no remove control.
+- Slot `render` receives `{ namePrefix, path }` for the slot's form path.
 
 ## Related
 

@@ -22,6 +22,7 @@ export interface FlatNoHeaderArrayFieldItemProps {
   titleId: string
   itemPrefix: string
   reserveDragHandleSlot: boolean
+  reserveCaretSlot?: boolean
   collapsible: boolean
   dragging?: boolean
   shellClassName?: string

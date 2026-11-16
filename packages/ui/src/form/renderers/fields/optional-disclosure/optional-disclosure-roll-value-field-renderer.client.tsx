@@ -6,7 +6,10 @@ import { OptionalFieldDisclosure } from '../../../../components/ui/optional-fiel
 import type { FieldHintPosition } from '../../../../components/ui/field.variants'
 import { useDependsOnValues } from '../../../config/form-depends-on.client'
 import type { OptionalDisclosureConfig, RollValueFieldConfig } from '../../../field-config'
-import { assertOptionalDisclosureFieldConfig } from '../../../config/optional-disclosure-config.lib'
+import {
+  assertOptionalDisclosureFieldConfig,
+  optionalDisclosureLeafFieldConfig,
+} from '../../../config/optional-disclosure-config.lib'
 import { RollValueFieldRenderer } from '../roll-value-field-renderer.client'
 
 export function isOptionalRollPresent(value: unknown): boolean {
@@ -77,7 +80,7 @@ export function OptionalDisclosureRollValueFieldRenderer({
     >
       {open ? (
         <RollValueFieldRenderer
-          config={{ ...config, labelVisibility: 'srOnly' }}
+          config={optionalDisclosureLeafFieldConfig(config)}
           fullName={fullName}
           id={id}
           hint={hint}

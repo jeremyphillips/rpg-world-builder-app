@@ -1168,7 +1168,6 @@ export {
   CollapsibleListItemDragHandleTrigger,
   CollapsibleListItemShell,
   CollapsibleListItemToolbar,
-  buildCollapsibleListItemLeadingChromeStyle,
   collapsibleListItemBodyClasses,
   collapsibleListItemBodyFrameClasses,
   collapsibleListItemChromeColumnClasses,

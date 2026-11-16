@@ -37,7 +37,7 @@ describe('spellResolutionSchema', () => {
     }
   })
 
-  it('defaults outcome applications to an empty array', () => {
+  it('defaults omitted outcome effects to an empty array', () => {
     const parsed = spellResolutionSchema.parse({
       selectionMode: 'targets',
       target: { count: 1, kind: 'creature', proximity: { kind: 'touch' } },
@@ -53,13 +53,22 @@ describe('spellResolutionSchema', () => {
       outcomes: [
         {
           result: 'hit',
-          note: 'The target is marked until the end of your next turn.',
+          effects: [
+            {
+              kind: 'note',
+              description: 'The target is marked until the end of your next turn.',
+            },
+          ],
         },
       ],
     })
 
-    expect(parsed.outcomes[0]?.applications).toEqual([])
-    expect(parsed.outcomes[0]?.note).toBe('The target is marked until the end of your next turn.')
+    expect(parsed.outcomes[0]?.effects).toEqual([
+      {
+        kind: 'note',
+        description: 'The target is marked until the end of your next turn.',
+      },
+    ])
   })
 
   it('accepts a saving-throw resolution with only a failed-save outcome', () => {
@@ -79,7 +88,13 @@ describe('spellResolutionSchema', () => {
         outcomes: [
           {
             result: 'failed-save',
-            applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
+            effects: [
+              {
+                kind: 'effect-reference',
+                effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+                amount: 'full',
+              },
+            ],
           },
         ],
       }),
@@ -104,7 +119,7 @@ describe('spellResolutionSchema', () => {
     expect(spellResolutionSchema.parse(CURE_WOUNDS_RESOLUTION)).toEqual(CURE_WOUNDS_RESOLUTION)
   })
 
-  it('rejects outcomes with neither applications nor note', () => {
+  it('rejects outcomes with no effects', () => {
     const result = spellResolutionSchema.safeParse({
       ...ELDRITCH_BLAST_RESOLUTION,
       outcomes: [{ result: 'hit' }],
@@ -113,7 +128,7 @@ describe('spellResolutionSchema', () => {
     expect(result.success).toBe(false)
     if (result.success) return
 
-    expect(result.error.issues.some((issue) => issue.message.includes('application'))).toBe(true)
+    expect(result.error.issues.some((issue) => issue.message.includes('effect'))).toBe(true)
   })
 
   it('rejects duplicate effect ids', () => {
@@ -153,11 +168,23 @@ describe('spellResolutionSchema', () => {
       outcomes: [
         {
           result: 'failed-save',
-          applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
+          effects: [
+            {
+              kind: 'effect-reference',
+              effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+              amount: 'full',
+            },
+          ],
         },
         {
           result: 'failed-save',
-          applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'half' }],
+          effects: [
+            {
+              kind: 'effect-reference',
+              effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+              amount: 'half',
+            },
+          ],
         },
       ],
     })
@@ -180,7 +207,7 @@ describe('spellResolutionSchema', () => {
       outcomes: [
         {
           result: 'hit',
-          applications: [{ effectId: unknownId, amount: 'full' }],
+          effects: [{ kind: 'effect-reference', effectId: unknownId, amount: 'full' }],
         },
       ],
     })
@@ -190,7 +217,7 @@ describe('spellResolutionSchema', () => {
 
     expect(result.error.issues).toContainEqual(
       expect.objectContaining({
-        path: ['outcomes', 0, 'applications', 0, 'effectId'],
+        path: ['outcomes', 0, 'effects', 0, 'effectId'],
         message: spellResolutionValidationMessages.unknownEffectReference({
           effectId: unknownId,
         }),
@@ -204,7 +231,13 @@ describe('spellResolutionSchema', () => {
       outcomes: [
         {
           result: 'failed-save',
-          applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
+          effects: [
+            {
+              kind: 'effect-reference',
+              effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+              amount: 'full',
+            },
+          ],
         },
       ],
     })
@@ -237,7 +270,13 @@ describe('spellResolutionSchema', () => {
       outcomes: [
         {
           result: 'applied',
-          applications: [{ effectId: RESOLUTION_PRIMARY_HEALING_EFFECT_ID, amount: 'full' }],
+          effects: [
+            {
+              kind: 'effect-reference',
+              effectId: RESOLUTION_PRIMARY_HEALING_EFFECT_ID,
+              amount: 'full',
+            },
+          ],
         },
       ],
     })

@@ -27,6 +27,8 @@ export interface ArrayFieldItemContentProps {
   showDragHandle: boolean
   fieldsLength: number
   collapsible: boolean
+  /** List-level caret column. Summary rows keep the inset when a sibling can expand. */
+  reserveCaretSlot?: boolean
   variant: 'compact' | 'detailed'
   collapsed: boolean
   onToggleCollapse: () => void
@@ -97,12 +99,15 @@ function resolveArrayItemShellTone(
 }
 
 function renderArrayItemUtilitySlot(
-  slot: { render: () => React.ReactNode } | undefined,
+  slot: { render: (ctx: { namePrefix?: string; path: string }) => React.ReactNode } | undefined,
   arrayContext: React.ComponentProps<typeof ArrayFieldContext.Provider>['value'],
+  path: string,
 ): React.ReactNode {
   if (!slot) return undefined
   return (
-    <ArrayFieldContext.Provider value={arrayContext}>{slot.render()}</ArrayFieldContext.Provider>
+    <ArrayFieldContext.Provider value={arrayContext}>
+      {slot.render({ path, namePrefix: path })}
+    </ArrayFieldContext.Provider>
   )
 }
 
@@ -119,6 +124,7 @@ export function ArrayFieldItemContent({
   showDragHandle: _showDragHandle,
   fieldsLength,
   collapsible,
+  reserveCaretSlot = false,
   variant,
   collapsed,
   onToggleCollapse,
@@ -165,6 +171,7 @@ export function ArrayFieldItemContent({
     collapsed,
     fieldsLength,
     collapsible,
+    reserveCaretSlot,
     dragHandleProps,
     onRemoveItem: onRemove,
   })
@@ -188,8 +195,8 @@ export function ArrayFieldItemContent({
     itemValues,
   })
 
-  const customRemove = renderArrayItemUtilitySlot(itemConfig.removeSlot, arrayContext)
-  const beforeRemove = renderArrayItemUtilitySlot(itemConfig.beforeRemove, arrayContext)
+  const customRemove = renderArrayItemUtilitySlot(itemConfig.removeSlot, arrayContext, itemPrefix)
+  const beforeRemove = renderArrayItemUtilitySlot(itemConfig.beforeRemove, arrayContext, itemPrefix)
 
   const actionsEmbedded = anatomy === 'flatNoHeader' || Boolean(itemConfig.renderShell)
   const actionsRail = (

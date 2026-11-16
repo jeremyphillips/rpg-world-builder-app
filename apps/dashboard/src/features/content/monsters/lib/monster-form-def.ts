@@ -15,7 +15,7 @@ import { nameField } from '../../lib/forms/fields/content-identity-form-fields'
 import { monstersQueryKey, useMonsters } from '../hooks/use-monsters'
 import { buildMonsterTabs } from './monster-form-fields'
 import { buildMonsterPreviewIdentity, buildMonsterPreviewSections } from './monster-form-preview'
-import { buildMonsterActionRequirementValueSyncs } from './monster-action-requirement-form-sync'
+import { buildMonsterActionRequirementValueSyncs } from './actions/monster-action-requirement-form-sync'
 import { buildMonsterHitPointsFormValueSyncs } from './statistics/monster-hit-points-form.lib'
 import { resolveMonsterFormSchema } from './monster-form-schema'
 import {
@@ -96,7 +96,7 @@ export const monsterFormDef: ContentFormDef<Monster, MonsterFormValues, CreateMo
   useListQuery: useMonsters,
   queryKey: monstersQueryKey,
   preview: {
-    buildIdentity: (values) => buildMonsterPreviewIdentity(values),
+    buildIdentity: buildMonsterPreviewIdentity,
     buildSections: buildMonsterPreviewSections,
   },
 }

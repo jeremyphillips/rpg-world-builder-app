@@ -151,11 +151,16 @@ function mapOutcomeRefsToForm(
 ): ResolutionOutcomeFormItem[] {
   return outcomes.map((outcome) => ({
     result: outcome.result,
-    ...(outcome.note ? { note: outcome.note } : {}),
-    applications: outcome.applications.map((application) => ({
-      effectId: application.effectId,
-      amount: application.amount as ResolutionOutcomeFormItem['applications'][number]['amount'],
-    })),
+    effects: (outcome.effects ?? []).map((effect) =>
+      effect.kind === 'effect-reference'
+        ? {
+            kind: 'effect-reference' as const,
+            effectId: effect.effectId,
+            amount: effect.amount,
+          }
+        : effect,
+    ),
+    ...(outcome.repeatSave ? { repeatSave: outcome.repeatSave } : {}),
   }))
 }
 

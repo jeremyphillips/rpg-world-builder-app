@@ -103,9 +103,13 @@ function forceRegenerateHeritageObject(
 }
 
 type SpellResolutionEffect = { id: string; kind: string }
-type SpellResolutionApplication = { effectId: string; amount: string }
+type SpellResolutionOutcomeEffect = { kind?: string; effectId?: string; [key: string]: unknown }
 type SpellResolutionOutcome = {
-  applications?: SpellResolutionApplication[]
+  effects?: SpellResolutionOutcomeEffect[]
+  repeatSave?: {
+    secondFailure?: { effects?: SpellResolutionOutcomeEffect[] }
+    [key: string]: unknown
+  }
   [key: string]: unknown
 }
 type SpellResolutionBody = {
@@ -129,12 +133,26 @@ function regenerateSpellResolution(
     return { ...effect, id: newId }
   })
 
+  const remapEffects = (effects: SpellResolutionOutcomeEffect[] | undefined) =>
+    (effects ?? []).map((effect) => {
+      if (effect.kind !== 'effect-reference' || typeof effect.effectId !== 'string') return effect
+      return { ...effect, effectId: effectIdMap.get(effect.effectId) ?? effect.effectId }
+    })
+
   const outcomes = (body.outcomes ?? []).map((outcome) => ({
     ...outcome,
-    applications: (outcome.applications ?? []).map((application) => ({
-      ...application,
-      effectId: effectIdMap.get(application.effectId) ?? application.effectId,
-    })),
+    effects: remapEffects(outcome.effects),
+    ...(outcome.repeatSave
+      ? {
+          repeatSave: {
+            ...outcome.repeatSave,
+            secondFailure: {
+              ...outcome.repeatSave.secondFailure,
+              effects: remapEffects(outcome.repeatSave.secondFailure?.effects),
+            },
+          },
+        }
+      : {}),
   }))
 
   return { ...body, effects, outcomes }

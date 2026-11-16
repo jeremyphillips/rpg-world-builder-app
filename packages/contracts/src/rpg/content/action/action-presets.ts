@@ -8,7 +8,7 @@ import {
 import type { NaturalAttackForm } from '../../vocab/action/natural-attack-form'
 import type { EffectResolution } from '../lib/resolution/schema'
 import { effectResolutionSchema } from '../lib/resolution/schema'
-import { RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID } from '../lib/resolution/schema'
+import { nextResolutionEffectId } from '../lib/resolution/resolution-effect-id-alloc'
 
 export type ActionPresetDcSource =
   | { kind: 'ability'; ability: Ability; proficient: boolean }
@@ -89,13 +89,19 @@ function naturalAttackPreset(
   }
 }
 
+const BREATH_WEAPON_EFFECT_ID = nextResolutionEffectId(
+  [],
+  () => '6f1c0a2e-4b7d-4e1a-9c3f-8a2d5e7b1c04',
+)
+const CONSTRICT_EFFECT_ID = nextResolutionEffectId([], () => 'a91e4c33-0d58-4f6b-b2e1-7c4d8a0e5f16')
+
 const BREATH_WEAPON_RESOLUTION = effectResolutionSchema.parse({
   selectionMode: 'self',
   areaOfEffect: { shape: 'cone', length: { value: 15, unit: 'ft' } },
   method: { kind: 'saving-throw', ability: 'dex' },
   effects: [
     {
-      id: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+      id: BREATH_WEAPON_EFFECT_ID,
       kind: 'damage',
       roll: { dice: { count: 1, faces: 6 } },
       damageType: 'fire',
@@ -104,11 +110,11 @@ const BREATH_WEAPON_RESOLUTION = effectResolutionSchema.parse({
   outcomes: [
     {
       result: 'failed-save',
-      applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
+      effects: [{ kind: 'effect-reference', effectId: BREATH_WEAPON_EFFECT_ID, amount: 'full' }],
     },
     {
       result: 'successful-save',
-      applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'half' }],
+      effects: [{ kind: 'effect-reference', effectId: BREATH_WEAPON_EFFECT_ID, amount: 'half' }],
     },
   ],
 })
@@ -123,7 +129,7 @@ const CONSTRICT_RESOLUTION = effectResolutionSchema.parse({
   method: { kind: 'saving-throw', ability: 'str' },
   effects: [
     {
-      id: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
+      id: CONSTRICT_EFFECT_ID,
       kind: 'damage',
       roll: { dice: { count: 1, faces: 6 } },
       damageType: 'bludgeoning',
@@ -132,8 +138,17 @@ const CONSTRICT_RESOLUTION = effectResolutionSchema.parse({
   outcomes: [
     {
       result: 'failed-save',
-      applications: [{ effectId: RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID, amount: 'full' }],
-      note: 'The target is Grappled (escape DC equals the save DC).',
+      effects: [
+        { kind: 'effect-reference', effectId: CONSTRICT_EFFECT_ID, amount: 'full' },
+        {
+          kind: 'note',
+          description: 'The target is Grappled (escape DC equals the save DC).',
+        },
+      ],
+    },
+    {
+      result: 'successful-save',
+      effects: [{ kind: 'effect-reference', effectId: CONSTRICT_EFFECT_ID, amount: 'none' }],
     },
   ],
 })

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { creatureFamilyIdSchema } from '../vocab/creature-family'
 
 import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
 import { abilitySchema } from '../vocab/ability'
@@ -59,6 +60,17 @@ import {
   RULES_OR_SAVING_THROW_MESSAGE,
   refineMonsterActionShape,
   refineMonsterSpellEntries,
+  ACTION_REFERENCE_CHOOSE_FROM_ACTIONS,
+  ACTION_REFERENCE_DUPLICATE_MESSAGE,
+  actionReferenceInvalidKindMessage,
+  CHOOSE_ATTACK_FROM_ACTIONS,
+  collectRepeatabilityViolations,
+  LEGENDARY_REFERENCE_ATTACK_CHOICE_MESSAGE,
+  MULTIATTACK_REFERENCE_DUPLICATE_MESSAGE,
+  MULTIATTACK_REFERENCE_INVALID_KIND_MESSAGE,
+  MULTIATTACK_REFERENCE_MISSING_MESSAGE,
+  MULTIATTACK_REFERENCE_SELF_MESSAGE,
+  MULTIATTACK_SECTION_MESSAGE,
 } from './monster/action'
 import { findSpellCastingSource } from './monster/spell-casting-source'
 import { savingThrowEffectDraftSchema, savingThrowEffectSchema } from './lib/saving-throw/schema'
@@ -281,6 +293,14 @@ export const monsterEquipmentEntrySchema = z.preprocess((value) => {
 export const monsterBodyFields = {
   sizes: creatureSizesSchema,
   creatureType: creatureTypeRefSchema,
+  creatureFamilyIds: z
+    .array(creatureFamilyIdSchema)
+    .refine((ids) => new Set(ids).size === ids.length, 'Creature families must be unique.')
+    .optional(),
+  classIds: z
+    .array(z.string().min(1))
+    .refine((ids) => new Set(ids).size === ids.length, 'Class classifications must be unique.')
+    .optional(),
   alignment: creatureAlignmentSchema,
   abilityScores: creatureAbilityScoresSchema,
   armorClass: monsterArmorClassSchema.default({}),
@@ -548,7 +568,7 @@ function refineMultiattackRow(
   ctx: z.RefinementCtx,
 ): void {
   if (section !== 'actions') {
-    addCustomRefinementIssue(ctx, 'Multiattack is only valid in Actions.', [...path, 'kind'])
+    addCustomRefinementIssue(ctx, MULTIATTACK_SECTION_MESSAGE, [...path, 'kind'])
     return
   }
   const seen = new Set<string>()
@@ -562,10 +582,10 @@ function refineMultiattackRow(
       (idIndex) => [...path, 'steps', stepIndex, 'actionIds', idIndex],
       MULTIATTACK_ATTACK_KINDS,
       {
-        self: 'A multiattack cannot reference itself.',
-        duplicate: 'Each attack can be referenced only once.',
-        missing: 'must reference an action in Actions',
-        invalidKind: 'invalid kind',
+        self: MULTIATTACK_REFERENCE_SELF_MESSAGE,
+        duplicate: MULTIATTACK_REFERENCE_DUPLICATE_MESSAGE,
+        missing: MULTIATTACK_REFERENCE_MISSING_MESSAGE,
+        invalidKind: MULTIATTACK_REFERENCE_INVALID_KIND_MESSAGE,
       },
       seen,
     )
@@ -588,13 +608,18 @@ function refineParryFollowUp(
     () => [...path, 'followUpActionId'],
     MULTIATTACK_ATTACK_KINDS,
     {
-      duplicate: 'Choose an attack from Actions.',
-      missing: 'Choose an attack from Actions.',
-      invalidKind: 'Choose an attack from Actions.',
+      duplicate: CHOOSE_ATTACK_FROM_ACTIONS,
+      missing: CHOOSE_ATTACK_FROM_ACTIONS,
+      invalidKind: CHOOSE_ATTACK_FROM_ACTIONS,
     },
     new Set(),
   )
 }
+
+const ACTION_REFERENCE_MESSAGES = {
+  duplicate: ACTION_REFERENCE_DUPLICATE_MESSAGE,
+  missing: ACTION_REFERENCE_CHOOSE_FROM_ACTIONS,
+} as const
 
 function refineReactionActionReference(
   action: ActionReferenceRow,
@@ -612,9 +637,8 @@ function refineReactionActionReference(
     (idIndex) => [...path, 'actionIds', idIndex],
     LEGENDARY_REFERENCE_KINDS,
     {
-      duplicate: 'Each action can be chosen only once.',
-      missing: 'Choose an attack or ability from Actions.',
-      invalidKind: "This action can't be used by a reaction.",
+      ...ACTION_REFERENCE_MESSAGES,
+      invalidKind: actionReferenceInvalidKindMessage('reaction'),
     },
     new Set(),
   )
@@ -635,9 +659,8 @@ function refineLegendaryActionReference(
     (idIndex) => [...path, 'actionIds', idIndex],
     LEGENDARY_REFERENCE_KINDS,
     {
-      duplicate: 'Each action can be chosen only once.',
-      missing: 'Choose an attack or ability from Actions.',
-      invalidKind: "This action can't be used by a legendary action.",
+      ...ACTION_REFERENCE_MESSAGES,
+      invalidKind: actionReferenceInvalidKindMessage('legendary'),
     },
     new Set(),
   )
@@ -646,7 +669,7 @@ function refineLegendaryActionReference(
     const target = actionsById.get(id)
     if (!target || !LEGENDARY_REFERENCE_KINDS.has(target.kind)) return
     if (MULTIATTACK_ATTACK_KINDS.has(target.kind)) return
-    addCustomRefinementIssue(ctx, 'Only attacks can be offered as a choice.', [
+    addCustomRefinementIssue(ctx, LEGENDARY_REFERENCE_ATTACK_CHOICE_MESSAGE, [
       ...path,
       'actionIds',
       idIndex,
@@ -796,6 +819,9 @@ export function refineMonsterBody(
   })
 
   refineWeaponEntryReferences(body, ctx, prefix, { requirePresent: true })
+  for (const violation of collectRepeatabilityViolations(body, prefix)) {
+    addCustomRefinementIssue(ctx, violation.message, violation.path)
+  }
   refineMultiattackReferences(body, ctx, prefix, { published: true })
   refineLegendaryActionPool(body, ctx, prefix)
   refineCreatureDamageDefenses(body.defenses, ctx, [...prefix, 'defenses'])
@@ -914,6 +940,8 @@ export const createMonsterDraftInputSchema = monsterDraftInputSchema.superRefine
 )
 
 export const updateMonsterInputSchema = monsterPublishInputSchema.partial().extend({
+  creatureFamilyIds: monsterBodyFields.creatureFamilyIds.nullable(),
+  classIds: monsterBodyFields.classIds.nullable(),
   experiencePointsOverride: z.number().int().min(0).nullable().optional(),
   hover: z.boolean().nullable().optional(),
   description: z.string().nullable().optional(),
@@ -923,6 +951,10 @@ export type UpdateMonsterInput = z.infer<typeof updateMonsterInputSchema>
 
 export const updateMonsterDraftInputSchema = monsterDraftInputSchema
   .partial()
+  .extend({
+    creatureFamilyIds: monsterBodyFields.creatureFamilyIds.nullable(),
+    classIds: monsterBodyFields.classIds.nullable(),
+  })
   .superRefine((input, ctx) => refineMonsterDraftBody(input as MonsterBodyDraft, ctx))
 
 export {
@@ -942,3 +974,5 @@ export const monsterPatchSchema = contentPatchBaseSchema.extend({
 })
 
 export type MonsterPatch = z.infer<typeof monsterPatchSchema>
+
+export * from './monster/monster-classification'

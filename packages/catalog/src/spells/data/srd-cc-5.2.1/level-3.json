@@ -373,18 +373,23 @@
       "outcomes": [
         {
           "result": "failed-save",
-          "note": "Flammable objects in the area that aren't being worn or carried start burning.",
-          "applications": [
+          "effects": [
             {
+              "kind": "effect-reference",
               "effectId": "damage",
               "amount": "full"
+            },
+            {
+              "kind": "note",
+              "description": "Flammable objects in the area that aren't being worn or carried start burning."
             }
           ]
         },
         {
           "result": "successful-save",
-          "applications": [
+          "effects": [
             {
+              "kind": "effect-reference",
               "effectId": "damage",
               "amount": "half"
             }
@@ -447,9 +452,19 @@
     "school": "transmutation",
     "level": 3,
     "classIds": ["sorcerer", "warlock", "wizard"],
-    "tags": { "roles": ["movement"] },
-    "castingTime": { "normal": { "value": 1, "unit": "action" }, "canBeCastAsRitual": false },
-    "range": { "kind": "touch" },
+    "tags": {
+      "roles": ["movement"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "touch"
+    },
     "duration": {
       "kind": "timed",
       "value": 10,
@@ -457,8 +472,19 @@
       "concentration": true,
       "upTo": true
     },
-    "components": { "verbal": true, "somatic": true, "material": { "description": "a feather" } },
-    "modeling": { "blocker": { "code": "effect-schema-missing", "capabilityId": "movement" } }
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": {
+        "description": "a feather"
+      }
+    },
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "movement"
+      }
+    }
   },
   {
     "id": "srd-cc-5.2.1:glyph-of-warding",
@@ -604,8 +630,9 @@
       "outcomes": [
         {
           "result": "failed-save",
-          "applications": [
+          "effects": [
             {
+              "kind": "effect-reference",
               "effectId": "damage",
               "amount": "full"
             }
@@ -613,8 +640,9 @@
         },
         {
           "result": "successful-save",
-          "applications": [
+          "effects": [
             {
+              "kind": "effect-reference",
               "effectId": "damage",
               "amount": "half"
             }
@@ -720,8 +748,9 @@
       "outcomes": [
         {
           "result": "applied",
-          "applications": [
+          "effects": [
             {
+              "kind": "effect-reference",
               "effectId": "healing",
               "amount": "full"
             }

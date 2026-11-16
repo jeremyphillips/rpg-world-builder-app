@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { activationTriggerSchema } from '../../../primitives/activation-trigger'
 import { entryProvenanceField } from '../../../primitives/provenance'
 import { draftActionFields, omitActionKinds, publishedActionFields, strict } from './schema-helpers'
+import { ACTION_REFERENCE_CHOOSE_FROM_ACTIONS } from './reference-messages'
 import { parryAcBonusSchema, type MonsterActionMode } from './shared-fragments'
 import type { MonsterAction, MonsterActionDraft } from './actions-schema'
 
@@ -12,7 +13,7 @@ function reactionReferenceSchema(mode: MonsterActionMode) {
   const actionIds =
     mode === 'draft'
       ? z.array(z.string().min(1)).max(1).default([])
-      : z.array(z.string().min(1)).min(1, 'Choose an attack or ability from Actions.').max(1)
+      : z.array(z.string().min(1)).min(1, ACTION_REFERENCE_CHOOSE_FROM_ACTIONS).max(1)
   return z.object({
     id: z.string().min(1),
     kind: z.literal('action-reference'),

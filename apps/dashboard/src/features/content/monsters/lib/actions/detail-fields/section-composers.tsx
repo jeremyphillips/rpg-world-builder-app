@@ -15,6 +15,7 @@ import { buildActiveCreatureTypeFieldOptions } from '@/features/vocabulary'
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import { distanceJoinedPairField } from '../../../../lib/forms/fields/content-distance-form-fields'
 import { resolutionOccupantRequirementsFields } from '../../../../lib/forms/fields/resolution-target-authoring-fields'
+import { monsterActionTurnLimitField } from '../../../../lib/forms/mechanics/monster-action-turn-limit-fields'
 import { MonsterActionAttackSummary } from '../../../components/form/actions/monster-action-attack-summary'
 import { MonsterActionBonusSummary } from '../../../components/form/actions/monster-action-bonus-summary'
 import { MonsterActionParrySummary } from '../../../components/form/actions/monster-action-parry-summary'
@@ -46,10 +47,6 @@ import {
   MONSTER_REACTION_ADDITIONAL_RULES_LABEL,
   MONSTER_REACTION_REFERENCE_HINT,
   MONSTER_REFERENCE_ACTION_LABEL,
-  MONSTER_TURN_LIMIT_ADD_LABEL,
-  MONSTER_TURN_LIMIT_EMPTY_LABEL,
-  MONSTER_TURN_LIMIT_LABEL,
-  MONSTER_TURN_LIMIT_OPTION_LABEL,
   MONSTER_PARRY_AC_BONUS_HINT,
   MONSTER_PARRY_AC_BONUS_LABEL,
   MONSTER_PARRY_FOLLOW_UP_ADD_LABEL,
@@ -60,9 +57,9 @@ import type { MonsterActionSection } from '../references/monster-action-equipmen
 import type { MonsterActionDraftRow } from '../monster-action-presets'
 import type { MonsterFormAdvisory } from '../../monster-form-advisories'
 import { monsterFormAdvisorySlot } from '../../monster-form-advisory-presentation'
-import { legendaryActionCategory } from '../legendary-action-category'
+import { legendaryActionCategory } from '../legendary/legendary-action-category'
 import { leapDistanceFields } from '../leap-distance-options'
-import { legendaryActionDetailFields } from '../monster-legendary-action-fields'
+import { legendaryActionDetailFields } from '../legendary/monster-legendary-action-fields'
 import type { MonsterFormValues } from '../../monster-form-values'
 import {
   monsterActionMechanicFields,
@@ -163,16 +160,7 @@ function monsterActionEquipmentField(
   }
 }
 
-function turnLimitField(): FormItem {
-  return {
-    type: 'select',
-    name: 'onceUntilNextTurn',
-    label: MONSTER_TURN_LIMIT_LABEL,
-    placeholder: MONSTER_TURN_LIMIT_EMPTY_LABEL,
-    optionalDisclosure: { addLabel: MONSTER_TURN_LIMIT_ADD_LABEL },
-    options: [{ value: 'true', label: MONSTER_TURN_LIMIT_OPTION_LABEL }],
-  }
-}
+const turnLimitField = monsterActionTurnLimitField
 
 function monsterActionParryPreviewSlot(
   ctx: ContentFormCtx,
@@ -433,7 +421,7 @@ function sharedAuthoringFields(input: {
       equipment: input.equipment ?? [],
       onCastingSourceBlocked: input.onCastingSourceBlocked,
     }),
-    turnLimitField(),
+    ...(action.kind !== 'save' ? [turnLimitField()] : []),
     ...supplemental,
   ]
 }

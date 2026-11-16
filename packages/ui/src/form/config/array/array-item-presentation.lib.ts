@@ -143,8 +143,8 @@ export function resolveArrayItemPresentation({
   const chrome = disclosure === 'collapsible' ? 'disclosure' : 'flat'
   const stackTreatment = resolveStackTreatment(chrome, itemLabel, disclosure)
   const listGap = resolveListGap(stackTreatment, chrome, variant)
-  const reserveDragHandleSlot = reorder === 'dragHandle'
-  const sortableEnabled = reserveDragHandleSlot && fieldsLength > 1
+  const sortableEnabled = reorder === 'dragHandle' && fieldsLength > 1
+  const reserveDragHandleSlot = sortableEnabled
 
   return {
     itemLabel,

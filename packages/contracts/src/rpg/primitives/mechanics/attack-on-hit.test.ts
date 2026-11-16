@@ -15,7 +15,12 @@ describe('attackOnHitSchema', () => {
         {
           kind: 'condition',
           conditionId: 'paralyzed',
-          description: " until the start of the lich's next turn ",
+          end: {
+            kind: 'turn-bound',
+            participant: 'source',
+            boundary: 'start',
+            which: 'next',
+          },
         },
         { kind: 'note', description: ' The target starts burning ' },
       ],
@@ -30,10 +35,29 @@ describe('attackOnHitSchema', () => {
       {
         kind: 'condition',
         conditionId: 'paralyzed',
-        description: "until the start of the lich's next turn",
+        end: {
+          kind: 'turn-bound',
+          participant: 'source',
+          boundary: 'start',
+          which: 'next',
+        },
       },
       { kind: 'note', description: 'The target starts burning' },
     ])
+  })
+
+  it('rejects condition replacement on attack on-hit', () => {
+    expect(
+      attackOnHitSchema.safeParse({
+        effects: [
+          {
+            kind: 'condition',
+            conditionId: 'petrified',
+            replacesConditionId: 'restrained',
+          },
+        ],
+      }).success,
+    ).toBe(false)
   })
 
   it('rejects a missing condition and a blank note', () => {

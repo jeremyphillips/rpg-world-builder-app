@@ -6,6 +6,7 @@ import {
   CONDITION_SET_ID,
   CREATURE_SIZE_SET_ID,
   CREATURE_TYPE_SET_ID,
+  CREATURE_FAMILY_SET_ID,
   DAMAGE_TYPE_SET_ID,
   EFFECT_CONDITION_ENTRIES,
   EFFECT_CONDITION_IDS,
@@ -409,6 +410,7 @@ describe('seeded vocabulary set registry', () => {
         CONDITION_SET_ID,
         CREATURE_SIZE_SET_ID,
         CREATURE_TYPE_SET_ID,
+        CREATURE_FAMILY_SET_ID,
         DAMAGE_TYPE_SET_ID,
         EDITION_PRESET_SET_ID,
         EQUIPMENT_CATEGORY_SET_ID,
@@ -434,4 +436,17 @@ describe('seeded vocabulary set registry', () => {
       expect(seededIds.has(setId), `${setId} requires catalog seed`).toBe(true)
     }
   })
+})
+
+it('preserves creature family compatibility metadata in resolved seeds', () => {
+  const families = loadSeedVocabularyOptionSet(DEFAULT_SYSTEM_RULESET_ID, 'creature-families')
+  expect(families.options).toHaveLength(10)
+  for (const id of ['lycanthrope', 'titan']) {
+    expect(families.options.find((row) => row.id === id)?.allowedCreatureTypes).toEqual([
+      'monstrosity',
+    ])
+  }
+  expect(families.options.find((row) => row.id === 'chromatic')?.allowedCreatureTypes).toEqual([
+    'dragon',
+  ])
 })

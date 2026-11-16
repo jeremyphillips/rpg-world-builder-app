@@ -16,7 +16,7 @@ import {
   MONSTER_CAST_SPELL_LABEL,
   MONSTER_USE_DEFAULT_NAME_LABEL,
 } from '../monster-form-labels'
-import { legendaryActionCategory } from './legendary-action-category'
+import { legendaryActionCategory } from './legendary/legendary-action-category'
 import {
   nextDistinctTitle,
   presentActionReference,

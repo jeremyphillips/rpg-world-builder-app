@@ -27,6 +27,13 @@ function catalogLoadStatus(
 function buildMonsterFormCatalogs(ctx: ContentFormCtx): MonsterCatalogs {
   return {
     equipmentById: ctx.equipmentCatalogById ?? new Map(),
+    creatureFamilies: ctx.creatureFamilyVocabulary?.byId,
+    classesById:
+      ctx.options?.classes &&
+      ctx.classCatalogStatus !== 'pending' &&
+      ctx.classCatalogStatus !== 'error'
+        ? new Map(ctx.options.classes.visible.map((row) => [row.id, row]))
+        : undefined,
     skillBySlug: ctx.skillCatalogBySlug ?? new Map(),
     equipmentCatalog: catalogLoadStatus(ctx.equipmentCatalogStatus),
     skillCatalog: catalogLoadStatus(ctx.skillCatalogStatus),

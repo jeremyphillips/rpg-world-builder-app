@@ -1,10 +1,11 @@
 import { ACTION_PRESET_IDS, formatResolutionTargetFromParts, getActionPreset } from '@rpg/contracts'
-import type {
-  ArrayConfig,
-  FormItem,
-  GroupConfig,
-  JoinedPairFieldConfig,
-  SelectFieldConfig,
+import {
+  resolveFieldConfigPrimaryName,
+  type ArrayConfig,
+  type FormItem,
+  type GroupConfig,
+  type JoinedPairFieldConfig,
+  type SelectFieldConfig,
 } from '@rpg/ui/form'
 import { describe, expect, it } from 'vitest'
 
@@ -112,7 +113,11 @@ describe('monster action acquisition', () => {
       resolution: {
         selectionMode: 'targets',
         method: { kind: 'saving-throw' },
-        effects: [{ id: 'damage', kind: 'damage' }],
+        effects: [],
+        outcomes: [
+          { result: 'failed-save', effects: [] },
+          { result: 'successful-save', effects: [] },
+        ],
         target: expect.objectContaining({
           count: 1,
           kind: 'creature',
@@ -258,21 +263,30 @@ describe('monster action detail fields', () => {
     const onHit = monsterActionOnHitFields(detailCtx)
     expect(onHit.kind).toBe('array')
     if (onHit.kind !== 'array') return
-    expect(onHit.addAction).toMatchObject({
-      label: 'Add effect',
-      menu: {
-        enableSearch: false,
-        items: [
-          {
-            id: 'damage',
-            label: 'Damage',
-            appendDefaults: { kind: 'damage', roll: { dice: { count: 1, faces: 6 } } },
-          },
-          { id: 'condition', label: 'Condition', appendDefaults: { kind: 'condition' } },
-          { id: 'note', label: 'Note', appendDefaults: { kind: 'note' } },
-        ],
+    expect(onHit.item).toMatchObject({ collapsible: true })
+    expect(onHit).toMatchObject({
+      addAction: {
+        label: 'Add effect',
+        menu: {
+          enableSearch: false,
+          items: [
+            {
+              id: 'damage',
+              label: 'Damage',
+              appendDefaults: { kind: 'damage', roll: { dice: { count: 1, faces: 6 } } },
+            },
+            { id: 'condition', label: 'Condition', appendDefaults: { kind: 'condition' } },
+            { id: 'note', label: 'Note', appendDefaults: { kind: 'note' } },
+          ],
+        },
       },
     })
+    expect(
+      onHit.fields.find(
+        (field) => !('kind' in field) && resolveFieldConfigPrimaryName(field) === 'kind',
+      ),
+    ).toBeUndefined()
+    expect(onHit).not.toHaveProperty('density')
   })
 
   it('shows only the natural-weapon editors and keeps attack editors', () => {
@@ -328,6 +342,11 @@ describe('monster action detail fields', () => {
       (item) => 'kind' in item && item.kind === 'group' && item.heading?.label === 'Damage',
     )
     expect(attackDamage).toMatchObject({ heading: { label: 'Damage' } })
+    expect(
+      attackItems.find(
+        (item) => 'kind' in item && item.kind === 'array' && item.name === 'onHit.effects',
+      ),
+    ).toMatchObject({ separator: 'subtle' })
     const damageRow =
       attackDamage && 'fields' in attackDamage
         ? attackDamage.fields.find((field) => 'kind' in field && field.kind === 'row')
@@ -395,17 +414,24 @@ describe('monster action detail fields', () => {
     expect(attack[0]).toBe('attackPreview')
     expect(attack[1]).toBe('buildAdvisories')
     expect(attack.indexOf('onHit.effects')).toBeLessThan(attack.indexOf('limitedUse'))
-    const attackBonus = attackItems.find(
-      (item) =>
-        'kind' in item &&
-        item.kind === 'dependent' &&
-        'controller' in item &&
-        item.controller.name === 'bonusSource.kind',
+    const attackBonusSection = attackItems.find(
+      (item) => 'kind' in item && item.kind === 'group' && item.heading?.label === 'Attack bonus',
     )
+    expect(attackBonusSection).toMatchObject({
+      headingScale: 'subsection',
+      separator: 'subtle',
+    })
+    const attackBonus =
+      attackBonusSection && 'fields' in attackBonusSection
+        ? attackBonusSection.fields[0]
+        : undefined
     expect(
       attackBonus && 'controller' in attackBonus ? attackBonus.controller : null,
     ).toMatchObject({
+      type: 'segmentedControl',
       required: true,
+      fullWidth: true,
+      labelVisibility: 'srOnly',
     })
     const attackBonusDependents =
       attackBonus && 'dependents' in attackBonus ? attackBonus.dependents.fields : []
@@ -440,6 +466,7 @@ describe('monster action detail fields', () => {
     }
     expect(distanceGroup).toMatchObject({
       visibility: { dependsOn: ['modes'] },
+      separator: 'subtle',
     })
     const distanceRows = distanceGroup.fields.filter(
       (field) => 'kind' in field && field.kind === 'row',
@@ -585,27 +612,27 @@ describe('monster action detail fields', () => {
     expect(findSelectField(items, 'dcSource.ability')).toMatchObject({ required: true })
   })
 
-  it('places save configuration before resolution damage and outcomes', () => {
+  it('orders save subsection fields before supplemental prose and omits global turn limit', () => {
     const names = detailFields({
       id: 'breath',
       kind: 'save',
       name: 'Fire Breath',
       preset: 'breath-weapon',
     })
-    const damageTypeIndex = names.indexOf('resolution.effects.0.damageType')
-    const rollIndex = names.indexOf('resolution.effects.0.roll')
+    const failedEffectsPath = names.find((name) => name.includes('resolution.outcomes.0.effects'))
     expect(names[0]).toBe('buildAdvisories')
-    expect(names.indexOf('_saveSuccessAmount')).toBeLessThan(names.indexOf('limitedUse'))
     expect(names.indexOf('resolution.method.ability')).toBeLessThan(
       names.indexOf('resolution.selectionMode'),
     )
-    expect(names.indexOf('resolution.selectionMode')).toBeLessThan(damageTypeIndex)
-    expect(rollIndex).toBe(damageTypeIndex + 1)
-    expect(damageTypeIndex).toBeLessThan(names.indexOf('_saveFailureNote'))
-    expect(names.indexOf('_saveFailureNote')).toBeLessThan(names.indexOf('_saveSuccessAmount'))
+    expect(failedEffectsPath).toBeDefined()
+    expect(names.indexOf(failedEffectsPath!)).toBeGreaterThan(
+      names.indexOf('resolution.selectionMode'),
+    )
+    expect(names.indexOf('_saveFailureOrSuccess')).toBeLessThan(names.indexOf('_turnLimit'))
+    expect(names).not.toContain('_saveSuccessAmount')
+    expect(names).not.toContain('onceUntilNextTurn')
     expect(names.at(-1)).toBe('description')
     expect(names).not.toContain('limitedUse.kind')
-    expect(names).not.toContain('attackPreview')
     const constrict = detailFields({
       id: 'squeeze',
       kind: 'save',

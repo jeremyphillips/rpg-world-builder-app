@@ -21,6 +21,7 @@ import {
   OptionalDisclosureTextareaFieldRenderer,
   OptionalDisclosureTextFieldRenderer,
 } from './fields/optional-disclosure/optional-disclosure-field-renderer.client'
+import { OptionalDisclosureComboboxFieldRenderer } from './fields/optional-disclosure/optional-disclosure-combobox-field-renderer.client'
 
 /**
  * Single-controller binding and progressive validation. Composites, select, and
@@ -105,6 +106,23 @@ export function StandardFieldRenderer({ resolved }: { resolved: ResolvedFieldRen
         hintPosition={resolved.hintPosition}
         presentationSize={resolved.presentationSize}
         controlSize={resolved.controlSize}
+        {...validation}
+      />
+    )
+  }
+
+  if (renderConfig.type === 'combobox' && renderConfig.optionalDisclosure) {
+    return (
+      <OptionalDisclosureComboboxFieldRenderer
+        config={renderConfig}
+        disclosure={renderConfig.optionalDisclosure}
+        field={progressiveField}
+        id={resolved.id}
+        hint={resolved.hint}
+        hintPosition={resolved.hintPosition}
+        presentationSize={resolved.presentationSize}
+        controlSize={resolved.controlSize}
+        namePrefix={resolved.namePrefix}
         {...validation}
       />
     )

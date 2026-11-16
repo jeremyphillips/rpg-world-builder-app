@@ -62,7 +62,7 @@ describe('deepMerge', () => {
         selectionMode: 'self',
         method: { kind: 'automatic' },
         effects: [{ id: 'healing', kind: 'healing' }],
-        outcomes: [{ result: 'applied', applications: [] }],
+        outcomes: [{ result: 'applied', effects: [] }],
       },
     }
 

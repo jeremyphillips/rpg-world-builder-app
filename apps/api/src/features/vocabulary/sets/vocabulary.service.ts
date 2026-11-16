@@ -15,6 +15,8 @@ import type {
 import {
   activeVocabularyOptionIds,
   CREATURE_TYPE_SET_ID,
+  CREATURE_FAMILY_SET_ID,
+  validateCreatureFamilyDefinitions,
   getVocabularySetCapability,
   LANGUAGE_SET_ID,
   vocabularyEntryUsageSchema,
@@ -223,6 +225,13 @@ export async function resolveVocabularySetForCampaign(
   const setPatch = patchDoc ? getSetPatch(patchDoc, setId) : undefined
   const capability = getVocabularySetCapability(setId)
   const options = resolveVocabularySet(seed, setPatch)
+  if (setId === CREATURE_FAMILY_SET_ID) {
+    const types = resolveVocabularySet(
+      loadSeedVocabularyOptionSet(rulesetId, CREATURE_TYPE_SET_ID),
+      patchDoc ? getSetPatch(patchDoc, CREATURE_TYPE_SET_ID) : undefined,
+    )
+    validateCreatureFamilyDefinitions(options, new Set(types.map((row) => row.id)))
+  }
   const usageRegistration = capability.batchUsageCounting
     ? getVocabularyUsageRegistration(setId)
     : undefined
