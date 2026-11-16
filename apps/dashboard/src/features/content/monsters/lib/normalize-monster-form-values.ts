@@ -562,10 +562,10 @@ function normalizeMonsterForms(forms: NonNullable<MonsterFormValues['forms']>) {
   const cleaned = omitEmptyStrings(forms)
   if (!isRecord(cleaned)) return cleaned
   const shape = cleaned
-  const alternates = Array.isArray(shape.alternates) ? shape.alternates : []
+  const definedForms = Array.isArray(shape.definedForms) ? shape.definedForms : []
   return {
     ...shape,
-    alternates: alternates.map((entry) => {
+    definedForms: definedForms.map((entry) => {
       if (!isRecord(entry)) return entry
       const overrides = isRecord(entry.overrides) ? entry.overrides : undefined
       return {

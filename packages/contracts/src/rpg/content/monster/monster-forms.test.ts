@@ -5,52 +5,146 @@ import { monsterActionDraftSchema } from './action'
 import { MONSTER_TEST_BODY } from './test-fixtures'
 
 const forms = {
-  trueForm: { id: 'humanoid', name: 'Humanoid', appearance: 'humanoid' },
-  alternates: [{ id: 'bear', name: 'Bear', appearance: 'bear', overrides: { sizes: ['large'] } }],
+  profileFormId: 'profile',
+  trueForm: { kind: 'defined' as const, formId: 'humanoid' },
+  definedForms: [
+    { id: 'humanoid', name: 'Humanoid', overrides: {} },
+    { id: 'bear', name: 'Bear', overrides: { sizes: ['large'] } },
+  ],
 }
 
 describe('monster forms', () => {
-  it('accepts a draft with a missing name and an empty alternate list', () => {
+  it('accepts a recoverable draft with an unresolved designation and empty forms', () => {
     const parsed = createMonsterDraftInputSchema.safeParse({
       slug: 'forms-draft',
       ...MONSTER_TEST_BODY,
-      forms: { trueForm: { id: 'humanoid' }, alternates: [] },
+      forms: {
+        profileFormId: 'profile',
+        trueForm: { kind: 'defined' },
+        definedForms: [],
+      },
     })
     expect(parsed.success).toBe(true)
   })
 
-  it('rejects a publish with a missing name, no alternates, or duplicate ids and names', () => {
+  it('rejects missing names, destinations, duplicate identity, and true-form overrides', () => {
     const missingName = createMonsterInputSchema.safeParse({
       slug: 'forms-name',
       ...MONSTER_TEST_BODY,
-      forms: { trueForm: { id: 'humanoid' }, alternates: [{ id: 'bear', name: 'Bear' }] },
+      forms: {
+        profileFormId: 'profile',
+        trueForm: { kind: 'profile' },
+        definedForms: [{ id: 'bear' }],
+      },
     })
     expect(missingName.success).toBe(false)
     if (!missingName.success) {
-      expect(missingName.error.issues.some((issue) => issue.message === 'Name is required')).toBe(
-        true,
+      expect(missingName.error.issues).toContainEqual(
+        expect.objectContaining({
+          path: ['forms', 'definedForms', 0, 'name'],
+          message: 'Enter a form name.',
+        }),
       )
     }
 
     const empty = createMonsterInputSchema.safeParse({
       slug: 'forms-empty',
       ...MONSTER_TEST_BODY,
-      forms: { trueForm: { id: 'humanoid', name: 'Humanoid' }, alternates: [] },
+      forms: { profileFormId: 'profile', trueForm: { kind: 'profile' }, definedForms: [] },
     })
-    expect(empty.success).toBe(false)
+    if (empty.success) throw new Error('Expected empty forms to fail')
+    expect(empty.error.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          path: ['forms', 'definedForms'],
+          message: 'Add a form or remove the forms configuration.',
+        }),
+      ]),
+    )
 
     const duplicate = createMonsterInputSchema.safeParse({
       slug: 'forms-dup',
       ...MONSTER_TEST_BODY,
       forms: {
-        trueForm: { id: 'humanoid', name: 'Humanoid' },
-        alternates: [
+        profileFormId: 'humanoid',
+        trueForm: { kind: 'profile', name: 'Humanoid' },
+        definedForms: [
           { id: 'humanoid', name: 'humanoid' },
           { id: 'other', name: 'Humanoid' },
         ],
       },
     })
-    expect(duplicate.success).toBe(false)
+    if (duplicate.success) throw new Error('Expected duplicate forms to fail')
+    expect(duplicate.error.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          path: ['forms', 'trueForm', 'name'],
+          message: 'Form names must be unique.',
+        }),
+        expect.objectContaining({
+          path: ['forms', 'definedForms', 0, 'name'],
+          message: 'Form names must be unique.',
+        }),
+      ]),
+    )
+
+    const overriddenTrue = createMonsterInputSchema.safeParse({
+      slug: 'forms-overridden-true',
+      ...MONSTER_TEST_BODY,
+      forms: {
+        ...forms,
+        definedForms: [
+          { id: 'humanoid', name: 'Humanoid', overrides: { sizes: ['large'] } },
+          forms.definedForms[1],
+        ],
+      },
+    })
+    if (overriddenTrue.success) throw new Error('Expected true-form overrides to fail')
+    expect(overriddenTrue.error.issues).toContainEqual(
+      expect.objectContaining({
+        path: ['forms', 'trueForm', 'formId'],
+        message: 'The true form uses base statistics. Remove its statistic overrides.',
+      }),
+    )
+  })
+
+  it('claims unresolved true-form issues before destination issues', () => {
+    const missingSelection = createMonsterInputSchema.safeParse({
+      slug: 'forms-missing-selection',
+      ...MONSTER_TEST_BODY,
+      forms: {
+        profileFormId: 'profile',
+        trueForm: { kind: 'defined' },
+        definedForms: [{ id: 'bear', name: 'Bear' }],
+      },
+    })
+    if (missingSelection.success) throw new Error('Expected missing selection to fail')
+    expect(missingSelection.error.issues).toContainEqual(
+      expect.objectContaining({
+        path: ['forms', 'trueForm', 'formId'],
+        message: 'Select the true form.',
+      }),
+    )
+    expect(missingSelection.error.issues).not.toContainEqual(
+      expect.objectContaining({ message: 'Add a form other than the true form.' }),
+    )
+
+    const missingRow = createMonsterInputSchema.safeParse({
+      slug: 'forms-missing-row',
+      ...MONSTER_TEST_BODY,
+      forms: {
+        profileFormId: 'profile',
+        trueForm: { kind: 'defined', formId: 'missing' },
+        definedForms: [{ id: 'bear', name: 'Bear' }],
+      },
+    })
+    if (missingRow.success) throw new Error('Expected missing true form to fail')
+    expect(missingRow.error.issues).toContainEqual(
+      expect.objectContaining({
+        path: ['forms', 'trueForm', 'formId'],
+        message: 'Select an existing form as the true form.',
+      }),
+    )
   })
 
   it('keeps unavailable active keys off shape-shift and rejects a second row or bad reference', () => {

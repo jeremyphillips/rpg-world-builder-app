@@ -34,10 +34,11 @@ function Host() {
       name: 'Vampire',
       sizes: ['medium'],
       forms: {
-        trueForm: { id: 'vampire', name: 'Vampire', appearance: 'vampire' },
-        alternates: [
-          { id: 'bat', name: 'Bat', appearance: 'bat', overrides: { sizes: ['tiny'] } },
-          { id: 'mist', name: 'Mist', appearance: 'cloud of mist', overrides: {} },
+        profileFormId: 'vampire',
+        trueForm: { kind: 'profile' },
+        definedForms: [
+          { id: 'bat', name: 'Bat', overrides: { sizes: ['tiny'] } },
+          { id: 'mist', name: 'Cloud of mist', overrides: {} },
         ],
       },
       bonusActions: [shapeShift] as MonsterFormValues['bonusActions'],

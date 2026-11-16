@@ -19,10 +19,10 @@ Keep the evidence when a gap is verified. Deficiency types are not interchangeab
 
 ## Gaps
 
-### `creature-alternate-forms`
+### `creature-forms`
 
-- Concept: alternate forms on one stat block, including size overrides, a generated Shape-Shift action, and a derived Alternate Forms trait when that action is absent.
-- Implemented: size overrides, form identity, the Shape-Shift kind in Actions and Bonus Actions, equipment and prerequisite sentences, and removal of Shape-Shift with the forms block. Movement, speech, presentation, and `onlyInFormIds` are not in this pass.
+- Concept: multiple defined forms on one stat block, including stable profile identity, true-form designation, size overrides, a generated Shape-Shift action, and a derived Forms trait when that action is absent.
+- Implemented: unified defined forms, central identity and destination resolution, size overrides, the Shape-Shift kind in Actions and Bonus Actions, equipment and prerequisite sentences, form-scoped references, and lifecycle-planned removal. Movement, speech, and availability authoring remain later work.
 - Not this model: stat-block replacement, mist restrictions, involuntary shifts, and Multiattack replacement. Those stay on `stat-block-replacement` or their own gaps.
 - Evidence: [creature-forms.md](./creature-forms.md).
 - Representative: none seeded.
@@ -33,7 +33,7 @@ Keep the evidence when a gap is verified. Deficiency types are not interchangeab
 ### `stat-block-replacement`
 
 - Concept: a creature takes another creature’s stat block, such as Incubus Form, Succubus Form, or Shapechange.
-- Not this model: `creature-alternate-forms`, which changes sizes on one stat block. The duration-bound spell counterpart is the spell modeling code `transformation-model-missing`.
+- Not this model: `creature-forms`, which changes sizes on one stat block. The duration-bound spell counterpart is the spell modeling code `transformation-model-missing`.
 - Importance: essential when the source replaces the block.
 - Owner: deferred.
 - Approval: deferred. Implementation: not started.
@@ -132,4 +132,4 @@ A monster SRD fixture is an assertion in `packages/catalog/src/monsters/index.te
 Append after an approved authoring pass.
 
 - **Lich** (`srd-cc-5.2.1:lich`). Verified the non-legendary attack lines, multiattack sentence, and spellcasting save DC. Reused equipped-attack resolution, on-hit conditions, spell references, and Legendary Resistance. Opened no new gap. `legendary-actions`, `save-conditions`, and the lair's fifth resistance use stay open. Fixtures are the attack sentences, AC 20, and HP 315. Other SRD undead with on-hit conditions can reuse the same rider. The on-hit condition model was already in place; this seed did not add one.
-- **Creature forms.** Opened `creature-alternate-forms` for size overrides and Shape-Shift, and `stat-block-replacement` as deferred. No creature was seeded.
+- **Creature forms.** Implemented `creature-forms` for stable identity, true-form designation, size overrides, form restrictions, and Shape-Shift; retained `stat-block-replacement` as deferred. No creature was seeded.

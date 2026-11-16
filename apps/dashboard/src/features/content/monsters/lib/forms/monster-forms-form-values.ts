@@ -3,16 +3,17 @@ import type { CreatureFormsDraft } from '@rpg/contracts'
 import { createMonsterRowId } from '../monster-row-id'
 
 export type MonsterFormsDraft = CreatureFormsDraft
-export type MonsterAlternateFormDraft = MonsterFormsDraft['alternates'][number]
+export type MonsterDefinedFormDraft = MonsterFormsDraft['definedForms'][number]
 
 export function makeEmptyMonsterForms(): MonsterFormsDraft {
   return {
-    trueForm: { id: createMonsterRowId(), name: '' },
-    alternates: [],
+    profileFormId: createMonsterRowId(),
+    trueForm: { kind: 'profile' },
+    definedForms: [],
   }
 }
 
-export function makeEmptyMonsterAlternateForm(): MonsterAlternateFormDraft {
+export function makeEmptyMonsterDefinedForm(): MonsterDefinedFormDraft {
   return {
     id: createMonsterRowId(),
     name: '',

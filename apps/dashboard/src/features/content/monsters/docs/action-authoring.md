@@ -1,6 +1,6 @@
 # Monster action authoring
 
-Dashboard monster actions: contracts define shapes and catalog issues; the monsters feature owns field UX, acquisition, previews, and normalization before save/publish. Shape-Shift is acquired from Actions or Bonus Actions once an alternate form exists. Its equipment and prerequisite fields sit with the other action mechanics. Alternate forms themselves are edited under Creature Details.
+Dashboard monster actions: contracts define shapes and catalog issues; the monsters feature owns field UX, acquisition, previews, and normalization before save/publish. Shape-Shift is acquired from Actions or Bonus Actions once a form other than the true form exists. Its equipment and prerequisite fields sit with the other action mechanics. Defined forms and true-form designation are edited under Creature Details.
 
 ## Pipeline
 

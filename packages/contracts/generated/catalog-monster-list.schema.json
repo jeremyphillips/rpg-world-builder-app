@@ -6984,29 +6984,52 @@
     "__schema269": {
       "type": "object",
       "properties": {
-        "trueForm": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "minLength": 1
-            },
-            "name": {
-              "type": "string",
-              "minLength": 1
-            },
-            "appearance": {
-              "type": "string",
-              "minLength": 1
-            }
-          },
-          "required": [
-            "id",
-            "name"
-          ],
-          "additionalProperties": false
+        "profileFormId": {
+          "type": "string",
+          "minLength": 1
         },
-        "alternates": {
+        "trueForm": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "profile",
+                  "description": "profile"
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "kind"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "defined",
+                  "description": "defined"
+                },
+                "formId": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "kind",
+                "formId"
+              ],
+              "additionalProperties": false
+            }
+          ]
+        },
+        "definedForms": {
           "minItems": 1,
           "type": "array",
           "items": {
@@ -7015,8 +7038,9 @@
         }
       },
       "required": [
+        "profileFormId",
         "trueForm",
-        "alternates"
+        "definedForms"
       ],
       "additionalProperties": false
     },
@@ -7031,12 +7055,7 @@
           "type": "string",
           "minLength": 1
         },
-        "appearance": {
-          "type": "string",
-          "minLength": 1
-        },
         "overrides": {
-          "default": {},
           "type": "object",
           "properties": {
             "sizes": {
@@ -7056,8 +7075,7 @@
       },
       "required": [
         "id",
-        "name",
-        "overrides"
+        "name"
       ],
       "additionalProperties": false
     }

@@ -1,5 +1,6 @@
 import {
   armorClassFromProtection,
+  creatureFormsDraftSchema,
   neutralAbilityScores,
   type ArmorClassRules,
   type ContentValidationIntent,
@@ -174,11 +175,49 @@ function hitPointsAuthoringFromEntity(
   }
 }
 
+function armorClassFormValue(entity: Monster, rules?: ArmorClassRules) {
+  return {
+    naturalArmorBonus: entity.armorClass.naturalArmorBonus ?? 0,
+    useFixedAc: entity.armorClass.fixedAcOffset !== undefined,
+    ...(entity.armorClass.fixedAcOffset !== undefined && rules
+      ? { fixedValue: armorClassFromProtection(rules, entity.armorClass.fixedAcOffset) }
+      : {}),
+  }
+}
+
+function actionListFormValues<
+  T extends MonsterActionDraft | MonsterBonusActionDraft | MonsterReactionDraft,
+>(actions: T[]): T[] {
+  return hydrateOnHitInActionList(
+    actions
+      .map(mapWeaponActionDamageToForm)
+      .map((action) => withSaveOutcomeSlots(withDefaultSaveResolutionTarget(action))),
+  ) as T[]
+}
+
+function legendaryActionFormValues(entity: Monster) {
+  if (!entity.legendaryActions) return {}
+  return {
+    legendaryActions: {
+      uses: entity.legendaryActions.uses,
+      ...(entity.legendaryActions.usesInLair !== undefined
+        ? { usesInLair: entity.legendaryActions.usesInLair }
+        : {}),
+      actions: hydrateOnHitInActionList(
+        entity.legendaryActions.actions
+          .map(mapWeaponActionDamageToForm)
+          .map((action) => withSaveOutcomeSlots(withDefaultSaveResolutionTarget(action))),
+      ),
+    },
+  }
+}
+
 export function monsterToFormValues(
   entity: Monster,
   ctx?: { armorClassRules?: ArmorClassRules },
 ): MonsterFormValues {
   const weapons = coerceCreatureWeaponProficienciesForForm(entity.proficiencies.weapons)
+  const parsedForms = entity.forms ? creatureFormsDraftSchema.safeParse(entity.forms) : undefined
 
   return {
     name: entity.name,
@@ -189,18 +228,7 @@ export function monsterToFormValues(
     classIds: entity.classIds,
     alignment: entity.alignment,
     abilityScores: entity.abilityScores,
-    armorClass: {
-      naturalArmorBonus: entity.armorClass.naturalArmorBonus ?? 0,
-      useFixedAc: entity.armorClass.fixedAcOffset !== undefined,
-      ...(entity.armorClass.fixedAcOffset !== undefined && ctx?.armorClassRules
-        ? {
-            fixedValue: armorClassFromProtection(
-              ctx.armorClassRules,
-              entity.armorClass.fixedAcOffset,
-            ),
-          }
-        : {}),
-    },
+    armorClass: armorClassFormValue(entity, ctx?.armorClassRules),
     hitPoints: entity.hitPoints,
     ...hitPointsAuthoringFromEntity(entity),
     movement: movementRecordToRows(entity.movement),
@@ -216,37 +244,11 @@ export function monsterToFormValues(
     defenses: entity.defenses,
     equipment: entity.equipment,
     traits: entity.traits,
-    ...(entity.forms ? { forms: entity.forms } : {}),
-    actions: hydrateOnHitInActionList(
-      entity.actions
-        .map(mapWeaponActionDamageToForm)
-        .map((action) => withSaveOutcomeSlots(withDefaultSaveResolutionTarget(action))),
-    ),
-    bonusActions: hydrateOnHitInActionList(
-      entity.bonusActions
-        .map(mapWeaponActionDamageToForm)
-        .map((action) => withSaveOutcomeSlots(withDefaultSaveResolutionTarget(action))),
-    ),
-    reactions: hydrateOnHitInActionList(
-      entity.reactions
-        .map(mapWeaponActionDamageToForm)
-        .map((action) => withSaveOutcomeSlots(withDefaultSaveResolutionTarget(action))),
-    ),
-    ...(entity.legendaryActions
-      ? {
-          legendaryActions: {
-            uses: entity.legendaryActions.uses,
-            ...(entity.legendaryActions.usesInLair !== undefined
-              ? { usesInLair: entity.legendaryActions.usesInLair }
-              : {}),
-            actions: hydrateOnHitInActionList(
-              entity.legendaryActions.actions
-                .map(mapWeaponActionDamageToForm)
-                .map((action) => withSaveOutcomeSlots(withDefaultSaveResolutionTarget(action))),
-            ),
-          },
-        }
-      : {}),
+    ...(parsedForms?.success ? { forms: parsedForms.data } : {}),
+    actions: actionListFormValues(entity.actions),
+    bonusActions: actionListFormValues(entity.bonusActions),
+    reactions: actionListFormValues(entity.reactions),
+    ...legendaryActionFormValues(entity),
     ...(() => {
       const hydration = weaponProficiencyHydrationFromWeapons(weapons)
       return {

@@ -4,56 +4,51 @@ import type { FormItem } from '@rpg/ui/form'
 import { buildActiveSizeFieldOptions } from '@/features/vocabulary'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { createCreatureSizesFieldConfig } from '../../../lib/forms/fields/creature-sizes-form-fields'
-import { MonsterAlternateFormsEditor } from '../../components/form/monster-alternate-forms-editor'
+import { MonsterFormsEditor } from '../../components/form/monster-forms-editor'
+import { MonsterTrueFormDesignation } from '../../components/form/monster-true-form-designation'
 import {
-  MONSTER_ALTERNATE_FORM_APPEARANCE_LABEL,
-  MONSTER_ALTERNATE_FORM_NAME_LABEL,
-  MONSTER_ALTERNATE_FORM_NOTES_ADD_LABEL,
-  MONSTER_ALTERNATE_FORM_NOTES_HINT,
-  MONSTER_ALTERNATE_FORM_NOTES_LABEL,
-  MONSTER_ALTERNATE_FORM_SIZE_HINT,
-  MONSTER_ALTERNATE_FORMS_ADD_LABEL,
-  MONSTER_ALTERNATE_FORMS_HEADING,
+  MONSTER_FORM_NAME_LABEL,
+  MONSTER_FORM_NOTES_ADD_LABEL,
+  MONSTER_FORM_NOTES_HINT,
+  MONSTER_FORM_NOTES_LABEL,
+  MONSTER_FORM_SIZE_HINT,
+  MONSTER_FORMS_ADD_LABEL,
+  MONSTER_FORMS_HEADING,
   MONSTER_TRUE_FORM_HEADING,
 } from '../monster-form-labels'
 
-export function monsterAlternateFormDetailFields(input: {
+export function monsterDefinedFormDetailFields(input: {
   rowPath: string
   ctx: ContentFormCtx
 }): FormItem[] {
   const { rowPath, ctx } = input
   const sizes = createCreatureSizesFieldConfig({
-    hint: MONSTER_ALTERNATE_FORM_SIZE_HINT,
+    hint: MONSTER_FORM_SIZE_HINT,
     options: buildActiveSizeFieldOptions(ctx.sizeVocabulary, ctx.creatureSizesSeedIds),
   })
   return [
     {
       type: 'text',
       name: `${rowPath}.name`,
-      label: MONSTER_ALTERNATE_FORM_NAME_LABEL,
+      label: MONSTER_FORM_NAME_LABEL,
       required: true,
-    },
-    {
-      type: 'text',
-      name: `${rowPath}.appearance`,
-      label: MONSTER_ALTERNATE_FORM_APPEARANCE_LABEL,
     },
     {
       ...sizes,
       name: `${rowPath}.overrides.sizes`,
       required: false,
       optionalDisclosure: {
-        addLabel: MONSTER_ALTERNATE_FORM_SIZE_HINT,
+        addLabel: MONSTER_FORM_SIZE_HINT,
         expandWhenPopulated: true,
       },
     },
     {
       type: 'textarea',
       name: `${rowPath}.notes`,
-      label: MONSTER_ALTERNATE_FORM_NOTES_LABEL,
-      hint: MONSTER_ALTERNATE_FORM_NOTES_HINT,
+      label: MONSTER_FORM_NOTES_LABEL,
+      hint: MONSTER_FORM_NOTES_HINT,
       optionalDisclosure: {
-        addLabel: MONSTER_ALTERNATE_FORM_NOTES_ADD_LABEL,
+        addLabel: MONSTER_FORM_NOTES_ADD_LABEL,
         expandWhenPopulated: true,
       },
     },
@@ -64,16 +59,14 @@ export function monsterFormsSectionFields(ctx: ContentFormCtx): FormItem[] {
   return [
     {
       kind: 'group',
-      heading: { label: MONSTER_ALTERNATE_FORMS_HEADING },
+      heading: { label: MONSTER_FORMS_HEADING },
       disclosure: {
         variant: 'inline',
-        openLabel: MONSTER_ALTERNATE_FORMS_HEADING,
-        closeLabel: MONSTER_ALTERNATE_FORMS_HEADING,
+        openLabel: MONSTER_FORMS_HEADING,
+        closeLabel: MONSTER_FORMS_HEADING,
         summaryDependsOn: ['forms'],
         resolveSummary: (values) => ({
-          primary: values.forms
-            ? MONSTER_ALTERNATE_FORMS_HEADING
-            : MONSTER_ALTERNATE_FORMS_ADD_LABEL,
+          primary: values.forms ? MONSTER_FORMS_HEADING : MONSTER_FORMS_ADD_LABEL,
         }),
       },
       fields: [
@@ -86,23 +79,34 @@ export function monsterFormsSectionFields(ctx: ContentFormCtx): FormItem[] {
           },
           fields: [
             {
-              type: 'text',
-              name: 'forms.trueForm.name',
-              label: MONSTER_ALTERNATE_FORM_NAME_LABEL,
-              required: true,
+              kind: 'slot',
+              name: 'forms.trueForm.kind',
+              issuePaths: ['forms.trueForm.formId', 'forms.trueForm.name'],
+              render: () => createElement(MonsterTrueFormDesignation),
             },
             {
               type: 'text',
-              name: 'forms.trueForm.appearance',
-              label: MONSTER_ALTERNATE_FORM_APPEARANCE_LABEL,
+              name: 'forms.trueForm.name',
+              label: MONSTER_FORM_NAME_LABEL,
+              hint: "Overrides the profile's form name in rules text.",
+              optionalDisclosure: {
+                addLabel: 'Override form name',
+                expandWhenPopulated: true,
+              },
+              visibility: {
+                dependsOn: ['forms.trueForm.kind'],
+                visibleWhen: (values) =>
+                  (values.forms as { trueForm?: { kind?: string } } | undefined)?.trueForm?.kind ===
+                  'profile',
+              },
             },
           ],
         },
         {
           kind: 'slot',
           name: 'formsEditor',
-          issuePaths: ['forms.alternates'],
-          render: () => createElement(MonsterAlternateFormsEditor, { ctx }),
+          issuePaths: ['forms.definedForms', 'forms.trueForm.formId'],
+          render: () => createElement(MonsterFormsEditor, { ctx }),
         },
       ],
     },

@@ -3,6 +3,7 @@ import {
   actionsReferencingAction,
   getMonsterActionKindLabel,
   isWeaponEquipment,
+  resolveCreatureFormsContext,
   resolveEquipmentInstanceReferenceLabel,
 } from '@rpg/contracts'
 import { ActionIcon, ButtonDropdown, ConfirmDialog } from '@rpg/ui'
@@ -107,6 +108,29 @@ function mapActionListItem(
   }
 }
 
+function shapeShiftDisabledReason(values: MonsterFormValues): string | undefined {
+  const formsContext = values.forms
+    ? resolveCreatureFormsContext(values.forms, values.name)
+    : undefined
+  if (!formsContext) return 'Add forms before adding Shape-Shift.'
+  if (formsContext.status !== 'complete') return 'Select the true form before adding Shape-Shift.'
+  if (formsContext.alternateDestinations.length === 0) {
+    return 'Add a form other than the true form before adding Shape-Shift.'
+  }
+  return undefined
+}
+
+function actionAcquisitionSectionRows(values: MonsterFormValues) {
+  return {
+    actions: values.actions ?? [],
+    bonusActions: values.bonusActions ?? [],
+    reactions: values.reactions ?? [],
+    ...(values.legendaryActions
+      ? { legendaryActions: { actions: values.legendaryActions.actions } }
+      : {}),
+  }
+}
+
 function MonsterActionAddMenu({
   section,
   weapons,
@@ -132,15 +156,8 @@ function MonsterActionAddMenu({
           weaponActions,
           allowAddWeapon,
           section,
-          hasAlternateForm: (values.forms?.alternates.length ?? 0) > 0,
-          sectionRows: {
-            actions: values.actions ?? [],
-            bonusActions: values.bonusActions ?? [],
-            reactions: values.reactions ?? [],
-            ...(values.legendaryActions
-              ? { legendaryActions: { actions: values.legendaryActions.actions } }
-              : {}),
-          },
+          shapeShiftDisabledReason: shapeShiftDisabledReason(values),
+          sectionRows: actionAcquisitionSectionRows(values),
           hasReferenceTargets: ((values.actions ?? []) as MonsterActionDraftRow[]).some(
             isLegendaryReferenceTarget,
           ),

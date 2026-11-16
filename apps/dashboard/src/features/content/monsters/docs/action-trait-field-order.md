@@ -20,3 +20,8 @@ Failed save is an ordered list of Damage, Condition, and Note rows. Each Damage 
 Repeat save stays hidden until the first-failure outcome lists a condition, or a repeat shell is already open. A note or damage row alone does not reveal it. Opening repeat writes the fixed end-of-next-turn timing and shows First failure and Second failure as field labels before the second tier has effects. Eligibility is an optional note on that shell. Recurring saves stay note effects.
 
 Do not apply this order to species traits or class features. Their descriptions are the primary authored content, and grant summaries are a different region.
+
+Form designation and the Defined forms master-detail editor live in Creature Details,
+outside action and trait detail-body ordering. Shape-Shift only authors its action-local
+equipment and prerequisite fields here; its destinations and return identity come from
+the shared Forms configuration.

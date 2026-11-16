@@ -81,7 +81,6 @@ import {
   type MonsterActionSectionBody,
 } from './monster/action-section-access'
 import { MONSTER_ACTION_SECTIONS } from './monster/action-sections'
-import { FORM_ALTERNATES_REQUIRED_MESSAGE } from './creature/forms'
 import {
   monsterFormsDraftSchema,
   monsterFormsSchema,
@@ -837,12 +836,12 @@ function refineShapeShiftForms(
   prefix: (string | number)[],
 ): void {
   const shapeShifts = shapeShiftRows(body)
-  if (shapeShifts.length === 0 || (body.forms?.alternates.length ?? 0) >= 1) return
+  if (shapeShifts.length === 0 || body.forms) return
   for (const located of shapeShifts) {
     const rows = monsterActionSectionRows(body, located.section)
     const index = rows.findIndex((row) => row.id === located.row.id)
     if (index < 0) continue
-    addCustomRefinementIssue(ctx, FORM_ALTERNATES_REQUIRED_MESSAGE, [
+    addCustomRefinementIssue(ctx, 'Add forms before adding Shape-Shift.', [
       ...prefix,
       ...monsterActionSectionRowPath(located.section, index, 'kind'),
     ])
@@ -915,7 +914,12 @@ export function refineMonsterBody(
     'telepathy',
   ])
   refineMonsterProficiencies(body.proficiencies, ctx, prefix)
-  if (body.forms) refineMonsterFormIdentity(body.forms, ctx, prefix)
+  if (body.forms) {
+    refineMonsterFormIdentity(body.forms, ctx, prefix, {
+      published: true,
+      creatureName: body.name,
+    })
+  }
   refineShapeShiftForms(body, ctx, prefix)
   refineExperiencePointsOverride(body, ctx, prefix)
 }
@@ -983,6 +987,7 @@ function refineMonsterDraftBody(
     requirePresent: false,
   })
   refineMultiattackReferences(sections, ctx, prefix, { published: false })
+  if (body.forms) refineMonsterFormIdentity(body.forms, ctx, prefix, { creatureName: body.name })
 }
 
 const monsterDraftStoredSchemaBase = draftStoredSchema(monsterBodyDraftSchema).superRefine(

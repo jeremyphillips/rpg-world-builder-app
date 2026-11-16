@@ -28,8 +28,7 @@ import { monsterArmorClassFields } from './statistics/monster-armor-class-fields
 import { monsterHitPointsFields } from './statistics/monster-hit-points-form-fields'
 import {
   MONSTER_CHALLENGE_HEADING,
-  MONSTER_ALTERNATE_FORM_APPEARANCE_LABEL,
-  MONSTER_ALTERNATE_FORM_NAME_LABEL,
+  MONSTER_FORM_NAME_LABEL,
   MONSTER_LEGENDARY_ACTIONS_HEADING,
   MONSTER_LEGENDARY_LAIR_USES_LABEL,
   MONSTER_LEGENDARY_USES_LABEL,
@@ -46,7 +45,7 @@ import {
   embeddedArrayResolverField,
   embeddedMasterDetailTabValidation,
 } from '../../lib/forms/validation/tabbed-form-resolver-fields'
-import { monsterAlternateFormRowResolveFields } from './forms/monster-forms-validation-fields'
+import { monsterDefinedFormRowResolveFields } from './forms/monster-forms-validation-fields'
 
 const alignmentOptions = toOptions(
   Object.keys(ALIGNMENT_ENTRIES),
@@ -139,22 +138,21 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
 
   const creatureDetails: FormItem[] = creatureDetailsFields(ctx)
   const formsValidation = embeddedMasterDetailTabValidation({
-    path: 'forms.alternates',
-    itemLabel: 'Alternate forms',
+    path: 'forms.definedForms',
+    itemLabel: 'Defined forms',
     fields: [],
-    resolveItemFields: monsterAlternateFormRowResolveFields(ctx),
+    resolveItemFields: monsterDefinedFormRowResolveFields(ctx),
   })
   const trueFormResolverFields: FormItem[] = [
     {
       type: 'text',
-      name: 'forms.trueForm.name',
-      label: MONSTER_ALTERNATE_FORM_NAME_LABEL,
-      required: true,
+      name: 'forms.trueForm.formId',
+      label: 'Select form',
     },
     {
       type: 'text',
-      name: 'forms.trueForm.appearance',
-      label: MONSTER_ALTERNATE_FORM_APPEARANCE_LABEL,
+      name: 'forms.trueForm.name',
+      label: MONSTER_FORM_NAME_LABEL,
     },
   ]
 

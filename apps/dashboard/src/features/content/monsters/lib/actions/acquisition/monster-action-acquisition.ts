@@ -38,7 +38,6 @@ import {
   MONSTER_REACTION_CUSTOM_LABEL,
   MONSTER_ACTION_REFERENCE_ACQUISITION_LABEL,
   MONSTER_SHAPE_SHIFT_ACQUISITION_DESCRIPTION,
-  MONSTER_SHAPE_SHIFT_REQUIRES_ALTERNATE_FORM_NOTE,
   LEGENDARY_CAST_SPELL_DISABLED_NOTE,
   LEGENDARY_REFERENCE_DESCRIPTION,
   LEGENDARY_REFERENCE_DISABLED_NOTE,
@@ -219,7 +218,7 @@ export function monsterActionAcquisitionItems(input: {
   /** Actions rows a reaction reference can use. */
   hasReferenceTargets?: boolean
   spellCatalogReady?: boolean
-  hasAlternateForm?: boolean
+  shapeShiftDisabledReason?: string
 }): MonsterActionAcquisitionItem[] {
   const sectionRows: MonsterActionSectionRows = input.sectionRows ?? {
     actions: [],
@@ -335,10 +334,10 @@ export function monsterActionAcquisitionItems(input: {
     ],
     sectionRows,
   )
-  if (input.hasAlternateForm !== false) return items
+  if (!input.shapeShiftDisabledReason) return items
   return items.map((item) =>
     item.id === 'create:shape-shift'
-      ? { ...item, disabled: true, note: MONSTER_SHAPE_SHIFT_REQUIRES_ALTERNATE_FORM_NOTE }
+      ? { ...item, disabled: true, note: input.shapeShiftDisabledReason }
       : item,
   )
 }

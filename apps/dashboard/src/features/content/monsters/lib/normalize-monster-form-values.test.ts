@@ -10,15 +10,17 @@ describe('normalizeMonsterFormValues', () => {
   it('trims form names and notes', () => {
     const values = resolveMonsterCreateDefaultValues()
     values.forms = {
-      trueForm: { id: 'true', name: '  Humanoid  ' },
-      alternates: [{ id: 'bear', name: '  Bear  ', notes: '  keeps its gear  ', overrides: {} }],
+      profileFormId: 'profile',
+      trueForm: { kind: 'profile', name: '  Humanoid  ' },
+      definedForms: [{ id: 'bear', name: '  Bear  ', notes: '  keeps its gear  ', overrides: {} }],
     }
 
     const normalized = normalizeMonsterFormValues(values, { intent: 'draft', mode: 'create' })
 
     expect(normalized.forms).toEqual({
-      trueForm: { id: 'true', name: 'Humanoid' },
-      alternates: [{ id: 'bear', name: 'Bear', notes: 'keeps its gear', overrides: {} }],
+      profileFormId: 'profile',
+      trueForm: { kind: 'profile', name: 'Humanoid' },
+      definedForms: [{ id: 'bear', name: 'Bear', notes: 'keeps its gear', overrides: {} }],
     })
   })
 

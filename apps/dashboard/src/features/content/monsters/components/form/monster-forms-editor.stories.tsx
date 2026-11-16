@@ -24,23 +24,43 @@ function MonsterFormsStory({ values }: { values: MonsterFormValues }) {
 }
 
 const meta = {
-  title: 'Dashboard/Content/Monsters/MonsterAlternateFormsEditor',
+  title: 'Dashboard/Content/Monsters/MonsterFormsEditor',
   component: MonsterFormsStory,
 } satisfies Meta<typeof MonsterFormsStory>
 
 export default meta
 type Story = StoryObj<typeof meta>
 
-function valuesWithForms(name?: string): MonsterFormValues {
+function valuesWithForms(
+  trueForm: NonNullable<MonsterFormValues['forms']>['trueForm'],
+  definedForms: NonNullable<MonsterFormValues['forms']>['definedForms'],
+): MonsterFormValues {
   return {
     ...resolveMonsterCreateDefaultValues(),
     forms: {
-      trueForm: { id: 'true', name: 'Humanoid' },
-      alternates: [{ id: 'bear', name, appearance: 'bear', overrides: { sizes: ['large'] } }],
+      profileFormId: 'profile',
+      trueForm,
+      definedForms,
     },
   }
 }
 
-export const Empty: Story = { args: { values: resolveMonsterCreateDefaultValues() } }
-export const Populated: Story = { args: { values: valuesWithForms('Bear') } }
-export const InvalidDraft: Story = { args: { values: valuesWithForms() } }
+const definedRows = [
+  { id: 'humanoid', name: 'Humanoid' },
+  { id: 'bear', name: 'Bear', overrides: { sizes: ['large' as const] } },
+]
+
+export const CreatureProfile: Story = {
+  args: { values: valuesWithForms({ kind: 'profile' }, definedRows) },
+}
+export const DefinedFormWithoutRows: Story = {
+  args: { values: valuesWithForms({ kind: 'defined', formId: undefined }, []) },
+}
+export const DefinedFormAwaitingSelection: Story = {
+  args: { values: valuesWithForms({ kind: 'defined', formId: undefined }, definedRows) },
+}
+export const DefinedFormSelected: Story = {
+  args: {
+    values: valuesWithForms({ kind: 'defined', formId: 'humanoid' }, definedRows),
+  },
+}

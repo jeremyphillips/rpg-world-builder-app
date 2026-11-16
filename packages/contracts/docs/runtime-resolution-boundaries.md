@@ -63,7 +63,7 @@ from a layer below it in this diagram, it is in the wrong module.
 - Dashboard or API modules
 - `runtime/character-builder/`
 
-**Suggested modules:** one noun per file — `languages.ts`, `senses.ts`, `traits.ts`, `forms.ts`, `damage-resistances.ts`. `forms.ts` resolves alternate-form sizes. Movement and speech overrides are not in that resolver yet.
+**Suggested modules:** one noun per file — `languages.ts`, `senses.ts`, `traits.ts`, `forms.ts`, `damage-resistances.ts`. `forms.ts` centrally resolves stable profile identity, true-form designation, eligible identities, alternate destinations, and effective sizes. Movement and speech overrides are not in that resolver yet.
 
 **Exists today:** `creature/languages.ts`, `creature/equipment.ts`, `creature/equipment-id-match.ts`,
 `creature/equipment-stack.ts`, `creature/proficiencies.ts`, `creature/weapon-cross-recommendation.ts`,

@@ -27,7 +27,16 @@ export type FormsRemovalSummary = {
 }
 
 type MonsterFormsPlanBody = {
-  forms?: { alternates?: readonly { id?: string; name?: string; notes?: string }[] }
+  forms?: {
+    profileFormId: string
+    trueForm: { kind: 'profile'; name?: string } | { kind: 'defined'; formId?: string }
+    definedForms: readonly {
+      id: string
+      name?: string
+      notes?: string
+      overrides?: { sizes?: readonly string[] }
+    }[]
+  }
   traits?: readonly FormRestrictedRow[]
   actions?: readonly FormRestrictedRow[]
   bonusActions?: readonly FormRestrictedRow[]
@@ -112,9 +121,100 @@ function indirectlyAffectedReferences(
 }
 
 function deletedFormNotes(body: MonsterFormsPlanBody): string[] {
-  return (body.forms?.alternates ?? []).flatMap((form) =>
+  return (body.forms?.definedForms ?? []).flatMap((form) =>
     form.notes ? [form.name?.trim() || form.id || 'Untitled form'] : [],
   )
+}
+
+function stripFormId(row: FormRestrictedRow, formId: string): FormRestrictedRow {
+  if (!row.onlyInFormIds?.includes(formId)) return row
+  return { ...row, onlyInFormIds: row.onlyInFormIds.filter((id) => id !== formId) }
+}
+
+function mapFormReferences(
+  body: MonsterFormsPlanBody,
+  formId: string,
+): Pick<
+  MonsterFormsPlanBody,
+  'traits' | 'actions' | 'bonusActions' | 'reactions' | 'legendaryActions'
+> {
+  return {
+    traits: (body.traits ?? []).map((row) => stripFormId(row, formId)),
+    actions: (body.actions ?? []).map((row) => stripFormId(row, formId)),
+    bonusActions: (body.bonusActions ?? []).map((row) => stripFormId(row, formId)),
+    reactions: (body.reactions ?? []).map((row) => stripFormId(row, formId)),
+    legendaryActions: body.legendaryActions
+      ? {
+          ...body.legendaryActions,
+          actions: (body.legendaryActions.actions ?? []).map((row) => stripFormId(row, formId)),
+        }
+      : undefined,
+  }
+}
+
+export function planMonsterTrueFormDesignation(
+  body: MonsterFormsPlanBody & { forms: NonNullable<MonsterFormsPlanBody['forms']> },
+  trueForm: NonNullable<MonsterFormsPlanBody['forms']>['trueForm'],
+) {
+  const leavingProfile = body.forms.trueForm.kind === 'profile' && trueForm.kind === 'defined'
+  const profileName = body.forms.trueForm.kind === 'profile' ? body.forms.trueForm.name : undefined
+  const strippedProfileReferences = leavingProfile
+    ? [...(body.traits ?? []), ...actionRows(body)].filter((row) =>
+        row.onlyInFormIds?.includes(body.forms.profileFormId),
+      )
+    : []
+  const references = leavingProfile ? mapFormReferences(body, body.forms.profileFormId) : body
+  const definedForms = body.forms.definedForms.map((form) =>
+    trueForm.kind === 'defined' && form.id === trueForm.formId ? { ...form, overrides: {} } : form,
+  )
+  return {
+    next: {
+      ...references,
+      forms: { ...body.forms, trueForm, definedForms },
+    },
+    summary: {
+      removedProfileName: leavingProfile && Boolean(profileName),
+      strippedProfileReferences: strippedProfileReferences.map((row) => ({
+        id: row.id,
+        name: row.name,
+      })),
+      indirectlyAffectedReferences: indirectlyAffectedReferences(body, strippedProfileReferences),
+      clearedOverrideLabels:
+        trueForm.kind === 'defined'
+          ? body.forms.definedForms
+              .filter((form) => form.id === trueForm.formId)
+              .flatMap((form) => (form.overrides?.sizes ? ['Sizes'] : []))
+          : [],
+    },
+  }
+}
+
+export function planMonsterDefinedFormRemoval(
+  body: MonsterFormsPlanBody & { forms: NonNullable<MonsterFormsPlanBody['forms']> },
+  formId: string,
+) {
+  const form = body.forms.definedForms.find((entry) => entry.id === formId)
+  if (!form) return undefined
+  const references = mapFormReferences(body, formId)
+  const wasTrue = body.forms.trueForm.kind === 'defined' && body.forms.trueForm.formId === formId
+  return {
+    next: {
+      ...references,
+      forms: {
+        ...body.forms,
+        trueForm: wasTrue ? ({ kind: 'profile' } as const) : body.forms.trueForm,
+        definedForms: body.forms.definedForms.filter((entry) => entry.id !== formId),
+      },
+    },
+    summary: {
+      removedForm: { id: form.id, name: form.name },
+      wasTrueForm: wasTrue,
+      deletedNote: Boolean(form.notes),
+      strippedReferences: [...(body.traits ?? []), ...actionRows(body)]
+        .filter((row) => row.onlyInFormIds?.includes(formId))
+        .map((row) => ({ id: row.id, name: row.name })),
+    },
+  }
 }
 
 export function planMonsterFormsRemoval(body: MonsterFormsPlanBody): {

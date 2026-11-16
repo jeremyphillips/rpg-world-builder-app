@@ -22,20 +22,25 @@ const ctx = {
   spellCatalogById: new Map(),
 } as unknown as ContentFormCtx
 
-function Host() {
+function Host({ onlyTrueForm = false }: { onlyTrueForm?: boolean }) {
   const form = useForm<MonsterFormValues>({
     defaultValues: monsterFormTestValues({
       name: 'Werebear',
       sizes: ['medium'],
       forms: {
-        trueForm: { id: 'humanoid', name: 'Humanoid', appearance: 'humanoid' },
-        alternates: [
-          {
-            id: 'bear',
-            name: 'Bear',
-            appearance: 'bear',
-            overrides: { sizes: ['large'] },
-          },
+        profileFormId: 'profile',
+        trueForm: { kind: 'defined', formId: 'humanoid' },
+        definedForms: [
+          { id: 'humanoid', name: 'Humanoid' },
+          ...(onlyTrueForm
+            ? []
+            : [
+                {
+                  id: 'bear',
+                  name: 'Bear',
+                  overrides: { sizes: ['large' as const] },
+                },
+              ]),
         ],
       },
       bonusActions: [shapeShift] as MonsterFormValues['bonusActions'],
@@ -53,10 +58,19 @@ describe('MonsterActionShapeShiftSummary', () => {
     render(<Host />)
 
     expect(screen.getByText('Destinations')).toBeInTheDocument()
-    expect(screen.getByText('Bear and Humanoid')).toBeInTheDocument()
+    expect(screen.getByText('Bear')).toBeInTheDocument()
     expect(screen.getByText(/werebear shape-shifts into a Large bear/i)).toBeInTheDocument()
     expect(
       screen.getByText(/equipment it is wearing or carrying isn't transformed/i),
     ).toBeInTheDocument()
+  })
+
+  it('prompts for an alternate form when the resolved true form is the only form', () => {
+    render(<Host onlyTrueForm />)
+
+    expect(
+      screen.getByText('Add a form other than the true form before adding Shape-Shift.'),
+    ).toBeInTheDocument()
+    expect(screen.queryByText(/shape-shifts into/i)).not.toBeInTheDocument()
   })
 })

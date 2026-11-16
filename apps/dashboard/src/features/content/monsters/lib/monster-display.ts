@@ -37,7 +37,7 @@ import {
   formatMonsterParryTrigger,
   formatMonsterTakeActions,
   formatMonsterTeleport,
-  formatMonsterAlternateForms,
+  formatMonsterForms,
   formatMonsterShapeShift,
   shapeShiftRows,
   monsterActionSectionRows,
@@ -469,20 +469,19 @@ function mapSaveActionItem(
   }
 }
 
-function alternateFormsTrait(monster: Monster): MonsterTraitItemViewModel[] {
-  if (!monster.forms || monster.forms.alternates.length === 0) return []
+function formsTrait(monster: Monster): MonsterTraitItemViewModel[] {
+  if (!monster.forms || monster.forms.definedForms.length === 0) return []
   if (shapeShiftRows(monster).length > 0) return []
-  const text = formatMonsterAlternateForms({
+  const text = formatMonsterForms({
     monsterName: monster.name,
     baseSizes: monster.sizes,
-    trueForm: monster.forms.trueForm,
-    alternates: monster.forms.alternates,
+    forms: monster.forms,
   })
   if (!text) return []
   return [
     {
-      id: 'alternate-forms',
-      name: 'Alternate Forms',
+      id: 'forms',
+      name: 'Forms',
       descriptionHtml: `<p>${escapeStatBlockText(text)}</p>`,
     },
   ]
@@ -723,14 +722,15 @@ function mapShapeShiftActionItem(
   name: string,
   spells: SpellDisplayContext,
 ): MonsterActionItemViewModel {
-  const generated = formatMonsterShapeShift({
-    monsterName: spells.monsterName,
-    baseSizes: spells.monster.sizes,
-    trueForm: spells.monster.forms?.trueForm ?? { id: 'true' },
-    alternates: spells.monster.forms?.alternates ?? [],
-    equipment: action.equipment,
-    prerequisite: action.prerequisite,
-  })
+  const generated = spells.monster.forms
+    ? formatMonsterShapeShift({
+        monsterName: spells.monsterName,
+        baseSizes: spells.monster.sizes,
+        forms: spells.monster.forms,
+        equipment: action.equipment,
+        prerequisite: action.prerequisite,
+      })
+    : ''
   const description = [generated, action.description].filter(Boolean).join(' ')
   return { id: action.id, name, descriptionHtml: `<p>${escapeStatBlockText(description)}</p>` }
 }
@@ -1187,7 +1187,7 @@ export function buildMonsterDetailViewModel({
           return available !== false
         })
         .map((trait) => mapMonsterTrait(trait, monster, derived)),
-      ...alternateFormsTrait(monster),
+      ...formsTrait(monster),
     ],
     actions: mapActionItems(
       availableBodyRows(monster.actions),

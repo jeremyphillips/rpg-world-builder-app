@@ -646,18 +646,22 @@ describe('monster classification persistence', () => {
     expect(catalog.find((row) => row.id === id)?.classIds).toBeUndefined()
   })
 
-  it('round-trips alternate forms', async () => {
+  it('round-trips defined forms', async () => {
     const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(monstersWriteConfig, campaign.id, {
       ...minimalHomebrewMonsterInput,
       slug: 'forms-round-trip',
       forms: {
-        trueForm: { id: 'humanoid', name: 'Humanoid' },
-        alternates: [{ id: 'bear', name: 'Bear', overrides: { sizes: ['large'] } }],
+        profileFormId: 'profile',
+        trueForm: { kind: 'defined', formId: 'humanoid' },
+        definedForms: [
+          { id: 'humanoid', name: 'Humanoid' },
+          { id: 'bear', name: 'Bear', overrides: { sizes: ['large'] } },
+        ],
       },
     })
-    expect(created.forms?.trueForm.id).toBe('humanoid')
-    expect(created.forms?.alternates[0]?.overrides.sizes).toEqual(['large'])
+    expect(created.forms?.trueForm).toEqual({ kind: 'defined', formId: 'humanoid' })
+    expect(created.forms?.definedForms[1]?.overrides?.sizes).toEqual(['large'])
   })
 
   it('rejects an incompatible family at its field path on publish', async () => {

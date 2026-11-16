@@ -5,7 +5,9 @@ import {
   type MonsterCatalogs,
   monsterBodyDraftSchema,
   monsterBodySchema,
+  refineMonsterBody,
   type ContentValidationIntent,
+  type MonsterBody,
 } from '@rpg/contracts'
 import { z } from 'zod'
 
@@ -82,6 +84,9 @@ export function resolveMonsterFormSchema(
     .pipe(
       z.preprocess((input) => preprocessMonsterFormValuesForBodySchema(input, ctx, intent), base),
     )
+    .superRefine((body, refinement) => {
+      if (intent === 'publish') refineMonsterBody(body as MonsterBody, refinement)
+    })
     .superRefine((body, refinement) => {
       for (const issue of collectMonsterCatalogIssues(
         body,
