@@ -1,4 +1,8 @@
 import type { ContentTypeKey } from '../../primitives/content/content-type-keys'
+import {
+  mergeLegendaryActionsBlock,
+  readLegendaryActionsBlockFromUnknown,
+} from '../monster/action-section-access'
 import { MONSTER_ACTION_SECTIONS } from '../monster/action-sections'
 
 /** Nested entry arrays (keyed by stable `id`) that may carry entry provenance. */
@@ -98,28 +102,15 @@ export function provenanceEntryHostsFor(
   return CONTENT_TYPE_CAPABILITIES[contentType].provenanceEntryHosts
 }
 
-type LegendaryProvenanceBlock = { uses?: number; usesInLair?: number; actions?: unknown }
-
-function legendaryProvenanceBlock(
-  body: Record<string, unknown>,
-): LegendaryProvenanceBlock | undefined {
-  const block = body.legendaryActions
-  if (!block || typeof block !== 'object' || Array.isArray(block)) return undefined
-  return block as LegendaryProvenanceBlock
-}
-
 function writeLegendaryProvenanceHost(
   body: Record<string, unknown>,
   entries: unknown,
 ): Record<string, unknown> {
-  const preserved = legendaryProvenanceBlock(body)
+  const preserved = readLegendaryActionsBlockFromUnknown(body.legendaryActions)
+  const actions = Array.isArray(entries) ? entries : []
   return {
     ...body,
-    legendaryActions: {
-      ...(preserved?.uses !== undefined ? { uses: preserved.uses } : {}),
-      ...(preserved?.usesInLair !== undefined ? { usesInLair: preserved.usesInLair } : {}),
-      actions: entries,
-    },
+    legendaryActions: mergeLegendaryActionsBlock(preserved, actions),
   }
 }
 
@@ -136,7 +127,10 @@ export function readProvenanceHostEntries(
     case 'reactions':
       return body.reactions
     case 'legendaryActions':
-      return legendaryProvenanceBlock(body)?.actions ?? body.legendaryActions
+      return (
+        readLegendaryActionsBlockFromUnknown(body.legendaryActions)?.actions ??
+        body.legendaryActions
+      )
     case 'traits':
       return body.traits
   }

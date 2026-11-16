@@ -1,4 +1,4 @@
-import type { MonsterLegendaryActionDraft } from '@rpg/contracts'
+import { monsterActionSectionRows, type MonsterLegendaryActionDraft } from '@rpg/contracts'
 
 import type { MonsterFormValues } from '../monster-form-values'
 import type { MonsterActionSection } from './references/monster-action-equipment-references'
@@ -31,9 +31,5 @@ export function monsterFormSectionRows(
   section: MonsterActionSection,
 ): MonsterActionDraftRow[] {
   if (!values) return []
-  if (section === 'legendaryActions') {
-    return (values.legendaryActions?.actions ?? []) as MonsterActionDraftRow[]
-  }
-  const rows = values[section]
-  return Array.isArray(rows) ? (rows as MonsterActionDraftRow[]) : []
+  return [...monsterActionSectionRows(values, section)] as MonsterActionDraftRow[]
 }

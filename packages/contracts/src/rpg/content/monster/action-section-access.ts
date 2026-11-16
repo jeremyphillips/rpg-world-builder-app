@@ -43,3 +43,33 @@ export function monsterActionSectionsForEach(
     visit(section, monsterActionSectionRows(body, section))
   }
 }
+
+export type LegendaryActionsPoolScalars = Pick<
+  MonsterLegendaryActionsBlockDraft,
+  'uses' | 'usesInLair'
+>
+
+/** Parse a persisted or authored legendary block; rejects legacy flat action arrays. */
+export function readLegendaryActionsBlockFromUnknown(
+  value: unknown,
+): (LegendaryActionsPoolScalars & { actions: unknown[] }) | undefined {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return undefined
+  const record = value as Record<string, unknown>
+  return {
+    ...(typeof record.uses === 'number' ? { uses: record.uses } : {}),
+    ...(typeof record.usesInLair === 'number' ? { usesInLair: record.usesInLair } : {}),
+    actions: Array.isArray(record.actions) ? record.actions : [],
+  }
+}
+
+/** Preserve pool scalars when replacing legendary action rows (form, provenance, casting). */
+export function mergeLegendaryActionsBlock<TAction>(
+  pool: LegendaryActionsPoolScalars | undefined,
+  actions: readonly TAction[],
+): MonsterLegendaryActionsBlockDraft {
+  return {
+    ...(pool?.uses !== undefined ? { uses: pool.uses } : {}),
+    ...(pool?.usesInLair !== undefined ? { usesInLair: pool.usesInLair } : {}),
+    actions: [...actions] as MonsterLegendaryActionsBlockDraft['actions'],
+  }
+}

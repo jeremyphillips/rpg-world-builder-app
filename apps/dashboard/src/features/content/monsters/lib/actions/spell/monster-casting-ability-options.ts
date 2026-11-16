@@ -7,6 +7,7 @@ import {
   findSpellCastingSource,
   formatSignedModifier,
   getAbilityLabel,
+  mergeLegendaryActionsBlock,
   spellAttackBonus,
   weaponAttackBonus,
   type Ability,
@@ -49,15 +50,7 @@ function spellCastingSections(values: MonsterFormValues): SpellCastingSections {
     actions: values.actions,
     bonusActions: values.bonusActions,
     reactions: values.reactions,
-    ...(block
-      ? {
-          legendaryActions: {
-            ...(block.uses !== undefined ? { uses: block.uses } : {}),
-            ...(block.usesInLair !== undefined ? { usesInLair: block.usesInLair } : {}),
-            actions: block.actions,
-          },
-        }
-      : {}),
+    ...(block ? { legendaryActions: mergeLegendaryActionsBlock(block, block.actions ?? []) } : {}),
   }
 }
 

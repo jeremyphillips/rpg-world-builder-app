@@ -85,8 +85,11 @@ import { MONSTER_ACTION_SECTIONS } from './monster/action-sections'
 export { MONSTER_ACTION_SECTIONS }
 export type { MonsterActionSection } from './monster/action-sections'
 export {
+  mergeLegendaryActionsBlock,
   monsterActionSectionRowPath,
   monsterActionSectionRows,
+  readLegendaryActionsBlockFromUnknown,
+  type LegendaryActionsPoolScalars,
   type MonsterActionSectionBody,
 } from './monster/action-section-access'
 

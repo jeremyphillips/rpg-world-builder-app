@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { resolveMonsterActionIdentity } from '@rpg/contracts'
+import { mergeLegendaryActionsBlock, resolveMonsterActionIdentity } from '@rpg/contracts'
 import { useFormContext, useWatch, type UseFormSetValue } from 'react-hook-form'
 
 import { masterDetailItemTitle } from '../../lib/master-detail/master-detail-constants'
@@ -114,7 +114,7 @@ function seedLegendaryUsesIfFirst(
   const block = getValues().legendaryActions
   setValue(
     'legendaryActions',
-    { ...block, actions: block?.actions ?? [], uses: 3 },
+    mergeLegendaryActionsBlock({ ...block, uses: 3 }, block?.actions ?? []),
     { shouldDirty: true },
   )
 }
@@ -145,15 +145,7 @@ function setLegendaryActions(
     setValue('legendaryActions', undefined as never, { shouldDirty: true })
     return
   }
-  setValue(
-    'legendaryActions',
-    {
-      ...(block?.uses !== undefined ? { uses: block.uses } : {}),
-      ...(block?.usesInLair !== undefined ? { usesInLair: block.usesInLair } : {}),
-      actions,
-    },
-    { shouldDirty: true },
-  )
+  setValue('legendaryActions', mergeLegendaryActionsBlock(block, actions), { shouldDirty: true })
 }
 
 export function useMonsterActionSections(
@@ -308,7 +300,7 @@ export function useMonsterActionSections(
         const block = getValues().legendaryActions
         setValue(
           'legendaryActions',
-          { ...block, actions: block?.actions ?? [], uses: 3 },
+          mergeLegendaryActionsBlock({ ...block, uses: 3 }, block?.actions ?? []),
           { shouldDirty: true },
         )
       }

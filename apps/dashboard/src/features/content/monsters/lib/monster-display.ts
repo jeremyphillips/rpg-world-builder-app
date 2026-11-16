@@ -38,6 +38,7 @@ import {
   formatMonsterTakeActions,
   formatMonsterTeleport,
   formatLegendaryActionUsesIntro,
+  monsterActionSectionRows,
   formatOnceUntilNextTurnSentence,
   resolveCreatureSenses,
   resolveCreatureTraitGrants,
@@ -1040,7 +1041,11 @@ function mapMonsterTrait(
 
 function formatLegendaryActionsIntro(monster: Monster): string | undefined {
   const block = monster.legendaryActions
-  if (availableBodyRows(block?.actions ?? []).length === 0 || block?.uses === undefined) {
+  if (
+    availableBodyRows(monsterActionSectionRows<MonsterLegendaryAction>(monster, 'legendaryActions'))
+      .length === 0 ||
+    block?.uses === undefined
+  ) {
     return undefined
   }
   return formatLegendaryActionUsesIntro({
@@ -1076,7 +1081,7 @@ export function buildMonsterDetailViewModel({
         ...monster.actions,
         ...monster.bonusActions,
         ...monster.reactions,
-        ...(monster.legendaryActions?.actions ?? []),
+        ...monsterActionSectionRows<MonsterLegendaryAction>(monster, 'legendaryActions'),
       ])
         .filter((action) => action.kind === 'spell')
         .map((action) => [action.id, action]),
@@ -1139,7 +1144,9 @@ export function buildMonsterDetailViewModel({
       spellContext,
     ),
     legendaryActions: mapActionItems(
-      availableBodyRows(monster.legendaryActions?.actions ?? []),
+      availableBodyRows(
+        monsterActionSectionRows<MonsterLegendaryAction>(monster, 'legendaryActions'),
+      ),
       'legendaryActions',
       derived,
       catalogState,

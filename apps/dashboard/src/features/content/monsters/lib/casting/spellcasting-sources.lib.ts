@@ -1,6 +1,7 @@
 import {
   isPrimarySpellcastingAction,
   listDirectSpellCastingSources,
+  mergeLegendaryActionsBlock,
   monsterActionSectionRows,
   PRIMARY_SPELLCASTING_PROFILE,
   type ResolvedSpellCastingSource,
@@ -36,11 +37,10 @@ function asSpellCastingSections(sections: FormCastingSections): SpellCastingSect
     reactions: (sections.reactions ?? []) as SpellCastingSourceRow[],
     ...(block
       ? {
-          legendaryActions: {
-            ...(block.uses !== undefined ? { uses: block.uses } : {}),
-            ...(block.usesInLair !== undefined ? { usesInLair: block.usesInLair } : {}),
-            actions: (block.actions ?? []) as SpellCastingSourceRow[],
-          },
+          legendaryActions: mergeLegendaryActionsBlock(
+            block,
+            (block.actions ?? []) as SpellCastingSourceRow[],
+          ),
         }
       : {}),
   } as SpellCastingSections
