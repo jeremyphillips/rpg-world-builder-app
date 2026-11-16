@@ -366,7 +366,17 @@ describe('duplicate content routes', () => {
       magicPropertyProvider: () => undefined,
     })
 
-    expect(copyBlock.attacks).toEqual(sourceBlock.attacks)
+    expect(
+      copyBlock.attacks.map((attack) => {
+        const { sourceName: _sourceName, ...rest } = attack
+        return rest
+      }),
+    ).toEqual(
+      sourceBlock.attacks.map((attack) => {
+        const { sourceName: _sourceName, ...rest } = attack
+        return rest
+      }),
+    )
 
     const listRes = await agent
       .get(`/api/campaigns/${campaignId}/content/monsters`)

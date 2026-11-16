@@ -533,7 +533,8 @@ export function createMonsterActionFromAcquisition(
             { result: 'successful-save', effects: [] },
           ],
         },
-      } as MonsterActionDraftRow
+        // The saving-throw ability is chosen in the editor after the row is added.
+      } as unknown as MonsterActionDraftRow
     }
     return { id, kind: 'attack', damage: authoredStartingDamage() } as MonsterActionDraftRow
   }

@@ -38,6 +38,19 @@ function defaultProximityForKind(
   return proximityWithDistance('distance', distanceFt ?? 120)
 }
 
+function formProximityToStored(
+  proximity: ResolutionFormTarget['proximity'],
+): ResolutionTargetProximity | undefined {
+  switch (proximity.kind) {
+    case 'touch':
+      return { kind: 'touch' }
+    case 'reach':
+      return proximity.distance ? { kind: 'reach', distance: proximity.distance } : { kind: 'reach' }
+    case 'distance':
+      return proximity.distance ? { kind: 'distance', distance: proximity.distance } : undefined
+  }
+}
+
 export function createDefaultResolutionFormTarget(
   overrides?: TargetOverrides,
 ): ResolutionFormTarget {
@@ -65,8 +78,8 @@ export function formTargetToStored(
 ): ResolutionTarget | undefined {
   if (!target) return undefined
 
-  const proximity = target.proximity
-  if (proximity.kind === 'distance' && !proximity.distance) return undefined
+  const proximity = formProximityToStored(target.proximity)
+  if (!proximity) return undefined
 
   return {
     count: target.count,
@@ -74,7 +87,7 @@ export function formTargetToStored(
     kind: target.kind,
     proximity,
     ...(Array.isArray(target.requirements) && target.requirements.length > 0
-      ? { requirements: target.requirements }
+      ? { requirements: target.requirements as ResolutionTarget['requirements'] }
       : {}),
   }
 }
@@ -126,7 +139,7 @@ function proximityAfterFlatPatch(
   if (proximityKind === 'reach' && patch.proximityKind === 'reach') {
     return { kind: 'reach' }
   }
-  return base.proximity
+  return formProximityToStored(base.proximity) ?? DEFAULT_RESOLUTION_TARGET.proximity
 }
 
 export function applyFlatTargetPatch(

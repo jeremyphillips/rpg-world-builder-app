@@ -34,7 +34,7 @@ describe('CompositeGroup', () => {
     )
 
     const fieldset = container.querySelector('fieldset')
-    const legend = screen.getByText('Speed').closest('legend')
+    expect(screen.getByText('Speed').closest('legend')).toBeTruthy()
     expect(screen.getByText('Speed').closest('.sr-only')).toBeTruthy()
     expect(fieldset).toHaveClass('flex', 'flex-col')
     expect(fieldset?.className).not.toContain('gap-y-')

@@ -68,7 +68,7 @@ describe('monster classification authoring', () => {
     expect(
       screen.queryByRole('combobox', { name: /class classifications/i }),
     ).not.toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Add families' }))
+    await user.click(screen.getByRole('button', { name: 'Add creature families' }))
     expect(screen.getByRole('combobox', { name: /creature famil/i })).toBeInTheDocument()
     expect(
       screen.queryByRole('combobox', { name: /class classifications/i }),
@@ -130,11 +130,10 @@ describe('monster classification authoring', () => {
       />,
     )
     await user.click(screen.getByRole('button', { name: 'Publish' }))
-    expect(
-      await screen.findByText(
-        'This creature family is not compatible with the chosen creature type.',
-      ),
-    ).toBeInTheDocument()
+    const incompatibilityMessages = await screen.findAllByText(
+      'This creature family is not compatible with the chosen creature type.',
+    )
+    expect(incompatibilityMessages.length).toBeGreaterThan(0)
   })
 
   it('round trips stored refs, formats preview, and explicitly clears persisted selections', () => {

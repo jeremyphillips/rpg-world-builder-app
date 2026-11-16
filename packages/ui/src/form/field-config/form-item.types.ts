@@ -17,7 +17,7 @@ import type { ArrayItemShellRenderProps } from '../config/array/array-item-shell
 import type { FormColumnsCollapseOrder } from '../config/form-columns-collapse.lib'
 import type { FormIssue, FormIssueScope, FormIssueSeverity } from '../errors/form-issue.types'
 import type { FormDensity } from '../form-density'
-import type { FieldLabelVisibility, FormHeading } from '../form-heading.lib'
+import type { FormHeading } from '../form-heading.lib'
 
 import type { FieldWidth } from '../../components/ui/field-control.variants'
 

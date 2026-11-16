@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { FormProvider, useForm } from 'react-hook-form'
 
+import { systemDefaultArmorClassRules } from '@rpg/contracts'
+
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import type { MonsterActionDraftRow } from '../../../lib/actions/monster-action-presets'
 import {
@@ -18,9 +20,28 @@ const spellcasting: MonsterActionDraftRow = {
   spells: [{ spellId: 'srd-cc-5.2.1:mage-hand' }, { spellId: 'srd-cc-5.2.1:detect-magic' }],
 }
 
+const storyCtx = {
+  entityCatalogLayer: 'homebrew',
+  equipmentCatalogStatus: 'ready',
+  equipmentCatalogById: new Map(),
+  spellCatalogStatus: 'ready',
+  spellCatalogById: new Map([
+    ['srd-cc-5.2.1:mage-hand', { id: 'srd-cc-5.2.1:mage-hand', name: 'Mage Hand' }],
+    ['srd-cc-5.2.1:detect-magic', { id: 'srd-cc-5.2.1:detect-magic', name: 'Detect Magic' }],
+  ]),
+  armorClassRules: systemDefaultArmorClassRules(),
+  options: { skills: { visible: [] } },
+  rulesetId: 'srd-cc-5.2.1',
+} as unknown as ContentFormCtx
+
 const meta = {
   title: 'Dashboard/Content/Monsters/MonsterActionSpellSummary',
   component: MonsterActionSpellSummary,
+  args: {
+    ctx: storyCtx,
+    action: spellcasting,
+    section: 'actions',
+  },
 } satisfies Meta<typeof MonsterActionSpellSummary>
 
 export default meta
@@ -34,22 +55,9 @@ function Host() {
   values.abilityScores = { str: 10, dex: 10, con: 10, int: 20, wis: 10, cha: 10 }
   values.actions = [spellcasting]
   const form = useForm<MonsterFormValues>({ defaultValues: values })
-  const ctx = {
-    entityCatalogLayer: 'homebrew',
-    equipmentCatalogStatus: 'ready',
-    equipmentCatalogById: new Map(),
-    spellCatalogStatus: 'ready',
-    spellCatalogById: new Map([
-      ['srd-cc-5.2.1:mage-hand', { id: 'srd-cc-5.2.1:mage-hand', name: 'Mage Hand' }],
-      ['srd-cc-5.2.1:detect-magic', { id: 'srd-cc-5.2.1:detect-magic', name: 'Detect Magic' }],
-    ]),
-    armorClassRules: { mode: 'ascending', base: 10 },
-    options: { skills: { visible: [] } },
-    rulesetId: 'srd-cc-5.2.1',
-  } as ContentFormCtx
   return (
     <FormProvider {...form}>
-      <MonsterActionSpellSummary ctx={ctx} action={spellcasting} section="actions" />
+      <MonsterActionSpellSummary ctx={storyCtx} action={spellcasting} section="actions" />
     </FormProvider>
   )
 }

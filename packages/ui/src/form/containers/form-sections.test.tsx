@@ -113,7 +113,7 @@ describe('Form section rendering', () => {
       {
         kind: 'group',
         id: 'summary-group',
-        label: 'Campaign availability',
+        heading: { label: 'Campaign availability' },
         disclosure: {
           variant: 'inline',
           defaultOpen: false,

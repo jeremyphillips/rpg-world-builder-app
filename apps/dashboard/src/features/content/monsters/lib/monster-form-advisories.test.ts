@@ -63,7 +63,10 @@ describe('collectMonsterFormAdvisories', () => {
     values.movement = [{ mode: 'walk', feet: '' }]
     expect(collectMonsterFormAdvisories(values, new Map())).toEqual([])
 
-    values.movement = [{ mode: 'walk', feet: 0 }]
+    // Zero is outside the Walk Speed select, but a stored row can still carry it.
+    values.movement = [
+      { mode: 'walk', feet: 0 as unknown as MonsterFormValues['movement'][number]['feet'] },
+    ]
     expect(collectMonsterFormAdvisories(values, new Map())).toEqual([
       {
         code: 'leap-zero-walk-speed',

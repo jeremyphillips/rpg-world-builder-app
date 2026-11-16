@@ -293,7 +293,12 @@ function buildOutcomes(
   if (method.kind === 'attack' && hitNote) {
     return stripEmptyOutcomeSlots(
       defaults.map((outcome) =>
-        outcome.result === 'hit' ? { ...outcome, note: hitNote } : outcome,
+        outcome.result === 'hit'
+          ? {
+              ...outcome,
+              effects: [...(outcome.effects ?? []), { kind: 'note' as const, description: hitNote }],
+            }
+          : outcome,
       ),
     )
   }
@@ -301,7 +306,15 @@ function buildOutcomes(
   if (method.kind === 'saving-throw' && failedSaveNote) {
     return stripEmptyOutcomeSlots(
       defaults.map((outcome) =>
-        outcome.result === 'failed-save' ? { ...outcome, note: failedSaveNote } : outcome,
+        outcome.result === 'failed-save'
+          ? {
+              ...outcome,
+              effects: [
+                ...(outcome.effects ?? []),
+                { kind: 'note' as const, description: failedSaveNote },
+              ],
+            }
+          : outcome,
       ),
     )
   }

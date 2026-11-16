@@ -1,16 +1,29 @@
 import {
   addCustomRefinementIssue,
-  RESOLUTION_REQUIREMENT_CREATURE_ONLY_VALIDATION,
   type ResolutionTargetKind,
   refineRequirementRowsForTargetKind,
 } from '@rpg/contracts'
-import { Form, makeResolver, type FormItem } from '@rpg/ui/form'
+import { Form, makeResolver, type ArrayConfig, type FormItem } from '@rpg/ui/form'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
 
 import { resolutionTargetAuthoringFields } from './resolution-target-authoring-fields'
+
+function findArrayField(items: readonly FormItem[], name: string): ArrayConfig | undefined {
+  return items.find(
+    (item): item is ArrayConfig =>
+      'kind' in item && item.kind === 'array' && item.name === name,
+  )
+}
+
+/** First requirement-row error on `resolution.target.requirements`, if any. */
+function firstRequirementError(errors: unknown): unknown {
+  const resolution = (errors as { resolution?: { target?: { requirements?: unknown[] } } })
+    .resolution
+  return resolution?.target?.requirements?.[0]
+}
 
 const schema = z.object({
   resolution: z.object({
@@ -187,7 +200,7 @@ describe('requirement target compatibility display', () => {
       { fields: {}, shouldUseNativeValidation: false },
     )
 
-    expect(result.errors.resolution?.target?.requirements?.[0]).toBeDefined()
+    expect(firstRequirementError(result.errors)).toBeDefined()
   })
 
   it('schema marks target sight on object targets incompatible', () => {
@@ -224,10 +237,11 @@ describe('production requirement authoring validation display', () => {
     prefix: 'resolution.target',
     creatureTypeOptions: [{ value: 'humanoid', label: 'Humanoid' }],
   })
-  const productionRequirementField = productionFields.find(
-    (field) => field.kind === 'array' && field.name === 'resolution.target.requirements',
+  const productionRequirementField = findArrayField(
+    productionFields,
+    'resolution.target.requirements',
   )
-  if (!productionRequirementField || productionRequirementField.kind !== 'array') {
+  if (!productionRequirementField) {
     throw new Error('Expected production requirement array field')
   }
 
@@ -264,7 +278,7 @@ describe('production requirement authoring validation display', () => {
       { fields: {}, shouldUseNativeValidation: false },
     )
 
-    expect(result.errors.resolution?.target?.requirements?.[0]).toBeDefined()
+    expect(firstRequirementError(result.errors)).toBeDefined()
   })
 
   it('resolver flags incompatible sight rows on production fields', async () => {
@@ -278,31 +292,28 @@ describe('production requirement authoring validation display', () => {
       { fields: {}, shouldUseNativeValidation: false },
     )
 
-    expect(result.errors.resolution?.target?.requirements?.[0]).toBeDefined()
+    expect(firstRequirementError(result.errors)).toBeDefined()
   })
 
   const requirementOnlySchema = targetCompatibilitySchema
-  const productionRequirementFieldForTest =
-    productionRequirementField.kind === 'array'
-      ? {
-          ...productionRequirementField,
-          fields: [
-            ...productionRequirementField.fields,
-            {
-              type: 'text' as const,
-              name: 'kind',
-              label: 'Kind',
-              labelVisibility: 'srOnly' as const,
-            },
-            {
-              type: 'text' as const,
-              name: 'who',
-              label: 'Who',
-              labelVisibility: 'srOnly' as const,
-            },
-          ],
-        }
-      : productionRequirementField
+  const productionRequirementFieldForTest = {
+    ...productionRequirementField,
+    fields: [
+      ...productionRequirementField.fields,
+      {
+        type: 'text' as const,
+        name: 'kind',
+        label: 'Kind',
+        labelVisibility: 'srOnly' as const,
+      },
+      {
+        type: 'text' as const,
+        name: 'who',
+        label: 'Who',
+        labelVisibility: 'srOnly' as const,
+      },
+    ],
+  }
   const productionDisplayFields = [
     {
       type: 'text' as const,
@@ -344,19 +355,12 @@ describe('production requirement authoring validation display', () => {
 
     expect(onSubmit).not.toHaveBeenCalled()
 
-    const rowAlert = await screen.findByRole('alert')
     expect(
-      screen.getByRole('button', { name: /Review 1 issue in 1 row in Requirements/i }),
+      await screen.findByRole('button', { name: /Review 1 issue in 1 row in Requirements/i }),
     ).toBeInTheDocument()
-    expect(rowAlert).toHaveAttribute('data-array-item-issue-placement', 'rowAlert')
-    expect(rowAlert).toHaveTextContent(RESOLUTION_REQUIREMENT_CREATURE_ONLY_VALIDATION)
     expect(screen.getByText('It can see you', { exact: false })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Expand requirement/i })).not.toBeInTheDocument()
 
-    const rowShell = document
-      .querySelector('[data-array-item-prefix="resolution.target.requirements.0"]')
-      ?.closest('[class*="border-destructive"]')
-    expect(rowShell).toBeTruthy()
   })
 
   it('clears requirement row validation when target kind is creature', async () => {

@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- field config and disclosure component share module */
 'use client'
 
 import { OptionalFieldDisclosure, Text } from '@rpg/ui'

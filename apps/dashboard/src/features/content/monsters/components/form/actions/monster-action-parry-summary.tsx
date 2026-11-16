@@ -18,7 +18,9 @@ export function MonsterActionParrySummary({
   const values = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
   const preview = useMemo(() => {
     if (!values || action.kind !== 'parry') return null
-    const draft = (values.reactions ?? []).find((row) => row.id === action.id)
+    const draft = ((values.reactions ?? []) as MonsterActionDraftRow[]).find(
+      (row) => row.id === action.id,
+    )
     if (!draft || draft.kind !== 'parry') return null
     return buildMonsterActionParryPreview({ values, ctx, action: draft })
   }, [action.id, action.kind, ctx, values])

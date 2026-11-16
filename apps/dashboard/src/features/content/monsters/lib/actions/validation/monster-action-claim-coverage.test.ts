@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, it } from 'vitest'
 import { expectIssuesClaimedByControls, expectLabeledIssueCopy } from '@rpg/ui/form/test-utils'
 
 import { createMonsterActionFromAcquisition } from '../acquisition/monster-action-acquisition'

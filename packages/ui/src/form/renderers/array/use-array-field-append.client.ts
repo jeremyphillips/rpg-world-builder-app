@@ -121,7 +121,9 @@ export function useArrayFieldAppend({
     )
   }, [addActionMenu, menuContextValues, watchedItems])
   const resolvedMenuItemsRef = React.useRef(resolvedMenuItems)
-  resolvedMenuItemsRef.current = resolvedMenuItems
+  React.useLayoutEffect(() => {
+    resolvedMenuItemsRef.current = resolvedMenuItems
+  })
 
   const appendFromAddMenu = React.useCallback(
     (itemId: string) => {

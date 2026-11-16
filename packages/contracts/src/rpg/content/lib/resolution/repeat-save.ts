@@ -35,13 +35,13 @@ export function hasMeaningfulRepeatSaveSecondFailure(
   secondFailure: RepeatSaveSecondFailure | undefined,
 ): boolean {
   if (!secondFailure) return false
-  if (Boolean(secondFailure.note?.trim())) return true
+  if (secondFailure.note?.trim()) return true
   return Boolean(secondFailure.effects && secondFailure.effects.length > 0)
 }
 
 export function hasMeaningfulRepeatSave(repeatSave: RepeatSave | undefined): boolean {
   if (!repeatSave) return false
   if (hasMeaningfulRepeatSaveSecondFailure(repeatSave.secondFailure)) return true
-  if (Boolean(repeatSave.eligibilityNote?.trim())) return true
+  if (repeatSave.eligibilityNote?.trim()) return true
   return Boolean(repeatSave.timing)
 }

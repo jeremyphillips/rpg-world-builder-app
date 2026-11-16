@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- group builder and shared copy share module */
 import {
   ABILITY_IDS,
   DEFAULT_FIXED_SAVE_DC,
@@ -5,7 +6,7 @@ import {
   SAVE_DC_MIN,
   getAbilityLabel,
 } from '@rpg/contracts'
-import type { FormItem } from '@rpg/ui/form'
+import type { GroupConfig } from '@rpg/ui/form'
 import type { ReactNode } from 'react'
 
 import {
@@ -46,7 +47,9 @@ function whenKind(kind: 'fixed' | 'spellcasting') {
 }
 
 /** Shared optional saving-throw group. Callers pass the spellcasting ability control. */
-export function savingThrowFieldGroup(input: { renderCastingAbility: () => ReactNode }): FormItem {
+export function savingThrowFieldGroup(input: {
+  renderCastingAbility: () => ReactNode
+}): GroupConfig {
   return {
     kind: 'group',
     name: 'savingThrow',

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { TabbedForm } from '@rpg/ui/form'
+import { resolutionEffectIdSchema } from '@rpg/contracts'
 import { z } from 'zod'
 
 import { RESOLUTION_FORM_FIXTURES } from '../../fixtures'
@@ -83,7 +84,7 @@ export const IncompleteApplicationRow: Story = {
       outcomes: [
         {
           result: 'hit',
-          effects: [{ kind: 'effect-reference', effectId: 'incomplete', amount: 'full' }],
+          effects: [{ kind: 'effect-reference', effectId: resolutionEffectIdSchema.parse('incomplete'), amount: 'full' }],
         },
       ],
     },

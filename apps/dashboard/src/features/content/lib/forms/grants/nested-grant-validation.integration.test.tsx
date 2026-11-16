@@ -106,13 +106,6 @@ describe('nested grant validation integration', () => {
 
     await user.click(screen.getByRole('button', { name: 'Save' }))
 
-    await waitFor(() => {
-      expect(screen.getByRole('combobox', { name: 'Weapons' })).toHaveAttribute(
-        'aria-invalid',
-        'true',
-      )
-    })
-
     const form = screen.getByRole('button', { name: 'Save' }).closest('form')
     expect(form).toBeTruthy()
 

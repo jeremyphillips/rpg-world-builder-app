@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { resolveFieldConfigPrimaryName, type ArrayConfig, type FormItem } from '@rpg/ui/form'
 
 import {
-  outcomeApplicationsReferenceEffect,
+  outcomeReferencesEffect,
   planResolutionChange,
   resolutionChangeRequiresConfirm,
   RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID,
@@ -43,9 +43,9 @@ function findResolutionEffectsArray(fields: FormItem[]): ArrayConfig | undefined
 }
 
 describe('resolutionFields effects array', () => {
-  it('hides the generic add control in favor of the resolution-specific add slot', () => {
+  it('uses the resolution effect add menu instead of a generic array add control', () => {
     const arrayField = findResolutionEffectsArray(resolutionFields({}))
-    expect(arrayField?.addAction).toBe(false)
+    expect(arrayField?.addAction).toMatchObject({ label: 'Add effect' })
     expect(arrayField?.item?.removable).toBe(false)
   })
 
@@ -143,7 +143,7 @@ describe('resolution effect removal planning', () => {
     const form = RESOLUTION_FORM_FIXTURES.inflictWounds
     const effectId = RESOLUTION_PRIMARY_DAMAGE_EFFECT_ID
 
-    expect(outcomeApplicationsReferenceEffect(form.outcomes, effectId)).toBe(true)
+    expect(outcomeReferencesEffect(form.outcomes, effectId)).toBe(true)
 
     const plan = planResolutionChange(resolutionFormToSelectionContext(form)!, {
       field: 'removeEffect',

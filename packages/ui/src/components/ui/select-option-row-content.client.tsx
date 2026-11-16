@@ -1,7 +1,5 @@
 'use client'
 
-import './select-option-item.css'
-
 import { cn } from '../../lib/utils'
 import type { SelectOptionTrailing } from '../../form/field-config/field-options'
 import {

@@ -10,9 +10,25 @@ import type { FieldSize } from '../../../components/ui/field.client'
 import type { FieldRhythm } from '../../../components/ui/field.variants'
 import { Text } from '../../../components/ui/text'
 import { FormRhythmStack } from '../../context/form-section.context'
-import type { SlotConfig } from '../../field-config'
+import { normalizeFieldHint, type SlotConfig } from '../../field-config'
+import type { FormHeading } from '../../form-heading.lib'
 import { CompositeGroup } from '../../presentation/composite-group.client'
 import { resolveSlotHeading } from '../../resolve-container-heading.lib'
+
+function slotHintSource(config: SlotConfig): FormHeading['hint'] | undefined {
+  const legacy = (config as SlotConfig & { hint?: FormHeading['hint'] }).hint
+  return config.heading?.hint ?? legacy
+}
+
+function resolveSlotCompositeHeading(config: SlotConfig): FormHeading | undefined {
+  const heading = resolveSlotHeading(config)
+  if (!heading) return undefined
+  const hint = slotHintSource(config)
+  if (hint !== undefined && heading.hint === undefined) {
+    return { ...heading, hint }
+  }
+  return heading
+}
 
 function withSlotWidth(body: ReactNode, width: SlotConfig['width']): ReactNode {
   if (!width) return body
@@ -25,7 +41,7 @@ export function buildSlotFieldBody(
   _rhythm: FieldRhythm,
   size: FieldSize,
 ): ReactNode | null {
-  const heading = resolveSlotHeading(config)
+  const heading = resolveSlotCompositeHeading(config)
 
   if (heading) {
     return (
@@ -40,13 +56,14 @@ export function buildSlotFieldBody(
     )
   }
 
-  if (content == null && !config.hint) return null
-  if (!config.hint) return content
+  const hintText = normalizeFieldHint(slotHintSource(config)).text
+  if (content == null && !hintText) return null
+  if (!hintText) return content
 
   return (
     <FormRhythmStack className={config.className}>
       <Text as="span" variant="supporting">
-        {config.hint}
+        {hintText}
       </Text>
       {content}
     </FormRhythmStack>
@@ -59,15 +76,16 @@ export function wrapSlotFieldBody(
   chromeSize: FieldSize,
   resolvedChrome?: FieldChrome,
 ): ReactNode {
-  const heading = resolveSlotHeading(config)
+  const heading = resolveSlotCompositeHeading(config)
   const chrome = resolvedChrome ?? config.chrome
+  const hintText = normalizeFieldHint(slotHintSource(config)).text
 
   if (hasActiveFieldChrome(chrome)) {
     return withSlotWidth(
       <FormFieldChromeShell
         chrome={chrome}
         size={chromeSize}
-        className={!heading && !config.hint ? config.className : undefined}
+        className={!heading && !hintText ? config.className : undefined}
       >
         {body}
       </FormFieldChromeShell>,
@@ -75,7 +93,7 @@ export function wrapSlotFieldBody(
     )
   }
 
-  if (!heading && !config.hint && config.className) {
+  if (!heading && !hintText && config.className) {
     return withSlotWidth(<div className={config.className}>{body}</div>, config.width)
   }
 

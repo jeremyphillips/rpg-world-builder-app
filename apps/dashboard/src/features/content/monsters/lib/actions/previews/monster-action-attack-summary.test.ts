@@ -4,7 +4,10 @@ import { resolveMonsterActionAttackProfile } from '@rpg/contracts'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import { MONSTER_ATTACK_BONUS_LABEL } from '../../monster-form-labels'
-import { resolveMonsterCreateDefaultValues } from '../../monster-form-values'
+import {
+  resolveMonsterCreateDefaultValues,
+  type MonsterFormValues,
+} from '../../monster-form-values'
 import {
   buildMonsterActionAttackPreview,
   resolveMonsterActionAttackPreviewGuidance,
@@ -91,10 +94,10 @@ describe('buildMonsterActionAttackPreview', () => {
       entityCatalogLayer: 'homebrew',
       equipmentCatalogStatus: 'ready',
       equipmentCatalogById: new Map(),
-    } as ContentFormCtx
+    } as unknown as ContentFormCtx
     const values = {
       ...resolveMonsterCreateDefaultValues(),
-      challengeRating: '1',
+      challengeRating: '1' as const,
       abilityScores: { str: 16, dex: 14, con: 13, int: 8, wis: 11, cha: 8 },
       actions: [
         {
@@ -106,8 +109,8 @@ describe('buildMonsterActionAttackPreview', () => {
           damage: { dice: { count: 1, faces: 6 } },
           bonusSource: { kind: 'ability', ability: 'str', proficient: true },
         },
-      ],
-    } as const
+      ] as unknown as MonsterFormValues['actions'],
+    }
 
     const profile = resolveMonsterFormActionAttackProfile(values, ctx, 'slash')
     expect(profile.status).toBe('resolved')
@@ -120,10 +123,10 @@ describe('buildMonsterActionAttackPreview', () => {
       entityCatalogLayer: 'homebrew',
       equipmentCatalogStatus: 'ready',
       equipmentCatalogById: new Map(),
-    } as ContentFormCtx
+    } as unknown as ContentFormCtx
     const values = {
       ...resolveMonsterCreateDefaultValues(),
-      challengeRating: '1',
+      challengeRating: '1' as const,
       abilityScores: { str: 16, dex: 14, con: 13, int: 8, wis: 11, cha: 8 },
       actions: [
         {
@@ -134,8 +137,8 @@ describe('buildMonsterActionAttackPreview', () => {
           damageType: 'slashing',
           bonusSource: { kind: 'ability', ability: 'str', proficient: true },
         },
-      ],
-    } as const
+      ] as unknown as MonsterFormValues['actions'],
+    }
 
     expect(resolveMonsterFormActionAttackProfile(values, ctx, 'slash').status).toBe('unavailable')
   })
@@ -145,10 +148,10 @@ describe('buildMonsterActionAttackPreview', () => {
       entityCatalogLayer: 'homebrew',
       equipmentCatalogStatus: 'ready',
       equipmentCatalogById: new Map(),
-    } as ContentFormCtx
+    } as unknown as ContentFormCtx
     const values = {
       ...resolveMonsterCreateDefaultValues(),
-      challengeRating: '1',
+      challengeRating: '1' as const,
       abilityScores: { str: 16, dex: 14, con: 13, int: 8, wis: 11, cha: 8 },
       actions: [
         {
@@ -159,14 +162,16 @@ describe('buildMonsterActionAttackPreview', () => {
           damageType: 'slashing',
           damage: { dice: { count: 1, faces: 6 } },
         },
-      ],
-    } as const
+      ] as unknown as MonsterFormValues['actions'],
+    }
 
     expect(
       resolveMonsterActionAttackPreviewGuidance({
         ctx,
         values,
-        action: values.actions[0],
+        action: values.actions[0] as Parameters<
+          typeof resolveMonsterActionAttackPreviewGuidance
+        >[0]['action'],
       }),
     ).toBe(`Configure ${MONSTER_ATTACK_BONUS_LABEL} to calculate this attack.`)
   })

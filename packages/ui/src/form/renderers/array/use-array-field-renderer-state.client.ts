@@ -112,9 +112,6 @@ export function useArrayFieldRendererState({
     getItemValues,
   })
 
-  const showDefaultItemRemove = itemConfig.removable && !itemConfig.removeSlot
-  const canRemove = showDefaultItemRemove
-
   const { addEnabled, addDisabledReason } = resolveArrayAppendAvailability({
     config,
     fieldsLength: fields.length,

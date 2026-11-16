@@ -54,7 +54,8 @@ export function actionMoveDropsTrigger(
   from: MonsterActionSection,
   to: MonsterActionSection,
 ): boolean {
-  return monsterActionMoveDataLoss(action, from, to).dropsTrigger
+  const trigger = 'trigger' in action ? action.trigger : undefined
+  return monsterActionMoveDataLoss({ trigger }, from, to).dropsTrigger
 }
 
 /** Whether Move to may place this row in `to`. Primary Spellcasting stays in Actions. */

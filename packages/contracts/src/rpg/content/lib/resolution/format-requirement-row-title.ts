@@ -65,7 +65,7 @@ function resolvedConditionLabels(ids: readonly string[]): string[] {
 }
 
 function resolvedCreatureTypeIds(
-  ids: readonly string[],
+  ids: unknown,
   options?: ResolutionRequirementRowTitleOptions,
 ): string[] {
   const labelFor = (id: string) => resolveCreatureTypeLabel(id, options)

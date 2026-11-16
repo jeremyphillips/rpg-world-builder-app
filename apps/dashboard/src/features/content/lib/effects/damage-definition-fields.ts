@@ -3,7 +3,10 @@ import type { FieldVisibility, FormItem } from '@rpg/ui/form'
 import type { ContentFormCtx } from '../forms/registry/content-form-registry'
 import { damageFieldGroup } from '../forms/mechanics/damage-field-group'
 
-/** Canonical damage definition editor. On-hit rows and save owner rows share this group. */
+/**
+ * Canonical damage definition editor. On-hit rows and save owner rows share this group.
+ * Save owner add seeds roll only; `damageType` stays empty until the author chooses one.
+ */
 export function damageDefinitionFields(options: {
   ctx: ContentFormCtx
   legendVisibility?: 'visible' | 'srOnly'

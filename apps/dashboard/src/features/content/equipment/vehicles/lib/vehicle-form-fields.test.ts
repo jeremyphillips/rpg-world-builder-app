@@ -16,10 +16,7 @@ const VEHICLE_SEEDS = seedEquipmentOfKind('vehicle')
 describe('vehicle kindFieldGroups', () => {
   it('buildFields composes name, kind group, economy, and description', () => {
     const fields = expectComposedKindGroups('vehicle', '')
-    const kindGroup = fields.find(
-      (field) => 'kind' in field && field.kind === 'group' && field.heading?.label === '',
-    )
-    expect(kindGroup).toEqual(fieldGroupsForEquipmentKind('vehicle')?.[0])
+    expect(fields[0]).toEqual(fieldGroupsForEquipmentKind('vehicle')?.[0])
   })
 
   it('uses a flex row at intrinsic width for cargo, speed, crew, and passengers', () => {

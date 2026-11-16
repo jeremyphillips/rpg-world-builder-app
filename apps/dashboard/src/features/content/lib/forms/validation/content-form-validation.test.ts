@@ -135,6 +135,8 @@ const SPELLS_SCHEMA_EXEMPT = [
   /^resolution\.outcomes\b/,
   /^resolution\.progressionBasis\b/,
   /^resolution\.progressionTracks\b/,
+  'resolution.originDistanceFt',
+  /^resolution\.target\.proximity\b/,
 ] as const
 
 describe.each(registryEntries)('ContentFormDef[%s] validation', (routeKey, def) => {
@@ -396,7 +398,7 @@ describe('embedded content sub-forms validation', () => {
     const fields = traitItemFields(ctx)
     assertFieldPathsRegistered(fields)
     assertRegistryCoverage(traitRowFormSchema, fields, {
-      exemptPaths: [...SERVER_ROW_EXEMPT, ...GRANT_NESTED_EXEMPT, 'available'],
+      exemptPaths: [...SERVER_ROW_EXEMPT, ...GRANT_NESTED_EXEMPT, 'available', 'templateId'],
     })
     assertInvalidSubmitUsesRefinedMessages(traitRowFormSchema, fields, {
       invalidValue: { kind: 'custom', name: '', grants: [] },

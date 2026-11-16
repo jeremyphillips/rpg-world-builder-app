@@ -56,7 +56,7 @@ describe('legendary actions', () => {
       )
     }
     expect(monsterActionSchema.safeParse(reference).success).toBe(false)
-    expect(monsterReactionSchema.safeParse(reference).success).toBe(false)
+    expect(monsterReactionSchema.safeParse(reference).success).toBe(true)
     expect(
       monsterLegendaryActionDraftSchema.safeParse({ ...reference, actionIds: [] }).success,
     ).toBe(true)

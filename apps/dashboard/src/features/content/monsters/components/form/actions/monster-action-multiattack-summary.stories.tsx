@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { FormProvider, useForm } from 'react-hook-form'
 
+import { systemDefaultArmorClassRules } from '@rpg/contracts'
+
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import type { MonsterActionDraftRow } from '../../../lib/actions/monster-action-presets'
 import {
@@ -25,9 +27,24 @@ const multiattack: MonsterActionDraftRow = {
   steps: [{ count: 2, actionIds: ['bite'] }],
 }
 
+const storyCtx = {
+  entityCatalogLayer: 'homebrew',
+  equipmentCatalogStatus: 'ready',
+  equipmentCatalogById: new Map(),
+  spellCatalogStatus: 'ready',
+  spellCatalogById: new Map(),
+  armorClassRules: systemDefaultArmorClassRules(),
+  options: { skills: { visible: [] } },
+  rulesetId: 'srd-cc-5.2.1',
+} as unknown as ContentFormCtx
+
 const meta = {
   title: 'Dashboard/Content/Monsters/MonsterActionMultiattackSummary',
   component: MonsterActionMultiattackSummary,
+  args: {
+    ctx: storyCtx,
+    action: multiattack,
+  },
 } satisfies Meta<typeof MonsterActionMultiattackSummary>
 
 export default meta
@@ -39,19 +56,9 @@ function Host() {
   values.name = 'Wolf'
   values.actions = [bite, multiattack]
   const form = useForm<MonsterFormValues>({ defaultValues: values })
-  const ctx = {
-    entityCatalogLayer: 'homebrew',
-    equipmentCatalogStatus: 'ready',
-    equipmentCatalogById: new Map(),
-    spellCatalogStatus: 'ready',
-    spellCatalogById: new Map(),
-    armorClassRules: { mode: 'ascending', base: 10 },
-    options: { skills: { visible: [] } },
-    rulesetId: 'srd-cc-5.2.1',
-  } as ContentFormCtx
   return (
     <FormProvider {...form}>
-      <MonsterActionMultiattackSummary ctx={ctx} action={multiattack} />
+      <MonsterActionMultiattackSummary ctx={storyCtx} action={multiattack} />
     </FormProvider>
   )
 }

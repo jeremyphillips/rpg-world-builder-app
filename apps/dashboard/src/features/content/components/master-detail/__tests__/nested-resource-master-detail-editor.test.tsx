@@ -9,6 +9,7 @@ import {
   masterDetailEmptySelectionHeading,
 } from '../../../lib/master-detail/master-detail-constants'
 import { NestedResourceMasterDetailEditor } from '../nested-resource-master-detail-editor'
+import type { MasterDetailEditorIdentity } from '../master-detail-editor-shell'
 import type { MasterDetailListItem } from '../master-detail-list-panel'
 
 const itemNoun = TRAIT_MASTER_DETAIL_ITEM_NOUN
@@ -43,7 +44,7 @@ function EditorHarness({
   onDelete?: () => void
   countSupplement?: ReactNode
 }) {
-  const selectedIdentity =
+  const selectedIdentity: MasterDetailEditorIdentity | undefined =
     selectedRowId === 'row-a'
       ? {
           title: 'Alpha',

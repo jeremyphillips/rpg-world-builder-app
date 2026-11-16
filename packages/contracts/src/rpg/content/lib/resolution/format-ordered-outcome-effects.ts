@@ -7,7 +7,7 @@ import type {
   OrderedEffect,
 } from '../../../primitives/mechanics/ordered-effect'
 import { formatStatBlockRollExpression } from '../../../primitives/mechanics/roll'
-import { resolveStatBlockDamagePart } from '../../../runtime/creature/stat-block-average'
+import { resolveStatBlockDamagePart } from '../../../primitives/mechanics/stat-block-average'
 import { getDamageTypeLabel } from '../../../vocab/damage/vocabulary'
 import { getEffectConditionLabel } from '../../../vocab/effect-condition'
 import type { RepeatSaveTiming } from './repeat-save'

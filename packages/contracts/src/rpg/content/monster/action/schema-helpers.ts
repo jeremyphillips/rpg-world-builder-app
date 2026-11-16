@@ -12,8 +12,8 @@ import { weaponModeSchema } from '../../../vocab/weapon'
 import { entryProvenanceField } from '../../../primitives/provenance'
 import {
   castingAbilitySchema,
-  savingThrowEffectDraftSchema,
-  savingThrowEffectSchema,
+  type savingThrowEffectDraftSchema,
+  type savingThrowEffectSchema,
 } from '../../lib/saving-throw/schema'
 import { naturalAttackFormSchema } from '../../../vocab/action/natural-attack-form'
 import { spellReferenceSchema } from '../../spell/spell-reference'

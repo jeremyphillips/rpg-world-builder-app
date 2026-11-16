@@ -273,7 +273,7 @@ describe('group field container', () => {
       expect(childTitle).toHaveClass(
         density === 'compact' ? 'text-style-field-label-sm' : 'text-style-field-label-md',
       )
-      expect(childTitle.className).not.toMatch(/text-style-field-legend/)
+      expect(childTitle?.className).not.toMatch(/text-style-field-legend/)
       const description = screen.getByText('Optional tuning.')
       expect(description).toHaveClass(
         density === 'compact' ? 'text-style-field-hint-compact' : 'text-style-field-hint',

@@ -19,7 +19,7 @@ function readyCtx(spellMap: Map<string, { id: string; name: string }>): ContentF
     armorClassRules: { mode: 'ascending', base: 10 },
     options: { skills: { visible: [] } },
     rulesetId: 'srd-cc-5.2.1',
-  } as ContentFormCtx
+  } as unknown as unknown as ContentFormCtx
 }
 
 describe('buildMonsterActionSpellPreview', () => {
@@ -32,7 +32,7 @@ describe('buildMonsterActionSpellPreview', () => {
     const values = {
       ...resolveMonsterCreateDefaultValues(),
       name: 'Archmage',
-      challengeRating: '5',
+      challengeRating: '5' as const,
       abilityScores: { str: 10, dex: 10, con: 10, int: 20, wis: 10, cha: 10 },
       actions: [
         {
@@ -63,7 +63,7 @@ describe('buildMonsterActionSpellPreview', () => {
     const ctx = readyCtx(new Map())
     const values = {
       ...resolveMonsterCreateDefaultValues(),
-      challengeRating: '1',
+      challengeRating: '1' as const,
       actions: [
         {
           id: 'spellcasting',

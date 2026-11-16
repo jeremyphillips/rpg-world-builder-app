@@ -5,7 +5,7 @@ import {
   type ContentTrait,
 } from '@rpg/contracts'
 
-import type { MasterDetailEditorIdentity } from '../../components/master-detail/master-detail-editor-shell'
+import type { MasterDetailEditorIdentity } from '../../../components/master-detail/master-detail-editor-shell'
 import { MONSTER_USE_DEFAULT_NAME_LABEL } from '../monster-form-labels'
 
 function isRecord(row: unknown): row is Record<string, unknown> {

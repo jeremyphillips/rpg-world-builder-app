@@ -9,6 +9,7 @@ import {
   AnatomyFieldRowCluster,
   combineFieldVisibilityAll,
   Form,
+  type FieldVisibility,
   type FormItem,
 } from '@rpg/ui/form'
 import { describe, expect, it, vi } from 'vitest'
@@ -44,13 +45,13 @@ function arrayIncludes(value: unknown, mode: string): boolean {
 }
 
 function monsterDistanceFields(): FormItem {
-  const meleeVisibility = {
-    dependsOn: ['modes'] as const,
-    visibleWhen: (values: Record<string, unknown>) => arrayIncludes(values.modes, 'melee'),
+  const meleeVisibility: FieldVisibility = {
+    dependsOn: ['modes'],
+    visibleWhen: (values) => arrayIncludes(values.modes, 'melee'),
   }
-  const rangedVisibility = {
-    dependsOn: ['modes'] as const,
-    visibleWhen: (values: Record<string, unknown>) => arrayIncludes(values.modes, 'ranged'),
+  const rangedVisibility: FieldVisibility = {
+    dependsOn: ['modes'],
+    visibleWhen: (values) => arrayIncludes(values.modes, 'ranged'),
   }
   const reach = {
     type: 'joinedPair' as const,

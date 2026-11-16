@@ -292,7 +292,7 @@ function formatConditionPreviewSecondary(
   }
   if (effect.description) parts.push(effect.description)
   if (parts.length === 0) return undefined
-  return parts.join(' · ')
+  return joinInlineMetadata(parts)
 }
 
 function onHitPreviewRow(

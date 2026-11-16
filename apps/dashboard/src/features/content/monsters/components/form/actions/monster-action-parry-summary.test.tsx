@@ -37,10 +37,10 @@ function Host({ reactions }: { reactions: MonsterFormValues['reactions'] }) {
     armorClassRules: { mode: 'ascending', base: 10 },
     options: { skills: { visible: [] } },
     rulesetId: 'srd-cc-5.2.1',
-  } as ContentFormCtx
+  } as unknown as ContentFormCtx
   return (
     <FormProvider {...form}>
-      <MonsterActionParrySummary ctx={ctx} action={reactions?.[0] ?? parry} />
+      <MonsterActionParrySummary ctx={ctx} action={(reactions?.[0] as MonsterActionDraftRow | undefined) ?? parry} />
     </FormProvider>
   )
 }

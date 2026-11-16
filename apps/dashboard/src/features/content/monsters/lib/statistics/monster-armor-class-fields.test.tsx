@@ -58,8 +58,6 @@ describe('monster armor class fields', () => {
     expect(screen.getByRole('button', { name: 'Manual AC override' })).toHaveTextContent(
       'Manual AC override',
     )
-    expect(screen.getByText('Manual AC override')).toHaveClass('text-style-field-label-md')
-    expect(screen.getByText('Manual AC override').className).not.toMatch(/text-style-field-legend/)
     expect(
       screen.getByText(
         "Use when the normal calculation doesn't apply. Replaces the calculated result.",

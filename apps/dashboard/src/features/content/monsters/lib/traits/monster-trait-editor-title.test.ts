@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import type { MasterDetailEditorIdentity } from '../../components/master-detail/master-detail-editor-shell'
+import type { MasterDetailEditorIdentity } from '../../../components/master-detail/master-detail-editor-shell'
 import {
   monsterCustomTraitFallbacks,
   monsterTraitListTitle,

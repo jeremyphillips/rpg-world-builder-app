@@ -9,7 +9,7 @@
  * `shouldUnregister: true`. The mount effect writes `[]` when the path is
  * missing, and that write does not copy sibling keys.
  */
-import { useEffect, useState } from 'react'
+import { useLayoutEffect, useState } from 'react'
 import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { TabbedForm } from '@rpg/ui/form'
@@ -134,13 +134,13 @@ describe('structural registration does not override the form policy', () => {
 
 function ArrayOps({
   shouldUnregister,
-  api,
+  apiRef,
 }: {
   shouldUnregister: boolean
-  api: {
+  apiRef: {
     current: {
       form: UseFormReturn<ResolutionValues>
-      fieldArray: UseFieldArrayReturn
+      fieldArray: UseFieldArrayReturn<ResolutionValues, 'resolution.outcomes.0.effects'>
     } | null
   }
 }) {
@@ -149,21 +149,23 @@ function ArrayOps({
     control: form.control,
     name: 'resolution.outcomes.0.effects',
   })
-  api.current = { form, fieldArray }
+  useLayoutEffect(() => {
+    apiRef.current = { form, fieldArray }
+  })
   return <output data-testid="values">{JSON.stringify(form.getValues())}</output>
 }
 
 describe('mutations under value retention', () => {
   it('appends, removes, and reorders without dropping unregistered siblings', () => {
-    const api: {
+    const apiRef: {
       current: {
         form: UseFormReturn<ResolutionValues>
-        fieldArray: UseFieldArrayReturn
+        fieldArray: UseFieldArrayReturn<ResolutionValues, 'resolution.outcomes.0.effects'>
       } | null
     } = { current: null }
-    render(<ArrayOps shouldUnregister={false} api={api} />)
+    render(<ArrayOps shouldUnregister={false} apiRef={apiRef} />)
     act(() => {
-      api.current?.fieldArray.append({ kind: 'note', text: 'added' })
+      apiRef.current?.fieldArray.append({ kind: 'note', text: 'added' })
     })
     let next = readOutput()
     expect(next.resolution.effects).toEqual(resolution.resolution.effects)
@@ -171,14 +173,14 @@ describe('mutations under value retention', () => {
     expect(next.resolution.outcomes[1]?.result).toBe('miss')
 
     act(() => {
-      api.current?.fieldArray.move(0, 1)
+      apiRef.current?.fieldArray.move(0, 1)
     })
     next = readOutput()
     expect(next.resolution.outcomes[0]?.effects[0]).toMatchObject({ kind: 'note' })
     expect(next.resolution.effects).toEqual(resolution.resolution.effects)
 
     act(() => {
-      api.current?.fieldArray.remove(0)
+      apiRef.current?.fieldArray.remove(0)
     })
     next = readOutput()
     expect(next.resolution.outcomes[0]?.effects).toHaveLength(1)
@@ -187,30 +189,30 @@ describe('mutations under value retention', () => {
   })
 
   it('reset restores the full default tree when values are retained', () => {
-    const api: {
+    const apiRef: {
       current: {
         form: UseFormReturn<ResolutionValues>
-        fieldArray: UseFieldArrayReturn
+        fieldArray: UseFieldArrayReturn<ResolutionValues, 'resolution.outcomes.0.effects'>
       } | null
     } = { current: null }
-    render(<ArrayOps shouldUnregister={false} api={api} />)
+    render(<ArrayOps shouldUnregister={false} apiRef={apiRef} />)
     act(() => {
-      api.current?.fieldArray.append({ kind: 'note', text: 'added' })
-      api.current?.form.reset(resolution)
+      apiRef.current?.fieldArray.append({ kind: 'note', text: 'added' })
+      apiRef.current?.form.reset(resolution)
     })
     expect(readOutput()).toEqual(resolution)
   })
 
   it('reset under shouldUnregister drops keys that are not mounted inputs', () => {
-    const api: {
+    const apiRef: {
       current: {
         form: UseFormReturn<ResolutionValues>
-        fieldArray: UseFieldArrayReturn
+        fieldArray: UseFieldArrayReturn<ResolutionValues, 'resolution.outcomes.0.effects'>
       } | null
     } = { current: null }
-    render(<ArrayOps shouldUnregister={true} api={api} />)
+    render(<ArrayOps shouldUnregister={true} apiRef={apiRef} />)
     act(() => {
-      api.current?.form.reset(resolution)
+      apiRef.current?.form.reset(resolution)
     })
     expect(readOutput()).toEqual({})
   })
@@ -305,7 +307,7 @@ function AmountField() {
 }
 
 function ConditionalHost({ shouldUnregister }: { shouldUnregister: boolean }) {
-  const form = useForm({
+  const form = useForm<{ kind: string; extra: string | undefined; amount: string }>({
     defaultValues: { kind: 'damage', extra: 'secret', amount: 'full' },
     shouldUnregister,
   })
@@ -401,11 +403,8 @@ const tabbedSchema = z.object({
 
 function TabbedSnapshot() {
   const form = useFormContext()
-  const [snap, setSnap] = useState('')
-  useEffect(() => {
-    setSnap(JSON.stringify(form.getValues()))
-  })
-  return <output data-testid="tabbed">{snap}</output>
+  const values = form.watch()
+  return <output data-testid="tabbed">{JSON.stringify(values)}</output>
 }
 
 describe('TabbedForm shell', () => {

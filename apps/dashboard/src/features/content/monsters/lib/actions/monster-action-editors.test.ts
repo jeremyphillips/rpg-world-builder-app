@@ -1,5 +1,6 @@
 import { ACTION_PRESET_IDS, formatResolutionTargetFromParts, getActionPreset } from '@rpg/contracts'
 import {
+  flattenSelectFieldOptions,
   resolveFieldConfigPrimaryName,
   type ArrayConfig,
   type FormItem,
@@ -476,6 +477,7 @@ describe('monster action detail fields', () => {
       (row) =>
         'visibility' in row &&
         row.visibility?.dependsOn?.includes('modes') &&
+        'fields' in row &&
         row.fields?.length === 2,
     )
     if (!dualRow || !('fields' in dualRow)) {
@@ -603,6 +605,7 @@ describe('monster action detail fields', () => {
         'kind' in item &&
         item.kind === 'dependent' &&
         'controller' in item &&
+        'name' in item.controller &&
         item.controller.name === 'dcSource.kind'
       ) {
         dcSourceController = item.controller as SelectFieldConfig
@@ -675,7 +678,11 @@ describe('monster action detail fields', () => {
     })
     expect(findSelectField(items, 'resolution.target.proximity.kind')).toBeUndefined()
     const shape = findSelectField(items, 'resolution.areaOfEffect.shape')
-    expect(shape?.options?.some((option) => option.value === AREA_GEOMETRY_FORM_NONE)).toBe(false)
+    expect(
+      flattenSelectFieldOptions(shape?.options ?? []).some(
+        (option) => option.value === AREA_GEOMETRY_FORM_NONE,
+      ),
+    ).toBe(false)
     expect(shape?.required).toBe(true)
     expect(shape?.placeholder).toBe('Choose a shape…')
     const occupants = findArrayField(items, 'resolution.occupantRequirements')
@@ -730,7 +737,7 @@ describe('monster action section moves', () => {
     expect(monsterActionSectionMoveAllowed(profile, 'actions', 'reactions')).toBe(false)
     expect(
       monsterActionSectionMoveAllowed(
-        { id: 'shield', kind: 'spell', name: 'Shield' },
+        { kind: 'spell' },
         'bonusActions',
         'actions',
       ),

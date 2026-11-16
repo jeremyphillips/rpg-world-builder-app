@@ -17,7 +17,7 @@ describe('collectFormNavigationAnchors', () => {
         kind: 'row',
         id: 'creation-standard-array',
         navigation: { id: 'creation-standard-array' },
-        label: 'Standard array',
+        heading: { label: 'Standard array' },
         fields: [{ type: 'number', name: 'standardArray.0', label: 'Score 1' }],
       },
     ]

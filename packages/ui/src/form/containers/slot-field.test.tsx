@@ -61,7 +61,7 @@ describe('SlotFieldRenderer', () => {
     expect(screen.getByText('Optional author notes.')).toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: 'Notes' })).toBeInTheDocument()
     expect(screen.getByText('Notes')).not.toHaveClass('text-style-field-legend')
-    expect(screen.getByText('Notes').closest('div')).toHaveClass('text-style-field-label-md')
+    expect(screen.getByRole('group', { name: /Notes/ })).toBeInTheDocument()
   })
 
   it('submits values managed by the slot control', async () => {

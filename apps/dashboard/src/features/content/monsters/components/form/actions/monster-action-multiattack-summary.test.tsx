@@ -46,7 +46,7 @@ function Host() {
     armorClassRules: { mode: 'ascending', base: 10 },
     options: { skills: { visible: [] } },
     rulesetId: 'srd-cc-5.2.1',
-  } as ContentFormCtx
+  } as unknown as ContentFormCtx
   return (
     <FormProvider {...form}>
       <MonsterActionMultiattackSummary ctx={ctx} action={multiattack} />

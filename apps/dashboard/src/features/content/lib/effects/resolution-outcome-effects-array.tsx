@@ -1,8 +1,10 @@
+/* eslint-disable react-refresh/only-export-components -- array config and slot component share module */
 import { useController, useFormContext } from 'react-hook-form'
 import {
   CONDITION_TERM,
   formatDamageValue,
   planLinkedEffectAdd,
+  planLinkedEffectRemove,
   type ResolutionApplicationAmount,
 } from '@rpg/contracts'
 import type {
@@ -67,7 +69,10 @@ function damageSummary(effectId: unknown, library: unknown): string {
     | { roll?: { dice?: { count: number; faces: number }; flat?: number }; damageType?: string }
     | undefined
   if (!effect?.roll || !effect.damageType) return EFFECT_DAMAGE_LABEL
-  return formatDamageValue(effect.roll, effect.damageType)
+  return formatDamageValue(
+    effect.roll as Parameters<typeof formatDamageValue>[0],
+    effect.damageType,
+  )
 }
 
 function rowPath(slotPath: string): string {
@@ -129,6 +134,8 @@ export function resolutionOutcomeEffectsArray(options: {
   name: string
   listPath: string
   libraryPath: string
+  /** Required for `owner` remove: full `resolution.outcomes` (or prefixed) for reference stripping. */
+  outcomesPath?: string
   inlineKinds: readonly ('condition' | 'note')[]
   references: ReferenceRole
   precedingEffectsPath?: string
@@ -149,6 +156,7 @@ export function resolutionOutcomeEffectsArray(options: {
             }) => {
               const plan = planLinkedEffectAdd({
                 existingIds: effectIds(ctx.getValues(options.libraryPath)),
+                // Intentionally no damageType: authors choose a type in the definition editor.
                 definition: { kind: 'damage', roll: { dice: { count: 1, faces: 6 } } },
                 owner: { result: 'failed-save' as const, amount: 'full' as const },
                 linked: references.linked.map((link) => ({
@@ -236,27 +244,28 @@ export function resolutionOutcomeEffectsArray(options: {
         references.role === 'linked' ? values.kind !== 'effect-reference' : true,
       removable: references.role === 'linked' ? (row) => row.kind !== 'effect-reference' : true,
       remove:
-        references.role === 'owner'
+        references.role === 'owner' && options.outcomesPath
           ? (ctx) => {
               const row = ctx.row as { kind?: string; effectId?: string }
-              ctx.removeAt(options.listPath, ctx.index)
-              if (row.kind !== 'effect-reference' || !row.effectId) return
-              for (const link of references.linked) {
-                const rows = ctx.getValues(link.path)
-                if (!Array.isArray(rows)) continue
-                for (let index = rows.length - 1; index >= 0; index -= 1) {
-                  const entry = rows[index]
-                  if (
-                    entry &&
-                    typeof entry === 'object' &&
-                    (entry as { effectId?: string }).effectId === row.effectId
-                  ) {
-                    ctx.removeAt(link.path, index)
-                  }
-                }
+              if (row.kind !== 'effect-reference' || !row.effectId) {
+                ctx.removeAt(options.listPath, ctx.index)
+                return
               }
+              const effectId = row.effectId
+              ctx.removeAt(options.listPath, ctx.index)
+              const library = ctx.getValues(options.libraryPath)
+              const outcomes = ctx.getValues(options.outcomesPath!)
+              const plan = planLinkedEffectRemove({
+                library: Array.isArray(library) ? library : [],
+                outcomes: Array.isArray(outcomes) ? outcomes : [],
+                effectId,
+              })
+              ctx.setValue(options.libraryPath, plan.library)
+              ctx.setValue(options.outcomesPath!, plan.outcomes)
             }
-          : undefined,
+          : references.role === 'owner'
+            ? (ctx) => ctx.removeAt(options.listPath, ctx.index)
+            : undefined,
       header: {
         fallback: () => EFFECT_DAMAGE_LABEL,
         primary: (values) => {

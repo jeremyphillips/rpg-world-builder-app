@@ -13,11 +13,13 @@ import {
 import { normalizeMonsterFormValues } from '../../normalize-monster-form-values'
 import { resolveMonsterFormActionAttackProfile } from './monster-action-attack-summary'
 
+type AttackProfileAction = Parameters<typeof resolveMonsterActionAttackProfile>[0]['action']
+
 const ctx = {
   entityCatalogLayer: 'homebrew',
   equipmentCatalogStatus: 'ready',
   equipmentCatalogById: new Map(),
-} as ContentFormCtx
+} as unknown as ContentFormCtx
 
 function authoredAttack(
   overrides: Record<string, unknown> = {},
@@ -56,7 +58,8 @@ describe('attack summary investigation (authored attack guards)', () => {
     const bare = { id: 'slash', kind: 'attack' as const }
     expect(
       resolveMonsterActionAttackProfile({
-        action: bare,
+        // A bare create row has no modes yet; the profile resolver must report it unavailable.
+        action: bare as unknown as AttackProfileAction,
         monster: { abilityScores: { str: 16 } },
         equipmentCatalog: new Map(),
         proficiencyBonus: 2,

@@ -129,11 +129,6 @@ function hasRequirementKind(items: unknown[], kinds: readonly string[]): boolean
   })
 }
 
-function stringIds(value: unknown): string[] {
-  if (!Array.isArray(value)) return []
-  return value.filter((id): id is string => typeof id === 'string' && id.length > 0)
-}
-
 function creatureTypeLabelFor(options: readonly FieldOption[]): (id: string) => string {
   const labels = new Map(options.map((option) => [String(option.value), option.label]))
   return (id) => labels.get(id) ?? id

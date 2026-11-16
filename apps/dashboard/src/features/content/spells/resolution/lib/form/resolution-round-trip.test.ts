@@ -13,6 +13,7 @@ import {
   MAGIC_MISSILE_RESOLUTION,
   MASS_HEALING_WORD_RESOLUTION,
   type SPELL_RESOLUTION_FIXTURES,
+  resolutionEffectIdSchema,
 } from '@rpg/contracts'
 import { resolutionFormSchema } from './resolution-form-schema'
 import { formOutcomesToStoredShape } from './resolution-outcome-slots.lib'
@@ -59,7 +60,7 @@ describe('spell resolution round trips', () => {
     const storedShape = formOutcomesToStoredShape(method, [
       {
         result: 'hit',
-        effects: [{ kind: 'effect-reference', effectId: 'damage', amount: 'full' }],
+        effects: [{ kind: 'effect-reference', effectId: resolutionEffectIdSchema.parse('damage'), amount: 'full' }],
       },
       { result: 'miss', effects: [] },
     ])
@@ -67,7 +68,7 @@ describe('spell resolution round trips', () => {
     expect(storedShape).toEqual([
       {
         result: 'hit',
-        effects: [{ kind: 'effect-reference', effectId: 'damage', amount: 'full' }],
+        effects: [{ kind: 'effect-reference', effectId: resolutionEffectIdSchema.parse('damage'), amount: 'full' }],
       },
     ])
   })

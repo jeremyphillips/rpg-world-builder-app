@@ -158,7 +158,7 @@ export function resolveSelectIdFromEffectEnd(end: EffectEnd | undefined): string
   if (end.kind === 'timed') return EFFECT_END_TIMING_OPTION_IDS.timed
   if (end.kind === 'custom') return EFFECT_END_TIMING_OPTION_IDS.custom
   for (const option of TURN_BOUND_OPTIONS) {
-    if (effectEndsEqual(option.end, end)) return option.id
+    if (option.end && effectEndsEqual(option.end, end)) return option.id
   }
   return undefined
 }
