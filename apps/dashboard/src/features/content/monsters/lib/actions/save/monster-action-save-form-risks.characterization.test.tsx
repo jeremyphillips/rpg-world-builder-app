@@ -264,10 +264,7 @@ describe('monster save form risks (Phase 2 characterization)', () => {
 
       await act(async () => {
         const form = formRef.current!
-        getArrayFieldMutators(
-          form.control as unknown as Parameters<typeof getArrayFieldMutators>[0],
-          failedPath,
-        )?.remove(0)
+        getArrayFieldMutators(form.control, failedPath)?.remove(0)
         const plan = planLinkedEffectRemove({
           library: readResolutionEffects(
             form.getValues(libraryPath),

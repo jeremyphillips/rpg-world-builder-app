@@ -38,7 +38,6 @@ describe('planLinkedEffectAdd', () => {
       },
     ])
   })
-
 })
 
 describe('planLinkedEffectRemove', () => {
