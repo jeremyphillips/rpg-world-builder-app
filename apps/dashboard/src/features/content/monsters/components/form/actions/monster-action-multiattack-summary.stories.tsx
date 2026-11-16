@@ -5,10 +5,8 @@ import { systemDefaultArmorClassRules } from '@rpg/contracts'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import type { MonsterActionDraftRow } from '../../../lib/actions/monster-action-presets'
-import {
-  resolveMonsterCreateDefaultValues,
-  type MonsterFormValues,
-} from '../../../lib/monster-form-values'
+import { monsterFormTestValues } from '../../../lib/monster-form-test-values'
+import type { MonsterFormValues } from '../../../lib/monster-form-values'
 import { MonsterActionMultiattackSummary } from './monster-action-multiattack-summary'
 
 const bite: MonsterActionDraftRow = {
@@ -52,10 +50,12 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 function Host() {
-  const values = resolveMonsterCreateDefaultValues()
-  values.name = 'Wolf'
-  values.actions = [bite, multiattack]
-  const form = useForm<MonsterFormValues>({ defaultValues: values })
+  const form = useForm<MonsterFormValues>({
+    defaultValues: monsterFormTestValues({
+      name: 'Wolf',
+      actions: [bite, multiattack] as MonsterFormValues['actions'],
+    }),
+  })
   return (
     <FormProvider {...form}>
       <MonsterActionMultiattackSummary ctx={storyCtx} action={multiattack} />

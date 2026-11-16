@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
 import { normalizeMonsterFormValues } from './normalize-monster-form-values'
-import { resolveMonsterCreateDefaultValues } from './monster-form-values'
+import { monsterFormTestValues } from './monster-form-test-values'
+import { resolveMonsterCreateDefaultValues, type MonsterFormValues } from './monster-form-values'
 import { buildMonsterPreviewSections } from './monster-form-preview'
 import { buildMonsterInput } from './monster-form-values'
 
@@ -108,7 +109,7 @@ describe('normalizeMonsterFormValues', () => {
         id: 'flat',
         kind: 'weapon',
         equipmentEntryId: 'bow',
-        damage: { flatOperator: '+', flatAmount: 1 },
+        damage: { flat: 1 },
       },
       {
         id: 'open',
@@ -117,7 +118,7 @@ describe('normalizeMonsterFormValues', () => {
         damage: {},
       },
       { id: 'plain', kind: 'weapon', equipmentEntryId: 'dagger' },
-    ]
+    ] as MonsterFormValues['actions']
     const normalized = normalizeMonsterFormValues(values, { intent: 'draft', mode: 'create' })
     const actions = normalized.actions as Array<{ id: string; damage?: unknown }>
     expect(actions.find((action) => action.id === 'partial')?.damage).toEqual({
@@ -129,8 +130,8 @@ describe('normalizeMonsterFormValues', () => {
   })
 
   it('does not invent a damage roll or melee reach', () => {
-    const input = {
-      ...resolveMonsterCreateDefaultValues(),
+    const input = monsterFormTestValues({
+      name: 'Slash test',
       actions: [
         {
           id: 'slash',
@@ -140,7 +141,7 @@ describe('normalizeMonsterFormValues', () => {
           damageType: 'slashing',
         },
       ],
-    }
+    })
     const normalized = normalizeMonsterFormValues(input, { intent: 'publish', mode: 'create' })
     const row = (normalized.actions as Array<{ damage?: unknown; reach?: unknown }>)?.[0]
     expect(row?.damage).toBeUndefined()
@@ -150,8 +151,8 @@ describe('normalizeMonsterFormValues', () => {
   })
 
   it('keeps take-actions combination on draft and omits it on publish when fewer than two actions', () => {
-    const values = {
-      ...resolveMonsterCreateDefaultValues(),
+    const values = monsterFormTestValues({
+      name: 'Cunning',
       bonusActions: [
         {
           id: 'cunning',
@@ -161,7 +162,7 @@ describe('normalizeMonsterFormValues', () => {
           combination: 'each',
         },
       ],
-    }
+    })
     const draft = normalizeMonsterFormValues(values, { intent: 'draft', mode: 'create' })
     const draftRow = (draft.bonusActions as Array<{ combination?: string }>)[0]
     expect(draftRow?.combination).toBe('each')
@@ -195,22 +196,30 @@ describe('normalizeMonsterFormValues', () => {
         spells: [],
       },
     ]
-    values.legendaryActions = [
-      {
-        id: 'pounce',
-        kind: 'action-reference',
-        name: 'Pounce',
-        actionIds: ['bite', ''],
-        onceUntilNextTurn: 'true',
-        movement: { allowance: 'half-speed', withoutOpportunityAttacks: false },
-      },
-    ]
+    values.legendaryActions = {
+      actions: [
+        {
+          id: 'pounce',
+          kind: 'action-reference',
+          name: 'Pounce',
+          actionIds: ['bite', ''],
+          onceUntilNextTurn: true,
+          movement: { allowance: 'half-speed' },
+        },
+      ],
+    }
     const normalized = normalizeMonsterFormValues(values, { intent: 'draft', mode: 'create' })
     const legendary = (
       normalized.legendaryActions as
-        | { actionIds?: string[]; onceUntilNextTurn?: boolean; movement?: { allowance?: string } }[]
+        | {
+            actions?: {
+              actionIds?: string[]
+              onceUntilNextTurn?: boolean
+              movement?: { allowance?: string }
+            }[]
+          }
         | undefined
-    )?.[0]
+    )?.actions?.[0]
     const action = (normalized.actions as { spellInvocation?: string }[] | undefined)?.[0]
     expect(action).not.toHaveProperty('spellInvocation')
     expect(legendary).toMatchObject({
@@ -222,20 +231,24 @@ describe('normalizeMonsterFormValues', () => {
 
   it('drops a cast level stored on a legendary spell taken from Spellcasting', () => {
     const values = resolveMonsterCreateDefaultValues()
-    values.legendaryActions = [
-      {
-        id: 'presence',
-        kind: 'spell',
-        name: 'Commanding Presence',
-        spellInvocation: 'use-entry',
-        castingAbility: { kind: 'shared', entryId: 'spellcasting' },
-        spells: [{ spellId: 'srd:fireball', castAtLevel: 5 }],
-      },
-    ]
+    values.legendaryActions = {
+      actions: [
+        {
+          id: 'presence',
+          kind: 'spell',
+          name: 'Commanding Presence',
+          spellInvocation: 'use-entry',
+          castingAbility: { kind: 'shared', entryId: 'spellcasting' },
+          spells: [{ spellId: 'srd:fireball', castAtLevel: 5 }],
+        },
+      ],
+    }
     const normalized = normalizeMonsterFormValues(values, { intent: 'draft', mode: 'create' })
     const spell = (
-      normalized.legendaryActions as { spells?: { spellId?: string; castAtLevel?: number }[] }[]
-    )[0]?.spells?.[0]
+      normalized.legendaryActions as {
+        actions?: { spells?: { spellId?: string; castAtLevel?: number }[] }[]
+      }
+    )?.actions?.[0]?.spells?.[0]
     expect(spell).toEqual({ spellId: 'srd:fireball' })
     expect(spell).not.toHaveProperty('castAtLevel')
   })

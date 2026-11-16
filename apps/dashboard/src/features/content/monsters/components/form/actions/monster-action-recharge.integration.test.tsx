@@ -14,10 +14,8 @@ import { buildSeedDamageTypeVocabulary } from '@/features/vocabulary'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import { normalizeMonsterFormValues } from '../../../lib/normalize-monster-form-values'
-import {
-  resolveMonsterCreateDefaultValues,
-  type MonsterFormValues,
-} from '../../../lib/monster-form-values'
+import { monsterFormTestValues } from '../../../lib/monster-form-test-values'
+import type { MonsterFormValues } from '../../../lib/monster-form-values'
 import type { MonsterActionDraftRow } from '../../../lib/actions/monster-action-presets'
 import { MonsterActionSections } from '../monster-action-sections'
 
@@ -88,10 +86,10 @@ function Host({
 }
 
 function formValues(actions: MonsterActionDraftRow[]): MonsterFormValues {
-  const values = resolveMonsterCreateDefaultValues()
-  values.name = 'Scout'
-  values.actions = actions
-  return values
+  return monsterFormTestValues({
+    name: 'Scout',
+    actions: actions as MonsterFormValues['actions'],
+  })
 }
 
 function threshold() {

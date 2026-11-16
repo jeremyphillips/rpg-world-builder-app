@@ -87,3 +87,5 @@ export type MonsterReactionDraft =
   | (Extract<MonsterActionDraft, { kind: 'spell' | 'special' }> & ReactionTrigger)
   | z.infer<typeof draftReactionReferenceSchema>
   | z.infer<typeof draftParrySchema>
+/** Authoring input before parse defaults; use on monster form reaction rows. */
+export type MonsterReactionDraftInput = z.input<typeof monsterReactionDraftSchema>

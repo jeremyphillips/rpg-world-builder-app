@@ -108,7 +108,7 @@ describe('monster action repeatability', () => {
       ],
       bonusActions: [{ id: 'leap', kind: 'leap' }],
       reactions: [{ id: 'parry', kind: 'parry' }],
-      legendaryActions: [],
+      legendaryActions: { actions: [] },
     }
     expect(acquisitionStateForItem('create:spell', sections)).toEqual({
       disabled: true,

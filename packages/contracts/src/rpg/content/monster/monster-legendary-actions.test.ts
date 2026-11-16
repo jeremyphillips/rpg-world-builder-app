@@ -9,6 +9,18 @@ import {
 } from '../monster'
 import { BITE_ACTION, MONSTER_TEST_INPUT, issueMessages } from './test-fixtures'
 
+function legendaryBlock(
+  actions: unknown[],
+  uses?: number,
+  usesInLair?: number,
+): { uses?: number; usesInLair?: number; actions: unknown[] } {
+  return {
+    ...(uses !== undefined ? { uses } : {}),
+    ...(usesInLair !== undefined ? { usesInLair } : {}),
+    actions,
+  }
+}
+
 const spellcastingAction = {
   id: 'spellcasting',
   kind: 'spell' as const,
@@ -68,16 +80,20 @@ describe('legendary actions', () => {
         createMonsterInputSchema.safeParse({
           ...MONSTER_TEST_INPUT,
           actions: [BITE_ACTION],
-          legendaryActions: [reference],
+          legendaryActions: legendaryBlock([reference]),
         }),
       ),
-    ).toContain('Enter legendary action uses.')
+    ).toEqual(
+      expect.arrayContaining([
+        expect.stringMatching(/Enter legendary action uses|expected number/),
+      ]),
+    )
 
     expect(
       issueMessages(
         createMonsterInputSchema.safeParse({
           ...MONSTER_TEST_INPUT,
-          legendaryActionUses: 3,
+          legendaryActions: legendaryBlock([], 3),
         }),
       ),
     ).toContain('Legendary action uses require a legendary action.')
@@ -86,16 +102,18 @@ describe('legendary actions', () => {
       issueMessages(
         createMonsterInputSchema.safeParse({
           ...MONSTER_TEST_INPUT,
-          legendaryActionUses: 3,
-          legendaryActionUsesInLair: 3,
-          legendaryActions: [
-            {
-              id: 'note',
-              kind: 'special',
-              name: 'Deathly Teleport',
-              description: '<p>The lich teleports.</p>',
-            },
-          ],
+          legendaryActions: legendaryBlock(
+            [
+              {
+                id: 'note',
+                kind: 'special',
+                name: 'Deathly Teleport',
+                description: '<p>The lich teleports.</p>',
+              },
+            ],
+            3,
+            3,
+          ),
         }),
       ),
     ).toContain('In-lair uses must be greater than legendary action uses.')
@@ -103,15 +121,17 @@ describe('legendary actions', () => {
     expect(
       createMonsterInputSchema.safeParse({
         ...MONSTER_TEST_INPUT,
-        legendaryActionUses: 3,
-        legendaryActionUsesInLair: 4,
         actions: [BITE_ACTION],
-        legendaryActions: [
-          {
-            ...reference,
-            movement: { allowance: 'half-speed' },
-          },
-        ],
+        legendaryActions: legendaryBlock(
+          [
+            {
+              ...reference,
+              movement: { allowance: 'half-speed' },
+            },
+          ],
+          3,
+          4,
+        ),
       }).success,
     ).toBe(true)
   })
@@ -120,9 +140,8 @@ describe('legendary actions', () => {
     expect(
       createMonsterInputSchema.safeParse({
         ...MONSTER_TEST_INPUT,
-        legendaryActionUses: 3,
         actions: [spellcastingAction],
-        legendaryActions: [legendarySpell('srd-cc-5.2.1:fear')],
+        legendaryActions: legendaryBlock([legendarySpell('srd-cc-5.2.1:fear')], 3),
       }).success,
     ).toBe(true)
 
@@ -130,14 +149,19 @@ describe('legendary actions', () => {
       issueMessages(
         createMonsterInputSchema.safeParse({
           ...MONSTER_TEST_INPUT,
-          legendaryActionUses: 3,
           actions: [spellcastingAction],
-          legendaryActions: [
-            {
-              ...legendarySpell('srd-cc-5.2.1:fear'),
-              spells: [{ spellId: 'srd-cc-5.2.1:fear' }, { spellId: 'srd-cc-5.2.1:scorching-ray' }],
-            },
-          ],
+          legendaryActions: legendaryBlock(
+            [
+              {
+                ...legendarySpell('srd-cc-5.2.1:fear'),
+                spells: [
+                  { spellId: 'srd-cc-5.2.1:fear' },
+                  { spellId: 'srd-cc-5.2.1:scorching-ray' },
+                ],
+              },
+            ],
+            3,
+          ),
         }),
       ),
     ).toContain('Choose one spell.')
@@ -160,18 +184,22 @@ describe('legendary actions', () => {
     expect(
       createMonsterInputSchema.safeParse({
         ...MONSTER_TEST_INPUT,
-        legendaryActionUses: 3,
         actions: [spellcastingAction],
-        legendaryActions: [legendarySpell('srd-cc-5.2.1:scorching-ray', 3, 'use-entry')],
+        legendaryActions: legendaryBlock(
+          [legendarySpell('srd-cc-5.2.1:scorching-ray', 3, 'use-entry')],
+          3,
+        ),
       }).success,
     ).toBe(true)
 
     expect(
       createMonsterInputSchema.safeParse({
         ...MONSTER_TEST_INPUT,
-        legendaryActionUses: 3,
         actions: [spellcastingAction],
-        legendaryActions: [legendarySpell('srd-cc-5.2.1:scorching-ray', undefined, 'use-entry')],
+        legendaryActions: legendaryBlock(
+          [legendarySpell('srd-cc-5.2.1:scorching-ray', undefined, 'use-entry')],
+          3,
+        ),
       }).success,
     ).toBe(true)
 
@@ -179,9 +207,11 @@ describe('legendary actions', () => {
       issueMessages(
         createMonsterInputSchema.safeParse({
           ...MONSTER_TEST_INPUT,
-          legendaryActionUses: 3,
           actions: [spellcastingAction],
-          legendaryActions: [legendarySpell('srd-cc-5.2.1:fear', undefined, 'use-entry')],
+          legendaryActions: legendaryBlock(
+            [legendarySpell('srd-cc-5.2.1:fear', undefined, 'use-entry')],
+            3,
+          ),
         }),
       ),
     ).toContain("This spell isn't on the selected Spellcasting action.")
@@ -190,9 +220,11 @@ describe('legendary actions', () => {
       issueMessages(
         createMonsterInputSchema.safeParse({
           ...MONSTER_TEST_INPUT,
-          legendaryActionUses: 3,
           actions: [spellcastingAction],
-          legendaryActions: [legendarySpell('srd-cc-5.2.1:scorching-ray', 2, 'use-entry')],
+          legendaryActions: legendaryBlock(
+            [legendarySpell('srd-cc-5.2.1:scorching-ray', 2, 'use-entry')],
+            3,
+          ),
         }),
       ),
     ).toContain('Cast level must match the Spellcasting action.')
@@ -201,8 +233,10 @@ describe('legendary actions', () => {
       issueMessages(
         createMonsterInputSchema.safeParse({
           ...MONSTER_TEST_INPUT,
-          legendaryActionUses: 3,
-          legendaryActions: [legendarySpell('srd-cc-5.2.1:scorching-ray', 3, 'use-entry')],
+          legendaryActions: legendaryBlock(
+            [legendarySpell('srd-cc-5.2.1:scorching-ray', 3, 'use-entry')],
+            3,
+          ),
         }),
       ),
     ).toContain('Shared spellcasting must use another spell entry that has its own ability.')
@@ -211,18 +245,20 @@ describe('legendary actions', () => {
       issueMessages(
         createMonsterInputSchema.safeParse({
           ...MONSTER_TEST_INPUT,
-          legendaryActionUses: 3,
           actions: [spellcastingAction],
-          legendaryActions: [
-            {
-              id: 'cast',
-              kind: 'spell',
-              name: 'Cast',
-              spellInvocation: 'use-entry',
-              castingAbility: { kind: 'ability', ability: 'cha' },
-              spells: [{ spellId: 'srd-cc-5.2.1:scorching-ray' }],
-            },
-          ],
+          legendaryActions: legendaryBlock(
+            [
+              {
+                id: 'cast',
+                kind: 'spell',
+                name: 'Cast',
+                spellInvocation: 'use-entry',
+                castingAbility: { kind: 'ability', ability: 'cha' },
+                spells: [{ spellId: 'srd-cc-5.2.1:scorching-ray' }],
+              },
+            ],
+            3,
+          ),
         }),
       ),
     ).toContain('Choose a Spellcasting action.')
@@ -233,7 +269,6 @@ describe('legendary actions', () => {
       issueMessages(
         createMonsterInputSchema.safeParse({
           ...MONSTER_TEST_INPUT,
-          legendaryActionUses: 3,
           actions: [
             {
               id: 'misty-step',
@@ -243,15 +278,18 @@ describe('legendary actions', () => {
               spells: [{ spellId: 'srd-cc-5.2.1:misty-step' }],
             },
           ],
-          legendaryActions: [
-            {
-              id: 'beguile',
-              kind: 'spell',
-              name: 'Beguile',
-              castingAbility: { kind: 'ability', ability: 'cha' },
-              spells: [{ spellId: 'srd-cc-5.2.1:suggestion' }],
-            },
-          ],
+          legendaryActions: legendaryBlock(
+            [
+              {
+                id: 'beguile',
+                kind: 'spell',
+                name: 'Beguile',
+                castingAbility: { kind: 'ability', ability: 'cha' },
+                spells: [{ spellId: 'srd-cc-5.2.1:suggestion' }],
+              },
+            ],
+            3,
+          ),
         }),
       ),
     ).toContain('Shared spellcasting must use another spell entry that has its own ability.')
@@ -262,16 +300,18 @@ describe('legendary actions', () => {
       issueMessages(
         createMonsterInputSchema.safeParse({
           ...MONSTER_TEST_INPUT,
-          legendaryActionUses: 3,
           actions: [BITE_ACTION],
-          legendaryActions: [
-            {
-              id: 'bite',
-              kind: 'special',
-              name: 'Bite',
-              description: '<p>The creature bites.</p>',
-            },
-          ],
+          legendaryActions: legendaryBlock(
+            [
+              {
+                id: 'bite',
+                kind: 'special',
+                name: 'Bite',
+                description: '<p>The creature bites.</p>',
+              },
+            ],
+            3,
+          ),
         }),
       ),
     ).toContain('Action ids must be unique across all sections.')

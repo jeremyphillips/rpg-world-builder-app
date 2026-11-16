@@ -58,6 +58,10 @@ import {
   monsterMagicPropertyProvider,
 } from '../../../lib/monster-form-derivation'
 import type { MonsterFormValues } from '../../../lib/monster-form-values'
+import {
+  monsterFormSectionRowNamePrefix,
+  monsterFormSectionRows,
+} from '../../../lib/actions/monster-action-section-access'
 import type { useMonsterActionSections } from '../../../hooks/use-monster-action-sections'
 
 type Sections = ReturnType<typeof useMonsterActionSections>
@@ -112,13 +116,13 @@ export function MonsterActionDetail({
 }) {
   const values = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
   const action = located?.action
-  const namePrefix = located ? `${located.section}.${located.index}` : ''
-  const sectionRows = (
-    located && values ? (values[located.section] ?? []) : []
-  ) as MonsterActionDraftRow[]
+  const namePrefix = located
+    ? `${monsterFormSectionRowNamePrefix(located.section)}.${located.index}`
+    : ''
+  const sectionRows = located && values ? monsterFormSectionRows(values, located.section) : []
   const liveAction =
     located && values
-      ? ((values[located.section]?.[located.index] as MonsterActionDraftRow | undefined) ?? action)
+      ? (monsterFormSectionRows(values, located.section)[located.index] ?? action)
       : action
   const headerName =
     located && liveAction

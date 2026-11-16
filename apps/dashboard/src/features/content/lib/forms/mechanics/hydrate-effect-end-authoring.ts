@@ -14,7 +14,7 @@ export function hydrateConditionEffectEndRow(
   return { ...row, effectEndOption: option }
 }
 
-export function hydrateOnHitInAction(action: Record<string, unknown>): Record<string, unknown> {
+export function hydrateOnHitInAction<T extends Record<string, unknown>>(action: T): T {
   const onHit = action.onHit
   if (!isRecord(onHit) || !Array.isArray(onHit.effects)) return action
   return {
@@ -28,8 +28,8 @@ export function hydrateOnHitInAction(action: Record<string, unknown>): Record<st
   }
 }
 
-export function hydrateOnHitInActionList(
-  actions: readonly Record<string, unknown>[],
-): Record<string, unknown>[] {
+export function hydrateOnHitInActionList<T extends Record<string, unknown>>(
+  actions: readonly T[],
+): T[] {
   return actions.map((action) => (isRecord(action) ? hydrateOnHitInAction(action) : action))
 }

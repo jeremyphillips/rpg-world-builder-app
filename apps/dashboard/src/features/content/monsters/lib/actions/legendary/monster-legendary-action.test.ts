@@ -159,7 +159,7 @@ describe('legendary action fields', () => {
         ctx,
         action: { id: 'pounce', kind: 'action-reference', name: 'Pounce', actionIds: ['rend'] },
         section: 'legendaryActions',
-        namePrefix: 'legendaryActions.0',
+        namePrefix: 'legendaryActions.actions.0',
         equipmentOptions: [],
         sharedCastingOptions: [],
         referenceOptions: [
@@ -188,7 +188,7 @@ describe('legendary action fields', () => {
           spells: [{ spellId: undefined }],
         },
         section: 'legendaryActions',
-        namePrefix: 'legendaryActions.0',
+        namePrefix: 'legendaryActions.actions.0',
         equipmentOptions: [],
         sharedCastingOptions: [{ value: 'spellcasting', label: 'Spellcasting' }],
         sourceSpellOptions: [{ value: 'srd:command', label: 'Command' }],
@@ -205,7 +205,7 @@ describe('legendary action fields', () => {
       ctx,
       action: { id: 'beguile', kind: 'spell', name: 'Beguile', spells: [{ spellId: undefined }] },
       section: 'legendaryActions',
-      namePrefix: 'legendaryActions.0',
+      namePrefix: 'legendaryActions.actions.0',
       equipmentOptions: [],
       sharedCastingOptions: [],
     })
@@ -224,7 +224,7 @@ describe('legendary action fields', () => {
       ctx,
       action: { id: 'note', kind: 'special', name: 'Teleport' },
       section: 'legendaryActions',
-      namePrefix: 'legendaryActions.0',
+      namePrefix: 'legendaryActions.actions.0',
       equipmentOptions: [],
       sharedCastingOptions: [],
     })

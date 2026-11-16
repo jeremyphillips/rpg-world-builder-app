@@ -5,10 +5,8 @@ import { systemDefaultArmorClassRules } from '@rpg/contracts'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import type { MonsterActionDraftRow } from '../../../lib/actions/monster-action-presets'
-import {
-  resolveMonsterCreateDefaultValues,
-  type MonsterFormValues,
-} from '../../../lib/monster-form-values'
+import { monsterFormTestValues } from '../../../lib/monster-form-test-values'
+import type { MonsterFormValues } from '../../../lib/monster-form-values'
 import { MonsterActionSpellSummary } from './monster-action-spell-summary'
 
 const spellcasting: MonsterActionDraftRow = {
@@ -49,12 +47,14 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 function Host() {
-  const values = resolveMonsterCreateDefaultValues()
-  values.name = 'Archmage'
-  values.challengeRating = '5'
-  values.abilityScores = { str: 10, dex: 10, con: 10, int: 20, wis: 10, cha: 10 }
-  values.actions = [spellcasting]
-  const form = useForm<MonsterFormValues>({ defaultValues: values })
+  const form = useForm<MonsterFormValues>({
+    defaultValues: monsterFormTestValues({
+      name: 'Archmage',
+      challengeRating: '5',
+      abilityScores: { str: 10, dex: 10, con: 10, int: 20, wis: 10, cha: 10 },
+      actions: [spellcasting] as MonsterFormValues['actions'],
+    }),
+  })
   return (
     <FormProvider {...form}>
       <MonsterActionSpellSummary ctx={storyCtx} action={spellcasting} section="actions" />

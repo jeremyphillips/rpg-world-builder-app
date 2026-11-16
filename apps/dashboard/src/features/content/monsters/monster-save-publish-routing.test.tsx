@@ -20,10 +20,8 @@ import { makeContentFormCtx } from '../lib/fixtures/content-form-ctx'
 import { applyContentPublishValidation } from '../lib/forms/validation/content-publish-validation.lib'
 import { buildMonsterTabs } from './lib/monster-form-fields'
 import { resolveMonsterFormSchema } from './lib/monster-form-schema'
-import {
-  resolveMonsterCreateDefaultValues,
-  type MonsterFormValues,
-} from './lib/monster-form-values'
+import { monsterFormTestValues } from './lib/monster-form-test-values'
+import type { MonsterFormValues } from './lib/monster-form-values'
 
 vi.mock('@/features/vocabulary/hooks/use-vocabulary-set', async (importOriginal) => {
   const actual = await importOriginal<Pick<typeof VocabularyModule, 'useVocabularySet'>>()
@@ -66,10 +64,10 @@ function MonsterPublishHarness() {
       <TabbedForm<MonsterFormValues>
         schema={monsterFormSchema('draft')}
         tabs={tabs}
-        defaultValues={{
-          ...resolveMonsterCreateDefaultValues(),
-          actions: [blankSaveAction()],
-        }}
+        defaultValues={monsterFormTestValues({
+          name: 'Publish routing test',
+          actions: [blankSaveAction()] as MonsterFormValues['actions'],
+        })}
         onSubmit={vi.fn()}
         publishPresentationEnabled
         hasAttemptedPublish={hasAttemptedPublish}

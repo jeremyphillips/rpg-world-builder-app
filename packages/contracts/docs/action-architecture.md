@@ -46,9 +46,9 @@ with a second distance. The destination is always an unoccupied space the
 creature can see. `take-actions` stores Dash, Disengage, and Hide. One action
 prints that action. Two or more also store whether the creature chooses one or
 uses each. A missing choice prints nothing. None of the three kinds is an
-encounter movement or action resolver. Legendary actions spend one use from `legendaryActionUses`. An
-optional `legendaryActionUsesInLair` is printed only when it is greater than
-that pool. There is no per-option cost.
+encounter movement or action resolver. Legendary actions spend one use from
+`legendaryActions.uses`. An optional `legendaryActions.usesInLair` is printed only when it is
+greater than that pool. There is no per-option cost.
 `onceUntilNextTurn` prints one restriction sentence and is not `limitedUse`.
 `spellInvocation: 'use-entry'` is stored only on a legendary spell row and
 points at one spell on a shared spellcasting action. Omitting it shares only

@@ -7,10 +7,8 @@ import { describe, expect, it } from 'vitest'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import type { MonsterActionDraftRow } from '../../../lib/actions/monster-action-presets'
-import {
-  resolveMonsterCreateDefaultValues,
-  type MonsterFormValues,
-} from '../../../lib/monster-form-values'
+import { monsterFormTestValues } from '../../../lib/monster-form-test-values'
+import type { MonsterFormValues } from '../../../lib/monster-form-values'
 import { MonsterActionSpellSummary } from './monster-action-spell-summary'
 
 const spellcasting: MonsterActionDraftRow = {
@@ -24,13 +22,12 @@ const spellcasting: MonsterActionDraftRow = {
 
 function Host() {
   const form = useForm<MonsterFormValues>({
-    defaultValues: {
-      ...resolveMonsterCreateDefaultValues(),
+    defaultValues: monsterFormTestValues({
       name: 'Mage',
       challengeRating: '5',
       abilityScores: { str: 10, dex: 10, con: 10, int: 18, wis: 10, cha: 10 },
-      actions: [spellcasting],
-    },
+      actions: [spellcasting] as MonsterFormValues['actions'],
+    }),
   })
   const ctx = {
     entityCatalogLayer: 'homebrew',
@@ -54,13 +51,12 @@ function Host() {
 function ReactionHost() {
   const reactionSpell: MonsterActionDraftRow = { ...spellcasting, id: 'protective-magic' }
   const form = useForm<MonsterFormValues>({
-    defaultValues: {
-      ...resolveMonsterCreateDefaultValues(),
+    defaultValues: monsterFormTestValues({
       name: 'Mage',
       challengeRating: '5',
       abilityScores: { str: 10, dex: 10, con: 10, int: 18, wis: 10, cha: 10 },
-      reactions: [reactionSpell],
-    },
+      reactions: [reactionSpell] as MonsterFormValues['reactions'],
+    }),
   })
   const ctx = {
     entityCatalogLayer: 'homebrew',

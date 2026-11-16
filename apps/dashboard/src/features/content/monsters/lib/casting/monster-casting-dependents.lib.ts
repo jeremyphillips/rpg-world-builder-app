@@ -24,12 +24,11 @@ type CastingRow = {
   }
 }
 
-type FormCastingSections = {
-  actions?: readonly unknown[]
-  bonusActions?: readonly unknown[]
-  reactions?: readonly unknown[]
-  legendaryActions?: readonly unknown[]
-}
+import {
+  monsterFormSectionRows,
+  type MonsterFormActionSectionBody,
+} from '../actions/monster-action-section-access'
+import type { FormCastingSections } from './spellcasting-sources.lib'
 
 function sharedEntryId(
   casting: { kind?: string; entryId?: string } | undefined,
@@ -58,10 +57,10 @@ export function monsterCastingDependentLabels(
   equipmentCatalogStatus: 'pending' | 'ready' | 'error' = 'ready',
 ): string[] {
   const rows = [
-    ...(values.actions ?? []),
-    ...(values.bonusActions ?? []),
-    ...(values.reactions ?? []),
-    ...(values.legendaryActions ?? []),
+    ...monsterFormSectionRows(values as MonsterFormActionSectionBody, 'actions'),
+    ...monsterFormSectionRows(values as MonsterFormActionSectionBody, 'bonusActions'),
+    ...monsterFormSectionRows(values as MonsterFormActionSectionBody, 'reactions'),
+    ...monsterFormSectionRows(values as MonsterFormActionSectionBody, 'legendaryActions'),
   ] as CastingRow[]
   return rows.flatMap((row) => {
     if (row.id === sourceId || !rowUsesCastingSource(row, sourceId)) return []

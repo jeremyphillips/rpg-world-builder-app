@@ -168,14 +168,8 @@
       "reactions": {
         "$ref": "#/definitions/__schema260"
       },
-      "legendaryActionUses": {
-        "$ref": "#/definitions/__schema264"
-      },
-      "legendaryActionUsesInLair": {
-        "$ref": "#/definitions/__schema265"
-      },
       "legendaryActions": {
-        "$ref": "#/definitions/__schema266"
+        "$ref": "#/definitions/__schema264"
       }
     },
     "required": [
@@ -204,8 +198,7 @@
       "traits",
       "actions",
       "bonusActions",
-      "reactions",
-      "legendaryActions"
+      "reactions"
     ],
     "additionalProperties": false
   },
@@ -6789,93 +6782,106 @@
       "minLength": 1
     },
     "__schema264": {
-      "type": "integer",
-      "minimum": 1,
-      "maximum": 9007199254740991
+      "type": "object",
+      "properties": {
+        "uses": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "usesInLair": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "actions": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/__schema265"
+          }
+        }
+      },
+      "required": [
+        "uses",
+        "actions"
+      ],
+      "additionalProperties": false
     },
     "__schema265": {
-      "type": "integer",
-      "minimum": 1,
-      "maximum": 9007199254740991
-    },
-    "__schema266": {
-      "default": [],
-      "type": "array",
-      "items": {
-        "oneOf": [
-          {
-            "$ref": "#/definitions/__schema188"
-          },
-          {
-            "$ref": "#/definitions/__schema193"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "id": {
-                "$ref": "#/definitions/__schema165"
-              },
-              "preset": {
-                "$ref": "#/definitions/__schema166"
-              },
-              "onceUntilNextTurn": {
-                "$ref": "#/definitions/__schema170"
-              },
-              "available": {
-                "$ref": "#/definitions/__schema171"
-              },
-              "provenance": {
-                "$ref": "#/definitions/__schema67"
-              },
-              "kind": {
-                "type": "string",
-                "const": "action-reference",
-                "description": "action-reference"
-              },
-              "name": {
-                "type": "string",
-                "minLength": 1
-              },
-              "actionIds": {
-                "minItems": 1,
-                "type": "array",
-                "items": {
-                  "$ref": "#/definitions/__schema267"
-                }
-              },
-              "movement": {
-                "type": "object",
-                "properties": {
-                  "allowance": {
-                    "type": "string",
-                    "enum": [
-                      "half-speed",
-                      "speed"
-                    ],
-                    "description": "half-speed | speed"
-                  },
-                  "withoutOpportunityAttacks": {
-                    "type": "boolean",
-                    "const": true
-                  }
-                },
-                "required": [
-                  "allowance"
-                ],
-                "additionalProperties": false
+      "oneOf": [
+        {
+          "$ref": "#/definitions/__schema188"
+        },
+        {
+          "$ref": "#/definitions/__schema193"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/definitions/__schema165"
+            },
+            "preset": {
+              "$ref": "#/definitions/__schema166"
+            },
+            "onceUntilNextTurn": {
+              "$ref": "#/definitions/__schema170"
+            },
+            "available": {
+              "$ref": "#/definitions/__schema171"
+            },
+            "provenance": {
+              "$ref": "#/definitions/__schema67"
+            },
+            "kind": {
+              "type": "string",
+              "const": "action-reference",
+              "description": "action-reference"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "actionIds": {
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/__schema266"
               }
             },
-            "required": [
-              "id",
-              "kind",
-              "actionIds"
-            ],
-            "additionalProperties": false
-          }
-        ]
-      }
+            "movement": {
+              "type": "object",
+              "properties": {
+                "allowance": {
+                  "type": "string",
+                  "enum": [
+                    "half-speed",
+                    "speed"
+                  ],
+                  "description": "half-speed | speed"
+                },
+                "withoutOpportunityAttacks": {
+                  "type": "boolean",
+                  "const": true
+                }
+              },
+              "required": [
+                "allowance"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "id",
+            "kind",
+            "actionIds"
+          ],
+          "additionalProperties": false
+        }
+      ]
     },
-    "__schema267": {
+    "__schema266": {
       "type": "string",
       "minLength": 1
     }

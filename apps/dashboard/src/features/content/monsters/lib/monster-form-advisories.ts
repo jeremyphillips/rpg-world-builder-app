@@ -19,6 +19,10 @@ import {
 import type { MonsterActionDraftRow } from './actions/monster-action-presets'
 import { readWalkSpeed, isLeapWholeFeet } from './actions/leap-distance-options'
 import type { MonsterFormValues } from './monster-form-values'
+import {
+  monsterFormSectionRowNamePrefix,
+  monsterFormSectionRows,
+} from './actions/monster-action-section-access'
 
 export const TUNNELER_MISSING_BURROW_SPEED_MESSAGE =
   "Tunneler uses half the creature's Burrow Speed, but no Burrow Speed is configured."
@@ -95,8 +99,7 @@ function sectionRows(
   values: MonsterFormValues,
   section: MonsterActionSection,
 ): MonsterActionDraftRow[] {
-  const rows = values[section]
-  return Array.isArray(rows) ? (rows as MonsterActionDraftRow[]) : []
+  return monsterFormSectionRows(values, section)
 }
 
 function appendMultiattackAdvisories(
@@ -107,7 +110,7 @@ function appendMultiattackAdvisories(
   index: number,
 ): void {
   if (action.kind !== 'multiattack') return
-  const path = `${section}.${index}`
+  const path = `${monsterFormSectionRowNamePrefix(section)}.${index}`
   const seen = new Set<string>()
   for (const step of action.steps ?? []) {
     for (const actionId of step.actionIds ?? []) {
@@ -138,7 +141,7 @@ function appendWeaponAdvisories(
   if (!entry) return
   const item = equipmentById.get(entry.equipmentId)
   const name = equipmentEntryBaseName(entry, equipmentById)
-  const path = `${section}.${index}`
+  const path = `${monsterFormSectionRowNamePrefix(section)}.${index}`
   if (!entry.equipped) {
     advisories.push({
       code: 'weapon-not-equipped',
@@ -169,7 +172,7 @@ function appendLeapAdvisories(
   if (action.kind !== 'leap') return
   if (!isLeapWholeFeet(action.distanceFeet) || !isLeapWholeFeet(action.movementFeet)) return
   const walk = readWalkSpeed(values.movement)
-  const path = `${section}.${index}`
+  const path = `${monsterFormSectionRowNamePrefix(section)}.${index}`
   if (walk.status === 'missing') {
     advisories.push({
       code: 'leap-missing-walk-speed',

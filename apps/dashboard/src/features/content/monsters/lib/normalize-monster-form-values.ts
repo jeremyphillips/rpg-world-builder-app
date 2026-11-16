@@ -455,10 +455,26 @@ function normalizeTraitRichText(value: unknown): unknown {
  * Inactive AC, HP, and action-kind fields are dropped. Empty strings are absent.
  * Update payloads send `null` only for clearable keys the baseline actually had.
  */
+function normalizedLegendaryBlock(
+  values: MonsterFormValues,
+  intent: ContentValidationIntent,
+): Record<string, unknown> | undefined {
+  const block = values.legendaryActions
+  const actions = (block?.actions ?? []).map((action) =>
+    normalizeAction(action, 'legendaryActions', intent),
+  )
+  if (actions.length === 0) return undefined
+  const normalized: Record<string, unknown> = { actions }
+  if (typeof block?.uses === 'number') normalized.uses = block.uses
+  if (typeof block?.usesInLair === 'number') normalized.usesInLair = block.usesInLair
+  return normalized
+}
+
 function normalizedActionSections(
   values: MonsterFormValues,
   intent: ContentValidationIntent,
 ): Record<string, unknown> {
+  const legendaryActions = normalizedLegendaryBlock(values, intent)
   return {
     actions: (values.actions ?? []).map((action) => normalizeAction(action, 'actions', intent)),
     bonusActions: (values.bonusActions ?? []).map((action) =>
@@ -467,21 +483,8 @@ function normalizedActionSections(
     reactions: (values.reactions ?? []).map((action) =>
       normalizeAction(action, 'reactions', intent),
     ),
-    legendaryActions: (values.legendaryActions ?? []).map((action) =>
-      normalizeAction(action, 'legendaryActions', intent),
-    ),
+    ...(legendaryActions ? { legendaryActions } : {}),
   }
-}
-
-function legendaryUseFields(values: MonsterFormValues): Record<string, number> {
-  const fields: Record<string, number> = {}
-  if (typeof values.legendaryActionUses === 'number') {
-    fields.legendaryActionUses = values.legendaryActionUses
-  }
-  if (typeof values.legendaryActionUsesInLair === 'number') {
-    fields.legendaryActionUsesInLair = values.legendaryActionUsesInLair
-  }
-  return fields
 }
 
 export function normalizeMonsterFormValues(
@@ -513,7 +516,6 @@ export function normalizeMonsterFormValues(
     equipment: values.equipment,
     traits: normalizeTraitRichText(omitEmptyStrings(values.traits)),
     ...normalizedActionSections(values, options.intent),
-    ...legendaryUseFields(values),
   }
 
   applyOptionalScalars(normalized, values, challengeRating, hasFly)

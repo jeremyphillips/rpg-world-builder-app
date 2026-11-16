@@ -7,10 +7,8 @@ import { describe, expect, it } from 'vitest'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import type { MonsterActionDraftRow } from '../../../lib/actions/monster-action-presets'
-import {
-  resolveMonsterCreateDefaultValues,
-  type MonsterFormValues,
-} from '../../../lib/monster-form-values'
+import { monsterFormTestValues } from '../../../lib/monster-form-test-values'
+import type { MonsterFormValues } from '../../../lib/monster-form-values'
 import { MonsterActionParrySummary } from './monster-action-parry-summary'
 
 const parry: MonsterActionDraftRow = {
@@ -23,12 +21,11 @@ const parry: MonsterActionDraftRow = {
 
 function Host({ reactions }: { reactions: MonsterFormValues['reactions'] }) {
   const form = useForm<MonsterFormValues>({
-    defaultValues: {
-      ...resolveMonsterCreateDefaultValues(),
+    defaultValues: monsterFormTestValues({
       name: 'Pirate Captain',
-      actions: [{ id: 'rapier', kind: 'attack', name: 'Rapier' }],
+      actions: [{ id: 'rapier', kind: 'attack', name: 'Rapier' }] as MonsterFormValues['actions'],
       reactions,
-    },
+    }),
   })
   const ctx = {
     entityCatalogLayer: 'homebrew',
@@ -40,7 +37,10 @@ function Host({ reactions }: { reactions: MonsterFormValues['reactions'] }) {
   } as unknown as ContentFormCtx
   return (
     <FormProvider {...form}>
-      <MonsterActionParrySummary ctx={ctx} action={(reactions?.[0] as MonsterActionDraftRow | undefined) ?? parry} />
+      <MonsterActionParrySummary
+        ctx={ctx}
+        action={(reactions?.[0] as MonsterActionDraftRow | undefined) ?? parry}
+      />
     </FormProvider>
   )
 }
@@ -56,7 +56,13 @@ describe('MonsterActionParrySummary', () => {
   })
 
   it('shows the trigger without a response until the bonus is a whole number', () => {
-    render(<Host reactions={[{ id: 'parry', kind: 'parry', name: 'Parry' }]} />)
+    render(
+      <Host
+        reactions={
+          [{ id: 'parry', kind: 'parry', name: 'Parry' }] as MonsterFormValues['reactions']
+        }
+      />,
+    )
     expect(screen.getByText('Reaction preview')).toBeInTheDocument()
     expect(screen.getByText(/while holding a weapon/)).toBeInTheDocument()
     expect(screen.queryByText(/Response:/)).not.toBeInTheDocument()

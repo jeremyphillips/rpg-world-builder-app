@@ -27,7 +27,12 @@ import {
   MONSTER_SECTION_ECONOMY,
 } from '../spell/casting-economy'
 import { collectSpellReferenceIssues } from '../spell/spell-reference'
-import { MONSTER_ACTION_SECTIONS } from './action-sections'
+import {
+  monsterActionSectionRowPath,
+  monsterActionSectionRows,
+  type MonsterActionSectionBody,
+} from './action-section-access'
+import { MONSTER_ACTION_SECTIONS, type MonsterActionSection } from './action-sections'
 export const MONSTER_CATALOG_ISSUE_CODE = {
   unknownEquipment: CATALOG_REFERENCE_ISSUE_CODE.equipment.unknown,
   weaponActionNotWeapon: 'weapon_action_not_weapon',
@@ -63,16 +68,13 @@ type CatalogSkillEntry = {
   skill?: string
 }
 
-export type MonsterCatalogIssueBody = MonsterClassification & {
-  equipment?: readonly CatalogEquipmentEntry[]
-  actions?: readonly CatalogAction[]
-  bonusActions?: readonly CatalogAction[]
-  reactions?: readonly CatalogAction[]
-  legendaryActions?: readonly CatalogAction[]
-  proficiencies?: {
-    skills?: readonly CatalogSkillEntry[]
+export type MonsterCatalogIssueBody = MonsterClassification &
+  MonsterActionSectionBody & {
+    equipment?: readonly CatalogEquipmentEntry[]
+    proficiencies?: {
+      skills?: readonly CatalogSkillEntry[]
+    }
   }
-}
 
 export type MonsterCatalogs = MonsterClassificationCatalogs & {
   equipmentById: ReadonlyMap<string, Equipment>
@@ -181,7 +183,10 @@ function collectWeaponActionIssues(
   issues: ContentValidationIssue[],
 ): void {
   for (const section of MONSTER_ACTION_SECTIONS) {
-    for (const [index, action] of (body[section] ?? []).entries()) {
+    for (const [index, action] of monsterActionSectionRows<CatalogAction>(
+      body,
+      section,
+    ).entries()) {
       pushWeaponActionIssue(section, index, action, equipment, catalogs, issues)
     }
   }
@@ -202,7 +207,7 @@ function pushWeaponActionIssue(
   if (!item || isWeaponEquipment(item)) return
   issues.push(
     issue(
-      `${section}.${index}.equipmentEntryId`,
+      [...monsterActionSectionRowPath(section, index, 'equipmentEntryId')].join('.'),
       'Weapon action must reference a weapon.',
       MONSTER_CATALOG_ISSUE_CODE.weaponActionNotWeapon,
     ),
@@ -236,7 +241,10 @@ function spellActionReferences(
 ): { path: string; spellId: string; castAtLevel?: number }[] {
   const refs: { path: string; spellId: string; castAtLevel?: number }[] = []
   for (const section of MONSTER_ACTION_SECTIONS) {
-    for (const [index, action] of (body[section] ?? []).entries()) {
+    for (const [index, action] of monsterActionSectionRows<CatalogAction>(
+      body,
+      section,
+    ).entries()) {
       if (action.kind !== 'spell') continue
       appendSpellReferences(refs, section, index, action.spells)
     }
@@ -246,14 +254,15 @@ function spellActionReferences(
 
 function appendSpellReferences(
   refs: { path: string; spellId: string; castAtLevel?: number }[],
-  section: string,
+  section: MonsterActionSection,
   actionIndex: number,
   spells: CatalogAction['spells'],
 ): void {
+  const actionPath = monsterActionSectionRowPath(section, actionIndex).join('.')
   for (const [spellIndex, spell] of (spells ?? []).entries()) {
     if (!spell.spellId) continue
     refs.push({
-      path: `${section}.${actionIndex}.spells.${spellIndex}.spellId`,
+      path: `${actionPath}.spells.${spellIndex}.spellId`,
       spellId: spell.spellId,
       ...(spell.castAtLevel !== undefined ? { castAtLevel: spell.castAtLevel } : {}),
     })

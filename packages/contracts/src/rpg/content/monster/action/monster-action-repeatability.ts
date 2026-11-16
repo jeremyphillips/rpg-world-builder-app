@@ -1,6 +1,11 @@
 import { getActionPreset, type ActionPresetId } from '../../action/action-presets'
 import { PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE } from '../spell-casting-source'
 import { isPrimarySpellcastingAction } from '../spell-casting-source'
+import {
+  monsterActionSectionRowPath,
+  monsterActionSectionRows,
+  type MonsterActionSectionBody,
+} from '../action-section-access'
 import type { MonsterActionSection } from '../action-sections'
 import { MONSTER_ACTION_SECTIONS } from '../action-sections'
 import {
@@ -29,12 +34,7 @@ export type MonsterActionRowLike = {
   profile?: string
 }
 
-export type MonsterActionSectionRows = {
-  actions?: readonly MonsterActionRowLike[]
-  bonusActions?: readonly MonsterActionRowLike[]
-  reactions?: readonly MonsterActionRowLike[]
-  legendaryActions?: readonly MonsterActionRowLike[]
-}
+export type MonsterActionSectionRows = MonsterActionSectionBody
 
 export type RepeatabilityViolation = {
   message: string
@@ -51,7 +51,7 @@ function sectionRows(
   sections: MonsterActionSectionRows,
   section: MonsterActionSection,
 ): readonly MonsterActionRowLike[] {
-  return sections[section] ?? []
+  return monsterActionSectionRows<MonsterActionRowLike>(sections, section)
 }
 
 function pushSingletonKindViolations(
@@ -68,7 +68,7 @@ function pushSingletonKindViolations(
       for (const index of matches.slice(1)) {
         violations.push({
           message: monsterSingletonKindMessage(kind),
-          path: [...prefix, section, index, 'kind'],
+          path: [...prefix, ...monsterActionSectionRowPath(section, index, 'kind')],
         })
       }
     }

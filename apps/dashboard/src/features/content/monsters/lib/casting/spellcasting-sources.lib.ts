@@ -1,6 +1,7 @@
 import {
   isPrimarySpellcastingAction,
   listDirectSpellCastingSources,
+  monsterActionSectionRows,
   PRIMARY_SPELLCASTING_PROFILE,
   type ResolvedSpellCastingSource,
   type SpellCastingSections,
@@ -11,25 +12,38 @@ import {
   formatSharedCastingOptionLabel,
   formatSpellcastingActionOptionLabel,
 } from './spellcasting-source-labels.lib'
+import type { MonsterActionDraftRow } from '../actions/monster-action-presets'
+import type { MonsterFormValues } from '../monster-form-values'
+import {
+  monsterFormSectionRows,
+  type MonsterFormActionSectionBody,
+} from '../actions/monster-action-section-access'
 
 export const MONSTER_CASTING_SHARE_GROUP_LABEL = "Use another action's ability"
 
-type FormCastingSections = {
-  actions?: readonly unknown[]
-  bonusActions?: readonly unknown[]
-  reactions?: readonly unknown[]
-  legendaryActions?: readonly unknown[]
+export type FormCastingSections = {
+  actions?: readonly MonsterActionDraftRow[]
+  bonusActions?: readonly MonsterActionDraftRow[]
+  reactions?: readonly MonsterActionDraftRow[]
+  legendaryActions?: MonsterFormValues['legendaryActions']
 }
 
 function asSpellCastingSections(sections: FormCastingSections): SpellCastingSections {
-  const rows = (section: readonly unknown[] | undefined) =>
-    (section ?? []) as SpellCastingSourceRow[]
+  const block = sections.legendaryActions
   return {
-    actions: rows(sections.actions),
-    bonusActions: rows(sections.bonusActions),
-    reactions: rows(sections.reactions),
-    legendaryActions: rows(sections.legendaryActions),
-  }
+    actions: (sections.actions ?? []) as SpellCastingSourceRow[],
+    bonusActions: (sections.bonusActions ?? []) as SpellCastingSourceRow[],
+    reactions: (sections.reactions ?? []) as SpellCastingSourceRow[],
+    ...(block
+      ? {
+          legendaryActions: {
+            ...(block.uses !== undefined ? { uses: block.uses } : {}),
+            ...(block.usesInLair !== undefined ? { usesInLair: block.usesInLair } : {}),
+            actions: (block.actions ?? []) as SpellCastingSourceRow[],
+          },
+        }
+      : {}),
+  } as SpellCastingSections
 }
 
 type SpellCountRow = {
@@ -61,7 +75,7 @@ export function conventionalSpellcastingSources(sections: FormCastingSections) {
 export function primarySpellcastingProfile(sections: FormCastingSections) {
   const resolved = asSpellCastingSections(sections)
   for (const section of ['actions', 'bonusActions', 'reactions', 'legendaryActions'] as const) {
-    for (const row of resolved[section] ?? []) {
+    for (const row of monsterActionSectionRows(resolved, section)) {
       if (isPrimarySpellcastingAction(row)) return row
     }
   }
@@ -69,9 +83,9 @@ export function primarySpellcastingProfile(sections: FormCastingSections) {
 }
 
 function spellCountFor(sections: FormCastingSections, entryId: string): number {
-  const rows = (['actions', 'bonusActions', 'reactions'] as const).flatMap(
-    (section) => (sections[section] ?? []) as SpellCountRow[],
-  )
+  const rows = (['actions', 'bonusActions', 'reactions'] as const).flatMap((section) =>
+    monsterFormSectionRows(sections as MonsterFormActionSectionBody, section),
+  ) as SpellCountRow[]
   const source = rows.find((row) => row.id === entryId && row.kind === 'spell')
   return (source?.spells ?? []).filter((spell) => Boolean(spell.spellId)).length
 }

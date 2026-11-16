@@ -98,6 +98,31 @@ export function provenanceEntryHostsFor(
   return CONTENT_TYPE_CAPABILITIES[contentType].provenanceEntryHosts
 }
 
+type LegendaryProvenanceBlock = { uses?: number; usesInLair?: number; actions?: unknown }
+
+function legendaryProvenanceBlock(
+  body: Record<string, unknown>,
+): LegendaryProvenanceBlock | undefined {
+  const block = body.legendaryActions
+  if (!block || typeof block !== 'object' || Array.isArray(block)) return undefined
+  return block as LegendaryProvenanceBlock
+}
+
+function writeLegendaryProvenanceHost(
+  body: Record<string, unknown>,
+  entries: unknown,
+): Record<string, unknown> {
+  const preserved = legendaryProvenanceBlock(body)
+  return {
+    ...body,
+    legendaryActions: {
+      ...(preserved?.uses !== undefined ? { uses: preserved.uses } : {}),
+      ...(preserved?.usesInLair !== undefined ? { usesInLair: preserved.usesInLair } : {}),
+      actions: entries,
+    },
+  }
+}
+
 /** Reads one registered host. Paths are a closed switch, not a generic walk. */
 export function readProvenanceHostEntries(
   body: Record<string, unknown>,
@@ -111,7 +136,7 @@ export function readProvenanceHostEntries(
     case 'reactions':
       return body.reactions
     case 'legendaryActions':
-      return body.legendaryActions
+      return legendaryProvenanceBlock(body)?.actions ?? body.legendaryActions
     case 'traits':
       return body.traits
   }
@@ -130,7 +155,7 @@ export function writeProvenanceHostEntries(
     case 'reactions':
       return { ...body, reactions: entries }
     case 'legendaryActions':
-      return { ...body, legendaryActions: entries }
+      return writeLegendaryProvenanceHost(body, entries)
     case 'traits':
       return { ...body, traits: entries }
   }

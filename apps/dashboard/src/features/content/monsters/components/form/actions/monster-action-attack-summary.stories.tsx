@@ -3,10 +3,8 @@ import { FormProvider, useForm } from 'react-hook-form'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import type { MonsterActionDraftRow } from '../../../lib/actions/monster-action-presets'
-import {
-  resolveMonsterCreateDefaultValues,
-  type MonsterFormValues,
-} from '../../../lib/monster-form-values'
+import { monsterFormTestValues } from '../../../lib/monster-form-test-values'
+import type { MonsterFormValues } from '../../../lib/monster-form-values'
 import { MonsterActionAttackSummary } from './monster-action-attack-summary'
 
 const bite: MonsterActionDraftRow = {
@@ -28,9 +26,12 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 function Host() {
-  const values = resolveMonsterCreateDefaultValues()
-  values.actions = [bite]
-  const form = useForm<MonsterFormValues>({ defaultValues: values })
+  const form = useForm<MonsterFormValues>({
+    defaultValues: monsterFormTestValues({
+      name: 'Attack summary story',
+      actions: [bite] as MonsterFormValues['actions'],
+    }),
+  })
   const ctx = {
     entityCatalogLayer: 'homebrew',
     equipmentCatalogStatus: 'ready',

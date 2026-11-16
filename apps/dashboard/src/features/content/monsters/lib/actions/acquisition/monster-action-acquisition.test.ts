@@ -15,6 +15,8 @@ import {
   MONSTER_ACQUISITION_SAVE_DESCRIPTION,
   MONSTER_ACQUISITION_SPECIAL_DESCRIPTION,
 } from '../../monster-form-labels'
+import type { MonsterActionDraftRow } from '../monster-action-presets'
+import type { FormCastingSections } from '../../casting/spellcasting-sources.lib'
 import {
   MONSTER_ACTION_ACQUISITION_GROUPS,
   MONSTER_ACTION_ALREADY_ADDED_NOTE,
@@ -245,12 +247,18 @@ describe('createSpellActionDraft', () => {
         },
       ],
     }
-    expect(spellDraft('bonusActions', sections, 'standalone').castingAbility).toEqual({
+    expect(
+      spellDraft('bonusActions', sections as FormCastingSections, 'standalone').castingAbility,
+    ).toEqual({
       kind: 'shared',
       entryId: 'spellcasting',
     })
     expect(
-      spellDraft('reactions', { actions: [sections.actions[1]] }, 'standalone').castingAbility,
+      spellDraft(
+        'reactions',
+        { actions: [sections.actions[1] as MonsterActionDraftRow] } as FormCastingSections,
+        'standalone',
+      ).castingAbility,
     ).toBeUndefined()
   })
 })

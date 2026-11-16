@@ -1,6 +1,7 @@
 import { MONSTER_ACTION_SECTIONS, type MonsterActionSection } from '@rpg/contracts/content'
 
 import type { MonsterFormValues } from '../../monster-form-values'
+import { monsterFormSectionRows } from '../monster-action-section-access'
 
 export { MONSTER_ACTION_SECTIONS, type MonsterActionSection }
 
@@ -14,8 +15,7 @@ function sectionActions(
   values: MonsterFormValues,
   section: MonsterActionSection,
 ): Array<Record<string, unknown>> {
-  const rows = values[section]
-  return Array.isArray(rows) ? (rows as Array<Record<string, unknown>>) : []
+  return monsterFormSectionRows(values, section) as Array<Record<string, unknown>>
 }
 
 export function findActionsReferencingEntry(

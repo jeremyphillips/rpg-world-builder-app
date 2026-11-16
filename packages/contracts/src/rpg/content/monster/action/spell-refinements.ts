@@ -2,6 +2,12 @@ import { type z } from 'zod'
 
 import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
 import {
+  monsterActionSectionRowPath,
+  monsterActionSectionRows,
+  type MonsterActionSectionBody,
+} from '../action-section-access'
+import { MONSTER_ACTION_SECTIONS, type MonsterActionSection } from '../action-sections'
+import {
   findSpellCastingSource,
   isPrimarySpellcastingAction,
   listDirectSpellCastingSources,
@@ -28,19 +34,12 @@ type SpellEntryLike = {
 }
 
 export function refineMonsterSpellEntries(
-  sections: {
-    actions?: readonly SpellEntryLike[]
-    bonusActions?: readonly SpellEntryLike[]
-    reactions?: readonly SpellEntryLike[]
-    legendaryActions?: readonly SpellEntryLike[]
-  },
+  sections: MonsterActionSectionBody,
   ctx: z.RefinementCtx,
   prefix: (string | number)[] = [],
   options?: { published?: boolean },
 ): void {
-  const located = (['actions', 'bonusActions', 'reactions', 'legendaryActions'] as const).flatMap(
-    (section) => (sections[section] ?? []).map((action, index) => ({ section, index, action })),
-  )
+  const located = spellRows(sections)
   const spellsById = new Map(
     located
       .filter((entry) => entry.action.kind === 'spell' && entry.section !== 'legendaryActions')
@@ -55,17 +54,25 @@ export function refineMonsterSpellEntries(
   if (options?.published) refineUniqueDirectCastingNames(sections, ctx, prefix)
 }
 
-type LocatedSpell = { section: string; index: number; action: SpellEntryLike }
+type LocatedSpell = { section: MonsterActionSection; index: number; action: SpellEntryLike }
 
-function spellRows(sections: {
-  actions?: readonly SpellEntryLike[]
-  bonusActions?: readonly SpellEntryLike[]
-  reactions?: readonly SpellEntryLike[]
-  legendaryActions?: readonly SpellEntryLike[]
-}): LocatedSpell[] {
-  return (['actions', 'bonusActions', 'reactions', 'legendaryActions'] as const).flatMap(
-    (section) => (sections[section] ?? []).map((action, index) => ({ section, index, action })),
+function spellRows(sections: MonsterActionSectionBody): LocatedSpell[] {
+  return MONSTER_ACTION_SECTIONS.flatMap((section) =>
+    monsterActionSectionRows<SpellEntryLike>(sections, section).map((action, index) => ({
+      section,
+      index,
+      action,
+    })),
   )
+}
+
+function spellEntryPath(
+  prefix: (string | number)[],
+  section: MonsterActionSection,
+  index: number,
+  ...suffix: (string | number)[]
+): (string | number)[] {
+  return [...prefix, ...monsterActionSectionRowPath(section, index), ...suffix]
 }
 
 function refineReservedSpellcastingName(
@@ -77,10 +84,7 @@ function refineReservedSpellcastingName(
   if (row.action.name?.trim() !== MONSTER_SPELLCASTING_ACTION_NAME) return
   if (isPrimarySpellcastingAction(row.action)) return
   addCustomRefinementIssue(ctx, PRIMARY_SPELLCASTING_NAME_MESSAGE, [
-    ...prefix,
-    row.section,
-    row.index,
-    'name',
+    ...spellEntryPath(prefix, row.section, row.index, 'name'),
   ])
 }
 
@@ -92,28 +96,17 @@ function refineOnePrimarySpellcastingProfile(
 ): void {
   if (row.section !== 'actions') {
     addCustomRefinementIssue(ctx, PRIMARY_SPELLCASTING_SECTION_MESSAGE, [
-      ...prefix,
-      row.section,
-      row.index,
-      'profile',
+      ...spellEntryPath(prefix, row.section, row.index, 'profile'),
     ])
   }
   if (!requireCanonicalName || row.action.name?.trim() === MONSTER_SPELLCASTING_ACTION_NAME) return
   addCustomRefinementIssue(ctx, PRIMARY_SPELLCASTING_NAME_MESSAGE, [
-    ...prefix,
-    row.section,
-    row.index,
-    'name',
+    ...spellEntryPath(prefix, row.section, row.index, 'name'),
   ])
 }
 
 function refinePrimarySpellcastingProfiles(
-  sections: {
-    actions?: readonly SpellEntryLike[]
-    bonusActions?: readonly SpellEntryLike[]
-    reactions?: readonly SpellEntryLike[]
-    legendaryActions?: readonly SpellEntryLike[]
-  },
+  sections: MonsterActionSectionBody,
   ctx: z.RefinementCtx,
   prefix: (string | number)[],
   requireCanonicalName: boolean,
@@ -126,16 +119,13 @@ function refinePrimarySpellcastingProfiles(
   }
   for (const extra of profiles.slice(1)) {
     addCustomRefinementIssue(ctx, PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE, [
-      ...prefix,
-      extra.section,
-      extra.index,
-      'profile',
+      ...spellEntryPath(prefix, extra.section, extra.index, 'profile'),
     ])
   }
 }
 
 function refineOneSpellEntry(
-  locatedEntry: { section: string; index: number; action: SpellEntryLike },
+  locatedEntry: LocatedSpell,
   spellsById: ReadonlyMap<string, SpellEntryLike>,
   ctx: z.RefinementCtx,
   prefix: (string | number)[],
@@ -143,7 +133,7 @@ function refineOneSpellEntry(
 ): void {
   const { section, index, action } = locatedEntry
   if (action.kind !== 'spell') return
-  const path = [...prefix, section, index]
+  const path = spellEntryPath(prefix, section, index)
   refineSpellOwnership(action, ctx, path)
   refineSharedCastingAbility(action, spellsById, ctx, path)
   refineLegendarySpellShape(action, section, ctx, path, published)
@@ -249,11 +239,7 @@ function nestedSharedEntryId(
 
 function refineNestedSpellSource(
   locatedEntry: { section: string; index: number; action: SpellEntryLike },
-  sections: {
-    actions?: readonly SpellEntryLike[]
-    bonusActions?: readonly SpellEntryLike[]
-    reactions?: readonly SpellEntryLike[]
-  },
+  sections: MonsterActionSectionBody,
   ctx: z.RefinementCtx,
   prefix: (string | number)[],
 ): void {
@@ -274,17 +260,19 @@ function refineNestedSpellSource(
   addCustomRefinementIssue(
     ctx,
     'Shared spellcasting must use another spell entry that has its own ability.',
-    [...prefix, section, index, ...nested.path, 'castingAbility', 'entryId'],
+    spellEntryPath(
+      prefix,
+      section as MonsterActionSection,
+      index,
+      ...nested.path,
+      'castingAbility',
+      'entryId',
+    ),
   )
 }
 
 function refineUniqueDirectCastingNames(
-  sections: {
-    actions?: readonly SpellEntryLike[]
-    bonusActions?: readonly SpellEntryLike[]
-    reactions?: readonly SpellEntryLike[]
-    legendaryActions?: readonly SpellEntryLike[]
-  },
+  sections: MonsterActionSectionBody,
   ctx: z.RefinementCtx,
   prefix: (string | number)[],
 ): void {
@@ -293,12 +281,11 @@ function refineUniqueDirectCastingNames(
     const name = source.name?.trim()
     if (!name) continue
     if (seen.has(name)) {
-      const index = (sections[source.section] ?? []).findIndex((row) => row.id === source.id)
+      const index = monsterActionSectionRows(sections, source.section).findIndex(
+        (row) => row.id === source.id,
+      )
       addCustomRefinementIssue(ctx, DUPLICATE_CASTING_SOURCE_NAME, [
-        ...prefix,
-        source.section,
-        index,
-        'name',
+        ...spellEntryPath(prefix, source.section, index, 'name'),
       ])
       continue
     }

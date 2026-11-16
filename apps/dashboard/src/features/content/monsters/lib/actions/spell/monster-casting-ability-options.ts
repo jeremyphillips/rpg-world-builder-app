@@ -44,12 +44,21 @@ function abilityScore(values: MonsterFormValues, ability: Ability): number | und
 }
 
 function spellCastingSections(values: MonsterFormValues): SpellCastingSections {
+  const block = values.legendaryActions
   return {
     actions: values.actions,
     bonusActions: values.bonusActions,
     reactions: values.reactions,
-    legendaryActions: values.legendaryActions,
-  } as SpellCastingSections
+    ...(block
+      ? {
+          legendaryActions: {
+            ...(block.uses !== undefined ? { uses: block.uses } : {}),
+            ...(block.usesInLair !== undefined ? { usesInLair: block.usesInLair } : {}),
+            actions: block.actions,
+          },
+        }
+      : {}),
+  }
 }
 
 function formatSaveDcTrailing(dc: number): SelectOptionTrailing {

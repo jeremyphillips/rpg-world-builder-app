@@ -126,3 +126,5 @@ export const monsterBonusActionDraftSchema = z.discriminatedUnion('kind', [
 
 export type MonsterBonusAction = z.infer<typeof monsterBonusActionSchema>
 export type MonsterBonusActionDraft = z.infer<typeof monsterBonusActionDraftSchema>
+/** Authoring input before parse defaults; use on monster form bonus action rows. */
+export type MonsterBonusActionDraftInput = z.input<typeof monsterBonusActionDraftSchema>

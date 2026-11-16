@@ -352,7 +352,6 @@ describe('monster-display', () => {
     const monster = {
       ...pickMonster('hell-hound'),
       name: 'Ancient Red Dragon',
-      legendaryActionUses: 3,
       actions: [
         {
           id: 'rend',
@@ -364,14 +363,17 @@ describe('monster-display', () => {
           damageType: 'slashing',
         },
       ],
-      legendaryActions: [
-        {
-          id: 'swipe',
-          kind: 'action-reference' as const,
-          name: 'Tail Swipe',
-          actionIds: ['rend'],
-        },
-      ],
+      legendaryActions: {
+        uses: 3,
+        actions: [
+          {
+            id: 'swipe',
+            kind: 'action-reference' as const,
+            name: 'Tail Swipe',
+            actionIds: ['rend'],
+          },
+        ],
+      },
     }
     const viewModel = buildMonsterDetailViewModel({
       monster: monster as unknown as Monster,

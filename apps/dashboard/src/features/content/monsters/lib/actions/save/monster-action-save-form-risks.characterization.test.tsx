@@ -9,7 +9,13 @@ import { act, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { planLinkedEffectRemove, resolutionEffectIdSchema } from '@rpg/contracts'
 import { FormItems, getArrayFieldMutators } from '@rpg/ui/form'
-import { FormProvider, useController, useForm, type UseFormReturn } from 'react-hook-form'
+import {
+  FormProvider,
+  useController,
+  useForm,
+  type Control,
+  type UseFormReturn,
+} from 'react-hook-form'
 import { beforeAll, describe, expect, it } from 'vitest'
 
 import { buildSeedDamageTypeVocabulary } from '@/features/vocabulary'
@@ -23,10 +29,8 @@ import {
   MONSTER_SAVE_FAILURE_OR_SUCCESS_ADD_LABEL,
   MONSTER_SAVE_FAILURE_OR_SUCCESS_NOTE_LABEL,
 } from '../../monster-form-labels'
-import {
-  resolveMonsterCreateDefaultValues,
-  type MonsterFormValues,
-} from '../../monster-form-values'
+import { monsterFormTestValues } from '../../monster-form-test-values'
+import type { MonsterFormValues } from '../../monster-form-values'
 import { monsterActionDetailFields } from '../detail-fields/monster-action-detail-fields'
 import type { MonsterActionDraftRow } from '../monster-action-presets'
 import {
@@ -173,10 +177,11 @@ function SaveActionFormHost({
   action: MonsterActionDraftRow
   formRef: { current: UseFormReturn<MonsterFormValues> | null }
 }) {
-  const defaults = resolveMonsterCreateDefaultValues()
-  defaults.actions = [action]
   const form = useForm<MonsterFormValues>({
-    defaultValues: defaults,
+    defaultValues: monsterFormTestValues({
+      name: 'Save form risks',
+      actions: [action] as MonsterFormValues['actions'],
+    }),
     shouldUnregister: true,
   })
   useEffect(() => {
@@ -264,7 +269,7 @@ describe('monster save form risks (Phase 2 characterization)', () => {
 
       await act(async () => {
         const form = formRef.current!
-        getArrayFieldMutators(form.control, failedPath)?.remove(0)
+        getArrayFieldMutators(form.control as unknown as Control, failedPath)?.remove(0)
         const plan = planLinkedEffectRemove({
           library: readResolutionEffects(
             form.getValues(libraryPath),

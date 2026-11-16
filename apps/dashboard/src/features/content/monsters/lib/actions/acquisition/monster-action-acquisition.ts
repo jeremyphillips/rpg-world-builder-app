@@ -18,6 +18,7 @@ import {
   type MonsterActionSectionRows,
 } from '@rpg/contracts'
 import { conventionalSpellcastingSources } from '../spell/monster-action-casting-summary'
+import type { FormCastingSections } from '../../casting/spellcasting-sources.lib'
 import type { MonsterActionSection } from '../references/monster-action-equipment-references'
 
 import {
@@ -213,7 +214,7 @@ export function monsterActionAcquisitionItems(input: {
     actions: [],
     bonusActions: [],
     reactions: [],
-    legendaryActions: [],
+    legendaryActions: { actions: [] },
   }
   if (input.section === 'reactions') {
     return applyAcquisitionPolicies(
@@ -461,12 +462,7 @@ export function createBonusActionDraft(
 
 export function createReactionActionDraft(
   category: 'reference' | 'parry' | 'cast-spell' | 'custom',
-  sections: {
-    actions?: readonly unknown[]
-    bonusActions?: readonly unknown[]
-    reactions?: readonly unknown[]
-    legendaryActions?: readonly unknown[]
-  },
+  sections: FormCastingSections,
 ): MonsterActionDraftRow {
   if (category === 'reference') {
     return {
@@ -544,12 +540,7 @@ export function createMonsterActionFromAcquisition(
 /** Spell row for the add menu. Primary profile only when spellAcquisition is primary. */
 export function createSpellActionDraft(
   section: MonsterActionSection,
-  sections: {
-    actions?: readonly unknown[]
-    bonusActions?: readonly unknown[]
-    reactions?: readonly unknown[]
-    legendaryActions?: readonly unknown[]
-  },
+  sections: FormCastingSections,
   spellAcquisition: 'primary' | 'standalone' = 'standalone',
 ): MonsterActionDraftRow {
   const id = createMonsterRowId()

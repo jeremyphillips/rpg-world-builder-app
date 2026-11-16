@@ -30,7 +30,6 @@ const DEFAULT_MONSTER = {
   actions: [],
   bonusActions: [],
   reactions: [],
-  legendaryActions: [],
 } satisfies Monster
 
 export function makeMonster(overrides: Partial<Monster> = {}): Monster {

@@ -1,4 +1,5 @@
 import { abilitySchema, type Ability } from '../../vocab/ability'
+import { monsterActionSectionRows, type MonsterActionSectionBody } from './action-section-access'
 import { MONSTER_ACTION_SECTIONS, type MonsterActionSection } from './action-sections'
 
 /** Conventional Actions-block name. The primary profile stores this exact name. */
@@ -25,9 +26,7 @@ export type SpellCastingSourceRow = {
   castingAbility?: { kind?: string; ability?: string; entryId?: string }
 }
 
-export type SpellCastingSections = {
-  [K in MonsterActionSection]?: readonly SpellCastingSourceRow[]
-}
+export type SpellCastingSections = MonsterActionSectionBody
 
 export type ResolvedSpellCastingSource = {
   id: string
@@ -52,7 +51,7 @@ export function listDirectSpellCastingSources(
   const sources: ResolvedSpellCastingSource[] = []
   for (const section of MONSTER_ACTION_SECTIONS) {
     if (section === 'legendaryActions') continue
-    for (const row of sections[section] ?? []) {
+    for (const row of monsterActionSectionRows<SpellCastingSourceRow>(sections, section)) {
       const ability = directAbility(row)
       if (!ability) continue
       sources.push({

@@ -16,10 +16,8 @@ import {
   SPELLCASTING_ABILITY_PRIMARY_HINT,
   SPELLCASTING_ABILITY_SHARED_HINT,
 } from '../../../../lib/forms/mechanics/spellcasting-ability-field-copy'
-import {
-  resolveMonsterCreateDefaultValues,
-  type MonsterFormValues,
-} from '../../monster-form-values'
+import { monsterFormTestValues } from '../../monster-form-test-values'
+import type { MonsterFormValues } from '../../monster-form-values'
 import { monsterActionDetailFields } from '../detail-fields/monster-action-detail-fields'
 import type { MonsterActionDraftRow } from '../monster-action-presets'
 
@@ -45,9 +43,13 @@ function ActionDetailHost({
   action: MonsterActionDraftRow
   section: 'actions' | 'bonusActions' | 'reactions'
 }) {
-  const defaults = resolveMonsterCreateDefaultValues()
-  defaults[section] = [action]
-  const form = useForm<MonsterFormValues>({ defaultValues: defaults, shouldUnregister: true })
+  const form = useForm<MonsterFormValues>({
+    defaultValues: monsterFormTestValues({
+      name: 'Spell casting hints',
+      [section]: [action] as MonsterFormValues[typeof section],
+    }),
+    shouldUnregister: true,
+  })
   const namePrefix = `${section}.0`
 
   return (

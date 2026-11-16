@@ -65,7 +65,14 @@ function sourceHasSelectedSpell(
 export function legendarySpellcastingSources(
   values: MonsterFormValues,
 ): ResolvedSpellCastingSource[] {
-  return listDirectSpellCastingSources(values as SpellCastingSections).filter((source) =>
+  const block = values.legendaryActions
+  const sections: SpellCastingSections = {
+    actions: values.actions,
+    bonusActions: values.bonusActions,
+    reactions: values.reactions,
+    ...(block ? { legendaryActions: { actions: block.actions } } : {}),
+  }
+  return listDirectSpellCastingSources(sections).filter((source) =>
     sourceHasSelectedSpell(values, source),
   )
 }

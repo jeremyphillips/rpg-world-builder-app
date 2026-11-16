@@ -33,6 +33,7 @@ import {
   MONSTER_LEGENDARY_USES_LABEL,
   monsterEquipmentSectionLabel,
 } from './monster-form-labels'
+import type { MonsterFormValues } from './monster-form-values'
 import { monsterClassificationFields } from './monster-classification-fields'
 import { MONSTER_FORM_TAB } from './monster-form-view'
 import {
@@ -148,9 +149,11 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       kind: 'group',
       heading: { label: MONSTER_LEGENDARY_ACTIONS_HEADING },
       visibility: {
-        dependsOn: ['legendaryActions'],
-        visibleWhen: (values) =>
-          Array.isArray(values.legendaryActions) && values.legendaryActions.length > 0,
+        dependsOn: ['legendaryActions.actions'],
+        visibleWhen: (values) => {
+          const block = values.legendaryActions as MonsterFormValues['legendaryActions']
+          return (block?.actions?.length ?? 0) > 0
+        },
       },
       fields: [
         {
@@ -158,7 +161,7 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
           fields: [
             {
               type: 'number',
-              name: 'legendaryActionUses',
+              name: 'legendaryActions.uses',
               label: MONSTER_LEGENDARY_USES_LABEL,
               min: 1,
               digits: 2,
@@ -166,7 +169,7 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
             },
             {
               type: 'number',
-              name: 'legendaryActionUsesInLair',
+              name: 'legendaryActions.usesInLair',
               label: MONSTER_LEGENDARY_LAIR_USES_LABEL,
               min: 1,
               digits: 2,
@@ -210,7 +213,13 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       label: 'Actions',
       fields: actions,
       ...actionValidation,
-      errorPaths: ['actions', 'bonusActions', 'reactions', 'legendaryActions'],
+      errorPaths: [
+        'actions',
+        'bonusActions',
+        'reactions',
+        'legendaryActions',
+        'legendaryActions.actions',
+      ],
       resolverFields: [
         ...actionValidation.resolverFields,
         embeddedArrayResolverField('bonusActions', 'Bonus actions', {
@@ -219,7 +228,7 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
         embeddedArrayResolverField('reactions', 'Reactions', {
           resolveItemFields: monsterActionRowResolveFields({ ctx, section: 'reactions' }),
         }),
-        embeddedArrayResolverField('legendaryActions', 'Legendary Actions', {
+        embeddedArrayResolverField('legendaryActions.actions', 'Legendary Actions', {
           resolveItemFields: monsterActionRowResolveFields({ ctx, section: 'legendaryActions' }),
         }),
       ],

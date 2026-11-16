@@ -7,10 +7,10 @@ import { describe, expect, it } from 'vitest'
 import { buildSeedDamageTypeVocabulary } from '@/features/vocabulary'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
+import { monsterFormTestValues } from '../../../lib/monster-form-test-values'
 import {
   buildMonsterInput,
   monsterToFormValues,
-  resolveMonsterCreateDefaultValues,
   type MonsterFormValues,
 } from '../../../lib/monster-form-values'
 import { createMonsterActionFromAcquisition } from '../../../lib/actions/acquisition/monster-action-acquisition'
@@ -41,10 +41,10 @@ const customizedBite: MonsterActionDraftRow = {
 }
 
 function valuesWith(actions: MonsterActionDraftRow[]): MonsterFormValues {
-  const values = resolveMonsterCreateDefaultValues()
-  values.name = 'Scout'
-  values.actions = actions
-  return values
+  return monsterFormTestValues({
+    name: 'Scout',
+    actions: actions as MonsterFormValues['actions'],
+  })
 }
 
 const RETAINED_FORM_PATHS = [
@@ -274,7 +274,9 @@ describe('natural weapon action round trip', () => {
     const reloadedForm: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }
     render(<Host values={reloaded} formRef={reloadedForm} />)
     await waitFor(() => {
-      const action = reloadedForm.current!.getValues().actions[0] as MonsterActionDraftRow | undefined
+      const action = reloadedForm.current!.getValues().actions[0] as
+        | MonsterActionDraftRow
+        | undefined
       expect(action?.kind === 'natural-weapon' ? action.reach : undefined).toBe(15)
     })
     await user.click(screen.getAllByRole('button', { name: /Fangs/i })[0]!)
