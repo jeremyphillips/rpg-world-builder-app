@@ -176,6 +176,17 @@ Collapses empty optional fields behind a compact **+ Add …** control. When exp
 (or when populated and `expandWhenPopulated` is true), the field label and control render
 with a **Remove** action that clears the value and collapses back to the add control.
 
+**Presentation contract** (shared across leaf fields and `kind: 'group'`):
+
+- The **label** (or group legend) identifies the field.
+- **`summary`** communicates the effective or inherited value while collapsed (and under the
+  header when open in labeled mode). It uses label **scale** at body weight with secondary ink —
+  not caption or hint typography.
+- Header **add/clear** actions use the form **micro-action** text button (`xs`) with `ActionIcon`
+  `add` / `clear`, including open optional groups (`legendAction`).
+- With **`labeled: true`**, the header action stays on the label row in both collapsed and open
+  states; the summary sits on the line below.
+
 **Implemented for:** `text`, `textSuggestions`, `textarea`, `richtext`, `select`,
 `combobox`, and `rollValue`. Dev guards log when `optionalDisclosure` is used on any other kind.
 

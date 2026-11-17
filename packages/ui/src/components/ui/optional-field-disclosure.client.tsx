@@ -6,6 +6,8 @@ import {
   FieldRowParticipationProvider,
   useFieldRowParticipation,
 } from './field-row-anatomy.context'
+import type { ComponentProps } from 'react'
+
 import { Button } from './button.client'
 import { ActionIcon } from './action-icon.client'
 import type { FieldSize } from './field.client'
@@ -13,12 +15,12 @@ import { fieldRowParticipationClasses } from './field-root.lib'
 import { FieldControlRegion, FieldLabelRegion, FieldMessageRegion } from './field-anatomy-regions'
 import { FieldLabelContent } from './field-label-content'
 import {
-  fieldActionLabelMetricsClasses,
   fieldAnatomyStackVariants,
   fieldLabelVariants,
+  optionalDisclosureSummaryTypographyVariants,
 } from './field.variants'
 import { cn } from '../../lib/utils'
-import { Text } from './text'
+import { formMicroActionButtonProps } from '../../form/form-micro-action'
 
 export type OptionalFieldDisclosureProps = {
   controlId: string
@@ -40,13 +42,44 @@ export type OptionalFieldDisclosureProps = {
   message?: ReactNode
 }
 
+type OptionalDisclosureMicroActionProps = Omit<
+  ComponentProps<typeof Button>,
+  'variant' | 'size'
+> & {
+  action: 'add' | 'clear'
+  children: ReactNode
+}
+
+/** Shared xs text action for optional disclosure add/clear controls. */
+export function OptionalDisclosureMicroAction({
+  action,
+  children,
+  className,
+  ...props
+}: OptionalDisclosureMicroActionProps) {
+  return (
+    <Button {...formMicroActionButtonProps} className={cn('shrink-0', className)} {...props}>
+      <ActionIcon action={action} size="owner" />
+      {children}
+    </Button>
+  )
+}
+
 /** Collapses an optional field behind a compact add control until opened or populated. */
-function DisclosureSummary({ id, summary }: { id: string; summary?: string }) {
+function DisclosureSummary({
+  id,
+  summary,
+  size,
+}: {
+  id: string
+  summary?: string
+  size: FieldSize
+}) {
   if (!summary) return null
   return (
-    <Text id={id} as="p" variant="caption">
+    <p id={id} className={optionalDisclosureSummaryTypographyVariants({ size })}>
       {summary}
-    </Text>
+    </p>
   )
 }
 
@@ -252,8 +285,7 @@ function CollapsedOptionalFieldDisclosure({
 function DisclosureAddButton({
   controlId,
   addLabel,
-  labeled: _labeled,
-  size,
+  labeled,
   summaryId,
   addDisabled,
   onOpenChange,
@@ -261,17 +293,14 @@ function DisclosureAddButton({
   controlId: string
   addLabel: string
   labeled: boolean
-  size: FieldSize
   summaryId?: string
   addDisabled: boolean
   onOpenChange: (open: boolean) => void
 }) {
   return (
-    <Button
-      type="button"
-      variant="text"
-      size="default"
-      className={cn('font-normal', 'w-fit justify-start')}
+    <OptionalDisclosureMicroAction
+      action="add"
+      className={labeled ? undefined : 'w-fit justify-start'}
       aria-controls={controlId}
       aria-expanded={false}
       aria-describedby={summaryId}
@@ -281,9 +310,8 @@ function DisclosureAddButton({
         onOpenChange(true)
       }}
     >
-      <ActionIcon action="add" size="owner" />
-      <span className={fieldActionLabelMetricsClasses(size)}>{addLabel}</span>
-    </Button>
+      {addLabel}
+    </OptionalDisclosureMicroAction>
   )
 }
 
@@ -311,17 +339,13 @@ function OpenOptionalFieldDisclosure({
   children: ReactNode
 }) {
   const removeButton = (
-    <Button
-      type="button"
-      variant="text"
-      size="default"
-      className="gap-1.5"
+    <OptionalDisclosureMicroAction
+      action="clear"
       aria-label={`${removeLabel} ${fieldLabel}`}
       onClick={onRemove}
     >
-      <ActionIcon action="clear" size="owner" />
-      <span className={fieldActionLabelMetricsClasses(size)}>{removeLabel}</span>
-    </Button>
+      {removeLabel}
+    </OptionalDisclosureMicroAction>
   )
   const fieldLabelNode = (
     <label htmlFor={controlId} className={disclosureLabelClass(size)}>
@@ -370,13 +394,12 @@ export function OptionalFieldDisclosure({
 }: OptionalFieldDisclosureProps) {
   const summaryId = `${controlId}-summary`
   const inAnatomyRow = useFieldRowParticipation()
-  const summaryNode = <DisclosureSummary id={summaryId} summary={summary} />
+  const summaryNode = <DisclosureSummary id={summaryId} summary={summary} size={size} />
   const addButton = (
     <DisclosureAddButton
       controlId={controlId}
       addLabel={addLabel}
       labeled={labeled}
-      size={size}
       summaryId={summary ? summaryId : undefined}
       addDisabled={addDisabled}
       onOpenChange={onOpenChange}

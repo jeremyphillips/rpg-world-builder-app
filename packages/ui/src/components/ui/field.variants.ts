@@ -226,20 +226,26 @@ export const fieldLabelTypographyVariants = cva('', {
   },
 })
 
-/** Label font metrics for optional-disclosure text actions — omits label weight so action chrome owns emphasis. */
-export function fieldActionLabelMetricsClasses(size: FieldSizeToken): string {
-  switch (size) {
-    case 'xs':
-    case 'sm':
-      return 'text-[length:var(--text-fine-md)] leading-none'
-    case 'md':
-      return 'text-[length:var(--text-md)] leading-none'
-    case 'lg':
-      return 'text-base leading-[var(--text-base--line-height)]'
-    default:
-      return 'text-[length:var(--text-md)] leading-none'
-  }
-}
+/**
+ * Optional disclosure inherited-value line — matches label type scale at body weight
+ * with secondary ink (not caption or hint scale).
+ */
+export const optionalDisclosureSummaryTypographyVariants = cva(
+  'font-normal text-muted-foreground',
+  {
+    variants: {
+      size: {
+        xs: 'text-[length:var(--text-fine-md)] leading-none',
+        sm: 'text-[length:var(--text-fine-md)] leading-none',
+        md: 'text-[length:var(--text-md)] leading-[var(--text-md--line-height)]',
+        lg: 'text-base leading-[var(--text-base--line-height)]',
+      },
+    },
+    defaultVariants: {
+      size: 'md',
+    },
+  },
+)
 
 export type FieldArrayItemLayoutVariant = 'compact' | 'detailed'
 

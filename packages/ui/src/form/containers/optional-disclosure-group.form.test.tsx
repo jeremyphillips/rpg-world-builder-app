@@ -135,8 +135,13 @@ describe('group optionalDisclosure', () => {
       )
     }
     render(<MovementHarness />)
-    await user.click(screen.getByRole('button', { name: 'Override movement' }))
+    const addButton = screen.getByRole('button', { name: 'Override movement' })
+    expect(addButton).toHaveClass('ui-button__text--xs')
+    await user.click(addButton)
     expect(screen.getByRole('group', { name: /Movement/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Remove Movement' })).toHaveClass(
+      'ui-button__text--xs',
+    )
     const movementLabel = screen
       .getByText('Movement')
       .closest('span.text-style-field-label-sm, span.text-style-field-label-md')
