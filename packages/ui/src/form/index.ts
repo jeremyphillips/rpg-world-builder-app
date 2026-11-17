@@ -185,6 +185,7 @@ export {
   type TextareaFieldConfig,
   type ConfirmBeforeClearConfig,
   type OptionalDisclosureConfig,
+  type OptionalDisclosureIntent,
   type OptionalDisclosureFieldKind,
   OPTIONAL_DISCLOSURE_FIELD_KINDS,
   type SelectFieldConfig,
@@ -334,6 +335,13 @@ export {
   type SilentValidationResult,
 } from './config/form-resolver'
 export { disableOptionsUsedInSiblingRows } from './config/array-unique-select.lib'
+export {
+  optionalDisclosureLeafActions,
+  optionalDisclosureShellProps,
+  resolveOptionalDisclosureActions,
+  type OptionalDisclosureActionVerb,
+  type ResolvedOptionalDisclosureActions,
+} from './config/optional-disclosure-actions.lib'
 export { navigateInvalidSubmit } from './config/navigate-invalid-submit.client'
 export { navigateTabbedFormInvalidSubmit } from './shells/navigate-tabbed-form-invalid-submit.client'
 export { performInvalidSubmitFocus } from './config/navigate-invalid-submit-focus.lib'

@@ -462,7 +462,7 @@ export function monsterActionMechanicFields(input: {
         name: `${namePrefix}.prerequisite`,
         label: MONSTER_SHAPE_SHIFT_PREREQUISITE_LABEL,
         hint: MONSTER_SHAPE_SHIFT_PREREQUISITE_HINT,
-        optionalDisclosure: { addLabel: MONSTER_SHAPE_SHIFT_PREREQUISITE_ADD_LABEL },
+        optionalDisclosure: { intent: 'add', addLabel: MONSTER_SHAPE_SHIFT_PREREQUISITE_ADD_LABEL },
       },
     )
   }

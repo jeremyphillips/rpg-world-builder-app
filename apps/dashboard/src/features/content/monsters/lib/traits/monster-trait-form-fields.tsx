@@ -90,7 +90,7 @@ export function monsterTraitTemplateFields(): FormItem[] {
       name: 'descriptionOverride',
       label: MONSTER_CUSTOM_DESCRIPTION_LABEL,
       hint: MONSTER_CUSTOM_DESCRIPTION_HINT,
-      optionalDisclosure: { addLabel: MONSTER_CUSTOM_DESCRIPTION_ADD_LABEL },
+      optionalDisclosure: { intent: 'add', addLabel: MONSTER_CUSTOM_DESCRIPTION_ADD_LABEL },
     },
   ]
 }

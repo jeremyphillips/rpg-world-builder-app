@@ -25,7 +25,9 @@ function renderDisclosure({
       controlId="note-field"
       fieldLabel="Additional behavior"
       addLabel="Add additional behavior"
+      addAccessibleName="Add additional behavior"
       removeLabel="Remove"
+      removeAccessibleName="Remove Additional behavior"
       open={open}
       onOpenChange={onOpenChange}
       onRemove={onRemove}
@@ -102,7 +104,9 @@ describe('OptionalFieldDisclosure', () => {
           controlId="note-field"
           fieldLabel="Long range"
           addLabel="Add long range"
+          addAccessibleName="Add long range"
           removeLabel="Remove"
+          removeAccessibleName="Remove"
           open
           onOpenChange={vi.fn()}
           onRemove={vi.fn()}
@@ -143,7 +147,9 @@ describe('OptionalFieldDisclosure', () => {
         controlId="note-field"
         fieldLabel="Additional behavior"
         addLabel="Add additional behavior"
+        addAccessibleName="Add additional behavior"
         removeLabel="Remove"
+        removeAccessibleName="Remove"
         open={false}
         labeled
         onOpenChange={vi.fn()}
@@ -172,7 +178,9 @@ describe('OptionalFieldDisclosure', () => {
         controlId="movement"
         fieldLabel="Movement"
         addLabel="Override movement"
+        addAccessibleName="Override movement"
         removeLabel="Clear override"
+        removeAccessibleName="Clear override"
         open={false}
         labeled
         summary="Inherits · Walk 30 ft."
@@ -198,8 +206,11 @@ describe('OptionalFieldDisclosure', () => {
       <OptionalFieldDisclosure
         controlId="damage"
         fieldLabel="Damage"
-        addLabel="Override damage"
+        addLabel="Override"
+        addAccessibleName="Override Damage"
+        addAction="edit"
         removeLabel="Clear override"
+        removeAccessibleName="Clear Damage override"
         open
         labeled
         summary="Inherits · 1d8 slashing"
@@ -215,9 +226,34 @@ describe('OptionalFieldDisclosure', () => {
     const headerRow = label?.parentElement?.parentElement
     expect(headerRow).toHaveClass('items-center', 'justify-between')
     expect(headerRow).toContainElement(
-      screen.getByRole('button', { name: 'Clear override Damage' }),
+      screen.getByRole('button', { name: 'Clear Damage override' }),
     )
     expect(screen.getByText('Inherits · 1d8 slashing')).not.toHaveClass('text-style-caption')
+  })
+
+  it('uses the edit glyph and a full accessible name for a compact override action', () => {
+    const { container } = render(
+      <OptionalFieldDisclosure
+        controlId="damage"
+        fieldLabel="Damage"
+        addLabel="Override"
+        addAccessibleName="Override Damage"
+        addAction="edit"
+        removeLabel="Clear override"
+        removeAccessibleName="Clear Damage override"
+        open={false}
+        labeled
+        onOpenChange={vi.fn()}
+        onRemove={vi.fn()}
+        size="md"
+      >
+        {null}
+      </OptionalFieldDisclosure>,
+    )
+
+    const button = screen.getByRole('button', { name: 'Override Damage' })
+    expect(button).toHaveTextContent('Override')
+    expect(container.querySelector('[data-icon="pencil"]')).not.toBeNull()
   })
 
   it('places the open control on the row control track beside the label and remove action', () => {
@@ -227,7 +263,9 @@ describe('OptionalFieldDisclosure', () => {
           controlId="note-field"
           fieldLabel="Cast at level"
           addLabel="Cast at a higher level"
+          addAccessibleName="Cast at a higher level"
           removeLabel="Remove"
+          removeAccessibleName="Remove"
           open
           onOpenChange={vi.fn()}
           onRemove={vi.fn()}
@@ -252,9 +290,7 @@ describe('OptionalFieldDisclosure', () => {
     const controlRegion = container.querySelector('[data-field-control-region]')
     expect(participant).toHaveClass('row-span-3', 'grid-rows-subgrid')
     expect(labelRegion).toContainElement(screen.getByText('Cast at level'))
-    expect(labelRegion).toContainElement(
-      screen.getByRole('button', { name: 'Remove Cast at level' }),
-    )
+    expect(labelRegion).toContainElement(screen.getByRole('button', { name: 'Remove' }))
     expect(controlRegion).toContainElement(screen.getByRole('textbox', { name: 'Cast at level' }))
   })
 

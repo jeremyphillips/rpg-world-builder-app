@@ -210,9 +210,18 @@ export type OptionalDisclosureAddGate = {
   disabledReasonWhen?: (values: Record<string, unknown>) => string | undefined
 }
 
-/** Collapse empty optional fields behind an add control (textarea and select). */
+export type OptionalDisclosureIntent = 'add' | 'override'
+
+/**
+ * Collapse empty optional fields behind an add or override control.
+ * `intent` selects the default action copy and icon. `addLabel` and `removeLabel`
+ * replace that visible copy and its accessible name when the phrase is not the default.
+ */
 export type OptionalDisclosureConfig = {
-  addLabel: string
+  intent: OptionalDisclosureIntent
+  /** Complete phrase. When set, this is both the collapsed label and its accessible name. */
+  addLabel?: string
+  /** Complete phrase. When set, this is both the open label and its accessible name. */
   removeLabel?: string
   /** When true (default), populated values keep the field expanded. */
   expandWhenPopulated?: boolean

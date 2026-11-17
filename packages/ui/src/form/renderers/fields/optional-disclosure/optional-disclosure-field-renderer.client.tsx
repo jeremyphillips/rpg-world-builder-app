@@ -28,6 +28,10 @@ import type {
 import { LazyFieldSuspense } from '../../lazy-field.client'
 import { LazyRichTextField } from '../lazy-rich-text-field.client'
 import { fieldDefaultValue } from '../../../field-config'
+import {
+  optionalDisclosureLeafActions,
+  optionalDisclosureShellProps,
+} from '../../../config/optional-disclosure-actions.lib'
 import { optionalDisclosureLeafFieldConfig } from '../../../config/optional-disclosure-config.lib'
 import { useConfirmBeforeClear } from '../../../config/use-confirm-before-clear.client'
 import { normalizedSelectFieldValue } from '../select/select-field-renderer.lib'
@@ -92,8 +96,9 @@ export function OptionalDisclosureTextareaFieldRenderer({
       <OptionalFieldDisclosure
         controlId={id}
         fieldLabel={config.label}
-        addLabel={disclosure.addLabel}
-        removeLabel={disclosure.removeLabel}
+        {...optionalDisclosureShellProps(
+          optionalDisclosureLeafActions({ label: config.label, optionalDisclosure: disclosure }),
+        )}
         open={open}
         onOpenChange={setManualOpen}
         onRemove={attemptClear}
@@ -187,8 +192,9 @@ export function OptionalDisclosureTextFieldRenderer({
       <OptionalFieldDisclosure
         controlId={id}
         fieldLabel={config.label}
-        addLabel={disclosure.addLabel}
-        removeLabel={disclosure.removeLabel}
+        {...optionalDisclosureShellProps(
+          optionalDisclosureLeafActions({ label: config.label, optionalDisclosure: disclosure }),
+        )}
         open={open}
         onOpenChange={setManualOpen}
         onRemove={attemptClear}
@@ -306,8 +312,9 @@ export function OptionalDisclosureSelectFieldRenderer({
       <OptionalFieldDisclosure
         controlId={resolved.id}
         fieldLabel={state.renderConfig.label}
-        addLabel={disclosure.addLabel}
-        removeLabel={disclosure.removeLabel}
+        {...optionalDisclosureShellProps(
+          optionalDisclosureLeafActions({ label: config.label, optionalDisclosure: disclosure }),
+        )}
         open={open}
         onOpenChange={setManualOpen}
         onRemove={attemptClear}
@@ -397,8 +404,9 @@ export function OptionalDisclosureTextSuggestionsFieldRenderer({
       <OptionalFieldDisclosure
         controlId={resolved.id}
         fieldLabel={config.label}
-        addLabel={disclosure.addLabel}
-        removeLabel={disclosure.removeLabel}
+        {...optionalDisclosureShellProps(
+          optionalDisclosureLeafActions({ label: config.label, optionalDisclosure: disclosure }),
+        )}
         open={open}
         onOpenChange={handleOpenChange}
         onRemove={attemptClear}
@@ -490,8 +498,9 @@ export function OptionalDisclosureRichTextFieldRenderer({
       <OptionalFieldDisclosure
         controlId={id}
         fieldLabel={config.label}
-        addLabel={disclosure.addLabel}
-        removeLabel={disclosure.removeLabel}
+        {...optionalDisclosureShellProps(
+          optionalDisclosureLeafActions({ label: config.label, optionalDisclosure: disclosure }),
+        )}
         open={open}
         onOpenChange={setOpen}
         onRemove={attemptClear}

@@ -47,6 +47,7 @@ export function monsterActionLimitedUseFields(options?: { addDisabled?: boolean 
         label: 'Limit',
         placeholder: 'No limit',
         optionalDisclosure: {
+          intent: 'add',
           addLabel: MONSTER_LIMIT_ADD_LABEL,
           ...(options?.addDisabled ? { addDisabled: true } : {}),
         },

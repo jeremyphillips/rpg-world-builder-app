@@ -40,6 +40,7 @@ export function monsterSpellCastAtLevelField(input: {
     placeholder: MONSTER_SPELL_CAST_LEVEL_PLACEHOLDER,
     width: input.width,
     optionalDisclosure: input.optionalDisclosure ?? {
+      intent: 'override',
       addLabel: MONSTER_SPELL_CAST_HIGHER_LEVEL_LABEL,
       expandWhenPopulated: true,
     },

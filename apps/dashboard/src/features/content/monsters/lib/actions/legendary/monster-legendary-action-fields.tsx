@@ -68,7 +68,7 @@ export function legendaryActionDetailFields(input: {
         name: 'movement.allowance',
         label: MONSTER_MOVEMENT_LABEL,
         placeholder: MONSTER_MOVEMENT_PLACEHOLDER,
-        optionalDisclosure: { addLabel: MONSTER_MOVEMENT_ADD_LABEL },
+        optionalDisclosure: { intent: 'add', addLabel: MONSTER_MOVEMENT_ADD_LABEL },
         hint: { text: MONSTER_MOVEMENT_HINT },
         options: MOVEMENT_ALLOWANCES.map((allowance) => ({
           value: allowance,

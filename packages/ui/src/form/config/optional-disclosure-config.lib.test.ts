@@ -58,7 +58,7 @@ describe('assertOptionalDisclosureFieldConfig', () => {
 
     assertOptionalDisclosureFieldConfig(
       textareaField({
-        optionalDisclosure: { addLabel: 'Add additional behavior' },
+        optionalDisclosure: { intent: 'add', addLabel: 'Add additional behavior' },
       }),
     )
 
@@ -70,7 +70,7 @@ describe('assertOptionalDisclosureFieldConfig', () => {
 
     assertOptionalDisclosureFieldConfig(
       selectField({
-        optionalDisclosure: { addLabel: 'Add function override' },
+        optionalDisclosure: { intent: 'add', addLabel: 'Add function override' },
       }),
     )
 
@@ -88,7 +88,7 @@ describe('assertOptionalDisclosureFieldConfig', () => {
         dependsOn: ['classification.facilityType'],
         suggestionsWhen: () => [],
       },
-      optionalDisclosure: { addLabel: 'Add specialization' },
+      optionalDisclosure: { intent: 'add', addLabel: 'Add specialization' },
     })
 
     expect(error).not.toHaveBeenCalled()
@@ -101,7 +101,7 @@ describe('assertOptionalDisclosureFieldConfig', () => {
       type: 'number',
       name: 'count',
       label: 'Count',
-      optionalDisclosure: { addLabel: 'Add count note' },
+      optionalDisclosure: { intent: 'add', addLabel: 'Add count note' },
     } as FieldConfig)
 
     expect(error).toHaveBeenCalledWith(
@@ -117,7 +117,7 @@ describe('assertOptionalDisclosureFieldConfig', () => {
     assertOptionalDisclosureFieldConfig(
       textareaField({
         required: true,
-        optionalDisclosure: { addLabel: 'Add additional behavior' },
+        optionalDisclosure: { intent: 'add', addLabel: 'Add additional behavior' },
       }),
     )
 
@@ -131,7 +131,7 @@ describe('assertOptionalDisclosureFieldConfig', () => {
       type: 'text',
       name: 'note',
       label: 'Note',
-      optionalDisclosure: { addLabel: 'Add note' },
+      optionalDisclosure: { intent: 'add', addLabel: 'Add note' },
     } as FieldConfig)
 
     expect(error).not.toHaveBeenCalled()
@@ -144,7 +144,7 @@ describe('assertOptionalDisclosureFieldConfig', () => {
       type: 'richtext',
       name: 'description',
       label: 'Custom description',
-      optionalDisclosure: { addLabel: 'Add custom description' },
+      optionalDisclosure: { intent: 'add', addLabel: 'Add custom description' },
     })
 
     expect(error).not.toHaveBeenCalled()

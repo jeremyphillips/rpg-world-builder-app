@@ -13,7 +13,6 @@ import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form
 import { monsterEquipmentCatalog } from '../../monster-form-derivation'
 import {
   MONSTER_BASE_DAMAGE_OVERRIDE_LABEL,
-  MONSTER_DAMAGE_OVERRIDE_ADD_LABEL,
   MONSTER_DAMAGE_OVERRIDE_REMOVE_LABEL,
   MONSTER_WEAPON_DAMAGE_NONE_LABEL,
   MONSTER_WEAPON_DAMAGE_REPLACING_LABEL,
@@ -106,8 +105,8 @@ export function monsterWeaponDamageOverrideField(args: {
     label: MONSTER_BASE_DAMAGE_OVERRIDE_LABEL,
     width: 'auto',
     optionalDisclosure: {
+      intent: 'override',
       labeled: true,
-      addLabel: MONSTER_DAMAGE_OVERRIDE_ADD_LABEL,
       removeLabel: MONSTER_DAMAGE_OVERRIDE_REMOVE_LABEL,
       addDisabled: monsterWeaponDamageOverrideAddDisabled(
         ctx,

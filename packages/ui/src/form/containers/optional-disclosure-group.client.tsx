@@ -13,6 +13,10 @@ import { collectDependentClearingFields } from '../config/confirm-before-clear.l
 import { useDependsOnValues } from '../config/form-depends-on.client'
 import { useConfirmBeforeClear } from '../config/use-confirm-before-clear.client'
 import {
+  optionalDisclosureShellProps,
+  resolveOptionalDisclosureActions,
+} from '../config/optional-disclosure-actions.lib'
+import {
   resolveOptionalDisclosureClearPaths,
   useOptionalDisclosureGroupLegendChrome,
 } from './optional-disclosure-group.lib'
@@ -142,7 +146,13 @@ function OptionalDisclosureGroupBody({
     onClear: clear,
   })
 
-  const removeLabel = disclosure.removeLabel ?? 'Remove'
+  const actions = resolveOptionalDisclosureActions({
+    intent: disclosure.intent,
+    subject: fieldLabel,
+    labeled: disclosure.labeled,
+    addLabel: disclosure.addLabel,
+    removeLabel: disclosure.removeLabel,
+  })
   if (open) {
     return (
       <>
@@ -158,11 +168,11 @@ function OptionalDisclosureGroupBody({
           hint={hint}
           legendAction={
             <OptionalDisclosureMicroAction
-              action="clear"
-              aria-label={`${removeLabel} ${fieldLabel}`}
+              action={actions.openAction}
+              aria-label={actions.openAccessibleName}
               onClick={attemptClear}
             >
-              {removeLabel}
+              {actions.openLabel}
             </OptionalDisclosureMicroAction>
           }
         >
@@ -178,8 +188,7 @@ function OptionalDisclosureGroupBody({
       <OptionalFieldDisclosure
         controlId={controlId}
         fieldLabel={fieldLabel}
-        addLabel={disclosure.addLabel}
-        removeLabel={removeLabel}
+        {...optionalDisclosureShellProps(actions)}
         open={false}
         size={groupSize}
         labeled={disclosure.labeled}

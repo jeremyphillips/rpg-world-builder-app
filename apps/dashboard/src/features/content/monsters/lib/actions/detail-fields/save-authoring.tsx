@@ -342,7 +342,7 @@ function monsterSaveFailedSubsection(ctx: ContentFormCtx, namePrefix: string): F
         name: `${MONSTER_SAVE_REPEAT_PATH}.eligibilityNote`,
         label: MONSTER_SAVE_REPEAT_ELIGIBILITY_LABEL,
         visibility: repeatSaveShellVisibility,
-        optionalDisclosure: { addLabel: MONSTER_SAVE_REPEAT_ELIGIBILITY_ADD_LABEL },
+        optionalDisclosure: { intent: 'add', addLabel: MONSTER_SAVE_REPEAT_ELIGIBILITY_ADD_LABEL },
       },
       {
         kind: 'group',

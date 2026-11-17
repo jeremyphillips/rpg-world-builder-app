@@ -11,8 +11,10 @@ import type { FormItem } from '../field-config'
 const field = {
   kind: 'group',
   name: 'savingThrow',
+  heading: { label: 'Saving throw' },
   separator: 'subtle',
   optionalDisclosure: {
+    intent: 'add',
     addLabel: 'Add saving throw',
     removeLabel: 'Remove saving throw',
   },
@@ -72,7 +74,7 @@ describe('group optionalDisclosure', () => {
       expect(state().dirty).toBe(true)
     })
 
-    await user.click(screen.getByRole('button', { name: 'Remove saving throw Saving throw' }))
+    await user.click(screen.getByRole('button', { name: 'Remove saving throw' }))
     await waitFor(() => {
       expect(state()).toEqual({ dirty: true, savingThrow: null })
     })
@@ -86,6 +88,7 @@ describe('group optionalDisclosure', () => {
       heading: { label: 'Wrapper' },
       separator: 'subtle',
       optionalDisclosure: {
+        intent: 'add',
         addLabel: 'Add tags',
         removeLabel: 'Remove',
         watchPaths: ['tags', 'roles'],
@@ -106,7 +109,7 @@ describe('group optionalDisclosure', () => {
     }
     render(<WatchHarness defaultValues={{ tags: ['demon'] }} />)
     expect(screen.getByText('Tags')).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Remove Wrapper' }))
+    await user.click(screen.getByRole('button', { name: 'Remove' }))
     await waitFor(() => {
       expect(screen.getByRole('button', { name: 'Add tags' })).toBeInTheDocument()
     })
@@ -120,6 +123,7 @@ describe('group optionalDisclosure', () => {
       heading: { label: 'Movement' },
       headingScale: 'field',
       optionalDisclosure: {
+        intent: 'add',
         addLabel: 'Override movement',
         removeLabel: 'Remove',
         labeled: true,
@@ -139,9 +143,7 @@ describe('group optionalDisclosure', () => {
     expect(addButton).toHaveClass('ui-button__text--xs')
     await user.click(addButton)
     expect(screen.getByRole('group', { name: /Movement/ })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Remove Movement' })).toHaveClass(
-      'ui-button__text--xs',
-    )
+    expect(screen.getByRole('button', { name: 'Remove' })).toHaveClass('ui-button__text--xs')
     const movementLabel = screen
       .getByText('Movement')
       .closest('span.text-style-field-label-sm, span.text-style-field-label-md')
@@ -155,10 +157,7 @@ describe('group optionalDisclosure', () => {
       kind: 'group',
       name: 'movementOverride',
       heading: { label: 'Movement' },
-      optionalDisclosure: {
-        addLabel: 'Override movement',
-        removeLabel: 'Remove',
-      },
+      optionalDisclosure: { intent: 'add', addLabel: 'Override movement', removeLabel: 'Remove' },
       fields: [
         { type: 'text', name: 'walk', label: 'Walk' },
         { type: 'text', name: 'hover', label: 'Hover' },
@@ -193,7 +192,7 @@ describe('group optionalDisclosure', () => {
     await user.click(screen.getByRole('button', { name: 'Override movement' }))
     const movementGroup = screen.getByRole('group', { name: /Movement/ })
     expect(movementGroup).not.toHaveClass('mb-8')
-    await user.click(screen.getByRole('button', { name: 'Remove Movement' }))
+    await user.click(screen.getByRole('button', { name: 'Remove' }))
     await waitFor(() => {
       expect(screen.getByRole('button', { name: 'Override movement' })).toBeInTheDocument()
     })
@@ -204,7 +203,11 @@ describe('group optionalDisclosure', () => {
     const user = userEvent.setup()
     const seeded = {
       ...field,
-      optionalDisclosure: { addLabel: 'Add saving throw', seedWhen: () => ({ withinFeet: 10 }) },
+      optionalDisclosure: {
+        intent: 'add',
+        addLabel: 'Add saving throw',
+        seedWhen: () => ({ withinFeet: 10 }),
+      },
     } as const satisfies FormItem
     function SeedHarness() {
       const form = useForm({ defaultValues: {}, shouldUnregister: true })

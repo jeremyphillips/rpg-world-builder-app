@@ -3,7 +3,11 @@
 
 import { OptionalFieldDisclosure, Text } from '@rpg/ui'
 import type { FormItem } from '@rpg/ui/form'
-import { useFieldControlSize } from '@rpg/ui/form'
+import {
+  optionalDisclosureShellProps,
+  resolveOptionalDisclosureActions,
+  useFieldControlSize,
+} from '@rpg/ui/form'
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import {
@@ -19,12 +23,17 @@ function MonsterActionTurnLimitControl({ name }: { name: string }) {
   const { setValue } = useFormContext()
   const enabled = useWatch({ name }) === true
   const fieldId = `${name.replaceAll('.', '-')}-turn-limit`
+  const actions = resolveOptionalDisclosureActions({
+    intent: 'add',
+    subject: MONSTER_TURN_LIMIT_LABEL,
+    addLabel: MONSTER_TURN_LIMIT_ADD_LABEL,
+  })
 
   return (
     <OptionalFieldDisclosure
       controlId={fieldId}
       fieldLabel={MONSTER_TURN_LIMIT_LABEL}
-      addLabel={MONSTER_TURN_LIMIT_ADD_LABEL}
+      {...optionalDisclosureShellProps(actions)}
       open={enabled}
       onOpenChange={(next) => {
         if (next) setValue(name as never, true as never, WRITE_OPTIONS)

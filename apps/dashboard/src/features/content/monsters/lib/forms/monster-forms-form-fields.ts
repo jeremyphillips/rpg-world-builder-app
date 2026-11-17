@@ -30,10 +30,6 @@ export function monsterDefinedFormDetailFields(ctx: ContentFormCtx): FormItem[] 
       ...sizes,
       name: 'overrides.sizes',
       required: false,
-      optionalDisclosure: {
-        addLabel: MONSTER_FORM_SIZE_HINT,
-        expandWhenPopulated: true,
-      },
     },
     monsterFormMovementOverrideGroup(),
     {
@@ -47,6 +43,7 @@ export function monsterDefinedFormDetailFields(ctx: ContentFormCtx): FormItem[] 
       label: MONSTER_FORM_NOTES_LABEL,
       hint: MONSTER_FORM_NOTES_HINT,
       optionalDisclosure: {
+        intent: 'add',
         addLabel: MONSTER_FORM_NOTES_ADD_LABEL,
         expandWhenPopulated: true,
       },
@@ -89,6 +86,7 @@ export function monsterFormsSectionFields(ctx: ContentFormCtx): FormItem[] {
               label: MONSTER_FORM_NAME_LABEL,
               hint: "Overrides the profile's form name in rules text.",
               optionalDisclosure: {
+                intent: 'override',
                 addLabel: 'Override form name',
                 expandWhenPopulated: true,
               },

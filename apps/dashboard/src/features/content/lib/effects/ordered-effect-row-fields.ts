@@ -46,6 +46,7 @@ function replaceConditionField(precedingEffectsPath: string): SelectFieldConfig 
       },
     },
     optionalDisclosure: {
+      intent: 'add',
       addLabel: EFFECT_REPLACE_CONDITION_ADD_LABEL,
       removeLabel: 'Remove',
     },
@@ -74,7 +75,7 @@ export function orderedEffectRowFields(options: {
         name: 'description',
         label: EFFECT_DETAILS_LABEL,
         visibility: damage,
-        optionalDisclosure: { addLabel: EFFECT_DETAILS_ADD_LABEL },
+        optionalDisclosure: { intent: 'add', addLabel: EFFECT_DETAILS_ADD_LABEL },
       },
     )
   }
@@ -101,7 +102,7 @@ export function orderedEffectRowFields(options: {
         name: 'description',
         label: EFFECT_DETAILS_LABEL,
         visibility: condition,
-        optionalDisclosure: { addLabel: EFFECT_DETAILS_ADD_LABEL },
+        optionalDisclosure: { intent: 'add', addLabel: EFFECT_DETAILS_ADD_LABEL },
         hint: EFFECT_CONDITION_DETAILS_HINT,
         placeholder: EFFECT_CONDITION_DETAILS_PLACEHOLDER,
       },

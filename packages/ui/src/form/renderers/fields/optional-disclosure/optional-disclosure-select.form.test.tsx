@@ -35,6 +35,7 @@ describe('FormItems select optionalDisclosure', () => {
               { value: 'lodging', label: 'Lodging' },
             ],
             optionalDisclosure: {
+              intent: 'add',
               addLabel: 'Add function override',
               removeLabel: 'Remove function override',
             },
@@ -63,6 +64,7 @@ describe('FormItems select optionalDisclosure', () => {
               { value: 'lodging', label: 'Lodging' },
             ],
             optionalDisclosure: {
+              intent: 'add',
               addLabel: 'Add function override',
               removeLabel: 'Remove function override',
             },
@@ -72,13 +74,9 @@ describe('FormItems select optionalDisclosure', () => {
     )
 
     expect(screen.getByLabelText('Function override')).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: 'Remove function override Function override' }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Remove function override' })).toBeInTheDocument()
 
-    await user.click(
-      screen.getByRole('button', { name: 'Remove function override Function override' }),
-    )
+    await user.click(screen.getByRole('button', { name: 'Remove function override' }))
 
     expect(screen.getByRole('button', { name: 'Add function override' })).toBeInTheDocument()
   })
@@ -95,6 +93,7 @@ describe('FormItems select optionalDisclosure', () => {
             label: 'Function override',
             options: [{ value: 'care', label: 'Care' }],
             optionalDisclosure: {
+              intent: 'add',
               addLabel: 'Add function override',
               removeLabel: 'Remove function override',
             },
@@ -124,6 +123,7 @@ describe('FormItems select optionalDisclosure', () => {
               { value: 'lodging', label: 'Lodging' },
             ],
             optionalDisclosure: {
+              intent: 'add',
               addLabel: 'Add function override',
               removeLabel: 'Remove function override',
               confirmBeforeClear: {
@@ -137,9 +137,7 @@ describe('FormItems select optionalDisclosure', () => {
       />,
     )
 
-    await user.click(
-      screen.getByRole('button', { name: 'Remove function override Function override' }),
-    )
+    await user.click(screen.getByRole('button', { name: 'Remove function override' }))
 
     expect(screen.getByRole('alertdialog')).toBeInTheDocument()
     expect(screen.getByLabelText('Function override')).toBeInTheDocument()
@@ -172,7 +170,7 @@ describe('FormItems select optionalDisclosure', () => {
                 label: 'Cast at level',
                 width: '1/2',
                 options: [{ value: '4', label: '4th' }],
-                optionalDisclosure: { addLabel: 'Cast at a higher level' },
+                optionalDisclosure: { intent: 'add', addLabel: 'Cast at a higher level' },
               },
             ],
           },

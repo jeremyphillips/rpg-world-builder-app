@@ -54,6 +54,7 @@ function attackRangeLongJoinedPair(
       },
     },
     optionalDisclosure: {
+      intent: 'add',
       addLabel: 'Add long range',
       expandWhenPopulated: true,
       addGate: {

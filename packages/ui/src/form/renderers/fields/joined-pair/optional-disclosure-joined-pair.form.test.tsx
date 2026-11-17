@@ -28,10 +28,7 @@ const longRangeField: JoinedPairFieldConfig = {
     text: 'ft.',
     ariaLabel: 'Long range unit',
   },
-  optionalDisclosure: {
-    addLabel: 'Add long range',
-    expandWhenPopulated: true,
-  },
+  optionalDisclosure: { intent: 'add', addLabel: 'Add long range', expandWhenPopulated: true },
 }
 
 const schema = z.object({

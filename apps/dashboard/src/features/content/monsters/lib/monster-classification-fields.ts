@@ -17,6 +17,7 @@ const MONSTER_CREATURE_FAMILY_PLACEHOLDER = 'Choose families…'
 const CLASS_CLASSIFICATION_LABEL = `${getContentTypeTerm('classes').label} classifications`
 
 const classificationDisclosure = (addLabel: string, removeLabel: string) => ({
+  intent: 'add' as const,
   addLabel,
   removeLabel,
   expandWhenPopulated: true,

@@ -10,10 +10,7 @@ import {
   movementRowsToRecordForPreview,
   type MovementRowDraftFormValues,
 } from '../../../lib/forms/fields/content-movement-form-fields'
-import {
-  MONSTER_FORM_MOVEMENT_HINT,
-  MONSTER_FORM_USE_BASE_MOVEMENT_LABEL,
-} from '../monster-form-labels'
+import { MONSTER_FORM_USE_BASE_MOVEMENT_LABEL } from '../monster-form-labels'
 
 const FORM_BASE_MOVEMENT_DEPENDS = ['../../movement', '../../hover'] as const
 
@@ -72,7 +69,7 @@ export function monsterFormMovementOverrideGroup(): FormItem {
     heading: { label: MOVEMENT_FIELD_LABEL },
     headingScale: 'field',
     optionalDisclosure: {
-      addLabel: MONSTER_FORM_MOVEMENT_HINT,
+      intent: 'override',
       removeLabel: MONSTER_FORM_USE_BASE_MOVEMENT_LABEL,
       expandWhenPopulated: true,
       labeled: true,

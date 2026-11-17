@@ -44,7 +44,7 @@ export function useOptionalDisclosureGroupLegendChrome(
 ): OptionalDisclosureGroupLegendChrome {
   const parentContext = useFormSectionContext()
   const heading = resolveGroupHeading(item)
-  const fieldLabel = heading?.label ?? 'Saving throw'
+  const fieldLabel = heading?.label ?? ''
   const structuralTier = resolveGroupHeadingTier(parentContext.namedGroupDepth)
   const legendSize = resolveGroupLegendSize(structuralTier)
   const groupDensity = item.density ?? parentContext.density

@@ -342,8 +342,8 @@ Collapsible sections, separators, nested groups: [containers.md](./forms/contain
 
 ## Optional disclosure structure
 
-Field config, `labeled` / `summary`, and the shared presentation contract (micro-action add/clear,
-label-scale summary): [field-types.md](./forms/field-types.md#optional-disclosure-optionaldisclosure).
+Field config, `intent`, `labeled` / `summary`, and the shared action resolver (micro-action
+add/edit/clear, label-scale summary): [field-types.md](./forms/field-types.md#optional-disclosure-optionaldisclosure).
 
 | State  | Leaf field                | `kind: 'group'` + `optionalDisclosure` |
 | ------ | ------------------------- | -------------------------------------- |

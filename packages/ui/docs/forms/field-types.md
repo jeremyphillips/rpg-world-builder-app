@@ -173,18 +173,26 @@ values, dirty state, validation, or serialization.
 
 ## Optional disclosure (`optionalDisclosure`)
 
-Collapses empty optional fields behind a compact **+ Add …** control. When expanded
-(or when populated and `expandWhenPopulated` is true), the field label and control render
-with a **Remove** action that clears the value and collapses back to the add control.
+Collapses empty optional fields behind an add or override control. `intent` is `add` or
+`override`. `resolveOptionalDisclosureActions` owns the default visible label, accessible name,
+and `ActionIcon` verb. Leaf renderers call `optionalDisclosureLeafActions`; optional groups call
+the same resolver with the group heading. Renderers still own opening, seeding, and clearing.
 
 **Presentation contract** (shared across leaf fields and `kind: 'group'`):
 
-- The **label** (or group legend) identifies the field.
+- The **label** (or group legend) is the subject. Action-only defaults keep that casing
+  (`Add Notes`). There is no separate subject property.
+- **`labeled: true`** shows the verb only (`Add`, `Override`, `Remove`, `Clear override`) because
+  the label is already visible. The accessible name is still `Add ${subject}` or
+  `Override ${subject}`.
+- **`addLabel` / `removeLabel`**, when set, replace both the visible text and the accessible name.
+  The resolver does not append the subject to an explicit phrase.
 - **`summary`** communicates the effective or inherited value while collapsed (and under the
   header when open in labeled mode). It uses label **scale** at body weight with secondary ink —
   not caption or hint typography.
-- Header **add/clear** actions use the form **micro-action** text button (`xs`) with `ActionIcon`
-  `add` / `clear`, including open optional groups (`legendAction`).
+- Header actions use the form **micro-action** text button (`xs`). `add` uses `ActionIcon` `add`
+  (plus). `override` uses `edit` (pencil). The open action uses `clear` (x), including open
+  optional groups (`legendAction`).
 - With **`labeled: true`**, the header action stays on the label row in both collapsed and open
   states; the summary sits on the line below.
 
@@ -210,6 +218,7 @@ must be chosen first). Dice defaults are not written for a `rollValue` that uses
   label: 'Additional behavior',
   placeholder: 'Describe behavior not modeled above...',
   optionalDisclosure: {
+    intent: 'add',
     addLabel: 'Add additional behavior',
     removeLabel: 'Remove',
     expandWhenPopulated: true,

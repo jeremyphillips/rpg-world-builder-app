@@ -7,6 +7,10 @@ import type { FieldHintPosition } from '../../../../components/ui/field.variants
 import { useDependsOnValues } from '../../../config/form-depends-on.client'
 import type { OptionalDisclosureConfig, RollValueFieldConfig } from '../../../field-config'
 import {
+  optionalDisclosureLeafActions,
+  optionalDisclosureShellProps,
+} from '../../../config/optional-disclosure-actions.lib'
+import {
   assertOptionalDisclosureFieldConfig,
   optionalDisclosureLeafFieldConfig,
 } from '../../../config/optional-disclosure-config.lib'
@@ -67,8 +71,9 @@ export function OptionalDisclosureRollValueFieldRenderer({
     <OptionalFieldDisclosure
       controlId={id}
       fieldLabel={config.label}
-      addLabel={disclosure.addLabel}
-      removeLabel={disclosure.removeLabel}
+      {...optionalDisclosureShellProps(
+        optionalDisclosureLeafActions({ label: config.label, optionalDisclosure: disclosure }),
+      )}
       open={open}
       labeled={disclosure.labeled}
       summary={summary}

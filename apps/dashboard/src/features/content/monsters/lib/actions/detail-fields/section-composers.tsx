@@ -74,7 +74,7 @@ const monsterActionOptionalDescriptionField = {
   name: 'description',
   label: MONSTER_CUSTOM_DESCRIPTION_LABEL,
   hint: MONSTER_CUSTOM_DESCRIPTION_HINT,
-  optionalDisclosure: { addLabel: MONSTER_CUSTOM_DESCRIPTION_ADD_LABEL },
+  optionalDisclosure: { intent: 'add', addLabel: MONSTER_CUSTOM_DESCRIPTION_ADD_LABEL },
 } as const satisfies FormItem
 
 function monsterActionDescriptionField(action: MonsterActionDraftRow): FormItem {
@@ -221,6 +221,7 @@ function bonusAuthoringFields(input: {
           hint: MONSTER_TELEPORT_PASSENGER_HINT,
         },
         optionalDisclosure: {
+          intent: 'add',
           addLabel: MONSTER_TELEPORT_PASSENGER_ADD_LABEL,
           seedWhen: () => ({ withinFeet: TELEPORT_WITHIN_DEFAULT }),
         },
@@ -293,7 +294,7 @@ function bonusAuthoringFields(input: {
         label: MONSTER_TAKE_ACTIONS_RESTRICTION_LABEL,
         hint: { text: MONSTER_TAKE_ACTIONS_RESTRICTION_HINT },
         placeholder: MONSTER_TAKE_ACTIONS_RESTRICTION_PLACEHOLDER,
-        optionalDisclosure: { addLabel: MONSTER_TAKE_ACTIONS_RESTRICTION_ADD_LABEL },
+        optionalDisclosure: { intent: 'add', addLabel: MONSTER_TAKE_ACTIONS_RESTRICTION_ADD_LABEL },
       },
       ...usage,
     ]
@@ -336,6 +337,7 @@ function reactionAuthoringFields(input: {
         placeholder: 'Choose',
         options: attackOptions,
         optionalDisclosure: {
+          intent: 'add',
           addLabel: MONSTER_PARRY_FOLLOW_UP_ADD_LABEL,
           seedWhen: () => '',
         },
@@ -360,7 +362,10 @@ function reactionAuthoringFields(input: {
         name: 'description',
         label: MONSTER_REACTION_ADDITIONAL_RULES_LABEL,
         hint: MONSTER_REACTION_ADDITIONAL_RULES_HINT,
-        optionalDisclosure: { addLabel: MONSTER_REACTION_ADDITIONAL_RULES_ADD_LABEL },
+        optionalDisclosure: {
+          intent: 'add',
+          addLabel: MONSTER_REACTION_ADDITIONAL_RULES_ADD_LABEL,
+        },
       },
     ]
   }

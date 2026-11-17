@@ -1,5 +1,9 @@
 import { NumberField, OptionalFieldDisclosure } from '@rpg/ui'
-import { useFieldControlSize } from '@rpg/ui/form'
+import {
+  optionalDisclosureShellProps,
+  resolveOptionalDisclosureActions,
+  useFieldControlSize,
+} from '@rpg/ui/form'
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import {
@@ -28,6 +32,11 @@ export function MonsterActionRechargeField({
   const recharge = completeRecharge(current)
   const open = presentation === 'included' || recharge !== undefined
   const fieldId = `${name.replaceAll('.', '-')}-min-roll`
+  const actions = resolveOptionalDisclosureActions({
+    intent: 'add',
+    subject: MONSTER_LIMIT_RECHARGES_ON_LABEL,
+    addLabel: MONSTER_RECHARGE_ADD_LABEL,
+  })
 
   const write = (next: ReturnType<typeof rechargeValueFromRaw>) => {
     if (next === 'unchanged') return
@@ -42,7 +51,7 @@ export function MonsterActionRechargeField({
     <OptionalFieldDisclosure
       controlId={fieldId}
       fieldLabel={MONSTER_LIMIT_RECHARGES_ON_LABEL}
-      addLabel={MONSTER_RECHARGE_ADD_LABEL}
+      {...optionalDisclosureShellProps(actions)}
       open={open}
       onOpenChange={(next) => {
         if (next && !recharge) write(MONSTER_RECHARGE_SEED)

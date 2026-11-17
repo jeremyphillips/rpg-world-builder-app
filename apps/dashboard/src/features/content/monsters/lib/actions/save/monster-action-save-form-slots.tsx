@@ -1,5 +1,9 @@
 import { Button, ConfirmDialog, OptionalFieldDisclosure, TextareaField } from '@rpg/ui'
-import { useFieldControlSize } from '@rpg/ui/form'
+import {
+  optionalDisclosureShellProps,
+  resolveOptionalDisclosureActions,
+  useFieldControlSize,
+} from '@rpg/ui/form'
 import { useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
@@ -135,13 +139,18 @@ export function MonsterActionSaveFailureOrSuccessField({ namePrefix }: { namePre
   const existing = outcomes.find((outcome) => outcome.result === 'failed-or-successful-save')
   const [open, setOpen] = useState(existing != null)
   const fieldId = `${namePrefix.replaceAll('.', '-')}-failure-or-success`
+  const actions = resolveOptionalDisclosureActions({
+    intent: 'add',
+    subject: MONSTER_SAVE_FAILURE_OR_SUCCESS_ADD_LABEL,
+    addLabel: MONSTER_SAVE_FAILURE_OR_SUCCESS_ADD_LABEL,
+    removeLabel: 'Remove',
+  })
 
   return (
     <OptionalFieldDisclosure
       controlId={fieldId}
       fieldLabel={MONSTER_SAVE_FAILURE_OR_SUCCESS_ADD_LABEL}
-      addLabel={MONSTER_SAVE_FAILURE_OR_SUCCESS_ADD_LABEL}
-      removeLabel="Remove"
+      {...optionalDisclosureShellProps(actions)}
       open={open || existing != null}
       onOpenChange={(next) => {
         setOpen(next)

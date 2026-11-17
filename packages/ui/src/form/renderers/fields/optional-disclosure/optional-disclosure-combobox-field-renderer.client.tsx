@@ -10,6 +10,10 @@ import { OptionalDisclosureRowMessage } from '../../../../components/ui/optional
 import { useFieldRowParticipation } from '../../../../components/ui/field-row-anatomy.context'
 import type { ComboboxFieldConfig, OptionalDisclosureConfig } from '../../../field-config'
 import type { FieldValidationProps } from '../../../../components/ui/field-validation-props'
+import {
+  optionalDisclosureLeafActions,
+  optionalDisclosureShellProps,
+} from '../../../config/optional-disclosure-actions.lib'
 import { optionalDisclosureLeafFieldConfig } from '../../../config/optional-disclosure-config.lib'
 import { useConfirmBeforeClear } from '../../../config/use-confirm-before-clear.client'
 import { ComboboxFieldRenderer } from '../combobox/combobox-field-renderer.client'
@@ -78,8 +82,9 @@ export function OptionalDisclosureComboboxFieldRenderer({
       <OptionalFieldDisclosure
         controlId={id}
         fieldLabel={config.label}
-        addLabel={disclosure.addLabel}
-        removeLabel={disclosure.removeLabel}
+        {...optionalDisclosureShellProps(
+          optionalDisclosureLeafActions({ label: config.label, optionalDisclosure: disclosure }),
+        )}
         open={open}
         labeled={disclosure.labeled}
         addDisabled={disclosure.addDisabled}

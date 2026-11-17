@@ -56,6 +56,7 @@ export function savingThrowFieldGroup(input: {
     heading: { label: SAVING_THROW_SECTION_LEGEND },
     separator: 'subtle',
     optionalDisclosure: {
+      intent: 'add',
       addLabel: SAVING_THROW_ADD_LABEL,
       removeLabel: SAVING_THROW_REMOVE_LABEL,
       confirmBeforeClear: {
@@ -126,7 +127,7 @@ export function savingThrowFieldGroup(input: {
         name: 'savingThrow.success',
         label: 'Success',
         placeholder: SAVING_THROW_SUCCESS_PLACEHOLDER,
-        optionalDisclosure: { addLabel: SAVING_THROW_SUCCESS_ADD_LABEL },
+        optionalDisclosure: { intent: 'add', addLabel: SAVING_THROW_SUCCESS_ADD_LABEL },
       },
     ],
   }

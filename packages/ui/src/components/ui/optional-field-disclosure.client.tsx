@@ -21,12 +21,17 @@ import {
 } from './field.variants'
 import { cn } from '../../lib/utils'
 import { formMicroActionButtonProps } from '../../form/form-micro-action'
+import type { OptionalDisclosureActionVerb } from '../../form/config/optional-disclosure-actions.lib'
 
 export type OptionalFieldDisclosureProps = {
   controlId: string
   fieldLabel: string
   addLabel: string
+  addAccessibleName: string
+  addAction?: Extract<OptionalDisclosureActionVerb, 'add' | 'edit'>
   removeLabel?: string
+  removeAccessibleName: string
+  removeAction?: Extract<OptionalDisclosureActionVerb, 'clear'>
   open: boolean
   onOpenChange: (open: boolean) => void
   onRemove: () => void
@@ -46,7 +51,7 @@ type OptionalDisclosureMicroActionProps = Omit<
   ComponentProps<typeof Button>,
   'variant' | 'size'
 > & {
-  action: 'add' | 'clear'
+  action: OptionalDisclosureActionVerb
   children: ReactNode
 }
 
@@ -285,6 +290,8 @@ function CollapsedOptionalFieldDisclosure({
 function DisclosureAddButton({
   controlId,
   addLabel,
+  addAccessibleName,
+  addAction,
   labeled,
   summaryId,
   addDisabled,
@@ -292,6 +299,8 @@ function DisclosureAddButton({
 }: {
   controlId: string
   addLabel: string
+  addAccessibleName: string
+  addAction: 'add' | 'edit'
   labeled: boolean
   summaryId?: string
   addDisabled: boolean
@@ -299,8 +308,9 @@ function DisclosureAddButton({
 }) {
   return (
     <OptionalDisclosureMicroAction
-      action="add"
+      action={addAction}
       className={labeled ? undefined : 'w-fit justify-start'}
+      aria-label={addAccessibleName}
       aria-controls={controlId}
       aria-expanded={false}
       aria-describedby={summaryId}
@@ -320,6 +330,8 @@ function OpenOptionalFieldDisclosure({
   controlId,
   fieldLabel,
   removeLabel,
+  removeAccessibleName,
+  removeAction,
   inAnatomyRow,
   labeled,
   message,
@@ -331,6 +343,8 @@ function OpenOptionalFieldDisclosure({
   controlId: string
   fieldLabel: string
   removeLabel: string
+  removeAccessibleName: string
+  removeAction: 'clear'
   inAnatomyRow: boolean
   labeled: boolean
   message?: ReactNode
@@ -340,8 +354,8 @@ function OpenOptionalFieldDisclosure({
 }) {
   const removeButton = (
     <OptionalDisclosureMicroAction
-      action="clear"
-      aria-label={`${removeLabel} ${fieldLabel}`}
+      action={removeAction}
+      aria-label={removeAccessibleName}
       onClick={onRemove}
     >
       {removeLabel}
@@ -381,7 +395,11 @@ export function OptionalFieldDisclosure({
   controlId,
   fieldLabel,
   addLabel,
+  addAccessibleName,
+  addAction = 'add',
   removeLabel = 'Remove',
+  removeAccessibleName,
+  removeAction = 'clear',
   open,
   onOpenChange,
   onRemove,
@@ -399,6 +417,8 @@ export function OptionalFieldDisclosure({
     <DisclosureAddButton
       controlId={controlId}
       addLabel={addLabel}
+      addAccessibleName={addAccessibleName}
+      addAction={addAction}
       labeled={labeled}
       summaryId={summary ? summaryId : undefined}
       addDisabled={addDisabled}
@@ -427,6 +447,8 @@ export function OptionalFieldDisclosure({
       controlId={controlId}
       fieldLabel={fieldLabel}
       removeLabel={removeLabel}
+      removeAccessibleName={removeAccessibleName}
+      removeAction={removeAction}
       inAnatomyRow={inAnatomyRow}
       labeled={labeled}
       message={message}
