@@ -110,6 +110,38 @@ describe('group optionalDisclosure', () => {
     })
   })
 
+  it('applies headingScale field on open optional disclosure groups', async () => {
+    const user = userEvent.setup()
+    const movementGroup = {
+      kind: 'group',
+      name: 'movementOverride',
+      heading: { label: 'Movement' },
+      headingScale: 'field',
+      optionalDisclosure: {
+        addLabel: 'Override movement',
+        removeLabel: 'Remove',
+        labeled: true,
+      },
+      fields: [{ type: 'text', name: 'walk', label: 'Walk' }],
+    } as const satisfies FormItem
+    function MovementHarness() {
+      const form = useForm({ defaultValues: {}, shouldUnregister: true })
+      return (
+        <FormProvider {...form}>
+          <FormItems items={[movementGroup]} idPrefix="movement" />
+        </FormProvider>
+      )
+    }
+    render(<MovementHarness />)
+    await user.click(screen.getByRole('button', { name: 'Override movement' }))
+    expect(screen.getByRole('group', { name: /Movement/ })).toBeInTheDocument()
+    const movementLabel = screen
+      .getByText('Movement')
+      .closest('span.text-style-field-label-sm, span.text-style-field-label-md')
+    expect(movementLabel).toHaveClass('text-style-field-label-md')
+    expect(movementLabel?.className).not.toMatch(/text-style-field-legend/)
+  })
+
   it('writes seedWhen when the group opens', async () => {
     const user = userEvent.setup()
     const seeded = {

@@ -9,7 +9,12 @@ import { OptionalFieldDisclosure } from '../../components/ui/optional-field-disc
 import { formMicroActionButtonProps } from '../form-micro-action'
 import type { GroupConfig } from '../field-config'
 import { collectDependentClearingFields } from '../config/confirm-before-clear.lib'
+import { useDependsOnValues } from '../config/form-depends-on.client'
 import { useConfirmBeforeClear } from '../config/use-confirm-before-clear.client'
+import {
+  resolveOptionalDisclosureClearPaths,
+  useOptionalDisclosureGroupLegendChrome,
+} from './optional-disclosure-group.lib'
 
 function objectHasContent(value: unknown): boolean {
   if (value == null || typeof value !== 'object' || Array.isArray(value)) return false
@@ -62,10 +67,9 @@ export function OptionalDisclosureGroup({
 
   return (
     <OptionalDisclosureGroupBody
+      item={item}
       disclosure={disclosure}
       objectName={objectName}
-      fieldLabel={item.heading?.label ?? 'Saving throw'}
-      fields={item.fields}
       idPrefix={idPrefix}
       namePrefix={namePrefix}
     >
@@ -75,22 +79,22 @@ export function OptionalDisclosureGroup({
 }
 
 function OptionalDisclosureGroupBody({
+  item,
   disclosure,
   objectName,
-  fieldLabel,
-  fields,
   idPrefix,
   namePrefix,
   children,
 }: {
+  item: GroupConfig
   disclosure: NonNullable<GroupConfig['optionalDisclosure']>
   objectName: string
-  fieldLabel: string
-  fields: GroupConfig['fields']
   idPrefix: string
   namePrefix?: string
   children: ReactNode
 }) {
+  const { fieldLabel, heading, legendSize, groupRhythm, groupSize, hint } =
+    useOptionalDisclosureGroupLegendChrome(item, namePrefix)
   const fullName = namePrefix ? `${namePrefix}.${objectName}` : objectName
   const { setValue, unregister, getValues } = useFormContext()
   const watched = useWatch({ name: fullName })
@@ -110,14 +114,12 @@ function OptionalDisclosureGroupBody({
   }, [defaultValues])
   const open = manualOpen || (disclosure.expandWhenPopulated !== false && populated)
   const controlId = `${idPrefix}-${fullName.replaceAll('.', '-')}`
+  const summaryDependsOn = disclosure.summary?.dependsOn ?? []
+  const summaryDependencyValues = useDependsOnValues(summaryDependsOn, namePrefix)
+  const summaryText = disclosure.summary?.resolve(summaryDependencyValues, { open })
 
   const clear = () => {
-    const pathsToClear =
-      disclosure.clearPaths && disclosure.clearPaths.length > 0
-        ? disclosure.clearPaths
-        : disclosure.watchPaths && disclosure.watchPaths.length > 0
-          ? disclosure.watchPaths
-          : [fullName]
+    const pathsToClear = resolveOptionalDisclosureClearPaths(disclosure, fullName)
     for (const path of pathsToClear) {
       unregister(path, { keepDefaultValue: true, keepDirty: false })
     }
@@ -134,7 +136,7 @@ function OptionalDisclosureGroupBody({
   }
   const { attemptClear, confirmDialog } = useConfirmBeforeClear({
     confirmBeforeClear: disclosure.confirmBeforeClear,
-    clearingFields: collectDependentClearingFields(fields),
+    clearingFields: collectDependentClearingFields(item.fields),
     namePrefix,
     onClear: clear,
   })
@@ -146,6 +148,13 @@ function OptionalDisclosureGroupBody({
         <FieldGroup
           id={controlId}
           legend={fieldLabel}
+          legendSrOnly={heading?.labelVisibility === 'srOnly'}
+          legendAccessory={heading?.accessory}
+          legendSize={legendSize}
+          headingScale={item.headingScale}
+          rhythm={groupRhythm}
+          size={groupSize}
+          hint={hint}
           legendAction={
             <Button
               {...formMicroActionButtonProps}
@@ -172,12 +181,14 @@ function OptionalDisclosureGroupBody({
         removeLabel={removeLabel}
         open={false}
         labeled={disclosure.labeled}
+        summary={summaryText}
         addDisabled={disclosure.addDisabled}
         onOpenChange={(next) => {
           if (!next) return
           setManualOpen(true)
           if (disclosure.seedWhen && !watchedHasContent(watched)) {
-            setValue(fullName, disclosure.seedWhen({}), {
+            const seedValues = (formValues ?? getValues()) as Record<string, unknown>
+            setValue(fullName, disclosure.seedWhen(seedValues), {
               shouldDirty: true,
               shouldTouch: true,
               shouldValidate: true,
