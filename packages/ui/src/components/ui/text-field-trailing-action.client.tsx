@@ -5,7 +5,7 @@ import * as React from 'react'
 import { Button } from './button.client'
 import { Field, type FieldSize, useFieldRootContext } from './field.client'
 import { FieldLayout } from './field-layout'
-import { FieldLabelContent } from './field-label-content'
+import { FormFieldLabel } from '../../form/presentation/form-field-label.client'
 import { Input } from './input.client'
 import { InputActionGroup } from './input-action-group.client'
 import { Text } from './text'
@@ -172,9 +172,13 @@ export const TextFieldTrailingAction = React.forwardRef<
         <FieldLayout
           wrapControl={false}
           label={
-            <Field.Label id={`${id}-label`} htmlFor={id}>
-              <FieldLabelContent label={label} info={info} />
-            </Field.Label>
+            <FormFieldLabel
+              id={`${id}-label`}
+              htmlFor={id}
+              label={label}
+              info={info}
+              required={required}
+            />
           }
           control={
             <TextFieldTrailingActionControl

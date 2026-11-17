@@ -279,6 +279,9 @@ export const fieldSetResetClasses = 'min-w-0 border-0 p-0 m-0'
 export const fieldSetChromeContainClasses = 'flex flex-col'
 /** `contents` so legend children participate in fieldset flex gap. */
 export const fieldSetInFlowLegendClasses = 'contents min-w-0 p-0'
+/** Keeps a visible legend name and outside info action on one header row inside a fieldset flex stack. */
+export const fieldSetLegendInfoFlowClasses =
+  '[&>[data-field-legend-info]]:shrink-0 [&>:not(legend):not([data-field-legend-info])]:w-full [&>:not(legend):not([data-field-legend-info])]:basis-full'
 /** Prose connectors share a row with compact controls — center on the control band, not the box bottom. */
 export const fieldInlineSentenceClasses = 'flex flex-wrap items-center gap-x-2 gap-y-2'
 /** Inline sentence inside an anatomy row — same cross-axis alignment with row min-width guard. */

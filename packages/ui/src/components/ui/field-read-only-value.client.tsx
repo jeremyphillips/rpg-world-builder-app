@@ -5,7 +5,7 @@ import type { ReactNode } from 'react'
 import { cn } from '../../lib/utils'
 import { Field, type FieldSize, useFieldRootContext } from './field.client'
 import { FieldLayout } from './field-layout'
-import { FieldLabelContent } from './field-label-content'
+import { FormFieldLabel } from '../../form/presentation/form-field-label.client'
 import { FormField } from './form-field'
 import type { FieldWidth } from './field-control.variants'
 import type { FieldHintPosition, FieldLabelPosition } from './field.variants'
@@ -156,11 +156,7 @@ export function FieldReadOnlyValueField({
       {label.trim() ? (
         <FieldLayout
           wrapControl={false}
-          label={
-            <Field.Label id={labelId}>
-              <FieldLabelContent label={label} info={info} />
-            </Field.Label>
-          }
+          label={<FormFieldLabel id={labelId} label={label} info={info} />}
           control={<Field.Control>{controlBody}</Field.Control>}
           chrome={chrome}
           size={size}

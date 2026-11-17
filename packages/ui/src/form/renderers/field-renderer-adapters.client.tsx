@@ -156,7 +156,7 @@ export const fieldRenderers: {
           digits={config.digits}
           size={resolveNumberStepperSizeFromFieldSize(args.controlSize)}
           disabled={config.disabled}
-          aria-label={config.label}
+          stepperLabel={config.label}
           aria-invalid={validation.invalid || undefined}
           onBlur={field.onBlur}
         />

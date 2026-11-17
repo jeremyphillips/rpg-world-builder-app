@@ -13,8 +13,7 @@ import {
   fieldLabelVariants,
   type FieldHintPosition,
 } from './field.variants'
-import { FieldLabelContent, FieldLabelInfoAction } from './field-label-content'
-import { shouldShowVisibleRequiredMarker } from './field-required.lib'
+import { FieldLegendInfoSibling, FieldLegendLabel } from './field-label-content'
 import type { FieldOption } from '../../form/field-config/field-options'
 import type { FieldWidth } from './field-control.variants'
 import type { SelectFieldValueProps } from './select-field-value-props'
@@ -271,7 +270,8 @@ export function ChipsField({
         hintId={hintId}
         error={error}
         errorId={errorId}
-        legendSrOnly={labelVisibility === 'srOnly' && info == null}
+        legendSrOnly={labelVisibility === 'srOnly'}
+        legendHasInfo={info != null}
         fieldsetProps={{
           id,
           'aria-describedby': resolvedDescribedBy,
@@ -286,19 +286,15 @@ export function ChipsField({
           hint={hint}
           hintId={hintId}
           legend={
-            <legend id={legendId} className={labelVisibility === 'srOnly' ? 'sr-only' : undefined}>
-              <FieldLabelContent
-                label={label}
-                required={required}
-                showRequiredMarker={shouldShowVisibleRequiredMarker(required, labelVisibility)}
-                info={labelVisibility === 'srOnly' ? undefined : info}
-              />
-            </legend>
+            <FieldLegendLabel
+              legendId={legendId}
+              label={label}
+              labelVisibility={labelVisibility}
+              required={required}
+            />
           }
         >
-          {labelVisibility === 'srOnly' && info != null ? (
-            <FieldLabelInfoAction label={label} info={info} />
-          ) : null}
+          {info != null ? <FieldLegendInfoSibling label={label} info={info} /> : null}
           {chipsControl(legendId)}
         </FieldsetChromeAnatomy>
       </FieldsetChromeFrame>

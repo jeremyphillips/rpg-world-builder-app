@@ -4,7 +4,7 @@ import type { ReactNode } from 'react'
 
 import type { FieldSize } from '../../components/ui/field.client'
 import { FieldLabelContent } from '../../components/ui/field-label-content'
-import { shouldShowVisibleRequiredMarker } from '../../components/ui/field-required.lib'
+import { resolveOwnedLabelPolicy } from '../../components/ui/field-required.lib'
 import {
   fieldLabelVariants,
   type FieldRhythm,
@@ -76,27 +76,24 @@ function renderHeadingBlock({
   let labelLine: ReactNode = null
 
   if (headingScale === 'field') {
+    const fieldLabelVisibility = showVisibleLabel ? 'visible' : 'srOnly'
+    const { showRequiredMarker, nameClassName } = resolveOwnedLabelPolicy(
+      required,
+      fieldLabelVisibility,
+    )
     if (showVisibleLabel) {
       labelLine = (
         <div className={formSectionHeaderLabelRowClasses}>
           <span className={fieldLabelVariants({ size })}>
-            <FieldLabelContent
-              label={label}
-              required={required}
-              showRequiredMarker={shouldShowVisibleRequiredMarker(required ?? false, 'visible')}
-            />
+            <FieldLabelContent label={label} showRequiredMarker={showRequiredMarker} />
           </span>
           {labelAccessory}
         </div>
       )
     } else {
       const srOnlyLabel = (
-        <span className={cn(fieldLabelVariants({ size }), 'sr-only')}>
-          <FieldLabelContent
-            label={label}
-            required={required}
-            showRequiredMarker={shouldShowVisibleRequiredMarker(required ?? false, 'visible')}
-          />
+        <span className={cn(fieldLabelVariants({ size }), nameClassName)}>
+          <FieldLabelContent label={label} showRequiredMarker={showRequiredMarker} />
         </span>
       )
       labelLine = labelAccessory ? (

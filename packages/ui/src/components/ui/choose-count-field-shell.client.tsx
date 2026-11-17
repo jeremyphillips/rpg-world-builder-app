@@ -8,9 +8,8 @@ import { resolveFieldAnatomyWidth, type FieldChrome } from './field-chrome.varia
 import { fieldAnatomyIds } from './choose-count-field.lib'
 import { resolveFieldDescribedBy } from './field-validation-props'
 import { type FieldHintPosition } from './field.variants'
-import { FieldLabelContent, FieldLabelInfoAction } from './field-label-content'
+import { FieldLegendInfoSibling, FieldLegendLabel } from './field-label-content'
 import { FieldsetChromeAnatomy, FieldsetChromeFrame } from './fieldset-chrome-anatomy'
-import { shouldShowVisibleRequiredMarker } from './field-required.lib'
 import type { FieldLabelVisibility } from '../../form/form-heading.lib'
 
 export interface ChooseCountFieldAnatomy {
@@ -74,7 +73,8 @@ export function ChooseCountFieldShell({
         hintId={hintId}
         error={error}
         errorId={errorId}
-        legendSrOnly={labelVisibility === 'srOnly' && info == null}
+        legendSrOnly={labelVisibility === 'srOnly'}
+        legendHasInfo={info != null}
         fieldsetProps={{
           id,
           'aria-describedby': describedBy,
@@ -88,19 +88,15 @@ export function ChooseCountFieldShell({
           hint={hint}
           hintId={hintId}
           legend={
-            <legend id={legendId} className={labelVisibility === 'srOnly' ? 'sr-only' : undefined}>
-              <FieldLabelContent
-                label={label}
-                required={required}
-                showRequiredMarker={shouldShowVisibleRequiredMarker(required, labelVisibility)}
-                info={labelVisibility === 'srOnly' ? undefined : info}
-              />
-            </legend>
+            <FieldLegendLabel
+              legendId={legendId}
+              label={label}
+              labelVisibility={labelVisibility}
+              required={required}
+            />
           }
         >
-          {labelVisibility === 'srOnly' && info != null ? (
-            <FieldLabelInfoAction label={label} info={info} />
-          ) : null}
+          {info != null ? <FieldLegendInfoSibling label={label} info={info} /> : null}
           {children({ legendId, chooseId, hintId, errorId })}
         </FieldsetChromeAnatomy>
       </FieldsetChromeFrame>

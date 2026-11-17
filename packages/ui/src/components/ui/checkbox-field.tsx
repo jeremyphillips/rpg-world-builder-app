@@ -2,7 +2,7 @@ import type { ComponentProps, ReactNode } from 'react'
 
 import { useFieldRowParticipation } from './field-row-anatomy.context'
 import { Field, type FieldSize } from './field.client'
-import { FieldLabelInfoAction } from './field-label-content'
+import { FieldLabelLine } from './field-label-content'
 import { CheckboxFieldOptionLabel } from './checkbox-field-option-label'
 import { CheckboxOption, type CheckboxOptionShell } from './checkbox-option.client'
 import type { CheckboxOptionScale } from './checkbox-option.lib'
@@ -91,27 +91,25 @@ export function CheckboxField({
         <FieldControlRegion>
           <div className={presentation.controlBandClassName}>
             <div className={cn(hintBelowOption && fieldLabelHintStackClasses)}>
-              <CheckboxOption
-                id={id}
-                label={
-                  <CheckboxFieldOptionLabel
-                    label={label}
-                    labelVisibility={labelVisibility}
-                    required={required}
-                    info={info}
-                  />
-                }
-                shell={shell}
-                tone={tone}
-                size={optionSize}
-                invalid={invalid ?? Boolean(error)}
-                describedBy={describedBy}
-                required={required}
-                {...checkboxProps}
-              />
-              {labelVisibility === 'srOnly' && info != null ? (
-                <FieldLabelInfoAction label={label} info={info} />
-              ) : null}
+              <FieldLabelLine label={label} info={info}>
+                <CheckboxOption
+                  id={id}
+                  label={
+                    <CheckboxFieldOptionLabel
+                      label={label}
+                      labelVisibility={labelVisibility}
+                      required={required}
+                    />
+                  }
+                  shell={shell}
+                  tone={tone}
+                  size={optionSize}
+                  invalid={invalid ?? Boolean(error)}
+                  describedBy={describedBy}
+                  required={required}
+                  {...checkboxProps}
+                />
+              </FieldLabelLine>
               {hintBelowOption ? <Field.Hint /> : null}
             </div>
           </div>

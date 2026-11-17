@@ -7,7 +7,7 @@ import { Field, useFieldRootContext, type FieldSize } from './field.client'
 import { FieldLayout } from './field-layout'
 import { resolveFieldAnatomyWidth, type FieldChrome } from './field-chrome.variants'
 import type { FieldHintPosition } from './field.variants'
-import { FieldLabelContent } from './field-label-content'
+import { FormFieldLabel } from '../../form/presentation/form-field-label.client'
 import { fieldAnatomyStackClasses } from './field.variants'
 import { Input } from './input.client'
 import { TextSuggestionsActions } from './text-suggestions-field-parts.client'
@@ -96,8 +96,8 @@ export function TextSuggestionsField({
 }: TextSuggestionsFieldProps) {
   const field = useTextSuggestionsField({ value, onValueChange, onBlur })
   const showSuggestions = suggestions.length > 0 && !field.trimmedInput
-  const inputAriaLabel = ariaLabel ?? (label.trim() ? label : undefined)
   const showLabel = Boolean(label.trim())
+  const inputAriaLabel = showLabel ? undefined : (ariaLabel ?? (label.trim() ? label : undefined))
   const rootWidth = resolveFieldAnatomyWidth(width, chrome)
 
   return (
@@ -118,23 +118,29 @@ export function TextSuggestionsField({
         controlSize={controlSize}
         label={
           showLabel ? (
-            <Field.Label id={`${id}-label`} htmlFor={id}>
-              <FieldLabelContent label={label} info={info} />
-            </Field.Label>
+            <FormFieldLabel
+              id={`${id}-label`}
+              htmlFor={id}
+              label={label}
+              info={info}
+              required={required}
+            />
           ) : null
         }
         control={
           <div className={cn(fieldAnatomyStackClasses, 'gap-2')}>
-            <TextSuggestionsInput
-              id={id}
-              size={controlSize ?? size}
-              disabled={disabled}
-              placeholder={placeholder}
-              value={field.displayValue}
-              ariaLabel={inputAriaLabel}
-              onChange={field.handleInputChange}
-              onBlur={field.handleInputBlur}
-            />
+            <Field.Control>
+              <TextSuggestionsInput
+                id={id}
+                size={controlSize ?? size}
+                disabled={disabled}
+                placeholder={placeholder}
+                value={field.displayValue}
+                ariaLabel={inputAriaLabel}
+                onChange={field.handleInputChange}
+                onBlur={field.handleInputBlur}
+              />
+            </Field.Control>
             {showSuggestions ? (
               <TextSuggestionsActions
                 suggestions={suggestions}

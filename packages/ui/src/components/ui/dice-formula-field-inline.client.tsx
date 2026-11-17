@@ -10,8 +10,8 @@ import type { FieldWidth } from './field-control.variants'
 import { fieldWidthVariants } from './field-control.variants'
 import type { FieldLabelVisibility } from '../../form/form-heading.lib'
 import { showOwnedLabelSlot } from './owned-label-visibility.lib'
-import { FieldLabelContent, FieldLabelInfoAction } from './field-label-content'
-import { shouldShowVisibleRequiredMarker } from './field-required.lib'
+import { FieldLabelContent, FieldLabelLine } from './field-label-content'
+import { resolveOwnedLabelPolicy } from './field-required.lib'
 import {
   fieldAnatomyStackVariants,
   fieldInlineControlRowClasses,
@@ -52,22 +52,19 @@ function DiceFormulaInlineLabel({
   DiceFormulaInlineFieldProps,
   'label' | 'labelVisibility' | 'required' | 'info' | 'size' | 'inlineLabelId'
 >) {
-  const labelSrOnly = labelVisibility === 'srOnly'
+  const { showRequiredMarker, nameClassName } = resolveOwnedLabelPolicy(
+    required,
+    labelVisibility ?? 'visible',
+  )
   return (
-    <>
+    <FieldLabelLine label={label} info={info}>
       <span
         id={inlineLabelId}
-        className={cn(fieldLabelVariants({ size }), labelSrOnly ? 'sr-only' : 'shrink-0')}
+        className={cn(fieldLabelVariants({ size }), nameClassName ?? 'shrink-0')}
       >
-        <FieldLabelContent
-          label={label}
-          required={required}
-          showRequiredMarker={shouldShowVisibleRequiredMarker(required, labelVisibility)}
-          info={labelSrOnly ? undefined : info}
-        />
+        <FieldLabelContent label={label} showRequiredMarker={showRequiredMarker} />
       </span>
-      {labelSrOnly && info != null ? <FieldLabelInfoAction label={label} info={info} /> : null}
-    </>
+    </FieldLabelLine>
   )
 }
 

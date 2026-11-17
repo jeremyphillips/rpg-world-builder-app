@@ -77,7 +77,7 @@ describe('SwitchField', () => {
     )
     const label = screen.getByText('Allow multiclassing').closest('label')
     const hint = screen.getByText('When off, characters cannot take levels in additional classes.')
-    const textColumn = label?.parentElement
+    const textColumn = label?.parentElement?.parentElement
 
     expect(textColumn).not.toBeNull()
     expect(textColumn).toHaveClass('flex', 'flex-col', 'gap-0.5')

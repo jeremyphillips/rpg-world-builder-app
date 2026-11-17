@@ -12,6 +12,7 @@ import {
   fieldLabelVariants,
   fieldSetChromeContainClasses,
   fieldSetInFlowLegendClasses,
+  fieldSetLegendInfoFlowClasses,
   fieldSetResetClasses,
   type FieldHintPosition,
 } from './field.variants'
@@ -37,6 +38,8 @@ export interface FieldsetChromeFrameProps {
   errorId: string
   /** Omit header-to-body gap when the legend is out of flow. Body spacing stays. */
   legendSrOnly?: boolean
+  /** Applies header-row flow when a legend info action renders as a fieldset sibling. */
+  legendHasInfo?: boolean
   fieldsetProps: ComponentProps<'fieldset'>
   children: ReactNode
 }
@@ -145,6 +148,7 @@ export function FieldsetChromeFrame({
   error,
   errorId,
   legendSrOnly = false,
+  legendHasInfo = false,
   fieldsetProps,
   children,
 }: FieldsetChromeFrameProps) {
@@ -163,6 +167,8 @@ export function FieldsetChromeFrame({
             fieldSetResetClasses,
             fieldSetChromeContainClasses,
             fieldsetStack,
+            legendHasInfo && 'flex flex-row flex-wrap items-center gap-x-1.5',
+            legendHasInfo && fieldSetLegendInfoFlowClasses,
             fieldsetClassName,
           )}
         >

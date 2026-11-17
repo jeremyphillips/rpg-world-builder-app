@@ -14,6 +14,16 @@ export function shouldShowVisibleRequiredMarker(
   return Boolean(required) && labelVisibility !== 'srOnly'
 }
 
+export function resolveOwnedLabelPolicy(
+  required: boolean | undefined,
+  visibility: FieldLabelVisibility,
+): { showRequiredMarker: boolean; nameClassName: string | undefined } {
+  return {
+    showRequiredMarker: shouldShowVisibleRequiredMarker(required, visibility),
+    nameClassName: visibility === 'srOnly' ? 'sr-only' : undefined,
+  }
+}
+
 function getComponentDisplayName(type: unknown): string | undefined {
   if (typeof type !== 'function' && typeof type !== 'object') return undefined
   if (type === null) return undefined

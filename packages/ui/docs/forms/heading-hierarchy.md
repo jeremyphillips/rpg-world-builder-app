@@ -56,7 +56,7 @@ labelVisibility?: 'visible' | 'srOnly' // default 'visible'
 
 Declare `labelVisibility` once on the field or group heading. The nearest `Field.Root` stores it. The owned label slot (`FieldLayout`, settings, inline, `FormFieldLabel`, `FieldRadiogroupLabel`) reads that value. An explicit prop on the slot still wins. Nested fields create their own root and do not inherit it. Segment labels (`aria-label`, raw `<label>`, occupant text) do not read it, so they stay visible without `labelVisibility: 'visible'`.
 
-An `srOnly` label stays in the accessibility tree and does not occupy the label region, settings column, or inline label wrapper. A visible hint, recommendation, or info action still occupies that header space. The info button stays outside the `sr-only` text so it remains focusable. Fieldset legends stay `<legend>`; hiding one omits header-to-body gap and leaves body rhythm in place.
+An `srOnly` label stays in the accessibility tree and does not occupy the label region, settings column, or inline label wrapper. A visible hint, recommendation, or info action still occupies that header space. For every visibility, the info button sits in `FieldLabelLine` beside the naming element (`<label>`, `<legend>`, or radiogroup span) — never inside it — so it stays focusable and out of the accessible name. Fieldset legends stay `<legend>` with name text only; info renders as the next fieldset sibling. Hiding a legend omits header-to-body gap and leaves body rhythm in place.
 
 ## Phase 0 migration audit (sample)
 

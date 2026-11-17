@@ -27,6 +27,7 @@ import { cn } from '../../lib/utils'
 import type { FieldLayoutRecommendation } from './field-recommendation.types'
 import { FieldRecommendationFieldContent } from './field-recommendation-field-content.client'
 import { resolveFieldLayoutRecommendation } from './field-recommendation.lib'
+import { showOwnedLabelSlot } from './owned-label-visibility.lib'
 
 export interface FormFieldProps {
   id: string
@@ -179,7 +180,11 @@ export function FormField({
   const resolvedRecommendation = resolveFieldLayoutRecommendation(hintPosition, recommendation)
   const hintInHeader = Boolean(hint) && (hintPosition ?? 'below-label') !== 'below-control'
   const headerHasVisibleContent =
-    labelVisibility !== 'srOnly' || hintInHeader || Boolean(resolvedRecommendation) || Boolean(info)
+    showOwnedLabelSlot({
+      labelVisibility,
+      hintInLabelSlot: hintInHeader,
+      hasInfo: Boolean(info),
+    }) || Boolean(resolvedRecommendation)
 
   if (labelPosition === 'settings') {
     return (
