@@ -15,9 +15,11 @@ import type { ArrayConfig, FieldVisibility, FormItem } from '@rpg/ui/form'
 import { disableOptionsUsedInSiblingRows } from '@rpg/ui/form'
 import { z } from 'zod'
 
+export const MOVEMENT_FIELD_LABEL = 'Movement'
 export const MOVEMENT_MODE_FIELD_LABEL = 'Mode'
 export const MOVEMENT_SPEED_FIELD_LABEL = 'Speed'
 export const CREATURE_FLY_HOVER_LABEL = 'Can hover'
+export const MOVEMENT_ARRAY_EMPTY_STATE_PRIMARY = 'No modes added.'
 
 export const movementValidationMessages = {
   duplicateMode: defineMessage(
@@ -82,7 +84,9 @@ export function movementArrayField(): ArrayConfig {
   return {
     kind: 'array',
     name: 'movement',
-    heading: { label: 'Movement' },
+    heading: { label: MOVEMENT_FIELD_LABEL },
+    headingScale: 'field',
+    emptyStatePrimary: MOVEMENT_ARRAY_EMPTY_STATE_PRIMARY,
     addAction: { label: 'Add movement', layout: 'inline', size: 'sm' },
     min: 1,
     max: MOVEMENT_MODES.length,
@@ -175,12 +179,10 @@ export function creatureFlyHoverSwitchField(): FormItem {
 }
 
 export function movementWithHoverGroup(): FormItem {
-  const movementField = movementArrayField()
   return {
     kind: 'group',
-    heading: { label: 'Movement' },
     density: 'comfortable',
-    fields: [movementField, creatureFlyHoverSwitchField()],
+    fields: [movementArrayField(), creatureFlyHoverSwitchField()],
   }
 }
 

@@ -4,14 +4,17 @@ import type { FormItem } from '@rpg/ui/form'
 import { buildActiveSizeFieldOptions } from '@/features/vocabulary'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { createCreatureSizesFieldConfig } from '../../../lib/forms/fields/creature-sizes-form-fields'
+import { MonsterFormsDifferencePresentation } from '../../components/form/monster-forms-difference-presentation'
 import { MonsterFormsEditor } from '../../components/form/monster-forms-editor'
 import { MonsterTrueFormDesignation } from '../../components/form/monster-true-form-designation'
+import { monsterFormMovementOverrideGroup } from './monster-form-movement-override-fields'
 import {
   MONSTER_FORM_NAME_LABEL,
   MONSTER_FORM_NOTES_ADD_LABEL,
   MONSTER_FORM_NOTES_HINT,
   MONSTER_FORM_NOTES_LABEL,
   MONSTER_FORM_SIZE_HINT,
+  MONSTER_FORM_SPEECH_LABEL,
   MONSTER_FORMS_ADD_LABEL,
   MONSTER_FORMS_HEADING,
   MONSTER_TRUE_FORM_HEADING,
@@ -31,6 +34,12 @@ export function monsterDefinedFormDetailFields(ctx: ContentFormCtx): FormItem[] 
         addLabel: MONSTER_FORM_SIZE_HINT,
         expandWhenPopulated: true,
       },
+    },
+    monsterFormMovementOverrideGroup(),
+    {
+      type: 'checkbox',
+      name: 'speechRestricted',
+      label: MONSTER_FORM_SPEECH_LABEL,
     },
     {
       type: 'textarea',
@@ -97,6 +106,12 @@ export function monsterFormsSectionFields(ctx: ContentFormCtx): FormItem[] {
           name: 'formsEditor',
           issuePaths: ['forms.definedForms', 'forms.trueForm.formId'],
           render: () => createElement(MonsterFormsEditor, { ctx }),
+        },
+        {
+          kind: 'slot',
+          name: 'forms.differencesPresentation',
+          issuePaths: ['forms.differencesPresentation'],
+          render: () => createElement(MonsterFormsDifferencePresentation),
         },
       ],
     },

@@ -37,25 +37,39 @@ export function MonsterFormsEditor({ ctx }: { ctx: ContentFormCtx }) {
     () => ({ resolveItemFields: monsterDefinedFormRowResolveFields(ctx) }),
     [ctx],
   )
-  const resolveItemFields = useCallback(() => {
-    const fields = monsterDefinedFormDetailFields(ctx)
-    const selected =
-      editor.selectedIndex === null ? undefined : forms?.definedForms[editor.selectedIndex]
-    const designated = forms?.trueForm.kind === 'defined' && forms.trueForm.formId === selected?.id
-    if (!designated) return fields
-    return [
-      ...fields.filter((field) => !('name' in field) || field.name !== 'overrides.sizes'),
-      {
-        kind: 'slot' as const,
-        name: 'baseStatistics',
-        render: () => (
-          <div>
-            <p>This form uses the creature's base statistics.</p>
-          </div>
+  const resolveItemFields = useCallback(
+    (row: unknown) => {
+      const draft = row as MonsterDefinedFormDraft
+      const fields = monsterDefinedFormDetailFields(ctx)
+      const designated = forms?.trueForm.kind === 'defined' && forms.trueForm.formId === draft?.id
+      if (!designated) return fields
+      const trueFormOverrideFieldNames = [
+        'overrides.sizes',
+        'movementOverride',
+        'speechRestricted',
+      ] as const
+      return [
+        ...fields.filter(
+          (field) =>
+            !('name' in field) ||
+            field.name == null ||
+            !trueFormOverrideFieldNames.includes(
+              field.name as (typeof trueFormOverrideFieldNames)[number],
+            ),
         ),
-      },
-    ]
-  }, [ctx, editor.selectedIndex, forms])
+        {
+          kind: 'slot' as const,
+          name: 'baseStatistics',
+          render: () => (
+            <div>
+              <p>This form uses the creature's base statistics.</p>
+            </div>
+          ),
+        },
+      ]
+    },
+    [ctx, forms?.trueForm],
+  )
   const lifecycleEditor = useMemo(
     () => ({
       ...editor,

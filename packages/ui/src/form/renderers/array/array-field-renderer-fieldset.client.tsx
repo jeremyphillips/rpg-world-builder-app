@@ -2,8 +2,6 @@
 
 import type { FieldSizeToken } from '../../../components/ui/field-sizing.variants'
 import {
-  fieldGroupBottomMarginClasses,
-  fieldGroupSectionOuterMarginResetClasses,
   fieldSetChromeContainClasses,
   fieldSetResetClasses,
 } from '../../../components/ui/field.variants'
@@ -23,23 +21,17 @@ type ArrayFieldRendererState = ReturnType<typeof useArrayFieldRendererState>
 export function resolveArrayFieldsetClassName({
   config,
   sectionLayout,
-  omitSectionBottomMargin,
   showSectionHeader,
   legendFieldSize,
 }: {
   config: ArrayConfig
   sectionLayout?: ArrayFieldSectionLayout
-  omitSectionBottomMargin: boolean
   showSectionHeader: boolean
   legendFieldSize: FieldSizeToken
 }): string {
   return cn(
     fieldSetResetClasses,
-    !omitSectionBottomMargin && fieldGroupBottomMarginClasses,
     sectionLayout?.wrapSectionChrome && fieldSetChromeContainClasses,
-    sectionLayout &&
-      (sectionLayout.inParentRhythm || sectionLayout.wrapSectionChrome) &&
-      fieldGroupSectionOuterMarginResetClasses,
     resolveArrayFieldsetHeaderBodyStackClassName(showSectionHeader, legendFieldSize),
     config.className,
   )
@@ -53,6 +45,7 @@ interface ArrayFieldRendererFieldsetProps {
   onMove: (from: number, to: number) => void
 }
 
+// fallow-ignore-next-line complexity
 export function ArrayFieldRendererFieldset({
   config,
   sectionLayout,
@@ -86,7 +79,6 @@ export function ArrayFieldRendererFieldset({
       className={resolveArrayFieldsetClassName({
         config,
         sectionLayout,
-        omitSectionBottomMargin: state.omitSectionBottomMargin,
         showSectionHeader: state.showSectionHeader,
         legendFieldSize: state.legendFieldSize,
       })}
@@ -115,7 +107,10 @@ export function ArrayFieldRendererFieldset({
         {fields.length === 0 ? (
           <div className="flex flex-col gap-1.5">
             {config.emptyState === 'none' ? null : (
-              <ArrayFieldEmptyState itemLabel={state.emptyItemLabel} />
+              <ArrayFieldEmptyState
+                itemLabel={state.emptyItemLabel}
+                primaryMessage={state.emptyStatePrimary}
+              />
             )}
             <ArrayFieldContainerError
               fullName={state.fullName}

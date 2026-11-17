@@ -57,7 +57,7 @@ describe('monster forms validation claims', () => {
         trueForm: { kind: 'profile' },
         definedForms: [{ id: 'bear' }],
       },
-      expected: [{ path: 'forms.definedForms.0.name', targetRole: 'slotOwner' }],
+      expected: [{ path: 'forms.definedForms.0.name', targetRole: 'control' }],
     },
     {
       name: 'duplicate and profile-colliding names',
@@ -71,8 +71,8 @@ describe('monster forms validation claims', () => {
       },
       expected: [
         { path: 'forms.trueForm.name', targetRole: 'slotOwner' },
-        { path: 'forms.definedForms.0.name', targetRole: 'slotOwner' },
-        { path: 'forms.definedForms.1.name', targetRole: 'slotOwner' },
+        { path: 'forms.definedForms.0.name', targetRole: 'control' },
+        { path: 'forms.definedForms.1.name', targetRole: 'control' },
       ],
     },
     {

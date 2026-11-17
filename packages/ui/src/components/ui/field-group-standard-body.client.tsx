@@ -15,7 +15,6 @@ import { isLegendDisclosure, resolveDisclosureDefaultOpen } from './field-group-
 import { FieldGroupLegend } from './field-group-legend.client'
 import {
   fieldAnatomyStackVariants,
-  fieldGroupBottomMarginClasses,
   fieldGroupLegendDisclosureContentVariants,
   fieldSetResetClasses,
   fieldStackRhythmVariants,
@@ -121,7 +120,6 @@ export function StandardFieldGroupBody({
 
   const fieldsetClassName = cn(
     fieldSetResetClasses,
-    fieldGroupBottomMarginClasses,
     'min-w-0',
     chromeClasses.fieldset,
     useLeafAnatomyStack && fieldAnatomyStackVariants({ size: fieldSize }),

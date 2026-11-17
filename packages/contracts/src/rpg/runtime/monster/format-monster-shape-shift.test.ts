@@ -1,15 +1,20 @@
 import { describe, expect, it } from 'vitest'
 
+import type { CreatureFormsDraft } from '../../content/creature/forms'
 import type { CreatureSize } from '../../vocab/creature-size'
 import {
   planMonsterDefinedFormRemoval,
   planMonsterFormsRemoval,
   planMonsterTrueFormDesignation,
 } from '../../content/monster/forms-plan'
+import { analyzeCreatureFormDifferences } from '../creature/form-differences'
 import { formatMonsterForms, formatMonsterShapeShift } from './format-monster-shape-shift'
+import { formatMonsterSpeedStatRow } from './format-monster-speed-stat-row'
+import { formatFormSpeechQualifier } from './format-form-speech'
+import { formatCreatureCommunication } from '../creature/communication'
 import { resolveMonsterHitPoints } from './stat-block'
 
-const werebearForms = {
+const werebearForms: CreatureFormsDraft = {
   profileFormId: 'werebear-profile',
   trueForm: { kind: 'defined' as const, formId: 'humanoid' },
   definedForms: [
@@ -22,69 +27,78 @@ const werebearForms = {
     {
       id: 'bear',
       name: 'Bear',
-      overrides: { sizes: ['large' as const] },
+      overrides: {
+        sizes: ['large' as const],
+        movement: { speeds: { walk: 40, climb: 30 } },
+        canSpeak: false as const,
+      },
     },
   ],
+}
+
+const werebearBase = {
+  monsterName: 'Werebear',
+  baseSizes: ['medium', 'small'] as CreatureSize[],
+  sizes: ['medium', 'small'] as CreatureSize[],
+  baseMovement: { walk: 30 },
 }
 
 describe('formatMonsterShapeShift', () => {
   it('describes size changes, equipment, and a true-form appearance', () => {
     expect(
       formatMonsterShapeShift({
-        monsterName: 'Werebear',
-        baseSizes: ['medium', 'small'],
+        ...werebearBase,
         forms: werebearForms,
         equipment: 'unchanged',
+        hasShapeShift: true,
       }),
     ).toBe(
       "The werebear shape-shifts into a Large bear-humanoid hybrid or a Large bear, or it returns to its true humanoid form. Except for the differences noted, its game statistics are the same in each form. Any equipment it is wearing or carrying isn't transformed.",
     )
   })
 
-  it('uses the prerequisite and notes without implying a speed change', () => {
-    expect(
-      formatMonsterShapeShift({
-        monsterName: 'Vampire',
-        baseSizes: ['medium', 'small'],
-        forms: {
-          profileFormId: 'vampire-profile',
-          trueForm: { kind: 'profile' },
-          definedForms: [
-            { id: 'bat', name: 'Bat', overrides: { sizes: ['tiny'] } },
-            {
-              id: 'mist',
-              name: 'Cloud of mist',
-              overrides: { sizes: ['medium'] },
-              notes:
-                "the vampire can't take any actions or manipulate objects. It is weightless and can enter an enemy's space and stop there.",
+  it('uses the prerequisite, description-mode speech, and notes', () => {
+    const text = formatMonsterShapeShift({
+      monsterName: 'Vampire',
+      baseSizes: ['medium', 'small'],
+      baseMovement: { walk: 40, climb: 40 },
+      forms: {
+        profileFormId: 'vampire-profile',
+        trueForm: { kind: 'profile' },
+        differencesPresentation: 'transformation-description',
+        definedForms: [
+          {
+            id: 'bat',
+            name: 'Bat',
+            overrides: {
+              sizes: ['tiny'],
+              movement: { speeds: { walk: 5, fly: 30 } },
+              canSpeak: false as const,
             },
-          ],
-        },
-        equipment: 'worn-transforms',
-        prerequisite: "the vampire isn't in sunlight or running water",
-      }),
-    ).toContain(
-      "If the vampire isn't in sunlight or running water, it shape-shifts into a Tiny bat or a Medium cloud of mist, or it returns to its true form.",
+          },
+          {
+            id: 'mist',
+            name: 'Cloud of mist',
+            overrides: {
+              sizes: ['medium'],
+              movement: { speeds: { walk: 5, fly: 20 }, hover: true },
+              canSpeak: false as const,
+            },
+            notes:
+              "the vampire can't take any actions or manipulate objects. It is weightless and can enter an enemy's space and stop there.",
+          },
+        ],
+      },
+      equipment: 'worn-transforms',
+      prerequisite: "the vampire isn't in sunlight or running water",
+      hasShapeShift: true,
+    })
+    expect(text).toContain(
+      "If the vampire isn't in sunlight or running water, it shape-shifts into a Tiny bat (Walk 5 ft., Fly 30 ft.) or a Medium cloud of mist (Walk 5 ft., Fly 20 ft. [hover])",
     )
-    expect(
-      formatMonsterShapeShift({
-        monsterName: 'Vampire',
-        baseSizes: ['medium', 'small'],
-        forms: {
-          profileFormId: 'vampire-profile',
-          trueForm: { kind: 'profile' },
-          definedForms: [
-            {
-              id: 'mist',
-              name: 'Mist',
-              notes: 'the vampire is weightless.',
-            },
-          ],
-        },
-        equipment: 'worn-transforms',
-        prerequisite: "the vampire isn't in sunlight or running water",
-      }),
-    ).toContain('While in mist form, the vampire is weightless.')
+    expect(text).toContain("While in bat or cloud of mist form, the vampire can't speak.")
+    expect(text).toContain('Anything it is wearing transforms with it.')
+    expect(text).toContain('While in cloud of mist form, the vampire')
   })
 
   it('uses a profile override and supports Small-or-Medium destinations', () => {
@@ -92,6 +106,7 @@ describe('formatMonsterShapeShift', () => {
       formatMonsterShapeShift({
         monsterName: 'X',
         baseSizes: ['medium'],
+        baseMovement: { walk: 20 },
         forms: {
           profileFormId: 'profile',
           trueForm: { kind: 'profile', name: 'Blob' },
@@ -100,10 +115,121 @@ describe('formatMonsterShapeShift', () => {
           ],
         },
         equipment: 'unchanged',
+        hasShapeShift: true,
       }),
     ).toBe(
       "The x shape-shifts into a Small or Medium object, or it returns to its true blob form. Except for the differences noted, its game statistics are the same in each form. Any equipment it is wearing or carrying isn't transformed.",
     )
+  })
+
+  it('prints the succubus fly-only-true-form sentence in description mode', () => {
+    const text = formatMonsterShapeShift({
+      monsterName: 'Succubus',
+      baseSizes: ['medium'],
+      baseMovement: { walk: 30, fly: 60 },
+      forms: {
+        profileFormId: 'succubus-profile',
+        trueForm: { kind: 'profile' },
+        differencesPresentation: 'transformation-description',
+        definedForms: [
+          {
+            id: 'humanoid',
+            name: 'Humanoid',
+            overrides: { sizes: ['medium', 'small'], movement: { speeds: { walk: 30 } } },
+          },
+        ],
+      },
+      equipment: 'unchanged',
+      hasShapeShift: true,
+    })
+    expect(text).toContain('Its Fly Speed is available only in its true form.')
+  })
+})
+
+describe('qualified stat rows', () => {
+  it('formats Werebear speed and language qualifiers', () => {
+    expect(
+      formatMonsterSpeedStatRow({
+        monsterName: werebearBase.monsterName,
+        sizes: werebearBase.sizes,
+        movement: werebearBase.baseMovement,
+        forms: werebearForms,
+        hasShapeShift: true,
+      }),
+    ).toBe('Walk 30 ft., 40 ft. (bear form only), Climb 30 ft. (bear form only)')
+    expect(
+      formatFormSpeechQualifier(
+        analyzeSilentForms(werebearForms, werebearBase.monsterName, werebearBase.baseSizes, {
+          walk: 30,
+        }),
+      ),
+    ).toBe("(can't speak in bear form)")
+  })
+
+  it('leaves Wererat speed unqualified when movement is shared', () => {
+    const forms: CreatureFormsDraft = {
+      profileFormId: 'profile',
+      trueForm: { kind: 'defined', formId: 'humanoid' },
+      definedForms: [
+        { id: 'humanoid', name: 'Humanoid' },
+        {
+          id: 'rat',
+          name: 'Rat',
+          overrides: { sizes: ['small'], canSpeak: false },
+        },
+      ],
+    }
+    expect(
+      formatMonsterSpeedStatRow({
+        monsterName: 'Wererat',
+        sizes: ['medium', 'small'],
+        movement: { walk: 30, climb: 30 },
+        forms,
+        hasShapeShift: true,
+      }),
+    ).toBe('Walk 30 ft., Climb 30 ft.')
+  })
+
+  it('falls back to stat rows when Shape-Shift is missing', () => {
+    expect(
+      formatMonsterSpeedStatRow({
+        monsterName: werebearBase.monsterName,
+        sizes: werebearBase.sizes,
+        movement: werebearBase.baseMovement,
+        forms: werebearForms,
+        hasShapeShift: false,
+      }),
+    ).toBe('Walk 30 ft., 40 ft. (bear form only), Climb 30 ft. (bear form only)')
+  })
+})
+
+function analyzeSilentForms(
+  forms: CreatureFormsDraft,
+  monsterName: string,
+  sizes: CreatureSize[],
+  movement: Record<string, number>,
+): readonly string[] {
+  return (
+    analyzeCreatureFormDifferences({
+      forms,
+      monsterName,
+      sizes,
+      movement,
+    })?.silentFormNames ?? []
+  )
+}
+
+describe('formatCreatureCommunication speech qualifier', () => {
+  it('appends a speech qualifier after spoken languages', () => {
+    expect(
+      formatCreatureCommunication(
+        {
+          languages: [{ language: 'common' }],
+          speechQualifier: "(can't speak in bear form)",
+        },
+        { formatLanguageLabel: (id) => (id === 'common' ? 'Common' : id) },
+      ),
+    ).toBe("Common (can't speak in bear form)")
   })
 })
 
@@ -111,8 +237,7 @@ describe('formatMonsterForms', () => {
   it('lists sizes and notes when no Shape-Shift row exists', () => {
     expect(
       formatMonsterForms({
-        monsterName: 'Werebear',
-        baseSizes: ['medium', 'small'],
+        ...werebearBase,
         forms: werebearForms,
       }),
     ).toBe(

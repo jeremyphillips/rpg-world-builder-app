@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, type ReactNode, type RefObject } from 'react'
-import { FormItems, type FormItem } from '@rpg/ui/form'
+import { FormItems, FormRhythmStack, type FormItem } from '@rpg/ui/form'
 
 import { AvailabilityAlert, type Availability } from '@/lib/availability'
 import { MasterDetailDetailFormScope } from '../../lib/master-detail/master-detail-detail-form-scope'
@@ -111,12 +111,14 @@ function MasterDetailSelectedRowEditor({
         {renderBody ? (
           renderBody({ selectedFieldId, selectedIndex, namePrefix: rowPrefix })
         ) : (
-          <FormItems
-            key={`${selectedFieldId}:${selectedIndex}`}
-            items={wrapMasterDetailDetailFields(itemFields)}
-            idPrefix={`${idPrefix}-${selectedFieldId}`}
-            namePrefix={rowPrefix}
-          />
+          <FormRhythmStack>
+            <FormItems
+              key={`${selectedFieldId}:${selectedIndex}`}
+              items={wrapMasterDetailDetailFields(itemFields)}
+              idPrefix={`${idPrefix}-${selectedFieldId}`}
+              namePrefix={rowPrefix}
+            />
+          </FormRhythmStack>
         )}
       </MasterDetailDetailFormScope>
     </MasterDetailRowPrefixProvider>
@@ -127,6 +129,7 @@ function MasterDetailSelectedRowEditor({
  * Detail column for a form-embedded master-detail editor: one bordered surface
  * with compact identity, overflow delete, and selected row form.
  */
+// fallow-ignore-next-line complexity
 export function MasterDetailEditorPanel({
   editor,
   itemFields,

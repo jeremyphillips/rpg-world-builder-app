@@ -28,18 +28,14 @@ type ResolveArrayFieldRendererChromeInput = {
   /** Parent section context before array defaults apply. */
   parentContext: Pick<FormSectionContextValue, 'density' | 'defaultControlSize'>
   depth: number
-  inRhythmStack: boolean | undefined
   fieldsLength: number
-  wrapSectionChrome?: boolean
 }
 
 export function resolveArrayFieldRendererChrome({
   config,
   parentContext,
   depth,
-  inRhythmStack,
   fieldsLength,
-  wrapSectionChrome = false,
 }: ResolveArrayFieldRendererChromeInput) {
   const {
     bodyLayoutDensity: arrayBodyDensity,
@@ -73,7 +69,6 @@ export function resolveArrayFieldRendererChrome({
   const itemCollapseKey = itemConfig.collapseKey
   const itemBodyStackClasses = fieldStackRhythmVariants({ rhythm })
   const nested = isNestedArraySection(depth)
-  const omitSectionBottomMargin = nested || inRhythmStack || wrapSectionChrome
   const variant = resolveArrayItemVariant(config, { nested })
   const reorder = resolveArrayItemReorder(config)
   const reorderConfigured = reorder === 'dragHandle'
@@ -97,6 +92,7 @@ export function resolveArrayFieldRendererChrome({
 
   return {
     emptyItemLabel: resolveArrayEmptyItemLabel(config),
+    emptyStatePrimary: config.emptyStatePrimary,
     addAction,
     addActionLabel,
     addActionVariant,
@@ -119,7 +115,6 @@ export function resolveArrayFieldRendererChrome({
     max,
     min,
     nested,
-    omitSectionBottomMargin,
     reorderConfigured,
     sortableEnabled,
     stackTreatment: presentation.stackTreatment,

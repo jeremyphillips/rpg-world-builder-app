@@ -53,18 +53,19 @@ override. `headingScale: 'field'` is the only authored type opt-in: it replaces 
 structural legend and hint type with the field label and hint scale for the group's
 density (comfortable label `md`, compact label `sm`; hint matches `Field.Hint`).
 Spacing, disclosure, and legend semantics stay unchanged. There is no separate legend or
-hint size. Nested groups omit `mb-8` — parent group rhythm (`gap-6` / `gap-3`) owns sibling
-spacing, matching nested array sections. Top-level groups and arrays inside `<Form>` omit
-`mb-8` as well — the form's `FormRhythmStack` (`gap-6` / `gap-3`) owns sibling spacing.
-Standalone `FormItems` outside `<Form>` need rhythm from either `<Form>` (which wraps
-`FormRhythmStack` automatically) or **`FormFieldStack`** — a detached shell that composes
-`FormUiProvider`, `FormSectionProvider`, `FormRhythmStack`, and `FormItems`. Use
-`FormFieldStack` in modals where the caller owns `FormProvider` + `useForm` and actions
-live in `Modal.Footer` instead of a `<form>` submit.
+hint size. **External sibling spacing** is owned by the parent rhythm stack
+(`FormRhythmStack`, group body `fieldStackRhythmVariants`, or an explicit layout wrapper) —
+not by unconditional trailing margin on fieldset primitives. Nested groups and arrays follow
+the same rule.
 
-`FormSectionProvider` with `inRhythmStack` only omits group bottom margin when a **parent**
-already stacks siblings — it does not apply gap between fields. Header-embedded sections
-whose parent shell already spaces siblings use that pattern instead of `FormFieldStack`.
+`FormItems` must render inside a rhythm owner: `<Form>` (wraps `FormRhythmStack`),
+**`FormFieldStack`**, an explicit `FormRhythmStack`, or a parent that already applies
+`fieldStackRhythmVariants` between siblings. Use `FormFieldStack` in modals where the caller
+owns `FormProvider` + `useForm` and actions live in `Modal.Footer` instead of a `<form>` submit.
+
+`FormSectionProvider` with `inRhythmStack` marks that a parent stack owns sibling gap; it does
+not apply gap by itself. Header-embedded sections whose parent shell already spaces siblings
+use that pattern instead of `FormFieldStack`.
 
 ```ts
 {
@@ -473,10 +474,10 @@ See [Component entry files](#component-entry-files).
 
 **Heading:** Omit `heading` for layout-only arrays (e.g. dependents inside a labeled stack). Named headings render through `FormSectionHeader` in the fieldset `<legend>`; omitting `heading` avoids phantom legend spacing.
 
-**Section margin:** Standalone `FieldGroup` fieldsets use `mb-8`. Arrays and groups inside
-`<Form>` omit it — `FormRhythmStack` gap controls sibling spacing. Nested arrays (inside
-stacks, groups, or array items) also omit it so parent `fieldStackRhythmVariants` gap
-controls spacing.
+**Section rhythm:** `FieldGroup` and array fieldsets do not apply trailing sibling margin.
+Parent `FormRhythmStack` or `fieldStackRhythmVariants` controls spacing between top-level
+config items. Use `separator` or group `chrome: { variant: 'divider' }` when a stronger
+structural break is needed between named sections.
 
 **Item chrome:** Detailed rows compose `CollapsibleListItem` (header, summary, body, actions).
 Compact inline rows use `ArrayItemShell` with `layout="compactRow"`. `itemVariant: 'auto'`

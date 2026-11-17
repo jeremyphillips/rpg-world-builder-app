@@ -244,7 +244,25 @@ export function monsterToFormValues(
     defenses: entity.defenses,
     equipment: entity.equipment,
     traits: entity.traits,
-    ...(parsedForms?.success ? { forms: parsedForms.data } : {}),
+    ...(parsedForms?.success
+      ? {
+          forms: {
+            ...parsedForms.data,
+            definedForms: parsedForms.data.definedForms.map((form) => ({
+              ...form,
+              speechRestricted: form.overrides?.canSpeak === false,
+              ...(form.overrides?.movement
+                ? {
+                    movementOverride: {
+                      rows: movementRecordToRows(form.overrides.movement.speeds),
+                      ...(form.overrides.movement.hover ? { hover: true as const } : {}),
+                    },
+                  }
+                : {}),
+            })),
+          },
+        }
+      : {}),
     actions: actionListFormValues(entity.actions),
     bonusActions: actionListFormValues(entity.bonusActions),
     reactions: actionListFormValues(entity.reactions),

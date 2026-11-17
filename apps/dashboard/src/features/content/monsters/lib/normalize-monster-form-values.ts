@@ -558,6 +558,40 @@ function normalizePrerequisite(value: string): string {
     .trim()
 }
 
+// fallow-ignore-next-line complexity
+function normalizeDefinedFormOverride(
+  entry: Record<string, unknown>,
+): Record<string, unknown> | undefined {
+  const overrides = isRecord(entry.overrides) ? { ...entry.overrides } : {}
+  if (entry.speechRestricted === true) overrides.canSpeak = false
+  else delete overrides.canSpeak
+  const movementBundle = isRecord(entry.movementOverride) ? entry.movementOverride : undefined
+  const legacyRows = Array.isArray(entry.movementOverrideRows)
+    ? (entry.movementOverrideRows as Parameters<typeof movementRowsToRecordForPreview>[0])
+    : undefined
+  const rows = Array.isArray(movementBundle?.rows) ? movementBundle.rows : legacyRows
+  const overrideHover =
+    movementBundle?.hover === true || entry.movementOverrideHover === true ? true : undefined
+  if (rows) {
+    const speeds = movementRowsToRecordForPreview(
+      rows as Parameters<typeof movementRowsToRecordForPreview>[0],
+    )
+    if (Object.keys(speeds).length > 0) {
+      overrides.movement = {
+        speeds,
+        ...(overrideHover && speeds.fly !== undefined ? { hover: true } : {}),
+      }
+    } else {
+      delete overrides.movement
+    }
+  }
+  delete entry.speechRestricted
+  delete entry.movementOverride
+  delete entry.movementOverrideRows
+  delete entry.movementOverrideHover
+  return Object.keys(overrides).length > 0 ? overrides : undefined
+}
+
 function normalizeMonsterForms(forms: NonNullable<MonsterFormValues['forms']>) {
   const cleaned = omitEmptyStrings(forms)
   if (!isRecord(cleaned)) return cleaned
@@ -567,10 +601,10 @@ function normalizeMonsterForms(forms: NonNullable<MonsterFormValues['forms']>) {
     ...shape,
     definedForms: definedForms.map((entry) => {
       if (!isRecord(entry)) return entry
-      const overrides = isRecord(entry.overrides) ? entry.overrides : undefined
+      const overrides = normalizeDefinedFormOverride(entry)
       return {
         ...entry,
-        ...(overrides && Object.keys(overrides).length > 0 ? { overrides } : {}),
+        ...(overrides ? { overrides } : {}),
       }
     }),
   }

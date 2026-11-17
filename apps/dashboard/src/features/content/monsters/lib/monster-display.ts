@@ -37,8 +37,12 @@ import {
   formatMonsterParryTrigger,
   formatMonsterTakeActions,
   formatMonsterTeleport,
+  analyzeCreatureFormDifferences,
+  formatFormSpeechQualifier,
   formatMonsterForms,
   formatMonsterShapeShift,
+  formatMonsterSpeedStatRow,
+  resolveFormDifferencesPresentation,
   shapeShiftRows,
   monsterActionSectionRows,
   formatLegendaryActionUsesIntro,
@@ -204,8 +208,22 @@ function formatHpStatRow(derived: DerivedMonsterStatBlock): ContentStatRowData {
 }
 
 function formatSpeedStatRow(monster: Monster): ContentStatRowData {
-  const movement = formatMovementDisplay(monster.movement, 'ft.')
-  const value = movement && monster.hover ? `${movement} (hover)` : movement
+  const hasShapeShift = shapeShiftRows(monster).length > 0
+  const value =
+    (monster.forms
+      ? formatMonsterSpeedStatRow({
+          sizes: monster.sizes,
+          movement: monster.movement,
+          hover: monster.hover,
+          forms: monster.forms,
+          monsterName: monster.name,
+          hasShapeShift,
+        })
+      : undefined) ??
+    (() => {
+      const movement = formatMovementDisplay(monster.movement, 'ft.')
+      return movement && monster.hover ? `${movement} (hover)` : movement
+    })()
   return {
     id: 'speed',
     label: 'Speed',
@@ -475,6 +493,8 @@ function formsTrait(monster: Monster): MonsterTraitItemViewModel[] {
   const text = formatMonsterForms({
     monsterName: monster.name,
     baseSizes: monster.sizes,
+    baseMovement: monster.movement,
+    baseHover: monster.hover,
     forms: monster.forms,
   })
   if (!text) return []
@@ -726,9 +746,12 @@ function mapShapeShiftActionItem(
     ? formatMonsterShapeShift({
         monsterName: spells.monsterName,
         baseSizes: spells.monster.sizes,
+        baseMovement: spells.monster.movement,
+        baseHover: spells.monster.hover,
         forms: spells.monster.forms,
         equipment: action.equipment,
         prerequisite: action.prerequisite,
+        hasShapeShift: true,
       })
     : ''
   const description = [generated, action.description].filter(Boolean).join(' ')
@@ -894,11 +917,26 @@ function formatSenseLines(monster: Monster, passivePerception?: number): string 
 }
 
 function formatLanguageLines(monster: Monster): string | undefined {
+  const hasShapeShift = shapeShiftRows(monster).length > 0
+  const speechQualifier = (() => {
+    if (!monster.forms) return undefined
+    const presentation = resolveFormDifferencesPresentation(monster.forms, hasShapeShift)
+    if (presentation !== 'stat-rows') return undefined
+    const analysis = analyzeCreatureFormDifferences({
+      sizes: monster.sizes,
+      movement: monster.movement,
+      hover: monster.hover,
+      forms: monster.forms,
+      monsterName: monster.name,
+    })
+    return analysis?.speechDiffers ? formatFormSpeechQualifier(analysis.silentFormNames) : undefined
+  })()
   return formatCreatureCommunication(
     {
       languages: monster.proficiencies.languages,
       telepathy: monster.communication.telepathy,
       additionalLanguageCount: monster.proficiencies.additionalLanguageCount,
+      speechQualifier,
     },
     { formatLanguageLabel: getLanguageLabel },
   )

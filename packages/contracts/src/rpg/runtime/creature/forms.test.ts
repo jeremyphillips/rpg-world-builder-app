@@ -8,13 +8,21 @@ import {
 
 describe('creature form size resolution', () => {
   it('uses only the base sizes or the nested alternate override', () => {
-    expect(resolveCreatureFormStatistics({ sizes: ['medium'] })).toEqual({ sizes: ['medium'] })
+    expect(resolveCreatureFormStatistics({ sizes: ['medium'], movement: { walk: 30 } })).toEqual({
+      sizes: ['medium'],
+      movement: { speeds: { walk: 30 }, hover: false },
+      canSpeak: true,
+    })
     expect(
       resolveCreatureFormStatistics(
-        { sizes: ['medium'] },
+        { sizes: ['medium'], movement: { walk: 30 } },
         { overrides: { sizes: ['small', 'tiny'] } },
       ),
-    ).toEqual({ sizes: ['small', 'tiny'] })
+    ).toEqual({
+      sizes: ['small', 'tiny'],
+      movement: { speeds: { walk: 30 }, hover: false },
+      canSpeak: true,
+    })
   })
 
   it('compares size sets independently of their order', () => {
@@ -39,10 +47,18 @@ describe('creature form size resolution', () => {
     expect(context.alternateDestinations.map((form) => form.id)).toEqual(['bear'])
     expect(context.eligibleForms.map((form) => form.id)).toEqual(['humanoid', 'bear'])
     expect(
-      resolveCreatureFormStatistics({ sizes: ['medium'] }, context.trueForm?.form, {
-        usesBaseStatistics: context.trueForm?.usesBaseStatistics,
-      }),
-    ).toEqual({ sizes: ['medium'] })
+      resolveCreatureFormStatistics(
+        { sizes: ['medium'], movement: { walk: 30 } },
+        context.trueForm?.form,
+        {
+          usesBaseStatistics: context.trueForm?.usesBaseStatistics,
+        },
+      ),
+    ).toEqual({
+      sizes: ['medium'],
+      movement: { speeds: { walk: 30 }, hover: false },
+      canSpeak: true,
+    })
   })
 
   it('does not fall back to profile for unresolved defined designation', () => {

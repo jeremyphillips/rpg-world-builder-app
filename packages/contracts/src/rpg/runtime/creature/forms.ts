@@ -1,8 +1,15 @@
 import type { CreatureSize } from '../../vocab/creature-size'
-import type { CreatureFormsDraft } from '../../content/creature/forms'
+import type { CreatureFormOverrides, CreatureFormsDraft } from '../../content/creature/forms'
+import type { MovementSpeeds } from '../../vocab/movement-mode'
 
 export type CreatureFormStatisticsSource = {
-  overrides?: { sizes?: readonly CreatureSize[] }
+  overrides?: CreatureFormOverrides
+}
+
+export type ResolvedCreatureFormStatistics = {
+  sizes: readonly CreatureSize[]
+  movement: { speeds: MovementSpeeds; hover: boolean }
+  canSpeak: boolean
 }
 
 export type ResolvedCreatureFormIdentity = {
@@ -122,15 +129,37 @@ export function resolveCreatureFormsContext(
   }
 }
 
-/** Resolves effective sizes; profile and designated true identities always use base sizes. */
+type CreatureBaseStatistics = {
+  sizes?: readonly CreatureSize[]
+  movement: MovementSpeeds
+  hover?: boolean
+}
+
+/** Resolves effective sizes, movement, and speech for one eligible form identity. */
 export function resolveCreatureFormStatistics(
-  base: { sizes?: readonly CreatureSize[] },
+  base: CreatureBaseStatistics,
   form?: CreatureFormStatisticsSource,
   options: { usesBaseStatistics?: boolean } = {},
-): { sizes: readonly CreatureSize[] } {
-  const override = options.usesBaseStatistics ? undefined : form?.overrides?.sizes
-  if (override && override.length > 0) return { sizes: override }
-  return { sizes: base.sizes ?? [] }
+): ResolvedCreatureFormStatistics {
+  const usesBase = options.usesBaseStatistics === true
+  const overrideSizes = usesBase ? undefined : form?.overrides?.sizes
+  const sizes = overrideSizes && overrideSizes.length > 0 ? overrideSizes : (base.sizes ?? [])
+
+  const movementOverride = usesBase ? undefined : form?.overrides?.movement
+  const movement =
+    movementOverride != null
+      ? {
+          speeds: movementOverride.speeds,
+          hover: movementOverride.hover === true,
+        }
+      : {
+          speeds: base.movement,
+          hover: base.hover === true,
+        }
+
+  const canSpeak = form?.overrides?.canSpeak === false ? false : true
+
+  return { sizes, movement, canSpeak }
 }
 
 export function creatureFormSizesDiffer(

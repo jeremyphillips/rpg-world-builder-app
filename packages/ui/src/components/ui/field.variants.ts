@@ -19,8 +19,7 @@ import { type FieldSizeToken } from './field-sizing.variants'
  * - `fieldLabelContentClusterClasses` — label + required marker + info on one line
  * - `fieldLabelHintStackClasses` — label cluster + hint when hint sits below the label (2px)
  * - `fieldGroupStackClasses` — sibling fields within a group or form column (gap-based; avoids margin collapse with fieldsets)
- * - `fieldGroupBottomMarginClasses` — space below standalone group/array fieldsets (omitted when a parent rhythm stack owns sibling gap)
- *   (nested array sections omit this; parent stack/group rhythm owns spacing)
+ * - `fieldGroupBottomMarginClasses` — optional opt-in trailing margin when a parent does not own sibling rhythm (stories / legacy layouts)
  * - `fieldGroupFlexStackClasses` — wider 32px gap stack for collapse-prone fieldset siblings (embedded editors, …)
  * - `fieldSetResetClasses` — strip UA fieldset chrome from leaf field wrappers
  * - `fieldSetChromeContainClasses` — column stack for borderless leaf fieldset anatomy
@@ -189,9 +188,8 @@ export const fieldRecommendationGroupHeaderClasses =
 export const fieldRecommendationGroupItemsClasses = 'flex max-w-full flex-wrap gap-2'
 
 export const fieldGroupStackClasses = 'flex flex-col gap-6'
+/** Opt-in trailing margin — `FieldGroup` primitives do not apply this by default; parent rhythm owns sibling gap. */
 export const fieldGroupBottomMarginClasses = 'mb-8'
-/** Omits standalone group bottom margin when a parent rhythm stack owns sibling gap. */
-export const fieldGroupSectionOuterMarginResetClasses = 'mb-0'
 export const fieldGroupFlexStackClasses = 'flex flex-col gap-8'
 export const formSectionStackClasses = 'flex flex-col gap-7'
 /** Horizontal + wrap gap between chip pills — vertical label→chips spacing is the anatomy token. */

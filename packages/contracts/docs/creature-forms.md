@@ -24,5 +24,10 @@ including a designated true form.
 
 Form qualifiers use the full authoritative form name, for example “Bite (Bear or
 Bear-Humanoid Hybrid Form Only)”; SRD shorthand is intentionally not modeled.
-Movement, speech, and availability UI remain later phases. Hit points continue reading
-base `sizes` (`resolveMonsterHitPoints`).
+Defined forms may override `movement` (atomic speeds and hover), `canSpeak: false`, and
+sizes. `analyzeCreatureFormDifferences` and `resolveCreatureFormStatistics` in
+`runtime/creature` drive qualified Speed and Languages rows (`stat-rows`) or Shape-Shift
+parentheticals and speech sentences (`transformation-description`). `forms.differencesPresentation`
+defaults to `stat-rows`; `resolveFormDifferencesPresentation` keeps differences visible when
+Shape-Shift is absent. Hit points continue reading base `sizes` (`resolveMonsterHitPoints`).
+`onlyInFormIds` authoring remains Phase 4.

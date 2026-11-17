@@ -9,11 +9,7 @@ import type { FieldChrome } from './field-chrome.variants'
 import type { FieldGroupChromeClassNames } from './field-group-chrome.variants'
 import type { FieldGroupSummaryDisclosure } from './field-group-disclosure.types'
 import { FieldGroupSummaryDisclosure as FieldGroupSummaryDisclosureView } from './field-group-summary-disclosure.client'
-import {
-  fieldGroupBottomMarginClasses,
-  fieldSetResetClasses,
-  type FieldRhythm,
-} from './field.variants'
+import { fieldSetResetClasses, type FieldRhythm } from './field.variants'
 
 export type SummaryDisclosureFieldGroupShellProps = {
   id?: string
@@ -54,13 +50,7 @@ export function SummaryDisclosureFieldGroupShell({
     <fieldset
       id={id}
       aria-labelledby={legendId}
-      className={cn(
-        fieldSetResetClasses,
-        fieldGroupBottomMarginClasses,
-        'min-w-0',
-        chromeClasses.fieldset,
-        className,
-      )}
+      className={cn(fieldSetResetClasses, 'min-w-0', chromeClasses.fieldset, className)}
     >
       <FieldGroupSummaryDisclosureView
         legend={legend}

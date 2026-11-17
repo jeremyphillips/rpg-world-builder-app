@@ -20,10 +20,10 @@ export function resolveOptionalDisclosureClearPaths(
   fullName: string,
 ): string[] {
   if (disclosure.clearPaths && disclosure.clearPaths.length > 0) {
-    return disclosure.clearPaths
+    return [...disclosure.clearPaths]
   }
   if (disclosure.watchPaths && disclosure.watchPaths.length > 0) {
-    return disclosure.watchPaths
+    return [...disclosure.watchPaths]
   }
   return [fullName]
 }

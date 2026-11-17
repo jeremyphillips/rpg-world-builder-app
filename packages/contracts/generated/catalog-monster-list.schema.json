@@ -7035,6 +7035,14 @@
           "items": {
             "$ref": "#/definitions/__schema270"
           }
+        },
+        "differencesPresentation": {
+          "type": "string",
+          "enum": [
+            "stat-rows",
+            "transformation-description"
+          ],
+          "description": "stat-rows | transformation-description"
         }
       },
       "required": [
@@ -7064,6 +7072,25 @@
                   "$ref": "#/definitions/__schema26"
                 }
               ]
+            },
+            "movement": {
+              "type": "object",
+              "properties": {
+                "speeds": {
+                  "$ref": "#/definitions/__schema37"
+                },
+                "hover": {
+                  "$ref": "#/definitions/__schema271"
+                }
+              },
+              "required": [
+                "speeds"
+              ],
+              "additionalProperties": false
+            },
+            "canSpeak": {
+              "type": "boolean",
+              "const": false
             }
           },
           "additionalProperties": false
@@ -7078,6 +7105,10 @@
         "name"
       ],
       "additionalProperties": false
+    },
+    "__schema271": {
+      "type": "boolean",
+      "const": true
     }
   }
 }

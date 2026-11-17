@@ -4,6 +4,8 @@ import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm, useFormContext } from 'react-hook-form'
 
 import { FormItems } from './form-items.client'
+import { FormRhythmStack, FormSectionContext } from '../context/form-section.context'
+import { DEFAULT_FORM_DENSITY } from '../form-density'
 import type { FormItem } from '../field-config'
 
 const field = {
@@ -140,6 +142,57 @@ describe('group optionalDisclosure', () => {
       .closest('span.text-style-field-label-sm, span.text-style-field-label-md')
     expect(movementLabel).toHaveClass('text-style-field-label-md')
     expect(movementLabel?.className).not.toMatch(/text-style-field-legend/)
+  })
+
+  it('keeps open and closed optional groups free of fieldset trailing margin in rhythm stacks', async () => {
+    const user = userEvent.setup()
+    const rhythmField = {
+      kind: 'group',
+      name: 'movementOverride',
+      heading: { label: 'Movement' },
+      optionalDisclosure: {
+        addLabel: 'Override movement',
+        removeLabel: 'Remove',
+      },
+      fields: [
+        { type: 'text', name: 'walk', label: 'Walk' },
+        { type: 'text', name: 'hover', label: 'Hover' },
+      ],
+    } as const satisfies FormItem
+
+    function RhythmHarness() {
+      const form = useForm({ defaultValues: {}, shouldUnregister: true })
+      return (
+        <FormProvider {...form}>
+          <FormSectionContext.Provider
+            value={{
+              depth: 1,
+              namedGroupDepth: 1,
+              density: DEFAULT_FORM_DENSITY,
+              inGroup: true,
+            }}
+          >
+            <FormRhythmStack>
+              <FormItems
+                items={[rhythmField, { type: 'text', name: 'notes', label: 'Notes' }]}
+                idPrefix="rhythm"
+              />
+            </FormRhythmStack>
+          </FormSectionContext.Provider>
+        </FormProvider>
+      )
+    }
+
+    render(<RhythmHarness />)
+    expect(screen.getByRole('button', { name: 'Override movement' })).not.toHaveClass('mb-8')
+    await user.click(screen.getByRole('button', { name: 'Override movement' }))
+    const movementGroup = screen.getByRole('group', { name: /Movement/ })
+    expect(movementGroup).not.toHaveClass('mb-8')
+    await user.click(screen.getByRole('button', { name: 'Remove Movement' }))
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Override movement' })).toBeInTheDocument()
+    })
+    expect(screen.queryByRole('group', { name: /Movement/ })).not.toBeInTheDocument()
   })
 
   it('writes seedWhen when the group opens', async () => {

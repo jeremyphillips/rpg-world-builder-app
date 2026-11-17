@@ -31,6 +31,8 @@ export type FormatCreatureCommunicationInput = {
   languages: readonly CreatureLanguageProficiencyEntry[]
   telepathy?: number
   additionalLanguageCount?: number
+  /** Appended after spoken languages, e.g. "(can't speak in bear form)". */
+  speechQualifier?: string
 }
 
 /**
@@ -59,7 +61,8 @@ export function formatCreatureCommunication(
         : additionalLanguageCount && additionalLanguageCount > 1
           ? ` plus ${additionalLanguageCount} other languages`
           : ''
-    parts.push(`${names}${extra}`)
+    const qualifier = input.speechQualifier?.trim()
+    parts.push(`${names}${extra}${qualifier ? ` ${qualifier}` : ''}`)
   }
   if (understandsOnly.length > 0) {
     const labels = understandsOnly

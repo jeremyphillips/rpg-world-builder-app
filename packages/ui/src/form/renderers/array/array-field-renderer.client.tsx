@@ -18,7 +18,6 @@ export type { ArrayFieldItemContentProps }
 
 export interface ArrayFieldSectionLayout {
   wrapSectionChrome: boolean
-  inParentRhythm: boolean
 }
 
 export interface ArrayFieldRendererProps {
@@ -59,7 +58,6 @@ export function ArrayFieldRenderer({
     remove,
     getValues,
     watchedItems,
-    wrapSectionChrome: sectionLayout?.wrapSectionChrome,
   })
 
   React.useEffect(() => {

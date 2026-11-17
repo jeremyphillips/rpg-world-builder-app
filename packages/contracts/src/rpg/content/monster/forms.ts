@@ -11,12 +11,17 @@ import {
   type CreatureFormsDraft,
 } from '../creature/forms'
 
+import { formDifferencesPresentationSchema } from '../../vocab/form-differences-presentation'
+
 /**
  * Monster stat-block host for defined forms and transformation destinations.
- * Presentation (`differencesPresentation`) is added with movement and speech.
  */
-export const monsterFormsSchema = creatureFormsSchema
-export const monsterFormsDraftSchema = creatureFormsDraftSchema
+export const monsterFormsSchema = creatureFormsSchema.extend({
+  differencesPresentation: formDifferencesPresentationSchema.optional(),
+})
+export const monsterFormsDraftSchema = creatureFormsDraftSchema.extend({
+  differencesPresentation: formDifferencesPresentationSchema.optional(),
+})
 
 export type MonsterForms = z.infer<typeof monsterFormsSchema>
 

@@ -237,6 +237,12 @@ export const MONSTER_FORM_ITEM_NOUN_LABEL = 'Form'
 export const MONSTER_FORM_ITEM_NOUN_PLURAL = 'forms'
 export const MONSTER_FORM_NAME_LABEL = 'Form name'
 export const MONSTER_FORM_SIZE_HINT = 'Use base size'
+export const MONSTER_FORM_MOVEMENT_HINT = 'Override movement'
+export const MONSTER_FORM_USE_BASE_MOVEMENT_LABEL = 'Use base movement'
+export const MONSTER_FORM_SPEECH_LABEL = "Can't speak in this form"
+export const MONSTER_FORM_DIFFERENCES_LABEL = 'Show form differences in'
+export const MONSTER_FORM_DIFFERENCES_FALLBACK_NOTE =
+  'Shown in Speed and Languages rows: there is no Shape-Shift action'
 export const MONSTER_FORM_NOTES_LABEL = 'Notes'
 export const MONSTER_FORM_NOTES_ADD_LABEL = 'Add notes'
 export const MONSTER_FORM_NOTES_HINT = 'Completes the sentence: While in this form, …'

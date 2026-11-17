@@ -23,7 +23,6 @@ describe('resolveArrayFieldRendererChrome', () => {
       config: nestedGrantArray,
       parentContext: { density: 'comfortable' },
       depth: 2,
-      inRhythmStack: undefined,
       fieldsLength: 2,
     })
 
@@ -42,7 +41,6 @@ describe('resolveArrayFieldRendererChrome', () => {
       },
       parentContext: { density: 'comfortable' },
       depth: 0,
-      inRhythmStack: undefined,
       fieldsLength: 1,
     })
 
@@ -54,7 +52,6 @@ describe('resolveArrayFieldRendererChrome', () => {
       config: nestedGrantArray,
       parentContext: { density: 'comfortable' },
       depth: 0,
-      inRhythmStack: undefined,
       fieldsLength: 1,
     })
 
@@ -68,7 +65,6 @@ describe('resolveArrayFieldRendererChrome', () => {
       config: { ...nestedGrantArray, density: 'compact' },
       parentContext: { density: 'comfortable' },
       depth: 0,
-      inRhythmStack: undefined,
       fieldsLength: 1,
     })
 
@@ -86,7 +82,6 @@ describe('resolveArrayFieldRendererChrome', () => {
       },
       parentContext: { density: 'comfortable' },
       depth: 2,
-      inRhythmStack: undefined,
       fieldsLength: 1,
     })
 

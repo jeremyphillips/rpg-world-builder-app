@@ -527,6 +527,8 @@ interface ArrayConfigCore {
   filterSelect?: ArrayFilterSelectConfig
   /** Empty list presentation. @default 'panel' */
   emptyState?: 'panel' | 'none'
+  /** When set, replaces derived `No {item} added.` copy for this array. */
+  emptyStatePrimary?: string
   /** When append should stay visible but disabled (e.g. finite enum saturation). */
   resolveCanAppend?: (items: unknown[]) => ArrayCanAppendResult
   id?: string

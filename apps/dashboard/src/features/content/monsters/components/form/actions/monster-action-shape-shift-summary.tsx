@@ -3,6 +3,7 @@ import {
   joinNaturalList,
   resolveCreatureFormsContext,
 } from '@rpg/contracts'
+import { movementRowsToRecordForPreview } from '../../../../lib/forms/fields/content-movement-form-fields'
 import { RulesPreview } from '@rpg/ui'
 import { useMemo } from 'react'
 import { useWatch } from 'react-hook-form'
@@ -46,13 +47,17 @@ export function MonsterActionShapeShiftSummary({
     const destinationNames = context.alternateDestinations.map(
       (form) => form.name || 'Untitled form',
     )
+    const baseMovement = movementRowsToRecordForPreview(values.movement ?? [])
     const preview = formatMonsterShapeShift({
       monsterName: values.name,
       baseSizes: values.sizes ?? [],
+      baseMovement,
+      baseHover: values.hover,
       forms: values.forms,
       equipment: draft.equipment,
       prerequisite: draft.prerequisite,
       description: draft.description,
+      hasShapeShift: true,
     })
     return { destinations: joinNaturalList(destinationNames), preview }
   }, [action.id, action.kind, ctx, values])
