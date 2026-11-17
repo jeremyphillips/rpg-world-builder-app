@@ -83,17 +83,15 @@ describe('FieldGroup', () => {
         <TextField id="name" label="Name" />
       </FieldGroup>,
     )
-    expect(screen.getByText('Shown on your sheet.')).toBeInTheDocument()
-    const fieldset = screen.getByRole('group', { name: /Character basics/ })
+    const hint = screen.getByText('Shown on your sheet.')
+    expect(hint).toBeInTheDocument()
+    const fieldset = screen.getByRole('group', { name: 'Character basics' })
     const legend = screen.getByText('Character basics').closest('legend')
     expect(legend).toHaveClass('w-full')
     expect(legend).not.toHaveClass('text-style-field-legend')
+    expect(legend).not.toContainElement(hint)
+    expect(fieldset).toHaveAttribute('aria-describedby', hint.id)
     expect(legendTitleTypographyNode('Character basics')).toHaveClass('text-style-field-legend')
-    expect(screen.getByText('Shown on your sheet.').parentElement).toHaveClass(
-      'flex',
-      'flex-col',
-      'gap-2',
-    )
     expect(legend?.firstElementChild).not.toHaveClass('mb-5')
     expect(bodyRelationshipWrapper(fieldset)).toHaveClass('mt-5')
     expect(screen.getByText('Shown on your sheet.')).toHaveClass(
@@ -122,15 +120,11 @@ describe('FieldGroup', () => {
       </FieldGroup>,
     )
 
-    const fieldset = screen.getByRole('group', { name: /Damage/ })
-    expect(screen.getByText('Primary damage dice.').parentElement).toHaveClass(
-      'flex',
-      'flex-col',
-      'gap-2',
-    )
-    expect(screen.getByText('Primary damage dice.')).toHaveClass(
-      'text-style-field-subsection-description',
-    )
+    const fieldset = screen.getByRole('group', { name: 'Damage' })
+    const hint = screen.getByText('Primary damage dice.')
+    expect(hint.closest('legend')).toBeNull()
+    expect(fieldset).toHaveAttribute('aria-describedby', hint.id)
+    expect(hint).toHaveClass('text-style-field-subsection-description')
     expect(bodyRelationshipWrapper(fieldset)).toHaveClass('mt-4')
   })
 
@@ -156,11 +150,11 @@ describe('FieldGroup', () => {
     const legend = screen.getByText('Basics').closest('legend')
     expect(legend).not.toHaveClass('text-style-field-legend-compact')
     expect(legendTitleTypographyNode('Basics')).toHaveClass('text-style-field-legend-compact')
-    expect(screen.getByText('Help copy.').parentElement).toHaveClass('gap-1')
+    const hint = screen.getByText('Help copy.')
+    expect(hint.closest('legend')).toBeNull()
+    expect(fieldset).toHaveAttribute('aria-describedby', hint.id)
     expect(bodyRelationshipWrapper(fieldset)).toHaveClass('mt-3')
-    expect(screen.getByText('Help copy.')).toHaveClass(
-      'text-style-field-section-description-compact',
-    )
+    expect(hint).toHaveClass('text-style-field-section-description-compact')
 
     const stack = fieldStack(fieldset)
     expect(stack).toHaveClass('flex', 'flex-col', 'gap-4')
@@ -221,8 +215,9 @@ describe('FieldGroup', () => {
       'text-style-field-subsection-description-compact',
       'text-style-body',
     )
-    expect(screen.getByText('Optional tuning.').parentElement).toHaveClass('gap-0.5')
-    const fieldset = screen.getByRole('group', { name: /Advanced options/ })
+    expect(description.closest('legend')).toBeNull()
+    const fieldset = screen.getByRole('group', { name: 'Advanced options' })
+    expect(fieldset).toHaveAttribute('aria-describedby', description.id)
     expect(fieldset).toHaveClass(...fieldAnatomyStackVariants({ size: 'md' }).split(/\s+/))
     expect(bodyRelationshipWrapper(fieldset)).toBeNull()
   })
@@ -247,8 +242,9 @@ describe('FieldGroup', () => {
     const description = screen.getByText('Optional tuning.')
     expect(description).toHaveClass('text-style-field-hint-compact')
     expect(description).not.toHaveClass('text-style-field-subsection-description-compact')
-    expect(screen.getByText('Optional tuning.').parentElement).toHaveClass('gap-0.5')
-    const fieldset = screen.getByRole('group', { name: /Advanced options/ })
+    expect(description.closest('legend')).toBeNull()
+    const fieldset = screen.getByRole('group', { name: 'Advanced options' })
+    expect(fieldset).toHaveAttribute('aria-describedby', description.id)
     expect(fieldset).toHaveClass(...fieldAnatomyStackVariants({ size: 'sm' }).split(/\s+/))
     expect(bodyRelationshipWrapper(fieldset)).toBeNull()
   })
@@ -283,9 +279,9 @@ describe('FieldGroup', () => {
     const chevron = trigger.querySelector('[data-icon="chevron-down"]')
     expect(chevron).toBeTruthy()
     expect(chevron).not.toHaveClass('rotate-180')
-    expect(trigger).toHaveClass('items-start')
-    expect(trigger).not.toHaveClass('items-center')
-    const fieldset = screen.getByRole('group', { name: /Advanced options/ })
+    expect(trigger).toHaveClass('items-center')
+    expect(screen.getByText('Optional tuning.').closest('button')).toBeNull()
+    const fieldset = screen.getByRole('group', { name: 'Advanced options' })
     expect(fieldset).toHaveClass(...fieldAnatomyStackVariants({ size: 'md' }).split(/\s+/))
     expect(bodyRelationshipWrapper(fieldset)).toBeNull()
 
@@ -432,10 +428,9 @@ describe('FieldGroup', () => {
     expect(legendTitleTypographyNode('Optional details')).toHaveClass(
       'text-style-field-legend-compact',
     )
-    expect(legend?.firstElementChild?.querySelector('.flex.flex-col.gap-1')).toBeTruthy()
+    expect(screen.getByText('Member affinities and description').closest('button')).toBeNull()
     const trigger = screen.getByRole('button', { name: /Optional details/i })
-    expect(trigger).toHaveClass('py-0', 'items-start')
-    expect(trigger).not.toHaveClass('items-center')
+    expect(trigger).toHaveClass('py-0', 'items-center')
     expect(trigger).not.toHaveClass('text-style-field-legend')
     expect(bodyRelationshipWrapper(fieldset)).toBeNull()
     const content = fieldset.querySelector('[data-state]')

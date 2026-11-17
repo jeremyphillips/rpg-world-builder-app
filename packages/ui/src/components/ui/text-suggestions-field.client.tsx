@@ -7,15 +7,15 @@ import { Field, useFieldRootContext, type FieldSize } from './field.client'
 import { FieldLayout } from './field-layout'
 import { resolveFieldAnatomyWidth, type FieldChrome } from './field-chrome.variants'
 import type { FieldHintPosition } from './field.variants'
+import type { FieldLabelPresentationProps } from './field-label-props'
 import { FormFieldLabel } from '../../form/presentation/form-field-label.client'
 import { fieldAnatomyStackClasses } from './field.variants'
 import { Input } from './input.client'
 import { TextSuggestionsActions } from './text-suggestions-field-parts.client'
 import { useTextSuggestionsField } from './text-suggestions-field.use.client'
 
-export interface TextSuggestionsFieldProps {
+export interface TextSuggestionsFieldProps extends FieldLabelPresentationProps {
   id: string
-  label: string
   value: string | undefined
   suggestions: readonly string[]
   onValueChange: (value: string | undefined) => void
@@ -33,7 +33,7 @@ export interface TextSuggestionsFieldProps {
   width?: React.ComponentProps<typeof Field.Root>['width']
   chrome?: FieldChrome
   onBlur?: () => void
-  /** Used when the visible label is provided by a parent shell (e.g. optional disclosure). */
+  /** Used only when `label` is blank — prefer `label` + `labelVisibility`. */
   ariaLabel?: string
 }
 
@@ -77,6 +77,7 @@ function TextSuggestionsInput({
 export function TextSuggestionsField({
   id,
   label,
+  labelVisibility,
   value,
   suggestions,
   onValueChange,
@@ -110,18 +111,21 @@ export function TextSuggestionsField({
       size={size}
       controlSize={controlSize}
       width={rootWidth}
+      labelVisibility={labelVisibility}
       anatomy
     >
       <FieldLayout
         chrome={chrome}
         size={size}
         controlSize={controlSize}
+        wrapControl={false}
         label={
           showLabel ? (
             <FormFieldLabel
               id={`${id}-label`}
               htmlFor={id}
               label={label}
+              labelVisibility={labelVisibility}
               info={info}
               required={required}
             />

@@ -370,9 +370,9 @@ function OpenOptionalFieldDisclosure({
     </OptionalDisclosureMicroAction>
   )
   const fieldLabelNode = (
-    <label htmlFor={controlId} className={disclosureLabelClass(size)}>
+    <span aria-hidden className={disclosureLabelClass(size)}>
       <FieldLabelContent label={fieldLabel} />
-    </label>
+    </span>
   )
   const header = <DisclosureHeaderRow label={fieldLabelNode} action={removeButton} />
   const sourcePreviewNode = (

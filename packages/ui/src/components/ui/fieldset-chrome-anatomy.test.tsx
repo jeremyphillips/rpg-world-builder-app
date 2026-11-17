@@ -34,9 +34,12 @@ describe('FieldsetChromeFrame', () => {
     expect(fieldset?.parentElement).not.toBe(legend?.parentElement)
   })
 
-  it('keeps below-label hint inside the legend cluster with a 2px stack gap', () => {
+  it('keeps below-label hint as a fieldset sibling outside the legend name', () => {
     render(
-      <FieldsetChromeFrame errorId="scores-error" fieldsetProps={{ id: 'scores-fieldset' }}>
+      <FieldsetChromeFrame
+        errorId="scores-error"
+        fieldsetProps={{ id: 'scores-fieldset', 'aria-describedby': 'scores-hint' }}
+      >
         <FieldsetChromeAnatomy
           hint="Drag to reorder."
           hintId="scores-hint"
@@ -53,9 +56,12 @@ describe('FieldsetChromeFrame', () => {
 
     const hint = screen.getByText('Drag to reorder.')
     const legend = screen.getByText('Ability scores').closest('legend')
-    expect(legend).toContainElement(hint)
-    expect(hint.parentElement).toHaveClass('gap-0.5')
+    const fieldset = legend?.closest('fieldset')
+    expect(legend).not.toContainElement(hint)
+    expect(hint).toHaveAttribute('id', 'scores-hint')
+    expect(fieldset).toHaveAttribute('aria-describedby', 'scores-hint')
     expect(legend).toHaveClass('contents')
+    expect(screen.getByRole('group', { name: 'Ability scores' })).toBeInTheDocument()
   })
 
   it('keeps below-label hint visible when an error is present', () => {

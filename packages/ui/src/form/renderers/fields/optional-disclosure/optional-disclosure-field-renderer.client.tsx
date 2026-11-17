@@ -115,7 +115,7 @@ export function OptionalDisclosureTextareaFieldRenderer({
               controlSize,
             },
             { error, invalid, describedBy },
-            { sizes: 'both', label: 'accessible-name' },
+            { sizes: 'both', label: 'visible' },
           )}
           placeholder={config.placeholder}
           rows={config.rows}
@@ -211,7 +211,7 @@ export function OptionalDisclosureTextFieldRenderer({
               controlSize,
             },
             { error, invalid, describedBy },
-            { sizes: 'both', label: 'accessible-name' },
+            { sizes: 'both', label: 'visible' },
           )}
           placeholder={config.placeholder}
           disabled={config.disabled}
@@ -282,7 +282,7 @@ export function OptionalDisclosureSelectFieldRenderer({
   const editorChrome = {
     ...buildFieldShellProps(shellSource, state.validation, {
       sizes: 'both',
-      label: 'accessible-name',
+      label: 'visible',
     }),
     ...selectExtras,
   }
@@ -423,7 +423,7 @@ export function OptionalDisclosureTextSuggestionsFieldRenderer({
               controlSize: resolved.controlSize,
             },
             validation,
-            { sizes: 'both', label: 'accessible-name' },
+            { sizes: 'both', label: 'visible' },
           )}
           suggestions={suggestions}
           placeholder={config.placeholder}
@@ -520,7 +520,6 @@ export function OptionalDisclosureRichTextFieldRenderer({
               { error, invalid, describedBy },
               { sizes: 'both', label: 'visible' },
             )}
-            labelVisibility="srOnly"
             linkable={config.linkable}
             codeBlocks={config.codeBlocks}
             tables={config.tables}

@@ -189,7 +189,9 @@ describe('FormItems select optionalDisclosure', () => {
     expect(participants).toHaveLength(2)
     expect(controlRegionFor(frequency)).toBeTruthy()
     expect(controlRegionFor(cast)).toBeTruthy()
-    const labelRegion = screen.getByText('Cast at level').closest('[data-field-label-region]')
+    const castParticipant = controlRegionFor(cast)!
+    const labelRegion = castParticipant.querySelector('[data-field-label-region]')
+    expect(labelRegion?.querySelector('[aria-hidden]')).toHaveTextContent('Cast at level')
     expect(labelRegion).toContainElement(
       screen.getByRole('button', { name: 'Remove Cast at level' }),
     )

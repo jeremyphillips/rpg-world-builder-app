@@ -8,7 +8,6 @@ import type { FieldChrome } from './field-chrome.variants'
 import { FieldChromeShell } from './field-chrome-shell'
 import {
   fieldAnatomyStackVariants,
-  fieldLabelHintStackClasses,
   fieldLabelVariants,
   fieldSetChromeContainClasses,
   fieldSetInFlowLegendClasses,
@@ -80,20 +79,16 @@ function wrapLegendCluster(
 
   const labelLine = <div className={fieldLabelVariants({ size: options.size })}>{labelContent}</div>
 
-  const cluster = options.belowLabelHint ? (
-    <div className={fieldLabelHintStackClasses}>
-      {labelLine}
+  return (
+    <>
+      {cloneElement(legend, {
+        ...legendRest,
+        className: cn(fieldSetInFlowLegendClasses, legendClassName),
+        children: labelLine,
+      })}
       {options.belowLabelHint}
-    </div>
-  ) : (
-    labelLine
+    </>
   )
-
-  return cloneElement(legend, {
-    ...legendRest,
-    className: cn(fieldSetInFlowLegendClasses, legendClassName),
-    children: cluster,
-  })
 }
 
 /**

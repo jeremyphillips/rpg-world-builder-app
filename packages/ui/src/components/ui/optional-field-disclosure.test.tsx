@@ -35,8 +35,8 @@ function renderDisclosure({
     >
       <TextareaField
         id="note-field"
-        label=""
-        aria-label="Additional behavior"
+        label="Additional behavior"
+        labelVisibility="srOnly"
         placeholder="Describe behavior not modeled above..."
         rows={3}
         width="full"
@@ -78,19 +78,18 @@ describe('OptionalFieldDisclosure', () => {
     const user = userEvent.setup()
     const { container } = renderDisclosure({ open: true, onRemove })
 
-    expect(screen.getByText('Additional behavior')).toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: 'Additional behavior' })).toBeInTheDocument()
 
     const removeButton = screen.getByRole('button', { name: 'Remove Additional behavior' })
-    const label = screen.getByText('Additional behavior').closest('label')
+    const headerSubject = container.querySelector('[aria-hidden]')
+    expect(headerSubject).toHaveTextContent('Additional behavior')
     expect(removeButton).toHaveClass(
       'text-foreground',
       'text-action-standalone',
       'ui-button__text--xs',
     )
-    expect(label).toHaveClass('self-center')
-    expect(label).not.toHaveClass('self-start')
-    expect(label?.parentElement?.parentElement).toHaveClass('items-center')
+    expect(headerSubject?.closest('label')).toBeNull()
+    expect(headerSubject?.parentElement?.parentElement).toHaveClass('items-center')
     expect(container.querySelector('.flex.flex-col.gap-1')).toBeNull()
 
     await user.click(removeButton)
@@ -115,8 +114,8 @@ describe('OptionalFieldDisclosure', () => {
         >
           <TextareaField
             id="note-field"
-            label=""
-            aria-label="Long range"
+            label="Long range"
+            labelVisibility="srOnly"
             rows={1}
             width="full"
             size="md"
@@ -202,7 +201,7 @@ describe('OptionalFieldDisclosure', () => {
   })
 
   it('keeps the header action on the label row when labeled and open', () => {
-    render(
+    const { container } = render(
       <OptionalFieldDisclosure
         controlId="damage"
         fieldLabel="Damage"
@@ -222,8 +221,7 @@ describe('OptionalFieldDisclosure', () => {
       </OptionalFieldDisclosure>,
     )
 
-    const label = screen.getByText('Damage').closest('label')
-    const headerRow = label?.parentElement?.parentElement
+    const headerRow = container.querySelector('[aria-hidden]')?.parentElement?.parentElement
     expect(headerRow).toHaveClass('items-center', 'justify-between')
     expect(headerRow).toContainElement(
       screen.getByRole('button', { name: 'Clear Damage override' }),
@@ -273,8 +271,8 @@ describe('OptionalFieldDisclosure', () => {
         >
           <TextareaField
             id="note-field"
-            label=""
-            aria-label="Cast at level"
+            label="Cast at level"
+            labelVisibility="srOnly"
             rows={1}
             width="full"
             size="md"
@@ -289,7 +287,7 @@ describe('OptionalFieldDisclosure', () => {
     const labelRegion = container.querySelector('[data-field-label-region]')
     const controlRegion = container.querySelector('[data-field-control-region]')
     expect(participant).toHaveClass('row-span-3', 'grid-rows-subgrid')
-    expect(labelRegion).toContainElement(screen.getByText('Cast at level'))
+    expect(labelRegion?.querySelector('[aria-hidden]')).toHaveTextContent('Cast at level')
     expect(labelRegion).toContainElement(screen.getByRole('button', { name: 'Remove' }))
     expect(controlRegion).toContainElement(screen.getByRole('textbox', { name: 'Cast at level' }))
   })

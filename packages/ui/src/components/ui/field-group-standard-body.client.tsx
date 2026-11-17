@@ -111,6 +111,8 @@ export function StandardFieldGroupBody({
   })
 
   const hasBody = React.Children.count(children) > 0
+  const generatedHintId = React.useId()
+  const hintId = hint ? (id ? `${id}-hint` : generatedHintId) : undefined
   const bodyVisible = hasBody && (!collapsible || open)
   const useLeafAnatomyStack = headingScale === 'field' && Boolean(legend) && !legendSrOnly
   const bodyGapClass =
@@ -139,14 +141,16 @@ export function StandardFieldGroupBody({
   )
 
   const Wrapper = legend ? 'fieldset' : 'div'
+  const groupDescribedBy = hint && hintId ? hintId : undefined
 
   return (
-    <Wrapper id={id} className={fieldsetClassName}>
+    <Wrapper id={id} className={fieldsetClassName} aria-describedby={groupDescribedBy}>
       {legend ? (
         <FieldGroupLegend
           legend={legend}
           legendSrOnly={legendSrOnly}
           hint={hint}
+          hintId={hintId}
           legendAccessory={legendAccessory}
           legendAction={legendAction}
           legendSize={legendSize}

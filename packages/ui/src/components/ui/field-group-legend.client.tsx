@@ -15,6 +15,7 @@ import {
   formSectionHeaderActionSlotClasses,
   resolveFormSectionHeaderActionLayoutClasses,
 } from '../../form/presentation/form-section-header.variants'
+import { FieldGroupLegendHint } from './field-group-legend-hint.client'
 
 const legendChromeClasses = 'w-full min-w-0'
 
@@ -22,6 +23,7 @@ export type FieldGroupLegendProps = {
   legend: string
   legendSrOnly?: boolean
   hint?: string
+  hintId?: string
   /** Non-interactive status/decoration beside the legend label (group headings only). */
   legendAccessory?: React.ReactNode
   /** Trailing compact inline action on the legend row end. */
@@ -49,6 +51,7 @@ function StaticFieldGroupLegend({
   fieldSize,
   legend,
   hint,
+  hintId,
   legendAccessory,
   legendAction,
 }: {
@@ -59,21 +62,32 @@ function StaticFieldGroupLegend({
   fieldSize: FieldSize
   legend: string
   hint?: string
+  hintId?: string
   legendAccessory?: React.ReactNode
   legendAction?: React.ReactNode
 }) {
   return (
-    <legend className={legendClassName(legendChromeClassName, legendSrOnly)}>
-      <FormSectionHeader
-        label={legend}
-        hint={hint}
-        headingScale={presentationScale}
-        rhythm={rhythm}
-        size={fieldSize}
-        labelAccessory={legendAccessory}
-        action={legendAction}
-      />
-    </legend>
+    <>
+      <legend className={legendClassName(legendChromeClassName, legendSrOnly)}>
+        <FormSectionHeader
+          label={legend}
+          headingScale={presentationScale}
+          rhythm={rhythm}
+          size={fieldSize}
+          labelAccessory={legendAccessory}
+          action={legendAction}
+        />
+      </legend>
+      {hint && hintId ? (
+        <FieldGroupLegendHint
+          hint={hint}
+          hintId={hintId}
+          headingScale={presentationScale}
+          rhythm={rhythm}
+          size={fieldSize}
+        />
+      ) : null}
+    </>
   )
 }
 
@@ -85,6 +99,7 @@ function CollapsibleFieldGroupLegend({
   fieldSize,
   legend,
   hint,
+  hintId,
   legendAccessory,
   legendAction,
   open,
@@ -97,16 +112,15 @@ function CollapsibleFieldGroupLegend({
   fieldSize: FieldSize
   legend: string
   hint?: string
+  hintId?: string
   legendAccessory?: React.ReactNode
   legendAction?: React.ReactNode
   open?: boolean
   onToggle?: () => void
 }) {
-  const hasStackedHint = Boolean(hint)
   const headingInTrigger = (
     <FormSectionHeader
       label={legend}
-      hint={hint}
       headingScale={presentationScale}
       rhythm={rhythm}
       size={fieldSize}
@@ -115,17 +129,12 @@ function CollapsibleFieldGroupLegend({
   )
 
   const toggleRow = (
-    <div
-      className={cn('flex w-full min-w-0 gap-2', hasStackedHint ? 'items-start' : 'items-center')}
-    >
+    <div className={cn('flex w-full min-w-0 gap-2', 'items-center')}>
       <button
         type="button"
         aria-expanded={open}
         onClick={onToggle}
-        className={cn(
-          fieldGroupLegendDisclosureTriggerVariants({ rhythm }),
-          hasStackedHint && 'items-start',
-        )}
+        className={fieldGroupLegendDisclosureTriggerVariants({ rhythm })}
       >
         <div className="min-w-0 flex-1">{headingInTrigger}</div>
         <Icon
@@ -142,14 +151,25 @@ function CollapsibleFieldGroupLegend({
   )
 
   return (
-    <legend className={legendClassName(legendChromeClassName, legendSrOnly)}>
-      <div className={resolveFormSectionHeaderActionLayoutClasses({ hasStackedHint })}>
-        <div className="min-w-0">{toggleRow}</div>
-        {legendAction ? (
-          <div className={formSectionHeaderActionSlotClasses}>{legendAction}</div>
-        ) : null}
-      </div>
-    </legend>
+    <>
+      <legend className={legendClassName(legendChromeClassName, legendSrOnly)}>
+        <div className={resolveFormSectionHeaderActionLayoutClasses({ hasStackedHint: false })}>
+          <div className="min-w-0">{toggleRow}</div>
+          {legendAction ? (
+            <div className={formSectionHeaderActionSlotClasses}>{legendAction}</div>
+          ) : null}
+        </div>
+      </legend>
+      {hint && hintId ? (
+        <FieldGroupLegendHint
+          hint={hint}
+          hintId={hintId}
+          headingScale={presentationScale}
+          rhythm={rhythm}
+          size={fieldSize}
+        />
+      ) : null}
+    </>
   )
 }
 
@@ -157,6 +177,7 @@ export function FieldGroupLegend({
   legend,
   legendSrOnly = false,
   hint,
+  hintId,
   legendAccessory,
   legendAction,
   legendSize,
@@ -183,6 +204,7 @@ export function FieldGroupLegend({
         fieldSize={fieldSize}
         legend={legend}
         hint={hint}
+        hintId={hintId}
         legendAccessory={legendAccessory}
         legendAction={legendAction}
       />
@@ -198,6 +220,7 @@ export function FieldGroupLegend({
       fieldSize={fieldSize}
       legend={legend}
       hint={hint}
+      hintId={hintId}
       legendAccessory={legendAccessory}
       legendAction={legendAction}
       open={open}

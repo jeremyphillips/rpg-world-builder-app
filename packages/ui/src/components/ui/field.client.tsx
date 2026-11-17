@@ -360,9 +360,14 @@ export function FieldErrorText({
 export function FieldHintBelowLabel({
   hint,
   hintId,
-}: Pick<FieldHintErrorContent, 'hint'> & Pick<FieldMessageIds, 'hintId'>) {
+  size,
+}: Pick<FieldHintErrorContent, 'hint'> & Pick<FieldMessageIds, 'hintId'> & { size?: FieldSize }) {
   if (!hint) return null
-  return <FieldHintText id={hintId}>{hint}</FieldHintText>
+  return (
+    <FieldHintText id={hintId} size={size}>
+      {hint}
+    </FieldHintText>
+  )
 }
 
 /** Hint or error after the control. */
