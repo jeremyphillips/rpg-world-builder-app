@@ -1,8 +1,9 @@
 'use client'
 
-import { forwardRef, useId, useState, type ReactNode } from 'react'
+import { forwardRef, useId, useState, type FocusEventHandler, type ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
+import { TEXT_VARIANT_MAP } from './text.variants'
 import { useFieldControlSize } from '../../form/context/form-section.context'
 import { useOptionalFilterChrome } from '../../filters/filter-chrome.context'
 import { Checkbox } from './checkbox.client'
@@ -27,6 +28,7 @@ export type BooleanFieldProps = {
   className?: string
   /** Marks the field as a filter-toolbar alignment anchor. */
   toolbarAlign?: boolean
+  onBlur?: FocusEventHandler<HTMLButtonElement>
 }
 
 export const BooleanField = forwardRef<HTMLButtonElement, BooleanFieldProps>(function BooleanField(
@@ -44,6 +46,7 @@ export const BooleanField = forwardRef<HTMLButtonElement, BooleanFieldProps>(fun
     name,
     className,
     toolbarAlign,
+    onBlur,
   },
   ref,
 ) {
@@ -80,13 +83,14 @@ export const BooleanField = forwardRef<HTMLButtonElement, BooleanFieldProps>(fun
         disabled={disabled}
         aria-invalid={invalid || undefined}
         aria-describedby={describedBy}
+        onBlur={onBlur}
         onCheckedChange={(next) => {
           const value = next === true
           if (checked === undefined) setUncontrolledChecked(value)
           onCheckedChange?.(value)
         }}
       />
-      <span className="ui-boolean-field__label">{label}</span>
+      <span className={cn('ui-boolean-field__label', TEXT_VARIANT_MAP.option)}>{label}</span>
     </label>
   )
 })

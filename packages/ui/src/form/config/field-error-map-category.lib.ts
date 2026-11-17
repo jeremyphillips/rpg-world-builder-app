@@ -43,6 +43,7 @@ const TYPE_CATEGORIES: Record<FieldConfig['type'], FieldMessageCategory> = {
   chooseFromChips: 'multi',
   file: 'multi',
   checkbox: 'boolean',
+  boolean: 'boolean',
   switch: 'boolean',
   inputSelect: 'text',
 }

@@ -18,7 +18,8 @@ shapes: [`field-config/`](../../src/form/field-config/) (layered modules; barrel
 | `radio`            | `string`  | `orientation`, `labelHidden`                                                                      |
 | `segmentedControl` | `string`  | `interactivity` for mounted-but-disabled; `defaultValue`                                          |
 | `radioCard`        | `string`  | Card-style options with `meta` / `badge`                                                          |
-| `checkbox`         | `boolean` |                                                                                                   |
+| `checkbox`         | `boolean` | Inline field-label anatomy beside the indicator                                                   |
+| `boolean`          | `boolean` | Outlined `BooleanField` — option typography on the control label                                  |
 | `switch`           | `boolean` | `labelPosition`: `inline`, `above`, `settings`                                                    |
 | `select`           | `string`  | `labelPosition`: `inline`, `above`, `settings`                                                    |
 | `file`             | `File[]`  | `accept`, `multiple`, `maxFiles`, `maxSize`                                                       |
@@ -186,6 +187,9 @@ with a **Remove** action that clears the value and collapses back to the add con
   `add` / `clear`, including open optional groups (`legendAction`).
 - With **`labeled: true`**, the header action stays on the label row in both collapsed and open
   states; the summary sits on the line below.
+
+Collapsed vs open **group** shells (`OptionalFieldDisclosure` vs `FieldGroup`) are an intentional
+structural split — [forms.md](./forms.md#optional-disclosure-structure).
 
 **Implemented for:** `text`, `textSuggestions`, `textarea`, `richtext`, `select`,
 `combobox`, and `rollValue`. Dev guards log when `optionalDisclosure` is used on any other kind.

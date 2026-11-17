@@ -340,6 +340,24 @@ not as a renderer requirement.
 
 Collapsible sections, separators, nested groups: [containers.md](./forms/containers.md).
 
+## Optional disclosure structure
+
+Field config, `labeled` / `summary`, and the shared presentation contract (micro-action add/clear,
+label-scale summary): [field-types.md](./forms/field-types.md#optional-disclosure-optionaldisclosure).
+
+| State  | Leaf field                | `kind: 'group'` + `optionalDisclosure` |
+| ------ | ------------------------- | -------------------------------------- |
+| Closed | `OptionalFieldDisclosure` | `OptionalFieldDisclosure`              |
+| Open   | `OptionalFieldDisclosure` | `FieldGroup` + `legendAction`          |
+
+Open optional **groups** intentionally stay on `FieldGroup` so fieldset legend, `headingScale`,
+hint, and nested field body rhythm match other subsections. Collapsed groups still use
+`OptionalFieldDisclosure` for the labeled header and summary row. Add/clear and summary typography
+are shared primitives; only the open group **shell** differs.
+
+**Deferred:** Merging open groups into the same structural component as leaf open disclosures is
+not planned — `OpenOptionalFieldDisclosure` does not own fieldset legend or group body spacing.
+
 ## Renderer ownership
 
 `FieldRenderer` resolves chrome, options, hints, sizes, and text-suggestion strings once.

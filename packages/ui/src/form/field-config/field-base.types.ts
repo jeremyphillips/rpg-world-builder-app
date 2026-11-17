@@ -32,6 +32,7 @@ export type FieldType =
   | 'radioCard'
   | 'segmentedControl'
   | 'checkbox'
+  | 'boolean'
   | 'switch'
   | 'json'
   | 'richtext'

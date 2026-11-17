@@ -14,6 +14,7 @@ import type {
   SegmentedControlFieldConfig,
   RadioCardFieldConfig,
   CheckboxFieldConfig,
+  BooleanFieldConfig,
   SwitchFieldConfig,
   ChipsFieldConfig,
   ChooseFromChipsFieldConfig,
@@ -47,6 +48,7 @@ export type FieldConfig =
   | SegmentedControlFieldConfig
   | RadioCardFieldConfig
   | CheckboxFieldConfig
+  | BooleanFieldConfig
   | SwitchFieldConfig
   | JsonFieldConfig
   | RichTextFieldConfig

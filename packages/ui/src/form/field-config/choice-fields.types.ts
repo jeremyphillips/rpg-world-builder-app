@@ -107,6 +107,12 @@ export interface CheckboxFieldConfig extends BaseFieldConfig {
   defaultValue?: boolean
 }
 
+/** Outlined pill checkbox — label on the control; use instead of `checkbox` when field-label anatomy is not wanted. */
+export interface BooleanFieldConfig extends BaseFieldConfig {
+  type: 'boolean'
+  defaultValue?: boolean
+}
+
 export interface SwitchFieldConfig extends BaseFieldConfig {
   type: 'switch'
   defaultValue?: boolean

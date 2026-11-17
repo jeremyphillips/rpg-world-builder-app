@@ -61,6 +61,7 @@ describe('BooleanField', () => {
 
     const text = label.querySelector('.ui-boolean-field__label')
     if (!text) throw new Error('missing label text')
+    expect(text).toHaveClass('text-style-option')
     await user.click(text)
     expect(onCheckedChange).toHaveBeenCalledTimes(3)
   })

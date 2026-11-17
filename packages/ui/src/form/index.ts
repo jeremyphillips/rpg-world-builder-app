@@ -192,6 +192,7 @@ export {
   type SegmentedControlFieldConfig,
   type FieldInteractivity,
   type CheckboxFieldConfig,
+  type BooleanFieldConfig,
   type SwitchFieldConfig,
   type JsonFieldConfig,
   type RichTextFieldConfig,

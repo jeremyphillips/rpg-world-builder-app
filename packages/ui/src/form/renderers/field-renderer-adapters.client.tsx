@@ -28,6 +28,7 @@ import {
   type FileFieldRemotePreview,
 } from '../field-config'
 import type { FieldLabelVisibility } from '../form-heading.lib'
+import { BooleanFieldRenderer } from './fields/boolean-field-renderer.client'
 import { ComboboxFieldRenderer } from './fields/combobox/combobox-field-renderer.client'
 import { DiceFormulaFieldRenderer } from './fields/dice-formula-field-renderer.client'
 import type { EditableGridFieldRendererProps } from './fields/editable-grid-field-renderer.client'
@@ -246,6 +247,7 @@ export const fieldRenderers: {
       />
     )
   },
+  boolean: (args) => <BooleanFieldRenderer {...args} />,
   switch: ({ config, field, ...args }) => {
     const validation = { error: args.error, invalid: args.invalid, describedBy: args.describedBy }
     return (

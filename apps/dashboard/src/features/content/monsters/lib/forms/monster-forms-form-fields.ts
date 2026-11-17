@@ -37,7 +37,7 @@ export function monsterDefinedFormDetailFields(ctx: ContentFormCtx): FormItem[] 
     },
     monsterFormMovementOverrideGroup(),
     {
-      type: 'checkbox',
+      type: 'boolean',
       name: 'speechRestricted',
       label: MONSTER_FORM_SPEECH_LABEL,
     },
