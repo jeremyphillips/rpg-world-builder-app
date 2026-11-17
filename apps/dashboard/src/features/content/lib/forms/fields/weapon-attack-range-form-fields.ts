@@ -1,5 +1,11 @@
 import { ATTACK_RANGE_FEET } from '@rpg/contracts'
-import type { FieldVisibility, FormItem, JoinedPairFieldConfig, RowConfig } from '@rpg/ui/form'
+import type {
+  FieldVisibility,
+  FormItem,
+  JoinedPairFieldConfig,
+  RowConfig,
+  RowFieldItem,
+} from '@rpg/ui/form'
 
 import { distanceAmountOptions, distanceJoinedPairField } from './content-distance-form-fields'
 import {
@@ -92,16 +98,18 @@ export function attackRangeRow(options: AttackRangeRowOptions): FormItem {
   }
 }
 
-/** Normal + Long split evenly inside a parent `2/3` column (dual melee+ranged distance row). */
+/** Intrinsic width tokens for Normal + Long inside a parent `2/3` anatomy cluster slot. */
+export function applyAttackRangeClusterWidths<T extends RowFieldItem>(fields: readonly T[]): T[] {
+  return fields.map((field) => ({ ...field, width: 'auto' as const }))
+}
+
+/** Normal + Long at intrinsic width inside a parent `2/3` column (dual melee+ranged distance row). */
 export function attackRangeClusterRow(options: AttackRangeRowOptions): RowConfig {
   return {
     kind: 'row',
     spacing: 'compact',
     visibility: options.visibility,
-    fields: attackRangeJoinedPairFields(options).map((field) => ({
-      ...field,
-      width: '1/2',
-    })),
+    fields: applyAttackRangeClusterWidths(attackRangeJoinedPairFields(options)),
   }
 }
 

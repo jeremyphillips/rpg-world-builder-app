@@ -274,6 +274,15 @@ Compose sibling widths with leaf `width` tokens — intrinsic (`xs`–`xl`, `aut
 
 Reserve row `className` for one-offs; prefer `width` tokens when a layout recurs.
 
+### Anatomy field row cluster
+
+[`AnatomyFieldRowCluster`](../presentation/anatomy-field-row-cluster.client.tsx) lays out
+fields inside a parent anatomy row slot (often `width: '2/3'`). Child fields use the same
+`width` tokens as [`AnatomyFieldRow`](../presentation/anatomy-field-row.client.tsx); column
+tracks come from [`resolveFieldRowColumnTracks`](../../components/ui/field-row-column-tracks.lib.ts)
+(`--row-cols`). The parent slot caps total width; cluster children only partition that space
+(e.g. `auto` + `auto` → intrinsic `max-content` tracks with trailing free space inside the slot).
+
 ## Array inline row spacing (chrome shells)
 
 Compact array inline rows (`ArrayItemAnatomyGrid`) use **two-tier** horizontal spacing —

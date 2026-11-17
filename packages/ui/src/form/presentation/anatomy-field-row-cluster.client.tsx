@@ -1,6 +1,10 @@
 'use client'
 
+import type { CSSProperties } from 'react'
+
+import { resolveFieldRowColumnTracks } from '../../components/ui/field-row-column-tracks.lib'
 import { cn } from '../../lib/utils'
+import { resolveRowFieldWidths } from '../config/resolve-row-field-widths.lib'
 import { FieldNode } from '../containers/form-conditional.client'
 import { isRowSlotItem, resolveFieldConfigPrimaryName, type RowFieldItem } from '../field-config'
 
@@ -23,12 +27,16 @@ export function AnatomyFieldRowCluster({
   fields,
   gap = 'compact',
 }: AnatomyFieldRowClusterProps) {
+  const leafFields = fields.filter((field) => !isRowSlotItem(field))
+  const { gridTemplateColumns } = resolveFieldRowColumnTracks(resolveRowFieldWidths(leafFields))
+
   return (
     <div
       className={cn(
-        'row-span-3 grid min-w-0 w-full grid-rows-subgrid grid-cols-[minmax(0,1fr)_minmax(0,1fr)]',
+        'row-span-3 grid min-w-0 w-full grid-rows-subgrid [grid-template-columns:var(--row-cols)]',
         gap === 'compact' ? 'gap-x-4' : 'gap-x-6',
       )}
+      style={{ '--row-cols': gridTemplateColumns } as CSSProperties}
     >
       {fields.map((field) => {
         if (isRowSlotItem(field)) return null

@@ -24,6 +24,7 @@ import { savingThrowFieldGroup } from '../../../../lib/forms/mechanics/saving-th
 import {
   ATTACK_RANGE_LONG_FIELD_LABEL,
   ATTACK_RANGE_NORMAL_FIELD_LABEL,
+  applyAttackRangeClusterWidths,
   attackRangeJoinedPairFields,
 } from '../../../../lib/forms/fields/weapon-attack-range-form-fields'
 import { MonsterAttackRangeClusterSlot } from '../monster-attack-range-cluster-slot.client'
@@ -261,11 +262,7 @@ function monsterAttackDistanceFields(
 ): FormItem {
   const reach = monsterAttackReachField(modeField)
   const rangeFields = monsterAttackRangeJoinedPairs(modeField)
-  const rangeClusterRow = {
-    kind: 'row' as const,
-    spacing: 'compact' as const,
-    fields: rangeFields.map((field) => ({ ...field, width: '1/2' as const })),
-  }
+  const rangeClusterFields = applyAttackRangeClusterWidths(rangeFields)
   return {
     kind: 'group',
     heading: { label: MONSTER_ACTION_DISTANCE_SECTION_LEGEND },
@@ -288,7 +285,7 @@ function monsterAttackDistanceFields(
               <MonsterAttackRangeClusterSlot
                 idPrefix={formScope.idPrefix}
                 namePrefix={formScope.namePrefix}
-                fields={rangeClusterRow.fields}
+                fields={rangeClusterFields}
               />
             ),
           },
