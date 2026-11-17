@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
+import { FieldRowAnatomyProvider } from './field-row-anatomy.context'
 import { SwitchField } from './switch-field'
 
 describe('SwitchField', () => {
@@ -125,5 +126,26 @@ describe('SwitchField', () => {
       />,
     )
     await expectNoAxeViolations(container)
+  })
+
+  it('uses a content-sized control band without single-line min-height', () => {
+    const { container } = render(<SwitchField id="notify" label="Email reminders" />)
+    const band = container.querySelector('[data-field-control-region] > div')
+    expect(band).not.toBeNull()
+    expect(band).toHaveClass('min-h-0', 'h-auto', 'items-start')
+    expect(band).not.toHaveClass('min-h-9')
+    expect(band).not.toHaveClass('items-center')
+  })
+
+  it('uses a single-line control band inside anatomy rows', () => {
+    const { container } = render(
+      <FieldRowAnatomyProvider>
+        <SwitchField id="prepared" label="Always prepared" />
+      </FieldRowAnatomyProvider>,
+    )
+    const band = container.querySelector('[data-field-control-region] > div')
+    expect(band).toHaveClass('min-h-9')
+    expect(band).not.toHaveClass('min-h-0')
+    expect(band).toHaveClass('items-center')
   })
 })

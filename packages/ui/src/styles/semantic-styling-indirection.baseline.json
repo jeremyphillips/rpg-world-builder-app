@@ -64,7 +64,7 @@
   "apps/dashboard/src/lib/in-page-nav/in-page-section-nav.variants.ts:inPageSectionNavMobileSelectSlotClasses:single-utility-alias",
   "apps/dashboard/src/lib/in-page-nav/in-page-section-nav.variants.ts:inPageSectionNavRailWidthClasses:single-utility-alias",
   "apps/dashboard/src/lib/in-page-nav/in-page-section-nav.variants.ts:inPageSectionNavSectionListClasses:single-utility-alias",
-  "packages/ui/src/components/ui/boolean-field.client.tsx:UI_BOOLEAN_FIELD_CLASS:single-semantic-alias",
+  "packages/ui/src/components/ui/checkbox-option.client.tsx:UI_CHECKBOX_OPTION_CLASS:single-semantic-alias",
   "packages/ui/src/components/ui/bounded-scroll-region.variants.ts:boundedScrollRegionEndInsetClasses:single-utility-alias",
   "packages/ui/src/components/ui/button.styles.ts:UI_BUTTON_ATTACHED_SIZE_CLASS:single-semantic-alias",
   "packages/ui/src/components/ui/button.styles.ts:UI_BUTTON_BLOCK_CLASS:single-semantic-alias",

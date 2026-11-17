@@ -7,11 +7,9 @@ import { FieldRowAnatomyProvider } from './field-row-anatomy.context'
 import { CheckboxField } from './checkbox-field'
 
 describe('CheckboxField', () => {
-  it('applies field size to the label', () => {
+  it('uses option typography on the label', () => {
     render(<CheckboxField id="homebrew" label="Allow homebrew" size="sm" />)
-    expect(screen.getByText('Allow homebrew').closest('label')).toHaveClass(
-      'text-style-field-label-sm',
-    )
+    expect(screen.getByText('Allow homebrew').closest('.text-style-option')).toBeTruthy()
   })
 
   it('toggles via its associated label', async () => {
@@ -33,7 +31,7 @@ describe('CheckboxField', () => {
     await expectNoAxeViolations(container)
   })
 
-  it('stacks inline label and hint in the same column beside the checkbox', () => {
+  it('stacks hint below the option row when not in an anatomy row', () => {
     render(
       <CheckboxField
         id="homebrew"
@@ -41,12 +39,10 @@ describe('CheckboxField', () => {
         hint="Includes third-party content in search results."
       />,
     )
-    const label = screen.getByText('Allow homebrew').closest('label')
     const hint = screen.getByText('Includes third-party content in search results.')
-    const textColumn = label?.parentElement
-
-    expect(textColumn).toHaveClass('flex', 'flex-col', 'gap-0.5')
-    expect(textColumn).toContainElement(hint)
+    const stack = hint.parentElement
+    expect(stack).toHaveClass('flex', 'flex-col', 'gap-0.5')
+    expect(stack?.querySelector('.ui-checkbox-option')).toBeTruthy()
   })
 
   it('uses a single-line control band with hints in the message region inside anatomy rows', () => {
@@ -70,7 +66,16 @@ describe('CheckboxField', () => {
     ).toBeTruthy()
   })
 
-  it('keeps first-line checkbox column alignment inside the content-sized band', () => {
+  it('uses a content-sized control band without single-line min-height', () => {
+    const { container } = render(<CheckboxField id="plain" label="Plain option" />)
+    const band = container.querySelector('[data-field-control-region] > div')
+    expect(band).not.toBeNull()
+    expect(band).toHaveClass('min-h-0', 'h-auto', 'items-start')
+    expect(band).not.toHaveClass('min-h-9')
+    expect(band).not.toHaveClass('items-center')
+  })
+
+  it('renders three-region field anatomy', () => {
     const { container } = render(
       <CheckboxField
         id="homebrew"
@@ -82,8 +87,6 @@ describe('CheckboxField', () => {
     expect(container.querySelector('[data-field-control-region]')).not.toBeNull()
     expect(container.querySelector('[data-field-label-region]')).not.toBeNull()
     expect(container.querySelector('[data-field-message-region]')).not.toBeNull()
-    const row = screen.getByText('Allow homebrew').closest('label')?.parentElement?.parentElement
-    expect(row).toHaveClass('flex', 'gap-2')
-    expect(row?.firstElementChild).toHaveClass('flex', 'h-4', 'shrink-0', 'items-center')
+    expect(container.querySelector('.ui-checkbox-option')).toBeTruthy()
   })
 })

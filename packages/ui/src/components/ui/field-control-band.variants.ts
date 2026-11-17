@@ -16,19 +16,33 @@ export type FieldControlBand = 'single-line' | 'content-sized'
 /** `grid` is settings-style only in v1 — no multi-column label grid yet. */
 export type FieldRowLayout = 'flow' | 'grid'
 
-export const fieldControlBandVariants = cva('flex w-full min-w-0 items-center', {
+const singleLineMinHeights = {
+  xs: 'min-h-6',
+  sm: 'min-h-8',
+  md: 'min-h-9',
+  lg: 'min-h-11',
+} as const satisfies Record<FieldSizeToken, string>
+
+export const fieldControlBandVariants = cva('flex w-full min-w-0', {
   variants: {
     size: {
-      xs: 'min-h-6',
-      sm: 'min-h-8',
-      md: 'min-h-9',
-      lg: 'min-h-11',
+      xs: '',
+      sm: '',
+      md: '',
+      lg: '',
     } satisfies Record<FieldSizeToken, string>,
     band: {
-      'single-line': '',
+      'single-line': 'items-center',
       'content-sized': 'min-h-0 h-auto items-start',
     },
   },
+  compoundVariants: (Object.entries(singleLineMinHeights) as [FieldSizeToken, string][]).map(
+    ([size, className]) => ({
+      band: 'single-line' as const,
+      size,
+      className,
+    }),
+  ),
   defaultVariants: {
     size: 'md',
     band: 'single-line',

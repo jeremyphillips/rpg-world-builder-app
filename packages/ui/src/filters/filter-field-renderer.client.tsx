@@ -10,7 +10,7 @@ import { cn } from '../lib/utils'
 import { useFilterChrome } from './filter-chrome.context'
 import { isFilterFieldDisabled, resolveFilterPopoverSizerLabels } from './filter-bar.lib'
 import { resolveChipsFieldOptions, resolvePopoverFieldGroups } from './filter-field-options.lib'
-import { BooleanField } from '../components/ui/boolean-field.client'
+import { CheckboxOption } from '../components/ui/checkbox-option.client'
 import {
   resolveFilterFieldPresentation,
   resolveFilterFieldWidthClasses,
@@ -308,9 +308,10 @@ function FilterBooleanField<TData, TState extends Record<string, unknown>>({
   const isChecked = state[booleanField.id] === true
 
   return (
-    <BooleanField
+    <CheckboxOption
       id={controlId}
       label={booleanField.label}
+      shell="outlined"
       className={presentation.groupClassName}
       toolbarAlign
       checked={isChecked}

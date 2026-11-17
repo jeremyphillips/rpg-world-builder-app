@@ -1,5 +1,5 @@
 import { useContext } from 'react'
-import { BooleanField } from '@rpg/ui'
+import { CheckboxOption } from '@rpg/ui'
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import { MasterDetailRowPrefixContext } from '../../../lib/master-detail/use-master-detail-row-prefix'
@@ -23,7 +23,8 @@ export function WaterBreathingToggle({ namePrefix: namePrefixProp }: { namePrefi
   })
 
   return (
-    <BooleanField
+    <CheckboxOption
+      shell="outlined"
       label={WATER_BREATHING_TOGGLE_LABEL}
       checked={enabled}
       onCheckedChange={(checked) => {

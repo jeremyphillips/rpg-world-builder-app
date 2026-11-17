@@ -8,7 +8,7 @@ import {
   TELEPATHY_MILE_FEET,
   type SenseId,
 } from '@rpg/contracts'
-import { BooleanField, ComboboxField, JoinedPairFieldForm } from '@rpg/ui'
+import { CheckboxOption, ComboboxField, JoinedPairFieldForm } from '@rpg/ui'
 
 import { buildLabelDescriptionActiveVocabulary, useVocabularySet } from '@/features/vocabulary'
 
@@ -143,7 +143,8 @@ function MonsterLanguageFluencyRowTrailing({
 
   return (
     <div className="flex flex-wrap items-center justify-end gap-2">
-      <BooleanField
+      <CheckboxOption
+        shell="outlined"
         id={`monster-language-${entry.language}-understands-only`}
         label={MONSTER_UNDERSTANDS_ONLY_LABEL}
         checked={!speaks}

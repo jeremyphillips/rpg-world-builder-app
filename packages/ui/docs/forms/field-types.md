@@ -18,8 +18,8 @@ shapes: [`field-config/`](../../src/form/field-config/) (layered modules; barrel
 | `radio`            | `string`  | `orientation`, `labelHidden`                                                                      |
 | `segmentedControl` | `string`  | `interactivity` for mounted-but-disabled; `defaultValue`                                          |
 | `radioCard`        | `string`  | Card-style options with `meta` / `badge`                                                          |
-| `checkbox`         | `boolean` | Inline field-label anatomy beside the indicator                                                   |
-| `boolean`          | `boolean` | Outlined `BooleanField` — option typography on the control label                                  |
+| `checkbox`         | `boolean` | Alias of `boolean` (plain `CheckboxOption` + option typography)                                   |
+| `boolean`          | `boolean` | Single checkbox — plain default; `shell: 'outlined'` for pill; `tone` for checked indicator       |
 | `switch`           | `boolean` | `labelPosition`: `inline`, `above`, `settings`                                                    |
 | `select`           | `string`  | `labelPosition`: `inline`, `above`, `settings`                                                    |
 | `file`             | `File[]`  | `accept`, `multiple`, `maxFiles`, `maxSize`                                                       |

@@ -992,7 +992,22 @@ export {
   resolveSelectSizingGhostLabels,
 } from './components/ui/select-trigger.lib'
 export { Checkbox } from './components/ui/checkbox.client'
-export { BooleanField, type BooleanFieldProps } from './components/ui/boolean-field.client'
+export {
+  CheckboxOption,
+  UI_CHECKBOX_OPTION_CLASS,
+  type CheckboxOptionProps,
+  type CheckboxOptionShell,
+} from './components/ui/checkbox-option.client'
+export {
+  resolveCheckboxOptionScale,
+  type CheckboxOptionScale,
+  type ResolvedCheckboxOptionScale,
+} from './components/ui/checkbox-option.lib'
+/** @deprecated Use {@link CheckboxOption} with `shell="outlined"` where a pill is needed. */
+export {
+  CheckboxOption as BooleanField,
+  type CheckboxOptionProps as BooleanFieldProps,
+} from './components/ui/checkbox-option.client'
 export type { ChoiceTone } from './components/ui/choice-control.styles'
 export { RadioGroup, RadioGroupItem } from './components/ui/radio-group.client'
 export { Switch } from './components/ui/switch.client'

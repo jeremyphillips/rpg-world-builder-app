@@ -13,7 +13,14 @@ import type { FieldSizeToken } from './field-sizing.variants'
 
 const LABEL_LAYOUTS: FieldLabelLayout[] = ['hidden', 'stacked', 'inline', 'settings']
 const CONTROL_BANDS: FieldControlBand[] = ['single-line', 'content-sized']
-const SIZES: FieldSizeToken[] = ['sm', 'md', 'lg']
+const SIZES: FieldSizeToken[] = ['xs', 'sm', 'md', 'lg']
+
+const SIZE_MIN_HEIGHTS: Record<FieldSizeToken, string> = {
+  xs: 'min-h-6',
+  sm: 'min-h-8',
+  md: 'min-h-9',
+  lg: 'min-h-11',
+}
 
 describe('resolveFieldPresentation', () => {
   it.each(
@@ -32,18 +39,28 @@ describe('resolveFieldPresentation', () => {
     expect(presentation.labelClassName).toBeTruthy()
 
     if (controlBand === 'single-line') {
-      if (size === 'sm') expect(presentation.controlBandClassName).toContain('min-h-8')
-      if (size === 'md') expect(presentation.controlBandClassName).toContain('min-h-9')
-      if (size === 'lg') expect(presentation.controlBandClassName).toContain('min-h-11')
+      expect(presentation.controlBandClassName).toContain(SIZE_MIN_HEIGHTS[size])
+      expect(presentation.controlBandClassName).toContain('items-center')
+      expect(presentation.controlBandClassName).not.toContain('min-h-0')
+      expect(presentation.controlBandClassName).not.toContain('items-start')
+      for (const other of SIZES) {
+        if (other === size) continue
+        expect(presentation.controlBandClassName).not.toContain(SIZE_MIN_HEIGHTS[other])
+      }
     } else {
       expect(presentation.controlBandClassName).toContain('min-h-0')
+      expect(presentation.controlBandClassName).toContain('h-auto')
       expect(presentation.controlBandClassName).toContain('items-start')
+      expect(presentation.controlBandClassName).not.toContain('items-center')
+      for (const token of Object.values(SIZE_MIN_HEIGHTS)) {
+        expect(presentation.controlBandClassName).not.toContain(token)
+      }
     }
 
     if (labelLayout === 'stacked') {
       expect(presentation.groupClassName).toContain('flex-col')
       expect(presentation.alignmentAnchorClassName).toContain(
-        size === 'sm' ? 'gap-y-1' : 'gap-y-1.5',
+        size === 'sm' || size === 'xs' ? 'gap-y-1' : 'gap-y-1.5',
       )
     }
     if (labelLayout === 'inline') {

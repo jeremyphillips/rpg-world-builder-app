@@ -5,7 +5,7 @@ import * as React from 'react'
 
 import { FilterToolbarLabelSizer } from '../../filters/filter-toolbar-label-sizer.client'
 import { Button } from './button.client'
-import { Checkbox } from './checkbox.client'
+import { CheckboxOption } from './checkbox-option.client'
 import { PopoverLayerPortal } from './layer-portal-container.client'
 import { Text } from './text'
 import { popoverContentVariants } from './popover-content.variants'
@@ -97,26 +97,19 @@ export function FilterPopover({
                     const checked = group.selectedValues.includes(option.value)
                     const checkboxId = `${group.id}-${option.value}`
                     return (
-                      <label
+                      <CheckboxOption
                         key={option.value}
-                        htmlFor={checkboxId}
-                        className="flex items-center gap-2"
-                      >
-                        <Checkbox
-                          id={checkboxId}
-                          checked={checked}
-                          onCheckedChange={() =>
-                            toggleValue(
-                              group.selectedValues,
-                              option.value,
-                              group.onSelectedValuesChange,
-                            )
-                          }
-                        />
-                        <Text as="span" className="text-sm">
-                          {option.label}
-                        </Text>
-                      </label>
+                        id={checkboxId}
+                        label={option.label}
+                        checked={checked}
+                        onCheckedChange={() =>
+                          toggleValue(
+                            group.selectedValues,
+                            option.value,
+                            group.onSelectedValuesChange,
+                          )
+                        }
+                      />
                     )
                   })}
                 </div>

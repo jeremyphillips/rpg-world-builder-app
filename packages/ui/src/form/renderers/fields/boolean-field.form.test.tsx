@@ -24,15 +24,15 @@ function Harness() {
 }
 
 describe('boolean field', () => {
-  it('renders BooleanField chrome and toggles form state', async () => {
+  it('renders a plain checkbox option and toggles form state', async () => {
     const user = userEvent.setup()
     render(<Harness />)
 
     const control = screen.getByRole('checkbox', { name: 'Cannot speak' })
-    expect(control.closest('.ui-boolean-field')).toBeTruthy()
-    expect(
-      control.closest('.ui-boolean-field')?.querySelector('.text-style-option'),
-    ).toHaveTextContent('Cannot speak')
+    const option = control.closest('.ui-checkbox-option')
+    expect(option).toBeTruthy()
+    expect(option).not.toHaveAttribute('data-shell', 'outlined')
+    expect(option?.querySelector('.text-style-option')).toHaveTextContent('Cannot speak')
 
     await user.click(control)
     expect(control).toBeChecked()

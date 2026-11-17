@@ -202,7 +202,7 @@ item cards keep their own shell model.
 `var(--choice-control-border)` in `choice-control.css`, composed toward `--surface-current` — not
 `border-input`. There is no `border-choice-control` utility (removed as unused); semantic
 `--choice-control-border` / `--color-choice-control-border` remain. Checkbox `tone` (`default`, `success`, `warning`, `destructive`) sets
-`--choice-indicator-*` from `[data-choice-tone]` in `choice-control.css`. `BooleanField`
+`--choice-indicator-*` from `[data-choice-tone]` in `choice-control.css`. Outlined `CheckboxOption`
 paints every tone through the same roles: `--boolean-bg`, `--boolean-hover-bg`,
 `--boolean-checked-bg`, and the matching border roles. The neutral checked fill is
 `--interactive-outline-active-bg`; the checkmark stays `--primary`. Labels stay
