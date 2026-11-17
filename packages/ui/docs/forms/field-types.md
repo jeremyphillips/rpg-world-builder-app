@@ -204,6 +204,12 @@ structural split — [forms.md](./forms.md#optional-disclosure-structure).
 
 **Implemented for:** `text`, `textSuggestions`, `textarea`, `richtext`, `select`,
 `combobox`, and `rollValue`. Dev guards log when `optionalDisclosure` is used on any other kind.
+`chips` is intentionally excluded — multivalue size overrides stay always visible.
+
+**Lifecycle split:** `rollValue` opens while its object is present. Scalar fields (`text`,
+`select`, …) use `manualOpen` until a meaningful value is stored. Losing `manualOpen` on
+remount while the value is still empty is expected. Only populated scalar values must survive
+remount and clear back to an absent selection.
 
 `rollValue` treats the roll object as present even when dice or flat are incomplete.
 Add calls `seedWhen` and writes that value. Remove unsets the whole object. Set

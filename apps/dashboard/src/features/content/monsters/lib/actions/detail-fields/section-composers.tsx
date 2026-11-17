@@ -339,7 +339,6 @@ function reactionAuthoringFields(input: {
         optionalDisclosure: {
           intent: 'add',
           addLabel: MONSTER_PARRY_FOLLOW_UP_ADD_LABEL,
-          seedWhen: () => '',
         },
       },
     ]
