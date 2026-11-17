@@ -45,7 +45,6 @@ import {
   MONSTER_TRIGGER_LABEL,
   MONSTER_TRIGGER_PLACEHOLDER,
   MONSTER_SHAPE_SHIFT_EQUIPMENT_LABEL,
-  MONSTER_SHAPE_SHIFT_PREREQUISITE_ADD_LABEL,
   MONSTER_SHAPE_SHIFT_PREREQUISITE_HINT,
   MONSTER_SHAPE_SHIFT_PREREQUISITE_LABEL,
 } from '../../monster-form-labels'
@@ -462,7 +461,7 @@ export function monsterActionMechanicFields(input: {
         name: `${namePrefix}.prerequisite`,
         label: MONSTER_SHAPE_SHIFT_PREREQUISITE_LABEL,
         hint: MONSTER_SHAPE_SHIFT_PREREQUISITE_HINT,
-        optionalDisclosure: { intent: 'add', addLabel: MONSTER_SHAPE_SHIFT_PREREQUISITE_ADD_LABEL },
+        optionalDisclosure: { intent: 'add' },
       },
     )
   }

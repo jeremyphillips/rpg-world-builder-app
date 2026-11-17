@@ -13,9 +13,9 @@ import { damageDefinitionFields } from './damage-definition-fields'
 import {
   EFFECT_CONDITION_DETAILS_HINT,
   EFFECT_CONDITION_DETAILS_PLACEHOLDER,
-  EFFECT_DETAILS_ADD_LABEL,
   EFFECT_DETAILS_LABEL,
   EFFECT_REPLACE_CONDITION_ADD_LABEL,
+  EFFECT_REPLACE_CONDITION_REMOVE_LABEL,
 } from './effect-authoring-copy'
 
 export type OrderedEffectKind = 'damage' | 'condition' | 'note'
@@ -48,7 +48,7 @@ function replaceConditionField(precedingEffectsPath: string): SelectFieldConfig 
     optionalDisclosure: {
       intent: 'add',
       addLabel: EFFECT_REPLACE_CONDITION_ADD_LABEL,
-      removeLabel: 'Remove',
+      removeLabel: EFFECT_REPLACE_CONDITION_REMOVE_LABEL,
     },
   }
 }
@@ -75,7 +75,7 @@ export function orderedEffectRowFields(options: {
         name: 'description',
         label: EFFECT_DETAILS_LABEL,
         visibility: damage,
-        optionalDisclosure: { intent: 'add', addLabel: EFFECT_DETAILS_ADD_LABEL },
+        optionalDisclosure: { intent: 'add', actionSubject: 'details' },
       },
     )
   }
@@ -102,7 +102,7 @@ export function orderedEffectRowFields(options: {
         name: 'description',
         label: EFFECT_DETAILS_LABEL,
         visibility: condition,
-        optionalDisclosure: { intent: 'add', addLabel: EFFECT_DETAILS_ADD_LABEL },
+        optionalDisclosure: { intent: 'add', actionSubject: 'details' },
         hint: EFFECT_CONDITION_DETAILS_HINT,
         placeholder: EFFECT_CONDITION_DETAILS_PLACEHOLDER,
       },

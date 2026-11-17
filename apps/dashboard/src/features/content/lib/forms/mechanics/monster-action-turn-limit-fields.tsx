@@ -11,7 +11,6 @@ import {
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import {
-  MONSTER_TURN_LIMIT_ADD_LABEL,
   MONSTER_TURN_LIMIT_LABEL,
   MONSTER_TURN_LIMIT_OPTION_LABEL,
 } from '../../../monsters/lib/monster-form-labels'
@@ -25,8 +24,7 @@ function MonsterActionTurnLimitControl({ name }: { name: string }) {
   const fieldId = `${name.replaceAll('.', '-')}-turn-limit`
   const actions = resolveOptionalDisclosureActions({
     intent: 'add',
-    subject: MONSTER_TURN_LIMIT_LABEL,
-    addLabel: MONSTER_TURN_LIMIT_ADD_LABEL,
+    subject: 'turn limit',
   })
 
   return (

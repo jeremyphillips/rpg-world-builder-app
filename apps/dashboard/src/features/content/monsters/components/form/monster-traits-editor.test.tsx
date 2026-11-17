@@ -85,7 +85,7 @@ describe('MonsterTraitsEditor', () => {
     ).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Add custom name' })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Edit name' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Add additional details' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add details' })).toBeInTheDocument()
   })
 
   it('shows a Tunneler advisory only on that trait', async () => {

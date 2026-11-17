@@ -15,6 +15,7 @@ import { useConfirmBeforeClear } from '../config/use-confirm-before-clear.client
 import {
   optionalDisclosureShellProps,
   resolveOptionalDisclosureActions,
+  resolveOptionalDisclosureSubject,
 } from '../config/optional-disclosure-actions.lib'
 import {
   resolveOptionalDisclosureClearPaths,
@@ -153,7 +154,7 @@ function OptionalDisclosureGroupBody({
 
   const actions = resolveOptionalDisclosureActions({
     intent: disclosure.intent,
-    subject: fieldLabel,
+    subject: resolveOptionalDisclosureSubject(fieldLabel, disclosure),
     labeled: disclosure.labeled,
     addLabel: disclosure.addLabel,
     removeLabel: disclosure.removeLabel,

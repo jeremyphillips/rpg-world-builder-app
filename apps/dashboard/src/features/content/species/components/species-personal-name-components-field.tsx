@@ -42,8 +42,7 @@ export function SpeciesPersonalNameComponentsField({
   const [open, setOpen] = useState(value.length > 0)
   const actions = resolveOptionalDisclosureActions({
     intent: 'add',
-    subject: 'Personal name components',
-    addLabel: 'Add personal name components',
+    subject: 'name components',
   })
 
   return (

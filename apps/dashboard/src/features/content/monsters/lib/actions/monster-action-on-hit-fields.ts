@@ -5,7 +5,6 @@ import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-re
 import { orderedEffectFormFields } from '../../../lib/forms/mechanics/ordered-effect-form-fields'
 import { vocabularyFieldLabel } from '@/features/vocabulary'
 import {
-  MONSTER_LIMIT_ADD_LABEL,
   MONSTER_LIMIT_RECHARGES_ON_LABEL,
   monsterLimitRechargesOnHint,
   MONSTER_ON_HIT_HINT,
@@ -48,7 +47,7 @@ export function monsterActionLimitedUseFields(options?: { addDisabled?: boolean 
         placeholder: 'No limit',
         optionalDisclosure: {
           intent: 'add',
-          addLabel: MONSTER_LIMIT_ADD_LABEL,
+          actionSubject: 'limit',
           ...(options?.addDisabled ? { addDisabled: true } : {}),
         },
         options: [

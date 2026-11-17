@@ -340,6 +340,7 @@ export {
   optionalDisclosureLeafActions,
   optionalDisclosureShellProps,
   resolveOptionalDisclosureActions,
+  resolveOptionalDisclosureSubject,
   type OptionalDisclosureActionVerb,
   type ResolvedOptionalDisclosureActions,
 } from './config/optional-disclosure-actions.lib'

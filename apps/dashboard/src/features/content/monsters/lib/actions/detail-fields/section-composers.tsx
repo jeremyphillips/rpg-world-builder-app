@@ -24,13 +24,11 @@ import { MonsterActionSpellSummary } from '../../../components/form/actions/mons
 import { MonsterActionShapeShiftSummary } from '../../../components/form/actions/monster-action-shape-shift-summary'
 import {
   MONSTER_RULES_TEXT_LABEL,
-  MONSTER_CUSTOM_DESCRIPTION_ADD_LABEL,
   MONSTER_CUSTOM_DESCRIPTION_HINT,
   MONSTER_CUSTOM_DESCRIPTION_LABEL,
   MONSTER_TELEPORT_PASSENGER_HINT,
   MONSTER_TELEPORT_DISTANCE_HINT,
   MONSTER_TELEPORT_DISTANCE_LABEL,
-  MONSTER_TELEPORT_PASSENGER_ADD_LABEL,
   MONSTER_TELEPORT_PASSENGER_LEGEND,
   MONSTER_TELEPORT_WITHIN_HINT,
   MONSTER_TELEPORT_WITHIN_LABEL,
@@ -39,18 +37,15 @@ import {
   MONSTER_TAKE_ACTIONS_CHOICE_EACH,
   MONSTER_TAKE_ACTIONS_CHOICE_LABEL,
   MONSTER_TAKE_ACTIONS_CHOICE_ONE,
-  MONSTER_TAKE_ACTIONS_RESTRICTION_ADD_LABEL,
   MONSTER_TAKE_ACTIONS_RESTRICTION_HINT,
   MONSTER_TAKE_ACTIONS_RESTRICTION_LABEL,
   MONSTER_TAKE_ACTIONS_RESTRICTION_PLACEHOLDER,
-  MONSTER_REACTION_ADDITIONAL_RULES_ADD_LABEL,
   MONSTER_REACTION_ADDITIONAL_RULES_HINT,
   MONSTER_REACTION_ADDITIONAL_RULES_LABEL,
   MONSTER_REACTION_REFERENCE_HINT,
   MONSTER_REFERENCE_ACTION_LABEL,
   MONSTER_PARRY_AC_BONUS_HINT,
   MONSTER_PARRY_AC_BONUS_LABEL,
-  MONSTER_PARRY_FOLLOW_UP_ADD_LABEL,
   MONSTER_PARRY_FOLLOW_UP_HINT,
   MONSTER_PARRY_FOLLOW_UP_LABEL,
 } from '../../monster-form-labels'
@@ -74,7 +69,7 @@ const monsterActionOptionalDescriptionField = {
   name: 'description',
   label: MONSTER_CUSTOM_DESCRIPTION_LABEL,
   hint: MONSTER_CUSTOM_DESCRIPTION_HINT,
-  optionalDisclosure: { intent: 'add', addLabel: MONSTER_CUSTOM_DESCRIPTION_ADD_LABEL },
+  optionalDisclosure: { intent: 'add', actionSubject: 'details' },
 } as const satisfies FormItem
 
 function monsterActionDescriptionField(action: MonsterActionDraftRow): FormItem {
@@ -222,7 +217,7 @@ function bonusAuthoringFields(input: {
         },
         optionalDisclosure: {
           intent: 'add',
-          addLabel: MONSTER_TELEPORT_PASSENGER_ADD_LABEL,
+          actionSubject: 'passenger',
           seedWhen: () => ({ withinFeet: TELEPORT_WITHIN_DEFAULT }),
         },
         fields: [
@@ -294,7 +289,7 @@ function bonusAuthoringFields(input: {
         label: MONSTER_TAKE_ACTIONS_RESTRICTION_LABEL,
         hint: { text: MONSTER_TAKE_ACTIONS_RESTRICTION_HINT },
         placeholder: MONSTER_TAKE_ACTIONS_RESTRICTION_PLACEHOLDER,
-        optionalDisclosure: { intent: 'add', addLabel: MONSTER_TAKE_ACTIONS_RESTRICTION_ADD_LABEL },
+        optionalDisclosure: { intent: 'add' },
       },
       ...usage,
     ]
@@ -338,7 +333,7 @@ function reactionAuthoringFields(input: {
         options: attackOptions,
         optionalDisclosure: {
           intent: 'add',
-          addLabel: MONSTER_PARRY_FOLLOW_UP_ADD_LABEL,
+          actionSubject: 'follow-up attack',
         },
       },
     ]
@@ -363,7 +358,7 @@ function reactionAuthoringFields(input: {
         hint: MONSTER_REACTION_ADDITIONAL_RULES_HINT,
         optionalDisclosure: {
           intent: 'add',
-          addLabel: MONSTER_REACTION_ADDITIONAL_RULES_ADD_LABEL,
+          actionSubject: 'rules',
         },
       },
     ]

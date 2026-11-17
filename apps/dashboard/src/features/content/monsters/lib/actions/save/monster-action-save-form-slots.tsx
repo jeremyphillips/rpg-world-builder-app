@@ -8,8 +8,8 @@ import { useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import {
-  MONSTER_SAVE_FAILURE_OR_SUCCESS_ADD_LABEL,
   MONSTER_SAVE_FAILURE_OR_SUCCESS_NOTE_LABEL,
+  MONSTER_SAVE_OUTCOME_DISCLOSURE_LABEL,
   MONSTER_SAVE_REPEAT_ADD_LABEL,
 } from '../../monster-form-labels'
 import {
@@ -141,15 +141,13 @@ export function MonsterActionSaveFailureOrSuccessField({ namePrefix }: { namePre
   const fieldId = `${namePrefix.replaceAll('.', '-')}-failure-or-success`
   const actions = resolveOptionalDisclosureActions({
     intent: 'add',
-    subject: MONSTER_SAVE_FAILURE_OR_SUCCESS_ADD_LABEL,
-    addLabel: MONSTER_SAVE_FAILURE_OR_SUCCESS_ADD_LABEL,
-    removeLabel: 'Remove',
+    subject: 'save outcome',
   })
 
   return (
     <OptionalFieldDisclosure
       controlId={fieldId}
-      fieldLabel={MONSTER_SAVE_FAILURE_OR_SUCCESS_ADD_LABEL}
+      fieldLabel={MONSTER_SAVE_OUTCOME_DISCLOSURE_LABEL}
       {...optionalDisclosureShellProps(actions)}
       open={open || existing != null}
       onOpenChange={(next) => {

@@ -2,8 +2,9 @@ import { type Spell } from '@rpg/contracts'
 import type { SelectFieldConfig } from '@rpg/ui/form'
 
 import {
-  MONSTER_SPELL_CAST_HIGHER_LEVEL_LABEL,
   MONSTER_SPELL_CAST_LEVEL_PLACEHOLDER,
+  MONSTER_SPELL_CAST_LEVEL_SET_LABEL,
+  MONSTER_SPELL_CAST_LEVEL_USE_DEFAULT_LABEL,
 } from '../../monster-form-labels'
 import { higherCastLevelOptions, spellAllowsHigherCastLevel } from './monster-spell-frequency'
 
@@ -41,7 +42,8 @@ export function monsterSpellCastAtLevelField(input: {
     width: input.width,
     optionalDisclosure: input.optionalDisclosure ?? {
       intent: 'override',
-      addLabel: MONSTER_SPELL_CAST_HIGHER_LEVEL_LABEL,
+      addLabel: MONSTER_SPELL_CAST_LEVEL_SET_LABEL,
+      removeLabel: MONSTER_SPELL_CAST_LEVEL_USE_DEFAULT_LABEL,
       expandWhenPopulated: true,
     },
     optionsResolve: {

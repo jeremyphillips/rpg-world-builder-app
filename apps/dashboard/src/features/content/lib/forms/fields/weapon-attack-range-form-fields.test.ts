@@ -24,7 +24,7 @@ function assertAttackRangeRowFields(row: FormItem) {
     type: 'joinedPair',
     label: 'Long',
     hint: { text: 'Disadvantage beyond normal range.', position: 'below-control' },
-    optionalDisclosure: { intent: 'add', addLabel: 'Add long range' },
+    optionalDisclosure: { intent: 'add', actionSubject: 'long range' },
     start: { kind: 'select', name: 'range.long', allowCustom: true, clearable: true },
   })
   const normal = row.fields[0]

@@ -8,7 +8,6 @@ import { useFormContext, useWatch } from 'react-hook-form'
 
 import {
   MONSTER_LIMIT_RECHARGES_ON_LABEL,
-  MONSTER_RECHARGE_ADD_LABEL,
   monsterLimitRechargesOnHint,
 } from '../../monster-form-labels'
 import {
@@ -34,8 +33,7 @@ export function MonsterActionRechargeField({
   const fieldId = `${name.replaceAll('.', '-')}-min-roll`
   const actions = resolveOptionalDisclosureActions({
     intent: 'add',
-    subject: MONSTER_LIMIT_RECHARGES_ON_LABEL,
-    addLabel: MONSTER_RECHARGE_ADD_LABEL,
+    subject: 'recharge',
   })
 
   const write = (next: ReturnType<typeof rechargeValueFromRaw>) => {

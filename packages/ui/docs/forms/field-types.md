@@ -180,13 +180,17 @@ the same resolver with the group heading. Renderers still own opening, seeding, 
 
 **Presentation contract** (shared across leaf fields and `kind: 'group'`):
 
-- The **label** (or group legend) is the subject. Action-only defaults keep that casing
-  (`Add Notes`). There is no separate subject property.
+- The **label** (or group legend) is the default action subject. Use **`actionSubject`** when
+  the displayed label is not a good noun phrase for generated copy (for example legend
+  `Recharges on` with action subject `recharge`). Does not change visible field or legend text.
 - **`labeled: true`** shows the verb only (`Add`, `Override`, `Remove`, `Clear override`) because
   the label is already visible. The accessible name is still `Add ${subject}` or
   `Override ${subject}`.
 - **`addLabel` / `removeLabel`**, when set, replace both the visible text and the accessible name.
-  The resolver does not append the subject to an explicit phrase.
+  The resolver does not append the subject to an explicit phrase. Reserve these for semantic
+  exceptions (`Omit components` / `Restore components`, contextual resets like `Use base movement`).
+- **`confirmBeforeClear`** copy is authored independently — do not derive headlines from action
+  button labels.
 - **`summary`** communicates the effective or inherited value while collapsed (and under the
   header when open in labeled mode). It uses label **scale** at body weight with secondary ink —
   not caption or hint typography.
@@ -228,8 +232,7 @@ must be chosen first). Dice defaults are not written for a `rollValue` that uses
   placeholder: 'Describe behavior not modeled above...',
   optionalDisclosure: {
     intent: 'add',
-    addLabel: 'Add additional behavior',
-    removeLabel: 'Remove',
+    actionSubject: 'additional behavior',
     expandWhenPopulated: true,
     confirmBeforeClear: {
       headline: 'Remove additional behavior?',
@@ -239,6 +242,30 @@ must be chosen first). Dice defaults are not written for a `rollValue` that uses
   },
 }
 ```
+
+### Optional disclosure action naming
+
+Prefer **short, predictable action labels**. Most disclosures should use generated labels rather
+than custom action copy.
+
+- **Labeled fields:** Use minimal visible actions (`Add`, `Remove`, `Override`, `Clear override`).
+  Accessible names must still identify the field.
+- **Action-only fields:** Use a verb plus a concise subject (`Add recharge`, `Remove recharge`).
+  The action must make sense without a separate visible label.
+- **Subjects:** Prefer short noun phrases, typically one or two words. Use `actionSubject` when the
+  field label or legend is not a good action phrase.
+- **Intent:** Use `add` for optional content the schema does not yet store. Use `override` when
+  clearing restores a non-authored value — an inherited field, catalog default, or **resolved**
+  effective value (for example spell cast level: undefined in the form still resolves to the spell's
+  level until the author explicitly sets `castAtLevel`).
+- **Custom labels:** Reserve for operations whose meaning cannot be expressed with default verbs.
+  Spell cast level uses `Set cast level` / `Use default level` because override describes replacing
+  that resolved default, not adding a value where none exists.
+
+Avoid repeating context already established by a nearby heading. Use sentence case, preserve
+meaningful domain terminology, and keep paired actions consistent. Before adding custom labels,
+check whether `actionSubject` or a better label would let the resolver generate both actions.
+Never sacrifice a clear accessible name to make an action visually shorter.
 
 - **`confirmBeforeClear`** (optional) — when removing populated content via the disclosure
   **Remove** action, prompts before clearing. Same config shape as

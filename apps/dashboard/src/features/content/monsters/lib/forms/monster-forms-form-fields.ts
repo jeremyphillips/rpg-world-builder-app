@@ -10,7 +10,6 @@ import { MonsterTrueFormDesignation } from '../../components/form/monster-true-f
 import { monsterFormMovementOverrideGroup } from './monster-form-movement-override-fields'
 import {
   MONSTER_FORM_NAME_LABEL,
-  MONSTER_FORM_NOTES_ADD_LABEL,
   MONSTER_FORM_NOTES_HINT,
   MONSTER_FORM_NOTES_LABEL,
   MONSTER_FORM_SIZE_HINT,
@@ -44,7 +43,7 @@ export function monsterDefinedFormDetailFields(ctx: ContentFormCtx): FormItem[] 
       hint: MONSTER_FORM_NOTES_HINT,
       optionalDisclosure: {
         intent: 'add',
-        addLabel: MONSTER_FORM_NOTES_ADD_LABEL,
+        actionSubject: 'notes',
         expandWhenPopulated: true,
       },
     },
@@ -87,7 +86,7 @@ export function monsterFormsSectionFields(ctx: ContentFormCtx): FormItem[] {
               hint: "Overrides the profile's form name in rules text.",
               optionalDisclosure: {
                 intent: 'override',
-                addLabel: 'Override form name',
+                actionSubject: 'form name',
                 expandWhenPopulated: true,
               },
               visibility: {

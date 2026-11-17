@@ -14,9 +14,9 @@ import { useId, useState } from 'react'
 import { useController, useFormContext, useWatch } from 'react-hook-form'
 
 import {
-  MONSTER_SPELL_COMPONENT_OMISSION_ADD_LABEL,
   MONSTER_SPELL_COMPONENT_OMISSION_HINT,
   MONSTER_SPELL_COMPONENT_OMISSION_LABEL,
+  MONSTER_SPELL_COMPONENT_OMISSION_REMOVE_LABEL,
 } from '../../lib/monster-form-labels'
 
 function readOmitted(value: unknown): SpellComponentId[] {
@@ -41,7 +41,8 @@ export function MonsterSpellComponentRequirementsField({ name }: { name: string 
   const actions = resolveOptionalDisclosureActions({
     intent: 'add',
     subject: MONSTER_SPELL_COMPONENT_OMISSION_LABEL,
-    addLabel: MONSTER_SPELL_COMPONENT_OMISSION_ADD_LABEL,
+    addLabel: MONSTER_SPELL_COMPONENT_OMISSION_LABEL,
+    removeLabel: MONSTER_SPELL_COMPONENT_OMISSION_REMOVE_LABEL,
   })
 
   const writeOmitted = (next: SpellComponentId[] | undefined) => {

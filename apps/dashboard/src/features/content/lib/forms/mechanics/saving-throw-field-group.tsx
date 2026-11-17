@@ -10,15 +10,12 @@ import type { GroupConfig } from '@rpg/ui/form'
 import type { ReactNode } from 'react'
 
 import {
-  SAVING_THROW_ADD_LABEL,
   SAVING_THROW_ABILITY_HINT,
   SAVING_THROW_ABILITY_LABEL,
   SAVING_THROW_DC_SOURCE_LABEL,
   SAVING_THROW_DC_SOURCE_SPELLCASTING_OPTION_LABEL,
   SAVING_THROW_FAILURE_PLACEHOLDER,
-  SAVING_THROW_REMOVE_LABEL,
   SAVING_THROW_SECTION_LEGEND,
-  SAVING_THROW_SUCCESS_ADD_LABEL,
   SAVING_THROW_SUCCESS_PLACEHOLDER,
   SAVING_THROW_TARGETS_HINT,
   SAVING_THROW_TARGETS_PLACEHOLDER,
@@ -32,7 +29,6 @@ export {
   SAVING_THROW_SPELLCASTING_HINT,
   SAVING_THROW_REMOVE_LABEL,
   SAVING_THROW_SECTION_LEGEND,
-  SAVING_THROW_SUCCESS_ADD_LABEL,
 } from './saving-throw-field-copy'
 
 function abilityOptions() {
@@ -57,8 +53,6 @@ export function savingThrowFieldGroup(input: {
     separator: 'subtle',
     optionalDisclosure: {
       intent: 'add',
-      addLabel: SAVING_THROW_ADD_LABEL,
-      removeLabel: SAVING_THROW_REMOVE_LABEL,
       confirmBeforeClear: {
         headline: 'Remove saving throw?',
         description: 'This will clear the saving throw you entered.',
@@ -127,7 +121,7 @@ export function savingThrowFieldGroup(input: {
         name: 'savingThrow.success',
         label: 'Success',
         placeholder: SAVING_THROW_SUCCESS_PLACEHOLDER,
-        optionalDisclosure: { intent: 'add', addLabel: SAVING_THROW_SUCCESS_ADD_LABEL },
+        optionalDisclosure: { intent: 'add', actionSubject: 'success' },
       },
     ],
   }

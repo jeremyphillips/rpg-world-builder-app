@@ -569,7 +569,7 @@ describe('monster action detail fields', () => {
       } as MonsterActionDraftRow),
     ).toMatchObject({
       type: 'richtext',
-      optionalDisclosure: { intent: 'add', addLabel: 'Add additional details' },
+      optionalDisclosure: { intent: 'add', actionSubject: 'details' },
     })
     expect(descriptionFieldConfig({ id: 'parry', kind: 'special', name: 'Parry' })).toMatchObject({
       type: 'richtext',

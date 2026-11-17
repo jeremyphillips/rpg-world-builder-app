@@ -18,7 +18,6 @@ import { WaterBreathingToggle } from '../../components/form/water-breathing-togg
 import { formatMonsterTemplateSentence } from '../format-monster-template-sentence'
 import type { MonsterFormAdvisory } from '../monster-form-advisories'
 import {
-  MONSTER_CUSTOM_DESCRIPTION_ADD_LABEL,
   MONSTER_CUSTOM_DESCRIPTION_HINT,
   MONSTER_CUSTOM_DESCRIPTION_LABEL,
   MONSTER_RULES_TEXT_LABEL,
@@ -90,7 +89,7 @@ export function monsterTraitTemplateFields(): FormItem[] {
       name: 'descriptionOverride',
       label: MONSTER_CUSTOM_DESCRIPTION_LABEL,
       hint: MONSTER_CUSTOM_DESCRIPTION_HINT,
-      optionalDisclosure: { intent: 'add', addLabel: MONSTER_CUSTOM_DESCRIPTION_ADD_LABEL },
+      optionalDisclosure: { intent: 'add', actionSubject: 'details' },
     },
   ]
 }

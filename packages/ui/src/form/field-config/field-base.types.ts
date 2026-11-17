@@ -228,6 +228,11 @@ export type OptionalDisclosureIntent = 'add' | 'override'
  */
 export type OptionalDisclosureConfig = {
   intent: OptionalDisclosureIntent
+  /**
+   * Noun phrase for generated action labels when the field label or group legend
+   * is not a good action subject. Does not change visible field/legend copy.
+   */
+  actionSubject?: string
   /** Complete phrase. When set, this is both the collapsed label and its accessible name. */
   addLabel?: string
   /** Complete phrase. When set, this is both the open label and its accessible name. */

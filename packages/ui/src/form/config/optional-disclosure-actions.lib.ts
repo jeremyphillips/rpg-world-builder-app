@@ -56,17 +56,24 @@ export function resolveOptionalDisclosureActions(input: {
   }
 }
 
+export function resolveOptionalDisclosureSubject(
+  displayLabel: string,
+  disclosure: Pick<OptionalDisclosureConfig, 'actionSubject'>,
+): string {
+  return disclosure.actionSubject ?? displayLabel
+}
+
 export function optionalDisclosureLeafActions(config: {
   label: string
   optionalDisclosure: Pick<
     OptionalDisclosureConfig,
-    'intent' | 'labeled' | 'addLabel' | 'removeLabel'
+    'intent' | 'labeled' | 'actionSubject' | 'addLabel' | 'removeLabel'
   >
 }): ResolvedOptionalDisclosureActions {
   const disclosure = config.optionalDisclosure
   return resolveOptionalDisclosureActions({
     intent: disclosure.intent,
-    subject: config.label,
+    subject: resolveOptionalDisclosureSubject(config.label, disclosure),
     labeled: disclosure.labeled,
     addLabel: disclosure.addLabel,
     removeLabel: disclosure.removeLabel,

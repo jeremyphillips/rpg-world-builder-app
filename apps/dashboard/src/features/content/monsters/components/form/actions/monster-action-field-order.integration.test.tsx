@@ -130,7 +130,7 @@ describe('monster action field order form state', () => {
         effects: [{ kind: 'damage', damageType: 'fire', roll: { dice: { count: 1, faces: 4 } } }],
       },
     })
-    await user.click(screen.getByRole('button', { name: 'Add additional details' }))
+    await user.click(screen.getByRole('button', { name: 'Add details' }))
     expect(screen.getByRole('textbox', { name: 'Additional details' })).toBeInTheDocument()
   })
 })

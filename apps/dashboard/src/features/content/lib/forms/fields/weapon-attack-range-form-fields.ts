@@ -55,7 +55,7 @@ function attackRangeLongJoinedPair(
     },
     optionalDisclosure: {
       intent: 'add',
-      addLabel: 'Add long range',
+      actionSubject: 'long range',
       expandWhenPopulated: true,
       addGate: {
         dependsOn: [normalName],

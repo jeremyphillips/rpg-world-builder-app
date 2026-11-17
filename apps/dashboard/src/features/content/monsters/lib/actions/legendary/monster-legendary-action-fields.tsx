@@ -14,7 +14,6 @@ import { monsterSpellCastAtLevelField } from '../spell/monster-spell-cast-at-lev
 import { monsterSpellComponentRequirementsField } from '../spell/monster-spell-component-form-fields'
 import {
   MONSTER_CAST_SPELL_HINT,
-  MONSTER_MOVEMENT_ADD_LABEL,
   MONSTER_MOVEMENT_HINT,
   MONSTER_MOVEMENT_LABEL,
   MONSTER_MOVEMENT_OPPORTUNITY_LABEL,
@@ -68,7 +67,7 @@ export function legendaryActionDetailFields(input: {
         name: 'movement.allowance',
         label: MONSTER_MOVEMENT_LABEL,
         placeholder: MONSTER_MOVEMENT_PLACEHOLDER,
-        optionalDisclosure: { intent: 'add', addLabel: MONSTER_MOVEMENT_ADD_LABEL },
+        optionalDisclosure: { intent: 'add', actionSubject: 'movement' },
         hint: { text: MONSTER_MOVEMENT_HINT },
         options: MOVEMENT_ALLOWANCES.map((allowance) => ({
           value: allowance,
