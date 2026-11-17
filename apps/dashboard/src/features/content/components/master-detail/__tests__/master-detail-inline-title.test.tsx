@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm, type UseFormReturn } from 'react-hook-form'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { defineMasterDetailItemNoun } from '../../../lib/master-detail/master-detail-item-noun'
 import { MasterDetailEditorShell } from '../master-detail-editor-shell'
@@ -11,18 +11,22 @@ const itemNoun = defineMasterDetailItemNoun({ label: 'Action', singular: 'action
 
 function Harness({
   formRef,
-  rowKey = 'row-1',
+  fieldId = 'field-1',
   name = 'Dagger',
   mode = 'authored' as 'authored' | 'override',
   fallback = 'Attack',
   resetLabel,
+  initialEdit,
+  onAcquisitionEditApplied,
 }: {
   formRef?: { current: UseFormReturn<{ actions: { name?: string }[] }> | null }
-  rowKey?: string
+  fieldId?: string
   name?: string
   mode?: 'authored' | 'override'
   fallback?: string
   resetLabel?: string
+  initialEdit?: boolean
+  onAcquisitionEditApplied?: (fieldId: string) => void
 }) {
   const form = useForm<{ actions: { name?: string }[] }>({
     defaultValues: { actions: [{ name }] },
@@ -35,9 +39,10 @@ function Harness({
       <MasterDetailEditorShell
         itemNoun={itemNoun}
         namePrefix="actions.0"
+        selectedFieldId={fieldId}
         selectedIdentity={{
           title: name || fallback,
-          rowKey,
+          rowKey: fieldId,
           meta: {
             provenance: 'homebrew',
             persistence: 'persisted',
@@ -49,15 +54,27 @@ function Harness({
             mode,
             fallback,
             placeholder: fallback,
+            ...(initialEdit ? { initialEdit: true } : {}),
             ...(resetLabel ? { resetLabel } : {}),
           },
         }}
+        onAcquisitionEditApplied={onAcquisitionEditApplied}
       />
     </FormProvider>
   )
 }
 
 describe('master detail inline title', () => {
+  it('acknowledges acquisition once after initial edit focus', async () => {
+    const onAcquisitionEditApplied = vi.fn()
+    render(<Harness initialEdit onAcquisitionEditApplied={onAcquisitionEditApplied} name="" />)
+    await waitFor(() => {
+      expect(screen.getByRole('textbox', { name: 'Name' })).toHaveFocus()
+    })
+    expect(onAcquisitionEditApplied).toHaveBeenCalledOnce()
+    expect(onAcquisitionEditApplied).toHaveBeenCalledWith('field-1')
+  })
+
   it('keeps the title row height token and the edit affordance in both modes', async () => {
     const user = userEvent.setup()
     render(<Harness />)
@@ -172,9 +189,10 @@ describe('master detail inline title', () => {
           <MasterDetailEditorShell
             itemNoun={itemNoun}
             namePrefix={`actions.${index}`}
+            selectedFieldId={`field-${index}`}
             selectedIdentity={{
               title: index === 0 ? 'One' : 'Two',
-              rowKey: `row-${index}`,
+              rowKey: `field-${index}`,
               inlineTitle: {
                 field: 'name',
                 mode: 'authored',

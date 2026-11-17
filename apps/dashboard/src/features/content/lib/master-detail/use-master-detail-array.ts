@@ -31,6 +31,12 @@ export interface UseMasterDetailArrayResult {
   removeAt: (index: number) => void
   /** Field id of the most recently appended row until consumed by the detail panel. */
   lastAddedFieldId: string | null
+  /**
+   * Consumes add intent for `fieldId` when it matches `lastAddedFieldId`.
+   * No-ops for stale or mismatched ids.
+   */
+  acknowledgeAcquisition: (fieldId: string) => void
+  /** @deprecated Prefer `acknowledgeAcquisition(fieldId)`. */
   clearLastAddedFieldId: () => void
   /** Row index pending delete confirmation, or `null` when no dialog is open. */
   deleteIndex: number | null
@@ -197,11 +203,19 @@ export function useMasterDetailArray(
     append(makeItemDefaults())
   }, [append, fields.length, makeItemDefaults])
 
+  const acknowledgeAcquisition = useCallback(
+    (fieldId: string) => {
+      if (!fieldId || fieldId !== lastAddedFieldId) return
+      setConsumedAddedFieldId(fieldId)
+      setPendingSelectIndex(null)
+      if (resolvedSelectedFieldId) setSelectedFieldId(resolvedSelectedFieldId)
+    },
+    [lastAddedFieldId, resolvedSelectedFieldId],
+  )
+
   const clearLastAddedFieldId = useCallback(() => {
-    if (lastAddedFieldId) setConsumedAddedFieldId(lastAddedFieldId)
-    setPendingSelectIndex(null)
-    if (resolvedSelectedFieldId) setSelectedFieldId(resolvedSelectedFieldId)
-  }, [lastAddedFieldId, resolvedSelectedFieldId])
+    if (lastAddedFieldId) acknowledgeAcquisition(lastAddedFieldId)
+  }, [acknowledgeAcquisition, lastAddedFieldId])
 
   const requestRemove = useCallback((index: number) => setDeleteIndex(index), [])
 
@@ -295,6 +309,7 @@ export function useMasterDetailArray(
     appendRow,
     removeAt,
     lastAddedFieldId,
+    acknowledgeAcquisition,
     clearLastAddedFieldId,
     deleteIndex,
     requestRemove,

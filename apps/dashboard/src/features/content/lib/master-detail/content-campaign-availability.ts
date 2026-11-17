@@ -1,4 +1,8 @@
-/** Prefers a saved domain id; falls back to the RHF field-array id for new rows. */
+/**
+ * List selection and persisted row identity: domain `row.id` when present,
+ * otherwise the RHF field-array id. Do not use for inline-title React keys
+ * (use stable RHF `field.id` for reconciliation and title input ids).
+ */
 export function resolveMasterDetailRowKey(
   fieldId: string,
   row: { id?: string } | undefined,

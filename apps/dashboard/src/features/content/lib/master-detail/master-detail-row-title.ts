@@ -19,6 +19,8 @@ export type MasterDetailRowTitleContext<TRow> = {
   rows: readonly TRow[]
   itemNoun: MasterDetailItemNounTerm
   lastAddedFieldId: string | null
+  /** False while the field-array slot has no materialized row object (e.g. watch lag). */
+  rowReady: boolean
 }
 
 export type MasterDetailRowTitleStrategy<TRow> =
@@ -89,7 +91,10 @@ function buildAuthoredResolution<TRow>(
   const fallback = strategy.resolveFallback?.(ctx) ?? masterDetailUnnamedItemTitle(ctx.itemNoun)
   const displayTitle = trimmed || fallback
   const allowInitial =
-    strategy.allowInitialEditOnAdd !== false && ctx.lastAddedFieldId === ctx.fieldId && !trimmed
+    ctx.rowReady &&
+    strategy.allowInitialEditOnAdd !== false &&
+    ctx.lastAddedFieldId === ctx.fieldId &&
+    !trimmed
 
   return {
     displayTitle,

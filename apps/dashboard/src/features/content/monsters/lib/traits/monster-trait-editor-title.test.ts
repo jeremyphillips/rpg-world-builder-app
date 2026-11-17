@@ -29,6 +29,7 @@ describe('monster trait editor titles', () => {
         fieldId: 'first',
         lastAddedFieldId: null,
         itemNoun: TRAIT_MASTER_DETAIL_ITEM_NOUN,
+        rowReady: true,
       }).displayTitle,
     ).toBe('Trait 2')
     expect(
@@ -39,6 +40,7 @@ describe('monster trait editor titles', () => {
         fieldId: 'named',
         lastAddedFieldId: null,
         itemNoun: TRAIT_MASTER_DETAIL_ITEM_NOUN,
+        rowReady: true,
       }).displayTitle,
     ).toBe('Trait 1')
   })
@@ -53,6 +55,7 @@ describe('monster trait editor titles', () => {
       fieldId: 'field-1',
       lastAddedFieldId: 'field-1',
       itemNoun: TRAIT_MASTER_DETAIL_ITEM_NOUN,
+      rowReady: true,
     })
     expect(custom.inlineTitle).toMatchObject({
       field: 'name',
@@ -69,6 +72,7 @@ describe('monster trait editor titles', () => {
       fieldId: 'field-1',
       lastAddedFieldId: null,
       itemNoun: TRAIT_MASTER_DETAIL_ITEM_NOUN,
+      rowReady: true,
     })
     expect(reopened.inlineTitle?.initialEdit).toBeFalsy()
 
@@ -79,6 +83,7 @@ describe('monster trait editor titles', () => {
       fieldId: 'field-2',
       lastAddedFieldId: 'field-2',
       itemNoun: TRAIT_MASTER_DETAIL_ITEM_NOUN,
+      rowReady: true,
     })
     expect(template.inlineTitle).toMatchObject({
       field: 'nameOverride',

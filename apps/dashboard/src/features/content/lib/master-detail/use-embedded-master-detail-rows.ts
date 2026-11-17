@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef } from 'react'
-import { useWatch } from 'react-hook-form'
+import { useFormContext, useWatch } from 'react-hook-form'
 import type { FormItem } from '@rpg/ui/form'
 
 import type { EmbeddedArrayResolverFieldInput } from '../forms/validation/tabbed-form-resolver-fields'
@@ -15,6 +15,10 @@ import {
 } from './build-embedded-master-detail-rows'
 import { resolveMasterDetailRowKey } from './content-campaign-availability'
 import { buildSelectedMasterDetailIdentity } from './build-selected-master-detail-identity'
+import {
+  buildEmbeddedFieldArrayRowSnapshot,
+  readEmbeddedFieldArrayRow,
+} from './resolve-embedded-field-array-row'
 import type { FormEmbeddedMasterDetailAccessConfig } from './master-detail-access.types'
 import { buildMasterDetailAvailabilityFormFields } from './master-detail-availability-form-fields'
 import { useMasterDetailRowValidation } from './master-detail-row-validation'
@@ -97,7 +101,19 @@ export function useEmbeddedMasterDetailRows<TRow = Record<string, unknown>>({
   showDelete = true,
   sectionLabel,
 }: UseEmbeddedMasterDetailRowsParams<TRow>) {
+  const { getValues } = useFormContext()
   const watched = useWatch({ name: fieldName }) as unknown[] | undefined
+  const fieldCount = editor.fields.length
+  const rowsSnapshot = useMemo(
+    () =>
+      buildEmbeddedFieldArrayRowSnapshot<TRow>(
+        fieldName,
+        fieldCount,
+        getValues,
+        watched,
+      ) as readonly TRow[],
+    [fieldCount, fieldName, getValues, watched],
+  )
   const availabilityDialogRef = useRef<HTMLDivElement>(null)
   const persistedRowIds = useMemo(() => {
     const ids = formCtx.embeddedSeedRowIds?.[fieldName]
@@ -112,8 +128,6 @@ export function useEmbeddedMasterDetailRows<TRow = Record<string, unknown>>({
   const { getRowHeaderIssues } = validation
   const getRowIssueCount = resolveRowIssueCount ?? validation.getRowIssueCount
   const showRowBadges = resolveRowIssueCount ? true : validation.showRowBadges
-
-  const rowsSnapshot = (watched ?? []) as readonly TRow[]
 
   const resolveListDisplay = useCallback(
     (mapCtx: FormEmbeddedMasterDetailMapListItemContext) =>
@@ -133,7 +147,7 @@ export function useEmbeddedMasterDetailRows<TRow = Record<string, unknown>>({
     if (access) {
       return buildEmbeddedMasterDetailRows({
         fields: editor.fields,
-        watched,
+        rowsSnapshot,
         formCtx,
         itemNoun,
         showDelete,
@@ -148,7 +162,7 @@ export function useEmbeddedMasterDetailRows<TRow = Record<string, unknown>>({
     }
 
     return editor.fields.map((field, formIndex) => {
-      const row = watched?.[formIndex]
+      const row = rowsSnapshot[formIndex]
       const listDisplay = resolveListDisplay({
         field,
         index: formIndex,
@@ -200,7 +214,7 @@ export function useEmbeddedMasterDetailRows<TRow = Record<string, unknown>>({
     systemOriginRowIds,
     sectionLabel,
     showDelete,
-    watched,
+    rowsSnapshot,
   ])
 
   const selectedRow = useMemo(
@@ -212,7 +226,7 @@ export function useEmbeddedMasterDetailRows<TRow = Record<string, unknown>>({
 
   const selectedRowAvailability = useMemo((): Availability | undefined => {
     if (!selectedRow || !resolveRowReasons) return undefined
-    const row = watched?.[selectedRow.formIndex]
+    const row = rowsSnapshot[selectedRow.formIndex]
     const extraReasons =
       resolveRowReasons({
         row,
@@ -221,7 +235,7 @@ export function useEmbeddedMasterDetailRows<TRow = Record<string, unknown>>({
       }) ?? []
     if (extraReasons.length === 0) return undefined
     return { status: 'inactive', reasons: [...extraReasons] }
-  }, [resolveRowReasons, selectedRow, watched])
+  }, [resolveRowReasons, rowsSnapshot, selectedRow])
 
   const openAvailabilityDialog = useCallback(() => {
     openCampaignAvailabilityDialog(availabilityDialogRef.current)
@@ -229,7 +243,7 @@ export function useEmbeddedMasterDetailRows<TRow = Record<string, unknown>>({
 
   const selectedIdentity = useMemo((): MasterDetailEditorIdentity | undefined => {
     if (!selectedRow) return undefined
-    const row = watched?.[selectedRow.formIndex]
+    const row = rowsSnapshot[selectedRow.formIndex]
     const listDisplay = resolveListDisplay({
       field: { id: selectedRow.fieldId },
       index: selectedRow.formIndex,
@@ -245,23 +259,25 @@ export function useEmbeddedMasterDetailRows<TRow = Record<string, unknown>>({
       headerIssues: getRowHeaderIssues(selectedRow.formIndex),
       availability: access ? selectedRow.availability : undefined,
       onAvailabilityChange: access ? openAvailabilityDialog : undefined,
+      lastAddedFieldId: editor.lastAddedFieldId,
     })
   }, [
     access,
+    editor.lastAddedFieldId,
     formCtx.entityCatalogLayer,
     getRowHeaderIssues,
     getRowIssueCount,
     openAvailabilityDialog,
     resolveListDisplay,
+    rowsSnapshot,
     selectedRow,
     showRowBadges,
-    watched,
   ])
 
   const availabilityFormItems = useMemo((): FormItem[] | undefined => {
     if (!access || !selectedRow || access.kind !== 'availability') return undefined
     const namePrefix = `${fieldName}.${selectedRow.formIndex}`
-    const row = watched?.[selectedRow.formIndex]
+    const row = rowsSnapshot[selectedRow.formIndex]
     const custom = resolveAvailabilityFormItems?.({
       row,
       fieldId: selectedRow.fieldId,
@@ -269,7 +285,7 @@ export function useEmbeddedMasterDetailRows<TRow = Record<string, unknown>>({
     })
     if (custom) return custom
     return buildMasterDetailAvailabilityFormFields(selectedRow.fieldId)
-  }, [access, fieldName, resolveAvailabilityFormItems, selectedRow, watched])
+  }, [access, fieldName, resolveAvailabilityFormItems, rowsSnapshot, selectedRow])
 
   const availabilityNamePrefix = useMemo(() => {
     if (!access || !selectedRow || access.kind !== 'availability') return undefined
@@ -281,7 +297,7 @@ export function useEmbeddedMasterDetailRows<TRow = Record<string, unknown>>({
     const mapCtx = {
       field: editor.fields[editor.deleteIndex]!,
       index: editor.deleteIndex,
-      row: watched?.[editor.deleteIndex],
+      row: rowsSnapshot[editor.deleteIndex],
       entityCatalogLayer: formCtx.entityCatalogLayer,
       getRowIssueCount,
     }
@@ -294,10 +310,13 @@ export function useEmbeddedMasterDetailRows<TRow = Record<string, unknown>>({
     getRowIssueCount,
     itemNoun,
     resolveListDisplay,
-    watched,
+    rowsSnapshot,
   ])
 
-  const rowAt = useCallback((index: number) => watched?.[index], [watched])
+  const rowAt = useCallback(
+    (index: number) => readEmbeddedFieldArrayRow(fieldName, index, getValues, watched),
+    [fieldName, getValues, watched],
+  )
 
   return {
     rowAt,

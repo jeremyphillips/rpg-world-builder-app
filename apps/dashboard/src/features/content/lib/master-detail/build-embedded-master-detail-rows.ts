@@ -23,7 +23,7 @@ export type EmbeddedMasterDetailRow = {
 
 export type BuildEmbeddedMasterDetailRowsParams = {
   fields: ReadonlyArray<{ id: string }>
-  watched: readonly unknown[] | undefined
+  rowsSnapshot: readonly unknown[]
   formCtx: ContentFormCtx
   itemNoun: MasterDetailItemNounTerm
   showDelete: boolean
@@ -70,7 +70,7 @@ function resolveRowLocalAvailability(
 /** Single source of truth for form-embedded master-detail row projection. */
 export function buildEmbeddedMasterDetailRows({
   fields,
-  watched,
+  rowsSnapshot,
   formCtx,
   itemNoun,
   showDelete,
@@ -83,7 +83,7 @@ export function buildEmbeddedMasterDetailRows({
   resolveRowReasons,
 }: BuildEmbeddedMasterDetailRowsParams): EmbeddedMasterDetailRow[] {
   return fields.map((field, formIndex) => {
-    const row = watched?.[formIndex]
+    const row = rowsSnapshot[formIndex]
     const listDisplay = resolveListDisplay({
       field,
       index: formIndex,

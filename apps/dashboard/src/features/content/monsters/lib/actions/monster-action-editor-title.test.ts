@@ -35,6 +35,7 @@ function resolveActionTitle(input: {
       fieldId: input.action.id,
       lastAddedFieldId: null,
       itemNoun: MONSTER_ACTION_ITEM_NOUN,
+      rowReady: true,
     },
   )
 }

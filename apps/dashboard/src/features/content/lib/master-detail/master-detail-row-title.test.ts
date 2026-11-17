@@ -25,6 +25,7 @@ function ctx(input: Partial<MasterDetailRowTitleContext<SampleRow>> & { row: Sam
     rows: [input.row],
     itemNoun: ITEM_NOUN,
     lastAddedFieldId: null,
+    rowReady: true,
     ...input,
   }
 }
@@ -54,6 +55,14 @@ describe('resolveMasterDetailRowTitle', () => {
     expect(resolution.displayTitle).toBe('Unnamed Trait')
     expect(resolution.inlineTitle?.fallback).toBe('Unnamed Trait')
     expect(resolution.inlineTitle?.mode).toBe('authored')
+  })
+
+  it('does not initial-edit when the row is not ready', () => {
+    const resolution = resolveMasterDetailRowTitle(
+      { strategy: 'authored', field: 'name' },
+      ctx({ row: { name: '' }, fieldId: 'new', lastAddedFieldId: 'new', rowReady: false }),
+    )
+    expect(resolution.inlineTitle?.initialEdit).toBeUndefined()
   })
 
   it('opens initial edit for unnamed rows added via lastAddedFieldId', () => {

@@ -125,6 +125,15 @@ list + detail editor instead of a tall stack, via shared, type-agnostic pieces:
 **Row titles:** prefer `rowTitle` on `FormEmbeddedMasterDetailEditor` and
 `useEmbeddedMasterDetailRows`. Pass `resolveListMeta` for caption facts only
 (`eyebrow`, `kindLabel`, `summary`). List caption still uses `summary ?? kindLabel`.
+
+**Row identity and acquisition:** embedded rows use one snapshot
+[`readEmbeddedFieldArrayRow`](./lib/master-detail/resolve-embedded-field-array-row.ts)
+(`getValues` then `useWatch`) for list and detail. Title `initialEdit` requires
+`rowReady` (materialized row object). Inline title React keys and input ids use
+stable RHF `field.id`; [`resolveMasterDetailRowKey`](./lib/master-detail/content-campaign-availability.ts)
+remains for list ids and campaign context only. `useMasterDetailArray.lastAddedFieldId`
+is the single add intent; `acknowledgeAcquisition(fieldId)` clears only on a
+matching id after inline title focus or body-field focus.
 Detail `FormItem.name` values under `MasterDetailEditorPanel` are **row-relative**
 (`name`, `overrides.sizes`); the panel applies `${fieldName}.${index}`. Slots call
 [`useMasterDetailRowPrefix()`](./lib/master-detail/use-master-detail-row-prefix.ts).

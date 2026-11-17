@@ -8,6 +8,7 @@ import {
   type MasterDetailTitleResolution,
 } from './master-detail-row-title'
 import type { FormEmbeddedMasterDetailMapListItemContext } from './use-embedded-master-detail-rows'
+import { isEmbeddedFieldArrayRowReady } from './resolve-embedded-field-array-row'
 
 export type EmbeddedListDisplay = Pick<MasterDetailListItem, 'title'> &
   MasterDetailListMetaInput & {
@@ -28,7 +29,8 @@ export function resolveEmbeddedListDisplay<TRow>(input: {
   lastAddedFieldId: string | null
 }): EmbeddedListDisplay {
   if (input.rowTitle) {
-    const row = input.mapCtx.row as TRow
+    const rowReady = isEmbeddedFieldArrayRowReady(input.mapCtx.row)
+    const row = (rowReady ? input.mapCtx.row : {}) as TRow
     const resolution = resolveMasterDetailRowTitle(input.rowTitle, {
       row,
       index: input.mapCtx.index,
@@ -36,6 +38,7 @@ export function resolveEmbeddedListDisplay<TRow>(input: {
       rows: input.rows,
       itemNoun: input.itemNoun,
       lastAddedFieldId: input.lastAddedFieldId,
+      rowReady,
     })
     const meta = input.resolveListMeta?.(input.mapCtx) ?? {}
     return {

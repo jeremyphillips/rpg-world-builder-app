@@ -27,8 +27,10 @@ export type { MasterDetailInlineTitle }
 
 export interface MasterDetailEditorIdentity {
   title: string
-  /** Stable selected row id. Remounts the title editor when the selection changes. */
+  /** Stable RHF field id; remounts the inline title editor when selection changes. */
   rowKey?: string
+  /** When true, add acquisition is deferred to inline title (row hydration or initial edit). */
+  acquisitionAwaitingTitleResolution?: boolean
   meta?: MasterDetailItemMeta
   /** Derived original name, shown in the detail caption while a custom name is stored. */
   sourceName?: string
@@ -53,6 +55,9 @@ export interface MasterDetailEditorShellProps {
   /** Extra overflow entries, rendered after availability and duplicate. */
   overflowActions?: readonly DetailOverflowMenuEntry[]
   bodyRef?: RefObject<HTMLDivElement | null>
+  /** RHF field id for the selected row; required when `inlineTitle` is set. */
+  selectedFieldId?: string
+  onAcquisitionEditApplied?: (fieldId: string) => void
   children?: ReactNode
 }
 
@@ -123,6 +128,8 @@ function MasterDetailEditableIdentityHeader({
   identity,
   namePrefix,
   inlineTitle,
+  selectedFieldId,
+  onAcquisitionEditApplied,
   itemNoun,
   onDelete,
   onDuplicate,
@@ -131,6 +138,8 @@ function MasterDetailEditableIdentityHeader({
   identity: MasterDetailEditorIdentity
   namePrefix: string
   inlineTitle: MasterDetailInlineTitle
+  selectedFieldId: string
+  onAcquisitionEditApplied?: (fieldId: string) => void
   itemNoun: MasterDetailItemNounTerm
   onDelete?: () => void
   onDuplicate?: () => void
@@ -174,10 +183,12 @@ function MasterDetailEditableIdentityHeader({
       resetAction={resetAction}
       title={
         <MasterDetailInlineTitleEditor
-          key={identity.rowKey ?? namePrefix}
+          key={selectedFieldId}
           namePrefix={namePrefix}
-          rowKey={identity.rowKey ?? namePrefix}
+          titleInputId={selectedFieldId}
           title={inlineTitle}
+          selectedFieldId={selectedFieldId}
+          onAcquisitionEditApplied={onAcquisitionEditApplied}
         />
       }
     />
@@ -187,6 +198,8 @@ function MasterDetailEditableIdentityHeader({
 function MasterDetailEditorIdentityHeader({
   identity,
   namePrefix,
+  selectedFieldId,
+  onAcquisitionEditApplied,
   itemNoun,
   onDelete,
   onDuplicate,
@@ -194,17 +207,21 @@ function MasterDetailEditorIdentityHeader({
 }: {
   identity: MasterDetailEditorIdentity
   namePrefix?: string
+  selectedFieldId?: string
+  onAcquisitionEditApplied?: (fieldId: string) => void
   itemNoun: MasterDetailItemNounTerm
   onDelete?: () => void
   onDuplicate?: () => void
   overflowActions?: readonly DetailOverflowMenuEntry[]
 }) {
-  if (identity.inlineTitle && namePrefix) {
+  if (identity.inlineTitle && namePrefix && selectedFieldId) {
     return (
       <MasterDetailEditableIdentityHeader
         identity={identity}
         namePrefix={namePrefix}
         inlineTitle={identity.inlineTitle}
+        selectedFieldId={selectedFieldId}
+        onAcquisitionEditApplied={onAcquisitionEditApplied}
         itemNoun={itemNoun}
         onDelete={onDelete}
         onDuplicate={onDuplicate}
@@ -233,6 +250,8 @@ export function MasterDetailEditorShell({
   itemNoun,
   selectedIdentity,
   namePrefix,
+  selectedFieldId,
+  onAcquisitionEditApplied,
   onDelete,
   onDuplicate,
   overflowActions,
@@ -257,6 +276,8 @@ export function MasterDetailEditorShell({
           <MasterDetailEditorIdentityHeader
             identity={selectedIdentity}
             namePrefix={namePrefix}
+            selectedFieldId={selectedFieldId}
+            onAcquisitionEditApplied={onAcquisitionEditApplied}
             itemNoun={itemNoun}
             onDelete={onDelete}
             onDuplicate={onDuplicate}

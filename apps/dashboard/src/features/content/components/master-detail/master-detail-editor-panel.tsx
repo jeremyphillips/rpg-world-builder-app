@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode, type RefObject } from 'react'
+import { useCallback, useEffect, useRef, type ReactNode, type RefObject } from 'react'
 import { FormItems, type FormItem } from '@rpg/ui/form'
 
 import { AvailabilityAlert, type Availability } from '@/lib/availability'
@@ -153,20 +153,27 @@ export function MasterDetailEditorPanel({
 
   const inlineTitle = hasSelectedRow ? selectedIdentity?.inlineTitle : undefined
 
+  const handleAcquisitionEditApplied = useCallback(
+    (fieldId: string) => {
+      editor.acknowledgeAcquisition(fieldId)
+    },
+    [editor],
+  )
+
   useEffect(() => {
     if (!editor.lastAddedFieldId || editor.lastAddedFieldId !== selectedFieldId) return
-    if (inlineTitle?.initialEdit) {
-      editor.clearLastAddedFieldId()
+    if (selectedIdentity?.acquisitionAwaitingTitleResolution) return
+    const root = bodyRef.current
+    if (!root) {
+      editor.acknowledgeAcquisition(selectedFieldId)
       return
     }
-    const root = bodyRef.current
-    if (!root) return
     const focusable = root.querySelector<HTMLElement>(
       'input:not([type="hidden"]), select, textarea, [contenteditable="true"]',
     )
     focusable?.focus()
-    editor.clearLastAddedFieldId()
-  }, [editor, inlineTitle?.initialEdit, selectedFieldId])
+    editor.acknowledgeAcquisition(selectedFieldId)
+  }, [editor, selectedFieldId, selectedIdentity?.acquisitionAwaitingTitleResolution])
 
   const visibleFields = omitInlineTitleField(itemFields, inlineTitle?.field)
 
@@ -176,6 +183,8 @@ export function MasterDetailEditorPanel({
       namePrefix={
         hasSelectedRow && selectedIndex !== null ? `${fieldName}.${selectedIndex}` : undefined
       }
+      selectedFieldId={hasSelectedRow ? selectedFieldId : undefined}
+      onAcquisitionEditApplied={handleAcquisitionEditApplied}
       selectedIdentity={hasSelectedRow ? selectedIdentity : undefined}
       onDelete={
         onDelete ??
