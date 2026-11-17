@@ -203,6 +203,15 @@ export type OptionalDisclosureSummary = {
   resolve: (values: Record<string, unknown>, state: { open: boolean }) => string | undefined
 }
 
+/**
+ * Read-only inherited source shown while an override is open. Uses the same
+ * `dependsOn` map as `summary`; catalog context comes from the closure.
+ */
+export type OptionalDisclosureSourcePreview = {
+  dependsOn: readonly string[]
+  resolve: (values: Record<string, unknown>) => { label: string; text: string } | undefined
+}
+
 /** Disables the add action from watched form values while collapsed. */
 export type OptionalDisclosureAddGate = {
   dependsOn: readonly string[]
@@ -234,6 +243,8 @@ export type OptionalDisclosureConfig = {
   labeled?: boolean
   /** Inherited or status text. `seedWhen` receives these `dependsOn` values. */
   summary?: OptionalDisclosureSummary
+  /** Inherited source block while open. Collapsed shells do not render it. */
+  sourcePreview?: OptionalDisclosureSourcePreview
   /** Value written when the add action opens a structured field. */
   seedWhen?: (values: Record<string, unknown>) => unknown
   /** Disables the add action. Does not disable an open editor. */

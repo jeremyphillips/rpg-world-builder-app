@@ -303,4 +303,53 @@ describe('OptionalFieldDisclosure', () => {
     const { container } = renderDisclosure({ open: true })
     await expectNoAxeViolations(container)
   })
+
+  it('renders source preview above the open control and omits it when collapsed', () => {
+    const { rerender } = render(
+      <OptionalFieldDisclosure
+        controlId="damage"
+        fieldLabel="Damage"
+        addLabel="Override"
+        addAccessibleName="Override Damage"
+        addAction="edit"
+        removeLabel="Clear override"
+        removeAccessibleName="Clear Damage override"
+        open
+        labeled
+        sourcePreview={{ label: 'Weapon base damage', text: '1d8 slashing' }}
+        onOpenChange={vi.fn()}
+        onRemove={vi.fn()}
+        size="md"
+      >
+        <p>Damage controls</p>
+      </OptionalFieldDisclosure>,
+    )
+
+    expect(screen.getByText('Weapon base damage')).toBeInTheDocument()
+    expect(screen.getByText('1d8 slashing')).toBeInTheDocument()
+    expect(screen.getByText('Damage controls')).toBeInTheDocument()
+
+    rerender(
+      <OptionalFieldDisclosure
+        controlId="damage"
+        fieldLabel="Damage"
+        addLabel="Override"
+        addAccessibleName="Override Damage"
+        addAction="edit"
+        removeLabel="Clear override"
+        removeAccessibleName="Clear Damage override"
+        open={false}
+        labeled
+        sourcePreview={{ label: 'Weapon base damage', text: '1d8 slashing' }}
+        onOpenChange={vi.fn()}
+        onRemove={vi.fn()}
+        size="md"
+      >
+        {null}
+      </OptionalFieldDisclosure>,
+    )
+
+    expect(screen.queryByText('Weapon base damage')).not.toBeInTheDocument()
+    expect(screen.queryByText('1d8 slashing')).not.toBeInTheDocument()
+  })
 })

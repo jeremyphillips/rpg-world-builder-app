@@ -10,7 +10,10 @@ import {
   movementRowsToRecordForPreview,
   type MovementRowDraftFormValues,
 } from '../../../lib/forms/fields/content-movement-form-fields'
-import { MONSTER_FORM_USE_BASE_MOVEMENT_LABEL } from '../monster-form-labels'
+import {
+  MONSTER_FORM_BASE_MOVEMENT_PREVIEW_LABEL,
+  MONSTER_FORM_USE_BASE_MOVEMENT_LABEL,
+} from '../monster-form-labels'
 
 const FORM_BASE_MOVEMENT_DEPENDS = ['../../movement', '../../hover'] as const
 
@@ -24,6 +27,12 @@ function readBaseMovementRows(values: Record<string, unknown>): MovementRowDraft
 function readBaseHover(values: Record<string, unknown>): boolean {
   const hover = values['../../hover'] ?? values.hover
   return hover === true
+}
+
+function baseMovementPreviewText(values: Record<string, unknown>): string | undefined {
+  const record = movementRowsToRecordForPreview(readBaseMovementRows(values))
+  const label = formatMovementDisplay(record, 'ft.')
+  return label || undefined
 }
 
 function seedFormMovementOverride(values: Record<string, unknown>) {
@@ -79,9 +88,16 @@ export function monsterFormMovementOverrideGroup(): FormItem {
       summary: {
         dependsOn: [...FORM_BASE_MOVEMENT_DEPENDS],
         resolve: (values) => {
-          const record = movementRowsToRecordForPreview(readBaseMovementRows(values))
-          const label = formatMovementDisplay(record, 'ft.')
-          return label ? `Inherits: ${label}` : 'Inherits base movement.'
+          const text = baseMovementPreviewText(values)
+          return text ? `Inherits: ${text}` : 'Inherits base movement.'
+        },
+      },
+      sourcePreview: {
+        dependsOn: [...FORM_BASE_MOVEMENT_DEPENDS],
+        resolve: (values) => {
+          const text = baseMovementPreviewText(values)
+          if (!text) return undefined
+          return { label: MONSTER_FORM_BASE_MOVEMENT_PREVIEW_LABEL, text }
         },
       },
     },

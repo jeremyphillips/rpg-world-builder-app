@@ -185,6 +185,7 @@ export {
   type TextareaFieldConfig,
   type ConfirmBeforeClearConfig,
   type OptionalDisclosureConfig,
+  type OptionalDisclosureSourcePreview,
   type OptionalDisclosureIntent,
   type OptionalDisclosureFieldKind,
   OPTIONAL_DISCLOSURE_FIELD_KINDS,

@@ -20,6 +20,8 @@ import {
   resolveOptionalDisclosureClearPaths,
   useOptionalDisclosureGroupLegendChrome,
 } from './optional-disclosure-group.lib'
+import { optionalDisclosureDependsOnPaths } from '../config/optional-disclosure-config.lib'
+import { OptionalDisclosureSourcePreview } from '../../components/ui/optional-disclosure-source-preview.client'
 
 function objectHasContent(value: unknown): boolean {
   if (value == null || typeof value !== 'object' || Array.isArray(value)) return false
@@ -119,9 +121,12 @@ function OptionalDisclosureGroupBody({
   }, [defaultValues])
   const open = manualOpen || (disclosure.expandWhenPopulated !== false && populated)
   const controlId = `${idPrefix}-${fullName.replaceAll('.', '-')}`
-  const summaryDependsOn = disclosure.summary?.dependsOn ?? []
-  const summaryDependencyValues = useDependsOnValues(summaryDependsOn, namePrefix)
-  const summaryText = disclosure.summary?.resolve(summaryDependencyValues, { open })
+  const dependencyValues = useDependsOnValues(
+    optionalDisclosureDependsOnPaths(disclosure),
+    namePrefix,
+  )
+  const summaryText = disclosure.summary?.resolve(dependencyValues, { open })
+  const sourcePreview = open ? disclosure.sourcePreview?.resolve(dependencyValues) : undefined
 
   const clear = () => {
     const pathsToClear = resolveOptionalDisclosureClearPaths(disclosure, fullName)
@@ -176,6 +181,10 @@ function OptionalDisclosureGroupBody({
             </OptionalDisclosureMicroAction>
           }
         >
+          <OptionalDisclosureSourcePreview
+            id={sourcePreview ? `${controlId}-source-preview` : undefined}
+            preview={sourcePreview}
+          />
           {children}
         </FieldGroup>
         {confirmDialog}

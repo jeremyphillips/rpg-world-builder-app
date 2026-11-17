@@ -22,6 +22,10 @@ import {
 import { cn } from '../../lib/utils'
 import { formMicroActionButtonProps } from '../../form/form-micro-action'
 import type { OptionalDisclosureActionVerb } from '../../form/config/optional-disclosure-actions.lib'
+import {
+  OptionalDisclosureSourcePreview,
+  type OptionalDisclosureSourcePreviewContent,
+} from './optional-disclosure-source-preview.client'
 
 export type OptionalFieldDisclosureProps = {
   controlId: string
@@ -45,6 +49,8 @@ export type OptionalFieldDisclosureProps = {
   addDisabled?: boolean
   /** Hint, validation, or summary rendered in the anatomy-row message track when open. */
   message?: ReactNode
+  /** Inherited source context shown only while open. */
+  sourcePreview?: OptionalDisclosureSourcePreviewContent
 }
 
 type OptionalDisclosureMicroActionProps = Omit<
@@ -336,6 +342,7 @@ function OpenOptionalFieldDisclosure({
   labeled,
   message,
   summaryNode,
+  sourcePreview,
   onRemove,
   children,
 }: {
@@ -349,6 +356,7 @@ function OpenOptionalFieldDisclosure({
   labeled: boolean
   message?: ReactNode
   summaryNode: ReactNode
+  sourcePreview?: OptionalDisclosureSourcePreviewContent
   onRemove: () => void
   children: ReactNode
 }) {
@@ -367,6 +375,18 @@ function OpenOptionalFieldDisclosure({
     </label>
   )
   const header = <DisclosureHeaderRow label={fieldLabelNode} action={removeButton} />
+  const sourcePreviewNode = (
+    <OptionalDisclosureSourcePreview
+      id={sourcePreview ? `${controlId}-source-preview` : undefined}
+      preview={sourcePreview}
+    />
+  )
+  const control = (
+    <div className={fieldAnatomyStackVariants({ size })}>
+      {sourcePreviewNode}
+      {children}
+    </div>
+  )
 
   if (inAnatomyRow) {
     const showMessageTrack = message != null || labeled
@@ -377,14 +397,13 @@ function OpenOptionalFieldDisclosure({
       </>
     ) : null
 
-    return (
-      <DisclosureAnatomy size={size} label={header} control={children} message={messageTrack} />
-    )
+    return <DisclosureAnatomy size={size} label={header} control={control} message={messageTrack} />
   }
 
   return (
     <div className={fieldAnatomyStackVariants({ size })}>
       {header}
+      {sourcePreviewNode}
       {children}
       {labeled ? summaryNode : null}
     </div>
@@ -409,6 +428,7 @@ export function OptionalFieldDisclosure({
   summary,
   addDisabled = false,
   message,
+  sourcePreview,
 }: OptionalFieldDisclosureProps) {
   const summaryId = `${controlId}-summary`
   const inAnatomyRow = useFieldRowParticipation()
@@ -453,6 +473,7 @@ export function OptionalFieldDisclosure({
       labeled={labeled}
       message={message}
       summaryNode={summaryNode}
+      sourcePreview={sourcePreview}
       onRemove={onRemove}
     >
       {children}

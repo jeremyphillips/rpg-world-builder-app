@@ -190,6 +190,9 @@ the same resolver with the group heading. Renderers still own opening, seeding, 
 - **`summary`** communicates the effective or inherited value while collapsed (and under the
   header when open in labeled mode). It uses label **scale** at body weight with secondary ink —
   not caption or hint typography.
+- **`sourcePreview`** is a read-only inherited source block shown only while open. It shares
+  `summary`'s `dependsOn` watch in the roll renderer and optional group body. `resolve` returns
+  `{ label, text } | undefined`; undefined leaves no gap. It does not write form state.
 - Header actions use the form **micro-action** text button (`xs`). `add` uses `ActionIcon` `add`
   (plus). `override` uses `edit` (pencil). The open action uses `clear` (x), including open
   optional groups (`legendAction`).

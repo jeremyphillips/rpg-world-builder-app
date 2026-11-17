@@ -146,14 +146,17 @@ describe('monster weapon damage override', () => {
     expect(state()).toMatchObject({ dirtyFields: {}, damage: null })
 
     await user.click(screen.getByRole('button', { name: 'Override Damage' }))
-    expect(screen.getByText('Replacing weapon base roll · 1d6')).toBeInTheDocument()
+    expect(screen.queryByText(/Replacing weapon base roll/)).not.toBeInTheDocument()
+    expect(screen.getByText('Weapon base damage')).toBeInTheDocument()
+    expect(screen.getByText('1d6 piercing')).toBeInTheDocument()
     await waitFor(() => {
       expect(state().dirtyFields).not.toEqual({})
       expect(state().damage).toEqual({ dice: { count: 1, faces: 6 } })
     })
 
     await user.click(screen.getByRole('button', { name: 'Switch weapon' }))
-    expect(screen.getByText('Replacing weapon base roll · 2d6')).toBeInTheDocument()
+    expect(screen.queryByText(/Replacing weapon base roll/)).not.toBeInTheDocument()
+    expect(screen.getByText('2d6 slashing')).toBeInTheDocument()
     expect(state().damage).toEqual({ dice: { count: 1, faces: 6 } })
 
     await user.click(screen.getByRole('button', { name: 'Use weapon default' }))
@@ -195,7 +198,7 @@ describe('monster weapon damage override', () => {
     const user = userEvent.setup()
     render(<Harness entryId="gone" damage={{ dice: { count: 2, faces: 6 } }} />)
     expect(screen.getByLabelText('Number of dice')).toHaveValue(2)
-    expect(screen.getByText('Weapon unavailable')).toBeInTheDocument()
+    expect(screen.queryByText('Weapon unavailable')).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Use weapon default' }))
     await waitFor(() => {
       expect(state().dirtyFields).not.toEqual({})
@@ -209,7 +212,7 @@ describe('monster weapon damage override', () => {
     ).toBe(false)
     expect(
       monsterWeaponDamageOverrideSummary(ctx, { equipmentEntryId: 'big', equipment }, true),
-    ).toBe('Replacing weapon base roll · 2d6')
+    ).toBeUndefined()
   })
 
   it('round-trips a flat weapon override without adding dice', () => {

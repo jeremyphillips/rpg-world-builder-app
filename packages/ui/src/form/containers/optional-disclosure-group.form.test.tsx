@@ -199,6 +199,48 @@ describe('group optionalDisclosure', () => {
     expect(screen.queryByRole('group', { name: /Movement/ })).not.toBeInTheDocument()
   })
 
+  it('renders source preview inside the fieldset without serializing it', async () => {
+    const user = userEvent.setup()
+    const previewGroup = {
+      kind: 'group',
+      name: 'movementOverride',
+      heading: { label: 'Movement' },
+      optionalDisclosure: {
+        intent: 'override',
+        labeled: true,
+        sourcePreview: {
+          dependsOn: ['baseWalk'],
+          resolve: (values: Record<string, unknown>) => {
+            const walk = values.baseWalk
+            if (typeof walk !== 'number') return undefined
+            return { label: 'Base movement', text: `Walk ${walk} ft.` }
+          },
+        },
+      },
+      fields: [{ type: 'text', name: 'walk', label: 'Walk' }],
+    } as const satisfies FormItem
+
+    function PreviewHarness() {
+      const form = useForm({
+        defaultValues: { baseWalk: 30 },
+        shouldUnregister: true,
+      })
+      return (
+        <FormProvider {...form}>
+          <StateProbe />
+          <FormItems items={[previewGroup]} idPrefix="preview" />
+        </FormProvider>
+      )
+    }
+
+    render(<PreviewHarness />)
+    await user.click(screen.getByRole('button', { name: 'Override Movement' }))
+    const group = screen.getByRole('group', { name: /Movement/ })
+    expect(group).toHaveTextContent('Base movement')
+    expect(group).toHaveTextContent('Walk 30 ft.')
+    expect(state()).toEqual({ dirty: false, savingThrow: null })
+  })
+
   it('writes seedWhen when the group opens', async () => {
     const user = userEvent.setup()
     const seeded = {

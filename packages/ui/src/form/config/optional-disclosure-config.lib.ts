@@ -3,6 +3,7 @@ import type { FieldLabelVisibility } from '../form-heading.lib'
 import {
   OPTIONAL_DISCLOSURE_FIELD_KINDS,
   type FieldConfig,
+  type OptionalDisclosureConfig,
   type OptionalDisclosureFieldKind,
   resolveFieldConfigPrimaryName,
 } from '../field-config'
@@ -84,4 +85,14 @@ export function assertOptionalDisclosureFieldConfigs(fields: readonly FieldConfi
   for (const field of fields) {
     assertOptionalDisclosureFieldConfig(field)
   }
+}
+
+/** Union of `summary` and `sourcePreview` watch paths for one `useDependsOnValues` call. */
+export function optionalDisclosureDependsOnPaths(
+  disclosure: Pick<OptionalDisclosureConfig, 'summary' | 'sourcePreview'>,
+): readonly string[] {
+  const paths = new Set<string>()
+  for (const path of disclosure.summary?.dependsOn ?? []) paths.add(path)
+  for (const path of disclosure.sourcePreview?.dependsOn ?? []) paths.add(path)
+  return [...paths]
 }

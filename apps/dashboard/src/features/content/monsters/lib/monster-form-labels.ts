@@ -114,6 +114,8 @@ export const MONSTER_WEAPON_DAMAGE_USING_LABEL = 'Using weapon base damage'
 export const MONSTER_WEAPON_DAMAGE_REPLACING_LABEL = 'Replacing weapon base roll'
 export const MONSTER_WEAPON_DAMAGE_UNAVAILABLE_LABEL = 'Weapon unavailable'
 export const MONSTER_WEAPON_DAMAGE_NONE_LABEL = 'This weapon has no base damage.'
+export const MONSTER_WEAPON_DAMAGE_SOURCE_PREVIEW_LABEL = 'Weapon base damage'
+export const MONSTER_FORM_BASE_MOVEMENT_PREVIEW_LABEL = 'Base movement'
 export const MONSTER_ON_HIT_LEGEND = 'On hit'
 export const MONSTER_ON_HIT_HINT =
   'Effects that apply when this attack hits, beyond its primary damage.'
