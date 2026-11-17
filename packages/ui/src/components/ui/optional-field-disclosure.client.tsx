@@ -2,7 +2,6 @@
 
 import type { ReactNode } from 'react'
 
-import { formMicroActionButtonProps } from '../../form/form-micro-action'
 import {
   FieldRowParticipationProvider,
   useFieldRowParticipation,
@@ -13,7 +12,11 @@ import type { FieldSize } from './field.client'
 import { fieldRowParticipationClasses } from './field-root.lib'
 import { FieldControlRegion, FieldLabelRegion, FieldMessageRegion } from './field-anatomy-regions'
 import { FieldLabelContent } from './field-label-content'
-import { fieldAnatomyStackVariants, fieldLabelVariants } from './field.variants'
+import {
+  fieldActionLabelMetricsClasses,
+  fieldAnatomyStackVariants,
+  fieldLabelVariants,
+} from './field.variants'
 import { cn } from '../../lib/utils'
 import { Text } from './text'
 
@@ -249,7 +252,8 @@ function CollapsedOptionalFieldDisclosure({
 function DisclosureAddButton({
   controlId,
   addLabel,
-  labeled,
+  labeled: _labeled,
+  size,
   summaryId,
   addDisabled,
   onOpenChange,
@@ -257,6 +261,7 @@ function DisclosureAddButton({
   controlId: string
   addLabel: string
   labeled: boolean
+  size: FieldSize
   summaryId?: string
   addDisabled: boolean
   onOpenChange: (open: boolean) => void
@@ -265,9 +270,8 @@ function DisclosureAddButton({
     <Button
       type="button"
       variant="text"
-      size={labeled ? undefined : 'sm'}
-      className={cn('font-normal', labeled ? undefined : 'w-fit justify-start')}
-      {...(labeled ? formMicroActionButtonProps : {})}
+      size="default"
+      className={cn('font-normal', 'w-fit justify-start')}
       aria-controls={controlId}
       aria-expanded={false}
       aria-describedby={summaryId}
@@ -277,8 +281,8 @@ function DisclosureAddButton({
         onOpenChange(true)
       }}
     >
-      <ActionIcon action="add" size={labeled ? 'sm' : 'lg'} />
-      {addLabel}
+      <ActionIcon action="add" size="owner" />
+      <span className={fieldActionLabelMetricsClasses(size)}>{addLabel}</span>
     </Button>
   )
 }
@@ -308,11 +312,15 @@ function OpenOptionalFieldDisclosure({
 }) {
   const removeButton = (
     <Button
-      {...formMicroActionButtonProps}
+      type="button"
+      variant="text"
+      size="default"
+      className="gap-1.5"
       aria-label={`${removeLabel} ${fieldLabel}`}
       onClick={onRemove}
     >
-      {removeLabel}
+      <ActionIcon action="clear" size="owner" />
+      <span className={fieldActionLabelMetricsClasses(size)}>{removeLabel}</span>
     </Button>
   )
   const fieldLabelNode = (
@@ -368,6 +376,7 @@ export function OptionalFieldDisclosure({
       controlId={controlId}
       addLabel={addLabel}
       labeled={labeled}
+      size={size}
       summaryId={summary ? summaryId : undefined}
       addDisabled={addDisabled}
       onOpenChange={onOpenChange}

@@ -226,6 +226,21 @@ export const fieldLabelTypographyVariants = cva('', {
   },
 })
 
+/** Label font metrics for optional-disclosure text actions — omits label weight so action chrome owns emphasis. */
+export function fieldActionLabelMetricsClasses(size: FieldSizeToken): string {
+  switch (size) {
+    case 'xs':
+    case 'sm':
+      return 'text-[length:var(--text-fine-md)] leading-none'
+    case 'md':
+      return 'text-[length:var(--text-md)] leading-none'
+    case 'lg':
+      return 'text-base leading-[var(--text-base--line-height)]'
+    default:
+      return 'text-[length:var(--text-md)] leading-none'
+  }
+}
+
 export type FieldArrayItemLayoutVariant = 'compact' | 'detailed'
 
 /**

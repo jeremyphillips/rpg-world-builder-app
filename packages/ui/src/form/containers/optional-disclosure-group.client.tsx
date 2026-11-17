@@ -3,10 +3,11 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useFormContext, useFormState, useWatch } from 'react-hook-form'
 
+import { ActionIcon } from '../../components/ui/action-icon.client'
 import { Button } from '../../components/ui/button.client'
 import { FieldGroup } from '../../components/ui/field-group.client'
 import { OptionalFieldDisclosure } from '../../components/ui/optional-field-disclosure.client'
-import { formMicroActionButtonProps } from '../form-micro-action'
+import { fieldActionLabelMetricsClasses } from '../../components/ui/field.variants'
 import type { GroupConfig } from '../field-config'
 import { collectDependentClearingFields } from '../config/confirm-before-clear.lib'
 import { useDependsOnValues } from '../config/form-depends-on.client'
@@ -157,11 +158,15 @@ function OptionalDisclosureGroupBody({
           hint={hint}
           legendAction={
             <Button
-              {...formMicroActionButtonProps}
+              type="button"
+              variant="text"
+              size="default"
+              className="gap-1.5"
               aria-label={`${removeLabel} ${fieldLabel}`}
               onClick={attemptClear}
             >
-              {removeLabel}
+              <ActionIcon action="clear" size="owner" />
+              <span className={fieldActionLabelMetricsClasses(groupSize)}>{removeLabel}</span>
             </Button>
           }
         >
