@@ -134,8 +134,8 @@ export interface ChipsFieldProps extends SelectFieldValueProps, FieldLabelPresen
 }
 
 /**
- * Pill-shaped toggle-button group. Renders as a `<fieldset>` with a `<legend>`
- * so screen readers announce the group label before each option.
+ * Pill-shaped toggle-button group. The visible name is {@link FieldRadiogroupLabel};
+ * the group is named with `aria-labelledby`.
  */
 function ChipsFieldIntroText({
   introText,
@@ -237,11 +237,7 @@ export function ChipsField({
         chrome={chrome}
         controlBand="content-sized"
       >
-        {({ labelId: rowLabelId }) =>
-          rowLabelId
-            ? chipsControl(rowLabelId, multiple ? 'group' : 'radiogroup')
-            : chipsControl(labelId, multiple ? 'group' : 'radiogroup')
-        }
+        {({ labelId: rowLabelId }) => chipsControl(rowLabelId ?? labelId)}
       </FieldAnatomyRowShell>
     )
   }

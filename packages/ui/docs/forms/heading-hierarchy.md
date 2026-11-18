@@ -2,6 +2,8 @@
 
 **Authoring rule:** Heading scale follows structure; accessible names follow controls.
 
+Visible field labels go through `FormFieldLabel` (labelable controls) or `FieldRadiogroupLabel` (radios, chips, choose-count, and other groups). Both apply `fieldLabelVariants`. A fieldset, a legend, or an anatomy row may change the markup, and none of those choose the field-label type. Structural legends (`FieldGroup`, array headers, composite groups) stay on the heading scale. `display: contents` on a `<legend>` is not how a leaf field gets a field label. A new renderer keeps the accessible name, hint, required marker, and error on that shell, and checks the label both standalone and in an anatomy row.
+
 ## Tier resolver
 
 | Context                                                     | Resolved tier                               |

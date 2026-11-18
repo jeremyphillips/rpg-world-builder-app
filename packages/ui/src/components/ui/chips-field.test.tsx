@@ -534,7 +534,7 @@ describe('ChipsField', () => {
     expect(container.querySelector('[data-field-row-participant]')).toBeTruthy()
     expect(container.querySelector('fieldset')).toBeNull()
     expect(container.querySelector('[data-field-label-region]')).toHaveTextContent('Level')
-    expect(container.querySelector('[role="radiogroup"]')).toBeTruthy()
+    expect(screen.getByRole('group', { name: 'Level' })).toBeTruthy()
     expect(
       screen.getByText('Cantrips use level 0.').closest('[data-field-message-region]'),
     ).toBeTruthy()
