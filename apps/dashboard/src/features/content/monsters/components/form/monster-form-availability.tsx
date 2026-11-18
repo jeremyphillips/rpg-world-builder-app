@@ -1,7 +1,9 @@
 import {
   formatMonsterFormQualifier,
   formatMonsterQualifiedHeading,
+  monsterFormRestrictionEligibleIds,
   resolveCreatureFormsContext,
+  type CreatureFormsDraft,
 } from '@rpg/contracts'
 import { ChipsField, RadioGroupField, RulesPreview } from '@rpg/ui'
 import { useSlotIssues, type FormItem } from '@rpg/ui/form'
@@ -38,22 +40,28 @@ export function monsterFormAvailabilityField(): FormItem {
   }
 }
 
-function formNamesById(
-  forms: MonsterFormValues['forms'],
+function restrictionFormLabels(
+  forms: CreatureFormsDraft,
   creatureName: string,
 ): Map<string, string> {
+  const eligibleIds = new Set(monsterFormRestrictionEligibleIds(forms))
   const names = new Map<string, string>()
-  if (!forms) return names
   const context = resolveCreatureFormsContext(forms, creatureName)
   if (context.status === 'invalid') return names
-  for (const form of context.eligibleForms) {
-    if (form.id) names.set(form.id, form.name.trim() || 'Untitled form')
+
+  const register = (id: string, label: string) => {
+    if (eligibleIds.has(id)) names.set(id, label.trim() || 'Untitled form')
+  }
+
+  if (context.profile?.id) register(context.profile.id, context.profile.name)
+  for (const form of context.definedForms) {
+    register(form.id, form.name)
   }
   return names
 }
 
-function stringIds(value: unknown): string[] | undefined {
-  if (!Array.isArray(value)) return undefined
+function stringIds(value: unknown): string[] {
+  if (!Array.isArray(value)) return []
   return value.filter((id): id is string => typeof id === 'string')
 }
 
@@ -92,14 +100,14 @@ function applyAvailabilityMode(
   form: UseFormReturn<MonsterFormValues>,
   namePrefix: string,
   restrictionPath: string,
-  restricted: boolean,
+  restrictionKeyPresent: boolean,
   value: string,
 ) {
   if (value === 'all') {
     clearOnlyInFormIds(form, namePrefix)
     return
   }
-  if (restricted) return
+  if (restrictionKeyPresent) return
   form.setValue(restrictionPath as never, [] as never, AVAILABILITY_WRITE)
 }
 
@@ -115,48 +123,61 @@ function writeSelectedFormIds(
   )
 }
 
-export function MonsterFormAvailabilityControl({ namePrefix }: { namePrefix?: string }) {
-  const form = useFormContext<MonsterFormValues>()
-  const forms = useWatch<MonsterFormValues, 'forms'>({ name: 'forms' })
-  const creatureName = useWatch<MonsterFormValues, 'name'>({ name: 'name' })
-  const restrictionPath = rowFieldPath(namePrefix, 'onlyInFormIds')
-  const watchedIds: unknown = useWatch({ name: restrictionPath as never })
-  const watchedName: unknown = useWatch({ name: rowFieldPath(namePrefix, 'name') as never })
-  const ids = stringIds(watchedIds)
-  const rowName = typeof watchedName === 'string' ? watchedName : undefined
-  const { message } = useSlotIssues()
-  const restricted = Array.isArray(ids)
-  if (!namePrefix || (!forms && !restricted)) return null
+function shouldShowFormAvailability(
+  namePrefix: string | undefined,
+  authorable: boolean,
+  restrictionKeyPresent: boolean,
+): namePrefix is string {
+  return Boolean(namePrefix && (authorable || restrictionKeyPresent))
+}
 
-  const knownNames = formNamesById(forms, creatureName ?? '')
-  const selected = restricted ? ids : []
-  const heading = availabilityHeading(rowName, selected, knownNames)
-  const controlId = `${namePrefix.replaceAll('.', '-')}-form-availability`
+type MonsterFormAvailabilityViewProps = {
+  form: UseFormReturn<MonsterFormValues>
+  namePrefix: string
+  restrictionPath: string
+  controlId: string
+  message?: string
+  restrictionKeyPresent: boolean
+  selected: readonly string[]
+  chipOptions: ReturnType<typeof orderedFormOptions>
+  heading?: string
+}
 
+function MonsterFormAvailabilityView({
+  form,
+  namePrefix,
+  restrictionPath,
+  controlId,
+  message,
+  restrictionKeyPresent,
+  selected,
+  chipOptions,
+  heading,
+}: MonsterFormAvailabilityViewProps) {
   return (
     <div className="flex flex-col gap-3">
       <RadioGroupField
         id={controlId}
         label={MONSTER_FORM_AVAILABILITY_LABEL}
         orientation="horizontal"
-        value={restricted ? 'selected' : 'all'}
+        value={restrictionKeyPresent ? 'selected' : 'all'}
         error={message}
         options={[
           { value: 'all', label: MONSTER_FORM_AVAILABILITY_ALL },
           { value: 'selected', label: MONSTER_FORM_AVAILABILITY_SELECTED },
         ]}
         onValueChange={(value) =>
-          applyAvailabilityMode(form, namePrefix, restrictionPath, restricted, value)
+          applyAvailabilityMode(form, namePrefix, restrictionPath, restrictionKeyPresent, value)
         }
       />
-      {restricted ? (
+      {restrictionKeyPresent ? (
         <ChipsField
           id={`${controlId}-forms`}
           label={MONSTER_FORM_AVAILABILITY_FORMS_LABEL}
           hint={MONSTER_FORM_AVAILABILITY_ORDER_HINT}
-          options={orderedFormOptions(knownNames, selected)}
+          options={chipOptions}
           multiple
-          value={selected}
+          value={[...selected]}
           onChange={(value) => writeSelectedFormIds(form, restrictionPath, value)}
         />
       ) : null}
@@ -167,5 +188,37 @@ export function MonsterFormAvailabilityControl({ namePrefix }: { namePrefix?: st
         />
       ) : null}
     </div>
+  )
+}
+
+export function MonsterFormAvailabilityControl({ namePrefix }: { namePrefix?: string }) {
+  const form = useFormContext<MonsterFormValues>()
+  const forms = useWatch<MonsterFormValues, 'forms'>({ name: 'forms' })
+  const creatureName = useWatch<MonsterFormValues, 'name'>({ name: 'name' })
+  const restrictionPath = rowFieldPath(namePrefix, 'onlyInFormIds')
+  const watchedIds: unknown = useWatch({ name: restrictionPath as never })
+  const watchedName: unknown = useWatch({ name: rowFieldPath(namePrefix, 'name') as never })
+  const rowName = typeof watchedName === 'string' ? watchedName : undefined
+  const { message } = useSlotIssues()
+
+  const restrictionKeyPresent = Array.isArray(watchedIds)
+  const authorable = forms ? monsterFormRestrictionEligibleIds(forms).length > 1 : false
+  if (!shouldShowFormAvailability(namePrefix, authorable, restrictionKeyPresent)) return null
+
+  const knownNames = forms ? restrictionFormLabels(forms, creatureName ?? '') : new Map()
+  const selected = restrictionKeyPresent ? stringIds(watchedIds) : []
+
+  return (
+    <MonsterFormAvailabilityView
+      form={form}
+      namePrefix={namePrefix}
+      restrictionPath={restrictionPath}
+      controlId={`${namePrefix.replaceAll('.', '-')}-form-availability`}
+      message={message}
+      restrictionKeyPresent={restrictionKeyPresent}
+      selected={selected}
+      chipOptions={orderedFormOptions(knownNames, selected)}
+      heading={availabilityHeading(rowName, selected, knownNames)}
+    />
   )
 }

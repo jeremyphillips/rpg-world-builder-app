@@ -19,17 +19,24 @@ type FormAvailabilityBody = MonsterActionSectionBody & {
   traits?: readonly unknown[]
 }
 
-function restrictionIds(row: unknown): readonly string[] | undefined {
+/** Present when the row stores `onlyInFormIds`, including an empty publish-invalid list. */
+export function readMonsterRowFormRestrictionIds(row: unknown): readonly string[] | undefined {
   if (!row || typeof row !== 'object' || !('onlyInFormIds' in row)) return undefined
   const ids = (row as { onlyInFormIds?: unknown }).onlyInFormIds
   if (!Array.isArray(ids)) return undefined
   return ids.filter((id): id is string => typeof id === 'string')
 }
 
-function eligibleFormIds(forms: CreatureFormsDraft): Set<string> {
-  const ids = new Set(forms.definedForms.map((form) => form.id))
+/** Ids that may appear in `onlyInFormIds`; shared with {@link refineMonsterFormAvailability}. */
+export function monsterFormRestrictionEligibleIds(forms: CreatureFormsDraft): readonly string[] {
+  if (!Array.isArray(forms.definedForms) || !forms.trueForm) return []
+  const ids = new Set(forms.definedForms.flatMap((form) => (form.id ? [form.id] : [])))
   if (forms.trueForm.kind === 'profile' && forms.profileFormId) ids.add(forms.profileFormId)
-  return ids
+  return [...ids]
+}
+
+function eligibleFormIds(forms: CreatureFormsDraft): Set<string> {
+  return new Set(monsterFormRestrictionEligibleIds(forms))
 }
 
 function refineRestriction(
@@ -63,7 +70,7 @@ export function refineMonsterFormAvailability(
   prefix: (string | number)[] = [],
 ): void {
   body.traits?.forEach((trait, index) => {
-    refineRestriction(restrictionIds(trait), body.forms, ctx, [
+    refineRestriction(readMonsterRowFormRestrictionIds(trait), body.forms, ctx, [
       ...prefix,
       'traits',
       index,
@@ -72,7 +79,7 @@ export function refineMonsterFormAvailability(
   })
   for (const section of MONSTER_ACTION_SECTIONS) {
     monsterActionSectionRows(body, section).forEach((action, index) => {
-      refineRestriction(restrictionIds(action), body.forms, ctx, [
+      refineRestriction(readMonsterRowFormRestrictionIds(action), body.forms, ctx, [
         ...prefix,
         ...monsterActionSectionRowPath(section, index, 'onlyInFormIds'),
       ])
