@@ -103,6 +103,7 @@ export function OptionalDisclosureTextareaFieldRenderer({
         onOpenChange={setManualOpen}
         onRemove={attemptClear}
         size={controlSize}
+        labeled={disclosure.labeled}
       >
         <TextareaField
           {...buildFieldShellProps(
@@ -199,6 +200,7 @@ export function OptionalDisclosureTextFieldRenderer({
         onOpenChange={setManualOpen}
         onRemove={attemptClear}
         size={controlSize}
+        labeled={disclosure.labeled}
       >
         <TextField
           {...buildFieldShellProps(
@@ -319,6 +321,7 @@ export function OptionalDisclosureSelectFieldRenderer({
         onOpenChange={setManualOpen}
         onRemove={attemptClear}
         size={state.controlSize}
+        labeled={disclosure.labeled}
       >
         <SelectField
           options={state.resolvedOptions}
@@ -411,6 +414,7 @@ export function OptionalDisclosureTextSuggestionsFieldRenderer({
         onOpenChange={handleOpenChange}
         onRemove={attemptClear}
         size={resolved.controlSize}
+        labeled={disclosure.labeled}
       >
         <TextSuggestionsField
           {...buildFieldShellProps(
@@ -505,6 +509,7 @@ export function OptionalDisclosureRichTextFieldRenderer({
         onOpenChange={setOpen}
         onRemove={attemptClear}
         size={controlSize}
+        labeled={disclosure.labeled}
       >
         <LazyFieldSuspense>
           <LazyRichTextField

@@ -57,7 +57,7 @@ describe('OptionalFieldDisclosure', () => {
     expect(addButton).toHaveClass(
       'text-foreground',
       'text-action-standalone',
-      'ui-button__text--xs',
+      'ui-button__text--sm',
     )
     expect(addButton).not.toHaveClass('hover:bg-accent')
     expect(screen.queryByRole('textbox', { name: 'Additional behavior' })).not.toBeInTheDocument()
@@ -133,8 +133,31 @@ describe('OptionalFieldDisclosure', () => {
     expect(hint.closest('[data-field-control-region]')).toBeNull()
   })
 
-  it('uses xs micro-actions for add and remove with matching emphasis', () => {
-    const microActionContract = [
+  it('uses comfortable default geometry for standalone collapsed add actions', () => {
+    render(
+      <OptionalFieldDisclosure
+        controlId="note-field"
+        fieldLabel="Additional behavior"
+        addLabel="Add additional behavior"
+        addAccessibleName="Add additional behavior"
+        removeLabel="Remove"
+        removeAccessibleName="Remove"
+        open={false}
+        onOpenChange={vi.fn()}
+        onRemove={vi.fn()}
+        size="md"
+      >
+        {null}
+      </OptionalFieldDisclosure>,
+    )
+
+    expect(screen.getByRole('button', { name: 'Add additional behavior' })).toHaveClass(
+      'ui-button__text--default',
+    )
+  })
+
+  it('uses inline xs disclosure actions with matching emphasis', () => {
+    const disclosureActionEmphasisClasses = [
       'ui-button__text--xs',
       'text-action-standalone',
       'text-foreground',
@@ -165,7 +188,7 @@ describe('OptionalFieldDisclosure', () => {
     const removeButton = screen.getByRole('button', { name: 'Remove Additional behavior' })
     unmountOpen()
 
-    for (const className of microActionContract) {
+    for (const className of disclosureActionEmphasisClasses) {
       expect(addButton).toHaveClass(className)
       expect(removeButton).toHaveClass(className)
     }

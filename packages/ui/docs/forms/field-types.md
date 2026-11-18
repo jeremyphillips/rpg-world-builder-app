@@ -204,9 +204,11 @@ the same resolver with the group heading. Renderers still own opening, seeding, 
   section field rhythm. Legend→preview spacing uses `resolveFieldScaleLegendBodyMargin` when
   `headingScale: 'field'`. When a preview renders, preview→editor uses field anatomy stack; nested
   editor fields keep `fieldStackRhythmVariants` inside that stack.
-- Header actions use the form **micro-action** text button (`xs`). `add` uses `ActionIcon` `add`
-  (plus). `override` uses `edit` (pencil). The open action uses `clear` (x), including open
-  optional groups (`legendAction`).
+- Header actions use the optional-disclosure **text** button (`OptionalDisclosureAction`).
+  Inline with a visible label or legend (`labeled: true`, open header row, open group
+  `legendAction`): `xs`. Standalone collapsed add (action-only control band): `sm` in compact
+  sections, comfortable `default` text geometry in comfortable sections. `add` uses `ActionIcon`
+  `add` (plus). `override` uses `edit` (pencil). The open action uses `clear` (x).
 - With **`labeled: true`**, the header action stays on the label row in both collapsed and open
   states; the summary sits on the line below.
 

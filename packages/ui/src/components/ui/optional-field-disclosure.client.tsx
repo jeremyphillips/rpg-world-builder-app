@@ -18,8 +18,11 @@ import { fieldAnatomyStackVariants, fieldLabelVariants } from './field.variants'
 import { splitOptionalDisclosureSummary } from './optional-disclosure-inherited.lib'
 import { OptionalDisclosureInheritedLine } from './optional-disclosure-inherited-line.client'
 import { cn } from '../../lib/utils'
-import { formMicroActionButtonProps } from '../../form/form-micro-action'
 import type { OptionalDisclosureActionVerb } from '../../form/config/optional-disclosure-actions.lib'
+import {
+  optionalDisclosureActionButtonProps,
+  type OptionalDisclosureActionPlacement,
+} from '../../form/optional-disclosure-action-size.lib'
 import {
   OptionalDisclosureSourcePreview,
   type OptionalDisclosureSourcePreviewContent,
@@ -51,23 +54,28 @@ export type OptionalFieldDisclosureProps = {
   sourcePreview?: OptionalDisclosureSourcePreviewContent
 }
 
-type OptionalDisclosureMicroActionProps = Omit<
-  ComponentProps<typeof Button>,
-  'variant' | 'size'
-> & {
+type OptionalDisclosureActionProps = Omit<ComponentProps<typeof Button>, 'variant' | 'size'> & {
   action: OptionalDisclosureActionVerb
+  placement: OptionalDisclosureActionPlacement
+  fieldSize: FieldSize
   children: ReactNode
 }
 
-/** Shared xs text action for optional disclosure add/clear controls. */
-export function OptionalDisclosureMicroAction({
+/** Text add/edit/clear action for optional disclosure shells. */
+export function OptionalDisclosureAction({
   action,
+  placement,
+  fieldSize,
   children,
   className,
   ...props
-}: OptionalDisclosureMicroActionProps) {
+}: OptionalDisclosureActionProps) {
   return (
-    <Button {...formMicroActionButtonProps} className={cn('shrink-0', className)} {...props}>
+    <Button
+      {...optionalDisclosureActionButtonProps({ placement, fieldSize })}
+      className={cn('shrink-0', className)}
+      {...props}
+    >
       <ActionIcon action={action} size="owner" />
       {children}
     </Button>
@@ -285,6 +293,7 @@ function DisclosureAddButton({
   addAccessibleName,
   addAction,
   labeled,
+  fieldSize,
   summaryId,
   addDisabled,
   onOpenChange,
@@ -294,13 +303,16 @@ function DisclosureAddButton({
   addAccessibleName: string
   addAction: 'add' | 'edit'
   labeled: boolean
+  fieldSize: FieldSize
   summaryId?: string
   addDisabled: boolean
   onOpenChange: (open: boolean) => void
 }) {
   return (
-    <OptionalDisclosureMicroAction
+    <OptionalDisclosureAction
       action={addAction}
+      placement={labeled ? 'inlineWithLabel' : 'standalone'}
+      fieldSize={fieldSize}
       className={labeled ? undefined : 'w-fit justify-start'}
       aria-label={addAccessibleName}
       aria-controls={controlId}
@@ -313,7 +325,7 @@ function DisclosureAddButton({
       }}
     >
       {addLabel}
-    </OptionalDisclosureMicroAction>
+    </OptionalDisclosureAction>
   )
 }
 
@@ -347,13 +359,15 @@ function OpenOptionalFieldDisclosure({
   children: ReactNode
 }) {
   const removeButton = (
-    <OptionalDisclosureMicroAction
+    <OptionalDisclosureAction
       action={removeAction}
+      placement="inlineWithLabel"
+      fieldSize={size}
       aria-label={removeAccessibleName}
       onClick={onRemove}
     >
       {removeLabel}
-    </OptionalDisclosureMicroAction>
+    </OptionalDisclosureAction>
   )
   const fieldLabelNode = (
     <span aria-hidden className={disclosureLabelClass(size)}>
@@ -426,6 +440,7 @@ export function OptionalFieldDisclosure({
       addAccessibleName={addAccessibleName}
       addAction={addAction}
       labeled={labeled}
+      fieldSize={size}
       summaryId={summary ? summaryId : undefined}
       addDisabled={addDisabled}
       onOpenChange={onOpenChange}

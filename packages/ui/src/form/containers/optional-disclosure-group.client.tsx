@@ -5,7 +5,7 @@ import { useFormContext, useFormState, useWatch } from 'react-hook-form'
 
 import { FieldGroup } from '../../components/ui/field-group.client'
 import {
-  OptionalDisclosureMicroAction,
+  OptionalDisclosureAction,
   OptionalFieldDisclosure,
 } from '../../components/ui/optional-field-disclosure.client'
 import type { GroupConfig } from '../field-config'
@@ -210,13 +210,15 @@ function OptionalDisclosureGroupBody({
           size={groupSize}
           hint={hint}
           legendAction={
-            <OptionalDisclosureMicroAction
+            <OptionalDisclosureAction
               action={actions.openAction}
+              placement="inlineWithLabel"
+              fieldSize={groupSize}
               aria-label={actions.openAccessibleName}
               onClick={attemptClear}
             >
               {actions.openLabel}
-            </OptionalDisclosureMicroAction>
+            </OptionalDisclosureAction>
           }
         >
           <OptionalDisclosureOpenGroupBody

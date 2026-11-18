@@ -87,6 +87,7 @@ export function OptionalDisclosureJoinedPairFieldRenderer({
         onOpenChange={handleOpenChange}
         onRemove={attemptClear}
         size={controlSize}
+        labeled={disclosure.labeled}
         addDisabled={addDisabled}
         summary={collapsedSummary}
         message={rowMessage}
