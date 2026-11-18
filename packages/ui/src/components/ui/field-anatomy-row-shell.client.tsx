@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react'
 
 import type { FieldLabelVisibility } from '../../form/form-heading.lib'
-import { FormFieldLabel } from '../../form/presentation/form-field-label.client'
+import { FieldRadiogroupLabel } from './field-label-content'
 import type { FieldControlBand } from './field-control-band.variants'
 import { resolveFieldAnatomyWidth, type FieldChrome } from './field-chrome.variants'
 import { Field, type FieldSize } from './field.client'
@@ -80,7 +80,13 @@ export function FieldAnatomyRowShell({
         controlBand={controlBand}
         label={
           showFieldLabel ? (
-            <FormFieldLabel id={labelId} label={label} required={required} info={info} />
+            <FieldRadiogroupLabel
+              id={labelId}
+              label={label}
+              required={required}
+              info={info}
+              size={size}
+            />
           ) : null
         }
         control={

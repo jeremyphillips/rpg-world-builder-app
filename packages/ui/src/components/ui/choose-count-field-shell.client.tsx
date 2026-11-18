@@ -2,14 +2,13 @@
 
 import * as React from 'react'
 
-import { type FieldSize } from './field.client'
-import { fieldWidthVariants, type FieldWidth } from './field-control.variants'
+import { Field, type FieldSize, useFieldRootContext } from './field.client'
+import { type FieldWidth } from './field-control.variants'
 import { resolveFieldAnatomyWidth, type FieldChrome } from './field-chrome.variants'
 import { fieldAnatomyIds } from './choose-count-field.lib'
-import { resolveFieldDescribedBy } from './field-validation-props'
 import { type FieldHintPosition } from './field.variants'
-import { FieldLegendInfoSibling, FieldLegendLabel } from './field-label-content'
-import { FieldsetChromeAnatomy, FieldsetChromeFrame } from './fieldset-chrome-anatomy'
+import { FieldRadiogroupLabel } from './field-label-content'
+import { FieldLayout } from './field-layout'
 import type { FieldLabelVisibility } from '../../form/form-heading.lib'
 
 export interface ChooseCountFieldAnatomy {
@@ -35,7 +34,7 @@ interface ChooseCountFieldShellProps {
   children: (anatomy: ChooseCountFieldAnatomy) => React.ReactNode
 }
 
-/** Shared fieldset + legend wrapper for inline choose-count composite fields. */
+/** Group shell for inline choose-count composites. The visible name is a field label, not a legend. */
 export function ChooseCountFieldShell({
   id,
   label,
@@ -51,55 +50,65 @@ export function ChooseCountFieldShell({
   labelVisibility = 'visible',
   children,
 }: ChooseCountFieldShellProps) {
-  const { legendId, chooseId, hintId, errorId } = fieldAnatomyIds(id)
-  const describedBy = resolveFieldDescribedBy(
-    error,
-    undefined,
-    hint,
-    undefined,
-    errorId,
-    hintId,
-    hintPosition,
-  )
+  const { chooseId, hintId, errorId } = fieldAnatomyIds(id)
+  const labelId = `${id}-label`
   const rootWidth = resolveFieldAnatomyWidth(width, chrome)
 
   return (
-    <div className={fieldWidthVariants({ width: rootWidth })}>
-      <FieldsetChromeFrame
+    <Field.Root
+      id={id}
+      error={error}
+      hint={hint}
+      hintPosition={hintPosition}
+      required={required}
+      size={size}
+      width={rootWidth}
+      labelVisibility={labelVisibility}
+      anatomy
+    >
+      <FieldLayout
+        wrapControl={false}
         chrome={chrome}
         size={size}
-        hint={hint}
-        hintPosition={hintPosition}
-        hintId={hintId}
-        error={error}
-        errorId={errorId}
-        legendSrOnly={labelVisibility === 'srOnly'}
-        legendHasInfo={info != null}
-        fieldsetProps={{
-          id,
-          'aria-describedby': describedBy,
-          'aria-invalid': error ? true : undefined,
-          disabled,
-        }}
-      >
-        <FieldsetChromeAnatomy
-          size={size}
-          hintPosition={hintPosition}
-          hint={hint}
-          hintId={hintId}
-          legend={
-            <FieldLegendLabel
-              legendId={legendId}
-              label={label}
-              labelVisibility={labelVisibility}
-              required={required}
-            />
-          }
-        >
-          {info != null ? <FieldLegendInfoSibling label={label} info={info} /> : null}
-          {children({ legendId, chooseId, hintId, errorId })}
-        </FieldsetChromeAnatomy>
-      </FieldsetChromeFrame>
+        controlBand="content-sized"
+        label={
+          <FieldRadiogroupLabel
+            id={labelId}
+            label={label}
+            required={required}
+            info={info}
+            size={size}
+          />
+        }
+        control={
+          <ChooseCountGroup labelId={labelId} disabled={disabled}>
+            {children({ legendId: labelId, chooseId, hintId, errorId })}
+          </ChooseCountGroup>
+        }
+      />
+    </Field.Root>
+  )
+}
+
+function ChooseCountGroup({
+  labelId,
+  disabled,
+  children,
+}: {
+  labelId: string
+  disabled?: boolean
+  children: React.ReactNode
+}) {
+  const { describedBy, hasError } = useFieldRootContext('ChooseCountFieldShell')
+  return (
+    <div
+      role="group"
+      aria-labelledby={labelId}
+      aria-describedby={describedBy}
+      aria-invalid={hasError || undefined}
+      aria-disabled={disabled || undefined}
+    >
+      {children}
     </div>
   )
 }

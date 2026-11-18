@@ -18,10 +18,6 @@ const difficultyOptions = [
   { value: 'dangerous', label: 'Dangerous' },
 ]
 
-function fieldsetChromeShell(fieldset: HTMLElement | null | undefined): HTMLElement | null {
-  return fieldset?.parentElement?.parentElement ?? null
-}
-
 describe('ChipsField', () => {
   it('renders label and all options', () => {
     render(
@@ -40,7 +36,7 @@ describe('ChipsField', () => {
   })
 
   describe('introText lead-in', () => {
-    it('keeps the concise label in an sr-only legend while introText is visible', () => {
+    it('keeps the concise label in an sr-only name while introText is visible', () => {
       const { container } = render(
         <ChipsField
           id="granted-languages"
@@ -53,9 +49,10 @@ describe('ChipsField', () => {
         />,
       )
 
-      const legend = container.querySelector('legend')
-      expect(legend).toHaveClass('sr-only')
-      expect(legend).toHaveTextContent('Granted languages')
+      const name = container.querySelector('#granted-languages-label')
+      expect(name).toHaveClass('sr-only')
+      expect(name).toHaveTextContent('Granted languages')
+      expect(container.querySelector('legend')).toBeNull()
 
       const intro = screen.getByText('Characters receive these languages:')
       expect(intro).toBeVisible()
@@ -79,7 +76,8 @@ describe('ChipsField', () => {
 
       expect(screen.getByText('Pick all starting languages.')).toBeInTheDocument()
       expect(screen.getByText('Characters receive these languages:')).toBeInTheDocument()
-      expect(container.querySelector('legend')).toHaveClass('sr-only')
+      expect(container.querySelector('#granted-languages-label')).toHaveClass('sr-only')
+      expect(container.querySelector('legend')).toBeNull()
     })
 
     it('renders introText inside anatomy rows', () => {
@@ -246,12 +244,11 @@ describe('ChipsField', () => {
       />,
     )
     const error = screen.getByRole('alert')
-    const fieldset = document.querySelector('fieldset')
+    const group = screen.getByRole('group', { name: 'Play Style' })
     expect(error).toHaveTextContent('Choose at least one.')
-    expect(fieldset?.tagName).toBe('FIELDSET')
-    expect(fieldsetChromeShell(fieldset)).toContainElement(error)
-    expect(fieldset?.contains(error)).toBe(false)
-    expect(error.parentElement).toHaveClass('gap-y-1.5')
+    expect(document.querySelector('fieldset')).toBeNull()
+    expect(error.closest('[data-field-message-region]')).toBeTruthy()
+    expect(group.contains(error)).toBe(false)
   })
 
   it('uses compact error text for sm fields', () => {
@@ -352,7 +349,7 @@ describe('ChipsField', () => {
         value={[]}
       />,
     )
-    expect(screen.getByText('Play Style').closest('div')).toHaveClass('text-style-field-label-md')
+    expect(document.getElementById('play-style-label')).toHaveClass('text-style-field-label-md')
   })
 
   it('keeps below-label hint visible when invalid', () => {
@@ -383,13 +380,14 @@ describe('ChipsField', () => {
       />,
     )
 
-    const fieldset = container.querySelector('fieldset')
-    const legend = screen.getByText('Primary abilities').closest('legend')
-    const chipWrap = legend?.nextElementSibling
+    const name = container.querySelector('#abilities-label')
+    const group = screen.getByRole('group', { name: 'Primary abilities' })
 
-    expect(fieldset).toHaveClass('gap-y-1.5')
-    expect(legend).toHaveClass('contents')
-    expect(chipWrap).toHaveClass('flex', 'flex-wrap', 'gap-2')
+    expect(container.querySelector('legend')).toBeNull()
+    expect(name).toHaveClass('text-style-field-label-md')
+    expect(name?.closest('[data-field-label-region]')).toBeTruthy()
+    expect(group).toHaveAttribute('aria-labelledby', 'abilities-label')
+    expect(group.querySelector('.flex.flex-wrap.gap-2')).toBeTruthy()
   })
 
   it('keeps the required marker inline with the label when a below-label hint is present', () => {
@@ -405,8 +403,8 @@ describe('ChipsField', () => {
       />,
     )
 
-    const cluster = screen.getByText('Progression')
-    expect(cluster).toHaveClass('inline-flex')
+    const cluster = document.getElementById('progression-label')
+    expect(cluster).toHaveClass('text-style-field-label-md')
     expect(cluster).toContainElement(screen.getByText('*'))
     expect(cluster).not.toContainElement(
       screen.getByText('Choose how this class gains spell slots.'),
@@ -455,8 +453,8 @@ describe('ChipsField', () => {
     await expectNoAxeViolations(container)
   })
 
-  it('renders panel chrome around legend, hint, and chips, with error outside the shell', () => {
-    const { container } = render(
+  it('renders panel chrome around the label, hint, and chips', () => {
+    render(
       <ChipsField
         id="alignment"
         label="Alignment"
@@ -467,20 +465,17 @@ describe('ChipsField', () => {
       />,
     )
 
-    const fieldset = container.querySelector('fieldset')!
-    const legend = fieldset.querySelector('legend')
-    const shell = fieldsetChromeShell(fieldset)
+    const group = screen.getByRole('radiogroup', { name: 'Alignment' })
+    const shell = group.closest('.rounded-md')
 
-    expect(legend).toHaveTextContent('Alignment')
-    expect(fieldset).toHaveClass('border-0')
-    expect(fieldset).not.toHaveClass('rounded-md')
-    expect(shell).toHaveClass('rounded-md', 'border', 'bg-surface-subtle')
+    expect(document.querySelector('legend')).toBeNull()
+    expect(shell).toHaveClass('border', 'bg-surface-subtle')
     expect(shell).toHaveTextContent('Pick one')
-    expect(fieldset.querySelector('button')).toBeTruthy()
+    expect(group.querySelector('button')).toBeTruthy()
   })
 
-  it('puts container chrome on a wrapper so the legend is not on the fieldset border', () => {
-    const { container } = render(
+  it('puts container chrome on a wrapper around the field label', () => {
+    render(
       <ChipsField
         id="abilities"
         label="Primary abilities"
@@ -491,17 +486,17 @@ describe('ChipsField', () => {
       />,
     )
 
-    const fieldset = container.querySelector('fieldset')!
-    const shell = fieldsetChromeShell(fieldset)
+    const group = screen.getByRole('group', { name: 'Primary abilities' })
+    const shell = group.closest('.rounded-md')
 
-    expect(fieldset).toHaveClass('border-0')
-    expect(shell).toHaveClass('rounded-md', 'border', 'bg-field-container', 'p-4')
+    expect(document.querySelector('legend')).toBeNull()
+    expect(shell).toHaveClass('border', 'bg-field-container', 'p-4')
     expect(shell).toHaveTextContent('Primary abilities')
     expect(shell).toHaveTextContent('Select up to 2 abilities')
   })
 
-  it('keeps validation errors outside panel chrome', () => {
-    const { container } = render(
+  it('keeps validation errors in the message region inside panel chrome', () => {
+    render(
       <ChipsField
         id="alignment"
         label="Alignment"
@@ -512,14 +507,15 @@ describe('ChipsField', () => {
       />,
     )
 
-    const fieldset = container.querySelector('fieldset')
-    const error = container.querySelector('[role="alert"]')
-    const shell = fieldsetChromeShell(fieldset)
+    const group = screen.getByRole('radiogroup', { name: 'Alignment' })
+    const error = screen.getByRole('alert')
+    const shell = group.closest('.rounded-md')
 
-    expect(shell).toHaveClass('rounded-md', 'border', 'bg-surface-subtle')
+    expect(shell).toHaveClass('border', 'bg-surface-subtle')
     expect(error).toHaveTextContent('Select an alignment.')
-    expect(fieldset?.contains(error)).toBe(false)
+    expect(error.closest('[data-field-message-region]')).toBeTruthy()
     expect(shell?.contains(error)).toBe(true)
+    expect(group.contains(error)).toBe(false)
   })
 
   it('participates in anatomy rows with three-region layout and no fieldset', () => {

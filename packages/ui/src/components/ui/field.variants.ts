@@ -23,7 +23,7 @@ import { type FieldSizeToken } from './field-sizing.variants'
  * - `fieldGroupFlexStackClasses` — wider 32px gap stack for collapse-prone fieldset siblings (embedded editors, …)
  * - `fieldSetResetClasses` — strip UA fieldset chrome from leaf field wrappers
  * - `fieldSetChromeContainClasses` — column stack for borderless leaf fieldset anatomy
- * - `fieldSetInFlowLegendClasses` — reset UA legend padding on chip / choose-count captions
+ * - `fieldSetInFlowLegendClasses` — structural contents legends (not leaf field labels)
  * - `formSectionStackClasses` — vertical gap between top-level form sections
  * - `fieldRowLayoutClasses` — deprecated alias (`gap-6`); prefer `resolveFieldRowClasses`
  * - `fieldChipWrapGapClasses` — chip pill row gap only (no vertical pad) inside `ChipsField`

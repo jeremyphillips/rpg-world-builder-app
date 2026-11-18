@@ -4,20 +4,19 @@ import * as React from 'react'
 
 import { resolveFieldAnatomyWidth, type FieldChrome } from './field-chrome.variants'
 import { FieldAnatomyRowShell } from './field-anatomy-row-shell.client'
-import { Field, type FieldSize } from './field.client'
+import { Field, type FieldSize, useFieldRootContext } from './field.client'
 import { useFieldRowParticipation } from './field-row-anatomy.context'
-import { FieldsetChromeAnatomy, FieldsetChromeFrame } from './fieldset-chrome-anatomy'
+import { FieldLayout } from './field-layout'
 import {
   fieldAnatomyStackVariants,
   fieldChipWrapGapClasses,
   fieldLabelVariants,
   type FieldHintPosition,
 } from './field.variants'
-import { FieldLegendInfoSibling, FieldLegendLabel } from './field-label-content'
+import { FieldRadiogroupLabel } from './field-label-content'
 import type { FieldOption } from '../../form/field-config/field-options'
 import type { FieldWidth } from './field-control.variants'
 import type { SelectFieldValueProps } from './select-field-value-props'
-import { fieldHasValidationError, resolveFieldDescribedBy } from './field-validation-props'
 import type { FieldLabelPresentationProps } from './field-label-props'
 import { Chip, type ChipSize } from './chip.client'
 import { ChipGroup } from './chip-group.client'
@@ -186,21 +185,8 @@ export function ChipsField({
   const inAnatomyRow = useFieldRowParticipation()
   const resolvedChipSize = chipSize ?? controlSize ?? size
   const resolvedHintPosition = inAnatomyRow ? 'below-control' : hintPosition
-  const legendId = `${id}-legend`
-  const hintId = `${id}-hint`
-  const errorId = `${id}-error`
-  const hasError = fieldHasValidationError(error, invalid)
-  const resolvedDescribedBy = resolveFieldDescribedBy(
-    error,
-    invalid,
-    hint,
-    describedBy,
-    errorId,
-    hintId,
-    hintPosition,
-  )
+  const labelId = `${id}-label`
   const rootWidth = resolveFieldAnatomyWidth(width, chrome)
-  const outerWidthClass = rootWidth === 'auto' ? 'w-auto' : 'w-full'
 
   const chipsOptions = (labelledBy: string, semanticRole?: 'group' | 'radiogroup') => (
     <ChipsFieldOptions
@@ -251,53 +237,73 @@ export function ChipsField({
         chrome={chrome}
         controlBand="content-sized"
       >
-        {({ labelId }) =>
-          labelId
-            ? chipsControl(labelId, multiple ? 'group' : 'radiogroup')
-            : chipsControl(`${id}-legend`, multiple ? 'group' : 'radiogroup')
+        {({ labelId: rowLabelId }) =>
+          rowLabelId
+            ? chipsControl(rowLabelId, multiple ? 'group' : 'radiogroup')
+            : chipsControl(labelId, multiple ? 'group' : 'radiogroup')
         }
       </FieldAnatomyRowShell>
     )
   }
 
   return (
-    <div className={outerWidthClass}>
-      <FieldsetChromeFrame
+    <Field.Root
+      id={id}
+      error={error}
+      invalid={invalid}
+      describedBy={describedBy}
+      hint={hint}
+      hintPosition={hintPosition}
+      required={required}
+      size={size}
+      controlSize={controlSize}
+      width={rootWidth}
+      labelVisibility={labelVisibility}
+      anatomy
+    >
+      <FieldLayout
+        wrapControl={false}
         chrome={chrome}
         size={size}
-        hint={hint}
-        hintPosition={hintPosition}
-        hintId={hintId}
-        error={error}
-        errorId={errorId}
-        legendSrOnly={labelVisibility === 'srOnly'}
-        legendHasInfo={info != null}
-        fieldsetProps={{
-          id,
-          'aria-describedby': resolvedDescribedBy,
-          'aria-invalid': hasError || undefined,
-          disabled,
-          onBlur,
-        }}
-      >
-        <FieldsetChromeAnatomy
-          size={size}
-          hintPosition={hintPosition}
-          hint={hint}
-          hintId={hintId}
-          legend={
-            <FieldLegendLabel
-              legendId={legendId}
-              label={label}
-              labelVisibility={labelVisibility}
-              required={required}
-            />
-          }
-        >
-          {info != null ? <FieldLegendInfoSibling label={label} info={info} /> : null}
-          {chipsControl(legendId)}
-        </FieldsetChromeAnatomy>
-      </FieldsetChromeFrame>
+        controlSize={controlSize}
+        controlBand="content-sized"
+        label={
+          <FieldRadiogroupLabel
+            id={labelId}
+            label={label}
+            required={required}
+            info={info}
+            size={size}
+          />
+        }
+        control={
+          <ChipsFieldGroup labelId={labelId} multiple={multiple}>
+            {chipsControl(labelId)}
+          </ChipsFieldGroup>
+        }
+      />
+    </Field.Root>
+  )
+}
+
+function ChipsFieldGroup({
+  labelId,
+  multiple,
+  children,
+}: {
+  labelId: string
+  multiple: boolean
+  children: React.ReactNode
+}) {
+  const { describedBy, hasError } = useFieldRootContext('ChipsField')
+  return (
+    <div
+      role={multiple ? 'group' : 'radiogroup'}
+      aria-labelledby={labelId}
+      aria-describedby={describedBy}
+      aria-invalid={hasError || undefined}
+    >
+      {children}
     </div>
   )
 }
@@ -305,19 +311,7 @@ export function ChipsField({
 /** Thin wrapper that wires `ChipsField` into the `Field.*` compound context.
  *  Use directly when you need the full label/hint/error compound layout. */
 export function ChipsFormField(props: ChipsFieldProps) {
-  return (
-    <Field.Root
-      id={props.id}
-      error={props.error}
-      hint={props.hint}
-      required={props.required}
-      width={resolveFieldAnatomyWidth(props.width, props.chrome)}
-      size={props.size}
-      controlSize={props.controlSize}
-    >
-      <ChipsField {...props} />
-    </Field.Root>
-  )
+  return <ChipsField {...props} />
 }
 
 export type { ChipSize } from './chip.lib'
