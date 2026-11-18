@@ -247,7 +247,6 @@ export const MONSTER_FORM_AVAILABILITY_ALL = 'All forms'
 export const MONSTER_FORM_AVAILABILITY_SELECTED = 'Only in selected forms'
 export const MONSTER_FORM_AVAILABILITY_FORMS_LABEL = 'Forms'
 export const MONSTER_FORM_AVAILABILITY_ORDER_HINT = 'Selection order is the heading order.'
-export const MONSTER_FORM_AVAILABILITY_PREVIEW_LABEL = 'Heading preview'
 
 export function formatMonsterMissingFormLabel(id: string): string {
   return `Missing form (${id})`

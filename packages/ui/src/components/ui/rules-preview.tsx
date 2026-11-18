@@ -22,6 +22,8 @@ export type RulesPreviewContent =
 
 export type RulesPreviewProps = {
   label: string
+  /** Qualified stat-block heading between the eyebrow and body. */
+  title?: string
   context?: string
   content: RulesPreviewContent
 }
@@ -75,7 +77,7 @@ function RulesPreviewBody({ content }: { content: RulesPreviewContent }) {
 }
 
 /** Compact rules panel. Callers supply the label and one content shape. */
-export function RulesPreview({ label, context, content }: RulesPreviewProps) {
+export function RulesPreview({ label, title, context, content }: RulesPreviewProps) {
   if (!rulesPreviewHasContent(content)) return null
 
   return (
@@ -89,6 +91,7 @@ export function RulesPreview({ label, context, content }: RulesPreviewProps) {
             </Text>
           ) : null}
         </div>
+        {title ? <Text variant="emphasis">{title}</Text> : null}
         <RulesPreviewBody content={content} />
       </div>
     </Panel>

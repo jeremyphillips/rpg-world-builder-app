@@ -140,4 +140,50 @@ describe('MonsterActionAttackSummary', () => {
     expect(screen.getByText('Configure Attack bonus to calculate this attack.')).toBeInTheDocument()
     expect(screen.queryByText(/Attack summary unavailable/i)).not.toBeInTheDocument()
   })
+
+  it('shows a qualified preview title only when the action is form-restricted', () => {
+    const restricted: MonsterActionDraftRow = {
+      ...bite,
+      onlyInFormIds: ['bear'],
+    }
+
+    function RestrictedHost() {
+      const form = useForm<MonsterFormValues>({
+        defaultValues: monsterFormTestValues({
+          name: 'Werebear',
+          challengeRating: '1',
+          abilityScores: { str: 16, dex: 14, con: 13, int: 8, wis: 11, cha: 8 },
+          forms: {
+            profileFormId: 'profile',
+            trueForm: { kind: 'profile' },
+            definedForms: [{ id: 'bear', name: 'Bear' }],
+          },
+          actions: [restricted] as MonsterFormValues['actions'],
+        }),
+      })
+      const ctx = {
+        entityCatalogLayer: 'homebrew',
+        equipmentCatalogStatus: 'ready',
+        equipmentCatalogById: new Map(),
+      } as ContentFormCtx
+
+      return (
+        <FormProvider {...form}>
+          <MonsterActionAttackSummary ctx={ctx} action={restricted} />
+        </FormProvider>
+      )
+    }
+
+    render(<RestrictedHost />)
+
+    const title = screen.getByText('Bite (Bear Form Only)')
+    expect(title).toHaveClass('text-style-emphasis')
+    expect(title.closest('.ui-panel')).toHaveTextContent('Attack preview')
+  })
+
+  it('omits a preview title when the action is available in all forms', () => {
+    render(<Host action={bite} />)
+    const panel = screen.getByText('Attack preview').closest('.ui-panel')
+    expect(panel?.querySelector('.text-style-emphasis')).toBeNull()
+  })
 })

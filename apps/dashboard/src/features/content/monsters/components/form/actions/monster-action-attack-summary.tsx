@@ -10,6 +10,7 @@ import {
   resolveMonsterFormActionAttackProfile,
 } from '../../../lib/actions/previews/monster-action-attack-summary'
 import { MONSTER_ACTION_ATTACK_PREVIEW_LABEL } from '../../../lib/monster-form-labels'
+import { useMonsterQualifiedPreviewTitle } from '../../../lib/monster-qualified-preview-title'
 import type { MonsterActionDraftRow } from '../../../lib/actions/monster-action-presets'
 import type { MonsterFormValues } from '../../../lib/monster-form-values'
 
@@ -36,12 +37,16 @@ export function MonsterActionAttackSummary({
     )
   }, [action.id, action.kind, ctx, values])
 
+  const draft = values ? findMonsterFormActionDraft(values, ctx, action.id) : undefined
+  const title = useMonsterQualifiedPreviewTitle(draft)
+
   if (!preview) return null
 
   if (preview.status === 'unavailable') {
     return (
       <RulesPreview
         label={MONSTER_ACTION_ATTACK_PREVIEW_LABEL}
+        title={title}
         content={{ kind: 'guidance', message: preview.guidance }}
       />
     )
@@ -50,6 +55,7 @@ export function MonsterActionAttackSummary({
   return (
     <RulesPreview
       label={MONSTER_ACTION_ATTACK_PREVIEW_LABEL}
+      title={title}
       context={preview.modeCaption}
       content={{ kind: 'metadata', rows: preview.rows }}
     />

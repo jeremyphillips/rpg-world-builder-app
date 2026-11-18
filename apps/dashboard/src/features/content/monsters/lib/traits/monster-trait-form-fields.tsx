@@ -9,6 +9,7 @@ import type { FieldVisibility, FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { useMasterDetailRowPrefix } from '../../../lib/master-detail/use-master-detail-row-prefix'
+import { useMonsterQualifiedPreviewTitle } from '../monster-qualified-preview-title'
 import {
   advisoriesForRowPath,
   monsterFormAdvisoryTone,
@@ -24,6 +25,8 @@ import {
   MONSTER_RULES_TEXT_LABEL,
   MONSTER_TRAIT_PREVIEW_LABEL,
 } from '../monster-form-labels'
+import { useWatch } from 'react-hook-form'
+
 import {
   monsterTraitPresetFields,
   waterBreathingDurationEnabled,
@@ -114,13 +117,24 @@ function isTemplateRow(row: unknown): row is { templateId: string; config?: unkn
   )
 }
 
+function MonsterTraitRulesPreview({ text }: { text: string }) {
+  const rowPrefix = useMasterDetailRowPrefix()
+  const row = useWatch({ name: rowPrefix as never })
+  const title = useMonsterQualifiedPreviewTitle(row)
+  return (
+    <RulesPreview
+      label={MONSTER_TRAIT_PREVIEW_LABEL}
+      title={title}
+      content={{ kind: 'prose', text }}
+    />
+  )
+}
+
 function traitPreviewSlot(text: string): FormItem {
   return {
     kind: 'slot',
     name: 'traitPreview',
-    render: () => (
-      <RulesPreview label={MONSTER_TRAIT_PREVIEW_LABEL} content={{ kind: 'prose', text }} />
-    ),
+    render: () => <MonsterTraitRulesPreview text={text} />,
   }
 }
 

@@ -78,7 +78,7 @@ describe('MonsterFormAvailabilityControl', () => {
     await user.click(screen.getByRole('checkbox', { name: 'Bear-humanoid hybrid' }))
 
     expect(screen.getByLabelText('restriction')).toHaveTextContent('["bear","hybrid"]')
-    expect(screen.getByText('Rend (Bear or Bear-humanoid hybrid Form Only)')).toBeInTheDocument()
+    expect(screen.queryByText('Heading preview')).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('radio', { name: 'All forms' }))
     expect(screen.getByLabelText('restriction')).toHaveTextContent('null')
