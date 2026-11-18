@@ -79,6 +79,18 @@ export function templateDerivedName(row: {
   } as ContentTrait)
 }
 
+/** Preview base name: resolved trait title, then the editor fallback for an empty custom trait. */
+export function monsterTraitPreviewBaseName(
+  row: unknown,
+  monsterName: string,
+  rows: readonly unknown[],
+): string {
+  const resolved = monsterTraitResolvedTitle(row, monsterName)
+  if (resolved) return resolved
+  if (!isRecord(row) || typeof row.id !== 'string' || !row.id) return ''
+  return monsterCustomTraitFallbacks(rows, monsterName).get(row.id) ?? ''
+}
+
 export function monsterTraitResolvedTitle(row: unknown, monsterName: string): string {
   if (isTemplateRow(row)) {
     const override = storedText(row.nameOverride)

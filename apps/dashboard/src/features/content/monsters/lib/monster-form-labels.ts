@@ -313,9 +313,7 @@ export function resolveMonsterFormAvailabilityHint(
   }
 }
 
-export function formatMonsterMissingFormLabel(id: string): string {
-  return `Missing form (${id})`
-}
+export { formatMonsterMissingFormLabel } from '@rpg/contracts'
 
 export const MONSTER_FORM_NOTES_LABEL = 'Notes'
 export const MONSTER_FORM_NOTES_HINT = 'Completes the sentence: While in this form, …'

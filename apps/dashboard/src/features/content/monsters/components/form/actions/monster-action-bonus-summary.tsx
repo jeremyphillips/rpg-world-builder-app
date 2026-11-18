@@ -6,12 +6,13 @@ import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form
 import { buildMonsterActionBonusPreview } from '../../../lib/actions/previews/monster-action-bonus-summary'
 import type { MonsterActionDraftRow } from '../../../lib/actions/monster-action-presets'
 import { MONSTER_BONUS_ACTION_PREVIEW_LABEL } from '../../../lib/monster-form-labels'
-import { useMonsterQualifiedPreviewTitle } from '../../../lib/monster-qualified-preview-title'
+import { useMonsterActionPreviewTitle } from '../../../lib/monster-qualified-preview-title'
 import type { MonsterFormValues } from '../../../lib/monster-form-values'
 
 const BONUS_PREVIEW_KINDS = new Set(['leap', 'teleport', 'take-actions'])
 
 export function MonsterActionBonusSummary({
+  ctx,
   action,
 }: {
   ctx: ContentFormCtx
@@ -34,7 +35,12 @@ export function MonsterActionBonusSummary({
   }, [action.id, action.kind, values])
 
   const draft = (values?.bonusActions ?? []).find((row) => row.id === action.id)
-  const title = useMonsterQualifiedPreviewTitle(draft)
+  const title = useMonsterActionPreviewTitle(
+    draft as MonsterActionDraftRow | undefined,
+    values,
+    ctx,
+    'bonusActions',
+  )
 
   if (!preview) return null
 

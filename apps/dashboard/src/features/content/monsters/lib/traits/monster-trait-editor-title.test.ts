@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest'
 
 import { TRAIT_MASTER_DETAIL_ITEM_NOUN } from '../../../species/lib/species-trait-form-labels'
 import { resolveMasterDetailRowTitle } from '../../../lib/master-detail/master-detail-row-title'
-import { monsterCustomTraitFallbacks } from './monster-trait-editor-title'
+import {
+  monsterCustomTraitFallbacks,
+  monsterTraitPreviewBaseName,
+} from './monster-trait-editor-title'
 import { resolveMonsterTraitRowTitleConfig } from './monster-trait-row-title'
 
 describe('monster trait editor titles', () => {
@@ -43,6 +46,14 @@ describe('monster trait editor titles', () => {
         rowReady: true,
       }).displayTitle,
     ).toBe('Trait 1')
+  })
+
+  it('uses the preset display name for a preview and the editor fallback for an empty custom trait', () => {
+    const preset = { id: 'pack', preset: 'pack-tactics' }
+    const custom = { id: 'note', kind: 'custom', name: '' }
+    const rows = [preset, custom]
+    expect(monsterTraitPreviewBaseName(preset, 'Owl', rows)).toBe('Pack Tactics')
+    expect(monsterTraitPreviewBaseName(custom, 'Owl', rows)).toBe('Trait 1')
   })
 
   it('auto-edits a new empty custom trait and keeps template overrides optional', () => {

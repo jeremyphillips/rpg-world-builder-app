@@ -10,7 +10,18 @@ Derived values follow SRD 5.2.1 table math unless the body explicitly overrides 
 
 - **Natural weapons** are always treated as proficient for attack bonus.
 - **Weapon actions** use equipment catalog rows; names fall back from action → instance custom name → equipment name.
-- **Limited use** on any kind is optional. An absent limit is at will. A present limit is rendered in the heading from `formatLimitedUseNotation` (`stat-block` style), for example `(Recharge 5–6)` or `(Recharges after a Short or Long Rest)`. `formatMonsterQualifiedHeading` appends a form qualifier in the same parenthesis when `onlyInFormIds` is set: `(Recharge 5–6; Vampire Form Only)`. The qualifier lists form names in stored id order. An unrestricted row has no form qualifier.
+- **Limited use** on any kind is optional. An absent limit is at will. A present limit is rendered in the heading from `formatLimitedUseNotation` (`stat-block` style), for example `(Recharge 5–6)` or `(Recharges after a Short or Long Rest)`. `resolveMonsterEntryHeading` resolves the base name's form qualifier from `onlyInFormIds`. `formatMonsterQualifiedHeading` appends that qualifier in the same parenthesis when the row is restricted: `(Recharge 5–6; Vampire Form Only)`. The qualifier lists form names in stored id order. An absent restriction and an empty `onlyInFormIds` list both omit the qualifier. An unknown id prints `Missing form (${id})`. A known form with a blank name prints `Untitled form`. Spell-entry headings still come from `formatMonsterSpellEntry` and do not yet include the form qualifier.
+
+## Heading rollout
+
+Form previews for attacks, multiattack, spells, parry, bonus actions, and traits pass `resolveMonsterEntryHeading` into `RulesPreview.title`. The base name is the existing action identity or trait display name, with the editor list title only when that name is empty. Those editor titles are not stored. Detail and stat-block rows use the same resolver inside `withQualifiedHeading`, and still pass limited use into `formatMonsterQualifiedHeading`. Master-detail lists keep the editor title and omit the form qualifier.
+
+Still separate:
+
+- Shape-shift, special, save, and action-reference previews have no `RulesPreview` title yet. Their detail headings already use `withQualifiedHeading`, except action references, which use `actionReferenceHeadings`.
+- Spell detail headings omit the form qualifier until `formatMonsterSpellEntry` accepts it. Wrapping that heading would add a second parenthesis.
+- Bonus-action preview HTML still repeats a limited-use heading in the body.
+- Editor ordinals such as `Attack 2` stay off the published stat block.
 - **Saving-throw actions** (`kind: 'save'`) do not store the printed sentence. `formatMonsterSaveAction` builds the heading with `formatMonsterLimitedUseHeading` and the body from `abilitySaveDc`, `formatAreaGeometry(..., 'stat-block')`, stat-block damage averages, and the envelope outcomes. Hell Hound Fire Breath is the seed parity case.
 - **Multiattack** (`kind: 'multiattack'`) does not store the printed sentence. `formatMonsterMultiattack` names the monster and the referenced actions. Weapon names come from the equipment catalog. Several ids in one step read as "in any combination." `description`, when present, is appended.
 - **Action reference** (`kind: 'action-reference'`) does not store the printed sentence. `formatMonsterActionReference` names the monster and the Actions rows. Several attack ids read as "makes one A or B attack." One save or special ability reads as "uses" that name. A missing id prints nothing. Legendary rows may set `movement.allowance` to `half-speed` or `speed`, and `withoutOpportunityAttacks` adds "without provoking Opportunity Attacks." A reaction reference stores one id and may append authored additional rules after that sentence.

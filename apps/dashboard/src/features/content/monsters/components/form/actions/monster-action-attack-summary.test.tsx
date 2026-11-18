@@ -181,9 +181,24 @@ describe('MonsterActionAttackSummary', () => {
     expect(title.closest('.ui-panel')).toHaveTextContent('Attack preview')
   })
 
-  it('omits a preview title when the action is available in all forms', () => {
+  it('shows the action name when the action is available in all forms', () => {
     render(<Host action={bite} />)
-    const panel = screen.getByText('Attack preview').closest('.ui-panel')
-    expect(panel?.querySelector('.text-style-emphasis')).toBeNull()
+    const title = screen.getByText('Bite')
+    expect(title).toHaveClass('text-style-emphasis')
+    expect(title.closest('.ui-panel')).toHaveTextContent('Attack preview')
+  })
+
+  it('uses the preset name when the draft has no stored name', () => {
+    const preset: MonsterActionDraftRow = {
+      id: 'bite',
+      kind: 'natural-weapon',
+      preset: 'bite',
+      mode: 'melee',
+      damageType: 'piercing',
+      damage: { dice: { count: 1, faces: 8 } },
+    }
+    render(<Host action={preset} />)
+    expect(screen.getByText('Bite')).toHaveClass('text-style-emphasis')
+    expect(screen.queryByText('Untitled')).not.toBeInTheDocument()
   })
 })

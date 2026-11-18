@@ -9,7 +9,7 @@ import type { FieldVisibility, FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { useMasterDetailRowPrefix } from '../../../lib/master-detail/use-master-detail-row-prefix'
-import { useMonsterQualifiedPreviewTitle } from '../monster-qualified-preview-title'
+import { useMonsterTraitPreviewTitle } from '../monster-qualified-preview-title'
 import {
   advisoriesForRowPath,
   monsterFormAdvisoryTone,
@@ -120,7 +120,7 @@ function isTemplateRow(row: unknown): row is { templateId: string; config?: unkn
 function MonsterTraitRulesPreview({ text }: { text: string }) {
   const rowPrefix = useMasterDetailRowPrefix()
   const row = useWatch({ name: rowPrefix as never })
-  const title = useMonsterQualifiedPreviewTitle(row)
+  const title = useMonsterTraitPreviewTitle(row)
   return (
     <RulesPreview
       label={MONSTER_TRAIT_PREVIEW_LABEL}

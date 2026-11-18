@@ -492,6 +492,36 @@ describe('monster-display', () => {
       'Prowl (Bear-humanoid hybrid or Bear Form Only)',
     )
   })
+
+  it('labels an unresolved form restriction instead of printing the raw id', () => {
+    const monster = {
+      ...pickMonster('kobold-warrior'),
+      name: 'Werebear',
+      forms: {
+        profileFormId: 'profile',
+        trueForm: { kind: 'profile' },
+        definedForms: [{ id: 'bear', name: 'Bear' }],
+      },
+      actions: [
+        {
+          id: 'bite',
+          kind: 'special',
+          name: 'Bite',
+          description: '<p>Bite.</p>',
+          onlyInFormIds: ['missing'],
+        },
+      ],
+    } as Monster
+    const viewModel = buildMonsterDetailViewModel({
+      monster,
+      creatureTypeLabel: 'Humanoid',
+      equipmentById: new Map(),
+      catalogState: 'ready',
+    })
+    expect(viewModel.actions.find((action) => action.id === 'bite')?.name).toBe(
+      'Bite (Missing form (missing) Form Only)',
+    )
+  })
 })
 
 it('prints resolved class labels in the shared detail classification phrase', () => {

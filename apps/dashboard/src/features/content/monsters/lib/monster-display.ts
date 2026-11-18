@@ -39,13 +39,12 @@ import {
   formatMonsterTeleport,
   analyzeCreatureFormDifferences,
   formatFormSpeechQualifier,
-  formatMonsterFormQualifier,
   formatMonsterForms,
   formatMonsterQualifiedHeading,
+  resolveMonsterEntryHeading,
   formatMonsterShapeShift,
   formatMonsterSpeedStatRow,
   monsterHasFormRestrictions,
-  resolveCreatureFormsContext,
   resolveFormDifferencesPresentation,
   shapeShiftRows,
   monsterActionSectionRows,
@@ -267,22 +266,6 @@ function findAttackLine(
   return derived?.attacks.find((line) => line.section === section && line.id === actionId)
 }
 
-function formNamesForIds(monster: Monster, ids: readonly string[] | undefined): string[] {
-  if (!ids?.length || !monster.forms) return []
-  const context = resolveCreatureFormsContext(monster.forms, monster.name)
-  const named = new Map<string, string>()
-  if (context.status !== 'invalid') {
-    if (context.profile?.name.trim()) named.set(context.profile.id, context.profile.name.trim())
-    for (const form of context.definedForms) {
-      if (form.name.trim()) named.set(form.id, form.name.trim())
-    }
-    for (const form of context.eligibleForms) {
-      if (form.name.trim()) named.set(form.id, form.name.trim())
-    }
-  }
-  return ids.map((id) => named.get(id) ?? id)
-}
-
 function headingSource(row: unknown): {
   limitedUse: unknown
   onlyInFormIds: readonly string[] | undefined
@@ -298,9 +281,15 @@ function headingSource(row: unknown): {
 function withQualifiedHeading(monster: Monster, name: string, row: unknown): string {
   const source = headingSource(row)
   const parsed = limitedUseSchema.safeParse(source.limitedUse)
-  return formatMonsterQualifiedHeading(name, {
+  const heading = resolveMonsterEntryHeading({
+    name,
+    onlyInFormIds: source.onlyInFormIds,
+    forms: monster.forms,
+    creatureName: monster.name,
+  })
+  return formatMonsterQualifiedHeading(heading.name, {
     limitedUse: parsed.success ? parsed.data : undefined,
-    formQualifier: formatMonsterFormQualifier(formNamesForIds(monster, source.onlyInFormIds)),
+    formQualifier: heading.formQualifier,
   })
 }
 
