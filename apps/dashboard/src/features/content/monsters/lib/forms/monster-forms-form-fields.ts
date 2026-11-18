@@ -13,7 +13,8 @@ import {
   MONSTER_FORM_NOTES_LABEL,
   MONSTER_FORM_SPEECH_LABEL,
   MONSTER_FORMS_ADD_LABEL,
-  MONSTER_FORMS_HEADING,
+  MONSTER_SHAPE_SHIFTING_DESCRIPTION,
+  MONSTER_SHAPE_SHIFTING_HEADING,
   MONSTER_TRUE_FORM_HEADING,
 } from '../monster-form-labels'
 
@@ -44,14 +45,17 @@ export function monsterFormsSectionFields(ctx: ContentFormCtx): FormItem[] {
   return [
     {
       kind: 'group',
-      heading: { label: MONSTER_FORMS_HEADING },
+      heading: {
+        label: MONSTER_SHAPE_SHIFTING_HEADING,
+        hint: MONSTER_SHAPE_SHIFTING_DESCRIPTION,
+      },
       disclosure: {
         variant: 'inline',
-        openLabel: MONSTER_FORMS_HEADING,
-        closeLabel: MONSTER_FORMS_HEADING,
+        openLabel: MONSTER_SHAPE_SHIFTING_HEADING,
+        closeLabel: MONSTER_SHAPE_SHIFTING_HEADING,
         summaryDependsOn: ['forms'],
         resolveSummary: (values) => ({
-          primary: values.forms ? MONSTER_FORMS_HEADING : MONSTER_FORMS_ADD_LABEL,
+          primary: values.forms ? MONSTER_SHAPE_SHIFTING_HEADING : MONSTER_FORMS_ADD_LABEL,
         }),
       },
       fields: [

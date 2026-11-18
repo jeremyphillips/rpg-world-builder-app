@@ -10,6 +10,8 @@ import { useMonsterFormsLifecycle } from '../../hooks/use-monster-forms-lifecycl
 import {
   MONSTER_FORM_ITEM_NOUN_LABEL,
   MONSTER_FORM_ITEM_NOUN_PLURAL,
+  MONSTER_DEFINED_FORM_DISPLAY_FALLBACK,
+  MONSTER_DEFINED_FORMS_LIST_HEADING,
   MONSTER_FORMS_ADD_FORM_LABEL,
   MONSTER_FORMS_ADD_LABEL,
   MONSTER_FORMS_REMOVE_LABEL,
@@ -124,13 +126,17 @@ export function MonsterFormsEditor({ ctx }: { ctx: ContentFormCtx }) {
         itemFields={resolver}
         resolveItemFields={resolveItemFields}
         itemNoun={MONSTER_FORM_ITEM_NOUN}
-        listTitle="Defined forms"
-        ariaLabel="Defined forms"
+        listTitle={MONSTER_DEFINED_FORMS_LIST_HEADING}
+        ariaLabel={MONSTER_DEFINED_FORMS_LIST_HEADING}
         addLabel={MONSTER_FORMS_ADD_FORM_LABEL}
         addControl={addControl}
         idPrefix="monster-defined-form"
         makeItemDefaults={makeDefaults}
-        rowTitle={{ strategy: 'authored', field: 'name' }}
+        rowTitle={{
+          strategy: 'authored',
+          field: 'name',
+          resolveFallback: () => MONSTER_DEFINED_FORM_DISPLAY_FALLBACK,
+        }}
         resolveListMeta={(mapCtx) => monsterDefinedFormListMeta(forms, mapCtx)}
       />
       <Button type="button" variant="ghost" onClick={lifecycle.requestRemoveAll}>

@@ -3,9 +3,15 @@ import { useFormContext, useWatch } from 'react-hook-form'
 
 import { useMonsterFormsLifecycle } from '../../hooks/use-monster-forms-lifecycle'
 import {
+  MONSTER_DEFINED_FORM_DISPLAY_FALLBACK,
   MONSTER_TRUE_FORM_DEFINED_EMPTY_HINT,
   MONSTER_TRUE_FORM_HEADING,
+  MONSTER_TRUE_FORM_KIND_DEFINED_LABEL,
+  MONSTER_TRUE_FORM_KIND_PROFILE_LABEL,
   MONSTER_TRUE_FORM_PROFILE_HINT,
+  MONSTER_TRUE_FORM_SELECT_HINT,
+  MONSTER_TRUE_FORM_SELECT_LABEL,
+  MONSTER_TRUE_FORM_SELECT_PLACEHOLDER,
 } from '../../lib/monster-form-labels'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
 
@@ -16,6 +22,10 @@ function trueFormKindRadioHint(
   if (kind === 'profile') return MONSTER_TRUE_FORM_PROFILE_HINT
   if (kind === 'defined' && definedFormCount === 0) return MONSTER_TRUE_FORM_DEFINED_EMPTY_HINT
   return undefined
+}
+
+function definedFormDisplayName(name: string | undefined): string {
+  return name?.trim() || MONSTER_DEFINED_FORM_DISPLAY_FALLBACK
 }
 
 export function MonsterTrueFormDesignation() {
@@ -36,11 +46,12 @@ export function MonsterTrueFormDesignation() {
       <RadioGroupField
         id="monster-true-form-kind"
         label={MONSTER_TRUE_FORM_HEADING}
+        labelVisibility="srOnly"
         hint={radioHint}
         value={forms.trueForm.kind}
         options={[
-          { value: 'profile', label: 'Creature profile' },
-          { value: 'defined', label: 'Defined form' },
+          { value: 'profile', label: MONSTER_TRUE_FORM_KIND_PROFILE_LABEL },
+          { value: 'defined', label: MONSTER_TRUE_FORM_KIND_DEFINED_LABEL },
         ]}
         onValueChange={(kind) =>
           lifecycle.requestDesignation(
@@ -51,14 +62,14 @@ export function MonsterTrueFormDesignation() {
       {forms.trueForm.kind === 'defined' && forms.definedForms.length > 0 ? (
         <SelectField
           id="monster-true-form-id"
-          label="Select form"
-          placeholder="Select a form"
+          label={MONSTER_TRUE_FORM_SELECT_LABEL}
+          placeholder={MONSTER_TRUE_FORM_SELECT_PLACEHOLDER}
           value={selectedId}
           options={forms.definedForms.map((form) => ({
             value: form.id,
-            label: form.name?.trim() || 'Untitled form',
+            label: definedFormDisplayName(form.name),
           }))}
-          hint="The selected form uses the creature's base statistics."
+          hint={MONSTER_TRUE_FORM_SELECT_HINT}
           error={selectorError}
           onValueChange={(formId) => lifecycle.requestDesignation({ kind: 'defined', formId })}
         />

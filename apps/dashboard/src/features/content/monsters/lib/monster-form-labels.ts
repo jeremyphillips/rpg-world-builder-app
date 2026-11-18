@@ -225,8 +225,19 @@ export function monsterActionSectionHeading(section: MonsterActionSection): stri
 
 export const MONSTER_ADD_LABEL = 'Add'
 
-export const MONSTER_FORMS_HEADING = 'Forms'
+export const MONSTER_SHAPE_SHIFTING_HEADING = 'Shape-shifting'
+export const MONSTER_SHAPE_SHIFTING_DESCRIPTION =
+  "Define the creature's forms and identify its true form."
+export const MONSTER_DEFINED_FORMS_LIST_HEADING = 'Defined forms'
+/** Display-only label for an unnamed defined form row or selector option — not persisted. */
+export const MONSTER_DEFINED_FORM_DISPLAY_FALLBACK = 'New form'
 export const MONSTER_TRUE_FORM_HEADING = 'True form'
+export const MONSTER_TRUE_FORM_KIND_PROFILE_LABEL = 'Creature profile'
+export const MONSTER_TRUE_FORM_KIND_DEFINED_LABEL = 'Defined form'
+export const MONSTER_TRUE_FORM_SELECT_LABEL = 'Select form'
+export const MONSTER_TRUE_FORM_SELECT_PLACEHOLDER = 'Select a form'
+export const MONSTER_TRUE_FORM_SELECT_HINT =
+  "The selected form uses the creature's base statistics."
 /** Shown on the true-form kind radio when Creature profile is selected. */
 export const MONSTER_TRUE_FORM_PROFILE_HINT =
   "Uses the creature's main statistics as its true form."

@@ -6,6 +6,11 @@ import { describe, expect, it } from 'vitest'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { buildMonsterTabs } from '../../lib/monster-form-fields'
+import {
+  MONSTER_DEFINED_FORM_DISPLAY_FALLBACK,
+  MONSTER_SHAPE_SHIFTING_DESCRIPTION,
+  MONSTER_SHAPE_SHIFTING_HEADING,
+} from '../../lib/monster-form-labels'
 import { monsterFormsSectionFields } from '../../lib/forms/monster-forms-form-fields'
 import { makeEmptyMonsterDefinedForm } from '../../lib/forms/monster-forms-form-values'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
@@ -19,7 +24,10 @@ describe('monster forms authoring architecture', () => {
     const section = monsterFormsSectionFields(ctx)[0]
     expect(section).toMatchObject({
       kind: 'group',
-      heading: { label: 'Forms' },
+      heading: {
+        label: MONSTER_SHAPE_SHIFTING_HEADING,
+        hint: MONSTER_SHAPE_SHIFTING_DESCRIPTION,
+      },
     })
     if (!section || !('fields' in section)) throw new Error('Expected forms field group')
     expect(section.fields).toContainEqual(
@@ -139,15 +147,39 @@ describe('monster forms authoring architecture', () => {
     await user.click(screen.getByRole('button', { name: 'Add forms' }))
     await user.click(screen.getByRole('button', { name: 'Add form' }))
 
-    await user.click(screen.getByRole('button', { name: /Actions for Unnamed Form/i }))
+    await user.click(screen.getByRole('button', { name: /Actions for New form/i }))
     await user.click(screen.getByRole('menuitem', { name: /Delete form/i }))
 
     const dialog = screen.getByRole('alertdialog')
     expect(dialog).toHaveTextContent(/Remove Untitled form\?/i)
 
     await user.click(within(dialog).getByRole('button', { name: 'Remove form' }))
-    expect(
-      screen.queryByRole('button', { name: /Actions for Unnamed Form/i }),
-    ).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Actions for New form/i })).not.toBeInTheDocument()
+  })
+
+  it('shows New form as the display fallback without persisting a name', async () => {
+    const user = userEvent.setup()
+    const formRef: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }
+
+    function Host() {
+      const form = useForm<MonsterFormValues>({
+        defaultValues: monsterFormTestValues({ name: 'Werebear' }),
+      })
+      useEffect(() => {
+        formRef.current = form
+      })
+      return (
+        <FormProvider {...form}>
+          <MonsterFormsEditor ctx={ctx} />
+        </FormProvider>
+      )
+    }
+
+    render(<Host />)
+    await user.click(screen.getByRole('button', { name: 'Add forms' }))
+    await user.click(screen.getByRole('button', { name: 'Add form' }))
+
+    expect(screen.getByText(MONSTER_DEFINED_FORM_DISPLAY_FALLBACK)).toBeInTheDocument()
+    expect(formRef.current?.getValues('forms.definedForms.0.name')).toBe('')
   })
 })

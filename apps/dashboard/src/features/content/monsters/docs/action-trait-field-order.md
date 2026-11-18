@@ -26,4 +26,4 @@ Do not apply this order to species traits or class features. Their descriptions 
 Form designation and the Defined forms master-detail editor live in Creature Details,
 outside action and trait detail-body ordering. Shape-Shift only authors its action-local
 equipment and prerequisite fields here; its destinations and return identity come from
-the shared Forms configuration.
+the shared Shape-shifting configuration.
