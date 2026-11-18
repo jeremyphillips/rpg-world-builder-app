@@ -171,7 +171,7 @@ describe('OptionalFieldDisclosure', () => {
     }
   })
 
-  it('renders labeled summary at field-value scale instead of caption', () => {
+  it('renders labeled summary segments at md scale instead of caption', () => {
     render(
       <OptionalFieldDisclosure
         controlId="movement"
@@ -191,10 +191,15 @@ describe('OptionalFieldDisclosure', () => {
       </OptionalFieldDisclosure>,
     )
 
-    const summary = screen.getByText('Inherits · Walk 30 ft.')
-    expect(summary).toHaveClass('text-muted-foreground', 'font-normal')
-    expect(summary).not.toHaveClass('text-style-caption')
-    expect(summary.className).toMatch(/text-\[length:var\(--text-md\)\]/)
+    const leading = screen.getByText('Inherits ·', { exact: false })
+    expect(leading).toHaveClass('text-muted-foreground', 'font-normal')
+    expect(leading.className).toMatch(/text-\[length:var\(--text-md\)\]/)
+
+    const value = screen.getByText('Walk 30 ft.')
+    expect(value).toHaveClass('text-foreground', 'font-normal')
+    expect(value.className).toMatch(/text-\[length:var\(--text-md\)\]/)
+    expect(value).not.toHaveClass('text-style-caption')
+
     expect(screen.getByRole('button', { name: 'Override movement' })).toHaveClass(
       'ui-button__text--xs',
     )
@@ -226,7 +231,8 @@ describe('OptionalFieldDisclosure', () => {
     expect(headerRow).toContainElement(
       screen.getByRole('button', { name: 'Clear Damage override' }),
     )
-    expect(screen.getByText('Inherits · 1d8 slashing')).not.toHaveClass('text-style-caption')
+    expect(screen.getByText('1d8 slashing')).toHaveClass('font-normal')
+    expect(screen.getByText('Inherits ·', { exact: false })).toHaveClass('text-muted-foreground')
   })
 
   it('uses the edit glyph and a full accessible name for a compact override action', () => {
@@ -323,8 +329,13 @@ describe('OptionalFieldDisclosure', () => {
       </OptionalFieldDisclosure>,
     )
 
-    expect(screen.getByText('Weapon base damage')).toBeInTheDocument()
-    expect(screen.getByText('1d8 slashing')).toBeInTheDocument()
+    const sourceLabel = screen.getByText('Weapon base damage:')
+    expect(sourceLabel).toHaveClass('text-muted-foreground')
+    expect(sourceLabel.className).toMatch(/text-\[length:var\(--text-md\)\]/)
+
+    const sourceValue = screen.getByText('1d8 slashing')
+    expect(sourceValue).toHaveClass('text-foreground', 'font-normal')
+    expect(sourceValue.className).toMatch(/text-\[length:var\(--text-md\)\]/)
     expect(screen.getByText('Damage controls')).toBeInTheDocument()
 
     rerender(

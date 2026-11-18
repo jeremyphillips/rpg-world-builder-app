@@ -226,27 +226,6 @@ export const fieldLabelTypographyVariants = cva('', {
   },
 })
 
-/**
- * Optional disclosure inherited-value line — matches label type scale at body weight
- * with secondary ink (not caption or hint scale).
- */
-export const optionalDisclosureSummaryTypographyVariants = cva(
-  'font-normal text-muted-foreground',
-  {
-    variants: {
-      size: {
-        xs: 'text-[length:var(--text-fine-md)] leading-none',
-        sm: 'text-[length:var(--text-fine-md)] leading-none',
-        md: 'text-[length:var(--text-md)] leading-[var(--text-md--line-height)]',
-        lg: 'text-base leading-[var(--text-base--line-height)]',
-      },
-    },
-    defaultVariants: {
-      size: 'md',
-    },
-  },
-)
-
 export type FieldArrayItemLayoutVariant = 'compact' | 'detailed'
 
 /**

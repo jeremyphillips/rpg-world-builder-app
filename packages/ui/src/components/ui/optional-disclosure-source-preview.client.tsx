@@ -1,11 +1,6 @@
 'use client'
 
-import { Text } from './text'
-import {
-  fieldDerivedMetaLabelVariants,
-  fieldDerivedMetaRowVariants,
-  fieldDerivedMetaValueVariants,
-} from './field-derived-meta.variants'
+import { OptionalDisclosureInheritedLine } from './optional-disclosure-inherited-line.client'
 
 export type OptionalDisclosureSourcePreviewContent = {
   label: string
@@ -23,13 +18,11 @@ export function OptionalDisclosureSourcePreview({
   if (!preview) return null
 
   return (
-    <div id={id} className={fieldDerivedMetaRowVariants}>
-      <Text variant="caption" as="span" className={fieldDerivedMetaLabelVariants}>
-        {preview.label}
-      </Text>
-      <Text variant="caption" as="span" className={fieldDerivedMetaValueVariants}>
-        {preview.text}
-      </Text>
-    </div>
+    <OptionalDisclosureInheritedLine
+      id={id}
+      leading={preview.label}
+      value={preview.text}
+      formatSourceLeading
+    />
   )
 }

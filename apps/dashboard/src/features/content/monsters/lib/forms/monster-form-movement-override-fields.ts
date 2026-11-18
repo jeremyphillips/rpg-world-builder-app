@@ -15,18 +15,16 @@ import {
   MONSTER_FORM_USE_BASE_MOVEMENT_LABEL,
 } from '../monster-form-labels'
 
-const FORM_BASE_MOVEMENT_DEPENDS = ['../../movement', '../../hover'] as const
+/** Defined-form row prefix is `forms.definedForms.{index}` — three hops to root movement/hover. */
+const FORM_BASE_MOVEMENT_DEPENDS = ['../../../movement', '../../../hover'] as const
 
 function readBaseMovementRows(values: Record<string, unknown>): MovementRowDraftFormValues[] {
-  const baseRows = (values['../../movement'] ?? values.movement) as
-    | MovementRowDraftFormValues[]
-    | undefined
+  const baseRows = values['../../../movement'] as MovementRowDraftFormValues[] | undefined
   return baseRows ?? []
 }
 
 function readBaseHover(values: Record<string, unknown>): boolean {
-  const hover = values['../../hover'] ?? values.hover
-  return hover === true
+  return values['../../../hover'] === true
 }
 
 function baseMovementPreviewText(values: Record<string, unknown>): string | undefined {

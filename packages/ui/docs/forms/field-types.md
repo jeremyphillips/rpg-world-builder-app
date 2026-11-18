@@ -192,11 +192,14 @@ the same resolver with the group heading. Renderers still own opening, seeding, 
 - **`confirmBeforeClear`** copy is authored independently — do not derive headlines from action
   button labels.
 - **`summary`** communicates the effective or inherited value while collapsed (and under the
-  header when open in labeled mode). It uses label **scale** at body weight with secondary ink —
-  not caption or hint typography.
+  header when open in labeled mode). Inherited override copy uses 15px (`--text-md`): a muted
+  leading segment (`Inherits ·` / `Inherits:`) and a foreground value segment (normal weight) —
+  same SSOT as
+  `sourcePreview`.
 - **`sourcePreview`** is a read-only inherited source block shown only while open. It shares
   `summary`'s `dependsOn` watch in the roll renderer and optional group body. `resolve` returns
-  `{ label, text } | undefined`; undefined leaves no gap. It does not write form state.
+  `{ label, text } | undefined`; undefined leaves no gap. It does not write form state. The UI
+  renders `label` and `text` on one inline line with a colon (same anatomy as collapsed `summary`).
 - Header actions use the form **micro-action** text button (`xs`). `add` uses `ActionIcon` `add`
   (plus). `override` uses `edit` (pencil). The open action uses `clear` (x), including open
   optional groups (`legendAction`).

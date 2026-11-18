@@ -14,11 +14,9 @@ import type { FieldSize } from './field.client'
 import { fieldRowParticipationClasses } from './field-root.lib'
 import { FieldControlRegion, FieldLabelRegion, FieldMessageRegion } from './field-anatomy-regions'
 import { FieldLabelContent } from './field-label-content'
-import {
-  fieldAnatomyStackVariants,
-  fieldLabelVariants,
-  optionalDisclosureSummaryTypographyVariants,
-} from './field.variants'
+import { fieldAnatomyStackVariants, fieldLabelVariants } from './field.variants'
+import { splitOptionalDisclosureSummary } from './optional-disclosure-inherited.lib'
+import { OptionalDisclosureInheritedLine } from './optional-disclosure-inherited-line.client'
 import { cn } from '../../lib/utils'
 import { formMicroActionButtonProps } from '../../form/form-micro-action'
 import type { OptionalDisclosureActionVerb } from '../../form/config/optional-disclosure-actions.lib'
@@ -77,21 +75,9 @@ export function OptionalDisclosureMicroAction({
 }
 
 /** Collapses an optional field behind a compact add control until opened or populated. */
-function DisclosureSummary({
-  id,
-  summary,
-  size,
-}: {
-  id: string
-  summary?: string
-  size: FieldSize
-}) {
+function DisclosureSummary({ id, summary }: { id: string; summary?: string }) {
   if (!summary) return null
-  return (
-    <p id={id} className={optionalDisclosureSummaryTypographyVariants({ size })}>
-      {summary}
-    </p>
-  )
+  return <OptionalDisclosureInheritedLine id={id} {...splitOptionalDisclosureSummary(summary)} />
 }
 
 /** `fieldLabelVariants` pins `self-start`, which lifts the label above the action. */
@@ -432,7 +418,7 @@ export function OptionalFieldDisclosure({
 }: OptionalFieldDisclosureProps) {
   const summaryId = `${controlId}-summary`
   const inAnatomyRow = useFieldRowParticipation()
-  const summaryNode = <DisclosureSummary id={summaryId} summary={summary} size={size} />
+  const summaryNode = <DisclosureSummary id={summaryId} summary={summary} />
   const addButton = (
     <DisclosureAddButton
       controlId={controlId}
