@@ -227,6 +227,12 @@ export const MONSTER_ADD_LABEL = 'Add'
 
 export const MONSTER_FORMS_HEADING = 'Forms'
 export const MONSTER_TRUE_FORM_HEADING = 'True form'
+/** Shown on the true-form kind radio when Creature profile is selected. */
+export const MONSTER_TRUE_FORM_PROFILE_HINT =
+  "Uses the creature's main statistics as its true form."
+/** Shown on the true-form kind radio when Defined form is selected and the list is empty. */
+export const MONSTER_TRUE_FORM_DEFINED_EMPTY_HINT =
+  'Add a form below to designate it as the true form.'
 export const MONSTER_FORMS_ADD_LABEL = 'Add forms'
 export const MONSTER_FORMS_ADD_FORM_LABEL = 'Add form'
 export const MONSTER_FORMS_REMOVE_LABEL = 'Remove forms'
