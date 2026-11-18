@@ -46,7 +46,6 @@ export function MonsterTrueFormDesignation() {
       <RadioGroupField
         id="monster-true-form-kind"
         label={MONSTER_TRUE_FORM_HEADING}
-        labelVisibility="srOnly"
         hint={radioHint}
         value={forms.trueForm.kind}
         options={[

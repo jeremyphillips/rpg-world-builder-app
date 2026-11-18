@@ -12,6 +12,7 @@ import {
 import { isElementOutsideScrollport } from '../../lib/master-detail/is-element-outside-scrollport'
 import type { MasterDetailItemMeta } from '../../lib/master-detail/master-detail-item-meta'
 import { MasterDetailListRow } from './master-detail-list-row'
+import { MasterDetailSortableListRows } from './master-detail-sortable-list-rows.client'
 import { masterDetailEmptyListLabel } from '../../lib/master-detail/master-detail-constants'
 import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
 import {
@@ -70,6 +71,8 @@ export type MasterDetailListPanelProps = {
   countSupplement?: ReactNode
   /** Count of visible list rows with validation issues (not total issue count). */
   invalidItemCount?: number
+  /** When set on a flat rail with more than one row, enables drag-to-reorder handles. */
+  onListMove?: (from: number, to: number) => void
 }
 
 function buildVisibleListProjection(items: readonly MasterDetailListItem[]): string {
@@ -123,12 +126,27 @@ function MasterDetailListRows({
   selectedItemId,
   onSelectItem,
   selectedRowRef,
+  onListMove,
 }: {
   items: readonly MasterDetailListItem[]
   selectedItemId: string | null
   onSelectItem: (id: string) => void
   selectedRowRef: RefObject<HTMLButtonElement | null>
+  onListMove?: (from: number, to: number) => void
 }) {
+  if (onListMove) {
+    return (
+      <MasterDetailSortableListRows
+        items={items}
+        selectedItemId={selectedItemId}
+        onSelectItem={onSelectItem}
+        onMove={onListMove}
+        selectedRowRef={selectedRowRef}
+        listClassName={masterDetailListBodyClasses}
+      />
+    )
+  }
+
   return (
     <ul className={masterDetailListBodyClasses} role="list">
       {items.map((item) => (
@@ -137,7 +155,7 @@ function MasterDetailListRows({
           item={item}
           isSelected={item.id === selectedItemId}
           onSelect={onSelectItem}
-          selectedRowRef={selectedRowRef}
+          selectedRowRef={item.id === selectedItemId ? selectedRowRef : undefined}
         />
       ))}
     </ul>
@@ -152,6 +170,7 @@ function MasterDetailListScroll({
   onSelectItem,
   selectedRowRef,
   scrollRef,
+  onListMove,
 }: {
   groups?: MasterDetailListGroup[]
   items: readonly MasterDetailListItem[]
@@ -160,6 +179,7 @@ function MasterDetailListScroll({
   onSelectItem: (id: string) => void
   selectedRowRef: RefObject<HTMLButtonElement | null>
   scrollRef: RefObject<HTMLDivElement | null>
+  onListMove?: (from: number, to: number) => void
 }) {
   if (groups) {
     return (
@@ -210,6 +230,7 @@ function MasterDetailListScroll({
         selectedItemId={selectedItemId}
         onSelectItem={onSelectItem}
         selectedRowRef={selectedRowRef}
+        onListMove={onListMove}
       />
     </ScrollBoundaryRegion>
   )
@@ -268,7 +289,14 @@ function MasterDetailCountRow({
 }
 
 export function MasterDetailListPanel(props: MasterDetailListPanelProps) {
-  const { selectedItemId, onSelectItem, ariaLabel, itemNoun, invalidItemCount = 0 } = props
+  const {
+    selectedItemId,
+    onSelectItem,
+    ariaLabel,
+    itemNoun,
+    invalidItemCount = 0,
+    onListMove,
+  } = props
   const items = listPanelItems(props)
   const emptyLabel = masterDetailEmptyListLabel(itemNoun)
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -301,6 +329,7 @@ export function MasterDetailListPanel(props: MasterDetailListPanelProps) {
         onSelectItem={onSelectItem}
         selectedRowRef={selectedRowRef}
         scrollRef={scrollRef}
+        onListMove={props.groups ? undefined : onListMove}
       />
     </nav>
   )

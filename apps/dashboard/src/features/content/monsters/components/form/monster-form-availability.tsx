@@ -1,15 +1,18 @@
-import { monsterFormRestrictionEligibleIds } from '@rpg/contracts'
-import { ChipsField, RadioGroupField } from '@rpg/ui'
+import { monsterFormRestrictionEligibleIds, sortMonsterFormRestrictionIds } from '@rpg/contracts'
+import { ChipsField, RadioGroupField, type FieldHintPosition } from '@rpg/ui'
 import { useSlotIssues, type FormItem } from '@rpg/ui/form'
+import { useEffect, useState } from 'react'
 import { useFormContext, useWatch, type UseFormReturn } from 'react-hook-form'
 
 import {
   MONSTER_FORM_AVAILABILITY_ALL,
   MONSTER_FORM_AVAILABILITY_FORMS_LABEL,
   MONSTER_FORM_AVAILABILITY_LABEL,
-  MONSTER_FORM_AVAILABILITY_ORDER_HINT,
   MONSTER_FORM_AVAILABILITY_SELECTED,
   formatMonsterMissingFormLabel,
+  monsterFormAvailabilityHintPhase,
+  monsterFormAvailabilityRowKind,
+  resolveMonsterFormAvailabilityHint,
 } from '../../lib/monster-form-labels'
 import { monsterFormRestrictionLabels } from '../../lib/monster-qualified-preview-title'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
@@ -43,9 +46,20 @@ function rowFieldPath(namePrefix: string | undefined, field: string): string {
   return namePrefix ? `${namePrefix}.${field}` : field
 }
 
-function orderedFormOptions(knownNames: Map<string, string>, selected: readonly string[]) {
-  const unselected = [...knownNames.keys()].filter((id) => !selected.includes(id))
-  return [...selected, ...unselected].map((id) => ({
+function formRestrictionChipOptions(
+  knownNames: Map<string, string>,
+  forms: MonsterFormValues['forms'] | undefined,
+  selected: readonly string[],
+) {
+  const ordered =
+    forms?.trueForm && Array.isArray(forms.definedForms)
+      ? monsterFormRestrictionEligibleIds(forms)
+      : []
+  const ids = [...ordered]
+  for (const id of selected) {
+    if (!ids.includes(id)) ids.push(id)
+  }
+  return ids.map((id) => ({
     value: id,
     label: knownNames.get(id) ?? formatMonsterMissingFormLabel(id),
   }))
@@ -79,12 +93,11 @@ function writeSelectedFormIds(
   form: UseFormReturn<MonsterFormValues>,
   restrictionPath: string,
   value: unknown,
+  forms: NonNullable<MonsterFormValues['forms']> | undefined,
 ) {
-  form.setValue(
-    restrictionPath as never,
-    (Array.isArray(value) ? value : []) as never,
-    AVAILABILITY_WRITE,
-  )
+  const raw = Array.isArray(value) ? value.filter((id): id is string => typeof id === 'string') : []
+  const normalized = forms && raw.length > 0 ? sortMonsterFormRestrictionIds(raw, forms) : raw
+  form.setValue(restrictionPath as never, normalized as never, AVAILABILITY_WRITE)
 }
 
 function shouldShowFormAvailability(
@@ -103,7 +116,11 @@ type MonsterFormAvailabilityViewProps = {
   message?: string
   restrictionKeyPresent: boolean
   selected: readonly string[]
-  chipOptions: ReturnType<typeof orderedFormOptions>
+  chipOptions: ReturnType<typeof formRestrictionChipOptions>
+  forms: MonsterFormValues['forms'] | undefined
+  hint: string
+  hintPosition: FieldHintPosition
+  onAvailabilityModeChange: (value: string) => void
 }
 
 function MonsterFormAvailabilityView({
@@ -115,12 +132,18 @@ function MonsterFormAvailabilityView({
   restrictionKeyPresent,
   selected,
   chipOptions,
+  forms,
+  hint,
+  hintPosition,
+  onAvailabilityModeChange,
 }: MonsterFormAvailabilityViewProps) {
   return (
     <div className="flex flex-col gap-3">
       <RadioGroupField
         id={controlId}
         label={MONSTER_FORM_AVAILABILITY_LABEL}
+        hint={hint}
+        hintPosition={hintPosition}
         orientation="horizontal"
         value={restrictionKeyPresent ? 'selected' : 'all'}
         error={message}
@@ -128,19 +151,17 @@ function MonsterFormAvailabilityView({
           { value: 'all', label: MONSTER_FORM_AVAILABILITY_ALL },
           { value: 'selected', label: MONSTER_FORM_AVAILABILITY_SELECTED },
         ]}
-        onValueChange={(value) =>
-          applyAvailabilityMode(form, namePrefix, restrictionPath, restrictionKeyPresent, value)
-        }
+        onValueChange={onAvailabilityModeChange}
       />
       {restrictionKeyPresent ? (
         <ChipsField
           id={`${controlId}-forms`}
           label={MONSTER_FORM_AVAILABILITY_FORMS_LABEL}
-          hint={MONSTER_FORM_AVAILABILITY_ORDER_HINT}
+          labelVisibility="srOnly"
           options={chipOptions}
           multiple
           value={[...selected]}
-          onChange={(value) => writeSelectedFormIds(form, restrictionPath, value)}
+          onChange={(value) => writeSelectedFormIds(form, restrictionPath, value, forms)}
         />
       ) : null}
     </div>
@@ -157,10 +178,25 @@ export function MonsterFormAvailabilityControl({ namePrefix }: { namePrefix?: st
 
   const restrictionKeyPresent = Array.isArray(watchedIds)
   const authorable = forms ? monsterFormRestrictionEligibleIds(forms).length > 1 : false
-  if (!shouldShowFormAvailability(namePrefix, authorable, restrictionKeyPresent)) return null
+  const visible = shouldShowFormAvailability(namePrefix, authorable, restrictionKeyPresent)
+
+  const [availabilityEngaged, setAvailabilityEngaged] = useState(restrictionKeyPresent)
+
+  useEffect(() => {
+    setAvailabilityEngaged(restrictionKeyPresent)
+  }, [namePrefix])
+
+  useEffect(() => {
+    if (restrictionKeyPresent) setAvailabilityEngaged(true)
+  }, [restrictionKeyPresent])
+
+  if (!visible) return null
 
   const knownNames = forms ? monsterFormRestrictionLabels(forms, creatureName ?? '') : new Map()
   const selected = restrictionKeyPresent ? stringIds(watchedIds) : []
+  const rowKind = monsterFormAvailabilityRowKind(namePrefix)
+  const hintPhase = monsterFormAvailabilityHintPhase(restrictionKeyPresent, availabilityEngaged)
+  const { hint, hintPosition } = resolveMonsterFormAvailabilityHint(hintPhase, rowKind)
 
   return (
     <MonsterFormAvailabilityView
@@ -171,7 +207,14 @@ export function MonsterFormAvailabilityControl({ namePrefix }: { namePrefix?: st
       message={message}
       restrictionKeyPresent={restrictionKeyPresent}
       selected={selected}
-      chipOptions={orderedFormOptions(knownNames, selected)}
+      chipOptions={formRestrictionChipOptions(knownNames, forms, selected)}
+      forms={forms}
+      hint={hint}
+      hintPosition={hintPosition}
+      onAvailabilityModeChange={(value) => {
+        if (value === 'selected' || value === 'all') setAvailabilityEngaged(true)
+        applyAvailabilityMode(form, namePrefix, restrictionPath, restrictionKeyPresent, value)
+      }}
     />
   )
 }

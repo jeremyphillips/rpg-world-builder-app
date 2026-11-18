@@ -21,6 +21,7 @@ import { monsterDefinedFormListMeta } from '../../lib/forms/monster-defined-form
 import { monsterDefinedFormDetailFields } from '../../lib/forms/monster-forms-form-fields'
 import type { MonsterDefinedFormDraft } from '../../lib/forms/monster-forms-form-values'
 import { makeEmptyMonsterDefinedForm } from '../../lib/forms/monster-forms-form-values'
+import { resortMonsterFormRestrictionIds } from '../../lib/resort-monster-form-restriction-ids'
 import { monsterDefinedFormRowResolveFields } from '../../lib/forms/monster-forms-validation-fields'
 
 const MONSTER_FORM_ITEM_NOUN = defineMasterDetailItemNoun({
@@ -31,7 +32,8 @@ const MONSTER_FORM_ITEM_NOUN = defineMasterDetailItemNoun({
 
 export function MonsterFormsEditor({ ctx }: { ctx: ContentFormCtx }) {
   const forms = useWatch<MonsterFormValues, 'forms'>({ name: 'forms' })
-  const { getValues, setValue, trigger } = useFormContext<MonsterFormValues>()
+  const form = useFormContext<MonsterFormValues>()
+  const { getValues, setValue, trigger } = form
   const makeDefaults = useCallback(() => makeEmptyMonsterDefinedForm(), [])
   const editor = useMasterDetailArray('forms.definedForms', makeDefaults)
   const lifecycle = useMonsterFormsLifecycle()
@@ -75,6 +77,13 @@ export function MonsterFormsEditor({ ctx }: { ctx: ContentFormCtx }) {
   const lifecycleEditor = useMemo(
     () => ({
       ...editor,
+      move: (from: number, to: number) => {
+        editor.move(from, to)
+        const nextForms = getValues('forms')
+        if (nextForms?.definedForms && nextForms.trueForm) {
+          resortMonsterFormRestrictionIds(form, nextForms)
+        }
+      },
       requestRemove: (index: number) => {
         const definedForms = getValues('forms')?.definedForms ?? forms?.definedForms
         const formId = definedForms?.[index]?.id
@@ -87,7 +96,7 @@ export function MonsterFormsEditor({ ctx }: { ctx: ContentFormCtx }) {
         })
       },
     }),
-    [editor, forms?.definedForms, getValues, lifecycle],
+    [editor, form, forms?.definedForms, getValues, lifecycle],
   )
   const addControl = (
     <Button
@@ -138,6 +147,7 @@ export function MonsterFormsEditor({ ctx }: { ctx: ContentFormCtx }) {
           resolveFallback: () => MONSTER_DEFINED_FORM_DISPLAY_FALLBACK,
         }}
         resolveListMeta={(mapCtx) => monsterDefinedFormListMeta(forms, mapCtx)}
+        listReorder
       />
       <Button type="button" variant="ghost" onClick={lifecycle.requestRemoveAll}>
         {MONSTER_FORMS_REMOVE_LABEL}

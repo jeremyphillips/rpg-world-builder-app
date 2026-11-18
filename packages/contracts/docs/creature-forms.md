@@ -33,7 +33,7 @@ sizes. `analyzeCreatureFormDifferences` and `resolveCreatureFormStatistics` in
 parentheticals and speech sentences (`transformation-description`). `forms.differencesPresentation`
 defaults to `stat-rows`; `resolveFormDifferencesPresentation` keeps differences visible when
 Shape-Shift is absent. Hit points continue reading base `sizes` (`resolveMonsterHitPoints`).
-`formatMonsterFormQualifier` prints those names in the stored order of `onlyInFormIds`,
+`formatMonsterFormQualifier` prints those names in the stored order of `onlyInFormIds` (canonical order follows `definedForms`, then the profile id when the profile is the true form),
 for example “Bite (Bear or Bear-humanoid hybrid Form Only)”. It composes with limited-use
 notation as “(Recharge 5–6; Vampire Form Only)”. `collectFormAvailabilityAdvisories` checks
 one level: a Multiattack step with no eligible attack in a form that can use the

@@ -30,9 +30,27 @@ export function readMonsterRowFormRestrictionIds(row: unknown): readonly string[
 /** Ids that may appear in `onlyInFormIds`; shared with {@link refineMonsterFormAvailability}. */
 export function monsterFormRestrictionEligibleIds(forms: CreatureFormsDraft): readonly string[] {
   if (!Array.isArray(forms.definedForms) || !forms.trueForm) return []
-  const ids = new Set(forms.definedForms.flatMap((form) => (form.id ? [form.id] : [])))
-  if (forms.trueForm.kind === 'profile' && forms.profileFormId) ids.add(forms.profileFormId)
-  return [...ids]
+  const ids: string[] = []
+  for (const form of forms.definedForms) {
+    if (form.id) ids.push(form.id)
+  }
+  if (forms.trueForm.kind === 'profile' && forms.profileFormId) {
+    if (!ids.includes(forms.profileFormId)) ids.push(forms.profileFormId)
+  }
+  return ids
+}
+
+/** Orders selected restriction ids by {@link monsterFormRestrictionEligibleIds}; unknown ids trail. */
+export function sortMonsterFormRestrictionIds(
+  ids: readonly string[],
+  forms: CreatureFormsDraft,
+): string[] {
+  const eligible = monsterFormRestrictionEligibleIds(forms)
+  const eligibleSet = new Set(eligible)
+  const selected = new Set(ids)
+  const ordered = eligible.filter((id) => selected.has(id))
+  const trailing = ids.filter((id) => !eligibleSet.has(id))
+  return [...ordered, ...trailing]
 }
 
 function eligibleFormIds(forms: CreatureFormsDraft): Set<string> {

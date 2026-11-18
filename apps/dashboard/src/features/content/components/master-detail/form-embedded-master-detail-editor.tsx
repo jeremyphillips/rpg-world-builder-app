@@ -1,12 +1,11 @@
 import type { ReactNode, RefObject } from 'react'
-import { useCallback, useMemo } from 'react'
+import { useCallback } from 'react'
 import { fieldGroupFlexStackClasses } from '@rpg/ui'
 import { buildItemDefaultValues, type FormItem } from '@rpg/ui/form'
 
 import type { Availability, AvailabilityReason } from '@/lib/availability'
 import type { EmbeddedArrayResolverFieldInput } from '../../lib/forms/validation/tabbed-form-resolver-fields'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
-import { duplicateMasterDetailRow } from '../../lib/master-detail/duplicate-master-detail-row'
 import type { FormEmbeddedMasterDetailAccessConfig } from '../../lib/master-detail/master-detail-access.types'
 import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
 import { masterDetailItemNounLabel } from '../../lib/master-detail/master-detail-constants'
@@ -15,15 +14,12 @@ import type {
   MasterDetailListMetaInput,
   MasterDetailRowTitleConfig,
 } from '../../lib/master-detail/master-detail-row-title'
-import {
-  useEmbeddedMasterDetailRows,
-  type FormEmbeddedMasterDetailMapListItemContext,
-} from '../../lib/master-detail/use-embedded-master-detail-rows'
-import { useMasterDetailCollectionAvailability } from '../../lib/master-detail/use-master-detail-collection-availability'
+import type { FormEmbeddedMasterDetailMapListItemContext } from '../../lib/master-detail/use-embedded-master-detail-rows'
 import {
   useMasterDetailArray,
   type UseMasterDetailArrayResult,
 } from '../../lib/master-detail/use-master-detail-array'
+import { useFormEmbeddedMasterDetailEditorBody } from './use-form-embedded-master-detail-editor-body'
 import { MasterDetailBodyCampaignAccessDialogFields } from './master-detail-body-campaign-access-dialog-fields'
 import { MasterDetailDeleteDialog } from './master-detail-delete-dialog'
 import { MasterDetailEditorPanel } from './master-detail-editor-panel'
@@ -87,6 +83,8 @@ type FormEmbeddedMasterDetailEditorBase = {
   access?: FormEmbeddedMasterDetailAccessConfig
   /** Replaces the default Add button. `append` inserts a caller-built row. */
   renderAddControl?: (ctx: { append: (row: Record<string, unknown>) => void }) => ReactNode
+  /** Enables drag-to-reorder on the flat list rail; calls `editor.move` on drop. */
+  listReorder?: boolean
 }
 
 export type FormEmbeddedMasterDetailEditorProps<TRow = Record<string, unknown>> =
@@ -123,18 +121,6 @@ interface FormEmbeddedMasterDetailEditorBodyProps<TRow = Record<string, unknown>
   editor: UseMasterDetailArrayResult
 }
 
-function resolveEmbeddedDetailFields(
-  itemFields: FormItem[] | EmbeddedArrayResolverFieldInput,
-  resolveItemFields: ((row: unknown) => FormItem[]) | undefined,
-  selectedRow: EmbeddedMasterDetailRow | undefined,
-  rowAt: (index: number) => unknown,
-): FormItem[] {
-  if (!resolveItemFields) {
-    return Array.isArray(itemFields) ? itemFields : []
-  }
-  return resolveItemFields(selectedRow ? rowAt(selectedRow.formIndex) : undefined)
-}
-
 function embeddedCampaignAccessDialog(input: {
   access: FormEmbeddedMasterDetailAccessConfig | undefined
   formCtx: ContentFormCtx
@@ -157,163 +143,53 @@ function embeddedCampaignAccessDialog(input: {
 }
 
 function FormEmbeddedMasterDetailEditorBody<TRow = Record<string, unknown>>({
-  formCtx,
-  fieldName,
-  itemFields,
-  itemNoun,
+  leadingContent,
   listTitle,
   ariaLabel,
   addLabel,
-  addControl: addControlProp,
-  resolveItemFields,
-  idPrefix,
-  mapListItem,
-  rowTitle,
-  resolveListMeta,
-  resolveHeaderIdentity,
-  editor,
-  showDelete = true,
-  leadingContent,
-  resolveRowReasons,
-  resolveAvailabilityFormItems,
-  access,
-  renderAddControl,
+  ...props
 }: FormEmbeddedMasterDetailEditorBodyProps<TRow>) {
-  const rows = useEmbeddedMasterDetailRows<TRow>(
-    rowTitle
-      ? {
-          formCtx,
-          fieldName,
-          editor,
-          itemFields,
-          itemNoun,
-          rowTitle,
-          resolveListMeta,
-          access,
-          resolveRowReasons,
-          resolveAvailabilityFormItems,
-          showDelete,
-        }
-      : {
-          formCtx,
-          fieldName,
-          editor,
-          itemFields,
-          itemNoun,
-          mapListItem: mapListItem!,
-          access,
-          resolveRowReasons,
-          resolveAvailabilityFormItems,
-          showDelete,
-        },
-  )
-
-  const availabilityItems = useMemo(
-    () => (access ? rows.allRows.map((row) => row.availability) : []),
-    [access, rows.allRows],
-  )
-
-  const handleAvailabilitySelectionChange = useCallback(
-    (rowId: string) => {
-      const row = rows.allRows.find((entry) => entry.item.id === rowId)
-      if (row) editor.select(row.formIndex)
-    },
-    [editor, rows.allRows],
-  )
-
-  const collection = useMasterDetailCollectionAvailability({
-    items: availabilityItems,
-    selectedId: access ? rows.selectedDomainId : null,
-    onSelectedIdChange: access ? handleAvailabilitySelectionChange : undefined,
-  })
-
-  const visibleRows = useMemo(() => {
-    if (!access) return rows.allRows
-    const visibleIds = new Set(collection.visibleItems.map((item) => item.rowId))
-    return rows.allRows.filter((row) => visibleIds.has(row.item.id))
-  }, [access, collection.visibleItems, rows.allRows])
-
-  const listItems = useMemo(() => visibleRows.map((row) => row.item), [visibleRows])
-
-  const invalidItemCount = useMemo(() => {
-    if (!rows.showRowBadges) return 0
-    return listItems.filter((item) => (item.issueCount ?? 0) > 0).length
-  }, [listItems, rows.showRowBadges])
-
-  const isSelectedRowVisible = access
-    ? collection.isSelectedVisible
-    : rows.selectedDomainId !== null
-
-  const handleSelectItem = useCallback(
-    (id: string) => {
-      const row = visibleRows.find((entry) => entry.item.id === id)
-      if (row) editor.select(row.formIndex)
-    },
-    [editor, visibleRows],
-  )
-
-  const handleDuplicate = useCallback(() => {
-    if (!rows.selectedRow) return
-    const copy = duplicateMasterDetailRow(rows.rowAt(rows.selectedRow.formIndex))
-    if (copy) editor.appendRow(copy)
-  }, [editor, rows])
-
-  const selectedIdentity =
-    !rowTitle && rows.selectedIdentity && resolveHeaderIdentity && rows.selectedRow
-      ? resolveHeaderIdentity({
-          row: rows.rowAt(rows.selectedRow.formIndex),
-          index: rows.selectedRow.formIndex,
-          fieldId: rows.selectedRow.fieldId,
-          identity: rows.selectedIdentity,
-        })
-      : rows.selectedIdentity
-
-  const detailFields = resolveEmbeddedDetailFields(
-    itemFields,
-    resolveItemFields,
-    rows.selectedRow,
-    rows.rowAt,
-  )
-  const addControl = addControlProp ?? renderAddControl?.({ append: editor.appendRow })
+  const body = useFormEmbeddedMasterDetailEditorBody(props)
   const campaignAccessDialog = embeddedCampaignAccessDialog({
-    access,
-    formCtx,
-    fieldName,
-    idPrefix,
-    selectedRow: rows.selectedRow,
-    dialogRef: rows.availabilityDialogRef,
+    access: props.access,
+    formCtx: body.formCtx,
+    fieldName: body.fieldName,
+    idPrefix: body.idPrefix,
+    selectedRow: body.rows.selectedRow,
+    dialogRef: body.rows.availabilityDialogRef,
   })
 
   return (
     <EmbeddedMasterDetailLayout
       leadingContent={leadingContent}
-      listItems={listItems}
-      selectedItemId={isSelectedRowVisible ? rows.selectedDomainId : null}
+      listItems={body.listItems}
+      selectedItemId={body.isSelectedRowVisible ? body.rows.selectedDomainId : null}
       listTitle={listTitle}
       ariaLabel={ariaLabel}
       addLabel={addLabel}
-      itemNoun={itemNoun}
-      countSupplement={access ? collection.countSupplement : undefined}
-      invalidItemCount={invalidItemCount}
-      onSelectItem={handleSelectItem}
-      addControl={addControl}
-      onAdd={editor.handleAdd}
-      editor={editor}
-      itemFields={detailFields}
-      fieldName={fieldName}
-      idPrefix={idPrefix}
-      showSelectedDetail={isSelectedRowVisible}
-      selectedIdentity={selectedIdentity}
-      campaignId={formCtx.campaignId}
-      rowAvailability={rows.selectedRowAvailability}
-      availabilityFormItems={rows.availabilityFormItems}
-      availabilityNamePrefix={rows.availabilityNamePrefix}
-      availabilityDialogRef={rows.availabilityDialogRef}
-      onDuplicate={rows.selectedRow ? handleDuplicate : undefined}
-      deleteOpen={editor.deleteIndex !== null}
-      deleteName={rows.deleteName}
-      onCancelDelete={editor.cancelRemove}
-      onConfirmDelete={editor.confirmRemove}
+      itemNoun={body.itemNoun}
+      countSupplement={body.access ? body.collection.countSupplement : undefined}
+      invalidItemCount={body.invalidItemCount}
+      onSelectItem={body.handleSelectItem}
+      addControl={body.addControl}
+      onAdd={body.editor.handleAdd}
+      editor={body.editor}
+      itemFields={body.detailFields}
+      fieldName={body.fieldName}
+      idPrefix={body.idPrefix}
+      showSelectedDetail={body.isSelectedRowVisible}
+      selectedIdentity={body.selectedIdentity}
+      campaignId={body.formCtx.campaignId}
+      rowAvailability={body.rows.selectedRowAvailability}
+      availabilityFormItems={body.rows.availabilityFormItems}
+      availabilityNamePrefix={body.rows.availabilityNamePrefix}
+      availabilityDialogRef={body.rows.availabilityDialogRef}
+      onDuplicate={body.rows.selectedRow ? body.handleDuplicate : undefined}
+      onListMove={body.onListMove}
+      deleteOpen={body.editor.deleteIndex !== null}
+      deleteName={body.rows.deleteName}
+      onCancelDelete={body.editor.cancelRemove}
+      onConfirmDelete={body.editor.confirmRemove}
       campaignAccessDialog={campaignAccessDialog}
     />
   )
@@ -349,6 +225,7 @@ function EmbeddedMasterDetailLayout({
   availabilityNamePrefix,
   availabilityDialogRef,
   onDuplicate,
+  onListMove,
 }: {
   leadingContent?: ReactNode
   campaignAccessDialog: ReactNode
@@ -379,6 +256,7 @@ function EmbeddedMasterDetailLayout({
   availabilityNamePrefix?: string
   availabilityDialogRef?: RefObject<HTMLDivElement | null>
   onDuplicate?: () => void
+  onListMove?: (from: number, to: number) => void
 }) {
   const grid = (
     <MasterDetailGrid>
@@ -392,6 +270,7 @@ function EmbeddedMasterDetailLayout({
         countSupplement={countSupplement}
         invalidItemCount={invalidItemCount}
         onSelectItem={onSelectItem}
+        onListMove={onListMove}
         {...(addControl ? { addControl } : { onAdd })}
       />
       <MasterDetailEditorPanel

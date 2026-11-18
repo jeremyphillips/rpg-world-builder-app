@@ -61,7 +61,7 @@ export function monsterFormsSectionFields(ctx: ContentFormCtx): FormItem[] {
       fields: [
         {
           kind: 'group',
-          heading: { label: MONSTER_TRUE_FORM_HEADING },
+          heading: { label: MONSTER_SHAPE_SHIFTING_HEADING },
           visibility: {
             dependsOn: ['forms'],
             visibleWhen: (values) => values.forms != null,

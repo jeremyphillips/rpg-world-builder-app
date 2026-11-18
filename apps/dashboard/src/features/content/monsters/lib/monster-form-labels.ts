@@ -259,11 +259,59 @@ export const MONSTER_FORM_SPEECH_LABEL = "Can't speak in this form"
 export const MONSTER_FORM_DIFFERENCES_LABEL = 'Show form differences in'
 export const MONSTER_FORM_DIFFERENCES_FALLBACK_NOTE =
   'Shown in Speed and Languages rows: there is no Shape-Shift action'
-export const MONSTER_FORM_AVAILABILITY_LABEL = 'Form availability'
+export const MONSTER_FORM_AVAILABILITY_LABEL = 'Available in'
 export const MONSTER_FORM_AVAILABILITY_ALL = 'All forms'
-export const MONSTER_FORM_AVAILABILITY_SELECTED = 'Only in selected forms'
-export const MONSTER_FORM_AVAILABILITY_FORMS_LABEL = 'Forms'
-export const MONSTER_FORM_AVAILABILITY_ORDER_HINT = 'Selection order is the heading order.'
+export const MONSTER_FORM_AVAILABILITY_SELECTED = 'Selected forms'
+export const MONSTER_FORM_AVAILABILITY_FORMS_LABEL = 'Select forms'
+export const MONSTER_FORM_AVAILABILITY_ALL_HINT = 'Includes forms added later.'
+export const MONSTER_FORM_AVAILABILITY_SELECTED_HINT =
+  "Choose forms below. New forms won't be included automatically."
+
+export type MonsterFormAvailabilityRowKind = 'action' | 'trait'
+export type MonsterFormAvailabilityHintPhase = 'intro' | 'all' | 'selected'
+
+export function monsterFormAvailabilityRowKind(namePrefix: string): MonsterFormAvailabilityRowKind {
+  return namePrefix.startsWith('traits.') ? 'trait' : 'action'
+}
+
+export function monsterFormAvailabilityIntroHint(rowKind: MonsterFormAvailabilityRowKind): string {
+  return `Choose which forms can use this ${rowKind}.`
+}
+
+export function monsterFormAvailabilityHintPhase(
+  restrictionKeyPresent: boolean,
+  availabilityEngaged: boolean,
+): MonsterFormAvailabilityHintPhase {
+  if (restrictionKeyPresent) return 'selected'
+  if (!availabilityEngaged) return 'intro'
+  return 'all'
+}
+
+export function resolveMonsterFormAvailabilityHint(
+  phase: MonsterFormAvailabilityHintPhase,
+  rowKind: MonsterFormAvailabilityRowKind,
+): {
+  hint: string
+  hintPosition: 'below-label' | 'below-control'
+} {
+  switch (phase) {
+    case 'intro':
+      return {
+        hint: monsterFormAvailabilityIntroHint(rowKind),
+        hintPosition: 'below-label',
+      }
+    case 'all':
+      return {
+        hint: MONSTER_FORM_AVAILABILITY_ALL_HINT,
+        hintPosition: 'below-control',
+      }
+    case 'selected':
+      return {
+        hint: MONSTER_FORM_AVAILABILITY_SELECTED_HINT,
+        hintPosition: 'below-control',
+      }
+  }
+}
 
 export function formatMonsterMissingFormLabel(id: string): string {
   return `Missing form (${id})`

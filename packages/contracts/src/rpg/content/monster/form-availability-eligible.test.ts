@@ -4,6 +4,7 @@ import type { CreatureFormsDraft } from '../creature/forms'
 import {
   monsterFormRestrictionEligibleIds,
   readMonsterRowFormRestrictionIds,
+  sortMonsterFormRestrictionIds,
 } from './form-availability'
 
 describe('monsterFormRestrictionEligibleIds', () => {
@@ -13,9 +14,7 @@ describe('monsterFormRestrictionEligibleIds', () => {
         profileFormId: 'profile',
         trueForm: { kind: 'profile' },
         definedForms: [{ id: 'bear', name: 'Bear' }],
-      })
-        .slice()
-        .sort(),
+      }),
     ).toEqual(['bear', 'profile'])
   })
 
@@ -28,10 +27,8 @@ describe('monsterFormRestrictionEligibleIds', () => {
           { id: 'humanoid', name: 'Humanoid' },
           { id: 'bear', name: 'Bear' },
         ],
-      })
-        .slice()
-        .sort(),
-    ).toEqual(['bear', 'humanoid'])
+      }),
+    ).toEqual(['humanoid', 'bear'])
   })
 
   it('includes every defined row while designation is incomplete', () => {
@@ -43,10 +40,8 @@ describe('monsterFormRestrictionEligibleIds', () => {
           { id: 'humanoid', name: 'Humanoid' },
           { id: 'bear', name: 'Bear' },
         ],
-      })
-        .slice()
-        .sort(),
-    ).toEqual(['bear', 'humanoid'])
+      }),
+    ).toEqual(['humanoid', 'bear'])
   })
 
   it('returns no ids when the forms draft is still partial', () => {
@@ -56,6 +51,34 @@ describe('monsterFormRestrictionEligibleIds', () => {
         definedForms: [{ id: 'bear', name: 'Bear' }],
       } as CreatureFormsDraft),
     ).toEqual([])
+  })
+})
+
+describe('sortMonsterFormRestrictionIds', () => {
+  const forms = {
+    profileFormId: 'profile',
+    trueForm: { kind: 'defined', formId: 'humanoid' } as const,
+    definedForms: [
+      { id: 'humanoid', name: 'Humanoid' },
+      { id: 'hybrid', name: 'Hybrid' },
+      { id: 'bear', name: 'Bear' },
+    ],
+  } satisfies CreatureFormsDraft
+
+  it('orders selected ids by defined-form list order', () => {
+    expect(sortMonsterFormRestrictionIds(['bear', 'hybrid', 'humanoid'], forms)).toEqual([
+      'humanoid',
+      'hybrid',
+      'bear',
+    ])
+  })
+
+  it('trails ids that are not currently eligible', () => {
+    expect(sortMonsterFormRestrictionIds(['stale', 'bear', 'humanoid'], forms)).toEqual([
+      'humanoid',
+      'bear',
+      'stale',
+    ])
   })
 })
 

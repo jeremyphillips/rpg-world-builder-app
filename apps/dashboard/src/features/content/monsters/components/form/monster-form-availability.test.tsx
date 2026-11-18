@@ -57,7 +57,32 @@ function expectFormAvailabilityVisible(visible: boolean) {
 }
 
 describe('MonsterFormAvailabilityControl', () => {
-  it('stores selected forms in click order and clears the key for all forms', async () => {
+  it('shows intro, all-forms, and selected-forms hints as the mode changes', async () => {
+    const user = userEvent.setup()
+    renderControl({
+      name: 'Werebear',
+      forms: {
+        profileFormId: 'profile',
+        trueForm: { kind: 'defined', formId: 'humanoid' },
+        definedForms: [
+          { id: 'humanoid', name: 'Humanoid' },
+          { id: 'bear', name: 'Bear' },
+        ],
+      },
+    })
+
+    expect(screen.getByText('Choose which forms can use this action.')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('radio', { name: 'Selected forms' }))
+    expect(
+      screen.getByText("Choose forms below. New forms won't be included automatically."),
+    ).toBeInTheDocument()
+
+    await user.click(screen.getByRole('radio', { name: 'All forms' }))
+    expect(screen.getByText('Includes forms added later.')).toBeInTheDocument()
+  })
+
+  it('stores selected forms in defined-form order and clears the key for all forms', async () => {
     const user = userEvent.setup()
     renderControl({
       name: 'Werebear',
@@ -73,11 +98,11 @@ describe('MonsterFormAvailabilityControl', () => {
     })
 
     expect(screen.queryByRole('checkbox', { name: 'Bear' })).not.toBeInTheDocument()
-    await user.click(screen.getByRole('radio', { name: 'Only in selected forms' }))
-    await user.click(screen.getByRole('checkbox', { name: 'Bear' }))
+    await user.click(screen.getByRole('radio', { name: 'Selected forms' }))
     await user.click(screen.getByRole('checkbox', { name: 'Bear-humanoid hybrid' }))
+    await user.click(screen.getByRole('checkbox', { name: 'Bear' }))
 
-    expect(screen.getByLabelText('restriction')).toHaveTextContent('["bear","hybrid"]')
+    expect(screen.getByLabelText('restriction')).toHaveTextContent('["hybrid","bear"]')
     expect(screen.queryByText('Heading preview')).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('radio', { name: 'All forms' }))
@@ -159,7 +184,7 @@ describe('MonsterFormAvailabilityControl', () => {
       ] as MonsterFormValues['actions'],
     })
     expectFormAvailabilityVisible(true)
-    expect(screen.getByRole('radio', { name: 'Only in selected forms' })).toBeChecked()
+    expect(screen.getByRole('radio', { name: 'Selected forms' })).toBeChecked()
   })
 
   it('stays visible for stale restriction ids and lists missing forms', () => {
@@ -201,7 +226,7 @@ describe('MonsterFormAvailabilityControl', () => {
     const eligible = monsterFormRestrictionEligibleIds(forms)
     expect(eligible).toHaveLength(3)
 
-    await user.click(screen.getByRole('radio', { name: 'Only in selected forms' }))
+    await user.click(screen.getByRole('radio', { name: 'Selected forms' }))
     for (const id of eligible) {
       const label =
         id === 'profile'

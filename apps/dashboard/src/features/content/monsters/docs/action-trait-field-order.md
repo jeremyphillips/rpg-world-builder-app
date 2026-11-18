@@ -11,7 +11,7 @@ Regions, in order. An empty region renders nothing.
 5. **Mechanics** — optional Saving throw on a custom ability or custom trait, then trigger, usage, configuration, primary damage, and secondary effects. Shape-Shift puts equipment and the prerequisite in this region. Spellcasting keeps its action-level limit after omitted components. Per-spell limits stay inside each spell row.
 6. **Supplemental prose** — optional Additional details. The editor stays in this position when the disclosure is open.
 
-Form availability follows the advisory when the row schema includes `onlyInFormIds`. The slot always inserts for eligible kinds; the control renders only when more than one restriction-eligible form exists or the row already stores `onlyInFormIds`. All forms leaves that key absent. Only in selected forms stores ids in heading order. Shape-Shift omits the control. Preset traits do not carry the field.
+**Available in** follows the advisory when the row schema includes `onlyInFormIds`. The slot always inserts for eligible kinds; the control renders only when more than one restriction-eligible form exists or the row already stores `onlyInFormIds`. All forms leaves that key absent. Selected forms stores ids in defined-form list order (the same order as the Shape-shifting defined-forms master-detail list). Shape-Shift omits the control. Preset traits do not carry the field.
 
 Casting ability is mechanics. It does not belong in Source.
 
