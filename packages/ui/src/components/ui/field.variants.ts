@@ -234,6 +234,21 @@ export const fieldLabelTypographyVariants = cva('', {
   },
 })
 
+/** Field guidance copy — size-aware; not generic `text-style-caption`. */
+export const fieldHintTypographyVariants = cva('', {
+  variants: {
+    size: {
+      xs: 'text-style-field-hint-compact',
+      sm: 'text-style-field-hint-compact',
+      md: 'text-style-field-hint',
+      lg: 'text-style-field-hint',
+    },
+  },
+  defaultVariants: {
+    size: 'md',
+  },
+})
+
 export type FieldArrayItemLayoutVariant = 'compact' | 'detailed'
 
 /**

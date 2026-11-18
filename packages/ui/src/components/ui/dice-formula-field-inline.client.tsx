@@ -118,7 +118,7 @@ function DiceFormulaInlineBody({
           {hintInLabelSlot ? (
             <div className={fieldLabelHintStackClasses}>
               {ownedLabel}
-              <FieldHintBelowLabel hint={hint} hintId={hintId} />
+              <FieldHintBelowLabel hint={hint} hintId={hintId} size={size} />
             </div>
           ) : (
             ownedLabel
@@ -132,7 +132,9 @@ function DiceFormulaInlineBody({
         </>
       )}
       {hintPosition === 'below-control' && hint && !error ? (
-        <FieldHintText id={hintId}>{hint}</FieldHintText>
+        <FieldHintText id={hintId} size={size}>
+          {hint}
+        </FieldHintText>
       ) : null}
     </>
   )

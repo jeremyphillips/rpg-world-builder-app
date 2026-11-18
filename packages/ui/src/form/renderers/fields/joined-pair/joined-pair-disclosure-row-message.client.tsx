@@ -1,7 +1,8 @@
 'use client'
 
 import { OptionalDisclosureRowMessage } from '../../../../components/ui/optional-disclosure-row-message.client'
-import { useFieldControlSize } from '../../../context/form-section.context'
+import { resolveFormDensity } from '../../../form-density'
+import { useFormSectionContext } from '../../../context/form-section.context'
 import type { JoinedPairFieldConfig } from '../../../field-config'
 import { useJoinedPairFieldRendererState } from './joined-pair-field-renderer-state.client'
 
@@ -15,7 +16,8 @@ export function JoinedPairDisclosureRowMessage({
   id: string
   namePrefix?: string
 }) {
-  const controlSize = useFieldControlSize(config.controlSizeOverride)
+  const { density } = useFormSectionContext()
+  const { size: presentationSize } = resolveFormDensity(density)
   const { validation, hintPresentation } = useJoinedPairFieldRendererState(config, id, namePrefix, {
     rowAwareHints: true,
   })
@@ -23,7 +25,7 @@ export function JoinedPairDisclosureRowMessage({
   return (
     <OptionalDisclosureRowMessage
       controlId={id}
-      size={controlSize}
+      size={presentationSize}
       error={validation.error}
       hint={hintPresentation.text}
       hintPosition={hintPresentation.position}

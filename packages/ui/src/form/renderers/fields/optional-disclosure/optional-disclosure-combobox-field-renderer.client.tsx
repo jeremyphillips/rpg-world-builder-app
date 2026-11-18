@@ -60,7 +60,7 @@ export function OptionalDisclosureComboboxFieldRenderer({
   const rowMessage = hoistRowMessage ? (
     <OptionalDisclosureRowMessage
       controlId={id}
-      size={controlSize}
+      size={presentationSize}
       error={validation.error}
       hint={hint}
       hintPosition={hintPosition}

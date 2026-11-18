@@ -55,7 +55,7 @@ export function CompositeGroup({
 
   const hintNode =
     hintText != null && hintText !== '' ? (
-      <FieldHintBelowLabel hint={hintText} hintId={hintId} />
+      <FieldHintBelowLabel hint={hintText} hintId={hintId} size={size} />
     ) : null
 
   const describedBy = hintText ? hintId : undefined

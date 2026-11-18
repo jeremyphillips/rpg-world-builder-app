@@ -228,12 +228,23 @@ Named `kind: 'array'` section headers default to **field** presentation (`text-s
 `text-style-field-hint*`) via `FormSectionHeader` — not a separate array legend scale. Optional
 `headingScale` on the array config can opt into structural section/subsection typography when needed.
 
-### Compact form heading pairs (`rhythm: compact`)
+### Comfortable field label + hint (`size` md / lg)
+
+| Role                        | Utility                     | px  |
+| --------------------------- | --------------------------- | --- |
+| Field label (`size` md)     | `text-style-field-label-md` | 15  |
+| Field label (`size` lg)     | `text-style-field-label-lg` | 16  |
+| Field hint (`size` md / lg) | `text-style-field-hint`     | 14  |
+
+Field-scale header hints resolve through `fieldHintTypographyVariants({ size })`, not section
+`rhythm`.
+
+### Compact form heading pairs (`rhythm: compact` or `size` sm / xs)
 
 | Role                         | Utility                                           | px  |
 | ---------------------------- | ------------------------------------------------- | --- |
 | Field label (`size` sm / xs) | `text-style-field-label-sm`                       | 13  |
-| Field hint                   | `text-style-field-hint-compact`                   | 12  |
+| Field hint (`size` sm / xs)  | `text-style-field-hint-compact`                   | 12  |
 | Section legend               | `text-style-field-legend-compact`                 | 18  |
 | Section hint                 | `text-style-field-section-description-compact`    | 15  |
 | Subsection legend            | `text-style-field-legend-sub-compact`             | 15  |

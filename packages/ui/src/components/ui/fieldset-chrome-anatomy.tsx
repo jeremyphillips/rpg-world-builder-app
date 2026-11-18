@@ -107,7 +107,7 @@ export function FieldsetChromeAnatomy({
 }: Omit<FieldsetChromeAnatomyProps, 'errorId' | 'error'>) {
   const belowLabelHint =
     hintPosition === 'below-label' && hint ? (
-      <FieldHintBelowLabel hint={hint} hintId={hintId} />
+      <FieldHintBelowLabel hint={hint} hintId={hintId} size={size} />
     ) : null
   return (
     <>
@@ -128,7 +128,9 @@ function FieldsetBelowControlHint({
 
   return (
     <FieldMessageRegion size={size}>
-      <FieldHintText id={hintId}>{hint}</FieldHintText>
+      <FieldHintText id={hintId} size={size}>
+        {hint}
+      </FieldHintText>
     </FieldMessageRegion>
   )
 }

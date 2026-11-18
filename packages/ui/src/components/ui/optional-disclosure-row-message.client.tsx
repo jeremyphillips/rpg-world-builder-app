@@ -1,9 +1,7 @@
 'use client'
 
 import type { FieldHintPosition } from './field.variants'
-import type { FieldSize } from './field.client'
-import { FieldErrorText } from './field.client'
-import { Text } from './text'
+import { FieldErrorText, FieldHintText, type FieldSize } from './field.client'
 
 export type OptionalDisclosureRowMessageProps = {
   controlId: string
@@ -40,8 +38,8 @@ export function OptionalDisclosureRowMessage({
   if (!hasHint || hintPosition !== 'below-control') return null
 
   return (
-    <Text id={hintId} as="p" variant="caption" className="min-w-0 max-w-full break-words">
+    <FieldHintText id={hintId} size={size} className="min-w-0 max-w-full break-words">
       {hint}
-    </Text>
+    </FieldHintText>
   )
 }

@@ -71,7 +71,10 @@ describe('MonsterFormAvailabilityControl', () => {
       },
     })
 
-    expect(screen.getByText('Choose which forms can use this action.')).toBeInTheDocument()
+    const group = screen.getByRole('radiogroup', { name: 'Available in' })
+    const introHint = screen.getByText('Choose which forms can use this action.')
+    expect(introHint).toHaveClass('text-style-field-hint')
+    expect(group.getAttribute('aria-describedby')?.split(' ')).toContain(introHint.id)
 
     await user.click(screen.getByRole('radio', { name: 'Selected forms' }))
     expect(

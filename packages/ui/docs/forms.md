@@ -185,6 +185,15 @@ Centralized in `Field.Root` context:
 
 **Hint vs error.** Hints are guidance; errors are validation. Never encode required-ness as a hint.
 
+**Typography ownership.** Field labels use `fieldLabelVariants` / `fieldLabelTypographyVariants`.
+Field hints use `fieldHintTypographyVariants` (`xs`/`sm` → compact, `md`/`lg` → standard) on
+`Field.Hint` and `FieldHintText` — not generic `Text` caption. Field errors use
+`fieldErrorTextVariants`. Group descriptions (section/subsection) stay on structural description
+utilities and rhythm. Source previews and general supporting copy use `Text` supporting/caption.
+
+A primitive rendered inside a schema **slot** does not inherit section presentation `size` unless
+that slot passes `size` into the primitive.
+
 Adapters resolve effective hint presentation once. `Field.Root` stores that `hintPosition`. `FieldLayout`, `Field.Hint`, and `aria-describedby` read it. Do not pass a second position into `FieldLayout`.
 
 | `hintPosition`          | Role                                   | When invalid                                   |

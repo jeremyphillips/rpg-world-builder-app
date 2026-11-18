@@ -37,8 +37,10 @@ describe('MonsterTrueFormDesignation', () => {
       />,
     )
 
-    expect(screen.getByRole('radiogroup', { name: 'True form' })).toBeInTheDocument()
-    expect(screen.getByText(MONSTER_TRUE_FORM_PROFILE_HINT)).toBeInTheDocument()
+    const group = screen.getByRole('radiogroup', { name: 'True form' })
+    const profileHint = screen.getByText(MONSTER_TRUE_FORM_PROFILE_HINT)
+    expect(profileHint).toHaveClass('text-style-field-hint')
+    expect(group.getAttribute('aria-describedby')?.split(' ')).toContain(profileHint.id)
     expect(screen.queryByText(MONSTER_TRUE_FORM_DEFINED_EMPTY_HINT)).not.toBeInTheDocument()
   })
 

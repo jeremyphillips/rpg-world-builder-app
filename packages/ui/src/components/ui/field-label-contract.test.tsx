@@ -12,7 +12,8 @@ import { Form } from '../../form/shells/form.client'
 import { launchHeadlessChromium } from '../../test-utils/launch-headless-chromium.lib'
 import { ChipsField } from './chips-field.client'
 import { ChooseCountFieldShell } from './choose-count-field-shell.client'
-import { fieldLabelVariants } from './field.variants'
+import { fieldHintTypographyVariants, fieldLabelVariants } from './field.variants'
+import { TextField } from './text-field'
 import { FieldRow } from './field-row'
 import { FieldRowAnatomyProvider } from './field-row-anatomy.context'
 import { InlineSentenceField } from './inline-sentence-field.client'
@@ -204,5 +205,104 @@ describe('field label computed type', () => {
     expect(type.chipsSm).toEqual(type.radioSm)
     expect(type.chipsMd.fontSize).not.toBe(type.chipsSm.fontSize)
     expect(type.chipsMd.fontWeight).not.toBe(type.legend.fontWeight)
+  })
+})
+
+const hintMd = fieldHintTypographyVariants({ size: 'md' })
+const hintSm = fieldHintTypographyVariants({ size: 'sm' })
+
+describe('field hint computed type', () => {
+  let browser: Browser
+  let css: string
+
+  beforeAll(async () => {
+    const tailwind = loadTailwindNode()
+    const globalsPath = join(here, '../../styles/globals.css')
+    const compiler = await tailwind.compile(readFileSync(globalsPath, 'utf8'), {
+      base: dirname(globalsPath),
+      from: globalsPath,
+      onDependency() {},
+    })
+    css = compiler.build([
+      ...hintMd.split(/\s+/),
+      ...hintSm.split(/\s+/),
+      'text-style-field-hint',
+      'text-style-field-hint-compact',
+      'text-style-caption',
+    ])
+    browser = await launchHeadlessChromium()
+  }, 180_000)
+
+  afterAll(async () => {
+    await browser?.close()
+  })
+
+  it('resolves default md radio hint to field-hint, not caption', async () => {
+    render(
+      <RadioGroupField
+        id="availability"
+        label="Available in"
+        hint="Choose which forms can use this action."
+        orientation="horizontal"
+        options={[
+          { value: 'all', label: 'All forms' },
+          { value: 'selected', label: 'Selected forms' },
+        ]}
+      />,
+    )
+
+    const hint = screen.getByText('Choose which forms can use this action.')
+    expect(hint.tagName).toBe('P')
+    expect(hint).toHaveClass('text-style-field-hint')
+    expect(hint).not.toHaveClass('text-style-caption')
+
+    const group = screen.getByRole('radiogroup', { name: 'Available in' })
+    expect(group.getAttribute('aria-describedby')?.split(' ')).toContain('availability-hint')
+
+    const page = await browser.newPage()
+    await page.setContent(`<!doctype html>
+      <body>
+        <p id="hint-md" class="${hintMd}">Field hint</p>
+        <p id="caption" class="text-style-caption">Caption</p>
+        <p id="hint-sm" class="${hintSm}">Compact hint</p>
+      </body>`)
+    await page.addStyleTag({ content: css })
+
+    const type = await page.evaluate(() => {
+      const read = (id: string) => {
+        const style = getComputedStyle(document.getElementById(id)!)
+        return {
+          fontSize: style.fontSize,
+          fontWeight: style.fontWeight,
+          lineHeight: style.lineHeight,
+          color: style.color,
+        }
+      }
+      return { hintMd: read('hint-md'), caption: read('caption'), hintSm: read('hint-sm') }
+    })
+    await page.close()
+
+    expect(type.hintMd).not.toEqual(type.caption)
+    expect(type.hintSm.fontSize).not.toBe(type.hintMd.fontSize)
+  })
+
+  it('keeps sm field hints compact when controlSize is lg', () => {
+    render(<TextField id="name" label="Name" size="sm" controlSize="lg" hint="Helper." />)
+    expect(screen.getByText('Helper.')).toHaveClass('text-style-field-hint-compact')
+  })
+
+  it('uses md field-hint on vertical radio groups', () => {
+    render(
+      <RadioGroupField
+        id="true-form"
+        label="True form"
+        hint="Profile guidance."
+        options={[
+          { value: 'profile', label: 'Profile' },
+          { value: 'defined', label: 'Defined form' },
+        ]}
+      />,
+    )
+    expect(screen.getByText('Profile guidance.')).toHaveClass('text-style-field-hint')
   })
 })
