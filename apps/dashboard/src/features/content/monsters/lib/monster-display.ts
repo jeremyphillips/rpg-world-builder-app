@@ -39,9 +39,13 @@ import {
   formatMonsterTeleport,
   analyzeCreatureFormDifferences,
   formatFormSpeechQualifier,
+  formatMonsterFormQualifier,
   formatMonsterForms,
+  formatMonsterQualifiedHeading,
   formatMonsterShapeShift,
   formatMonsterSpeedStatRow,
+  monsterHasFormRestrictions,
+  resolveCreatureFormsContext,
   resolveFormDifferencesPresentation,
   shapeShiftRows,
   monsterActionSectionRows,
@@ -50,7 +54,6 @@ import {
   resolveCreatureSenses,
   resolveCreatureTraitGrants,
   resolveTraitDisplay,
-  formatMonsterLimitedUseHeading,
   formatMonsterSaveAction,
   formatMonsterSpellEntry,
   formatMonsterStatBlockSubject,
@@ -264,9 +267,41 @@ function findAttackLine(
   return derived?.attacks.find((line) => line.section === section && line.id === actionId)
 }
 
-function withLimitedUseHeading(name: string, limitedUse: unknown): string {
-  const parsed = limitedUseSchema.safeParse(limitedUse)
-  return parsed.success ? formatMonsterLimitedUseHeading(name, parsed.data) : name
+function formNamesForIds(monster: Monster, ids: readonly string[] | undefined): string[] {
+  if (!ids?.length || !monster.forms) return []
+  const context = resolveCreatureFormsContext(monster.forms, monster.name)
+  const named = new Map<string, string>()
+  if (context.status !== 'invalid') {
+    if (context.profile?.name.trim()) named.set(context.profile.id, context.profile.name.trim())
+    for (const form of context.definedForms) {
+      if (form.name.trim()) named.set(form.id, form.name.trim())
+    }
+    for (const form of context.eligibleForms) {
+      if (form.name.trim()) named.set(form.id, form.name.trim())
+    }
+  }
+  return ids.map((id) => named.get(id) ?? id)
+}
+
+function headingSource(row: unknown): {
+  limitedUse: unknown
+  onlyInFormIds: readonly string[] | undefined
+} {
+  if (!row || typeof row !== 'object') return { limitedUse: undefined, onlyInFormIds: undefined }
+  const source = row as { limitedUse?: unknown; onlyInFormIds?: unknown }
+  const ids = Array.isArray(source.onlyInFormIds)
+    ? source.onlyInFormIds.filter((id): id is string => typeof id === 'string')
+    : undefined
+  return { limitedUse: source.limitedUse, onlyInFormIds: ids }
+}
+
+function withQualifiedHeading(monster: Monster, name: string, row: unknown): string {
+  const source = headingSource(row)
+  const parsed = limitedUseSchema.safeParse(source.limitedUse)
+  return formatMonsterQualifiedHeading(name, {
+    limitedUse: parsed.success ? parsed.data : undefined,
+    formQualifier: formatMonsterFormQualifier(formNamesForIds(monster, source.onlyInFormIds)),
+  })
 }
 
 function actionDisplayIdentity(
@@ -496,6 +531,7 @@ function formsTrait(monster: Monster): MonsterTraitItemViewModel[] {
     baseMovement: monster.movement,
     baseHover: monster.hover,
     forms: monster.forms,
+    hasFormRestrictions: monsterHasFormRestrictions(monster),
   })
   if (!text) return []
   return [
@@ -752,6 +788,7 @@ function mapShapeShiftActionItem(
         equipment: action.equipment,
         prerequisite: action.prerequisite,
         hasShapeShift: true,
+        hasFormRestrictions: monsterHasFormRestrictions(spells.monster),
       })
     : ''
   const description = [generated, action.description].filter(Boolean).join(' ')
@@ -824,10 +861,7 @@ function mapActionItem(
     action.kind === 'action-reference'
       ? (referenceHeadings.get(action.id) ?? identity.displayName)
       : identity.displayName
-  const name = withLimitedUseHeading(
-    heading,
-    'limitedUse' in action ? action.limitedUse : undefined,
-  )
+  const name = withQualifiedHeading(spells.monster, heading, action)
   return mapActionItemBody(
     action,
     section,
@@ -1133,11 +1167,15 @@ function mapMonsterTrait(
   derived: DerivedMonsterStatBlock | null | undefined,
 ): MonsterTraitItemViewModel {
   const record = traitRecord(trait)
-  return (
+  const mapped =
     mapPresetMonsterTrait(trait, record, monster.name) ??
     mapTemplateMonsterTrait(trait, record, monster.name) ??
     mapNamedMonsterTrait(trait, record, monster, derived)
-  )
+  const ids = 'onlyInFormIds' in trait ? trait.onlyInFormIds : undefined
+  return {
+    ...mapped,
+    name: withQualifiedHeading(monster, mapped.name, { onlyInFormIds: ids }),
+  }
 }
 
 function formatLegendaryActionsIntro(monster: Monster): string | undefined {

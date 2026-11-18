@@ -22,7 +22,7 @@ Keep the evidence when a gap is verified. Deficiency types are not interchangeab
 ### `creature-forms`
 
 - Concept: multiple defined forms on one stat block, including stable profile identity, true-form designation, size overrides, a generated Shape-Shift action, and a derived Forms trait when that action is absent.
-- Implemented: unified defined forms, central identity and destination resolution, size overrides, the Shape-Shift kind in Actions and Bonus Actions, equipment and prerequisite sentences, form-scoped references, and lifecycle-planned removal. Movement, speech, and availability authoring remain later work.
+- Implemented: unified defined forms, central identity and destination resolution, size, movement, and speech overrides, the Shape-Shift kind in Actions and Bonus Actions, equipment and prerequisite sentences, `onlyInFormIds` on actions and traits, heading qualifiers, single-level form advisories, and lifecycle-planned removal that keeps an emptied restriction invalid.
 - Not this model: stat-block replacement, mist restrictions, involuntary shifts, and Multiattack replacement. Those stay on `stat-block-replacement` or their own gaps.
 - Evidence: [creature-forms.md](./creature-forms.md).
 - Representative: none seeded.

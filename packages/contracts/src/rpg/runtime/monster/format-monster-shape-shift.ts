@@ -38,6 +38,8 @@ export type ShapeShiftDescriptionInput = {
   prerequisite?: string
   description?: string
   hasShapeShift?: boolean
+  /** A trait or action with a non-empty `onlyInFormIds` list. */
+  hasFormRestrictions?: boolean
 }
 
 function lowerName(name: string | undefined): string {
@@ -153,7 +155,9 @@ export function formatMonsterShapeShift(input: ShapeShiftDescriptionInput): stri
 
   const mechanicalDiffers = creatureFormMechanicalDifferencesExist(analysis)
   const differs =
-    mechanicalDiffers || context.definedForms.some((form) => Boolean(form.form?.notes))
+    mechanicalDiffers ||
+    context.definedForms.some((form) => Boolean(form.form?.notes)) ||
+    input.hasFormRestrictions === true
 
   const parts = [`${lead}, or it returns to ${returns}.`]
 
@@ -187,6 +191,7 @@ export function formatMonsterForms(input: {
   baseMovement: MovementSpeeds
   baseHover?: boolean
   forms: MonsterForms
+  hasFormRestrictions?: boolean
 }): string | undefined {
   const context = resolveCreatureFormsContext(input.forms, input.monsterName)
   if (context.status !== 'complete' || context.alternateDestinations.length === 0) return undefined
@@ -212,7 +217,8 @@ export function formatMonsterForms(input: {
     : 'its true form'
   const differs =
     creatureFormMechanicalDifferencesExist(analysis) ||
-    context.definedForms.some((form) => Boolean(form.form?.notes))
+    context.definedForms.some((form) => Boolean(form.form?.notes)) ||
+    input.hasFormRestrictions === true
   const parts = [
     `In addition to ${truePhrase}, the ${monsterSubject(input.monsterName)} can take these forms: ${joinNaturalList(destinations)}.`,
     retainedSentence(differs),

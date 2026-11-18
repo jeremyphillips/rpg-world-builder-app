@@ -39,6 +39,7 @@ describe('monsterTraitDetailFields', () => {
       traitNames({ id: 'note', kind: 'custom', name: 'Note', description: 'Custom.' }),
     ).toEqual([
       'buildAdvisories',
+      'formAvailability',
       'description',
       'savingThrow',
       'savingThrow.ability',

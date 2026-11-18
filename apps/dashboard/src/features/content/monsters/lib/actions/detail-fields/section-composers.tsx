@@ -52,6 +52,7 @@ import {
 import type { MonsterActionSection } from '../references/monster-action-equipment-references'
 import type { MonsterActionDraftRow } from '../monster-action-presets'
 import { monsterActionActiveKeys } from '../monster-action-kind'
+import { insertMonsterFormAvailabilityField } from '../../../components/form/monster-form-availability'
 import type { MonsterFormAdvisory } from '../../monster-form-advisories'
 import { monsterFormAdvisorySlot } from '../../monster-form-advisory-presentation'
 import { legendaryActionCategory } from '../legendary/legendary-action-category'
@@ -455,10 +456,13 @@ export type MonsterActionDetailFieldsInput = {
 export function resolveMonsterActionSectionFields(
   input: MonsterActionDetailFieldsInput,
 ): FormItem[] {
-  return (
+  const fields =
     reactionAuthoringFields(input) ??
     legendaryAuthoringFields(input) ??
     bonusAuthoringFields(input) ??
     sharedAuthoringFields(input)
-  )
+  if (!monsterActionActiveKeys(input.action.kind, input.section).includes('onlyInFormIds')) {
+    return fields
+  }
+  return insertMonsterFormAvailabilityField(fields)
 }

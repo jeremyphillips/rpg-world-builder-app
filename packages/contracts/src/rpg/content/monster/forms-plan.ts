@@ -126,6 +126,43 @@ function deletedFormNotes(body: MonsterFormsPlanBody): string[] {
   )
 }
 
+function formLabel(body: MonsterFormsPlanBody, formId: string): string {
+  const forms = body.forms
+  if (!forms) return formId
+  if (formId === forms.profileFormId) {
+    return forms.trueForm.kind === 'profile' && forms.trueForm.name?.trim()
+      ? forms.trueForm.name.trim()
+      : 'Creature profile'
+  }
+  return forms.definedForms.find((form) => form.id === formId)?.name?.trim() || 'Untitled form'
+}
+
+export type DefinedFormRemovalSummary = {
+  removedForm: { id: string; name?: string }
+  wasTrueForm: boolean
+  deletedNote: boolean
+  strippedReferences: { id?: string; name?: string }[]
+  rowsLosingForm: { id?: string; name?: string; remainingFormNames: string[] }[]
+  indirectlyAffectedReferences: { id?: string; name?: string }[]
+}
+
+function rowsLosingForm(
+  body: MonsterFormsPlanBody,
+  formId: string,
+): DefinedFormRemovalSummary['rowsLosingForm'] {
+  return [...(body.traits ?? []), ...actionRows(body)].flatMap((row) => {
+    if (!row.onlyInFormIds?.includes(formId)) return []
+    const remaining = row.onlyInFormIds.filter((id) => id !== formId)
+    return [
+      {
+        id: row.id,
+        name: row.name,
+        remainingFormNames: remaining.map((id) => formLabel(body, id)),
+      },
+    ]
+  })
+}
+
 function stripFormId(row: FormRestrictedRow, formId: string): FormRestrictedRow {
   if (!row.onlyInFormIds?.includes(formId)) return row
   return { ...row, onlyInFormIds: row.onlyInFormIds.filter((id) => id !== formId) }
@@ -197,6 +234,8 @@ export function planMonsterDefinedFormRemoval(
   if (!form) return undefined
   const references = mapFormReferences(body, formId)
   const wasTrue = body.forms.trueForm.kind === 'defined' && body.forms.trueForm.formId === formId
+  const losingForm = rowsLosingForm(body, formId)
+  const emptied = losingForm.filter((row) => row.remainingFormNames.length === 0)
   return {
     next: {
       ...references,
@@ -210,9 +249,9 @@ export function planMonsterDefinedFormRemoval(
       removedForm: { id: form.id, name: form.name },
       wasTrueForm: wasTrue,
       deletedNote: Boolean(form.notes),
-      strippedReferences: [...(body.traits ?? []), ...actionRows(body)]
-        .filter((row) => row.onlyInFormIds?.includes(formId))
-        .map((row) => ({ id: row.id, name: row.name })),
+      strippedReferences: losingForm.map((row) => ({ id: row.id, name: row.name })),
+      rowsLosingForm: losingForm,
+      indirectlyAffectedReferences: indirectlyAffectedReferences(body, emptied),
     },
   }
 }

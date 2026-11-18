@@ -8,7 +8,10 @@ import {
   planMonsterTrueFormDesignation,
 } from '../../content/monster/forms-plan'
 import { analyzeCreatureFormDifferences } from '../creature/form-differences'
+import { formatMonsterFormQualifier } from './format-monster-form-qualifier'
 import { formatMonsterForms, formatMonsterShapeShift } from './format-monster-shape-shift'
+import { formatMonsterQualifiedHeading } from './spell-entry-presentation'
+import { RECHARGE_ACTIONS } from '../../content/monster/test-fixtures'
 import { formatMonsterSpeedStatRow } from './format-monster-speed-stat-row'
 import { formatFormSpeechQualifier } from './format-form-speech'
 import { formatCreatureCommunication } from '../creature/communication'
@@ -120,6 +123,24 @@ describe('formatMonsterShapeShift', () => {
     ).toBe(
       "The x shape-shifts into a Small or Medium object, or it returns to its true blob form. Except for the differences noted, its game statistics are the same in each form. Any equipment it is wearing or carrying isn't transformed.",
     )
+  })
+
+  it('notes differences when the only change is a form restriction', () => {
+    expect(
+      formatMonsterShapeShift({
+        monsterName: 'X',
+        baseSizes: ['medium'],
+        baseMovement: { walk: 30 },
+        forms: {
+          profileFormId: 'profile',
+          trueForm: { kind: 'profile' },
+          definedForms: [{ id: 'twin', name: 'Twin' }],
+        },
+        equipment: 'unchanged',
+        hasShapeShift: true,
+        hasFormRestrictions: true,
+      }),
+    ).toContain('Except for the differences noted, its game statistics are the same in each form.')
   })
 
   it('prints the succubus fly-only-true-form sentence in description mode', () => {
@@ -331,5 +352,52 @@ describe('planMonsterFormsRemoval', () => {
     expect(plan?.next.forms.trueForm).toEqual({ kind: 'profile' })
     expect(plan?.next.actions?.[0]?.onlyInFormIds).toEqual([])
     expect(plan?.summary.wasTrueForm).toBe(true)
+  })
+
+  it('strips one form without broadening the row and lists indirect references', () => {
+    const plan = planMonsterDefinedFormRemoval(
+      {
+        forms: werebearForms,
+        actions: [
+          { id: 'rend', name: 'Rend', onlyInFormIds: ['bear', 'hybrid'] },
+          { id: 'bite', name: 'Bite', onlyInFormIds: ['bear'] },
+          {
+            id: 'multi',
+            name: 'Multiattack',
+            kind: 'multiattack',
+            steps: [{ actionIds: ['bite'] }],
+          },
+        ],
+      },
+      'bear',
+    )
+    expect(plan?.next.actions?.[0]?.onlyInFormIds).toEqual(['hybrid'])
+    expect(plan?.next.actions?.[1]?.onlyInFormIds).toEqual([])
+    expect(plan?.summary.rowsLosingForm).toEqual([
+      { id: 'rend', name: 'Rend', remainingFormNames: ['Bear-humanoid hybrid'] },
+      { id: 'bite', name: 'Bite', remainingFormNames: [] },
+    ])
+    expect(plan?.summary.indirectlyAffectedReferences).toEqual([
+      { id: 'multi', name: 'Multiattack' },
+    ])
+  })
+})
+
+describe('formatMonsterFormQualifier', () => {
+  it('keeps stored name order and composes with limited use', () => {
+    expect(formatMonsterFormQualifier(['Bear', 'Bear-humanoid hybrid'])).toBe(
+      'Bear or Bear-humanoid hybrid Form Only',
+    )
+    expect(formatMonsterFormQualifier(['Object'])).toBe('Object Form Only')
+    expect(formatMonsterFormQualifier([])).toBeUndefined()
+    expect(
+      formatMonsterQualifiedHeading('Multiattack', {
+        limitedUse: RECHARGE_ACTIONS[1]?.limitedUse,
+        formQualifier: 'Vampire Form Only',
+      }),
+    ).toBe('Multiattack (Recharge 5–6; Vampire Form Only)')
+    expect(
+      formatMonsterQualifiedHeading('Bite', { formQualifier: 'Bat or Vampire Form Only' }),
+    ).toBe('Bite (Bat or Vampire Form Only)')
   })
 })

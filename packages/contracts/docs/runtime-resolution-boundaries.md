@@ -125,7 +125,8 @@ lookup when assembling derivation input from a persisted sheet — not draft sem
 
 **Responsibilities:** Derive printed-style values from authored monster bodies — AC,
 HP, saves, skills, passive Perception, attack lines, spellcasting DC and attack
-bonus, reaction triggers, generated spell prose, XP, and initiative. Policy
+bonus, reaction triggers, generated spell prose, form heading qualifiers, single-level
+form-availability advisories, XP, and initiative. Policy
 lives in [monster-stat-blocks.md](./monster-stat-blocks.md) and
 [activation-and-limited-use.md](./activation-and-limited-use.md).
 

@@ -17,6 +17,7 @@ import {
   getMonsterTraitSectionLabel,
   getProficiencyDomainCollectionLabel,
   joinInlineMetadata,
+  joinNaturalList,
   getProficiencyGrantCompactAddLabel,
   getTermLabelSingular,
   HIT_POINTS_TERM,
@@ -241,6 +242,17 @@ export const MONSTER_FORM_SPEECH_LABEL = "Can't speak in this form"
 export const MONSTER_FORM_DIFFERENCES_LABEL = 'Show form differences in'
 export const MONSTER_FORM_DIFFERENCES_FALLBACK_NOTE =
   'Shown in Speed and Languages rows: there is no Shape-Shift action'
+export const MONSTER_FORM_AVAILABILITY_LABEL = 'Form availability'
+export const MONSTER_FORM_AVAILABILITY_ALL = 'All forms'
+export const MONSTER_FORM_AVAILABILITY_SELECTED = 'Only in selected forms'
+export const MONSTER_FORM_AVAILABILITY_FORMS_LABEL = 'Forms'
+export const MONSTER_FORM_AVAILABILITY_ORDER_HINT = 'Selection order is the heading order.'
+export const MONSTER_FORM_AVAILABILITY_PREVIEW_LABEL = 'Heading preview'
+
+export function formatMonsterMissingFormLabel(id: string): string {
+  return `Missing form (${id})`
+}
+
 export const MONSTER_FORM_NOTES_LABEL = 'Notes'
 export const MONSTER_FORM_NOTES_HINT = 'Completes the sentence: While in this form, …'
 export const MONSTER_SHAPE_SHIFT_EQUIPMENT_LABEL = 'Equipment'
@@ -282,6 +294,40 @@ export function formatMonsterFormsRemovalSummary(summary: {
     sentences.push(`Deleted notes: ${summary.deletedNotes.join(', ')}.`)
   }
   return sentences.join(' ') || 'This removes the forms configuration.'
+}
+
+export function formatMonsterDefinedFormRemovalSummary(summary: {
+  removedForm: { name?: string }
+  wasTrueForm: boolean
+  deletedNote: boolean
+  rowsLosingForm: readonly { name?: string; remainingFormNames: readonly string[] }[]
+  indirectlyAffectedReferences: readonly { name?: string }[]
+}): string {
+  const formName = summary.removedForm.name?.trim() || 'Untitled form'
+  const rowName = (name?: string) => name?.trim() || 'Untitled row'
+  const sentences: string[] = []
+  if (summary.wasTrueForm) sentences.push('The creature profile will become the true form.')
+  if (summary.rowsLosingForm.length > 0) {
+    const names = summary.rowsLosingForm.map((row) => rowName(row.name))
+    const verb = names.length === 1 ? 'loses' : 'lose'
+    sentences.push(`${joinNaturalList(names)} ${verb} ${formName}.`)
+    for (const row of summary.rowsLosingForm) {
+      const label = rowName(row.name)
+      sentences.push(
+        row.remainingFormNames.length === 0
+          ? `${label} will have no forms selected.`
+          : `${label} will then be available only in ${joinNaturalList(row.remainingFormNames, { conjunction: 'or' })} form.`,
+      )
+    }
+    sentences.push('No row becomes unrestricted.')
+  }
+  if (summary.indirectlyAffectedReferences.length > 0) {
+    sentences.push(
+      `Also affected: ${joinNaturalList(summary.indirectlyAffectedReferences.map((row) => rowName(row.name)))}.`,
+    )
+  }
+  if (summary.deletedNote) sentences.push(`${formName}'s notes will be deleted.`)
+  return sentences.join(' ') || 'This removes the defined form.'
 }
 
 export const MONSTER_ACQUISITION_SAVE_DESCRIPTION = 'Saving throw effect'

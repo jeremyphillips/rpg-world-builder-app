@@ -87,6 +87,7 @@ import {
   refineMonsterFormIdentity,
 } from './monster/forms'
 import { shapeShiftRows } from './monster/action/action-removal-plan'
+import { refineMonsterFormAvailability } from './monster/form-availability'
 
 export { MONSTER_ACTION_SECTIONS }
 export type { MonsterActionSection } from './monster/action-sections'
@@ -169,6 +170,7 @@ export const monsterHitPointsSchema = z.discriminatedUnion('kind', [
 
 const monsterTraitAvailabilityFields = {
   available: z.boolean().optional(),
+  onlyInFormIds: z.array(z.string().min(1)).optional(),
   ...entryProvenanceField,
 }
 
@@ -921,6 +923,7 @@ export function refineMonsterBody(
     })
   }
   refineShapeShiftForms(body, ctx, prefix)
+  refineMonsterFormAvailability(body, ctx, prefix)
   refineExperiencePointsOverride(body, ctx, prefix)
 }
 

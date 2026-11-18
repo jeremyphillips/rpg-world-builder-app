@@ -421,6 +421,77 @@ describe('monster-display', () => {
     expect(viewModel.reactions[0]?.name).toBe('Use Antennae')
     expect(viewModel.reactions[0]?.descriptionHtml).toContain('makes one Antennae attack')
   })
+
+  it('qualifies action and trait headings in stored form order', () => {
+    const monster = {
+      ...pickMonster('kobold-warrior'),
+      name: 'Werebear',
+      forms: {
+        profileFormId: 'profile',
+        trueForm: { kind: 'defined', formId: 'humanoid' },
+        definedForms: [
+          { id: 'humanoid', name: 'Humanoid' },
+          { id: 'hybrid', name: 'Bear-humanoid hybrid' },
+          { id: 'bear', name: 'Bear' },
+          { id: 'object', name: 'Object' },
+          { id: 'vampire', name: 'Vampire' },
+          { id: 'bat', name: 'Bat' },
+        ],
+      },
+      traits: [
+        {
+          id: 'adhesive',
+          kind: 'custom',
+          name: 'Adhesive',
+          description: '<p>Sticky.</p>',
+          onlyInFormIds: ['object'],
+        },
+      ],
+      actions: [
+        {
+          id: 'bite',
+          kind: 'special',
+          name: 'Bite',
+          description: '<p>Bite.</p>',
+          onlyInFormIds: ['bear', 'hybrid'],
+        },
+        {
+          id: 'vampire-bite',
+          kind: 'special',
+          name: 'Bite',
+          description: '<p>Bite.</p>',
+          onlyInFormIds: ['bat', 'vampire'],
+        },
+      ],
+      bonusActions: [
+        {
+          id: 'prowl',
+          kind: 'special',
+          name: 'Prowl',
+          description: '<p>Prowl.</p>',
+          onlyInFormIds: ['hybrid', 'bear'],
+        },
+      ],
+    } as Monster
+    const viewModel = buildMonsterDetailViewModel({
+      monster,
+      creatureTypeLabel: 'Humanoid',
+      equipmentById: new Map(),
+      catalogState: 'ready',
+    })
+    expect(viewModel.traits.find((trait) => trait.id === 'adhesive')?.name).toBe(
+      'Adhesive (Object Form Only)',
+    )
+    expect(viewModel.actions.find((action) => action.id === 'bite')?.name).toBe(
+      'Bite (Bear or Bear-humanoid hybrid Form Only)',
+    )
+    expect(viewModel.actions.find((action) => action.id === 'vampire-bite')?.name).toBe(
+      'Bite (Bat or Vampire Form Only)',
+    )
+    expect(viewModel.bonusActions.find((action) => action.id === 'prowl')?.name).toBe(
+      'Prowl (Bear-humanoid hybrid or Bear Form Only)',
+    )
+  })
 })
 
 it('prints resolved class labels in the shared detail classification phrase', () => {

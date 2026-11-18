@@ -14,6 +14,7 @@ import {
   monsterFormAdvisoryTone,
 } from '../monster-form-advisory-presentation'
 import { defineMasterDetailItemNoun } from '../../../lib/master-detail/master-detail-item-noun'
+import { insertMonsterFormAvailabilityField } from '../../components/form/monster-form-availability'
 import { WaterBreathingToggle } from '../../components/form/water-breathing-toggle'
 import { formatMonsterTemplateSentence } from '../format-monster-template-sentence'
 import type { MonsterFormAdvisory } from '../monster-form-advisories'
@@ -181,15 +182,19 @@ export function monsterTraitDetailFields(input: {
         monsterName: input.monsterName,
       }) ?? ''
     const preview = sentence ? [traitPreviewSlot(sentence)] : []
-    return [...preview, advisorySlot, ...monsterTraitTemplateFields()]
+    return insertMonsterFormAvailabilityField([
+      ...preview,
+      advisorySlot,
+      ...monsterTraitTemplateFields(),
+    ])
   }
   if (!isPresetRow(input.row)) {
-    return [
+    return insertMonsterFormAvailabilityField([
       advisorySlot,
       ...monsterTraitItemFields({
         sharedCastingOptions: input.sharedCastingOptions,
       }),
-    ]
+    ])
   }
   const subject = formatMonsterStatBlockSubject(input.monsterName)
   const formatted = formatCreatureTrait({ subject, trait: input.row })

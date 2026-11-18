@@ -127,6 +127,46 @@ describe('useMonsterFormsLifecycle', () => {
     expect(screen.getByLabelText('forms state')).not.toHaveTextContent('"id":"humanoid"')
   })
 
+  it('lists remaining forms and emptied restrictions when a form is removed', async () => {
+    const user = userEvent.setup()
+    render(
+      <LifecycleHost
+        values={monsterFormTestValues({
+          name: 'Werebear',
+          forms: {
+            profileFormId: 'profile',
+            trueForm: { kind: 'defined', formId: 'humanoid' },
+            definedForms: [
+              { id: 'humanoid', name: 'Humanoid' },
+              { id: 'hybrid', name: 'Bear-humanoid hybrid' },
+              { id: 'bear', name: 'Bear' },
+            ],
+          },
+          actions: [
+            { id: 'rend', kind: 'special', name: 'Rend', onlyInFormIds: ['bear', 'hybrid'] },
+            { id: 'bite', kind: 'special', name: 'Bite', onlyInFormIds: ['bear'] },
+            {
+              id: 'multi',
+              kind: 'multiattack',
+              name: 'Multiattack',
+              steps: [{ actionIds: ['bite'] }],
+            },
+          ] as MonsterFormValues['actions'],
+        })}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Remove bear' }))
+    const dialog = screen.getByRole('alertdialog')
+    expect(dialog).toHaveTextContent('Rend and Bite lose Bear.')
+    expect(dialog).toHaveTextContent(
+      'Rend will then be available only in Bear-humanoid hybrid form.',
+    )
+    expect(dialog).toHaveTextContent('Bite will have no forms selected.')
+    expect(dialog).toHaveTextContent('No row becomes unrestricted.')
+    expect(dialog).toHaveTextContent('Also affected: Multiattack.')
+  })
+
   it('preserves designation when removing a non-designated row', async () => {
     const user = userEvent.setup()
     render(<LifecycleHost values={values} />)

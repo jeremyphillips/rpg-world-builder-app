@@ -1,6 +1,7 @@
 import {
   formatMonsterShapeShift,
   joinNaturalList,
+  monsterHasFormRestrictions,
   resolveCreatureFormsContext,
 } from '@rpg/contracts'
 import { movementRowsToRecordForPreview } from '../../../../lib/forms/fields/content-movement-form-fields'
@@ -58,6 +59,7 @@ export function MonsterActionShapeShiftSummary({
       prerequisite: draft.prerequisite,
       description: draft.description,
       hasShapeShift: true,
+      hasFormRestrictions: monsterHasFormRestrictions(values),
     })
     return { destinations: joinNaturalList(destinationNames), preview }
   }, [action.id, action.kind, ctx, values])

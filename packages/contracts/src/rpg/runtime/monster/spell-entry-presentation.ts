@@ -208,7 +208,21 @@ export function formatOnceUntilNextTurnSentence(args: {
 
 export function formatMonsterLimitedUseHeading(name: string, limitedUse?: LimitedUse): string {
   if (!limitedUse) return name
-  return `${name} (${formatLimitedUseNotation(limitedUse, 'stat-block')})`
+  return formatMonsterQualifiedHeading(name, { limitedUse })
+}
+
+/** Limited-use notation, then a form qualifier, joined in one heading parenthesis. */
+export function formatMonsterQualifiedHeading(
+  name: string,
+  options: { limitedUse?: LimitedUse; formQualifier?: string } = {},
+): string {
+  const notation = options.limitedUse
+    ? formatLimitedUseNotation(options.limitedUse, 'stat-block')
+    : undefined
+  const qualifier = options.formQualifier?.trim()
+  const details = [notation, qualifier].filter((part): part is string => Boolean(part))
+  if (details.length === 0) return name
+  return `${name} (${details.join('; ')})`
 }
 
 export function formatMonsterSpellEntry(args: {

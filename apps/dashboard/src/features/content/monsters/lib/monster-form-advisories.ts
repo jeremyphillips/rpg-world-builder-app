@@ -1,4 +1,5 @@
 import {
+  collectFormAvailabilityAdvisories,
   isWeaponEquipment,
   isWeaponProficientFromGrantSet,
   joinInlineMetadata,
@@ -48,6 +49,8 @@ export type MonsterFormAdvisory = {
     | 'leap-zero-walk-speed'
     | 'leap-movement-exceeds-walk-speed'
     | 'multiattack-unavailable-action'
+    | 'form-restricted-reference'
+    | 'form-restricted-multiattack'
   message: string
   path: string
 }
@@ -215,5 +218,9 @@ export function collectMonsterFormAdvisories(
     })
   }
 
-  return [...advisories, ...collectTraitSpeedAdvisories(values)]
+  return [
+    ...advisories,
+    ...collectTraitSpeedAdvisories(values),
+    ...collectFormAvailabilityAdvisories(values),
+  ]
 }

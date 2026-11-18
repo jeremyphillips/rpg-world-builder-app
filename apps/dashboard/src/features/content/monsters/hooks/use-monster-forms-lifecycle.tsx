@@ -12,6 +12,7 @@ import {
   MONSTER_FORMS_CANCEL_LABEL,
   MONSTER_FORMS_REMOVE_CONFIRM_LABEL,
   MONSTER_FORMS_REMOVE_HEADLINE,
+  formatMonsterDefinedFormRemovalSummary,
   formatMonsterFormsRemovalSummary,
 } from '../lib/monster-form-labels'
 import { makeEmptyMonsterForms } from '../lib/forms/monster-forms-form-values'
@@ -117,19 +118,10 @@ export function useMonsterFormsLifecycle() {
       )
       if (!plan) return
       const name = plan.summary.removedForm.name?.trim() || 'Untitled form'
-      const consequences = [
-        plan.summary.wasTrueForm ? 'The creature profile will become the true form.' : undefined,
-        plan.summary.strippedReferences.length > 0
-          ? `Form restrictions removed from: ${plan.summary.strippedReferences
-              .map((row) => row.name?.trim() || 'Untitled row')
-              .join(', ')}.`
-          : undefined,
-        plan.summary.deletedNote ? `The note for ${name} will be deleted.` : undefined,
-      ].filter(Boolean) as string[]
       setPending({
         next: plan.next,
         headline: `Remove ${name}?`,
-        description: consequences.join(' ') || 'This removes the defined form.',
+        description: formatMonsterDefinedFormRemovalSummary(plan.summary),
         confirmLabel: 'Remove form',
         afterConfirm,
       })

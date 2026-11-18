@@ -11,6 +11,8 @@ Regions, in order. An empty region renders nothing.
 5. **Mechanics** — optional Saving throw on a custom ability or custom trait, then trigger, usage, configuration, primary damage, and secondary effects. Shape-Shift puts equipment and the prerequisite in this region. Spellcasting keeps its action-level limit after omitted components. Per-spell limits stay inside each spell row.
 6. **Supplemental prose** — optional Additional details. The editor stays in this position when the disclosure is open.
 
+Form availability follows the advisory when the row schema includes `onlyInFormIds`. All forms leaves that key absent. Only in selected forms stores ids in heading order. Shape-Shift omits the control. Preset traits do not carry the field.
+
 Casting ability is mechanics. It does not belong in Source.
 
 Save actions keep one Saving Throw group. Inside it, order is: save ability and DC, targeting, **Failed save** (one ordered effect list, then repeat save), **Successful save** (one ordered effect list), optional **Failure or success**, then **Turn limit**. Turn limit is the presence of `onceUntilNextTurn`. Global turn-limit disclosure is omitted on save actions because it lives on this tail.

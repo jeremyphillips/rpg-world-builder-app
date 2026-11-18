@@ -2,7 +2,13 @@ import { describe, expect, it } from 'vitest'
 
 import { createMonsterDraftInputSchema, createMonsterInputSchema } from '../monster'
 import { monsterActionDraftSchema } from './action'
-import { MONSTER_TEST_BODY } from './test-fixtures'
+import {
+  FORM_RESTRICTION_DUPLICATE_MESSAGE,
+  FORM_RESTRICTION_EMPTY_MESSAGE,
+  FORM_RESTRICTION_REQUIRES_FORMS_MESSAGE,
+  FORM_RESTRICTION_UNRESOLVED_MESSAGE,
+} from './form-availability'
+import { BITE_ACTION, MONSTER_TEST_BODY } from './test-fixtures'
 
 const forms = {
   profileFormId: 'profile',
@@ -155,6 +161,85 @@ describe('monster forms', () => {
     expect(Object.keys(option?.shape ?? {})).not.toContain('onlyInFormIds')
     expect(Object.keys(option?.shape ?? {})).not.toContain('onceUntilNextTurn')
     expect(Object.keys(monsterActionDraftSchema.options[0]?.shape ?? {})).toContain('onlyInFormIds')
+
+    const emptyRestriction = createMonsterInputSchema.safeParse({
+      slug: 'empty-restriction',
+      ...MONSTER_TEST_BODY,
+      forms,
+      actions: [{ ...BITE_ACTION, onlyInFormIds: [] }],
+    })
+    expect(emptyRestriction.success).toBe(false)
+    if (!emptyRestriction.success) {
+      expect(emptyRestriction.error.issues).toContainEqual(
+        expect.objectContaining({
+          path: ['actions', 0, 'onlyInFormIds'],
+          message: FORM_RESTRICTION_EMPTY_MESSAGE,
+        }),
+      )
+    }
+
+    const duplicateIds = createMonsterInputSchema.safeParse({
+      slug: 'duplicate-restriction',
+      ...MONSTER_TEST_BODY,
+      forms,
+      actions: [{ ...BITE_ACTION, onlyInFormIds: ['bear', 'bear'] }],
+    })
+    expect(duplicateIds.success).toBe(false)
+    if (!duplicateIds.success) {
+      expect(duplicateIds.error.issues).toContainEqual(
+        expect.objectContaining({ message: FORM_RESTRICTION_DUPLICATE_MESSAGE }),
+      )
+    }
+
+    const unresolved = createMonsterInputSchema.safeParse({
+      slug: 'unresolved-restriction',
+      ...MONSTER_TEST_BODY,
+      forms,
+      actions: [{ ...BITE_ACTION, onlyInFormIds: ['profile'] }],
+    })
+    expect(unresolved.success).toBe(false)
+    if (!unresolved.success) {
+      expect(unresolved.error.issues).toContainEqual(
+        expect.objectContaining({ message: FORM_RESTRICTION_UNRESOLVED_MESSAGE }),
+      )
+    }
+
+    const withoutForms = createMonsterInputSchema.safeParse({
+      slug: 'restriction-without-forms',
+      ...MONSTER_TEST_BODY,
+      actions: [{ ...BITE_ACTION, onlyInFormIds: ['bear'] }],
+    })
+    expect(withoutForms.success).toBe(false)
+    if (!withoutForms.success) {
+      expect(withoutForms.error.issues).toContainEqual(
+        expect.objectContaining({ message: FORM_RESTRICTION_REQUIRES_FORMS_MESSAGE }),
+      )
+    }
+
+    const everyForm = createMonsterInputSchema.safeParse({
+      slug: 'every-form',
+      ...MONSTER_TEST_BODY,
+      forms,
+      actions: [{ ...BITE_ACTION, onlyInFormIds: ['humanoid', 'bear'] }],
+    })
+    expect(everyForm.success).toBe(true)
+
+    const draft = createMonsterDraftInputSchema.safeParse({
+      slug: 'restriction-draft',
+      ...MONSTER_TEST_BODY,
+      forms,
+      actions: [{ ...BITE_ACTION, onlyInFormIds: [] }],
+      traits: [
+        {
+          id: 'adhesive',
+          kind: 'custom',
+          name: 'Adhesive',
+          description: '<p>Sticky.</p>',
+          onlyInFormIds: ['missing'],
+        },
+      ],
+    })
+    expect(draft.success).toBe(true)
 
     const second = createMonsterInputSchema.safeParse({
       slug: 'two-shifts',
