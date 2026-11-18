@@ -354,8 +354,9 @@ Open optional **groups** intentionally stay on `FieldGroup` so fieldset legend, 
 hint, and nested field body rhythm match other subsections. Collapsed groups still use
 `OptionalFieldDisclosure` for the labeled header and summary row. Add/clear and summary typography
 are shared primitives; only the open group **shell** differs. When `sourcePreview` is set, the open
-shell renders that read-only block above the editor (leaf) or as the first child inside the
-fieldset (group); it is display-only and never serializes.
+shell renders that read-only block above the editor (leaf anatomy stack) or, for groups, inside an
+anatomy wrapper with section-rhythm field stack beneath it — not as the first spaced sibling in the
+section rhythm bucket. It is display-only and never serializes.
 
 **Deferred:** Merging open groups into the same structural component as leaf open disclosures is
 not planned — `OpenOptionalFieldDisclosure` does not own fieldset legend or group body spacing.

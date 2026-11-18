@@ -3,9 +3,13 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm, useFormContext } from 'react-hook-form'
 
+import {
+  fieldAnatomyStackVariants,
+  fieldStackRhythmVariants,
+} from '../../components/ui/field.variants'
 import { FormItems } from './form-items.client'
 import { FormRhythmStack, FormSectionContext } from '../context/form-section.context'
-import { DEFAULT_FORM_DENSITY } from '../form-density'
+import { DEFAULT_FORM_DENSITY, resolveFormDensity } from '../form-density'
 import type { FormItem } from '../field-config'
 
 const field = {
@@ -239,6 +243,19 @@ describe('group optionalDisclosure', () => {
     expect(group).toHaveTextContent('Base movement')
     expect(group).toHaveTextContent('Walk 30 ft.')
     expect(state()).toEqual({ dirty: false, savingThrow: null })
+
+    const previewLine = document.getElementById('preview-movementOverride-source-preview')
+    expect(previewLine).toBeInTheDocument()
+    const anatomyStack = previewLine?.parentElement
+    expect(anatomyStack).toHaveClass(
+      ...fieldAnatomyStackVariants({ size: resolveFormDensity().size }).split(/\s+/),
+    )
+
+    const editorStack = anatomyStack?.querySelector(':scope > div.min-w-0')
+    expect(editorStack).toHaveClass(
+      ...fieldStackRhythmVariants({ rhythm: resolveFormDensity().rhythm }).split(/\s+/),
+    )
+    expect(editorStack).toContainElement(screen.getByRole('textbox', { name: 'Walk' }))
   })
 
   it('writes seedWhen when the group opens', async () => {

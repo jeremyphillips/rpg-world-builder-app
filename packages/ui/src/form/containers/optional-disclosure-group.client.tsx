@@ -23,6 +23,14 @@ import {
 } from './optional-disclosure-group.lib'
 import { optionalDisclosureDependsOnPaths } from '../config/optional-disclosure-config.lib'
 import { OptionalDisclosureSourcePreview } from '../../components/ui/optional-disclosure-source-preview.client'
+import type { OptionalDisclosureSourcePreviewContent } from '../../components/ui/optional-disclosure-source-preview.client'
+import type { FieldSize } from '../../components/ui/field.client'
+import {
+  fieldAnatomyStackVariants,
+  fieldStackRhythmVariants,
+  type FieldRhythm,
+} from '../../components/ui/field.variants'
+import { cn } from '../../lib/utils'
 
 function objectHasContent(value: unknown): boolean {
   if (value == null || typeof value !== 'object' || Array.isArray(value)) return false
@@ -60,6 +68,35 @@ type OptionalDisclosureGroupProps = {
   idPrefix: string
   namePrefix?: string
   children: ReactNode
+}
+
+/**
+ * Source preview sits in field anatomy with the editor; editor siblings keep section rhythm.
+ * Omit the wrapper when no preview — ordinary group body layout is unchanged.
+ */
+function OptionalDisclosureOpenGroupBody({
+  controlId,
+  sourcePreview,
+  groupSize,
+  groupRhythm,
+  children,
+}: {
+  controlId: string
+  sourcePreview?: OptionalDisclosureSourcePreviewContent
+  groupSize: FieldSize
+  groupRhythm: FieldRhythm
+  children: ReactNode
+}) {
+  if (!sourcePreview) return children
+
+  return (
+    <div className={fieldAnatomyStackVariants({ size: groupSize })}>
+      <OptionalDisclosureSourcePreview id={`${controlId}-source-preview`} preview={sourcePreview} />
+      <div className={cn(fieldStackRhythmVariants({ rhythm: groupRhythm }), 'min-w-0')}>
+        {children}
+      </div>
+    </div>
+  )
 }
 
 /** Optional object group. Opening writes form state only when `seedWhen` is set. Remove unsets the object. */
@@ -182,11 +219,14 @@ function OptionalDisclosureGroupBody({
             </OptionalDisclosureMicroAction>
           }
         >
-          <OptionalDisclosureSourcePreview
-            id={sourcePreview ? `${controlId}-source-preview` : undefined}
-            preview={sourcePreview}
-          />
-          {children}
+          <OptionalDisclosureOpenGroupBody
+            controlId={controlId}
+            sourcePreview={sourcePreview}
+            groupSize={groupSize}
+            groupRhythm={groupRhythm}
+          >
+            {children}
+          </OptionalDisclosureOpenGroupBody>
         </FieldGroup>
         {confirmDialog}
       </>
