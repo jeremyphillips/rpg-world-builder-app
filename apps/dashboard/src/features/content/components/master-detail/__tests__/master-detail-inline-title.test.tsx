@@ -65,6 +65,19 @@ function Harness({
 }
 
 describe('master detail inline title', () => {
+  it('commits a typed name when the initial edit blurs', async () => {
+    const user = userEvent.setup()
+    const formRef: { current: UseFormReturn<{ actions: { name?: string }[] }> | null } = {
+      current: null,
+    }
+    render(<Harness formRef={formRef} initialEdit name="" />)
+    const input = await screen.findByRole('textbox', { name: 'Name' })
+    await user.type(input, 'Bear')
+    await user.tab()
+    expect(formRef.current?.getValues('actions.0.name')).toBe('Bear')
+    expect(screen.getByText('Bear')).toBeInTheDocument()
+  })
+
   it('acknowledges acquisition once after initial edit focus', async () => {
     const onAcquisitionEditApplied = vi.fn()
     render(<Harness initialEdit onAcquisitionEditApplied={onAcquisitionEditApplied} name="" />)

@@ -1,6 +1,7 @@
+import { useEffect } from 'react'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { FormProvider, useForm, useWatch } from 'react-hook-form'
+import { FormProvider, useForm, useWatch, type UseFormReturn } from 'react-hook-form'
 import { describe, expect, it } from 'vitest'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
@@ -84,5 +85,38 @@ describe('monster forms authoring architecture', () => {
     }
     expect(state.definedForms).toHaveLength(1)
     expect(state.trueForm.formId).toBe(state.definedForms[0]?.id)
+  })
+
+  it('keeps a defined form name after the inline title blurs', async () => {
+    const user = userEvent.setup()
+    const formRef: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }
+
+    function Host() {
+      const form = useForm<MonsterFormValues>({
+        defaultValues: monsterFormTestValues({ name: 'Werebear' }),
+        shouldUnregister: true,
+      })
+      useEffect(() => {
+        formRef.current = form
+      })
+      return (
+        <FormProvider {...form}>
+          <MonsterFormsEditor ctx={ctx} />
+        </FormProvider>
+      )
+    }
+
+    render(<Host />)
+    await user.click(screen.getByRole('button', { name: 'Add forms' }))
+    await user.click(screen.getByRole('button', { name: 'Add form' }))
+    const input = await screen.findByRole('textbox', { name: 'Name' })
+    await user.type(input, 'Bear')
+    await user.tab()
+
+    expect(formRef.current?.getValues('forms.definedForms.0.name')).toBe('Bear')
+    expect(screen.getAllByText('Bear').length).toBeGreaterThan(0)
+    expect(screen.queryByRole('textbox', { name: 'Name' })).not.toBeInTheDocument()
+    expect(document.activeElement?.getAttribute('aria-hidden')).not.toBe('true')
+    expect(formRef.current?.getValues('forms.definedForms')).toHaveLength(1)
   })
 })

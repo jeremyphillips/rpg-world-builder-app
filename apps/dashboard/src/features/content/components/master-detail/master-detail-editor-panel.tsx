@@ -16,6 +16,19 @@ import {
 
 export type { MasterDetailEditorIdentity, MasterDetailInlineTitle }
 
+/** Visible detail controls. Skips Radix bubble inputs (`aria-hidden`, `tabindex="-1"`). */
+const MASTER_DETAIL_BODY_FOCUS_SELECTOR = [
+  'input:not([type="hidden"]):not([aria-hidden="true"]):not([tabindex="-1"])',
+  'select:not([aria-hidden="true"]):not([tabindex="-1"])',
+  'textarea:not([aria-hidden="true"]):not([tabindex="-1"])',
+  '[contenteditable="true"]:not([aria-hidden="true"])',
+].join(', ')
+
+function focusIsInInlineTitle(): boolean {
+  const active = document.activeElement
+  return active instanceof Element && Boolean(active.closest('[data-master-detail-title-row]'))
+}
+
 function omitInlineTitleField(fields: FormItem[], fieldName: string | undefined): FormItem[] {
   if (!fieldName) return fields
   return fields.filter((item) => !('name' in item) || item.name !== fieldName)
@@ -156,27 +169,33 @@ export function MasterDetailEditorPanel({
 
   const inlineTitle = hasSelectedRow ? selectedIdentity?.inlineTitle : undefined
 
+  const lastAddedFieldId = editor.lastAddedFieldId
+  const acknowledgeAcquisition = editor.acknowledgeAcquisition
+  const awaitingTitle = Boolean(selectedIdentity?.acquisitionAwaitingTitleResolution)
+
   const handleAcquisitionEditApplied = useCallback(
     (fieldId: string) => {
-      editor.acknowledgeAcquisition(fieldId)
+      acknowledgeAcquisition(fieldId)
     },
-    [editor],
+    [acknowledgeAcquisition],
   )
 
   useEffect(() => {
-    if (!editor.lastAddedFieldId || editor.lastAddedFieldId !== selectedFieldId) return
-    if (selectedIdentity?.acquisitionAwaitingTitleResolution) return
+    if (!lastAddedFieldId || lastAddedFieldId !== selectedFieldId) return
+    if (awaitingTitle) return
     const root = bodyRef.current
     if (!root) {
-      editor.acknowledgeAcquisition(selectedFieldId)
+      acknowledgeAcquisition(selectedFieldId)
       return
     }
-    const focusable = root.querySelector<HTMLElement>(
-      'input:not([type="hidden"]), select, textarea, [contenteditable="true"]',
-    )
+    if (focusIsInInlineTitle()) {
+      acknowledgeAcquisition(selectedFieldId)
+      return
+    }
+    const focusable = root.querySelector<HTMLElement>(MASTER_DETAIL_BODY_FOCUS_SELECTOR)
     focusable?.focus()
-    editor.acknowledgeAcquisition(selectedFieldId)
-  }, [editor, selectedFieldId, selectedIdentity?.acquisitionAwaitingTitleResolution])
+    acknowledgeAcquisition(selectedFieldId)
+  }, [acknowledgeAcquisition, awaitingTitle, lastAddedFieldId, selectedFieldId])
 
   const visibleFields = omitInlineTitleField(itemFields, inlineTitle?.field)
 

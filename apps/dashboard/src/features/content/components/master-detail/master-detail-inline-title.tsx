@@ -88,7 +88,8 @@ export function MasterDetailInlineTitleEditor({
   const cancelingRef = useRef(false)
   const localWriteRef = useRef(false)
   const seenValueRef = useRef(valueKey)
-  const snapshotRef = useRef(storedName(watched))
+  const snapshotRef = useRef<string | undefined>(undefined)
+  const snapshotReadyRef = useRef(false)
   const acquisitionEditOpenedRef = useRef(Boolean(title.initialEdit))
   const acquisitionAcknowledgedRef = useRef(false)
   const [editing, setEditing] = useState(() => Boolean(title.initialEdit))
@@ -111,10 +112,21 @@ export function MasterDetailInlineTitleEditor({
   }, [valueKey])
 
   useEffect(() => {
+    if (!editing) {
+      snapshotReadyRef.current = false
+      return
+    }
+    if (snapshotReadyRef.current) return
+    snapshotReadyRef.current = true
+    snapshotRef.current = storedName(getValues(path))
+  }, [editing, getValues, path])
+
+  useEffect(() => {
     if (!title.initialEdit || acquisitionEditOpenedRef.current) return
     acquisitionEditOpenedRef.current = true
+    snapshotRef.current = storedName(getValues(path))
     setEditing(true)
-  }, [title.initialEdit])
+  }, [getValues, path, title.initialEdit])
 
   useEffect(() => {
     if (!editing) return
