@@ -62,6 +62,10 @@ export interface FieldReadOnlyValueFieldProps extends FieldValidationProps, Fiel
   hint?: string
   hintPosition?: FieldHintPosition
   info?: ReactNode
+  /**
+   * Accepted so field config can pass `required`. The value is not an input, so the
+   * marker and programmatic required state stay off.
+   */
   required?: boolean
   width?: FieldWidth
   size?: FieldSize
@@ -88,7 +92,6 @@ export function FieldReadOnlyValueField({
   hint,
   hintPosition,
   info,
-  required,
   width,
   size = 'md',
   digits,
@@ -129,7 +132,6 @@ export function FieldReadOnlyValueField({
         hint={hint}
         hintPosition={hintPosition}
         info={info}
-        required={required}
         width={width}
         size={size}
         labelPosition="settings"
@@ -148,7 +150,6 @@ export function FieldReadOnlyValueField({
       describedBy={describedBy}
       hint={hint}
       hintPosition={hintPosition}
-      required={required}
       width={width}
       size={size}
       anatomy={Boolean(label.trim())}

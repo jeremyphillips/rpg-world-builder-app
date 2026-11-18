@@ -12,6 +12,7 @@ import { ArrayFieldAddControl } from './array-field-add-control.client'
 import { ArrayFieldContainerError } from './array-field-container-error.client'
 import { ArrayFieldEmptyState } from './array-field-empty-state.client'
 import { ArraySectionHeader } from './array-section-header.client'
+import { resolveArrayFieldsetDescribedBy } from './resolve-array-fieldset-described-by.lib'
 import { ArrayFieldItemList } from './array-field-item-list.client'
 import type { ArrayFieldSectionLayout } from './array-field-renderer.client'
 import type { useArrayFieldRendererState } from './use-array-field-renderer-state.client'
@@ -54,7 +55,15 @@ export function ArrayFieldRendererFieldset({
   onMove,
 }: ArrayFieldRendererFieldsetProps) {
   const inlineAddInHeader = state.addActionLayout === 'inline' && state.showSectionHeader
-  const containerErrorId = `${state.idPrefix}-${state.fullName.replaceAll('.', '-')}-error`
+  const descriptionBaseId = `${state.idPrefix}-${state.fullName.replaceAll('.', '-')}`
+  const containerErrorId = `${descriptionBaseId}-error`
+  const hintId = `${descriptionBaseId}-hint`
+  const describedBy = resolveArrayFieldsetDescribedBy({
+    hasContainerIssue: state.hasContainerIssue,
+    hint: state.sectionHint,
+    errorId: containerErrorId,
+    hintId,
+  })
 
   const addControl = (
     <ArrayFieldAddControl
@@ -82,7 +91,7 @@ export function ArrayFieldRendererFieldset({
         showSectionHeader: state.showSectionHeader,
         legendFieldSize: state.legendFieldSize,
       })}
-      aria-describedby={state.hasContainerIssue ? containerErrorId : undefined}
+      aria-describedby={describedBy}
       aria-invalid={state.hasContainerIssue ? true : undefined}
     >
       {state.showSectionHeader || state.labelMode === 'srOnly' ? (
@@ -91,6 +100,7 @@ export function ArrayFieldRendererFieldset({
           showSectionHeader={state.showSectionHeader}
           sectionLabel={state.sectionLabel}
           hint={state.sectionHint}
+          hintId={hintId}
           legendFieldSize={state.legendFieldSize}
           legendRhythm={state.legendRhythm}
           headingScale={state.headingScale}

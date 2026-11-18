@@ -227,7 +227,7 @@ describe('controlSizeOverride escape hatch', () => {
     expect(screen.getByRole('textbox', { name: 'Title' })).toHaveClass('ui-field-control--lg')
     expect(screen.getByRole('textbox', { name: 'Subtitle' })).toHaveClass('ui-field-control--md')
     expect(screen.getByLabelText('Subtitle').closest('.gap-6')).toBeInTheDocument()
-    expect(screen.getByText('Title').parentElement).toHaveClass('text-style-field-label-md')
+    expect(screen.getByText('Title')).toHaveClass('text-style-field-label-md')
   })
 })
 

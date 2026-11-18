@@ -164,7 +164,7 @@ describe('ArrayFieldRenderer', () => {
     expect(legend).toHaveClass('contents')
     expect(legend).not.toHaveClass('mb-1.5')
     expect(fieldset).toHaveClass(...fieldAnatomyStackVariants({ size: 'md' }).split(/\s+/))
-    expect(screen.getByText('Traits').parentElement).toHaveClass('text-style-field-label-md')
+    expect(screen.getByText('Traits')).toHaveClass('text-style-field-label-md')
     expect(legend).not.toHaveClass('text-field-array-legend')
     expect(legend).not.toHaveClass('text-style-field-legend')
     expect(fieldset.querySelector(':scope > div')).toHaveClass('gap-3')
@@ -356,26 +356,32 @@ describe('ArrayFieldRenderer', () => {
       },
     ]
 
-    const { container } = render(
+    render(
       <Form<Values>
         schema={schema}
         fields={inlineFields}
+        defaultValues={{ name: 'Hero', traits: [{ name: 'Darkvision', description: '' }] }}
         onSubmit={vi.fn()}
         footer={<button type="submit">Save</button>}
       />,
     )
 
-    const fieldset = container.querySelector('fieldset')!
+    const fieldset = screen.getByRole('group', { name: /^Grants/ })
     const legend = fieldset.querySelector('legend')
     const addButton = screen.getByRole('button', { name: 'Add grant' })
+    const hint = screen.getByText('Add the mechanical effects this feature provides.')
 
     expect(legend).toHaveTextContent('Grants')
-    expect(
-      screen.getByText('Add the mechanical effects this feature provides.'),
-    ).toBeInTheDocument()
+    expect(legend).not.toContainElement(hint)
+    expect(fieldset).toHaveAccessibleName(/Grants/)
+    expect(fieldset).not.toHaveAccessibleName(/mechanical effects/)
+    expect(fieldset).toHaveAttribute('aria-describedby', hint.id)
+    const traitNameDescribedBy =
+      screen.getByRole('textbox', { name: 'Trait name' }).getAttribute('aria-describedby') ?? ''
+    expect(traitNameDescribedBy).not.toContain(hint.id)
     expect(legend).toContainElement(addButton)
     expect(legend).toHaveClass('w-full')
-    expect(document.querySelector('.grid.items-start')).toBeTruthy()
+    expect(document.querySelector('.grid.items-center')).toBeTruthy()
   })
 
   it('renders inline add actions in the legend row with a leading plus icon', () => {

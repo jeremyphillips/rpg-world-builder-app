@@ -36,6 +36,11 @@ export interface FormSectionHeaderProps {
   required?: boolean
   /** When false, omit the visible label line. Hint and accessories remain. */
   showVisibleLabel?: boolean
+  /**
+   * The accessible name is owned by another element (for example a fieldset legend).
+   * Renders accessories and hint only — no second copy of the label text.
+   */
+  omitLabel?: boolean
   className?: string
   id?: string
 }
@@ -65,6 +70,7 @@ function renderHeadingBlock({
   required,
   id,
   showVisibleLabel = true,
+  omitLabel = false,
 }: FormSectionHeaderProps & { rhythm: FieldRhythm; size: FieldSize }): ReactNode {
   const stackTypography = resolveFormHeaderStackTypography({
     headingScale,
@@ -75,7 +81,11 @@ function renderHeadingBlock({
 
   let labelLine: ReactNode = null
 
-  if (headingScale === 'field') {
+  if (omitLabel) {
+    labelLine = labelAccessory ? (
+      <div className={formSectionHeaderLabelRowClasses}>{labelAccessory}</div>
+    ) : null
+  } else if (headingScale === 'field') {
     const fieldLabelVisibility = showVisibleLabel ? 'visible' : 'srOnly'
     const { showRequiredMarker, nameClassName } = resolveOwnedLabelPolicy(
       required,
@@ -142,6 +152,7 @@ export function FormSectionHeader({
   labelAccessory,
   required,
   showVisibleLabel = true,
+  omitLabel = false,
   className,
   id,
 }: FormSectionHeaderProps) {
@@ -161,6 +172,7 @@ export function FormSectionHeader({
     required,
     id,
     showVisibleLabel,
+    omitLabel,
     rhythm,
     size,
   })
