@@ -21,7 +21,7 @@ Standalone **`FormSectionHeader`** instances (dashboard slots, modals) inherit p
 **`FormSectionProvider`** density via {@link resolveFormSectionHeaderPresentation} unless
 `density` / `rhythm` / `size` overrides are passed explicitly.
 
-`headingScale: 'field'` replaces structural legend and hint type with the field label and hint scale for that group's density, and applies `fieldAnatomyStackVariants` on the fieldset for legend→body spacing (including when a collapsible group is closed). It is not a `legendSize` and does not change tier resolution or disclosure.
+`headingScale: 'field'` replaces structural legend and hint type with the field label and hint scale for that group's density, applies `resolveFieldScaleLegendBodyMargin` after a visible legend (on the hint when present, otherwise the body wrapper), and keeps `fieldAnatomyStackVariants` on the fieldset for nested in-flow siblings (including optional-disclosure preview→editor stacks). It is not a `legendSize` and does not change tier resolution or disclosure.
 
 `headingScale: 'subsection'` forces structural subsection legend typography when a flat sibling list would otherwise resolve as section (for example a named group at `namedGroupDepth === 0`). Hint copy stays on the structural subsection hint scale. Do not use this on shared field builders solely to fit master-detail detail rails — dashboard [`MasterDetailDetailFormScope`](../../../../apps/dashboard/src/features/content/lib/master-detail/master-detail-detail-form-scope.tsx) floors `namedGroupDepth` for those bodies instead (no SR-only nesting fieldsets).
 
@@ -41,7 +41,8 @@ Three axes stay independent:
 the header component is presentation-only.
 
 `headingScale: 'field'` on a named group replaces structural legend + hint utilities with field
-label + hint, and applies `fieldAnatomyStackVariants` on the fieldset body. It does **not** change
+label + hint, applies legend→body margin via `resolveFieldScaleLegendBodyMargin`, and keeps
+`fieldAnatomyStackVariants` on the fieldset for nested stacks. It does **not** change
 `legendSize`, `namedGroupDepth`, or disclosure behavior.
 
 Explicit `headingScale: 'subsection'` at depth `0` changes **type only** — section body gap and

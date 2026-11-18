@@ -32,6 +32,7 @@ export type FieldGroupLegendProps = {
   fieldSize?: FieldSize
   headingScale?: FormHeadingScale
   legendChromeClassName: string
+  hintMarginClass?: string
   collapsible: boolean
   rhythm?: FieldRhythm
   open?: boolean
@@ -54,6 +55,7 @@ function StaticFieldGroupLegend({
   hintId,
   legendAccessory,
   legendAction,
+  hintMarginClass,
 }: {
   legendChromeClassName: string
   legendSrOnly: boolean
@@ -65,6 +67,7 @@ function StaticFieldGroupLegend({
   hintId?: string
   legendAccessory?: React.ReactNode
   legendAction?: React.ReactNode
+  hintMarginClass?: string
 }) {
   return (
     <>
@@ -85,6 +88,7 @@ function StaticFieldGroupLegend({
           headingScale={presentationScale}
           rhythm={rhythm}
           size={fieldSize}
+          className={hintMarginClass}
         />
       ) : null}
     </>
@@ -102,6 +106,7 @@ function CollapsibleFieldGroupLegend({
   hintId,
   legendAccessory,
   legendAction,
+  hintMarginClass,
   open,
   onToggle,
 }: {
@@ -115,6 +120,7 @@ function CollapsibleFieldGroupLegend({
   hintId?: string
   legendAccessory?: React.ReactNode
   legendAction?: React.ReactNode
+  hintMarginClass?: string
   open?: boolean
   onToggle?: () => void
 }) {
@@ -167,6 +173,7 @@ function CollapsibleFieldGroupLegend({
           headingScale={presentationScale}
           rhythm={rhythm}
           size={fieldSize}
+          className={hintMarginClass}
         />
       ) : null}
     </>
@@ -184,6 +191,7 @@ export function FieldGroupLegend({
   fieldSize = 'md',
   headingScale,
   legendChromeClassName,
+  hintMarginClass,
   collapsible,
   rhythm = 'comfortable',
   open,
@@ -207,6 +215,7 @@ export function FieldGroupLegend({
         hintId={hintId}
         legendAccessory={legendAccessory}
         legendAction={legendAction}
+        hintMarginClass={hintMarginClass}
       />
     )
   }
@@ -223,6 +232,7 @@ export function FieldGroupLegend({
       hintId={hintId}
       legendAccessory={legendAccessory}
       legendAction={legendAction}
+      hintMarginClass={hintMarginClass}
       open={open}
       onToggle={onToggle}
     />

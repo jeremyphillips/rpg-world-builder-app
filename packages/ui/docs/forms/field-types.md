@@ -201,9 +201,9 @@ the same resolver with the group heading. Renderers still own opening, seeding, 
   `{ label, text } | undefined`; undefined leaves no gap. It does not write form state. The UI
   renders `label` and `text` on one inline line with a colon (same anatomy as collapsed `summary`).
   **Open optional groups:** source preview belongs to the disclosure heading/anatomy region, not
-  section field rhythm. Legend→body spacing stays on the fieldset (`headingScale: 'field'`). When a
-  preview renders, preview→editor uses field anatomy stack; nested editor fields keep
-  `fieldStackRhythmVariants` inside that stack.
+  section field rhythm. Legend→preview spacing uses `resolveFieldScaleLegendBodyMargin` when
+  `headingScale: 'field'`. When a preview renders, preview→editor uses field anatomy stack; nested
+  editor fields keep `fieldStackRhythmVariants` inside that stack.
 - Header actions use the form **micro-action** text button (`xs`). `add` uses `ActionIcon` `add`
   (plus). `override` uses `edit` (pencil). The open action uses `clear` (x), including open
   optional groups (`legendAction`).

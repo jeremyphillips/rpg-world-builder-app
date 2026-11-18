@@ -37,16 +37,16 @@ function legendTitleTypographyNode(labelText: string): HTMLElement {
 function bodyRelationshipWrapper(fieldset: HTMLElement): HTMLElement | null {
   return fieldset.querySelector(
     [
-      ':scope > .mt-5',
-      ':scope > .mt-4',
-      ':scope > .mt-3',
-      ':scope > .mt-1\\.5',
-      ':scope > .mt-1',
-      ':scope [data-state] > .mt-5',
-      ':scope [data-state] > .mt-4',
-      ':scope [data-state] > .mt-3',
-      ':scope [data-state] > .mt-1\\.5',
-      ':scope [data-state] > .mt-1',
+      ':scope > div.mt-5',
+      ':scope > div.mt-4',
+      ':scope > div.mt-3',
+      ':scope > div.mt-1\\.5',
+      ':scope > div.mt-1',
+      ':scope [data-state] > div.mt-5',
+      ':scope [data-state] > div.mt-4',
+      ':scope [data-state] > div.mt-3',
+      ':scope [data-state] > div.mt-1\\.5',
+      ':scope [data-state] > div.mt-1',
     ].join(', '),
   )
 }
@@ -219,6 +219,7 @@ describe('FieldGroup', () => {
     const fieldset = screen.getByRole('group', { name: 'Advanced options' })
     expect(fieldset).toHaveAttribute('aria-describedby', description.id)
     expect(fieldset).toHaveClass(...fieldAnatomyStackVariants({ size: 'md' }).split(/\s+/))
+    expect(description).toHaveClass('mt-1.5')
     expect(bodyRelationshipWrapper(fieldset)).toBeNull()
   })
 
@@ -246,6 +247,7 @@ describe('FieldGroup', () => {
     const fieldset = screen.getByRole('group', { name: 'Advanced options' })
     expect(fieldset).toHaveAttribute('aria-describedby', description.id)
     expect(fieldset).toHaveClass(...fieldAnatomyStackVariants({ size: 'sm' }).split(/\s+/))
+    expect(description).toHaveClass('mt-1')
     expect(bodyRelationshipWrapper(fieldset)).toBeNull()
   })
 
@@ -282,13 +284,16 @@ describe('FieldGroup', () => {
     expect(trigger).toHaveClass('items-center')
     expect(screen.getByText('Optional tuning.').closest('button')).toBeNull()
     const fieldset = screen.getByRole('group', { name: 'Advanced options' })
+    const description = screen.getByText('Optional tuning.')
     expect(fieldset).toHaveClass(...fieldAnatomyStackVariants({ size: 'md' }).split(/\s+/))
+    expect(description).not.toHaveClass('mt-1.5')
     expect(bodyRelationshipWrapper(fieldset)).toBeNull()
 
     await user.click(trigger)
     expect(trigger).toHaveAttribute('aria-expanded', 'true')
     expect(chevron).toHaveClass('rotate-180')
     expect(fieldset).toHaveClass(...fieldAnatomyStackVariants({ size: 'md' }).split(/\s+/))
+    expect(description).toHaveClass('mt-1.5')
     expect(bodyRelationshipWrapper(fieldset)).toBeNull()
   })
 
@@ -323,7 +328,7 @@ describe('FieldGroup', () => {
     )
     expect(screen.getByText('Grants').closest('legend')).not.toHaveClass('mb-1.5')
     expect(fieldset).toHaveClass(...fieldAnatomyStackVariants({ size: 'md' }).split(/\s+/))
-    expect(bodyRelationshipWrapper(fieldset)).toBeNull()
+    expect(bodyRelationshipWrapper(fieldset)).toHaveClass('mt-1.5')
   })
 
   it('defaults field-scale legend to sm field label typography when size is omitted', () => {

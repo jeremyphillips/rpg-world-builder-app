@@ -44,7 +44,7 @@ export function MonsterFormsEditor({ ctx }: { ctx: ContentFormCtx }) {
       const designated = forms?.trueForm.kind === 'defined' && forms.trueForm.formId === draft?.id
       if (!designated) return fields
       const trueFormOverrideFieldNames = [
-        'overrides.sizes',
+        'sizesOverride',
         'movementOverride',
         'speechRestricted',
       ] as const

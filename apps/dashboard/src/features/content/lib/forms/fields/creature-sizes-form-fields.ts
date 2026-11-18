@@ -10,7 +10,7 @@ export const MONSTER_SIZES_FIELD_HINT =
 
 /** Shared sizes chips. Hosts supply hint and already rank-sorted options. */
 export function createCreatureSizesFieldConfig(config: {
-  hint: string
+  hint?: string
   options: FieldOption[]
 }): ChipsFieldConfig {
   return {
@@ -20,6 +20,6 @@ export function createCreatureSizesFieldConfig(config: {
     label: CREATURE_SIZES_FIELD_LABEL,
     options: config.options,
     required: true,
-    hint: config.hint,
+    ...(config.hint ? { hint: config.hint } : {}),
   }
 }

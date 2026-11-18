@@ -19,6 +19,7 @@ import {
   fieldSetResetClasses,
   fieldStackRhythmVariants,
   resolveFieldGroupBodyGap,
+  resolveFieldScaleLegendBodyMargin,
   type FieldGroupLegendSize,
   type FieldRhythm,
   type FormHeadingScale,
@@ -54,12 +55,12 @@ function useGroupCollapseState(options: {
 
 function wrapFieldGroupBody(
   body: React.ReactNode,
-  bodyGapClass: string | undefined,
+  bodyRelationshipClass: string | undefined,
 ): React.ReactNode {
-  if (!bodyGapClass) {
+  if (!bodyRelationshipClass) {
     return body
   }
-  return <div className={bodyGapClass}>{body}</div>
+  return <div className={bodyRelationshipClass}>{body}</div>
 }
 
 export type StandardFieldGroupBodyProps = {
@@ -119,6 +120,13 @@ export function StandardFieldGroupBody({
     legend && bodyVisible && !legendSrOnly && headingScale !== 'field'
       ? resolveFieldGroupBodyGap({ size: legendSize, rhythm })
       : undefined
+  const fieldScaleBodyMargin =
+    headingScale === 'field' && Boolean(legend) && !legendSrOnly && bodyVisible
+      ? resolveFieldScaleLegendBodyMargin(fieldSize)
+      : undefined
+  const bodyMarginClass = fieldScaleBodyMargin && !hint ? fieldScaleBodyMargin : undefined
+  const hintMarginClass = fieldScaleBodyMargin && hint ? fieldScaleBodyMargin : undefined
+  const bodyRelationshipClass = cn(bodyGapClass, bodyMarginClass)
 
   const fieldsetClassName = cn(
     fieldSetResetClasses,
@@ -135,9 +143,9 @@ export function StandardFieldGroupBody({
   // Keep one wrapper element across open and closed. Adding the gap div only
   // while open remounts the body, and `shouldUnregister` then clears values.
   const bodyWithGap = collapsible ? (
-    <div className={bodyGapClass}>{body}</div>
+    <div className={bodyRelationshipClass}>{body}</div>
   ) : (
-    wrapFieldGroupBody(body, bodyGapClass)
+    wrapFieldGroupBody(body, bodyRelationshipClass)
   )
 
   const Wrapper = legend ? 'fieldset' : 'div'
@@ -158,6 +166,7 @@ export function StandardFieldGroupBody({
           headingScale={headingScale}
           rhythm={rhythm}
           legendChromeClassName={chromeClasses.legend}
+          hintMarginClass={hintMarginClass}
           collapsible={collapsible}
           open={open}
           onToggle={() => onOpenChange(!open)}

@@ -12,7 +12,7 @@ import { type FieldSizeToken } from './field-sizing.variants'
  * - `field-row-presentation.lib.ts` — `resolveFieldPresentation`, `resolveFieldRowClasses`
  *
  * Spacing tokens below:
- * - `fieldAnatomyHeaderBodyGapClasses` — header→body step values (fieldset `gap-y` + label-region `pb`)
+ * - `fieldAnatomyHeaderBodyGapClasses` — header→body step values (fieldset `gap-y`, label-region `pb`, field-scale FieldGroup `mt`)
  * - `fieldAnatomyStackVariants` — fieldset / composite column stack (reads header→body map)
  * - `fieldLabelRegionVariants` / `fieldMessageRegionVariants` — region-owned padding for flat three-region anatomy
  * - `fieldControlRegionClasses` — control region shell (no intrinsic spacing)
@@ -52,11 +52,14 @@ import { type FieldSizeToken } from './field-sizing.variants'
  * Fieldset stacks use `stack`; flat three-region anatomy uses `labelRegionBottom`.
  */
 export const fieldAnatomyHeaderBodyGapClasses = {
-  xs: { stack: 'gap-y-1', labelRegionBottom: 'has-[*]:pb-1' },
-  sm: { stack: 'gap-y-1', labelRegionBottom: 'has-[*]:pb-1' },
-  md: { stack: 'gap-y-1.5', labelRegionBottom: 'has-[*]:pb-1.5' },
-  lg: { stack: 'gap-y-1.5', labelRegionBottom: 'has-[*]:pb-1.5' },
-} as const satisfies Record<FieldSizeToken, { stack: string; labelRegionBottom: string }>
+  xs: { stack: 'gap-y-1', labelRegionBottom: 'has-[*]:pb-1', bodyMarginTop: 'mt-1' },
+  sm: { stack: 'gap-y-1', labelRegionBottom: 'has-[*]:pb-1', bodyMarginTop: 'mt-1' },
+  md: { stack: 'gap-y-1.5', labelRegionBottom: 'has-[*]:pb-1.5', bodyMarginTop: 'mt-1.5' },
+  lg: { stack: 'gap-y-1.5', labelRegionBottom: 'has-[*]:pb-1.5', bodyMarginTop: 'mt-1.5' },
+} as const satisfies Record<
+  FieldSizeToken,
+  { stack: string; labelRegionBottom: string; bodyMarginTop: string }
+>
 
 /**
  * Label/heading cluster → control and control → validation / bottom hint.
@@ -96,6 +99,11 @@ export const fieldAnatomyAlignVariants = cva('flex flex-col', {
 /** Fieldset / composite column header→body stack — thin alias for call-site clarity. */
 export function resolveFieldAnatomyHeaderBodyStackClassName(size: FieldSizeToken = 'md'): string {
   return fieldAnatomyStackVariants({ size })
+}
+
+/** Legend→body margin for `headingScale: 'field'` FieldGroups (legend is not a flex gap item). */
+export function resolveFieldScaleLegendBodyMargin(size: FieldSizeToken = 'md'): string {
+  return fieldAnatomyHeaderBodyGapClasses[size].bodyMarginTop
 }
 
 /** Subgrid row track for label regions inside {@link fieldRowParticipationClasses} columns. */

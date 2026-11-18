@@ -162,8 +162,9 @@ Optional open/collapse and summary behavior. Composes with `chrome`.
 
 Legend→body spacing for `FieldGroup` is owned by `StandardFieldGroupBody`: section/subsection tiers use
 `resolveFieldGroupBodyGap` on a body-side wrapper when a body is visible; `headingScale="field"` applies
-`fieldAnatomyStackVariants` on the fieldset (stable when collapsible groups are closed). Array fieldsets gate the same
-stack with `showSectionHeader` (visible label band or chrome — not sr-only-only labels). `FieldGroupLegend`
+`resolveFieldScaleLegendBodyMargin` on the hint or body wrapper (legend is not a flex gap item) and keeps
+`fieldAnatomyStackVariants` on the fieldset for nested in-flow siblings (stable when collapsible groups are closed).
+Array fieldsets gate the same stack with `showSectionHeader` (visible label band or chrome — not sr-only-only labels). `FieldGroupLegend`
 keeps title, hint, and accessory anatomy only. Legacy legend header margin
 (`fieldGroupLegendHeaderMarginVariants`) remains for non-FieldGroup headings. In-flow array legends use
 `fieldSetInFlowLegendClasses` and require a parent fieldset stack — never legend `mb-*`. `<legend>` is `w-full` and sits **outside** panel, outline, inset, and

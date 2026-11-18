@@ -1,18 +1,16 @@
 import { createElement } from 'react'
 import type { FormItem } from '@rpg/ui/form'
 
-import { buildActiveSizeFieldOptions } from '@/features/vocabulary'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
-import { createCreatureSizesFieldConfig } from '../../../lib/forms/fields/creature-sizes-form-fields'
 import { MonsterFormsDifferencePresentation } from '../../components/form/monster-forms-difference-presentation'
 import { MonsterFormsEditor } from '../../components/form/monster-forms-editor'
 import { MonsterTrueFormDesignation } from '../../components/form/monster-true-form-designation'
 import { monsterFormMovementOverrideGroup } from './monster-form-movement-override-fields'
+import { monsterFormSizesOverrideGroup } from './monster-form-sizes-override-fields'
 import {
   MONSTER_FORM_NAME_LABEL,
   MONSTER_FORM_NOTES_HINT,
   MONSTER_FORM_NOTES_LABEL,
-  MONSTER_FORM_SIZE_HINT,
   MONSTER_FORM_SPEECH_LABEL,
   MONSTER_FORMS_ADD_LABEL,
   MONSTER_FORMS_HEADING,
@@ -20,16 +18,8 @@ import {
 } from '../monster-form-labels'
 
 export function monsterDefinedFormDetailFields(ctx: ContentFormCtx): FormItem[] {
-  const sizes = createCreatureSizesFieldConfig({
-    hint: MONSTER_FORM_SIZE_HINT,
-    options: buildActiveSizeFieldOptions(ctx.sizeVocabulary, ctx.creatureSizesSeedIds),
-  })
   return [
-    {
-      ...sizes,
-      name: 'overrides.sizes',
-      required: false,
-    },
+    monsterFormSizesOverrideGroup(ctx),
     monsterFormMovementOverrideGroup(),
     {
       type: 'boolean',

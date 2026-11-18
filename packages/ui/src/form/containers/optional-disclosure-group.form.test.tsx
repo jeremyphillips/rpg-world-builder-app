@@ -209,6 +209,7 @@ describe('group optionalDisclosure', () => {
       kind: 'group',
       name: 'movementOverride',
       heading: { label: 'Movement' },
+      headingScale: 'field',
       optionalDisclosure: {
         intent: 'override',
         labeled: true,
@@ -244,6 +245,7 @@ describe('group optionalDisclosure', () => {
     expect(group).toHaveTextContent('Walk 30 ft.')
     expect(state()).toEqual({ dirty: false, savingThrow: null })
 
+    expect(group.querySelector(':scope > div.mt-1\\.5, :scope > div.mt-1')).toBeTruthy()
     const previewLine = document.getElementById('preview-movementOverride-source-preview')
     expect(previewLine).toBeInTheDocument()
     const anatomyStack = previewLine?.parentElement

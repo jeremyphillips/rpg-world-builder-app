@@ -314,17 +314,19 @@ export function FieldHintText({
   id,
   children,
   size: sizeProp,
+  className,
 }: {
   id: string
   children: string
   size?: FieldSize
+  className?: string
 }) {
   const context = React.useContext(FieldContext)
   const size = sizeProp ?? context?.size ?? 'md'
   const hintClass =
     size === 'sm' || size === 'xs' ? 'text-style-field-hint-compact' : 'text-style-field-hint'
   return (
-    <span id={id} className={hintClass}>
+    <span id={id} className={cn(hintClass, className)}>
       {children}
     </span>
   )
@@ -361,10 +363,12 @@ export function FieldHintBelowLabel({
   hint,
   hintId,
   size,
-}: Pick<FieldHintErrorContent, 'hint'> & Pick<FieldMessageIds, 'hintId'> & { size?: FieldSize }) {
+  className,
+}: Pick<FieldHintErrorContent, 'hint'> &
+  Pick<FieldMessageIds, 'hintId'> & { size?: FieldSize; className?: string }) {
   if (!hint) return null
   return (
-    <FieldHintText id={hintId} size={size}>
+    <FieldHintText id={hintId} size={size} className={className}>
       {hint}
     </FieldHintText>
   )
