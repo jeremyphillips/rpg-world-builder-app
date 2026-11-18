@@ -29,7 +29,7 @@ const MONSTER_FORM_ITEM_NOUN = defineMasterDetailItemNoun({
 
 export function MonsterFormsEditor({ ctx }: { ctx: ContentFormCtx }) {
   const forms = useWatch<MonsterFormValues, 'forms'>({ name: 'forms' })
-  const { setValue, trigger } = useFormContext<MonsterFormValues>()
+  const { getValues, setValue, trigger } = useFormContext<MonsterFormValues>()
   const makeDefaults = useCallback(() => makeEmptyMonsterDefinedForm(), [])
   const editor = useMasterDetailArray('forms.definedForms', makeDefaults)
   const lifecycle = useMonsterFormsLifecycle()
@@ -74,15 +74,18 @@ export function MonsterFormsEditor({ ctx }: { ctx: ContentFormCtx }) {
     () => ({
       ...editor,
       requestRemove: (index: number) => {
-        const formId = forms?.definedForms[index]?.id
+        const definedForms = getValues('forms')?.definedForms ?? forms?.definedForms
+        const formId = definedForms?.[index]?.id
         if (!formId) return
         lifecycle.requestDefinedFormRemoval(formId, () => {
-          if (editor.fields.length <= 1) return
-          editor.select(index < editor.fields.length - 1 ? index + 1 : index - 1)
+          const nextDefinedForms = getValues('forms')?.definedForms ?? []
+          editor.replaceRows(nextDefinedForms as Record<string, unknown>[])
+          if (nextDefinedForms.length <= 1) return
+          editor.select(index < nextDefinedForms.length ? index : index - 1)
         })
       },
     }),
-    [editor, forms?.definedForms, lifecycle],
+    [editor, forms?.definedForms, getValues, lifecycle],
   )
   const addControl = (
     <Button

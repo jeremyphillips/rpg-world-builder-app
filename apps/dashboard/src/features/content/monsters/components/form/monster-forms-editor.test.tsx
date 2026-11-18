@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm, useWatch, type UseFormReturn } from 'react-hook-form'
 import { describe, expect, it } from 'vitest'
@@ -118,5 +118,36 @@ describe('monster forms authoring architecture', () => {
     expect(screen.queryByRole('textbox', { name: 'Name' })).not.toBeInTheDocument()
     expect(document.activeElement?.getAttribute('aria-hidden')).not.toBe('true')
     expect(formRef.current?.getValues('forms.definedForms')).toHaveLength(1)
+  })
+
+  it('opens remove confirmation after adding a defined form', async () => {
+    const user = userEvent.setup()
+
+    function Host() {
+      const form = useForm<MonsterFormValues>({
+        defaultValues: monsterFormTestValues({ name: 'Werebear' }),
+        shouldUnregister: true,
+      })
+      return (
+        <FormProvider {...form}>
+          <MonsterFormsEditor ctx={ctx} />
+        </FormProvider>
+      )
+    }
+
+    render(<Host />)
+    await user.click(screen.getByRole('button', { name: 'Add forms' }))
+    await user.click(screen.getByRole('button', { name: 'Add form' }))
+
+    await user.click(screen.getByRole('button', { name: /Actions for Unnamed Form/i }))
+    await user.click(screen.getByRole('menuitem', { name: /Delete form/i }))
+
+    const dialog = screen.getByRole('alertdialog')
+    expect(dialog).toHaveTextContent(/Remove Untitled form\?/i)
+
+    await user.click(within(dialog).getByRole('button', { name: 'Remove form' }))
+    expect(
+      screen.queryByRole('button', { name: /Actions for Unnamed Form/i }),
+    ).not.toBeInTheDocument()
   })
 })

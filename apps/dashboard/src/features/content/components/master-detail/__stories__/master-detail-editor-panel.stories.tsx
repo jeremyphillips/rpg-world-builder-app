@@ -18,6 +18,7 @@ const selectedEditor: UseMasterDetailArrayResult = {
   handleAdd: () => {},
   appendRow: () => {},
   removeAt: () => {},
+  replaceRows: () => {},
   lastAddedFieldId: null,
   acknowledgeAcquisition: () => {},
   clearLastAddedFieldId: () => {},

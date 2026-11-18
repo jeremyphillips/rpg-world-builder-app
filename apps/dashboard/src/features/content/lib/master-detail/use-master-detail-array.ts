@@ -29,6 +29,8 @@ export interface UseMasterDetailArrayResult {
   appendRow: (row: Record<string, unknown>) => void
   /** Removes a row without the delete dialog and selects the next sibling. */
   removeAt: (index: number) => void
+  /** Replaces field-array rows with caller-provided values (after external lifecycle writes). */
+  replaceRows: (rows: Record<string, unknown>[]) => void
   /** Field id of the most recently appended row until consumed by the detail panel. */
   lastAddedFieldId: string | null
   /**
@@ -258,6 +260,17 @@ export function useMasterDetailArray(
     [fields.length, selectFieldAfterRemoval],
   )
 
+  const replaceRows = useCallback(
+    (rows: Record<string, unknown>[]) => {
+      replace(rows)
+      if (rows.length === 0) {
+        setSelectedFieldId(null)
+        setPendingSelectIndex(null)
+      }
+    },
+    [replace],
+  )
+
   const move = useCallback(
     (from: number, to: number) => {
       if (!isValidFieldArrayMove(from, to, fields.length)) return
@@ -308,6 +321,7 @@ export function useMasterDetailArray(
     handleAdd,
     appendRow,
     removeAt,
+    replaceRows,
     lastAddedFieldId,
     acknowledgeAcquisition,
     clearLastAddedFieldId,
