@@ -114,17 +114,17 @@ that a `reset` or other programmatic write is impossible.
 
 ## Migrated off slots
 
-| Identity                                                                     | Replacement                                           |
-| ---------------------------------------------------------------------------- | ----------------------------------------------------- |
-| `_editionPresetEffects`                                                      | `buildMechanicsValueSyncs()`                          |
-| `_mechanicsLeadCopy`                                                         | `mechanics-lead-copy-display.lib.ts`                  |
-| `_resolutionEffectsApplicationLabel`                                         | `resolution-effects-application-label-display.lib.ts` |
-| `_standardLevelRangeSummary`, `_extendedLevelRangeSummary`                   | `level-range-summary-display.lib.ts`                  |
-| `_resolutionSelectionHints`                                                  | `resolution-selection-hints-display.lib.ts`           |
-| `spellcastingFeatureSummary`                                                 | display text; the cross-tab link is inline copy       |
-| `cultureNamingAlert`, `_effectsPersistenceNotice`, `_grantTypeMissingRepair` | `kind: 'display'`                                     |
-| `buildAdvisories`                                                            | `monsterFormAdvisoryDisplay()`                        |
-| `baseStatistics`                                                             | `defined-form-base-statistics` display                |
+| Identity                                                                     | Replacement                                                    |
+| ---------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| `_editionPresetEffects`                                                      | `buildMechanicsValueSyncs()`                                   |
+| `_mechanicsLeadCopy`                                                         | `mechanics-lead-copy-display.lib.ts`                           |
+| `_resolutionEffectsApplicationLabel`                                         | `resolution-effects-application-label-display.lib.ts`          |
+| `_standardLevelRangeSummary`, `_extendedLevelRangeSummary`                   | `level-range-summary-display.lib.ts`                           |
+| `_resolutionSelectionHints`                                                  | `resolution-selection-hints-display.lib.ts`                    |
+| `spellcastingFeatureSummary`                                                 | `classSpellcastingFeatureSummaryDisplay()` (`featureTableRow`) |
+| `cultureNamingAlert`, `_effectsPersistenceNotice`, `_grantTypeMissingRepair` | `kind: 'display'`                                              |
+| `buildAdvisories`                                                            | `monsterFormAdvisoryDisplay()`                                 |
+| `baseStatistics`                                                             | `defined-form-base-statistics` display                         |
 
 ## Conditional
 

@@ -143,6 +143,35 @@ describe('DisplayFieldRenderer', () => {
     expect(note).toBeInTheDocument()
   })
 
+  it('renders a feature table row block', () => {
+    const fields: FormItem[] = [
+      {
+        kind: 'display',
+        id: 'feature-summary',
+        content: {
+          variant: 'featureTableRow',
+          title: 'Spellcasting',
+          metadata: 'Level 1 · Edit on the Features tab',
+          typeLabel: 'Spellcasting feature',
+        },
+      },
+    ]
+
+    render(
+      <Form<Values>
+        schema={schema}
+        fields={fields}
+        defaultValues={{ level: 1, note: '' }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    expect(screen.getByText('Spellcasting')).toBeInTheDocument()
+    expect(screen.getByText('Level 1 · Edit on the Features tab')).toBeInTheDocument()
+    expect(screen.getByText('Spellcasting feature')).toBeInTheDocument()
+  })
+
   it('excludes display from row field items at compile time', () => {
     const _excluded: RowConfig = {
       kind: 'row',

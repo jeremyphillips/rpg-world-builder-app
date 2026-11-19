@@ -9,12 +9,10 @@ import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { notifySaveSuccess } from '@/lib/notify'
 import {
   buildCharacterConfigurationNavigation,
-  buildMechanicsConfigFields,
-  buildMechanicsValueSyncs,
   buildMechanicsPatchInput,
   mapRulesetPatchToMechanicsValues,
   MECHANICS_CONFIGURATION_SECTIONS,
-  mechanicsValuesSchema,
+  mechanicsFormDef,
   type MechanicsValues,
   type RulesValues,
   useCanManageCampaign,
@@ -166,7 +164,7 @@ function MechanicsConfigurationForm({ campaignId }: { campaignId: string }) {
 
   const fields = useMemo(() => {
     return disableFormItems(
-      buildMechanicsConfigFields({
+      mechanicsFormDef.buildFields({
         editionPresetOptions: buildEditionPresetFieldOptions(editionPresetVocabulary),
         attackResolutionModeOptions: buildAttackResolutionModeFieldOptions(
           attackResolutionVocabulary,
@@ -202,9 +200,9 @@ function MechanicsConfigurationForm({ campaignId }: { campaignId: string }) {
           <Form<MechanicsValues>
             key={campaignId}
             uiStateKey={`${campaignId}:mechanics`}
-            schema={mechanicsValuesSchema}
+            schema={mechanicsFormDef.schema}
             fields={fields}
-            valueSyncs={buildMechanicsValueSyncs()}
+            valueSyncs={mechanicsFormDef.valueSyncs()}
             defaultValues={defaultValues}
             onSubmit={onSubmit}
             formError={formError}

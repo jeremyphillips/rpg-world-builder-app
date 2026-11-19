@@ -274,6 +274,7 @@ export {
   type SlotConfig,
   type DisplayConfig,
   type FormDisplayBlock,
+  type FormDisplayFeatureTableRowBlock,
   type FormDisplayTextRole,
   type FormDisplayRulesContent,
   type FormDisplayResolve,

@@ -7,12 +7,8 @@ import type { UseFormReturn } from 'react-hook-form'
 
 import { disableFormItems } from '@/lib/disable-form-items'
 
-import {
-  buildMechanicsConfigFields,
-  buildMechanicsValueSyncs,
-  mechanicsValuesSchema,
-  type MechanicsValues,
-} from './mechanics-form-fields'
+import { mechanicsFormDef } from './mechanics-form-def'
+import type { MechanicsValues } from './mechanics-form-fields'
 import { buildMechanicsPatchInput, defaultMechanicsValues } from './mechanics-form-values'
 
 const editionPresetOptions = [
@@ -25,7 +21,7 @@ const attackResolutionModeOptions = [
 ]
 
 function fields() {
-  return buildMechanicsConfigFields({ editionPresetOptions, attackResolutionModeOptions })
+  return mechanicsFormDef.buildFields({ editionPresetOptions, attackResolutionModeOptions })
 }
 
 function MechanicsHarness({
@@ -49,10 +45,10 @@ function MechanicsHarness({
 
   return (
     <Form
-      schema={mechanicsValuesSchema}
+      schema={mechanicsFormDef.schema}
       fields={readOnly ? disableFormItems(fields(), true) : fields()}
       defaultValues={defaultValues}
-      valueSyncs={buildMechanicsValueSyncs()}
+      valueSyncs={mechanicsFormDef.valueSyncs()}
       onSubmit={vi.fn()}
       footer={footer}
     />

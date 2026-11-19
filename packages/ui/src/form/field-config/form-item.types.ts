@@ -34,6 +34,7 @@ import type { DisplayConfig } from './display-config.types'
 export type {
   DisplayConfig,
   FormDisplayBlock,
+  FormDisplayFeatureTableRowBlock,
   FormDisplayNoticeBlock,
   FormDisplayResolve,
   FormDisplayRulesContent,

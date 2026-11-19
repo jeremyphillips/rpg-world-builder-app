@@ -1,4 +1,5 @@
-import { useEffect } from 'react'
+import { useEffect, useId } from 'react'
+import { CheckboxOption, Text } from '@rpg/ui'
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import {
@@ -9,6 +10,7 @@ import type { MonsterFormValues } from '../../lib/monster-form-values'
 
 /** Zero-XP checkbox for challenge rating 0 — keeps transactional `setValue` out of display. */
 export function MonsterChallengeRatingZeroXpField() {
+  const hintId = useId()
   const form = useFormContext<MonsterFormValues>()
   const challengeRating = useWatch<MonsterFormValues, 'challengeRating'>({
     name: 'challengeRating',
@@ -24,19 +26,21 @@ export function MonsterChallengeRatingZeroXpField() {
   if (challengeRating !== '0') return null
 
   return (
-    <label>
-      <input
-        type="checkbox"
-        aria-label={MONSTER_AWARDS_ZERO_XP_LABEL}
+    <div className="flex flex-col gap-2">
+      <CheckboxOption
+        shell="outlined"
+        label={MONSTER_AWARDS_ZERO_XP_LABEL}
         checked={awardsZeroXp === 0}
-        onChange={(event) =>
-          form.setValue('experiencePointsOverride', event.target.checked ? 0 : undefined, {
+        describedBy={hintId}
+        onCheckedChange={(checked) =>
+          form.setValue('experiencePointsOverride', checked ? 0 : undefined, {
             shouldDirty: true,
           })
         }
       />
-      {MONSTER_AWARDS_ZERO_XP_LABEL}
-      <span>{MONSTER_AWARDS_ZERO_XP_HINT}</span>
-    </label>
+      <Text id={hintId} variant="caption">
+        {MONSTER_AWARDS_ZERO_XP_HINT}
+      </Text>
+    </div>
   )
 }

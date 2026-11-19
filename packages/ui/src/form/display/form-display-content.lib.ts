@@ -38,6 +38,8 @@ function displayBlockIsEmpty(block: FormDisplayBlock): boolean {
       return !block.notice.message.trim()
     case 'rulesPreview':
       return !rulesPreviewBlockHasContent(block.preview.content)
+    case 'featureTableRow':
+      return !block.title.trim()
     default:
       return false
   }

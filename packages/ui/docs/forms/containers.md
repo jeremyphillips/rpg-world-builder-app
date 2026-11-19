@@ -731,7 +731,9 @@ Use `kind: 'display'` before a slot when the UI is static or `resolve.contentWhe
 ```
 
 **Blocks (v1):** `text` (`supporting` | `caption` | `muted`, optional `live: 'polite'`), `notice`
-(`AdvisoryAlert` props), `rulesPreview` (metadata, prose, guidance — not `html`). **`id`** is a
+(`AdvisoryAlert` props), `rulesPreview` (metadata, prose, guidance — not `html`),
+`featureTableRow` (`title`, optional `metadata`, optional `typeLabel` — compact table icon card).
+**`id`** is a
 stable config identity among siblings (not an RHF path). **`resolve.dependsOn`** uses the same
 relative paths as field `visibility`. Display items are excluded from `kind: 'row'` fields,
 error ownership, and tab path prefixes. Empty resolved content renders `null` with no spacing

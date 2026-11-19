@@ -25,9 +25,10 @@ export function classSpellcastingFeatureSummaryDisplay(): DisplayConfig {
           }
         }
         return {
-          variant: 'text',
-          text: `${summary.name} · ${joinInlineMetadata([`Level ${summary.level}`, 'Edit on the Features tab'])}`,
-          role: 'supporting',
+          variant: 'featureTableRow',
+          title: summary.name,
+          metadata: joinInlineMetadata([`Level ${summary.level}`, 'Edit on the Features tab']),
+          typeLabel: 'Spellcasting feature',
         }
       },
     },

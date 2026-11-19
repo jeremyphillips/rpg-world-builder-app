@@ -41,6 +41,10 @@ export {
   type MechanicsValues,
 } from './lib/rules/mechanics/mechanics-form-fields'
 export {
+  mechanicsFormDef,
+  type MechanicsFormDefOptions,
+} from './lib/rules/mechanics/mechanics-form-def'
+export {
   buildCharacterCreationPatchInput,
   mapRulesetPatchToRulesValues,
 } from './lib/rules/character-configuration/character-configuration-form-values'

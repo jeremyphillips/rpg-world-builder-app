@@ -26,10 +26,19 @@ export type FormDisplayRulesPreviewBlock = {
   preview: Omit<RulesPreviewProps, 'content'> & { content: FormDisplayRulesContent }
 }
 
+/** Read-only feature summary row (table icon, title, metadata, optional type badge). */
+export type FormDisplayFeatureTableRowBlock = {
+  variant: 'featureTableRow'
+  title: string
+  metadata?: string
+  typeLabel?: string
+}
+
 export type FormDisplayBlock =
   | FormDisplayTextBlock
   | FormDisplayNoticeBlock
   | FormDisplayRulesPreviewBlock
+  | FormDisplayFeatureTableRowBlock
 
 export type FormDisplayResolve = {
   dependsOn: readonly string[]
