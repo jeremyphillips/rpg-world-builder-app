@@ -26,7 +26,6 @@ import {
   isWeaponEquipment,
   getSpellGrantAvailabilityLabel,
 } from '@rpg/contracts'
-import { Text } from '@rpg/ui'
 
 import {
   SPELL_MINIMUM_REST_OPTIONS,
@@ -36,6 +35,7 @@ import {
 import {
   toOptions,
   type FieldOption,
+  type DisplayConfig,
   type FieldVisibility,
   type FormItem,
   type InlineSentenceFieldConfig,
@@ -353,23 +353,22 @@ function grantTypePersistFields(): FormItem[] {
   ]
 }
 
+const GRANT_TYPE_MISSING_REPAIR_DISPLAY: DisplayConfig = {
+  kind: 'display',
+  id: 'grant-type-missing-repair',
+  content: {
+    variant: 'text',
+    text: GRANT_TYPE_MISSING_MESSAGE,
+    role: 'muted',
+  },
+}
+
 function grantTypeMissingRepairFields(): FormItem[] {
   return [
     {
       kind: 'group',
       visibility: visibleWhenGrantTypeMissing(),
-      fields: [
-        {
-          kind: 'slot',
-          name: '_grantTypeMissingRepair',
-          render: () =>
-            createElement(
-              Text,
-              { variant: 'muted', className: 'text-sm' },
-              GRANT_TYPE_MISSING_MESSAGE,
-            ),
-        },
-      ],
+      fields: [GRANT_TYPE_MISSING_REPAIR_DISPLAY],
     },
   ]
 }

@@ -2,6 +2,7 @@ import { createElement } from 'react'
 import type { FormItem } from '@rpg/ui/form'
 
 import { MonsterFormAvailabilityControl } from '../../components/form/monster-form-availability'
+import { isMonsterRowAdvisoryDisplay } from '../monster-form-advisory-presentation'
 
 export const MONSTER_FORM_AVAILABILITY_FIELD = 'formAvailability'
 
@@ -16,9 +17,7 @@ export function monsterFormAvailabilityField(): FormItem {
 
 export function insertMonsterFormAvailabilityField(fields: FormItem[]): FormItem[] {
   const slot = monsterFormAvailabilityField()
-  const advisoryIndex = fields.findIndex(
-    (item) => 'name' in item && item.name === 'buildAdvisories',
-  )
+  const advisoryIndex = fields.findIndex((item) => isMonsterRowAdvisoryDisplay(item))
   if (advisoryIndex < 0) return [slot, ...fields]
   return [...fields.slice(0, advisoryIndex + 1), slot, ...fields.slice(advisoryIndex + 1)]
 }

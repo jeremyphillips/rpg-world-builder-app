@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from 'react'
-import { Button, Text } from '@rpg/ui'
+import { Button } from '@rpg/ui'
+import type { DisplayConfig } from '@rpg/ui/form'
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
@@ -62,12 +63,14 @@ export function MonsterFormsEditor({ ctx }: { ctx: ContentFormCtx }) {
             ),
         ),
         {
-          kind: 'slot' as const,
-          name: 'baseStatistics',
-          render: () => (
-            <Text role="supporting">This form uses the creature&apos;s base statistics.</Text>
-          ),
-        },
+          kind: 'display',
+          id: 'defined-form-base-statistics',
+          content: {
+            variant: 'text',
+            text: "This form uses the creature's base statistics.",
+            role: 'supporting',
+          },
+        } satisfies DisplayConfig,
       ]
     },
     [ctx, forms?.trueForm],

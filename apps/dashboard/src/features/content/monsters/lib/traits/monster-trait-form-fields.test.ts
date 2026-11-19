@@ -7,9 +7,12 @@ import { monsterTraitDetailFields } from './monster-trait-form-fields'
 
 const ctx = { damageTypeVocabulary: buildSeedDamageTypeVocabulary() }
 
+const TRAIT_ROW_ADVISORY_DISPLAY = 'monster-row-advisories-traits-0'
+
 function namesOf(items: readonly FormItem[]): string[] {
   const names: string[] = []
   for (const item of items) {
+    if (item.kind === 'display' && typeof item.id === 'string') names.push(item.id)
     if ('name' in item && typeof item.name === 'string') names.push(item.name)
     if ('fields' in item && Array.isArray(item.fields)) names.push(...namesOf(item.fields))
     if ('start' in item && item.start && typeof item.start === 'object' && 'name' in item.start) {
@@ -27,6 +30,7 @@ function traitNames(row: unknown) {
     monsterTraitDetailFields({
       row,
       advisories: [],
+      rowPath: 'traits.0',
       monsterName: 'Owl',
       ctx,
     }),
@@ -38,7 +42,7 @@ describe('monsterTraitDetailFields', () => {
     expect(
       traitNames({ id: 'note', kind: 'custom', name: 'Note', description: 'Custom.' }),
     ).toEqual([
-      'buildAdvisories',
+      TRAIT_ROW_ADVISORY_DISPLAY,
       'formAvailability',
       'description',
       'savingThrow',
@@ -67,14 +71,14 @@ describe('monsterTraitDetailFields', () => {
   it('puts a fixed preset preview before the advisory and adds no body fields', () => {
     const names = traitNames({ id: 'fly', preset: 'flyby' })
     expect(names[0]).toBe('traitPreview')
-    expect(names[1]).toBe('buildAdvisories')
+    expect(names[1]).toBe(TRAIT_ROW_ADVISORY_DISPLAY)
     expect(names).toHaveLength(2)
   })
 
   it('keeps water-breathing duration behind the toggle until it is enabled', () => {
     expect(traitNames({ id: 'water', preset: 'water-breathing' })).toEqual([
       'traitPreview',
-      'buildAdvisories',
+      TRAIT_ROW_ADVISORY_DISPLAY,
       'outsideWaterBreathToggle',
     ])
     expect(
@@ -86,7 +90,7 @@ describe('monsterTraitDetailFields', () => {
       }),
     ).toEqual([
       'traitPreview',
-      'buildAdvisories',
+      TRAIT_ROW_ADVISORY_DISPLAY,
       'outsideWaterBreathToggle',
       'outsideWaterBreathAmount',
       'outsideWaterBreathUnit',

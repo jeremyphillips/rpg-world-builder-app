@@ -23,8 +23,11 @@ const ctx = {
   spellCatalogById: new Map([['srd:fear', { id: 'srd:fear', name: 'Fear' }]]),
 } as unknown as ContentFormCtx
 
-function names(fields: { name?: string }[]): string[] {
-  return fields.flatMap((field) => (field.name ? [field.name] : []))
+function names(fields: Array<{ name?: string; kind?: string; id?: string }>): string[] {
+  return fields.flatMap((field) => {
+    if (field.kind === 'display' && field.id) return [field.id]
+    return field.name ? [field.name] : []
+  })
 }
 
 describe('legendary action acquisition', () => {
@@ -169,7 +172,7 @@ describe('legendary action fields', () => {
       }) as { name?: string }[],
     )
     expect(reference).toEqual([
-      'buildAdvisories',
+      'monster-row-advisories-legendaryActions-actions-0',
       'formAvailability',
       'actionIds',
       'movement.allowance',
@@ -196,7 +199,7 @@ describe('legendary action fields', () => {
       }) as { name?: string }[],
     )
     expect(spellcasting).toEqual([
-      'buildAdvisories',
+      'monster-row-advisories-legendaryActions-actions-0',
       'formAvailability',
       'castingAbility',
       'spells.0.spellId',
@@ -212,7 +215,7 @@ describe('legendary action fields', () => {
       sharedCastingOptions: [],
     })
     expect(names(cast as { name?: string }[])).toEqual([
-      'buildAdvisories',
+      'monster-row-advisories-legendaryActions-actions-0',
       'formAvailability',
       'castingAbility',
       'spells.0.spellId',

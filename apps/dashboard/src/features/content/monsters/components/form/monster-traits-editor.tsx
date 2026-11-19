@@ -74,15 +74,30 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
   )
 
   const resolveItemFields = useCallback(
-    (row: unknown) =>
-      monsterTraitDetailFields({
+    (row: unknown) => {
+      const rowIndex =
+        row && traits
+          ? traits.findIndex(
+              (trait) =>
+                trait === row ||
+                (typeof row === 'object' &&
+                  row !== null &&
+                  'id' in row &&
+                  typeof trait?.id === 'string' &&
+                  trait.id === (row as { id: string }).id),
+            )
+          : -1
+      const index = rowIndex >= 0 ? rowIndex : (editor.selectedIndex ?? 0)
+      return monsterTraitDetailFields({
         row,
         advisories,
+        rowPath: `traits.${index}`,
         monsterName: monsterName ?? '',
         ctx,
         sharedCastingOptions: values ? sharedCastingOptions(values, '') : [],
-      }),
-    [advisories, ctx, monsterName, values],
+      })
+    },
+    [advisories, ctx, editor.selectedIndex, monsterName, traits, values],
   )
 
   return (

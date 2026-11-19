@@ -5,8 +5,8 @@ Evidence stages: code-analysis candidate, feasibility verified, parity tested,
 approved, completed. Confidence: **V** verified, **C** conditional, **P** needs a
 shared API change.
 
-Recount after Phase 1 (production `*.ts` / `*.tsx` only, tests and stories
-excluded): **100 static literals in 41 files**. Phase 0 started at 101.
+Recount after Phase 3a (production `*.ts` / `*.tsx` only, tests and stories
+excluded): **95 static literals in 39 files** (was 97 after Phase 2a). Phase 0 started at 101.
 `_editionPresetEffects` moved to `valueSyncs`. The audit plan's 103/41 figure
 predates `formsShapeShifting` replacing separate true-form and forms-editor
 slots. `locations/README.md` mentions `kind: 'slot'` in prose and is not a
@@ -188,15 +188,15 @@ Owner is the feature folder.
 Phase 2a/3a. Previews are excluded by the PoC.
 
 | Identity                                                                     | Responsibility                                 | Tag |
-| ---------------------------------------------------------------------------- | ---------------------------------------------- | --- | -------------------------------------------------------------------------------------------- |
-| `_standardLevelRangeSummary`, `_extendedLevelRangeSummary`                   | live muted summary                             | P   | **Completed:** `kind: 'display'` via `level-range-summary-display.lib.ts`                    |
+| ---------------------------------------------------------------------------- | ---------------------------------------------- | --- | --------------------------------------------------------------------------------------------------------------- |
+| `_standardLevelRangeSummary`, `_extendedLevelRangeSummary`                   | live muted summary                             | P   | **Completed:** `kind: 'display'` via `level-range-summary-display.lib.ts`                                       |
 | `_resolutionSelectionHints`                                                  | multi-paragraph guidance                       | C   |
 | `_outcomeApplicationStatus`                                                  | derived status                                 | P   |
 | `spellcastingFeatureSummary`                                                 | copy plus cross-tab link                       | C   |
-| `cultureNamingAlert`, `_effectsPersistenceNotice`, `_grantTypeMissingRepair` | notice                                         | P   | **Completed (pilot):** `cultureNamingAlert`, `_effectsPersistenceNotice` → `kind: 'display'` |
-| `buildAdvisories` (factory + trait literal)                                  | advisory title and tone                        | P   |
+| `cultureNamingAlert`, `_effectsPersistenceNotice`, `_grantTypeMissingRepair` | notice                                         | P   | **Completed:** `cultureNamingAlert`, `_effectsPersistenceNotice`, `_grantTypeMissingRepair` → `kind: 'display'` |
+| `buildAdvisories` (factory + trait literal)                                  | advisory title and tone                        | P   | **Completed:** `monsterFormAdvisoryDisplay()` → `kind: 'display'`                                               |
 | `weaponProficiencyReconciliation` ×2                                         | notice plus flag clear                         | C   |
-| `baseStatistics`                                                             | supporting sentence                            | P   |
+| `baseStatistics`                                                             | supporting sentence                            | P   | **Completed:** `defined-form-base-statistics` display in forms editor                                           |
 | `_effectsPreview`, `_resolutionProjectilesPreview`                           | read-only preview without whole-form normalize | C   |
 | `armorClass.preview`                                                         | preview plus catalog loading                   | C   |
 | `formsShapeShifting`                                                         | designation, editor, difference radio (split)  | C   |

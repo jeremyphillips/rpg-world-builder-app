@@ -33,12 +33,16 @@ export function DisplayFieldRenderer({ config, namePrefix }: DisplayFieldRendere
 
   if (displayContentIsEmpty(blocks)) return null
 
+  if (blocks.length === 1) {
+    return <FormDisplayBlockView block={blocks[0]!} />
+  }
+
   return (
-    <>
+    <div className="flex flex-col gap-2">
       {blocks.map((block, index) => (
         <FormDisplayBlockView key={`${config.id}-${index}`} block={block} />
       ))}
-    </>
+    </div>
   )
 }
 
