@@ -36,6 +36,10 @@ function collectPrefixesFromItems(items: readonly FormItem[], prefixes: string[]
       continue
     }
 
+    if (item.kind === 'display') {
+      continue
+    }
+
     if (item.kind === 'dependent') {
       prefixes.push(resolveFieldConfigPrimaryName(item.controller))
       collectPrefixesFromItems(item.dependents.fields, prefixes)

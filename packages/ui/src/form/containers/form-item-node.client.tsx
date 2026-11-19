@@ -26,6 +26,7 @@ import {
 import { ArrayFormItemSection } from '../renderers/array/array-form-item-section.client'
 import { ConditionalArrayField } from '../renderers/array/conditional-array-field.client'
 import { SlotFormItemSection } from '../renderers/fields/slot-field-renderer.client'
+import { DisplayFormItemSection } from '../renderers/fields/display-field-renderer.client'
 
 export interface NestedFormItemsProps {
   items: Array<FormItem | RowConfig>
@@ -136,6 +137,9 @@ export function FormItemNode({ item, index, idPrefix, namePrefix, depth }: FormI
   if (item.kind === 'columns') return renderColumnsNode(item, shared)
   if (item.kind === 'dependent') return renderDependentNode(item, shared)
   if (item.kind === 'slot') return renderSlotNode(item, parentContext, shared)
+  if (item.kind === 'display') {
+    return <DisplayFormItemSection item={item} namePrefix={shared.namePrefix} />
+  }
   return renderArrayNode(item, parentContext, shared)
 }
 
@@ -155,6 +159,10 @@ export function formItemKey(
   index: number,
   namePrefix?: string,
 ): string {
+  if ('kind' in item && item.kind === 'display') {
+    return prefixFormItemKey(namePrefix, `display-${item.id}-${index}`)
+  }
+
   if ('name' in item && typeof item.name === 'string') {
     const leafType = 'type' in item && typeof item.type === 'string' ? item.type : undefined
     const key = leafType ? `${item.name}-${leafType}-${index}` : `${item.name}-${index}`

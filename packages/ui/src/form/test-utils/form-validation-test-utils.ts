@@ -388,6 +388,10 @@ function applyRegisteredStructuredItem(
     case 'group':
     case 'row':
       applyRegisteredShape(record, item.fields as FormItem[], inactive)
+      return
+    case 'slot':
+    case 'display':
+      return
   }
 }
 

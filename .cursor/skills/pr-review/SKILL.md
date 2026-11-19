@@ -54,7 +54,7 @@ non-reusable.
 | 5   | **Silent failures**              | Errors masquerading as empty data, missing entities as loading, swallowed query failures, UI hiding without server enforcement                                   |
 | 6   | **Behavior or test regressions** | Changed flows, defaults, navigation, permissions, persisted state; deleted/weakened/stale tests                                                                  |
 | 7   | **Wiring gaps**                  | Partial landing across layers — see below                                                                                                                        |
-| 8   | **New form slots**               | A new production `kind: 'slot'` that `visibility`, `optionsResolve`, `hint.resolve`, `derivedMeta`, `valueSyncs`, `dependent`, or `optionalDisclosure` could express. Growth must update `form-slot-register.md` and the slot-count baseline. |
+| 8   | **New form slots**               | A new production `kind: 'slot'` that `display`, `visibility`, `optionsResolve`, `hint.resolve`, `derivedMeta`, `valueSyncs`, `dependent`, or `optionalDisclosure` could express. Growth must update `form-slot-register.md` and the slot-count baseline. |
 
 ### SSOT rule
 

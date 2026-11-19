@@ -1,8 +1,6 @@
 import { createElement } from 'react'
 import { z } from 'zod'
 import { Form } from '@rpg/ui/form'
-import { Text } from '@rpg/ui'
-
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { effectArrayFields } from '../lib/effects/effect-form-fields'
 import { spellEffectsFormSchema } from '../lib/effects/effect-form-schema'
@@ -28,14 +26,13 @@ export function SpellEffectsEditor({ formCtx, defaultEffects = [] }: SpellEffect
       schema={spellEffectsEditorSchema}
       fields={[
         {
-          kind: 'slot',
-          name: '_effectsPersistenceNotice',
-          render: () =>
-            createElement(
-              Text,
-              { variant: 'muted', className: 'text-sm', role: 'status' },
-              EFFECTS_NOT_SAVED_BANNER,
-            ),
+          kind: 'display',
+          id: 'effects-persistence-notice',
+          content: {
+            variant: 'text',
+            text: EFFECTS_NOT_SAVED_BANNER,
+            role: 'muted',
+          },
         },
         {
           kind: 'slot',

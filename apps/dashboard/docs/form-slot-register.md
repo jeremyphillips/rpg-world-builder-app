@@ -188,12 +188,12 @@ Owner is the feature folder.
 Phase 2a/3a. Previews are excluded by the PoC.
 
 | Identity                                                                     | Responsibility                                 | Tag |
-| ---------------------------------------------------------------------------- | ---------------------------------------------- | --- |
-| `_standardLevelRangeSummary`, `_extendedLevelRangeSummary`                   | live muted summary                             | P   |
+| ---------------------------------------------------------------------------- | ---------------------------------------------- | --- | -------------------------------------------------------------------------------------------- |
+| `_standardLevelRangeSummary`, `_extendedLevelRangeSummary`                   | live muted summary                             | P   | **Completed:** `kind: 'display'` via `level-range-summary-display.lib.ts`                    |
 | `_resolutionSelectionHints`                                                  | multi-paragraph guidance                       | C   |
 | `_outcomeApplicationStatus`                                                  | derived status                                 | P   |
 | `spellcastingFeatureSummary`                                                 | copy plus cross-tab link                       | C   |
-| `cultureNamingAlert`, `_effectsPersistenceNotice`, `_grantTypeMissingRepair` | notice                                         | P   |
+| `cultureNamingAlert`, `_effectsPersistenceNotice`, `_grantTypeMissingRepair` | notice                                         | P   | **Completed (pilot):** `cultureNamingAlert`, `_effectsPersistenceNotice` → `kind: 'display'` |
 | `buildAdvisories` (factory + trait literal)                                  | advisory title and tone                        | P   |
 | `weaponProficiencyReconciliation` ×2                                         | notice plus flag clear                         | C   |
 | `baseStatistics`                                                             | supporting sentence                            | P   |

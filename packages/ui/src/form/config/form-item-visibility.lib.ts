@@ -156,6 +156,7 @@ function formItemHasVisibleRenderableField(
     case 'dependent':
       return formDependentHasVisibleRenderableFields(item, values)
     case 'slot':
+    case 'display':
       return item.visibility ? item.visibility.visibleWhen(values) : true
     case 'array':
       return item.visibility ? item.visibility.visibleWhen(values) : true

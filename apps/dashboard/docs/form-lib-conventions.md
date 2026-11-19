@@ -439,7 +439,10 @@ modals and one-off editors once at the composition boundary instead of threading
 - **Persistence** — may stay in a section shell (`CampaignAvailabilityField`, create/edit
   shells) when it uses a separate API or RHF form — but the **rendered UI** must still flow
   through `FormProvider` + `FormItems` over the field builder.
-- **Escape hatch** — `kind: 'slot'` only after `visibility`, `optionsResolve`, `hint.resolve`,
+- **Display** — `kind: 'display'` for read-only text, notices, and rules previews via
+  `content` or `resolve.contentWhen` (see
+  [containers.md#display-fields](../../../../packages/ui/docs/forms/containers.md#display-fields)).
+- **Escape hatch** — `kind: 'slot'` only after `display`, `visibility`, `optionsResolve`, `hint.resolve`,
   `derivedMeta`, `valueSyncs`, `dependent`, `optionalDisclosure`, and standard composition
   cannot express the behavior (for example an availability preflight switch). Extend
   `@rpg/ui/form` when the same pattern appears twice. Record the slot in

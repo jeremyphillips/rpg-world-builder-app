@@ -18,7 +18,9 @@ Do **not** hand-build form section chrome in feature components when `FormItem[]
 3. **Rendering** — `FormProvider` + `FormItems` (or `<Form>` / `<TabbedForm>`). Section shells
    may own separate persistence (e.g. campaign access PATCH) but must not duplicate field
    layout or disclosure chrome.
-4. **Slots** — `kind: 'slot'` only after checking `visibility`, `optionsResolve`, `hint.resolve`,
+4. **Display** — `kind: 'display'` for read-only text, notices, or rules previews driven by
+   `content` or `resolve.contentWhen` (see [containers.md](../../packages/ui/docs/forms/containers.md#display-fields)).
+5. **Slots** — `kind: 'slot'` only after checking `display`, `visibility`, `optionsResolve`, `hint.resolve`,
    `derivedMeta`, `valueSyncs`, `kind: 'dependent'`, `optionalDisclosure`, and standard
    group/row/columns composition. If the pattern repeats, extend `@rpg/ui/form` instead of
    copying a dashboard slot. Record every new production slot in

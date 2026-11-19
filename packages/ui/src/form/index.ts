@@ -272,6 +272,11 @@ export {
   type ArrayAddActionLayout,
   type ArrayItemVariant,
   type SlotConfig,
+  type DisplayConfig,
+  type FormDisplayBlock,
+  type FormDisplayTextRole,
+  type FormDisplayRulesContent,
+  type FormDisplayResolve,
   type FormItem,
   type FormIssue,
   type FormIssueSeverity,
@@ -297,6 +302,12 @@ export {
   defineDependentField,
 } from './form-authoring'
 export { isRowSlotItem } from './field-config'
+export {
+  collectDisplayDependsOn,
+  displayContentIsEmpty,
+  normalizeDisplayBlocks,
+  resolveDisplayBlocks,
+} from './display/form-display-content.lib'
 export {
   assertNavigationIdsMatchDomIds,
   collectFormNavigationAnchors,

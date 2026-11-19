@@ -1,5 +1,5 @@
 {
-  "features/campaign/lib/rules/character-configuration/character-configuration-form-fields.ts": 5,
+  "features/campaign/lib/rules/character-configuration/character-configuration-form-fields.ts": 3,
   "features/campaign/lib/rules/mechanics/mechanics-form-fields.ts": 1,
   "features/campaign/lib/settings/campaign-profile-form-fields.ts": 1,
   "features/character/lib/steps/abilities-form-fields.ts": 5,
@@ -33,8 +33,8 @@
   "features/content/monsters/lib/monster-form-fields.tsx": 7,
   "features/content/monsters/lib/statistics/monster-armor-class-fields.tsx": 3,
   "features/content/monsters/lib/traits/monster-trait-form-fields.tsx": 3,
-  "features/content/species/lib/species-culture-form-fields.ts": 2,
-  "features/content/spells/components/spell-effects-editor.tsx": 2,
+  "features/content/species/lib/species-culture-form-fields.ts": 1,
+  "features/content/spells/components/spell-effects-editor.tsx": 1,
   "features/content/spells/lib/spell-form-fields.ts": 1,
   "features/content/spells/resolution/lib/form/resolution-form-fields.ts": 1,
   "features/content/spells/resolution/lib/form/resolution-form-slots.ts": 11,

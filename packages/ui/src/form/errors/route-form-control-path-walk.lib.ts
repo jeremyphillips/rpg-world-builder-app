@@ -100,6 +100,8 @@ function walkContainerItem(
     case 'slot':
       registerSlotPath(item, absolutePrefix, params, params.inactivePaths)
       return
+    case 'display':
+      return
     case 'dependent':
       walkOrderedControlPaths([item.controller, ...item.dependents.fields], absolutePrefix, params)
       return

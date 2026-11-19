@@ -53,6 +53,10 @@ function appendSlotOrderPaths(
 }
 
 function walkContainerItem(item: FieldOrderContainer, prefix: string, paths: string[]): void {
+  if (item.kind === 'display') {
+    return
+  }
+
   if (item.kind === 'slot') {
     appendSlotOrderPaths(item, prefix, paths)
     return
@@ -152,7 +156,7 @@ function walkArraySections(
       continue
     }
 
-    if (item.kind === 'slot') continue
+    if (item.kind === 'slot' || item.kind === 'display') continue
 
     if (item.kind === 'dependent') {
       walkArraySections(

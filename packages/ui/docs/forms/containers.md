@@ -5,28 +5,30 @@ defaults: [forms hub — Form density](../forms.md#form-density).
 
 ## Overview
 
-| `kind`    | Semantics            | Density boundary? | Default density | Fieldset legend |
-| --------- | -------------------- | ----------------- | --------------- | --------------- |
-| `group`   | Named subsection     | yes (optional)    | inherit parent  | yes             |
-| `row`     | Horizontal siblings  | no                | inherit parent  | no              |
-| `columns` | Side-by-side stacks  | no                | inherit parent  | no              |
-| `stack`   | Layout-only column   | no                | inherit parent  | no              |
-| `array`   | `useFieldArray` list | yes (optional)    | `compact`       | yes (`array`)   |
-| `slot`    | Custom `render()` UI | no                | inherit parent  | optional label  |
+| `kind`    | Semantics                | Density boundary? | Default density | Fieldset legend |
+| --------- | ------------------------ | ----------------- | --------------- | --------------- |
+| `group`   | Named subsection         | yes (optional)    | inherit parent  | yes             |
+| `row`     | Horizontal siblings      | no                | inherit parent  | no              |
+| `columns` | Side-by-side stacks      | no                | inherit parent  | no              |
+| `stack`   | Layout-only column       | no                | inherit parent  | no              |
+| `array`   | `useFieldArray` list     | yes (optional)    | `compact`       | yes (`array`)   |
+| `slot`    | Custom `render()` UI     | no                | inherit parent  | optional label  |
+| `display` | Read-only schema content | no                | inherit parent  | no              |
 
 ## Component entry files
 
 Every form container or renderer component has **one semantically named entry file** that
 matches the exported component name in kebab-case:
 
-| Component               | Entry file                                                                                             |
-| ----------------------- | ------------------------------------------------------------------------------------------------------ |
-| `ArrayFieldRenderer`    | [`array-field-renderer.client.tsx`](../src/form/renderers/array/array-field-renderer.client.tsx)       |
-| `ArrayFormItemSection`  | [`array-form-item-section.client.tsx`](../src/form/renderers/array/array-form-item-section.client.tsx) |
-| `ConditionalArrayField` | [`conditional-array-field.client.tsx`](../src/form/renderers/array/conditional-array-field.client.tsx) |
-| `ColumnsFieldSection`   | [`form-columns-section.client.tsx`](../src/form/containers/form-columns-section.client.tsx)            |
-| `SlotFieldRenderer`     | [`slot-field-renderer.client.tsx`](../src/form/renderers/fields/slot-field-renderer.client.tsx)        |
-| `FieldRenderer`         | [`field-renderer.client.tsx`](../src/form/renderers/field-renderer.client.tsx)                         |
+| Component                | Entry file                                                                                             |
+| ------------------------ | ------------------------------------------------------------------------------------------------------ |
+| `ArrayFieldRenderer`     | [`array-field-renderer.client.tsx`](../src/form/renderers/array/array-field-renderer.client.tsx)       |
+| `ArrayFormItemSection`   | [`array-form-item-section.client.tsx`](../src/form/renderers/array/array-form-item-section.client.tsx) |
+| `ConditionalArrayField`  | [`conditional-array-field.client.tsx`](../src/form/renderers/array/conditional-array-field.client.tsx) |
+| `ColumnsFieldSection`    | [`form-columns-section.client.tsx`](../src/form/containers/form-columns-section.client.tsx)            |
+| `SlotFieldRenderer`      | [`slot-field-renderer.client.tsx`](../src/form/renderers/fields/slot-field-renderer.client.tsx)        |
+| `DisplayFormItemSection` | [`display-field-renderer.client.tsx`](../src/form/renderers/fields/display-field-renderer.client.tsx)  |
+| `FieldRenderer`          | [`field-renderer.client.tsx`](../src/form/renderers/field-renderer.client.tsx)                         |
 
 Convention: `NewComponent` → `new-component.client.tsx`. Supporting hooks, variants, and
 presentational sub-parts live alongside the entry file in the same folder; they are not
@@ -707,12 +709,41 @@ Avoid three+ levels for UX.
 
 Nested `useFieldArray` under `shouldUnregister: true` is unsupported. `<Form>` uses that flag, so an array mount can drop sibling values that were only on `defaultValues`. `<TabbedForm>` keeps the default tree. Lists that share a structural object with sibling fields, including spell outcome effects, belong on `<TabbedForm>`. See [forms.md](../forms.md).
 
+## Display fields
+
+Read-only copy resolved from declared dependencies — no RHF registration, no custom `render()`.
+Use `kind: 'display'` before a slot when the UI is static or `resolve.contentWhen` data.
+
+```ts
+{
+  kind: 'display',
+  id: 'tier-summary',
+  resolve: {
+    dependsOn: ['maxLevel'],
+    contentWhen: (values) => ({
+      variant: 'text',
+      text: `Levels 1–${values.maxLevel}`,
+      role: 'muted',
+      live: 'polite',
+    }),
+  },
+}
+```
+
+**Blocks (v1):** `text` (`supporting` | `caption` | `muted`, optional `live: 'polite'`), `notice`
+(`AdvisoryAlert` props), `rulesPreview` (metadata, prose, guidance — not `html`). **`id`** is a
+stable config identity among siblings (not an RHF path). **`resolve.dependsOn`** uses the same
+relative paths as field `visibility`. Display items are excluded from `kind: 'row'` fields,
+error ownership, and tab path prefixes. Empty resolved content renders `null` with no spacing
+chrome.
+
 ## Slot fields
 
 ### Before adding a slot
 
 Use a slot only when none of these already express the behavior:
 
+- `kind: 'display'` for read-only text, notices, or rules previews
 - `visibility` for show and hide
 - `optionsResolve` for options that depend on other values
 - `hint.resolve` for dynamic hint copy
