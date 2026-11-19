@@ -11,7 +11,7 @@ Monsters / stat block entries. Part of the [`content`](../README.md) feature; se
 | Form hub                              | `lib/monster-form-{fields,values,schema,labels,preview}.ts(x)`                                                             |
 | Equipment tab lib                     | [`lib/equipment/`](./lib/equipment/)                                                                                       |
 | Actions tab lib                       | [`lib/actions/`](./lib/actions/)                                                                                           |
-| Actions tab UI                        | [`components/form/monster-action-sections.tsx`](./components/form/monster-action-sections.tsx)                             |
+| Actions tab UI                        | [`components/form/actions/action-sections.tsx`](./components/form/actions/action-sections.tsx)                             |
 | Weapon action mode audit              | [`docs/weapon-action-modes.md`](./docs/weapon-action-modes.md)                                                             |
 | Statistics tab lib                    | [`lib/statistics/`](./lib/statistics/)                                                                                     |
 | Creature details tab lib              | [`lib/creature-details/`](./lib/creature-details/) (skills, languages, defenses)                                           |
@@ -41,9 +41,8 @@ components/form/slots/
 ```
 
 `slots/actions/` includes action-preview entries. Do not add
-`components/form/actions/**/*.slot.tsx`. Substantial UI that is not itself the
-registered render stays at `components/form/` for now. The later folder move
-puts it here:
+`components/form/actions/**/*.slot.tsx`. Substantial UI that is not itself the registered render lives under
+semantic folders beside `slots/`:
 
 | Concern                                          | Path                                               |
 | ------------------------------------------------ | -------------------------------------------------- |

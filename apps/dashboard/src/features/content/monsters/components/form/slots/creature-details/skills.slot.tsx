@@ -36,7 +36,7 @@ import {
 } from '../../../../lib/monster-form-labels'
 import { monsterSkillDerivedMetadataLine } from '../../../../lib/creature-details/monster-skill-derived-metadata.lib'
 import type { MonsterFormValues } from '../../../../lib/monster-form-values'
-import { MonsterCreatureDetailsRemoveRowButton } from '../../monster-creature-details-slot-parts'
+import { MonsterCreatureDetailsRemoveRowButton } from '../../creature-details/slot-parts'
 
 function SkillCatalogStatusMessages({ status }: { status: ContentFormCtx['skillCatalogStatus'] }) {
   if (status === 'pending') {

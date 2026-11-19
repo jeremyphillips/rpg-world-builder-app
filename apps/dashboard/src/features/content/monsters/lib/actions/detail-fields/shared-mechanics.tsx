@@ -62,11 +62,11 @@ import { monsterSpellComponentRequirementsField } from '../spell/monster-spell-c
 import { monsterWeaponDamageOverrideField } from '../weapon/monster-weapon-damage-override'
 import type { MonsterFormValues } from '../../monster-form-values'
 import { monsterSpellCastAtLevelField } from '../spell/monster-spell-cast-at-level-form-fields'
-import { MONSTER_SPELL_PICKER_INTERCEPT } from '../../../components/form/monster-spell-picker-context'
+import { MONSTER_SPELL_PICKER_INTERCEPT } from '../../../components/form/spells/spell-picker-context'
 import {
   MonsterSpellChangeAction,
   MonsterSpellEntryCard,
-} from '../../../components/form/monster-spell-entry-card'
+} from '../../../components/form/spells/spell-entry-card'
 import { MonsterSpellFrequencySlot } from '../../../components/form/slots/spells/frequency.slot'
 import { monsterAbilitySourceDependent, monsterActionSaveSection } from './save-authoring'
 

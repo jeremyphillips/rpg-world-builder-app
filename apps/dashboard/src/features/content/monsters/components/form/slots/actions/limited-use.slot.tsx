@@ -34,6 +34,7 @@ export function MonsterActionRechargeField({
   const actions = resolveOptionalDisclosureActions({
     intent: 'add',
     subject: 'recharge',
+    removeLabel: `Remove ${MONSTER_LIMIT_RECHARGES_ON_LABEL}`,
   })
 
   const write = (next: ReturnType<typeof rechargeValueFromRaw>) => {

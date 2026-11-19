@@ -32,7 +32,7 @@ function Harness({ defaultValues }: { defaultValues?: { omittedComponents?: stri
 describe('MonsterSpellComponentRequirementsField', () => {
   it('starts collapsed with no persisted omissions and stays clean on mount', () => {
     render(<Harness />)
-    expect(screen.getByRole('button', { name: /omit spell components/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /omit components/i })).toBeInTheDocument()
     expect(screen.getByTestId('value').textContent).toBe('')
     expect(screen.getByTestId('dirty').textContent).toBe('false')
   })
@@ -60,7 +60,7 @@ describe('MonsterSpellComponentRequirementsField', () => {
     const user = userEvent.setup()
     render(<Harness />)
 
-    await user.click(screen.getByRole('button', { name: /omit spell components/i }))
+    await user.click(screen.getByRole('button', { name: /omit components/i }))
     await user.click(screen.getByRole('checkbox', { name: 'Material' }))
     expect(screen.getByTestId('value').textContent).toBe('["material"]')
 
@@ -72,10 +72,10 @@ describe('MonsterSpellComponentRequirementsField', () => {
     const user = userEvent.setup()
     render(<Harness defaultValues={{ omittedComponents: ['material'] }} />)
 
-    await user.click(screen.getByRole('button', { name: /remove omit components/i }))
+    await user.click(screen.getByRole('button', { name: /restore components/i }))
     await waitFor(() => expect(screen.getByTestId('value').textContent).toBe(''))
     await waitFor(() =>
-      expect(screen.getByRole('button', { name: /omit spell components/i })).toBeInTheDocument(),
+      expect(screen.getByRole('button', { name: /omit components/i })).toBeInTheDocument(),
     )
     expect(screen.queryByRole('checkbox', { name: 'Material' })).not.toBeInTheDocument()
   })

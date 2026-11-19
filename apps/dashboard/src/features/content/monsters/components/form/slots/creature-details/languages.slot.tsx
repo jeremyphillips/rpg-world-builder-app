@@ -6,8 +6,8 @@ import { EntityCard } from '@/features/content'
 import type { ContentFormCtx } from '../../../../../lib/forms/registry/content-form-registry'
 import { MONSTER_UNDERSTANDS_ONLY_LABEL } from '../../../../lib/monster-form-labels'
 import type { MonsterFormValues } from '../../../../lib/monster-form-values'
-import { MonsterCreatureDetailsLanguagesAddField } from '../../monster-creature-details-languages-add-field'
-import { MonsterCreatureDetailsRemoveRowButton } from '../../monster-creature-details-slot-parts'
+import { MonsterCreatureDetailsLanguagesAddField } from '../../creature-details/languages-add-field'
+import { MonsterCreatureDetailsRemoveRowButton } from '../../creature-details/slot-parts'
 
 function MonsterLanguageFluencyRowTrailing({
   entry,

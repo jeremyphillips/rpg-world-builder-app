@@ -20,7 +20,7 @@ import {
   MONSTER_SPECIAL_SENSE_SUPPORTING_LABEL,
 } from '../../../../lib/monster-form-labels'
 import type { MonsterFormValues } from '../../../../lib/monster-form-values'
-import { MonsterCreatureDetailsRemoveRowButton } from '../../monster-creature-details-slot-parts'
+import { MonsterCreatureDetailsRemoveRowButton } from '../../creature-details/slot-parts'
 
 const CLEARED_RANGE = -1
 

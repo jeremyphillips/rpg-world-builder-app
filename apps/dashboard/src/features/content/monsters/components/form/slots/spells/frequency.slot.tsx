@@ -1,6 +1,6 @@
 import { useArrayFieldContext } from '@rpg/ui/form'
 
-import { MonsterSpellFrequencyField } from '../../monster-spell-frequency-field'
+import { MonsterSpellFrequencyField } from '../../spells/spell-frequency-field'
 
 export function MonsterSpellFrequencySlot() {
   const array = useArrayFieldContext()

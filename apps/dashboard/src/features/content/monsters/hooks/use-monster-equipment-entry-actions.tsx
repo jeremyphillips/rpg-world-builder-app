@@ -21,7 +21,7 @@ import type { MonsterEquipmentFormEntry, MonsterFormValues } from '../lib/monste
 import {
   MonsterEquipmentEntryCardView,
   MonsterEquipmentEntryDialogs,
-} from '../components/form/monster-equipment-entry-actions.parts'
+} from '../components/form/equipment/equipment-entry-actions.parts'
 
 type PendingRemove = {
   entryId: string

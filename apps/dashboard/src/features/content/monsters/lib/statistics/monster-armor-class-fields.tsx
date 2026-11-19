@@ -8,7 +8,7 @@ import type { FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { MonsterArmorClassPreview } from '../../components/form/slots/statistics/armor-class-preview.slot'
-import { MonsterArmorSlotAction } from '../../components/form/monster-armor-slot'
+import { MonsterArmorSlotAction } from '../../components/form/statistics/armor-slot'
 import {
   BodyArmorSlot,
   ShieldSlot,
