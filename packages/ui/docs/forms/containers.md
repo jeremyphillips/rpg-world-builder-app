@@ -709,6 +709,24 @@ Nested `useFieldArray` under `shouldUnregister: true` is unsupported. `<Form>` u
 
 ## Slot fields
 
+### Before adding a slot
+
+Use a slot only when none of these already express the behavior:
+
+- `visibility` for show and hide
+- `optionsResolve` for options that depend on other values
+- `hint.resolve` for dynamic hint copy
+- `derivedMeta` for read-only metadata beside a field
+- `valueSyncs` on `<Form>` or `<TabbedForm>` for writes that follow a driver field after mount
+- `kind: 'dependent'` for a controller and its dependents
+- `optionalDisclosure` for add, override, or clear-when-empty fields
+- a `group`, `row`, `columns`, or standard field composition
+
+If the same slot pattern appears twice, extend `@rpg/ui/form` instead of copying the slot.
+A new production `kind: 'slot'` literal must be recorded in
+[form-slot-register.md](../../../../apps/dashboard/docs/form-slot-register.md). The dashboard
+ratchet rejects a per-file count increase until that baseline is updated on purpose.
+
 Custom UI inside `FormProvider`. `name` aligns with a form value; defaults from form
 `defaultValues`.
 

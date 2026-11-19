@@ -439,9 +439,13 @@ modals and one-off editors once at the composition boundary instead of threading
 - **Persistence** — may stay in a section shell (`CampaignAvailabilityField`, create/edit
   shells) when it uses a separate API or RHF form — but the **rendered UI** must still flow
   through `FormProvider` + `FormItems` over the field builder.
-- **Escape hatch** — `kind: 'slot'` for behavior that truly cannot be config-shaped (e.g.
-  availability preflight switch). Extend `@rpg/ui/form` when the same pattern appears twice
-  instead of adding a second layout system.
+- **Escape hatch** — `kind: 'slot'` only after `visibility`, `optionsResolve`, `hint.resolve`,
+  `derivedMeta`, `valueSyncs`, `dependent`, `optionalDisclosure`, and standard composition
+  cannot express the behavior (for example an availability preflight switch). Extend
+  `@rpg/ui/form` when the same pattern appears twice. Record the slot in
+  [form-slot-register.md](./form-slot-register.md) and raise
+  `src/test/form-slot-literal-baseline.json`. The ratchet allows a count to fall without an
+  edit and rejects growth that skips the register.
 
 Detail: [packages/ui/docs/forms.md](../../../../packages/ui/docs/forms.md),
 [packages/ui/docs/forms/containers.md](../../../../packages/ui/docs/forms/containers.md).

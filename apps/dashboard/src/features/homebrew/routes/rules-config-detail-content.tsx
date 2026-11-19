@@ -10,6 +10,7 @@ import { notifySaveSuccess } from '@/lib/notify'
 import {
   buildCharacterConfigurationNavigation,
   buildMechanicsConfigFields,
+  buildMechanicsValueSyncs,
   buildMechanicsPatchInput,
   mapRulesetPatchToMechanicsValues,
   MECHANICS_CONFIGURATION_SECTIONS,
@@ -203,6 +204,7 @@ function MechanicsConfigurationForm({ campaignId }: { campaignId: string }) {
             uiStateKey={`${campaignId}:mechanics`}
             schema={mechanicsValuesSchema}
             fields={fields}
+            valueSyncs={buildMechanicsValueSyncs()}
             defaultValues={defaultValues}
             onSubmit={onSubmit}
             formError={formError}

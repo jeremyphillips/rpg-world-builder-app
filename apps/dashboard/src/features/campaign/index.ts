@@ -38,6 +38,7 @@ export {
 } from './lib/rules/character-configuration/character-configuration-navigation.lib'
 export {
   buildMechanicsConfigFields,
+  buildMechanicsValueSyncs,
   MECHANICS_CONFIGURATION_SECTIONS,
   mechanicsValuesSchema,
   type MechanicsConfigurationSectionId,

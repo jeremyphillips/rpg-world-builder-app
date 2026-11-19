@@ -6,19 +6,21 @@ import {
   ARMOR_CLASS_MODES,
   ATTACK_RESOLUTION_MODE_TERM,
   DEFAULT_EDITION_PRESET_ID,
+  EDITION_PRESET_IDS,
   EDITION_PRESET_TERM,
   armorClassFromProtection,
   attackResolutionModeIdSchema,
   editionPresetIdSchema,
   armorClassModeSchema,
+  getEditionPresetMechanics,
   type ArmorClassBase,
   type ArmorClassMode,
+  type EditionPresetId,
 } from '@rpg/contracts'
-import { toOptions, type FieldOption, type FormItem } from '@rpg/ui/form'
+import { toOptions, type FieldOption, type FormItem, type FormValueSync } from '@rpg/ui/form'
 
 import { vocabularyFieldLabel } from '@/features/vocabulary'
 
-import { EditionPresetEffects } from '../../../components/edition-preset-effects'
 import { ARMOR_CLASS_BASE_LABELS, ARMOR_CLASS_MODE_LABELS } from './mechanics-form-labels'
 
 export const mechanicsValuesSchema = z.object({
@@ -78,6 +80,30 @@ function editionPresetOptionsWithRecommendedBadge(options: FieldOption[]): Field
   )
 }
 
+function isEditionPresetId(value: unknown): value is EditionPresetId {
+  return typeof value === 'string' && (EDITION_PRESET_IDS as readonly string[]).includes(value)
+}
+
+/** Writes preset knobs after the author changes the preset. Skips the first observation. */
+const MECHANICS_VALUE_SYNCS: FormValueSync[] = [
+  {
+    dependsOn: ['editionPresetId'],
+    apply: (values) => {
+      if (!isEditionPresetId(values.editionPresetId)) return undefined
+      const bundle = getEditionPresetMechanics(values.editionPresetId)
+      return {
+        armorClassMode: bundle.armorClass.mode,
+        armorClassBase: String(bundle.armorClass.base),
+        attackResolutionMode: bundle.attackResolution.mode,
+      }
+    },
+  },
+]
+
+export function buildMechanicsValueSyncs(): FormValueSync[] {
+  return MECHANICS_VALUE_SYNCS
+}
+
 function editionPresetGroup(editionPresetOptions: FieldOption[]): FormItem {
   return {
     kind: 'group',
@@ -93,11 +119,6 @@ function editionPresetGroup(editionPresetOptions: FieldOption[]): FormItem {
         required: true,
         options: editionPresetOptionsWithRecommendedBadge(editionPresetOptions),
         defaultValue: DEFAULT_EDITION_PRESET_ID,
-      },
-      {
-        kind: 'slot',
-        name: '_editionPresetEffects',
-        render: () => createElement(EditionPresetEffects),
       },
     ],
   }
