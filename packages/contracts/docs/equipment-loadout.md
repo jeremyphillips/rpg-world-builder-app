@@ -149,5 +149,5 @@ When assignment mechanics land, expect touch points:
 - [`equipment-stack.test.ts`](../src/rpg/runtime/creature/equipment-stack.test.ts)
 - [`equipment-inventory-unmodified-context.test.ts`](../src/rpg/runtime/creature/equipment-inventory-unmodified-context.test.ts)
 - [`resolve-equipment-row-summary.test.ts`](../src/rpg/runtime/creature/resolve-equipment-row-summary.test.ts)
-- [`monster-equipment-panel.test.tsx`](../../apps/dashboard/src/features/content/monsters/components/form/monster-equipment-panel.test.tsx)
+- [`equipment-panel.test.tsx`](../../apps/dashboard/src/features/content/monsters/components/form/equipment/equipment-panel.test.tsx)
 - [`monster-equipment-loadout.lib.test.ts`](../../apps/dashboard/src/features/content/monsters/lib/equipment/monster-equipment-loadout.lib.test.ts)

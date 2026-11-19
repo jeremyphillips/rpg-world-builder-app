@@ -9,8 +9,7 @@ import {
   saveOutcomesPath,
   withMonsterSaveRepeatSave,
 } from './monster-action-save-outcomes'
-
-const WRITE_OPTIONS = { shouldDirty: true, shouldTouch: true, shouldValidate: true } as const
+import { MONSTER_FORM_WRITE_OPTIONS } from '../../monster-form-write-options'
 
 export function MonsterActionSaveRepeatAdd({
   namePrefix,
@@ -45,7 +44,7 @@ export function MonsterActionSaveRepeatRemove({ namePrefix }: { namePrefix: stri
     setValue(
       saveOutcomesPath(namePrefix),
       withMonsterSaveRepeatSave(outcomes, undefined),
-      WRITE_OPTIONS,
+      MONSTER_FORM_WRITE_OPTIONS,
     )
   }
   return (

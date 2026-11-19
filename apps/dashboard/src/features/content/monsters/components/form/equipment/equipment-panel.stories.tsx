@@ -3,7 +3,7 @@ import { buildContentPurposeSelectors } from '@rpg/contracts'
 import { FormProvider, useForm } from 'react-hook-form'
 import { pickEquipment } from '@/test/fixtures/pick'
 
-import { MonsterEquipmentPanel } from '../equipment/equipment-panel'
+import { MonsterEquipmentPanel } from './equipment-panel'
 import {
   resolveMonsterCreateDefaultValues,
   type MonsterFormValues,

@@ -29,7 +29,7 @@ import { SPELLCASTING_ABILITY_FIELD_LABEL } from '../../../../lib/forms/mechanic
 import type { MonsterFormValues } from '../../monster-form-values'
 import { normalizeMonsterDraftForPreview } from '../../normalize-monster-form-values'
 import type { MonsterActionSection } from '../references/monster-action-equipment-references'
-import { findMonsterFormActionDraft } from './monster-action-attack-summary'
+import { findMonsterFormActionDraft } from './monster-action-draft-lookup'
 
 type SpellEntry = Extract<MonsterAction, { kind: 'spell' }>
 

@@ -25,8 +25,7 @@ import {
   spellFrequencyControlIsShared,
   spellFrequencyOptions,
 } from '../../../lib/actions/spell/monster-spell-frequency'
-
-const WRITE_OPTIONS = { shouldDirty: true, shouldTouch: true, shouldValidate: true } as const
+import { MONSTER_FORM_WRITE_OPTIONS } from '../../../lib/monster-form-write-options'
 
 const LIMIT_KIND_OPTIONS = [
   { value: SPELL_ENTRY_FREQUENCY_AT_WILL, label: SPELL_ENTRY_FREQUENCY_AT_WILL_LABEL },
@@ -65,7 +64,7 @@ export function MonsterSpellFrequencyField({
   const fieldId = `${spellLimitName.replaceAll('.', '-')}-frequency`
 
   const write = (next: unknown) => {
-    setValue(spellLimitName, next as never, WRITE_OPTIONS)
+    setValue(spellLimitName, next as never, MONSTER_FORM_WRITE_OPTIONS)
   }
 
   if (reading.status === 'incomplete') {

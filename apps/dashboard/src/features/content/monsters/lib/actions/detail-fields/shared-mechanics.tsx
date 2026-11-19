@@ -51,9 +51,9 @@ import {
 } from '../../monster-form-labels'
 import type { MonsterActionSection } from '../references/monster-action-equipment-references'
 import type { MonsterActionDraftRow } from '../monster-action-presets'
-import { MonsterActionAttackAbilityField } from '../../../components/form/actions/shared/bonus-source-ability.slot'
+import { MonsterActionAttackAbilityField } from '../../../components/form/actions/shared/attack-ability.slot'
 import { MonsterActionCastingAbilityField } from '../../../components/form/actions/shared/casting-ability.slot'
-import { MonsterActionRechargeField } from '../../../components/form/actions/shared/limited-use.slot'
+import { MonsterActionRechargeField } from '../../../components/form/actions/shared/recharge.slot'
 import {
   monsterActionLimitedUseFields,
   monsterActionOnHitFields,

@@ -19,8 +19,7 @@ import {
   withMonsterSaveFailureOrSuccessOutcome,
   type MonsterSaveOutcome,
 } from '../../../../lib/actions/save/monster-action-save-outcomes'
-
-const WRITE_OPTIONS = { shouldDirty: true, shouldTouch: true, shouldValidate: true } as const
+import { MONSTER_FORM_WRITE_OPTIONS } from '../../../../lib/monster-form-write-options'
 
 export function MonsterActionSaveFailureOrSuccessField({ namePrefix }: { namePrefix: string }) {
   const controlSize = useFieldControlSize()
@@ -51,13 +50,17 @@ export function MonsterActionSaveFailureOrSuccessField({ namePrefix }: { namePre
               ...slotted,
               { result: 'failed-or-successful-save', effects: [] },
             ] as MonsterSaveOutcome[],
-            WRITE_OPTIONS,
+            MONSTER_FORM_WRITE_OPTIONS,
           )
         }
       }}
       onRemove={() => {
         setOpen(false)
-        setValue(path, withMonsterSaveFailureOrSuccessOutcome(outcomes, ''), WRITE_OPTIONS)
+        setValue(
+          path,
+          withMonsterSaveFailureOrSuccessOutcome(outcomes, ''),
+          MONSTER_FORM_WRITE_OPTIONS,
+        )
       }}
       size={controlSize}
     >
@@ -73,7 +76,7 @@ export function MonsterActionSaveFailureOrSuccessField({ namePrefix }: { namePre
           setValue(
             path,
             withMonsterSaveFailureOrSuccessOutcome(outcomes, event.target.value),
-            WRITE_OPTIONS,
+            MONSTER_FORM_WRITE_OPTIONS,
           )
         }}
       />

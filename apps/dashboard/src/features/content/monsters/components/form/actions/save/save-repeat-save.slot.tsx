@@ -12,8 +12,7 @@ import {
   shouldShowSaveRepeatSaveAuthoring,
   withMonsterSaveRepeatSave,
 } from '../../../../lib/actions/save/monster-action-save-outcomes'
-
-const WRITE_OPTIONS = { shouldDirty: true, shouldTouch: true, shouldValidate: true } as const
+import { MONSTER_FORM_WRITE_OPTIONS } from '../../../../lib/monster-form-write-options'
 
 export function MonsterActionSaveRepeatSaveField({ namePrefix }: { namePrefix: string }) {
   const { setValue } = useFormContext()
@@ -35,7 +34,7 @@ export function MonsterActionSaveRepeatSaveField({ namePrefix }: { namePrefix: s
         setValue(
           saveOutcomesPath(namePrefix),
           withMonsterSaveRepeatSave(outcomes, defaultRepeatSaveShell()),
-          WRITE_OPTIONS,
+          MONSTER_FORM_WRITE_OPTIONS,
         )
       }}
     />

@@ -10,7 +10,7 @@ import { movementRowsToRecordForPreview } from '../../../../lib/forms/fields/con
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import { MONSTER_SHAPE_SHIFT_REQUIRES_ALTERNATE_FORM_NOTE } from '../../monster-form-labels'
 import type { MonsterFormValues } from '../../monster-form-values'
-import { findMonsterFormActionDraft } from './monster-action-attack-summary'
+import { findMonsterFormActionDraft } from './monster-action-draft-lookup'
 
 const SHAPE_SHIFT_INCOMPLETE_FORMS_GUIDANCE = 'Select the true form to preview Shape-Shift.'
 

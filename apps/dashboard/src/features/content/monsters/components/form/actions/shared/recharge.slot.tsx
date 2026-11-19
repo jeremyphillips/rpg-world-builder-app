@@ -10,13 +10,12 @@ import {
   MONSTER_LIMIT_RECHARGES_ON_LABEL,
   monsterLimitRechargesOnHint,
 } from '../../../../lib/monster-form-labels'
+import { MONSTER_FORM_WRITE_OPTIONS } from '../../../../lib/monster-form-write-options'
 import {
   completeRecharge,
   MONSTER_RECHARGE_SEED,
   rechargeValueFromRaw,
 } from '../../../../lib/actions/recharge/monster-action-recharge'
-
-const WRITE_OPTIONS = { shouldDirty: true, shouldTouch: true, shouldValidate: true } as const
 
 export function MonsterActionRechargeField({
   name,
@@ -39,11 +38,11 @@ export function MonsterActionRechargeField({
 
   const write = (next: ReturnType<typeof rechargeValueFromRaw>) => {
     if (next === 'unchanged') return
-    setValue(name as never, next as never, WRITE_OPTIONS)
+    setValue(name as never, next as never, MONSTER_FORM_WRITE_OPTIONS)
     if (!next) return
     // A merged write would keep count and recovery from a previous uses value.
-    setValue(`${name}.count` as never, undefined as never, WRITE_OPTIONS)
-    setValue(`${name}.recovery` as never, undefined as never, WRITE_OPTIONS)
+    setValue(`${name}.count` as never, undefined as never, MONSTER_FORM_WRITE_OPTIONS)
+    setValue(`${name}.recovery` as never, undefined as never, MONSTER_FORM_WRITE_OPTIONS)
   }
 
   return (

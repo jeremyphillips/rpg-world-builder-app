@@ -14,7 +14,7 @@ Pure builders live here. Registered preview slot components live under
 
 Headings: [`resolveMonsterEntryHeading`](../../../../../../../packages/contracts/src/rpg/runtime/monster/resolve-monster-entry-heading.ts) only — no preview-local fallbacks.
 
-Draft lookup: [`findMonsterFormActionDraft`](./monster-action-attack-summary.ts) only — no section-local `.find` on `reactions` / `bonusActions`.
+Draft lookup: [`findMonsterFormActionDraft`](./monster-action-draft-lookup.ts) only — no section-local `.find` on `reactions` / `bonusActions`.
 
 ## Per-kind retention (Phase 6 E)
 
@@ -27,7 +27,7 @@ Draft lookup: [`findMonsterFormActionDraft`](./monster-action-attack-summary.ts)
 | Bonus (leap / teleport / take-actions) | `actions/sections/bonus-preview.slot.tsx`          | `buildMonsterActionBonusPreview`       | No unavailable branch      |
 | Shape-shift                            | `actions/shape-shift/shape-shift-summary.slot.tsx` | `buildMonsterActionShapeShiftPreview`  | Dual `RulesPreview` panels |
 
-Trait rules preview uses `useMonsterEntryPreviewTitle` only — shared heading helper, not action orchestration.
+Trait rules preview uses `useMonsterTraitPreviewTitle` and `MonsterActionRulesPreview` for presentation — shared heading helper, not action orchestration.
 
 ## Subscriptions
 

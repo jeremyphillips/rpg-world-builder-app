@@ -25,8 +25,6 @@ import {
   type MonsterActionAttackProfile,
   type MonsterActionAttackRoll,
   type MonsterActionDraft,
-  monsterActionSectionRows,
-  type MonsterActionSectionBody,
   type ResolveMonsterActionAttackProfileInput,
 } from '@rpg/contracts'
 
@@ -39,6 +37,7 @@ import {
 } from '../../monster-form-derivation'
 import type { MonsterFormValues } from '../../monster-form-values'
 import { normalizeMonsterFormValues } from '../../normalize-monster-form-values'
+import { findMonsterFormActionDraft } from './monster-action-draft-lookup'
 import {
   formatMonsterActionAttackPreviewConfigureHint,
   MONSTER_ACTION_ATTACK_PREVIEW_ATTACK_LABEL,
@@ -69,31 +68,6 @@ function proficiencyBonus(challengeRating: unknown): number | undefined {
   if (typeof challengeRating !== 'string') return undefined
   if (!(challengeRating in CHALLENGE_RATING_MECHANICS)) return undefined
   return CHALLENGE_RATING_MECHANICS[challengeRating as ChallengeRating].proficiencyBonus
-}
-
-export function findMonsterFormActionDraft(
-  values: MonsterFormValues,
-  ctx: ContentFormCtx,
-  actionId: string,
-): MonsterActionDraft | undefined {
-  if (!values.armorClass || !values.hitPoints || !values.abilityScores) return undefined
-  const normalized = normalizeMonsterFormValues(values, {
-    intent: 'draft',
-    mode: 'create',
-    armorClassRules: ctx.armorClassRules,
-  })
-  const sections = ['actions', 'bonusActions', 'reactions', 'legendaryActions'] as const
-  for (const section of sections) {
-    const rows = monsterActionSectionRows(normalized as MonsterActionSectionBody, section)
-    if (rows.length === 0) continue
-    const match = rows.find((row) => {
-      return Boolean(row) && typeof row === 'object' && 'id' in row && row.id === actionId
-    })
-    if (match && typeof match === 'object' && 'kind' in match) {
-      return match as MonsterActionDraft
-    }
-  }
-  return undefined
 }
 
 function attackBonusSourceIncomplete(
