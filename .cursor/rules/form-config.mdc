@@ -24,9 +24,10 @@ Do **not** hand-build form section chrome in feature components when `FormItem[]
    `derivedMeta`, `valueSyncs`, `kind: 'dependent'`, `optionalDisclosure`, and standard
    group/row/columns composition. If the pattern repeats, extend `@rpg/ui/form` instead of
    copying a dashboard slot. A confirm-gated multi-path write stays a feature controller
-   plus `ConfirmDialog` (Phase 4, Option A), not a new Form patch API. Record every new production slot in
-   `apps/dashboard/docs/form-slot-register.md` and update
-   `apps/dashboard/src/test/form-slot-literal-baseline.json`.
+   plus `ConfirmDialog`, not a new Form patch API. Record every new production slot in
+   `apps/dashboard/docs/form-slot-register.md` and add that identity to
+   `apps/dashboard/src/test/form-slot-literal-baseline.json`. A removed slot does not
+   require an allowlist edit. A new or renamed one does.
 
 ## Reference
 

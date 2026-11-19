@@ -446,11 +446,11 @@ modals and one-off editors once at the composition boundary instead of threading
   `derivedMeta`, `valueSyncs`, `dependent`, `optionalDisclosure`, and standard composition
   cannot express the behavior (for example an availability preflight switch). Extend
   `@rpg/ui/form` when the same pattern appears twice. A confirm-gated multi-path write stays
-  a feature controller plus `ConfirmDialog` (Phase 4, Option A); do not add a shared patch
-  API for that case. Record the slot in
-  [form-slot-register.md](./form-slot-register.md) and raise
-  `src/test/form-slot-literal-baseline.json`. The ratchet allows a count to fall without an
-  edit and rejects growth that skips the register.
+  a feature controller plus `ConfirmDialog`; do not add a shared patch API for that case.
+  Record the slot in
+  [form-slot-register.md](./form-slot-register.md) and raise that identity in
+  `src/test/form-slot-literal-baseline.json`. The ratchet allows an identity count to fall
+  without an edit and rejects a new or renamed identity that skips the register.
 
 Detail: [packages/ui/docs/forms.md](../../../../packages/ui/docs/forms.md),
 [packages/ui/docs/forms/containers.md](../../../../packages/ui/docs/forms/containers.md).

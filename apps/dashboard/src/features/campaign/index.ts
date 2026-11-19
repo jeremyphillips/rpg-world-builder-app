@@ -14,10 +14,6 @@ export { PendingCampaignInvitation } from './components/recovery/pending-campaig
 export { PendingCampaignInvitationsSection } from './components/recovery/pending-campaign-invitations-section'
 export { CampaignCharacterEligibilityAlert } from './components/onboarding/campaign-character-eligibility-alert'
 export { ExtendedProgressionEffects } from './components/extended-progression-effects'
-export {
-  ExtendedLevelRangeSummary,
-  StandardLevelRangeSummary,
-} from './components/level-range-summary'
 export { NewCampaignLink } from './components/new-campaign-link'
 export {
   buildRulesConfigFields,

@@ -3,11 +3,17 @@ import { join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
+import { collectSlotIdentities, type SlotIdentityCounts } from './form-slot-identities'
+
 const srcRoot = fileURLToPath(new URL('../', import.meta.url))
 const baselinePath = fileURLToPath(new URL('./form-slot-literal-baseline.json', import.meta.url))
 
-function productionSlotCounts(root: string): Record<string, number> {
-  const counts: Record<string, number> = {}
+function isProductionSource(entry: string): boolean {
+  return /\.(ts|tsx)$/.test(entry) && !/\.test\.|\.stories\./.test(entry)
+}
+
+export function productionSlotIdentities(root: string): SlotIdentityCounts {
+  const counts: SlotIdentityCounts = {}
   const walk = (dir: string) => {
     for (const entry of readdirSync(dir)) {
       const path = join(dir, entry)
@@ -15,30 +21,34 @@ function productionSlotCounts(root: string): Record<string, number> {
         walk(path)
         continue
       }
-      if (!/\.(ts|tsx)$/.test(entry) || /\.test\.|\.stories\./.test(entry)) continue
-      const count = (readFileSync(path, 'utf8').match(/kind:\s*'slot'/g) ?? []).length
-      if (count > 0) counts[relative(root, path)] = count
+      if (!isProductionSource(entry)) continue
+      const file = relative(root, path)
+      const found = collectSlotIdentities(readFileSync(path, 'utf8'), file)
+      for (const [key, count] of Object.entries(found)) {
+        counts[key] = (counts[key] ?? 0) + count
+      }
     }
   }
   walk(root)
   return counts
 }
 
-describe('form slot literal ratchet', () => {
-  it('does not grow static kind: slot counts beyond the baseline', () => {
-    const baseline = JSON.parse(readFileSync(baselinePath, 'utf8')) as Record<string, number>
-    const current = productionSlotCounts(srcRoot)
+describe('form slot identity ratchet', () => {
+  it('does not add slot identities beyond the allowlist', () => {
+    const baseline = JSON.parse(readFileSync(baselinePath, 'utf8')) as SlotIdentityCounts
+    const current = productionSlotIdentities(srcRoot)
     const growth: string[] = []
-    for (const [file, count] of Object.entries(current)) {
-      const allowed = baseline[file] ?? 0
-      if (count > allowed) growth.push(`${file}: ${allowed} -> ${count}`)
+    for (const [identity, count] of Object.entries(current)) {
+      const allowed = baseline[identity] ?? 0
+      if (count > allowed) growth.push(`${identity}: ${allowed} -> ${count}`)
     }
     expect(
       growth,
       [
-        "A production file added kind: 'slot' literals.",
-        'Prefer visibility, optionsResolve, hint.resolve, derivedMeta, valueSyncs, dependent, or optionalDisclosure.',
-        'If a slot is still required, add a row to apps/dashboard/docs/form-slot-register.md and raise that file in form-slot-literal-baseline.json.',
+        "A production file added or renamed a kind: 'slot' identity.",
+        'Prefer visibility, optionsResolve, hint.resolve, derivedMeta, valueSyncs, dependent, display, or optionalDisclosure.',
+        'A confirm-gated multi-path write stays a feature controller plus ConfirmDialog.',
+        'If a slot is still required, add a row to apps/dashboard/docs/form-slot-register.md and raise that identity in form-slot-literal-baseline.json.',
       ].join('\n'),
     ).toEqual([])
   })

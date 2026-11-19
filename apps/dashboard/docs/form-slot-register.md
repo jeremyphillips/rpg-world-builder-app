@@ -1,41 +1,35 @@
 # Form slot register
 
-Phase 0 inventory for production `kind: 'slot'` declarations in the dashboard.
+Production `kind: 'slot'` declarations in the dashboard. Tests, stories, and
+prose mentions are not declarations. `locations/README.md` names `kind: 'slot'`
+and is not one.
 
-**Phase 4 (transactional gate):** [form-slot-phase-4-transactional-gate.md](./form-slot-phase-4-transactional-gate.md) — **approved, Option A.** Domain controllers stay. `ConfirmDialog` is the shared presentation. No host, patch DSL, or Form field capability was added.
-Evidence stages: code-analysis candidate, feasibility verified, parity tested,
-approved, completed. Confidence: **V** verified, **C** conditional, **P** needs a
-shared API change.
+**88 static literals in 38 files, 86 identities.**
 
-Recount after Phase 3b (production `*.ts` / `*.tsx` only, tests and stories
-excluded): **90 static literals in 39 files** (was 95 after Phase 3a). Phase 0 started at 101.
-`_editionPresetEffects` moved to `valueSyncs`. The audit plan's 103/41 figure
-predates `formsShapeShifting` replacing separate true-form and forms-editor
-slots. `locations/README.md` mentions `kind: 'slot'` in prose and is not a
-declaration. The ratchet baseline is
-`apps/dashboard/src/test/form-slot-literal-baseline.json`.
-
-Stable identity is the source file plus the slot `name` literal, or the factory
-function name when one literal serves many runtime rows.
+The ratchet allowlist is
+`apps/dashboard/src/test/form-slot-literal-baseline.json`. Each key is the
+source file plus the slot `name` literal, or `file::factory()` when the name is
+a parameter or other non-literal. A repeated name in one file keeps a count.
+Removing an identity may leave the allowlist high. Adding or renaming one fails
+until this register and the allowlist both grow.
 
 ## Baseline (static literals per file)
 
 | File                                                                     | Literals |
 | ------------------------------------------------------------------------ | -------: |
-| `spells/resolution/lib/form/resolution-form-slots.ts`                    |       11 |
+| `spells/resolution/lib/form/resolution-form-slots.ts`                    |        9 |
 | `monsters/lib/monster-form-fields.tsx`                                   |        7 |
 | `monsters/lib/actions/detail-fields/section-composers.tsx`               |        6 |
 | `monsters/lib/creature-details/monster-creature-details-form-fields.tsx` |        5 |
 | `monsters/lib/actions/detail-fields/shared-mechanics.tsx`                |        5 |
 | `character/lib/steps/identity-form-fields.ts`                            |        5 |
 | `character/lib/steps/abilities-form-fields.ts`                           |        5 |
-| `campaign/.../character-configuration-form-fields.ts`                    |        5 |
 | `lib/forms/organization-form-projection.ts`                              |        4 |
-| `classes/lib/class-spellcasting-form-fields.ts`                          |        4 |
-| `monsters/lib/traits/monster-trait-form-fields.tsx`                      |        3 |
+| `campaign/.../character-configuration-form-fields.ts`                    |        3 |
+| `classes/lib/class-spellcasting-form-fields.ts`                          |        3 |
 | `monsters/lib/statistics/monster-armor-class-fields.tsx`                 |        3 |
 | `monsters/lib/actions/detail-fields/save-authoring.tsx`                  |        3 |
-| Remaining 28 files                                                       | 1–2 each |
+| Remaining 26 files                                                       | 1–2 each |
 
 `ownedSlot` in `monster-form-fields.tsx` is one factory covering five names:
 `experiencePointsOverride`, `proficiencies.savingThrows`, `bonusActions`,
@@ -46,186 +40,130 @@ function name when one literal serves many runtime rows.
 `_grantTypeMissingRepair`, `_effectId` / `_definition`, `_outcomeApplicationStatus`,
 and `contentAvailabilitySlot` across content shells.
 
-## Phase 0 findings
+## Constraints
 
-### Preview dependency proof of concept — fail
+### Action previews stay slots
 
-Subject: `attackPreview` (`MonsterActionAttackSummary`).
+`attackPreview` (`MonsterActionAttackSummary`) reads the whole form with
+`useWatch()`, normalizes `MonsterFormValues`, and finds the row by `action.id`
+across action sections. It also needs challenge rating, ability scores, the
+equipment catalog, `ctx.armorClassRules`, and a title from
+`useMonsterActionPreviewTitle`. `dependsOn` plus `contentWhen` cannot express
+that without a render callback. Display does not grow one.
 
-Inputs the builder actually uses:
+`parryPreview` is the same shape at smaller scale. `spellPreview`,
+`multiattackPreview`, `shapeShiftSummary`, `bonusPreview`, and `traitPreview`
+stay slots for the same reason. HTML previews (`spellPreview`, `parryPreview`,
+`bonusPreview`) are also outside display, which has no `html` block.
 
-- Whole form via `useWatch()` with no name.
-- `findMonsterFormActionDraft` and `resolveMonsterFormActionAttackProfile` call
-  `normalizeMonsterFormValues` on the full values object and locate the row by
-  `action.id` across action sections, not by `namePrefix`.
-- Normalized challenge rating (proficiency), ability scores, equipment catalog,
-  magic-property provider, and `ctx.armorClassRules`.
-- Title from `useMonsterActionPreviewTitle`, which watches `forms` and `name`.
-- Catalog readiness lives on `ctx`, not on form values.
+### Display
 
-A declarative `dependsOn` plus pure `contentWhen` cannot express this without
-subscribing to whole top-level sections (id search), reconstructing a near-complete
-`MonsterFormValues`, and calling a hook for the title. **Previews stay slots.**
-Display v1 launches with text and notice only. Future approaches, not
-implemented: a per-row selector plus a narrow stat context, or a domain preview
-context. Display must not grow a render callback to absorb this.
-
-`parryPreview` is the same shape at smaller scale (own row, follow-up action by
-id, `forms`, `ctx`). `traitPreview` and `shapeShiftSummary` are simpler but were
-not assumed to pass.
-
-### Display walker, placement, identity
-
-`FormItem` walkers that switch on `kind` must add a `display` branch or they
-silently drop the node. `assertNever` on the default is feasible only in
-exhaustive switches; several walkers use `if (item.kind === 'slot')` and would
-need an explicit branch. Column stacks may host display items because
-`GroupFieldItem` is wider than `RowFieldItem`. `formItemKey` already keys on
-`name` plus sibling index; a required `id` on display keeps reorder stable when
-the block has no field name. Empty `contentWhen` results should render no DOM
-so spacing does not reserve a blank row.
-
-### Live region and text roles
-
-Level-range summaries mount `<Text variant="muted" as="p" aria-live="polite">`
-and unmount with the switch, so mount-with-content is not announced. Display
-`text` with `live: 'polite'` matches that. `aria-atomic` is not required for
-parity. Allowed roles from current text consumers: `supporting`, `caption`,
-`muted`. `label` and `emphasis` stay excluded.
+Walkers that switch on `kind` include `display`. Display items are excluded from
+`kind: 'row'` because `RowFieldItem` is narrower than `GroupFieldItem`. A
+required `id` keeps reorder stable when the block has no field name. Empty
+resolved content renders no DOM. Live `text` uses `live: 'polite'` and the roles
+`supporting`, `caption`, and `muted`. `label` and `emphasis` are excluded.
+`aria-atomic` is not required. Mounting a live region with content is not
+announced.
 
 ### `dependsOn`
 
 Paths are relative to `namePrefix`. Each `../` pops one segment, including
-indexes, and extra hops clamp to the root. That is enough for row-local fields.
-Root-anchored paths are a clarity extension, not a blocker for text and notice
-migrations. The forms.md `../` example should be corrected when that extension
-lands.
+indexes, and extra hops clamp to the root. There is no root-anchored form.
 
-### `ownedSlot` parity
+### Slots that stay until behavior matches
 
-The factory registers a `hostSlot` labeled with the raw path and owns the tab
-prefix. It does not register the control or claim issues. Replacing it with tab
-`errorPaths` covers the badge prefix only. Removing the host entry can change
-footer copy from the raw path to the unlabeled fallback. **Stay C** until a
-parity test compares badge counts, footer summary, and claim targets. Raw-path
-labels are a copy defect candidate, not a migration by themselves.
-
-### Extended progression
+`ownedSlot` registers a `hostSlot` labeled with the raw path and owns the tab
+prefix. It does not register the control or claim issues. Tab `errorPaths`
+cover the badge prefix only. Removing the host entry can change footer copy
+from the raw path to the unlabeled fallback. It stays until a comparison of
+badge counts, footer summary, and claim targets matches. Raw-path labels are a
+copy defect on their own.
 
 `_extendedProgressionEffects` writes on every dependency change, including
 mount, and re-seeds `extendedMaxLevel` when the author clears it. `valueSyncs`
-skip the first observation. **Do not promote** until a spike test matches
+skip the first observation, so they do not match. A replacement has to match
 create, load, toggle, clear, standard-max change, reset, dirty state, and
-`null` versus object serialization. Otherwise retain the slot.
-
-### `_editionPresetEffects`
-
-**Completed.** Replaced by `buildMechanicsValueSyncs()` on the mechanics
-`<Form>`. The headless `EditionPresetEffects` slot is gone. Parity covers
-initial load, a preset change, reset after save, and read-only fields.
-
-### `_resolutionEffectsApplicationLabel`
-
-Sits in a resolution group. `heading.hint.resolve` is valid only if that group
-is the direct parent and the hint role matches. Otherwise it is a Phase 3a
-display `text`. Stage stays conditional.
-
-### `_mechanicsLeadCopy`
-
-`PageHeader` does not take arbitrary supporting copy for this screen. Option B
-(display `text`) is the feasible path. Copy must stay verbatim.
-
-### Grant and effect registration
+`null` versus object serialization.
 
 `_grantTypePersist`, `_effectId`, and
-`_organizationMembershipTitlesRegistration` exist to keep values registered
-while the visible control is absent. `valueSyncs` and `optionalDisclosure` do
-not cover that. Hidden registration stays an independent decision gate. Fewer
-than three consumers have a shared safe-path contract, so the default is retain.
+`_organizationMembershipTitlesRegistration` keep values registered while the
+visible control is absent. `valueSyncs` and `optionalDisclosure` do not.
 
-### Chips value semantics
+`optionalDisclosure` treats a populated array as expanded. Species
+`personalNameComponents` can use that only if `undefined`, `[]`, and a
+non-empty list stay distinct in the payload. Monster `omittedComponents` is a
+checkbox group. `limitedUse` and `_turnLimit` stay slots because disclosure
+cannot express number presence or boolean absence.
 
-`optionalDisclosure` treats populated arrays as expanded. Species
-`personalNameComponents` can use that if `undefined`, `[]`, and a non-empty
-list stay distinct in the payload. Monster `omittedComponents` is a checkbox
-group today. Moving it to chips is a presentation change and needs product
-approval. Number and boolean presence (`limitedUse`, `_turnLimit`) stay deferred.
+### Open issues
 
-### D1 `challengeRating` collision — confirmed mechanism
+**`challengeRating` registry collision.** `registerSlotItem` calls
+`registry.set(slotKey, …)` with no `registry.has` guard. The statistics select
+and the metadata slot both use `challengeRating`, so the later entry wins and
+the select's label can be replaced by the slot name. The fix is to rename the
+slot (for example `_challengeRatingMeta`) and, if other collisions exist, skip
+`registry.set` when a `control` entry is already present. It is not fixed.
 
-`registerSlotItem` calls `registry.set(slotKey, …)` with no `registry.has`
-guard. The statistics select and the metadata slot both use `challengeRating`,
-so the later entry wins and the select's label can be replaced by the slot
-name. Smallest fix, on the defect track: rename the slot (for example
-`_challengeRatingMeta`) and, if other collisions exist, skip `registry.set`
-when a `control` entry is already present. Not fixed in Phase 0.
+**True-form confirmation freshness.** `useMonsterFormsLifecycle` stores
+`plan.next` and applies it on confirm. `ConfirmDialog` blocks pointer and
+keyboard input outside the dialog, and save/discard live in the edit footer, so
+they do not run while it is open. Unmount drops pending state with the dialog.
+No async catalog or value sync writes `forms`, traits, or action sections while
+that dialog is open. Leave the code unchanged. A stale write would require a
+background writer that this form does not have. Modal blocking does not prove
+that a `reset` or other programmatic write is impossible.
 
-### D2 true-form confirmation freshness — theoretical
+## Migrated off slots
 
-`useMonsterFormsLifecycle` stores `plan.next` and applies it on confirm.
-`ConfirmDialog` is a modal `AlertDialog`, so pointer and keyboard input outside
-it is blocked. Save and discard live in the edit footer and do not run while
-the dialog is open. Unmount drops pending state with the dialog. No async
-catalog or value sync writes `forms`, traits, or action sections while that
-dialog is open. **No code change.** A stale write would require a background
-writer that is not in this form.
+| Identity                                                                     | Replacement                                           |
+| ---------------------------------------------------------------------------- | ----------------------------------------------------- |
+| `_editionPresetEffects`                                                      | `buildMechanicsValueSyncs()`                          |
+| `_mechanicsLeadCopy`                                                         | `mechanics-lead-copy-display.lib.ts`                  |
+| `_resolutionEffectsApplicationLabel`                                         | `resolution-effects-application-label-display.lib.ts` |
+| `_standardLevelRangeSummary`, `_extendedLevelRangeSummary`                   | `level-range-summary-display.lib.ts`                  |
+| `_resolutionSelectionHints`                                                  | `resolution-selection-hints-display.lib.ts`           |
+| `spellcastingFeatureSummary`                                                 | display text; the cross-tab link is inline copy       |
+| `cultureNamingAlert`, `_effectsPersistenceNotice`, `_grantTypeMissingRepair` | `kind: 'display'`                                     |
+| `buildAdvisories`                                                            | `monsterFormAdvisoryDisplay()`                        |
+| `baseStatistics`                                                             | `defined-form-base-statistics` display                |
 
-## Register by decision
+## Conditional
 
-Columns below use short labels. Stage is `candidate` unless a spike moved it.
-Owner is the feature folder.
+| Identity                                           | Why it is still a slot                              |
+| -------------------------------------------------- | --------------------------------------------------- |
+| `_extendedProgressionEffects`                      | `valueSyncs` skip mount and do not re-seed on clear |
+| `ownedSlot` ×5                                     | tab `errorPaths` cover the badge prefix only        |
+| `_outcomeApplicationStatus`                        | derived status; not a static notice                 |
+| `weaponProficiencyReconciliation` ×2               | notice plus a flag clear                            |
+| `_effectsPreview`, `_resolutionProjectilesPreview` | read-only preview without whole-form normalize      |
+| `armorClass.preview`                               | preview plus catalog loading                        |
 
-### Phase 1
+## Transactional slots
 
-| Identity                                                                 | Stage     | Tag | Decision                                              |
-| ------------------------------------------------------------------------ | --------- | --- | ----------------------------------------------------- |
-| `mechanics-form-fields.ts` / `_editionPresetEffects`                     | completed | V   | migrated to `buildMechanicsValueSyncs()`              |
-| `character-configuration-form-fields.ts` / `_extendedProgressionEffects` | candidate | C   | retain unless mount and re-seed match                 |
-| `ownedSlot` ×5                                                           | candidate | C   | tab `errorPaths` only after claim parity              |
-| `resolution-form-slots.ts` / `_resolutionEffectsApplicationLabel`        | completed | C   | `resolution-effects-application-label-display.lib.ts` |
-| `mechanics-form-fields.ts` / `_mechanicsLeadCopy`                        | completed | C   | `mechanics-lead-copy-display.lib.ts`                  |
+These intercept a write, run a domain planner, show runtime consequence copy,
+and apply several updates after confirm. `display` and `valueSyncs` do not do
+that. `ConfirmDialog` is the shared modal. The feature controller owns the
+request, the planner, pending state, whether to re-plan, and the patch.
 
-### Display candidates (text and notice)
+Monster true form stores `plan.next` in provider state and applies that
+snapshot. Pending dies with the provider. Spell resolution stores the request
+on a per-form `WeakMap` and plans again from current values on confirm. Pending
+lasts as long as that form `control`. Do not unify those lifetimes. One confirm
+is one author action. The handlers still publish sequential `setValue` and
+field-array updates. Consequence copy stays as written.
 
-Phase 2a/3a. Previews are excluded by the PoC.
+| Identity                                                                                   | Owner            | Controller                   |
+| ------------------------------------------------------------------------------------------ | ---------------- | ---------------------------- |
+| `formsShapeShifting` (designation, removal, remove-all)                                    | Monster forms    | `useMonsterFormsLifecycle`   |
+| `_resolutionChangeConfirm`, `_resolutionChangeNotice`                                      | Spell resolution | `useResolutionChangeConfirm` |
+| `_resolutionSelectionModeSelect`, `_resolutionProximitySelect`, `_resolutionHowItResolves` | Spell resolution | `requestResolutionChange`    |
+| `startingPointId`, `_organizationEditFamiliarType`                                         | Organization     | feature confirm              |
+| `spellcastingFeatureAvailability`                                                          | Class            | feature confirm              |
+| `castingAbility` (row variants)                                                            | Monster actions  | feature confirm              |
+| `armorClass.bodyArmor`, `armorClass.shield`                                                | Armor            | replacement transaction      |
 
-| Identity                                                                     | Responsibility                                 | Tag |
-| ---------------------------------------------------------------------------- | ---------------------------------------------- | --- | --------------------------------------------------------------------------------------------------------------- |
-| `_standardLevelRangeSummary`, `_extendedLevelRangeSummary`                   | live muted summary                             | P   | **Completed:** `kind: 'display'` via `level-range-summary-display.lib.ts`                                       |
-| `_resolutionSelectionHints`                                                  | multi-paragraph guidance                       | C   | **Completed:** `resolution-selection-hints-display.lib.ts`                                                      |
-| `_outcomeApplicationStatus`                                                  | derived status                                 | P   |
-| `spellcastingFeatureSummary`                                                 | copy plus cross-tab link                       | C   | **Completed:** display text; `FeatureTableRow` link → inline copy                                               |
-| `cultureNamingAlert`, `_effectsPersistenceNotice`, `_grantTypeMissingRepair` | notice                                         | P   | **Completed:** `cultureNamingAlert`, `_effectsPersistenceNotice`, `_grantTypeMissingRepair` → `kind: 'display'` |
-| `buildAdvisories` (factory + trait literal)                                  | advisory title and tone                        | P   | **Completed:** `monsterFormAdvisoryDisplay()` → `kind: 'display'`                                               |
-| `weaponProficiencyReconciliation` ×2                                         | notice plus flag clear                         | C   |
-| `baseStatistics`                                                             | supporting sentence                            | P   | **Completed:** `defined-form-base-statistics` display in forms editor                                           |
-| `_effectsPreview`, `_resolutionProjectilesPreview`                           | read-only preview without whole-form normalize | C   |
-| `armorClass.preview`                                                         | preview plus catalog loading                   | C   |
-| `formsShapeShifting`                                                         | designation, editor, difference radio (split)  | C   |
-
-### Retained because the preview PoC failed
-
-`attackPreview`, `spellPreview`, `multiattackPreview`, `shapeShiftSummary`,
-`parryPreview`, `bonusPreview`, `traitPreview`. Blocker: whole-form
-normalization and id lookup, plus a title hook. HTML previews
-(`spellPreview`, `parryPreview`, `bonusPreview`) also stay out of display v1
-because `html` is excluded.
-
-### Phase 4 — transactional slots retained (Option A)
-
-Approved. These stay `kind: 'slot'` with a feature-owned controller. Shared UI is `ConfirmDialog` only. Monster true-form pending stays provider state and applies a stored `plan.next`. Spell resolution pending stays the per-form `WeakMap` request and re-plans on confirm. Do not add a confirmation coordinator or a generic patch API because both flows open a dialog. Consequence copy is unchanged. D1 and D2 stay on the defect track.
-
-| Identity                                                                                   | Owner                   | Decision                               |
-| ------------------------------------------------------------------------------------------ | ----------------------- | -------------------------------------- |
-| `formsShapeShifting` (designation)                                                         | Monster forms lifecycle | Retain `useMonsterFormsLifecycle`      |
-| `_resolutionChangeConfirm`, `_resolutionChangeNotice`                                      | Spell resolution        | Retain `useResolutionChangeConfirm`    |
-| `_resolutionSelectionModeSelect`, `_resolutionProximitySelect`, `_resolutionHowItResolves` | Spell resolution        | Keep calling `requestResolutionChange` |
-| `startingPointId`, `_organizationEditFamiliarType`                                         | Organization            | Retain the feature confirm             |
-| `spellcastingFeatureAvailability`                                                          | Class                   | Retain the feature confirm             |
-| `castingAbility` (row variants)                                                            | Monster actions         | Retain the feature confirm             |
-| `armorClass.bodyArmor`, `armorClass.shield`                                                | Armor                   | Retain the replacement transaction     |
-
-### Retained slots (custom or transactional)
+## Other retained slots
 
 Tab editors (`abilityScores`, `equipment`, `traits`, `actions`), creature
 pickers (`proficiencies.skills`, `proficiencies.languages`, `senses`,
@@ -235,32 +173,45 @@ assignment boards, media, campaign availability (`available`,
 `contentAvailabilitySlot`, `startingDistricts`), `prerequisiteEditor`,
 resolution graph (`_resolutionOutcomes`, `_resolutionProgression`,
 `_resolutionEmptyState`, `_saveRepeatSave`, `_saveFailureOrSuccess`),
-`frequency`, `usageReferences`, builder registration slots, `publishCatalogWriteGate`,
-proficiency cues, narrative generation, `attackRangeCluster`, and the
-transactional set (`formsShapeShifting` designation half, resolution confirms
-and selects, organization starting point and familiar type, spellcasting
-availability, `castingAbility`, armor `bodyArmor` / `shield`).
+`frequency`, `usageReferences`, builder registration slots,
+`publishCatalogWriteGate`, proficiency cues, narrative generation, and
+`attackRangeCluster`.
 
-`limitedUse` and `_turnLimit` stay slots until disclosure can express sibling
-clears and boolean absence. Hidden registration slots stay until that extension
-is approved.
+Action previews retained for the whole-form reason above: `attackPreview`,
+`spellPreview`, `multiattackPreview`, `shapeShiftSummary`, `parryPreview`,
+`bonusPreview`, `traitPreview`.
 
-## Presentation gaps (product)
+## Unsupported patterns
 
-| Topic                             | Gap                                       | Approval                                             |
-| --------------------------------- | ----------------------------------------- | ---------------------------------------------------- |
-| Level-range summaries             | live text is in display v1                | parity tests, no product change                      |
-| Resolution hints                  | condensing paragraphs                     | yes, if copy changes                                 |
-| `_turnLimit`                      | checkbox versus absent key                | yes                                                  |
-| `formAvailability`                | disclosure would change empty-list timing | yes                                                  |
-| `omittedComponents`               | checkbox group versus chips               | yes                                                  |
-| True form and resolution confirms | runtime consequence copy                  | **Decided (Phase 4):** keep verbatim; no shared host |
-| `challengeRating` zero-XP         | checkbox stored as a number               | yes                                                  |
-| Advisories                        | title and tone must survive               | no                                                   |
-| HTML action previews              | stay slots after PoC fail                 | no                                                   |
+A slot that needs one of these stays a slot.
+
+- Confirm-gated multi-path writes. There is no field-change guard and no patch
+  DSL. Two confirmation dialogs are not a reason to add one.
+- `valueSyncs` as a transaction. They skip the first observation, fire when a
+  dependency changes identity, and write one reaction with
+  `shouldValidate: false`.
+- Display `html`, and previews that need whole-form normalization or a title hook.
+  Display is `text`, `notice`, and data-only `rulesPreview`.
+- Display inside `kind: 'row'`.
+- Root-anchored `dependsOn`, chips for number or boolean presence, and a shared
+  hidden-registration kind.
+
+A custom transactional slot is a supported outcome.
+
+## Presentation gaps
+
+| Topic                             | Gap                                       | Decision                 |
+| --------------------------------- | ----------------------------------------- | ------------------------ |
+| Resolution hints                  | condensing paragraphs                     | only if copy changes     |
+| `_turnLimit`                      | checkbox versus absent key                | needs a product decision |
+| `formAvailability`                | disclosure would change empty-list timing | needs a product decision |
+| `omittedComponents`               | checkbox group versus chips               | needs a product decision |
+| True form and resolution confirms | runtime consequence copy                  | keep the current copy    |
+| `challengeRating` zero-XP         | checkbox stored as a number               | needs a product decision |
+| Advisories                        | title and tone must survive               | keep both                |
+| HTML action previews              | outside display                           | stay slots               |
 
 ## Ownership
 
 Dashboard content and character features own the slot components. `@rpg/ui/form`
-owns walkers, registry, `valueSyncs`, and any future `kind: 'display'`. Phase 0
-does not add that kind.
+owns walkers, the field registry, `valueSyncs`, and `kind: 'display'`.
