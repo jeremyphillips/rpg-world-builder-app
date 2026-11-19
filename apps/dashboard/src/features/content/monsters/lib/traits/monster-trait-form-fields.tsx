@@ -8,6 +8,7 @@ import { RulesPreview } from '@rpg/ui'
 import type { FieldVisibility, FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
+import { useMasterDetailRowPrefix } from '../../../lib/master-detail/use-master-detail-row-prefix'
 import { useMonsterTraitPreviewTitle } from '../monster-qualified-preview-title'
 import { monsterFormAdvisoryDisplay } from '../monster-form-advisory-presentation'
 import { defineMasterDetailItemNoun } from '../../../lib/master-detail/master-detail-item-noun'

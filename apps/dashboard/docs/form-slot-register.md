@@ -1,6 +1,8 @@
 # Form slot register
 
 Phase 0 inventory for production `kind: 'slot'` declarations in the dashboard.
+
+**Phase 4 (transactional gate):** [form-slot-phase-4-transactional-gate.md](./form-slot-phase-4-transactional-gate.md) — investigation and approval checklist; **no implementation** until signed off.
 Evidence stages: code-analysis candidate, feasibility verified, parity tested,
 approved, completed. Confidence: **V** verified, **C** conditional, **P** needs a
 shared API change.
