@@ -241,8 +241,9 @@ A custom transactional slot is a supported outcome.
 
 Monster registration stays in `monsters/lib/**`. The render for a non-null
 monster slot is a `*.slot.tsx` module under
-`monsters/components/form/slots/`. That includes tab shells and action
-previews. There is no second entry location under `form/actions/`.
+`monsters/components/form/slots/` (tabs, statistics, creature-details, …) or
+`monsters/components/form/actions/**` for action-kind and shared action slots.
+Do not reintroduce `form/slots/actions/`.
 
 Host-null slots (`ownedSlot`, `render: () => null`) have no entry module.
 

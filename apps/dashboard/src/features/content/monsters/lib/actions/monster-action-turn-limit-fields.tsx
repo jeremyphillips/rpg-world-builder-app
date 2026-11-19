@@ -1,6 +1,6 @@
 import type { FormItem } from '@rpg/ui/form'
 
-import { MonsterActionTurnLimitControl } from '../../components/form/slots/actions/turn-limit.slot'
+import { MonsterActionTurnLimitControl } from '../../components/form/actions/shared/turn-limit.slot'
 
 export function monsterActionTurnLimitField(name = 'onceUntilNextTurn'): FormItem {
   return {

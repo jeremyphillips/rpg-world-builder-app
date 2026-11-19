@@ -16,12 +16,12 @@ import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form
 import { distanceJoinedPairField } from '../../../../lib/forms/fields/content-distance-form-fields'
 import { resolutionOccupantRequirementsFields } from '../../../../lib/forms/fields/resolution-target-authoring-fields'
 import { monsterActionTurnLimitField } from '../monster-action-turn-limit-fields'
-import { MonsterActionAttackSummary } from '../../../components/form/slots/actions/attack-preview.slot'
-import { MonsterActionBonusSummary } from '../../../components/form/slots/actions/bonus-preview.slot'
-import { MonsterActionParrySummary } from '../../../components/form/slots/actions/parry-preview.slot'
-import { MonsterActionMultiattackSummary } from '../../../components/form/slots/actions/multiattack-preview.slot'
-import { MonsterActionSpellSummary } from '../../../components/form/slots/actions/spell-preview.slot'
-import { MonsterActionShapeShiftSummary } from '../../../components/form/slots/actions/shape-shift-summary.slot'
+import { MonsterActionAttackSummary } from '../../../components/form/actions/attack/attack-preview.slot'
+import { MonsterActionBonusSummary } from '../../../components/form/actions/sections/bonus-preview.slot'
+import { MonsterActionParrySummary } from '../../../components/form/actions/parry/parry-preview.slot'
+import { MonsterActionMultiattackSummary } from '../../../components/form/actions/multiattack/multiattack-preview.slot'
+import { MonsterActionSpellSummary } from '../../../components/form/actions/spell/spell-preview.slot'
+import { MonsterActionShapeShiftSummary } from '../../../components/form/actions/shape-shift/shape-shift-summary.slot'
 import {
   MONSTER_RULES_TEXT_LABEL,
   MONSTER_CUSTOM_DESCRIPTION_HINT,

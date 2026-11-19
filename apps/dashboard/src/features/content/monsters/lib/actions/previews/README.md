@@ -1,7 +1,7 @@
 # Monster action form previews
 
-Pure builders live here. Registered render components stay under
-`components/form/slots/actions/*-preview.slot.tsx` (through Phase 6 Sub-phase E).
+Pure builders live here. Registered preview slot components live under
+`components/form/actions/{kind,sections,shared}/**/*.slot.tsx`.
 
 ## Ownership
 
@@ -18,21 +18,17 @@ Draft lookup: [`findMonsterFormActionDraft`](./monster-action-attack-summary.ts)
 
 ## Per-kind retention (Phase 6 E)
 
-| Kind                                   | Slot module                    | Builder                                | Notes                      |
-| -------------------------------------- | ------------------------------ | -------------------------------------- | -------------------------- |
-| Attack (weapon / natural / custom)     | `attack-preview.slot.tsx`      | `buildMonsterActionAttackPreview`      | Profile + metadata rows    |
-| Spell / reaction spell                 | `spell-preview.slot.tsx`       | `buildMonsterActionSpellPreview`       | Section-aware label        |
-| Multiattack                            | `multiattack-preview.slot.tsx` | `buildMonsterActionMultiattackPreview` | Prose                      |
-| Parry                                  | `parry-preview.slot.tsx`       | `buildMonsterActionParryPreview`       | Reactions section          |
-| Bonus (leap / teleport / take-actions) | `bonus-preview.slot.tsx`       | `buildMonsterActionBonusPreview`       | No unavailable branch      |
-| Shape-shift                            | `shape-shift-summary.slot.tsx` | `buildMonsterActionShapeShiftPreview`  | Dual `RulesPreview` panels |
+| Kind                                   | Slot module                                        | Builder                                | Notes                      |
+| -------------------------------------- | -------------------------------------------------- | -------------------------------------- | -------------------------- |
+| Attack (weapon / natural / custom)     | `actions/attack/attack-preview.slot.tsx`           | `buildMonsterActionAttackPreview`      | Profile + metadata rows    |
+| Spell / reaction spell                 | `actions/spell/spell-preview.slot.tsx`             | `buildMonsterActionSpellPreview`       | Section-aware label        |
+| Multiattack                            | `actions/multiattack/multiattack-preview.slot.tsx` | `buildMonsterActionMultiattackPreview` | Prose                      |
+| Parry                                  | `actions/parry/parry-preview.slot.tsx`             | `buildMonsterActionParryPreview`       | Reactions section          |
+| Bonus (leap / teleport / take-actions) | `actions/sections/bonus-preview.slot.tsx`          | `buildMonsterActionBonusPreview`       | No unavailable branch      |
+| Shape-shift                            | `actions/shape-shift/shape-shift-summary.slot.tsx` | `buildMonsterActionShapeShiftPreview`  | Dual `RulesPreview` panels |
 
 Trait rules preview uses `useMonsterEntryPreviewTitle` only — shared heading helper, not action orchestration.
 
 ## Subscriptions
 
 Previews keep whole-form `useWatch` while a single selected master-detail row mounts one preview at a time. Narrowing field watches is deferred without mount evidence (Phase 6 N.7).
-
-## Follow-up
-
-Sub-phase F (section O of the slot architecture plan) may colocate `.slot.tsx` files under `components/form/actions/` by feature ownership after this matrix is stable.

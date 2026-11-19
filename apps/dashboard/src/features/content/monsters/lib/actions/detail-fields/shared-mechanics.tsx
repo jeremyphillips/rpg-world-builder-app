@@ -27,7 +27,7 @@ import {
   applyAttackRangeClusterWidths,
   attackRangeJoinedPairFields,
 } from '../../../../lib/forms/fields/weapon-attack-range-form-fields'
-import { MonsterAttackRangeClusterSlot } from '../../../components/form/slots/actions/attack-range-cluster.slot'
+import { MonsterAttackRangeClusterSlot } from '../../../components/form/actions/attack/attack-range-cluster.slot'
 import {
   MONSTER_ADDITIONAL_CONDITION_HINT,
   MONSTER_ADDITIONAL_CONDITION_LABEL,
@@ -51,9 +51,9 @@ import {
 } from '../../monster-form-labels'
 import type { MonsterActionSection } from '../references/monster-action-equipment-references'
 import type { MonsterActionDraftRow } from '../monster-action-presets'
-import { MonsterActionAttackAbilityField } from '../../../components/form/slots/actions/bonus-source-ability.slot'
-import { MonsterActionCastingAbilityField } from '../../../components/form/slots/actions/casting-ability.slot'
-import { MonsterActionRechargeField } from '../../../components/form/slots/actions/limited-use.slot'
+import { MonsterActionAttackAbilityField } from '../../../components/form/actions/shared/bonus-source-ability.slot'
+import { MonsterActionCastingAbilityField } from '../../../components/form/actions/shared/casting-ability.slot'
+import { MonsterActionRechargeField } from '../../../components/form/actions/shared/limited-use.slot'
 import {
   monsterActionLimitedUseFields,
   monsterActionOnHitFields,

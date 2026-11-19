@@ -3,7 +3,7 @@ import {
   SAVING_THROW_SPELLCASTING_HINT,
   savingThrowFieldGroup,
 } from '../../../lib/forms/mechanics/saving-throw-field-group'
-import { MonsterActionCastingAbilityField } from '../../components/form/slots/actions/casting-ability.slot'
+import { MonsterActionCastingAbilityField } from '../../components/form/actions/shared/casting-ability.slot'
 import type { FieldVisibility, FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'

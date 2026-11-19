@@ -42,11 +42,11 @@ import {
   MONSTER_SAVE_TARGETING_MODE_LABEL,
   MONSTER_SAVE_TARGETING_MODE_SELECTED_TARGETS,
 } from '../../monster-form-labels'
-import { MonsterActionCastingAbilityField } from '../../../components/form/slots/actions/casting-ability.slot'
+import { MonsterActionCastingAbilityField } from '../../../components/form/actions/shared/casting-ability.slot'
 import { monsterSaveDcAbilityHintWhen } from '../save/monster-action-save-field-hints'
 import { MonsterActionSaveRepeatRemove } from '../save/monster-action-save-repeat-controls'
-import { MonsterActionSaveFailureOrSuccessField } from '../../../components/form/slots/actions/save-failure-or-success.slot'
-import { MonsterActionSaveRepeatSaveField } from '../../../components/form/slots/actions/save-repeat-save.slot'
+import { MonsterActionSaveFailureOrSuccessField } from '../../../components/form/actions/save/save-failure-or-success.slot'
+import { MonsterActionSaveRepeatSaveField } from '../../../components/form/actions/save/save-repeat-save.slot'
 import { monsterSaveOutcomeEffectsFields } from '../save/monster-action-save-outcome-effects'
 import {
   MONSTER_SAVE_FAILED_EFFECTS_PATH,
