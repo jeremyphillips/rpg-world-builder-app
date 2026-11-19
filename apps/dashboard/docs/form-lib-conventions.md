@@ -445,7 +445,9 @@ modals and one-off editors once at the composition boundary instead of threading
 - **Escape hatch** — `kind: 'slot'` only after `display`, `visibility`, `optionsResolve`, `hint.resolve`,
   `derivedMeta`, `valueSyncs`, `dependent`, `optionalDisclosure`, and standard composition
   cannot express the behavior (for example an availability preflight switch). Extend
-  `@rpg/ui/form` when the same pattern appears twice. Record the slot in
+  `@rpg/ui/form` when the same pattern appears twice. A confirm-gated multi-path write stays
+  a feature controller plus `ConfirmDialog` (Phase 4, Option A); do not add a shared patch
+  API for that case. Record the slot in
   [form-slot-register.md](./form-slot-register.md) and raise
   `src/test/form-slot-literal-baseline.json`. The ratchet allows a count to fall without an
   edit and rejects growth that skips the register.

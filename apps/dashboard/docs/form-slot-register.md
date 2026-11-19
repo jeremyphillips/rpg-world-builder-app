@@ -2,7 +2,7 @@
 
 Phase 0 inventory for production `kind: 'slot'` declarations in the dashboard.
 
-**Phase 4 (transactional gate):** [form-slot-phase-4-transactional-gate.md](./form-slot-phase-4-transactional-gate.md) — investigation and approval checklist; **no implementation** until signed off.
+**Phase 4 (transactional gate):** [form-slot-phase-4-transactional-gate.md](./form-slot-phase-4-transactional-gate.md) — **approved, Option A.** Domain controllers stay. `ConfirmDialog` is the shared presentation. No host, patch DSL, or Form field capability was added.
 Evidence stages: code-analysis candidate, feasibility verified, parity tested,
 approved, completed. Confidence: **V** verified, **C** conditional, **P** needs a
 shared API change.
@@ -211,6 +211,20 @@ normalization and id lookup, plus a title hook. HTML previews
 (`spellPreview`, `parryPreview`, `bonusPreview`) also stay out of display v1
 because `html` is excluded.
 
+### Phase 4 — transactional slots retained (Option A)
+
+Approved. These stay `kind: 'slot'` with a feature-owned controller. Shared UI is `ConfirmDialog` only. Monster true-form pending stays provider state and applies a stored `plan.next`. Spell resolution pending stays the per-form `WeakMap` request and re-plans on confirm. Do not add a confirmation coordinator or a generic patch API because both flows open a dialog. Consequence copy is unchanged. D1 and D2 stay on the defect track.
+
+| Identity                                                                                   | Owner                   | Decision                               |
+| ------------------------------------------------------------------------------------------ | ----------------------- | -------------------------------------- |
+| `formsShapeShifting` (designation)                                                         | Monster forms lifecycle | Retain `useMonsterFormsLifecycle`      |
+| `_resolutionChangeConfirm`, `_resolutionChangeNotice`                                      | Spell resolution        | Retain `useResolutionChangeConfirm`    |
+| `_resolutionSelectionModeSelect`, `_resolutionProximitySelect`, `_resolutionHowItResolves` | Spell resolution        | Keep calling `requestResolutionChange` |
+| `startingPointId`, `_organizationEditFamiliarType`                                         | Organization            | Retain the feature confirm             |
+| `spellcastingFeatureAvailability`                                                          | Class                   | Retain the feature confirm             |
+| `castingAbility` (row variants)                                                            | Monster actions         | Retain the feature confirm             |
+| `armorClass.bodyArmor`, `armorClass.shield`                                                | Armor                   | Retain the replacement transaction     |
+
 ### Retained slots (custom or transactional)
 
 Tab editors (`abilityScores`, `equipment`, `traits`, `actions`), creature
@@ -233,17 +247,17 @@ is approved.
 
 ## Presentation gaps (product)
 
-| Topic                             | Gap                                       | Approval                        |
-| --------------------------------- | ----------------------------------------- | ------------------------------- |
-| Level-range summaries             | live text is in display v1                | parity tests, no product change |
-| Resolution hints                  | condensing paragraphs                     | yes, if copy changes            |
-| `_turnLimit`                      | checkbox versus absent key                | yes                             |
-| `formAvailability`                | disclosure would change empty-list timing | yes                             |
-| `omittedComponents`               | checkbox group versus chips               | yes                             |
-| True form and resolution confirms | runtime consequence copy                  | Phase 4, no simplification      |
-| `challengeRating` zero-XP         | checkbox stored as a number               | yes                             |
-| Advisories                        | title and tone must survive               | no                              |
-| HTML action previews              | stay slots after PoC fail                 | no                              |
+| Topic                             | Gap                                       | Approval                                             |
+| --------------------------------- | ----------------------------------------- | ---------------------------------------------------- |
+| Level-range summaries             | live text is in display v1                | parity tests, no product change                      |
+| Resolution hints                  | condensing paragraphs                     | yes, if copy changes                                 |
+| `_turnLimit`                      | checkbox versus absent key                | yes                                                  |
+| `formAvailability`                | disclosure would change empty-list timing | yes                                                  |
+| `omittedComponents`               | checkbox group versus chips               | yes                                                  |
+| True form and resolution confirms | runtime consequence copy                  | **Decided (Phase 4):** keep verbatim; no shared host |
+| `challengeRating` zero-XP         | checkbox stored as a number               | yes                                                  |
+| Advisories                        | title and tone must survive               | no                                                   |
+| HTML action previews              | stay slots after PoC fail                 | no                                                   |
 
 ## Ownership
 
