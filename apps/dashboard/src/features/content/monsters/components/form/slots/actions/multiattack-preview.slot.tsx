@@ -1,14 +1,14 @@
-import { RulesPreview } from '@rpg/ui'
 import { useMemo } from 'react'
-import { useWatch } from 'react-hook-form'
 
 import type { ContentFormCtx } from '../../../../../lib/forms/registry/content-form-registry'
-import { findMonsterFormActionDraft } from '../../../../lib/actions/previews/monster-action-attack-summary'
 import { buildMonsterActionMultiattackPreview } from '../../../../lib/actions/previews/monster-action-multiattack-summary'
+import {
+  MonsterActionRulesPreview,
+  MonsterActionUnavailableRulesPreview,
+} from '../../../../lib/actions/previews/monster-action-preview-presentation'
+import { useMonsterActionPreviewContext } from '../../../../lib/actions/previews/use-monster-action-preview-context'
 import { MONSTER_ACTION_MULTIATTACK_PREVIEW_LABEL } from '../../../../lib/monster-form-labels'
 import type { MonsterActionDraftRow } from '../../../../lib/actions/monster-action-presets'
-import { useMonsterActionPreviewTitle } from '../../../../lib/monster-qualified-preview-title'
-import type { MonsterFormValues } from '../../../../lib/monster-form-values'
 
 export function MonsterActionMultiattackSummary({
   ctx,
@@ -17,10 +17,9 @@ export function MonsterActionMultiattackSummary({
   ctx: ContentFormCtx
   action: MonsterActionDraftRow
 }) {
-  const values = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
+  const { values, draft, title } = useMonsterActionPreviewContext(ctx, action, 'actions')
   const preview = useMemo(() => {
     if (!values || action.kind !== 'multiattack') return null
-    const draft = findMonsterFormActionDraft(values, ctx, action.id)
     const unavailableContext =
       draft && draft.kind === 'multiattack' ? { ctx, values, action: draft } : undefined
     return buildMonsterActionMultiattackPreview({
@@ -29,25 +28,22 @@ export function MonsterActionMultiattackSummary({
       actionId: action.id,
       unavailableContext,
     })
-  }, [action.id, action.kind, ctx, values])
-
-  const draft = values ? findMonsterFormActionDraft(values, ctx, action.id) : undefined
-  const title = useMonsterActionPreviewTitle(draft, values, ctx, 'actions')
+  }, [action.id, action.kind, ctx, draft, values])
 
   if (!preview) return null
 
   if (preview.status === 'unavailable') {
     return (
-      <RulesPreview
+      <MonsterActionUnavailableRulesPreview
         label={MONSTER_ACTION_MULTIATTACK_PREVIEW_LABEL}
         title={title}
-        content={{ kind: 'guidance', message: preview.guidance }}
+        guidance={preview.guidance}
       />
     )
   }
 
   return (
-    <RulesPreview
+    <MonsterActionRulesPreview
       label={MONSTER_ACTION_MULTIATTACK_PREVIEW_LABEL}
       title={title}
       content={{ kind: 'prose', text: preview.prose }}

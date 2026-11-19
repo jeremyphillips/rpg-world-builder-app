@@ -1,13 +1,11 @@
-import { RulesPreview } from '@rpg/ui'
 import { useMemo } from 'react'
-import { useWatch } from 'react-hook-form'
 
 import type { ContentFormCtx } from '../../../../../lib/forms/registry/content-form-registry'
 import { buildMonsterActionParryPreview } from '../../../../lib/actions/previews/monster-action-parry-summary'
+import { MonsterActionRulesPreview } from '../../../../lib/actions/previews/monster-action-preview-presentation'
+import { useMonsterActionPreviewContext } from '../../../../lib/actions/previews/use-monster-action-preview-context'
 import type { MonsterActionDraftRow } from '../../../../lib/actions/monster-action-presets'
 import { MONSTER_REACTION_PREVIEW_LABEL } from '../../../../lib/monster-form-labels'
-import { useMonsterActionPreviewTitle } from '../../../../lib/monster-qualified-preview-title'
-import type { MonsterFormValues } from '../../../../lib/monster-form-values'
 
 export function MonsterActionParrySummary({
   ctx,
@@ -16,25 +14,20 @@ export function MonsterActionParrySummary({
   ctx: ContentFormCtx
   action: MonsterActionDraftRow
 }) {
-  const values = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
+  const { values, draft, title } = useMonsterActionPreviewContext(ctx, action, 'reactions')
   const preview = useMemo(() => {
-    if (!values || action.kind !== 'parry') return null
-    const draft = ((values.reactions ?? []) as MonsterActionDraftRow[]).find(
-      (row) => row.id === action.id,
-    )
-    if (!draft || draft.kind !== 'parry') return null
-    return buildMonsterActionParryPreview({ values, ctx, action: draft })
-  }, [action.id, action.kind, ctx, values])
-
-  const draft = ((values?.reactions ?? []) as MonsterActionDraftRow[]).find(
-    (row) => row.id === action.id,
-  )
-  const title = useMonsterActionPreviewTitle(draft, values, ctx, 'reactions')
+    if (!values || action.kind !== 'parry' || !draft) return null
+    return buildMonsterActionParryPreview({
+      values,
+      ctx,
+      action: draft as unknown as Extract<MonsterActionDraftRow, { kind: 'parry' }>,
+    })
+  }, [action.kind, ctx, draft, values])
 
   if (!preview) return null
 
   return (
-    <RulesPreview
+    <MonsterActionRulesPreview
       label={MONSTER_REACTION_PREVIEW_LABEL}
       title={title}
       content={{ kind: 'html', html: preview.bodyHtml }}

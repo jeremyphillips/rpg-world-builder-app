@@ -1,18 +1,18 @@
-import { RulesPreview } from '@rpg/ui'
 import { useMemo } from 'react'
-import { useWatch } from 'react-hook-form'
 
 import type { ContentFormCtx } from '../../../../../lib/forms/registry/content-form-registry'
-import { findMonsterFormActionDraft } from '../../../../lib/actions/previews/monster-action-attack-summary'
 import { buildMonsterActionSpellPreview } from '../../../../lib/actions/previews/monster-action-spell-summary'
+import {
+  MonsterActionRulesPreview,
+  MonsterActionUnavailableRulesPreview,
+} from '../../../../lib/actions/previews/monster-action-preview-presentation'
+import { useMonsterActionPreviewContext } from '../../../../lib/actions/previews/use-monster-action-preview-context'
 import type { MonsterActionSection } from '../../../../lib/actions/references/monster-action-equipment-references'
 import {
   MONSTER_ACTION_SPELL_PREVIEW_LABEL,
   MONSTER_REACTION_PREVIEW_LABEL,
 } from '../../../../lib/monster-form-labels'
 import type { MonsterActionDraftRow } from '../../../../lib/actions/monster-action-presets'
-import { useMonsterActionPreviewTitle } from '../../../../lib/monster-qualified-preview-title'
-import type { MonsterFormValues } from '../../../../lib/monster-form-values'
 
 export function MonsterActionSpellSummary({
   ctx,
@@ -23,10 +23,9 @@ export function MonsterActionSpellSummary({
   action: MonsterActionDraftRow
   section: MonsterActionSection
 }) {
-  const values = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
+  const { values, draft, title } = useMonsterActionPreviewContext(ctx, action, section)
   const preview = useMemo(() => {
     if (!values || action.kind !== 'spell') return null
-    const draft = findMonsterFormActionDraft(values, ctx, action.id)
     const unavailableContext =
       draft && draft.kind === 'spell' ? { ctx, values, action: draft } : undefined
     return buildMonsterActionSpellPreview({
@@ -36,10 +35,7 @@ export function MonsterActionSpellSummary({
       section,
       unavailableContext,
     })
-  }, [action.id, action.kind, ctx, section, values])
-
-  const draft = values ? findMonsterFormActionDraft(values, ctx, action.id) : undefined
-  const title = useMonsterActionPreviewTitle(draft, values, ctx, section)
+  }, [action.id, action.kind, ctx, draft, section, values])
 
   if (!preview) return null
 
@@ -48,15 +44,19 @@ export function MonsterActionSpellSummary({
 
   if (preview.status === 'unavailable') {
     return (
-      <RulesPreview
+      <MonsterActionUnavailableRulesPreview
         label={label}
         title={title}
-        content={{ kind: 'guidance', message: preview.guidance }}
+        guidance={preview.guidance}
       />
     )
   }
 
   return (
-    <RulesPreview label={label} title={title} content={{ kind: 'html', html: preview.bodyHtml }} />
+    <MonsterActionRulesPreview
+      label={label}
+      title={title}
+      content={{ kind: 'html', html: preview.bodyHtml }}
+    />
   )
 }
