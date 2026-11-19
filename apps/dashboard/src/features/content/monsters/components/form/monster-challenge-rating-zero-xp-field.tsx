@@ -28,7 +28,6 @@ export function MonsterChallengeRatingZeroXpField() {
   return (
     <div className="flex flex-col gap-2">
       <CheckboxOption
-        shell="outlined"
         label={MONSTER_AWARDS_ZERO_XP_LABEL}
         checked={awardsZeroXp === 0}
         describedBy={hintId}
