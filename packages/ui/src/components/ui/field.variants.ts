@@ -12,19 +12,18 @@ import { type FieldSizeToken } from './field-sizing.variants'
  * - `field-row-presentation.lib.ts` — `resolveFieldPresentation`, `resolveFieldRowClasses`
  *
  * Spacing tokens below:
- * - `fieldAnatomyHeaderBodyGapClasses` — header→body step values (fieldset `gap-y` + label-region `pb`)
+ * - `fieldAnatomyHeaderBodyGapClasses` — header→body step values (fieldset `gap-y`, label-region `pb`, field-scale FieldGroup `mt`)
  * - `fieldAnatomyStackVariants` — fieldset / composite column stack (reads header→body map)
  * - `fieldLabelRegionVariants` / `fieldMessageRegionVariants` — region-owned padding for flat three-region anatomy
  * - `fieldControlRegionClasses` — control region shell (no intrinsic spacing)
  * - `fieldLabelContentClusterClasses` — label + required marker + info on one line
  * - `fieldLabelHintStackClasses` — label cluster + hint when hint sits below the label (2px)
  * - `fieldGroupStackClasses` — sibling fields within a group or form column (gap-based; avoids margin collapse with fieldsets)
- * - `fieldGroupBottomMarginClasses` — space below standalone group/array fieldsets (omitted when a parent rhythm stack owns sibling gap)
- *   (nested array sections omit this; parent stack/group rhythm owns spacing)
+ * - `fieldGroupBottomMarginClasses` — optional opt-in trailing margin when a parent does not own sibling rhythm (stories / legacy layouts)
  * - `fieldGroupFlexStackClasses` — wider 32px gap stack for collapse-prone fieldset siblings (embedded editors, …)
  * - `fieldSetResetClasses` — strip UA fieldset chrome from leaf field wrappers
  * - `fieldSetChromeContainClasses` — column stack for borderless leaf fieldset anatomy
- * - `fieldSetInFlowLegendClasses` — reset UA legend padding on chip / choose-count captions
+ * - `fieldSetInFlowLegendClasses` — structural contents legends (not leaf field labels)
  * - `formSectionStackClasses` — vertical gap between top-level form sections
  * - `fieldRowLayoutClasses` — deprecated alias (`gap-6`); prefer `resolveFieldRowClasses`
  * - `fieldChipWrapGapClasses` — chip pill row gap only (no vertical pad) inside `ChipsField`
@@ -53,11 +52,14 @@ import { type FieldSizeToken } from './field-sizing.variants'
  * Fieldset stacks use `stack`; flat three-region anatomy uses `labelRegionBottom`.
  */
 export const fieldAnatomyHeaderBodyGapClasses = {
-  xs: { stack: 'gap-y-1', labelRegionBottom: 'has-[*]:pb-1' },
-  sm: { stack: 'gap-y-1', labelRegionBottom: 'has-[*]:pb-1' },
-  md: { stack: 'gap-y-1.5', labelRegionBottom: 'has-[*]:pb-1.5' },
-  lg: { stack: 'gap-y-1.5', labelRegionBottom: 'has-[*]:pb-1.5' },
-} as const satisfies Record<FieldSizeToken, { stack: string; labelRegionBottom: string }>
+  xs: { stack: 'gap-y-1', labelRegionBottom: 'has-[*]:pb-1', bodyMarginTop: 'mt-1' },
+  sm: { stack: 'gap-y-1', labelRegionBottom: 'has-[*]:pb-1', bodyMarginTop: 'mt-1' },
+  md: { stack: 'gap-y-1.5', labelRegionBottom: 'has-[*]:pb-1.5', bodyMarginTop: 'mt-1.5' },
+  lg: { stack: 'gap-y-1.5', labelRegionBottom: 'has-[*]:pb-1.5', bodyMarginTop: 'mt-1.5' },
+} as const satisfies Record<
+  FieldSizeToken,
+  { stack: string; labelRegionBottom: string; bodyMarginTop: string }
+>
 
 /**
  * Label/heading cluster → control and control → validation / bottom hint.
@@ -97,6 +99,11 @@ export const fieldAnatomyAlignVariants = cva('flex flex-col', {
 /** Fieldset / composite column header→body stack — thin alias for call-site clarity. */
 export function resolveFieldAnatomyHeaderBodyStackClassName(size: FieldSizeToken = 'md'): string {
   return fieldAnatomyStackVariants({ size })
+}
+
+/** Legend→body margin for `headingScale: 'field'` FieldGroups (legend is not a flex gap item). */
+export function resolveFieldScaleLegendBodyMargin(size: FieldSizeToken = 'md'): string {
+  return fieldAnatomyHeaderBodyGapClasses[size].bodyMarginTop
 }
 
 /** Subgrid row track for label regions inside {@link fieldRowParticipationClasses} columns. */
@@ -189,9 +196,8 @@ export const fieldRecommendationGroupHeaderClasses =
 export const fieldRecommendationGroupItemsClasses = 'flex max-w-full flex-wrap gap-2'
 
 export const fieldGroupStackClasses = 'flex flex-col gap-6'
+/** Opt-in trailing margin — `FieldGroup` primitives do not apply this by default; parent rhythm owns sibling gap. */
 export const fieldGroupBottomMarginClasses = 'mb-8'
-/** Omits standalone group bottom margin when a parent rhythm stack owns sibling gap. */
-export const fieldGroupSectionOuterMarginResetClasses = 'mb-0'
 export const fieldGroupFlexStackClasses = 'flex flex-col gap-8'
 export const formSectionStackClasses = 'flex flex-col gap-7'
 /** Horizontal + wrap gap between chip pills — vertical label→chips spacing is the anatomy token. */
@@ -221,6 +227,21 @@ export const fieldLabelTypographyVariants = cva('', {
       sm: 'text-style-field-label-sm',
       md: 'text-style-field-label-md',
       lg: 'text-style-field-label-lg',
+    },
+  },
+  defaultVariants: {
+    size: 'md',
+  },
+})
+
+/** Field guidance copy — size-aware; not generic `text-style-caption`. */
+export const fieldHintTypographyVariants = cva('', {
+  variants: {
+    size: {
+      xs: 'text-style-field-hint-compact',
+      sm: 'text-style-field-hint-compact',
+      md: 'text-style-field-hint',
+      lg: 'text-style-field-hint',
     },
   },
   defaultVariants: {
@@ -260,6 +281,9 @@ export const fieldSetResetClasses = 'min-w-0 border-0 p-0 m-0'
 export const fieldSetChromeContainClasses = 'flex flex-col'
 /** `contents` so legend children participate in fieldset flex gap. */
 export const fieldSetInFlowLegendClasses = 'contents min-w-0 p-0'
+/** Keeps a visible legend name and outside info action on one header row inside a fieldset flex stack. */
+export const fieldSetLegendInfoFlowClasses =
+  '[&>[data-field-legend-info]]:shrink-0 [&>:not(legend):not([data-field-legend-info])]:w-full [&>:not(legend):not([data-field-legend-info])]:basis-full'
 /** Prose connectors share a row with compact controls — center on the control band, not the box bottom. */
 export const fieldInlineSentenceClasses = 'flex flex-wrap items-center gap-x-2 gap-y-2'
 /** Inline sentence inside an anatomy row — same cross-axis alignment with row min-width guard. */

@@ -7,6 +7,23 @@ import { buildMonsterPreviewSections } from './monster-form-preview'
 import { buildMonsterInput } from './monster-form-values'
 
 describe('normalizeMonsterFormValues', () => {
+  it('trims form names and notes', () => {
+    const values = resolveMonsterCreateDefaultValues()
+    values.forms = {
+      profileFormId: 'profile',
+      trueForm: { kind: 'profile', name: '  Humanoid  ' },
+      definedForms: [{ id: 'bear', name: '  Bear  ', notes: '  keeps its gear  ', overrides: {} }],
+    }
+
+    const normalized = normalizeMonsterFormValues(values, { intent: 'draft', mode: 'create' })
+
+    expect(normalized.forms).toEqual({
+      profileFormId: 'profile',
+      trueForm: { kind: 'profile', name: 'Humanoid' },
+      definedForms: [{ id: 'bear', name: 'Bear', notes: 'keeps its gear', overrides: {} }],
+    })
+  })
+
   it('strips inactive variants and never emits a zero hit-dice count', () => {
     const values = resolveMonsterCreateDefaultValues()
     values.sizes = ['small', 'medium']

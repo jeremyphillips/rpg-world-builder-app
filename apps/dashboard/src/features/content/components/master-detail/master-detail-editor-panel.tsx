@@ -1,5 +1,5 @@
-import { useEffect, useRef, type ReactNode, type RefObject } from 'react'
-import { FormItems, type FormItem } from '@rpg/ui/form'
+import { useCallback, useEffect, useRef, type ReactNode, type RefObject } from 'react'
+import { FormItems, FormRhythmStack, type FormItem } from '@rpg/ui/form'
 
 import { AvailabilityAlert, type Availability } from '@/lib/availability'
 import { MasterDetailDetailFormScope } from '../../lib/master-detail/master-detail-detail-form-scope'
@@ -15,6 +15,19 @@ import {
 } from './master-detail-editor-shell'
 
 export type { MasterDetailEditorIdentity, MasterDetailInlineTitle }
+
+/** Visible detail controls. Skips Radix bubble inputs (`aria-hidden`, `tabindex="-1"`). */
+const MASTER_DETAIL_BODY_FOCUS_SELECTOR = [
+  'input:not([type="hidden"]):not([aria-hidden="true"]):not([tabindex="-1"])',
+  'select:not([aria-hidden="true"]):not([tabindex="-1"])',
+  'textarea:not([aria-hidden="true"]):not([tabindex="-1"])',
+  '[contenteditable="true"]:not([aria-hidden="true"])',
+].join(', ')
+
+function focusIsInInlineTitle(): boolean {
+  const active = document.activeElement
+  return active instanceof Element && Boolean(active.closest('[data-master-detail-title-row]'))
+}
 
 function omitInlineTitleField(fields: FormItem[], fieldName: string | undefined): FormItem[] {
   if (!fieldName) return fields
@@ -111,12 +124,14 @@ function MasterDetailSelectedRowEditor({
         {renderBody ? (
           renderBody({ selectedFieldId, selectedIndex, namePrefix: rowPrefix })
         ) : (
-          <FormItems
-            key={`${selectedFieldId}:${selectedIndex}`}
-            items={wrapMasterDetailDetailFields(itemFields)}
-            idPrefix={`${idPrefix}-${selectedFieldId}`}
-            namePrefix={rowPrefix}
-          />
+          <FormRhythmStack>
+            <FormItems
+              key={`${selectedFieldId}:${selectedIndex}`}
+              items={wrapMasterDetailDetailFields(itemFields)}
+              idPrefix={`${idPrefix}-${selectedFieldId}`}
+              namePrefix={rowPrefix}
+            />
+          </FormRhythmStack>
         )}
       </MasterDetailDetailFormScope>
     </MasterDetailRowPrefixProvider>
@@ -127,6 +142,7 @@ function MasterDetailSelectedRowEditor({
  * Detail column for a form-embedded master-detail editor: one bordered surface
  * with compact identity, overflow delete, and selected row form.
  */
+// fallow-ignore-next-line complexity
 export function MasterDetailEditorPanel({
   editor,
   itemFields,
@@ -153,20 +169,33 @@ export function MasterDetailEditorPanel({
 
   const inlineTitle = hasSelectedRow ? selectedIdentity?.inlineTitle : undefined
 
+  const lastAddedFieldId = editor.lastAddedFieldId
+  const acknowledgeAcquisition = editor.acknowledgeAcquisition
+  const awaitingTitle = Boolean(selectedIdentity?.acquisitionAwaitingTitleResolution)
+
+  const handleAcquisitionEditApplied = useCallback(
+    (fieldId: string) => {
+      acknowledgeAcquisition(fieldId)
+    },
+    [acknowledgeAcquisition],
+  )
+
   useEffect(() => {
-    if (!editor.lastAddedFieldId || editor.lastAddedFieldId !== selectedFieldId) return
-    if (inlineTitle?.initialEdit) {
-      editor.clearLastAddedFieldId()
+    if (!lastAddedFieldId || lastAddedFieldId !== selectedFieldId) return
+    if (awaitingTitle) return
+    const root = bodyRef.current
+    if (!root) {
+      acknowledgeAcquisition(selectedFieldId)
       return
     }
-    const root = bodyRef.current
-    if (!root) return
-    const focusable = root.querySelector<HTMLElement>(
-      'input:not([type="hidden"]), select, textarea, [contenteditable="true"]',
-    )
+    if (focusIsInInlineTitle()) {
+      acknowledgeAcquisition(selectedFieldId)
+      return
+    }
+    const focusable = root.querySelector<HTMLElement>(MASTER_DETAIL_BODY_FOCUS_SELECTOR)
     focusable?.focus()
-    editor.clearLastAddedFieldId()
-  }, [editor, inlineTitle?.initialEdit, selectedFieldId])
+    acknowledgeAcquisition(selectedFieldId)
+  }, [acknowledgeAcquisition, awaitingTitle, lastAddedFieldId, selectedFieldId])
 
   const visibleFields = omitInlineTitleField(itemFields, inlineTitle?.field)
 
@@ -176,6 +205,8 @@ export function MasterDetailEditorPanel({
       namePrefix={
         hasSelectedRow && selectedIndex !== null ? `${fieldName}.${selectedIndex}` : undefined
       }
+      selectedFieldId={hasSelectedRow ? selectedFieldId : undefined}
+      onAcquisitionEditApplied={handleAcquisitionEditApplied}
       selectedIdentity={hasSelectedRow ? selectedIdentity : undefined}
       onDelete={
         onDelete ??

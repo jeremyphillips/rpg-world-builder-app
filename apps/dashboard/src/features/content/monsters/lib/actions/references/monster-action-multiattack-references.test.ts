@@ -1,11 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  actionsReferencingAction,
-  multiattacksReferencingAction,
-  stripMultiattackActionId,
-  stripReferencedActionId,
-} from './monster-action-multiattack-references'
+import { actionsReferencingAction, stripReferencedActionId } from '@rpg/contracts'
+
 import type { MonsterActionDraftRow } from '../monster-action-presets'
 
 const bite = { id: 'bite', kind: 'natural-weapon', name: 'Bite' } as MonsterActionDraftRow
@@ -16,12 +12,12 @@ const multi = {
   steps: [{ count: 2, actionIds: ['bite'] }],
 } as MonsterActionDraftRow
 
-describe('multiattack references', () => {
+describe('action references', () => {
   it('names multiattacks that reference an action and removes only that id', () => {
-    expect(
-      multiattacksReferencingAction([bite, multi], 'bite').map((action) => action.name),
-    ).toEqual(['Multiattack'])
-    const next = stripMultiattackActionId([bite, multi], 'bite')
+    expect(actionsReferencingAction([bite, multi], 'bite').map((action) => action.name)).toEqual([
+      'Multiattack',
+    ])
+    const next = stripReferencedActionId([bite, multi], 'bite')
     const updated = next[1]
     expect(updated?.kind === 'multiattack' ? updated.steps : undefined).toEqual([
       { count: 2, actionIds: [] },

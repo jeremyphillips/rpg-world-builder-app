@@ -8,8 +8,10 @@ Regions, in order. An empty region renders nothing.
 2. **Preview** — read-only attack summary, multiattack stat-block sentence, spellcasting stat-block sentence, or trait sentence.
 3. **Advisory** — `buildAdvisories` for the selected row.
 4. **Primary prose** — Rules text on a custom ability and a custom trait. It can be omitted when a saving throw is present.
-5. **Mechanics** — optional Saving throw on a custom ability or custom trait, then trigger, usage, configuration, primary damage, and secondary effects. Spellcasting keeps its action-level limit after omitted components. Per-spell limits stay inside each spell row.
+5. **Mechanics** — optional Saving throw on a custom ability or custom trait, then trigger, usage, configuration, primary damage, and secondary effects. Shape-Shift puts equipment and the prerequisite in this region. Spellcasting keeps its action-level limit after omitted components. Per-spell limits stay inside each spell row.
 6. **Supplemental prose** — optional Additional details. The editor stays in this position when the disclosure is open.
+
+**Available in** follows the advisory when the row schema includes `onlyInFormIds`. The slot always inserts for eligible kinds; the control renders only when more than one restriction-eligible form exists or the row already stores `onlyInFormIds`. All forms leaves that key absent. Selected forms stores ids in defined-form list order (the same order as the Shape-shifting defined-forms master-detail list). Shape-Shift omits the control. Preset traits do not carry the field.
 
 Casting ability is mechanics. It does not belong in Source.
 
@@ -20,3 +22,8 @@ Failed save is an ordered list of Damage, Condition, and Note rows. Each Damage 
 Repeat save stays hidden until the first-failure outcome lists a condition, or a repeat shell is already open. A note or damage row alone does not reveal it. Opening repeat writes the fixed end-of-next-turn timing and shows First failure and Second failure as field labels before the second tier has effects. Eligibility is an optional note on that shell. Recurring saves stay note effects.
 
 Do not apply this order to species traits or class features. Their descriptions are the primary authored content, and grant summaries are a different region.
+
+Form designation and the Defined forms master-detail editor live in Creature Details,
+outside action and trait detail-body ordering. Shape-Shift only authors its action-local
+equipment and prerequisite fields here; its destinations and return identity come from
+the shared Shape-shifting configuration.

@@ -21,15 +21,14 @@ import { MonsterActionBonusSummary } from '../../../components/form/actions/mons
 import { MonsterActionParrySummary } from '../../../components/form/actions/monster-action-parry-summary'
 import { MonsterActionMultiattackSummary } from '../../../components/form/actions/monster-action-multiattack-summary'
 import { MonsterActionSpellSummary } from '../../../components/form/actions/monster-action-spell-summary'
+import { MonsterActionShapeShiftSummary } from '../../../components/form/actions/monster-action-shape-shift-summary'
 import {
   MONSTER_RULES_TEXT_LABEL,
-  MONSTER_CUSTOM_DESCRIPTION_ADD_LABEL,
   MONSTER_CUSTOM_DESCRIPTION_HINT,
   MONSTER_CUSTOM_DESCRIPTION_LABEL,
   MONSTER_TELEPORT_PASSENGER_HINT,
   MONSTER_TELEPORT_DISTANCE_HINT,
   MONSTER_TELEPORT_DISTANCE_LABEL,
-  MONSTER_TELEPORT_PASSENGER_ADD_LABEL,
   MONSTER_TELEPORT_PASSENGER_LEGEND,
   MONSTER_TELEPORT_WITHIN_HINT,
   MONSTER_TELEPORT_WITHIN_LABEL,
@@ -38,23 +37,22 @@ import {
   MONSTER_TAKE_ACTIONS_CHOICE_EACH,
   MONSTER_TAKE_ACTIONS_CHOICE_LABEL,
   MONSTER_TAKE_ACTIONS_CHOICE_ONE,
-  MONSTER_TAKE_ACTIONS_RESTRICTION_ADD_LABEL,
   MONSTER_TAKE_ACTIONS_RESTRICTION_HINT,
   MONSTER_TAKE_ACTIONS_RESTRICTION_LABEL,
   MONSTER_TAKE_ACTIONS_RESTRICTION_PLACEHOLDER,
-  MONSTER_REACTION_ADDITIONAL_RULES_ADD_LABEL,
   MONSTER_REACTION_ADDITIONAL_RULES_HINT,
   MONSTER_REACTION_ADDITIONAL_RULES_LABEL,
   MONSTER_REACTION_REFERENCE_HINT,
   MONSTER_REFERENCE_ACTION_LABEL,
   MONSTER_PARRY_AC_BONUS_HINT,
   MONSTER_PARRY_AC_BONUS_LABEL,
-  MONSTER_PARRY_FOLLOW_UP_ADD_LABEL,
   MONSTER_PARRY_FOLLOW_UP_HINT,
   MONSTER_PARRY_FOLLOW_UP_LABEL,
 } from '../../monster-form-labels'
 import type { MonsterActionSection } from '../references/monster-action-equipment-references'
 import type { MonsterActionDraftRow } from '../monster-action-presets'
+import { monsterActionActiveKeys } from '../monster-action-kind'
+import { insertMonsterFormAvailabilityField } from '../../forms/monster-form-availability-fields'
 import type { MonsterFormAdvisory } from '../../monster-form-advisories'
 import { monsterFormAdvisorySlot } from '../../monster-form-advisory-presentation'
 import { legendaryActionCategory } from '../legendary/legendary-action-category'
@@ -72,7 +70,7 @@ const monsterActionOptionalDescriptionField = {
   name: 'description',
   label: MONSTER_CUSTOM_DESCRIPTION_LABEL,
   hint: MONSTER_CUSTOM_DESCRIPTION_HINT,
-  optionalDisclosure: { addLabel: MONSTER_CUSTOM_DESCRIPTION_ADD_LABEL },
+  optionalDisclosure: { intent: 'add', actionSubject: 'details' },
 } as const satisfies FormItem
 
 function monsterActionDescriptionField(action: MonsterActionDraftRow): FormItem {
@@ -134,6 +132,14 @@ function monsterActionAuthoringPreviewSlots(
       return [monsterActionSpellPreviewSlot(ctx, action, section)]
     case 'multiattack':
       return [monsterActionMultiattackPreviewSlot(ctx, action)]
+    case 'shape-shift':
+      return [
+        {
+          kind: 'slot',
+          name: 'shapeShiftSummary',
+          render: () => <MonsterActionShapeShiftSummary ctx={ctx} action={action} />,
+        },
+      ]
     default:
       return []
   }
@@ -211,7 +217,8 @@ function bonusAuthoringFields(input: {
           hint: MONSTER_TELEPORT_PASSENGER_HINT,
         },
         optionalDisclosure: {
-          addLabel: MONSTER_TELEPORT_PASSENGER_ADD_LABEL,
+          intent: 'add',
+          actionSubject: 'passenger',
           seedWhen: () => ({ withinFeet: TELEPORT_WITHIN_DEFAULT }),
         },
         fields: [
@@ -283,7 +290,7 @@ function bonusAuthoringFields(input: {
         label: MONSTER_TAKE_ACTIONS_RESTRICTION_LABEL,
         hint: { text: MONSTER_TAKE_ACTIONS_RESTRICTION_HINT },
         placeholder: MONSTER_TAKE_ACTIONS_RESTRICTION_PLACEHOLDER,
-        optionalDisclosure: { addLabel: MONSTER_TAKE_ACTIONS_RESTRICTION_ADD_LABEL },
+        optionalDisclosure: { intent: 'add' },
       },
       ...usage,
     ]
@@ -326,8 +333,8 @@ function reactionAuthoringFields(input: {
         placeholder: 'Choose',
         options: attackOptions,
         optionalDisclosure: {
-          addLabel: MONSTER_PARRY_FOLLOW_UP_ADD_LABEL,
-          seedWhen: () => '',
+          intent: 'add',
+          actionSubject: 'follow-up attack',
         },
       },
     ]
@@ -350,7 +357,10 @@ function reactionAuthoringFields(input: {
         name: 'description',
         label: MONSTER_REACTION_ADDITIONAL_RULES_LABEL,
         hint: MONSTER_REACTION_ADDITIONAL_RULES_HINT,
-        optionalDisclosure: { addLabel: MONSTER_REACTION_ADDITIONAL_RULES_ADD_LABEL },
+        optionalDisclosure: {
+          intent: 'add',
+          actionSubject: 'rules',
+        },
       },
     ]
   }
@@ -421,7 +431,9 @@ function sharedAuthoringFields(input: {
       equipment: input.equipment ?? [],
       onCastingSourceBlocked: input.onCastingSourceBlocked,
     }),
-    ...(action.kind !== 'save' ? [turnLimitField()] : []),
+    ...(monsterActionActiveKeys(action.kind, section).includes('onceUntilNextTurn')
+      ? [turnLimitField()]
+      : []),
     ...supplemental,
   ]
 }
@@ -444,10 +456,13 @@ export type MonsterActionDetailFieldsInput = {
 export function resolveMonsterActionSectionFields(
   input: MonsterActionDetailFieldsInput,
 ): FormItem[] {
-  return (
+  const fields =
     reactionAuthoringFields(input) ??
     legendaryAuthoringFields(input) ??
     bonusAuthoringFields(input) ??
     sharedAuthoringFields(input)
-  )
+  if (!monsterActionActiveKeys(input.action.kind, input.section).includes('onlyInFormIds')) {
+    return fields
+  }
+  return insertMonsterFormAvailabilityField(fields)
 }

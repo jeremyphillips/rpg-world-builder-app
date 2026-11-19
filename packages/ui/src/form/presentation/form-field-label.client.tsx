@@ -4,8 +4,9 @@ import type { ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
 import { Field } from '../../components/ui/field.client'
-import { FieldLabelContent, FieldLabelInfoAction } from '../../components/ui/field-label-content'
-import { shouldShowVisibleRequiredMarker } from '../../components/ui/field-required.lib'
+import type { FieldLabelPlacement } from '../../components/ui/field.variants'
+import { FieldLabelContent, FieldLabelLine } from '../../components/ui/field-label-content'
+import { resolveOwnedLabelPolicy } from '../../components/ui/field-required.lib'
 import { useOwnedLabelVisibility } from '../../components/ui/owned-label-visibility.lib'
 import type { FieldLabelVisibility } from '../form-heading.lib'
 
@@ -18,11 +19,12 @@ export interface FormFieldLabelProps {
   className?: string
   id?: string
   htmlFor?: string
+  placement?: FieldLabelPlacement
 }
 
 /**
- * Canonical leaf field label. Applies `sr-only` to the text only; an info
- * action stays outside that wrapper so it remains visible and focusable.
+ * Canonical leaf field label. Applies `sr-only` to the naming element only; the
+ * info action stays in {@link FieldLabelLine} beside it.
  */
 export function FormFieldLabel({
   label,
@@ -32,31 +34,23 @@ export function FormFieldLabel({
   className,
   id,
   htmlFor,
+  placement,
 }: FormFieldLabelProps) {
   const visibility = useOwnedLabelVisibility(labelVisibility)
   if (!label.trim()) return null
 
-  const text = (
-    <Field.Label
-      id={id}
-      htmlFor={htmlFor}
-      className={cn(visibility === 'srOnly' && 'sr-only', className)}
-    >
-      <FieldLabelContent
-        label={label}
-        required={required}
-        showRequiredMarker={shouldShowVisibleRequiredMarker(required, visibility)}
-        info={visibility === 'srOnly' ? undefined : info}
-      />
-    </Field.Label>
-  )
-
-  if (visibility !== 'srOnly' || info == null) return text
+  const { showRequiredMarker, nameClassName } = resolveOwnedLabelPolicy(required, visibility)
 
   return (
-    <>
-      {text}
-      <FieldLabelInfoAction label={label} info={info} />
-    </>
+    <FieldLabelLine label={label} info={info}>
+      <Field.Label
+        id={id}
+        htmlFor={htmlFor}
+        placement={placement}
+        className={cn(nameClassName, className)}
+      >
+        <FieldLabelContent label={label} showRequiredMarker={showRequiredMarker} />
+      </Field.Label>
+    </FieldLabelLine>
   )
 }

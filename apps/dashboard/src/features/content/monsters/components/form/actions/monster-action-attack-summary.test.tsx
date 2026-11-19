@@ -140,4 +140,65 @@ describe('MonsterActionAttackSummary', () => {
     expect(screen.getByText('Configure Attack bonus to calculate this attack.')).toBeInTheDocument()
     expect(screen.queryByText(/Attack summary unavailable/i)).not.toBeInTheDocument()
   })
+
+  it('shows a qualified preview title only when the action is form-restricted', () => {
+    const restricted: MonsterActionDraftRow = {
+      ...bite,
+      onlyInFormIds: ['bear'],
+    }
+
+    function RestrictedHost() {
+      const form = useForm<MonsterFormValues>({
+        defaultValues: monsterFormTestValues({
+          name: 'Werebear',
+          challengeRating: '1',
+          abilityScores: { str: 16, dex: 14, con: 13, int: 8, wis: 11, cha: 8 },
+          forms: {
+            profileFormId: 'profile',
+            trueForm: { kind: 'profile' },
+            definedForms: [{ id: 'bear', name: 'Bear' }],
+          },
+          actions: [restricted] as MonsterFormValues['actions'],
+        }),
+      })
+      const ctx = {
+        entityCatalogLayer: 'homebrew',
+        equipmentCatalogStatus: 'ready',
+        equipmentCatalogById: new Map(),
+      } as ContentFormCtx
+
+      return (
+        <FormProvider {...form}>
+          <MonsterActionAttackSummary ctx={ctx} action={restricted} />
+        </FormProvider>
+      )
+    }
+
+    render(<RestrictedHost />)
+
+    const title = screen.getByText('Bite (Bear Form Only)')
+    expect(title).toHaveClass('text-style-emphasis')
+    expect(title.closest('.ui-panel')).toHaveTextContent('Attack preview')
+  })
+
+  it('shows the action name when the action is available in all forms', () => {
+    render(<Host action={bite} />)
+    const title = screen.getByText('Bite')
+    expect(title).toHaveClass('text-style-emphasis')
+    expect(title.closest('.ui-panel')).toHaveTextContent('Attack preview')
+  })
+
+  it('uses the preset name when the draft has no stored name', () => {
+    const preset: MonsterActionDraftRow = {
+      id: 'bite',
+      kind: 'natural-weapon',
+      preset: 'bite',
+      mode: 'melee',
+      damageType: 'piercing',
+      damage: { dice: { count: 1, faces: 8 } },
+    }
+    render(<Host action={preset} />)
+    expect(screen.getByText('Bite')).toHaveClass('text-style-emphasis')
+    expect(screen.queryByText('Untitled')).not.toBeInTheDocument()
+  })
 })

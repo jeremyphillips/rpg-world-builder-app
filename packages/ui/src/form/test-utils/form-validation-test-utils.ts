@@ -144,6 +144,7 @@ const CLEARED_VALUE_BY_TYPE: Record<string, (field: FlatField) => unknown> = {
   radioCard: () => '',
   number: () => 0,
   checkbox: () => false,
+  boolean: () => false,
   switch: () => false,
   chips: (field) => ('multiple' in field && field.multiple ? [] : ''),
   combobox: (field) => ('multiple' in field && field.multiple ? [] : ''),

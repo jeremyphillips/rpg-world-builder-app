@@ -56,6 +56,7 @@ const FIELD_CONTENT_CHECKERS: Partial<Record<FieldConfig['type'], FieldContentCh
   markdown: richTextValueHasContent,
   chips: (value) => Array.isArray(value) && value.length > 0,
   checkbox: (value) => value === true,
+  boolean: (value) => value === true,
   switch: (value) => value === true,
   number: (value) => typeof value === 'number' && !Number.isNaN(value),
   json: stringLikeValueHasContent,

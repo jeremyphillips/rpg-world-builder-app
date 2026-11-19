@@ -177,6 +177,8 @@ describe('filter-presentation.lib', () => {
     expect(presentation.type).toBe('chips')
     if (presentation.type === 'chips') {
       expect(presentation.controlBandClassName).toContain('min-h-0')
+      expect(presentation.controlBandClassName).not.toContain('min-h-8')
+      expect(presentation.controlBandClassName).not.toContain('min-h-9')
     }
   })
 })

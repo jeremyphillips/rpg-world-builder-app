@@ -37,6 +37,7 @@ const TYPE_DEFAULTS: Record<FieldType, unknown> = {
   radioCard: '',
   segmentedControl: '',
   checkbox: false,
+  boolean: false,
   switch: false,
   json: '',
   richtext: '',

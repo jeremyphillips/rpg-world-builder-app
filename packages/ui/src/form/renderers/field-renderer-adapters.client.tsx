@@ -3,7 +3,6 @@
 import * as React from 'react'
 import type { ControllerRenderProps } from 'react-hook-form'
 
-import { CheckboxField } from '../../components/ui/checkbox-field'
 import { ChipsField } from '../../components/ui/chips-field.client'
 import { FormField } from '../../components/ui/form-field'
 import { NumberField } from '../../components/ui/number-field'
@@ -28,6 +27,7 @@ import {
   type FileFieldRemotePreview,
 } from '../field-config'
 import type { FieldLabelVisibility } from '../form-heading.lib'
+import { SingleCheckboxFieldRenderer } from './fields/single-checkbox-field-renderer.client'
 import { ComboboxFieldRenderer } from './fields/combobox/combobox-field-renderer.client'
 import { DiceFormulaFieldRenderer } from './fields/dice-formula-field-renderer.client'
 import type { EditableGridFieldRendererProps } from './fields/editable-grid-field-renderer.client'
@@ -156,7 +156,7 @@ export const fieldRenderers: {
           digits={config.digits}
           size={resolveNumberStepperSizeFromFieldSize(args.controlSize)}
           disabled={config.disabled}
-          aria-label={config.label}
+          stepperLabel={config.label}
           aria-invalid={validation.invalid || undefined}
           onBlur={field.onBlur}
         />
@@ -230,22 +230,8 @@ export const fieldRenderers: {
       />
     )
   },
-  checkbox: ({ config, field, ...args }) => {
-    const validation = { error: args.error, invalid: args.invalid, describedBy: args.describedBy }
-    const { hintPosition: _hintPosition, ...shell } = shellFor(
-      { config, field, ...args },
-      validation,
-      bothSizes,
-    )
-    return (
-      <CheckboxField
-        {...shell}
-        checked={field.value ?? false}
-        onCheckedChange={(checked) => field.onChange(checked === true)}
-        onBlur={field.onBlur}
-      />
-    )
-  },
+  checkbox: (args) => <SingleCheckboxFieldRenderer {...args} />,
+  boolean: (args) => <SingleCheckboxFieldRenderer {...args} />,
   switch: ({ config, field, ...args }) => {
     const validation = { error: args.error, invalid: args.invalid, describedBy: args.describedBy }
     return (

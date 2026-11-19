@@ -128,7 +128,7 @@ export function ComboboxFieldRenderer({
         validation,
         {
           sizes: 'both',
-          label: resolveFieldLabelVisibility(config) === 'srOnly' ? 'accessible-name' : 'visible',
+          label: 'visible',
         },
       )}
       options={comboboxOptions}

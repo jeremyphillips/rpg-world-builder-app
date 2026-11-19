@@ -338,6 +338,11 @@ function normalizeAction(
   applyReactionTriggerDraft(cleaned, section)
   applyTurnAndInvocationDraft(cleaned, section)
   applyLimitedUseDraft(cleaned)
+  if (cleaned.kind === 'shape-shift' && typeof cleaned.prerequisite === 'string') {
+    const prerequisite = normalizePrerequisite(cleaned.prerequisite)
+    if (prerequisite) cleaned.prerequisite = prerequisite
+    else delete cleaned.prerequisite
+  }
   applySpellEntryDraft(cleaned)
   omitTakeActionsCombination(cleaned, intent)
   normalizeWeaponActionDamage(cleaned)
@@ -487,15 +492,12 @@ function normalizedActionSections(
   }
 }
 
-export function normalizeMonsterFormValues(
+function normalizedMonsterCore(
   values: MonsterFormValues,
   options: NormalizeMonsterFormOptions,
+  movement: Record<string, number>,
 ): Record<string, unknown> {
-  const movementRecord = movementRowsToRecordForPreview(values.movement ?? [])
-  const hasFly = typeof movementRecord.fly === 'number'
-  const challengeRating = values.challengeRating
-
-  const normalized: Record<string, unknown> = {
+  return {
     name: typeof values.name === 'string' ? values.name : '',
     sizes: values.sizes,
     creatureType: values.creatureType,
@@ -505,7 +507,7 @@ export function normalizeMonsterFormValues(
     abilityScores: values.abilityScores,
     armorClass: normalizeArmorClass(values.armorClass, options.armorClassRules),
     hitPoints: normalizeHitPoints(values.hitPoints),
-    movement: movementRecord,
+    movement,
     senses: values.senses ?? [],
     communication: normalizeCommunication(values.communication),
     proficiencies: normalizeProficiencies(
@@ -515,8 +517,20 @@ export function normalizeMonsterFormValues(
     defenses: values.defenses,
     equipment: values.equipment,
     traits: normalizeTraitRichText(omitEmptyStrings(values.traits)),
+    ...(values.forms ? { forms: normalizeMonsterForms(values.forms) } : {}),
     ...normalizedActionSections(values, options.intent),
   }
+}
+
+export function normalizeMonsterFormValues(
+  values: MonsterFormValues,
+  options: NormalizeMonsterFormOptions,
+): Record<string, unknown> {
+  const movementRecord = movementRowsToRecordForPreview(values.movement ?? [])
+  const hasFly = typeof movementRecord.fly === 'number'
+  const challengeRating = values.challengeRating
+
+  const normalized = normalizedMonsterCore(values, options, movementRecord)
 
   applyOptionalScalars(normalized, values, challengeRating, hasFly)
   if (options.mode === 'update' && options.baseline) {
@@ -535,6 +549,65 @@ export function normalizeMonsterDraftForPreview(
   options: NormalizeMonsterFormOptions,
 ): Monster {
   return normalizeMonsterFormValues(values, options) as Monster
+}
+
+function normalizePrerequisite(value: string): string {
+  return value
+    .trim()
+    .replace(/[,.]+$/u, '')
+    .trim()
+}
+
+// fallow-ignore-next-line complexity
+function normalizeDefinedFormOverride(
+  entry: Record<string, unknown>,
+): Record<string, unknown> | undefined {
+  const overrides = isRecord(entry.overrides) ? { ...entry.overrides } : {}
+  if (entry.speechRestricted === true) overrides.canSpeak = false
+  else delete overrides.canSpeak
+  const movementBundle = isRecord(entry.movementOverride) ? entry.movementOverride : undefined
+  const legacyRows = Array.isArray(entry.movementOverrideRows)
+    ? (entry.movementOverrideRows as Parameters<typeof movementRowsToRecordForPreview>[0])
+    : undefined
+  const rows = Array.isArray(movementBundle?.rows) ? movementBundle.rows : legacyRows
+  const overrideHover =
+    movementBundle?.hover === true || entry.movementOverrideHover === true ? true : undefined
+  if (rows) {
+    const speeds = movementRowsToRecordForPreview(
+      rows as Parameters<typeof movementRowsToRecordForPreview>[0],
+    )
+    if (Object.keys(speeds).length > 0) {
+      overrides.movement = {
+        speeds,
+        ...(overrideHover && speeds.fly !== undefined ? { hover: true } : {}),
+      }
+    } else {
+      delete overrides.movement
+    }
+  }
+  delete entry.speechRestricted
+  delete entry.movementOverride
+  delete entry.movementOverrideRows
+  delete entry.movementOverrideHover
+  return Object.keys(overrides).length > 0 ? overrides : undefined
+}
+
+function normalizeMonsterForms(forms: NonNullable<MonsterFormValues['forms']>) {
+  const cleaned = omitEmptyStrings(forms)
+  if (!isRecord(cleaned)) return cleaned
+  const shape = cleaned
+  const definedForms = Array.isArray(shape.definedForms) ? shape.definedForms : []
+  return {
+    ...shape,
+    definedForms: definedForms.map((entry) => {
+      if (!isRecord(entry)) return entry
+      const overrides = normalizeDefinedFormOverride(entry)
+      return {
+        ...entry,
+        ...(overrides ? { overrides } : {}),
+      }
+    }),
+  }
 }
 
 function applyOptionalScalars(

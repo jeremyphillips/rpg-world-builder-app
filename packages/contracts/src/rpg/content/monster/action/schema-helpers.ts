@@ -22,6 +22,7 @@ import {
   weaponDamageSchema,
   weaponRangeSchema,
 } from '../../equipment/weapon-variant'
+import { shapeShiftEquipmentSchema } from '../../../vocab/shape-shift-equipment'
 import { MONSTER_SECTION_KINDS } from '../action-section-eligibility'
 import { PRIMARY_SPELLCASTING_PROFILE } from '../spell-casting-source'
 import {
@@ -77,12 +78,18 @@ export function monsterActionFields<M extends MonsterActionMode>(mode: M) {
     limitedUse: limitedUse.optional(),
     onceUntilNextTurn: z.literal(true).optional(),
     available: z.boolean().optional(),
+    onlyInFormIds: z.array(z.string().min(1)).optional(),
     ...entryProvenanceField,
   }
   const {
     description: _referenceDescription,
     limitedUse: _referenceLimitedUse,
     ...referenceIdentity
+  } = identity
+  const {
+    onlyInFormIds: _formEligibility,
+    onceUntilNextTurn: _turnLimit,
+    ...transformIdentity
   } = identity
   const actionIds =
     mode === 'draft'
@@ -191,6 +198,13 @@ export function monsterActionFields<M extends MonsterActionMode>(mode: M) {
       steps: multiattackStepsSchema(mode),
     }),
     z.object({
+      ...transformIdentity,
+      kind: z.literal('shape-shift'),
+      name: z.string().min(1).optional(),
+      equipment: strict(shapeShiftEquipmentSchema, mode),
+      prerequisite: z.string().trim().min(1).optional(),
+    }),
+    z.object({
       ...referenceIdentity,
       kind: z.literal('action-reference'),
       name: z.string().min(1).optional(),
@@ -225,6 +239,7 @@ const ACTION_FIELD_KINDS = [
   'special',
   'spell',
   'multiattack',
+  'shape-shift',
   'action-reference',
 ] as const
 

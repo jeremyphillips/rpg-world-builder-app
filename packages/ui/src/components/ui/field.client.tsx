@@ -15,6 +15,7 @@ import { FieldDerivedMeta } from './field-derived-meta.client'
 import { useFieldDerivedMetaContext } from './field-derived-meta-context.client'
 import {
   fieldErrorTextVariants,
+  fieldHintTypographyVariants,
   fieldLabelVariants,
   type FieldHintPosition,
   type FieldLabelPlacement,
@@ -22,7 +23,6 @@ import {
 import type { FieldLabelVisibility } from '../../form/form-heading.lib'
 import { resolveControlRequiredProps } from './field-required.lib'
 import { Icon } from './icon/icon'
-import { Text } from './text'
 
 interface FieldContextValue {
   controlId: string
@@ -314,17 +314,17 @@ export function FieldHintText({
   id,
   children,
   size: sizeProp,
+  className,
 }: {
   id: string
   children: string
   size?: FieldSize
+  className?: string
 }) {
   const context = React.useContext(FieldContext)
   const size = sizeProp ?? context?.size ?? 'md'
-  const hintClass =
-    size === 'sm' || size === 'xs' ? 'text-style-field-hint-compact' : 'text-style-field-hint'
   return (
-    <span id={id} className={hintClass}>
+    <span id={id} className={cn(fieldHintTypographyVariants({ size }), className)}>
       {children}
     </span>
   )
@@ -360,9 +360,16 @@ export function FieldErrorText({
 export function FieldHintBelowLabel({
   hint,
   hintId,
-}: Pick<FieldHintErrorContent, 'hint'> & Pick<FieldMessageIds, 'hintId'>) {
+  size,
+  className,
+}: Pick<FieldHintErrorContent, 'hint'> &
+  Pick<FieldMessageIds, 'hintId'> & { size?: FieldSize; className?: string }) {
   if (!hint) return null
-  return <FieldHintText id={hintId}>{hint}</FieldHintText>
+  return (
+    <FieldHintText id={hintId} size={size} className={className}>
+      {hint}
+    </FieldHintText>
+  )
 }
 
 /** Hint or error after the control. */
@@ -387,19 +394,23 @@ export function FieldHintErrorBelowControl({
 export type FieldHintProps = React.HTMLAttributes<HTMLParagraphElement>
 
 function FieldHint({ className, children, ...props }: FieldHintProps) {
-  const { hintId, hasError, hasHint, hint, hintPosition, hintIcon } = useFieldContext('Field.Hint')
+  const { hintId, hasError, hasHint, hint, hintPosition, hintIcon, size } =
+    useFieldContext('Field.Hint')
   if (!hasHint) return null
   if (hasError && hintPosition === 'below-control') return null
   return (
-    <Text
+    <p
       id={hintId}
-      variant="caption"
-      className={cn(hintIcon ? 'inline-flex items-center gap-1' : undefined, className)}
+      className={cn(
+        fieldHintTypographyVariants({ size }),
+        hintIcon ? 'inline-flex items-center gap-1' : undefined,
+        className,
+      )}
       {...props}
     >
       {hintIcon === 'info' ? <Icon name="info" size="xs" /> : null}
       {children ?? hint}
-    </Text>
+    </p>
   )
 }
 FieldHint.displayName = 'Field.Hint'

@@ -202,7 +202,6 @@ export const rowClasses = cn('ui-card', 'flex')`,
       'apps/dashboard/src/features/character/components/builder/character-builder-shell.variants.ts:characterBuilderStepPanelClasses',
       'packages/ui/src/components/ui/field.variants.ts:fieldChipWrapGapClasses',
       'packages/ui/src/components/ui/field.variants.ts:fieldGroupBottomMarginClasses',
-      'packages/ui/src/components/ui/field.variants.ts:fieldGroupSectionOuterMarginResetClasses',
       'packages/ui/src/components/ui/panel.variants.ts:panelSectionInsetClasses',
       'packages/ui/src/form/chrome/form-chrome.variants.ts:formStickyScrollShellWithDockedFooterClasses',
     ]

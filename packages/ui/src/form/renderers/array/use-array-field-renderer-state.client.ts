@@ -43,7 +43,6 @@ type UseArrayFieldRendererStateOptions = {
   remove: UseFieldArrayReturn['remove']
   getValues: (name: string) => unknown
   watchedItems: unknown[] | undefined
-  wrapSectionChrome?: boolean
 }
 
 export function useArrayFieldRendererState({
@@ -55,20 +54,17 @@ export function useArrayFieldRendererState({
   remove,
   getValues,
   watchedItems,
-  wrapSectionChrome,
 }: UseArrayFieldRendererStateOptions) {
   const { control, setValue } = useFormContext()
   const { addValidationSessionExpandKeys } = useFormUiContext()
   const validation = useFormValidationPresentation()
   const sectionContext = useFormSectionContext()
-  const { depth, inRhythmStack } = sectionContext
+  const { depth } = sectionContext
   const chrome = resolveArrayFieldRendererChrome({
     config,
     parentContext: resolveArraySectionDensityParent(sectionContext),
     depth,
-    inRhythmStack,
     fieldsLength: fields.length,
-    wrapSectionChrome,
   })
   const {
     addAction,
@@ -80,6 +76,7 @@ export function useArrayFieldRendererState({
     addActionMenu,
     collapsible,
     emptyItemLabel,
+    emptyStatePrimary,
     itemCollapseKey,
     itemConfig,
     itemListClasses,
@@ -93,7 +90,6 @@ export function useArrayFieldRendererState({
     headingScale,
     max,
     nested,
-    omitSectionBottomMargin,
     reorderConfigured,
     sortableEnabled,
     variant,
@@ -246,6 +242,7 @@ export function useArrayFieldRendererState({
 
   return {
     emptyItemLabel,
+    emptyStatePrimary,
     required: resolveArrayRequiredMarker(config),
     containerIssue,
     hasContainerIssue,
@@ -279,7 +276,6 @@ export function useArrayFieldRendererState({
     legendRhythm,
     headingScale,
     nested,
-    omitSectionBottomMargin,
     showSectionHeader: resolveArrayShowSectionHeader({
       labelMode,
       sectionHint,

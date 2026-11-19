@@ -4,7 +4,7 @@
  */
 @layer components {
   /*
-   * One tone map for checkbox indicators and BooleanField surfaces.
+   * One tone map for checkbox indicators and outlined checkbox-option surfaces.
    * Unchecked chrome does not read these variables.
    */
   [data-choice-tone='default'] {

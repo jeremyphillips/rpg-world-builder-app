@@ -11,17 +11,17 @@ import {
 import type { FormItem, FieldOption } from '@rpg/ui/form'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 
-export const MONSTER_CREATURE_FAMILY_ADD_LABEL = 'Add creature families'
-export const MONSTER_CLASS_CLASSIFICATION_ADD_LABEL = 'Add class classifications'
+const MONSTER_CREATURE_FAMILY_CLEAR_HEADLINE = 'Remove creature families?'
+const MONSTER_CLASS_CLASSIFICATION_CLEAR_HEADLINE = 'Remove class classifications?'
 const MONSTER_CREATURE_FAMILY_PLACEHOLDER = 'Choose families…'
 const CLASS_CLASSIFICATION_LABEL = `${getContentTypeTerm('classes').label} classifications`
 
-const classificationDisclosure = (addLabel: string, removeLabel: string) => ({
-  addLabel,
-  removeLabel,
+const classificationDisclosure = (actionSubject: string, clearHeadline: string) => ({
+  intent: 'add' as const,
+  actionSubject,
   expandWhenPopulated: true,
   confirmBeforeClear: {
-    headline: `Remove ${addLabel.replace(/^Add /, '').toLowerCase()}?`,
+    headline: clearHeadline,
     description: 'This clears the values you selected.',
     confirmLabel: 'Remove',
   },
@@ -89,7 +89,6 @@ export function monsterClassFieldOptions(
 
 export function monsterClassificationFields(ctx: ContentFormCtx): FormItem[] {
   const familyCopy = vocabularyTermFieldCopy(CREATURE_FAMILY_TERM, { multiple: true })
-
   return [
     {
       kind: 'row',
@@ -102,8 +101,8 @@ export function monsterClassificationFields(ctx: ContentFormCtx): FormItem[] {
           label: familyCopy.label,
           placeholder: MONSTER_CREATURE_FAMILY_PLACEHOLDER,
           optionalDisclosure: classificationDisclosure(
-            MONSTER_CREATURE_FAMILY_ADD_LABEL,
-            'Remove families',
+            'families',
+            MONSTER_CREATURE_FAMILY_CLEAR_HEADLINE,
           ),
           options: monsterFamilyFieldOptions(ctx),
           optionsResolve: {
@@ -127,8 +126,8 @@ export function monsterClassificationFields(ctx: ContentFormCtx): FormItem[] {
             position: 'below-control',
           },
           optionalDisclosure: classificationDisclosure(
-            MONSTER_CLASS_CLASSIFICATION_ADD_LABEL,
-            'Remove class classifications',
+            'classifications',
+            MONSTER_CLASS_CLASSIFICATION_CLEAR_HEADLINE,
           ),
           options: monsterClassFieldOptions(ctx),
           optionsResolve: {

@@ -1,6 +1,9 @@
 import type { ButtonProps } from '../components/ui/button.client'
 
-/** Shared props for inline control-band actions in schema-driven forms. */
+/**
+ * Shared props for always-xs inline control-band actions in schema-driven forms.
+ * Optional disclosure actions use `optionalDisclosureActionButtonProps` instead.
+ */
 export const formMicroActionButtonProps = {
   type: 'button',
   variant: 'text',

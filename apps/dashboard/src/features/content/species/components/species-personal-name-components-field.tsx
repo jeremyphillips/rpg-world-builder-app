@@ -4,7 +4,11 @@ import {
   type PersonalNameComponent,
 } from '@rpg/contracts/vocab'
 import { ChipsField, OptionalFieldDisclosure } from '@rpg/ui'
-import type { FieldOption } from '@rpg/ui/form'
+import {
+  optionalDisclosureShellProps,
+  resolveOptionalDisclosureActions,
+  type FieldOption,
+} from '@rpg/ui/form'
 import { useId, useState } from 'react'
 import { useController, useFormContext } from 'react-hook-form'
 
@@ -36,12 +40,16 @@ export function SpeciesPersonalNameComponentsField({
   })
   const value = (field.value as PersonalNameComponent[] | undefined) ?? []
   const [open, setOpen] = useState(value.length > 0)
+  const actions = resolveOptionalDisclosureActions({
+    intent: 'add',
+    subject: 'name components',
+  })
 
   return (
     <OptionalFieldDisclosure
       controlId={controlId}
       fieldLabel="Personal name components"
-      addLabel="Add personal name components"
+      {...optionalDisclosureShellProps(actions)}
       open={open}
       onOpenChange={setOpen}
       onRemove={() => {

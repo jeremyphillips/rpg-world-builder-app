@@ -114,10 +114,10 @@ export function resolveMonsterHitPoints(
   if (hitPoints.kind === 'fixed') return resolveFixedHitPoints(hitPoints)
 
   if (hitPoints.count === undefined || hitPoints.count < 1) return unavailableField('missing-input')
-  // Largest permitted size chooses the Hit Die. That matches the current SRD
-  // stat blocks in this catalog. It is an application convention, not a claim
-  // that every future creature derives hit points the same way. An instance
-  // that later uses a smaller permitted size does not rewrite this formula.
+  // Largest permitted size on the base stat block chooses the Hit Die. Alternate
+  // form sizes are not an input. Werebear stays 18d8 (Medium) and Vampire 23d8
+  // (Medium) when a form is Large or Tiny. An instance that later uses a smaller
+  // permitted size does not rewrite this formula.
   const largestSize = resolveLargestCreatureSize(monster.sizes ?? [])
   if (!largestSize || monster.abilityScores?.con === undefined)
     return unavailableField('missing-input')

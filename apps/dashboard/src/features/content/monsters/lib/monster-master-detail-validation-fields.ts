@@ -71,15 +71,13 @@ export function monsterTraitRowResolveFields(
   input: MonsterTraitRowResolveContext,
 ): ArrayResolveFieldsFn {
   const { ctx, readValues } = input
-  return (row, index) => {
+  return (row, _index) => {
     const values = readValues?.()
-    const rowPath = `traits.${index}`
     if (row === undefined || row === null) {
-      return monsterTraitItemFields({ rowPath, sharedCastingOptions: [] })
+      return monsterTraitItemFields({ sharedCastingOptions: [] })
     }
     return monsterTraitDetailFields({
       row,
-      rowPath,
       ctx,
       monsterName: values?.name ?? '',
       advisories: values ? collectMonsterFormAdvisories(values, monsterEquipmentCatalog(ctx)) : [],

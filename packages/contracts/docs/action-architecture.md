@@ -21,11 +21,11 @@ bonus + ability modifier). Area sentences for stat blocks use
 
 ## Monster action kinds
 
-`weapon`, `natural-weapon`, `attack`, `save`, `multiattack`, `special`,
+`weapon`, `natural-weapon`, `attack`, `save`, `multiattack`, `shape-shift`, `special`,
 `spell`, `action-reference`, `parry`, `leap`, `teleport`, and `take-actions`.
 Which kinds a section accepts is `MONSTER_SECTION_KINDS`. Actions keep the
-attack, save, spell, special, and multiattack kinds. Bonus Actions keep
-`attack`, `save`, `spell`, `special`, `leap`, `teleport`, and `take-actions`.
+attack, save, spell, special, multiattack, and shape-shift kinds. Bonus Actions keep
+`attack`, `save`, `spell`, `special`, `leap`, `teleport`, `take-actions`, and `shape-shift`.
 Reactions keep `parry`, `action-reference`, `spell`, and `special`. Legendary
 Actions keep `action-reference`, `spell`, and `special`. `multiattack` is valid
 only in `actions`. `leap`, `teleport`, and `take-actions` are valid only in
@@ -49,6 +49,7 @@ uses each. A missing choice prints nothing. None of the three kinds is an
 encounter movement or action resolver. Legendary actions spend one use from
 `legendaryActions.uses`. An optional `legendaryActions.usesInLair` is printed only when it is
 greater than that pool. There is no per-option cost.
+`shape-shift` is one row across Actions and Bonus Actions. It has no `onlyInFormIds` and is not a Multiattack, legendary, or reaction target. Its description is generated from centrally resolved transformation destinations. See [creature-forms.md](./creature-forms.md).
 `onceUntilNextTurn` prints one restriction sentence and is not `limitedUse`.
 `spellInvocation: 'use-entry'` is stored only on a legendary spell row and
 points at one spell on a shared spellcasting action. Omitting it shares only

@@ -33,7 +33,11 @@ describe('FormItems combobox optionalDisclosure', () => {
             label: 'Creature families',
             multiple: true,
             options: [{ value: 'demon', label: 'Demon' }],
-            optionalDisclosure: { addLabel: 'Add families', removeLabel: 'Remove families' },
+            optionalDisclosure: {
+              intent: 'add',
+              addLabel: 'Add families',
+              removeLabel: 'Remove families',
+            },
           },
         ]}
       />,
@@ -55,13 +59,17 @@ describe('FormItems combobox optionalDisclosure', () => {
             label: 'Creature families',
             multiple: true,
             options: [{ value: 'demon', label: 'Demon' }],
-            optionalDisclosure: { addLabel: 'Add families', removeLabel: 'Remove families' },
+            optionalDisclosure: {
+              intent: 'add',
+              addLabel: 'Add families',
+              removeLabel: 'Remove families',
+            },
           },
         ]}
       />,
     )
     expect(screen.getByRole('combobox', { name: 'Creature families' })).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Remove families Creature families' }))
+    await user.click(screen.getByRole('button', { name: 'Remove families' }))
     await waitFor(() => {
       expect(screen.getByRole('button', { name: 'Add families' })).toBeInTheDocument()
     })
@@ -82,7 +90,11 @@ describe('FormItems combobox optionalDisclosure', () => {
                 multiple: true,
                 width: '1/2',
                 options: [{ value: 'demon', label: 'Demon' }],
-                optionalDisclosure: { addLabel: 'Add families', removeLabel: 'Remove families' },
+                optionalDisclosure: {
+                  intent: 'add',
+                  addLabel: 'Add families',
+                  removeLabel: 'Remove families',
+                },
               },
               {
                 type: 'combobox',
@@ -120,7 +132,11 @@ describe('FormItems combobox optionalDisclosure', () => {
                 width: '1/2',
                 hint: { text: 'Pick one or more.', position: 'below-control' },
                 options: [{ value: 'demon', label: 'Demon' }],
-                optionalDisclosure: { addLabel: 'Add families', removeLabel: 'Remove families' },
+                optionalDisclosure: {
+                  intent: 'add',
+                  addLabel: 'Add families',
+                  removeLabel: 'Remove families',
+                },
               },
             ],
           },

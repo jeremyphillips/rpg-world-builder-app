@@ -145,20 +145,21 @@ describe('monster weapon damage override', () => {
     expect(screen.getByText('Using weapon base damage · 1d6 piercing')).toBeInTheDocument()
     expect(state()).toMatchObject({ dirtyFields: {}, damage: null })
 
-    await user.click(screen.getByRole('button', { name: 'Override' }))
-    expect(screen.getByText('Replacing weapon base roll · 1d6')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Override Damage' }))
+    expect(screen.queryByText(/Replacing weapon base roll/)).not.toBeInTheDocument()
+    expect(screen.getByText('Weapon base damage')).toBeInTheDocument()
+    expect(screen.getByText('1d6 piercing')).toBeInTheDocument()
     await waitFor(() => {
       expect(state().dirtyFields).not.toEqual({})
       expect(state().damage).toEqual({ dice: { count: 1, faces: 6 } })
     })
 
     await user.click(screen.getByRole('button', { name: 'Switch weapon' }))
-    expect(screen.getByText('Replacing weapon base roll · 2d6')).toBeInTheDocument()
+    expect(screen.queryByText(/Replacing weapon base roll/)).not.toBeInTheDocument()
+    expect(screen.getByText('2d6 slashing')).toBeInTheDocument()
     expect(state().damage).toEqual({ dice: { count: 1, faces: 6 } })
 
-    await user.click(
-      screen.getByRole('button', { name: 'Use weapon default Base damage override' }),
-    )
+    await user.click(screen.getByRole('button', { name: 'Use weapon default' }))
     expect(screen.getByText('Using weapon base damage · 2d6 slashing')).toBeInTheDocument()
     await waitFor(() => {
       expect(state()).toMatchObject({ dirtyFields: {}, damage: null })
@@ -169,7 +170,7 @@ describe('monster weapon damage override', () => {
     const user = userEvent.setup()
     render(<Harness entryId="puff" />)
 
-    await user.click(screen.getByRole('button', { name: 'Override' }))
+    await user.click(screen.getByRole('button', { name: 'Override Damage' }))
     expect(state().damage).toEqual({ flatOperator: '+', flatAmount: 1 })
     expect(screen.queryByLabelText('Number of dice')).not.toBeInTheDocument()
   })
@@ -179,14 +180,14 @@ describe('monster weapon damage override', () => {
     render(<Harness entryId="stick" />)
 
     expect(screen.getByText('This weapon has no base damage.')).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Override' }))
+    await user.click(screen.getByRole('button', { name: 'Override Damage' }))
     expect(state().damage).toEqual({})
   })
 
   it('disables add when the weapon reference is missing', async () => {
     const user = userEvent.setup()
     render(<Harness entryId="gone" />)
-    const add = screen.getByRole('button', { name: 'Override' })
+    const add = screen.getByRole('button', { name: 'Override Damage' })
     expect(add).toBeDisabled()
     expect(screen.getByText('Weapon unavailable')).toBeInTheDocument()
     await user.click(add)
@@ -197,10 +198,8 @@ describe('monster weapon damage override', () => {
     const user = userEvent.setup()
     render(<Harness entryId="gone" damage={{ dice: { count: 2, faces: 6 } }} />)
     expect(screen.getByLabelText('Number of dice')).toHaveValue(2)
-    expect(screen.getByText('Weapon unavailable')).toBeInTheDocument()
-    await user.click(
-      screen.getByRole('button', { name: 'Use weapon default Base damage override' }),
-    )
+    expect(screen.queryByText('Weapon unavailable')).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Use weapon default' }))
     await waitFor(() => {
       expect(state().dirtyFields).not.toEqual({})
       expect(state().damage).toBeNull()
@@ -213,7 +212,7 @@ describe('monster weapon damage override', () => {
     ).toBe(false)
     expect(
       monsterWeaponDamageOverrideSummary(ctx, { equipmentEntryId: 'big', equipment }, true),
-    ).toBe('Replacing weapon base roll · 2d6')
+    ).toBeUndefined()
   })
 
   it('round-trips a flat weapon override without adding dice', () => {

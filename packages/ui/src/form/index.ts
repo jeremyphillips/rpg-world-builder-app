@@ -185,6 +185,8 @@ export {
   type TextareaFieldConfig,
   type ConfirmBeforeClearConfig,
   type OptionalDisclosureConfig,
+  type OptionalDisclosureSourcePreview,
+  type OptionalDisclosureIntent,
   type OptionalDisclosureFieldKind,
   OPTIONAL_DISCLOSURE_FIELD_KINDS,
   type SelectFieldConfig,
@@ -192,6 +194,7 @@ export {
   type SegmentedControlFieldConfig,
   type FieldInteractivity,
   type CheckboxFieldConfig,
+  type BooleanFieldConfig,
   type SwitchFieldConfig,
   type JsonFieldConfig,
   type RichTextFieldConfig,
@@ -333,6 +336,14 @@ export {
   type SilentValidationResult,
 } from './config/form-resolver'
 export { disableOptionsUsedInSiblingRows } from './config/array-unique-select.lib'
+export {
+  optionalDisclosureLeafActions,
+  optionalDisclosureShellProps,
+  resolveOptionalDisclosureActions,
+  resolveOptionalDisclosureSubject,
+  type OptionalDisclosureActionVerb,
+  type ResolvedOptionalDisclosureActions,
+} from './config/optional-disclosure-actions.lib'
 export { navigateInvalidSubmit } from './config/navigate-invalid-submit.client'
 export { navigateTabbedFormInvalidSubmit } from './shells/navigate-tabbed-form-invalid-submit.client'
 export { performInvalidSubmitFocus } from './config/navigate-invalid-submit-focus.lib'

@@ -3,9 +3,8 @@ import type { ComponentProps, ReactNode } from 'react'
 import { useFieldRowParticipation } from './field-row-anatomy.context'
 import { Field, type FieldSize } from './field.client'
 import { FieldLayout } from './field-layout'
-import { FieldLabelContent, FieldLabelInfoAction } from './field-label-content'
-import { shouldShowVisibleRequiredMarker } from './field-required.lib'
 import { FormField } from './form-field'
+import { FormFieldLabel } from '../../form/presentation/form-field-label.client'
 import { FieldChromeShell } from './field-chrome-shell'
 import type { FieldChromeProps } from './field-chrome.variants'
 import { resolveFieldAnatomyWidth } from './field-chrome.variants'
@@ -48,32 +47,6 @@ export interface SwitchFieldProps
   labelPosition?: SwitchLabelPosition
 }
 
-function SwitchFieldLabel({
-  label,
-  labelVisibility,
-  labelPosition,
-  required,
-  info,
-}: Pick<SwitchFieldProps, 'label' | 'labelVisibility' | 'labelPosition' | 'required' | 'info'>) {
-  const labelSrOnly = labelVisibility === 'srOnly'
-  return (
-    <>
-      <Field.Label
-        placement={labelPosition === 'inline' ? 'inlineSwitch' : undefined}
-        className={cn(labelSrOnly && 'sr-only')}
-      >
-        <FieldLabelContent
-          label={label}
-          required={required}
-          showRequiredMarker={shouldShowVisibleRequiredMarker(required, labelVisibility)}
-          info={labelSrOnly ? undefined : info}
-        />
-      </Field.Label>
-      {labelSrOnly && info != null ? <FieldLabelInfoAction label={label} info={info} /> : null}
-    </>
-  )
-}
-
 /** A labelled toggle switch bound to the compound `Field`. */
 export function SwitchField({
   id,
@@ -98,12 +71,12 @@ export function SwitchField({
   const rootWidth = resolveFieldAnatomyWidth(width, chrome)
 
   const labelNode = (
-    <SwitchFieldLabel
+    <FormFieldLabel
       label={label}
       labelVisibility={labelVisibility}
-      labelPosition={labelPosition}
       required={required}
       info={info}
+      placement={labelPosition === 'inline' ? 'inlineSwitch' : undefined}
     />
   )
 

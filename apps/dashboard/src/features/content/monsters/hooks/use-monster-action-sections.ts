@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { mergeLegendaryActionsBlock, resolveMonsterActionIdentity } from '@rpg/contracts'
+import {
+  actionsReferencingAction,
+  mergeLegendaryActionsBlock,
+  planMonsterActionRemoval,
+  resolveMonsterActionIdentity,
+} from '@rpg/contracts'
 import { useFormContext, useWatch, type UseFormSetValue } from 'react-hook-form'
 
 import { masterDetailItemTitle } from '../../lib/master-detail/master-detail-constants'
@@ -22,10 +27,6 @@ import {
   actionMoveDropsTrigger,
   monsterActionSectionMoveAllowed,
 } from '../lib/actions/monster-action-kind'
-import {
-  multiattacksReferencingAction,
-  stripMultiattackActionId,
-} from '../lib/actions/references/monster-action-multiattack-references'
 import type { MonsterActionDraftRow } from '../lib/actions/monster-action-presets'
 import {
   firstMonsterActionId,
@@ -319,35 +320,36 @@ export function useMonsterActionSections(
         located.section,
         actionId,
       )
-      const legendaryBefore = rowsOf(getValues(), 'legendaryActions').length
-      if (located.section === 'actions') {
-        const actions = stripMultiattackActionId(rowsOf(getValues(), 'actions'), actionId).filter(
-          (action) => action.id !== actionId,
-        )
-        setValue('actions', actions as MonsterFormValues['actions'], { shouldDirty: true })
-        const nextLegendary = stripMultiattackActionId(
-          rowsOf(getValues(), 'legendaryActions'),
-          actionId,
-        )
-        setLegendaryActions(setValue, getValues, nextLegendary as MonsterLegendaryActionDraft[])
-        setValue(
-          'reactions',
-          stripMultiattackActionId(
-            rowsOf(getValues(), 'reactions'),
-            actionId,
-          ) as MonsterFormValues['reactions'],
-          { shouldDirty: true },
-        )
-      } else {
-        editors[located.section].removeAt(located.index)
+      const plan = planMonsterActionRemoval(getValues(), actionId)
+      if (!plan) return
+      if (plan.next.actions) {
+        setValue('actions', plan.next.actions as MonsterFormValues['actions'], {
+          shouldDirty: true,
+        })
       }
-      if (located.section === 'legendaryActions' && legendaryBefore === 1) {
+      if (plan.next.bonusActions) {
+        setValue('bonusActions', plan.next.bonusActions as MonsterFormValues['bonusActions'], {
+          shouldDirty: true,
+        })
+      }
+      if (plan.next.reactions) {
+        setValue('reactions', plan.next.reactions as MonsterFormValues['reactions'], {
+          shouldDirty: true,
+        })
+      }
+      if (plan.next.legendaryActions === null) {
         setValue('legendaryActions', undefined as never, { shouldDirty: true })
+      } else if (plan.next.legendaryActions) {
+        setLegendaryActions(
+          setValue,
+          getValues,
+          (plan.next.legendaryActions.actions ?? []) as MonsterLegendaryActionDraft[],
+        )
       }
       setSelectedActionId(nextSelection)
       setPending(null)
     },
-    [editors, getValues, locate, setValue],
+    [getValues, locate, setValue],
   )
 
   const removeAction = useCallback(
@@ -365,7 +367,7 @@ export function useMonsterActionSections(
       }
       const referenceRows =
         located.section === 'actions'
-          ? multiattacksReferencingAction(
+          ? actionsReferencingAction(
               [
                 ...rowsOf(getValues(), 'actions'),
                 ...rowsOf(getValues(), 'legendaryActions'),
@@ -438,9 +440,9 @@ export function useMonsterActionSections(
       if (
         located.section === 'actions' &&
         to !== 'actions' &&
-        multiattacksReferencingAction(referenceRows, located.action.id).length > 0
+        actionsReferencingAction(referenceRows, located.action.id).length > 0
       ) {
-        const references = multiattacksReferencingAction(referenceRows, located.action.id)
+        const references = actionsReferencingAction(referenceRows, located.action.id)
         setPending({
           type: 'multiattack-move',
           actionId: located.action.id,

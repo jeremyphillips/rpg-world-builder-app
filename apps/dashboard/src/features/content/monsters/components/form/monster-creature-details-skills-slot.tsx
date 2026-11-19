@@ -8,7 +8,7 @@ import {
 } from '@rpg/contracts'
 import { proficiencyDomainFieldNoun } from '@rpg/contracts'
 import {
-  BooleanField,
+  CheckboxOption,
   cn,
   ComboboxField,
   SemanticText,
@@ -141,7 +141,8 @@ function MonsterSkillProficiencyRowTrailing({
   return (
     <div className="flex flex-wrap items-center justify-end gap-2">
       <MonsterSkillProficiencyModifier display={modifierDisplay} />
-      <BooleanField
+      <CheckboxOption
+        shell="outlined"
         id={`monster-skill-${row.skill}-expertise`}
         label={PROFICIENCY_RANK_ENTRIES.expertise.label}
         tone="success"

@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { FormProvider, useForm, type Control, type FieldValues } from 'react-hook-form'
 
 import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
+import { fieldStackRhythmVariants } from './field.variants'
 import { FieldGroup } from './field-group'
 import { FIELD_GROUP_CHROME_CLASS_SPECS } from './field-group-chrome.styles'
 import { SelectField } from './select-field'
@@ -26,6 +27,13 @@ const meta = {
   title: 'Forms/Layout/FieldGroup',
   component: FieldGroup,
   parameters: { layout: 'padded' },
+  decorators: [
+    (Story) => (
+      <div className={fieldStackRhythmVariants({ rhythm: 'comfortable' })}>
+        <Story />
+      </div>
+    ),
+  ],
 } satisfies Meta<typeof FieldGroup>
 
 export default meta

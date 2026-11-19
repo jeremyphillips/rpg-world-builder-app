@@ -54,7 +54,7 @@ describe('FormSectionHeader', () => {
     )
 
     const label = screen.getByText('Columns')
-    expect(label.parentElement).toHaveClass('text-style-field-label-md')
+    expect(label).toHaveClass('text-style-field-label-md')
     expect(screen.getByText('Add the columns for this table.')).toHaveClass('text-style-field-hint')
   })
 
@@ -86,7 +86,7 @@ describe('FormSectionHeader', () => {
       </FormSectionProvider>,
     )
 
-    expect(screen.getByText('Columns').parentElement).toHaveClass('text-style-field-label-sm')
+    expect(screen.getByText('Columns')).toHaveClass('text-style-field-label-sm')
     expect(screen.getByText('Add the columns for this table.')).toHaveClass(
       'text-style-field-hint-compact',
     )
@@ -110,7 +110,7 @@ describe('FormSectionHeader', () => {
     const legend = container.querySelector('legend')
     expect(legend).toHaveClass(...fieldSetInFlowLegendClasses.split(/\s+/))
     expect(legend).not.toHaveClass('text-style-field-label-md')
-    expect(screen.getByText('Grants').parentElement).toHaveClass('text-style-field-label-md')
+    expect(screen.getByText('Grants')).toHaveClass('text-style-field-label-md')
     expect(screen.getByText('Add the mechanical effects this feature provides.')).toHaveClass(
       'text-style-field-hint',
     )

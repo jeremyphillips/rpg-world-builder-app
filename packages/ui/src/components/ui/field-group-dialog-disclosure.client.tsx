@@ -7,7 +7,7 @@ import { useFormState } from 'react-hook-form'
 import { cn } from '../../lib/utils'
 import { Button } from './button.client'
 import { Field, type FieldSize } from './field.client'
-import { FieldLabelContent } from './field-label-content'
+import { FieldLabelContent, FieldLabelLine } from './field-label-content'
 import { FieldLayout } from './field-layout'
 import type { FieldGroupDialogDisclosure as FieldGroupDialogDisclosureConfig } from './field-group-disclosure.types'
 import { FieldGroupSummaryTrigger } from './field-group-summary-trigger.client'
@@ -73,9 +73,11 @@ export function FieldGroupDialogDisclosure<TFieldValues extends FieldValues = Fi
           wrapControl={false}
           size={size}
           label={
-            <Field.Label associate={false} id={legendId}>
-              <FieldLabelContent label={legend} info={disclosure.info} />
-            </Field.Label>
+            <FieldLabelLine label={legend} info={disclosure.info}>
+              <Field.Label associate={false} id={legendId}>
+                <FieldLabelContent label={legend} />
+              </Field.Label>
+            </FieldLabelLine>
           }
           control={
             <Field.Control>

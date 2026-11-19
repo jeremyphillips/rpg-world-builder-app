@@ -35,9 +35,8 @@ describe('array density presentation', () => {
       />,
     )
 
-    expect(screen.getByText('Traits').parentElement).toHaveClass('text-style-field-label-md')
-    const traitNameLabel = screen.getByText('Trait name').parentElement
-    expect(traitNameLabel).toHaveClass('text-style-field-label-sm')
+    expect(screen.getByText('Traits')).toHaveClass('text-style-field-label-md')
+    expect(screen.getByText('Trait name')).toHaveClass('text-style-field-label-sm')
     expect(screen.getByRole('textbox', { name: 'Trait name' })).toHaveClass('ui-field-control--sm')
     expect(screen.getByRole('button', { name: 'Add trait' })).toHaveClass('ui-button--md')
 

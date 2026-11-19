@@ -7,7 +7,6 @@ import {
   hasActiveFieldChrome,
   resolveEffectiveFieldChrome,
 } from '../../../components/ui/field-chrome.variants'
-import { fieldGroupBottomMarginClasses } from '../../../components/ui/field.variants'
 import {
   FormSectionContext,
   type FormSectionContextValue,
@@ -44,7 +43,6 @@ export function ArrayFormItemSection({
     },
   )
   const wrapSectionChrome = hasActiveFieldChrome(arrayFieldChrome)
-  const inParentRhythm = Boolean(parentContext.inGroup || parentContext.inRhythmStack)
 
   const arrayChildContext = React.useMemo(
     () =>
@@ -61,17 +59,13 @@ export function ArrayFormItemSection({
         config={item}
         idPrefix={idPrefix}
         fullName={fullArrayName}
-        sectionLayout={{ wrapSectionChrome, inParentRhythm }}
+        sectionLayout={{ wrapSectionChrome }}
       />
     </FormSectionContext.Provider>
   )
 
   const content = wrapSectionChrome ? (
-    <FormFieldChromeShell
-      chrome={arrayFieldChrome}
-      size={arraySize}
-      className={inParentRhythm ? undefined : fieldGroupBottomMarginClasses}
-    >
+    <FormFieldChromeShell chrome={arrayFieldChrome} size={arraySize}>
       {renderer}
     </FormFieldChromeShell>
   ) : (

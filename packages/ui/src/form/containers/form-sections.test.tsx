@@ -46,7 +46,7 @@ describe('Form section rendering', () => {
     const tagsLegend = screen.getByRole('group', { name: /Tags/ }).querySelector('legend')
     expect(tagsLegend).toHaveClass('contents')
     expect(tagsLegend).not.toHaveClass('text-style-field-label-md')
-    expect(screen.getByText('Tags').parentElement).toHaveClass('text-style-field-label-md')
+    expect(screen.getByText('Tags')).toHaveClass('text-style-field-label-md')
     expect(tagsLegend).not.toHaveClass('text-field-array-legend')
   })
 
@@ -72,9 +72,7 @@ describe('Form section rendering', () => {
     const damageGroup = screen.getByRole('group', { name: /Damage/ })
 
     expect(weaponGroup).not.toHaveClass('mb-8')
-    expect(weaponGroup).toHaveClass('mb-0')
     expect(damageGroup).not.toHaveClass('mb-8')
-    expect(damageGroup).toHaveClass('mb-0')
   })
 
   it('keeps anonymous layout groups transparent to heading tier', () => {
@@ -142,7 +140,6 @@ describe('Form section rendering', () => {
 
     const group = screen.getByRole('group', { name: /Campaign availability/ })
     expect(group).not.toHaveClass('mb-8')
-    expect(group).toHaveClass('mb-0')
   })
 
   it('renders row spacing compact as gap-4 on FieldRow', () => {

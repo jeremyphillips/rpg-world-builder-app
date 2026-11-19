@@ -35,13 +35,14 @@ describe('buildFieldShellProps', () => {
     })
   })
 
-  it('omits sizes and exposes the accessible name when requested', () => {
-    const shell = buildFieldShellProps(source, {}, { sizes: 'none', label: 'accessible-name' })
+  it('omits sizes and keeps the config label', () => {
+    const shell = buildFieldShellProps(source, {}, { sizes: 'none', label: 'visible' })
 
     expect(shell.size).toBeUndefined()
     expect(shell.controlSize).toBeUndefined()
-    expect(shell.label).toBe('')
-    expect(shell['aria-label']).toBe('Name')
-    expect(shell.ariaLabel).toBe('Name')
+    expect(shell.label).toBe('Name')
+    expect(shell.labelVisibility).toBe('visible')
+    expect(shell['aria-label']).toBeUndefined()
+    expect(shell.ariaLabel).toBeUndefined()
   })
 })

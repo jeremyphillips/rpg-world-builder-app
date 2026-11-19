@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { FormProvider, useForm } from 'react-hook-form'
+import { FormProvider, useForm, useFormContext } from 'react-hook-form'
 
 import { FormItems } from '../../../containers/form-items.client'
 import type { FormItem } from '../../../field-config'
@@ -35,6 +35,7 @@ describe('FormItems select optionalDisclosure', () => {
               { value: 'lodging', label: 'Lodging' },
             ],
             optionalDisclosure: {
+              intent: 'add',
               addLabel: 'Add function override',
               removeLabel: 'Remove function override',
             },
@@ -63,6 +64,7 @@ describe('FormItems select optionalDisclosure', () => {
               { value: 'lodging', label: 'Lodging' },
             ],
             optionalDisclosure: {
+              intent: 'add',
               addLabel: 'Add function override',
               removeLabel: 'Remove function override',
             },
@@ -72,13 +74,9 @@ describe('FormItems select optionalDisclosure', () => {
     )
 
     expect(screen.getByLabelText('Function override')).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: 'Remove function override Function override' }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Remove function override' })).toBeInTheDocument()
 
-    await user.click(
-      screen.getByRole('button', { name: 'Remove function override Function override' }),
-    )
+    await user.click(screen.getByRole('button', { name: 'Remove function override' }))
 
     expect(screen.getByRole('button', { name: 'Add function override' })).toBeInTheDocument()
   })
@@ -95,6 +93,7 @@ describe('FormItems select optionalDisclosure', () => {
             label: 'Function override',
             options: [{ value: 'care', label: 'Care' }],
             optionalDisclosure: {
+              intent: 'add',
               addLabel: 'Add function override',
               removeLabel: 'Remove function override',
             },
@@ -124,6 +123,7 @@ describe('FormItems select optionalDisclosure', () => {
               { value: 'lodging', label: 'Lodging' },
             ],
             optionalDisclosure: {
+              intent: 'add',
               addLabel: 'Add function override',
               removeLabel: 'Remove function override',
               confirmBeforeClear: {
@@ -137,9 +137,7 @@ describe('FormItems select optionalDisclosure', () => {
       />,
     )
 
-    await user.click(
-      screen.getByRole('button', { name: 'Remove function override Function override' }),
-    )
+    await user.click(screen.getByRole('button', { name: 'Remove function override' }))
 
     expect(screen.getByRole('alertdialog')).toBeInTheDocument()
     expect(screen.getByLabelText('Function override')).toBeInTheDocument()
@@ -172,7 +170,7 @@ describe('FormItems select optionalDisclosure', () => {
                 label: 'Cast at level',
                 width: '1/2',
                 options: [{ value: '4', label: '4th' }],
-                optionalDisclosure: { addLabel: 'Cast at a higher level' },
+                optionalDisclosure: { intent: 'add', addLabel: 'Cast at a higher level' },
               },
             ],
           },
@@ -191,9 +189,85 @@ describe('FormItems select optionalDisclosure', () => {
     expect(participants).toHaveLength(2)
     expect(controlRegionFor(frequency)).toBeTruthy()
     expect(controlRegionFor(cast)).toBeTruthy()
-    const labelRegion = screen.getByText('Cast at level').closest('[data-field-label-region]')
+    const castParticipant = controlRegionFor(cast)!
+    const labelRegion = castParticipant.querySelector('[data-field-label-region]')
+    expect(labelRegion?.querySelector('[aria-hidden]')).toHaveTextContent('Cast at level')
     expect(labelRegion).toContainElement(
       screen.getByRole('button', { name: 'Remove Cast at level' }),
     )
+  })
+
+  it('keeps a populated optional select expanded after remount', () => {
+    const items = [
+      {
+        type: 'select',
+        name: 'followUpActionId',
+        label: 'Attack on a miss',
+        options: [
+          { value: 'rapier', label: 'Rapier' },
+          { value: 'claw', label: 'Claw' },
+        ],
+        optionalDisclosure: {
+          intent: 'add',
+          addLabel: 'Add attack on a miss',
+          removeLabel: 'Remove attack on a miss',
+        },
+      },
+    ] as const satisfies FormItem[]
+
+    const { unmount } = render(
+      <SelectDisclosureHarness defaultValues={{ followUpActionId: 'rapier' }} items={[...items]} />,
+    )
+    expect(screen.getByRole('combobox', { name: 'Attack on a miss' })).toBeInTheDocument()
+
+    unmount()
+    render(
+      <SelectDisclosureHarness defaultValues={{ followUpActionId: 'rapier' }} items={[...items]} />,
+    )
+    expect(screen.getByRole('combobox', { name: 'Attack on a miss' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Remove attack on a miss' })).toBeInTheDocument()
+  })
+
+  it('clears a populated optional select to an empty value on remove', async () => {
+    const user = userEvent.setup()
+    const items = [
+      {
+        type: 'select',
+        name: 'followUpActionId',
+        label: 'Attack on a miss',
+        options: [{ value: 'rapier', label: 'Rapier' }],
+        optionalDisclosure: {
+          intent: 'add',
+          addLabel: 'Add attack on a miss',
+          removeLabel: 'Remove attack on a miss',
+        },
+      },
+    ] as const satisfies FormItem[]
+
+    function ValueProbe() {
+      const { watch } = useFormContext()
+      return (
+        <output data-testid="value">{JSON.stringify(watch('followUpActionId') ?? null)}</output>
+      )
+    }
+
+    function Harness() {
+      const form = useForm({ defaultValues: { followUpActionId: 'rapier' } })
+      return (
+        <FormProvider {...form}>
+          <ValueProbe />
+          <FormItems items={[...items]} idPrefix="test" />
+        </FormProvider>
+      )
+    }
+
+    render(<Harness />)
+
+    await user.click(screen.getByRole('button', { name: 'Remove attack on a miss' }))
+    await waitFor(() => {
+      const stored = screen.getByTestId('value').textContent
+      expect(stored === 'null' || stored === '""').toBe(true)
+    })
+    expect(screen.getByRole('button', { name: 'Add attack on a miss' })).toBeInTheDocument()
   })
 })

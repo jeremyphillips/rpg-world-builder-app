@@ -63,6 +63,10 @@ export {
   MULTIATTACK_SECTION_MESSAGE,
   actionReferenceInvalidKindMessage,
 } from './reference-messages'
+export { actionsReferencingAction, stripReferencedActionId } from './action-references'
+export type { ReferencedActionRow } from './action-references'
+export { planMonsterActionRemoval, shapeShiftRows } from './action-removal-plan'
+export type { MonsterActionPlanBody, MonsterActionRemovalPlan } from './action-removal-plan'
 export {
   MONSTER_CONSTRICT_PRESET_DUPLICATE_MESSAGE,
   MONSTER_NATURAL_FORM_DUPLICATE_MESSAGE,

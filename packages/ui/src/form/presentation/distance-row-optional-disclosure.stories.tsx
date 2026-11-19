@@ -26,7 +26,7 @@ const reachField: JoinedPairFieldConfig = {
 const normalRangeField: JoinedPairFieldConfig = {
   type: 'joinedPair',
   label: 'Normal range',
-  width: '1/2',
+  width: 'auto',
   required: true,
   start: {
     kind: 'select',
@@ -41,7 +41,7 @@ const normalRangeField: JoinedPairFieldConfig = {
 const longRangeField: JoinedPairFieldConfig = {
   type: 'joinedPair',
   label: 'Long range',
-  width: '1/2',
+  width: 'auto',
   hint: { text: LONG_HINT, position: 'below-control' },
   start: {
     kind: 'select',
@@ -54,7 +54,8 @@ const longRangeField: JoinedPairFieldConfig = {
   },
   end: { kind: 'label', text: 'ft.', ariaLabel: 'Long range unit' },
   optionalDisclosure: {
-    addLabel: 'Add long range',
+    intent: 'add',
+    actionSubject: 'long range',
     expandWhenPopulated: true,
   },
 }
@@ -67,13 +68,21 @@ const schema = z.object({
   }),
 })
 
-function DistanceRowFixture() {
+type DistanceRowFixtureProps = {
+  maxWidthClass?: string
+  defaultValues?: { reach?: number; range: { normal: number; long?: number } }
+}
+
+function DistanceRowFixture({
+  maxWidthClass = 'max-w-3xl',
+  defaultValues = { reach: 5, range: { normal: 120, long: 240 } },
+}: DistanceRowFixtureProps) {
   return (
-    <div className="max-w-3xl rounded-md border border-border bg-field-container p-4">
+    <div className={`${maxWidthClass} rounded-md border border-border bg-field-container p-4`}>
       <Form
         schema={schema}
         id="distance-row"
-        defaultValues={{ reach: 5, range: { normal: 120, long: 240 } }}
+        defaultValues={defaultValues}
         onSubmit={() => undefined}
         fields={[
           {
@@ -123,4 +132,12 @@ type Story = StoryObj<typeof meta>
 
 export const DualModeDistanceRow: Story = {
   render: () => <DistanceRowFixture />,
+}
+
+export const LongRangeCollapsed: Story = {
+  render: () => <DistanceRowFixture defaultValues={{ reach: 5, range: { normal: 120 } }} />,
+}
+
+export const NarrowContainer: Story = {
+  render: () => <DistanceRowFixture maxWidthClass="max-w-md" />,
 }

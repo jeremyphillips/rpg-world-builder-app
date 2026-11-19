@@ -2,11 +2,12 @@
 
 import type { ReactNode } from 'react'
 
-import { formMicroActionButtonProps } from '../../form/form-micro-action'
 import {
   FieldRowParticipationProvider,
   useFieldRowParticipation,
 } from './field-row-anatomy.context'
+import type { ComponentProps } from 'react'
+
 import { Button } from './button.client'
 import { ActionIcon } from './action-icon.client'
 import type { FieldSize } from './field.client'
@@ -14,14 +15,28 @@ import { fieldRowParticipationClasses } from './field-root.lib'
 import { FieldControlRegion, FieldLabelRegion, FieldMessageRegion } from './field-anatomy-regions'
 import { FieldLabelContent } from './field-label-content'
 import { fieldAnatomyStackVariants, fieldLabelVariants } from './field.variants'
+import { splitOptionalDisclosureSummary } from './optional-disclosure-inherited.lib'
+import { OptionalDisclosureInheritedLine } from './optional-disclosure-inherited-line.client'
 import { cn } from '../../lib/utils'
-import { Text } from './text'
+import type { OptionalDisclosureActionVerb } from '../../form/config/optional-disclosure-actions.lib'
+import {
+  optionalDisclosureActionButtonProps,
+  type OptionalDisclosureActionPlacement,
+} from '../../form/optional-disclosure-action-size.lib'
+import {
+  OptionalDisclosureSourcePreview,
+  type OptionalDisclosureSourcePreviewContent,
+} from './optional-disclosure-source-preview.client'
 
 export type OptionalFieldDisclosureProps = {
   controlId: string
   fieldLabel: string
   addLabel: string
+  addAccessibleName: string
+  addAction?: Extract<OptionalDisclosureActionVerb, 'add' | 'edit'>
   removeLabel?: string
+  removeAccessibleName: string
+  removeAction?: Extract<OptionalDisclosureActionVerb, 'clear'>
   open: boolean
   onOpenChange: (open: boolean) => void
   onRemove: () => void
@@ -35,16 +50,42 @@ export type OptionalFieldDisclosureProps = {
   addDisabled?: boolean
   /** Hint, validation, or summary rendered in the anatomy-row message track when open. */
   message?: ReactNode
+  /** Inherited source context shown only while open. */
+  sourcePreview?: OptionalDisclosureSourcePreviewContent
+}
+
+type OptionalDisclosureActionProps = Omit<ComponentProps<typeof Button>, 'variant' | 'size'> & {
+  action: OptionalDisclosureActionVerb
+  placement: OptionalDisclosureActionPlacement
+  fieldSize: FieldSize
+  children: ReactNode
+}
+
+/** Text add/edit/clear action for optional disclosure shells. */
+export function OptionalDisclosureAction({
+  action,
+  placement,
+  fieldSize,
+  children,
+  className,
+  ...props
+}: OptionalDisclosureActionProps) {
+  return (
+    <Button
+      {...optionalDisclosureActionButtonProps({ placement, fieldSize })}
+      className={cn('shrink-0', className)}
+      {...props}
+    >
+      <ActionIcon action={action} size="owner" />
+      {children}
+    </Button>
+  )
 }
 
 /** Collapses an optional field behind a compact add control until opened or populated. */
 function DisclosureSummary({ id, summary }: { id: string; summary?: string }) {
   if (!summary) return null
-  return (
-    <Text id={id} as="p" variant="caption">
-      {summary}
-    </Text>
-  )
+  return <OptionalDisclosureInheritedLine id={id} {...splitOptionalDisclosureSummary(summary)} />
 }
 
 /** `fieldLabelVariants` pins `self-start`, which lifts the label above the action. */
@@ -249,25 +290,31 @@ function CollapsedOptionalFieldDisclosure({
 function DisclosureAddButton({
   controlId,
   addLabel,
+  addAccessibleName,
+  addAction,
   labeled,
+  fieldSize,
   summaryId,
   addDisabled,
   onOpenChange,
 }: {
   controlId: string
   addLabel: string
+  addAccessibleName: string
+  addAction: 'add' | 'edit'
   labeled: boolean
+  fieldSize: FieldSize
   summaryId?: string
   addDisabled: boolean
   onOpenChange: (open: boolean) => void
 }) {
   return (
-    <Button
-      type="button"
-      variant="text"
-      size={labeled ? undefined : 'sm'}
-      className={cn('font-normal', labeled ? undefined : 'w-fit justify-start')}
-      {...(labeled ? formMicroActionButtonProps : {})}
+    <OptionalDisclosureAction
+      action={addAction}
+      placement={labeled ? 'inlineWithLabel' : 'standalone'}
+      fieldSize={fieldSize}
+      className={labeled ? undefined : 'w-fit justify-start'}
+      aria-label={addAccessibleName}
       aria-controls={controlId}
       aria-expanded={false}
       aria-describedby={summaryId}
@@ -277,9 +324,8 @@ function DisclosureAddButton({
         onOpenChange(true)
       }}
     >
-      <ActionIcon action="add" size={labeled ? 'sm' : 'lg'} />
       {addLabel}
-    </Button>
+    </OptionalDisclosureAction>
   )
 }
 
@@ -288,10 +334,13 @@ function OpenOptionalFieldDisclosure({
   controlId,
   fieldLabel,
   removeLabel,
+  removeAccessibleName,
+  removeAction,
   inAnatomyRow,
   labeled,
   message,
   summaryNode,
+  sourcePreview,
   onRemove,
   children,
 }: {
@@ -299,28 +348,45 @@ function OpenOptionalFieldDisclosure({
   controlId: string
   fieldLabel: string
   removeLabel: string
+  removeAccessibleName: string
+  removeAction: 'clear'
   inAnatomyRow: boolean
   labeled: boolean
   message?: ReactNode
   summaryNode: ReactNode
+  sourcePreview?: OptionalDisclosureSourcePreviewContent
   onRemove: () => void
   children: ReactNode
 }) {
   const removeButton = (
-    <Button
-      {...formMicroActionButtonProps}
-      aria-label={`${removeLabel} ${fieldLabel}`}
+    <OptionalDisclosureAction
+      action={removeAction}
+      placement="inlineWithLabel"
+      fieldSize={size}
+      aria-label={removeAccessibleName}
       onClick={onRemove}
     >
       {removeLabel}
-    </Button>
+    </OptionalDisclosureAction>
   )
   const fieldLabelNode = (
-    <label htmlFor={controlId} className={disclosureLabelClass(size)}>
+    <span aria-hidden className={disclosureLabelClass(size)}>
       <FieldLabelContent label={fieldLabel} />
-    </label>
+    </span>
   )
   const header = <DisclosureHeaderRow label={fieldLabelNode} action={removeButton} />
+  const sourcePreviewNode = (
+    <OptionalDisclosureSourcePreview
+      id={sourcePreview ? `${controlId}-source-preview` : undefined}
+      preview={sourcePreview}
+    />
+  )
+  const control = (
+    <div className={fieldAnatomyStackVariants({ size })}>
+      {sourcePreviewNode}
+      {children}
+    </div>
+  )
 
   if (inAnatomyRow) {
     const showMessageTrack = message != null || labeled
@@ -331,14 +397,13 @@ function OpenOptionalFieldDisclosure({
       </>
     ) : null
 
-    return (
-      <DisclosureAnatomy size={size} label={header} control={children} message={messageTrack} />
-    )
+    return <DisclosureAnatomy size={size} label={header} control={control} message={messageTrack} />
   }
 
   return (
     <div className={fieldAnatomyStackVariants({ size })}>
       {header}
+      {sourcePreviewNode}
       {children}
       {labeled ? summaryNode : null}
     </div>
@@ -349,7 +414,11 @@ export function OptionalFieldDisclosure({
   controlId,
   fieldLabel,
   addLabel,
+  addAccessibleName,
+  addAction = 'add',
   removeLabel = 'Remove',
+  removeAccessibleName,
+  removeAction = 'clear',
   open,
   onOpenChange,
   onRemove,
@@ -359,6 +428,7 @@ export function OptionalFieldDisclosure({
   summary,
   addDisabled = false,
   message,
+  sourcePreview,
 }: OptionalFieldDisclosureProps) {
   const summaryId = `${controlId}-summary`
   const inAnatomyRow = useFieldRowParticipation()
@@ -367,7 +437,10 @@ export function OptionalFieldDisclosure({
     <DisclosureAddButton
       controlId={controlId}
       addLabel={addLabel}
+      addAccessibleName={addAccessibleName}
+      addAction={addAction}
       labeled={labeled}
+      fieldSize={size}
       summaryId={summary ? summaryId : undefined}
       addDisabled={addDisabled}
       onOpenChange={onOpenChange}
@@ -395,10 +468,13 @@ export function OptionalFieldDisclosure({
       controlId={controlId}
       fieldLabel={fieldLabel}
       removeLabel={removeLabel}
+      removeAccessibleName={removeAccessibleName}
+      removeAction={removeAction}
       inAnatomyRow={inAnatomyRow}
       labeled={labeled}
       message={message}
       summaryNode={summaryNode}
+      sourcePreview={sourcePreview}
       onRemove={onRemove}
     >
       {children}

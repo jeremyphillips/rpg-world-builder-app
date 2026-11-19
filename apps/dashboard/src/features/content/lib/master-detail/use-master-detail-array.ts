@@ -29,8 +29,16 @@ export interface UseMasterDetailArrayResult {
   appendRow: (row: Record<string, unknown>) => void
   /** Removes a row without the delete dialog and selects the next sibling. */
   removeAt: (index: number) => void
+  /** Replaces field-array rows with caller-provided values (after external lifecycle writes). */
+  replaceRows: (rows: Record<string, unknown>[]) => void
   /** Field id of the most recently appended row until consumed by the detail panel. */
   lastAddedFieldId: string | null
+  /**
+   * Consumes add intent for `fieldId` when it matches `lastAddedFieldId`.
+   * No-ops for stale or mismatched ids.
+   */
+  acknowledgeAcquisition: (fieldId: string) => void
+  /** @deprecated Prefer `acknowledgeAcquisition(fieldId)`. */
   clearLastAddedFieldId: () => void
   /** Row index pending delete confirmation, or `null` when no dialog is open. */
   deleteIndex: number | null
@@ -197,11 +205,19 @@ export function useMasterDetailArray(
     append(makeItemDefaults())
   }, [append, fields.length, makeItemDefaults])
 
+  const acknowledgeAcquisition = useCallback(
+    (fieldId: string) => {
+      if (!fieldId || fieldId !== lastAddedFieldId) return
+      setConsumedAddedFieldId(fieldId)
+      setPendingSelectIndex(null)
+      if (resolvedSelectedFieldId) setSelectedFieldId(resolvedSelectedFieldId)
+    },
+    [lastAddedFieldId, resolvedSelectedFieldId],
+  )
+
   const clearLastAddedFieldId = useCallback(() => {
-    if (lastAddedFieldId) setConsumedAddedFieldId(lastAddedFieldId)
-    setPendingSelectIndex(null)
-    if (resolvedSelectedFieldId) setSelectedFieldId(resolvedSelectedFieldId)
-  }, [lastAddedFieldId, resolvedSelectedFieldId])
+    if (lastAddedFieldId) acknowledgeAcquisition(lastAddedFieldId)
+  }, [acknowledgeAcquisition, lastAddedFieldId])
 
   const requestRemove = useCallback((index: number) => setDeleteIndex(index), [])
 
@@ -242,6 +258,17 @@ export function useMasterDetailArray(
       selectFieldAfterRemoval(index)
     },
     [fields.length, selectFieldAfterRemoval],
+  )
+
+  const replaceRows = useCallback(
+    (rows: Record<string, unknown>[]) => {
+      replace(rows)
+      if (rows.length === 0) {
+        setSelectedFieldId(null)
+        setPendingSelectIndex(null)
+      }
+    },
+    [replace],
   )
 
   const move = useCallback(
@@ -294,7 +321,9 @@ export function useMasterDetailArray(
     handleAdd,
     appendRow,
     removeAt,
+    replaceRows,
     lastAddedFieldId,
+    acknowledgeAcquisition,
     clearLastAddedFieldId,
     deleteIndex,
     requestRemove,

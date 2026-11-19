@@ -24,7 +24,7 @@ function assertAttackRangeRowFields(row: FormItem) {
     type: 'joinedPair',
     label: 'Long',
     hint: { text: 'Disadvantage beyond normal range.', position: 'below-control' },
-    optionalDisclosure: { addLabel: 'Add long range' },
+    optionalDisclosure: { intent: 'add', actionSubject: 'long range' },
     start: { kind: 'select', name: 'range.long', allowCustom: true, clearable: true },
   })
   const normal = row.fields[0]
@@ -92,15 +92,15 @@ describe('attackRangeRow', () => {
 })
 
 describe('attackRangeClusterRow', () => {
-  it('splits Normal and Long at half width for a parent 2/3 column', () => {
+  it('assigns intrinsic width to Normal and Long for a parent 2/3 column', () => {
     const row = attackRangeClusterRow({
       normalName: 'range.normal',
       longName: 'range.long',
     })
     expect(row).toMatchObject({ kind: 'row', spacing: 'compact' })
     expect(row.fields).toHaveLength(2)
-    expect(row.fields[0]).toMatchObject({ width: '1/2', label: 'Normal' })
-    expect(row.fields[1]).toMatchObject({ width: '1/2', label: 'Long' })
+    expect(row.fields[0]).toMatchObject({ width: 'auto', label: 'Normal' })
+    expect(row.fields[1]).toMatchObject({ width: 'auto', label: 'Long' })
   })
 })
 

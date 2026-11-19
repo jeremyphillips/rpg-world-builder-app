@@ -8,7 +8,13 @@ import type {
 import { contentTypeSubject, type ContentMediaDomain } from '@rpg/contracts'
 import { useWatch } from 'react-hook-form'
 import { cn, fieldStackRhythmVariants } from '@rpg/ui'
-import { FormItems, resolveFormDensity, useFormSectionContext, type FormItem } from '@rpg/ui/form'
+import {
+  FormItems,
+  FormRhythmStack,
+  resolveFormDensity,
+  useFormSectionContext,
+  type FormItem,
+} from '@rpg/ui/form'
 
 import type { UnsavedChangesConfirmController } from '@/lib/form-unsaved-changes-guard'
 import type { CampaignAvailabilityPresentation } from '@/lib/campaign-availability/campaign-availability-form-fields'
@@ -145,7 +151,9 @@ export function ContentFormHeader({
           />
         ) : null}
         <div className="min-w-0 flex-1">
-          <FormItems items={items} idPrefix={idPrefix} />
+          <FormRhythmStack>
+            <FormItems items={items} idPrefix={idPrefix} />
+          </FormRhythmStack>
         </div>
       </div>
     </div>

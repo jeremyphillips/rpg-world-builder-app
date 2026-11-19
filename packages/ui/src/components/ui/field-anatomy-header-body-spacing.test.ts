@@ -10,6 +10,7 @@ import {
   fieldAnatomyHeaderBodyGapClasses,
   fieldAnatomyStackVariants,
   fieldSetInFlowLegendClasses,
+  resolveFieldScaleLegendBodyMargin,
 } from './field.variants'
 import { launchHeadlessChromium } from '../../test-utils/launch-headless-chromium.lib'
 
@@ -47,7 +48,7 @@ const PROBE_HTML = `<!doctype html>
       <legend class="w-full min-w-0">
         <span class="text-style-field-label-md">Grants</span>
       </legend>
-      <div id="fieldgroup-array-md-body" class="flex flex-col gap-6">field</div>
+      <div id="fieldgroup-array-md-body" class="${resolveFieldScaleLegendBodyMargin('md')} flex flex-col gap-6">field</div>
     </fieldset>
 
     <fieldset id="fieldgroup-section-md" class="border-0 p-0 m-0 min-w-0">
@@ -111,6 +112,8 @@ describe('field anatomy header→body spacing', () => {
       'gap-3',
       'gap-6',
       'mt-5',
+      'mt-1.5',
+      'mt-1',
       'flex',
       'flex-col',
       'border-0',
@@ -167,6 +170,7 @@ describe('field anatomy header→body spacing', () => {
         arraySm: distance('#array-labeled-sm .text-style-field-label-sm', 'array-labeled-sm-body'),
         compositeMd: distance('#composite-md .text-style-field-label-md', 'composite-md-body'),
         fieldGroupSection: distance('#fieldgroup-section-md legend', 'fieldgroup-section-md-body'),
+        fieldGroupArray: distance('#fieldgroup-array-md legend', 'fieldgroup-array-md-body'),
         sronlyOnly: distance('#array-sronly-only legend', 'array-sronly-only-body'),
         sronlyHintBand: distance(
           '#array-sronly-hint .text-style-caption',
@@ -181,6 +185,7 @@ describe('field anatomy header→body spacing', () => {
     expect(distances.arraySm).toBeCloseTo(4, 0)
     expect(distances.compositeMd).toBeCloseTo(6, 0)
     expect(distances.fieldGroupSection).toBeGreaterThanOrEqual(18)
+    expect(distances.fieldGroupArray).toBeCloseTo(6, 0)
     expect(distances.sronlyOnly).toBeLessThan(2)
     expect(distances.sronlyHintBand).toBeCloseTo(6, 0)
   })
@@ -190,5 +195,7 @@ describe('field anatomy header→body spacing', () => {
     expect(fieldAnatomyHeaderBodyGapClasses.sm.stack).toBe('gap-y-1')
     expect(fieldAnatomyHeaderBodyGapClasses.md.labelRegionBottom).toBe('has-[*]:pb-1.5')
     expect(fieldAnatomyHeaderBodyGapClasses.sm.labelRegionBottom).toBe('has-[*]:pb-1')
+    expect(fieldAnatomyHeaderBodyGapClasses.md.bodyMarginTop).toBe('mt-1.5')
+    expect(fieldAnatomyHeaderBodyGapClasses.sm.bodyMarginTop).toBe('mt-1')
   })
 })

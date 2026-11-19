@@ -7,7 +7,12 @@ import type { FieldHintPosition } from '../../../../components/ui/field.variants
 import { useDependsOnValues } from '../../../config/form-depends-on.client'
 import type { OptionalDisclosureConfig, RollValueFieldConfig } from '../../../field-config'
 import {
+  optionalDisclosureLeafActions,
+  optionalDisclosureShellProps,
+} from '../../../config/optional-disclosure-actions.lib'
+import {
   assertOptionalDisclosureFieldConfig,
+  optionalDisclosureDependsOnPaths,
   optionalDisclosureLeafFieldConfig,
 } from '../../../config/optional-disclosure-config.lib'
 import { RollValueFieldRenderer } from '../roll-value-field-renderer.client'
@@ -40,9 +45,12 @@ export function OptionalDisclosureRollValueFieldRenderer({
   const { setValue, unregister } = useFormContext()
   const watched = useWatch({ name: fullName })
   const open = isOptionalRollPresent(watched)
-  const dependsOn = disclosure.summary?.dependsOn ?? []
-  const dependencyValues = useDependsOnValues(dependsOn, namePrefix)
+  const dependencyValues = useDependsOnValues(
+    optionalDisclosureDependsOnPaths(disclosure),
+    namePrefix,
+  )
   const summary = disclosure.summary?.resolve(dependencyValues, { open })
+  const sourcePreview = open ? disclosure.sourcePreview?.resolve(dependencyValues) : undefined
 
   const seed = () => {
     if (disclosure.addDisabled) return
@@ -67,11 +75,13 @@ export function OptionalDisclosureRollValueFieldRenderer({
     <OptionalFieldDisclosure
       controlId={id}
       fieldLabel={config.label}
-      addLabel={disclosure.addLabel}
-      removeLabel={disclosure.removeLabel}
+      {...optionalDisclosureShellProps(
+        optionalDisclosureLeafActions({ label: config.label, optionalDisclosure: disclosure }),
+      )}
       open={open}
       labeled={disclosure.labeled}
       summary={summary}
+      sourcePreview={sourcePreview}
       addDisabled={disclosure.addDisabled}
       onOpenChange={(next) => {
         if (next) seed()

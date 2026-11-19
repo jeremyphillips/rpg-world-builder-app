@@ -58,6 +58,7 @@ const specializationFields: FormItem[] = [
       },
     },
     optionalDisclosure: {
+      intent: 'add',
       addLabel: 'Add specialization',
       removeLabel: 'Remove specialization',
     },
@@ -100,7 +101,7 @@ describe('FormItems textSuggestions optionalDisclosure', () => {
     )
 
     expect(screen.getByRole('textbox', { name: 'Specialization' })).toHaveValue('coaching inn')
-    await user.click(screen.getByRole('button', { name: 'Remove specialization Specialization' }))
+    await user.click(screen.getByRole('button', { name: 'Remove specialization' }))
     expect(screen.getByRole('button', { name: 'Add specialization' })).toBeInTheDocument()
   })
 

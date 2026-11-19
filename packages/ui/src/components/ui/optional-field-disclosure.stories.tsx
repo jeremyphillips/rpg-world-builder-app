@@ -15,7 +15,9 @@ const meta = {
     controlId: 'story-note',
     fieldLabel: 'Additional behavior',
     addLabel: 'Add additional behavior',
+    addAccessibleName: 'Add additional behavior',
     removeLabel: 'Remove',
+    removeAccessibleName: 'Remove',
     open: false,
     onOpenChange: action('onOpenChange'),
     onRemove: action('onRemove'),
@@ -38,7 +40,9 @@ function DisclosureDemo({ initialValue = '' }: { initialValue?: string }) {
       controlId="story-note"
       fieldLabel="Additional behavior"
       addLabel="Add additional behavior"
+      addAccessibleName="Add additional behavior"
       removeLabel="Remove"
+      removeAccessibleName="Remove"
       open={open}
       onOpenChange={setManualOpen}
       onRemove={() => {
@@ -81,7 +85,9 @@ export const OpenInAnatomyRowWithMessage: Story = {
           controlId="story-long-range"
           fieldLabel="Long range"
           addLabel="Add long range"
+          addAccessibleName="Add long range"
           removeLabel="Remove"
+          removeAccessibleName="Remove"
           open
           onOpenChange={action('onOpenChange')}
           onRemove={action('onRemove')}

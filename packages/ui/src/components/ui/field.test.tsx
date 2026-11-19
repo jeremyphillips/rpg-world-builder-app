@@ -37,6 +37,29 @@ describe('Field', () => {
     const input = screen.getByLabelText('Name')
     expect(input).toHaveAttribute('aria-describedby', 'name-hint')
     expect(input).not.toHaveAttribute('aria-invalid')
+    const hint = screen.getByText('Your display name.')
+    expect(hint.tagName).toBe('P')
+    expect(hint).toHaveClass('text-style-field-hint')
+    expect(hint).not.toHaveClass('text-style-caption')
+    expect(hint).toHaveAttribute('id', 'name-hint')
+  })
+
+  it('uses compact hint typography when Field.Root size is sm', () => {
+    render(
+      <Field.Root id="slug" size="sm" hint="Lowercase only.">
+        <Field.Label>Slug</Field.Label>
+        <Field.Control>
+          <Input />
+        </Field.Control>
+        <Field.Hint />
+      </Field.Root>,
+    )
+    expect(screen.getByText('Lowercase only.')).toHaveClass('text-style-field-hint-compact')
+  })
+
+  it('renders no hint node when hint is absent', () => {
+    renderField()
+    expect(screen.queryByText(/display name/i)).not.toBeInTheDocument()
   })
 
   it('keeps below-label hint visible with error: aria-invalid, describedby includes both ids', () => {

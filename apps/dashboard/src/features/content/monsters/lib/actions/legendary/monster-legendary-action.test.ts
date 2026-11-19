@@ -170,6 +170,7 @@ describe('legendary action fields', () => {
     )
     expect(reference).toEqual([
       'buildAdvisories',
+      'formAvailability',
       'actionIds',
       'movement.allowance',
       'movement.withoutOpportunityAttacks',
@@ -196,6 +197,7 @@ describe('legendary action fields', () => {
     )
     expect(spellcasting).toEqual([
       'buildAdvisories',
+      'formAvailability',
       'castingAbility',
       'spells.0.spellId',
       '_turnLimit',
@@ -211,6 +213,7 @@ describe('legendary action fields', () => {
     })
     expect(names(cast as { name?: string }[])).toEqual([
       'buildAdvisories',
+      'formAvailability',
       'castingAbility',
       'spells.0.spellId',
       'spells.0.castAtLevel',

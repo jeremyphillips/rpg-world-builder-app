@@ -35,6 +35,20 @@ export const Prose: Story = {
   },
 }
 
+export const QualifiedTitle: Story = {
+  args: {
+    label: 'Attack preview',
+    title: 'Bite (Bear or Vampire Form Only)',
+    content: {
+      kind: 'metadata',
+      rows: [
+        { id: 'attack', label: 'Attack', primary: '+5', secondary: 'STR +3' },
+        { id: 'reach', label: 'Reach', primary: '5 ft' },
+      ],
+    },
+  },
+}
+
 export const Guidance: Story = {
   args: {
     label: 'Attack preview',

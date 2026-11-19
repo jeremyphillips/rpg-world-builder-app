@@ -21,10 +21,11 @@ describe('content movement form fields', () => {
     expect(speciesCreateDefaultValues.movement).toEqual([{ mode: 'walk', feet: 30 }])
   })
 
-  it('movementWithHoverGroup includes fly hover switch', () => {
+  it('movementWithHoverGroup stacks movement array and hover without a section heading', () => {
     const group = movementWithHoverGroup()
     expect(isContainer(group) && group.kind === 'group').toBe(true)
     if (!isContainer(group) || group.kind !== 'group') return
+    expect(group.heading).toBeUndefined()
     const hasHoverSwitch = group.fields.some(
       (field) =>
         ('type' in field && field.type === 'switch' && field.name === 'hover') ||
@@ -58,6 +59,8 @@ describe('content movement form fields', () => {
   it('configures unique mode filtering and append defaults', () => {
     const field = movementArrayField() as ArrayConfig
 
+    expect(field.headingScale).toBe('field')
+    expect(field.emptyStatePrimary).toBe('No modes added.')
     expect(field.max).toBe(MOVEMENT_MODES.length)
     expect(field.appendDefaults?.([])).toEqual({ mode: '', feet: undefined })
     expect(field.filterSelect?.filter).toBeTypeOf('function')

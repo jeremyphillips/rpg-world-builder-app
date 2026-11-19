@@ -88,7 +88,7 @@ defineArrayField({
 ## `heading` presentation
 
 Array section headers use the same **leaf field label line** (`fieldLabelVariants`) and
-**below-label hint** (`Text variant="caption"`) as scalar fields. The fieldset
+**below-label hint** (`fieldHintTypographyVariants` via `FormSectionHeader`) as scalar fields. The fieldset
 `<legend>` is in-flow (`fieldSetInFlowLegendClasses`) so label weight does not cascade
 into hints or inline add controls. Section/subsection legend scale belongs on named
 **groups**, not on `kind: 'array'`.

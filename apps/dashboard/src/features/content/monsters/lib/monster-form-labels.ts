@@ -17,6 +17,7 @@ import {
   getMonsterTraitSectionLabel,
   getProficiencyDomainCollectionLabel,
   joinInlineMetadata,
+  joinNaturalList,
   getProficiencyGrantCompactAddLabel,
   getTermLabelSingular,
   HIT_POINTS_TERM,
@@ -104,17 +105,17 @@ export const MONSTER_USE_DEFAULT_NAME_LABEL = 'Use default name'
 export const MONSTER_CUSTOM_DESCRIPTION_LABEL = 'Additional details'
 export const MONSTER_CUSTOM_DESCRIPTION_HINT =
   'Narrative detail shown with the generated rules. It does not change them.'
-export const MONSTER_CUSTOM_DESCRIPTION_ADD_LABEL = 'Add additional details'
 export const MONSTER_RULES_TEXT_LABEL = 'Rules text'
 export const MONSTER_CUSTOM_NAME_ADD_LABEL = 'Add custom name'
 export const MONSTER_NATURAL_WEAPON_DAMAGE_HINT = 'Ability modifiers are applied automatically.'
-export const MONSTER_BASE_DAMAGE_OVERRIDE_LABEL = 'Base damage override'
-export const MONSTER_DAMAGE_OVERRIDE_ADD_LABEL = 'Override'
+export const MONSTER_BASE_DAMAGE_OVERRIDE_LABEL = 'Damage'
 export const MONSTER_DAMAGE_OVERRIDE_REMOVE_LABEL = 'Use weapon default'
 export const MONSTER_WEAPON_DAMAGE_USING_LABEL = 'Using weapon base damage'
 export const MONSTER_WEAPON_DAMAGE_REPLACING_LABEL = 'Replacing weapon base roll'
 export const MONSTER_WEAPON_DAMAGE_UNAVAILABLE_LABEL = 'Weapon unavailable'
 export const MONSTER_WEAPON_DAMAGE_NONE_LABEL = 'This weapon has no base damage.'
+export const MONSTER_WEAPON_DAMAGE_SOURCE_PREVIEW_LABEL = 'Weapon base damage'
+export const MONSTER_FORM_BASE_MOVEMENT_PREVIEW_LABEL = 'Base'
 export const MONSTER_ON_HIT_LEGEND = 'On hit'
 export const MONSTER_ON_HIT_HINT =
   'Effects that apply when this attack hits, beyond its primary damage.'
@@ -206,7 +207,6 @@ export const MONSTER_REACTIONS_HEADING = getActionEconomySectionLabel('reaction'
 export const MONSTER_LEGENDARY_ACTIONS_HEADING = 'Legendary Actions'
 export const MONSTER_LEGENDARY_USES_LABEL = 'Uses'
 export const MONSTER_LEGENDARY_LAIR_USES_LABEL = 'Uses in lair'
-export const MONSTER_TURN_LIMIT_ADD_LABEL = 'Add turn limit'
 export const MONSTER_TURN_LIMIT_LABEL = 'Turn limit'
 export const MONSTER_TURN_LIMIT_EMPTY_LABEL = 'No turn limit'
 export const MONSTER_TURN_LIMIT_OPTION_LABEL =
@@ -225,8 +225,173 @@ export function monsterActionSectionHeading(section: MonsterActionSection): stri
 
 export const MONSTER_ADD_LABEL = 'Add'
 
-export const MONSTER_LIMIT_ADD_LABEL = 'Add limit'
-export const MONSTER_RECHARGE_ADD_LABEL = 'Add recharge'
+export const MONSTER_SHAPE_SHIFTING_HEADING = 'Shape-shifting'
+export const MONSTER_SHAPE_SHIFTING_DESCRIPTION =
+  "Define the creature's forms and identify its true form."
+export const MONSTER_DEFINED_FORMS_LIST_HEADING = 'Defined forms'
+/** Display-only label for an unnamed defined form row or selector option — not persisted. */
+export const MONSTER_DEFINED_FORM_DISPLAY_FALLBACK = 'New form'
+export const MONSTER_TRUE_FORM_HEADING = 'True form'
+export const MONSTER_TRUE_FORM_KIND_PROFILE_LABEL = 'Creature profile'
+export const MONSTER_TRUE_FORM_KIND_DEFINED_LABEL = 'Defined form'
+export const MONSTER_TRUE_FORM_SELECT_LABEL = 'Select form'
+export const MONSTER_TRUE_FORM_SELECT_PLACEHOLDER = 'Select a form'
+export const MONSTER_TRUE_FORM_SELECT_HINT =
+  "The selected form uses the creature's base statistics."
+/** Shown on the true-form kind radio when Creature profile is selected. */
+export const MONSTER_TRUE_FORM_PROFILE_HINT =
+  "Uses the creature's main statistics as its true form."
+/** Shown on the true-form kind radio when Defined form is selected and the list is empty. */
+export const MONSTER_TRUE_FORM_DEFINED_EMPTY_HINT =
+  'Add a form below to designate it as the true form.'
+export const MONSTER_FORMS_ADD_LABEL = 'Add forms'
+export const MONSTER_FORMS_ADD_FORM_LABEL = 'Add form'
+export const MONSTER_FORMS_REMOVE_LABEL = 'Remove forms'
+export const MONSTER_FORMS_REMOVE_HEADLINE = 'Remove forms?'
+export const MONSTER_FORMS_REMOVE_CONFIRM_LABEL = 'Remove forms'
+export const MONSTER_FORMS_CANCEL_LABEL = 'Cancel'
+export const MONSTER_FORM_ITEM_NOUN_LABEL = 'Form'
+export const MONSTER_FORM_ITEM_NOUN_PLURAL = 'forms'
+export const MONSTER_FORM_NAME_LABEL = 'Form name'
+export const MONSTER_FORM_USE_BASE_MOVEMENT_LABEL = 'Use base movement'
+export const MONSTER_FORM_USE_BASE_SIZES_LABEL = 'Use base sizes'
+export const MONSTER_FORM_SPEECH_LABEL = "Can't speak in this form"
+export const MONSTER_FORM_DIFFERENCES_LABEL = 'Show form differences in'
+export const MONSTER_FORM_DIFFERENCES_FALLBACK_NOTE =
+  'Shown in Speed and Languages rows: there is no Shape-Shift action'
+export const MONSTER_FORM_AVAILABILITY_LABEL = 'Available in'
+export const MONSTER_FORM_AVAILABILITY_ALL = 'All forms'
+export const MONSTER_FORM_AVAILABILITY_SELECTED = 'Selected forms'
+export const MONSTER_FORM_AVAILABILITY_FORMS_LABEL = 'Select forms'
+export const MONSTER_FORM_AVAILABILITY_ALL_HINT = 'Includes forms added later.'
+export const MONSTER_FORM_AVAILABILITY_SELECTED_HINT =
+  "Choose forms below. New forms won't be included automatically."
+
+export type MonsterFormAvailabilityRowKind = 'action' | 'trait'
+export type MonsterFormAvailabilityHintPhase = 'intro' | 'all' | 'selected'
+
+export function monsterFormAvailabilityRowKind(namePrefix: string): MonsterFormAvailabilityRowKind {
+  return namePrefix.startsWith('traits.') ? 'trait' : 'action'
+}
+
+export function monsterFormAvailabilityIntroHint(rowKind: MonsterFormAvailabilityRowKind): string {
+  return `Choose which forms can use this ${rowKind}.`
+}
+
+export function monsterFormAvailabilityHintPhase(
+  restrictionKeyPresent: boolean,
+  availabilityEngaged: boolean,
+): MonsterFormAvailabilityHintPhase {
+  if (restrictionKeyPresent) return 'selected'
+  if (!availabilityEngaged) return 'intro'
+  return 'all'
+}
+
+export function resolveMonsterFormAvailabilityHint(
+  phase: MonsterFormAvailabilityHintPhase,
+  rowKind: MonsterFormAvailabilityRowKind,
+): {
+  hint: string
+  hintPosition: 'below-label' | 'below-control'
+} {
+  switch (phase) {
+    case 'intro':
+      return {
+        hint: monsterFormAvailabilityIntroHint(rowKind),
+        hintPosition: 'below-label',
+      }
+    case 'all':
+      return {
+        hint: MONSTER_FORM_AVAILABILITY_ALL_HINT,
+        hintPosition: 'below-control',
+      }
+    case 'selected':
+      return {
+        hint: MONSTER_FORM_AVAILABILITY_SELECTED_HINT,
+        hintPosition: 'below-control',
+      }
+  }
+}
+
+export { formatMonsterMissingFormLabel } from '@rpg/contracts'
+
+export const MONSTER_FORM_NOTES_LABEL = 'Notes'
+export const MONSTER_FORM_NOTES_HINT = 'Completes the sentence: While in this form, …'
+export const MONSTER_SHAPE_SHIFT_EQUIPMENT_LABEL = 'Equipment'
+export const MONSTER_SHAPE_SHIFT_PREREQUISITE_LABEL = 'Prerequisite'
+export const MONSTER_SHAPE_SHIFT_PREREQUISITE_HINT =
+  'Completes the sentence: If …, it shape-shifts.'
+export const MONSTER_SHAPE_SHIFT_DESTINATIONS_LABEL = 'Destinations'
+export const MONSTER_SHAPE_SHIFT_PREVIEW_LABEL = 'Preview'
+export const MONSTER_SHAPE_SHIFT_ACQUISITION_DESCRIPTION =
+  'Changes among this creature’s alternate forms.'
+export const MONSTER_SHAPE_SHIFT_REQUIRES_ALTERNATE_FORM_NOTE =
+  'Add a form other than the true form before adding Shape-Shift.'
+
+export function formatMonsterFormsRemovalSummary(summary: {
+  unrestricted: readonly { name?: string }[]
+  deletedShapeShifts: readonly { hadPrerequisite: boolean; hadDescription: boolean }[]
+  strippedReferences: readonly { name?: string }[]
+  indirectlyAffectedReferences: readonly { name?: string }[]
+  deletedNotes: readonly string[]
+}): string {
+  const sentences: string[] = []
+  if (summary.unrestricted.length > 0) {
+    sentences.push(
+      `Become unrestricted: ${summary.unrestricted.map((row) => row.name || 'Untitled row').join(', ')}.`,
+    )
+  }
+  if (summary.deletedShapeShifts.length > 0) {
+    sentences.push(
+      `Deleted Shape-Shift action${summary.deletedShapeShifts.length === 1 ? '' : 's'}: ${summary.deletedShapeShifts.length}.`,
+    )
+  }
+  if (summary.strippedReferences.length > 0) {
+    sentences.push(`References removed: ${summary.strippedReferences.length}.`)
+  }
+  if (summary.indirectlyAffectedReferences.length > 0) {
+    sentences.push(`Also affected: ${summary.indirectlyAffectedReferences.length} referenced rows.`)
+  }
+  if (summary.deletedNotes.length > 0) {
+    sentences.push(`Deleted notes: ${summary.deletedNotes.join(', ')}.`)
+  }
+  return sentences.join(' ') || 'This removes the forms configuration.'
+}
+
+export function formatMonsterDefinedFormRemovalSummary(summary: {
+  removedForm: { name?: string }
+  wasTrueForm: boolean
+  deletedNote: boolean
+  rowsLosingForm: readonly { name?: string; remainingFormNames: readonly string[] }[]
+  indirectlyAffectedReferences: readonly { name?: string }[]
+}): string {
+  const formName = summary.removedForm.name?.trim() || 'Untitled form'
+  const rowName = (name?: string) => name?.trim() || 'Untitled row'
+  const sentences: string[] = []
+  if (summary.wasTrueForm) sentences.push('The creature profile will become the true form.')
+  if (summary.rowsLosingForm.length > 0) {
+    const names = summary.rowsLosingForm.map((row) => rowName(row.name))
+    const verb = names.length === 1 ? 'loses' : 'lose'
+    sentences.push(`${joinNaturalList(names)} ${verb} ${formName}.`)
+    for (const row of summary.rowsLosingForm) {
+      const label = rowName(row.name)
+      sentences.push(
+        row.remainingFormNames.length === 0
+          ? `${label} will have no forms selected.`
+          : `${label} will then be available only in ${joinNaturalList(row.remainingFormNames, { conjunction: 'or' })} form.`,
+      )
+    }
+    sentences.push('No row becomes unrestricted.')
+  }
+  if (summary.indirectlyAffectedReferences.length > 0) {
+    sentences.push(
+      `Also affected: ${joinNaturalList(summary.indirectlyAffectedReferences.map((row) => rowName(row.name)))}.`,
+    )
+  }
+  if (summary.deletedNote) sentences.push(`${formName}'s notes will be deleted.`)
+  return sentences.join(' ') || 'This removes the defined form.'
+}
+
 export const MONSTER_ACQUISITION_SAVE_DESCRIPTION = 'Saving throw effect'
 export const MONSTER_ACQUISITION_ATTACK_DESCRIPTION = 'Custom attack'
 export const MONSTER_ACQUISITION_SPELL_PRIMARY_DESCRIPTION =
@@ -280,7 +445,6 @@ export const MONSTER_REFERENCE_ACTION_HINT =
   'Choose an attack or ability from Actions. If you select several attacks, the creature makes one of them.'
 export const MONSTER_MOVEMENT_LABEL = 'Movement'
 export const MONSTER_MOVEMENT_PLACEHOLDER = 'No movement'
-export const MONSTER_MOVEMENT_ADD_LABEL = 'Add movement'
 export const MONSTER_MOVEMENT_HINT = 'Optional movement before the action.'
 export const MONSTER_MOVEMENT_OPPORTUNITY_LABEL = 'Without provoking Opportunity Attacks'
 export const MONSTER_LEGENDARY_SPELLCASTING_FIELD_LABEL = 'Source action'
@@ -289,10 +453,11 @@ export const MONSTER_LEGENDARY_SPELLCASTING_FIELD_HINT =
 export const MONSTER_SPELLCASTING_SPELL_HINT = 'Choose a spell from this Spellcasting action.'
 export const MONSTER_CAST_SPELL_HINT = 'Choose a spell from the catalog.'
 export const MONSTER_CAST_AT_LEVEL_HINT = 'Set only to cast a higher-level version.'
+export const MONSTER_SPELL_CAST_LEVEL_SET_LABEL = 'Set cast level'
+export const MONSTER_SPELL_CAST_LEVEL_USE_DEFAULT_LABEL = 'Use default level'
 export const MONSTER_SPELL_FREQUENCY_LABEL = 'Frequency'
-export const MONSTER_SPELL_CAST_HIGHER_LEVEL_LABEL = 'Cast at a higher level'
-export const MONSTER_SPELL_COMPONENT_OMISSION_ADD_LABEL = 'Omit spell components'
 export const MONSTER_SPELL_COMPONENT_OMISSION_LABEL = 'Omit components'
+export const MONSTER_SPELL_COMPONENT_OMISSION_REMOVE_LABEL = 'Restore components'
 export const MONSTER_SPELL_COMPONENT_OMISSION_HINT = "Select components that aren't required."
 export const MONSTER_SPELL_CAST_LEVEL_PLACEHOLDER = 'Select level'
 export const MONSTER_SPELL_CHANGE_LABEL = 'Change spell'
@@ -370,8 +535,7 @@ export const MONSTER_SAVE_SECOND_FAILURE_LEGEND = 'Second failure'
 export const MONSTER_SAVE_EFFECTS_LEGEND = 'Effects'
 export const MONSTER_SAVE_REPEAT_ADD_LABEL = 'Repeat save'
 export const MONSTER_SAVE_REPEAT_ELIGIBILITY_LABEL = 'Eligibility note'
-export const MONSTER_SAVE_REPEAT_ELIGIBILITY_ADD_LABEL = 'Add eligibility'
-export const MONSTER_SAVE_FAILURE_OR_SUCCESS_ADD_LABEL = 'Failure or success'
+export const MONSTER_SAVE_OUTCOME_DISCLOSURE_LABEL = 'Save outcome'
 export const MONSTER_SAVE_FAILURE_OR_SUCCESS_NOTE_LABEL = 'Rules text'
 export const MONSTER_ORDERED_EFFECT_REPLACE_CONDITION_ADD_LABEL = 'Replace condition'
 export const MONSTER_SAVE_THROW_SECTION_DESCRIPTION =
@@ -422,7 +586,6 @@ export const MONSTER_TRIGGER_LABEL = getMonsterReactionFieldLabel('trigger')
 export const MONSTER_TRIGGER_PLACEHOLDER = 'When this reaction can be used'
 export const MONSTER_PARRY_AC_BONUS_LABEL = 'AC bonus'
 export const MONSTER_PARRY_AC_BONUS_HINT = 'Added against the triggering attack.'
-export const MONSTER_PARRY_FOLLOW_UP_ADD_LABEL = 'Add attack on a miss'
 export const MONSTER_PARRY_FOLLOW_UP_LABEL = 'Attack'
 export const MONSTER_PARRY_FOLLOW_UP_HINT = 'Choose an existing attack from Actions.'
 export const MONSTER_PARRY_DESCRIPTION = 'Add a bonus to AC against the triggering attack.'
@@ -437,7 +600,6 @@ export function formatLeapWalkSpeedHint(walkFeet: number): string {
 export const MONSTER_TELEPORT_DESCRIPTION = 'Teleport to an unoccupied space it can see.'
 export const MONSTER_TELEPORT_DISTANCE_LABEL = 'Distance'
 export const MONSTER_TELEPORT_DISTANCE_HINT = 'How far it teleports.'
-export const MONSTER_TELEPORT_PASSENGER_ADD_LABEL = 'Include another creature'
 export const MONSTER_TELEPORT_PASSENGER_LEGEND = 'Another creature'
 export const MONSTER_TELEPORT_PASSENGER_HINT =
   'Optional restrictions on the other creature. The sentence begins with "itself or a …".'
@@ -450,7 +612,6 @@ export const MONSTER_TAKE_ACTIONS_BEHAVIOR_HINT_DISABLED =
   'Choose at least two actions to configure behavior.'
 export const MONSTER_TAKE_ACTIONS_CHOICE_ONE = 'Chooses one'
 export const MONSTER_TAKE_ACTIONS_CHOICE_EACH = 'Uses each'
-export const MONSTER_TAKE_ACTIONS_RESTRICTION_ADD_LABEL = 'Add restriction'
 export const MONSTER_TAKE_ACTIONS_RESTRICTION_LABEL = 'Restriction'
 export const MONSTER_TAKE_ACTIONS_RESTRICTION_HINT = 'Leading clause, without a final period.'
 export const MONSTER_TAKE_ACTIONS_RESTRICTION_PLACEHOLDER = 'While in Dim Light or darkness'
@@ -469,7 +630,6 @@ export function formatMonsterActionReferenceUsesSummary(names: string): string {
 }
 export const MONSTER_REACTION_REFERENCE_HINT =
   'The reaction uses this action. The action stays in Actions.'
-export const MONSTER_REACTION_ADDITIONAL_RULES_ADD_LABEL = 'Add additional rules'
 export const MONSTER_REACTION_ADDITIONAL_RULES_LABEL = 'Additional rules'
 export const MONSTER_REACTION_ADDITIONAL_RULES_HINT =
   'Additional restrictions or effects when using the referenced action.'

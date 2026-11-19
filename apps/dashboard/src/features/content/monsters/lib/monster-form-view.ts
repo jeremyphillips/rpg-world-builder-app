@@ -26,6 +26,7 @@ const TAB_BY_PREFIX: Record<string, string> = {
   senses: MONSTER_FORM_TAB.creatureDetails,
   communication: MONSTER_FORM_TAB.creatureDetails,
   defenses: MONSTER_FORM_TAB.creatureDetails,
+  forms: MONSTER_FORM_TAB.creatureDetails,
   equipment: MONSTER_FORM_TAB.equipment,
   traits: MONSTER_FORM_TAB.traits,
   actions: MONSTER_FORM_TAB.actions,

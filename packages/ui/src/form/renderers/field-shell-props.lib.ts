@@ -32,7 +32,7 @@ export type FieldShellSource = {
 export type FieldShellOptions = {
   /** `both` passes presentation and control sizes. `presentation` passes `size` only. `none` omits both. */
   sizes: 'both' | 'presentation' | 'none'
-  label: 'visible' | 'accessible-name'
+  label: 'visible'
 }
 
 export type FieldShellProps = FieldLabelPresentationProps &
@@ -60,13 +60,10 @@ export function buildFieldShellProps(
   options: FieldShellOptions,
 ): FieldShellProps {
   const { config } = source
-  const label =
-    options.label === 'accessible-name'
-      ? { label: '', 'aria-label': config.label, ariaLabel: config.label }
-      : {
-          label: config.label,
-          labelVisibility: resolveFieldLabelVisibility(config),
-        }
+  const label = {
+    label: config.label,
+    labelVisibility: resolveFieldLabelVisibility(config),
+  }
   const sizes =
     options.sizes === 'both'
       ? { size: source.presentationSize, controlSize: source.controlSize }

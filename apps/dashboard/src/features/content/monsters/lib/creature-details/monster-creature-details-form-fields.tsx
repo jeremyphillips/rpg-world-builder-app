@@ -39,6 +39,7 @@ import {
   MONSTER_WEAPON_PROFICIENCY_MODE_HINT,
 } from '../monster-form-labels'
 import type { MonsterFormValues } from '../monster-form-values'
+import { monsterFormsSectionFields } from '../forms/monster-forms-form-fields'
 
 const weaponCategoryOptions = toOptions(
   WEAPON_CATEGORIES,
@@ -238,5 +239,6 @@ export function creatureDetailsFields(ctx: ContentFormCtx): FormItem[] {
         },
       ],
     },
+    ...monsterFormsSectionFields(ctx),
   ]
 }

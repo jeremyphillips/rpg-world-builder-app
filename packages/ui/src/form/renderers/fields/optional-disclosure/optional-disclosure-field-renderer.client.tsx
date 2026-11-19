@@ -28,6 +28,10 @@ import type {
 import { LazyFieldSuspense } from '../../lazy-field.client'
 import { LazyRichTextField } from '../lazy-rich-text-field.client'
 import { fieldDefaultValue } from '../../../field-config'
+import {
+  optionalDisclosureLeafActions,
+  optionalDisclosureShellProps,
+} from '../../../config/optional-disclosure-actions.lib'
 import { optionalDisclosureLeafFieldConfig } from '../../../config/optional-disclosure-config.lib'
 import { useConfirmBeforeClear } from '../../../config/use-confirm-before-clear.client'
 import { normalizedSelectFieldValue } from '../select/select-field-renderer.lib'
@@ -92,12 +96,14 @@ export function OptionalDisclosureTextareaFieldRenderer({
       <OptionalFieldDisclosure
         controlId={id}
         fieldLabel={config.label}
-        addLabel={disclosure.addLabel}
-        removeLabel={disclosure.removeLabel}
+        {...optionalDisclosureShellProps(
+          optionalDisclosureLeafActions({ label: config.label, optionalDisclosure: disclosure }),
+        )}
         open={open}
         onOpenChange={setManualOpen}
         onRemove={attemptClear}
         size={controlSize}
+        labeled={disclosure.labeled}
       >
         <TextareaField
           {...buildFieldShellProps(
@@ -110,7 +116,7 @@ export function OptionalDisclosureTextareaFieldRenderer({
               controlSize,
             },
             { error, invalid, describedBy },
-            { sizes: 'both', label: 'accessible-name' },
+            { sizes: 'both', label: 'visible' },
           )}
           placeholder={config.placeholder}
           rows={config.rows}
@@ -187,12 +193,14 @@ export function OptionalDisclosureTextFieldRenderer({
       <OptionalFieldDisclosure
         controlId={id}
         fieldLabel={config.label}
-        addLabel={disclosure.addLabel}
-        removeLabel={disclosure.removeLabel}
+        {...optionalDisclosureShellProps(
+          optionalDisclosureLeafActions({ label: config.label, optionalDisclosure: disclosure }),
+        )}
         open={open}
         onOpenChange={setManualOpen}
         onRemove={attemptClear}
         size={controlSize}
+        labeled={disclosure.labeled}
       >
         <TextField
           {...buildFieldShellProps(
@@ -205,7 +213,7 @@ export function OptionalDisclosureTextFieldRenderer({
               controlSize,
             },
             { error, invalid, describedBy },
-            { sizes: 'both', label: 'accessible-name' },
+            { sizes: 'both', label: 'visible' },
           )}
           placeholder={config.placeholder}
           disabled={config.disabled}
@@ -276,7 +284,7 @@ export function OptionalDisclosureSelectFieldRenderer({
   const editorChrome = {
     ...buildFieldShellProps(shellSource, state.validation, {
       sizes: 'both',
-      label: 'accessible-name',
+      label: 'visible',
     }),
     ...selectExtras,
   }
@@ -306,12 +314,14 @@ export function OptionalDisclosureSelectFieldRenderer({
       <OptionalFieldDisclosure
         controlId={resolved.id}
         fieldLabel={state.renderConfig.label}
-        addLabel={disclosure.addLabel}
-        removeLabel={disclosure.removeLabel}
+        {...optionalDisclosureShellProps(
+          optionalDisclosureLeafActions({ label: config.label, optionalDisclosure: disclosure }),
+        )}
         open={open}
         onOpenChange={setManualOpen}
         onRemove={attemptClear}
         size={state.controlSize}
+        labeled={disclosure.labeled}
       >
         <SelectField
           options={state.resolvedOptions}
@@ -397,12 +407,14 @@ export function OptionalDisclosureTextSuggestionsFieldRenderer({
       <OptionalFieldDisclosure
         controlId={resolved.id}
         fieldLabel={config.label}
-        addLabel={disclosure.addLabel}
-        removeLabel={disclosure.removeLabel}
+        {...optionalDisclosureShellProps(
+          optionalDisclosureLeafActions({ label: config.label, optionalDisclosure: disclosure }),
+        )}
         open={open}
         onOpenChange={handleOpenChange}
         onRemove={attemptClear}
         size={resolved.controlSize}
+        labeled={disclosure.labeled}
       >
         <TextSuggestionsField
           {...buildFieldShellProps(
@@ -415,7 +427,7 @@ export function OptionalDisclosureTextSuggestionsFieldRenderer({
               controlSize: resolved.controlSize,
             },
             validation,
-            { sizes: 'both', label: 'accessible-name' },
+            { sizes: 'both', label: 'visible' },
           )}
           suggestions={suggestions}
           placeholder={config.placeholder}
@@ -490,12 +502,14 @@ export function OptionalDisclosureRichTextFieldRenderer({
       <OptionalFieldDisclosure
         controlId={id}
         fieldLabel={config.label}
-        addLabel={disclosure.addLabel}
-        removeLabel={disclosure.removeLabel}
+        {...optionalDisclosureShellProps(
+          optionalDisclosureLeafActions({ label: config.label, optionalDisclosure: disclosure }),
+        )}
         open={open}
         onOpenChange={setOpen}
         onRemove={attemptClear}
         size={controlSize}
+        labeled={disclosure.labeled}
       >
         <LazyFieldSuspense>
           <LazyRichTextField
@@ -511,7 +525,6 @@ export function OptionalDisclosureRichTextFieldRenderer({
               { error, invalid, describedBy },
               { sizes: 'both', label: 'visible' },
             )}
-            labelVisibility="srOnly"
             linkable={config.linkable}
             codeBlocks={config.codeBlocks}
             tables={config.tables}

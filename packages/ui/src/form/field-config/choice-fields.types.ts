@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 
+import type { ChoiceTone } from '../../components/ui/choice-control.styles'
 import type { FieldSize } from '../../components/ui/field.client'
 import type { FieldLabelPosition } from '../../components/ui/field.variants'
 import type { FieldDigits } from '../../components/ui/field-digit-metrics'
@@ -105,6 +106,15 @@ export interface RadioCardFieldConfig extends BaseFieldConfig {
 export interface CheckboxFieldConfig extends BaseFieldConfig {
   type: 'checkbox'
   defaultValue?: boolean
+}
+
+/** Single boolean — option label on the control; `checkbox` is a plain presentation alias. */
+export interface BooleanFieldConfig extends BaseFieldConfig {
+  type: 'boolean'
+  defaultValue?: boolean
+  /** Outlined pill around the checkbox option. Omitted = plain intrinsic row. */
+  shell?: 'outlined'
+  tone?: ChoiceTone
 }
 
 export interface SwitchFieldConfig extends BaseFieldConfig {

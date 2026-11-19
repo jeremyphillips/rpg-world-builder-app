@@ -1,0 +1,104 @@
+import { formatMovementDisplay } from '@rpg/contracts'
+import type { FormItem } from '@rpg/ui/form'
+
+import {
+  CREATURE_FLY_HOVER_LABEL,
+  MOVEMENT_FIELD_LABEL,
+  movementArrayField,
+  movementRecordToRows,
+  movementRowsIncludeFly,
+  movementRowsToRecordForPreview,
+  type MovementRowDraftFormValues,
+} from '../../../lib/forms/fields/content-movement-form-fields'
+import {
+  MONSTER_FORM_BASE_MOVEMENT_PREVIEW_LABEL,
+  MONSTER_FORM_USE_BASE_MOVEMENT_LABEL,
+} from '../monster-form-labels'
+
+/** Defined-form row prefix is `forms.definedForms.{index}` — three hops to root movement/hover. */
+const FORM_BASE_MOVEMENT_DEPENDS = ['../../../movement', '../../../hover'] as const
+
+function readBaseMovementRows(values: Record<string, unknown>): MovementRowDraftFormValues[] {
+  const baseRows = values['../../../movement'] as MovementRowDraftFormValues[] | undefined
+  return baseRows ?? []
+}
+
+function readBaseHover(values: Record<string, unknown>): boolean {
+  return values['../../../hover'] === true
+}
+
+function baseMovementPreviewText(values: Record<string, unknown>): string | undefined {
+  const record = movementRowsToRecordForPreview(readBaseMovementRows(values))
+  const label = formatMovementDisplay(record, 'ft.')
+  return label || undefined
+}
+
+function seedFormMovementOverride(values: Record<string, unknown>) {
+  const record = movementRowsToRecordForPreview(readBaseMovementRows(values))
+  return {
+    rows: movementRecordToRows(record),
+    ...(readBaseHover(values) && record.fly !== undefined ? { hover: true as const } : {}),
+  }
+}
+
+function movementOverrideRowsField() {
+  return {
+    ...movementArrayField(),
+    name: 'rows',
+    heading: { label: MOVEMENT_FIELD_LABEL, labelVisibility: 'srOnly' as const },
+    addAction: { label: 'Add movement', layout: 'stacked' as const, size: 'sm' as const },
+    min: 0,
+  }
+}
+
+function movementOverrideHoverField(): FormItem {
+  return {
+    type: 'switch',
+    name: 'hover',
+    label: CREATURE_FLY_HOVER_LABEL,
+    visibility: {
+      dependsOn: ['movementOverride'],
+      visibleWhen: (watched) => {
+        const rows = (
+          watched.movementOverride as { rows?: MovementRowDraftFormValues[] } | undefined
+        )?.rows
+        return movementRowsIncludeFly(rows)
+      },
+    },
+  }
+}
+
+/** Optional movement override for a defined alternate form row (master-detail relative paths). */
+export function monsterFormMovementOverrideGroup(): FormItem {
+  return {
+    kind: 'group',
+    name: 'movementOverride',
+    heading: { label: MOVEMENT_FIELD_LABEL },
+    headingScale: 'field',
+    optionalDisclosure: {
+      intent: 'override',
+      removeLabel: MONSTER_FORM_USE_BASE_MOVEMENT_LABEL,
+      expandWhenPopulated: true,
+      labeled: true,
+      watchPaths: ['movementOverride', 'overrides.movement'],
+      clearPaths: ['movementOverride', 'overrides.movement'],
+      seedWhen: (values) => seedFormMovementOverride(values),
+      summary: {
+        dependsOn: [...FORM_BASE_MOVEMENT_DEPENDS],
+        resolve: (values) => {
+          const text = baseMovementPreviewText(values)
+          return text ? `Inherits: ${text}` : 'Inherits base movement.'
+        },
+      },
+      sourcePreview: {
+        dependsOn: [...FORM_BASE_MOVEMENT_DEPENDS],
+        resolve: (values) => {
+          const text = baseMovementPreviewText(values)
+          if (!text) return undefined
+          return { label: MONSTER_FORM_BASE_MOVEMENT_PREVIEW_LABEL, text }
+        },
+      },
+    },
+    fields: [movementOverrideRowsField(), movementOverrideHoverField()],
+  }
+}

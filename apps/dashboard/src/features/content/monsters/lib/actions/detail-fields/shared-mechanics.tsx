@@ -3,6 +3,9 @@ import {
   getWeaponModeLabel,
   isPrimarySpellcastingAction,
   monsterActionUsageCapability,
+  SHAPE_SHIFT_EQUIPMENT,
+  SHAPE_SHIFT_EQUIPMENT_ENTRIES,
+  type ShapeShiftEquipment,
   WEAPON_MODES,
   REACH_FEET,
 } from '@rpg/contracts'
@@ -11,6 +14,7 @@ import {
   type FieldVisibility,
   type FormItem,
   type JoinedPairFieldConfig,
+  toOptions,
 } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
@@ -20,6 +24,7 @@ import { savingThrowFieldGroup } from '../../../../lib/forms/mechanics/saving-th
 import {
   ATTACK_RANGE_LONG_FIELD_LABEL,
   ATTACK_RANGE_NORMAL_FIELD_LABEL,
+  applyAttackRangeClusterWidths,
   attackRangeJoinedPairFields,
 } from '../../../../lib/forms/fields/weapon-attack-range-form-fields'
 import { MonsterAttackRangeClusterSlot } from '../monster-attack-range-cluster-slot.client'
@@ -40,6 +45,9 @@ import {
   MONSTER_ATTACK_BONUS_LABEL,
   MONSTER_TRIGGER_LABEL,
   MONSTER_TRIGGER_PLACEHOLDER,
+  MONSTER_SHAPE_SHIFT_EQUIPMENT_LABEL,
+  MONSTER_SHAPE_SHIFT_PREREQUISITE_HINT,
+  MONSTER_SHAPE_SHIFT_PREREQUISITE_LABEL,
 } from '../../monster-form-labels'
 import type { MonsterActionSection } from '../references/monster-action-equipment-references'
 import type { MonsterActionDraftRow } from '../monster-action-presets'
@@ -254,11 +262,7 @@ function monsterAttackDistanceFields(
 ): FormItem {
   const reach = monsterAttackReachField(modeField)
   const rangeFields = monsterAttackRangeJoinedPairs(modeField)
-  const rangeClusterRow = {
-    kind: 'row' as const,
-    spacing: 'compact' as const,
-    fields: rangeFields.map((field) => ({ ...field, width: '1/2' as const })),
-  }
+  const rangeClusterFields = applyAttackRangeClusterWidths(rangeFields)
   return {
     kind: 'group',
     heading: { label: MONSTER_ACTION_DISTANCE_SECTION_LEGEND },
@@ -281,7 +285,7 @@ function monsterAttackDistanceFields(
               <MonsterAttackRangeClusterSlot
                 idPrefix={formScope.idPrefix}
                 namePrefix={formScope.namePrefix}
-                fields={rangeClusterRow.fields}
+                fields={rangeClusterFields}
               />
             ),
           },
@@ -436,6 +440,28 @@ export function monsterActionMechanicFields(input: {
         ]
       : []
   const kindFields: FormItem[] = []
+  if (action.kind === 'shape-shift') {
+    kindFields.push(
+      {
+        type: 'radio',
+        name: `${namePrefix}.equipment`,
+        label: MONSTER_SHAPE_SHIFT_EQUIPMENT_LABEL,
+        options: toOptions(
+          SHAPE_SHIFT_EQUIPMENT,
+          Object.fromEntries(
+            SHAPE_SHIFT_EQUIPMENT.map((id) => [id, SHAPE_SHIFT_EQUIPMENT_ENTRIES[id].label]),
+          ) as Record<ShapeShiftEquipment, string>,
+        ),
+      },
+      {
+        type: 'text',
+        name: `${namePrefix}.prerequisite`,
+        label: MONSTER_SHAPE_SHIFT_PREREQUISITE_LABEL,
+        hint: MONSTER_SHAPE_SHIFT_PREREQUISITE_HINT,
+        optionalDisclosure: { intent: 'add' },
+      },
+    )
+  }
   if (action.kind === 'weapon') {
     kindFields.push(
       monsterWeaponDamageOverrideField({

@@ -3,18 +3,9 @@ import { get, useFormContext, useFormState, useWatch, type FieldErrors } from 'r
 import { ActionButton, cn, Input, Text } from '@rpg/ui'
 import { useFieldErrorPresentation, useFormValidationPresentation } from '@rpg/ui/form'
 
-export interface MasterDetailInlineTitle {
-  field: 'name' | 'nameOverride'
-  /** Heading shown when the stored value is empty. Never written to the form. */
-  fallback: string
-  /** Empty-input hint. Never written to the form. */
-  placeholder: string
-  mode: 'authored' | 'override'
-  /** Open the editor once for a row that was just created. */
-  initialEdit?: boolean
-  /** Overflow label while an override is stored. */
-  resetLabel?: string
-}
+import type { MasterDetailInlineTitle } from '../../lib/master-detail/master-detail-inline-title.types'
+
+export type { MasterDetailInlineTitle }
 
 /** Shared by the display heading and the edit input so the two modes cannot drift. */
 const MASTER_DETAIL_TITLE_TYPE_CLASS = 'truncate text-lg font-medium text-foreground'
@@ -60,12 +51,17 @@ function writeStoredName(
 
 export function MasterDetailInlineTitleEditor({
   namePrefix,
-  rowKey,
+  titleInputId,
+  selectedFieldId,
   title,
+  onAcquisitionEditApplied,
 }: {
   namePrefix: string
-  rowKey: string
+  /** Stable id for the title input element (RHF field id within the array). */
+  titleInputId: string
+  selectedFieldId: string
   title: MasterDetailInlineTitle
+  onAcquisitionEditApplied?: (fieldId: string) => void
 }) {
   const path = `${namePrefix}.${title.field}`
   const { getValues, setValue } = useFormContext()
@@ -83,11 +79,14 @@ export function MasterDetailInlineTitleEditor({
   const cancelingRef = useRef(false)
   const localWriteRef = useRef(false)
   const seenValueRef = useRef(valueKey)
-  const snapshotRef = useRef(storedName(watched))
-  const [editing, setEditing] = useState(Boolean(title.initialEdit))
+  const snapshotRef = useRef<string | undefined>(undefined)
+  const snapshotReadyRef = useRef(false)
+  const acquisitionEditOpenedRef = useRef(Boolean(title.initialEdit))
+  const acquisitionAcknowledgedRef = useRef(false)
+  const [editing, setEditing] = useState(() => Boolean(title.initialEdit))
   const [draft, setDraft] = useState(valueKey)
   const label = TITLE_LABEL[title.mode]
-  const inputId = `master-detail-title-${rowKey}`
+  const inputId = `master-detail-title-${titleInputId}`
   const errorId = `${inputId}-error`
   const display = storedName(watched) ?? title.fallback
 
@@ -104,9 +103,37 @@ export function MasterDetailInlineTitleEditor({
   }, [valueKey])
 
   useEffect(() => {
+    if (!editing) {
+      snapshotReadyRef.current = false
+      return
+    }
+    if (snapshotReadyRef.current) return
+    snapshotReadyRef.current = true
+    snapshotRef.current = storedName(getValues(path))
+  }, [editing, getValues, path])
+
+  useEffect(() => {
+    if (!title.initialEdit || acquisitionEditOpenedRef.current) return
+    acquisitionEditOpenedRef.current = true
+    snapshotRef.current = storedName(getValues(path))
+    setEditing(true)
+  }, [getValues, path, title.initialEdit])
+
+  useEffect(() => {
     if (!editing) return
-    inputRef.current?.focus()
-  }, [editing])
+    const input = inputRef.current
+    if (!input) return
+    input.focus()
+    if (
+      title.initialEdit &&
+      acquisitionEditOpenedRef.current &&
+      !acquisitionAcknowledgedRef.current &&
+      onAcquisitionEditApplied
+    ) {
+      acquisitionAcknowledgedRef.current = true
+      onAcquisitionEditApplied(selectedFieldId)
+    }
+  }, [editing, onAcquisitionEditApplied, selectedFieldId, title.initialEdit])
 
   function commit(raw: string) {
     const next = storedName(raw)

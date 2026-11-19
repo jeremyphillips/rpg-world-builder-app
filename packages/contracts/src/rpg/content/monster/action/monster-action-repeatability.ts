@@ -142,7 +142,27 @@ export function collectRepeatabilityViolations(
   pushConstrictViolations(sections, prefix, violations)
   pushWeaponEquipmentViolations(sections, prefix, violations)
   pushNaturalFormViolations(sections, prefix, violations)
+  pushShapeShiftViolations(sections, prefix, violations)
   return violations
+}
+
+function pushShapeShiftViolations(
+  sections: MonsterActionSectionRows,
+  prefix: (string | number)[],
+  violations: RepeatabilityViolation[],
+): void {
+  const matches: { section: MonsterActionSection; index: number }[] = []
+  for (const section of MONSTER_ACTION_SECTIONS) {
+    sectionRows(sections, section).forEach((row, index) => {
+      if (row.kind === 'shape-shift') matches.push({ section, index })
+    })
+  }
+  for (const match of matches.slice(1)) {
+    violations.push({
+      message: monsterSingletonKindMessage('shape-shift'),
+      path: [...prefix, ...monsterActionSectionRowPath(match.section, match.index, 'kind')],
+    })
+  }
 }
 
 function hasSingletonKind(sections: MonsterActionSectionRows, kind: string): boolean {
@@ -197,6 +217,14 @@ function acquisitionStateForFixedItem(
       : {}
   }
   if (itemId === 'reaction:parry') return disabledWhenSingleton(sections, 'parry')
+  if (itemId === 'create:shape-shift') {
+    for (const section of MONSTER_ACTION_SECTIONS) {
+      if (sectionRows(sections, section).some((row) => row.kind === 'shape-shift')) {
+        return { disabled: true, note: monsterSingletonKindMessage('shape-shift') }
+      }
+    }
+    return {}
+  }
   return undefined
 }
 

@@ -13,10 +13,9 @@ import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form
 import { monsterEquipmentCatalog } from '../../monster-form-derivation'
 import {
   MONSTER_BASE_DAMAGE_OVERRIDE_LABEL,
-  MONSTER_DAMAGE_OVERRIDE_ADD_LABEL,
   MONSTER_DAMAGE_OVERRIDE_REMOVE_LABEL,
   MONSTER_WEAPON_DAMAGE_NONE_LABEL,
-  MONSTER_WEAPON_DAMAGE_REPLACING_LABEL,
+  MONSTER_WEAPON_DAMAGE_SOURCE_PREVIEW_LABEL,
   MONSTER_WEAPON_DAMAGE_UNAVAILABLE_LABEL,
   MONSTER_WEAPON_DAMAGE_USING_LABEL,
 } from '../../monster-form-labels'
@@ -64,13 +63,30 @@ export function monsterWeaponDamageOverrideSummary(
   ctx: ContentFormCtx,
   values: { equipmentEntryId?: unknown; equipment?: unknown },
   open: boolean,
-): string {
+): string | undefined {
+  if (open) return undefined
   const weapon = linkedWeapon(ctx, equipmentRows(values.equipment), values.equipmentEntryId)
   if (!weapon) return MONSTER_WEAPON_DAMAGE_UNAVAILABLE_LABEL
   const base = catalogBaseRoll(weapon.damage)
   if (!base) return MONSTER_WEAPON_DAMAGE_NONE_LABEL
-  const lead = open ? MONSTER_WEAPON_DAMAGE_REPLACING_LABEL : MONSTER_WEAPON_DAMAGE_USING_LABEL
-  return joinInlineMetadata([lead, inheritedRollPhrase(base, weapon.damageType, !open)])
+  return joinInlineMetadata([
+    MONSTER_WEAPON_DAMAGE_USING_LABEL,
+    inheritedRollPhrase(base, weapon.damageType, true),
+  ])
+}
+
+export function monsterWeaponDamageOverrideSourcePreview(
+  ctx: ContentFormCtx,
+  values: { equipmentEntryId?: unknown; equipment?: unknown },
+): { label: string; text: string } | undefined {
+  const weapon = linkedWeapon(ctx, equipmentRows(values.equipment), values.equipmentEntryId)
+  if (!weapon) return undefined
+  const base = catalogBaseRoll(weapon.damage)
+  if (!base) return undefined
+  return {
+    label: MONSTER_WEAPON_DAMAGE_SOURCE_PREVIEW_LABEL,
+    text: inheritedRollPhrase(base, weapon.damageType, true),
+  }
 }
 
 export function monsterWeaponDamageOverrideSeed(
@@ -106,8 +122,8 @@ export function monsterWeaponDamageOverrideField(args: {
     label: MONSTER_BASE_DAMAGE_OVERRIDE_LABEL,
     width: 'auto',
     optionalDisclosure: {
+      intent: 'override',
       labeled: true,
-      addLabel: MONSTER_DAMAGE_OVERRIDE_ADD_LABEL,
       removeLabel: MONSTER_DAMAGE_OVERRIDE_REMOVE_LABEL,
       addDisabled: monsterWeaponDamageOverrideAddDisabled(
         ctx,
@@ -126,6 +142,14 @@ export function monsterWeaponDamageOverrideField(args: {
             },
             state.open,
           ),
+      },
+      sourcePreview: {
+        dependsOn: OVERRIDE_DEPENDS_ON,
+        resolve: (values) =>
+          monsterWeaponDamageOverrideSourcePreview(ctx, {
+            equipmentEntryId: values.equipmentEntryId,
+            equipment: values['../../equipment'],
+          }),
       },
       seedWhen: (values) =>
         monsterWeaponDamageOverrideSeed(ctx, {

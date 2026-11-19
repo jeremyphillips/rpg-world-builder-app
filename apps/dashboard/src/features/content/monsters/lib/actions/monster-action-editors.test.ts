@@ -511,7 +511,8 @@ describe('monster action detail fields', () => {
     expect(weapon).not.toContain('moveSection')
     expect(weapon.indexOf('attackPreview')).toBe(weapon.indexOf('equipmentEntryId') + 1)
     expect(weapon.indexOf('buildAdvisories')).toBe(weapon.indexOf('attackPreview') + 1)
-    expect(weapon.indexOf('damage')).toBe(weapon.indexOf('buildAdvisories') + 1)
+    expect(weapon.indexOf('formAvailability')).toBe(weapon.indexOf('buildAdvisories') + 1)
+    expect(weapon.indexOf('damage')).toBe(weapon.indexOf('formAvailability') + 1)
     expect(weapon.indexOf('onHit.effects')).toBeLessThan(weapon.indexOf('description'))
     expect(weapon.at(-1)).toBe('description')
     const spellNames = detailFields({ id: 'cast', kind: 'spell' })
@@ -555,7 +556,8 @@ describe('monster action detail fields', () => {
 
     const special = detailFields({ id: 'parry', kind: 'special', name: 'Parry' })
     expect(special[0]).toBe('buildAdvisories')
-    expect(special[1]).toBe('description')
+    expect(special[1]).toBe('formAvailability')
+    expect(special[2]).toBe('description')
     expect(special.indexOf('description')).toBeLessThan(special.indexOf('savingThrow.ability'))
     expect(special.indexOf('savingThrow.ability')).toBeLessThan(special.indexOf('limitedUse.kind'))
   })
@@ -569,7 +571,7 @@ describe('monster action detail fields', () => {
       } as MonsterActionDraftRow),
     ).toMatchObject({
       type: 'richtext',
-      optionalDisclosure: { addLabel: 'Add additional details' },
+      optionalDisclosure: { intent: 'add', actionSubject: 'details' },
     })
     expect(descriptionFieldConfig({ id: 'parry', kind: 'special', name: 'Parry' })).toMatchObject({
       type: 'richtext',

@@ -5,9 +5,6 @@ import {
   type ContentTrait,
 } from '@rpg/contracts'
 
-import type { MasterDetailEditorIdentity } from '../../../components/master-detail/master-detail-editor-shell'
-import { MONSTER_USE_DEFAULT_NAME_LABEL } from '../monster-form-labels'
-
 function isRecord(row: unknown): row is Record<string, unknown> {
   return typeof row === 'object' && row !== null
 }
@@ -29,11 +26,11 @@ function storedText(value: unknown): string {
   return typeof value === 'string' ? value.trim() : ''
 }
 
-function traitOrdinalLabel(ordinal: number): string {
+export function traitOrdinalLabel(ordinal: number): string {
   return `Trait ${ordinal}`
 }
 
-function rowId(row: unknown, index: number): string {
+export function rowId(row: unknown, index: number): string {
   if (isRecord(row) && typeof row.id === 'string' && row.id) return row.id
   return `index:${index}`
 }
@@ -69,7 +66,11 @@ export function monsterCustomTraitFallbacks(
   return fallbacks
 }
 
-function templateDerivedName(row: { id?: string; templateId: string; config?: unknown }): string {
+export function templateDerivedName(row: {
+  id?: string
+  templateId: string
+  config?: unknown
+}): string {
   return resolveTraitName({
     kind: 'template',
     id: row.id ?? 'row',
@@ -78,7 +79,19 @@ function templateDerivedName(row: { id?: string; templateId: string; config?: un
   } as ContentTrait)
 }
 
-function monsterTraitResolvedTitle(row: unknown, monsterName: string): string {
+/** Preview base name: resolved trait title, then the editor fallback for an empty custom trait. */
+export function monsterTraitPreviewBaseName(
+  row: unknown,
+  monsterName: string,
+  rows: readonly unknown[],
+): string {
+  const resolved = monsterTraitResolvedTitle(row, monsterName)
+  if (resolved) return resolved
+  if (!isRecord(row) || typeof row.id !== 'string' || !row.id) return ''
+  return monsterCustomTraitFallbacks(rows, monsterName).get(row.id) ?? ''
+}
+
+export function monsterTraitResolvedTitle(row: unknown, monsterName: string): string {
   if (isTemplateRow(row)) {
     const override = storedText(row.nameOverride)
     return override || templateDerivedName(row)
@@ -91,92 +104,4 @@ function monsterTraitResolvedTitle(row: unknown, monsterName: string): string {
     return formatted?.name ?? (typeof row.preset === 'string' ? row.preset : '')
   }
   return storedText(isRecord(row) ? row.name : undefined)
-}
-
-export function monsterTraitListTitle(
-  row: unknown,
-  rows: readonly unknown[],
-  monsterName: string,
-  index: number,
-): string {
-  const resolved = monsterTraitResolvedTitle(row, monsterName)
-  if (resolved) return resolved
-  return (
-    monsterCustomTraitFallbacks(rows, monsterName).get(rowId(row, index)) ??
-    traitOrdinalLabel(index + 1)
-  )
-}
-
-function templateHeaderIdentity(
-  row: { id?: string; templateId: string; config?: unknown; nameOverride?: string },
-  title: string,
-  fieldId: string,
-  identity: MasterDetailEditorIdentity,
-): MasterDetailEditorIdentity {
-  const derived = templateDerivedName(row)
-  const stored = storedText(row.nameOverride)
-  const sourceName = stored && stored !== derived ? derived : undefined
-  return {
-    ...identity,
-    title,
-    rowKey: fieldId,
-    ...(sourceName ? { sourceName } : {}),
-    inlineTitle: {
-      field: 'nameOverride',
-      mode: 'override',
-      fallback: derived || title,
-      placeholder: derived,
-      ...(stored ? { resetLabel: MONSTER_USE_DEFAULT_NAME_LABEL } : {}),
-    },
-  }
-}
-
-function customTraitHeaderIdentity(input: {
-  row: unknown
-  rows: readonly unknown[]
-  monsterName: string
-  index: number
-  fieldId: string
-  lastAddedFieldId: string | null
-  identity: MasterDetailEditorIdentity
-  title: string
-}): MasterDetailEditorIdentity {
-  const cleared = input.rows.map((entry, entryIndex) =>
-    entryIndex === input.index && isRecord(entry) ? { ...entry, name: '' } : entry,
-  )
-  const fallback =
-    monsterCustomTraitFallbacks(cleared, input.monsterName).get(rowId(input.row, input.index)) ??
-    traitOrdinalLabel(input.index + 1)
-  const stored = storedText(isRecord(input.row) ? input.row.name : undefined)
-  return {
-    ...input.identity,
-    title: input.title,
-    rowKey: input.fieldId,
-    inlineTitle: {
-      field: 'name',
-      mode: 'authored',
-      fallback,
-      placeholder: fallback,
-      initialEdit: input.lastAddedFieldId === input.fieldId && !stored,
-    },
-  }
-}
-
-export function resolveMonsterTraitHeaderIdentity(input: {
-  row: unknown
-  rows: readonly unknown[]
-  monsterName: string
-  index: number
-  fieldId: string
-  lastAddedFieldId: string | null
-  identity: MasterDetailEditorIdentity
-}): MasterDetailEditorIdentity {
-  const title = monsterTraitListTitle(input.row, input.rows, input.monsterName, input.index)
-  if (isPresetRow(input.row)) {
-    return { ...input.identity, title, rowKey: input.fieldId }
-  }
-  if (isTemplateRow(input.row)) {
-    return templateHeaderIdentity(input.row, title, input.fieldId, input.identity)
-  }
-  return customTraitHeaderIdentity({ ...input, title })
 }

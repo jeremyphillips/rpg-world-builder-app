@@ -15,11 +15,11 @@ import { isLegendDisclosure, resolveDisclosureDefaultOpen } from './field-group-
 import { FieldGroupLegend } from './field-group-legend.client'
 import {
   fieldAnatomyStackVariants,
-  fieldGroupBottomMarginClasses,
   fieldGroupLegendDisclosureContentVariants,
   fieldSetResetClasses,
   fieldStackRhythmVariants,
   resolveFieldGroupBodyGap,
+  resolveFieldScaleLegendBodyMargin,
   type FieldGroupLegendSize,
   type FieldRhythm,
   type FormHeadingScale,
@@ -55,12 +55,12 @@ function useGroupCollapseState(options: {
 
 function wrapFieldGroupBody(
   body: React.ReactNode,
-  bodyGapClass: string | undefined,
+  bodyRelationshipClass: string | undefined,
 ): React.ReactNode {
-  if (!bodyGapClass) {
+  if (!bodyRelationshipClass) {
     return body
   }
-  return <div className={bodyGapClass}>{body}</div>
+  return <div className={bodyRelationshipClass}>{body}</div>
 }
 
 export type StandardFieldGroupBodyProps = {
@@ -112,16 +112,24 @@ export function StandardFieldGroupBody({
   })
 
   const hasBody = React.Children.count(children) > 0
+  const generatedHintId = React.useId()
+  const hintId = hint ? (id ? `${id}-hint` : generatedHintId) : undefined
   const bodyVisible = hasBody && (!collapsible || open)
   const useLeafAnatomyStack = headingScale === 'field' && Boolean(legend) && !legendSrOnly
   const bodyGapClass =
     legend && bodyVisible && !legendSrOnly && headingScale !== 'field'
       ? resolveFieldGroupBodyGap({ size: legendSize, rhythm })
       : undefined
+  const fieldScaleBodyMargin =
+    headingScale === 'field' && Boolean(legend) && !legendSrOnly && bodyVisible
+      ? resolveFieldScaleLegendBodyMargin(fieldSize)
+      : undefined
+  const bodyMarginClass = fieldScaleBodyMargin && !hint ? fieldScaleBodyMargin : undefined
+  const hintMarginClass = fieldScaleBodyMargin && hint ? fieldScaleBodyMargin : undefined
+  const bodyRelationshipClass = cn(bodyGapClass, bodyMarginClass)
 
   const fieldsetClassName = cn(
     fieldSetResetClasses,
-    fieldGroupBottomMarginClasses,
     'min-w-0',
     chromeClasses.fieldset,
     useLeafAnatomyStack && fieldAnatomyStackVariants({ size: fieldSize }),
@@ -135,20 +143,22 @@ export function StandardFieldGroupBody({
   // Keep one wrapper element across open and closed. Adding the gap div only
   // while open remounts the body, and `shouldUnregister` then clears values.
   const bodyWithGap = collapsible ? (
-    <div className={bodyGapClass}>{body}</div>
+    <div className={bodyRelationshipClass}>{body}</div>
   ) : (
-    wrapFieldGroupBody(body, bodyGapClass)
+    wrapFieldGroupBody(body, bodyRelationshipClass)
   )
 
   const Wrapper = legend ? 'fieldset' : 'div'
+  const groupDescribedBy = hint && hintId ? hintId : undefined
 
   return (
-    <Wrapper id={id} className={fieldsetClassName}>
+    <Wrapper id={id} className={fieldsetClassName} aria-describedby={groupDescribedBy}>
       {legend ? (
         <FieldGroupLegend
           legend={legend}
           legendSrOnly={legendSrOnly}
           hint={hint}
+          hintId={hintId}
           legendAccessory={legendAccessory}
           legendAction={legendAction}
           legendSize={legendSize}
@@ -156,6 +166,7 @@ export function StandardFieldGroupBody({
           headingScale={headingScale}
           rhythm={rhythm}
           legendChromeClassName={chromeClasses.legend}
+          hintMarginClass={hintMarginClass}
           collapsible={collapsible}
           open={open}
           onToggle={() => onOpenChange(!open)}

@@ -8,6 +8,10 @@ import { useFieldRowParticipation } from '../../../../components/ui/field-row-an
 import { useFieldControlSize } from '../../../context/form-section.context'
 import type { JoinedPairFieldConfig, OptionalDisclosureConfig } from '../../../field-config'
 import { useDependsOnValues } from '../../../config/form-depends-on.client'
+import {
+  optionalDisclosureLeafActions,
+  optionalDisclosureShellProps,
+} from '../../../config/optional-disclosure-actions.lib'
 import { optionalDisclosureLeafFieldConfig } from '../../../config/optional-disclosure-config.lib'
 import { useConfirmBeforeClear } from '../../../config/use-confirm-before-clear.client'
 import { JoinedPairFieldRenderer } from './joined-pair-field-renderer.client'
@@ -76,12 +80,14 @@ export function OptionalDisclosureJoinedPairFieldRenderer({
       <OptionalFieldDisclosure
         controlId={id}
         fieldLabel={config.label}
-        addLabel={disclosure.addLabel}
-        removeLabel={disclosure.removeLabel}
+        {...optionalDisclosureShellProps(
+          optionalDisclosureLeafActions({ label: config.label, optionalDisclosure: disclosure }),
+        )}
         open={open}
         onOpenChange={handleOpenChange}
         onRemove={attemptClear}
         size={controlSize}
+        labeled={disclosure.labeled}
         addDisabled={addDisabled}
         summary={collapsedSummary}
         message={rowMessage}

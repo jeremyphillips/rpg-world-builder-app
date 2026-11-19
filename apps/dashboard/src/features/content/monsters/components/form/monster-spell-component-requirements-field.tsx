@@ -5,14 +5,18 @@ import {
   SPELL_COMPONENT_IDS,
 } from '@rpg/contracts'
 import { CheckboxField, OptionalFieldDisclosure, Text } from '@rpg/ui'
-import { useFieldControlSize } from '@rpg/ui/form'
+import {
+  optionalDisclosureShellProps,
+  resolveOptionalDisclosureActions,
+  useFieldControlSize,
+} from '@rpg/ui/form'
 import { useId, useState } from 'react'
 import { useController, useFormContext, useWatch } from 'react-hook-form'
 
 import {
-  MONSTER_SPELL_COMPONENT_OMISSION_ADD_LABEL,
   MONSTER_SPELL_COMPONENT_OMISSION_HINT,
   MONSTER_SPELL_COMPONENT_OMISSION_LABEL,
+  MONSTER_SPELL_COMPONENT_OMISSION_REMOVE_LABEL,
 } from '../../lib/monster-form-labels'
 
 function readOmitted(value: unknown): SpellComponentId[] {
@@ -34,6 +38,12 @@ export function MonsterSpellComponentRequirementsField({ name }: { name: string 
   const [manualOpen, setManualOpen] = useState(false)
   const populated = omitted.length > 0
   const open = manualOpen || populated
+  const actions = resolveOptionalDisclosureActions({
+    intent: 'add',
+    subject: MONSTER_SPELL_COMPONENT_OMISSION_LABEL,
+    addLabel: MONSTER_SPELL_COMPONENT_OMISSION_LABEL,
+    removeLabel: MONSTER_SPELL_COMPONENT_OMISSION_REMOVE_LABEL,
+  })
 
   const writeOmitted = (next: SpellComponentId[] | undefined) => {
     const normalized = next?.length ? normalizeOmittedSpellComponents(next) : undefined
@@ -52,7 +62,7 @@ export function MonsterSpellComponentRequirementsField({ name }: { name: string 
     <OptionalFieldDisclosure
       controlId={disclosureId}
       fieldLabel={MONSTER_SPELL_COMPONENT_OMISSION_LABEL}
-      addLabel={MONSTER_SPELL_COMPONENT_OMISSION_ADD_LABEL}
+      {...optionalDisclosureShellProps(actions)}
       open={open}
       onOpenChange={setManualOpen}
       onRemove={() => {

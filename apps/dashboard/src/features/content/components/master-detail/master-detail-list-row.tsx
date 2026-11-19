@@ -4,19 +4,30 @@ import {
   InteractiveListRow,
   ValidationIssueCountBadge,
   cn,
+  dragHandleVariants,
   interactiveFocusVariants,
 } from '@rpg/ui'
+import type { DraggableAttributes } from '@dnd-kit/core'
+import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities'
 import type { RefObject } from 'react'
 
 import { joinMasterDetailCaption } from '../../lib/master-detail/master-detail-item-meta'
 import { masterDetailRowValidationStateLabel } from '../../lib/master-detail/master-detail-row-validation'
 import type { MasterDetailListItem } from './master-detail-list-panel'
 
+export type MasterDetailListRowDragHandleProps = {
+  attributes: DraggableAttributes
+  listeners: SyntheticListenerMap | undefined
+  isDragging: boolean
+  title: string
+}
+
 export type MasterDetailListRowProps = {
   item: MasterDetailListItem
   isSelected: boolean
   onSelect: (id: string) => void
   selectedRowRef?: RefObject<HTMLButtonElement | null>
+  dragHandleProps?: MasterDetailListRowDragHandleProps
 }
 
 function MasterDetailListRowContent({
@@ -52,13 +63,31 @@ export function MasterDetailListRow({
   isSelected,
   onSelect,
   selectedRowRef,
+  dragHandleProps,
 }: MasterDetailListRowProps) {
   const issueCount = item.issueCount ?? 0
+
+  const startSlot = dragHandleProps ? (
+    <button
+      type="button"
+      className={dragHandleVariants({
+        visibility: 'always',
+        dragging: dragHandleProps.isDragging,
+      })}
+      aria-label={`Drag to reorder ${dragHandleProps.title}`}
+      {...dragHandleProps.attributes}
+      {...dragHandleProps.listeners}
+      onClick={(event) => event.stopPropagation()}
+    >
+      <Icon name="grip-vertical" size="md" />
+    </button>
+  ) : undefined
 
   return (
     <li>
       <InteractiveListRow
         selected={isSelected}
+        startSlot={startSlot}
         content={<MasterDetailListRowContent item={item} issueCount={issueCount} />}
         endSlot={
           <span aria-hidden className="text-foreground">

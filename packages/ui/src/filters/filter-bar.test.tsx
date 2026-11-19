@@ -274,7 +274,8 @@ describe('FilterBar', () => {
     const checkboxShell = checkbox.closest('[data-field-align]')
 
     expect(combobox).toHaveClass('ui-field-control')
-    expect(checkboxShell).toHaveClass('ui-boolean-field')
+    expect(checkboxShell).toHaveClass('ui-checkbox-option')
+    expect(checkboxShell).toHaveAttribute('data-shell', 'outlined')
     expect(checkboxShell).not.toHaveClass('ui-field-control')
   })
 

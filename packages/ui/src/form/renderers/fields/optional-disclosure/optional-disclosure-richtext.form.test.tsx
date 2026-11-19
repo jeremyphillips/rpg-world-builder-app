@@ -16,7 +16,7 @@ const descriptionField = {
   name: 'description',
   label: 'Custom description',
   hint: 'Optional text shown with this action.',
-  optionalDisclosure: { addLabel: 'Add custom description', removeLabel: 'Remove' },
+  optionalDisclosure: { intent: 'add', addLabel: 'Add custom description', removeLabel: 'Remove' },
 } as const satisfies FormItem
 
 function ResetButton() {
@@ -74,7 +74,7 @@ describe('FormItems richtext optionalDisclosure', () => {
     renderDescription('<p>Venom</p>')
     await screen.findByRole('textbox', { name: 'Custom description' })
 
-    await user.click(screen.getByRole('button', { name: 'Remove Custom description' }))
+    await user.click(screen.getByRole('button', { name: 'Remove' }))
     expect(screen.getByRole('button', { name: 'Add custom description' })).toBeInTheDocument()
     expect(screen.queryByRole('textbox', { name: 'Custom description' })).not.toBeInTheDocument()
   })

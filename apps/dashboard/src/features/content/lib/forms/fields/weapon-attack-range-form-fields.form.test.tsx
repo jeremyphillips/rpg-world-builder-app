@@ -20,6 +20,7 @@ import { z } from 'zod'
 import {
   ATTACK_RANGE_LONG_FIELD_LABEL,
   ATTACK_RANGE_NORMAL_FIELD_LABEL,
+  applyAttackRangeClusterWidths,
   attackRangeJoinedPairFields,
   weaponAttackRangeGroup,
 } from './weapon-attack-range-form-fields'
@@ -110,7 +111,7 @@ function monsterDistanceFields(): FormItem {
             render: () => (
               <AnatomyFieldRowCluster
                 idPrefix="monster-distance"
-                fields={rangeFields.map((field) => ({ ...field, width: '1/2' as const }))}
+                fields={applyAttackRangeClusterWidths(rangeFields)}
                 gap="compact"
               />
             ),
@@ -242,7 +243,7 @@ describe('weaponAttackRangeGroup form', () => {
         onSubmit={vi.fn()}
       />,
     )
-    await user.click(screen.getByRole('button', { name: 'Remove Long' }))
+    await user.click(screen.getByRole('button', { name: 'Remove long range' }))
     await waitFor(() => {
       expect(screen.queryByRole('combobox', { name: 'Long value' })).not.toBeInTheDocument()
     })
@@ -285,7 +286,7 @@ describe('monster distance inline range form', () => {
     const hint = within(participant as HTMLElement).getByText(hintText)
     expect(hint.closest('[data-field-message-region]')).not.toBeNull()
     expect(hint.closest('[data-field-control-region]')).toBeNull()
-    expect(screen.getByRole('button', { name: 'Remove Long range' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Remove long range' })).toBeInTheDocument()
     expect(container.querySelector('[data-field-row-anatomy]')).toBeTruthy()
   })
 

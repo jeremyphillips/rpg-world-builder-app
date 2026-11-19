@@ -46,6 +46,7 @@ function NumberStepperValueSlot({
   inputId,
   ariaDescribedBy,
   ariaLabel,
+  namedByLabel,
   ariaValueText,
   autoFocus,
   onBlur,
@@ -69,6 +70,7 @@ function NumberStepperValueSlot({
     step?: number | string
   }
   ariaLabel: string
+  namedByLabel?: boolean
   ariaValueText?: string
   autoFocus?: boolean
   onBlur?: React.FocusEventHandler<HTMLInputElement>
@@ -79,7 +81,7 @@ function NumberStepperValueSlot({
     ref: inputRef,
     id: inputId,
     inputMode: 'numeric' as const,
-    'aria-label': ariaLabel,
+    ...(namedByLabel ? {} : { 'aria-label': ariaLabel }),
     'aria-describedby': ariaDescribedBy,
     ...(ariaValueText ? { 'aria-valuetext': ariaValueText } : {}),
     disabled: stepperLocked,
@@ -154,6 +156,7 @@ function NumberStepperControl({
   className,
   ariaLabel,
   inputId,
+  namedByLabel,
   ariaDescribedBy,
   autoFocus,
   onBlur,
@@ -175,6 +178,7 @@ function NumberStepperControl({
   className?: string
   ariaLabel: string
   inputId?: string
+  namedByLabel?: boolean
   ariaDescribedBy?: string
   autoFocus?: boolean
   onBlur?: React.FocusEventHandler<HTMLInputElement>
@@ -228,6 +232,7 @@ function NumberStepperControl({
         inputRef={interaction.inputRef}
         fieldBinding={interaction.fieldBinding}
         inputId={inputId}
+        namedByLabel={namedByLabel}
         ariaDescribedBy={ariaDescribedBy}
         ariaLabel={ariaLabel}
         ariaValueText={interaction.valueSlotAriaValueText}
@@ -274,7 +279,10 @@ export interface NumberStepperProps extends NumberStepperVariantProps {
   label?: string
   id?: string
   className?: string
-  'aria-label': string
+  /** Step button naming and standalone input naming when no associated label is present. */
+  'aria-label'?: string
+  /** When set, names increment/decrement controls — use with {@link FormField} labelling. */
+  stepperLabel?: string
   'aria-describedby'?: string
   'aria-invalid'?: React.AriaAttributes['aria-invalid']
   autoFocus?: boolean
@@ -299,12 +307,44 @@ export function NumberStepper({
   id,
   className,
   'aria-label': ariaLabel,
+  stepperLabel,
   'aria-describedby': ariaDescribedBy,
   'aria-invalid': ariaInvalid,
   autoFocus,
   onBlur,
 }: NumberStepperProps) {
-  const control = (
+  const stepLabel = stepperLabel ?? label ?? ariaLabel ?? ''
+  const namedByLabel = stepperLabel != null
+
+  if (label && id) {
+    return (
+      <FormField id={id} label={label} width="auto">
+        <NumberStepper
+          value={value}
+          unbound={unbound}
+          emptySeed={emptySeed}
+          onChange={onChange}
+          min={min}
+          max={max}
+          step={step}
+          digits={digits}
+          size={size}
+          bordered={bordered}
+          disabled={disabled}
+          minAction={minAction}
+          signDisplay={signDisplay}
+          className={className}
+          stepperLabel={label}
+          aria-describedby={ariaDescribedBy}
+          aria-invalid={ariaInvalid}
+          autoFocus={autoFocus}
+          onBlur={onBlur}
+        />
+      </FormField>
+    )
+  }
+
+  return (
     <NumberStepperControl
       value={value}
       unbound={unbound}
@@ -320,24 +360,15 @@ export function NumberStepper({
       minAction={minAction}
       signDisplay={signDisplay}
       className={className}
-      ariaLabel={label ?? ariaLabel}
-      inputId={label ? undefined : id}
+      ariaLabel={stepLabel}
+      inputId={id}
+      namedByLabel={namedByLabel}
       ariaDescribedBy={ariaDescribedBy}
       ariaInvalid={ariaInvalid}
       autoFocus={autoFocus}
       onBlur={onBlur}
     />
   )
-
-  if (label && id) {
-    return (
-      <FormField id={id} label={label} width="auto">
-        {control}
-      </FormField>
-    )
-  }
-
-  return control
 }
 
 export type { NumberStepperDigits }

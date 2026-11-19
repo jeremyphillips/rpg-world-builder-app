@@ -59,7 +59,7 @@ function JoinedPairRoot({
   return (
     <div
       role="group"
-      aria-label={ariaLabel}
+      aria-label={ariaLabelledBy ? undefined : ariaLabel}
       aria-labelledby={ariaLabelledBy}
       className={cn(joinedPairGroupVariants({ size, layout, invalid, disabled }), className)}
     >

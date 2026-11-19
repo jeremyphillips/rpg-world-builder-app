@@ -59,6 +59,7 @@ function toHomebrewMonster(doc: HomebrewDoc): Monster {
     ...(record.legendaryActions !== undefined && {
       legendaryActions: record.legendaryActions as Monster['legendaryActions'],
     }),
+    ...(record.forms !== undefined && { forms: record.forms as Monster['forms'] }),
   } as Monster
 }
 

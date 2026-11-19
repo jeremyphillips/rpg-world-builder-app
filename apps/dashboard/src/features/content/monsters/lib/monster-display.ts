@@ -37,13 +37,22 @@ import {
   formatMonsterParryTrigger,
   formatMonsterTakeActions,
   formatMonsterTeleport,
-  formatLegendaryActionUsesIntro,
+  analyzeCreatureFormDifferences,
+  formatFormSpeechQualifier,
+  formatMonsterForms,
+  formatMonsterQualifiedHeading,
+  resolveMonsterEntryHeading,
+  formatMonsterShapeShift,
+  formatMonsterSpeedStatRow,
+  monsterHasFormRestrictions,
+  resolveFormDifferencesPresentation,
+  shapeShiftRows,
   monsterActionSectionRows,
+  formatLegendaryActionUsesIntro,
   formatOnceUntilNextTurnSentence,
   resolveCreatureSenses,
   resolveCreatureTraitGrants,
   resolveTraitDisplay,
-  formatMonsterLimitedUseHeading,
   formatMonsterSaveAction,
   formatMonsterSpellEntry,
   formatMonsterStatBlockSubject,
@@ -201,8 +210,22 @@ function formatHpStatRow(derived: DerivedMonsterStatBlock): ContentStatRowData {
 }
 
 function formatSpeedStatRow(monster: Monster): ContentStatRowData {
-  const movement = formatMovementDisplay(monster.movement, 'ft.')
-  const value = movement && monster.hover ? `${movement} (hover)` : movement
+  const hasShapeShift = shapeShiftRows(monster).length > 0
+  const value =
+    (monster.forms
+      ? formatMonsterSpeedStatRow({
+          sizes: monster.sizes,
+          movement: monster.movement,
+          hover: monster.hover,
+          forms: monster.forms,
+          monsterName: monster.name,
+          hasShapeShift,
+        })
+      : undefined) ??
+    (() => {
+      const movement = formatMovementDisplay(monster.movement, 'ft.')
+      return movement && monster.hover ? `${movement} (hover)` : movement
+    })()
   return {
     id: 'speed',
     label: 'Speed',
@@ -243,9 +266,31 @@ function findAttackLine(
   return derived?.attacks.find((line) => line.section === section && line.id === actionId)
 }
 
-function withLimitedUseHeading(name: string, limitedUse: unknown): string {
-  const parsed = limitedUseSchema.safeParse(limitedUse)
-  return parsed.success ? formatMonsterLimitedUseHeading(name, parsed.data) : name
+function headingSource(row: unknown): {
+  limitedUse: unknown
+  onlyInFormIds: readonly string[] | undefined
+} {
+  if (!row || typeof row !== 'object') return { limitedUse: undefined, onlyInFormIds: undefined }
+  const source = row as { limitedUse?: unknown; onlyInFormIds?: unknown }
+  const ids = Array.isArray(source.onlyInFormIds)
+    ? source.onlyInFormIds.filter((id): id is string => typeof id === 'string')
+    : undefined
+  return { limitedUse: source.limitedUse, onlyInFormIds: ids }
+}
+
+function withQualifiedHeading(monster: Monster, name: string, row: unknown): string {
+  const source = headingSource(row)
+  const parsed = limitedUseSchema.safeParse(source.limitedUse)
+  const heading = resolveMonsterEntryHeading({
+    name,
+    onlyInFormIds: source.onlyInFormIds,
+    forms: monster.forms,
+    creatureName: monster.name,
+  })
+  return formatMonsterQualifiedHeading(heading.name, {
+    limitedUse: parsed.success ? parsed.data : undefined,
+    formQualifier: heading.formQualifier,
+  })
 }
 
 function actionDisplayIdentity(
@@ -464,6 +509,27 @@ function mapSaveActionItem(
       ? `<p>${withTurnLimit(body, action, spells.monsterName, false)}</p>`
       : withTurnLimit(action.description, action, spells.monsterName, true),
   }
+}
+
+function formsTrait(monster: Monster): MonsterTraitItemViewModel[] {
+  if (!monster.forms || monster.forms.definedForms.length === 0) return []
+  if (shapeShiftRows(monster).length > 0) return []
+  const text = formatMonsterForms({
+    monsterName: monster.name,
+    baseSizes: monster.sizes,
+    baseMovement: monster.movement,
+    baseHover: monster.hover,
+    forms: monster.forms,
+    hasFormRestrictions: monsterHasFormRestrictions(monster),
+  })
+  if (!text) return []
+  return [
+    {
+      id: 'forms',
+      name: 'Forms',
+      descriptionHtml: `<p>${escapeStatBlockText(text)}</p>`,
+    },
+  ]
 }
 
 function escapeStatBlockText(value: string): string {
@@ -693,6 +759,54 @@ function mapAttackActionItem(
   }
 }
 
+function mapShapeShiftActionItem(
+  action: Extract<
+    MonsterAction | MonsterBonusAction | MonsterReaction | MonsterLegendaryAction,
+    { kind: 'shape-shift' }
+  >,
+  name: string,
+  spells: SpellDisplayContext,
+): MonsterActionItemViewModel {
+  const generated = spells.monster.forms
+    ? formatMonsterShapeShift({
+        monsterName: spells.monsterName,
+        baseSizes: spells.monster.sizes,
+        baseMovement: spells.monster.movement,
+        baseHover: spells.monster.hover,
+        forms: spells.monster.forms,
+        equipment: action.equipment,
+        prerequisite: action.prerequisite,
+        hasShapeShift: true,
+        hasFormRestrictions: monsterHasFormRestrictions(spells.monster),
+      })
+    : ''
+  const description = [generated, action.description].filter(Boolean).join(' ')
+  return { id: action.id, name, descriptionHtml: `<p>${escapeStatBlockText(description)}</p>` }
+}
+
+function mapStructuredActionItem(
+  action: MonsterAction | MonsterBonusAction | MonsterReaction | MonsterLegendaryAction,
+  name: string,
+  identityName: string,
+  derived: DerivedMonsterStatBlock | null | undefined,
+  catalogState: MonsterCatalogLoadState,
+  spells: SpellDisplayContext,
+): MonsterActionItemViewModel | undefined {
+  if (action.kind === 'shape-shift') return mapShapeShiftActionItem(action, name, spells)
+  if (action.kind === 'special') return mapSpecialActionItem(action, name, derived, spells)
+  if (action.kind === 'save') {
+    return mapSaveActionItem(action, name, derived, catalogState, spells, identityName)
+  }
+  if (action.kind === 'action-reference') return mapActionReferenceItem(action, name, spells)
+  if (isGeneratedBonusAction(action))
+    return mapGeneratedBonusAction(action, name, spells.monsterName)
+  if (action.kind === 'parry') return mapParryActionItem(action, name, spells)
+  if (action.kind === 'multiattack') {
+    return mapMultiattackActionItem(action, name, derived, catalogState, spells)
+  }
+  return undefined
+}
+
 function mapActionItemBody(
   action: MonsterAction | MonsterBonusAction | MonsterReaction | MonsterLegendaryAction,
   section: DerivedMonsterAttackLine['section'],
@@ -705,17 +819,15 @@ function mapActionItemBody(
   if (action.kind === 'spell') {
     return mapSpellActionItem(action, section, derived, spells, identityName)
   }
-  if (action.kind === 'special') return mapSpecialActionItem(action, name, derived, spells)
-  if (action.kind === 'save') {
-    return mapSaveActionItem(action, name, derived, catalogState, spells, identityName)
-  }
-  if (action.kind === 'action-reference') return mapActionReferenceItem(action, name, spells)
-  if (isGeneratedBonusAction(action))
-    return mapGeneratedBonusAction(action, name, spells.monsterName)
-  if (action.kind === 'parry') return mapParryActionItem(action, name, spells)
-  if (action.kind === 'multiattack') {
-    return mapMultiattackActionItem(action, name, derived, catalogState, spells)
-  }
+  const structured = mapStructuredActionItem(
+    action,
+    name,
+    identityName,
+    derived,
+    catalogState,
+    spells,
+  )
+  if (structured) return structured
   return mapAttackActionItem(action, section, name, derived, catalogState, spells)
 }
 
@@ -738,10 +850,7 @@ function mapActionItem(
     action.kind === 'action-reference'
       ? (referenceHeadings.get(action.id) ?? identity.displayName)
       : identity.displayName
-  const name = withLimitedUseHeading(
-    heading,
-    'limitedUse' in action ? action.limitedUse : undefined,
-  )
+  const name = withQualifiedHeading(spells.monster, heading, action)
   return mapActionItemBody(
     action,
     section,
@@ -831,11 +940,26 @@ function formatSenseLines(monster: Monster, passivePerception?: number): string 
 }
 
 function formatLanguageLines(monster: Monster): string | undefined {
+  const hasShapeShift = shapeShiftRows(monster).length > 0
+  const speechQualifier = (() => {
+    if (!monster.forms) return undefined
+    const presentation = resolveFormDifferencesPresentation(monster.forms, hasShapeShift)
+    if (presentation !== 'stat-rows') return undefined
+    const analysis = analyzeCreatureFormDifferences({
+      sizes: monster.sizes,
+      movement: monster.movement,
+      hover: monster.hover,
+      forms: monster.forms,
+      monsterName: monster.name,
+    })
+    return analysis?.speechDiffers ? formatFormSpeechQualifier(analysis.silentFormNames) : undefined
+  })()
   return formatCreatureCommunication(
     {
       languages: monster.proficiencies.languages,
       telepathy: monster.communication.telepathy,
       additionalLanguageCount: monster.proficiencies.additionalLanguageCount,
+      speechQualifier,
     },
     { formatLanguageLabel: getLanguageLabel },
   )
@@ -1032,11 +1156,15 @@ function mapMonsterTrait(
   derived: DerivedMonsterStatBlock | null | undefined,
 ): MonsterTraitItemViewModel {
   const record = traitRecord(trait)
-  return (
+  const mapped =
     mapPresetMonsterTrait(trait, record, monster.name) ??
     mapTemplateMonsterTrait(trait, record, monster.name) ??
     mapNamedMonsterTrait(trait, record, monster, derived)
-  )
+  const ids = 'onlyInFormIds' in trait ? trait.onlyInFormIds : undefined
+  return {
+    ...mapped,
+    name: withQualifiedHeading(monster, mapped.name, { onlyInFormIds: ids }),
+  }
 }
 
 function formatLegendaryActionsIntro(monster: Monster): string | undefined {
@@ -1117,12 +1245,15 @@ export function buildMonsterDetailViewModel({
     statRows,
     abilities,
     detailsLeaves: buildDetailsLeaves(monster, derived, equipmentById, catalogState),
-    traits: monster.traits
-      .filter((trait) => {
-        const available = (trait as { available?: boolean }).available
-        return available !== false
-      })
-      .map((trait) => mapMonsterTrait(trait, monster, derived)),
+    traits: [
+      ...monster.traits
+        .filter((trait) => {
+          const available = (trait as { available?: boolean }).available
+          return available !== false
+        })
+        .map((trait) => mapMonsterTrait(trait, monster, derived)),
+      ...formsTrait(monster),
+    ],
     actions: mapActionItems(
       availableBodyRows(monster.actions),
       'actions',

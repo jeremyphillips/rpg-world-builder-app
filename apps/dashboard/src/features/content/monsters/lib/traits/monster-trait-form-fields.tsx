@@ -4,22 +4,29 @@ import {
   savingThrowFieldGroup,
 } from '../../../lib/forms/mechanics/saving-throw-field-group'
 import { MonsterActionCastingAbilityField } from '../actions/spell/monster-action-casting-fields'
-import { RulesPreview } from '@rpg/ui'
+import { AdvisoryAlert, RulesPreview } from '@rpg/ui'
 import type { FieldVisibility, FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
+import { useMasterDetailRowPrefix } from '../../../lib/master-detail/use-master-detail-row-prefix'
+import { useMonsterTraitPreviewTitle } from '../monster-qualified-preview-title'
+import {
+  advisoriesForRowPath,
+  monsterFormAdvisoryTone,
+} from '../monster-form-advisory-presentation'
 import { defineMasterDetailItemNoun } from '../../../lib/master-detail/master-detail-item-noun'
+import { insertMonsterFormAvailabilityField } from '../forms/monster-form-availability-fields'
 import { WaterBreathingToggle } from '../../components/form/water-breathing-toggle'
 import { formatMonsterTemplateSentence } from '../format-monster-template-sentence'
 import type { MonsterFormAdvisory } from '../monster-form-advisories'
-import { monsterFormAdvisorySlot } from '../monster-form-advisory-presentation'
 import {
-  MONSTER_CUSTOM_DESCRIPTION_ADD_LABEL,
   MONSTER_CUSTOM_DESCRIPTION_HINT,
   MONSTER_CUSTOM_DESCRIPTION_LABEL,
   MONSTER_RULES_TEXT_LABEL,
   MONSTER_TRAIT_PREVIEW_LABEL,
 } from '../monster-form-labels'
+import { useWatch } from 'react-hook-form'
+
 import {
   monsterTraitPresetFields,
   waterBreathingDurationEnabled,
@@ -39,11 +46,10 @@ export const MONSTER_TRAIT_ITEM_NOUN = defineMasterDetailItemNoun({
 })
 
 export function monsterTraitItemFields(input?: {
-  rowPath?: string
   sharedCastingOptions?: { value: string; label: string }[]
 }): FormItem[] {
-  const rowPath = input?.rowPath
-  const castingName = `${rowPath ? `${rowPath}.` : ''}savingThrow.dcSource.castingAbility`
+  const castingName = 'savingThrow.dcSource.castingAbility'
+  void input?.sharedCastingOptions
   return [
     {
       type: 'richtext',
@@ -87,7 +93,7 @@ export function monsterTraitTemplateFields(): FormItem[] {
       name: 'descriptionOverride',
       label: MONSTER_CUSTOM_DESCRIPTION_LABEL,
       hint: MONSTER_CUSTOM_DESCRIPTION_HINT,
-      optionalDisclosure: { addLabel: MONSTER_CUSTOM_DESCRIPTION_ADD_LABEL },
+      optionalDisclosure: { intent: 'add', actionSubject: 'details' },
     },
   ]
 }
@@ -111,19 +117,29 @@ function isTemplateRow(row: unknown): row is { templateId: string; config?: unkn
   )
 }
 
+function MonsterTraitRulesPreview({ text }: { text: string }) {
+  const rowPrefix = useMasterDetailRowPrefix()
+  const row = useWatch({ name: rowPrefix as never })
+  const title = useMonsterTraitPreviewTitle(row)
+  return (
+    <RulesPreview
+      label={MONSTER_TRAIT_PREVIEW_LABEL}
+      title={title}
+      content={{ kind: 'prose', text }}
+    />
+  )
+}
+
 function traitPreviewSlot(text: string): FormItem {
   return {
     kind: 'slot',
     name: 'traitPreview',
-    render: () => (
-      <RulesPreview label={MONSTER_TRAIT_PREVIEW_LABEL} content={{ kind: 'prose', text }} />
-    ),
+    render: () => <MonsterTraitRulesPreview text={text} />,
   }
 }
 
 function presetParameterFields(
   row: { preset: string } & Record<string, unknown>,
-  rowPath: string,
   ctx: Pick<ContentFormCtx, 'damageTypeVocabulary'>,
 ): FormItem[] {
   if (row.preset !== 'water-breathing') return monsterTraitPresetFields(row.preset, ctx)
@@ -131,7 +147,7 @@ function presetParameterFields(
     {
       kind: 'slot',
       name: 'outsideWaterBreathToggle',
-      render: () => <WaterBreathingToggle namePrefix={rowPath} />,
+      render: () => <WaterBreathingToggle />,
     },
     ...(waterBreathingDurationEnabled(row) ? monsterTraitPresetFields(row.preset, ctx) : []),
   ]
@@ -141,15 +157,37 @@ function presetParameterFields(
  * Trait detail order: preview, advisory, mechanics, then supplemental prose.
  * Custom description is primary content and stays immediately after the advisory.
  */
+function traitRowAdvisorySlot(advisories: readonly MonsterFormAdvisory[]): FormItem {
+  return {
+    kind: 'slot',
+    name: 'buildAdvisories',
+    render: function TraitRowAdvisorySlot() {
+      const rowPath = useMasterDetailRowPrefix()
+      const matches = advisoriesForRowPath(advisories, rowPath)
+      if (matches.length === 0) return null
+      return (
+        <div className="flex flex-col gap-2">
+          {matches.map((advisory) => (
+            <AdvisoryAlert
+              key={advisory.code}
+              tone={monsterFormAdvisoryTone(advisory.code)}
+              message={advisory.message}
+            />
+          ))}
+        </div>
+      )
+    },
+  }
+}
+
 export function monsterTraitDetailFields(input: {
   row: unknown
-  rowPath: string
   advisories: readonly MonsterFormAdvisory[]
   monsterName: string
   ctx: Pick<ContentFormCtx, 'damageTypeVocabulary'>
   sharedCastingOptions?: { value: string; label: string }[]
 }): FormItem[] {
-  const advisorySlot = monsterFormAdvisorySlot(input.advisories, input.rowPath)
+  const advisorySlot = traitRowAdvisorySlot(input.advisories)
   if (isTemplateRow(input.row)) {
     const sentence =
       formatMonsterTemplateSentence({
@@ -158,19 +196,22 @@ export function monsterTraitDetailFields(input: {
         monsterName: input.monsterName,
       }) ?? ''
     const preview = sentence ? [traitPreviewSlot(sentence)] : []
-    return [...preview, advisorySlot, ...monsterTraitTemplateFields()]
+    return insertMonsterFormAvailabilityField([
+      ...preview,
+      advisorySlot,
+      ...monsterTraitTemplateFields(),
+    ])
   }
   if (!isPresetRow(input.row)) {
-    return [
+    return insertMonsterFormAvailabilityField([
       advisorySlot,
       ...monsterTraitItemFields({
-        rowPath: input.rowPath,
         sharedCastingOptions: input.sharedCastingOptions,
       }),
-    ]
+    ])
   }
   const subject = formatMonsterStatBlockSubject(input.monsterName)
   const formatted = formatCreatureTrait({ subject, trait: input.row })
   const preview = formatted ? [traitPreviewSlot(formatted.sentence)] : []
-  return [...preview, advisorySlot, ...presetParameterFields(input.row, input.rowPath, input.ctx)]
+  return [...preview, advisorySlot, ...presetParameterFields(input.row, input.ctx)]
 }

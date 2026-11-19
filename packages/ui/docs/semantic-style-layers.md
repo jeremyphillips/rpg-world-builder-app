@@ -65,7 +65,7 @@ Badge `appearance`.
 
 Migrated controls emit BEM-style `ui-*` modifiers from `*.variants.ts` / `*.styles.ts`; height,
 padding, gap, and indicator geometry live in co-located `*.css` (`button.css`, `field-control.css`,
-`field-group.css`, `choice-control.css`, `boolean-field.css`, `floating-label-field.css`, `compact-control.css`).
+`field-group.css`, `choice-control.css`, `checkbox-option.css`, `floating-label-field.css`, `compact-control.css`).
 `semantic-control-variants-geometry-ban.test.ts` blocks raw `h-*`, `px-*`, `text-xs|sm|md|base`,
 and `[&_svg]:size-*` from returning to those CVA modules.
 

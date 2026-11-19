@@ -3,13 +3,34 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useFormContext, useFormState, useWatch } from 'react-hook-form'
 
-import { Button } from '../../components/ui/button.client'
 import { FieldGroup } from '../../components/ui/field-group.client'
-import { OptionalFieldDisclosure } from '../../components/ui/optional-field-disclosure.client'
-import { formMicroActionButtonProps } from '../form-micro-action'
+import {
+  OptionalDisclosureAction,
+  OptionalFieldDisclosure,
+} from '../../components/ui/optional-field-disclosure.client'
 import type { GroupConfig } from '../field-config'
 import { collectDependentClearingFields } from '../config/confirm-before-clear.lib'
+import { useDependsOnValues } from '../config/form-depends-on.client'
 import { useConfirmBeforeClear } from '../config/use-confirm-before-clear.client'
+import {
+  optionalDisclosureShellProps,
+  resolveOptionalDisclosureActions,
+  resolveOptionalDisclosureSubject,
+} from '../config/optional-disclosure-actions.lib'
+import {
+  resolveOptionalDisclosureClearPaths,
+  useOptionalDisclosureGroupLegendChrome,
+} from './optional-disclosure-group.lib'
+import { optionalDisclosureDependsOnPaths } from '../config/optional-disclosure-config.lib'
+import { OptionalDisclosureSourcePreview } from '../../components/ui/optional-disclosure-source-preview.client'
+import type { OptionalDisclosureSourcePreviewContent } from '../../components/ui/optional-disclosure-source-preview.client'
+import type { FieldSize } from '../../components/ui/field.client'
+import {
+  fieldAnatomyStackVariants,
+  fieldStackRhythmVariants,
+  type FieldRhythm,
+} from '../../components/ui/field.variants'
+import { cn } from '../../lib/utils'
 
 function objectHasContent(value: unknown): boolean {
   if (value == null || typeof value !== 'object' || Array.isArray(value)) return false
@@ -49,6 +70,35 @@ type OptionalDisclosureGroupProps = {
   children: ReactNode
 }
 
+/**
+ * Source preview sits in field anatomy with the editor; editor siblings keep section rhythm.
+ * Omit the wrapper when no preview — ordinary group body layout is unchanged.
+ */
+function OptionalDisclosureOpenGroupBody({
+  controlId,
+  sourcePreview,
+  groupSize,
+  groupRhythm,
+  children,
+}: {
+  controlId: string
+  sourcePreview?: OptionalDisclosureSourcePreviewContent
+  groupSize: FieldSize
+  groupRhythm: FieldRhythm
+  children: ReactNode
+}) {
+  if (!sourcePreview) return children
+
+  return (
+    <div className={fieldAnatomyStackVariants({ size: groupSize })}>
+      <OptionalDisclosureSourcePreview id={`${controlId}-source-preview`} preview={sourcePreview} />
+      <div className={cn(fieldStackRhythmVariants({ rhythm: groupRhythm }), 'min-w-0')}>
+        {children}
+      </div>
+    </div>
+  )
+}
+
 /** Optional object group. Opening writes form state only when `seedWhen` is set. Remove unsets the object. */
 export function OptionalDisclosureGroup({
   item,
@@ -62,10 +112,9 @@ export function OptionalDisclosureGroup({
 
   return (
     <OptionalDisclosureGroupBody
+      item={item}
       disclosure={disclosure}
       objectName={objectName}
-      fieldLabel={item.heading?.label ?? 'Saving throw'}
-      fields={item.fields}
       idPrefix={idPrefix}
       namePrefix={namePrefix}
     >
@@ -75,22 +124,22 @@ export function OptionalDisclosureGroup({
 }
 
 function OptionalDisclosureGroupBody({
+  item,
   disclosure,
   objectName,
-  fieldLabel,
-  fields,
   idPrefix,
   namePrefix,
   children,
 }: {
+  item: GroupConfig
   disclosure: NonNullable<GroupConfig['optionalDisclosure']>
   objectName: string
-  fieldLabel: string
-  fields: GroupConfig['fields']
   idPrefix: string
   namePrefix?: string
   children: ReactNode
 }) {
+  const { fieldLabel, heading, legendSize, groupRhythm, groupSize, hint } =
+    useOptionalDisclosureGroupLegendChrome(item, namePrefix)
   const fullName = namePrefix ? `${namePrefix}.${objectName}` : objectName
   const { setValue, unregister, getValues } = useFormContext()
   const watched = useWatch({ name: fullName })
@@ -110,14 +159,15 @@ function OptionalDisclosureGroupBody({
   }, [defaultValues])
   const open = manualOpen || (disclosure.expandWhenPopulated !== false && populated)
   const controlId = `${idPrefix}-${fullName.replaceAll('.', '-')}`
+  const dependencyValues = useDependsOnValues(
+    optionalDisclosureDependsOnPaths(disclosure),
+    namePrefix,
+  )
+  const summaryText = disclosure.summary?.resolve(dependencyValues, { open })
+  const sourcePreview = open ? disclosure.sourcePreview?.resolve(dependencyValues) : undefined
 
   const clear = () => {
-    const pathsToClear =
-      disclosure.clearPaths && disclosure.clearPaths.length > 0
-        ? disclosure.clearPaths
-        : disclosure.watchPaths && disclosure.watchPaths.length > 0
-          ? disclosure.watchPaths
-          : [fullName]
+    const pathsToClear = resolveOptionalDisclosureClearPaths(disclosure, fullName)
     for (const path of pathsToClear) {
       unregister(path, { keepDefaultValue: true, keepDirty: false })
     }
@@ -134,29 +184,51 @@ function OptionalDisclosureGroupBody({
   }
   const { attemptClear, confirmDialog } = useConfirmBeforeClear({
     confirmBeforeClear: disclosure.confirmBeforeClear,
-    clearingFields: collectDependentClearingFields(fields),
+    clearingFields: collectDependentClearingFields(item.fields),
     namePrefix,
     onClear: clear,
   })
 
-  const removeLabel = disclosure.removeLabel ?? 'Remove'
+  const actions = resolveOptionalDisclosureActions({
+    intent: disclosure.intent,
+    subject: resolveOptionalDisclosureSubject(fieldLabel, disclosure),
+    labeled: disclosure.labeled,
+    addLabel: disclosure.addLabel,
+    removeLabel: disclosure.removeLabel,
+  })
   if (open) {
     return (
       <>
         <FieldGroup
           id={controlId}
           legend={fieldLabel}
+          legendSrOnly={heading?.labelVisibility === 'srOnly'}
+          legendAccessory={heading?.accessory}
+          legendSize={legendSize}
+          headingScale={item.headingScale}
+          rhythm={groupRhythm}
+          size={groupSize}
+          hint={hint}
           legendAction={
-            <Button
-              {...formMicroActionButtonProps}
-              aria-label={`${removeLabel} ${fieldLabel}`}
+            <OptionalDisclosureAction
+              action={actions.openAction}
+              placement="inlineWithLabel"
+              fieldSize={groupSize}
+              aria-label={actions.openAccessibleName}
               onClick={attemptClear}
             >
-              {removeLabel}
-            </Button>
+              {actions.openLabel}
+            </OptionalDisclosureAction>
           }
         >
-          {children}
+          <OptionalDisclosureOpenGroupBody
+            controlId={controlId}
+            sourcePreview={sourcePreview}
+            groupSize={groupSize}
+            groupRhythm={groupRhythm}
+          >
+            {children}
+          </OptionalDisclosureOpenGroupBody>
         </FieldGroup>
         {confirmDialog}
       </>
@@ -168,16 +240,18 @@ function OptionalDisclosureGroupBody({
       <OptionalFieldDisclosure
         controlId={controlId}
         fieldLabel={fieldLabel}
-        addLabel={disclosure.addLabel}
-        removeLabel={removeLabel}
+        {...optionalDisclosureShellProps(actions)}
         open={false}
+        size={groupSize}
         labeled={disclosure.labeled}
+        summary={summaryText}
         addDisabled={disclosure.addDisabled}
         onOpenChange={(next) => {
           if (!next) return
           setManualOpen(true)
           if (disclosure.seedWhen && !watchedHasContent(watched)) {
-            setValue(fullName, disclosure.seedWhen({}), {
+            const seedValues = (formValues ?? getValues()) as Record<string, unknown>
+            setValue(fullName, disclosure.seedWhen(seedValues), {
               shouldDirty: true,
               shouldTouch: true,
               shouldValidate: true,

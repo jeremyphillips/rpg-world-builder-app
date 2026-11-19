@@ -31,6 +31,11 @@ describe('resolveDependsOnWatchName', () => {
     expect(resolveDependsOnWatchName('../../../../level', 'features.0.grants.0')).toBe('level')
   })
 
+  it('resolves monster defined-form movement override deps to root movement', () => {
+    expect(resolveDependsOnWatchName('../../../movement', 'forms.definedForms.0')).toBe('movement')
+    expect(resolveDependsOnWatchName('../../../hover', 'forms.definedForms.0')).toBe('hover')
+  })
+
   it('resolves target kind from nested monster action requirement arrays', () => {
     expect(resolveDependsOnWatchName('../kind', 'actions.0.resolution.target.requirements')).toBe(
       'actions.0.resolution.target.kind',

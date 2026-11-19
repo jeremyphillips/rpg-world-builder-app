@@ -104,6 +104,7 @@ describe('resolveFormHeaderStackTypography', () => {
       size: 'lg',
     })
     expect(stack.labelClass).toBe('text-style-field-label-lg')
-    expect(stack.hintClass).toBe('text-style-field-hint-compact')
+    expect(stack.hintClass).toBe('text-style-field-hint')
+    expect(stack.labelHintStackClass).toBe('flex flex-col gap-0.5')
   })
 })

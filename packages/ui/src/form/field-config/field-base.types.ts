@@ -32,6 +32,7 @@ export type FieldType =
   | 'radioCard'
   | 'segmentedControl'
   | 'checkbox'
+  | 'boolean'
   | 'switch'
   | 'json'
   | 'richtext'
@@ -202,6 +203,15 @@ export type OptionalDisclosureSummary = {
   resolve: (values: Record<string, unknown>, state: { open: boolean }) => string | undefined
 }
 
+/**
+ * Read-only inherited source shown while an override is open. Uses the same
+ * `dependsOn` map as `summary`; catalog context comes from the closure.
+ */
+export type OptionalDisclosureSourcePreview = {
+  dependsOn: readonly string[]
+  resolve: (values: Record<string, unknown>) => { label: string; text: string } | undefined
+}
+
 /** Disables the add action from watched form values while collapsed. */
 export type OptionalDisclosureAddGate = {
   dependsOn: readonly string[]
@@ -209,9 +219,23 @@ export type OptionalDisclosureAddGate = {
   disabledReasonWhen?: (values: Record<string, unknown>) => string | undefined
 }
 
-/** Collapse empty optional fields behind an add control (textarea and select). */
+export type OptionalDisclosureIntent = 'add' | 'override'
+
+/**
+ * Collapse empty optional fields behind an add or override control.
+ * `intent` selects the default action copy and icon. `addLabel` and `removeLabel`
+ * replace that visible copy and its accessible name when the phrase is not the default.
+ */
 export type OptionalDisclosureConfig = {
-  addLabel: string
+  intent: OptionalDisclosureIntent
+  /**
+   * Noun phrase for generated action labels when the field label or group legend
+   * is not a good action subject. Does not change visible field/legend copy.
+   */
+  actionSubject?: string
+  /** Complete phrase. When set, this is both the collapsed label and its accessible name. */
+  addLabel?: string
+  /** Complete phrase. When set, this is both the open label and its accessible name. */
   removeLabel?: string
   /** When true (default), populated values keep the field expanded. */
   expandWhenPopulated?: boolean
@@ -224,6 +248,8 @@ export type OptionalDisclosureConfig = {
   labeled?: boolean
   /** Inherited or status text. `seedWhen` receives these `dependsOn` values. */
   summary?: OptionalDisclosureSummary
+  /** Inherited source block while open. Collapsed shells do not render it. */
+  sourcePreview?: OptionalDisclosureSourcePreview
   /** Value written when the add action opens a structured field. */
   seedWhen?: (values: Record<string, unknown>) => unknown
   /** Disables the add action. Does not disable an open editor. */

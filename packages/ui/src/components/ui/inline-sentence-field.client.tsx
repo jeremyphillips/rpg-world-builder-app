@@ -20,6 +20,7 @@ import {
   fieldLabelVariants,
 } from './field.variants'
 import { parseChooseCount } from './choose-count-field.lib'
+import { resolveInlineSentenceOccupantLabel } from './inline-sentence-occupant-label.lib'
 import type { FieldWidth } from './field-control.variants'
 import type { FieldHintPosition } from './field.variants'
 import type { FieldChrome } from './field-chrome.variants'
@@ -124,10 +125,15 @@ function InlineSentenceNumberControl({
   disabled?: boolean
   ariaLabel?: string
 }) {
+  const occupantName = resolveInlineSentenceOccupantLabel({
+    ariaLabel: ariaLabel ?? `${label} count`,
+    segmentName: control.id,
+  })
+
   return (
     <>
       <label htmlFor={control.id} className="sr-only">
-        {ariaLabel ?? `${label} count`}
+        {occupantName}
       </label>
       <NumberInput
         id={control.id}
@@ -152,6 +158,7 @@ function InlineSentenceStackedSegment({
   labelVisibility = 'srOnly',
   size,
   controlId,
+  namingId,
   children,
 }: {
   label: string
@@ -159,6 +166,8 @@ function InlineSentenceStackedSegment({
   size: FieldSize
   /** When set, associates a visible/sr-only label with the segment control. */
   controlId?: string
+  /** Non-labelable composite group name when the segment does not use `htmlFor`. */
+  namingId?: string
   children: React.ReactNode
 }) {
   const labelClassName = cn(fieldLabelVariants({ size }), labelVisibility === 'srOnly' && 'sr-only')
@@ -171,7 +180,9 @@ function InlineSentenceStackedSegment({
           {labelContent}
         </label>
       ) : (
-        <span className={labelClassName}>{labelContent}</span>
+        <span id={namingId} className={labelClassName}>
+          {labelContent}
+        </span>
       )}
       {children}
     </div>
@@ -196,14 +207,19 @@ function InlineSentenceJoinedPairControl({
   const { start, end } = control
   const startHasError = control.hasError
   const endHasError = control.hasError
-  const resolvedLabel = label ?? control.ariaLabel
+  const groupNamingId = React.useId()
+  const resolvedLabel = resolveInlineSentenceOccupantLabel({
+    label,
+    ariaLabel: control.ariaLabel,
+    segmentName: 'joinedPair',
+  })
 
   const joinedPair = (
     <JoinedPair.Root
       layout="intrinsic"
       invalid={control.hasError}
       disabled={disabled}
-      aria-label={control.ariaLabel}
+      aria-labelledby={inAnatomyRow ? undefined : groupNamingId}
     >
       {start.kind === 'number' ? (
         <JoinedPair.NumberOccupant
@@ -277,6 +293,7 @@ function InlineSentenceJoinedPairControl({
       label={resolvedLabel}
       labelVisibility={labelVisibility}
       size={size}
+      namingId={groupNamingId}
     >
       {joinedPair}
     </InlineSentenceStackedSegment>
@@ -306,7 +323,11 @@ function InlineSentenceSelectControl({
     control.digits == null && control.sizingLabel == null && control.sizingLabels == null
       ? inlineSentenceSelectTriggerWidthClasses(control.width)
       : undefined
-  const resolvedLabel = label ?? control.ariaLabel ?? 'Field'
+  const occupantName = resolveInlineSentenceOccupantLabel({
+    label,
+    ariaLabel: control.ariaLabel,
+    segmentName: control.id,
+  })
 
   if (!hasOptions) {
     return null
@@ -333,7 +354,7 @@ function InlineSentenceSelectControl({
   if (!inAnatomyRow && (labelVisibility === 'visible' || label != null)) {
     return (
       <InlineSentenceStackedSegment
-        label={resolvedLabel}
+        label={occupantName}
         labelVisibility={labelVisibility}
         size={size}
         controlId={control.id}
@@ -346,7 +367,7 @@ function InlineSentenceSelectControl({
   return (
     <>
       <label htmlFor={control.id} className="sr-only">
-        {control.ariaLabel}
+        {occupantName}
       </label>
       {selectControl}
     </>

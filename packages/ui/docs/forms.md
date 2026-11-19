@@ -185,6 +185,15 @@ Centralized in `Field.Root` context:
 
 **Hint vs error.** Hints are guidance; errors are validation. Never encode required-ness as a hint.
 
+**Typography ownership.** Field labels use `fieldLabelVariants` / `fieldLabelTypographyVariants`.
+Field hints use `fieldHintTypographyVariants` (`xs`/`sm` → compact, `md`/`lg` → standard) on
+`Field.Hint` and `FieldHintText` — not generic `Text` caption. Field errors use
+`fieldErrorTextVariants`. Group descriptions (section/subsection) stay on structural description
+utilities and rhythm. Source previews and general supporting copy use `Text` supporting/caption.
+
+A primitive rendered inside a schema **slot** does not inherit section presentation `size` unless
+that slot passes `size` into the primitive.
+
 Adapters resolve effective hint presentation once. `Field.Root` stores that `hintPosition`. `FieldLayout`, `Field.Hint`, and `aria-describedby` read it. Do not pass a second position into `FieldLayout`.
 
 | `hintPosition`          | Role                                   | When invalid                                   |
@@ -339,6 +348,27 @@ not as a renderer requirement.
 | `slot`    | Custom `render()` region         | [containers.md](./forms/containers.md#slot-fields)  |
 
 Collapsible sections, separators, nested groups: [containers.md](./forms/containers.md).
+
+## Optional disclosure structure
+
+Field config, `intent`, `labeled` / `summary`, and the shared action resolver (optional-disclosure
+add/edit/clear actions, label-scale summary): [field-types.md](./forms/field-types.md#optional-disclosure-optionaldisclosure).
+
+| State  | Leaf field                | `kind: 'group'` + `optionalDisclosure` |
+| ------ | ------------------------- | -------------------------------------- |
+| Closed | `OptionalFieldDisclosure` | `OptionalFieldDisclosure`              |
+| Open   | `OptionalFieldDisclosure` | `FieldGroup` + `legendAction`          |
+
+Open optional **groups** intentionally stay on `FieldGroup` so fieldset legend, `headingScale`,
+hint, and nested field body rhythm match other subsections. Collapsed groups still use
+`OptionalFieldDisclosure` for the labeled header and summary row. Add/clear and summary typography
+are shared primitives; only the open group **shell** differs. When `sourcePreview` is set, the open
+shell renders that read-only block above the editor (leaf anatomy stack) or, for groups, inside an
+anatomy wrapper with section-rhythm field stack beneath it — not as the first spaced sibling in the
+section rhythm bucket. It is display-only and never serializes.
+
+**Deferred:** Merging open groups into the same structural component as leaf open disclosures is
+not planned — `OpenOptionalFieldDisclosure` does not own fieldset legend or group body spacing.
 
 ## Renderer ownership
 

@@ -10,7 +10,7 @@ const repoRoot = join(uiDir, '../../../../..')
 const BORDER_TOKEN_ALLOWLIST: Record<string, string> = {
   'chip.css': 'Unselected chips paint --background, so a root-baked border matches that fill.',
   'button.css': 'Split and expanded var(--border) are control seams, not surface planes.',
-  'boolean-field.css': 'Boolean hover uses the choice-control recipe.',
+  'checkbox-option.css': 'Outlined checkbox option hover uses the choice-control recipe.',
   'media-crop-editor.css': 'Crop guides do not establish a semantic plane.',
   'media-emblem-editor.css': 'The emblem viewport does not establish a semantic plane.',
 }

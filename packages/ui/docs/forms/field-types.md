@@ -18,7 +18,8 @@ shapes: [`field-config/`](../../src/form/field-config/) (layered modules; barrel
 | `radio`            | `string`  | `orientation`, `labelHidden`                                                                      |
 | `segmentedControl` | `string`  | `interactivity` for mounted-but-disabled; `defaultValue`                                          |
 | `radioCard`        | `string`  | Card-style options with `meta` / `badge`                                                          |
-| `checkbox`         | `boolean` |                                                                                                   |
+| `checkbox`         | `boolean` | Alias of `boolean` (plain `CheckboxOption` + option typography)                                   |
+| `boolean`          | `boolean` | Single checkbox — plain default; `shell: 'outlined'` for pill; `tone` for checked indicator       |
 | `switch`           | `boolean` | `labelPosition`: `inline`, `above`, `settings`                                                    |
 | `select`           | `string`  | `labelPosition`: `inline`, `above`, `settings`                                                    |
 | `file`             | `File[]`  | `accept`, `multiple`, `maxFiles`, `maxSize`                                                       |
@@ -172,12 +173,56 @@ values, dirty state, validation, or serialization.
 
 ## Optional disclosure (`optionalDisclosure`)
 
-Collapses empty optional fields behind a compact **+ Add …** control. When expanded
-(or when populated and `expandWhenPopulated` is true), the field label and control render
-with a **Remove** action that clears the value and collapses back to the add control.
+Collapses empty optional fields behind an add or override control. `intent` is `add` or
+`override`. `resolveOptionalDisclosureActions` owns the default visible label, accessible name,
+and `ActionIcon` verb. Leaf renderers call `optionalDisclosureLeafActions`; optional groups call
+the same resolver with the group heading. Renderers still own opening, seeding, and clearing.
+
+**Presentation contract** (shared across leaf fields and `kind: 'group'`):
+
+- The **label** (or group legend) is the default action subject. Use **`actionSubject`** when
+  the displayed label is not a good noun phrase for generated copy (for example legend
+  `Recharges on` with action subject `recharge`). Does not change visible field or legend text.
+- **`labeled: true`** shows the verb only (`Add`, `Override`, `Remove`, `Clear override`) because
+  the label is already visible. The accessible name is still `Add ${subject}` or
+  `Override ${subject}`.
+- **`addLabel` / `removeLabel`**, when set, replace both the visible text and the accessible name.
+  The resolver does not append the subject to an explicit phrase. Reserve these for semantic
+  exceptions (`Omit components` / `Restore components`, contextual resets like `Use base movement`).
+- **`confirmBeforeClear`** copy is authored independently — do not derive headlines from action
+  button labels.
+- **`summary`** communicates the effective or inherited value while collapsed (and under the
+  header when open in labeled mode). Inherited override copy uses 15px (`--text-md`): a muted
+  leading segment (`Inherits ·` / `Inherits:`) and a foreground value segment (normal weight) —
+  same SSOT as
+  `sourcePreview`.
+- **`sourcePreview`** is a read-only inherited source block shown only while open. It shares
+  `summary`'s `dependsOn` watch in the roll renderer and optional group body. `resolve` returns
+  `{ label, text } | undefined`; undefined leaves no gap. It does not write form state. The UI
+  renders `label` and `text` on one inline line with a colon (same anatomy as collapsed `summary`).
+  **Open optional groups:** source preview belongs to the disclosure heading/anatomy region, not
+  section field rhythm. Legend→preview spacing uses `resolveFieldScaleLegendBodyMargin` when
+  `headingScale: 'field'`. When a preview renders, preview→editor uses field anatomy stack; nested
+  editor fields keep `fieldStackRhythmVariants` inside that stack.
+- Header actions use the optional-disclosure **text** button (`OptionalDisclosureAction`).
+  Inline with a visible label or legend (`labeled: true`, open header row, open group
+  `legendAction`): `xs`. Standalone collapsed add (action-only control band): `sm` in compact
+  sections, comfortable `default` text geometry in comfortable sections. `add` uses `ActionIcon`
+  `add` (plus). `override` uses `edit` (pencil). The open action uses `clear` (x).
+- With **`labeled: true`**, the header action stays on the label row in both collapsed and open
+  states; the summary sits on the line below.
+
+Collapsed vs open **group** shells (`OptionalFieldDisclosure` vs `FieldGroup`) are an intentional
+structural split — [forms.md](./forms.md#optional-disclosure-structure).
 
 **Implemented for:** `text`, `textSuggestions`, `textarea`, `richtext`, `select`,
 `combobox`, and `rollValue`. Dev guards log when `optionalDisclosure` is used on any other kind.
+`chips` is intentionally excluded — multivalue size overrides stay always visible.
+
+**Lifecycle split:** `rollValue` opens while its object is present. Scalar fields (`text`,
+`select`, …) use `manualOpen` until a meaningful value is stored. Losing `manualOpen` on
+remount while the value is still empty is expected. Only populated scalar values must survive
+remount and clear back to an absent selection.
 
 `rollValue` treats the roll object as present even when dice or flat are incomplete.
 Add calls `seedWhen` and writes that value. Remove unsets the whole object. Set
@@ -195,8 +240,8 @@ must be chosen first). Dice defaults are not written for a `rollValue` that uses
   label: 'Additional behavior',
   placeholder: 'Describe behavior not modeled above...',
   optionalDisclosure: {
-    addLabel: 'Add additional behavior',
-    removeLabel: 'Remove',
+    intent: 'add',
+    actionSubject: 'additional behavior',
     expandWhenPopulated: true,
     confirmBeforeClear: {
       headline: 'Remove additional behavior?',
@@ -206,6 +251,30 @@ must be chosen first). Dice defaults are not written for a `rollValue` that uses
   },
 }
 ```
+
+### Optional disclosure action naming
+
+Prefer **short, predictable action labels**. Most disclosures should use generated labels rather
+than custom action copy.
+
+- **Labeled fields:** Use minimal visible actions (`Add`, `Remove`, `Override`, `Clear override`).
+  Accessible names must still identify the field.
+- **Action-only fields:** Use a verb plus a concise subject (`Add recharge`, `Remove recharge`).
+  The action must make sense without a separate visible label.
+- **Subjects:** Prefer short noun phrases, typically one or two words. Use `actionSubject` when the
+  field label or legend is not a good action phrase.
+- **Intent:** Use `add` for optional content the schema does not yet store. Use `override` when
+  clearing restores a non-authored value — an inherited field, catalog default, or **resolved**
+  effective value (for example spell cast level: undefined in the form still resolves to the spell's
+  level until the author explicitly sets `castAtLevel`).
+- **Custom labels:** Reserve for operations whose meaning cannot be expressed with default verbs.
+  Spell cast level uses `Set cast level` / `Use default level` because override describes replacing
+  that resolved default, not adding a value where none exists.
+
+Avoid repeating context already established by a nearby heading. Use sentence case, preserve
+meaningful domain terminology, and keep paired actions consistent. Before adding custom labels,
+check whether `actionSubject` or a better label would let the resolver generate both actions.
+Never sacrifice a clear accessible name to make an action visually shorter.
 
 - **`confirmBeforeClear`** (optional) — when removing populated content via the disclosure
   **Remove** action, prompts before clearing. Same config shape as

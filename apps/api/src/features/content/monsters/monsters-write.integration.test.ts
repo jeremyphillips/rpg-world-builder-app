@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { isApiValidationDetails } from '@rpg/contracts'
+import {
+  FORM_RESTRICTION_EMPTY_MESSAGE,
+  FORM_RESTRICTION_REQUIRES_FORMS_MESSAGE,
+  isApiValidationDetails,
+} from '@rpg/contracts'
 
 import { makeTestCampaign } from '../../../test/fixtures/campaigns'
 import { minimalHomebrewMonsterInput } from '../../../test/fixtures/monsters'
@@ -612,6 +616,165 @@ describe('promotion smoke', () => {
   })
 })
 
+const monsterAuthoringForms = {
+  profileFormId: 'profile',
+  trueForm: { kind: 'defined' as const, formId: 'humanoid' },
+  definedForms: [
+    { id: 'humanoid', name: 'Humanoid' },
+    { id: 'bear', name: 'Bear', overrides: { sizes: ['large'] } },
+  ],
+}
+
+const monsterRestrictionBite = {
+  id: 'bite',
+  kind: 'natural-weapon' as const,
+  name: 'Bite',
+  mode: 'melee' as const,
+  reach: 5,
+  damage: { dice: { count: 1, faces: 6 } },
+  damageType: 'piercing' as const,
+}
+
+describe('monster forms write validation', () => {
+  it('rejects publish with an empty form restriction list', async () => {
+    const campaign = await makeTestCampaign()
+    const draft = await createHomebrewContent(
+      monstersWriteConfig,
+      campaign.id,
+      {
+        ...minimalHomebrewMonsterInput,
+        slug: 'empty-restriction',
+        forms: monsterAuthoringForms,
+        actions: [{ ...monsterRestrictionBite, onlyInFormIds: [] }],
+        equipment: [],
+        proficiencies: {
+          savingThrows: [],
+          skills: [],
+          languages: [],
+          weapons: [],
+        },
+      },
+      { status: 'draft' },
+    )
+    await expect(
+      promoteContentToPublished(monstersWriteConfig, campaign.id, draft.id),
+    ).rejects.toMatchObject({
+      status: 400,
+      code: 'validation_error',
+      details: {
+        issues: expect.arrayContaining([
+          expect.objectContaining({
+            path: 'actions.0.onlyInFormIds',
+            message: FORM_RESTRICTION_EMPTY_MESSAGE,
+          }),
+        ]),
+      },
+    })
+  })
+
+  it('rejects publish when shape-shift is present without forms', async () => {
+    const campaign = await makeTestCampaign()
+    const draft = await createHomebrewContent(
+      monstersWriteConfig,
+      campaign.id,
+      {
+        ...minimalHomebrewMonsterInput,
+        slug: 'shift-without-forms',
+        actions: [
+          { id: 'shift', kind: 'shape-shift', name: 'Shape-Shift', equipment: 'unchanged' },
+        ],
+        equipment: [],
+        proficiencies: {
+          savingThrows: [],
+          skills: [],
+          languages: [],
+          weapons: [],
+        },
+      },
+      { status: 'draft' },
+    )
+    await expect(
+      promoteContentToPublished(monstersWriteConfig, campaign.id, draft.id),
+    ).rejects.toMatchObject({
+      status: 400,
+      code: 'validation_error',
+      details: {
+        issues: expect.arrayContaining([
+          expect.objectContaining({
+            path: 'actions.0.kind',
+            message: 'Add forms before adding Shape-Shift.',
+          }),
+        ]),
+      },
+    })
+  })
+
+  it('rejects publish when restricting actions without a forms block', async () => {
+    const campaign = await makeTestCampaign()
+    const draft = await createHomebrewContent(
+      monstersWriteConfig,
+      campaign.id,
+      {
+        ...minimalHomebrewMonsterInput,
+        slug: 'restriction-without-forms',
+        actions: [{ ...monsterRestrictionBite, onlyInFormIds: ['bear'] }],
+        equipment: [],
+        proficiencies: {
+          savingThrows: [],
+          skills: [],
+          languages: [],
+          weapons: [],
+        },
+      },
+      { status: 'draft' },
+    )
+    await expect(
+      promoteContentToPublished(monstersWriteConfig, campaign.id, draft.id),
+    ).rejects.toMatchObject({
+      status: 400,
+      code: 'validation_error',
+      details: {
+        issues: expect.arrayContaining([
+          expect.objectContaining({
+            path: 'actions.0.onlyInFormIds',
+            message: FORM_RESTRICTION_REQUIRES_FORMS_MESSAGE,
+          }),
+        ]),
+      },
+    })
+  })
+
+  it('round-trips form restrictions and shape-shift on publish', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(
+      monstersWriteConfig,
+      campaign.id,
+      {
+        ...minimalHomebrewMonsterInput,
+        slug: 'forms-restrictions-shift',
+        forms: monsterAuthoringForms,
+        equipment: [],
+        proficiencies: {
+          savingThrows: [],
+          skills: [],
+          languages: [],
+          weapons: [],
+        },
+        actions: [
+          { id: 'shift', kind: 'shape-shift', name: 'Shape-Shift', equipment: 'unchanged' },
+          { ...monsterRestrictionBite, onlyInFormIds: ['bear'] },
+        ],
+      },
+      { status: 'published' },
+    )
+    expect(created.actions?.[1]).toMatchObject({
+      id: 'bite',
+      onlyInFormIds: ['bear'],
+    })
+    expect(created.actions?.[0]).toMatchObject({ kind: 'shape-shift', name: 'Shape-Shift' })
+  })
+})
+
 describe('monster classification persistence', () => {
   it('persists, reads, and explicitly clears family and class classifications', async () => {
     const campaign = await makeTestCampaign()
@@ -644,6 +807,24 @@ describe('monster classification persistence', () => {
     await updateContentEntity(monstersWriteConfig, campaign.id, id, { classIds: null })
     const catalog = await resolveCatalogForCampaign(monstersWriteConfig.readConfig, campaign.id)
     expect(catalog.find((row) => row.id === id)?.classIds).toBeUndefined()
+  })
+
+  it('round-trips defined forms', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(monstersWriteConfig, campaign.id, {
+      ...minimalHomebrewMonsterInput,
+      slug: 'forms-round-trip',
+      forms: {
+        profileFormId: 'profile',
+        trueForm: { kind: 'defined', formId: 'humanoid' },
+        definedForms: [
+          { id: 'humanoid', name: 'Humanoid' },
+          { id: 'bear', name: 'Bear', overrides: { sizes: ['large'] } },
+        ],
+      },
+    })
+    expect(created.forms?.trueForm).toEqual({ kind: 'defined', formId: 'humanoid' })
+    expect(created.forms?.definedForms[1]?.overrides?.sizes).toEqual(['large'])
   })
 
   it('rejects an incompatible family at its field path on publish', async () => {

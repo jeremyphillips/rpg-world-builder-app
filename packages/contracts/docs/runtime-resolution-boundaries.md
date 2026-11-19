@@ -63,7 +63,7 @@ from a layer below it in this diagram, it is in the wrong module.
 - Dashboard or API modules
 - `runtime/character-builder/`
 
-**Suggested modules:** one noun per file — `languages.ts`, `senses.ts`, `traits.ts`, `damage-resistances.ts`.
+**Suggested modules:** one noun per file — `languages.ts`, `senses.ts`, `traits.ts`, `forms.ts`, `damage-resistances.ts`. `forms.ts` centrally resolves stable profile identity, true-form designation, eligible identities, alternate destinations, and effective sizes. Movement and speech overrides are not in that resolver yet.
 
 **Exists today:** `creature/languages.ts`, `creature/equipment.ts`, `creature/equipment-id-match.ts`,
 `creature/equipment-stack.ts`, `creature/proficiencies.ts`, `creature/weapon-cross-recommendation.ts`,
@@ -125,7 +125,8 @@ lookup when assembling derivation input from a persisted sheet — not draft sem
 
 **Responsibilities:** Derive printed-style values from authored monster bodies — AC,
 HP, saves, skills, passive Perception, attack lines, spellcasting DC and attack
-bonus, reaction triggers, generated spell prose, XP, and initiative. Policy
+bonus, reaction triggers, generated spell prose, form heading qualifiers, single-level
+form-availability advisories, XP, and initiative. Policy
 lives in [monster-stat-blocks.md](./monster-stat-blocks.md) and
 [activation-and-limited-use.md](./activation-and-limited-use.md).
 

@@ -1,6 +1,7 @@
 import type { FieldSizeToken } from '../../components/ui/field-sizing.variants'
 import {
   fieldGroupLegendHeaderStackVariants,
+  fieldHintTypographyVariants,
   fieldLabelHintStackClasses,
   fieldLabelTypographyVariants,
   type FieldGroupLegendSize,
@@ -70,7 +71,7 @@ export function resolveFormHeaderStackTypography(options: {
   if (options.headingScale === 'field') {
     return {
       labelClass: fieldLabelTypographyVariants({ size }),
-      hintClass: rhythm === 'compact' ? 'text-style-field-hint-compact' : 'text-style-field-hint',
+      hintClass: fieldHintTypographyVariants({ size }),
       labelHintStackClass: fieldLabelHintStackClasses,
     }
   }

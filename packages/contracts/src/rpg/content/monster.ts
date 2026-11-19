@@ -81,6 +81,13 @@ import {
   type MonsterActionSectionBody,
 } from './monster/action-section-access'
 import { MONSTER_ACTION_SECTIONS } from './monster/action-sections'
+import {
+  monsterFormsDraftSchema,
+  monsterFormsSchema,
+  refineMonsterFormIdentity,
+} from './monster/forms'
+import { shapeShiftRows } from './monster/action/action-removal-plan'
+import { refineMonsterFormAvailability } from './monster/form-availability'
 
 export { MONSTER_ACTION_SECTIONS }
 export type { MonsterActionSection } from './monster/action-sections'
@@ -163,6 +170,7 @@ export const monsterHitPointsSchema = z.discriminatedUnion('kind', [
 
 const monsterTraitAvailabilityFields = {
   available: z.boolean().optional(),
+  onlyInFormIds: z.array(z.string().min(1)).optional(),
   ...entryProvenanceField,
 }
 
@@ -342,6 +350,7 @@ export const monsterBodyFields = {
   bonusActions: z.array(monsterBonusActionSchema).default([]),
   reactions: z.array(monsterReactionSchema).default([]),
   legendaryActions: monsterLegendaryActionsBlockSchema.optional(),
+  forms: monsterFormsSchema.optional(),
 } as const
 
 export const monsterBodySchema = mediaBearingAuthoredContentBodySchema.extend(monsterBodyFields)
@@ -365,6 +374,7 @@ const monsterBodyDraftSchemaBase = mediaBearingDraftAuthoredContentBodySchema(
   reactions: z.array(monsterReactionDraftSchema).default([]),
   legendaryActions: monsterLegendaryActionsBlockDraftSchema.optional(),
   traits: z.array(monsterTraitDraftSchema).default([]),
+  forms: monsterFormsDraftSchema.optional(),
 })
 
 export const monsterBodyDraftSchema = monsterBodyDraftSchemaBase
@@ -785,6 +795,83 @@ function refinePublishedReactionTrigger(
   addCustomRefinementIssue(ctx, 'Trigger is required.', [...path, 'trigger'])
 }
 
+function refinePublishedActionRows(
+  body: MonsterBody,
+  ctx: z.RefinementCtx,
+  prefix: (string | number)[],
+): void {
+  for (const section of MONSTER_ACTION_SECTIONS) {
+    for (const [index, action] of monsterActionSectionRows(body, section).entries()) {
+      const path = [...prefix, ...monsterActionSectionRowPath(section, index)]
+      refineMonsterActionShape(action as Parameters<typeof refineMonsterActionShape>[0], ctx, path)
+      refinePublishedReactionTrigger(
+        action as Parameters<typeof refinePublishedReactionTrigger>[0],
+        section,
+        path,
+        ctx,
+      )
+    }
+  }
+}
+
+function refineTraitSpellcastingSources(
+  body: MonsterBody,
+  ctx: z.RefinementCtx,
+  prefix: (string | number)[],
+): void {
+  body.traits.forEach((trait, index) => {
+    if (!('savingThrow' in trait) || !trait.savingThrow) return
+    const source = trait.savingThrow.dcSource
+    if (source.kind !== 'spellcasting' || source.castingAbility.kind !== 'shared') return
+    if (findSpellCastingSource(body, source.castingAbility.entryId)) return
+    addCustomRefinementIssue(
+      ctx,
+      'Shared spellcasting must use another spell entry that has its own ability.',
+      [...prefix, 'traits', index, 'savingThrow', 'dcSource', 'castingAbility', 'entryId'],
+    )
+  })
+}
+
+function refineShapeShiftForms(
+  body: MonsterBody,
+  ctx: z.RefinementCtx,
+  prefix: (string | number)[],
+): void {
+  const shapeShifts = shapeShiftRows(body)
+  if (shapeShifts.length === 0 || body.forms) return
+  for (const located of shapeShifts) {
+    const rows = monsterActionSectionRows(body, located.section)
+    const index = rows.findIndex((row) => row.id === located.row.id)
+    if (index < 0) continue
+    addCustomRefinementIssue(ctx, 'Add forms before adding Shape-Shift.', [
+      ...prefix,
+      ...monsterActionSectionRowPath(located.section, index, 'kind'),
+    ])
+  }
+}
+
+function refineExperiencePointsOverride(
+  body: MonsterBody,
+  ctx: z.RefinementCtx,
+  prefix: (string | number)[],
+): void {
+  if (body.experiencePointsOverride === undefined) return
+  const derivedXp = CHALLENGE_RATING_MECHANICS[body.challengeRating].xp
+  if (body.challengeRating !== '0') {
+    addCustomRefinementIssue(
+      ctx,
+      'Experience point override is only allowed for challenge rating 0.',
+      [...prefix, 'experiencePointsOverride'],
+    )
+  } else if (body.experiencePointsOverride === derivedXp) {
+    addCustomRefinementIssue(
+      ctx,
+      'Experience point override must differ from the derived CR 0 value.',
+      [...prefix, 'experiencePointsOverride'],
+    )
+  }
+}
+
 export function refineMonsterBody(
   body: MonsterBody,
   ctx: z.RefinementCtx,
@@ -811,30 +898,9 @@ export function refineMonsterBody(
     ])
   }
 
-  for (const section of MONSTER_ACTION_SECTIONS) {
-    for (const [index, action] of monsterActionSectionRows(body, section).entries()) {
-      const path = [...prefix, ...monsterActionSectionRowPath(section, index)]
-      refineMonsterActionShape(action as Parameters<typeof refineMonsterActionShape>[0], ctx, path)
-      refinePublishedReactionTrigger(
-        action as Parameters<typeof refinePublishedReactionTrigger>[0],
-        section,
-        path,
-        ctx,
-      )
-    }
-  }
+  refinePublishedActionRows(body, ctx, prefix)
   refineMonsterSpellEntries(body, ctx, prefix, { published: true })
-  body.traits.forEach((trait, index) => {
-    if (!('savingThrow' in trait) || !trait.savingThrow) return
-    const source = trait.savingThrow.dcSource
-    if (source.kind !== 'spellcasting' || source.castingAbility.kind !== 'shared') return
-    if (findSpellCastingSource(body, source.castingAbility.entryId)) return
-    addCustomRefinementIssue(
-      ctx,
-      'Shared spellcasting must use another spell entry that has its own ability.',
-      [...prefix, 'traits', index, 'savingThrow', 'dcSource', 'castingAbility', 'entryId'],
-    )
-  })
+  refineTraitSpellcastingSources(body, ctx, prefix)
 
   refineWeaponEntryReferences(body, ctx, prefix, { requirePresent: true })
   for (const violation of collectRepeatabilityViolations(body, prefix)) {
@@ -850,22 +916,15 @@ export function refineMonsterBody(
     'telepathy',
   ])
   refineMonsterProficiencies(body.proficiencies, ctx, prefix)
-  const derivedXp = CHALLENGE_RATING_MECHANICS[body.challengeRating].xp
-  if (body.experiencePointsOverride !== undefined) {
-    if (body.challengeRating !== '0') {
-      addCustomRefinementIssue(
-        ctx,
-        'Experience point override is only allowed for challenge rating 0.',
-        [...prefix, 'experiencePointsOverride'],
-      )
-    } else if (body.experiencePointsOverride === derivedXp) {
-      addCustomRefinementIssue(
-        ctx,
-        'Experience point override must differ from the derived CR 0 value.',
-        [...prefix, 'experiencePointsOverride'],
-      )
-    }
+  if (body.forms) {
+    refineMonsterFormIdentity(body.forms, ctx, prefix, {
+      published: true,
+      creatureName: body.name,
+    })
   }
+  refineShapeShiftForms(body, ctx, prefix)
+  refineMonsterFormAvailability(body, ctx, prefix)
+  refineExperiencePointsOverride(body, ctx, prefix)
 }
 
 /** Stored monster record — explicit meta + body (Zod superRefine omits output typing). */
@@ -931,6 +990,7 @@ function refineMonsterDraftBody(
     requirePresent: false,
   })
   refineMultiattackReferences(sections, ctx, prefix, { published: false })
+  if (body.forms) refineMonsterFormIdentity(body.forms, ctx, prefix, { creatureName: body.name })
 }
 
 const monsterDraftStoredSchemaBase = draftStoredSchema(monsterBodyDraftSchema).superRefine(

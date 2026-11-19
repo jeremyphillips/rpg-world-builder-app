@@ -34,6 +34,7 @@ const homebrewMonsterSchema = new Schema(
     bonusActions: { type: [Schema.Types.Mixed], default: [] },
     reactions: { type: [Schema.Types.Mixed], default: [] },
     legendaryActions: { type: Schema.Types.Mixed },
+    forms: { type: Schema.Types.Mixed },
   },
   { timestamps: true },
 )

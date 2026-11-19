@@ -46,6 +46,19 @@ function setup() {
 }
 
 describe('useMasterDetailArray', () => {
+  it('exposes lastAddedFieldId after handleAdd and clears only for matching acknowledgeAcquisition', () => {
+    const { result } = setup()
+    act(() => result.current.handleAdd())
+    const addedFieldId = result.current.lastAddedFieldId
+    expect(addedFieldId).toBeTruthy()
+
+    act(() => result.current.acknowledgeAcquisition('wrong-id'))
+    expect(result.current.lastAddedFieldId).toBe(addedFieldId)
+
+    act(() => result.current.acknowledgeAcquisition(addedFieldId!))
+    expect(result.current.lastAddedFieldId).toBeNull()
+  })
+
   it('starts empty with no selection', () => {
     const { result } = setup()
     expect(result.current.fields).toHaveLength(0)

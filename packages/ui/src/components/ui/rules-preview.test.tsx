@@ -43,6 +43,27 @@ describe('RulesPreview', () => {
     expect(screen.getByText('Summary').closest('.ui-panel')).toHaveClass('ui-panel--compact')
   })
 
+  it('renders an optional title above the body with emphasis typography', () => {
+    render(
+      <RulesPreview
+        label="Attack preview"
+        title="Bite (Bear Form Only)"
+        content={{
+          kind: 'prose',
+          text: 'Melee Weapon Attack: +5 to hit.',
+        }}
+      />,
+    )
+
+    const title = screen.getByText('Bite (Bear Form Only)')
+    const body = screen.getByText('Melee Weapon Attack: +5 to hit.')
+    expect(title).toHaveClass('text-style-emphasis')
+    expect(title.compareDocumentPosition(body)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+    expect(screen.getByText('Attack preview').compareDocumentPosition(title)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    )
+  })
+
   it('renders prose as body text and omits the label from the body', () => {
     render(
       <RulesPreview

@@ -37,6 +37,7 @@ import {
   MONSTER_REACTION_CUSTOM_DESCRIPTION,
   MONSTER_REACTION_CUSTOM_LABEL,
   MONSTER_ACTION_REFERENCE_ACQUISITION_LABEL,
+  MONSTER_SHAPE_SHIFT_ACQUISITION_DESCRIPTION,
   LEGENDARY_CAST_SPELL_DISABLED_NOTE,
   LEGENDARY_REFERENCE_DESCRIPTION,
   LEGENDARY_REFERENCE_DISABLED_NOTE,
@@ -76,7 +77,7 @@ export type MonsterActionAcquisitionChoice =
   | { type: 'natural'; presetId: ActionPresetId }
   | { type: 'other-natural' }
   | { type: 'preset'; presetId: ActionPresetId }
-  | { type: 'create'; kind: 'attack' | 'special' | 'save' }
+  | { type: 'create'; kind: 'attack' | 'special' | 'save' | 'shape-shift' }
   | { type: 'create'; kind: 'spell'; spellAcquisition: 'primary' | 'standalone' }
   | { type: 'legendary'; category: 'reference' | 'spellcasting' | 'cast-spell' }
   | { type: 'reaction'; category: 'reference' | 'parry' | 'cast-spell' | 'custom' }
@@ -111,6 +112,13 @@ const OTHER_ITEMS: readonly MonsterActionAcquisitionItem[] = [
   },
 ]
 
+const SHAPE_SHIFT_ACQUISITION_ITEM: MonsterActionAcquisitionItem = {
+  id: 'create:shape-shift',
+  label: getMonsterActionKindLabel('shape-shift'),
+  groupId: 'other',
+  metadata: MONSTER_SHAPE_SHIFT_ACQUISITION_DESCRIPTION,
+}
+
 function specialMenuRank(presetId: ActionPresetId): number {
   const index = SPECIAL_MENU_ORDER.indexOf(presetId as (typeof SPECIAL_MENU_ORDER)[number])
   return index === -1 ? SPECIAL_MENU_ORDER.length : index
@@ -127,6 +135,7 @@ const EXACT_ACQUISITION_CHOICES: Record<string, MonsterActionAcquisitionChoice> 
   'create:spell-standalone': { type: 'create', kind: 'spell', spellAcquisition: 'standalone' },
   'create:special': { type: 'create', kind: 'special' },
   'create:save': { type: 'create', kind: 'save' },
+  'create:shape-shift': { type: 'create', kind: 'shape-shift' },
   'natural:other': { type: 'other-natural' },
   'reaction:reference': { type: 'reaction', category: 'reference' },
   'reaction:parry': { type: 'reaction', category: 'parry' },
@@ -209,6 +218,7 @@ export function monsterActionAcquisitionItems(input: {
   /** Actions rows a reaction reference can use. */
   hasReferenceTargets?: boolean
   spellCatalogReady?: boolean
+  shapeShiftDisabledReason?: string
 }): MonsterActionAcquisitionItem[] {
   const sectionRows: MonsterActionSectionRows = input.sectionRows ?? {
     actions: [],
@@ -298,7 +308,7 @@ export function monsterActionAcquisitionItems(input: {
       }
     })
   const weaponsAllowed = input.section === undefined || input.section === 'actions'
-  return applyAcquisitionPolicies(
+  const items = applyAcquisitionPolicies(
     [
       ...(weaponsAllowed
         ? [
@@ -323,6 +333,12 @@ export function monsterActionAcquisitionItems(input: {
       ...generalAcquisitionItems(input.section),
     ],
     sectionRows,
+  )
+  if (!input.shapeShiftDisabledReason) return items
+  return items.map((item) =>
+    item.id === 'create:shape-shift'
+      ? { ...item, disabled: true, note: input.shapeShiftDisabledReason }
+      : item,
   )
 }
 
@@ -386,11 +402,17 @@ function generalAcquisitionItems(
       },
       ...rest,
       saveItem,
+      SHAPE_SHIFT_ACQUISITION_ITEM,
       ...standalone,
     ]
   }
   if (section === 'reactions') return []
-  return [...rest, ...(spellcasting ? [spellcasting] : []), ...standalone]
+  return [
+    ...rest,
+    ...(spellcasting ? [spellcasting] : []),
+    SHAPE_SHIFT_ACQUISITION_ITEM,
+    ...standalone,
+  ]
 }
 
 /** Starting damage for a new Attack or Other natural attack. Not applied to loaded rows. */
@@ -487,6 +509,44 @@ export function createReactionActionDraft(
   return { id: createMonsterRowId(), kind: 'special' }
 }
 
+function createSaveActionDraft(id: string): MonsterActionDraftRow {
+  return {
+    id,
+    kind: 'save',
+    resolution: {
+      selectionMode: 'targets',
+      target: { ...DEFAULT_RESOLUTION_TARGET },
+      method: { kind: 'saving-throw' },
+      effects: [],
+      outcomes: [
+        { result: 'failed-save', effects: [] },
+        { result: 'successful-save', effects: [] },
+      ],
+    },
+    // The saving-throw ability is chosen in the editor after the row is added.
+  } as unknown as MonsterActionDraftRow
+}
+
+function createActionKindDraft(
+  choice: Extract<MonsterActionAcquisitionChoice, { type: 'create' }>,
+  id: string,
+): MonsterActionDraftRow {
+  if (choice.kind === 'spell') {
+    return createSpellActionDraft('actions', {}, choice.spellAcquisition ?? 'standalone')
+  }
+  if (choice.kind === 'special') return { id, kind: 'special' } as MonsterActionDraftRow
+  if (choice.kind === 'shape-shift') {
+    return {
+      id,
+      kind: 'shape-shift',
+      name: 'Shape-Shift',
+      equipment: 'unchanged',
+    } as MonsterActionDraftRow
+  }
+  if (choice.kind === 'save') return createSaveActionDraft(id)
+  return { id, kind: 'attack', damage: authoredStartingDamage() } as MonsterActionDraftRow
+}
+
 export function createMonsterActionFromAcquisition(
   choice: Exclude<
     MonsterActionAcquisitionChoice,
@@ -509,31 +569,7 @@ export function createMonsterActionFromAcquisition(
   if (choice.type === 'focus-existing') {
     throw new Error('focus-existing is not a create choice')
   }
-  if (choice.type === 'create') {
-    if (choice.kind === 'spell') {
-      const spellAcquisition = choice.spellAcquisition ?? 'standalone'
-      return createSpellActionDraft('actions', {}, spellAcquisition)
-    }
-    if (choice.kind === 'special') return { id, kind: 'special' } as MonsterActionDraftRow
-    if (choice.kind === 'save') {
-      return {
-        id,
-        kind: 'save',
-        resolution: {
-          selectionMode: 'targets',
-          target: { ...DEFAULT_RESOLUTION_TARGET },
-          method: { kind: 'saving-throw' },
-          effects: [],
-          outcomes: [
-            { result: 'failed-save', effects: [] },
-            { result: 'successful-save', effects: [] },
-          ],
-        },
-        // The saving-throw ability is chosen in the editor after the row is added.
-      } as unknown as MonsterActionDraftRow
-    }
-    return { id, kind: 'attack', damage: authoredStartingDamage() } as MonsterActionDraftRow
-  }
+  if (choice.type === 'create') return createActionKindDraft(choice, id)
   return { id, kind: 'special' } as MonsterActionDraftRow
 }
 

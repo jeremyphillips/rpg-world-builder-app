@@ -97,7 +97,7 @@ describe('monster action field order form state', () => {
     const onHitHint = await screen.findByText(
       'Effects that apply when this attack hits, beyond its primary damage.',
     )
-    const details = screen.getByRole('button', { name: 'Remove Additional details' })
+    const details = screen.getByRole('button', { name: 'Remove details' })
     expect(
       onHitHint.compareDocumentPosition(details) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy()
@@ -119,7 +119,7 @@ describe('monster action field order form state', () => {
       },
     })
 
-    await user.click(screen.getByRole('button', { name: 'Remove Additional details' }))
+    await user.click(screen.getByRole('button', { name: 'Remove details' }))
     await waitFor(() => {
       expect(shot(formRef.current!.getValues())).toMatchObject({ description: '' })
       expect(formRef.current!.getFieldState('actions.0.description').isDirty).toBe(true)
@@ -130,7 +130,11 @@ describe('monster action field order form state', () => {
         effects: [{ kind: 'damage', damageType: 'fire', roll: { dice: { count: 1, faces: 4 } } }],
       },
     })
-    await user.click(screen.getByRole('button', { name: 'Add additional details' }))
+    const addDetails = screen
+      .getAllByRole('button', { name: 'Add details' })
+      .find((button) => button.getAttribute('aria-controls')?.endsWith('actions-0-description'))
+    if (!addDetails) throw new Error('expected the action details disclosure')
+    await user.click(addDetails)
     expect(screen.getByRole('textbox', { name: 'Additional details' })).toBeInTheDocument()
   })
 })

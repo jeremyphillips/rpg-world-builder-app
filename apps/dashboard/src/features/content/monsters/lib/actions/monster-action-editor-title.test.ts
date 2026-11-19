@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
+import { resolveMasterDetailRowTitle } from '../../../lib/master-detail/master-detail-row-title'
+import { MONSTER_ACTION_ITEM_NOUN } from '../monster-form-labels'
 import type { MonsterFormValues } from '../monster-form-values'
-import { monsterActionEditorTitles, monsterActionHeaderName } from './monster-action-editor-title'
+import { monsterActionEditorTitles } from './monster-action-editor-title'
+import { createMonsterActionRowTitleConfig } from './monster-action-row-title'
 import type { MonsterActionDraftRow } from './monster-action-presets'
 
 const ctx = { equipmentCatalogStatus: 'ready' } as ContentFormCtx
@@ -14,6 +17,27 @@ function titles(rows: MonsterActionDraftRow[]) {
 function titlesFor(section: 'reactions' | 'legendaryActions', values: MonsterFormValues) {
   const rows = (values[section] ?? []) as MonsterActionDraftRow[]
   return monsterActionEditorTitles(rows, values, ctx, section)
+}
+
+function resolveActionTitle(input: {
+  action: MonsterActionDraftRow
+  sectionRows: readonly MonsterActionDraftRow[]
+  values: MonsterFormValues | undefined
+  section?: 'actions' | 'bonusActions' | 'reactions' | 'legendaryActions'
+}) {
+  const section = input.section ?? 'actions'
+  return resolveMasterDetailRowTitle(
+    createMonsterActionRowTitleConfig({ section, values: input.values, ctx }),
+    {
+      row: input.action,
+      rows: input.sectionRows,
+      index: input.sectionRows.findIndex((row) => row.id === input.action.id),
+      fieldId: input.action.id,
+      lastAddedFieldId: null,
+      itemNoun: MONSTER_ACTION_ITEM_NOUN,
+      rowReady: true,
+    },
+  )
 }
 
 describe('monsterActionEditorTitles', () => {
@@ -42,29 +66,21 @@ describe('monsterActionEditorTitles', () => {
       { id: 'bite', kind: 'natural-weapon', preset: 'bite' },
       { id: 'venom', kind: 'natural-weapon', preset: 'bite', name: 'Venomous Bite' },
     ] as MonsterActionDraftRow[]
+    const values = { actions: rows } as MonsterFormValues
 
     expect(titles(rows).get('bite')).toBe('Bite')
     expect(titles(rows).get('venom')).toBe('Venomous Bite')
-    expect(
-      monsterActionHeaderName({
-        action: rows[1]!,
-        sectionRows: rows,
-        values: { actions: rows } as MonsterFormValues,
-        ctx,
-      }),
-    ).toMatchObject({
-      mode: 'override',
+    expect(resolveActionTitle({ action: rows[1]!, sectionRows: rows, values })).toMatchObject({
+      displayTitle: 'Venomous Bite',
       sourceName: 'Bite',
-      resetLabel: 'Use default name',
-      fallback: 'Bite',
+      inlineTitle: {
+        mode: 'override',
+        resetLabel: 'Use default name',
+        fallback: 'Bite',
+      },
     })
     expect(
-      monsterActionHeaderName({
-        action: rows[0]!,
-        sectionRows: rows,
-        values: { actions: rows } as MonsterFormValues,
-        ctx,
-      }).sourceName,
+      resolveActionTitle({ action: rows[0]!, sectionRows: rows, values }).sourceName,
     ).toBeUndefined()
   })
 
@@ -85,19 +101,20 @@ describe('monsterActionEditorTitles', () => {
 
     expect(titlesFor('reactions', values).get('reflex')).toBe('Use Antennae')
     expect(reference).not.toHaveProperty('name')
-    const unnamedHeader = monsterActionHeaderName({
+    const unnamedHeader = resolveActionTitle({
       action: reference as MonsterActionDraftRow,
       sectionRows: [reference] as MonsterActionDraftRow[],
       values,
-      ctx,
       section: 'reactions',
     })
     expect(unnamedHeader).toMatchObject({
-      title: 'Use Antennae',
-      fallback: 'Use Antennae',
-      mode: 'authored',
+      displayTitle: 'Use Antennae',
+      inlineTitle: {
+        fallback: 'Use Antennae',
+        mode: 'authored',
+      },
     })
-    expect(unnamedHeader.resetLabel).toBeUndefined()
+    expect(unnamedHeader.inlineTitle?.resetLabel).toBeUndefined()
     expect(unnamedHeader.sourceName).toBeUndefined()
 
     const renamed = { ...antennae, name: 'Feelers' }
@@ -125,17 +142,18 @@ describe('monsterActionEditorTitles', () => {
       } as MonsterFormValues).get('reflex'),
     ).toBe('Reflexive Antennae')
     expect(
-      monsterActionHeaderName({
+      resolveActionTitle({
         action: authored as MonsterActionDraftRow,
         sectionRows: [authored] as MonsterActionDraftRow[],
         values: { actions: [renamed], reactions: [authored] } as MonsterFormValues,
-        ctx,
         section: 'reactions',
       }),
     ).toMatchObject({
-      title: 'Reflexive Antennae',
-      fallback: 'Use Feelers',
-      resetLabel: 'Use default name',
+      displayTitle: 'Reflexive Antennae',
+      inlineTitle: {
+        fallback: 'Use Feelers',
+        resetLabel: 'Use default name',
+      },
     })
   })
 
@@ -164,16 +182,14 @@ describe('monsterActionEditorTitles', () => {
       profile: 'primary',
       name: 'Spellcasting',
     } as MonsterActionDraftRow
-    expect(
-      monsterActionHeaderName({
-        action,
-        sectionRows: [action],
-        values: { actions: [action] } as MonsterFormValues,
-        ctx,
-      }),
-    ).toMatchObject({
-      title: 'Spellcasting',
-      editable: false,
+    const resolution = resolveActionTitle({
+      action,
+      sectionRows: [action],
+      values: { actions: [action] } as MonsterFormValues,
     })
+    expect(resolution).toMatchObject({
+      displayTitle: 'Spellcasting',
+    })
+    expect(resolution.inlineTitle).toBeUndefined()
   })
 })

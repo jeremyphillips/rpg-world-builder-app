@@ -82,8 +82,7 @@ Each symbol is allowlisted on its own. Membership in a shell or the field hub is
 - `formStickyScrollShellWithDockedFooterClasses` — `ui-form-docked-shell`, applied by `TabbedForm`, `FormShellChildren`, and `CharacterBuilderFormColumn`.
 - `appShellBreadcrumbRailClasses` — `dash-app-shell__breadcrumb-rail`, applied by the shell and by the detail-page header rail.
 - `characterBuilderStepPanelClasses` — `dash-character-builder__step-panel`, applied by the step panel and by the step frame.
-- `fieldGroupBottomMarginClasses` — shared `mb-8` under standalone field groups, omitted when parent rhythm owns the gap.
-- `fieldGroupSectionOuterMarginResetClasses` — shared `mb-0` that cancels that margin when a group is nested.
+- `fieldGroupBottomMarginClasses` — opt-in `mb-8` when a parent layout does not own sibling rhythm; `FieldGroup` primitives omit trailing margin by default.
 - `fieldChipWrapGapClasses` — shared `gap-2` for chip pills in chips field and text-suggestions.
 
 Page width (`PageShell`), page rhythm, and viewport workspace stay resolvers. Do not invent BEM for those utilities. Radio-card rows compose `InteractiveRow`. The two sticky recipes (document sticky actions and the docked-footer shell) are not one contract. `table-builder` / `table-grid` stays the domain exception.

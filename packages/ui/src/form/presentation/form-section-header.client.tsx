@@ -4,7 +4,7 @@ import type { ReactNode } from 'react'
 
 import type { FieldSize } from '../../components/ui/field.client'
 import { FieldLabelContent } from '../../components/ui/field-label-content'
-import { shouldShowVisibleRequiredMarker } from '../../components/ui/field-required.lib'
+import { resolveOwnedLabelPolicy } from '../../components/ui/field-required.lib'
 import {
   fieldLabelVariants,
   type FieldRhythm,
@@ -36,6 +36,11 @@ export interface FormSectionHeaderProps {
   required?: boolean
   /** When false, omit the visible label line. Hint and accessories remain. */
   showVisibleLabel?: boolean
+  /**
+   * The accessible name is owned by another element (for example a fieldset legend).
+   * Renders accessories and hint only — no second copy of the label text.
+   */
+  omitLabel?: boolean
   className?: string
   id?: string
 }
@@ -65,6 +70,7 @@ function renderHeadingBlock({
   required,
   id,
   showVisibleLabel = true,
+  omitLabel = false,
 }: FormSectionHeaderProps & { rhythm: FieldRhythm; size: FieldSize }): ReactNode {
   const stackTypography = resolveFormHeaderStackTypography({
     headingScale,
@@ -75,28 +81,29 @@ function renderHeadingBlock({
 
   let labelLine: ReactNode = null
 
-  if (headingScale === 'field') {
+  if (omitLabel) {
+    labelLine = labelAccessory ? (
+      <div className={formSectionHeaderLabelRowClasses}>{labelAccessory}</div>
+    ) : null
+  } else if (headingScale === 'field') {
+    const fieldLabelVisibility = showVisibleLabel ? 'visible' : 'srOnly'
+    const { showRequiredMarker, nameClassName } = resolveOwnedLabelPolicy(
+      required,
+      fieldLabelVisibility,
+    )
     if (showVisibleLabel) {
       labelLine = (
         <div className={formSectionHeaderLabelRowClasses}>
           <span className={fieldLabelVariants({ size })}>
-            <FieldLabelContent
-              label={label}
-              required={required}
-              showRequiredMarker={shouldShowVisibleRequiredMarker(required ?? false, 'visible')}
-            />
+            <FieldLabelContent label={label} showRequiredMarker={showRequiredMarker} />
           </span>
           {labelAccessory}
         </div>
       )
     } else {
       const srOnlyLabel = (
-        <span className={cn(fieldLabelVariants({ size }), 'sr-only')}>
-          <FieldLabelContent
-            label={label}
-            required={required}
-            showRequiredMarker={shouldShowVisibleRequiredMarker(required ?? false, 'visible')}
-          />
+        <span className={cn(fieldLabelVariants({ size }), nameClassName)}>
+          <FieldLabelContent label={label} showRequiredMarker={showRequiredMarker} />
         </span>
       )
       labelLine = labelAccessory ? (
@@ -145,6 +152,7 @@ export function FormSectionHeader({
   labelAccessory,
   required,
   showVisibleLabel = true,
+  omitLabel = false,
   className,
   id,
 }: FormSectionHeaderProps) {
@@ -164,6 +172,7 @@ export function FormSectionHeader({
     required,
     id,
     showVisibleLabel,
+    omitLabel,
     rhythm,
     size,
   })

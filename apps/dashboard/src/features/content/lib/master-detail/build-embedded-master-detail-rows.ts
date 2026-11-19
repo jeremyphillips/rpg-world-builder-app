@@ -2,7 +2,7 @@ import type { ResolvedContentCampaignAccess } from '@rpg/contracts'
 
 import type { AvailabilityReason } from '@/lib/availability'
 
-import type { MasterDetailListItem } from '../../components/master-detail/master-detail-list-panel'
+import type { MasterDetailListItem } from './master-detail-list-item.types'
 import type { ContentFormCtx } from '../forms/registry/content-form-registry'
 import { resolveMasterDetailRowKey } from './content-campaign-availability'
 import { buildEmbeddedMasterDetailListItem } from './build-embedded-master-detail-list-item'
@@ -10,7 +10,7 @@ import { buildMasterDetailAvailabilityPresentation } from './master-detail-avail
 import type { MasterDetailAvailabilityPresentation } from './master-detail-availability.types'
 import type { FormEmbeddedMasterDetailAccessConfig } from './master-detail-access.types'
 import type { MasterDetailItemNounTerm } from './master-detail-item-noun'
-import { masterDetailItemTitle } from './master-detail-constants'
+import { embeddedListItemTitle, type EmbeddedListDisplay } from './resolve-embedded-list-display'
 import { readRowLocalCampaignAccess } from './master-detail-effective-access.lib'
 
 export type EmbeddedMasterDetailRow = {
@@ -23,22 +23,18 @@ export type EmbeddedMasterDetailRow = {
 
 export type BuildEmbeddedMasterDetailRowsParams = {
   fields: ReadonlyArray<{ id: string }>
-  watched: readonly unknown[] | undefined
+  rowsSnapshot: readonly unknown[]
   formCtx: ContentFormCtx
   itemNoun: MasterDetailItemNounTerm
   showDelete: boolean
   access: FormEmbeddedMasterDetailAccessConfig
-  mapListItem: (ctx: {
+  resolveListDisplay: (ctx: {
     field: { id: string }
     index: number
     row: unknown
     entityCatalogLayer: ContentFormCtx['entityCatalogLayer']
     getRowIssueCount: (index: number) => number
-  }) => Pick<MasterDetailListItem, 'title'> & {
-    eyebrow?: string
-    kindLabel?: string
-    summary?: string
-  }
+  }) => EmbeddedListDisplay
   getRowIssueCount: (index: number) => number
   persistedRowIds?: ReadonlySet<string>
   systemOriginRowIds?: ReadonlySet<string>
@@ -74,12 +70,12 @@ function resolveRowLocalAvailability(
 /** Single source of truth for form-embedded master-detail row projection. */
 export function buildEmbeddedMasterDetailRows({
   fields,
-  watched,
+  rowsSnapshot,
   formCtx,
   itemNoun,
   showDelete,
   access,
-  mapListItem,
+  resolveListDisplay,
   getRowIssueCount,
   persistedRowIds,
   systemOriginRowIds,
@@ -87,8 +83,8 @@ export function buildEmbeddedMasterDetailRows({
   resolveRowReasons,
 }: BuildEmbeddedMasterDetailRowsParams): EmbeddedMasterDetailRow[] {
   return fields.map((field, formIndex) => {
-    const row = watched?.[formIndex]
-    const listDisplay = mapListItem({
+    const row = rowsSnapshot[formIndex]
+    const listDisplay = resolveListDisplay({
       field,
       index: formIndex,
       row,
@@ -109,7 +105,7 @@ export function buildEmbeddedMasterDetailRows({
       persistedRowIds,
       systemOriginRowIds,
       getRowIssueCount,
-      title: masterDetailItemTitle(listDisplay.title, itemNoun),
+      title: embeddedListItemTitle(listDisplay, itemNoun),
       eyebrow: listDisplay.eyebrow,
       kindLabel: listDisplay.kindLabel,
       summary: listDisplay.summary,

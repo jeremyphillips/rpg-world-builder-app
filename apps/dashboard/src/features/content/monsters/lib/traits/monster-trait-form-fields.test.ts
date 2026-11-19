@@ -26,7 +26,6 @@ function traitNames(row: unknown) {
   return namesOf(
     monsterTraitDetailFields({
       row,
-      rowPath: 'traits.0',
       advisories: [],
       monsterName: 'Owl',
       ctx,
@@ -40,6 +39,7 @@ describe('monsterTraitDetailFields', () => {
       traitNames({ id: 'note', kind: 'custom', name: 'Note', description: 'Custom.' }),
     ).toEqual([
       'buildAdvisories',
+      'formAvailability',
       'description',
       'savingThrow',
       'savingThrow.ability',

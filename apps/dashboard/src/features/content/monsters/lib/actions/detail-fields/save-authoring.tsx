@@ -31,7 +31,6 @@ import {
   MONSTER_SAVE_DC_PROFICIENCY_LABEL,
   MONSTER_SAVE_FAILED_LEGEND,
   MONSTER_SAVE_FIRST_FAILURE_LEGEND,
-  MONSTER_SAVE_REPEAT_ELIGIBILITY_ADD_LABEL,
   MONSTER_SAVE_REPEAT_ELIGIBILITY_LABEL,
   MONSTER_SAVE_SECOND_FAILURE_LEGEND,
   MONSTER_SAVE_SUCCESSFUL_LEGEND,
@@ -342,7 +341,7 @@ function monsterSaveFailedSubsection(ctx: ContentFormCtx, namePrefix: string): F
         name: `${MONSTER_SAVE_REPEAT_PATH}.eligibilityNote`,
         label: MONSTER_SAVE_REPEAT_ELIGIBILITY_LABEL,
         visibility: repeatSaveShellVisibility,
-        optionalDisclosure: { addLabel: MONSTER_SAVE_REPEAT_ELIGIBILITY_ADD_LABEL },
+        optionalDisclosure: { intent: 'add', actionSubject: 'eligibility note' },
       },
       {
         kind: 'group',

@@ -8,10 +8,10 @@ import type { FieldChrome } from './field-chrome.variants'
 import { FieldChromeShell } from './field-chrome-shell'
 import {
   fieldAnatomyStackVariants,
-  fieldLabelHintStackClasses,
   fieldLabelVariants,
   fieldSetChromeContainClasses,
   fieldSetInFlowLegendClasses,
+  fieldSetLegendInfoFlowClasses,
   fieldSetResetClasses,
   type FieldHintPosition,
 } from './field.variants'
@@ -37,6 +37,8 @@ export interface FieldsetChromeFrameProps {
   errorId: string
   /** Omit header-to-body gap when the legend is out of flow. Body spacing stays. */
   legendSrOnly?: boolean
+  /** Applies header-row flow when a legend info action renders as a fieldset sibling. */
+  legendHasInfo?: boolean
   fieldsetProps: ComponentProps<'fieldset'>
   children: ReactNode
 }
@@ -77,20 +79,16 @@ function wrapLegendCluster(
 
   const labelLine = <div className={fieldLabelVariants({ size: options.size })}>{labelContent}</div>
 
-  const cluster = options.belowLabelHint ? (
-    <div className={fieldLabelHintStackClasses}>
-      {labelLine}
+  return (
+    <>
+      {cloneElement(legend, {
+        ...legendRest,
+        className: cn(fieldSetInFlowLegendClasses, legendClassName),
+        children: labelLine,
+      })}
       {options.belowLabelHint}
-    </div>
-  ) : (
-    labelLine
+    </>
   )
-
-  return cloneElement(legend, {
-    ...legendRest,
-    className: cn(fieldSetInFlowLegendClasses, legendClassName),
-    children: cluster,
-  })
 }
 
 /**
@@ -109,7 +107,7 @@ export function FieldsetChromeAnatomy({
 }: Omit<FieldsetChromeAnatomyProps, 'errorId' | 'error'>) {
   const belowLabelHint =
     hintPosition === 'below-label' && hint ? (
-      <FieldHintBelowLabel hint={hint} hintId={hintId} />
+      <FieldHintBelowLabel hint={hint} hintId={hintId} size={size} />
     ) : null
   return (
     <>
@@ -130,7 +128,9 @@ function FieldsetBelowControlHint({
 
   return (
     <FieldMessageRegion size={size}>
-      <FieldHintText id={hintId}>{hint}</FieldHintText>
+      <FieldHintText id={hintId} size={size}>
+        {hint}
+      </FieldHintText>
     </FieldMessageRegion>
   )
 }
@@ -145,6 +145,7 @@ export function FieldsetChromeFrame({
   error,
   errorId,
   legendSrOnly = false,
+  legendHasInfo = false,
   fieldsetProps,
   children,
 }: FieldsetChromeFrameProps) {
@@ -163,6 +164,8 @@ export function FieldsetChromeFrame({
             fieldSetResetClasses,
             fieldSetChromeContainClasses,
             fieldsetStack,
+            legendHasInfo && 'flex flex-row flex-wrap items-center gap-x-1.5',
+            legendHasInfo && fieldSetLegendInfoFlowClasses,
             fieldsetClassName,
           )}
         >

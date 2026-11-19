@@ -12,6 +12,8 @@ const MONSTER_FORM_ADVISORY_TONE = {
   'leap-zero-walk-speed': 'warning',
   'leap-movement-exceeds-walk-speed': 'warning',
   'multiattack-unavailable-action': 'warning',
+  'form-restricted-reference': 'info',
+  'form-restricted-multiattack': 'info',
 } as const satisfies Record<MonsterFormAdvisory['code'], AdvisoryTone>
 
 /** Presentation tone for a collector code. Unknown codes still render, as warning. */

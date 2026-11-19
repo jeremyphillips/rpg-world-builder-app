@@ -180,11 +180,17 @@ describe('MasterDetailListPanel', () => {
     expect(document.querySelectorAll('[data-icon="chevron-right"]')).toHaveLength(2)
   })
 
-  it('does not render row delete or drag controls', () => {
+  it('does not render row delete or drag controls by default', () => {
     render(<MasterDetailListPanel {...baseProps()} />)
 
     expect(screen.queryByRole('button', { name: /Remove/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Drag to reorder/i })).not.toBeInTheDocument()
+  })
+
+  it('renders drag handles when list reorder is enabled', () => {
+    render(<MasterDetailListPanel {...baseProps()} onListMove={vi.fn()} />)
+
+    expect(screen.getAllByRole('button', { name: /Drag to reorder/i })).toHaveLength(2)
   })
 
   it('keeps header and count supplement outside the scroll region', () => {

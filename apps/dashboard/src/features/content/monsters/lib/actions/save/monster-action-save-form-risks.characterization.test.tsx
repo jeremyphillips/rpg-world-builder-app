@@ -26,7 +26,6 @@ import {
   MONSTER_ABILITY_SOURCE_KIND_ABILITY_LABEL,
   MONSTER_SAVE_DC_PROFICIENCY_LABEL,
   MONSTER_SAVE_FAILED_LEGEND,
-  MONSTER_SAVE_FAILURE_OR_SUCCESS_ADD_LABEL,
   MONSTER_SAVE_FAILURE_OR_SUCCESS_NOTE_LABEL,
 } from '../../monster-form-labels'
 import { monsterFormTestValues } from '../../monster-form-test-values'
@@ -313,9 +312,7 @@ describe('monster save form risks (Phase 2 characterization)', () => {
           (outcome) => outcome.result === 'failed-save',
         )?.effects ?? []
 
-      await user.click(
-        screen.getByRole('button', { name: MONSTER_SAVE_FAILURE_OR_SUCCESS_ADD_LABEL }),
-      )
+      await user.click(screen.getByRole('button', { name: 'Add save outcome' }))
       const note = screen.getByRole('textbox', { name: MONSTER_SAVE_FAILURE_OR_SUCCESS_NOTE_LABEL })
       await user.type(note, 'Applies whether the target succeeds or fails.')
 

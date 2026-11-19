@@ -326,7 +326,7 @@ describe('natural weapon action round trip', () => {
       expect(screen.getByRole('button', { name: 'Change Type' })).toBeInTheDocument()
     })
     expect(screen.queryByRole('combobox', { name: 'Type' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Add additional details' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Add details' })).toBeInTheDocument()
     expect(screen.getByText('Ability modifiers are applied automatically.')).toBeInTheDocument()
     expect(
       screen.getByText('Effects that apply when this attack hits, beyond its primary damage.'),

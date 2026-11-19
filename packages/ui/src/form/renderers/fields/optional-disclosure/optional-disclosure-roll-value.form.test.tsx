@@ -7,6 +7,7 @@ import { FormItems } from '../../../containers/form-items.client'
 import { buildDefaultValues, type FormItem } from '../../../field-config'
 
 const disclosure = {
+  intent: 'override' as const,
   labeled: true,
   addLabel: 'Override',
   removeLabel: 'Use weapon default',
@@ -95,9 +96,7 @@ describe('rollValue optionalDisclosure', () => {
       damage: { dice: { count: 2, faces: 6 } },
     })
 
-    await user.click(
-      screen.getByRole('button', { name: 'Use weapon default Base damage override' }),
-    )
+    await user.click(screen.getByRole('button', { name: 'Use weapon default' }))
 
     expect(screen.getByRole('button', { name: 'Override' })).toBeEnabled()
     expect(screen.queryByLabelText('Number of dice')).not.toBeInTheDocument()
@@ -109,9 +108,7 @@ describe('rollValue optionalDisclosure', () => {
   it('stays open when a stored roll is only partly filled', () => {
     render(<Harness defaultValues={{ damage: { dice: { count: 2 } } }} items={[field]} />)
 
-    expect(
-      screen.getByRole('button', { name: 'Use weapon default Base damage override' }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Use weapon default' })).toBeInTheDocument()
     expect(state()).toMatchObject({ damage: { dice: { count: 2 } } })
   })
 
@@ -150,9 +147,7 @@ describe('rollValue optionalDisclosure', () => {
     )
 
     expect(state().dirtyFields).toEqual({})
-    await user.click(
-      screen.getByRole('button', { name: 'Use weapon default Base damage override' }),
-    )
+    await user.click(screen.getByRole('button', { name: 'Use weapon default' }))
     await waitFor(() => {
       expect(state().damage).toBeNull()
       expect(state().dirtyFields).not.toEqual({})

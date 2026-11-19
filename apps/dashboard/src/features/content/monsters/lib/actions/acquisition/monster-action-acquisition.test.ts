@@ -133,6 +133,7 @@ describe('monster action acquisition presentation', () => {
       'create:attack',
       'create:special',
       'create:save',
+      'create:shape-shift',
       'create:spell-standalone',
     ])
     expect(createBonusActionDraft('leap')).toMatchObject({

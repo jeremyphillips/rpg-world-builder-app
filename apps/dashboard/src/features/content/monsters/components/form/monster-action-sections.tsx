@@ -1,7 +1,9 @@
 import { useCallback, useMemo, useState } from 'react'
 import {
+  actionsReferencingAction,
   getMonsterActionKindLabel,
   isWeaponEquipment,
+  resolveCreatureFormsContext,
   resolveEquipmentInstanceReferenceLabel,
 } from '@rpg/contracts'
 import { ActionIcon, ButtonDropdown, ConfirmDialog } from '@rpg/ui'
@@ -27,6 +29,7 @@ import {
   type MonsterActionSection,
 } from '../../lib/actions/references/monster-action-equipment-references'
 import { monsterActionEditorTitles } from '../../lib/actions/monster-action-editor-title'
+import { createMonsterActionRowTitleConfig } from '../../lib/actions/monster-action-row-title'
 import { presentActionReference } from '../../lib/actions/references/monster-action-reference-presentation'
 import {
   isLegendaryReferenceTarget,
@@ -43,7 +46,6 @@ import {
   MONSTER_MOVE_REFERENCED_ACTION_HEADLINE,
   MONSTER_REMOVE_REFERENCED_ACTION_HEADLINE,
 } from '../../lib/monster-form-labels'
-import { multiattacksReferencingAction } from '../../lib/actions/references/monster-action-multiattack-references'
 import type { MonsterActionDraftRow } from '../../lib/actions/monster-action-presets'
 import { monsterFormSectionRows } from '../../lib/actions/monster-action-section-access'
 import type { MonsterActionPending } from '../../hooks/use-monster-action-sections'
@@ -79,10 +81,8 @@ const SECTION_HEADINGS = {
   legendaryActions: MONSTER_LEGENDARY_ACTIONS_HEADING,
 } as const satisfies Record<MonsterActionSection, string>
 
-function mapActionListItem(
+function resolveActionListMeta(
   row: unknown,
-  index: number,
-  titles: ReadonlyMap<string, string>,
   section: MonsterActionSection,
   sourceTitles?: ReadonlyMap<string, string>,
 ) {
@@ -97,13 +97,35 @@ function mapActionListItem(
         })
       : undefined
   return {
-    title: action ? (titles.get(action.id) ?? `Action ${index + 1}`) : `Action ${index + 1}`,
     kindLabel: category
       ? LEGENDARY_ACTION_CATEGORY_LABELS[category]
       : action
         ? getMonsterActionKindLabel(action.kind)
         : undefined,
     ...(reference?.summary ? { summary: reference.summary } : {}),
+  }
+}
+
+function shapeShiftDisabledReason(values: MonsterFormValues): string | undefined {
+  const formsContext = values.forms
+    ? resolveCreatureFormsContext(values.forms, values.name)
+    : undefined
+  if (!formsContext) return 'Add forms before adding Shape-Shift.'
+  if (formsContext.status !== 'complete') return 'Select the true form before adding Shape-Shift.'
+  if (formsContext.alternateDestinations.length === 0) {
+    return 'Add a form other than the true form before adding Shape-Shift.'
+  }
+  return undefined
+}
+
+function actionAcquisitionSectionRows(values: MonsterFormValues) {
+  return {
+    actions: values.actions ?? [],
+    bonusActions: values.bonusActions ?? [],
+    reactions: values.reactions ?? [],
+    ...(values.legendaryActions
+      ? { legendaryActions: { actions: values.legendaryActions.actions } }
+      : {}),
   }
 }
 
@@ -132,14 +154,8 @@ function MonsterActionAddMenu({
           weaponActions,
           allowAddWeapon,
           section,
-          sectionRows: {
-            actions: values.actions ?? [],
-            bonusActions: values.bonusActions ?? [],
-            reactions: values.reactions ?? [],
-            ...(values.legendaryActions
-              ? { legendaryActions: { actions: values.legendaryActions.actions } }
-              : {}),
-          },
+          shapeShiftDisabledReason: shapeShiftDisabledReason(values),
+          sectionRows: actionAcquisitionSectionRows(values),
           hasReferenceTargets: ((values.actions ?? []) as MonsterActionDraftRow[]).some(
             isLegendaryReferenceTarget,
           ),
@@ -248,13 +264,30 @@ function useMonsterActionDetailRows(
     itemNoun: MONSTER_ACTION_ITEM_NOUN,
     access: { kind: 'availability' as const, fieldName: 'available' as const },
   }
+  const actionRowTitle = useMemo(
+    () => createMonsterActionRowTitleConfig({ section: 'actions', values, ctx }),
+    [ctx, values],
+  )
+  const bonusRowTitle = useMemo(
+    () => createMonsterActionRowTitleConfig({ section: 'bonusActions', values, ctx }),
+    [ctx, values],
+  )
+  const reactionRowTitle = useMemo(
+    () => createMonsterActionRowTitleConfig({ section: 'reactions', values, ctx }),
+    [ctx, values],
+  )
+  const legendaryRowTitle = useMemo(
+    () => createMonsterActionRowTitleConfig({ section: 'legendaryActions', values, ctx }),
+    [ctx, values],
+  )
   const actionRows = useEmbeddedMasterDetailRows({
     ...shared,
     itemFields: { resolveItemFields: makeActionResolver('actions') },
     fieldName: 'actions',
     editor: sections.editors.actions,
     sectionLabel: SECTION_HEADINGS.actions,
-    mapListItem: ({ row, index }) => mapActionListItem(row, index, actionTitles, 'actions'),
+    rowTitle: actionRowTitle,
+    resolveListMeta: ({ row }) => resolveActionListMeta(row, 'actions'),
   })
   const bonusRows = useEmbeddedMasterDetailRows({
     ...shared,
@@ -262,7 +295,8 @@ function useMonsterActionDetailRows(
     fieldName: 'bonusActions',
     editor: sections.editors.bonusActions,
     sectionLabel: SECTION_HEADINGS.bonusActions,
-    mapListItem: ({ row, index }) => mapActionListItem(row, index, bonusTitles, 'bonusActions'),
+    rowTitle: bonusRowTitle,
+    resolveListMeta: ({ row }) => resolveActionListMeta(row, 'bonusActions'),
   })
   const reactionRows = useEmbeddedMasterDetailRows({
     ...shared,
@@ -270,8 +304,8 @@ function useMonsterActionDetailRows(
     fieldName: 'reactions',
     editor: sections.editors.reactions,
     sectionLabel: SECTION_HEADINGS.reactions,
-    mapListItem: ({ row, index }) =>
-      mapActionListItem(row, index, reactionTitles, 'reactions', actionTitles),
+    rowTitle: reactionRowTitle,
+    resolveListMeta: ({ row }) => resolveActionListMeta(row, 'reactions', actionTitles),
   })
   const legendaryRows = useEmbeddedMasterDetailRows({
     ...shared,
@@ -279,8 +313,8 @@ function useMonsterActionDetailRows(
     fieldName: 'legendaryActions.actions',
     editor: sections.editors.legendaryActions,
     sectionLabel: SECTION_HEADINGS.legendaryActions,
-    mapListItem: ({ row, index }) =>
-      mapActionListItem(row, index, legendaryTitles, 'legendaryActions', actionTitles),
+    rowTitle: legendaryRowTitle,
+    resolveListMeta: ({ row }) => resolveActionListMeta(row, 'legendaryActions', actionTitles),
   })
   return {
     titlesBySection: {
@@ -357,7 +391,7 @@ export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
   }, 0)
   const deleteLocated = sections.locate(sections.deleteTargetId)
   const deleteReferences = deleteLocated
-    ? multiattacksReferencingAction(
+    ? actionsReferencingAction(
         [
           ...((values.actions ?? []) as MonsterActionDraftRow[]),
           ...monsterFormSectionRows(values, 'legendaryActions'),

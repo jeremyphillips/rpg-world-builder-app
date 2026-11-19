@@ -1,0 +1,156 @@
+/*
+ * Checkbox option — plain (intrinsic) or outlined shell (`data-shell="outlined"`).
+ * Indicator color comes from [data-choice-tone] in choice-control.css.
+ * Outlined surface state reads --checkbox-option-* for every tone.
+ */
+@layer components {
+  .ui-checkbox-option {
+    display: inline-flex;
+    width: auto;
+    max-width: 100%;
+    min-width: 0;
+    flex-shrink: 0;
+    align-items: center;
+    gap: calc(var(--spacing) * 2);
+    cursor: pointer;
+    color: var(--foreground);
+  }
+
+  .ui-checkbox-option[data-shell='outlined'] {
+    height: var(--control-height-md);
+    padding-inline: var(--field-padding-md);
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--checkbox-option-border);
+    border-radius: calc(var(--radius) - 2px);
+    background-color: var(--checkbox-option-bg);
+    --checkbox-option-bg: var(--color-background);
+    --checkbox-option-border: var(--interactive-outline-border);
+    --checkbox-option-hover-bg: var(--surface-subtle);
+    --checkbox-option-hover-border: var(--border-strong);
+    --checkbox-option-checked-bg: var(--interactive-outline-active-bg);
+    --checkbox-option-checked-border: var(--interactive-outline-border);
+    --checkbox-option-checked-hover-bg: color-mix(
+      in oklch,
+      var(--primary) 8%,
+      var(--interactive-outline-active-bg)
+    );
+    --checkbox-option-checked-hover-border: var(--border-strong);
+    transition-property: color, background-color, border-color, box-shadow;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+
+  .ui-checkbox-option[data-shell='outlined'][data-field-scale='sm']:not([data-size]) {
+    height: var(--control-height-sm);
+    padding-inline: var(--field-padding-sm);
+  }
+
+  .ui-checkbox-option[data-shell='outlined'][data-size='sm'] {
+    height: var(--control-height-sm);
+    padding-inline: var(--field-padding-sm);
+  }
+
+  .ui-checkbox-option[data-shell='outlined'][data-size='md'] {
+    height: var(--control-height-md);
+    padding-inline: var(--field-padding-md);
+  }
+
+  [data-content-density='compact'] .ui-checkbox-option[data-shell='outlined']:not([data-size]) {
+    height: var(--control-height-sm);
+    padding-inline: var(--field-padding-sm);
+  }
+
+  [data-content-density='comfortable'] .ui-checkbox-option[data-shell='outlined']:not([data-size]) {
+    height: var(--control-height-md);
+    padding-inline: var(--field-padding-md);
+  }
+
+  [data-heading-inline] .ui-checkbox-option[data-shell='outlined'],
+  [data-heading-inline] .ui-checkbox-option[data-shell='outlined'][data-size] {
+    height: var(--control-height-sm);
+    padding-inline: var(--field-padding-sm);
+  }
+
+  .ui-checkbox-option__label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ui-checkbox-option[data-shell='outlined'][data-choice-tone='success'] {
+    --checkbox-option-checked-bg: var(--success-subtle);
+    --checkbox-option-checked-border: var(--success-muted);
+    --checkbox-option-checked-hover-bg: color-mix(
+      in oklch,
+      var(--success) 8%,
+      var(--success-subtle)
+    );
+    --checkbox-option-checked-hover-border: var(--success-muted);
+  }
+
+  .ui-checkbox-option[data-shell='outlined'][data-choice-tone='warning'] {
+    --checkbox-option-checked-bg: var(--warning-subtle);
+    --checkbox-option-checked-border: var(--warning-muted);
+    --checkbox-option-checked-hover-bg: color-mix(
+      in oklch,
+      var(--warning) 8%,
+      var(--warning-subtle)
+    );
+    --checkbox-option-checked-hover-border: var(--warning-muted);
+  }
+
+  .ui-checkbox-option[data-shell='outlined'][data-choice-tone='destructive'] {
+    --checkbox-option-checked-bg: var(--destructive-subtle);
+    --checkbox-option-checked-border: var(--destructive-muted);
+    --checkbox-option-checked-hover-bg: color-mix(
+      in oklch,
+      var(--destructive) 8%,
+      var(--destructive-subtle)
+    );
+    --checkbox-option-checked-hover-border: var(--destructive-muted);
+  }
+
+  .ui-checkbox-option[data-shell='outlined'][data-checked='false']:hover:not(
+      [data-disabled='true']
+    ) {
+    background-color: var(--checkbox-option-hover-bg);
+    border-color: var(--checkbox-option-hover-border);
+  }
+
+  .ui-checkbox-option[data-shell='outlined'][data-checked='true'] {
+    background-color: var(--checkbox-option-checked-bg);
+    border-color: var(--checkbox-option-checked-border);
+  }
+
+  .ui-checkbox-option[data-shell='outlined'][data-checked='true']:hover:not(
+      [data-disabled='true']
+    ) {
+    background-color: var(--checkbox-option-checked-hover-bg);
+    border-color: var(--checkbox-option-checked-hover-border);
+  }
+
+  .ui-checkbox-option[data-shell='outlined'][data-invalid='true'] {
+    border-color: var(--field-control-border-invalid);
+  }
+
+  .ui-checkbox-option[data-shell='outlined'][data-disabled='true'] {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .ui-checkbox-option[data-shell='outlined'] .ui-choice-control:disabled {
+    opacity: 1;
+  }
+
+  .ui-checkbox-option[data-shell='outlined'] .ui-focus-ring:focus-visible {
+    box-shadow: none;
+    outline: none;
+  }
+
+  .ui-checkbox-option[data-shell='outlined']:has(:focus-visible) {
+    outline: none;
+    box-shadow: var(--ui-focus-ring-standalone);
+  }
+}

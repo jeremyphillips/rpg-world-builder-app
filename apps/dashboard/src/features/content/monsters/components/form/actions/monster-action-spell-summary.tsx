@@ -11,6 +11,7 @@ import {
   MONSTER_REACTION_PREVIEW_LABEL,
 } from '../../../lib/monster-form-labels'
 import type { MonsterActionDraftRow } from '../../../lib/actions/monster-action-presets'
+import { useMonsterActionPreviewTitle } from '../../../lib/monster-qualified-preview-title'
 import type { MonsterFormValues } from '../../../lib/monster-form-values'
 
 export function MonsterActionSpellSummary({
@@ -37,14 +38,25 @@ export function MonsterActionSpellSummary({
     })
   }, [action.id, action.kind, ctx, section, values])
 
+  const draft = values ? findMonsterFormActionDraft(values, ctx, action.id) : undefined
+  const title = useMonsterActionPreviewTitle(draft, values, ctx, section)
+
   if (!preview) return null
 
   const label =
     section === 'reactions' ? MONSTER_REACTION_PREVIEW_LABEL : MONSTER_ACTION_SPELL_PREVIEW_LABEL
 
   if (preview.status === 'unavailable') {
-    return <RulesPreview label={label} content={{ kind: 'guidance', message: preview.guidance }} />
+    return (
+      <RulesPreview
+        label={label}
+        title={title}
+        content={{ kind: 'guidance', message: preview.guidance }}
+      />
+    )
   }
 
-  return <RulesPreview label={label} content={{ kind: 'html', html: preview.bodyHtml }} />
+  return (
+    <RulesPreview label={label} title={title} content={{ kind: 'html', html: preview.bodyHtml }} />
+  )
 }

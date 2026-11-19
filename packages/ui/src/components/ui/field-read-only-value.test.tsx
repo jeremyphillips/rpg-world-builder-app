@@ -43,6 +43,21 @@ describe('FieldReadOnlyValueField', () => {
     expect(screen.getByText('Fixed.')).toBeInTheDocument()
   })
 
+  it('omits the required marker for a settings value', () => {
+    render(
+      <FieldReadOnlyValueField
+        id="amount"
+        label="Amount"
+        displayValue="Full effect"
+        required
+        labelPosition="settings"
+      />,
+    )
+    expect(screen.getByText('Amount')).toBeInTheDocument()
+    expect(screen.queryByText('*')).not.toBeInTheDocument()
+    expect(screen.getByText('Full effect')).not.toHaveAttribute('aria-required')
+  })
+
   it('omits the label row when label is blank', () => {
     render(<FieldReadOnlyValueField id="amount" label="" displayValue="Full effect" />)
     expect(screen.queryByText('Amount')).not.toBeInTheDocument()
