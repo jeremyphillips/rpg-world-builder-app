@@ -1,4 +1,4 @@
-import type { MasterDetailEditorIdentity } from '../../components/master-detail/master-detail-editor-shell'
+import type { MasterDetailEditorIdentity } from './master-detail-editor-identity.types'
 import type { EmbeddedMasterDetailRow } from './build-embedded-master-detail-rows'
 import type { MasterDetailAvailabilityPresentation } from './master-detail-availability.types'
 import type { EmbeddedListDisplay } from './resolve-embedded-list-display'

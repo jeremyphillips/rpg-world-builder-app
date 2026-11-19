@@ -2,7 +2,7 @@ import type { ResolvedContentCampaignAccess } from '@rpg/contracts'
 
 import type { AvailabilityReason } from '@/lib/availability'
 
-import type { MasterDetailListItem } from '../../components/master-detail/master-detail-list-panel'
+import type { MasterDetailListItem } from './master-detail-list-item.types'
 import type { ContentFormCtx } from '../forms/registry/content-form-registry'
 import { resolveMasterDetailRowKey } from './content-campaign-availability'
 import { buildEmbeddedMasterDetailListItem } from './build-embedded-master-detail-list-item'

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, type ReactNode } from 'react'
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm, useWatch, type UseFormReturn } from 'react-hook-form'
@@ -15,7 +15,12 @@ import { monsterFormsSectionFields } from '../../lib/forms/monster-forms-form-fi
 import { makeEmptyMonsterDefinedForm } from '../../lib/forms/monster-forms-form-values'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
 import { monsterFormTestValues } from '../../lib/monster-form-test-values'
+import { MonsterFormsLifecycleProvider } from '../../hooks/monster-forms-lifecycle-provider'
 import { MonsterFormsEditor } from './monster-forms-editor'
+
+function withMonsterFormsLifecycle(children: ReactNode) {
+  return <MonsterFormsLifecycleProvider>{children}</MonsterFormsLifecycleProvider>
+}
 
 const ctx: ContentFormCtx = { entityCatalogLayer: 'homebrew' }
 
@@ -33,7 +38,8 @@ describe('monster forms authoring architecture', () => {
     expect(section.fields).toContainEqual(
       expect.objectContaining({
         kind: 'slot',
-        issuePaths: ['forms.definedForms', 'forms.trueForm.formId'],
+        name: 'formsShapeShifting',
+        issuePaths: expect.arrayContaining(['forms.definedForms', 'forms.trueForm.formId']),
       }),
     )
     expect(JSON.stringify(section)).not.toMatch(/<(input|select|textarea)|register\(/)
@@ -73,7 +79,7 @@ describe('monster forms authoring architecture', () => {
       })
       return (
         <FormProvider {...form}>
-          <MonsterFormsEditor ctx={ctx} />
+          {withMonsterFormsLifecycle(<MonsterFormsEditor ctx={ctx} />)}
           <Output />
         </FormProvider>
       )
@@ -109,7 +115,7 @@ describe('monster forms authoring architecture', () => {
       })
       return (
         <FormProvider {...form}>
-          <MonsterFormsEditor ctx={ctx} />
+          {withMonsterFormsLifecycle(<MonsterFormsEditor ctx={ctx} />)}
         </FormProvider>
       )
     }
@@ -138,7 +144,7 @@ describe('monster forms authoring architecture', () => {
       })
       return (
         <FormProvider {...form}>
-          <MonsterFormsEditor ctx={ctx} />
+          {withMonsterFormsLifecycle(<MonsterFormsEditor ctx={ctx} />)}
         </FormProvider>
       )
     }
@@ -170,7 +176,7 @@ describe('monster forms authoring architecture', () => {
       })
       return (
         <FormProvider {...form}>
-          <MonsterFormsEditor ctx={ctx} />
+          {withMonsterFormsLifecycle(<MonsterFormsEditor ctx={ctx} />)}
         </FormProvider>
       )
     }

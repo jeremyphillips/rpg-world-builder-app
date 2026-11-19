@@ -2,9 +2,7 @@ import { createElement } from 'react'
 import type { FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
-import { MonsterFormsDifferencePresentation } from '../../components/form/monster-forms-difference-presentation'
-import { MonsterFormsEditor } from '../../components/form/monster-forms-editor'
-import { MonsterTrueFormDesignation } from '../../components/form/monster-true-form-designation'
+import { MonsterFormsShapeShiftingSection } from '../../components/form/monster-forms-shape-shifting-section'
 import { monsterFormMovementOverrideGroup } from './monster-form-movement-override-fields'
 import { monsterFormSizesOverrideGroup } from './monster-form-sizes-override-fields'
 import {
@@ -15,7 +13,6 @@ import {
   MONSTER_FORMS_ADD_LABEL,
   MONSTER_SHAPE_SHIFTING_DESCRIPTION,
   MONSTER_SHAPE_SHIFTING_HEADING,
-  MONSTER_TRUE_FORM_HEADING,
 } from '../monster-form-labels'
 
 export function monsterDefinedFormDetailFields(ctx: ContentFormCtx): FormItem[] {
@@ -68,12 +65,6 @@ export function monsterFormsSectionFields(ctx: ContentFormCtx): FormItem[] {
           },
           fields: [
             {
-              kind: 'slot',
-              name: 'forms.trueForm.kind',
-              issuePaths: ['forms.trueForm.formId', 'forms.trueForm.name'],
-              render: () => createElement(MonsterTrueFormDesignation),
-            },
-            {
               type: 'text',
               name: 'forms.trueForm.name',
               label: MONSTER_FORM_NAME_LABEL,
@@ -94,15 +85,14 @@ export function monsterFormsSectionFields(ctx: ContentFormCtx): FormItem[] {
         },
         {
           kind: 'slot',
-          name: 'formsEditor',
-          issuePaths: ['forms.definedForms', 'forms.trueForm.formId'],
-          render: () => createElement(MonsterFormsEditor, { ctx }),
-        },
-        {
-          kind: 'slot',
-          name: 'forms.differencesPresentation',
-          issuePaths: ['forms.differencesPresentation'],
-          render: () => createElement(MonsterFormsDifferencePresentation),
+          name: 'formsShapeShifting',
+          issuePaths: [
+            'forms.definedForms',
+            'forms.trueForm.formId',
+            'forms.trueForm.kind',
+            'forms.differencesPresentation',
+          ],
+          render: () => createElement(MonsterFormsShapeShiftingSection, { ctx }),
         },
       ],
     },

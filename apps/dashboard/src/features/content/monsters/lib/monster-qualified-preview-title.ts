@@ -1,10 +1,7 @@
 import {
-  formatMonsterQualifiedHeading,
-  MONSTER_UNTITLED_FORM_LABEL,
-  monsterFormRestrictionEligibleIds,
-  resolveCreatureFormsContext,
-  resolveMonsterEntryHeading,
   type CreatureFormsDraft,
+  formatMonsterQualifiedHeading,
+  resolveMonsterEntryHeading,
 } from '@rpg/contracts'
 import { useMemo } from 'react'
 import { useWatch } from 'react-hook-form'
@@ -16,26 +13,6 @@ import type { MonsterActionDraftRow } from './actions/monster-action-presets'
 import type { MonsterActionSection } from './actions/references/monster-action-equipment-references'
 import { monsterTraitPreviewBaseName } from './traits/monster-trait-editor-title'
 import type { MonsterFormValues } from './monster-form-values'
-
-export function monsterFormRestrictionLabels(
-  forms: CreatureFormsDraft,
-  creatureName: string,
-): Map<string, string> {
-  const eligibleIds = new Set(monsterFormRestrictionEligibleIds(forms))
-  const names = new Map<string, string>()
-  const context = resolveCreatureFormsContext(forms, creatureName)
-  if (context.status === 'invalid') return names
-
-  const register = (id: string, label: string) => {
-    if (eligibleIds.has(id)) names.set(id, label.trim() || MONSTER_UNTITLED_FORM_LABEL)
-  }
-
-  if (context.profile?.id) register(context.profile.id, context.profile.name)
-  for (const form of context.definedForms) {
-    register(form.id, form.name)
-  }
-  return names
-}
 
 function readOnlyInFormIds(row: unknown): readonly string[] | undefined {
   if (!row || typeof row !== 'object' || !('onlyInFormIds' in row)) return undefined

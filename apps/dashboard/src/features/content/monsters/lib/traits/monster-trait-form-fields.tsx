@@ -15,7 +15,7 @@ import {
   monsterFormAdvisoryTone,
 } from '../monster-form-advisory-presentation'
 import { defineMasterDetailItemNoun } from '../../../lib/master-detail/master-detail-item-noun'
-import { insertMonsterFormAvailabilityField } from '../../components/form/monster-form-availability'
+import { insertMonsterFormAvailabilityField } from '../forms/monster-form-availability-fields'
 import { WaterBreathingToggle } from '../../components/form/water-breathing-toggle'
 import { formatMonsterTemplateSentence } from '../format-monster-template-sentence'
 import type { MonsterFormAdvisory } from '../monster-form-advisories'

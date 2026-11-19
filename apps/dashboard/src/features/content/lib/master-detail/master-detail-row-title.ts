@@ -1,4 +1,4 @@
-import type { MasterDetailInlineTitle } from '../../components/master-detail/master-detail-inline-title'
+import type { MasterDetailInlineTitle } from './master-detail-inline-title.types'
 import type { MasterDetailItemMeta } from './master-detail-item-meta'
 import type { MasterDetailItemNounTerm } from './master-detail-item-noun'
 import { masterDetailUnnamedItemTitle } from './master-detail-constants'

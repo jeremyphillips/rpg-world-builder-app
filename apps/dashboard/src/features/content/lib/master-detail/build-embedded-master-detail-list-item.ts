@@ -1,6 +1,6 @@
 import type { ContentFormCtx } from '../forms/registry/content-form-registry'
 import type { AvailabilityReason } from '@/lib/availability'
-import type { MasterDetailListItem } from '../../components/master-detail/master-detail-list-panel'
+import type { MasterDetailListItem } from './master-detail-list-item.types'
 import { resolveMasterDetailRowKey } from './content-campaign-availability'
 import { resolveEmbeddedRowMeta } from './resolve-embedded-row-meta'
 

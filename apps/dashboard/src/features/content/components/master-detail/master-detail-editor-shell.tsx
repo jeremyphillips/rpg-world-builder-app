@@ -9,40 +9,16 @@ import {
   detailOverflowDuplicateAction,
   type DetailOverflowMenuEntry,
 } from '../../lib/detail/detail-overflow-actions'
-import {
-  joinMasterDetailCaption,
-  type MasterDetailItemMeta,
-} from '../../lib/master-detail/master-detail-item-meta'
+import { joinMasterDetailCaption } from '../../lib/master-detail/master-detail-item-meta'
 import { masterDetailItemNounLabel } from '../../lib/master-detail/master-detail-constants'
 import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
-import type { MasterDetailAvailabilityPresentation } from '../../lib/master-detail/master-detail-availability.types'
 import { MasterDetailEditorEmptyState } from './master-detail-editor-empty-state'
 import { MasterDetailEditorStatusRow } from './master-detail-editor-status-row'
-import {
-  MasterDetailInlineTitleEditor,
-  type MasterDetailInlineTitle,
-} from './master-detail-inline-title'
+import type { MasterDetailEditorIdentity } from '../../lib/master-detail/master-detail-editor-identity.types'
+import type { MasterDetailInlineTitle } from '../../lib/master-detail/master-detail-inline-title.types'
+import { MasterDetailInlineTitleEditor } from './master-detail-inline-title'
 
-export type { MasterDetailInlineTitle }
-
-export interface MasterDetailEditorIdentity {
-  title: string
-  /** Stable RHF field id; remounts the inline title editor when selection changes. */
-  rowKey?: string
-  /** When true, add acquisition is deferred to inline title (row hydration or initial edit). */
-  acquisitionAwaitingTitleResolution?: boolean
-  meta?: MasterDetailItemMeta
-  /** Derived original name, shown in the detail caption while a custom name is stored. */
-  sourceName?: string
-  deletable?: boolean
-  availability?: MasterDetailAvailabilityPresentation
-  onAvailabilityChange?: () => void
-  /** Distinct claim-target issue count for the selected row. */
-  issueCount?: number
-  /** Issues claimed by the row itself, shown beside the count. */
-  headerIssues?: readonly { path: string; message: string }[]
-  inlineTitle?: MasterDetailInlineTitle
-}
+export type { MasterDetailEditorIdentity, MasterDetailInlineTitle }
 
 export interface MasterDetailEditorShellProps {
   itemNoun: MasterDetailItemNounTerm

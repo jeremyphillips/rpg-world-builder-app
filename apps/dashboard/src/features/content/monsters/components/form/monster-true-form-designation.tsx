@@ -1,7 +1,7 @@
 import { RadioGroupField, SelectField } from '@rpg/ui'
 import { useFormContext, useWatch } from 'react-hook-form'
 
-import { useMonsterFormsLifecycle } from '../../hooks/use-monster-forms-lifecycle'
+import { useMonsterFormsLifecycleContext } from '../../hooks/monster-forms-lifecycle-provider'
 import {
   MONSTER_DEFINED_FORM_DISPLAY_FALLBACK,
   MONSTER_TRUE_FORM_DEFINED_EMPTY_HINT,
@@ -33,7 +33,7 @@ export function MonsterTrueFormDesignation() {
   const {
     formState: { errors },
   } = useFormContext<MonsterFormValues>()
-  const lifecycle = useMonsterFormsLifecycle()
+  const lifecycle = useMonsterFormsLifecycleContext()
   if (!forms?.trueForm || !Array.isArray(forms.definedForms)) return null
 
   const selectedId = forms.trueForm.kind === 'defined' ? forms.trueForm.formId : undefined
@@ -73,7 +73,6 @@ export function MonsterTrueFormDesignation() {
           onValueChange={(formId) => lifecycle.requestDesignation({ kind: 'defined', formId })}
         />
       ) : null}
-      {lifecycle.dialog}
     </>
   )
 }

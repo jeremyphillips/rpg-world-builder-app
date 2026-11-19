@@ -1,4 +1,4 @@
-import type { MasterDetailListItem } from '../../components/master-detail/master-detail-list-panel'
+import type { MasterDetailListItem } from './master-detail-list-item.types'
 import { masterDetailItemTitle } from './master-detail-constants'
 import type { MasterDetailItemNounTerm } from './master-detail-item-noun'
 import type { MasterDetailListMetaInput } from './master-detail-row-title'

@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useState, type ReactNode } from 'react'
 import {
   planMonsterDefinedFormRemoval,
   planMonsterFormsRemoval,
@@ -17,6 +17,17 @@ import {
 } from '../lib/monster-form-labels'
 import { makeEmptyMonsterForms } from '../lib/forms/monster-forms-form-values'
 
+export type MonsterFormsLifecycleApi = {
+  addForms: () => void
+  requestDesignation: (trueForm: NonNullable<MonsterFormValues['forms']>['trueForm']) => void
+  requestDefinedFormRemoval: (formId: string, afterConfirm?: () => void) => void
+  requestRemoveAll: () => void
+}
+
+type MonsterFormsLifecycleValue = MonsterFormsLifecycleApi & {
+  dialog: ReactNode
+}
+
 type PendingRemoval = {
   next: unknown
   description: string
@@ -25,7 +36,7 @@ type PendingRemoval = {
   afterConfirm?: () => void
 }
 
-export function useMonsterFormsLifecycle() {
+export function useMonsterFormsLifecycle(): MonsterFormsLifecycleValue {
   const { getValues, setValue, trigger } = useFormContext<MonsterFormValues>()
   const [pending, setPending] = useState<PendingRemoval | null>(null)
 

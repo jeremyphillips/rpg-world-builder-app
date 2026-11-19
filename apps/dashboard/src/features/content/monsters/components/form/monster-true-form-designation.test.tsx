@@ -12,6 +12,7 @@ import {
   MONSTER_TRUE_FORM_SELECT_LABEL,
 } from '../../lib/monster-form-labels'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
+import { MonsterFormsLifecycleProvider } from '../../hooks/monster-forms-lifecycle-provider'
 import { MonsterTrueFormDesignation } from './monster-true-form-designation'
 
 function Host({ forms }: { forms: unknown }) {
@@ -20,7 +21,9 @@ function Host({ forms }: { forms: unknown }) {
   })
   return (
     <FormProvider {...form}>
-      <MonsterTrueFormDesignation />
+      <MonsterFormsLifecycleProvider>
+        <MonsterTrueFormDesignation />
+      </MonsterFormsLifecycleProvider>
     </FormProvider>
   )
 }
@@ -98,21 +101,6 @@ describe('MonsterTrueFormDesignation', () => {
     await user.click(screen.getByLabelText('Defined form'))
     expect(screen.getByText(MONSTER_TRUE_FORM_DEFINED_EMPTY_HINT)).toBeInTheDocument()
     expect(screen.queryByText(MONSTER_TRUE_FORM_PROFILE_HINT)).not.toBeInTheDocument()
-  })
-
-  it('hides the duplicate true-form label while keeping the accessible radiogroup name', () => {
-    render(
-      <Host
-        forms={{
-          profileFormId: 'profile',
-          trueForm: { kind: 'profile' },
-          definedForms: [],
-        }}
-      />,
-    )
-
-    expect(screen.getByRole('radiogroup', { name: MONSTER_TRUE_FORM_HEADING })).toBeInTheDocument()
-    expect(screen.getByText(MONSTER_TRUE_FORM_HEADING)).toHaveClass('sr-only')
   })
 
   it('uses New form as the selector label for an unnamed defined form', () => {

@@ -1,6 +1,7 @@
 import type { z } from 'zod'
 
 import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
+import { monsterFormLabelById } from '../../runtime/creature/form-labels'
 import type { CreatureFormsDraft } from '../creature/forms'
 import {
   monsterActionSectionRowPath,
@@ -38,6 +39,20 @@ export function monsterFormRestrictionEligibleIds(forms: CreatureFormsDraft): re
     if (!ids.includes(forms.profileFormId)) ids.push(forms.profileFormId)
   }
   return ids
+}
+
+/** Display labels for ids that may appear in `onlyInFormIds` chips and filters. */
+export function monsterFormRestrictionLabelMap(
+  forms: CreatureFormsDraft,
+  creatureName: string,
+): Map<string, string> {
+  const eligible = new Set(monsterFormRestrictionEligibleIds(forms))
+  const labels = monsterFormLabelById(forms, creatureName)
+  const restricted = new Map<string, string>()
+  for (const [id, label] of labels) {
+    if (eligible.has(id)) restricted.set(id, label)
+  }
+  return restricted
 }
 
 /** Orders selected restriction ids by {@link monsterFormRestrictionEligibleIds}; unknown ids trail. */

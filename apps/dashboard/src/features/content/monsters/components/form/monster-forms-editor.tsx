@@ -1,12 +1,12 @@
 import { useCallback, useMemo } from 'react'
-import { Button } from '@rpg/ui'
+import { Button, Text } from '@rpg/ui'
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { FormEmbeddedMasterDetailEditor } from '../../../components/master-detail/form-embedded-master-detail-editor'
 import { useMasterDetailArray } from '../../../lib/master-detail/use-master-detail-array'
 import { defineMasterDetailItemNoun } from '../../../lib/master-detail/master-detail-item-noun'
-import { useMonsterFormsLifecycle } from '../../hooks/use-monster-forms-lifecycle'
+import { useMonsterFormsLifecycleContext } from '../../hooks/monster-forms-lifecycle-provider'
 import {
   MONSTER_FORM_ITEM_NOUN_LABEL,
   MONSTER_FORM_ITEM_NOUN_PLURAL,
@@ -36,7 +36,7 @@ export function MonsterFormsEditor({ ctx }: { ctx: ContentFormCtx }) {
   const { getValues, setValue, trigger } = form
   const makeDefaults = useCallback(() => makeEmptyMonsterDefinedForm(), [])
   const editor = useMasterDetailArray('forms.definedForms', makeDefaults)
-  const lifecycle = useMonsterFormsLifecycle()
+  const lifecycle = useMonsterFormsLifecycleContext()
   const resolver = useMemo(
     () => ({ resolveItemFields: monsterDefinedFormRowResolveFields(ctx) }),
     [ctx],
@@ -65,9 +65,7 @@ export function MonsterFormsEditor({ ctx }: { ctx: ContentFormCtx }) {
           kind: 'slot' as const,
           name: 'baseStatistics',
           render: () => (
-            <div>
-              <p>This form uses the creature's base statistics.</p>
-            </div>
+            <Text role="supporting">This form uses the creature&apos;s base statistics.</Text>
           ),
         },
       ]
@@ -121,7 +119,6 @@ export function MonsterFormsEditor({ ctx }: { ctx: ContentFormCtx }) {
         <Button type="button" variant="secondary" onClick={lifecycle.addForms}>
           {MONSTER_FORMS_ADD_LABEL}
         </Button>
-        {lifecycle.dialog}
       </>
     )
   }
@@ -152,7 +149,6 @@ export function MonsterFormsEditor({ ctx }: { ctx: ContentFormCtx }) {
       <Button type="button" variant="ghost" onClick={lifecycle.requestRemoveAll}>
         {MONSTER_FORMS_REMOVE_LABEL}
       </Button>
-      {lifecycle.dialog}
     </>
   )
 }

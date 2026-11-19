@@ -1,6 +1,7 @@
 import { monsterFormRestrictionEligibleIds, sortMonsterFormRestrictionIds } from '@rpg/contracts'
+import { monsterFormRestrictionLabelMap } from '@rpg/contracts'
 import { ChipsField, RadioGroupField, type FieldHintPosition } from '@rpg/ui'
-import { useSlotIssues, type FormItem } from '@rpg/ui/form'
+import { useSlotIssues } from '@rpg/ui/form'
 import { useEffect, useState } from 'react'
 import { useFormContext, useWatch, type UseFormReturn } from 'react-hook-form'
 
@@ -14,28 +15,7 @@ import {
   monsterFormAvailabilityRowKind,
   resolveMonsterFormAvailabilityHint,
 } from '../../lib/monster-form-labels'
-import { monsterFormRestrictionLabels } from '../../lib/monster-qualified-preview-title'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
-
-export const MONSTER_FORM_AVAILABILITY_FIELD = 'formAvailability'
-
-export function insertMonsterFormAvailabilityField(fields: FormItem[]): FormItem[] {
-  const slot = monsterFormAvailabilityField()
-  const advisoryIndex = fields.findIndex(
-    (item) => 'name' in item && item.name === 'buildAdvisories',
-  )
-  if (advisoryIndex < 0) return [slot, ...fields]
-  return [...fields.slice(0, advisoryIndex + 1), slot, ...fields.slice(advisoryIndex + 1)]
-}
-
-export function monsterFormAvailabilityField(): FormItem {
-  return {
-    kind: 'slot',
-    name: MONSTER_FORM_AVAILABILITY_FIELD,
-    issuePaths: ['onlyInFormIds'],
-    render: ({ namePrefix }) => <MonsterFormAvailabilityControl namePrefix={namePrefix} />,
-  }
-}
 
 function stringIds(value: unknown): string[] {
   if (!Array.isArray(value)) return []
@@ -110,7 +90,6 @@ function shouldShowFormAvailability(
 
 type MonsterFormAvailabilityViewProps = {
   form: UseFormReturn<MonsterFormValues>
-  namePrefix: string
   restrictionPath: string
   controlId: string
   message?: string
@@ -125,7 +104,6 @@ type MonsterFormAvailabilityViewProps = {
 
 function MonsterFormAvailabilityView({
   form,
-  namePrefix,
   restrictionPath,
   controlId,
   message,
@@ -192,7 +170,7 @@ export function MonsterFormAvailabilityControl({ namePrefix }: { namePrefix?: st
 
   if (!visible) return null
 
-  const knownNames = forms ? monsterFormRestrictionLabels(forms, creatureName ?? '') : new Map()
+  const knownNames = forms ? monsterFormRestrictionLabelMap(forms, creatureName ?? '') : new Map()
   const selected = restrictionKeyPresent ? stringIds(watchedIds) : []
   const rowKind = monsterFormAvailabilityRowKind(namePrefix)
   const hintPhase = monsterFormAvailabilityHintPhase(restrictionKeyPresent, availabilityEngaged)
@@ -201,7 +179,6 @@ export function MonsterFormAvailabilityControl({ namePrefix }: { namePrefix?: st
   return (
     <MonsterFormAvailabilityView
       form={form}
-      namePrefix={namePrefix}
       restrictionPath={restrictionPath}
       controlId={`${namePrefix.replaceAll('.', '-')}-form-availability`}
       message={message}

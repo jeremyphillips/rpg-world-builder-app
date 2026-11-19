@@ -10,6 +10,7 @@ import {
 } from '@rpg/ui'
 
 import { isElementOutsideScrollport } from '../../lib/master-detail/is-element-outside-scrollport'
+import type { MasterDetailListItem } from '../../lib/master-detail/master-detail-list-item.types'
 import type { MasterDetailItemMeta } from '../../lib/master-detail/master-detail-item-meta'
 import { MasterDetailListRow } from './master-detail-list-row'
 import { MasterDetailSortableListRows } from './master-detail-sortable-list-rows.client'
@@ -21,24 +22,7 @@ import {
   masterDetailListShellClasses,
 } from './master-detail-list-panel.layout'
 
-export type { MasterDetailItemMeta }
-
-export type MasterDetailListItem = {
-  /** Stable domain row id (`resolveMasterDetailRowKey`), or the resource id. */
-  id: string
-  /** Display label for the row. */
-  title: string
-  /** Structured subtitle parts for list row content and detail identity. */
-  meta?: MasterDetailItemMeta
-  /** Unique presentation-path issue count for the row; badge omitted when zero. */
-  issueCount?: number
-  /** When true, surfaces a validation error indicator on the row. */
-  hasError?: boolean
-  /** When false, detail overflow hides delete. Not shown on list rows. */
-  deletable?: boolean
-  /** Broad campaign availability label rendered below the title when unavailable. */
-  availabilityStatusLabel?: 'Unavailable'
-}
+export type { MasterDetailItemMeta, MasterDetailListItem }
 
 export type MasterDetailListGroup = {
   id: string

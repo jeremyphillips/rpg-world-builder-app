@@ -1,5 +1,5 @@
 import type { CreatureFormsDraft } from '../../content/creature/forms'
-import { resolveCreatureFormsContext } from '../creature/forms'
+import { monsterFormLabelById } from '../creature/form-labels'
 import { formatMonsterFormQualifier } from './format-monster-form-qualifier'
 
 export const MONSTER_UNTITLED_FORM_LABEL = 'Untitled form'
@@ -21,18 +21,6 @@ export type ResolveMonsterEntryHeadingInput = {
   creatureName: string
 }
 
-function formLabelById(forms: CreatureFormsDraft, creatureName: string): Map<string, string> {
-  const context = resolveCreatureFormsContext(forms, creatureName)
-  if (context.status === 'invalid') return new Map()
-  const names = new Map<string, string>()
-  const register = (id: string, label: string) => {
-    names.set(id, label.trim() || MONSTER_UNTITLED_FORM_LABEL)
-  }
-  if (context.profile?.id) register(context.profile.id, context.profile.name)
-  for (const form of context.definedForms) register(form.id, form.name)
-  return names
-}
-
 /** Semantic heading for one monster action or trait. Formatting stays with `formatMonsterQualifiedHeading`. */
 export function resolveMonsterEntryHeading(
   input: ResolveMonsterEntryHeadingInput,
@@ -41,7 +29,7 @@ export function resolveMonsterEntryHeading(
   const ids = input.onlyInFormIds?.filter((id) => id.trim())
   if (!ids || ids.length === 0) return { name }
 
-  const known = input.forms ? formLabelById(input.forms, input.creatureName) : new Map()
+  const known = input.forms ? monsterFormLabelById(input.forms, input.creatureName) : new Map()
   const formQualifier = formatMonsterFormQualifier(
     ids.map((id) => known.get(id) ?? formatMonsterMissingFormLabel(id)),
   )

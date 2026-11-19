@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import type { CreatureFormsDraft } from '../creature/forms'
 import {
   monsterFormRestrictionEligibleIds,
+  monsterFormRestrictionLabelMap,
   readMonsterRowFormRestrictionIds,
   sortMonsterFormRestrictionIds,
 } from './form-availability'
@@ -78,6 +79,26 @@ describe('sortMonsterFormRestrictionIds', () => {
       'humanoid',
       'bear',
       'stale',
+    ])
+  })
+})
+
+describe('monsterFormRestrictionLabelMap', () => {
+  it('omits the profile id when a defined form is the true form', () => {
+    const labels = monsterFormRestrictionLabelMap(
+      {
+        profileFormId: 'profile',
+        trueForm: { kind: 'defined', formId: 'humanoid' },
+        definedForms: [
+          { id: 'humanoid', name: 'Humanoid' },
+          { id: 'bear', name: '  ' },
+        ],
+      },
+      'Werebear',
+    )
+    expect([...labels.entries()]).toEqual([
+      ['humanoid', 'Humanoid'],
+      ['bear', 'Untitled form'],
     ])
   })
 })

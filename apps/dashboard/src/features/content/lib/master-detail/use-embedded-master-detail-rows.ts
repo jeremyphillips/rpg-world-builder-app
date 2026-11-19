@@ -24,8 +24,8 @@ import { buildMasterDetailAvailabilityFormFields } from './master-detail-availab
 import { useMasterDetailRowValidation } from './master-detail-row-validation'
 import type { MasterDetailItemNounTerm } from './master-detail-item-noun'
 import type { UseMasterDetailArrayResult } from './use-master-detail-array'
-import type { MasterDetailListItem } from '../../components/master-detail/master-detail-list-panel'
-import type { MasterDetailEditorIdentity } from '../../components/master-detail/master-detail-editor-shell'
+import type { MasterDetailEditorIdentity } from './master-detail-editor-identity.types'
+import type { MasterDetailListItem } from './master-detail-list-item.types'
 import { embeddedListItemTitle, resolveEmbeddedListDisplay } from './resolve-embedded-list-display'
 import type {
   MasterDetailListMetaInput,

@@ -3,18 +3,9 @@ import { get, useFormContext, useFormState, useWatch, type FieldErrors } from 'r
 import { ActionButton, cn, Input, Text } from '@rpg/ui'
 import { useFieldErrorPresentation, useFormValidationPresentation } from '@rpg/ui/form'
 
-export interface MasterDetailInlineTitle {
-  field: 'name' | 'nameOverride'
-  /** Heading shown when the stored value is empty. Never written to the form. */
-  fallback: string
-  /** Empty-input hint. Never written to the form. */
-  placeholder: string
-  mode: 'authored' | 'override'
-  /** Open the editor once for a row that was just created. */
-  initialEdit?: boolean
-  /** Overflow label while an override is stored. */
-  resetLabel?: string
-}
+import type { MasterDetailInlineTitle } from '../../lib/master-detail/master-detail-inline-title.types'
+
+export type { MasterDetailInlineTitle }
 
 /** Shared by the display heading and the edit input so the two modes cannot drift. */
 const MASTER_DETAIL_TITLE_TYPE_CLASS = 'truncate text-lg font-medium text-foreground'
