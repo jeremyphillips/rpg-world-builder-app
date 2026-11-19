@@ -1,5 +1,4 @@
-'use client'
-
+import { useEffect } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 
 import {
@@ -17,6 +16,10 @@ export function MonsterChallengeRatingZeroXpField() {
   const awardsZeroXp = useWatch<MonsterFormValues, 'experiencePointsOverride'>({
     name: 'experiencePointsOverride',
   })
+
+  useEffect(() => {
+    form.register('experiencePointsOverride', { shouldUnregister: false })
+  }, [form])
 
   if (challengeRating !== '0') return null
 

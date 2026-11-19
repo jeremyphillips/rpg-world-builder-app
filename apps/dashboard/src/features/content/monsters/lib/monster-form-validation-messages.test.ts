@@ -1,12 +1,14 @@
-import { formatFieldMessage } from '@rpg/contracts'
+import { fieldValidationMessages, formatFieldMessage } from '@rpg/contracts'
 import {
   collectTabbedFormResolverItems,
   groupIssuesForItemPrefix,
   makeFieldErrorMap,
 } from '@rpg/ui/form'
+import { collectIssueClaimReport } from '@rpg/ui/form/test-utils'
 import { describe, expect, it } from 'vitest'
 
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
+import { MONSTER_CHALLENGE_HEADING } from './monster-form-labels'
 import { buildMonsterTabs } from './monster-form-fields'
 import { resolveMonsterFormSchema } from './monster-form-schema'
 import { normalizeMonsterFormValues } from './normalize-monster-form-values'
@@ -66,6 +68,26 @@ function messageAt(result: ReturnType<typeof publish>, path: string) {
 }
 
 describe('monster publish validation messages', () => {
+  it('claims a missing challenge rating on the select', () => {
+    const fields = collectTabbedFormResolverItems(buildMonsterTabs(ctx))
+    const { challengeRating: _omitted, ...withoutRating } = body
+    const claim = collectIssueClaimReport({
+      schema,
+      values: withoutRating,
+      fields,
+    }).find((entry) => entry.path === 'challengeRating')
+
+    expect(claim).toMatchObject({
+      targetRole: 'control',
+      claim: { kind: 'field', target: 'challengeRating' },
+    })
+    expect(claim?.message).toBe(
+      formatFieldMessage(
+        fieldValidationMessages.requiredSelect({ label: MONSTER_CHALLENGE_HEADING }),
+      ),
+    )
+  })
+
   it('names the missing control instead of the actions slot', () => {
     const result = publish([
       { id: 'spell', kind: 'spell', spells: [] },

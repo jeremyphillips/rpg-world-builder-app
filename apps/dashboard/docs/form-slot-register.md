@@ -96,14 +96,12 @@ non-empty list stay distinct in the payload. Monster `omittedComponents` is a
 checkbox group. `limitedUse` and `_turnLimit` stay slots because disclosure
 cannot express number presence or boolean absence.
 
-### Open issues
+### Field registry
 
-**`challengeRating` registry collision.** `registerSlotItem` calls
-`registry.set(slotKey, …)` with no `registry.has` guard. The statistics select
-and the metadata slot both use `challengeRating`, so the later entry wins and
-the select's label can be replaced by the slot name. The fix is to rename the
-slot (for example `_challengeRatingMeta`) and, if other collisions exist, skip
-`registry.set` when a `control` entry is already present. It is not fixed.
+`registerSlotItem` replaces an existing key. A slot must not use the same name
+as a control.
+
+### Open issues
 
 **True-form confirmation freshness.** `useMonsterFormsLifecycle` stores
 `plan.next` and applies it on confirm. `ConfirmDialog` blocks pointer and
@@ -163,6 +161,25 @@ field-array updates. Consequence copy stays as written.
 | `castingAbility` (row variants)                                                            | Monster actions  | feature confirm              |
 | `armorClass.bodyArmor`, `armorClass.shield`                                                | Armor            | replacement transaction      |
 
+## Value-mapping exception
+
+`_challengeRatingZeroXp` stays a slot. It is a checkbox for challenge rating
+`0`, and it maps that checkbox onto `experiencePointsOverride`. It is not a
+boolean field, and it is not a shared checkbox mapping. The select owns
+`challengeRating`. A publish-validation test checks that a missing rating is
+claimed by that select.
+
+- The slot registers `experiencePointsOverride` with `shouldUnregister: false`,
+  so a loaded `0` stays in form values.
+- Checked writes `experiencePointsOverride: 0`.
+- Unchecked removes `experiencePointsOverride`.
+- The `challengeRating` select is unchanged.
+- The metadata display uses the override only when the rating is `0`.
+- Leaving CR 0 clears the override through the monster form value sync.
+  Returning to CR 0 shows the checkbox unchecked.
+- Load and reset restore the saved override. A loaded `0` shows the box
+  checked again.
+
 ## Other retained slots
 
 Tab editors (`abilityScores`, `equipment`, `traits`, `actions`), creature
@@ -207,7 +224,6 @@ A custom transactional slot is a supported outcome.
 | `formAvailability`                | disclosure would change empty-list timing | needs a product decision |
 | `omittedComponents`               | checkbox group versus chips               | needs a product decision |
 | True form and resolution confirms | runtime consequence copy                  | keep the current copy    |
-| `challengeRating` zero-XP         | checkbox stored as a number               | needs a product decision |
 | Advisories                        | title and tone must survive               | keep both                |
 | HTML action previews              | outside display                           | stay slots               |
 
