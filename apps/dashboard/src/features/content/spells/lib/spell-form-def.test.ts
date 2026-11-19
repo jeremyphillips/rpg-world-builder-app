@@ -118,6 +118,8 @@ function collectFieldNames(fields: FormItem[]): string[] {
       names.push(
         ...collectFieldNames(resolveColumnsCollapseSequence(field.columns, field.collapseOrder)),
       )
+    } else if ('kind' in field && field.kind === 'display') {
+      names.push(field.id)
     } else if ('kind' in field && field.kind === 'slot') {
       names.push(field.name)
     } else if ('kind' in field && field.kind === 'array') {
@@ -338,7 +340,8 @@ describe('spellFormDef resolution tab', () => {
     expect(names).toContain('_resolutionProximitySelect')
     expect(names).toContain('_resolutionHowItResolves')
     expect(names).toContain('resolution.effects')
-    expect(names).toContain('_resolutionEffectsApplicationLabel')
+    expect(names).toContain('resolution-effects-application-label')
+    expect(names).toContain('resolution-selection-hints')
     expect(names).toContain('_resolutionOutcomes')
     expect(findGroup(resolutionTab?.fields ?? [], 'Selection')).toBeDefined()
     expect(findGroup(resolutionTab?.fields ?? [], 'How it resolves')).toBeDefined()

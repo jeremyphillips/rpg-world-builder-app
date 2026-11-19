@@ -25,7 +25,7 @@ import {
 } from '@rpg/ui/form'
 
 import { ClassSpellbookAcquisitionField } from '../components/class-spellbook-acquisition-field'
-import { ClassSpellcastingFeatureField } from '../components/class-spellcasting-feature-field'
+import { classSpellcastingFeatureSummaryDisplay } from './class-spellcasting-feature-summary-display.lib'
 import { ClassSpellcastingProgressionField } from '../components/class-spellcasting-progression-field'
 import { ClassSpellcastingRecommendationsField } from '../components/class-spellcasting-recommendations-field'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
@@ -157,10 +157,8 @@ export function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
     dependents: {
       fields: [
         {
-          kind: 'slot',
-          name: 'spellcastingFeatureSummary',
+          ...classSpellcastingFeatureSummaryDisplay(),
           visibility: visibleWhenSpellcasting(),
-          render: () => createElement(ClassSpellcastingFeatureField),
         },
         {
           type: 'combobox',

@@ -1,6 +1,5 @@
 {
   "features/campaign/lib/rules/character-configuration/character-configuration-form-fields.ts": 3,
-  "features/campaign/lib/rules/mechanics/mechanics-form-fields.ts": 1,
   "features/campaign/lib/settings/campaign-profile-form-fields.ts": 1,
   "features/character/lib/steps/abilities-form-fields.ts": 5,
   "features/character/lib/steps/identity-form-fields.ts": 5,
@@ -9,7 +8,7 @@
   "features/content/classes/lib/class-feature-form-fields.ts": 2,
   "features/content/classes/lib/class-proficiencies-form-fields.ts": 1,
   "features/content/classes/lib/class-spellcasting-feature-availability-form-fields.ts": 1,
-  "features/content/classes/lib/class-spellcasting-form-fields.ts": 4,
+  "features/content/classes/lib/class-spellcasting-form-fields.ts": 3,
   "features/content/feats/lib/feat-form-fields.ts": 1,
   "features/content/lib/campaign-access/campaign-access-form-fields.ts": 1,
   "features/content/lib/effects/resolution-outcome-effects-array.tsx": 2,
@@ -35,7 +34,7 @@
   "features/content/spells/components/spell-effects-editor.tsx": 1,
   "features/content/spells/lib/spell-form-fields.ts": 1,
   "features/content/spells/resolution/lib/form/resolution-form-fields.ts": 1,
-  "features/content/spells/resolution/lib/form/resolution-form-slots.ts": 11,
+  "features/content/spells/resolution/lib/form/resolution-form-slots.ts": 9,
   "features/content/spells/resolution/lib/form/resolution-outcome-form-fields.ts": 1,
   "features/game-terms/lib/vocabulary/vocabulary-entry-sheet-fields.lib.ts": 1
 }

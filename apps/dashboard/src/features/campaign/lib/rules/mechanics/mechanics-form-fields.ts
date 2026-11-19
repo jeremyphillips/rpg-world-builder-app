@@ -1,6 +1,4 @@
-import { createElement } from 'react'
 import { z } from 'zod'
-import { Text } from '@rpg/ui'
 import {
   ARMOR_CLASS_BASES,
   ARMOR_CLASS_MODES,
@@ -22,6 +20,7 @@ import { toOptions, type FieldOption, type FormItem, type FormValueSync } from '
 import { vocabularyFieldLabel } from '@/features/vocabulary'
 
 import { ARMOR_CLASS_BASE_LABELS, ARMOR_CLASS_MODE_LABELS } from './mechanics-form-labels'
+import { MECHANICS_LEAD_COPY_DISPLAY } from './mechanics-lead-copy-display.lib'
 
 export const mechanicsValuesSchema = z.object({
   editionPresetId: editionPresetIdSchema,
@@ -177,16 +176,7 @@ export function buildMechanicsConfigFields({
   attackResolutionModeOptions,
 }: MechanicsFieldOptions): FormItem[] {
   return [
-    {
-      kind: 'slot',
-      name: '_mechanicsLeadCopy',
-      render: () =>
-        createElement(
-          Text,
-          { variant: 'muted' },
-          'Choose a rules-era preset to quickly configure core mechanics. You can customize individual mechanics after choosing a preset.',
-        ),
-    },
+    MECHANICS_LEAD_COPY_DISPLAY,
     editionPresetGroup(editionPresetOptions),
     mechanicsKnobsGroup(attackResolutionModeOptions),
   ]

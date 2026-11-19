@@ -17,7 +17,8 @@ import {
   MONSTER_SIZES_FIELD_HINT,
 } from '../../lib/forms/fields/creature-sizes-form-fields'
 import { movementWithHoverGroup } from '../../lib/forms/fields/content-movement-form-fields'
-import { MonsterChallengeRatingHint } from '../components/form/monster-challenge-rating-hint'
+import { MonsterChallengeRatingZeroXpField } from '../components/form/monster-challenge-rating-zero-xp-field'
+import { monsterChallengeRatingMetadataDisplay } from './statistics/monster-challenge-rating-display.lib'
 import { creatureDetailsFields } from './creature-details/monster-creature-details-form-fields'
 import { MonsterEquipmentPanel } from '../components/form/monster-equipment-panel'
 import { MonsterPublishCatalogWriteGate } from '../components/form/monster-publish-catalog-write-gate'
@@ -125,10 +126,11 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
           options: challengeRatingOptions,
           required: true,
         },
+        monsterChallengeRatingMetadataDisplay(),
         {
           kind: 'slot',
-          name: 'challengeRating',
-          render: () => <MonsterChallengeRatingHint />,
+          name: '_challengeRatingZeroXp',
+          render: () => <MonsterChallengeRatingZeroXpField />,
         },
         ownedSlot('experiencePointsOverride'),
       ],

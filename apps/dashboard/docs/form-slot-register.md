@@ -5,8 +5,8 @@ Evidence stages: code-analysis candidate, feasibility verified, parity tested,
 approved, completed. Confidence: **V** verified, **C** conditional, **P** needs a
 shared API change.
 
-Recount after Phase 3a (production `*.ts` / `*.tsx` only, tests and stories
-excluded): **95 static literals in 39 files** (was 97 after Phase 2a). Phase 0 started at 101.
+Recount after Phase 3b (production `*.ts` / `*.tsx` only, tests and stories
+excluded): **90 static literals in 39 files** (was 95 after Phase 3a). Phase 0 started at 101.
 `_editionPresetEffects` moved to `valueSyncs`. The audit plan's 103/41 figure
 predates `formsShapeShifting` replacing separate true-form and forms-editor
 slots. `locations/README.md` mentions `kind: 'slot'` in prose and is not a
@@ -175,13 +175,13 @@ Owner is the feature folder.
 
 ### Phase 1
 
-| Identity                                                                 | Stage                | Tag | Decision                                 |
-| ------------------------------------------------------------------------ | -------------------- | --- | ---------------------------------------- |
-| `mechanics-form-fields.ts` / `_editionPresetEffects`                     | completed            | V   | migrated to `buildMechanicsValueSyncs()` |
-| `character-configuration-form-fields.ts` / `_extendedProgressionEffects` | candidate            | C   | retain unless mount and re-seed match    |
-| `ownedSlot` ×5                                                           | candidate            | C   | tab `errorPaths` only after claim parity |
-| `resolution-form-slots.ts` / `_resolutionEffectsApplicationLabel`        | candidate            | C   | hint or display text                     |
-| `mechanics-form-fields.ts` / `_mechanicsLeadCopy`                        | feasibility verified | C   | display text; PageHeader cannot host it  |
+| Identity                                                                 | Stage     | Tag | Decision                                              |
+| ------------------------------------------------------------------------ | --------- | --- | ----------------------------------------------------- |
+| `mechanics-form-fields.ts` / `_editionPresetEffects`                     | completed | V   | migrated to `buildMechanicsValueSyncs()`              |
+| `character-configuration-form-fields.ts` / `_extendedProgressionEffects` | candidate | C   | retain unless mount and re-seed match                 |
+| `ownedSlot` ×5                                                           | candidate | C   | tab `errorPaths` only after claim parity              |
+| `resolution-form-slots.ts` / `_resolutionEffectsApplicationLabel`        | completed | C   | `resolution-effects-application-label-display.lib.ts` |
+| `mechanics-form-fields.ts` / `_mechanicsLeadCopy`                        | completed | C   | `mechanics-lead-copy-display.lib.ts`                  |
 
 ### Display candidates (text and notice)
 
@@ -190,9 +190,9 @@ Phase 2a/3a. Previews are excluded by the PoC.
 | Identity                                                                     | Responsibility                                 | Tag |
 | ---------------------------------------------------------------------------- | ---------------------------------------------- | --- | --------------------------------------------------------------------------------------------------------------- |
 | `_standardLevelRangeSummary`, `_extendedLevelRangeSummary`                   | live muted summary                             | P   | **Completed:** `kind: 'display'` via `level-range-summary-display.lib.ts`                                       |
-| `_resolutionSelectionHints`                                                  | multi-paragraph guidance                       | C   |
+| `_resolutionSelectionHints`                                                  | multi-paragraph guidance                       | C   | **Completed:** `resolution-selection-hints-display.lib.ts`                                                      |
 | `_outcomeApplicationStatus`                                                  | derived status                                 | P   |
-| `spellcastingFeatureSummary`                                                 | copy plus cross-tab link                       | C   |
+| `spellcastingFeatureSummary`                                                 | copy plus cross-tab link                       | C   | **Completed:** display text; `FeatureTableRow` link → inline copy                                               |
 | `cultureNamingAlert`, `_effectsPersistenceNotice`, `_grantTypeMissingRepair` | notice                                         | P   | **Completed:** `cultureNamingAlert`, `_effectsPersistenceNotice`, `_grantTypeMissingRepair` → `kind: 'display'` |
 | `buildAdvisories` (factory + trait literal)                                  | advisory title and tone                        | P   | **Completed:** `monsterFormAdvisoryDisplay()` → `kind: 'display'`                                               |
 | `weaponProficiencyReconciliation` ×2                                         | notice plus flag clear                         | C   |
