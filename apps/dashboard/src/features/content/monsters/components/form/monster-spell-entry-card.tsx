@@ -12,10 +12,7 @@ import {
 } from '../../lib/actions/spell/monster-spell-frequency'
 import { MONSTER_SPELL_CHANGE_LABEL } from '../../lib/monster-form-labels'
 import { useMonsterSpellPicker } from './monster-spell-picker-context'
-import {
-  MonsterSpellFrequencyField,
-  SpellEntryMetadataLines,
-} from './monster-spell-frequency-field'
+import { SpellEntryMetadataLines } from './monster-spell-frequency-field'
 
 export function MonsterSpellEntryCard({
   catalog,
@@ -76,17 +73,5 @@ export function MonsterSpellChangeAction({
     >
       <ActionIcon action="replace" size="md" />
     </button>
-  )
-}
-
-export function MonsterSpellFrequencySlot() {
-  const array = useArrayFieldContext()
-  if (!array?.fullArrayName) return null
-  const actionPath = array.fullArrayName.replace(/\.spells$/, '')
-  return (
-    <MonsterSpellFrequencyField
-      spellLimitName={`${array.fullArrayName}.${array.rowIndex}.limitedUse`}
-      actionLimitName={`${actionPath}.limitedUse`}
-    />
   )
 }

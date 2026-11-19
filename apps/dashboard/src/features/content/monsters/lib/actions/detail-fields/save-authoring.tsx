@@ -16,7 +16,7 @@ import {
   resolutionOccupantRequirementsFields,
   resolutionTargetAuthoringFields,
 } from '../../../../lib/forms/fields/resolution-target-authoring-fields'
-import { monsterActionTurnLimitField } from '../../../../lib/forms/mechanics/monster-action-turn-limit-fields'
+import { monsterActionTurnLimitField } from '../monster-action-turn-limit-fields'
 import {
   SAVING_THROW_ABILITY_HINT,
   SAVING_THROW_ABILITY_LABEL,
@@ -42,13 +42,11 @@ import {
   MONSTER_SAVE_TARGETING_MODE_LABEL,
   MONSTER_SAVE_TARGETING_MODE_SELECTED_TARGETS,
 } from '../../monster-form-labels'
-import { MonsterActionCastingAbilityField } from '../spell/monster-action-casting-fields'
+import { MonsterActionCastingAbilityField } from '../../../components/form/slots/actions/casting-ability.slot'
 import { monsterSaveDcAbilityHintWhen } from '../save/monster-action-save-field-hints'
-import {
-  MonsterActionSaveFailureOrSuccessField,
-  MonsterActionSaveRepeatRemove,
-  MonsterActionSaveRepeatSaveField,
-} from '../save/monster-action-save-form-slots'
+import { MonsterActionSaveRepeatRemove } from '../save/monster-action-save-repeat-controls'
+import { MonsterActionSaveFailureOrSuccessField } from '../../../components/form/slots/actions/save-failure-or-success.slot'
+import { MonsterActionSaveRepeatSaveField } from '../../../components/form/slots/actions/save-repeat-save.slot'
 import { monsterSaveOutcomeEffectsFields } from '../save/monster-action-save-outcome-effects'
 import {
   MONSTER_SAVE_FAILED_EFFECTS_PATH,

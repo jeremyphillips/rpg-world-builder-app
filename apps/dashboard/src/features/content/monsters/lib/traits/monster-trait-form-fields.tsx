@@ -3,26 +3,22 @@ import {
   SAVING_THROW_SPELLCASTING_HINT,
   savingThrowFieldGroup,
 } from '../../../lib/forms/mechanics/saving-throw-field-group'
-import { MonsterActionCastingAbilityField } from '../actions/spell/monster-action-casting-fields'
-import { RulesPreview } from '@rpg/ui'
+import { MonsterActionCastingAbilityField } from '../../components/form/slots/actions/casting-ability.slot'
 import type { FieldVisibility, FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
-import { useMasterDetailRowPrefix } from '../../../lib/master-detail/use-master-detail-row-prefix'
-import { useMonsterTraitPreviewTitle } from '../monster-qualified-preview-title'
 import { monsterFormAdvisoryDisplay } from '../monster-form-advisory-presentation'
 import { defineMasterDetailItemNoun } from '../../../lib/master-detail/master-detail-item-noun'
 import { insertMonsterFormAvailabilityField } from '../forms/monster-form-availability-fields'
-import { WaterBreathingToggle } from '../../components/form/water-breathing-toggle'
+import { OutsideWaterBreathSlot } from '../../components/form/slots/traits/outside-water-breath.slot'
+import { MonsterTraitRulesPreview } from '../../components/form/slots/traits/trait-preview.slot'
 import { formatMonsterTemplateSentence } from '../format-monster-template-sentence'
 import type { MonsterFormAdvisory } from '../monster-form-advisories'
 import {
   MONSTER_CUSTOM_DESCRIPTION_HINT,
   MONSTER_CUSTOM_DESCRIPTION_LABEL,
   MONSTER_RULES_TEXT_LABEL,
-  MONSTER_TRAIT_PREVIEW_LABEL,
 } from '../monster-form-labels'
-import { useWatch } from 'react-hook-form'
 
 import {
   monsterTraitPresetFields,
@@ -114,19 +110,6 @@ function isTemplateRow(row: unknown): row is { templateId: string; config?: unkn
   )
 }
 
-function MonsterTraitRulesPreview({ text }: { text: string }) {
-  const rowPrefix = useMasterDetailRowPrefix()
-  const row = useWatch({ name: rowPrefix as never })
-  const title = useMonsterTraitPreviewTitle(row)
-  return (
-    <RulesPreview
-      label={MONSTER_TRAIT_PREVIEW_LABEL}
-      title={title}
-      content={{ kind: 'prose', text }}
-    />
-  )
-}
-
 function traitPreviewSlot(text: string): FormItem {
   return {
     kind: 'slot',
@@ -144,7 +127,7 @@ function presetParameterFields(
     {
       kind: 'slot',
       name: 'outsideWaterBreathToggle',
-      render: () => <WaterBreathingToggle />,
+      render: () => <OutsideWaterBreathSlot />,
     },
     ...(waterBreathingDurationEnabled(row) ? monsterTraitPresetFields(row.preset, ctx) : []),
   ]

@@ -16,6 +16,7 @@ Monsters / stat block entries. Part of the [`content`](../README.md) feature; se
 | Statistics tab lib                    | [`lib/statistics/`](./lib/statistics/)                                                                                     |
 | Creature details tab lib              | [`lib/creature-details/`](./lib/creature-details/) (skills, languages, defenses)                                           |
 | Traits tab lib                        | [`lib/traits/`](./lib/traits/)                                                                                             |
+| Registered slot entries               | `components/form/slots/**/*.slot.tsx` — see [Form slots](#form-slots)                                                      |
 | Cross-tab spellcasting                | [`lib/casting/`](./lib/casting/) — shared ability sources; see [action-authoring.md](./docs/action-authoring.md)           |
 | Action authoring map                  | [action-authoring.md](./docs/action-authoring.md) — `actions/{save,spell,legendary,weapon,recharge,…}`                     |
 | Detail read model                     | [`lib/monster-display.ts`](./lib/monster-display.ts)                                                                       |
@@ -24,3 +25,38 @@ Monsters / stat block entries. Part of the [`content`](../README.md) feature; se
 
 Routes side-effect-import `monster-form-def.ts` in create/edit chunks — see
 [code-splitting.md](../../../../docs/code-splitting.md).
+
+## Form slots
+
+Registration (`kind: 'slot'` objects) stays in `lib/**`. Identities and the
+baseline-versus-registry uniqueness rule live in
+[form-slot-register.md](../../../../docs/form-slot-register.md).
+
+Entry modules live here:
+
+```text
+components/form/slots/
+  tabs/  shell/  statistics/  creature-details/  creature-forms/
+  traits/  restrictions/  actions/  spells/
+```
+
+`slots/actions/` includes action-preview entries. Do not add
+`components/form/actions/**/*.slot.tsx`. Substantial UI that is not itself the
+registered render stays at `components/form/` for now. The later folder move
+puts it here:
+
+| Concern                                          | Path                                               |
+| ------------------------------------------------ | -------------------------------------------------- |
+| Tab panels                                       | `statistics/`, `equipment/`, `traits/`, `actions/` |
+| Armor body                                       | `statistics/armor-slot.tsx` (not a `.slot.tsx`)    |
+| Spell frequency field, picker, entry card        | `spells/`                                          |
+| Skill/language parts                             | `creature-details/`                                |
+| True form, forms editor, difference presentation | `creature-forms/`                                  |
+
+`slots/creature-forms/forms-shape-shifting.slot.tsx` is the composer. The
+publish gate, form-availability control, weapon-proficiency reconciliation,
+and spell component requirements are the slot file itself, with no twin.
+`castingAbility` is one module with two components. Armor class equipment is
+one module with `BodyArmorSlot` and `ShieldSlot`.
+
+No `form/slots/index.ts`. No re-export left at the old path after a move.

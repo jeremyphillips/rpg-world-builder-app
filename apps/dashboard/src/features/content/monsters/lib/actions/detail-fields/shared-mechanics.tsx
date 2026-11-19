@@ -27,7 +27,7 @@ import {
   applyAttackRangeClusterWidths,
   attackRangeJoinedPairFields,
 } from '../../../../lib/forms/fields/weapon-attack-range-form-fields'
-import { MonsterAttackRangeClusterSlot } from '../monster-attack-range-cluster-slot.client'
+import { MonsterAttackRangeClusterSlot } from '../../../components/form/slots/actions/attack-range-cluster.slot'
 import {
   MONSTER_ADDITIONAL_CONDITION_HINT,
   MONSTER_ADDITIONAL_CONDITION_LABEL,
@@ -51,9 +51,9 @@ import {
 } from '../../monster-form-labels'
 import type { MonsterActionSection } from '../references/monster-action-equipment-references'
 import type { MonsterActionDraftRow } from '../monster-action-presets'
-import { MonsterActionAttackAbilityField } from '../monster-attack-ability-field'
-import { MonsterActionCastingAbilityField } from '../spell/monster-action-casting-fields'
-import { MonsterActionRechargeField } from '../recharge/monster-action-recharge-field'
+import { MonsterActionAttackAbilityField } from '../../../components/form/slots/actions/bonus-source-ability.slot'
+import { MonsterActionCastingAbilityField } from '../../../components/form/slots/actions/casting-ability.slot'
+import { MonsterActionRechargeField } from '../../../components/form/slots/actions/limited-use.slot'
 import {
   monsterActionLimitedUseFields,
   monsterActionOnHitFields,
@@ -66,8 +66,8 @@ import { MONSTER_SPELL_PICKER_INTERCEPT } from '../../../components/form/monster
 import {
   MonsterSpellChangeAction,
   MonsterSpellEntryCard,
-  MonsterSpellFrequencySlot,
 } from '../../../components/form/monster-spell-entry-card'
+import { MonsterSpellFrequencySlot } from '../../../components/form/slots/spells/frequency.slot'
 import { monsterAbilitySourceDependent, monsterActionSaveSection } from './save-authoring'
 
 function meleeVisibility(name: 'mode' | 'modes'): FieldVisibility {

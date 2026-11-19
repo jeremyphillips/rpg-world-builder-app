@@ -13,6 +13,16 @@ a parameter or other non-literal. A repeated name in one file keeps a count.
 Removing an identity may leave the allowlist high. Adding or renaming one fails
 until this register and the allowlist both grow.
 
+The baseline is a static allowlist. It is not the runtime uniqueness rule.
+`registerSlotItem` keys the field registry by `prefix.name` (or `name` at the
+root) and replaces an existing key. A slot must not use the same name as a
+control on that prefixed path. One factory or one repeated name under different
+prefixes — `formAvailability` per row, `${sourcePath}.castingAbility`,
+`_turnLimit` inside action composers — is one identity pattern, not one
+baseline row per row. Do not retune baseline counts to stand in for that rule.
+`kind: 'slot'` literals stay in the registration module. Moving a literal into
+a render file changes the ratchet key.
+
 ## Baseline (static literals per file)
 
 | File                                                                     | Literals |
@@ -227,7 +237,31 @@ A custom transactional slot is a supported outcome.
 | Advisories                        | title and tone must survive               | keep both                |
 | HTML action previews              | outside display                           | stay slots               |
 
+## Monster entry modules
+
+Monster registration stays in `monsters/lib/**`. The render for a non-null
+monster slot is a `*.slot.tsx` module under
+`monsters/components/form/slots/`. That includes tab shells and action
+previews. There is no second entry location under `form/actions/`.
+
+Host-null slots (`ownedSlot`, `render: () => null`) have no entry module.
+
+A component that is only used as the slot render is that entry file. A second
+module exists only when the same UI is also mounted outside the slot, or when
+a tab panel is the tab and the entry only passes `ctx`. Do not leave a
+re-export at the old path. Do not add `form/slots/index.ts`.
+
+That layout is in place. The identity inventory in this register does not
+move with those files. The file map is the
+[creature form-slot plan](../../../.cursor/plans/creature_form_slot_architecture_f1b1d1f5.plan.md).
+
+Co-located stories and component tests move with the module
+(`attack-preview.slot.stories.tsx` beside `attack-preview.slot.tsx`). Dashboard
+modules do not use a `.client` suffix or `'use client'`.
+
 ## Ownership
 
 Dashboard content and character features own the slot components. `@rpg/ui/form`
-owns walkers, the field registry, `valueSyncs`, and `kind: 'display'`.
+owns walkers, the field registry, `valueSyncs`, and `kind: 'display'`. Slot
+entry layout for monsters is the section above, not a second copy of the rules
+in the form-lib conventions.

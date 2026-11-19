@@ -28,7 +28,7 @@
   "features/content/lib/forms/fields/content-availability-slot.lib.tsx::buildContentAvailabilitySlotItem()": 1,
   "features/content/lib/forms/grants/equipment/equipment-grant-form-fields.ts::_proficiencyLinkedGrantCue": 1,
   "features/content/lib/forms/grants/grant-form-fields.ts::_grantTypePersist": 1,
-  "features/content/lib/forms/mechanics/monster-action-turn-limit-fields.tsx::_turnLimit": 1,
+  "features/content/monsters/lib/actions/monster-action-turn-limit-fields.tsx::_turnLimit": 1,
   "features/content/lib/forms/mechanics/saving-throw-field-group.tsx::savingThrow.dcSource.castingAbility": 1,
   "features/content/lib/forms/organization-form-projection.ts::_organizationEditFamiliarType": 1,
   "features/content/lib/forms/organization-form-projection.ts::_organizationMembershipTitlesRegistration": 1,
