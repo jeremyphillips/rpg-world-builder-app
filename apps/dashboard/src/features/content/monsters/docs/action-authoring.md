@@ -45,7 +45,7 @@ Cross-tab spellcasting source resolution lives under **`monsters/lib/casting/`**
 | Legendary row fields         | `lib/actions/legendary/`     | Legendary detail fields and category helpers                           |
 | Weapon damage override       | `lib/actions/weapon/`        | Catalog damage mapping and override field                              |
 | Recharge limited use         | `lib/actions/recharge/`      | Recharge value + detail field                                          |
-| Form surfaces                | `components/form/actions/`   | Preview/detail JSX; `monster-action-sections.tsx` stays at form root   |
+| Form surfaces                | `components/form/actions/`   | Preview/detail JSX; tab shell is `action-sections.tsx`                 |
 | Traits tab lib               | `lib/traits/`                | Trait acquisition, form fields, editor title                           |
 
 Section move **eligibility** and data-loss flags are pure helpers in `@rpg/contracts`; transforms and confirmations stay in `use-monster-action-sections.ts`.
