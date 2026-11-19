@@ -7,21 +7,21 @@ import {
   type SystemRulesetId,
 } from '@rpg/contracts'
 
-import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
-import { monsterEquipmentCatalog } from '../../lib/monster-form-derivation'
-import { commitEquipmentEntryRemoval } from '../../lib/equipment/commit-equipment-entry-removal.lib'
-import { resolveMonsterFormWeaponGrants } from '../../lib/equipment/monster-loadout-picker.lib'
-import { resolveEquipmentRemovalDecision } from '../../lib/equipment/resolve-equipment-removal-decision.lib'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
+import { commitEquipmentEntryRemoval } from '../lib/equipment/commit-equipment-entry-removal.lib'
+import { resolveMonsterFormWeaponGrants } from '../lib/equipment/monster-loadout-picker.lib'
+import { resolveEquipmentRemovalDecision } from '../lib/equipment/resolve-equipment-removal-decision.lib'
 import {
   MONSTER_EQUIPMENT_REMOVAL_FALLBACK_NAME,
   formatEquipmentCustomizationRemovalSummary,
   formatEquipmentRemovalConfirmCopy,
-} from '../../lib/monster-form-labels'
-import type { MonsterEquipmentFormEntry, MonsterFormValues } from '../../lib/monster-form-values'
+} from '../lib/monster-form-labels'
+import { monsterEquipmentCatalog } from '../lib/monster-form-derivation'
+import type { MonsterEquipmentFormEntry, MonsterFormValues } from '../lib/monster-form-values'
 import {
   MonsterEquipmentEntryCardView,
   MonsterEquipmentEntryDialogs,
-} from './monster-equipment-entry-actions.parts'
+} from '../components/form/monster-equipment-entry-actions.parts'
 
 type PendingRemove = {
   entryId: string

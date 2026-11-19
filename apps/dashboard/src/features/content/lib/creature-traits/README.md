@@ -11,10 +11,12 @@ Species, class, and feat traits: [content-types.md](../../../../../../../docs/co
 
 ## What is here
 
-| Module                                                                     | Role                                                            |
-| -------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| [`creature-trait-template-fields.ts`](./creature-trait-template-fields.ts) | Config and display-override fields for a `kind: 'template'` row |
-| [`creature-trait-add-menu.tsx`](./creature-trait-add-menu.tsx)             | Add menu for template and custom trait rows                     |
+| Module                                                                     | Role                                                             |
+| -------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| [`creature-trait-template-fields.ts`](./creature-trait-template-fields.ts) | Config and display-override fields for a `kind: 'template'` row  |
+| [`creature-trait-add-menu.tsx`](./creature-trait-add-menu.tsx)             | Add menu for template and custom trait rows                      |
+| [`outside-water-breath-toggle.tsx`](./outside-water-breath-toggle.tsx)     | Controlled hold-breath-outside-water checkbox (preset parameter) |
+| [`outside-water-breath.lib.ts`](./outside-water-breath.lib.ts)             | Duration-present predicate for those optional fields             |
 
 Monster and species template rows both use the template fields. The add menu
 lists template ids from the contract registry.
@@ -29,11 +31,11 @@ and duration bounds stay in contracts. `formatWaterBreathing` stays in
 `amphibious`, `limited-amphibiousness`, `hold-breath`, and `water-breathing`
 are separate presets. The monster “Hold breath outside water” control writes
 optional `outsideWaterBreathAmount` / `outsideWaterBreathUnit` on the
-`water-breathing` row. It does not define the breathing behavior. When that
-control is extracted, it is named `outside-water-breath-toggle.tsx` with
-`outside-water-breath.lib.ts` beside it. Those names are preset-parameter
-authoring. They are not a `water-breathing` capability API. The monster form
-slot that wires react-hook-form stays under `monsters/components/form/slots/`.
+`water-breathing` row. It does not define the breathing behavior.
+`outside-water-breath-toggle.tsx` and `outside-water-breath.lib.ts` are
+preset-parameter authoring. They are not a `water-breathing` capability API.
+The monster form slot that wires react-hook-form stays under
+`monsters/components/form/slots/`.
 
 A source-independent capability, shared by traits, spells, and items, is a
 later plan

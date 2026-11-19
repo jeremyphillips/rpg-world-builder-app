@@ -30,7 +30,7 @@ import {
   MONSTER_ARMOR_SLOT_EMPTY_LABEL,
 } from '../../lib/monster-form-labels'
 import type { MonsterEquipmentFormEntry, MonsterFormValues } from '../../lib/monster-form-values'
-import { useMonsterEquipmentEntryActions } from './use-monster-equipment-entry-actions'
+import { useMonsterEquipmentEntryActions } from '../../hooks/use-monster-equipment-entry-actions'
 
 function slotEntries(
   equipment: readonly MonsterEquipmentFormEntry[],

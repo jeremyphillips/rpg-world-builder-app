@@ -27,7 +27,7 @@ import {
 } from '../../lib/monster-form-labels'
 import { buildMonsterEquipmentRecommendationGroup } from '../../lib/equipment/monster-equipment-field-recommendation.lib'
 import type { MonsterEquipmentFormEntry } from '../../lib/monster-form-values'
-import { useMonsterEquipmentEntryActions } from './use-monster-equipment-entry-actions'
+import { useMonsterEquipmentEntryActions } from '../../hooks/use-monster-equipment-entry-actions'
 
 export function MonsterEquipmentPanel({ ctx }: { ctx: ContentFormCtx }) {
   const actions = useMonsterEquipmentEntryActions(ctx)

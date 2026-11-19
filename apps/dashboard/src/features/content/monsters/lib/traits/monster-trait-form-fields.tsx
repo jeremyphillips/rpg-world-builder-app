@@ -21,9 +21,11 @@ import {
 } from '../monster-form-labels'
 
 import {
-  monsterTraitPresetFields,
-  waterBreathingDurationEnabled,
-} from './monster-trait-preset-fields'
+  outsideWaterBreathDurationEnabled,
+  type OutsideWaterBreathDurationFields,
+} from '@/features/content/lib/creature-traits/outside-water-breath.lib'
+
+import { monsterTraitPresetFields } from './monster-trait-preset-fields'
 
 function visibleForCustomTrait(): FieldVisibility {
   return {
@@ -129,7 +131,9 @@ function presetParameterFields(
       name: 'outsideWaterBreathToggle',
       render: () => <OutsideWaterBreathSlot />,
     },
-    ...(waterBreathingDurationEnabled(row) ? monsterTraitPresetFields(row.preset, ctx) : []),
+    ...(outsideWaterBreathDurationEnabled(row as OutsideWaterBreathDurationFields)
+      ? monsterTraitPresetFields(row.preset, ctx)
+      : []),
   ]
 }
 
