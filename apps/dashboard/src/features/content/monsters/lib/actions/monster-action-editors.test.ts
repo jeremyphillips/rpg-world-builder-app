@@ -216,6 +216,9 @@ function findArrayField(items: readonly FormItem[], name: string): ArrayConfig |
 function collectFieldNames(items: readonly FormItem[]): string[] {
   const names: string[] = []
   for (const item of items) {
+    if ('kind' in item && item.kind === 'display' && 'id' in item && typeof item.id === 'string') {
+      names.push(item.id)
+    }
     if ('name' in item && typeof item.name === 'string') names.push(item.name)
     if ('kind' in item && item.kind === 'dependent') {
       names.push(...collectFieldNames([item.controller as FormItem]))
@@ -408,12 +411,12 @@ describe('monster action detail fields', () => {
     ).toBe(true)
     expect(attack).not.toContain('moveSection')
     expect(natural[0]).toBe('attackPreview')
-    expect(natural[1]).toBe('buildAdvisories')
+    expect(natural[1]).toBe('monster-row-advisories-actions-0')
     expect(natural.indexOf('onHit.effects')).toBeLessThan(natural.indexOf('limitedUse'))
     expect(natural.indexOf('limitedUse')).toBeLessThan(natural.lastIndexOf('description'))
     expect(natural.at(-1)).toBe('description')
     expect(attack[0]).toBe('attackPreview')
-    expect(attack[1]).toBe('buildAdvisories')
+    expect(attack[1]).toBe('monster-row-advisories-actions-0')
     expect(attack.indexOf('onHit.effects')).toBeLessThan(attack.indexOf('limitedUse'))
     const attackBonusSection = attackItems.find(
       (item) => 'kind' in item && item.kind === 'group' && item.heading?.label === 'Attack bonus',
@@ -510,15 +513,19 @@ describe('monster action detail fields', () => {
     expect(weapon).not.toContain('name')
     expect(weapon).not.toContain('moveSection')
     expect(weapon.indexOf('attackPreview')).toBe(weapon.indexOf('equipmentEntryId') + 1)
-    expect(weapon.indexOf('buildAdvisories')).toBe(weapon.indexOf('attackPreview') + 1)
-    expect(weapon.indexOf('formAvailability')).toBe(weapon.indexOf('buildAdvisories') + 1)
+    expect(weapon.indexOf('monster-row-advisories-actions-0')).toBe(
+      weapon.indexOf('attackPreview') + 1,
+    )
+    expect(weapon.indexOf('formAvailability')).toBe(
+      weapon.indexOf('monster-row-advisories-actions-0') + 1,
+    )
     expect(weapon.indexOf('damage')).toBe(weapon.indexOf('formAvailability') + 1)
     expect(weapon.indexOf('onHit.effects')).toBeLessThan(weapon.indexOf('description'))
     expect(weapon.at(-1)).toBe('description')
     const spellNames = detailFields({ id: 'cast', kind: 'spell' })
     expect(spellNames).not.toContain('attackPreview')
     expect(spellNames[0]).toBe('spellPreview')
-    expect(spellNames[1]).toBe('buildAdvisories')
+    expect(spellNames[1]).toBe('monster-row-advisories-actions-0')
 
     const spell = detailFields({ id: 'cast', kind: 'spell', name: 'Spellcasting', spells: [] })
     expect(spell).not.toContain('name')
@@ -549,13 +556,13 @@ describe('monster action detail fields', () => {
       steps: [],
     })
     expect(multiattack[0]).toBe('multiattackPreview')
-    expect(multiattack[1]).toBe('buildAdvisories')
+    expect(multiattack[1]).toBe('monster-row-advisories-actions-0')
     expect(multiattack.indexOf('steps')).toBeLessThan(multiattack.indexOf('description'))
     expect(multiattack.at(-1)).toBe('description')
     expect(multiattack).not.toContain('trigger.text')
 
     const special = detailFields({ id: 'parry', kind: 'special', name: 'Parry' })
-    expect(special[0]).toBe('buildAdvisories')
+    expect(special[0]).toBe('monster-row-advisories-actions-0')
     expect(special[1]).toBe('formAvailability')
     expect(special[2]).toBe('description')
     expect(special.indexOf('description')).toBeLessThan(special.indexOf('savingThrow.ability'))
@@ -625,7 +632,7 @@ describe('monster action detail fields', () => {
       preset: 'breath-weapon',
     })
     const failedEffectsPath = names.find((name) => name.includes('resolution.outcomes.0.effects'))
-    expect(names[0]).toBe('buildAdvisories')
+    expect(names[0]).toBe('monster-row-advisories-actions-0')
     expect(names.indexOf('resolution.method.ability')).toBeLessThan(
       names.indexOf('resolution.selectionMode'),
     )

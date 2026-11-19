@@ -2,14 +2,13 @@ import { createElement } from 'react'
 import { z } from 'zod'
 import { type SpeciesCultureConfig } from '@rpg/contracts'
 import { personalNameComponentSchema } from '@rpg/contracts/vocab'
-import { type FormItem } from '@rpg/ui/form'
+import { type DisplayConfig, type FormItem } from '@rpg/ui/form'
 
 import { buildActiveLanguageFieldOptions } from '@/features/vocabulary'
 import { languageMultiComboboxField } from '@/lib/forms/language-combobox-form-fields.lib'
 import { getContentTypeMidSentenceLabel } from '@/features/content/lib/content-type-labels'
 
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
-import { SpeciesCultureNamingAlert } from '../components/species-culture-naming-alert'
 import { SpeciesPersonalNameComponentsField } from '../components/species-personal-name-components-field'
 
 export const CULTURE_FIELD_PREFIX = 'culture'
@@ -18,6 +17,20 @@ export const CULTURE_NAME_FIELD = 'culture.name'
 export const CULTURE_ID_FIELD = 'culture.id'
 export const CULTURE_NAMING_SUPPORTED_FIELD = 'culture.naming.supported'
 export const CULTURE_NAMING_PERSONAL_NAME_COMPONENTS_FIELD = 'culture.naming.personalNameComponents'
+
+const CULTURE_NAMING_ALERT_DISPLAY: DisplayConfig = {
+  kind: 'display',
+  id: 'culture-naming-alert',
+  content: {
+    variant: 'notice',
+    notice: {
+      tone: 'warning',
+      title: 'Name generation unavailable',
+      message:
+        'Name generation and personal name components are not yet supported for homebrew species.',
+    },
+  },
+}
 
 export const speciesCultureFormSchema = z
   .object({
@@ -134,15 +147,7 @@ export function cultureFields(ctx: ContentFormCtx): FormItem {
           visibleWhen: () => false,
         },
       },
-      ...(homebrewSpecies
-        ? [
-            {
-              kind: 'slot' as const,
-              name: 'cultureNamingAlert',
-              render: () => createElement(SpeciesCultureNamingAlert),
-            },
-          ]
-        : []),
+      ...(homebrewSpecies ? [CULTURE_NAMING_ALERT_DISPLAY] : []),
       {
         kind: 'slot',
         name: CULTURE_NAMING_PERSONAL_NAME_COMPONENTS_FIELD,

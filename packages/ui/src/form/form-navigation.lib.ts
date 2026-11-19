@@ -47,7 +47,10 @@ function walkNavigationContainers(
   result: CollectedNavigationAnchor[],
 ): void {
   for (const item of items) {
-    if ('kind' in item && (item.kind === 'array' || item.kind === 'slot')) {
+    if (
+      'kind' in item &&
+      (item.kind === 'array' || item.kind === 'slot' || item.kind === 'display')
+    ) {
       continue
     }
 

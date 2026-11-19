@@ -4,6 +4,8 @@ import { forwardRef, useId, type FocusEventHandler, type ReactNode } from 'react
 
 import { cn } from '../../lib/utils'
 import { TEXT_VARIANT_MAP } from './text.variants'
+import { FieldHintText } from './field.client'
+import { fieldLabelHintStackClasses } from './field.variants'
 import { useFieldControlSize } from '../../form/context/form-section.context'
 import { useOptionalFilterChrome } from '../../filters/filter-chrome.context'
 import { Checkbox } from './checkbox.client'
@@ -36,6 +38,8 @@ export type CheckboxOptionProps = {
   /** Marks the option as a filter-toolbar alignment anchor. */
   toolbarAlign?: boolean
   onBlur?: FocusEventHandler<HTMLButtonElement>
+  /** Helper copy below the option row; wires `aria-describedby` on the checkbox. */
+  hint?: string
 }
 
 export const CheckboxOption = forwardRef<HTMLButtonElement, CheckboxOptionProps>(
@@ -57,10 +61,12 @@ export const CheckboxOption = forwardRef<HTMLButtonElement, CheckboxOptionProps>
       className,
       toolbarAlign,
       onBlur,
+      hint,
     },
     ref,
   ) {
     const generatedId = useId()
+    const hintId = useId()
     const controlId = id ?? generatedId
     const formSize = useFieldControlSize()
     const filterChrome = useOptionalFilterChrome()
@@ -81,7 +87,10 @@ export const CheckboxOption = forwardRef<HTMLButtonElement, CheckboxOptionProps>
       invalid,
     })
 
-    return (
+    const resolvedDescribedBy =
+      [describedBy, hint ? hintId : undefined].filter(Boolean).join(' ') || undefined
+
+    const optionRow = (
       <label {...shellProps} className={cn(UI_CHECKBOX_OPTION_CLASS, className)}>
         <Checkbox
           ref={ref}
@@ -94,12 +103,23 @@ export const CheckboxOption = forwardRef<HTMLButtonElement, CheckboxOptionProps>
           disabled={disabled}
           required={required}
           aria-invalid={invalid || undefined}
-          aria-describedby={describedBy}
+          aria-describedby={resolvedDescribedBy}
           onBlur={onBlur}
           onCheckedChange={handleCheckedChange}
         />
         <span className={cn('ui-checkbox-option__label', TEXT_VARIANT_MAP.option)}>{label}</span>
       </label>
+    )
+
+    if (!hint) return optionRow
+
+    return (
+      <div className={fieldLabelHintStackClasses}>
+        {optionRow}
+        <FieldHintText id={hintId} size={formSize} className="min-w-0 max-w-full break-words">
+          {hint}
+        </FieldHintText>
+      </div>
     )
   },
 )

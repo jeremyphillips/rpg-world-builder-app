@@ -108,7 +108,7 @@ function walkItems(
   bindings: RelationshipArrayBinding[],
 ): void {
   for (const item of items) {
-    if (!('kind' in item) || item.kind === 'slot') continue
+    if (!('kind' in item) || item.kind === 'slot' || item.kind === 'display') continue
     if (item.kind === 'array') {
       walkArrayItem(item, pathPrefix, insideArrayItem, bindings)
       continue

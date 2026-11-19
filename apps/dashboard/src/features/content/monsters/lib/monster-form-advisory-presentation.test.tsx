@@ -3,13 +3,14 @@
  */
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-
-import type { SlotConfig } from '@rpg/ui/form'
+import { Form } from '@rpg/ui/form'
+import { z } from 'zod'
+import { vi } from 'vitest'
 
 import type { MonsterFormAdvisory } from './monster-form-advisories'
 import {
   advisoriesForRowPath,
-  monsterFormAdvisorySlot,
+  monsterFormAdvisoryDisplay,
   monsterFormAdvisoryTone,
 } from './monster-form-advisory-presentation'
 
@@ -27,7 +28,7 @@ describe('monster form advisory presentation', () => {
     expect(monsterFormAdvisoryTone('flyby-missing-fly-speed')).toBe('warning')
     expect(monsterFormAdvisoryTone('future-code')).toBe('warning')
 
-    const slot = monsterFormAdvisorySlot(
+    const display = monsterFormAdvisoryDisplay(
       [
         {
           code: 'future-code' as MonsterFormAdvisory['code'],
@@ -37,8 +38,15 @@ describe('monster form advisory presentation', () => {
       ],
       'actions.0',
     )
-    const advisorySlot = slot as SlotConfig
-    render(<>{advisorySlot.render({ path: 'actions.0' })}</>)
+    render(
+      <Form
+        schema={z.object({})}
+        fields={[display]}
+        defaultValues={{}}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
     const note = screen.getByText('Still shown.')
     expect(note.closest('.ui-alert')).toHaveClass('ui-alert--warning')
   })
@@ -65,9 +73,17 @@ describe('monster form advisory presentation', () => {
     ).toEqual(['traits.0'])
   })
 
-  it('renders nothing when the row has no match and does not collect', () => {
-    const slot = monsterFormAdvisorySlot(weaponNotes, 'actions.2') as SlotConfig
-    expect(slot.name).toBe('buildAdvisories')
-    expect(slot.render({ path: 'actions.2' })).toBeNull()
+  it('renders nothing when the row has no match', () => {
+    const display = monsterFormAdvisoryDisplay(weaponNotes, 'actions.2')
+    const { container } = render(
+      <Form
+        schema={z.object({})}
+        fields={[display]}
+        defaultValues={{}}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+    expect(container.querySelector('.ui-alert')).toBeNull()
   })
 })

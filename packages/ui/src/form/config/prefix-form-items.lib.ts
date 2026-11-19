@@ -38,6 +38,10 @@ function prefixFormItem(item: FormItem, prefix: string): FormItem {
     }
   }
 
+  if (item.kind === 'display') {
+    return item
+  }
+
   if (item.kind === 'row') {
     return {
       ...item,

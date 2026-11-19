@@ -1,5 +1,5 @@
-import { AdvisoryAlert, type AdvisoryTone } from '@rpg/ui'
-import { pathOwnsIssue, type FormItem } from '@rpg/ui/form'
+import type { AdvisoryTone } from '@rpg/ui'
+import { pathOwnsIssue, type DisplayConfig } from '@rpg/ui/form'
 
 import type { MonsterFormAdvisory } from './monster-form-advisories'
 
@@ -32,28 +32,33 @@ export function advisoriesForRowPath(
   return advisories.filter((advisory) => pathOwnsIssue(rowPath, advisory.path))
 }
 
-/** Renders the parent collection for one row. Does not watch the form or collect. */
-export function monsterFormAdvisorySlot(
+export const MONSTER_ROW_ADVISORY_DISPLAY_ID_PREFIX = 'monster-row-advisories-'
+
+function monsterRowAdvisoryDisplayId(rowPath: string): string {
+  return `${MONSTER_ROW_ADVISORY_DISPLAY_ID_PREFIX}${rowPath.replaceAll('.', '-')}`
+}
+
+/** Read-only advisories for one action/trait row, scoped by `rowPath`. */
+export function monsterFormAdvisoryDisplay(
   advisories: readonly MonsterFormAdvisory[],
   rowPath: string,
-): FormItem {
+): DisplayConfig {
   const matches = advisoriesForRowPath(advisories, rowPath)
   return {
-    kind: 'slot',
-    name: 'buildAdvisories',
-    render: () => {
-      if (matches.length === 0) return null
-      return (
-        <div className="flex flex-col gap-2">
-          {matches.map((advisory) => (
-            <AdvisoryAlert
-              key={advisory.code}
-              tone={monsterFormAdvisoryTone(advisory.code)}
-              message={advisory.message}
-            />
-          ))}
-        </div>
-      )
-    },
+    kind: 'display',
+    id: monsterRowAdvisoryDisplayId(rowPath),
+    content: matches.map((advisory) => ({
+      variant: 'notice',
+      notice: {
+        tone: monsterFormAdvisoryTone(advisory.code),
+        message: advisory.message,
+      },
+    })),
   }
+}
+
+export function isMonsterRowAdvisoryDisplay(item: { kind?: string; id?: string }): boolean {
+  return (
+    item.kind === 'display' && Boolean(item.id?.startsWith(MONSTER_ROW_ADVISORY_DISPLAY_ID_PREFIX))
+  )
 }

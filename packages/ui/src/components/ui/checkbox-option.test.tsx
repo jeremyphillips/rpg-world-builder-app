@@ -76,6 +76,17 @@ describe('CheckboxOption', () => {
     expect(css).toContain("[data-shell='outlined']")
   })
 
+  it('stacks hint below the option row and links aria-describedby', () => {
+    render(<CheckboxOption label="Awards zero XP" hint="Counts as 0 XP when checked." />)
+    const checkbox = screen.getByRole('checkbox', { name: 'Awards zero XP' })
+    const hint = screen.getByText('Counts as 0 XP when checked.')
+    const stack = hint.parentElement
+    expect(stack).toHaveClass('flex', 'flex-col', 'gap-0.5')
+    expect(stack?.querySelector('.ui-checkbox-option')).toBeTruthy()
+    expect(checkbox.getAttribute('aria-describedby')).toContain(hint.id)
+    expect(hint).toHaveClass('text-style-field-hint')
+  })
+
   it('mirrors checked, disabled, and invalid state on the outlined container', () => {
     render(
       <CheckboxOption shell="outlined" label="Expertise" checked disabled invalid tone="success" />,

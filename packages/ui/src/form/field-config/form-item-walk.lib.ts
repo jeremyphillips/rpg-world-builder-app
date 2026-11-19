@@ -11,12 +11,20 @@ import type {
   GroupConfig,
   RowConfig,
   SlotConfig,
+  DisplayConfig,
 } from './form-item.types'
 
-/** Narrows a `FormItem` to a container (row/group/columns/dependent/array/slot) vs. a leaf field. */
+/** Narrows a `FormItem` to a container (row/group/columns/dependent/array/slot/display) vs. a leaf field. */
 export function isContainer(
   item: FormItem,
-): item is RowConfig | GroupConfig | ColumnsConfig | DependentConfig | ArrayConfig | SlotConfig {
+): item is
+  | RowConfig
+  | GroupConfig
+  | ColumnsConfig
+  | DependentConfig
+  | ArrayConfig
+  | SlotConfig
+  | DisplayConfig {
   return 'kind' in item
 }
 
@@ -34,7 +42,7 @@ export function flattenFields(items: Array<FormItem | RowConfig>): FieldConfig[]
       if (item.type !== 'levelRange') {
         fields.push(item)
       }
-    } else if (item.kind === 'array' || item.kind === 'slot') {
+    } else if (item.kind === 'array' || item.kind === 'slot' || item.kind === 'display') {
       // Intentionally skipped — see JSDoc above.
     } else if (item.kind === 'dependent') {
       fields.push(item.controller)

@@ -18,8 +18,16 @@ Do **not** hand-build form section chrome in feature components when `FormItem[]
 3. **Rendering** — `FormProvider` + `FormItems` (or `<Form>` / `<TabbedForm>`). Section shells
    may own separate persistence (e.g. campaign access PATCH) but must not duplicate field
    layout or disclosure chrome.
-4. **Slots** — `kind: 'slot'` only for behavior config cannot model yet; if the pattern repeats,
-   extend `@rpg/ui/form` (e.g. new `disclosure` variant) instead of a dashboard-only component.
+4. **Display** — `kind: 'display'` for read-only text, notices, or rules previews driven by
+   `content` or `resolve.contentWhen` (see [containers.md](../../packages/ui/docs/forms/containers.md#display-fields)).
+5. **Slots** — `kind: 'slot'` only after checking `display`, `visibility`, `optionsResolve`, `hint.resolve`,
+   `derivedMeta`, `valueSyncs`, `kind: 'dependent'`, `optionalDisclosure`, and standard
+   group/row/columns composition. If the pattern repeats, extend `@rpg/ui/form` instead of
+   copying a dashboard slot. A confirm-gated multi-path write stays a feature controller
+   plus `ConfirmDialog`, not a new Form patch API. Record every new production slot in
+   `apps/dashboard/docs/form-slot-register.md` and add that identity to
+   `apps/dashboard/src/test/form-slot-literal-baseline.json`. A removed slot does not
+   require an allowlist edit. A new or renamed one does.
 
 ## Reference
 

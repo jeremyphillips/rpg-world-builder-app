@@ -2,13 +2,16 @@ import { useEffect } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import { defaultExtendedMaxLevel } from '@rpg/contracts'
 
-import type { LevelRangeSummaryFormValues } from './level-range-summary'
+type ExtendedProgressionFormValues = {
+  maxCharacterLevel: number
+  extendedProgressionEnabled: boolean
+  extendedTierName?: string
+  extendedMaxLevel?: number
+}
 
 /** Resets extended fields when disabled; seeds default extended max when enabled. */
 export function ExtendedProgressionEffects() {
-  const { control, setValue } = useFormContext<
-    LevelRangeSummaryFormValues & { extendedTierName?: string; extendedMaxLevel?: number }
-  >()
+  const { control, setValue } = useFormContext<ExtendedProgressionFormValues>()
   const extendedProgressionEnabled = useWatch({ control, name: 'extendedProgressionEnabled' })
   const maxCharacterLevel = useWatch({ control, name: 'maxCharacterLevel' })
   const extendedMaxLevel = useWatch({ control, name: 'extendedMaxLevel' })

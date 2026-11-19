@@ -34,7 +34,7 @@ function assertLeafFieldLabels(
       continue
     }
 
-    if (item.kind === 'slot') {
+    if (item.kind === 'slot' || item.kind === 'display') {
       continue
     }
 

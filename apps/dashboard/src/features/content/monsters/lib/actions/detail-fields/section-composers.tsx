@@ -54,7 +54,7 @@ import type { MonsterActionDraftRow } from '../monster-action-presets'
 import { monsterActionActiveKeys } from '../monster-action-kind'
 import { insertMonsterFormAvailabilityField } from '../../forms/monster-form-availability-fields'
 import type { MonsterFormAdvisory } from '../../monster-form-advisories'
-import { monsterFormAdvisorySlot } from '../../monster-form-advisory-presentation'
+import { monsterFormAdvisoryDisplay } from '../../monster-form-advisory-presentation'
 import { legendaryActionCategory } from '../legendary/legendary-action-category'
 import { leapDistanceFields } from '../leap-distance-options'
 import { legendaryActionDetailFields } from '../legendary/monster-legendary-action-fields'
@@ -313,7 +313,7 @@ function reactionAuthoringFields(input: {
   if (input.action.kind === 'parry') {
     return [
       monsterActionParryPreviewSlot(input.ctx, input.action),
-      monsterFormAdvisorySlot(input.advisories ?? [], input.namePrefix),
+      monsterFormAdvisoryDisplay(input.advisories ?? [], input.namePrefix),
       {
         type: 'number',
         name: 'acBonus',
@@ -341,7 +341,7 @@ function reactionAuthoringFields(input: {
   }
   if (input.action.kind === 'action-reference') {
     return [
-      monsterFormAdvisorySlot(input.advisories ?? [], input.namePrefix),
+      monsterFormAdvisoryDisplay(input.advisories ?? [], input.namePrefix),
       monsterReactionConditionField(input.action),
       {
         type: 'select',
@@ -382,7 +382,7 @@ function legendaryAuthoringFields(input: {
     input.section === 'legendaryActions' ? legendaryActionCategory(input.action) : undefined
   if (!category || category === 'custom') return undefined
   return [
-    monsterFormAdvisorySlot(input.advisories ?? [], input.namePrefix),
+    monsterFormAdvisoryDisplay(input.advisories ?? [], input.namePrefix),
     ...legendaryActionDetailFields({
       category,
       namePrefix: input.namePrefix,
@@ -419,7 +419,7 @@ function sharedAuthoringFields(input: {
   return [
     ...source,
     ...preview,
-    monsterFormAdvisorySlot(input.advisories ?? [], namePrefix),
+    monsterFormAdvisoryDisplay(input.advisories ?? [], namePrefix),
     ...primaryProse,
     ...monsterActionMechanicFields({
       ctx,

@@ -164,6 +164,8 @@ export function registerFormItems(
       case 'slot':
         registerSlotItem(registry, prefix, item)
         break
+      case 'display':
+        break
       case 'dependent':
         registerDependentItem(registry, prefix, item, registerFormItems, formValues)
         break

@@ -14,10 +14,6 @@ export { PendingCampaignInvitation } from './components/recovery/pending-campaig
 export { PendingCampaignInvitationsSection } from './components/recovery/pending-campaign-invitations-section'
 export { CampaignCharacterEligibilityAlert } from './components/onboarding/campaign-character-eligibility-alert'
 export { ExtendedProgressionEffects } from './components/extended-progression-effects'
-export {
-  ExtendedLevelRangeSummary,
-  StandardLevelRangeSummary,
-} from './components/level-range-summary'
 export { NewCampaignLink } from './components/new-campaign-link'
 export {
   buildRulesConfigFields,
@@ -38,11 +34,16 @@ export {
 } from './lib/rules/character-configuration/character-configuration-navigation.lib'
 export {
   buildMechanicsConfigFields,
+  buildMechanicsValueSyncs,
   MECHANICS_CONFIGURATION_SECTIONS,
   mechanicsValuesSchema,
   type MechanicsConfigurationSectionId,
   type MechanicsValues,
 } from './lib/rules/mechanics/mechanics-form-fields'
+export {
+  mechanicsFormDef,
+  type MechanicsFormDefOptions,
+} from './lib/rules/mechanics/mechanics-form-def'
 export {
   buildCharacterCreationPatchInput,
   mapRulesetPatchToRulesValues,

@@ -3,7 +3,7 @@ import type { FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import { SpellResolutionEffectRemoveControl } from '../../components/effects/spell-resolution-effect-remove-control'
-import { SpellResolutionEffectsApplicationLabel } from '../../components/effects/spell-resolution-effects-application-label'
+import { resolutionEffectsApplicationLabelDisplay } from './resolution-effects-application-label-display.lib'
 import { SpellResolutionHowItResolves } from '../../components/method/spell-resolution-how-it-resolves'
 import { SpellResolutionProjectilesPreview } from '../../components/method/spell-resolution-how-it-resolves-projectiles'
 import { SpellResolutionChangeNotice } from '../../components/notices/spell-resolution-change-notice'
@@ -13,7 +13,7 @@ import { SpellResolutionProgression } from '../../components/progression/spell-r
 import { SpellResolutionPreview } from '../../components/preview/spell-resolution-preview'
 import { SpellResolutionProximitySelect } from '../../components/target/spell-resolution-proximity-select'
 import { ResolutionSelectionModeSelect } from '../../components/target/spell-resolution-selection-mode-select'
-import { SpellResolutionSelectionHints } from '../../components/target/spell-resolution-selection-hints'
+import { resolutionSelectionHintsDisplay } from './resolution-selection-hints-display.lib'
 import { deriveDefaultEffectRecipient, type ResolutionTargetKind } from '@rpg/contracts'
 import { buildActiveCreatureTypeFieldOptions } from '@/features/vocabulary'
 
@@ -192,15 +192,7 @@ function resolutionEffectsAndOutcomesGroup(ctx: ContentFormCtx): FormItem {
           {
             kind: 'group',
             className: 'gap-3',
-            fields: [
-              {
-                kind: 'slot',
-                name: '_resolutionEffectsApplicationLabel',
-                // Read-only label tying effects to the selected application pattern.
-                render: () => createElement(SpellResolutionEffectsApplicationLabel),
-              },
-              resolutionEffectsArrayField(ctx),
-            ],
+            fields: [resolutionEffectsApplicationLabelDisplay(), resolutionEffectsArrayField(ctx)],
           },
         ],
       },
@@ -244,11 +236,7 @@ export function configuredResolutionFields(ctx: ContentFormCtx): FormItem[] {
           name: '_resolutionSelectionModeSelect',
           render: () => createElement(ResolutionSelectionModeSelect),
         },
-        {
-          kind: 'slot',
-          name: '_resolutionSelectionHints',
-          render: () => createElement(SpellResolutionSelectionHints),
-        },
+        resolutionSelectionHintsDisplay(),
         {
           kind: 'group',
           heading: { label: 'Targeting' },

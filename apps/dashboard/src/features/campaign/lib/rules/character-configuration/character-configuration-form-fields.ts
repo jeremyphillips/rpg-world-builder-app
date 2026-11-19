@@ -53,9 +53,9 @@ import { ExtendedProgressionEffects } from '../../../components/extended-progres
 import { SpellcastingProgressionField } from '../../../components/spellcasting-progression-field'
 import { XpThresholdsField } from '../../../components/xp-thresholds-field'
 import {
-  ExtendedLevelRangeSummary,
-  StandardLevelRangeSummary,
-} from '../../../components/level-range-summary'
+  extendedLevelRangeSummaryDisplay,
+  standardLevelRangeSummaryDisplay,
+} from '../../forms/level-range-summary-display.lib'
 import { getStandardStartingWealthRules } from '@rpg/catalog/starting-wealth'
 
 import { IMPORTED_CHARACTERS_POLICY_LABELS } from './character-configuration-form-labels'
@@ -346,14 +346,6 @@ function maxCharacterLevelField(): FormItem {
   }
 }
 
-function standardLevelRangeSummarySlot(): FormItem {
-  return {
-    kind: 'slot',
-    name: '_standardLevelRangeSummary',
-    render: () => createElement(StandardLevelRangeSummary),
-  }
-}
-
 function allowedCharacterCreatureTypesField(creatureTypeOptions: FieldOption[]): FormItem {
   return vocabularyComboboxFieldForTerm(CREATURE_TYPE_TERM, {
     name: 'allowedCharacterCreatureTypes',
@@ -372,7 +364,7 @@ function progressionGroup(): FormItem {
       withNavigationAnchor(
         {
           kind: 'group',
-          fields: [maxCharacterLevelField(), standardLevelRangeSummarySlot()],
+          fields: [maxCharacterLevelField(), standardLevelRangeSummaryDisplay()],
         },
         { id: 'progression-standard-max-level', label: 'Standard max level' },
       ),
@@ -421,11 +413,7 @@ function progressionGroup(): FormItem {
                 name: '_extendedProgressionEffects',
                 render: () => createElement(ExtendedProgressionEffects),
               },
-              {
-                kind: 'slot',
-                name: '_extendedLevelRangeSummary',
-                render: () => createElement(ExtendedLevelRangeSummary),
-              },
+              extendedLevelRangeSummaryDisplay(),
             ],
           },
         },

@@ -135,6 +135,7 @@ function walkInactiveFormItem(
   switch (item.kind) {
     case 'array':
     case 'slot':
+    case 'display':
       return
     case 'row':
       walkInactiveContainerFields(

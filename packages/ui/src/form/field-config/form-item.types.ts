@@ -29,6 +29,19 @@ import type {
 import type { FieldConfig } from './field-config.types'
 import type { FieldOption } from './field-options'
 import type { FieldVisibility } from './field-visibility'
+import type { DisplayConfig } from './display-config.types'
+
+export type {
+  DisplayConfig,
+  FormDisplayBlock,
+  FormDisplayFeatureTableRowBlock,
+  FormDisplayNoticeBlock,
+  FormDisplayResolve,
+  FormDisplayRulesContent,
+  FormDisplayRulesPreviewBlock,
+  FormDisplayTextBlock,
+  FormDisplayTextRole,
+} from './display-config.types'
 
 export type {
   ArrayAddMenuConfig,
@@ -85,6 +98,7 @@ export type GroupFieldItem =
   | FieldConfig
   | RowConfig
   | SlotConfig
+  | DisplayConfig
   | GroupConfig
   | ColumnsConfig
   | DependentConfig
@@ -599,3 +613,4 @@ export type FormItem =
   | DependentConfig
   | ArrayConfig
   | SlotConfig
+  | DisplayConfig

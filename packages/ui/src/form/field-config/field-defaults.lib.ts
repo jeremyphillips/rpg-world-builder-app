@@ -210,32 +210,46 @@ export function buildItemDefaultValues(itemFields: FormItem[]): Record<string, u
   return values
 }
 
-/** Builds the `defaultValues` object RHF needs from a form's items. */
-export function buildDefaultValues(items: FormItem[]): Record<string, unknown> {
-  const values: Record<string, unknown> = {}
-  for (const item of items) {
-    if (!('kind' in item)) {
-      assignFieldDefaultValues(item, values)
-    } else if (item.kind === 'row') {
+function applyFormItemDefaultValues(item: FormItem, values: Record<string, unknown>): void {
+  if (!('kind' in item)) {
+    assignFieldDefaultValues(item, values)
+    return
+  }
+
+  switch (item.kind) {
+    case 'row':
       for (const field of item.fields) {
         if (isRowSlotItem(field)) continue
         assignFieldDefaultValues(field, values)
       }
-    } else if (item.kind === 'group') {
+      break
+    case 'group':
       Object.assign(values, buildDefaultValues(item.fields as FormItem[]))
-    } else if (item.kind === 'columns') {
+      break
+    case 'columns':
       Object.assign(
         values,
         buildDefaultValues(resolveColumnsCollapseSequence(item.columns, item.collapseOrder)),
       )
-    } else if (item.kind === 'dependent') {
+      break
+    case 'dependent':
       assignFieldDefaultValues(item.controller, values)
       Object.assign(values, buildDefaultValues(item.dependents.fields as FormItem[]))
-    } else if (item.kind === 'array') {
+      break
+    case 'array':
       values[item.name] = []
-    } else if (item.kind === 'slot') {
-      // Slot values come from the form's defaultValues.
-    }
+      break
+    case 'slot':
+    case 'display':
+      break
+  }
+}
+
+/** Builds the `defaultValues` object RHF needs from a form's items. */
+export function buildDefaultValues(items: FormItem[]): Record<string, unknown> {
+  const values: Record<string, unknown> = {}
+  for (const item of items) {
+    applyFormItemDefaultValues(item, values)
   }
   return values
 }

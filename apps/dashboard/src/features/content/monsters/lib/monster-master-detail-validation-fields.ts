@@ -71,7 +71,7 @@ export function monsterTraitRowResolveFields(
   input: MonsterTraitRowResolveContext,
 ): ArrayResolveFieldsFn {
   const { ctx, readValues } = input
-  return (row, _index) => {
+  return (row, index) => {
     const values = readValues?.()
     if (row === undefined || row === null) {
       return monsterTraitItemFields({ sharedCastingOptions: [] })
@@ -79,6 +79,7 @@ export function monsterTraitRowResolveFields(
     return monsterTraitDetailFields({
       row,
       ctx,
+      rowPath: `traits.${index}`,
       monsterName: values?.name ?? '',
       advisories: values ? collectMonsterFormAdvisories(values, monsterEquipmentCatalog(ctx)) : [],
       sharedCastingOptions: values ? sharedCastingOptions(values, '') : [],
