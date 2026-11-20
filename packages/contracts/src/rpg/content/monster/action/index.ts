@@ -72,6 +72,7 @@ export { multiattackValidationMessages } from './multiattack-validation-messages
 export {
   isMultiattackAttackGroup,
   isMultiattackUseClause,
+  multiattackPositiveInt,
   type MultiattackAlternative,
   type MultiattackAttackGroup,
   type MultiattackDraftStep,

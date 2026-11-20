@@ -122,6 +122,18 @@ export type MultiattackDraftStep = z.infer<typeof multiattackDraftStepSchema>
 export type MultiattackReplacement = z.infer<typeof multiattackReplacementSchema>
 export type MultiattackAlternative = z.infer<typeof multiattackAlternativePublishedSchema>
 
+/** Whole positive integers for multiattack counts in validation, normalization, and prose. */
+export function multiattackPositiveInt(value: unknown): number | undefined {
+  if (typeof value === 'number' && Number.isInteger(value) && value >= 1) return value
+  if (typeof value === 'string') {
+    const trimmed = value.trim()
+    if (!trimmed) return undefined
+    const parsed = Number(trimmed)
+    if (Number.isInteger(parsed) && parsed >= 1) return parsed
+  }
+  return undefined
+}
+
 export function isMultiattackAttackGroup(step: {
   kind?: string
   actionIds?: unknown

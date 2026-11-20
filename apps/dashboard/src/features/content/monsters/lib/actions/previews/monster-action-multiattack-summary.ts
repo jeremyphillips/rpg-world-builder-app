@@ -2,9 +2,11 @@ import {
   formatMonsterMultiattackResult,
   isMultiattackAttackGroup,
   isMultiattackUseClause,
+  multiattackPositiveInt,
   type CreatureEquipmentCatalog,
   type EquipmentInstance,
   type MagicPropertyDefinitionProvider,
+  type Monster,
   type MonsterAction,
   type MonsterActionDraft,
 } from '@rpg/contracts'
@@ -16,6 +18,7 @@ import {
   formatMonsterActionMultiattackPreviewConfigureHint,
   MONSTER_EQUIPMENT_CATALOG_ERROR,
   MONSTER_LOADING_EQUIPMENT,
+  MONSTER_MULTIATTACK_REPLACEMENT_LABEL,
   MONSTER_MULTIATTACK_STEPS_LABEL,
 } from '../../monster-form-labels'
 import type { MonsterFormValues } from '../../monster-form-values'
@@ -39,8 +42,7 @@ function multiattackStepsReady(
   return (action.steps ?? []).some((step) => {
     if (isMultiattackAttackGroup(step)) {
       return (
-        typeof step.count === 'number' &&
-        step.count >= 1 &&
+        multiattackPositiveInt(step.count) !== undefined &&
         Array.isArray(step.actionIds) &&
         step.actionIds.length > 0
       )
@@ -50,8 +52,30 @@ function multiattackStepsReady(
       return (step.choices ?? []).some((choice) => Boolean(choice.actionId))
     }
     return Boolean(step.actionId)
-    return false
   })
+}
+
+function multiattackReplacementBlocksReady(
+  action: Extract<MonsterActionDraft, { kind: 'multiattack' }>,
+): boolean {
+  const replacement = action.replacement
+  if (!replacement) return true
+  if (!multiattackPositiveInt(replacement.count)) return false
+  const choices = replacement.choices ?? []
+  return choices.some(
+    (choice) => typeof choice.actionId === 'string' && choice.actionId.trim().length > 0,
+  )
+}
+
+function normalizedMultiattackDraft(
+  normalized: Monster,
+  actionId: string,
+): Extract<MonsterActionDraft, { kind: 'multiattack' }> | undefined {
+  const match = (normalized.actions ?? []).find(
+    (row) => row?.id === actionId && row.kind === 'multiattack',
+  )
+  if (!match || match.kind !== 'multiattack') return undefined
+  return match as Extract<MonsterActionDraft, { kind: 'multiattack' }>
 }
 
 export type MonsterActionMultiattackPreviewUnavailableContext = {
@@ -62,10 +86,15 @@ export type MonsterActionMultiattackPreviewUnavailableContext = {
 
 export function resolveMonsterActionMultiattackPreviewGuidance({
   ctx,
+  action,
 }: MonsterActionMultiattackPreviewUnavailableContext): string {
   const configure = formatMonsterActionMultiattackPreviewConfigureHint
   if (ctx.equipmentCatalogStatus === 'error') return MONSTER_EQUIPMENT_CATALOG_ERROR
   if (ctx.equipmentCatalogStatus !== 'ready') return MONSTER_LOADING_EQUIPMENT
+  if (!multiattackStepsReady(action)) return configure(MONSTER_MULTIATTACK_STEPS_LABEL)
+  if (!multiattackReplacementBlocksReady(action)) {
+    return configure(MONSTER_MULTIATTACK_REPLACEMENT_LABEL)
+  }
   return configure(MONSTER_MULTIATTACK_STEPS_LABEL)
 }
 
@@ -101,7 +130,7 @@ export function buildMonsterMultiattackSentence(input: {
 function renderMultiattackProse(
   values: MonsterFormValues,
   ctx: ContentFormCtx,
-  action: Extract<MonsterActionDraft, { kind: 'multiattack' }>,
+  actionId: string,
 ): string {
   const armorClassRules = monsterArmorClassRules(ctx)
   const normalized = normalizeMonsterDraftForPreview(values, {
@@ -109,9 +138,11 @@ function renderMultiattackProse(
     mode: 'create',
     armorClassRules,
   })
+  const multiattack = normalizedMultiattackDraft(normalized, actionId)
+  if (!multiattack) return ''
   return buildMonsterMultiattackSentence({
     monsterName: normalized.name?.trim() || 'Creature',
-    action: action as MultiattackActionShape,
+    action: multiattack as MultiattackActionShape,
     actions: normalized.actions ?? [],
     equipment: normalized.equipment ?? [],
     equipmentCatalog: monsterEquipmentCatalog(ctx),
@@ -140,13 +171,14 @@ export function buildMonsterActionMultiattackPreview(input: {
 
   if (
     !multiattackStepsReady(draft) ||
+    !multiattackReplacementBlocksReady(draft) ||
     input.ctx.equipmentCatalogStatus !== 'ready' ||
     !monsterArmorClassRules(input.ctx)
   ) {
     return unavailableMultiattackPreview(guidanceContext)
   }
 
-  const prose = renderMultiattackProse(input.values, input.ctx, draft).trim()
+  const prose = renderMultiattackProse(input.values, input.ctx, input.actionId).trim()
   if (!prose) return unavailableMultiattackPreview(guidanceContext)
 
   return { status: 'ready', prose }

@@ -227,39 +227,39 @@ function monsterMultiattackReplacementGroup(input: {
     fields: [
       {
         type: 'number',
-        name: 'count',
+        name: 'replacement.count',
         label: MONSTER_MULTIATTACK_ATTACKS_REPLACED_LABEL,
         hint: { text: MONSTER_MULTIATTACK_ATTACKS_REPLACED_HINT },
         min: 1,
       },
       {
         type: 'select',
-        name: 'replacesActionId',
+        name: 'replacement.replacesActionId',
         label: MONSTER_MULTIATTACK_TARGET_ATTACK_LABEL,
         placeholder: 'Choose',
         options: input.targetAttackOptions,
         optionalDisclosure: { intent: 'add', actionSubject: 'target attack' },
         visibility: {
-          dependsOn: ['attackWord'],
-          visibleWhen: (values) => values.attackWord !== 'any',
+          dependsOn: ['replacement.attackWord'],
+          visibleWhen: (values) => values['replacement.attackWord'] !== 'any',
         },
       },
       {
         type: 'switch',
-        name: 'attackWord',
+        name: 'replacement.attackWord',
         label: MONSTER_MULTIATTACK_ANY_ATTACK_LABEL,
         hint: { text: MONSTER_MULTIATTACK_ANY_ATTACK_HINT },
         optionalDisclosure: { intent: 'add', actionSubject: 'any attack wording' },
       },
       {
         type: 'checkbox',
-        name: 'whenAvailable',
+        name: 'replacement.whenAvailable',
         label: MONSTER_MULTIATTACK_IF_AVAILABLE_LABEL,
         hint: { text: MONSTER_MULTIATTACK_IF_AVAILABLE_HINT },
       },
       {
         kind: 'array',
-        name: 'choices',
+        name: 'replacement.choices',
         heading: {
           label: MONSTER_MULTIATTACK_CHOICES_LABEL,
           hint: { text: MONSTER_MULTIATTACK_CHOICES_HINT },
@@ -302,7 +302,7 @@ function monsterMultiattackAlternativeGroup(input: {
     fields: [
       {
         type: 'select',
-        name: 'afterUsingActionId',
+        name: 'alternative.afterUsingActionId',
         label: MONSTER_MULTIATTACK_ONLY_AFTER_USING_LABEL,
         placeholder: MONSTER_MULTIATTACK_NO_PREREQUISITE,
         options: input.prerequisiteOptions,
@@ -316,7 +316,7 @@ function monsterMultiattackAlternativeGroup(input: {
           actionRows: input.actionRows,
           spellCatalogById: input.spellCatalogById,
         }),
-        name: 'steps',
+        name: 'alternative.steps',
         heading: {
           label: multiattackPrimarySequenceHeading(input.action),
           hint: { text: MONSTER_MULTIATTACK_ATTACKS_HINT },

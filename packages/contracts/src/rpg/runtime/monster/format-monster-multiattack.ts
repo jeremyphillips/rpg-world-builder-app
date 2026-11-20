@@ -5,6 +5,7 @@ import type { CreatureEquipmentCatalog } from '../creature/equipment'
 import {
   isMultiattackAttackGroup,
   isMultiattackUseClause,
+  multiattackPositiveInt,
   type MultiattackAlternative,
   type MultiattackPublishedStep,
   type MultiattackReplacement,
@@ -114,46 +115,52 @@ function letterLabel(index: number): string {
   return String.fromCharCode(65 + index)
 }
 
+function formatReplacementChoiceList(phrases: readonly string[]): string {
+  if (phrases.length === 1) return phrases[0]!
+  const allUseOf = phrases.every((phrase) => phrase.startsWith('a use of'))
+  const listed = phrases
+    .map((phrase, index) => {
+      const body = allUseOf ? phrase.replace(/^a use of /, '') : phrase
+      return `(${letterLabel(index)}) ${body}`
+    })
+    .join(' or ')
+  return allUseOf ? `a use of ${listed}` : listed
+}
+
+function formatReplacementTargetPhrase(
+  replacement: MultiattackReplacement,
+  replacementCount: number,
+  ctx: FormatContext,
+): string | undefined {
+  if (replacement.attackWord === 'any') return 'any attack'
+  if (replacement.replacesActionId) {
+    const target = referencedActionName(replacement.replacesActionId, ctx)
+    if (!target.name) return undefined
+    return `the ${target.name} attack`
+  }
+  if (replacementCount === 1) return 'one attack'
+  return `${formatCardinalWord(replacementCount)} attacks`
+}
+
 function formatReplacementPhrase(
   replacement: MultiattackReplacement,
   ctx: FormatContext,
 ): string | undefined {
-  const phrases = replacement.choices.map((choice) => replacementChoicePhrase(choice, ctx))
+  const replacementCount = multiattackPositiveInt(replacement.count)
+  const choices = replacement.choices ?? []
+  const hasChoices =
+    replacementCount &&
+    choices.length > 0 &&
+    choices.every((choice) => Boolean(choice.actionId?.trim()))
+  if (!hasChoices) return undefined
+
+  const phrases = choices.map((choice) => replacementChoicePhrase(choice, ctx))
   if (phrases.some((phrase) => !phrase)) return undefined
 
-  const resolvedPhrases = phrases as string[]
-  const allUseOf =
-    resolvedPhrases.length >= 2 && resolvedPhrases.every((phrase) => phrase.startsWith('a use of'))
+  const targetPhrase = formatReplacementTargetPhrase(replacement, replacementCount, ctx)
+  if (!targetPhrase) return undefined
 
-  let choiceText: string
-  if (resolvedPhrases.length === 1) {
-    choiceText = resolvedPhrases[0]!
-  } else if (allUseOf) {
-    choiceText = resolvedPhrases
-      .map((phrase, index) => `(${letterLabel(index)}) ${phrase.replace(/^a use of /, '')}`)
-      .join(' or ')
-    choiceText = `a use of ${choiceText}`
-  } else {
-    choiceText = resolvedPhrases
-      .map((phrase, index) => `(${letterLabel(index)}) ${phrase}`)
-      .join(' or ')
-    choiceText = choiceText
-  }
-
-  const countWord = formatCardinalWord(replacement.count)
-  let targetPhrase: string
-  if (replacement.attackWord === 'any') {
-    targetPhrase = 'any attack'
-  } else if (replacement.replacesActionId) {
-    const target = referencedActionName(replacement.replacesActionId, ctx)
-    if (!target.name) return undefined
-    targetPhrase = `the ${target.name} attack`
-  } else if (replacement.count === 1) {
-    targetPhrase = 'one attack'
-  } else {
-    targetPhrase = `${countWord} attacks`
-  }
-
+  const choiceText = formatReplacementChoiceList(phrases as string[])
   const available = replacement.whenAvailable ? ' if available' : ''
   return `It can replace ${targetPhrase} with ${choiceText}${available}`
 }
@@ -204,18 +211,20 @@ function formatUseChoicePhrase(
 }
 
 function attackGroupFragment(
-  step: { count: number; actionIds: readonly string[] },
+  step: { count: unknown; actionIds: readonly string[] },
   ctx: FormatContext,
 ): string | undefined {
+  const stepCount = multiattackPositiveInt(step.count)
+  if (!stepCount) return undefined
   const names = step.actionIds.map((id) => referencedActionName(id, ctx).name)
   if (names.some((name) => !name)) return undefined
-  const countLabel = formatCardinalWord(step.count)
+  const countLabel = formatCardinalWord(stepCount)
   if (step.actionIds.length === 1) {
     const name = names[0]!
-    const noun = step.count === 1 ? 'attack' : 'attacks'
+    const noun = stepCount === 1 ? 'attack' : 'attacks'
     return `${countLabel} ${name} ${noun}`
   }
-  const noun = step.count === 1 ? 'attack' : 'attacks'
+  const noun = stepCount === 1 ? 'attack' : 'attacks'
   return `${countLabel} ${noun}, using ${joinNaturalList(names as string[], { conjunction: 'or' })} in any combination`
 }
 

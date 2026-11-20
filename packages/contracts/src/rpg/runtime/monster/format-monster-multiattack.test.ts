@@ -66,6 +66,31 @@ describe('formatMonsterMultiattack', () => {
     ).toBe('unavailable')
   })
 
+  it('returns unavailable when replacement is opened but choices are missing', () => {
+    const actions = [
+      { id: 'bite', kind: 'natural-weapon', name: 'Bite' },
+      {
+        id: 'multiattack',
+        kind: 'multiattack',
+        name: 'Multiattack',
+        steps: [{ count: 2, actionIds: ['bite'] }],
+        replacement: {
+          choices: [],
+          replacesActionId: 'bite',
+        },
+      },
+    ] as MonsterAction[]
+    expect(
+      formatMonsterMultiattackResult({
+        monsterName: 'Hell Hound',
+        action: actions[1] as never,
+        actions,
+        equipment: [],
+        equipmentCatalog: emptyEquipmentCatalog,
+      }).status,
+    ).toBe('unavailable')
+  })
+
   it('prints replacement attack choices', () => {
     const actions = [
       { id: 'beak', kind: 'natural-weapon', name: 'Beak' },

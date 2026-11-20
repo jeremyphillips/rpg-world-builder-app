@@ -8,6 +8,7 @@ import {
   omitEmptySavingThrow,
   monsterLegendaryActionDraftSchema,
   monsterReactionDraftSchema,
+  multiattackPositiveInt,
   type ArmorClassRules,
   type ContentValidationIntent,
   type Monster,
@@ -244,14 +245,32 @@ function applyMultiattackDraft(cleaned: Record<string, unknown>): void {
     else delete record[key]
   }
 
+  const filterChoiceRows = (rows: unknown): unknown[] => {
+    if (!Array.isArray(rows)) return []
+    return rows.filter((row) => {
+      if (!isRecord(row)) return false
+      const actionId = row.actionId
+      return typeof actionId === 'string' && actionId.trim().length > 0
+    })
+  }
+
   const normalizeUseStep = (step: Record<string, unknown>) => {
-    if (step.kind !== 'use') return
+    if (step.kind !== 'use') {
+      const count = multiattackPositiveInt(step.count)
+      if (count) step.count = count
+      else delete step.count
+      return
+    }
+    const count = multiattackPositiveInt(step.count)
+    if (count) step.count = count
+    else delete step.count
     if (step.mode !== 'choice') {
       keepLiteralTrue(step, 'optional')
       keepLiteralTrue(step, 'whenAvailable')
       if (step.actionId === '') delete step.actionId
     } else {
       keepLiteralTrue(step, 'whenAvailable')
+      step.choices = filterChoiceRows(step.choices)
     }
   }
 
@@ -266,6 +285,11 @@ function applyMultiattackDraft(cleaned: Record<string, unknown>): void {
 
   if (isRecord(cleaned.replacement)) {
     const replacement = { ...cleaned.replacement }
+    const count = multiattackPositiveInt(replacement.count)
+    if (count) replacement.count = count
+    else delete replacement.count
+    if (replacement.replacesActionId === '') delete replacement.replacesActionId
+    replacement.choices = filterChoiceRows(replacement.choices)
     if (replacement.attackWord === true) replacement.attackWord = 'any'
     if (replacement.attackWord !== 'any') delete replacement.attackWord
     keepLiteralTrue(replacement, 'whenAvailable')
