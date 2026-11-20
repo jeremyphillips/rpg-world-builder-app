@@ -1,0 +1,17 @@
+/*
+ * Dependent nest horizontal alignment — tied to choice-control theme variables.
+ * @see packages/ui/src/styles/tokens/tailwind-theme.css (--control-choice-*)
+ */
+@layer components {
+  .ui-field-dependent-nest--align-field-edge {
+    margin-inline-start: 0;
+  }
+
+  .ui-field-dependent-nest--align-inline-switch {
+    margin-inline-start: calc(var(--control-choice-switch-width) + (var(--spacing) * 2));
+  }
+
+  .ui-field-dependent-nest--align-inline-checkbox {
+    margin-inline-start: calc(var(--control-choice-indicator-size-sm) + (var(--spacing) * 2));
+  }
+}

@@ -1,9 +1,17 @@
+import { cva } from 'class-variance-authority'
+
 import { cn } from '../../lib/utils'
 import type {
   DependentChrome,
   DependentDependentsConfig,
 } from '../../form/field-config/form-item.types'
 import { DEFAULT_DEPENDENT_CHROME } from '../../form/field-config/form-item.types'
+import type { FieldConfig } from '../../form/field-config'
+import { DEPENDENT_NEST_ALIGN_FIELD_EDGE_CLASS } from './field-dependent-alignment.constants'
+import {
+  resolveControllerDependentAnatomy,
+  resolveDependentNestAlignmentClass,
+} from '../../form/presentation/resolve-controller-dependent-anatomy.lib'
 import type { FieldRhythm } from './field.variants'
 import {
   resolveDependentNestRailClasses,
@@ -48,14 +56,40 @@ export type FormSurfaceHost = 'field-container' | 'array-item'
 
 export type FieldGroupRailTone = FieldRailTone
 
-/** Nest horizontal offset from controller — 44px (`ml-11`). */
+export {
+  DEPENDENT_NEST_ALIGN_FIELD_EDGE_CLASS,
+  DEPENDENT_NEST_ALIGN_INLINE_CHECKBOX_CLASS,
+  DEPENDENT_NEST_ALIGN_INLINE_SWITCH_CLASS,
+} from './field-dependent-alignment.constants'
+
+/** @deprecated Use {@link DEPENDENT_NEST_ALIGN_INLINE_SWITCH_CLASS} and field-dependent.css calc. */
 export const dependentNestMarginClasses = 'ml-11'
 
-/** Nest inner padding — 12px top/right/bottom, 16px left (`pt-3 pr-3 pb-3 pl-4`). */
+/**
+ * Nest inner padding — no block-start pad; parent-child gap is owned by
+ * {@link dependentSectionStackVariants}.
+ */
 export const dependentNestPaddingClasses = 'pt-3 pr-3 pb-3 pl-4'
 
-/** Vertical gap between controller and dependents region — 16px (`gap-4`). */
-export const dependentSectionStackClasses = 'flex flex-col gap-4'
+/** Vertical gap between controller and dependents region — rhythm-aware (compact 4px / comfortable 8px). */
+export const dependentSectionStackVariants = cva('flex flex-col', {
+  variants: {
+    rhythm: {
+      compact: 'gap-1',
+      comfortable: 'gap-2',
+    },
+  },
+  defaultVariants: {
+    rhythm: 'comfortable',
+  },
+})
+
+export function resolveDependentSectionStackClasses(rhythm: FieldRhythm = 'comfortable'): string {
+  return dependentSectionStackVariants({ rhythm })
+}
+
+/** @deprecated Use {@link resolveDependentSectionStackClasses}. */
+export const dependentSectionStackClasses = resolveDependentSectionStackClasses('comfortable')
 
 /** @deprecated Panel chrome removed — retained for legacy call sites mapping to nest. */
 export function resolveFieldDependentsChromeClasses(options: FieldContainerChromeOptions): string {
@@ -81,12 +115,13 @@ export function resolveDependentNestFillClasses(
   return cn('bg-background', establishSurfaceCurrent('background'))
 }
 
-/** Default dependent nest shell — margin, padding, and host-aware fill only. */
+/** Default dependent nest shell — alignment modifier, padding, host-aware fill. */
 export function resolveDependentNestShellClasses(
   surfaceHost: FormSurfaceHost = 'field-container',
+  alignmentClassName: string = DEPENDENT_NEST_ALIGN_FIELD_EDGE_CLASS,
 ): string {
   return cn(
-    dependentNestMarginClasses,
+    alignmentClassName,
     dependentNestPaddingClasses,
     resolveDependentNestFillClasses(surfaceHost),
   )
@@ -98,7 +133,7 @@ export type ResolvedDependentPresentation = {
   showNest: boolean
   /** Decorative rail on the nest wrapper. */
   railClassName?: string
-  /** Nest shell — margin, padding, host-aware fill. */
+  /** Nest shell — alignment, padding, host-aware fill. */
   nestShellClassName?: string
 }
 
@@ -106,10 +141,14 @@ export type ResolvedDependentPresentation = {
 export function resolveDependentPresentation(
   dependents: Pick<DependentDependentsConfig, 'chrome' | 'inset'>,
   _rhythm: FieldRhythm,
-  options?: { surfaceHost?: FormSurfaceHost },
+  options?: { surfaceHost?: FormSurfaceHost; controller?: FieldConfig },
 ): ResolvedDependentPresentation {
   let { chrome = DEFAULT_DEPENDENT_CHROME } = dependents
   const surfaceHost = options?.surfaceHost ?? 'field-container'
+  const controller = options?.controller
+  const alignmentClassName = controller
+    ? resolveDependentNestAlignmentClass(resolveControllerDependentAnatomy(controller))
+    : DEPENDENT_NEST_ALIGN_FIELD_EDGE_CLASS
 
   if (dependents.inset === false) {
     chrome = 'none'
@@ -123,7 +162,7 @@ export function resolveDependentPresentation(
     chrome,
     showNest: true,
     railClassName: resolveDependentNestRailClasses(),
-    nestShellClassName: resolveDependentNestShellClasses(surfaceHost),
+    nestShellClassName: resolveDependentNestShellClasses(surfaceHost, alignmentClassName),
   }
 }
 
@@ -134,7 +173,7 @@ export type ResolvedDependentChromePresentation = ResolvedDependentPresentation
 export function resolveDependentChromePresentation(
   dependents: DependentDependentsConfig,
   rhythm: FieldRhythm,
-  options?: { surfaceHost?: FormSurfaceHost },
+  options?: { surfaceHost?: FormSurfaceHost; controller?: FieldConfig },
 ): ResolvedDependentPresentation {
   return resolveDependentPresentation(dependents, rhythm, options)
 }

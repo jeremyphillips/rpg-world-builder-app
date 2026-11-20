@@ -6,7 +6,7 @@ import { z } from 'zod'
 import { render, screen } from '@testing-library/react'
 import { FormProvider, useForm } from 'react-hook-form'
 
-import { dependentSectionStackClasses } from '../components/ui/field-dependent.variants'
+import { resolveDependentSectionStackClasses } from '../components/ui/field-dependent.variants'
 import { FormFieldStack } from './containers/form-field-stack.client'
 import type { FormItem } from './field-config'
 import { Form } from './shells/form.client'
@@ -203,7 +203,7 @@ describe('dependent density inheritance', () => {
     )
 
     const dependent = container.querySelector('[data-field-dependent]')
-    expect(dependent).toHaveClass(dependentSectionStackClasses)
+    expect(dependent).toHaveClass(resolveDependentSectionStackClasses('comfortable'))
     expect(screen.getByRole('textbox', { name: 'Note' })).toHaveClass('ui-field-control--md')
   })
 })

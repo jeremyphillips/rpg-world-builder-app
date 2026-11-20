@@ -18,7 +18,13 @@ describe('resolveOptionalDisclosureActionButtonSize', () => {
     ).toBe('xs')
   })
 
-  it('maps standalone collapsed actions to sm or comfortable default text geometry', () => {
+  it('maps standalone collapsed actions to field control scale', () => {
+    expect(
+      resolveOptionalDisclosureActionButtonSize({
+        placement: 'standalone',
+        fieldSize: 'xs',
+      }),
+    ).toBe('xs')
     expect(
       resolveOptionalDisclosureActionButtonSize({
         placement: 'standalone',

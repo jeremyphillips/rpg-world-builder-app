@@ -48,6 +48,31 @@ describe('FormItems select optionalDisclosure', () => {
     expect(screen.queryByLabelText('Function override')).not.toBeInTheDocument()
   })
 
+  it('sizes standalone optional-disclosure add actions from controlSizeOverride', () => {
+    render(
+      <SelectDisclosureHarness
+        items={[
+          {
+            type: 'select',
+            name: 'spellId',
+            label: 'Spell',
+            controlSizeOverride: 'xs',
+            options: [{ value: 'a', label: 'A' }],
+            optionalDisclosure: {
+              intent: 'add',
+              addLabel: 'Pin specific spell',
+              removeLabel: 'Clear spell',
+            },
+          },
+        ]}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Pin specific spell' })).toHaveClass(
+      'ui-button__text--xs',
+    )
+  })
+
   it('expands populated values and clears them on remove', async () => {
     const user = userEvent.setup()
 

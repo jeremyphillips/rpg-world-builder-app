@@ -61,6 +61,7 @@ function spellPickerField(input: {
     name: 'spellId',
     label: MONSTER_MULTIATTACK_SPELL_LABEL,
     placeholder: MONSTER_MULTIATTACK_SPELL_PLACEHOLDER,
+    controlSizeOverride: 'xs',
     optionalDisclosure: {
       intent: 'add',
       addLabel: MONSTER_MULTIATTACK_PIN_SPELL_LABEL,
