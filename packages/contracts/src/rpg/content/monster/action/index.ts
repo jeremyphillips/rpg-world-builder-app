@@ -79,6 +79,14 @@ export {
   targetedAttackSlotTotal,
 } from './multiattack-replacement-budget'
 export {
+  classifyMultiattackReplacementChoice,
+  isMultiattackReplacementChoiceRedundant,
+  multiattackReplacementChoiceKey,
+  siblingMultiattackReplacementChoiceKeys,
+  type MultiattackReplacementChoiceRef,
+  type MultiattackReplacementRedundancy,
+} from './multiattack-replacement-choice-eligibility'
+export {
   isMultiattackAttackGroup,
   isMultiattackUseClause,
   multiattackPositiveInt,

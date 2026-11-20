@@ -15,6 +15,7 @@ import {
   MULTIATTACK_REFERENCE_SELF_MESSAGE,
   MULTIATTACK_SECTION_MESSAGE,
 } from './reference-messages'
+import { isMultiattackReplacementChoiceRedundant } from './multiattack-replacement-choice-eligibility'
 import { primaryAttackSlotTotal, targetedAttackSlotTotal } from './multiattack-replacement-budget'
 
 type ActionRow = { id?: string; kind?: string; spells?: readonly { spellId?: string }[] }
@@ -226,6 +227,10 @@ function refineReplacementChoice(
   actionsById: ReadonlyMap<string, ActionRow>,
   ctx: z.RefinementCtx,
   mode: 'replacement' | 'use',
+  replacementContext?: {
+    steps: readonly MultiattackDraftStep[]
+    replacesActionId?: string
+  },
 ): void {
   if (!choice.actionId) {
     addCustomRefinementIssue(
@@ -249,6 +254,20 @@ function refineReplacementChoice(
     },
     ctx,
   )
+  if (
+    mode === 'replacement' &&
+    replacementContext &&
+    isMultiattackReplacementChoiceRedundant({
+      steps: replacementContext.steps,
+      replacement: { replacesActionId: replacementContext.replacesActionId },
+      choice: { actionId: choice.actionId, spellId: choice.spellId },
+    })
+  ) {
+    addCustomRefinementIssue(ctx, multiattackValidationMessages.replacementChoiceRedundant(), [
+      ...choicePath,
+      'actionId',
+    ])
+  }
   if (choice.spellId) {
     refineSpellOnAction(
       choice.actionId,
@@ -402,6 +421,7 @@ export function refinePublishedMultiattack(
         actionsById,
         ctx,
         'replacement',
+        { steps, replacesActionId: replacement.replacesActionId },
       )
     })
   }

@@ -43,6 +43,8 @@ export function monsterMultiattackMechanicFields(input: {
     input.action.id,
     eligibilityValues,
     input.ctx,
+    input.action.steps ?? [],
+    input.action.replacement,
   )
 
   return monsterMultiattackFormFields({
@@ -57,7 +59,6 @@ export function monsterMultiattackMechanicFields(input: {
       eligibilityValues,
       input.ctx,
     ),
-    replacementOptions,
     prerequisiteOptions: multiattackPrerequisiteOptions(
       actionRows,
       bonusActionRows,

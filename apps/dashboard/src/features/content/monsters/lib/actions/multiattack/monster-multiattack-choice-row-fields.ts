@@ -1,7 +1,9 @@
 import type { Spell } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 
+import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import type { MonsterActionDraftRow } from '../monster-action-presets'
+import { multiattackReplacementChoiceOptionsFromWatched } from './monster-multiattack-form-options'
 import {
   MONSTER_MULTIATTACK_CHOICE_ACTION_LABEL,
   MONSTER_MULTIATTACK_CLEAR_SPELL_LABEL,
@@ -26,15 +28,45 @@ export function monsterMultiattackChoiceRowFields(input: {
   actionOptions: { value: string; label: string }[]
   actionRows: readonly MonsterActionDraftRow[]
   spellCatalogById?: ReadonlyMap<string, Spell>
+  replacementChoicePicker?: {
+    multiattackId: string
+    ctx: ContentFormCtx
+  }
 }): FormItem[] {
+  const actionField: FormItem = input.replacementChoicePicker
+    ? {
+        type: 'select',
+        name: 'actionId',
+        label: MONSTER_MULTIATTACK_CHOICE_ACTION_LABEL,
+        placeholder: 'Choose',
+        options: [],
+        optionsResolve: {
+          dependsOn: [
+            'actionId',
+            'spellId',
+            '../../replacesActionId',
+            '../../../steps',
+            '../../choices',
+          ],
+          optionsWhen: (watched) =>
+            multiattackReplacementChoiceOptionsFromWatched({
+              rows: input.actionRows,
+              multiattackId: input.replacementChoicePicker!.multiattackId,
+              ctx: input.replacementChoicePicker!.ctx,
+              watched,
+            }),
+        },
+      }
+    : {
+        type: 'select',
+        name: 'actionId',
+        label: MONSTER_MULTIATTACK_CHOICE_ACTION_LABEL,
+        placeholder: 'Choose',
+        options: input.actionOptions,
+      }
+
   return [
-    {
-      type: 'select',
-      name: 'actionId',
-      label: MONSTER_MULTIATTACK_CHOICE_ACTION_LABEL,
-      placeholder: 'Choose',
-      options: input.actionOptions,
-    },
+    actionField,
     {
       type: 'select',
       name: 'spellId',

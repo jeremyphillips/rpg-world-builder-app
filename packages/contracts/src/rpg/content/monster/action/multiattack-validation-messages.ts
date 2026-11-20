@@ -64,6 +64,10 @@ export const multiattackValidationMessages = {
     'validation.multiattack.replacement-choice-duplicate',
     () => 'This replacement choice is already selected.',
   ),
+  replacementChoiceRedundant: defineMessage(
+    'validation.multiattack.replacement-choice-redundant',
+    () => 'This action is already part of the attacks being replaced.',
+  ),
   spellUnavailable: defineMessage(
     'validation.multiattack.spell-unavailable',
     () => 'This spell is no longer available in Spellcasting.',

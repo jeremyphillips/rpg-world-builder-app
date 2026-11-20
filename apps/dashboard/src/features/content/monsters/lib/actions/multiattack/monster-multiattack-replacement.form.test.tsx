@@ -9,8 +9,8 @@ import { monsterFormTestValues } from '../../monster-form-test-values'
 import type { MonsterFormValues } from '../../monster-form-values'
 import { buildMonsterActionMultiattackPreview } from '../previews/monster-action-multiattack-summary'
 import type { MonsterActionDraftRow } from '../monster-action-presets'
-import { monsterMultiattackFormFields } from './monster-multiattack-form-fields'
 import { primeMultiattackReplacementActionsSnapshot } from './monster-multiattack-replacement-form-sync'
+import { monsterMultiattackMechanicFields } from './monster-multiattack-mechanic-fields'
 
 beforeAll(() => {
   if (!HTMLElement.prototype.hasPointerCapture) {
@@ -102,22 +102,13 @@ function Harness({ onReady }: { onReady: (getValues: () => MonsterFormValues) =>
       <FormItems
         idPrefix="multiattack"
         namePrefix="actions.0"
-        items={monsterMultiattackFormFields({
+        items={monsterMultiattackMechanicFields({
           namePrefix: 'actions.0',
           section: 'actions',
           action: multiattack as Extract<MonsterActionDraftRow, { kind: 'multiattack' }>,
           ctx,
           attackOptions: [{ value: 'bite', label: 'Bite' }],
-          useOptions: [{ value: 'fire-breath', label: 'Fire Breath' }],
-          replacementOptions: [
-            { value: 'bite', label: 'Bite' },
-            { value: 'fire-breath', label: 'Fire Breath' },
-          ],
-          prerequisiteOptions: [],
-          targetAttackOptions: [{ value: 'bite', label: 'Bite' }],
           actionRows,
-          hasAttackOptions: true,
-          canConfigureReplacement: true,
           weapons: [],
           weaponActions: [],
           allowAddWeapon: false,
@@ -136,7 +127,12 @@ function LichHarness() {
   }
   const defaultValues = monsterFormTestValues({
     name: 'Lich',
-    actions: [multiattackLich, eldritchBurst, paralyzingTouch] as MonsterFormValues['actions'],
+    actions: [
+      multiattackLich,
+      eldritchBurst,
+      paralyzingTouch,
+      fireBreath,
+    ] as MonsterFormValues['actions'],
   })
   primeMultiattackReplacementActionsSnapshot(defaultValues.actions as MonsterActionDraftRow[])
   const form = useForm<MonsterFormValues>({ defaultValues, shouldUnregister: true })
@@ -146,7 +142,7 @@ function LichHarness() {
       <FormItems
         idPrefix="multiattack"
         namePrefix="actions.0"
-        items={monsterMultiattackFormFields({
+        items={monsterMultiattackMechanicFields({
           namePrefix: 'actions.0',
           section: 'actions',
           action: multiattackLich,
@@ -155,20 +151,7 @@ function LichHarness() {
             { value: 'eldritch-burst', label: 'Eldritch Burst' },
             { value: 'paralyzing-touch', label: 'Paralyzing Touch' },
           ],
-          useOptions: [],
-          replacementOptions: [
-            { value: 'eldritch-burst', label: 'Eldritch Burst' },
-            { value: 'paralyzing-touch', label: 'Paralyzing Touch' },
-          ],
-          prerequisiteOptions: [],
-          targetAttackOptions: [
-            { value: 'eldritch-burst', label: 'Eldritch Burst' },
-            { value: 'paralyzing-touch', label: 'Paralyzing Touch' },
-          ],
           actionRows,
-          hasAttackOptions: true,
-          canConfigureReplacement: true,
-          replacementCountMax: 3,
           weapons: [],
           weaponActions: [],
           allowAddWeapon: false,
@@ -207,19 +190,13 @@ describe('multiattack replacement form values', () => {
           <FormItems
             idPrefix="multiattack"
             namePrefix="actions.0"
-            items={monsterMultiattackFormFields({
+            items={monsterMultiattackMechanicFields({
               namePrefix: 'actions.0',
               section: 'actions',
               action: multiattack as Extract<MonsterActionDraftRow, { kind: 'multiattack' }>,
               ctx,
               attackOptions: [{ value: 'bite', label: 'Bite' }],
-              useOptions: [],
-              replacementOptions: [{ value: 'spellcasting', label: 'Spellcasting' }],
-              prerequisiteOptions: [],
-              targetAttackOptions: [{ value: 'bite', label: 'Bite' }],
               actionRows: defaultValues.actions as MonsterActionDraftRow[],
-              hasAttackOptions: true,
-              canConfigureReplacement: true,
               weapons: [],
               weaponActions: [],
               allowAddWeapon: false,
@@ -244,6 +221,18 @@ describe('multiattack replacement form values', () => {
       read?.().actions?.[0] as { replacement?: { choices?: { spellId?: string }[] } } | undefined
     )?.replacement?.choices?.[0]
     expect(choice?.spellId).toBeFalsy()
+  })
+
+  it('does not offer attacks already in the primary sequence as replacement choices', async () => {
+    const user = userEvent.setup()
+    render(<Harness onReady={() => undefined} />)
+
+    await user.click(screen.getByRole('button', { name: 'Add action replacement' }))
+    await user.click(screen.getByRole('button', { name: 'Add choice' }))
+    await user.click(screen.getByRole('combobox', { name: 'Action' }))
+
+    expect(screen.queryByRole('option', { name: 'Bite' })).not.toBeInTheDocument()
+    expect(screen.getByRole('option', { name: 'Fire Breath' })).toBeInTheDocument()
   })
 
   it('stores a completed replacement under the action and previews it', async () => {

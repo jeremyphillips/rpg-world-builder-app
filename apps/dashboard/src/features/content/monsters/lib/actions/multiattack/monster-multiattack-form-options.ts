@@ -1,10 +1,16 @@
 import {
+  classifyMultiattackReplacementChoice,
   formatSpellCastAtLevelName,
   isMultiattackAttackGroup,
   meaningfulMultiattackTargetActionIds,
+  multiattackReplacementChoiceKey,
   multiattackRowEligibleForPurpose,
   multiattackSequenceAttackIds,
+  siblingMultiattackReplacementChoiceKeys,
+  unionPersistedOptions,
+  type MultiattackDraftStep,
   type MultiattackReplacement,
+  type MultiattackReplacementChoiceRef,
   type Spell,
 } from '@rpg/contracts'
 
@@ -43,16 +49,120 @@ export function multiattackExecutableUseOptions(
     .map((row) => ({ value: row.id, label: titles.get(row.id) ?? row.id }))
 }
 
+function parseReplacementChoiceRows(value: unknown): MultiattackReplacementChoiceRef[] {
+  if (!Array.isArray(value)) return []
+  return value.flatMap((entry) => {
+    if (entry === null || typeof entry !== 'object') return []
+    const row = entry as { actionId?: unknown; spellId?: unknown }
+    return [
+      {
+        actionId: typeof row.actionId === 'string' ? row.actionId : undefined,
+        spellId: typeof row.spellId === 'string' ? row.spellId : undefined,
+      },
+    ]
+  })
+}
+
+export function multiattackReplacementChoiceSelectOptions(input: {
+  rows: readonly MonsterActionDraftRow[]
+  multiattackId: string
+  values: MonsterFormValues
+  ctx: ContentFormCtx
+  steps: readonly MultiattackDraftStep[]
+  replacement: Pick<MultiattackReplacement, 'replacesActionId'> | undefined
+  siblingChoices: readonly MultiattackReplacementChoiceRef[]
+  storedChoice?: MultiattackReplacementChoiceRef
+}): Option[] {
+  const titles = monsterActionEditorTitles(input.rows, input.values, input.ctx, 'actions')
+  const replacement = input.replacement ?? {}
+  const current = input.storedChoice ?? {}
+  const taken = siblingMultiattackReplacementChoiceKeys(input.siblingChoices, current)
+
+  const selectable = input.rows.flatMap((row) => {
+    if (
+      !multiattackRowEligibleForPurpose(row, 'replacement-choice', {
+        multiattackId: input.multiattackId,
+      })
+    ) {
+      return []
+    }
+    const baseKey = multiattackReplacementChoiceKey({ actionId: row.id })
+    if (taken.has(baseKey)) return []
+
+    const redundancy = classifyMultiattackReplacementChoice({
+      steps: input.steps,
+      replacement,
+      choice: { actionId: row.id },
+    })
+    if (redundancy !== 'ok') return []
+
+    return [{ value: row.id, label: titles.get(row.id) ?? row.id }]
+  })
+
+  const storedActionId = input.storedChoice?.actionId
+  if (!storedActionId) return selectable
+
+  const authorizedDisplay = new Map<string, { label: string }>()
+  for (const row of input.rows) {
+    const label = titles.get(row.id) ?? row.id
+    authorizedDisplay.set(row.id, { label })
+  }
+
+  return unionPersistedOptions({
+    selectable,
+    persistedIds: [storedActionId],
+    authorizedDisplay,
+  })
+}
+
 export function multiattackReplacementChoiceOptions(
   rows: readonly MonsterActionDraftRow[],
   multiattackId: string,
   values: MonsterFormValues,
   ctx: ContentFormCtx,
+  steps: readonly MultiattackDraftStep[],
+  replacement: Pick<MultiattackReplacement, 'replacesActionId'> | undefined,
 ): Option[] {
-  const titles = monsterActionEditorTitles(rows, values, ctx, 'actions')
-  return rows
-    .filter((row) => multiattackRowEligibleForPurpose(row, 'replacement-choice', { multiattackId }))
-    .map((row) => ({ value: row.id, label: titles.get(row.id) ?? row.id }))
+  return multiattackReplacementChoiceSelectOptions({
+    rows,
+    multiattackId,
+    values,
+    ctx,
+    steps,
+    replacement,
+    siblingChoices: [],
+  })
+}
+
+export function multiattackReplacementChoiceOptionsFromWatched(input: {
+  rows: readonly MonsterActionDraftRow[]
+  multiattackId: string
+  ctx: ContentFormCtx
+  watched: Record<string, unknown>
+}): Option[] {
+  const steps = Array.isArray(input.watched['../../../steps'])
+    ? (input.watched['../../../steps'] as MultiattackDraftStep[])
+    : []
+  const replacesActionId =
+    typeof input.watched['../../replacesActionId'] === 'string'
+      ? input.watched['../../replacesActionId']
+      : undefined
+  const siblingChoices = parseReplacementChoiceRows(input.watched['../../choices'])
+  const actionId = typeof input.watched.actionId === 'string' ? input.watched.actionId : undefined
+  const spellId = typeof input.watched.spellId === 'string' ? input.watched.spellId : undefined
+
+  const eligibilityValues = { actions: input.rows } as MonsterFormValues
+
+  return multiattackReplacementChoiceSelectOptions({
+    rows: input.rows,
+    multiattackId: input.multiattackId,
+    values: eligibilityValues,
+    ctx: input.ctx,
+    steps,
+    replacement: { replacesActionId },
+    siblingChoices,
+    storedChoice: { actionId, spellId },
+  })
 }
 
 export function multiattackPrerequisiteOptions(

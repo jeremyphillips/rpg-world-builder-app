@@ -203,9 +203,9 @@ function monsterMultiattackStepsArray(input: {
 
 function monsterMultiattackReplacementGroup(input: {
   action: MultiattackDraft
-  replacementOptions: { value: string; label: string }[]
   targetAttackOptions: { value: string; label: string }[]
   actionRows: readonly MonsterActionDraftRow[]
+  ctx: ContentFormCtx
   spellCatalogById?: ReadonlyMap<string, Spell>
   canConfigureReplacement: boolean
   replacementCountMax?: number
@@ -306,9 +306,10 @@ function monsterMultiattackReplacementGroup(input: {
         addAction: { label: MONSTER_MULTIATTACK_ADD_CHOICE_LABEL },
         item: { headerVisibility: 'hidden', header: { fallback: () => '' } },
         fields: monsterMultiattackChoiceRowFields({
-          actionOptions: input.replacementOptions,
+          actionOptions: [],
           actionRows: input.actionRows,
           spellCatalogById: input.spellCatalogById,
+          replacementChoicePicker: { multiattackId: input.action.id, ctx: input.ctx },
         }),
       },
     ],
@@ -373,7 +374,6 @@ export function monsterMultiattackFormFields(input: {
   ctx: ContentFormCtx
   attackOptions: { value: string; label: string }[]
   useOptions: { value: string; label: string }[]
-  replacementOptions: { value: string; label: string }[]
   prerequisiteOptions: { value: string; label: string }[]
   targetAttackOptions: { value: string; label: string }[]
   actionRows: readonly MonsterActionDraftRow[]
@@ -433,9 +433,9 @@ export function monsterMultiattackFormFields(input: {
     }),
     monsterMultiattackReplacementGroup({
       action: input.action,
-      replacementOptions: input.replacementOptions,
       targetAttackOptions: input.targetAttackOptions,
       actionRows: input.actionRows,
+      ctx: input.ctx,
       spellCatalogById: input.ctx.spellCatalogById,
       canConfigureReplacement: input.canConfigureReplacement,
       replacementCountMax: input.replacementCountMax,
