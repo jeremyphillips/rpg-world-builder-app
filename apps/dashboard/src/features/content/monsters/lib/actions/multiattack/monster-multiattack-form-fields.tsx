@@ -6,12 +6,12 @@ import type { MonsterActionSection } from '../references/monster-action-equipmen
 import type { MonsterActionDraftRow } from '../monster-action-presets'
 import type { MonsterActionAcquisitionChoice } from '../acquisition/monster-action-acquisition'
 import {
+  MONSTER_MULTIATTACK_ADD_ACTION_CHOICE_LABEL,
   MONSTER_MULTIATTACK_ADD_ALTERNATIVE_LABEL,
-  MONSTER_MULTIATTACK_ADD_ATTACK_GROUP_LABEL,
   MONSTER_MULTIATTACK_ADD_CHOICE_LABEL,
-  MONSTER_MULTIATTACK_ADD_OTHER_ACTION_LABEL,
   MONSTER_MULTIATTACK_ADD_REPLACEMENT_LABEL,
   MONSTER_MULTIATTACK_ADD_TARGET_ATTACK_LABEL,
+  MONSTER_MULTIATTACK_ADD_TO_SEQUENCE_LABEL,
   MONSTER_MULTIATTACK_ALTERNATIVE_HINT,
   MONSTER_MULTIATTACK_ALTERNATIVE_LABEL,
   MONSTER_MULTIATTACK_ANY_ATTACK_HINT,
@@ -22,8 +22,9 @@ import {
   MONSTER_MULTIATTACK_ATTACKS_REPLACED_LABEL,
   MONSTER_MULTIATTACK_CHOICES_HINT,
   MONSTER_MULTIATTACK_CHOICES_LABEL,
-  MONSTER_MULTIATTACK_COMBINATION_HINT,
+  MONSTER_MULTIATTACK_CHOICE_ACTION_LABEL,
   MONSTER_MULTIATTACK_COUNT_LABEL,
+  MONSTER_MULTIATTACK_MAKE_ATTACKS_LABEL,
   MONSTER_MULTIATTACK_NO_PREREQUISITE,
   MONSTER_MULTIATTACK_ONLY_AFTER_USING_LABEL,
   MONSTER_MULTIATTACK_OPTIONAL_HINT,
@@ -33,11 +34,7 @@ import {
   MONSTER_MULTIATTACK_REPLACEMENT_LABEL,
   MONSTER_MULTIATTACK_REPLACES_ONE_ATTACK,
   MONSTER_MULTIATTACK_TARGET_ATTACK_LABEL,
-  MONSTER_MULTIATTACK_TIMES_LABEL,
-  MONSTER_MULTIATTACK_USE_CHOICE_LABEL,
-  MONSTER_MULTIATTACK_CHOICE_ACTION_LABEL,
-  MONSTER_MULTIATTACK_USE_SINGLE_LABEL,
-  MONSTER_MULTIATTACK_USE_STYLE_LABEL,
+  MONSTER_MULTIATTACK_USE_AN_ACTION_LABEL,
 } from '../../monster-form-labels'
 import {
   multiattackAnyAttackWordingVisible,
@@ -47,6 +44,13 @@ import {
 import { MonsterMultiattackEmptyAttacksSlot } from '../../../components/form/actions/multiattack/multiattack-empty-attacks.slot'
 import { MonsterMultiattackPersistSlot } from '../../../components/form/actions/multiattack/multiattack-persist.slot'
 import { MonsterMultiattackUseStepKindSlot } from '../../../components/form/actions/multiattack/multiattack-use-step-kind.slot'
+import { MonsterMultiattackUseStepControlsSlot } from '../../../components/form/actions/multiattack/multiattack-use-step-controls.slot'
+import { MonsterMultiattackUseChoiceRemoveControl } from '../../../components/form/actions/multiattack/multiattack-use-choice-remove-control'
+import {
+  MULTIATTACK_STEP_HEADER_DEPENDS_ON,
+  multiattackStepHeaderPrimary,
+  multiattackStepHeaderSummary,
+} from './monster-multiattack-step-headers'
 import {
   monsterMultiattackChoiceRowFields,
   monsterMultiattackUseStepSpellField,
@@ -105,14 +109,10 @@ function monsterMultiattackUseClauseFields(input: {
       render: ({ namePrefix }) => <MonsterMultiattackUseStepKindSlot namePrefix={namePrefix} />,
     },
     {
-      type: 'select',
-      name: 'mode',
-      label: MONSTER_MULTIATTACK_USE_STYLE_LABEL,
-      visibility: useClauseVisible,
-      options: [
-        { value: 'single', label: MONSTER_MULTIATTACK_USE_SINGLE_LABEL },
-        { value: 'choice', label: MONSTER_MULTIATTACK_USE_CHOICE_LABEL },
-      ],
+      kind: 'slot',
+      name: 'multiattackUseStepControls',
+      visibility: singleUseVisible,
+      render: ({ namePrefix }) => <MonsterMultiattackUseStepControlsSlot namePrefix={namePrefix} />,
     },
     {
       type: 'select',
@@ -141,16 +141,6 @@ function monsterMultiattackUseClauseFields(input: {
       visibility: singleUseVisible,
     }),
     {
-      type: 'number',
-      name: 'count',
-      label: MONSTER_MULTIATTACK_TIMES_LABEL,
-      min: 1,
-      step: 1,
-      control: 'stepper',
-      defaultValue: 1,
-      visibility: singleUseVisible,
-    },
-    {
       type: 'checkbox',
       name: 'optional',
       label: MONSTER_MULTIATTACK_OPTIONAL_LABEL,
@@ -162,8 +152,15 @@ function monsterMultiattackUseClauseFields(input: {
       name: 'choices',
       heading: { label: MONSTER_MULTIATTACK_CHOICES_LABEL },
       visibility: choiceUseVisible,
-      addAction: { label: MONSTER_MULTIATTACK_ADD_CHOICE_LABEL },
-      item: { headerVisibility: 'hidden', header: { fallback: () => '' } },
+      addAction: { label: MONSTER_MULTIATTACK_ADD_ACTION_CHOICE_LABEL },
+      item: {
+        headerVisibility: 'hidden',
+        header: { fallback: () => '' },
+        removeSlot: {
+          name: 'multiattackUseChoiceRemove',
+          render: () => <MonsterMultiattackUseChoiceRemoveControl />,
+        },
+      },
       fields: monsterMultiattackChoiceRowFields({
         section: input.section,
         sectionRowsDependsOn: input.useChoiceSectionRowsDependsOn,
@@ -192,62 +189,78 @@ function monsterMultiattackStepsArray(input: {
       hint: { text: MONSTER_MULTIATTACK_ATTACKS_HINT },
     },
     addAction: {
-      label: MONSTER_MULTIATTACK_ADD_ATTACK_GROUP_LABEL,
+      label: MONSTER_MULTIATTACK_ADD_TO_SEQUENCE_LABEL,
       menu: {
         groups: [],
         enableSearch: false,
         items: [
           {
             id: 'attack-group',
-            label: MONSTER_MULTIATTACK_ADD_ATTACK_GROUP_LABEL,
+            label: MONSTER_MULTIATTACK_MAKE_ATTACKS_LABEL,
             appendDefaults: () => ({ actionIds: [] }),
           },
           {
             id: 'use-action',
-            label: MONSTER_MULTIATTACK_ADD_OTHER_ACTION_LABEL,
-            appendDefaults: () => ({ kind: 'use', mode: 'single', actionId: '', count: 1 }),
+            label: MONSTER_MULTIATTACK_USE_AN_ACTION_LABEL,
+            appendDefaults: () => ({ kind: 'use', mode: 'single', actionId: '' }),
           },
         ],
       },
     },
-    item: { headerVisibility: 'hidden', header: { fallback: () => '' }, reorder: 'dragHandle' },
+    item: {
+      variant: 'compact',
+      reorder: 'dragHandle',
+      header: {
+        fallback: () => MONSTER_MULTIATTACK_MAKE_ATTACKS_LABEL,
+        primary: (values, index, watched) =>
+          multiattackStepHeaderPrimary(values, index, watched, {
+            section: input.section,
+            fallbackRows: input.actionRows,
+            ctx: input.ctx,
+          }),
+        summary: (values, index, watched) =>
+          multiattackStepHeaderSummary(values, index, watched, {
+            section: input.section,
+            fallbackRows: input.actionRows,
+            ctx: input.ctx,
+          }),
+        primaryDependsOn: [...MULTIATTACK_STEP_HEADER_DEPENDS_ON],
+        summaryDependsOn: [...MULTIATTACK_STEP_HEADER_DEPENDS_ON],
+      },
+    },
     fields: [
       {
-        type: 'number',
-        name: 'count',
-        label: MONSTER_MULTIATTACK_COUNT_LABEL,
-        min: 1,
-        step: 1,
-        control: 'stepper',
+        kind: 'row',
         visibility: attackGroupVisible,
-      },
-      {
-        type: 'chips',
-        name: 'actionIds',
-        label: MONSTER_MULTIATTACK_ATTACKS_PICKER_LABEL,
-        visibility: attackGroupVisible,
-        options: [],
-        optionsResolve: {
-          dependsOn: [...multiattackAttackPickerDependsOn(input.section)],
-          optionsWhen: (watched) =>
-            multiattackExecutableAttackOptionsFromWatched({
-              section: input.section,
-              multiattackId: input.action.id,
-              ctx: input.ctx,
-              watched,
-              fallbackRows: input.actionRows,
-            }),
-        },
-        hint: {
-          resolve: {
-            dependsOn: ['actionIds'],
-            hintWhen: (values: Record<string, unknown>) => {
-              const selected = values.actionIds
-              if (!Array.isArray(selected) || selected.length < 2) return undefined
-              return MONSTER_MULTIATTACK_COMBINATION_HINT
+        fields: [
+          {
+            type: 'number',
+            name: 'count',
+            label: MONSTER_MULTIATTACK_COUNT_LABEL,
+            min: 1,
+            step: 1,
+            control: 'stepper',
+            width: 'auto',
+          },
+          {
+            type: 'chips',
+            name: 'actionIds',
+            label: MONSTER_MULTIATTACK_ATTACKS_PICKER_LABEL,
+            width: 'full',
+            options: [],
+            optionsResolve: {
+              dependsOn: [...multiattackAttackPickerDependsOn(input.section)],
+              optionsWhen: (watched) =>
+                multiattackExecutableAttackOptionsFromWatched({
+                  section: input.section,
+                  multiattackId: input.action.id,
+                  ctx: input.ctx,
+                  watched,
+                  fallbackRows: input.actionRows,
+                }),
             },
           },
-        },
+        ],
       },
       ...monsterMultiattackUseClauseFields({
         section: input.section,
@@ -444,6 +457,7 @@ function monsterMultiattackAlternativeGroup(input: {
         name: 'alternative.steps',
         heading: {
           label: multiattackPrimarySequenceHeading(input.action),
+          labelVisibility: 'srOnly',
           hint: { text: MONSTER_MULTIATTACK_ATTACKS_HINT },
         },
       },
@@ -516,6 +530,13 @@ export function monsterMultiattackFormFields(input: {
       actionRows: input.actionRows,
       spellCatalogById: input.ctx.spellCatalogById,
     }),
+    monsterMultiattackAlternativeGroup({
+      section: input.section,
+      action: input.action,
+      ctx: input.ctx,
+      actionRows: input.actionRows,
+      spellCatalogById: input.ctx.spellCatalogById,
+    }),
     monsterMultiattackReplacementGroup({
       section: input.section,
       action: input.action,
@@ -524,13 +545,6 @@ export function monsterMultiattackFormFields(input: {
       spellCatalogById: input.ctx.spellCatalogById,
       canConfigureReplacement: input.canConfigureReplacement,
       replacementCountMax: input.replacementCountMax,
-    }),
-    monsterMultiattackAlternativeGroup({
-      section: input.section,
-      action: input.action,
-      ctx: input.ctx,
-      actionRows: input.actionRows,
-      spellCatalogById: input.ctx.spellCatalogById,
     }),
   ]
 }

@@ -52,6 +52,7 @@
   "features/content/monsters/lib/actions/multiattack/monster-multiattack-form-fields.tsx::multiattackEmptyAttacks": 1,
   "features/content/monsters/lib/actions/multiattack/monster-multiattack-form-fields.tsx::multiattackPersist": 1,
   "features/content/monsters/lib/actions/multiattack/monster-multiattack-form-fields.tsx::multiattackUseStepKind": 1,
+  "features/content/monsters/lib/actions/multiattack/monster-multiattack-form-fields.tsx::multiattackUseStepControls": 1,
   "features/content/monsters/lib/actions/legendary/monster-legendary-action-fields.tsx::castingAbility": 2,
   "features/content/monsters/lib/actions/spell/monster-spell-component-form-fields.tsx::monsterSpellComponentRequirementsField()": 1,
   "features/content/monsters/lib/creature-details/monster-creature-details-form-fields.tsx::communication.telepathy": 1,

@@ -1,5 +1,5 @@
 import type { Spell } from '@rpg/contracts'
-import type { FieldVisibility, FormItem } from '@rpg/ui/form'
+import { combineFieldVisibilityAll, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import type { MonsterActionSection } from '../references/monster-action-equipment-references'
@@ -28,12 +28,28 @@ function spellSource(
   return row?.kind === 'spell' ? row : undefined
 }
 
+function spellActionOnlyVisibility(input: {
+  sectionRowsDependsOn: string
+  fallbackActionRows?: readonly MonsterActionDraftRow[]
+}): FieldVisibility {
+  return {
+    dependsOn: ['actionId', input.sectionRowsDependsOn],
+    visibleWhen: (watched) => {
+      const actionId = typeof watched.actionId === 'string' ? watched.actionId.trim() : ''
+      if (!actionId) return false
+      const rows = multiattackRowsFromSpellWatch(watched, input)
+      return spellSource(actionId, rows) != null
+    },
+  }
+}
+
 function spellPickerField(input: {
   sectionRowsDependsOn: string
   fallbackActionRows?: readonly MonsterActionDraftRow[]
   spellCatalogById?: ReadonlyMap<string, Spell>
   visibility?: FieldVisibility
 }): FormItem {
+  const spellVisibility = spellActionOnlyVisibility(input)
   return {
     type: 'select',
     name: 'spellId',
@@ -46,15 +62,9 @@ function spellPickerField(input: {
       expandWhenPopulated: true,
       actionSubject: 'specific spell',
     },
-    visibility: input.visibility ?? {
-      dependsOn: ['actionId', input.sectionRowsDependsOn],
-      visibleWhen: (watched) => {
-        const rows = multiattackRowsFromSpellWatch(watched, input)
-        return (
-          spellSource(typeof watched.actionId === 'string' ? watched.actionId : '', rows) != null
-        )
-      },
-    },
+    visibility: input.visibility
+      ? combineFieldVisibilityAll(input.visibility, spellVisibility)
+      : spellVisibility,
     optionsResolve: {
       dependsOn: ['actionId', input.sectionRowsDependsOn],
       optionsWhen: (watched) => {
@@ -193,6 +203,7 @@ export function monsterMultiattackUseStepSpellField(input: {
   sectionRowsDependsOn: string
   actionRows: readonly MonsterActionDraftRow[]
   spellCatalogById?: ReadonlyMap<string, Spell>
+  /** Extra gate (e.g. single-use clause); spell-on-action visibility is always applied. */
   visibility: FieldVisibility
 }): FormItem {
   return spellPickerField({

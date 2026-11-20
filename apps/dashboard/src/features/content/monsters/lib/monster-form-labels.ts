@@ -29,6 +29,7 @@ import {
   SAVING_THROW_TERM,
   SENSE_TERM,
   type CreatureArmorSlot,
+  multiattackPositiveInt,
 } from '@rpg/contracts'
 
 export { formatEquipmentCustomizationRemovalSummary } from './equipment/equipment-entry-customization.lib'
@@ -131,11 +132,26 @@ export const MONSTER_ACTION_ATTACK_PREVIEW_LABEL = 'Attack preview'
 export const MONSTER_ACTION_SPELL_PREVIEW_LABEL = 'Spellcasting preview'
 export const MONSTER_REACTION_PREVIEW_LABEL = 'Reaction preview'
 export const MONSTER_ACTION_MULTIATTACK_PREVIEW_LABEL = 'Multiattack preview'
-export const MONSTER_MULTIATTACK_STEPS_LABEL = 'Attacks'
+export const MONSTER_MULTIATTACK_STEPS_LABEL = 'Sequence'
 export const MONSTER_MULTIATTACK_ATTACKS_LABEL = 'Attacks'
+export const MONSTER_MULTIATTACK_PRIMARY_SEQUENCE_LABEL = 'Primary sequence'
 export const MONSTER_MULTIATTACK_ATTACKS_HINT =
-  'Choose the attacks the creature makes during Multiattack.'
+  'Choose the attacks and other actions the creature uses during Multiattack.'
 export const MONSTER_MULTIATTACK_COMBINATION_HINT = 'These attacks can be used in any combination.'
+export const MONSTER_MULTIATTACK_MAKE_ATTACKS_LABEL = 'Make attacks'
+export const MONSTER_MULTIATTACK_CHOOSE_ATTACKS_LABEL = 'Choose attacks'
+export const MONSTER_MULTIATTACK_CHOOSE_AN_ACTION_LABEL = 'Choose an action'
+export const MONSTER_MULTIATTACK_CHOOSE_BETWEEN_ACTIONS_LABEL = 'Choose between actions'
+export const MONSTER_MULTIATTACK_ANY_COMBINATION_LABEL = 'Any combination'
+export const MONSTER_MULTIATTACK_ADD_TO_SEQUENCE_LABEL = 'Add to sequence'
+export const MONSTER_MULTIATTACK_USE_AN_ACTION_LABEL = 'Use an action'
+export const MONSTER_MULTIATTACK_ADD_ACTION_CHOICE_LABEL = 'Add action choice'
+export const MONSTER_MULTIATTACK_ADD_REPETITION_LABEL = 'Add repetition'
+export const MONSTER_MULTIATTACK_REMOVE_REPETITION_LABEL = 'Remove repetition'
+export const MONSTER_MULTIATTACK_CLEAR_OPTIONAL_BEFORE_CHOICE =
+  'Clear Optional before adding an action choice.'
+export const MONSTER_MULTIATTACK_REMOVE_REPETITION_BEFORE_CHOICE =
+  'Remove repetition before adding an action choice.'
 export const MONSTER_MULTIATTACK_COUNT_LABEL = 'Count'
 export const MONSTER_MULTIATTACK_ATTACKS_PICKER_LABEL = 'Attacks'
 export const MONSTER_MULTIATTACK_ADD_ATTACK_GROUP_LABEL = 'Add attack group'
@@ -187,6 +203,17 @@ export const MONSTER_MULTIATTACK_REPLACEMENT_DISABLED_HINT =
 export const MONSTER_MULTIATTACK_REMOVE_ALTERNATIVE_FIRST = 'Remove the alternative sequence first.'
 export const MONSTER_MULTIATTACK_REMOVE_REPLACEMENT_FIRST = 'Remove the action replacement first.'
 export const MONSTER_MULTIATTACK_NO_SPELLS_IN_SPELLCASTING = 'No spells configured in Spellcasting.'
+
+export function multiattackStepAttackCountLabel(count: number): string {
+  return count === 1 ? '1 attack' : `${count} attacks`
+}
+
+export function multiattackStepUseRepetitionSuffix(count: unknown): string | undefined {
+  const parsed = multiattackPositiveInt(count)
+  if (parsed === 2) return 'twice'
+  if (parsed !== undefined && parsed > 2) return `${parsed} times`
+  return undefined
+}
 export const MONSTER_TRAIT_PREVIEW_LABEL = 'Trait preview'
 /** Stat-block preview row — not action-economy {@link getActionEconomyLabel} “Action”. */
 export const MONSTER_ACTION_ATTACK_PREVIEW_ATTACK_LABEL = 'Attack'

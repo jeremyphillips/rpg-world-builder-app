@@ -15,7 +15,7 @@ import {
 } from '@rpg/contracts'
 
 import {
-  MONSTER_MULTIATTACK_ATTACKS_LABEL,
+  MONSTER_MULTIATTACK_PRIMARY_SEQUENCE_LABEL,
   MONSTER_MULTIATTACK_SEQUENCE_LABEL,
 } from '../../monster-form-labels'
 import type { MonsterActionSection } from '../references/monster-action-equipment-references'
@@ -463,8 +463,7 @@ export function multiattackSpellOptionsForAction(
 }
 
 export function multiattackPrimarySequenceHeading(action: MultiattackDraft): string {
-  const hasUse = (action.steps ?? []).some((step) => !isMultiattackAttackGroup(step))
   const hasAlternative = action.alternative !== undefined
-  if (hasUse || hasAlternative) return MONSTER_MULTIATTACK_SEQUENCE_LABEL
-  return MONSTER_MULTIATTACK_ATTACKS_LABEL
+  if (hasAlternative) return MONSTER_MULTIATTACK_PRIMARY_SEQUENCE_LABEL
+  return MONSTER_MULTIATTACK_SEQUENCE_LABEL
 }
