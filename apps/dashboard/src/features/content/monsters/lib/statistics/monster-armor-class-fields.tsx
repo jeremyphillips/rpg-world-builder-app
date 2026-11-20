@@ -7,11 +7,12 @@ import {
 import type { FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
-import { MonsterArmorClassPreview } from '../../components/form/monster-armor-class-preview'
+import { MonsterArmorClassPreview } from '../../components/form/slots/statistics/armor-class-preview.slot'
+import { MonsterArmorSlotAction } from '../../components/form/statistics/armor-slot'
 import {
-  MonsterArmorSlotAction,
-  MonsterArmorSlotBody,
-} from '../../components/form/monster-armor-slot'
+  BodyArmorSlot,
+  ShieldSlot,
+} from '../../components/form/slots/statistics/armor-class-equipment.slot'
 import {
   MONSTER_ARMOR_CLASS_HEADING,
   MONSTER_BODY_ARMOR_SLOT_HEADING,
@@ -75,7 +76,7 @@ export function monsterArmorClassFields(ctx: ContentFormCtx): FormItem[] {
                         label: MONSTER_BODY_ARMOR_SLOT_HEADING,
                         action: <MonsterArmorSlotAction slot="body-armor" ctx={ctx} />,
                       },
-                      render: () => <MonsterArmorSlotBody slot="body-armor" ctx={ctx} />,
+                      render: () => <BodyArmorSlot ctx={ctx} />,
                     },
                   ],
                 },
@@ -88,7 +89,7 @@ export function monsterArmorClassFields(ctx: ContentFormCtx): FormItem[] {
                         label: MONSTER_SHIELD_SLOT_HEADING,
                         action: <MonsterArmorSlotAction slot="shield" ctx={ctx} />,
                       },
-                      render: () => <MonsterArmorSlotBody slot="shield" ctx={ctx} />,
+                      render: () => <ShieldSlot ctx={ctx} />,
                     },
                   ],
                 },

@@ -50,21 +50,21 @@
       "fingerprint": "920a8e434537edd4"
     },
     {
-      "file": "features/content/monsters/components/form/monster-spell-change-action.test.tsx",
+      "file": "features/content/monsters/components/form/spells/spell-change-action.test.tsx",
       "kind": "type-assertion",
       "type": "Spell",
       "line": 16,
       "fingerprint": "53dc21ddc62b665c"
     },
     {
-      "file": "features/content/monsters/components/form/monster-spell-picker-drawer.stories.tsx",
+      "file": "features/content/monsters/components/form/spells/spell-picker-drawer.stories.tsx",
       "kind": "type-assertion",
       "type": "Spell",
       "line": 14,
       "fingerprint": "476cc1a9ee62f920"
     },
     {
-      "file": "features/content/monsters/components/form/monster-spell-picker-drawer.test.tsx",
+      "file": "features/content/monsters/components/form/spells/spell-picker-drawer.test.tsx",
       "kind": "type-assertion",
       "type": "Spell",
       "line": 27,

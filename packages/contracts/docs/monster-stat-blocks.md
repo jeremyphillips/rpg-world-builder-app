@@ -14,7 +14,7 @@ Derived values follow SRD 5.2.1 table math unless the body explicitly overrides 
 
 ## Heading rollout
 
-Form previews for attacks, multiattack, spells, parry, bonus actions, and traits pass `resolveMonsterEntryHeading` into `RulesPreview.title`. The base name is the existing action identity or trait display name, with the editor list title only when that name is empty. Those editor titles are not stored. Detail and stat-block rows use the same resolver inside `withQualifiedHeading`, and still pass limited use into `formatMonsterQualifiedHeading`. Master-detail lists keep the editor title and omit the form qualifier.
+Form previews for attacks, multiattack, spells, parry, bonus actions, and traits pass `resolveMonsterEntryHeading` into `RulesPreview.title` via `useMonsterActionPreviewContext` in the dashboard ([`lib/actions/previews/`](../../../../apps/dashboard/src/features/content/monsters/lib/actions/previews/README.md)). The base name is the existing action identity or trait display name, with the editor list title only when that name is empty. Those editor titles are not stored. Detail and stat-block rows use the same resolver inside `withQualifiedHeading`, and still pass limited use into `formatMonsterQualifiedHeading`. Master-detail lists keep the editor title and omit the form qualifier.
 
 Still separate:
 

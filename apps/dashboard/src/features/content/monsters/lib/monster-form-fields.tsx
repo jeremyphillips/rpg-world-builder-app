@@ -17,14 +17,14 @@ import {
   MONSTER_SIZES_FIELD_HINT,
 } from '../../lib/forms/fields/creature-sizes-form-fields'
 import { movementWithHoverGroup } from '../../lib/forms/fields/content-movement-form-fields'
-import { MonsterChallengeRatingZeroXpField } from '../components/form/monster-challenge-rating-zero-xp-field'
+import { MonsterChallengeRatingZeroXpField } from '../components/form/slots/statistics/challenge-rating-zero-xp.slot'
 import { monsterChallengeRatingMetadataDisplay } from './statistics/monster-challenge-rating-display.lib'
 import { creatureDetailsFields } from './creature-details/monster-creature-details-form-fields'
-import { MonsterEquipmentPanel } from '../components/form/monster-equipment-panel'
-import { MonsterPublishCatalogWriteGate } from '../components/form/monster-publish-catalog-write-gate'
-import { MonsterActionSections } from '../components/form/monster-action-sections'
-import { MonsterTraitsEditor } from '../components/form/monster-traits-editor'
-import { MonsterStatisticsPanel } from '../components/form/monster-statistics-panel'
+import { ActionsSlot } from '../components/form/slots/tabs/actions.slot'
+import { AbilityScoresSlot } from '../components/form/slots/tabs/ability-scores.slot'
+import { EquipmentSlot } from '../components/form/slots/tabs/equipment.slot'
+import { TraitsSlot } from '../components/form/slots/tabs/traits.slot'
+import { MonsterPublishCatalogWriteGate } from '../components/form/slots/shell/publish-catalog-write-gate.slot'
 import { monsterArmorClassFields } from './statistics/monster-armor-class-fields'
 import { monsterHitPointsFields } from './statistics/monster-hit-points-form-fields'
 import {
@@ -111,7 +111,7 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
   ]
 
   const statistics: FormItem[] = [
-    { kind: 'slot', name: 'abilityScores', render: () => <MonsterStatisticsPanel ctx={ctx} /> },
+    { kind: 'slot', name: 'abilityScores', render: () => <AbilityScoresSlot ctx={ctx} /> },
     ...monsterArmorClassFields(ctx),
     ...monsterHitPointsFields(),
     movementWithHoverGroup(),
@@ -159,11 +159,11 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
   ]
 
   const equipment: FormItem[] = [
-    { kind: 'slot', name: 'equipment', render: () => <MonsterEquipmentPanel ctx={ctx} /> },
+    { kind: 'slot', name: 'equipment', render: () => <EquipmentSlot ctx={ctx} /> },
   ]
 
   const traits: FormItem[] = [
-    { kind: 'slot', name: 'traits', render: () => <MonsterTraitsEditor ctx={ctx} /> },
+    { kind: 'slot', name: 'traits', render: () => <TraitsSlot ctx={ctx} /> },
   ]
 
   const actions: FormItem[] = [
@@ -201,7 +201,7 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
         },
       ],
     },
-    { kind: 'slot', name: 'actions', render: () => <MonsterActionSections ctx={ctx} /> },
+    { kind: 'slot', name: 'actions', render: () => <ActionsSlot ctx={ctx} /> },
     ownedSlot('bonusActions'),
     ownedSlot('reactions'),
     ownedSlot('legendaryActions'),

@@ -17,17 +17,15 @@ import { prepareWeaponProficiencyComboboxOptions } from '@/lib/forms/grant-sets/
 import { weaponProficiencyGrantSetField } from '@/lib/forms/grant-sets/weapon-proficiency-grant-field'
 import { weaponProficiencyGrantSetFromMode } from '@/lib/forms/grant-sets/weapon-proficiency-grant-mode.lib'
 
-import { MonsterWeaponProficiencyReconciliationField } from '../../components/monster-weapon-proficiency-reconciliation-field'
+import { MonsterWeaponProficiencyReconciliationField } from '../../components/form/slots/creature-details/weapon-proficiency-reconciliation.slot'
 import { resolveMonsterWeaponProficiencyRecommendationGroup } from './monster-weapon-proficiency-recommendations.lib'
 import { equipmentProficiencyGrantComboboxConfig } from '@/lib/forms/grant-sets/equipment-proficiency-grant-combobox-config.lib'
 import { resolveContentWeaponGrantOptionLabel } from '../../../lib/forms/grants/content-weapon-grant-option-label.lib'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
-import {
-  MonsterCreatureDetailsLanguagesSlot,
-  MonsterCreatureDetailsSensesSlot,
-  MonsterCreatureDetailsSkillsSlot,
-  MonsterTelepathyRangeField,
-} from '../../components/form/monster-creature-details-slots'
+import { MonsterCreatureDetailsLanguagesSlot } from '../../components/form/slots/creature-details/languages.slot'
+import { MonsterCreatureDetailsSensesSlot } from '../../components/form/slots/creature-details/senses.slot'
+import { MonsterCreatureDetailsSkillsSlot } from '../../components/form/slots/creature-details/skills.slot'
+import { MonsterTelepathyRangeField } from '../../components/form/slots/creature-details/telepathy-range.slot'
 import { damageDefenseComboboxOptions } from './monster-damage-defense-form.lib'
 import { MONSTER_DEFAULT_WEAPON_PROFICIENCY_MODE } from './monster-weapon-proficiencies-form.lib'
 import {

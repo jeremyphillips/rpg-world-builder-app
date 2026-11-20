@@ -52,14 +52,6 @@ function durationPair(amountName: string): FormItem {
   })
 }
 
-export function waterBreathingDurationEnabled(row: object): boolean {
-  const record = row as {
-    outsideWaterBreathAmount?: unknown
-    outsideWaterBreathUnit?: unknown
-  }
-  return record.outsideWaterBreathAmount != null || record.outsideWaterBreathUnit != null
-}
-
 /** Parameter fields for a configurable trait. Fixed presets return none. */
 export function monsterTraitPresetFields(
   preset: string,

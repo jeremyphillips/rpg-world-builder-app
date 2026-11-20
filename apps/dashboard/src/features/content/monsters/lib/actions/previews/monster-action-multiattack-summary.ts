@@ -18,7 +18,7 @@ import {
 } from '../../monster-form-labels'
 import type { MonsterFormValues } from '../../monster-form-values'
 import { normalizeMonsterDraftForPreview } from '../../normalize-monster-form-values'
-import { findMonsterFormActionDraft } from './monster-action-attack-summary'
+import { findMonsterFormActionDraft } from './monster-action-draft-lookup'
 import {
   monsterArmorClassRules,
   monsterEquipmentCatalog,

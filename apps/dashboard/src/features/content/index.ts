@@ -1,4 +1,13 @@
 // Lightweight cross-feature surface — keep before route/form exports to avoid barrel init cycles.
+export {
+  outsideWaterBreathDurationEnabled,
+  type OutsideWaterBreathDurationFields,
+} from './lib/creature-traits/outside-water-breath.lib'
+export {
+  OutsideWaterBreathToggle,
+  OUTSIDE_WATER_BREATH_TOGGLE_LABEL,
+  type OutsideWaterBreathToggleProps,
+} from './lib/creature-traits/outside-water-breath-toggle'
 export { monsterArmorClassUnavailableCopy } from './monsters/lib/statistics/monster-armor-class-presentation'
 export {
   formatAddContentTypeLabel,

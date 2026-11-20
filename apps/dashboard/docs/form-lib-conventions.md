@@ -451,6 +451,9 @@ modals and one-off editors once at the composition boundary instead of threading
   [form-slot-register.md](./form-slot-register.md) and raise that identity in
   `src/test/form-slot-literal-baseline.json`. The ratchet allows an identity count to fall
   without an edit and rejects a new or renamed identity that skips the register.
+  Monster entry paths, host-null slots, and baseline versus `registerSlotItem`
+  uniqueness are defined in that register, not here. The monster folder map is
+  [`monsters/README.md`](../src/features/content/monsters/README.md).
 
 Detail: [packages/ui/docs/forms.md](../../../../packages/ui/docs/forms.md),
 [packages/ui/docs/forms/containers.md](../../../../packages/ui/docs/forms/containers.md).

@@ -10,11 +10,11 @@ import { describe, expect, it } from 'vitest'
 import { buildSeedDamageTypeVocabulary } from '@/features/vocabulary'
 import { pickEquipment } from '@/test/fixtures/pick'
 
-import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
+import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import type { MonsterActionDraftRow } from '../../../lib/actions/monster-action-presets'
 import { monsterFormTestValues } from '../../../lib/monster-form-test-values'
 import type { MonsterFormValues } from '../../../lib/monster-form-values'
-import { MonsterActionSections } from '../monster-action-sections'
+import { MonsterActionSections } from './action-sections'
 
 const shortbow = pickEquipment('shortbow')
 

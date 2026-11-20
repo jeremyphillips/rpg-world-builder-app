@@ -46,6 +46,14 @@ export const MONSTER_SAVE_SUCCESS_EFFECTS_PATH = monsterSaveOutcomeEffectsPath(
 export const MONSTER_SAVE_REPEAT_PATH = `resolution.outcomes.${MONSTER_SAVE_FAILED_OUTCOME_INDEX}.repeatSave`
 export const MONSTER_SAVE_SECOND_FAILURE_EFFECTS_PATH = `${MONSTER_SAVE_REPEAT_PATH}.secondFailure.effects`
 
+export function saveOutcomesPath(namePrefix: string): string {
+  return `${namePrefix}.resolution.outcomes`
+}
+
+export function saveWatchPath(namePrefix: string, suffix: string): string {
+  return namePrefix ? `${namePrefix}.${suffix}` : suffix
+}
+
 function isSaveOutcome(value: unknown): value is MonsterSaveOutcome {
   if (!value || typeof value !== 'object') return false
   return typeof (value as MonsterSaveOutcome).result === 'string'

@@ -2,7 +2,7 @@ import { createElement } from 'react'
 import type { FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
-import { MonsterFormsShapeShiftingSection } from '../../components/form/monster-forms-shape-shifting-section'
+import { MonsterFormsShapeShiftingSection } from '../../components/form/slots/creature-forms/forms-shape-shifting.slot'
 import { monsterFormMovementOverrideGroup } from './monster-form-movement-override-fields'
 import { monsterFormSizesOverrideGroup } from './monster-form-sizes-override-fields'
 import {

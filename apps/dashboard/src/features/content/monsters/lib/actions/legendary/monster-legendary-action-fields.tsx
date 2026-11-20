@@ -9,7 +9,7 @@ import type { FieldVisibility, FormItem } from '@rpg/ui/form'
 import {
   MonsterActionCastingAbilityField,
   MonsterLegendarySpellcastingActionField,
-} from '../spell/monster-action-casting-fields'
+} from '../../../components/form/actions/shared/casting-ability.slot'
 import { monsterSpellCastAtLevelField } from '../spell/monster-spell-cast-at-level-form-fields'
 import { monsterSpellComponentRequirementsField } from '../spell/monster-spell-component-form-fields'
 import {

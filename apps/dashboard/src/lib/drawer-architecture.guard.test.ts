@@ -25,7 +25,7 @@ const PRODUCTION_DRAWER_SURFACES: readonly { label: string; path: string }[] = [
   },
   {
     label: 'MonsterSpellPickerDrawer',
-    path: 'apps/dashboard/src/features/content/monsters/components/form/monster-spell-picker-drawer.tsx',
+    path: 'apps/dashboard/src/features/content/monsters/components/form/spells/spell-picker-drawer.tsx',
   },
   {
     label: 'ProficiencyPickerDrawer',
