@@ -88,6 +88,11 @@ export function clampMultiattackReplacementActions(
 
 let primedActionsSnapshot: MonsterActionDraftRow[] | undefined
 
+/** Snapshot before the latest `actions` edit — shared by multiattack value syncs. */
+export function multiattackActionsBeforeEdit(): MonsterActionDraftRow[] | undefined {
+  return primedActionsSnapshot
+}
+
 /** Prime before the monster form mounts so the first edit can compare against hydrated state. */
 export function primeMultiattackReplacementActionsSnapshot(
   actions: MonsterActionDraftRow[] | undefined,

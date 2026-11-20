@@ -68,6 +68,12 @@ export {
   multiattackRowEligibleForPurpose,
   type MultiattackEligibilityPurpose,
 } from './multiattack-eligibility'
+export {
+  multiattackUseClauseHasRepetition,
+  multiattackUseClauseRepetitionEligible,
+  multiattackUseClauseRepetitionInvalid,
+  multiattackUseClauseRepetitionRepairRequired,
+} from './multiattack-use-repetition'
 export { multiattackValidationMessages } from './multiattack-validation-messages'
 export {
   actionIdAppearsInAttackSteps,

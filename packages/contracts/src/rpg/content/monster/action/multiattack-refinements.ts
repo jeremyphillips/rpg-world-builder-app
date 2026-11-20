@@ -17,6 +17,7 @@ import {
 } from './reference-messages'
 import { isMultiattackReplacementChoiceRedundant } from './multiattack-replacement-choice-eligibility'
 import { primaryAttackSlotTotal, targetedAttackSlotTotal } from './multiattack-replacement-budget'
+import { multiattackUseClauseRepetitionInvalid } from './multiattack-use-repetition'
 
 type ActionRow = { id?: string; kind?: string; spells?: readonly { spellId?: string }[] }
 
@@ -109,6 +110,7 @@ function refineUseClause(
     mode?: 'single' | 'choice'
     actionId?: string
     spellId?: string
+    count?: unknown
     optional?: true
     choices?: readonly { actionId?: string; spellId?: string }[]
   }
@@ -175,6 +177,14 @@ function refineUseClause(
         actionsById,
         ctx,
       )
+    }
+    if (
+      multiattackUseClauseRepetitionInvalid(actionsById.get(single.actionId)?.kind, single.count)
+    ) {
+      addCustomRefinementIssue(ctx, multiattackValidationMessages.useSpellRepetitionForbidden(), [
+        ...stepPath,
+        'count',
+      ])
     }
   }
 }

@@ -128,4 +128,8 @@ export const multiattackValidationMessages = {
     'validation.multiattack.use-action-ineligible',
     () => 'Select an action that can be used during Multiattack.',
   ),
+  useSpellRepetitionForbidden: defineMessage(
+    'validation.multiattack.use-spell-repetition-forbidden',
+    () => 'Spellcasting cannot repeat during Multiattack. Set Times to 1 or remove repetition.',
+  ),
 } as const

@@ -1,4 +1,3 @@
-import { multiattackPositiveInt } from '@rpg/contracts'
 import { NumberStepper, OptionalFieldDisclosure } from '@rpg/ui'
 import {
   optionalDisclosureShellProps,
@@ -14,30 +13,64 @@ import {
 } from '../../../../lib/monster-form-labels'
 import { MONSTER_FORM_WRITE_OPTIONS } from '../../../../lib/monster-form-write-options'
 import { multiattackRepetitionDisclosureOpen } from '../../../../lib/actions/multiattack/monster-multiattack-repetition.lib'
+import type { MonsterActionDraftRow } from '../../../../lib/actions/monster-action-presets'
+import {
+  multiattackActionKindById,
+  multiattackSectionRowsPathFromStepPrefix,
+  multiattackUseStepRepetitionAddVisible,
+  multiattackUseStepRepetitionSlotVisible,
+} from '../../../../lib/actions/multiattack/monster-multiattack-use-repetition.lib'
+import { multiattackTimesStepperBinding } from '../../../../lib/actions/multiattack/monster-multiattack-times-stepper.lib'
 
-function multiattackTimesStepperBinding(count: unknown): { value: number; unbound: boolean } {
-  const parsed = multiattackPositiveInt(count)
-  if (parsed !== undefined) return { value: parsed, unbound: false }
-  return { value: 0, unbound: true }
+export function MonsterMultiattackUseStepRepetitionSlot({
+  namePrefix,
+  fallbackActionRows,
+}: {
+  namePrefix?: string
+  fallbackActionRows?: readonly MonsterActionDraftRow[]
+}) {
+  if (!namePrefix) return null
+  return (
+    <MonsterMultiattackUseStepRepetitionSlotBound
+      namePrefix={namePrefix}
+      fallbackActionRows={fallbackActionRows}
+    />
+  )
 }
 
-export function MonsterMultiattackUseStepRepetitionSlot({ namePrefix }: { namePrefix?: string }) {
+function MonsterMultiattackUseStepRepetitionSlotBound({
+  namePrefix,
+  fallbackActionRows,
+}: {
+  namePrefix: string
+  fallbackActionRows?: readonly MonsterActionDraftRow[]
+}) {
   const controlSize = useFieldControlSize()
   const { setValue, control } = useFormContext()
-  if (!namePrefix) return null
 
   const step = (useWatch({ name: namePrefix }) ?? {}) as Record<string, unknown>
   const mode = step.mode
   const isSingle = mode !== 'choice' && !(Array.isArray(step.choices) && step.choices.length > 0)
-  if (!isSingle) return null
+
+  const sectionRowsPath = multiattackSectionRowsPathFromStepPrefix(namePrefix)
+  const liveActionRows = useWatch({ name: sectionRowsPath }) as MonsterActionDraftRow[] | undefined
+  const actionRows =
+    liveActionRows && liveActionRows.length > 0 ? liveActionRows : (fallbackActionRows ?? [])
+  const actionId = typeof step.actionId === 'string' ? step.actionId : undefined
+  const actionKind = multiattackActionKindById(actionId, actionRows)
 
   const countName = `${namePrefix}.count`
   const count = useWatch({ name: countName })
+  const slotVisible = isSingle && multiattackUseStepRepetitionSlotVisible({ actionKind, count })
+
+  const addVisible = multiattackUseStepRepetitionAddVisible(actionKind)
   const { field: countField } = useController({
     name: countName,
     control,
     shouldUnregister: false,
   })
+
+  if (!slotVisible) return null
 
   const repetitionOpen = multiattackRepetitionDisclosureOpen(count)
   const repetitionActions = resolveOptionalDisclosureActions({
@@ -55,13 +88,14 @@ export function MonsterMultiattackUseStepRepetitionSlot({ namePrefix }: { namePr
       {...optionalDisclosureShellProps(repetitionActions)}
       open={repetitionOpen}
       onOpenChange={(next) => {
+        if (!addVisible) return
         if (next && !repetitionOpen) {
           setValue(countName, 2, MONSTER_FORM_WRITE_OPTIONS)
         }
       }}
       onRemove={() => setValue(countName, undefined, MONSTER_FORM_WRITE_OPTIONS)}
       size={controlSize}
-      addDisabled={repetitionOpen}
+      addDisabled={repetitionOpen || !addVisible}
     >
       <NumberStepper
         id={repetitionFieldId}

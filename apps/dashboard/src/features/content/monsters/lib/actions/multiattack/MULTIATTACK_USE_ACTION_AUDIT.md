@@ -10,16 +10,17 @@ UI follows **mutual exclusion** (§8.8): hide **Add action choice** while repeti
 
 ## Audit matrix (§8.5)
 
-| Configuration                     | SRD example                                       | Schema                   | Ambiguity        | Recommendation                       |
-| --------------------------------- | ------------------------------------------------- | ------------------------ | ---------------- | ------------------------------------ |
-| Single action                     | Most beasts (e.g. Wolf bite + claws)              | Supported                | None             | Retain                               |
-| Repeated single action            | Hell Hound Fire Breath twice via count            | Supported                | None             | Retain                               |
-| Optional single action            | Roper Extrude / Retract “can use”                 | Supported                | None             | Retain                               |
-| OR-choice action                  | Marilith sword **or** tail (separate steps today) | Supported as choice step | None             | Retain                               |
-| Optional OR choice                | Rare; often separate optional use step            | Unsupported on choice    | “Can” on OR list | **Defer** — use optional single step |
-| Repeated OR (choose once, repeat) | Not observed in SRD 5.2 multiattack prose         | Unsupported              | Choice scope     | **Defer** — mutual exclusion         |
-| Choice per repetition             | Not observed                                      | Unsupported              | Per-use vs once  | **Defer**                            |
-| Optional repeated choice          | Not observed                                      | Unsupported              | Combined         | **Defer**                            |
+| Configuration                     | SRD example                                       | Schema                   | Ambiguity        | Recommendation                                                                            |
+| --------------------------------- | ------------------------------------------------- | ------------------------ | ---------------- | ----------------------------------------------------------------------------------------- |
+| Single action                     | Most beasts (e.g. Wolf bite + claws)              | Supported                | None             | Retain                                                                                    |
+| Repeated single action            | Hell Hound Fire Breath twice via count            | Supported                | None             | Retain                                                                                    |
+| Spellcasting use in multiattack   | SRD uses single cast references only              | Supported (no `count`)   | None             | Gate repetition when `kind: 'spell'`; clear on explicit action change via transition slot |
+| Optional single action            | Roper Extrude / Retract “can use”                 | Supported                | None             | Retain                                                                                    |
+| OR-choice action                  | Marilith sword **or** tail (separate steps today) | Supported as choice step | None             | Retain                                                                                    |
+| Optional OR choice                | Rare; often separate optional use step            | Unsupported on choice    | “Can” on OR list | **Defer** — use optional single step                                                      |
+| Repeated OR (choose once, repeat) | Not observed in SRD 5.2 multiattack prose         | Unsupported              | Choice scope     | **Defer** — mutual exclusion                                                              |
+| Choice per repetition             | Not observed                                      | Unsupported              | Per-use vs once  | **Defer**                                                                                 |
+| Optional repeated choice          | Not observed                                      | Unsupported              | Combined         | **Defer**                                                                                 |
 
 ## Repetition with choices (§8.3)
 

@@ -45,6 +45,7 @@ import { MonsterMultiattackEmptyAttacksSlot } from '../../../components/form/act
 import { MonsterMultiattackPersistSlot } from '../../../components/form/actions/multiattack/multiattack-persist.slot'
 import { MonsterMultiattackUseStepKindSlot } from '../../../components/form/actions/multiattack/multiattack-use-step-kind.slot'
 import { MonsterMultiattackUseStepChoiceAcquisitionSlot } from '../../../components/form/actions/multiattack/multiattack-use-step-choice-acquisition.slot'
+import { MonsterMultiattackUseStepActionTransitionSlot } from '../../../components/form/actions/multiattack/multiattack-use-step-action-transition.slot'
 import { MonsterMultiattackUseStepRepetitionSlot } from '../../../components/form/actions/multiattack/multiattack-use-step-repetition.slot'
 import { MonsterMultiattackUseChoiceRemoveControl } from '../../../components/form/actions/multiattack/multiattack-use-choice-remove-control'
 import {
@@ -120,6 +121,16 @@ function monsterMultiattackUseClauseFields(input: {
           actionRows: input.actionRows,
           spellCatalogById: input.spellCatalogById,
         }),
+        {
+          kind: 'slot',
+          name: 'multiattackUseStepActionTransition',
+          render: ({ namePrefix }) => (
+            <MonsterMultiattackUseStepActionTransitionSlot
+              namePrefix={namePrefix}
+              fallbackActionRows={input.actionRows}
+            />
+          ),
+        },
       ],
     },
     {
@@ -135,7 +146,10 @@ function monsterMultiattackUseClauseFields(input: {
       name: 'multiattackUseStepRepetition',
       visibility: singleUseVisible,
       render: ({ namePrefix }) => (
-        <MonsterMultiattackUseStepRepetitionSlot namePrefix={namePrefix} />
+        <MonsterMultiattackUseStepRepetitionSlot
+          namePrefix={namePrefix}
+          fallbackActionRows={input.actionRows}
+        />
       ),
     },
     {
