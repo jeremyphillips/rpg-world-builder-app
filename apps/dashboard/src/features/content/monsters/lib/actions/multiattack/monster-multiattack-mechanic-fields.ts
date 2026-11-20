@@ -1,3 +1,4 @@
+import { replacementCountMax } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
@@ -10,7 +11,7 @@ import {
   multiattackExecutableUseOptions,
   multiattackPrerequisiteOptions,
   multiattackReplacementChoiceOptions,
-  multiattackTargetAttackOptions,
+  multiattackTargetAttackOptionsForReplacement,
 } from './monster-multiattack-form-options'
 
 type MultiattackDraft = Extract<MonsterActionDraftRow, { kind: 'multiattack' }>
@@ -64,12 +65,16 @@ export function monsterMultiattackMechanicFields(input: {
       eligibilityValues,
       input.ctx,
     ),
-    targetAttackOptions: multiattackTargetAttackOptions(
+    targetAttackOptions: multiattackTargetAttackOptionsForReplacement(
       input.action.steps,
       actionRows,
       eligibilityValues,
       input.ctx,
+      input.action.replacement,
     ),
+    replacementCountMax: input.action.replacement
+      ? replacementCountMax(input.action.replacement, input.action.steps ?? [])
+      : undefined,
     actionRows,
     hasAttackOptions: input.attackOptions.length > 0,
     canConfigureReplacement: replacementOptions.length > 0,

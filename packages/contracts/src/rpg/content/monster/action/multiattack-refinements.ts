@@ -15,6 +15,7 @@ import {
   MULTIATTACK_REFERENCE_SELF_MESSAGE,
   MULTIATTACK_SECTION_MESSAGE,
 } from './reference-messages'
+import { primaryAttackSlotTotal, targetedAttackSlotTotal } from './multiattack-replacement-budget'
 
 type ActionRow = { id?: string; kind?: string; spells?: readonly { spellId?: string }[] }
 
@@ -40,27 +41,6 @@ function pathOf(base: (string | number)[], ...rest: (string | number)[]): (strin
 
 function attackGroupCount(step: { count?: number }): number | undefined {
   return typeof step.count === 'number' && Number.isInteger(step.count) ? step.count : undefined
-}
-
-function primaryAttackGroupTotal(steps: readonly MultiattackDraftStep[]): number | undefined {
-  let total = 0
-  for (const step of steps) {
-    if (!isMultiattackAttackGroup(step)) continue
-    const count = attackGroupCount(step)
-    if (count === undefined || count < 1) return undefined
-    total += count
-  }
-  return total
-}
-
-function targetedAttackTotal(steps: readonly MultiattackDraftStep[], actionId: string): number {
-  return steps.reduce((sum, step) => {
-    if (!isMultiattackAttackGroup(step)) return sum
-    const count = attackGroupCount(step)
-    if (count === undefined || count < 1) return sum
-    if (step.actionIds.length === 1 && step.actionIds[0] === actionId) return sum + count
-    return sum
-  }, 0)
 }
 
 function refineAttackGroup(
@@ -341,7 +321,7 @@ export function refinePublishedMultiattack(
         'count',
       ])
     } else {
-      const total = primaryAttackGroupTotal(steps)
+      const total = primaryAttackSlotTotal(steps)
       if (total !== undefined && count > total) {
         addCustomRefinementIssue(
           ctx,
@@ -350,7 +330,7 @@ export function refinePublishedMultiattack(
         )
       }
       if (replacement.replacesActionId) {
-        const targetTotal = targetedAttackTotal(steps, replacement.replacesActionId)
+        const targetTotal = targetedAttackSlotTotal(steps, replacement.replacesActionId)
         if (targetTotal > 0 && count > targetTotal) {
           const name =
             actionsById.get(replacement.replacesActionId)?.kind === 'weapon'
@@ -384,6 +364,13 @@ export function refinePublishedMultiattack(
           ...path,
           'replacement',
           'replacesActionId',
+        ])
+      }
+      if (replacement.attackWord === 'any' && count !== 1) {
+        addCustomRefinementIssue(ctx, multiattackValidationMessages.attackWordRequiresCountOne(), [
+          ...path,
+          'replacement',
+          'count',
         ])
       }
     }

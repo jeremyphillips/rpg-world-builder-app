@@ -170,9 +170,11 @@ export const MONSTER_MULTIATTACK_TIMES_LABEL = 'Times'
 export const MONSTER_MULTIATTACK_USE_STYLE_LABEL = 'Use'
 export const MONSTER_MULTIATTACK_USE_SINGLE_LABEL = 'Single action'
 export const MONSTER_MULTIATTACK_USE_CHOICE_LABEL = 'Choose between actions'
-export const MONSTER_MULTIATTACK_ANY_ATTACK_LABEL = 'Any attack'
+export const MONSTER_MULTIATTACK_ANY_ATTACK_LABEL = 'Allow repeated replacements'
 export const MONSTER_MULTIATTACK_ANY_ATTACK_HINT =
-  'The creature replaces one attack, and that attack can be any of them.'
+  "Each eligible attack can be replaced separately with one use of the selected action, up to the available attack slots. The action's usage limits still apply."
+export const MONSTER_MULTIATTACK_REPLACES_ONE_ATTACK = 'Replaces 1 attack'
+export const MONSTER_MULTIATTACK_ADD_TARGET_ATTACK_LABEL = 'Add target attack'
 export const MONSTER_MULTIATTACK_TARGET_ATTACK_LABEL = 'Target attack'
 export const MONSTER_MULTIATTACK_EMPTY_ATTACKS_HEADING = 'No attack actions available'
 export const MONSTER_MULTIATTACK_EMPTY_ATTACKS_BODY =

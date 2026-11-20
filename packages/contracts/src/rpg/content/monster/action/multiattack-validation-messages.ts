@@ -80,6 +80,10 @@ export const multiattackValidationMessages = {
     'validation.multiattack.attack-word-with-target',
     () => 'Choose any attack, or choose one attack by name.',
   ),
+  attackWordRequiresCountOne: defineMessage(
+    'validation.multiattack.attack-word-requires-count-one',
+    () => 'Use "any attack" wording only when replacing 1 attack.',
+  ),
   useModeContradiction: defineMessage(
     'validation.multiattack.use-mode-contradiction',
     () => 'Choose one action, or list choices.',

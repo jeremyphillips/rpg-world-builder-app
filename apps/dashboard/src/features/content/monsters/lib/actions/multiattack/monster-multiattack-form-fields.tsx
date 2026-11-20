@@ -11,6 +11,7 @@ import {
   MONSTER_MULTIATTACK_ADD_CHOICE_LABEL,
   MONSTER_MULTIATTACK_ADD_OTHER_ACTION_LABEL,
   MONSTER_MULTIATTACK_ADD_REPLACEMENT_LABEL,
+  MONSTER_MULTIATTACK_ADD_TARGET_ATTACK_LABEL,
   MONSTER_MULTIATTACK_ALTERNATIVE_HINT,
   MONSTER_MULTIATTACK_ALTERNATIVE_LABEL,
   MONSTER_MULTIATTACK_ANY_ATTACK_HINT,
@@ -30,6 +31,7 @@ import {
   MONSTER_MULTIATTACK_REMOVE_ALTERNATIVE_LABEL,
   MONSTER_MULTIATTACK_REPLACEMENT_HINT,
   MONSTER_MULTIATTACK_REPLACEMENT_LABEL,
+  MONSTER_MULTIATTACK_REPLACES_ONE_ATTACK,
   MONSTER_MULTIATTACK_TARGET_ATTACK_LABEL,
   MONSTER_MULTIATTACK_TIMES_LABEL,
   MONSTER_MULTIATTACK_USE_CHOICE_LABEL,
@@ -37,6 +39,11 @@ import {
   MONSTER_MULTIATTACK_USE_SINGLE_LABEL,
   MONSTER_MULTIATTACK_USE_STYLE_LABEL,
 } from '../../monster-form-labels'
+import {
+  multiattackAnyAttackWordingVisible,
+  multiattackShowsStaticReplacementCount,
+  multiattackTargetAttackFieldVisible,
+} from './monster-multiattack-replacement-visibility'
 import { MonsterMultiattackEmptyAttacksSlot } from '../../../components/form/actions/multiattack/multiattack-empty-attacks.slot'
 import { MonsterMultiattackPersistSlot } from '../../../components/form/actions/multiattack/multiattack-persist.slot'
 import { monsterMultiattackChoiceRowFields } from './monster-multiattack-choice-row-fields'
@@ -201,8 +208,15 @@ function monsterMultiattackReplacementGroup(input: {
   actionRows: readonly MonsterActionDraftRow[]
   spellCatalogById?: ReadonlyMap<string, Spell>
   canConfigureReplacement: boolean
+  replacementCountMax?: number
 }): FormItem {
   const hasAlternative = input.action.alternative !== undefined
+  const staticReplacementCountDeps: string[] = [
+    'replacement.count',
+    'replacement.replacesActionId',
+    'steps',
+  ]
+  const replacementCountStepperDeps = [...staticReplacementCountDeps]
   return {
     kind: 'group',
     name: 'replacement',
@@ -213,18 +227,36 @@ function monsterMultiattackReplacementGroup(input: {
     optionalDisclosure: {
       intent: 'add',
       addLabel: MONSTER_MULTIATTACK_ADD_REPLACEMENT_LABEL,
-      seedWhen: () => ({ choices: [] }),
+      seedWhen: () => ({ count: 1, choices: [] }),
       addDisabled: hasAlternative || !input.canConfigureReplacement,
     },
     fields: [
+      {
+        kind: 'display',
+        id: 'replacementCountStatic',
+        visibility: {
+          dependsOn: staticReplacementCountDeps,
+          visibleWhen: (values) => multiattackShowsStaticReplacementCount(values),
+        },
+        content: {
+          variant: 'text',
+          text: MONSTER_MULTIATTACK_REPLACES_ONE_ATTACK,
+          role: 'supporting',
+        },
+      },
       {
         type: 'number',
         name: 'replacement.count',
         label: MONSTER_MULTIATTACK_ATTACKS_REPLACED_LABEL,
         hint: { text: MONSTER_MULTIATTACK_ATTACKS_REPLACED_HINT },
         min: 1,
+        max: input.replacementCountMax,
         step: 1,
         control: 'stepper',
+        visibility: {
+          dependsOn: replacementCountStepperDeps,
+          visibleWhen: (values) => !multiattackShowsStaticReplacementCount(values),
+        },
       },
       {
         type: 'select',
@@ -232,10 +264,19 @@ function monsterMultiattackReplacementGroup(input: {
         label: MONSTER_MULTIATTACK_TARGET_ATTACK_LABEL,
         placeholder: 'Choose',
         options: input.targetAttackOptions,
-        optionalDisclosure: { intent: 'add', actionSubject: 'target attack' },
+        optionalDisclosure: {
+          intent: 'add',
+          addLabel: MONSTER_MULTIATTACK_ADD_TARGET_ATTACK_LABEL,
+          actionSubject: 'target attack',
+        },
         visibility: {
-          dependsOn: ['replacement.attackWord'],
-          visibleWhen: (values) => values['replacement.attackWord'] !== 'any',
+          dependsOn: [
+            'replacement.attackWord',
+            'replacement.replacesActionId',
+            'replacement.count',
+            'steps',
+          ],
+          visibleWhen: (values) => multiattackTargetAttackFieldVisible(values),
         },
       },
       {
@@ -243,7 +284,16 @@ function monsterMultiattackReplacementGroup(input: {
         name: 'replacement.attackWord',
         label: MONSTER_MULTIATTACK_ANY_ATTACK_LABEL,
         hint: { text: MONSTER_MULTIATTACK_ANY_ATTACK_HINT },
-        optionalDisclosure: { intent: 'add', actionSubject: 'any attack wording' },
+        optionalDisclosure: { intent: 'add', actionSubject: 'repeated replacements' },
+        visibility: {
+          dependsOn: [
+            'replacement.attackWord',
+            'replacement.replacesActionId',
+            'replacement.count',
+            'steps',
+          ],
+          visibleWhen: (values) => multiattackAnyAttackWordingVisible(values),
+        },
       },
       {
         kind: 'array',
@@ -328,6 +378,7 @@ export function monsterMultiattackFormFields(input: {
   actionRows: readonly MonsterActionDraftRow[]
   hasAttackOptions: boolean
   canConfigureReplacement: boolean
+  replacementCountMax?: number
   weapons: readonly { entryId: string; label: string; equipped: boolean }[]
   weaponActions: readonly { id: string; equipmentEntryId?: string }[]
   allowAddWeapon: boolean
@@ -386,6 +437,7 @@ export function monsterMultiattackFormFields(input: {
       actionRows: input.actionRows,
       spellCatalogById: input.ctx.spellCatalogById,
       canConfigureReplacement: input.canConfigureReplacement,
+      replacementCountMax: input.replacementCountMax,
     }),
     monsterMultiattackAlternativeGroup({
       action: input.action,

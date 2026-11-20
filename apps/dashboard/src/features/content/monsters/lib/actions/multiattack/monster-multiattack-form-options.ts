@@ -1,7 +1,10 @@
 import {
   formatSpellCastAtLevelName,
   isMultiattackAttackGroup,
+  meaningfulMultiattackTargetActionIds,
   multiattackRowEligibleForPurpose,
+  multiattackSequenceAttackIds,
+  type MultiattackReplacement,
   type Spell,
 } from '@rpg/contracts'
 
@@ -86,6 +89,28 @@ export function multiattackTargetAttackOptions(
     }
   }
   return [...ids].map((id) => ({ value: id, label: titles.get(id) ?? id }))
+}
+
+export function multiattackTargetAttackOptionsForReplacement(
+  steps: MultiattackDraft['steps'] | undefined,
+  rows: readonly MonsterActionDraftRow[],
+  values: MonsterFormValues,
+  ctx: ContentFormCtx,
+  replacement: MultiattackReplacement | undefined,
+): Option[] {
+  const titles = monsterActionEditorTitles(rows, values, ctx, 'actions')
+  const meaningful = new Set(meaningfulMultiattackTargetActionIds(steps ?? []))
+  const stored = replacement?.replacesActionId
+  const singleIdOptions = multiattackTargetAttackOptions(steps, rows, values, ctx)
+  if (replacement?.count !== 1) {
+    return singleIdOptions.filter(
+      (option) => meaningful.has(option.value) || option.value === stored,
+    )
+  }
+  return multiattackSequenceAttackIds(steps ?? []).map((id) => ({
+    value: id,
+    label: titles.get(id) ?? id,
+  }))
 }
 
 export function multiattackSpellOptionsForAction(

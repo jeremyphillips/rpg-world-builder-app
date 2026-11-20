@@ -10,6 +10,7 @@ import type { MonsterFormValues } from '../../monster-form-values'
 import { buildMonsterActionMultiattackPreview } from '../previews/monster-action-multiattack-summary'
 import type { MonsterActionDraftRow } from '../monster-action-presets'
 import { monsterMultiattackFormFields } from './monster-multiattack-form-fields'
+import { primeMultiattackReplacementActionsSnapshot } from './monster-multiattack-replacement-form-sync'
 
 beforeAll(() => {
   if (!HTMLElement.prototype.hasPointerCapture) {
@@ -57,11 +58,33 @@ const multiattack = {
   steps: [{ count: 2, actionIds: ['bite'] }],
 }
 
+const lichMultiattackStep = {
+  count: 3,
+  actionIds: ['eldritch-burst', 'paralyzing-touch'],
+}
+
+const eldritchBurst = {
+  id: 'eldritch-burst',
+  kind: 'spell',
+  name: 'Eldritch Burst',
+  spellId: 'eldritch-burst',
+}
+
+const paralyzingTouch = {
+  id: 'paralyzing-touch',
+  kind: 'natural-weapon',
+  name: 'Paralyzing Touch',
+  mode: 'melee',
+  damageType: 'necrotic',
+  damage: { dice: { count: 3, faces: 6 } },
+}
+
 function Harness({ onReady }: { onReady: (getValues: () => MonsterFormValues) => void }) {
   const defaultValues = monsterFormTestValues({
     name: 'Hell Hound',
     actions: [multiattack, bite, fireBreath] as MonsterFormValues['actions'],
   })
+  primeMultiattackReplacementActionsSnapshot(defaultValues.actions as MonsterActionDraftRow[])
   const form = useForm<MonsterFormValues>({ defaultValues, shouldUnregister: true })
   onReady(() => form.getValues())
   const actionRows = defaultValues.actions as MonsterActionDraftRow[]
@@ -95,14 +118,75 @@ function Harness({ onReady }: { onReady: (getValues: () => MonsterFormValues) =>
   )
 }
 
+function LichHarness() {
+  const multiattackLich = {
+    id: 'multiattack',
+    kind: 'multiattack' as const,
+    name: 'Multiattack',
+    steps: [lichMultiattackStep],
+  }
+  const defaultValues = monsterFormTestValues({
+    name: 'Lich',
+    actions: [multiattackLich, eldritchBurst, paralyzingTouch] as MonsterFormValues['actions'],
+  })
+  primeMultiattackReplacementActionsSnapshot(defaultValues.actions as MonsterActionDraftRow[])
+  const form = useForm<MonsterFormValues>({ defaultValues, shouldUnregister: true })
+  const actionRows = defaultValues.actions as MonsterActionDraftRow[]
+  return (
+    <FormProvider {...form}>
+      <FormItems
+        idPrefix="multiattack"
+        namePrefix="actions.0"
+        items={monsterMultiattackFormFields({
+          namePrefix: 'actions.0',
+          section: 'actions',
+          action: multiattackLich,
+          ctx,
+          attackOptions: [
+            { value: 'eldritch-burst', label: 'Eldritch Burst' },
+            { value: 'paralyzing-touch', label: 'Paralyzing Touch' },
+          ],
+          useOptions: [],
+          replacementOptions: [
+            { value: 'eldritch-burst', label: 'Eldritch Burst' },
+            { value: 'paralyzing-touch', label: 'Paralyzing Touch' },
+          ],
+          prerequisiteOptions: [],
+          targetAttackOptions: [
+            { value: 'eldritch-burst', label: 'Eldritch Burst' },
+            { value: 'paralyzing-touch', label: 'Paralyzing Touch' },
+          ],
+          actionRows,
+          hasAttackOptions: true,
+          canConfigureReplacement: true,
+          replacementCountMax: 3,
+          weapons: [],
+          weaponActions: [],
+          allowAddWeapon: false,
+        })}
+      />
+    </FormProvider>
+  )
+}
+
 describe('multiattack replacement form values', () => {
+  it('shows attacks-replaced stepper and add target attack for Lich-like combo sequence', async () => {
+    const user = userEvent.setup()
+    render(<LichHarness />)
+
+    await user.click(screen.getByRole('button', { name: 'Add action replacement' }))
+
+    expect(screen.getByRole('spinbutton', { name: /Attacks replaced/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Add target attack/i })).toBeInTheDocument()
+    expect(screen.queryByText(/Replaces 1 attack/i)).not.toBeInTheDocument()
+  })
+
   it('stores a completed replacement under the action and previews it', async () => {
     const user = userEvent.setup()
     let read: (() => MonsterFormValues) | undefined
     render(<Harness onReady={(getValues) => (read = getValues)} />)
 
     await user.click(screen.getByRole('button', { name: 'Add action replacement' }))
-    await user.type(screen.getByRole('spinbutton', { name: 'Attacks replaced' }), '1')
     await user.click(screen.getByRole('button', { name: 'Add choice' }))
     await user.click(screen.getByRole('combobox', { name: 'Action' }))
     await user.click(screen.getByRole('option', { name: 'Fire Breath' }))

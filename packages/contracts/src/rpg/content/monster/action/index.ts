@@ -70,6 +70,15 @@ export {
 } from './multiattack-eligibility'
 export { multiattackValidationMessages } from './multiattack-validation-messages'
 export {
+  actionIdAppearsInAttackSteps,
+  meaningfulMultiattackTargetActionIds,
+  multiattackReplacementShowsStaticCount,
+  multiattackSequenceAttackIds,
+  primaryAttackSlotTotal,
+  replacementCountMax,
+  targetedAttackSlotTotal,
+} from './multiattack-replacement-budget'
+export {
   isMultiattackAttackGroup,
   isMultiattackUseClause,
   multiattackPositiveInt,
