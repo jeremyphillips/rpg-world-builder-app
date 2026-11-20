@@ -1,4 +1,5 @@
-import { Button, NumberField, OptionalFieldDisclosure, Text } from '@rpg/ui'
+import { multiattackPositiveInt } from '@rpg/contracts'
+import { Button, NumberStepper, OptionalFieldDisclosure, Text } from '@rpg/ui'
 import {
   optionalDisclosureShellProps,
   resolveOptionalDisclosureActions,
@@ -18,6 +19,12 @@ import {
   multiattackUseChoiceExpandBlocked,
 } from '../../../../lib/actions/multiattack/monster-multiattack-use-choice.lib'
 import { multiattackRepetitionDisclosureOpen } from '../../../../lib/actions/multiattack/monster-multiattack-repetition.lib'
+
+function multiattackTimesStepperBinding(count: unknown): { value: number; unbound: boolean } {
+  const parsed = multiattackPositiveInt(count)
+  if (parsed !== undefined) return { value: parsed, unbound: false }
+  return { value: 0, unbound: true }
+}
 
 export function MonsterMultiattackUseStepControlsSlot({ namePrefix }: { namePrefix?: string }) {
   const controlSize = useFieldControlSize()
@@ -65,28 +72,18 @@ export function MonsterMultiattackUseStepControlsSlot({ namePrefix }: { namePref
         size={controlSize}
         addDisabled={repetitionOpen}
       >
-        <NumberField
+        <NumberStepper
           id={repetitionFieldId}
-          label={MONSTER_MULTIATTACK_TIMES_LABEL}
-          labelVisibility="srOnly"
+          stepperLabel={MONSTER_MULTIATTACK_TIMES_LABEL}
+          aria-label={MONSTER_MULTIATTACK_TIMES_LABEL}
           size={controlSize}
           digits={2}
           min={1}
           step={1}
-          value={countField.value ?? ''}
-          onChange={(event) => {
-            const raw = event.target.value
-            if (raw === '') {
-              setValue(countName, undefined, MONSTER_FORM_WRITE_OPTIONS)
-              return
-            }
-            const parsed = Number(raw)
-            if (Number.isInteger(parsed) && parsed >= 1) {
-              setValue(countName, parsed, MONSTER_FORM_WRITE_OPTIONS)
-            } else {
-              setValue(countName, raw as never, MONSTER_FORM_WRITE_OPTIONS)
-            }
-          }}
+          emptySeed={2}
+          {...multiattackTimesStepperBinding(countField.value)}
+          onChange={(next) => setValue(countName, next, MONSTER_FORM_WRITE_OPTIONS)}
+          onBlur={countField.onBlur}
         />
       </OptionalFieldDisclosure>
       <div className="flex flex-col gap-1">
