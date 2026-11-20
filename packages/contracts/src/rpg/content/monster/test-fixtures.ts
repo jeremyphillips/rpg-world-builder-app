@@ -1,3 +1,4 @@
+import { formatFieldMessage } from '../../../validation/define-message'
 import type { SpellCastingTime } from '../../vocab/spell/casting-time'
 
 type MonsterFixtureSpellRef = {
@@ -213,5 +214,7 @@ export function issueMessages(result: {
   success: boolean
   error?: { issues: { path: PropertyKey[]; message: string }[] }
 }) {
-  return result.success ? [] : (result.error?.issues ?? []).map((issue) => issue.message)
+  return result.success
+    ? []
+    : (result.error?.issues ?? []).map((issue) => formatFieldMessage(issue.message))
 }

@@ -163,16 +163,16 @@
         "$ref": "#/definitions/__schema165"
       },
       "bonusActions": {
-        "$ref": "#/definitions/__schema239"
+        "$ref": "#/definitions/__schema241"
       },
       "reactions": {
-        "$ref": "#/definitions/__schema263"
+        "$ref": "#/definitions/__schema265"
       },
       "legendaryActions": {
-        "$ref": "#/definitions/__schema267"
+        "$ref": "#/definitions/__schema269"
       },
       "forms": {
-        "$ref": "#/definitions/__schema270"
+        "$ref": "#/definitions/__schema272"
       }
     },
     "required": [
@@ -4538,6 +4538,61 @@
                 "items": {
                   "$ref": "#/definitions/__schema236"
                 }
+              },
+              "replacement": {
+                "type": "object",
+                "properties": {
+                  "count": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  "choices": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/definitions/__schema239"
+                    }
+                  },
+                  "replacesActionId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "attackWord": {
+                    "type": "string",
+                    "const": "any",
+                    "description": "any"
+                  },
+                  "whenAvailable": {
+                    "type": "boolean",
+                    "const": true
+                  }
+                },
+                "required": [
+                  "count",
+                  "choices"
+                ],
+                "additionalProperties": false
+              },
+              "alternative": {
+                "type": "object",
+                "properties": {
+                  "steps": {
+                    "minItems": 1,
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/definitions/__schema236"
+                    }
+                  },
+                  "afterUsingActionId": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "steps"
+                ],
+                "additionalProperties": false
               }
             },
             "required": [
@@ -4548,7 +4603,7 @@
             "additionalProperties": false
           },
           {
-            "$ref": "#/definitions/__schema238"
+            "$ref": "#/definitions/__schema240"
           }
         ]
       }
@@ -6287,32 +6342,144 @@
       ]
     },
     "__schema236": {
-      "type": "object",
-      "properties": {
-        "count": {
-          "type": "integer",
-          "minimum": 1,
-          "maximum": 9007199254740991
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "count": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "actionIds": {
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/__schema237"
+              }
+            }
+          },
+          "required": [
+            "count",
+            "actionIds"
+          ],
+          "additionalProperties": false
         },
-        "actionIds": {
-          "minItems": 1,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/__schema237"
-          }
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "use",
+              "description": "use"
+            },
+            "mode": {
+              "type": "string",
+              "const": "single",
+              "description": "single"
+            },
+            "actionId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "count": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "spellId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "optional": {
+              "type": "boolean",
+              "const": true
+            },
+            "whenAvailable": {
+              "type": "boolean",
+              "const": true
+            }
+          },
+          "required": [
+            "kind",
+            "mode",
+            "actionId"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "use",
+              "description": "use"
+            },
+            "mode": {
+              "type": "string",
+              "const": "choice",
+              "description": "choice"
+            },
+            "choices": {
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/__schema238"
+              }
+            },
+            "whenAvailable": {
+              "type": "boolean",
+              "const": true
+            }
+          },
+          "required": [
+            "kind",
+            "mode",
+            "choices"
+          ],
+          "additionalProperties": false
         }
-      },
-      "required": [
-        "count",
-        "actionIds"
-      ],
-      "additionalProperties": false
+      ]
     },
     "__schema237": {
       "type": "string",
       "minLength": 1
     },
     "__schema238": {
+      "type": "object",
+      "properties": {
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "spellId": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "actionId"
+      ],
+      "additionalProperties": false
+    },
+    "__schema239": {
+      "type": "object",
+      "properties": {
+        "actionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "spellId": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "actionId"
+      ],
+      "additionalProperties": false
+    },
+    "__schema240": {
       "type": "object",
       "properties": {
         "id": {
@@ -6362,7 +6529,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema239": {
+    "__schema241": {
       "default": [],
       "type": "array",
       "items": {
@@ -6380,13 +6547,13 @@
             "$ref": "#/definitions/__schema204"
           },
           {
-            "$ref": "#/definitions/__schema238"
+            "$ref": "#/definitions/__schema240"
           },
           {
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/definitions/__schema240"
+                "$ref": "#/definitions/__schema242"
               },
               "kind": {
                 "type": "string",
@@ -6394,19 +6561,19 @@
                 "description": "leap"
               },
               "name": {
-                "$ref": "#/definitions/__schema242"
+                "$ref": "#/definitions/__schema244"
               },
               "distanceFeet": {
-                "$ref": "#/definitions/__schema243"
-              },
-              "movementFeet": {
                 "$ref": "#/definitions/__schema245"
               },
+              "movementFeet": {
+                "$ref": "#/definitions/__schema247"
+              },
               "limitedUse": {
-                "$ref": "#/definitions/__schema246"
+                "$ref": "#/definitions/__schema248"
               },
               "available": {
-                "$ref": "#/definitions/__schema247"
+                "$ref": "#/definitions/__schema249"
               },
               "provenance": {
                 "$ref": "#/definitions/__schema67"
@@ -6425,7 +6592,7 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/definitions/__schema248"
+                "$ref": "#/definitions/__schema250"
               },
               "kind": {
                 "type": "string",
@@ -6433,19 +6600,19 @@
                 "description": "teleport"
               },
               "name": {
-                "$ref": "#/definitions/__schema250"
-              },
-              "distanceFeet": {
-                "$ref": "#/definitions/__schema244"
-              },
-              "passenger": {
-                "$ref": "#/definitions/__schema251"
-              },
-              "limitedUse": {
                 "$ref": "#/definitions/__schema252"
               },
-              "available": {
+              "distanceFeet": {
+                "$ref": "#/definitions/__schema246"
+              },
+              "passenger": {
                 "$ref": "#/definitions/__schema253"
+              },
+              "limitedUse": {
+                "$ref": "#/definitions/__schema254"
+              },
+              "available": {
+                "$ref": "#/definitions/__schema255"
               },
               "provenance": {
                 "$ref": "#/definitions/__schema67"
@@ -6463,7 +6630,7 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "#/definitions/__schema254"
+                "$ref": "#/definitions/__schema256"
               },
               "kind": {
                 "type": "string",
@@ -6471,10 +6638,10 @@
                 "description": "take-actions"
               },
               "name": {
-                "$ref": "#/definitions/__schema256"
+                "$ref": "#/definitions/__schema258"
               },
               "standardActions": {
-                "$ref": "#/definitions/__schema257"
+                "$ref": "#/definitions/__schema259"
               },
               "combination": {
                 "type": "string",
@@ -6485,13 +6652,13 @@
                 "description": "one | each"
               },
               "restriction": {
-                "$ref": "#/definitions/__schema260"
+                "$ref": "#/definitions/__schema262"
               },
               "limitedUse": {
-                "$ref": "#/definitions/__schema261"
+                "$ref": "#/definitions/__schema263"
               },
               "available": {
-                "$ref": "#/definitions/__schema262"
+                "$ref": "#/definitions/__schema264"
               },
               "provenance": {
                 "$ref": "#/definitions/__schema67"
@@ -6508,70 +6675,70 @@
         ]
       }
     },
-    "__schema240": {
-      "type": "string",
-      "minLength": 1
-    },
-    "__schema241": {
-      "type": "string",
-      "const": "leap",
-      "description": "leap"
-    },
     "__schema242": {
       "type": "string",
       "minLength": 1
     },
     "__schema243": {
+      "type": "string",
+      "const": "leap",
+      "description": "leap"
+    },
+    "__schema244": {
+      "type": "string",
+      "minLength": 1
+    },
+    "__schema245": {
       "maximum": 300,
       "allOf": [
         {
-          "$ref": "#/definitions/__schema244"
-        }
-      ]
-    },
-    "__schema244": {
-      "type": "integer",
-      "minimum": 1,
-      "maximum": 9007199254740991
-    },
-    "__schema245": {
-      "maximum": 299,
-      "allOf": [
-        {
-          "$ref": "#/definitions/__schema244"
+          "$ref": "#/definitions/__schema246"
         }
       ]
     },
     "__schema246": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "__schema247": {
+      "maximum": 299,
+      "allOf": [
+        {
+          "$ref": "#/definitions/__schema246"
+        }
+      ]
+    },
+    "__schema248": {
       "allOf": [
         {
           "$ref": "#/definitions/__schema170"
         }
       ]
     },
-    "__schema247": {
-      "type": "boolean"
-    },
-    "__schema248": {
-      "type": "string",
-      "minLength": 1
-    },
     "__schema249": {
-      "type": "string",
-      "const": "teleport",
-      "description": "teleport"
+      "type": "boolean"
     },
     "__schema250": {
       "type": "string",
       "minLength": 1
     },
     "__schema251": {
+      "type": "string",
+      "const": "teleport",
+      "description": "teleport"
+    },
+    "__schema252": {
+      "type": "string",
+      "minLength": 1
+    },
+    "__schema253": {
       "type": "object",
       "properties": {
         "withinFeet": {
           "allOf": [
             {
-              "$ref": "#/definitions/__schema244"
+              "$ref": "#/definitions/__schema246"
             }
           ]
         },
@@ -6585,30 +6752,30 @@
       },
       "additionalProperties": false
     },
-    "__schema252": {
+    "__schema254": {
       "allOf": [
         {
           "$ref": "#/definitions/__schema170"
         }
       ]
     },
-    "__schema253": {
-      "type": "boolean"
-    },
-    "__schema254": {
-      "type": "string",
-      "minLength": 1
-    },
     "__schema255": {
-      "type": "string",
-      "const": "take-actions",
-      "description": "take-actions"
+      "type": "boolean"
     },
     "__schema256": {
       "type": "string",
       "minLength": 1
     },
     "__schema257": {
+      "type": "string",
+      "const": "take-actions",
+      "description": "take-actions"
+    },
+    "__schema258": {
+      "type": "string",
+      "minLength": 1
+    },
+    "__schema259": {
       "minItems": 1,
       "type": "array",
       "items": {
@@ -6621,7 +6788,7 @@
         "description": "dash | disengage | hide"
       }
     },
-    "__schema258": {
+    "__schema260": {
       "type": "string",
       "enum": [
         "dash",
@@ -6630,7 +6797,7 @@
       ],
       "description": "dash | disengage | hide"
     },
-    "__schema259": {
+    "__schema261": {
       "type": "string",
       "enum": [
         "one",
@@ -6638,20 +6805,20 @@
       ],
       "description": "one | each"
     },
-    "__schema260": {
+    "__schema262": {
       "type": "string"
     },
-    "__schema261": {
+    "__schema263": {
       "allOf": [
         {
           "$ref": "#/definitions/__schema170"
         }
       ]
     },
-    "__schema262": {
+    "__schema264": {
       "type": "boolean"
     },
-    "__schema263": {
+    "__schema265": {
       "default": [],
       "type": "array",
       "items": {
@@ -6695,7 +6862,7 @@
                 "$ref": "#/definitions/__schema194"
               },
               "trigger": {
-                "$ref": "#/definitions/__schema264"
+                "$ref": "#/definitions/__schema266"
               }
             },
             "required": [
@@ -6760,7 +6927,7 @@
                 "$ref": "#/definitions/__schema202"
               },
               "trigger": {
-                "$ref": "#/definitions/__schema264"
+                "$ref": "#/definitions/__schema266"
               }
             },
             "required": [
@@ -6791,7 +6958,7 @@
               "trigger": {
                 "allOf": [
                   {
-                    "$ref": "#/definitions/__schema265"
+                    "$ref": "#/definitions/__schema267"
                   }
                 ]
               },
@@ -6803,7 +6970,7 @@
                 "maxItems": 1,
                 "type": "array",
                 "items": {
-                  "$ref": "#/definitions/__schema266"
+                  "$ref": "#/definitions/__schema268"
                 }
               },
               "available": {
@@ -6863,14 +7030,14 @@
         ]
       }
     },
-    "__schema264": {
+    "__schema266": {
       "allOf": [
         {
-          "$ref": "#/definitions/__schema265"
+          "$ref": "#/definitions/__schema267"
         }
       ]
     },
-    "__schema265": {
+    "__schema267": {
       "type": "object",
       "properties": {
         "text": {
@@ -6883,11 +7050,11 @@
       ],
       "additionalProperties": false
     },
-    "__schema266": {
+    "__schema268": {
       "type": "string",
       "minLength": 1
     },
-    "__schema267": {
+    "__schema269": {
       "type": "object",
       "properties": {
         "uses": {
@@ -6904,7 +7071,7 @@
           "minItems": 1,
           "type": "array",
           "items": {
-            "$ref": "#/definitions/__schema268"
+            "$ref": "#/definitions/__schema270"
           }
         }
       },
@@ -6914,7 +7081,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema268": {
+    "__schema270": {
       "oneOf": [
         {
           "$ref": "#/definitions/__schema190"
@@ -6956,7 +7123,7 @@
               "minItems": 1,
               "type": "array",
               "items": {
-                "$ref": "#/definitions/__schema269"
+                "$ref": "#/definitions/__schema271"
               }
             },
             "movement": {
@@ -6990,11 +7157,11 @@
         }
       ]
     },
-    "__schema269": {
+    "__schema271": {
       "type": "string",
       "minLength": 1
     },
-    "__schema270": {
+    "__schema272": {
       "type": "object",
       "properties": {
         "profileFormId": {
@@ -7046,7 +7213,7 @@
           "minItems": 1,
           "type": "array",
           "items": {
-            "$ref": "#/definitions/__schema271"
+            "$ref": "#/definitions/__schema273"
           }
         },
         "differencesPresentation": {
@@ -7065,7 +7232,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema271": {
+    "__schema273": {
       "type": "object",
       "properties": {
         "id": {
@@ -7093,7 +7260,7 @@
                   "$ref": "#/definitions/__schema37"
                 },
                 "hover": {
-                  "$ref": "#/definitions/__schema272"
+                  "$ref": "#/definitions/__schema274"
                 }
               },
               "required": [
@@ -7119,7 +7286,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema272": {
+    "__schema274": {
       "type": "boolean",
       "const": true
     }

@@ -66,12 +66,8 @@ import {
   CHOOSE_ATTACK_FROM_ACTIONS,
   collectRepeatabilityViolations,
   LEGENDARY_REFERENCE_ATTACK_CHOICE_MESSAGE,
-  MULTIATTACK_REFERENCE_DUPLICATE_MESSAGE,
-  MULTIATTACK_REFERENCE_INVALID_KIND_MESSAGE,
-  MULTIATTACK_REFERENCE_MISSING_MESSAGE,
-  MULTIATTACK_REFERENCE_SELF_MESSAGE,
-  MULTIATTACK_SECTION_MESSAGE,
 } from './monster/action'
+import { refinePublishedMultiattack } from './monster/action/multiattack-refinements'
 import { findSpellCastingSource } from './monster/spell-casting-source'
 import { savingThrowEffectDraftSchema, savingThrowEffectSchema } from './lib/saving-throw/schema'
 import { entryProvenanceField } from '../primitives/provenance'
@@ -536,6 +532,11 @@ function refineMultiattackReferences(
       action.id ? [[action.id, action as ActionReferenceRow] as const] : [],
     ),
   )
+  const bonusById = new Map(
+    (body.bonusActions ?? []).flatMap((action) =>
+      action.id ? [[action.id, action as ActionReferenceRow] as const] : [],
+    ),
+  )
   for (const section of MONSTER_ACTION_SECTIONS) {
     monsterActionSectionRows<ActionReferenceRow>(body, section).forEach((action, index) => {
       refineOneActionReference(
@@ -543,6 +544,7 @@ function refineMultiattackReferences(
         section,
         [...prefix, ...monsterActionSectionRowPath(section, index)],
         actionsById,
+        bonusById,
         ctx,
         options,
       )
@@ -555,11 +557,12 @@ function refineOneActionReference(
   section: string,
   path: (string | number)[],
   actionsById: ReadonlyMap<string, { kind: string }>,
+  bonusById: ReadonlyMap<string, { kind: string }>,
   ctx: z.RefinementCtx,
   options: { published: boolean },
 ): void {
   if (action.kind === 'multiattack') {
-    refineMultiattackRow(action, section, path, actionsById, ctx)
+    refineMultiattackRow(action, section, path, actionsById, bonusById, ctx, options)
     return
   }
   if (action.kind === 'parry') {
@@ -579,31 +582,22 @@ function refineMultiattackRow(
   section: string,
   path: (string | number)[],
   actionsById: ReadonlyMap<string, { kind: string }>,
+  bonusById: ReadonlyMap<string, { kind: string }>,
   ctx: z.RefinementCtx,
+  options: { published: boolean },
 ): void {
-  if (section !== 'actions') {
-    addCustomRefinementIssue(ctx, MULTIATTACK_SECTION_MESSAGE, [...path, 'kind'])
-    return
-  }
-  const seen = new Set<string>()
-  const steps = Array.isArray(action.steps) ? action.steps : []
-  steps.forEach((step, stepIndex) => {
-    refineReferencedIdList(
-      action.id,
-      Array.isArray(step.actionIds) ? step.actionIds : [],
-      actionsById,
-      ctx,
-      (idIndex) => [...path, 'steps', stepIndex, 'actionIds', idIndex],
-      MULTIATTACK_ATTACK_KINDS,
-      {
-        self: MULTIATTACK_REFERENCE_SELF_MESSAGE,
-        duplicate: MULTIATTACK_REFERENCE_DUPLICATE_MESSAGE,
-        missing: MULTIATTACK_REFERENCE_MISSING_MESSAGE,
-        invalidKind: MULTIATTACK_REFERENCE_INVALID_KIND_MESSAGE,
-      },
-      seen,
-    )
-  })
+  if (!options.published) return
+  refinePublishedMultiattack(
+    action as Parameters<typeof refinePublishedMultiattack>[0],
+    section,
+    path,
+    actionsById as ReadonlyMap<
+      string,
+      { id?: string; kind?: string; spells?: readonly { spellId?: string }[] }
+    >,
+    bonusById as ReadonlyMap<string, { id?: string; kind?: string }>,
+    ctx,
+  )
 }
 
 function refineParryFollowUp(

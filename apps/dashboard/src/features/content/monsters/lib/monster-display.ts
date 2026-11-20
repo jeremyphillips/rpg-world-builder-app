@@ -451,7 +451,7 @@ function withTurnLimit(
   html: boolean,
   hasSavingThrow = false,
 ): string | undefined {
-  if (action.onceUntilNextTurn !== true) return body
+  if (action.kind === 'multiattack' || action.onceUntilNextTurn !== true) return body
   const sentence = formatOnceUntilNextTurnSentence({
     monsterName,
     kind: action.kind,

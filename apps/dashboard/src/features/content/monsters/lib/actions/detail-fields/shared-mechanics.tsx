@@ -61,6 +61,7 @@ import {
 import { monsterSpellComponentRequirementsField } from '../spell/monster-spell-component-form-fields'
 import { monsterWeaponDamageOverrideField } from '../weapon/monster-weapon-damage-override'
 import type { MonsterFormValues } from '../../monster-form-values'
+import { monsterMultiattackAttackFields } from '../multiattack/monster-multiattack-form-fields'
 import { monsterSpellCastAtLevelField } from '../spell/monster-spell-cast-at-level-form-fields'
 import { MONSTER_SPELL_PICKER_INTERCEPT } from '../../../components/form/spells/spell-picker-context'
 import {
@@ -518,22 +519,7 @@ export function monsterActionMechanicFields(input: {
     kindFields.push(monsterActionSaveSection(ctx, namePrefix, action.id))
   }
   if (action.kind === 'multiattack') {
-    kindFields.push({
-      kind: 'array',
-      name: 'steps',
-      heading: { label: 'Steps' },
-      addAction: { label: 'Add step' },
-      item: { header: { fallback: (index) => `Step ${index + 1}` } },
-      fields: [
-        { type: 'number', name: 'count', label: 'Count', min: 1 },
-        {
-          type: 'chips',
-          name: 'actionIds',
-          label: 'Attacks',
-          options: input.attackOptions,
-        },
-      ],
-    })
+    kindFields.push(...monsterMultiattackAttackFields({ attackOptions: input.attackOptions }))
   }
   return [...trigger, ...saveGroup, ...kindFields, ...usage]
 }

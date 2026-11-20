@@ -240,7 +240,9 @@ function applyTurnAndInvocationDraft(
   cleaned: Record<string, unknown>,
   section: 'actions' | 'bonusActions' | 'reactions' | 'legendaryActions',
 ): void {
-  if (cleaned.onceUntilNextTurn === true || cleaned.onceUntilNextTurn === 'true') {
+  if (cleaned.kind === 'multiattack') {
+    delete cleaned.onceUntilNextTurn
+  } else if (cleaned.onceUntilNextTurn === true || cleaned.onceUntilNextTurn === 'true') {
     cleaned.onceUntilNextTurn = true
   } else {
     delete cleaned.onceUntilNextTurn

@@ -1,5 +1,5 @@
 import {
-  formatMonsterMultiattack,
+  formatMonsterMultiattackResult,
   type CreatureEquipmentCatalog,
   type EquipmentInstance,
   type MagicPropertyDefinitionProvider,
@@ -76,7 +76,7 @@ export function buildMonsterMultiattackSentence(input: {
   equipmentCatalog: CreatureEquipmentCatalog
   magicPropertyProvider: MagicPropertyDefinitionProvider
 }): string {
-  return formatMonsterMultiattack({
+  const result = formatMonsterMultiattackResult({
     monsterName: input.monsterName,
     action: input.action,
     actions: input.actions,
@@ -84,6 +84,7 @@ export function buildMonsterMultiattackSentence(input: {
     equipmentCatalog: input.equipmentCatalog,
     magicPropertyProvider: input.magicPropertyProvider,
   })
+  return result.status === 'ready' ? result.sentence : ''
 }
 
 function renderMultiattackProse(

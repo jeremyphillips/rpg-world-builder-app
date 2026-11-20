@@ -63,6 +63,23 @@ export {
   MULTIATTACK_SECTION_MESSAGE,
   actionReferenceInvalidKindMessage,
 } from './reference-messages'
+export {
+  multiattackEligibilityKinds,
+  multiattackRowEligibleForPurpose,
+  type MultiattackEligibilityPurpose,
+} from './multiattack-eligibility'
+export { multiattackValidationMessages } from './multiattack-validation-messages'
+export {
+  isMultiattackAttackGroup,
+  isMultiattackUseClause,
+  type MultiattackAlternative,
+  type MultiattackAttackGroup,
+  type MultiattackDraftStep,
+  type MultiattackPublishedStep,
+  type MultiattackReplacement,
+  type MultiattackUseChoice,
+  type MultiattackUseSingle,
+} from './multiattack-schemas'
 export { actionsReferencingAction, stripReferencedActionId } from './action-references'
 export type { ReferencedActionRow } from './action-references'
 export { planMonsterActionRemoval, shapeShiftRows } from './action-removal-plan'

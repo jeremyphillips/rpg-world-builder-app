@@ -31,7 +31,9 @@ export function monsterActionActiveKeys(
         : section === 'bonusActions'
           ? monsterBonusActionDraftSchema
           : monsterActionDraftSchema
-  return variantKeys(schema, kind)
+  const keys = variantKeys(schema, kind)
+  if (kind === 'multiattack') return keys.filter((key) => key !== 'onceUntilNextTurn')
+  return keys
 }
 
 /** Authored reaction trigger prose, or undefined when the field is blank. */
