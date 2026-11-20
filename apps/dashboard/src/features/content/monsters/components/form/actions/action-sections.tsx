@@ -456,6 +456,9 @@ export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
           sections={sections}
           located={collection.isSelectedVisible ? located : null}
           rows={located ? rowsBySection[located.section] : actionRows}
+          weapons={weapons}
+          weaponActions={weaponActionReferences(values)}
+          allowAddWeapon={allowAddWeapon}
         />
       </MasterDetailGrid>
       <MasterDetailDeleteDialog

@@ -58,6 +58,7 @@ import { monsterFormAdvisoryDisplay } from '../../monster-form-advisory-presenta
 import { legendaryActionCategory } from '../legendary/legendary-action-category'
 import { leapDistanceFields } from '../leap-distance-options'
 import { legendaryActionDetailFields } from '../legendary/monster-legendary-action-fields'
+import type { MonsterActionAcquisitionChoice } from '../acquisition/monster-action-acquisition'
 import type { MonsterFormValues } from '../../monster-form-values'
 import {
   monsterActionMechanicFields,
@@ -428,7 +429,13 @@ function sharedAuthoringFields(input: {
       namePrefix,
       sharedCastingOptions: input.sharedCastingOptions,
       attackOptions: input.attackOptions ?? [],
+      actionRows: input.actionRows,
+      bonusActionRows: input.bonusActionRows,
       equipment: input.equipment ?? [],
+      weapons: input.weapons,
+      weaponActions: input.weaponActions,
+      allowAddWeapon: input.allowAddWeapon,
+      onAcquireAttack: input.onAcquireAttack,
       onCastingSourceBlocked: input.onCastingSourceBlocked,
     }),
     ...(monsterActionActiveKeys(action.kind, section).includes('onceUntilNextTurn')
@@ -447,6 +454,15 @@ export type MonsterActionDetailFieldsInput = {
   equipment?: MonsterFormValues['equipment']
   sharedCastingOptions: { value: string; label: string }[]
   attackOptions?: { value: string; label: string }[]
+  actionRows?: MonsterActionDraftRow[]
+  bonusActionRows?: MonsterActionDraftRow[]
+  weapons?: readonly { entryId: string; label: string; equipped: boolean }[]
+  weaponActions?: readonly { id: string; equipmentEntryId?: string }[]
+  allowAddWeapon?: boolean
+  onAcquireAttack?: (
+    section: MonsterActionSection,
+    choice: Exclude<MonsterActionAcquisitionChoice, { type: 'add-weapon' }>,
+  ) => void
   referenceOptions?: { value: string; label: string }[]
   sourceSpellOptions?: { value: string; label: string }[]
   onCastingSourceBlocked?: (message: string) => void

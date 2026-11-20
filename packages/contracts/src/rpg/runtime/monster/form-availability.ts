@@ -11,7 +11,12 @@ type FormAvailabilityRow = {
   kind?: string
   name?: string
   onlyInFormIds?: readonly string[]
-  steps?: readonly { actionIds?: readonly string[] }[]
+  steps?: readonly {
+    actionIds?: readonly string[]
+    kind?: string
+    actionId?: string
+    choices?: readonly { actionId?: string }[]
+  }[]
   actionIds?: readonly string[]
   followUpActionId?: string
 }
@@ -76,7 +81,16 @@ function actionIndex(body: FormAvailabilityBody): Map<string, FormAvailabilityRo
 }
 
 function referencedIds(row: FormAvailabilityRow): readonly string[] {
-  if (row.kind === 'multiattack') return (row.steps ?? []).flatMap((step) => step.actionIds ?? [])
+  if (row.kind === 'multiattack') {
+    return (row.steps ?? []).flatMap((step) => {
+      if (step.actionIds?.length) return step.actionIds
+      if (step.kind === 'use' && step.actionId) return [step.actionId]
+      if (step.kind === 'use' && step.choices) {
+        return step.choices.flatMap((choice) => (choice.actionId ? [choice.actionId] : []))
+      }
+      return []
+    })
+  }
   if (row.kind === 'action-reference') return row.actionIds ?? []
   if (row.kind === 'parry' && row.followUpActionId) return [row.followUpActionId]
   return []

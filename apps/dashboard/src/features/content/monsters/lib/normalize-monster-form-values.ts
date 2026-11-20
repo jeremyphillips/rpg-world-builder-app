@@ -236,6 +236,71 @@ function applySpellEntryDraft(cleaned: Record<string, unknown>): void {
   })
 }
 
+function applyMultiattackDraft(cleaned: Record<string, unknown>): void {
+  if (cleaned.kind !== 'multiattack') return
+
+  const keepLiteralTrue = (record: Record<string, unknown>, key: string) => {
+    if (record[key] === true) record[key] = true
+    else delete record[key]
+  }
+
+  const normalizeUseStep = (step: Record<string, unknown>) => {
+    if (step.kind !== 'use') return
+    if (step.mode !== 'choice') {
+      keepLiteralTrue(step, 'optional')
+      keepLiteralTrue(step, 'whenAvailable')
+      if (step.actionId === '') delete step.actionId
+    } else {
+      keepLiteralTrue(step, 'whenAvailable')
+    }
+  }
+
+  if (Array.isArray(cleaned.steps)) {
+    cleaned.steps = cleaned.steps.map((step) => {
+      if (!isRecord(step)) return step
+      const next = { ...step }
+      normalizeUseStep(next)
+      return next
+    })
+  }
+
+  if (isRecord(cleaned.replacement)) {
+    const replacement = { ...cleaned.replacement }
+    if (replacement.attackWord === true) replacement.attackWord = 'any'
+    if (replacement.attackWord !== 'any') delete replacement.attackWord
+    keepLiteralTrue(replacement, 'whenAvailable')
+    cleaned.replacement = replacement
+  }
+
+  if (isRecord(cleaned.alternative)) {
+    const alternative = { ...cleaned.alternative }
+    if (Array.isArray(alternative.steps)) {
+      alternative.steps = alternative.steps.map((step) => {
+        if (!isRecord(step)) return step
+        const next = { ...step }
+        normalizeUseStep(next)
+        return next
+      })
+    }
+    cleaned.alternative = alternative
+  }
+}
+
+function normalizeActionMovementDraft(cleaned: Record<string, unknown>): void {
+  if (!isRecord(cleaned.movement)) {
+    delete cleaned.movement
+    return
+  }
+  const allowance = cleaned.movement.allowance
+  if (allowance !== 'half-speed' && allowance !== 'speed') {
+    delete cleaned.movement
+    return
+  }
+  if (cleaned.movement.withoutOpportunityAttacks !== true) {
+    delete cleaned.movement.withoutOpportunityAttacks
+  }
+}
+
 function applyTurnAndInvocationDraft(
   cleaned: Record<string, unknown>,
   section: 'actions' | 'bonusActions' | 'reactions' | 'legendaryActions',
@@ -263,18 +328,7 @@ function applyTurnAndInvocationDraft(
   if (Array.isArray(cleaned.actionIds)) {
     cleaned.actionIds = cleaned.actionIds.filter((id) => typeof id === 'string' && id.length > 0)
   }
-  if (!isRecord(cleaned.movement)) {
-    delete cleaned.movement
-    return
-  }
-  const allowance = cleaned.movement.allowance
-  if (allowance !== 'half-speed' && allowance !== 'speed') {
-    delete cleaned.movement
-    return
-  }
-  if (cleaned.movement.withoutOpportunityAttacks !== true) {
-    delete cleaned.movement.withoutOpportunityAttacks
-  }
+  normalizeActionMovementDraft(cleaned)
 }
 
 function stabilizeDraftActionKeys(
@@ -339,6 +393,7 @@ function normalizeAction(
   omitEmptyOnHit(cleaned)
   applyReactionTriggerDraft(cleaned, section)
   applyTurnAndInvocationDraft(cleaned, section)
+  applyMultiattackDraft(cleaned)
   applyLimitedUseDraft(cleaned)
   if (cleaned.kind === 'shape-shift' && typeof cleaned.prerequisite === 'string') {
     const prerequisite = normalizePrerequisite(cleaned.prerequisite)

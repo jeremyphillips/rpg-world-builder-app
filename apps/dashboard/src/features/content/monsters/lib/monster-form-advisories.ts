@@ -1,5 +1,6 @@
 import {
   collectFormAvailabilityAdvisories,
+  isMultiattackAttackGroup,
   isWeaponEquipment,
   isWeaponProficientFromGrantSet,
   joinInlineMetadata,
@@ -116,6 +117,7 @@ function appendMultiattackAdvisories(
   const path = `${monsterFormSectionRowNamePrefix(section)}.${index}`
   const seen = new Set<string>()
   for (const step of action.steps ?? []) {
+    if (!isMultiattackAttackGroup(step)) continue
     for (const actionId of step.actionIds ?? []) {
       if (seen.has(actionId)) continue
       const target = sectionRows(values, 'actions').find((row) => row.id === actionId)

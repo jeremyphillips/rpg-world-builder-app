@@ -1,5 +1,7 @@
 import {
   formatMonsterMultiattackResult,
+  isMultiattackAttackGroup,
+  isMultiattackUseClause,
   type CreatureEquipmentCatalog,
   type EquipmentInstance,
   type MagicPropertyDefinitionProvider,
@@ -34,13 +36,22 @@ function isMultiattackDraft(
 function multiattackStepsReady(
   action: Extract<MonsterActionDraft, { kind: 'multiattack' }>,
 ): boolean {
-  return (action.steps ?? []).some(
-    (step) =>
-      typeof step.count === 'number' &&
-      step.count >= 1 &&
-      Array.isArray(step.actionIds) &&
-      step.actionIds.length > 0,
-  )
+  return (action.steps ?? []).some((step) => {
+    if (isMultiattackAttackGroup(step)) {
+      return (
+        typeof step.count === 'number' &&
+        step.count >= 1 &&
+        Array.isArray(step.actionIds) &&
+        step.actionIds.length > 0
+      )
+    }
+    if (!isMultiattackUseClause(step)) return false
+    if (step.mode === 'choice') {
+      return (step.choices ?? []).some((choice) => Boolean(choice.actionId))
+    }
+    return Boolean(step.actionId)
+    return false
+  })
 }
 
 export type MonsterActionMultiattackPreviewUnavailableContext = {
