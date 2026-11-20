@@ -54,12 +54,11 @@ import {
 } from './monster-multiattack-step-headers'
 import {
   monsterMultiattackChoiceRowFields,
-  monsterMultiattackUseStepSpellField,
+  monsterMultiattackUseStepActionSpellDependent,
 } from './monster-multiattack-choice-row-fields'
 import {
   multiattackAttackPickerDependsOn,
   multiattackExecutableAttackOptionsFromWatched,
-  multiattackExecutableUseOptionsFromWatched,
   multiattackPrerequisiteOptionsFromWatched,
   multiattackPrimarySequenceHeading,
   multiattackReplacementChoiceRowSectionRowsDependsOn,
@@ -110,31 +109,19 @@ function monsterMultiattackUseClauseFields(input: {
       render: ({ namePrefix }) => <MonsterMultiattackUseStepKindSlot namePrefix={namePrefix} />,
     },
     {
-      type: 'select',
-      name: 'actionId',
-      label: MONSTER_MULTIATTACK_CHOICE_ACTION_LABEL,
-      placeholder: 'Choose',
+      kind: 'group',
       visibility: singleUseVisible,
-      options: [],
-      optionsResolve: {
-        dependsOn: ['actionId', input.stepSectionRowsDependsOn],
-        optionsWhen: (watched) =>
-          multiattackExecutableUseOptionsFromWatched({
-            section: input.section,
-            multiattackId: input.action.id,
-            ctx: input.ctx,
-            watched,
-            sectionRowsDependsOn: input.stepSectionRowsDependsOn,
-            fallbackRows: input.actionRows,
-          }),
-      },
+      fields: [
+        monsterMultiattackUseStepActionSpellDependent({
+          section: input.section,
+          multiattackId: input.action.id,
+          ctx: input.ctx,
+          sectionRowsDependsOn: input.stepSectionRowsDependsOn,
+          actionRows: input.actionRows,
+          spellCatalogById: input.spellCatalogById,
+        }),
+      ],
     },
-    monsterMultiattackUseStepSpellField({
-      sectionRowsDependsOn: input.stepSectionRowsDependsOn,
-      actionRows: input.actionRows,
-      spellCatalogById: input.spellCatalogById,
-      visibility: singleUseVisible,
-    }),
     {
       kind: 'slot',
       name: 'multiattackUseStepChoiceAcquisition',

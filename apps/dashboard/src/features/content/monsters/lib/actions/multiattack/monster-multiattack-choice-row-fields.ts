@@ -1,5 +1,5 @@
 import type { Spell } from '@rpg/contracts'
-import { combineFieldVisibilityAll, type FieldVisibility, type FormItem } from '@rpg/ui/form'
+import type { DependentChrome, FieldConfig, FieldVisibility, FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import type { MonsterActionSection } from '../references/monster-action-equipment-references'
@@ -28,7 +28,7 @@ function spellSource(
   return row?.kind === 'spell' ? row : undefined
 }
 
-function spellActionOnlyVisibility(input: {
+export function multiattackSpellActionOnlyVisibility(input: {
   sectionRowsDependsOn: string
   fallbackActionRows?: readonly MonsterActionDraftRow[]
 }): FieldVisibility {
@@ -47,9 +47,15 @@ function spellPickerField(input: {
   sectionRowsDependsOn: string
   fallbackActionRows?: readonly MonsterActionDraftRow[]
   spellCatalogById?: ReadonlyMap<string, Spell>
+  /** Parent `kind: 'dependent'` owns spell-on-action visibility when true. */
+  dependentsGated?: boolean
   visibility?: FieldVisibility
 }): FormItem {
-  const spellVisibility = spellActionOnlyVisibility(input)
+  const spellContext = {
+    sectionRowsDependsOn: input.sectionRowsDependsOn,
+    fallbackActionRows: input.fallbackActionRows,
+  }
+  const spellVisibility = multiattackSpellActionOnlyVisibility(spellContext)
   return {
     type: 'select',
     name: 'spellId',
@@ -62,13 +68,17 @@ function spellPickerField(input: {
       expandWhenPopulated: true,
       actionSubject: 'specific spell',
     },
-    visibility: input.visibility
-      ? combineFieldVisibilityAll(input.visibility, spellVisibility)
-      : spellVisibility,
+    ...(!input.dependentsGated && {
+      visibility: input.visibility ? { ...spellVisibility, ...input.visibility } : spellVisibility,
+    }),
+    ...(input.dependentsGated &&
+      input.visibility && {
+        visibility: input.visibility,
+      }),
     optionsResolve: {
       dependsOn: ['actionId', input.sectionRowsDependsOn],
       optionsWhen: (watched) => {
-        const rows = multiattackRowsFromSpellWatch(watched, input)
+        const rows = multiattackRowsFromSpellWatch(watched, spellContext)
         return multiattackSpellOptionsForAction(
           typeof watched.actionId === 'string' ? watched.actionId : '',
           rows,
@@ -79,7 +89,7 @@ function spellPickerField(input: {
     interactivity: {
       dependsOn: ['actionId', input.sectionRowsDependsOn],
       disabledWhen: (watched) => {
-        const rows = multiattackRowsFromSpellWatch(watched, input)
+        const rows = multiattackRowsFromSpellWatch(watched, spellContext)
         const source = spellSource(
           typeof watched.actionId === 'string' ? watched.actionId : '',
           rows,
@@ -92,7 +102,7 @@ function spellPickerField(input: {
       resolve: {
         dependsOn: ['actionId', input.sectionRowsDependsOn],
         hintWhen: (watched) => {
-          const rows = multiattackRowsFromSpellWatch(watched, input)
+          const rows = multiattackRowsFromSpellWatch(watched, spellContext)
           const source = spellSource(
             typeof watched.actionId === 'string' ? watched.actionId : '',
             rows,
@@ -123,6 +133,107 @@ function multiattackRowsFromSpellWatch(
   return live
 }
 
+type MultiattackActionSpellSpellContext = {
+  sectionRowsDependsOn: string
+  fallbackActionRows?: readonly MonsterActionDraftRow[]
+  spellCatalogById?: ReadonlyMap<string, Spell>
+}
+
+/** Action controller + spell dependents with shared spell-on-action visibility. */
+export function monsterMultiattackActionSpellDependent(
+  input: {
+    actionField: FieldConfig
+    chrome: DependentChrome
+    visibility?: FieldVisibility
+  } & MultiattackActionSpellSpellContext,
+): FormItem {
+  const spellContext = {
+    sectionRowsDependsOn: input.sectionRowsDependsOn,
+    fallbackActionRows: input.fallbackActionRows,
+  }
+  return {
+    kind: 'dependent',
+    ...(input.visibility ? { visibility: input.visibility } : {}),
+    controller: input.actionField,
+    dependents: {
+      chrome: input.chrome,
+      visibility: multiattackSpellActionOnlyVisibility(spellContext),
+      fields: [
+        spellPickerField({
+          ...spellContext,
+          spellCatalogById: input.spellCatalogById,
+          dependentsGated: true,
+        }),
+      ],
+    },
+  }
+}
+
+function buildMultiattackChoiceActionField(input: {
+  section: MonsterActionSection
+  sectionRowsDependsOn: string
+  actionRows: readonly MonsterActionDraftRow[]
+  actionPicker:
+    | {
+        mode: 'use'
+        multiattackId: string
+        ctx: ContentFormCtx
+      }
+    | {
+        mode: 'replacement'
+        multiattackId: string
+        ctx: ContentFormCtx
+      }
+}): FieldConfig {
+  if (input.actionPicker.mode === 'replacement') {
+    return {
+      type: 'select',
+      name: 'actionId',
+      label: MONSTER_MULTIATTACK_CHOICE_ACTION_LABEL,
+      placeholder: 'Choose',
+      options: [],
+      optionsResolve: {
+        dependsOn: [
+          'actionId',
+          'spellId',
+          '../../replacesActionId',
+          '../../../steps',
+          '../../choices',
+          input.sectionRowsDependsOn,
+        ],
+        optionsWhen: (watched) =>
+          multiattackReplacementChoiceOptionsFromWatched({
+            rows: input.actionRows,
+            section: input.section,
+            sectionRowsDependsOn: input.sectionRowsDependsOn,
+            multiattackId: input.actionPicker.multiattackId,
+            ctx: input.actionPicker.ctx,
+            watched,
+          }),
+      },
+    }
+  }
+  return {
+    type: 'select',
+    name: 'actionId',
+    label: MONSTER_MULTIATTACK_CHOICE_ACTION_LABEL,
+    placeholder: 'Choose',
+    options: [],
+    optionsResolve: {
+      dependsOn: ['actionId', input.sectionRowsDependsOn],
+      optionsWhen: (watched) =>
+        multiattackExecutableUseOptionsFromWatched({
+          section: input.section,
+          multiattackId: input.actionPicker.multiattackId,
+          ctx: input.actionPicker.ctx,
+          watched,
+          sectionRowsDependsOn: input.sectionRowsDependsOn,
+          fallbackRows: input.actionRows,
+        }),
+    },
+  }
+}
+
 /** Shared action + optional spell row for replacement choices and use-choice rows. */
 export function monsterMultiattackChoiceRowFields(input: {
   section: MonsterActionSection
@@ -141,75 +252,48 @@ export function monsterMultiattackChoiceRowFields(input: {
         ctx: ContentFormCtx
       }
 }): FormItem[] {
-  const actionField: FormItem =
-    input.actionPicker.mode === 'replacement'
-      ? {
-          type: 'select',
-          name: 'actionId',
-          label: MONSTER_MULTIATTACK_CHOICE_ACTION_LABEL,
-          placeholder: 'Choose',
-          options: [],
-          optionsResolve: {
-            dependsOn: [
-              'actionId',
-              'spellId',
-              '../../replacesActionId',
-              '../../../steps',
-              '../../choices',
-              input.sectionRowsDependsOn,
-            ],
-            optionsWhen: (watched) =>
-              multiattackReplacementChoiceOptionsFromWatched({
-                rows: input.actionRows,
-                section: input.section,
-                sectionRowsDependsOn: input.sectionRowsDependsOn,
-                multiattackId: input.actionPicker.multiattackId,
-                ctx: input.actionPicker.ctx,
-                watched,
-              }),
-          },
-        }
-      : {
-          type: 'select',
-          name: 'actionId',
-          label: MONSTER_MULTIATTACK_CHOICE_ACTION_LABEL,
-          placeholder: 'Choose',
-          options: [],
-          optionsResolve: {
-            dependsOn: ['actionId', input.sectionRowsDependsOn],
-            optionsWhen: (watched) =>
-              multiattackExecutableUseOptionsFromWatched({
-                section: input.section,
-                multiattackId: input.actionPicker.multiattackId,
-                ctx: input.actionPicker.ctx,
-                watched,
-                sectionRowsDependsOn: input.sectionRowsDependsOn,
-                fallbackRows: input.actionRows,
-              }),
-          },
-        }
-
   return [
-    actionField,
-    spellPickerField({
+    monsterMultiattackActionSpellDependent({
+      actionField: buildMultiattackChoiceActionField(input),
       sectionRowsDependsOn: input.sectionRowsDependsOn,
       fallbackActionRows: input.actionRows,
       spellCatalogById: input.spellCatalogById,
+      chrome: 'none',
     }),
   ]
 }
 
-export function monsterMultiattackUseStepSpellField(input: {
+export function monsterMultiattackUseStepActionSpellDependent(input: {
+  section: MonsterActionSection
+  multiattackId: string
+  ctx: ContentFormCtx
   sectionRowsDependsOn: string
   actionRows: readonly MonsterActionDraftRow[]
   spellCatalogById?: ReadonlyMap<string, Spell>
-  /** Extra gate (e.g. single-use clause); spell-on-action visibility is always applied. */
-  visibility: FieldVisibility
 }): FormItem {
-  return spellPickerField({
+  return monsterMultiattackActionSpellDependent({
+    actionField: {
+      type: 'select',
+      name: 'actionId',
+      label: MONSTER_MULTIATTACK_CHOICE_ACTION_LABEL,
+      placeholder: 'Choose',
+      options: [],
+      optionsResolve: {
+        dependsOn: ['actionId', input.sectionRowsDependsOn],
+        optionsWhen: (watched) =>
+          multiattackExecutableUseOptionsFromWatched({
+            section: input.section,
+            multiattackId: input.multiattackId,
+            ctx: input.ctx,
+            watched,
+            sectionRowsDependsOn: input.sectionRowsDependsOn,
+            fallbackRows: input.actionRows,
+          }),
+      },
+    },
     sectionRowsDependsOn: input.sectionRowsDependsOn,
     fallbackActionRows: input.actionRows,
     spellCatalogById: input.spellCatalogById,
-    visibility: input.visibility,
+    chrome: 'rail',
   })
 }
