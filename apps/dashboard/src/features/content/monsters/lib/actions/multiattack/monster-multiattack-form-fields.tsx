@@ -47,8 +47,22 @@ import {
 import { MonsterMultiattackEmptyAttacksSlot } from '../../../components/form/actions/multiattack/multiattack-empty-attacks.slot'
 import { MonsterMultiattackPersistSlot } from '../../../components/form/actions/multiattack/multiattack-persist.slot'
 import { MonsterMultiattackUseStepKindSlot } from '../../../components/form/actions/multiattack/multiattack-use-step-kind.slot'
-import { monsterMultiattackChoiceRowFields } from './monster-multiattack-choice-row-fields'
-import { multiattackPrimarySequenceHeading } from './monster-multiattack-form-options'
+import {
+  monsterMultiattackChoiceRowFields,
+  monsterMultiattackUseStepSpellField,
+} from './monster-multiattack-choice-row-fields'
+import {
+  multiattackAttackPickerDependsOn,
+  multiattackExecutableAttackOptionsFromWatched,
+  multiattackExecutableUseOptionsFromWatched,
+  multiattackPrerequisiteOptionsFromWatched,
+  multiattackPrimarySequenceHeading,
+  multiattackReplacementChoiceRowSectionRowsDependsOn,
+  multiattackRowScopeSectionRowsDependsOn,
+  multiattackStepScopeSectionRowsDependsOn,
+  multiattackTargetAttackOptionsFromWatched,
+  multiattackUseChoiceRowSectionRowsDependsOn,
+} from './monster-multiattack-form-options'
 
 type MultiattackDraft = Extract<MonsterActionDraftRow, { kind: 'multiattack' }>
 
@@ -75,9 +89,13 @@ const choiceUseVisible: FieldVisibility = {
 }
 
 function monsterMultiattackUseClauseFields(input: {
-  useOptions: { value: string; label: string }[]
+  section: MonsterActionSection
+  action: MultiattackDraft
+  ctx: ContentFormCtx
   actionRows: readonly MonsterActionDraftRow[]
   spellCatalogById?: ReadonlyMap<string, Spell>
+  stepSectionRowsDependsOn: string
+  useChoiceSectionRowsDependsOn: string
 }): FormItem[] {
   return [
     {
@@ -102,8 +120,26 @@ function monsterMultiattackUseClauseFields(input: {
       label: MONSTER_MULTIATTACK_CHOICE_ACTION_LABEL,
       placeholder: 'Choose',
       visibility: singleUseVisible,
-      options: input.useOptions,
+      options: [],
+      optionsResolve: {
+        dependsOn: ['actionId', input.stepSectionRowsDependsOn],
+        optionsWhen: (watched) =>
+          multiattackExecutableUseOptionsFromWatched({
+            section: input.section,
+            multiattackId: input.action.id,
+            ctx: input.ctx,
+            watched,
+            sectionRowsDependsOn: input.stepSectionRowsDependsOn,
+            fallbackRows: input.actionRows,
+          }),
+      },
     },
+    monsterMultiattackUseStepSpellField({
+      sectionRowsDependsOn: input.stepSectionRowsDependsOn,
+      actionRows: input.actionRows,
+      spellCatalogById: input.spellCatalogById,
+      visibility: singleUseVisible,
+    }),
     {
       type: 'number',
       name: 'count',
@@ -129,28 +165,25 @@ function monsterMultiattackUseClauseFields(input: {
       addAction: { label: MONSTER_MULTIATTACK_ADD_CHOICE_LABEL },
       item: { headerVisibility: 'hidden', header: { fallback: () => '' } },
       fields: monsterMultiattackChoiceRowFields({
-        actionOptions: input.useOptions,
+        section: input.section,
+        sectionRowsDependsOn: input.useChoiceSectionRowsDependsOn,
         actionRows: input.actionRows,
         spellCatalogById: input.spellCatalogById,
+        actionPicker: { mode: 'use', multiattackId: input.action.id, ctx: input.ctx },
       }),
     },
-    ...monsterMultiattackChoiceRowFields({
-      actionOptions: input.useOptions,
-      actionRows: input.actionRows,
-      spellCatalogById: input.spellCatalogById,
-    })
-      .filter((field) => 'name' in field && field.name === 'spellId')
-      .map((field) => ({ ...field, visibility: singleUseVisible })),
   ]
 }
 
 function monsterMultiattackStepsArray(input: {
+  section: MonsterActionSection
   action: MultiattackDraft
-  attackOptions: { value: string; label: string }[]
-  useOptions: { value: string; label: string }[]
+  ctx: ContentFormCtx
   actionRows: readonly MonsterActionDraftRow[]
   spellCatalogById?: ReadonlyMap<string, Spell>
 }): FormItem {
+  const stepSectionRowsDependsOn = multiattackStepScopeSectionRowsDependsOn(input.section)
+  const useChoiceSectionRowsDependsOn = multiattackUseChoiceRowSectionRowsDependsOn(input.section)
   const config = {
     kind: 'array' as const,
     name: 'steps',
@@ -193,7 +226,18 @@ function monsterMultiattackStepsArray(input: {
         name: 'actionIds',
         label: MONSTER_MULTIATTACK_ATTACKS_PICKER_LABEL,
         visibility: attackGroupVisible,
-        options: input.attackOptions,
+        options: [],
+        optionsResolve: {
+          dependsOn: [...multiattackAttackPickerDependsOn(input.section)],
+          optionsWhen: (watched) =>
+            multiattackExecutableAttackOptionsFromWatched({
+              section: input.section,
+              multiattackId: input.action.id,
+              ctx: input.ctx,
+              watched,
+              fallbackRows: input.actionRows,
+            }),
+        },
         hint: {
           resolve: {
             dependsOn: ['actionIds'],
@@ -205,21 +249,30 @@ function monsterMultiattackStepsArray(input: {
           },
         },
       },
-      ...monsterMultiattackUseClauseFields(input),
+      ...monsterMultiattackUseClauseFields({
+        section: input.section,
+        action: input.action,
+        ctx: input.ctx,
+        actionRows: input.actionRows,
+        spellCatalogById: input.spellCatalogById,
+        stepSectionRowsDependsOn,
+        useChoiceSectionRowsDependsOn,
+      }),
     ],
   }
   return config as unknown as FormItem
 }
 
 function monsterMultiattackReplacementGroup(input: {
+  section: MonsterActionSection
   action: MultiattackDraft
-  targetAttackOptions: { value: string; label: string }[]
-  actionRows: readonly MonsterActionDraftRow[]
   ctx: ContentFormCtx
+  actionRows: readonly MonsterActionDraftRow[]
   spellCatalogById?: ReadonlyMap<string, Spell>
   canConfigureReplacement: boolean
   replacementCountMax?: number
 }): FormItem {
+  const rowSectionRowsDependsOn = multiattackRowScopeSectionRowsDependsOn(input.section)
   const hasAlternative = input.action.alternative !== undefined
   const staticReplacementCountDeps: string[] = [
     'replacement.count',
@@ -274,7 +327,16 @@ function monsterMultiattackReplacementGroup(input: {
         name: 'replacement.replacesActionId',
         label: MONSTER_MULTIATTACK_TARGET_ATTACK_LABEL,
         placeholder: 'Choose',
-        options: input.targetAttackOptions,
+        options: [],
+        optionsResolve: {
+          dependsOn: ['../../steps', '../../replacement', rowSectionRowsDependsOn],
+          optionsWhen: (watched) =>
+            multiattackTargetAttackOptionsFromWatched({
+              section: input.section,
+              ctx: input.ctx,
+              watched,
+            }),
+        },
         optionalDisclosure: {
           intent: 'add',
           addLabel: MONSTER_MULTIATTACK_ADD_TARGET_ATTACK_LABEL,
@@ -316,10 +378,11 @@ function monsterMultiattackReplacementGroup(input: {
         addAction: { label: MONSTER_MULTIATTACK_ADD_CHOICE_LABEL },
         item: { headerVisibility: 'hidden', header: { fallback: () => '' } },
         fields: monsterMultiattackChoiceRowFields({
-          actionOptions: [],
+          section: input.section,
+          sectionRowsDependsOn: multiattackReplacementChoiceRowSectionRowsDependsOn(input.section),
           actionRows: input.actionRows,
           spellCatalogById: input.spellCatalogById,
-          replacementChoicePicker: { multiattackId: input.action.id, ctx: input.ctx },
+          actionPicker: { mode: 'replacement', multiattackId: input.action.id, ctx: input.ctx },
         }),
       },
     ],
@@ -327,10 +390,9 @@ function monsterMultiattackReplacementGroup(input: {
 }
 
 function monsterMultiattackAlternativeGroup(input: {
+  section: MonsterActionSection
   action: MultiattackDraft
-  attackOptions: { value: string; label: string }[]
-  useOptions: { value: string; label: string }[]
-  prerequisiteOptions: { value: string; label: string }[]
+  ctx: ContentFormCtx
   actionRows: readonly MonsterActionDraftRow[]
   spellCatalogById?: ReadonlyMap<string, Spell>
 }): FormItem {
@@ -355,14 +417,27 @@ function monsterMultiattackAlternativeGroup(input: {
         name: 'alternative.afterUsingActionId',
         label: MONSTER_MULTIATTACK_ONLY_AFTER_USING_LABEL,
         placeholder: MONSTER_MULTIATTACK_NO_PREREQUISITE,
-        options: input.prerequisiteOptions,
+        options: [],
+        optionsResolve: {
+          dependsOn: [
+            multiattackRowScopeSectionRowsDependsOn(input.section),
+            '../../../bonusActions',
+          ],
+          optionsWhen: (watched) =>
+            multiattackPrerequisiteOptionsFromWatched({
+              section: input.section,
+              multiattackId: input.action.id,
+              ctx: input.ctx,
+              watched,
+            }),
+        },
         optionalDisclosure: { intent: 'add', actionSubject: 'prerequisite' },
       },
       {
         ...monsterMultiattackStepsArray({
+          section: input.section,
           action: input.action,
-          attackOptions: input.attackOptions,
-          useOptions: input.useOptions,
+          ctx: input.ctx,
           actionRows: input.actionRows,
           spellCatalogById: input.spellCatalogById,
         }),
@@ -435,26 +510,25 @@ export function monsterMultiattackFormFields(input: {
   return [
     persist,
     monsterMultiattackStepsArray({
+      section: input.section,
       action: input.action,
-      attackOptions: input.attackOptions,
-      useOptions: input.useOptions,
+      ctx: input.ctx,
       actionRows: input.actionRows,
       spellCatalogById: input.ctx.spellCatalogById,
     }),
     monsterMultiattackReplacementGroup({
+      section: input.section,
       action: input.action,
-      targetAttackOptions: input.targetAttackOptions,
-      actionRows: input.actionRows,
       ctx: input.ctx,
+      actionRows: input.actionRows,
       spellCatalogById: input.ctx.spellCatalogById,
       canConfigureReplacement: input.canConfigureReplacement,
       replacementCountMax: input.replacementCountMax,
     }),
     monsterMultiattackAlternativeGroup({
+      section: input.section,
       action: input.action,
-      attackOptions: input.attackOptions,
-      useOptions: input.useOptions,
-      prerequisiteOptions: input.prerequisiteOptions,
+      ctx: input.ctx,
       actionRows: input.actionRows,
       spellCatalogById: input.ctx.spellCatalogById,
     }),

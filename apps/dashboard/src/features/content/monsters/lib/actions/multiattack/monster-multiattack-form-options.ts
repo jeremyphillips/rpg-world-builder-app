@@ -18,12 +18,219 @@ import {
   MONSTER_MULTIATTACK_ATTACKS_LABEL,
   MONSTER_MULTIATTACK_SEQUENCE_LABEL,
 } from '../../monster-form-labels'
+import type { MonsterActionSection } from '../references/monster-action-equipment-references'
+import { monsterFormSectionRowsFieldName } from '../monster-action-section-access'
 import type { MonsterActionDraftRow } from '../monster-action-presets'
 import { monsterActionEditorTitles } from '../monster-action-editor-title'
 import type { MonsterFormValues } from '../../monster-form-values'
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 
 type Option = { value: string; label: string }
+
+function multiattackSectionRowsFieldTail(section: MonsterActionSection): string {
+  const fieldName = monsterFormSectionRowsFieldName(section)
+  return fieldName.includes('.') ? fieldName.slice(fieldName.lastIndexOf('.') + 1) : fieldName
+}
+
+/** Watches the owning section's rows from a multiattack primary step field (`steps.0.*`). */
+export function multiattackStepScopeSectionRowsDependsOn(section: MonsterActionSection): string {
+  return `../../../../${multiattackSectionRowsFieldTail(section)}`
+}
+
+/** Watches section rows from a use-choice row inside a step (`steps.0.choices.0.*`). */
+export function multiattackUseChoiceRowSectionRowsDependsOn(section: MonsterActionSection): string {
+  return `../../../../../${multiattackSectionRowsFieldTail(section)}`
+}
+
+/** Watches the section's rows from a multiattack row group (`replacement.*`, `alternative.*`). */
+export function multiattackRowScopeSectionRowsDependsOn(section: MonsterActionSection): string {
+  return `../../../${multiattackSectionRowsFieldTail(section)}`
+}
+
+/** Watches section rows from a replacement choice row (`replacement.choices.0.*`). */
+export function multiattackReplacementChoiceRowSectionRowsDependsOn(
+  section: MonsterActionSection,
+): string {
+  return `../../../../../${multiattackSectionRowsFieldTail(section)}`
+}
+
+export const MULTIATTACK_ROW_SCOPE_BONUS_ROWS_DEPENDS_ON = '../../../bonusActions' as const
+export const MULTIATTACK_STEP_SCOPE_BONUS_ROWS_DEPENDS_ON = '../../../../bonusActions' as const
+export const MULTIATTACK_REPLACEMENT_CHOICE_BONUS_ROWS_DEPENDS_ON =
+  '../../../../../bonusActions' as const
+
+function multiattackBonusRowsDependsOn(sectionRowsDependsOn: string): string {
+  if (sectionRowsDependsOn.includes('../../../../../')) {
+    return MULTIATTACK_REPLACEMENT_CHOICE_BONUS_ROWS_DEPENDS_ON
+  }
+  if (sectionRowsDependsOn.includes('../../../../')) {
+    return MULTIATTACK_STEP_SCOPE_BONUS_ROWS_DEPENDS_ON
+  }
+  return MULTIATTACK_ROW_SCOPE_BONUS_ROWS_DEPENDS_ON
+}
+
+export function multiattackWatchedSectionRows(
+  watched: Record<string, unknown>,
+  dependsKey: string,
+): MonsterActionDraftRow[] | undefined {
+  if (!(dependsKey in watched)) return undefined
+  const value = watched[dependsKey]
+  if (value === undefined) return undefined
+  return Array.isArray(value) ? (value as MonsterActionDraftRow[]) : []
+}
+
+export function multiattackDraftRowsFromWatched(
+  watched: Record<string, unknown>,
+  dependsKey: string,
+): MonsterActionDraftRow[] {
+  return multiattackWatchedSectionRows(watched, dependsKey) ?? []
+}
+
+export function multiattackRowsWithFallback(
+  watched: Record<string, unknown>,
+  dependsKey: string,
+  fallbackRows?: readonly MonsterActionDraftRow[],
+): MonsterActionDraftRow[] {
+  const fallback = [...(fallbackRows ?? [])]
+  const watchedRows = multiattackWatchedSectionRows(watched, dependsKey)
+  if (watchedRows === undefined) return fallback
+  if (watchedRows.length === 0 && fallback.length > 0) return fallback
+  return watchedRows
+}
+
+function multiattackEligibilityValues(
+  section: MonsterActionSection,
+  sectionRows: readonly MonsterActionDraftRow[],
+  bonusRows: readonly MonsterActionDraftRow[],
+): MonsterFormValues {
+  if (section === 'bonusActions') {
+    return { bonusActions: [...sectionRows] } as MonsterFormValues
+  }
+  if (section === 'reactions') {
+    return { actions: [...sectionRows], reactions: [...sectionRows] } as MonsterFormValues
+  }
+  if (section === 'legendaryActions') {
+    return { legendaryActions: { actions: [...sectionRows] } } as MonsterFormValues
+  }
+  return { actions: [...sectionRows], bonusActions: [...bonusRows] } as MonsterFormValues
+}
+
+export function multiattackAttackPickerRowsFromWatched(
+  section: MonsterActionSection,
+  watched: Record<string, unknown>,
+): MonsterActionDraftRow[] {
+  if (section === 'reactions') {
+    return multiattackDraftRowsFromWatched(
+      watched,
+      multiattackStepScopeSectionRowsDependsOn('actions'),
+    )
+  }
+  return multiattackDraftRowsFromWatched(watched, multiattackStepScopeSectionRowsDependsOn(section))
+}
+
+export function multiattackAttackPickerDependsOn(section: MonsterActionSection): readonly string[] {
+  const deps = [multiattackStepScopeSectionRowsDependsOn(section)]
+  if (section === 'reactions') {
+    deps.push(multiattackStepScopeSectionRowsDependsOn('actions'))
+  }
+  return deps
+}
+
+export function multiattackExecutableAttackOptionsFromWatched(input: {
+  section: MonsterActionSection
+  multiattackId: string
+  ctx: ContentFormCtx
+  watched: Record<string, unknown>
+  fallbackRows?: readonly MonsterActionDraftRow[]
+}): Option[] {
+  const sectionKey =
+    input.section === 'reactions'
+      ? multiattackStepScopeSectionRowsDependsOn('actions')
+      : multiattackStepScopeSectionRowsDependsOn(input.section)
+  const rows = multiattackRowsWithFallback(input.watched, sectionKey, input.fallbackRows)
+  const bonusRows = multiattackDraftRowsFromWatched(
+    input.watched,
+    MULTIATTACK_STEP_SCOPE_BONUS_ROWS_DEPENDS_ON,
+  )
+  return multiattackExecutableAttackOptions(
+    rows,
+    input.multiattackId,
+    multiattackEligibilityValues(input.section, rows, bonusRows),
+    input.ctx,
+  )
+}
+
+export function multiattackExecutableUseOptionsFromWatched(input: {
+  section: MonsterActionSection
+  multiattackId: string
+  ctx: ContentFormCtx
+  watched: Record<string, unknown>
+  sectionRowsDependsOn: string
+  fallbackRows?: readonly MonsterActionDraftRow[]
+}): Option[] {
+  const rows = multiattackRowsWithFallback(
+    input.watched,
+    input.sectionRowsDependsOn,
+    input.fallbackRows,
+  )
+  const bonusRows = multiattackDraftRowsFromWatched(
+    input.watched,
+    multiattackBonusRowsDependsOn(input.sectionRowsDependsOn),
+  )
+  return multiattackExecutableUseOptions(
+    rows,
+    input.multiattackId,
+    multiattackEligibilityValues(input.section, rows, bonusRows),
+    input.ctx,
+  )
+}
+
+export function multiattackPrerequisiteOptionsFromWatched(input: {
+  section: MonsterActionSection
+  multiattackId: string
+  ctx: ContentFormCtx
+  watched: Record<string, unknown>
+}): Option[] {
+  const rows = multiattackDraftRowsFromWatched(
+    input.watched,
+    multiattackRowScopeSectionRowsDependsOn(input.section),
+  )
+  const bonusRows = multiattackDraftRowsFromWatched(
+    input.watched,
+    MULTIATTACK_ROW_SCOPE_BONUS_ROWS_DEPENDS_ON,
+  )
+  return multiattackPrerequisiteOptions(
+    rows,
+    bonusRows,
+    input.multiattackId,
+    multiattackEligibilityValues(input.section, rows, bonusRows),
+    input.ctx,
+  )
+}
+
+export function multiattackTargetAttackOptionsFromWatched(input: {
+  section: MonsterActionSection
+  ctx: ContentFormCtx
+  watched: Record<string, unknown>
+}): Option[] {
+  const steps = input.watched['../../steps']
+  const rows = multiattackDraftRowsFromWatched(
+    input.watched,
+    multiattackRowScopeSectionRowsDependsOn(input.section),
+  )
+  const replacement =
+    input.watched['../../replacement'] && typeof input.watched['../../replacement'] === 'object'
+      ? (input.watched['../../replacement'] as MultiattackReplacement)
+      : undefined
+  const eligibilityValues = multiattackEligibilityValues(input.section, rows, [])
+  return multiattackTargetAttackOptionsForReplacement(
+    Array.isArray(steps) ? (steps as MultiattackDraftStep[]) : [],
+    rows,
+    eligibilityValues,
+    input.ctx,
+    replacement,
+  )
+}
 
 export function multiattackExecutableAttackOptions(
   rows: readonly MonsterActionDraftRow[],
@@ -136,10 +343,14 @@ export function multiattackReplacementChoiceOptions(
 
 export function multiattackReplacementChoiceOptionsFromWatched(input: {
   rows: readonly MonsterActionDraftRow[]
+  section: MonsterActionSection
+  sectionRowsDependsOn: string
   multiattackId: string
   ctx: ContentFormCtx
   watched: Record<string, unknown>
 }): Option[] {
+  const liveRows = multiattackWatchedSectionRows(input.watched, input.sectionRowsDependsOn)
+  const rows = liveRows && liveRows.length > input.rows.length ? liveRows : [...input.rows]
   const steps = Array.isArray(input.watched['../../../steps'])
     ? (input.watched['../../../steps'] as MultiattackDraftStep[])
     : []
@@ -151,10 +362,15 @@ export function multiattackReplacementChoiceOptionsFromWatched(input: {
   const actionId = typeof input.watched.actionId === 'string' ? input.watched.actionId : undefined
   const spellId = typeof input.watched.spellId === 'string' ? input.watched.spellId : undefined
 
-  const eligibilityValues = { actions: input.rows } as MonsterFormValues
+  const bonusRows = multiattackDraftRowsFromWatched(
+    input.watched,
+    multiattackBonusRowsDependsOn(input.sectionRowsDependsOn),
+  )
+
+  const eligibilityValues = multiattackEligibilityValues(input.section, rows, bonusRows)
 
   return multiattackReplacementChoiceSelectOptions({
-    rows: input.rows,
+    rows,
     multiattackId: input.multiattackId,
     values: eligibilityValues,
     ctx: input.ctx,

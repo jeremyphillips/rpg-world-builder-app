@@ -36,6 +36,15 @@ describe('resolveDependsOnWatchName', () => {
     expect(resolveDependsOnWatchName('../../../hover', 'forms.definedForms.0')).toBe('hover')
   })
 
+  it('resolves monster multiattack replacement choice rows from form actions', () => {
+    expect(
+      resolveDependsOnWatchName('../../../../../actions', 'actions.0.replacement.choices.0'),
+    ).toBe('actions')
+    expect(resolveDependsOnWatchName('../../../steps', 'actions.0.replacement.choices.0')).toBe(
+      'actions.0.steps',
+    )
+  })
+
   it('resolves target kind from nested monster action requirement arrays', () => {
     expect(resolveDependsOnWatchName('../kind', 'actions.0.resolution.target.requirements')).toBe(
       'actions.0.resolution.target.kind',

@@ -1,48 +1,82 @@
 import { describe, expect, it } from 'vitest'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
-import type { MonsterFormValues } from '../../monster-form-values'
-import { multiattackReplacementChoiceSelectOptions } from './monster-multiattack-form-options'
+import {
+  multiattackExecutableAttackOptionsFromWatched,
+  multiattackReplacementChoiceOptionsFromWatched,
+  multiattackReplacementChoiceRowSectionRowsDependsOn,
+} from './monster-multiattack-form-options'
+import type { MonsterActionDraftRow } from '../monster-action-presets'
 
 const ctx = {
   entityCatalogLayer: 'homebrew',
+  equipmentCatalogStatus: 'ready',
   spellCatalogStatus: 'ready',
   spellCatalogById: new Map(),
+  armorClassRules: { mode: 'ascending', base: 10 },
+  options: { skills: { visible: [] } },
+  rulesetId: 'srd-cc-5.2.1',
 } as unknown as ContentFormCtx
 
-const values = { actions: [] } as MonsterFormValues
+const bite = { id: 'bite', kind: 'natural-weapon', name: 'Bite' }
+const fireBreath = { id: 'fire-breath', kind: 'save', name: 'Fire Breath' }
+const multiattack = {
+  id: 'multiattack',
+  kind: 'multiattack',
+  name: 'Multiattack',
+  steps: [{ count: 2, actionIds: ['bite'] }],
+}
 
-describe('multiattackReplacementChoiceSelectOptions', () => {
-  const rows = [
-    { id: 'bite', kind: 'natural-weapon', name: 'Bite' },
-    { id: 'fire-breath', kind: 'save', name: 'Fire Breath' },
-  ] as MonsterFormValues['actions']
-
-  it('omits attacks already in the primary sequence when unrestricted', () => {
-    const options = multiattackReplacementChoiceSelectOptions({
-      rows,
+describe('multiattack live option resolution', () => {
+  it('offers replacement choices from watched section rows', () => {
+    const actions = [multiattack, bite, fireBreath] as MonsterActionDraftRow[]
+    const sectionRowsKey = multiattackReplacementChoiceRowSectionRowsDependsOn('actions')
+    const options = multiattackReplacementChoiceOptionsFromWatched({
+      rows: actions,
+      section: 'actions',
+      sectionRowsDependsOn: sectionRowsKey,
       multiattackId: 'multiattack',
-      values,
       ctx,
-      steps: [{ count: 2, actionIds: ['bite'] }],
-      replacement: {},
-      siblingChoices: [],
+      watched: {
+        [sectionRowsKey]: actions,
+        '../../../steps': multiattack.steps,
+        '../../choices': [],
+        '../../replacesActionId': undefined,
+      },
     })
+
     expect(options.map((option) => option.value)).toEqual(['fire-breath'])
   })
 
-  it('keeps a stale stored choice visible for repair', () => {
-    const options = multiattackReplacementChoiceSelectOptions({
-      rows,
+  it('falls back to snapshot rows when the section watch is not ready', () => {
+    const actions = [multiattack, bite, fireBreath] as MonsterActionDraftRow[]
+    const sectionRowsKey = multiattackReplacementChoiceRowSectionRowsDependsOn('actions')
+    const options = multiattackReplacementChoiceOptionsFromWatched({
+      rows: actions,
+      section: 'actions',
+      sectionRowsDependsOn: sectionRowsKey,
       multiattackId: 'multiattack',
-      values,
       ctx,
-      steps: [{ count: 2, actionIds: ['bite'] }],
-      replacement: {},
-      siblingChoices: [{ actionId: 'bite' }],
-      storedChoice: { actionId: 'bite' },
+      watched: {
+        '../../../steps': multiattack.steps,
+        '../../choices': [],
+      },
     })
-    expect(options.map((option) => option.value)).toContain('bite')
-    expect(options.map((option) => option.value)).toContain('fire-breath')
+
+    expect(options.map((option) => option.value)).toEqual(['fire-breath'])
+  })
+
+  it('offers attack chips from watched section rows', () => {
+    const actions = [multiattack, bite, fireBreath] as MonsterActionDraftRow[]
+    const options = multiattackExecutableAttackOptionsFromWatched({
+      section: 'actions',
+      multiattackId: 'multiattack',
+      ctx,
+      watched: {
+        '../../../../actions': actions,
+      },
+    })
+
+    expect(options.map((option) => option.value).sort()).toEqual(['bite'])
   })
 })

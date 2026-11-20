@@ -318,7 +318,7 @@ export const fieldRenderers: {
       <ChipsField
         {...shellFor({ config, field, ...args }, validation, bothSizes)}
         introText={config.introText}
-        options={config.options}
+        options={config.options ?? []}
         multiple={config.multiple}
         max={config.max}
         chipSize={config.chipSize}

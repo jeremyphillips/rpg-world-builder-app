@@ -43,7 +43,10 @@ function selectFieldOptionsResolveDependsOn(field: {
   optionsResolve?: { dependsOn: readonly string[] }
 }): readonly string[] {
   if (
-    (field.type === 'select' || field.type === 'inlineSentence' || field.type === 'combobox') &&
+    (field.type === 'select' ||
+      field.type === 'inlineSentence' ||
+      field.type === 'combobox' ||
+      field.type === 'chips') &&
     field.optionsResolve
   ) {
     return field.optionsResolve.dependsOn
