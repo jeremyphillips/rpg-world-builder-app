@@ -4,7 +4,7 @@ Production `kind: 'slot'` declarations in the dashboard. Tests, stories, and
 prose mentions are not declarations. `locations/README.md` names `kind: 'slot'`
 and is not one.
 
-**89 static literals in 38 files, 87 identities.**
+**90 static literals in 38 files, 88 identities.**
 
 The ratchet allowlist is
 `apps/dashboard/src/test/form-slot-literal-baseline.json`. Each key is the
@@ -31,7 +31,7 @@ a render file changes the ratchet key.
 | `monsters/lib/monster-form-fields.tsx`                                   |        7 |
 | `monsters/lib/actions/detail-fields/section-composers.tsx`               |        6 |
 | `monsters/lib/creature-details/monster-creature-details-form-fields.tsx` |        5 |
-| `monsters/lib/actions/multiattack/monster-multiattack-form-fields.tsx`   |        3 |
+| `monsters/lib/actions/multiattack/monster-multiattack-form-fields.tsx`   |        4 |
 | `monsters/lib/actions/detail-fields/shared-mechanics.tsx`                |        5 |
 | `character/lib/steps/identity-form-fields.ts`                            |        5 |
 | `character/lib/steps/abilities-form-fields.ts`                           |        5 |

@@ -2,20 +2,20 @@ import { describe, expect, it } from 'vitest'
 
 import {
   multiattackExpandUseToChoicePayload,
-  multiattackUseChoiceExpandBlocked,
+  multiattackUseChoiceAcquisitionVisible,
   multiattackUseChoiceRemovePlan,
 } from './monster-multiattack-use-choice.lib'
 
-describe('multiattackUseChoiceExpandBlocked', () => {
-  it('blocks optional steps and non-one repetition', () => {
-    expect(multiattackUseChoiceExpandBlocked({ optional: true }).disabled).toBe(true)
-    expect(multiattackUseChoiceExpandBlocked({ count: 2 }).disabled).toBe(true)
-    expect(multiattackUseChoiceExpandBlocked({ count: '0' }).disabled).toBe(true)
+describe('multiattackUseChoiceAcquisitionVisible', () => {
+  it('hides optional steps and non-one repetition', () => {
+    expect(multiattackUseChoiceAcquisitionVisible({ optional: true })).toBe(false)
+    expect(multiattackUseChoiceAcquisitionVisible({ count: 2 })).toBe(false)
+    expect(multiattackUseChoiceAcquisitionVisible({ count: '0' })).toBe(false)
   })
 
-  it('allows compatible single steps including stored count one', () => {
-    expect(multiattackUseChoiceExpandBlocked({ actionId: 'bite', count: 1 }).disabled).toBe(false)
-    expect(multiattackUseChoiceExpandBlocked({ actionId: 'bite' }).disabled).toBe(false)
+  it('shows compatible single steps including stored count one', () => {
+    expect(multiattackUseChoiceAcquisitionVisible({ actionId: 'bite', count: 1 })).toBe(true)
+    expect(multiattackUseChoiceAcquisitionVisible({ actionId: 'bite' })).toBe(true)
   })
 })
 

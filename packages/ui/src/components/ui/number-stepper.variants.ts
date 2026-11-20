@@ -10,7 +10,7 @@ export type NumberStepperSize = 'xs' | 'sm' | 'md' | 'lg'
 
 export type NumberStepperButtonAppearance = 'default' | 'isolated'
 
-export const numberStepperRootVariants = cva('inline-flex items-center', {
+export const numberStepperRootVariants = cva('inline-flex flex-none self-start items-center', {
   variants: {
     size: {
       xs: 'h-6',

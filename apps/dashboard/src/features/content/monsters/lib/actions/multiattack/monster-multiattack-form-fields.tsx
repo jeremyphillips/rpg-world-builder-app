@@ -44,7 +44,8 @@ import {
 import { MonsterMultiattackEmptyAttacksSlot } from '../../../components/form/actions/multiattack/multiattack-empty-attacks.slot'
 import { MonsterMultiattackPersistSlot } from '../../../components/form/actions/multiattack/multiattack-persist.slot'
 import { MonsterMultiattackUseStepKindSlot } from '../../../components/form/actions/multiattack/multiattack-use-step-kind.slot'
-import { MonsterMultiattackUseStepControlsSlot } from '../../../components/form/actions/multiattack/multiattack-use-step-controls.slot'
+import { MonsterMultiattackUseStepChoiceAcquisitionSlot } from '../../../components/form/actions/multiattack/multiattack-use-step-choice-acquisition.slot'
+import { MonsterMultiattackUseStepRepetitionSlot } from '../../../components/form/actions/multiattack/multiattack-use-step-repetition.slot'
 import { MonsterMultiattackUseChoiceRemoveControl } from '../../../components/form/actions/multiattack/multiattack-use-choice-remove-control'
 import {
   MULTIATTACK_STEP_HEADER_DEPENDS_ON,
@@ -109,12 +110,6 @@ function monsterMultiattackUseClauseFields(input: {
       render: ({ namePrefix }) => <MonsterMultiattackUseStepKindSlot namePrefix={namePrefix} />,
     },
     {
-      kind: 'slot',
-      name: 'multiattackUseStepControls',
-      visibility: singleUseVisible,
-      render: ({ namePrefix }) => <MonsterMultiattackUseStepControlsSlot namePrefix={namePrefix} />,
-    },
-    {
       type: 'select',
       name: 'actionId',
       label: MONSTER_MULTIATTACK_CHOICE_ACTION_LABEL,
@@ -140,6 +135,22 @@ function monsterMultiattackUseClauseFields(input: {
       spellCatalogById: input.spellCatalogById,
       visibility: singleUseVisible,
     }),
+    {
+      kind: 'slot',
+      name: 'multiattackUseStepChoiceAcquisition',
+      visibility: singleUseVisible,
+      render: ({ namePrefix }) => (
+        <MonsterMultiattackUseStepChoiceAcquisitionSlot namePrefix={namePrefix} />
+      ),
+    },
+    {
+      kind: 'slot',
+      name: 'multiattackUseStepRepetition',
+      visibility: singleUseVisible,
+      render: ({ namePrefix }) => (
+        <MonsterMultiattackUseStepRepetitionSlot namePrefix={namePrefix} />
+      ),
+    },
     {
       type: 'checkbox',
       name: 'optional',

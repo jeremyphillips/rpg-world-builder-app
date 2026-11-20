@@ -148,10 +148,6 @@ export const MONSTER_MULTIATTACK_USE_AN_ACTION_LABEL = 'Use an action'
 export const MONSTER_MULTIATTACK_ADD_ACTION_CHOICE_LABEL = 'Add action choice'
 export const MONSTER_MULTIATTACK_ADD_REPETITION_LABEL = 'Add repetition'
 export const MONSTER_MULTIATTACK_REMOVE_REPETITION_LABEL = 'Remove repetition'
-export const MONSTER_MULTIATTACK_CLEAR_OPTIONAL_BEFORE_CHOICE =
-  'Clear Optional before adding an action choice.'
-export const MONSTER_MULTIATTACK_REMOVE_REPETITION_BEFORE_CHOICE =
-  'Remove repetition before adding an action choice.'
 export const MONSTER_MULTIATTACK_COUNT_LABEL = 'Count'
 export const MONSTER_MULTIATTACK_ATTACKS_PICKER_LABEL = 'Attacks'
 export const MONSTER_MULTIATTACK_ADD_ATTACK_GROUP_LABEL = 'Add attack group'

@@ -1,10 +1,5 @@
 import { multiattackPositiveInt } from '@rpg/contracts'
 
-import {
-  MONSTER_MULTIATTACK_CLEAR_OPTIONAL_BEFORE_CHOICE,
-  MONSTER_MULTIATTACK_REMOVE_REPETITION_BEFORE_CHOICE,
-} from '../../monster-form-labels'
-
 type UseChoiceRow = { actionId?: string; spellId?: string }
 type UseStep = {
   kind?: string
@@ -20,22 +15,14 @@ function nonEmptySpellId(spellId: unknown): string | undefined {
   return typeof spellId === 'string' && spellId.trim().length > 0 ? spellId : undefined
 }
 
-/** Whether Add action choice is allowed without mutating the step. */
-export function multiattackUseChoiceExpandBlocked(step: UseStep): {
-  disabled: boolean
-  captions: string[]
-} {
-  const captions: string[] = []
-  if (step.optional === true) {
-    captions.push(MONSTER_MULTIATTACK_CLEAR_OPTIONAL_BEFORE_CHOICE)
-  }
+/** Whether single-to-choice acquisition should render (variant A — mutual exclusion). */
+export function multiattackUseChoiceAcquisitionVisible(step: UseStep): boolean {
+  if (step.optional === true) return false
   const count = step.count
   const hasCount =
     count !== undefined && count !== null && !(typeof count === 'string' && count.trim() === '')
-  if (hasCount && multiattackPositiveInt(count) !== 1) {
-    captions.push(MONSTER_MULTIATTACK_REMOVE_REPETITION_BEFORE_CHOICE)
-  }
-  return { disabled: captions.length > 0, captions }
+  if (hasCount && multiattackPositiveInt(count) !== 1) return false
+  return true
 }
 
 /** Payload for expanding a compatible single use step into choice mode. */

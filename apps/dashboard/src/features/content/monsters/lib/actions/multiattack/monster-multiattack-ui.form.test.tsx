@@ -12,6 +12,7 @@ import {
   formatMonsterActionMultiattackPreviewConfigureHint,
   MONSTER_MULTIATTACK_ADD_ACTION_CHOICE_LABEL,
   MONSTER_MULTIATTACK_ADD_REPETITION_LABEL,
+  MONSTER_MULTIATTACK_OPTIONAL_LABEL,
   MONSTER_MULTIATTACK_ADD_TO_SEQUENCE_LABEL,
   MONSTER_MULTIATTACK_MAKE_ATTACKS_LABEL,
   MONSTER_MULTIATTACK_PIN_SPELL_LABEL,
@@ -127,12 +128,19 @@ describe('multiattack editor UI cleanup', () => {
     )
 
     expect(await screen.findByLabelText('Action')).toBeInTheDocument()
+    const addChoice = screen.getByRole('button', {
+      name: MONSTER_MULTIATTACK_ADD_ACTION_CHOICE_LABEL,
+    })
+    const addRepetition = screen.getByRole('button', {
+      name: MONSTER_MULTIATTACK_ADD_REPETITION_LABEL,
+    })
+    const optional = screen.getByRole('checkbox', { name: MONSTER_MULTIATTACK_OPTIONAL_LABEL })
     expect(
-      screen.getByRole('button', { name: MONSTER_MULTIATTACK_ADD_REPETITION_LABEL }),
-    ).toBeInTheDocument()
+      addChoice.compareDocumentPosition(addRepetition) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
     expect(
-      screen.getByRole('button', { name: MONSTER_MULTIATTACK_ADD_ACTION_CHOICE_LABEL }),
-    ).toBeInTheDocument()
+      addRepetition.compareDocumentPosition(optional) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
     expect(
       screen.queryByRole('button', { name: MONSTER_MULTIATTACK_PIN_SPELL_LABEL }),
     ).not.toBeInTheDocument()
@@ -219,6 +227,33 @@ describe('multiattack editor UI cleanup', () => {
     expect(preview.guidance).toBe(
       formatMonsterActionMultiattackPreviewConfigureHint(MONSTER_MULTIATTACK_STEPS_LABEL),
     )
+  })
+
+  it('hides Add action choice while optional or repetition is active', async () => {
+    const user = userEvent.setup()
+    const rows = [multiattackEmpty, bite] as MonsterActionDraftRow[]
+    render(<Harness action={multiattackEmpty} actionRows={rows} />)
+
+    await user.click(
+      screen.getByRole('button', { name: MONSTER_MULTIATTACK_ADD_TO_SEQUENCE_LABEL }),
+    )
+    await user.click(
+      await screen.findByRole('menuitem', { name: MONSTER_MULTIATTACK_USE_AN_ACTION_LABEL }),
+    )
+
+    const addChoice = () =>
+      screen.queryByRole('button', { name: MONSTER_MULTIATTACK_ADD_ACTION_CHOICE_LABEL })
+
+    expect(addChoice()).toBeInTheDocument()
+
+    await user.click(screen.getByRole('checkbox', { name: MONSTER_MULTIATTACK_OPTIONAL_LABEL }))
+    expect(addChoice()).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('checkbox', { name: MONSTER_MULTIATTACK_OPTIONAL_LABEL }))
+    expect(addChoice()).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: MONSTER_MULTIATTACK_ADD_REPETITION_LABEL }))
+    expect(addChoice()).not.toBeInTheDocument()
   })
 
   it('shows attack step headers with anatomy row fields', async () => {

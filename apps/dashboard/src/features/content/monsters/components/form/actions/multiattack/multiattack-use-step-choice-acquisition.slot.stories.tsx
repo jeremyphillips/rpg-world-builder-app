@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { FormProvider, useForm } from 'react-hook-form'
 
-import { MonsterMultiattackUseStepControlsSlot } from './multiattack-use-step-controls.slot'
+import { MonsterMultiattackUseStepChoiceAcquisitionSlot } from './multiattack-use-step-choice-acquisition.slot'
 
 const meta = {
-  title: 'Dashboard/Monsters/Multiattack use step controls',
-  component: MonsterMultiattackUseStepControlsSlot,
-} satisfies Meta<typeof MonsterMultiattackUseStepControlsSlot>
+  title: 'Dashboard/Monsters/Multiattack use step choice acquisition',
+  component: MonsterMultiattackUseStepChoiceAcquisitionSlot,
+} satisfies Meta<typeof MonsterMultiattackUseStepChoiceAcquisitionSlot>
 
 export default meta
 
@@ -16,12 +16,12 @@ function Harness({ defaultValues }: { defaultValues: Record<string, unknown> }) 
   const form = useForm({ defaultValues })
   return (
     <FormProvider {...form}>
-      <MonsterMultiattackUseStepControlsSlot namePrefix="step" />
+      <MonsterMultiattackUseStepChoiceAcquisitionSlot namePrefix="step" />
     </FormProvider>
   )
 }
 
-export const SingleUse: Story = {
+export const Visible: Story = {
   render: () => (
     <Harness
       defaultValues={{
@@ -31,7 +31,7 @@ export const SingleUse: Story = {
   ),
 }
 
-export const WithRepetition: Story = {
+export const HiddenWithRepetition: Story = {
   render: () => (
     <Harness
       defaultValues={{

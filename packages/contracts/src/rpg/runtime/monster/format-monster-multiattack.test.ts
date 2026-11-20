@@ -153,4 +153,35 @@ describe('formatMonsterMultiattack', () => {
       'The roc makes two Beak attacks. It can replace one attack with a Talons attack.',
     )
   })
+
+  it.fails(
+    'returns unavailable when an alternative leading with single use omits later configured steps',
+    () => {
+      const actions = [
+        { id: 'claw', kind: 'natural-weapon', name: 'Claw' },
+        { id: 'tail', kind: 'natural-weapon', name: 'Tail' },
+        {
+          id: 'multiattack',
+          kind: 'multiattack',
+          name: 'Multiattack',
+          steps: [{ count: 1, actionIds: ['claw'] }],
+          alternative: {
+            steps: [
+              { kind: 'use', mode: 'single', actionId: 'tail' },
+              { count: 1, actionIds: ['claw'] },
+            ],
+          },
+        },
+      ] as MonsterAction[]
+      expect(
+        formatMonsterMultiattackResult({
+          monsterName: 'Example',
+          action: actions[2] as never,
+          actions,
+          equipment: [],
+          equipmentCatalog: emptyEquipmentCatalog,
+        }).status,
+      ).toBe('unavailable')
+    },
+  )
 })
