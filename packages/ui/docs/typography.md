@@ -179,17 +179,19 @@ per-theme prose classes are required in components.
 At 16px root, **`--text-md` is 15px** — one step between compact UI (`text-sm`,
 14px) and primary body (`text-base`, 16px).
 
-| Surface                                             | Size                              |
-| --------------------------------------------------- | --------------------------------- |
-| `RichTextContent` `size="md"` (`prose-md`)          | 15px via `.prose.prose-md`        |
-| `RichTextContent` `size="sm"` (`prose-sm`)          | 14px via `.prose.prose-sm`        |
-| `RichTextContent` `size="base"` (`prose`)           | 16px — primary body               |
-| `Text` `emphasis`, `option`                         | `text-md`                         |
-| Generic `Card` `ui-card__description` (comfortable) | 14px (`text-sm` via shell var)    |
-| Rich-text editor (`size="md"`)                      | `prose-md` (matches catalog read) |
-| Rich-text editor (`size="sm"`)                      | `prose-sm`                        |
-| Form fields (`size="md"`)                           | `text-md` labels + controls       |
-| Form fields (`size="lg"`)                           | `text-base` labels + controls     |
+| Surface                                             | Size                                            |
+| --------------------------------------------------- | ----------------------------------------------- |
+| `RichTextContent` `size="md"` (`prose-md`)          | 15px via `.prose.prose-md`                      |
+| `RichTextContent` `size="sm"` (`prose-sm`)          | 14px via `.prose.prose-sm`                      |
+| `RichTextContent` `size="base"` (`prose`)           | 16px — primary body                             |
+| `Text` `emphasis`                                   | `text-md`                                       |
+| Checkbox / `RadioGroupField` option labels          | `text-style-option--sm` (13px) or `--md` (15px) |
+| `Text` `option` (static demos)                      | `text-style-option--md` default                 |
+| Generic `Card` `ui-card__description` (comfortable) | 14px (`text-sm` via shell var)                  |
+| Rich-text editor (`size="md"`)                      | `prose-md` (matches catalog read)               |
+| Rich-text editor (`size="sm"`)                      | `prose-sm`                                      |
+| Form fields (`size="md"`)                           | `text-md` labels + controls                     |
+| Form fields (`size="lg"`)                           | `text-base` labels + controls                   |
 
 Compact UI chrome (buttons, menus, data tables) stays on **`text-sm` (14px)**.
 
@@ -268,6 +270,10 @@ Role tokens live on `:root` in [`styles/tokens/typography-roles.css`](../src/sty
 
 `variant` controls appearance; `as` controls document semantics. Match the hierarchy
 table above in app code.
+
+## Option row copy
+
+`text-style-option` owns body weight and `line-height: 1`. Size modifiers own font-size: `text-style-option--sm` (`--text-fine-md`, 13px) and `text-style-option--md` (`--text-md`, 15px). `CheckboxOption` and `RadioGroupField` pick the modifier from field / form control scale. Compose both classes on the label. `RadioCard` row copy stays on the card density ladder in `copy-scale.css`.
 
 ## Score numerals
 

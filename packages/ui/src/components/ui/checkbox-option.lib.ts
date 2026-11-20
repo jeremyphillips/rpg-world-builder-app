@@ -17,7 +17,8 @@ export type ResolvedCheckboxOptionScale = {
   scale: CheckboxOptionScale
 }
 
-function formSizeToScale(size: FieldSize): CheckboxOptionScale {
+/** Maps field control scale to compact (13px) vs comfortable (15px) option copy. */
+export function fieldSizeToOptionTypographyScale(size: FieldSize): CheckboxOptionScale {
   return size === 'xs' || size === 'sm' ? 'sm' : 'md'
 }
 
@@ -34,7 +35,7 @@ export function resolveCheckboxOptionScale(
   if (options.filterDensity) {
     return { explicit: undefined, scale: resolveFilterControlSize(options.filterDensity) }
   }
-  return { explicit: undefined, scale: formSizeToScale(options.formSize) }
+  return { explicit: undefined, scale: fieldSizeToOptionTypographyScale(options.formSize) }
 }
 
 export type { ChoiceTone }

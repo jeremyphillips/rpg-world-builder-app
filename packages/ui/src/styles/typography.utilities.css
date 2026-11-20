@@ -183,10 +183,18 @@
   font-weight: var(--font-weight-body-emphasis);
 }
 
+/* Option row copy. Base owns weight and line-height; size modifiers own font-size. */
 @utility text-style-option {
-  font-size: var(--text-md);
   line-height: 1;
   font-weight: var(--font-weight-body);
+}
+
+@utility text-style-option--sm {
+  font-size: var(--text-fine-md);
+}
+
+@utility text-style-option--md {
+  font-size: var(--text-md);
 }
 
 @utility text-style-lead {

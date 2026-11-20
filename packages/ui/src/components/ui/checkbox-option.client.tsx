@@ -3,14 +3,12 @@
 import { forwardRef, useId, type FocusEventHandler, type ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
-import { TEXT_VARIANT_MAP } from './text.variants'
 import { FieldHintText } from './field.client'
+import { choiceOptionLabelClassName } from './choice-option-typography.lib'
 import { fieldLabelHintStackClasses } from './field.variants'
-import { useFieldControlSize } from '../../form/context/form-section.context'
-import { useOptionalFilterChrome } from '../../filters/filter-chrome.context'
 import { Checkbox } from './checkbox.client'
 import type { CheckboxOptionScale } from './checkbox-option.lib'
-import { resolveCheckboxOptionShellProps } from './checkbox-option-shell-props.lib'
+import { useCheckboxOptionPresentation } from './checkbox-option-presentation.client'
 import { useCheckboxOptionChecked } from './checkbox-option-state.client'
 import type { ChoiceTone } from './choice-control.styles'
 
@@ -68,18 +66,14 @@ export const CheckboxOption = forwardRef<HTMLButtonElement, CheckboxOptionProps>
     const generatedId = useId()
     const hintId = useId()
     const controlId = id ?? generatedId
-    const formSize = useFieldControlSize()
-    const filterChrome = useOptionalFilterChrome()
     const { isChecked, handleCheckedChange } = useCheckboxOptionChecked(
       checked,
       defaultChecked,
       onCheckedChange,
     )
-    const shellProps = resolveCheckboxOptionShellProps({
+    const { controlSize, resolvedScale, shellProps } = useCheckboxOptionPresentation({
       shell,
       size,
-      filterDensity: filterChrome?.density,
-      formSize,
       toolbarAlign,
       tone,
       isChecked,
@@ -107,7 +101,9 @@ export const CheckboxOption = forwardRef<HTMLButtonElement, CheckboxOptionProps>
           onBlur={onBlur}
           onCheckedChange={handleCheckedChange}
         />
-        <span className={cn('ui-checkbox-option__label', TEXT_VARIANT_MAP.option)}>{label}</span>
+        <span className={choiceOptionLabelClassName(resolvedScale, 'ui-checkbox-option__label')}>
+          {label}
+        </span>
       </label>
     )
 
@@ -116,7 +112,7 @@ export const CheckboxOption = forwardRef<HTMLButtonElement, CheckboxOptionProps>
     return (
       <div className={fieldLabelHintStackClasses}>
         {optionRow}
-        <FieldHintText id={hintId} size={formSize} className="min-w-0 max-w-full break-words">
+        <FieldHintText id={hintId} size={controlSize} className="min-w-0 max-w-full break-words">
           {hint}
         </FieldHintText>
       </div>

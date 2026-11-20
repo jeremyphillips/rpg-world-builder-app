@@ -3,6 +3,8 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
+import { FormSectionProvider } from '../../form/context/form-section.context'
+
 import { RadioGroupField } from './radio-group-field'
 
 const options = [
@@ -24,6 +26,20 @@ describe('RadioGroupField', () => {
     )
     await user.click(screen.getByLabelText('Deadly'))
     expect(onValueChange).toHaveBeenCalledWith('deadly')
+  })
+
+  it('uses compact option copy when the field control scale is sm', () => {
+    render(<RadioGroupField id="difficulty" label="Difficulty" options={options} size="sm" />)
+    expect(screen.getByText('Easy')).toHaveClass('text-style-option--sm')
+  })
+
+  it('matches compact form density when the field control scale is sm', () => {
+    render(
+      <FormSectionProvider density="compact">
+        <RadioGroupField id="difficulty" label="Difficulty" options={options} size="sm" />
+      </FormSectionProvider>,
+    )
+    expect(screen.getByText('Easy')).toHaveClass('text-style-option--sm')
   })
 
   it('labels the group and surfaces the error', () => {

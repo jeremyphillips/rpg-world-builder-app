@@ -9,7 +9,8 @@ import { CheckboxField } from './checkbox-field'
 describe('CheckboxField', () => {
   it('uses option typography on the label', () => {
     render(<CheckboxField id="homebrew" label="Allow homebrew" size="sm" />)
-    expect(screen.getByText('Allow homebrew').closest('.text-style-option')).toBeTruthy()
+    const label = screen.getByText('Allow homebrew')
+    expect(label).toHaveClass('text-style-option', 'text-style-option--sm')
   })
 
   it('toggles via its associated label', async () => {

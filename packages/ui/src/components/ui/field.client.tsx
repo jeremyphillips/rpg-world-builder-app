@@ -64,6 +64,11 @@ export function useResolvedFieldControlSize(): FieldSize {
   return useFieldRootContext('useResolvedFieldControlSize').controlSize
 }
 
+/** Field control scale when nested in `Field.Root`; undefined for standalone controls. */
+export function useOptionalResolvedFieldControlSize(): FieldSize | undefined {
+  return React.useContext(FieldContext)?.controlSize
+}
+
 /** Owned-label visibility from the nearest field root. Undefined outside a root. */
 export function useOptionalFieldLabelVisibility(): FieldLabelVisibility | undefined {
   return React.useContext(FieldContext)?.labelVisibility

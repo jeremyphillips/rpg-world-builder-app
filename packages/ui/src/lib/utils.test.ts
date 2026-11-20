@@ -99,6 +99,16 @@ describe('cn', () => {
     expect(cn('text-destructive', 'text-style-caption')).toBe('text-destructive text-style-caption')
   })
 
+  it('keeps an option base beside its size modifier and replaces a sibling size', () => {
+    expect(cn('text-style-option', 'text-style-option--md')).toBe(
+      'text-style-option text-style-option--md',
+    )
+    expect(cn('text-style-option text-style-option--md', 'text-style-option--sm')).toBe(
+      'text-style-option text-style-option--sm',
+    )
+    expect(cn('text-sm', 'text-style-option--md')).toBe('text-style-option--md')
+  })
+
   it('keeps a score base beside its size modifier and replaces a sibling size', () => {
     expect(cn('text-style-score', 'text-style-score--sm')).toBe(
       'text-style-score text-style-score--sm',

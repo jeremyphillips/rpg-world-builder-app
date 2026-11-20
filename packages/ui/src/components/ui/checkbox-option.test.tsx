@@ -64,7 +64,7 @@ describe('CheckboxOption', () => {
 
     const text = label.querySelector('.ui-checkbox-option__label')
     if (!text) throw new Error('missing label text')
-    expect(text).toHaveClass('text-style-option')
+    expect(text).toHaveClass('text-style-option', 'text-style-option--md')
     await user.click(text)
     expect(onCheckedChange).toHaveBeenCalledTimes(3)
   })
@@ -121,6 +121,17 @@ describe('CheckboxOption', () => {
     )
     const explicit = screen.getByRole('checkbox', { name: 'Expertise' }).closest('label')
     expect(explicit).toHaveAttribute('data-size', 'md')
+  })
+
+  it('uses compact option copy in compact form density', () => {
+    render(
+      <FormSectionProvider density="compact">
+        <CheckboxOption label="Expertise" />
+      </FormSectionProvider>,
+    )
+    const text = screen.getByText('Expertise')
+    expect(text).toHaveClass('text-style-option--sm')
+    expect(text).not.toHaveClass('text-style-option--md')
   })
 
   it('lets filter chrome set the base outlined scale inside a comfortable form', () => {
