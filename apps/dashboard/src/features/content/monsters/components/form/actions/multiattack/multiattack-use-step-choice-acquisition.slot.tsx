@@ -1,4 +1,4 @@
-import { Button } from '@rpg/ui'
+import { ActionButton, resolveAttachedButtonSize } from '@rpg/ui'
 import { useFieldControlSize } from '@rpg/ui/form'
 import { useFormContext, useWatch } from 'react-hook-form'
 
@@ -25,16 +25,17 @@ export function MonsterMultiattackUseStepChoiceAcquisitionSlot({
   if (!multiattackUseChoiceAcquisitionVisible(step)) return null
 
   return (
-    <Button
+    <ActionButton
+      action="add"
       type="button"
-      variant="link"
-      size={controlSize}
+      variant="text"
+      size={resolveAttachedButtonSize(controlSize)}
       className="self-start"
       onClick={() => {
         setValue(namePrefix, multiattackExpandUseToChoicePayload(step), MONSTER_FORM_WRITE_OPTIONS)
       }}
     >
       {MONSTER_MULTIATTACK_ADD_ACTION_CHOICE_LABEL}
-    </Button>
+    </ActionButton>
   )
 }
