@@ -8,6 +8,7 @@ import {
   omitEmptySavingThrow,
   monsterLegendaryActionDraftSchema,
   monsterReactionDraftSchema,
+  isMultiattackUseClause,
   multiattackPositiveInt,
   type ArmorClassRules,
   type ContentValidationIntent,
@@ -237,54 +238,65 @@ function applySpellEntryDraft(cleaned: Record<string, unknown>): void {
   })
 }
 
+function keepMultiattackLiteralTrue(record: Record<string, unknown>, key: string): void {
+  if (record[key] === true) record[key] = true
+  else delete record[key]
+}
+
+function filterMultiattackChoiceRows(rows: unknown): unknown[] {
+  if (!Array.isArray(rows)) return []
+  return rows
+    .filter((row) => {
+      if (!isRecord(row)) return false
+      const actionId = row.actionId
+      return typeof actionId === 'string' && actionId.trim().length > 0
+    })
+    .map((row) => {
+      if (!isRecord(row)) return row
+      const next = { ...row }
+      if (next.spellId === '') delete next.spellId
+      return next
+    })
+}
+
+function normalizeMultiattackAttackGroupStep(step: Record<string, unknown>): void {
+  const count = multiattackPositiveInt(step.count)
+  if (count) step.count = count
+  else delete step.count
+}
+
+function normalizeMultiattackUseStepRow(step: Record<string, unknown>): void {
+  step.kind = 'use'
+  delete step.actionIds
+  if (step.mode !== 'single' && step.mode !== 'choice') step.mode = 'single'
+  const count = multiattackPositiveInt(step.count)
+  if (count) step.count = count
+  else delete step.count
+  if (step.mode !== 'choice') {
+    keepMultiattackLiteralTrue(step, 'optional')
+    if (step.actionId === '') delete step.actionId
+  } else {
+    step.choices = filterMultiattackChoiceRows(step.choices)
+  }
+  delete step.whenAvailable
+}
+
+function normalizeMultiattackDraftStep(step: Record<string, unknown>): void {
+  if (!isMultiattackUseClause(step)) {
+    normalizeMultiattackAttackGroupStep(step)
+    return
+  }
+  normalizeMultiattackUseStepRow(step)
+}
+
 function applyMultiattackDraft(cleaned: Record<string, unknown>): void {
   if (cleaned.kind !== 'multiattack') return
-
-  const keepLiteralTrue = (record: Record<string, unknown>, key: string) => {
-    if (record[key] === true) record[key] = true
-    else delete record[key]
-  }
-
-  const filterChoiceRows = (rows: unknown): unknown[] => {
-    if (!Array.isArray(rows)) return []
-    return rows
-      .filter((row) => {
-        if (!isRecord(row)) return false
-        const actionId = row.actionId
-        return typeof actionId === 'string' && actionId.trim().length > 0
-      })
-      .map((row) => {
-        if (!isRecord(row)) return row
-        const next = { ...row }
-        if (next.spellId === '') delete next.spellId
-        return next
-      })
-  }
-
-  const normalizeUseStep = (step: Record<string, unknown>) => {
-    if (step.kind !== 'use') {
-      const count = multiattackPositiveInt(step.count)
-      if (count) step.count = count
-      else delete step.count
-      return
-    }
-    const count = multiattackPositiveInt(step.count)
-    if (count) step.count = count
-    else delete step.count
-    if (step.mode !== 'choice') {
-      keepLiteralTrue(step, 'optional')
-      if (step.actionId === '') delete step.actionId
-    } else {
-      step.choices = filterChoiceRows(step.choices)
-    }
-    delete step.whenAvailable
-  }
 
   if (Array.isArray(cleaned.steps)) {
     cleaned.steps = cleaned.steps.map((step) => {
       if (!isRecord(step)) return step
       const next = { ...step }
-      normalizeUseStep(next)
+      normalizeMultiattackDraftStep(next)
       return next
     })
   }
@@ -295,7 +307,7 @@ function applyMultiattackDraft(cleaned: Record<string, unknown>): void {
     if (count) replacement.count = count
     else delete replacement.count
     if (replacement.replacesActionId === '') delete replacement.replacesActionId
-    replacement.choices = filterChoiceRows(replacement.choices)
+    replacement.choices = filterMultiattackChoiceRows(replacement.choices)
     if (replacement.attackWord === true) replacement.attackWord = 'any'
     if (replacement.attackWord !== 'any') delete replacement.attackWord
     delete replacement.whenAvailable
@@ -308,7 +320,7 @@ function applyMultiattackDraft(cleaned: Record<string, unknown>): void {
       alternative.steps = alternative.steps.map((step) => {
         if (!isRecord(step)) return step
         const next = { ...step }
-        normalizeUseStep(next)
+        normalizeMultiattackDraftStep(next)
         return next
       })
     }

@@ -227,6 +227,7 @@ function attackGroupFragment(
   step: { count: unknown; actionIds: readonly string[] },
   ctx: FormatContext,
 ): string | undefined {
+  if (step.actionIds.length === 0) return undefined
   const stepCount = multiattackPositiveInt(step.count)
   if (!stepCount) return undefined
   const names = step.actionIds.map((id) => referencedActionName(id, ctx).name)
@@ -259,6 +260,7 @@ function formatPrimarySequence(
 
   for (const step of steps) {
     if (isMultiattackAttackGroup(step)) {
+      if (step.actionIds.length === 0) continue
       const fragment = attackGroupFragment(step, ctx)
       if (!fragment) return undefined
       if (hasNonAttack) {

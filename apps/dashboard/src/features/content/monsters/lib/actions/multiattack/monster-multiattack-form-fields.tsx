@@ -1,4 +1,4 @@
-import type { Spell } from '@rpg/contracts'
+import { isMultiattackUseClause, type Spell } from '@rpg/contracts'
 import type { FieldVisibility, FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
@@ -46,19 +46,22 @@ import {
 } from './monster-multiattack-replacement-visibility'
 import { MonsterMultiattackEmptyAttacksSlot } from '../../../components/form/actions/multiattack/multiattack-empty-attacks.slot'
 import { MonsterMultiattackPersistSlot } from '../../../components/form/actions/multiattack/multiattack-persist.slot'
+import { MonsterMultiattackUseStepKindSlot } from '../../../components/form/actions/multiattack/multiattack-use-step-kind.slot'
 import { monsterMultiattackChoiceRowFields } from './monster-multiattack-choice-row-fields'
 import { multiattackPrimarySequenceHeading } from './monster-multiattack-form-options'
 
 type MultiattackDraft = Extract<MonsterActionDraftRow, { kind: 'multiattack' }>
 
+const stepShapeDependsOn = ['kind', 'actionId', 'mode', 'choices'] as const
+
 const attackGroupVisible: FieldVisibility = {
-  dependsOn: ['kind'],
-  visibleWhen: (values) => values.kind !== 'use',
+  dependsOn: [...stepShapeDependsOn],
+  visibleWhen: (values) => !isMultiattackUseClause(values),
 }
 
 const useClauseVisible: FieldVisibility = {
-  dependsOn: ['kind'],
-  visibleWhen: (values) => values.kind === 'use',
+  dependsOn: [...stepShapeDependsOn],
+  visibleWhen: (values) => isMultiattackUseClause(values),
 }
 
 const singleUseVisible: FieldVisibility = {
@@ -77,6 +80,12 @@ function monsterMultiattackUseClauseFields(input: {
   spellCatalogById?: ReadonlyMap<string, Spell>
 }): FormItem[] {
   return [
+    {
+      kind: 'slot',
+      name: 'multiattackUseStepKind',
+      visibility: useClauseVisible,
+      render: ({ namePrefix }) => <MonsterMultiattackUseStepKindSlot namePrefix={namePrefix} />,
+    },
     {
       type: 'select',
       name: 'mode',
@@ -102,6 +111,7 @@ function monsterMultiattackUseClauseFields(input: {
       min: 1,
       step: 1,
       control: 'stepper',
+      defaultValue: 1,
       visibility: singleUseVisible,
     },
     {
@@ -162,7 +172,7 @@ function monsterMultiattackStepsArray(input: {
           {
             id: 'use-action',
             label: MONSTER_MULTIATTACK_ADD_OTHER_ACTION_LABEL,
-            appendDefaults: () => ({ kind: 'use', mode: 'single', actionId: '' }),
+            appendDefaults: () => ({ kind: 'use', mode: 'single', actionId: '', count: 1 }),
           },
         ],
       },

@@ -158,6 +158,61 @@ describe('buildMonsterActionMultiattackPreview', () => {
     expect(preview.prose).toMatch(/replace one attack with a use of fire breath/i)
   })
 
+  it('prints a use clause after any-combination attacks', () => {
+    const values = monsterFormTestValues({
+      name: 'Lich',
+      actions: [
+        {
+          id: 'eldritch-burst',
+          kind: 'natural-weapon',
+          name: 'Eldritch Burst',
+          mode: 'melee',
+          damageType: 'force',
+          damage: { dice: { count: 1, faces: 10 } },
+        },
+        {
+          id: 'paralyzing-touch',
+          kind: 'natural-weapon',
+          name: 'Paralyzing Touch',
+          mode: 'melee',
+          damageType: 'cold',
+          damage: { dice: { count: 3, faces: 6 } },
+        },
+        {
+          id: 'spellcasting',
+          kind: 'spell',
+          name: 'Spellcasting',
+          spells: [],
+        },
+        {
+          id: 'multiattack',
+          kind: 'multiattack',
+          name: 'Multiattack',
+          steps: [
+            { count: 3, actionIds: ['eldritch-burst', 'paralyzing-touch'] },
+            {
+              kind: 'use',
+              mode: 'single',
+              actionId: 'spellcasting',
+              count: 1,
+              actionIds: [],
+            },
+          ],
+        },
+      ] as MonsterFormValues['actions'],
+    })
+
+    const preview = buildMonsterActionMultiattackPreview({
+      values,
+      ctx: readyCtx(),
+      actionId: 'multiattack',
+    })
+
+    expect(preview?.status).toBe('ready')
+    if (!preview || preview.status !== 'ready') return
+    expect(preview.prose).toMatch(/in any combination and uses spellcasting/i)
+  })
+
   it('prints pinned spell replacement when spell catalog is available', () => {
     const counterspellId = 'srd:counterspell'
     const ctx = {

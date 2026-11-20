@@ -81,21 +81,34 @@ export const multiattackAttackGroupPublishedSchema = z.object({
   actionIds: z.array(z.string().min(1)).min(1),
 })
 
-export const multiattackAttackGroupDraftSchema = z.object({
-  count: z.number().int().min(1).optional(),
-  actionIds: z.array(z.string().min(1)).default([]),
-})
+export const multiattackAttackGroupDraftSchema = z
+  .object({
+    count: z.number().int().min(1).optional(),
+    actionIds: z.array(z.string().min(1)).default([]),
+    kind: z.literal('use').optional(),
+    actionId: z.string().optional(),
+    mode: z.literal('choice').optional(),
+    choices: z.array(z.unknown()).optional(),
+  })
+  .refine(
+    (step) =>
+      step.kind !== 'use' &&
+      !(typeof step.actionId === 'string' && step.actionId.trim().length > 0) &&
+      step.mode !== 'choice' &&
+      !(Array.isArray(step.choices) && step.choices.length > 0),
+    { message: 'Use steps are not attack groups.' },
+  )
 
 export const multiattackPublishedStepSchema = z.union([
-  multiattackAttackGroupPublishedSchema,
   multiattackUseSinglePublishedSchema,
   multiattackUseChoicePublishedSchema,
+  multiattackAttackGroupPublishedSchema,
 ])
 
 export const multiattackDraftStepSchema = z.union([
-  multiattackAttackGroupDraftSchema,
   multiattackUseSingleDraftSchema,
   multiattackUseChoiceDraftSchema,
+  multiattackAttackGroupDraftSchema,
 ])
 
 export const multiattackAlternativePublishedSchema = z.object({
@@ -128,16 +141,32 @@ export function multiattackPositiveInt(value: unknown): number | undefined {
   return undefined
 }
 
-export function isMultiattackAttackGroup(step: {
-  kind?: string
-  actionIds?: unknown
-}): step is MultiattackAttackGroup {
-  return step.kind !== 'use' && Array.isArray(step.actionIds)
+function multiattackStepHasUseActionId(step: { actionId?: unknown }): boolean {
+  return typeof step.actionId === 'string' && step.actionId.trim().length > 0
 }
 
+/** Draft or published step that performs another action (not an attack group row). */
 export function isMultiattackUseClause(step: {
   kind?: string
   actionIds?: unknown
+  actionId?: unknown
+  mode?: string
+  choices?: unknown
 }): step is MultiattackUseSingle | MultiattackUseChoice {
-  return step.kind === 'use'
+  if (step.kind === 'use') return true
+  if (multiattackStepHasUseActionId(step)) return true
+  if (step.mode === 'choice') return true
+  if (Array.isArray(step.choices) && step.choices.length > 0) return true
+  return false
+}
+
+export function isMultiattackAttackGroup(step: {
+  kind?: string
+  actionIds?: unknown
+  actionId?: unknown
+  mode?: string
+  choices?: unknown
+}): step is MultiattackAttackGroup {
+  if (isMultiattackUseClause(step)) return false
+  return Array.isArray(step.actionIds)
 }

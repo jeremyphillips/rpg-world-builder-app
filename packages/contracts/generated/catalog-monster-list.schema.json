@@ -6342,28 +6342,6 @@
         {
           "type": "object",
           "properties": {
-            "count": {
-              "type": "integer",
-              "minimum": 1,
-              "maximum": 9007199254740991
-            },
-            "actionIds": {
-              "minItems": 1,
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/__schema237"
-              }
-            }
-          },
-          "required": [
-            "count",
-            "actionIds"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
             "kind": {
               "type": "string",
               "const": "use",
@@ -6416,7 +6394,7 @@
               "minItems": 1,
               "type": "array",
               "items": {
-                "$ref": "#/definitions/__schema238"
+                "$ref": "#/definitions/__schema237"
               }
             }
           },
@@ -6426,14 +6404,32 @@
             "choices"
           ],
           "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "count": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "actionIds": {
+              "minItems": 1,
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/__schema238"
+              }
+            }
+          },
+          "required": [
+            "count",
+            "actionIds"
+          ],
+          "additionalProperties": false
         }
       ]
     },
     "__schema237": {
-      "type": "string",
-      "minLength": 1
-    },
-    "__schema238": {
       "type": "object",
       "properties": {
         "actionId": {
@@ -6449,6 +6445,10 @@
         "actionId"
       ],
       "additionalProperties": false
+    },
+    "__schema238": {
+      "type": "string",
+      "minLength": 1
     },
     "__schema239": {
       "type": "object",

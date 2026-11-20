@@ -117,6 +117,26 @@ describe('formatMonsterMultiattack', () => {
     )
   })
 
+  it('joins any-combination attacks with a single use clause', () => {
+    const actions = [
+      { id: 'eldritch-burst', kind: 'spell', name: 'Eldritch Burst', spells: [] },
+      { id: 'paralyzing-touch', kind: 'natural-weapon', name: 'Paralyzing Touch' },
+      { id: 'spellcasting', kind: 'spell', name: 'Spellcasting', spells: [] },
+      {
+        id: 'multiattack',
+        kind: 'multiattack',
+        name: 'Multiattack',
+        steps: [
+          { count: 3, actionIds: ['eldritch-burst', 'paralyzing-touch'] },
+          { actionId: 'spellcasting', count: 1, actionIds: [] },
+        ],
+      },
+    ] as MonsterAction[]
+    expect(formatSentence({ name: 'Lich', multiattack: actions[3] as never, actions })).toBe(
+      'The lich makes three attacks, using Eldritch Burst or Paralyzing Touch in any combination and uses Spellcasting.',
+    )
+  })
+
   it('prints replacement attack choices', () => {
     const actions = [
       { id: 'beak', kind: 'natural-weapon', name: 'Beak' },
