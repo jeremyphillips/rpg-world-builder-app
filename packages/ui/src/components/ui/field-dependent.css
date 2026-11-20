@@ -1,8 +1,45 @@
 /*
- * Dependent nest horizontal alignment — tied to choice-control theme variables.
+ * Dependent nest — rail, rhythm inset, host fill, horizontal alignment.
  * @see packages/ui/src/styles/tokens/tailwind-theme.css (--control-choice-*)
  */
 @layer components {
+  .ui-field-dependent-nest {
+    position: relative;
+    border-width: 0;
+  }
+
+  .ui-field-dependent-nest::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: 1px;
+    border-radius: 9999px;
+    background-color: var(--ui-border-color);
+  }
+
+  .ui-field-dependent-nest--comfortable {
+    padding-block: calc(var(--spacing) * 3);
+    padding-inline-end: calc(var(--spacing) * 3);
+    padding-inline-start: calc(var(--spacing) * 4);
+  }
+
+  .ui-field-dependent-nest--compact {
+    padding-block: calc(var(--spacing) * 2);
+    padding-inline-end: calc(var(--spacing) * 2);
+    padding-inline-start: calc(var(--spacing) * 3);
+  }
+
+  .ui-field-dependent-nest--host-field-container {
+    background-color: var(--background);
+    --surface-current: var(--background);
+  }
+
+  .ui-field-dependent-nest--host-array-item {
+    background-color: var(--surface-faint);
+    --surface-current: var(--surface-faint);
+  }
+
   .ui-field-dependent-nest--align-field-edge {
     margin-inline-start: 0;
   }

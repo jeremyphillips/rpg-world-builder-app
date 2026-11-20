@@ -8,10 +8,12 @@ import type { FieldConfig } from '../../form/field-config'
 import {
   DEPENDENT_NEST_ALIGN_FIELD_EDGE_CLASS,
   DEPENDENT_NEST_ALIGN_INLINE_SWITCH_CLASS,
-  dependentNestPaddingClasses,
+  DEPENDENT_NEST_HOST_CLASS,
+  DEPENDENT_NEST_RHYTHM_CLASS,
+} from './field-dependent-alignment.constants'
+import {
   dependentSectionStackVariants,
-  resolveDependentNestRailClasses,
-  resolveDependentNestShellClasses,
+  resolveDependentNestClasses,
   resolveDependentPresentation,
   resolveDependentSectionStackClasses,
 } from './field-dependent.variants'
@@ -31,19 +33,37 @@ describe('resolveFieldRailClasses', () => {
   })
 })
 
-describe('resolveDependentNestRailClasses', () => {
-  it('uses a weaker flush-start rail for default dependent nests', () => {
-    const classes = resolveDependentNestRailClasses()
-    expect(classes).toContain('ui-field-rail-nest')
-    expect(classes).toContain('ui-border--subtle')
-  })
-})
-
 describe('dependent nest alignment CSS', () => {
   it('ties inline modifiers to choice-control theme variables', () => {
     expect(dependentNestCss).toContain('var(--control-choice-switch-width)')
     expect(dependentNestCss).toContain('var(--control-choice-indicator-size-sm)')
     expect(dependentNestCss).toContain('var(--spacing)')
+  })
+})
+
+describe('resolveDependentNestClasses', () => {
+  it('includes the nest block and subtle border strength for the rail', () => {
+    const classes = resolveDependentNestClasses({
+      rhythm: 'comfortable',
+      surfaceHost: 'field-container',
+    })
+    expect(classes).toContain('ui-field-dependent-nest')
+    expect(classes).toContain('ui-border--subtle')
+  })
+
+  it('maps compact and comfortable rhythm modifiers', () => {
+    const compact = resolveDependentNestClasses({
+      rhythm: 'compact',
+      surfaceHost: 'field-container',
+    })
+    expect(compact).toContain(DEPENDENT_NEST_RHYTHM_CLASS.compact)
+    expect(compact).not.toContain(DEPENDENT_NEST_RHYTHM_CLASS.comfortable)
+
+    const comfortable = resolveDependentNestClasses({
+      rhythm: 'comfortable',
+      surfaceHost: 'field-container',
+    })
+    expect(comfortable).toContain(DEPENDENT_NEST_RHYTHM_CLASS.comfortable)
   })
 })
 
@@ -67,23 +87,32 @@ describe('resolveDependentPresentation', () => {
     })
     expect(presentation.chrome).toBe(DEFAULT_DEPENDENT_CHROME)
     expect(presentation.showNest).toBe(true)
-    expect(presentation.railClassName).toContain('ui-field-rail-nest')
-    expect(presentation.nestShellClassName).toContain(DEPENDENT_NEST_ALIGN_INLINE_SWITCH_CLASS)
-    expect(presentation.nestShellClassName).not.toContain('ml-11')
+    expect(presentation.nestClassName).toContain('ui-field-dependent-nest')
+    expect(presentation.nestClassName).toContain('ui-border--subtle')
+    expect(presentation.nestClassName).toContain(DEPENDENT_NEST_ALIGN_INLINE_SWITCH_CLASS)
+    expect(presentation.nestClassName).toContain(DEPENDENT_NEST_RHYTHM_CLASS.comfortable)
+    expect(presentation.nestClassName).not.toContain('ml-11')
+  })
+
+  it('uses compact rhythm on the nest when density is compact', () => {
+    const presentation = resolveDependentPresentation({}, 'compact', {
+      controller: switchController,
+    })
+    expect(presentation.nestClassName).toContain(DEPENDENT_NEST_RHYTHM_CLASS.compact)
+    expect(presentation.nestClassName).not.toContain(DEPENDENT_NEST_RHYTHM_CLASS.comfortable)
   })
 
   it('uses field-edge alignment for stacked select controllers', () => {
     const presentation = resolveDependentPresentation({}, 'comfortable', {
       controller: selectController,
     })
-    expect(presentation.nestShellClassName).toContain(DEPENDENT_NEST_ALIGN_FIELD_EDGE_CLASS)
+    expect(presentation.nestClassName).toContain(DEPENDENT_NEST_ALIGN_FIELD_EDGE_CLASS)
   })
 
   it('opts out of nest chrome when chrome is none', () => {
     const presentation = resolveDependentPresentation({ chrome: 'none' }, 'comfortable')
     expect(presentation.showNest).toBe(false)
-    expect(presentation.railClassName).toBeUndefined()
-    expect(presentation.nestShellClassName).toBeUndefined()
+    expect(presentation.nestClassName).toBeUndefined()
   })
 
   it('maps legacy inset false to flush layout', () => {
@@ -100,16 +129,20 @@ describe('resolveDependentPresentation', () => {
       controller: switchController,
     })
     expect(presentation.showNest).toBe(true)
-    expect(presentation.nestShellClassName).toContain(dependentNestPaddingClasses)
-    expect(presentation.nestShellClassName).not.toContain('border')
+    expect(presentation.nestClassName).toContain(DEPENDENT_NEST_RHYTHM_CLASS.comfortable)
+    expect(presentation.nestClassName).not.toContain('rounded-md')
   })
 
-  it('uses background fill on field-container hosts', () => {
-    expect(resolveDependentNestShellClasses('field-container')).toContain('bg-background')
+  it('uses background host on field-container hosts', () => {
+    expect(
+      resolveDependentNestClasses({ rhythm: 'comfortable', surfaceHost: 'field-container' }),
+    ).toContain(DEPENDENT_NEST_HOST_CLASS['field-container'])
   })
 
-  it('uses faint fill on array-item hosts', () => {
-    expect(resolveDependentNestShellClasses('array-item')).toContain('bg-surface-faint')
+  it('uses faint host on array-item hosts', () => {
+    expect(
+      resolveDependentNestClasses({ rhythm: 'comfortable', surfaceHost: 'array-item' }),
+    ).toContain(DEPENDENT_NEST_HOST_CLASS['array-item'])
   })
 })
 

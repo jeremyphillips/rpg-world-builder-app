@@ -5,10 +5,10 @@ import type { FieldRowAlignment } from '../../components/ui/field-control-band.v
 import type { FieldChrome } from '../../components/ui/field-chrome.variants'
 import type { FieldGroupChrome } from '../../components/ui/field-group-chrome.variants'
 import type { FieldGroupDisclosure } from '../../components/ui/field-group-disclosure.types'
-import type {
-  FieldDependentsScope,
-  SemanticSurfaceTone,
-} from '../../components/ui/field-dependent.variants'
+import type { SemanticSurfaceTone } from '../../components/ui/field-dependent.variants'
+
+/** Legacy scope split — ignored; the default nest always wraps dependents. */
+export type FieldDependentsScope = 'wrapper' | 'arrayItems'
 import type { SurfaceConfig } from '../../components/ui/visual-vocabulary.types'
 import type { FieldSeparator, FormHeadingScale } from '../../components/ui/field.variants'
 import type { ArrayResolveFieldsFn } from '../config/array/array-resolve-fields.lib'

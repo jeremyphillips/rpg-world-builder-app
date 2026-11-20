@@ -224,7 +224,7 @@ function DependentFieldsRegionContent({
 
   return (
     <div
-      className={cn(presentation.railClassName, presentation.nestShellClassName)}
+      className={presentation.nestClassName}
       data-field-dependent-fields=""
       data-field-dependent-nest=""
     >

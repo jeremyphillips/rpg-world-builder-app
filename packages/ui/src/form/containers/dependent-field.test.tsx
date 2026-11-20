@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { z } from 'zod'
 
+import { DEPENDENT_NEST_HOST_CLASS } from '../../components/ui/field-dependent-alignment.constants'
 import {
   DEPENDENT_NEST_ALIGN_FIELD_EDGE_CLASS,
   DEPENDENT_NEST_ALIGN_INLINE_SWITCH_CLASS,
@@ -114,7 +115,7 @@ describe('dependent field', () => {
     await waitFor(() => {
       const region = queryDependentsRegion(container)
       expect(region).toHaveClass(DEPENDENT_NEST_ALIGN_INLINE_SWITCH_CLASS)
-      expect(region).toHaveClass('bg-background')
+      expect(region).toHaveClass(DEPENDENT_NEST_HOST_CLASS['field-container'])
       expect(region).toHaveAttribute('data-field-dependent-nest', '')
       expect(region).not.toContainElement(switchControl)
       expect(region).toContainElement(screen.getByLabelText('Feature value'))
@@ -135,8 +136,8 @@ describe('dependent field', () => {
 
     await waitFor(() => {
       const shell = queryChromeShell(container)
-      expect(shell).toHaveClass('bg-background')
-      expect(shell).not.toHaveClass('border')
+      expect(shell).toHaveClass(DEPENDENT_NEST_HOST_CLASS['field-container'])
+      expect(shell).not.toHaveClass('rounded-md')
       expect(queryDependentsRegion(container)).toHaveClass(DEPENDENT_NEST_ALIGN_INLINE_SWITCH_CLASS)
     })
   })
@@ -203,7 +204,7 @@ describe('dependent field', () => {
       const region = queryDependentsRegion(container)
       expect(region).toHaveAttribute('data-field-dependent-nest', '')
       expect(region).toHaveClass(DEPENDENT_NEST_ALIGN_INLINE_SWITCH_CLASS)
-      expect(region).toHaveClass('ui-field-rail-nest')
+      expect(region).toHaveClass('ui-field-dependent-nest')
       expect(region?.querySelector(':scope > [data-field-dependent-nest]')).toBeNull()
     })
   })
@@ -385,7 +386,7 @@ describe('dependent field', () => {
 
     await waitFor(() => {
       const nest = queryChromeShell(container)
-      expect(nest).toHaveClass('bg-background')
+      expect(nest).toHaveClass(DEPENDENT_NEST_HOST_CLASS['field-container'])
       expect(screen.getByRole('group', { name: /Item #1/ })).toBeInTheDocument()
     })
   })

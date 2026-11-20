@@ -187,6 +187,8 @@ const fieldGroupCssPath = path.join(stylesDir, '../components/ui/field-group.css
 
 const fieldGroupChromeCssPath = path.join(stylesDir, '../components/ui/field-group-chrome.css')
 
+const fieldDependentCssPath = path.join(stylesDir, '../components/ui/field-dependent.css')
+
 const choiceControlCssPath = path.join(stylesDir, '../components/ui/choice-control.css')
 
 const interactiveRowCssPath = path.join(stylesDir, '../components/ui/interactive-row.css')
@@ -524,6 +526,23 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
           'padding-top',
           'padding-bottom',
         ] as const,
+      })),
+    ],
+  },
+  {
+    filePath: fieldDependentCssPath,
+    dimensions: [
+      ...(['compact', 'comfortable'] as const).map((name) => ({
+        modifierPrefix: `ui-field-dependent-nest--${name}`,
+        requiredProperties: [
+          'padding-block',
+          'padding-inline-end',
+          'padding-inline-start',
+        ] as const,
+      })),
+      ...(['host-field-container', 'host-array-item'] as const).map((name) => ({
+        modifierPrefix: `ui-field-dependent-nest--${name}`,
+        requiredProperties: ['background-color', '--surface-current'] as const,
       })),
     ],
   },

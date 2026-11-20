@@ -25,18 +25,5 @@
     background-color: var(--primary);
   }
 
-  .ui-field-rail-nest {
-    position: relative;
-    border-width: 0;
-  }
-
-  .ui-field-rail-nest::before {
-    content: '';
-    position: absolute;
-    inset-block: 0;
-    inset-inline-start: 0;
-    width: 1px;
-    border-radius: 9999px;
-    background-color: var(--ui-border-color);
-  }
+  /* Dependent nest rail — see field-dependent.css (`ui-field-dependent-nest`). */
 }

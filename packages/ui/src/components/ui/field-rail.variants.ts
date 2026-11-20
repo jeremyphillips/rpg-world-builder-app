@@ -16,10 +16,3 @@ export function resolveFieldRailClasses(tone: FieldRailTone = 'neutral'): string
       : cn('ui-border--default', 'ui-field-rail--tone-neutral'),
   )
 }
-
-/**
- * Weaker decorative rail for default dependent nests — flush inline-start.
- */
-export function resolveDependentNestRailClasses(): string {
-  return cn('ui-field-rail-nest', borderStrength('subtle'))
-}

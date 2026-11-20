@@ -87,10 +87,10 @@ An `srOnly` label stays in the accessibility tree and does not occupy the label 
 
 > **Default dependent nest:** weaker flush-left rail + 44px inset + host-aware fill. Opt out with `dependents.chrome: 'none'` for flush alignment.
 
-| Concept            | Meaning                                                                                                                                                                                                                                                            |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Dependent nest** | Default when `dependents.chrome` is omitted or `'rail'` / legacy `'panel'` — `ml-11`, padding `12/12/12/16`, weaker `before:left-0` rail, host-aware fill (`bg-background` on field containers, `bg-surface-faint` inside array items). No border or extra radius. |
-| **Opt out**        | `dependents.chrome: 'none'` — no rail, fill, or nest inset. Legacy `inset: false` maps to flush layout at render time.                                                                                                                                             |
+| Concept            | Meaning                                                                                                                                                                                                      |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Dependent nest** | Default when `dependents.chrome` is omitted or `'rail'` / legacy `'panel'` — `ui-field-dependent-nest` with anatomy alignment, rhythm inset, flush rail, and host fill modifiers. No border or extra radius. |
+| **Opt out**        | `dependents.chrome: 'none'` — no rail, fill, or nest inset. Legacy `inset: false` maps to flush layout at render time.                                                                                       |
 
 - Controller → dependents gap is **4px compact / 8px comfortable** via `resolveDependentSectionStackClasses` on `data-field-dependent`.
 - Nested dependent regions keep nest decoration but do **not** get additional field containers.

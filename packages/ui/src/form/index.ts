@@ -322,9 +322,7 @@ export {
   DEFAULT_PANEL_SURFACE,
   SEMANTIC_SURFACE_TONES,
   type SemanticSurfaceTone,
-  resolveFieldDependentsChromeClasses,
   resolveSurfaceClasses,
-  type FieldDependentsScope,
 } from '../components/ui/field-dependent.variants'
 export {
   DICE_FORMULA_TAIL_OPERATORS,
