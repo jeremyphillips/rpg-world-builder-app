@@ -163,8 +163,6 @@ export const MONSTER_MULTIATTACK_REMOVE_ALTERNATIVE_LABEL = 'Remove alternative 
 export const MONSTER_MULTIATTACK_ALTERNATIVE_HINT = 'The creature uses this sequence instead.'
 export const MONSTER_MULTIATTACK_ONLY_AFTER_USING_LABEL = 'Only after using'
 export const MONSTER_MULTIATTACK_NO_PREREQUISITE = 'No action can be required first.'
-export const MONSTER_MULTIATTACK_IF_AVAILABLE_LABEL = 'If available'
-export const MONSTER_MULTIATTACK_IF_AVAILABLE_HINT = 'Only when that action can be used.'
 export const MONSTER_MULTIATTACK_OPTIONAL_LABEL = 'Optional'
 export const MONSTER_MULTIATTACK_OPTIONAL_HINT =
   'The creature can choose whether to use this action.'

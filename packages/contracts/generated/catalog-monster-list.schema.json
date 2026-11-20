@@ -4562,10 +4562,6 @@
                     "type": "string",
                     "const": "any",
                     "description": "any"
-                  },
-                  "whenAvailable": {
-                    "type": "boolean",
-                    "const": true
                   }
                 },
                 "required": [
@@ -6394,10 +6390,6 @@
             "optional": {
               "type": "boolean",
               "const": true
-            },
-            "whenAvailable": {
-              "type": "boolean",
-              "const": true
             }
           },
           "required": [
@@ -6426,10 +6418,6 @@
               "items": {
                 "$ref": "#/definitions/__schema238"
               }
-            },
-            "whenAvailable": {
-              "type": "boolean",
-              "const": true
             }
           },
           "required": [

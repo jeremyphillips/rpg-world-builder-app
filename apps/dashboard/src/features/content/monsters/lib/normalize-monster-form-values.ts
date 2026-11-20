@@ -266,12 +266,11 @@ function applyMultiattackDraft(cleaned: Record<string, unknown>): void {
     else delete step.count
     if (step.mode !== 'choice') {
       keepLiteralTrue(step, 'optional')
-      keepLiteralTrue(step, 'whenAvailable')
       if (step.actionId === '') delete step.actionId
     } else {
-      keepLiteralTrue(step, 'whenAvailable')
       step.choices = filterChoiceRows(step.choices)
     }
+    delete step.whenAvailable
   }
 
   if (Array.isArray(cleaned.steps)) {
@@ -292,7 +291,7 @@ function applyMultiattackDraft(cleaned: Record<string, unknown>): void {
     replacement.choices = filterChoiceRows(replacement.choices)
     if (replacement.attackWord === true) replacement.attackWord = 'any'
     if (replacement.attackWord !== 'any') delete replacement.attackWord
-    keepLiteralTrue(replacement, 'whenAvailable')
+    delete replacement.whenAvailable
     cleaned.replacement = replacement
   }
 

@@ -16,6 +16,7 @@ import { MOVEMENT_ALLOWANCE_ENTRIES, type MovementAllowance } from '../../vocab/
 import { resolveMonsterActionIdentity } from './resolve-monster-action-identity'
 import { formatMonsterStatBlockSubject } from './spell-entry-presentation'
 import type { MonsterReferencedSpell } from './reaction-trigger'
+import { multiattackIfAvailableSuffix } from './multiattack-if-available'
 
 type MultiattackAction = Extract<MonsterAction, { kind: 'multiattack' }>
 
@@ -51,6 +52,10 @@ type FormatContext = {
 
 function sectionRows(ctx: FormatContext): readonly MonsterAction[] {
   return [...ctx.actions, ...(ctx.bonusActions ?? [])]
+}
+
+function resolvePeerAction(id: string, ctx: FormatContext): MonsterAction | undefined {
+  return sectionRows(ctx).find((entry) => entry.id === id)
 }
 
 function referencedActionName(
@@ -161,7 +166,9 @@ function formatReplacementPhrase(
   if (!targetPhrase) return undefined
 
   const choiceText = formatReplacementChoiceList(phrases as string[])
-  const available = replacement.whenAvailable ? ' if available' : ''
+  const available = multiattackIfAvailableSuffix(choices, (actionId) =>
+    resolvePeerAction(actionId, ctx),
+  )
   return `It can replace ${targetPhrase} with ${choiceText}${available}`
 }
 
@@ -175,7 +182,11 @@ function formatUseSinglePhrase(
   const count = step.count ?? 1
   const verb = step.optional ? 'can use' : 'uses'
   const twice = count === 2 ? ' twice' : ''
-  const available = step.whenAvailable ? ' if available' : ''
+  const available = multiattackIfAvailableSuffix(
+    [{ actionId: step.actionId, spellId: step.spellId }],
+    (actionId) => resolvePeerAction(actionId, ctx),
+    { skip: Boolean(step.optional) },
+  )
   if (resolved.kind === 'spell' && step.spellId) {
     const spellAction = resolved.action as Extract<MonsterAction, { kind: 'spell' }>
     const spellName = spellEntryLabel(spellAction, step.spellId, ctx)
@@ -205,7 +216,9 @@ function formatUseChoicePhrase(
   })
   if (names.some((name) => !name)) return undefined
   const list = joinNaturalList(names as string[], { conjunction: 'or' })
-  const available = step.whenAvailable ? ' if available' : ''
+  const available = multiattackIfAvailableSuffix(step.choices, (actionId) =>
+    resolvePeerAction(actionId, ctx),
+  )
   const prefix = subjectAlreadyPresent ? '' : `${capitalizeSubject(ctx.monsterName)} `
   return `${prefix}uses ${list}${available}`.trim()
 }

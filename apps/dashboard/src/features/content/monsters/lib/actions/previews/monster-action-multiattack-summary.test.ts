@@ -141,7 +141,6 @@ describe('buildMonsterActionMultiattackPreview', () => {
             count: 1,
             replacesActionId: '',
             attackWord: false,
-            whenAvailable: false,
           },
         },
       ] as MonsterFormValues['actions'],

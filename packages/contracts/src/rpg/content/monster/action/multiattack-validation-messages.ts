@@ -80,10 +80,6 @@ export const multiattackValidationMessages = {
     'validation.multiattack.attack-word-with-target',
     () => 'Choose any attack, or choose one attack by name.',
   ),
-  optionalAndWhenAvailable: defineMessage(
-    'validation.multiattack.optional-and-when-available',
-    () => 'An action cannot be both optional and limited to when it is available.',
-  ),
   useModeContradiction: defineMessage(
     'validation.multiattack.use-mode-contradiction',
     () => 'Choose one action, or list choices.',

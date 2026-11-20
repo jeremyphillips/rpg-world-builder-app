@@ -16,7 +16,6 @@ export const multiattackReplacementSchema = z
     choices: z.array(multiattackReplacementChoiceSchema).min(1),
     replacesActionId: z.string().min(1).optional(),
     attackWord: z.literal('any').optional(),
-    whenAvailable: z.literal(true).optional(),
   })
   .strict()
 
@@ -26,7 +25,6 @@ export const multiattackReplacementDraftSchema = z
     choices: z.array(multiattackReplacementChoiceDraftSchema).default([]),
     replacesActionId: z.string().min(1).optional(),
     attackWord: z.literal('any').optional(),
-    whenAvailable: z.literal(true).optional(),
   })
   .strict()
 
@@ -48,7 +46,6 @@ export const multiattackUseSinglePublishedSchema = z
     count: z.number().int().min(1).optional(),
     spellId: z.string().min(1).optional(),
     optional: z.literal(true).optional(),
-    whenAvailable: z.literal(true).optional(),
   })
   .strict()
 
@@ -60,7 +57,6 @@ export const multiattackUseSingleDraftSchema = z
     count: z.number().int().min(1).optional(),
     spellId: z.string().min(1).optional(),
     optional: z.literal(true).optional(),
-    whenAvailable: z.literal(true).optional(),
   })
   .strict()
 
@@ -69,7 +65,6 @@ export const multiattackUseChoicePublishedSchema = z
     kind: z.literal('use'),
     mode: z.literal('choice'),
     choices: z.array(multiattackUseChoiceRowSchema).min(1),
-    whenAvailable: z.literal(true).optional(),
   })
   .strict()
 
@@ -78,7 +73,6 @@ export const multiattackUseChoiceDraftSchema = z
     kind: z.literal('use'),
     mode: z.literal('choice').optional(),
     choices: z.array(multiattackUseChoiceRowDraftSchema).default([]),
-    whenAvailable: z.literal(true).optional(),
   })
   .strict()
 

@@ -91,6 +91,32 @@ describe('formatMonsterMultiattack', () => {
     ).toBe('unavailable')
   })
 
+  it('appends if available when a replacement choice has limited use', () => {
+    const actions = [
+      { id: 'claw', kind: 'natural-weapon', name: 'Claw' },
+      {
+        id: 'breath',
+        kind: 'save',
+        name: 'Fire Breath',
+        limitedUse: { kind: 'recharge', minRoll: 5 },
+      },
+      {
+        id: 'multiattack',
+        kind: 'multiattack',
+        name: 'Multiattack',
+        steps: [{ count: 1, actionIds: ['claw'] }],
+        replacement: {
+          count: 1,
+          replacesActionId: 'claw',
+          choices: [{ actionId: 'breath' }],
+        },
+      },
+    ] as MonsterAction[]
+    expect(formatSentence({ name: 'Chimera', multiattack: actions[2] as never, actions })).toBe(
+      'The chimera makes one Claw attack. It can replace the Claw attack with a use of Fire Breath if available.',
+    )
+  })
+
   it('prints replacement attack choices', () => {
     const actions = [
       { id: 'beak', kind: 'natural-weapon', name: 'Beak' },

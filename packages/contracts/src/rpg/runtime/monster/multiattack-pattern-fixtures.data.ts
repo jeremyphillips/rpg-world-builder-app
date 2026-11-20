@@ -1,5 +1,6 @@
 import { MONSTER_SPELLCASTING_ACTION_NAME } from '../../content/monster/spell-casting-source'
 import type { MonsterAction, MonsterBonusAction } from '../../content/monster/action/index'
+import type { LimitedUse } from '../../primitives/limited-use'
 import type { MonsterReferencedSpell } from './reaction-trigger'
 
 export const MULTIATTACK_PATTERN_CLASSES = [
@@ -72,13 +73,18 @@ function nw(id: string, name: string): MonsterAction {
   } as MonsterAction
 }
 
-function sp(id: string, name: string): MonsterAction {
+function sp(
+  id: string,
+  name: string,
+  extra?: { limitedUse?: LimitedUse; onceUntilNextTurn?: true },
+): MonsterAction {
   return {
     id,
     kind: 'special',
     name,
     description: '<p>Special rules.</p>',
-  }
+    ...extra,
+  } as MonsterAction
 }
 
 function spellcasting(
@@ -252,7 +258,7 @@ export const MULTIATTACK_PATTERN_FIXTURES: readonly MultiattackPatternFixture[] 
       nw('ram', 'Ram'),
       nw('bite', 'Bite'),
       nw('claw', 'Claw'),
-      sp('fire-breath', 'Fire Breath'),
+      sp('fire-breath', 'Fire Breath', { limitedUse: { kind: 'recharge', minRoll: 5 } }),
     ],
     multiattack: ma(
       [
@@ -264,7 +270,6 @@ export const MULTIATTACK_PATTERN_FIXTURES: readonly MultiattackPatternFixture[] 
         replacement: {
           count: 1,
           replacesActionId: 'claw',
-          whenAvailable: true,
           choices: [{ actionId: 'fire-breath' }],
         },
       },
@@ -370,14 +375,19 @@ export const MULTIATTACK_PATTERN_FIXTURES: readonly MultiattackPatternFixture[] 
     peerActions: [
       nw('tentacle', 'Tentacle'),
       sp('consume-memories', 'Consume Memories'),
-      sp('dominate-mind', 'Dominate Mind'),
+      sp('dominate-mind', 'Dominate Mind', {
+        limitedUse: {
+          kind: 'uses',
+          count: { kind: 'fixed', value: 2 },
+          recovery: { minimumRest: 'long' },
+        },
+      }),
     ],
     multiattack: ma([
       { count: 2, actionIds: ['tentacle'] },
       {
         kind: 'use',
         mode: 'choice',
-        whenAvailable: true,
         choices: [{ actionId: 'consume-memories' }, { actionId: 'dominate-mind' }],
       },
     ]),
@@ -389,12 +399,18 @@ export const MULTIATTACK_PATTERN_FIXTURES: readonly MultiattackPatternFixture[] 
     patternClass: 'use-when-available',
     slug: 'doppelganger',
     monsterName: 'Doppelganger',
-    peerActions: [nw('slam', 'Slam'), sp('read-thoughts', 'Read Thoughts')],
+    peerActions: [
+      nw('slam', 'Slam'),
+      sp('unsettling-visage', 'Unsettling Visage', {
+        limitedUse: { kind: 'recharge', minRoll: 6 },
+      }),
+    ],
     multiattack: ma([
       { count: 1, actionIds: ['slam'] },
-      { kind: 'use', mode: 'single', actionId: 'read-thoughts', whenAvailable: true },
+      { kind: 'use', mode: 'single', actionId: 'unsettling-visage' },
     ]),
-    expectedSentence: 'The doppelganger makes one Slam attack and uses Read Thoughts if available.',
+    expectedSentence:
+      'The doppelganger makes one Slam attack and uses Unsettling Visage if available.',
   },
   {
     id: 'multiattack-pattern/alternative-attack-led',

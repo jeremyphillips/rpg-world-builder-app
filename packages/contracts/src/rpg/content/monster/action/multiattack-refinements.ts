@@ -27,7 +27,6 @@ type MultiattackRow = {
     choices?: readonly { actionId?: string; spellId?: string }[]
     replacesActionId?: string
     attackWord?: 'any'
-    whenAvailable?: true
   }
   alternative?: {
     steps?: readonly MultiattackDraftStep[]
@@ -130,7 +129,6 @@ function refineUseClause(
     actionId?: string
     spellId?: string
     optional?: true
-    whenAvailable?: true
     choices?: readonly { actionId?: string; spellId?: string }[]
   }
 
@@ -167,12 +165,6 @@ function refineUseClause(
       addCustomRefinementIssue(ctx, multiattackValidationMessages.useModeContradiction(), [
         ...stepPath,
         'mode',
-      ])
-    }
-    if (single.optional && single.whenAvailable) {
-      addCustomRefinementIssue(ctx, multiattackValidationMessages.optionalAndWhenAvailable(), [
-        ...stepPath,
-        'optional',
       ])
     }
     if (!single.actionId) {

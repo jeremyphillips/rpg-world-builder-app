@@ -23,8 +23,6 @@ import {
   MONSTER_MULTIATTACK_CHOICES_LABEL,
   MONSTER_MULTIATTACK_COMBINATION_HINT,
   MONSTER_MULTIATTACK_COUNT_LABEL,
-  MONSTER_MULTIATTACK_IF_AVAILABLE_HINT,
-  MONSTER_MULTIATTACK_IF_AVAILABLE_LABEL,
   MONSTER_MULTIATTACK_NO_PREREQUISITE,
   MONSTER_MULTIATTACK_ONLY_AFTER_USING_LABEL,
   MONSTER_MULTIATTACK_OPTIONAL_HINT,
@@ -95,6 +93,8 @@ function monsterMultiattackUseClauseFields(input: {
       name: 'count',
       label: MONSTER_MULTIATTACK_TIMES_LABEL,
       min: 1,
+      step: 1,
+      control: 'stepper',
       visibility: singleUseVisible,
     },
     {
@@ -103,16 +103,6 @@ function monsterMultiattackUseClauseFields(input: {
       label: MONSTER_MULTIATTACK_OPTIONAL_LABEL,
       hint: { text: MONSTER_MULTIATTACK_OPTIONAL_HINT },
       visibility: singleUseVisible,
-    },
-    {
-      type: 'checkbox',
-      name: 'whenAvailable',
-      label: MONSTER_MULTIATTACK_IF_AVAILABLE_LABEL,
-      hint: { text: MONSTER_MULTIATTACK_IF_AVAILABLE_HINT },
-      visibility: {
-        dependsOn: ['kind', 'mode'],
-        visibleWhen: (values) => values.kind === 'use',
-      },
     },
     {
       kind: 'array',
@@ -177,6 +167,8 @@ function monsterMultiattackStepsArray(input: {
         name: 'count',
         label: MONSTER_MULTIATTACK_COUNT_LABEL,
         min: 1,
+        step: 1,
+        control: 'stepper',
         visibility: attackGroupVisible,
       },
       {
@@ -231,6 +223,8 @@ function monsterMultiattackReplacementGroup(input: {
         label: MONSTER_MULTIATTACK_ATTACKS_REPLACED_LABEL,
         hint: { text: MONSTER_MULTIATTACK_ATTACKS_REPLACED_HINT },
         min: 1,
+        step: 1,
+        control: 'stepper',
       },
       {
         type: 'select',
@@ -250,12 +244,6 @@ function monsterMultiattackReplacementGroup(input: {
         label: MONSTER_MULTIATTACK_ANY_ATTACK_LABEL,
         hint: { text: MONSTER_MULTIATTACK_ANY_ATTACK_HINT },
         optionalDisclosure: { intent: 'add', actionSubject: 'any attack wording' },
-      },
-      {
-        type: 'checkbox',
-        name: 'replacement.whenAvailable',
-        label: MONSTER_MULTIATTACK_IF_AVAILABLE_LABEL,
-        hint: { text: MONSTER_MULTIATTACK_IF_AVAILABLE_HINT },
       },
       {
         kind: 'array',
