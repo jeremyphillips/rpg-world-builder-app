@@ -13,7 +13,7 @@ export function fieldClearAffordanceGroupedClasses(size: FieldSize): string {
     groupedEndLabelSegmentShellClasses(size),
     resolveFieldGroupSizeClass(size),
     resolveFieldGroupCaretSlotClass(),
-    'inline-flex shrink-0 cursor-pointer items-center justify-center text-muted-foreground hover:text-foreground',
+    'relative z-[2] inline-flex shrink-0 cursor-pointer items-center justify-center text-muted-foreground hover:text-foreground',
     interactiveFocusVariants({ context: 'embedded' }),
   )
 }

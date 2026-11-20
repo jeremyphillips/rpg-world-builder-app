@@ -23,12 +23,14 @@ beforeAll(() => {
   }
 })
 
+const counterspellId = 'srd:counterspell'
+
 const ctx = {
   entityCatalogLayer: 'homebrew',
   equipmentCatalogStatus: 'ready',
   equipmentCatalogById: new Map(),
   spellCatalogStatus: 'ready',
-  spellCatalogById: new Map(),
+  spellCatalogById: new Map([[counterspellId, { id: counterspellId, name: 'Counterspell' }]]),
   armorClassRules: { mode: 'ascending', base: 10 },
   options: { skills: { visible: [] } },
   rulesetId: 'srd-cc-5.2.1',
@@ -77,6 +79,13 @@ const paralyzingTouch = {
   mode: 'melee',
   damageType: 'necrotic',
   damage: { dice: { count: 3, faces: 6 } },
+}
+
+const spellcasting = {
+  id: 'spellcasting',
+  kind: 'spell',
+  name: 'Spellcasting',
+  spells: [{ spellId: counterspellId }],
 }
 
 function Harness({ onReady }: { onReady: (getValues: () => MonsterFormValues) => void }) {
@@ -179,6 +188,62 @@ describe('multiattack replacement form values', () => {
     expect(screen.getByRole('spinbutton', { name: /Attacks replaced/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Add target attack/i })).toBeInTheDocument()
     expect(screen.queryByText(/Replaces 1 attack/i)).not.toBeInTheDocument()
+  })
+
+  it('clears a pinned spell from a replacement choice', async () => {
+    const user = userEvent.setup()
+    let read: (() => MonsterFormValues) | undefined
+
+    function SpellChoiceHarness() {
+      const defaultValues = monsterFormTestValues({
+        name: 'Lich',
+        actions: [multiattack, bite, spellcasting] as MonsterFormValues['actions'],
+      })
+      primeMultiattackReplacementActionsSnapshot(defaultValues.actions as MonsterActionDraftRow[])
+      const form = useForm<MonsterFormValues>({ defaultValues, shouldUnregister: true })
+      read = () => form.getValues()
+      return (
+        <FormProvider {...form}>
+          <FormItems
+            idPrefix="multiattack"
+            namePrefix="actions.0"
+            items={monsterMultiattackFormFields({
+              namePrefix: 'actions.0',
+              section: 'actions',
+              action: multiattack as Extract<MonsterActionDraftRow, { kind: 'multiattack' }>,
+              ctx,
+              attackOptions: [{ value: 'bite', label: 'Bite' }],
+              useOptions: [],
+              replacementOptions: [{ value: 'spellcasting', label: 'Spellcasting' }],
+              prerequisiteOptions: [],
+              targetAttackOptions: [{ value: 'bite', label: 'Bite' }],
+              actionRows: defaultValues.actions as MonsterActionDraftRow[],
+              hasAttackOptions: true,
+              canConfigureReplacement: true,
+              weapons: [],
+              weaponActions: [],
+              allowAddWeapon: false,
+            })}
+          />
+        </FormProvider>
+      )
+    }
+
+    render(<SpellChoiceHarness />)
+
+    await user.click(screen.getByRole('button', { name: 'Add action replacement' }))
+    await user.click(screen.getByRole('button', { name: 'Add choice' }))
+    await user.click(screen.getByRole('combobox', { name: 'Action' }))
+    await user.click(screen.getByRole('option', { name: 'Spellcasting' }))
+    await user.click(screen.getByRole('button', { name: 'Pin specific spell' }))
+    await user.click(screen.getByRole('combobox', { name: 'Spell' }))
+    await user.click(screen.getByRole('option', { name: 'Counterspell' }))
+    await user.click(screen.getByRole('button', { name: 'Clear spell' }))
+
+    const choice = (
+      read?.().actions?.[0] as { replacement?: { choices?: { spellId?: string }[] } } | undefined
+    )?.replacement?.choices?.[0]
+    expect(choice?.spellId).toBeFalsy()
   })
 
   it('stores a completed replacement under the action and previews it', async () => {

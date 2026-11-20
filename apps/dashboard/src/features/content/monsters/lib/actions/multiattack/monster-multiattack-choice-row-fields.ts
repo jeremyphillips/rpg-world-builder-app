@@ -4,6 +4,8 @@ import type { FormItem } from '@rpg/ui/form'
 import type { MonsterActionDraftRow } from '../monster-action-presets'
 import {
   MONSTER_MULTIATTACK_CHOICE_ACTION_LABEL,
+  MONSTER_MULTIATTACK_CLEAR_SPELL_LABEL,
+  MONSTER_MULTIATTACK_PIN_SPELL_LABEL,
   MONSTER_MULTIATTACK_NO_SPELLS_IN_SPELLCASTING,
   MONSTER_MULTIATTACK_SPELL_HINT,
   MONSTER_MULTIATTACK_SPELL_LABEL,
@@ -38,6 +40,13 @@ export function monsterMultiattackChoiceRowFields(input: {
       name: 'spellId',
       label: MONSTER_MULTIATTACK_SPELL_LABEL,
       placeholder: MONSTER_MULTIATTACK_SPELL_PLACEHOLDER,
+      optionalDisclosure: {
+        intent: 'add',
+        addLabel: MONSTER_MULTIATTACK_PIN_SPELL_LABEL,
+        removeLabel: MONSTER_MULTIATTACK_CLEAR_SPELL_LABEL,
+        expandWhenPopulated: true,
+        actionSubject: 'specific spell',
+      },
       visibility: {
         dependsOn: ['actionId'],
         visibleWhen: (values) =>

@@ -249,6 +249,7 @@ function monsterMultiattackReplacementGroup(input: {
         name: 'replacement.count',
         label: MONSTER_MULTIATTACK_ATTACKS_REPLACED_LABEL,
         hint: { text: MONSTER_MULTIATTACK_ATTACKS_REPLACED_HINT },
+        labelPosition: 'settings',
         min: 1,
         max: input.replacementCountMax,
         step: 1,

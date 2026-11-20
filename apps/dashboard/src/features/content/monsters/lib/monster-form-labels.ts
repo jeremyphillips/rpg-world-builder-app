@@ -155,6 +155,8 @@ export const MONSTER_MULTIATTACK_ADD_CHOICE_LABEL = 'Add choice'
 export const MONSTER_MULTIATTACK_CHOICE_ACTION_LABEL = 'Action'
 export const MONSTER_MULTIATTACK_SPELL_LABEL = 'Spell'
 export const MONSTER_MULTIATTACK_SPELL_PLACEHOLDER = 'No specific spell'
+export const MONSTER_MULTIATTACK_PIN_SPELL_LABEL = 'Pin specific spell'
+export const MONSTER_MULTIATTACK_CLEAR_SPELL_LABEL = 'Clear spell'
 export const MONSTER_MULTIATTACK_SPELL_HINT =
   'Optional. Choose a specific spell or leave unspecified.'
 export const MONSTER_MULTIATTACK_ALTERNATIVE_LABEL = 'Alternative sequence'

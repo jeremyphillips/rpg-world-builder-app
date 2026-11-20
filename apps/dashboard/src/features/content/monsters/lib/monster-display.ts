@@ -372,6 +372,7 @@ function formatMultiattackActionBody(
   equipmentById: Map<string, Equipment>,
   catalogState: MonsterCatalogLoadState,
   magicPropertyProvider: MagicPropertyDefinitionProvider,
+  spells: Pick<SpellDisplayContext, 'spellsById' | 'catalogStatus'>,
 ): string | undefined {
   if (catalogState !== 'ready') {
     return catalogState === 'error' ? MONSTER_UNRESOLVED_CATALOG_REFERENCE : undefined
@@ -383,6 +384,8 @@ function formatMultiattackActionBody(
     equipment: monster.equipment,
     equipmentCatalog: equipmentById,
     magicPropertyProvider,
+    spellsById: spells.spellsById,
+    spellCatalogStatus: spells.catalogStatus,
   })
   return appendMonsterActionSupplementalText(generated, action.description) || undefined
 }
@@ -589,6 +592,7 @@ function mapMultiattackActionItem(
     spells.equipmentById,
     catalogState,
     spells.magicPropertyProvider,
+    spells,
   )
   return {
     id: action.id,

@@ -247,11 +247,18 @@ function applyMultiattackDraft(cleaned: Record<string, unknown>): void {
 
   const filterChoiceRows = (rows: unknown): unknown[] => {
     if (!Array.isArray(rows)) return []
-    return rows.filter((row) => {
-      if (!isRecord(row)) return false
-      const actionId = row.actionId
-      return typeof actionId === 'string' && actionId.trim().length > 0
-    })
+    return rows
+      .filter((row) => {
+        if (!isRecord(row)) return false
+        const actionId = row.actionId
+        return typeof actionId === 'string' && actionId.trim().length > 0
+      })
+      .map((row) => {
+        if (!isRecord(row)) return row
+        const next = { ...row }
+        if (next.spellId === '') delete next.spellId
+        return next
+      })
   }
 
   const normalizeUseStep = (step: Record<string, unknown>) => {

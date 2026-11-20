@@ -9,6 +9,7 @@ import {
   type Monster,
   type MonsterAction,
   type MonsterActionDraft,
+  type MonsterReferencedSpell,
 } from '@rpg/contracts'
 
 type MultiattackActionShape = Extract<MonsterAction, { kind: 'multiattack' }>
@@ -115,6 +116,8 @@ export function buildMonsterMultiattackSentence(input: {
   equipment: readonly EquipmentInstance[]
   equipmentCatalog: CreatureEquipmentCatalog
   magicPropertyProvider: MagicPropertyDefinitionProvider
+  spellsById?: ReadonlyMap<string, MonsterReferencedSpell>
+  spellCatalogStatus?: 'ready' | 'unavailable'
 }): string {
   const result = formatMonsterMultiattackResult({
     monsterName: input.monsterName,
@@ -123,6 +126,8 @@ export function buildMonsterMultiattackSentence(input: {
     equipment: input.equipment,
     equipmentCatalog: input.equipmentCatalog,
     magicPropertyProvider: input.magicPropertyProvider,
+    spellsById: input.spellsById,
+    spellCatalogStatus: input.spellCatalogStatus,
   })
   return result.status === 'ready' ? result.sentence : ''
 }
@@ -147,6 +152,8 @@ function renderMultiattackProse(
     equipment: normalized.equipment ?? [],
     equipmentCatalog: monsterEquipmentCatalog(ctx),
     magicPropertyProvider: monsterMagicPropertyProvider(ctx),
+    spellsById: ctx.spellCatalogById,
+    spellCatalogStatus: ctx.spellCatalogStatus === 'ready' ? 'ready' : 'unavailable',
   })
 }
 
