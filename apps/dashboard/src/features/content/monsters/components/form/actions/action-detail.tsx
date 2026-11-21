@@ -32,6 +32,7 @@ import type { MonsterFormValues } from '../../../lib/monster-form-values'
 import {
   monsterFormSectionRowNamePrefix,
   monsterFormSectionRows,
+  monsterFormSectionRowsFieldName,
 } from '../../../lib/actions/monster-action-section-access'
 import type { useMonsterActionSections } from '../../../hooks/use-monster-action-sections'
 
@@ -184,7 +185,7 @@ export function MonsterActionDetail({
     <MasterDetailEditorPanel
       editor={editor}
       itemFields={fields}
-      fieldName={located?.section ?? 'actions'}
+      fieldName={located ? monsterFormSectionRowsFieldName(located.section) : 'actions'}
       idPrefix="monster-action"
       itemNoun={MONSTER_ACTION_ITEM_NOUN}
       showSelectedDetail={Boolean(located && action)}

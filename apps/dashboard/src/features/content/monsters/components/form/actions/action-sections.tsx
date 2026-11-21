@@ -31,16 +31,12 @@ import {
 import { monsterActionEditorTitles } from '../../../lib/actions/monster-action-editor-title'
 import { createMonsterActionRowTitleConfig } from '../../../lib/actions/monster-action-row-title'
 import { presentActionReference } from '../../../lib/actions/references/monster-action-reference-presentation'
-import {
-  isLegendaryReferenceTarget,
-  legendaryActionCategory,
-} from '../../../lib/actions/legendary/legendary-action-category'
+import { isLegendaryReferenceTarget } from '../../../lib/actions/legendary/legendary-action-category'
 import {
   LEGENDARY_ACTION_ACQUISITION_GROUPS,
   legendaryActionAcquisitionItems,
 } from '../../../lib/actions/acquisition/monster-legendary-action-acquisition'
 import {
-  LEGENDARY_ACTION_CATEGORY_LABELS,
   formatMoveReferencedActionBody,
   formatRemoveReferencedActionBody,
   MONSTER_MOVE_REFERENCED_ACTION_HEADLINE,
@@ -84,13 +80,8 @@ const SECTION_HEADINGS = {
   legendaryActions: MONSTER_LEGENDARY_ACTIONS_HEADING,
 } as const satisfies Record<MonsterActionSection, string>
 
-function resolveActionListMeta(
-  row: unknown,
-  section: MonsterActionSection,
-  sourceTitles?: ReadonlyMap<string, string>,
-) {
+function resolveActionListMeta(row: unknown, sourceTitles?: ReadonlyMap<string, string>) {
   const action = row as MonsterActionDraftRow | undefined
-  const category = section === 'legendaryActions' ? legendaryActionCategory(action) : undefined
   const reference =
     action?.kind === 'action-reference' && sourceTitles
       ? presentActionReference({
@@ -100,11 +91,7 @@ function resolveActionListMeta(
         })
       : undefined
   return {
-    kindLabel: category
-      ? LEGENDARY_ACTION_CATEGORY_LABELS[category]
-      : action
-        ? getMonsterActionKindLabel(action.kind)
-        : undefined,
+    kindLabel: action ? getMonsterActionKindLabel(action.kind) : undefined,
     ...(reference?.summary ? { summary: reference.summary } : {}),
   }
 }
@@ -287,7 +274,7 @@ function useMonsterActionDetailRows(
     editor: sections.editors.actions,
     sectionLabel: SECTION_HEADINGS.actions,
     rowTitle: actionRowTitle,
-    resolveListMeta: ({ row }) => resolveActionListMeta(row, 'actions'),
+    resolveListMeta: ({ row }) => resolveActionListMeta(row),
   })
   const bonusRows = useEmbeddedMasterDetailRows({
     ...shared,
@@ -296,7 +283,7 @@ function useMonsterActionDetailRows(
     editor: sections.editors.bonusActions,
     sectionLabel: SECTION_HEADINGS.bonusActions,
     rowTitle: bonusRowTitle,
-    resolveListMeta: ({ row }) => resolveActionListMeta(row, 'bonusActions'),
+    resolveListMeta: ({ row }) => resolveActionListMeta(row),
   })
   const reactionRows = useEmbeddedMasterDetailRows({
     ...shared,
@@ -305,7 +292,7 @@ function useMonsterActionDetailRows(
     editor: sections.editors.reactions,
     sectionLabel: SECTION_HEADINGS.reactions,
     rowTitle: reactionRowTitle,
-    resolveListMeta: ({ row }) => resolveActionListMeta(row, 'reactions', actionTitles),
+    resolveListMeta: ({ row }) => resolveActionListMeta(row, actionTitles),
   })
   const legendaryRows = useEmbeddedMasterDetailRows({
     ...shared,
@@ -314,7 +301,7 @@ function useMonsterActionDetailRows(
     editor: sections.editors.legendaryActions,
     sectionLabel: SECTION_HEADINGS.legendaryActions,
     rowTitle: legendaryRowTitle,
-    resolveListMeta: ({ row }) => resolveActionListMeta(row, 'legendaryActions', actionTitles),
+    resolveListMeta: ({ row }) => resolveActionListMeta(row, actionTitles),
   })
   return {
     titlesBySection: {
