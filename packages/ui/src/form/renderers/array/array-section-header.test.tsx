@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 
+import { formSectionHeaderLabelRowClasses } from '../../presentation/form-section-header.variants'
 import { ArraySectionHeader } from './array-section-header.client'
 
 describe('ArraySectionHeader', () => {
@@ -59,6 +60,31 @@ describe('ArraySectionHeader', () => {
     expect(screen.getAllByText('Grants')).toHaveLength(1)
     expect(screen.getByRole('group', { name: 'Grants' })).toBeInTheDocument()
     expect(legends[0]).not.toContainElement(screen.getByText('Add mechanical effects.'))
+  })
+
+  it('omits an empty label row for sr-only headers with hint when there are no issues', () => {
+    const { container } = render(
+      <fieldset>
+        <ArraySectionHeader
+          labelMode="srOnly"
+          showSectionHeader
+          sectionLabel="Grants"
+          hint="Add mechanical effects."
+          hintId="grants-hint"
+          legendFieldSize="md"
+          legendRhythm="comfortable"
+          addActionLayout="stacked"
+          arrayIssueCount={0}
+          invalidRowCount={0}
+          onFocusFirstArrayIssue={() => undefined}
+        />
+      </fieldset>,
+    )
+
+    expect(screen.getByText('Add mechanical effects.')).toBeInTheDocument()
+    expect(
+      container.querySelector(`.${formSectionHeaderLabelRowClasses.split(' ').join('.')}`),
+    ).toBeNull()
   })
 
   it('gives an anonymous section hint the description id', () => {

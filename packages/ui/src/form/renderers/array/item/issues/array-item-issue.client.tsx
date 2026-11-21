@@ -210,6 +210,17 @@ function resolveArrayIssueLinkLabel(
   return issueCountLabel(issueCount)
 }
 
+/** When false, {@link ArrayIssueLink} renders null — do not mount a label-row accessory slot. */
+export function arraySectionIssueLinkVisible(options: {
+  issueCount: number
+  invalidRowCount: number
+  hasContainerIssue?: boolean
+}): boolean {
+  if (options.issueCount <= 0) return false
+  if (options.invalidRowCount <= 0 && !options.hasContainerIssue) return false
+  return true
+}
+
 /** Aggregate invalid-row affordance beside a named array section header. */
 export function ArrayIssueLink({
   issueCount,
@@ -219,8 +230,9 @@ export function ArrayIssueLink({
   onPress,
   prominence = 'nav',
 }: ArrayIssueLinkProps) {
-  if (issueCount <= 0) return null
-  if (invalidRowCount <= 0 && !hasContainerIssue) return null
+  if (!arraySectionIssueLinkVisible({ issueCount, invalidRowCount, hasContainerIssue })) {
+    return null
+  }
 
   const label = resolveArrayIssueLinkLabel(issueCount, invalidRowCount, hasContainerIssue)
 
