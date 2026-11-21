@@ -238,6 +238,7 @@ export function monsterToFormValues(
     communication: entity.communication ?? {},
     challengeRating: entity.challengeRating,
     experiencePointsOverride: entity.experiencePointsOverride,
+    ...(entity.lair !== undefined ? { lair: entity.lair } : {}),
     proficiencies: {
       ...entity.proficiencies,
       weapons,
@@ -288,6 +289,7 @@ function baselineFromEntity(entity: Monster | undefined): MonsterNormalizeBaseli
     classIds: entity.classIds,
     description: entity.description,
     experiencePointsOverride: entity.experiencePointsOverride,
+    lair: entity.lair,
   }
 }
 

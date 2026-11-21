@@ -38,6 +38,7 @@ export type MonsterNormalizeBaseline = {
   hover?: boolean
   description?: string
   experiencePointsOverride?: number
+  lair?: Monster['lair']
 }
 
 export type NormalizeMonsterFormOptions = {
@@ -596,11 +597,25 @@ function normalizedActionSections(
   }
 }
 
+function normalizeLair(lair: MonsterFormValues['lair']): Record<string, unknown> | undefined {
+  if (lair?.enabled !== true) return undefined
+  const normalized: Record<string, unknown> = { enabled: true }
+  if (lair.experience) {
+    const experience: Record<string, unknown> = { mode: lair.experience.mode }
+    if (lair.experience.mode === 'custom' && lair.experience.value !== undefined) {
+      experience.value = lair.experience.value
+    }
+    normalized.experience = experience
+  }
+  return normalized
+}
+
 function normalizedMonsterCore(
   values: MonsterFormValues,
   options: NormalizeMonsterFormOptions,
   movement: Record<string, number>,
 ): Record<string, unknown> {
+  const lair = normalizeLair(values.lair)
   return {
     name: typeof values.name === 'string' ? values.name : '',
     sizes: values.sizes,
@@ -623,6 +638,7 @@ function normalizedMonsterCore(
     traits: normalizeTraitRichText(omitEmptyStrings(values.traits)),
     ...(values.forms ? { forms: normalizeMonsterForms(values.forms) } : {}),
     ...normalizedActionSections(values, options.intent),
+    ...(lair ? { lair } : {}),
   }
 }
 
@@ -730,23 +746,26 @@ function applyOptionalScalars(
   }
 }
 
+function tombstoneClearableKey(
+  normalized: Record<string, unknown>,
+  key: string,
+  baselineValue: unknown,
+  shouldTombstone = true,
+): void {
+  if (baselineValue !== undefined && shouldTombstone && normalized[key] === undefined) {
+    normalized[key] = null
+  }
+}
+
 function applyClearableNulls(
   normalized: Record<string, unknown>,
   baseline: NonNullable<NormalizeMonsterFormOptions['baseline']>,
   hasFly: boolean,
 ): void {
-  if (baseline.creatureFamilyIds !== undefined && normalized.creatureFamilyIds === undefined)
-    normalized.creatureFamilyIds = null
-  if (baseline.classIds !== undefined && normalized.classIds === undefined)
-    normalized.classIds = null
-  if (baseline.description !== undefined && normalized.description === undefined) {
-    normalized.description = null
-  }
-  if (baseline.hover !== undefined && !hasFly) normalized.hover = null
-  if (
-    baseline.experiencePointsOverride !== undefined &&
-    normalized.experiencePointsOverride === undefined
-  ) {
-    normalized.experiencePointsOverride = null
-  }
+  tombstoneClearableKey(normalized, 'creatureFamilyIds', baseline.creatureFamilyIds)
+  tombstoneClearableKey(normalized, 'classIds', baseline.classIds)
+  tombstoneClearableKey(normalized, 'description', baseline.description)
+  tombstoneClearableKey(normalized, 'hover', baseline.hover, !hasFly)
+  tombstoneClearableKey(normalized, 'experiencePointsOverride', baseline.experiencePointsOverride)
+  tombstoneClearableKey(normalized, 'lair', baseline.lair)
 }

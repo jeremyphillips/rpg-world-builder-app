@@ -65,7 +65,6 @@
   "features/content/monsters/lib/forms/monster-form-availability-fields.ts::formAvailability": 1,
   "features/content/monsters/lib/forms/monster-forms-form-fields.ts::formsShapeShifting": 1,
   "features/content/monsters/lib/monster-form-fields.tsx::_challengeRatingZeroXp": 1,
-  "features/content/monsters/lib/statistics/monster-lair-form-fields.tsx::lair": 1,
   "features/content/monsters/lib/monster-form-fields.tsx::abilityScores": 1,
   "features/content/monsters/lib/monster-form-fields.tsx::actions": 1,
   "features/content/monsters/lib/monster-form-fields.tsx::equipment": 1,

@@ -39,8 +39,10 @@ import {
   MONSTER_LEGENDARY_USES_LABEL,
   monsterEquipmentSectionLabel,
 } from './monster-form-labels'
-import { monsterLairFormFields } from './statistics/monster-lair-form-fields'
-import type { MonsterFormValues } from './monster-form-values'
+import {
+  monsterLairEnabledVisibility,
+  monsterLairFormFields,
+} from './statistics/monster-lair-form-fields'
 import { monsterClassificationFields } from './monster-classification-fields'
 import { MONSTER_FORM_TAB } from './monster-form-view'
 import {
@@ -78,12 +80,6 @@ const challengeRatingOptions = [...CHALLENGE_RATING_IDS]
       trailingScope: 'item' as const,
     }
   })
-
-const lairEnabledVisibility = {
-  dependsOn: ['lair.enabled'],
-  visibleWhen: (values: Record<string, unknown>) =>
-    (values.lair as { enabled?: boolean } | undefined)?.enabled === true,
-}
 
 function creatureTypeOptions(ctx: ContentFormCtx) {
   const vocabulary = ctx.creatureTypeVocabulary
@@ -224,7 +220,7 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
               width: 'auto',
               control: 'stepper',
               shouldUnregister: false,
-              visibility: lairEnabledVisibility,
+              visibility: monsterLairEnabledVisibility,
             },
           ],
         },
