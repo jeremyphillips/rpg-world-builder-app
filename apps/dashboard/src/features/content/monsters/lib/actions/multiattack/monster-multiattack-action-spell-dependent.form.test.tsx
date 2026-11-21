@@ -10,7 +10,6 @@ import type { MonsterFormValues } from '../../monster-form-values'
 import {
   MONSTER_MULTIATTACK_ADD_ACTION_CHOICE_LABEL,
   MONSTER_MULTIATTACK_ADD_TO_SEQUENCE_LABEL,
-  MONSTER_MULTIATTACK_USE_AN_ACTION_LABEL,
 } from '../../monster-form-labels'
 import type { MonsterActionDraftRow } from '../monster-action-presets'
 import { primeMultiattackReplacementActionsSnapshot } from './monster-multiattack-replacement-form-sync'
@@ -79,7 +78,7 @@ function MultiattackHarness({
     actions: actionRows as MonsterFormValues['actions'],
   })
   primeMultiattackReplacementActionsSnapshot(actionRows)
-  const form = useForm<MonsterFormValues>({ defaultValues, shouldUnregister: true })
+  const form = useForm<MonsterFormValues>({ defaultValues, shouldUnregister: false })
   return (
     <FormProvider {...form}>
       <FormItems
@@ -103,9 +102,7 @@ function MultiattackHarness({
 
 async function addSingleUseStep(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole('button', { name: MONSTER_MULTIATTACK_ADD_TO_SEQUENCE_LABEL }))
-  await user.click(
-    await screen.findByRole('menuitem', { name: MONSTER_MULTIATTACK_USE_AN_ACTION_LABEL }),
-  )
+  await user.click(await screen.findByRole('menuitem', { name: 'Spellcasting' }))
 }
 
 function dependentNestCount(container: HTMLElement) {

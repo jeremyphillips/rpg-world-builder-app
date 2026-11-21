@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { resolveDependsOnWatchName } from '@rpg/ui/form'
 
 import {
   buildResolutionRequirementAddMenu,
@@ -134,5 +135,14 @@ describe('resolution target authoring fields', () => {
     expect(resolveResolutionRequirementCollapsible({ kind: 'willing' })).toBe(false)
     expect(resolveResolutionRequirementCollapsible({ kind: 'sight', who: 'actor' })).toBe(false)
     expect(resolveResolutionRequirementCollapsible({ kind: 'size' })).toBe(true)
+  })
+
+  it('resolves requirement target kind from the parent target object', () => {
+    expect(resolveDependsOnWatchName('../kind', 'actions.0.resolution.target.requirements')).toBe(
+      'actions.0.resolution.target.kind',
+    )
+    expect(resolveDependsOnWatchName('../kind', 'resolution.target.requirements')).toBe(
+      'resolution.target.kind',
+    )
   })
 })

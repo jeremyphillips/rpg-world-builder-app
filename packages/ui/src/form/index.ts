@@ -345,6 +345,7 @@ export {
   createValidateSilently,
   type SilentValidationResult,
 } from './config/form-resolver'
+export { resolveDependsOnWatchName } from './config/form-depends-on.lib'
 export { disableOptionsUsedInSiblingRows } from './config/array-unique-select.lib'
 export {
   optionalDisclosureLeafActions,

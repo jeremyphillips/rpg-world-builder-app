@@ -136,23 +136,22 @@ export const MONSTER_MULTIATTACK_STEPS_LABEL = 'Sequence'
 export const MONSTER_MULTIATTACK_ATTACKS_LABEL = 'Attacks'
 export const MONSTER_MULTIATTACK_PRIMARY_SEQUENCE_LABEL = 'Primary sequence'
 export const MONSTER_MULTIATTACK_ATTACKS_HINT =
-  'Choose the attacks and other actions the creature uses during Multiattack.'
+  'Add the attacks and other actions the creature uses as part of one Multiattack.'
 export const MONSTER_MULTIATTACK_COMBINATION_HINT = 'These attacks can be used in any combination.'
-export const MONSTER_MULTIATTACK_MAKE_ATTACKS_LABEL = 'Make attacks'
+export const MONSTER_MULTIATTACK_ATTACK_GROUP_LABEL = 'Attack group'
+export const MONSTER_MULTIATTACK_OTHER_ACTIONS_GROUP_LABEL = 'Other actions'
+export const MONSTER_MULTIATTACK_STEP_CONJUNCTION = 'and'
+export const MONSTER_MULTIATTACK_IN_ANY_COMBINATION_LABEL = 'in any combination'
 export const MONSTER_MULTIATTACK_CHOOSE_ATTACKS_LABEL = 'Choose attacks'
 export const MONSTER_MULTIATTACK_CHOOSE_AN_ACTION_LABEL = 'Choose an action'
 export const MONSTER_MULTIATTACK_CHOOSE_BETWEEN_ACTIONS_LABEL = 'Choose between actions'
-export const MONSTER_MULTIATTACK_ANY_COMBINATION_LABEL = 'Any combination'
 export const MONSTER_MULTIATTACK_ADD_TO_SEQUENCE_LABEL = 'Add to sequence'
-export const MONSTER_MULTIATTACK_USE_AN_ACTION_LABEL = 'Use an action'
 export const MONSTER_MULTIATTACK_ADD_ACTION_CHOICE_LABEL = 'Add action choice'
 export const MONSTER_MULTIATTACK_ADD_REPETITION_LABEL = 'Add repetition'
 export const MONSTER_MULTIATTACK_REMOVE_REPETITION_LABEL = 'Remove repetition'
 export const MONSTER_MULTIATTACK_COUNT_LABEL = 'Count'
 export const MONSTER_MULTIATTACK_ATTACKS_PICKER_LABEL = 'Attacks'
-export const MONSTER_MULTIATTACK_ADD_ATTACK_GROUP_LABEL = 'Add attack group'
 export const MONSTER_MULTIATTACK_SEQUENCE_LABEL = 'Sequence'
-export const MONSTER_MULTIATTACK_ADD_OTHER_ACTION_LABEL = 'Add other action'
 export const MONSTER_MULTIATTACK_REPLACEMENT_LABEL = 'Action replacement'
 export const MONSTER_MULTIATTACK_ADD_REPLACEMENT_LABEL = 'Add action replacement'
 export const MONSTER_MULTIATTACK_REPLACEMENT_HINT =
@@ -202,6 +201,10 @@ export const MONSTER_MULTIATTACK_NO_SPELLS_IN_SPELLCASTING = 'No spells configur
 
 export function multiattackStepAttackCountLabel(count: number): string {
   return count === 1 ? '1 attack' : `${count} attacks`
+}
+
+export function multiattackUseOneOfActionsLabel(count: number): string {
+  return `Use one of ${count} actions`
 }
 
 export function multiattackStepUseRepetitionSuffix(count: unknown): string | undefined {

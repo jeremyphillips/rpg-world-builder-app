@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { resolveDependsOnWatchName } from '@rpg/ui/form'
 
 import { monsterFormMovementOverrideGroup } from './monster-form-movement-override-fields'
 
@@ -8,6 +9,12 @@ describe('monsterFormMovementOverrideGroup', () => {
 
   it('depends on root movement via three parent hops from a defined-form row', () => {
     expect(disclosure?.summary?.dependsOn).toEqual(['../../../movement', '../../../hover'])
+  })
+
+  it('resolves movement override watches from a defined-form row prefix', () => {
+    const rowPrefix = 'forms.definedForms.0'
+    expect(resolveDependsOnWatchName('../../../movement', rowPrefix)).toBe('movement')
+    expect(resolveDependsOnWatchName('../../../hover', rowPrefix)).toBe('hover')
   })
 
   it('resolves summary and source preview from watched root movement', () => {

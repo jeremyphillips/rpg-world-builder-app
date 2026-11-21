@@ -526,6 +526,11 @@ interface ArrayConfigCore {
    */
   density?: FormDensity
   fields: FormItem[]
+  /**
+   * Accessible word rendered between sortable items (`index > 0`). Stays mounted
+   * during drag. Omit to leave the list unchanged.
+   */
+  itemConjunction?: string
   addAction?: false | ArrayAddActionConfig
   min?: number
   max?: number

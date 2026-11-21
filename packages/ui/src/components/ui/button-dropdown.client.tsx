@@ -228,35 +228,37 @@ export function ButtonDropdown({
                   ))}
                 </InteractiveList>
               ) : (
-                groupedSections.map(({ group, items: sectionItems }) => (
-                  <React.Fragment key={group?.id ?? '__ungrouped'}>
-                    {group ? (
-                      <ListGroupHeading
-                        id={`${generatedId}-group-${group.id}`}
-                        label={group.label}
-                      />
-                    ) : null}
-                    <InteractiveList
-                      density={POPOVER_INTERACTIVE_LIST_DENSITY}
-                      role="group"
-                      aria-labelledby={group ? `${generatedId}-group-${group.id}` : undefined}
-                    >
-                      {sectionItems.map((item) => (
-                        <ButtonDropdownItemRow
-                          key={item.id}
-                          item={item}
-                          optionId={`${generatedId}-option-${item.id}`}
-                          isHighlighted={highlightIndexForItem(item) === highlightedIndex}
-                          onHighlight={() => {
-                            const index = highlightIndexForItem(item)
-                            if (index >= 0) setActiveIndex(index)
-                          }}
-                          onSelect={() => selectItem(item.id)}
-                        />
-                      ))}
-                    </InteractiveList>
-                  </React.Fragment>
-                ))
+                groupedSections.map(({ group, items: sectionItems }) => {
+                  const groupLabel = group?.label.trim() ?? ''
+                  const groupHeadingId =
+                    group && groupLabel.length > 0 ? `${generatedId}-group-${group.id}` : undefined
+                  return (
+                    <React.Fragment key={group?.id ?? '__ungrouped'}>
+                      {groupHeadingId ? (
+                        <ListGroupHeading id={groupHeadingId} label={groupLabel} />
+                      ) : null}
+                      <InteractiveList
+                        density={POPOVER_INTERACTIVE_LIST_DENSITY}
+                        role="group"
+                        aria-labelledby={groupHeadingId}
+                      >
+                        {sectionItems.map((item) => (
+                          <ButtonDropdownItemRow
+                            key={item.id}
+                            item={item}
+                            optionId={`${generatedId}-option-${item.id}`}
+                            isHighlighted={highlightIndexForItem(item) === highlightedIndex}
+                            onHighlight={() => {
+                              const index = highlightIndexForItem(item)
+                              if (index >= 0) setActiveIndex(index)
+                            }}
+                            onSelect={() => selectItem(item.id)}
+                          />
+                        ))}
+                      </InteractiveList>
+                    </React.Fragment>
+                  )
+                })
               )}
             </div>
           </InteractiveListViewport>

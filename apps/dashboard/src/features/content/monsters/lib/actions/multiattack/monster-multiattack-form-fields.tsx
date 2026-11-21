@@ -20,11 +20,11 @@ import {
   MONSTER_MULTIATTACK_ATTACKS_PICKER_LABEL,
   MONSTER_MULTIATTACK_ATTACKS_REPLACED_HINT,
   MONSTER_MULTIATTACK_ATTACKS_REPLACED_LABEL,
+  MONSTER_MULTIATTACK_ATTACK_GROUP_LABEL,
   MONSTER_MULTIATTACK_CHOICES_HINT,
   MONSTER_MULTIATTACK_CHOICES_LABEL,
   MONSTER_MULTIATTACK_CHOICE_ACTION_LABEL,
   MONSTER_MULTIATTACK_COUNT_LABEL,
-  MONSTER_MULTIATTACK_MAKE_ATTACKS_LABEL,
   MONSTER_MULTIATTACK_NO_PREREQUISITE,
   MONSTER_MULTIATTACK_ONLY_AFTER_USING_LABEL,
   MONSTER_MULTIATTACK_OPTIONAL_HINT,
@@ -33,8 +33,9 @@ import {
   MONSTER_MULTIATTACK_REPLACEMENT_HINT,
   MONSTER_MULTIATTACK_REPLACEMENT_LABEL,
   MONSTER_MULTIATTACK_REPLACES_ONE_ATTACK,
+  MONSTER_MULTIATTACK_OTHER_ACTIONS_GROUP_LABEL,
+  MONSTER_MULTIATTACK_STEP_CONJUNCTION,
   MONSTER_MULTIATTACK_TARGET_ATTACK_LABEL,
-  MONSTER_MULTIATTACK_USE_AN_ACTION_LABEL,
 } from '../../monster-form-labels'
 import {
   multiattackAnyAttackWordingVisible,
@@ -64,9 +65,11 @@ import {
   multiattackPrimarySequenceHeading,
   multiattackReplacementChoiceRowSectionRowsDependsOn,
   multiattackRowScopeSectionRowsDependsOn,
-  multiattackStepScopeSectionRowsDependsOn,
+  multiattackSequenceAddMenuItems,
+  multiattackSequenceMenuContextDependsOn,
+  multiattackSequenceRowsDependsOn,
   multiattackTargetAttackOptionsFromWatched,
-  multiattackUseChoiceRowSectionRowsDependsOn,
+  type MultiattackSequenceScope,
 } from './monster-multiattack-form-options'
 
 type MultiattackDraft = Extract<MonsterActionDraftRow, { kind: 'multiattack' }>
@@ -190,40 +193,50 @@ function monsterMultiattackStepsArray(input: {
   ctx: ContentFormCtx
   actionRows: readonly MonsterActionDraftRow[]
   spellCatalogById?: ReadonlyMap<string, Spell>
+  scope?: MultiattackSequenceScope
+  headingHint?: string
 }): FormItem {
-  const stepSectionRowsDependsOn = multiattackStepScopeSectionRowsDependsOn(input.section)
-  const useChoiceSectionRowsDependsOn = multiattackUseChoiceRowSectionRowsDependsOn(input.section)
+  const scope = input.scope ?? 'primary'
+  const stepSectionRowsDependsOn = multiattackSequenceRowsDependsOn(input.section, scope, 'step')
+  const useChoiceSectionRowsDependsOn = multiattackSequenceRowsDependsOn(
+    input.section,
+    scope,
+    'choice',
+  )
   const config = {
     kind: 'array' as const,
     name: 'steps',
+    itemConjunction: MONSTER_MULTIATTACK_STEP_CONJUNCTION,
     heading: {
       label: multiattackPrimarySequenceHeading(input.action),
-      hint: { text: MONSTER_MULTIATTACK_ATTACKS_HINT },
+      ...(input.headingHint ? { hint: { text: input.headingHint } } : {}),
     },
     addAction: {
       label: MONSTER_MULTIATTACK_ADD_TO_SEQUENCE_LABEL,
       menu: {
-        groups: [],
-        enableSearch: false,
-        items: [
-          {
-            id: 'attack-group',
-            label: MONSTER_MULTIATTACK_MAKE_ATTACKS_LABEL,
-            appendDefaults: () => ({ actionIds: [] }),
-          },
-          {
-            id: 'use-action',
-            label: MONSTER_MULTIATTACK_USE_AN_ACTION_LABEL,
-            appendDefaults: () => ({ kind: 'use', mode: 'single', actionId: '' }),
-          },
+        groups: [
+          { id: 'attack', label: '' },
+          { id: 'other-actions', label: MONSTER_MULTIATTACK_OTHER_ACTIONS_GROUP_LABEL },
         ],
+        enableSearch: false,
+        items: [],
+        contextDependsOn: multiattackSequenceMenuContextDependsOn(input.section, scope),
+        resolveItems: (watched: Record<string, unknown>) =>
+          multiattackSequenceAddMenuItems({
+            section: input.section,
+            scope,
+            multiattackId: input.action.id,
+            ctx: input.ctx,
+            watched,
+            fallbackRows: input.actionRows,
+          }),
       },
     },
     item: {
       variant: 'compact',
       reorder: 'dragHandle',
       header: {
-        fallback: () => MONSTER_MULTIATTACK_MAKE_ATTACKS_LABEL,
+        fallback: () => MONSTER_MULTIATTACK_ATTACK_GROUP_LABEL,
         primary: (values, index, watched) =>
           multiattackStepHeaderPrimary(values, index, watched, {
             section: input.section,
@@ -261,7 +274,7 @@ function monsterMultiattackStepsArray(input: {
             width: 'full',
             options: [],
             optionsResolve: {
-              dependsOn: [...multiattackAttackPickerDependsOn(input.section)],
+              dependsOn: [...multiattackAttackPickerDependsOn(input.section, scope)],
               optionsWhen: (watched) =>
                 multiattackExecutableAttackOptionsFromWatched({
                   section: input.section,
@@ -269,6 +282,7 @@ function monsterMultiattackStepsArray(input: {
                   ctx: input.ctx,
                   watched,
                   fallbackRows: input.actionRows,
+                  scope,
                 }),
             },
           },
@@ -465,12 +479,12 @@ function monsterMultiattackAlternativeGroup(input: {
           ctx: input.ctx,
           actionRows: input.actionRows,
           spellCatalogById: input.spellCatalogById,
+          scope: 'alternative',
         }),
         name: 'alternative.steps',
         heading: {
           label: multiattackPrimarySequenceHeading(input.action),
           labelVisibility: 'srOnly',
-          hint: { text: MONSTER_MULTIATTACK_ATTACKS_HINT },
         },
       },
     ],
@@ -541,6 +555,7 @@ export function monsterMultiattackFormFields(input: {
       ctx: input.ctx,
       actionRows: input.actionRows,
       spellCatalogById: input.ctx.spellCatalogById,
+      headingHint: MONSTER_MULTIATTACK_ATTACKS_HINT,
     }),
     monsterMultiattackAlternativeGroup({
       section: input.section,

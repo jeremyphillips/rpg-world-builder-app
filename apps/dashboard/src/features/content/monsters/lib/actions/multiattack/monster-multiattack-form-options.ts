@@ -15,6 +15,7 @@ import {
 } from '@rpg/contracts'
 
 import {
+  MONSTER_MULTIATTACK_ATTACK_GROUP_LABEL,
   MONSTER_MULTIATTACK_PRIMARY_SEQUENCE_LABEL,
   MONSTER_MULTIATTACK_SEQUENCE_LABEL,
 } from '../../monster-form-labels'
@@ -32,14 +33,38 @@ function multiattackSectionRowsFieldTail(section: MonsterActionSection): string 
   return fieldName.includes('.') ? fieldName.slice(fieldName.lastIndexOf('.') + 1) : fieldName
 }
 
-/** Watches the owning section's rows from a multiattack primary step field (`steps.0.*`). */
-export function multiattackStepScopeSectionRowsDependsOn(section: MonsterActionSection): string {
-  return `../../../../${multiattackSectionRowsFieldTail(section)}`
+export type MultiattackSequenceScope = 'primary' | 'alternative'
+export type MultiattackSequenceDepth = 'step' | 'choice' | 'menu'
+
+/** Parent hops from `actions.{index}` to the section rows field. */
+const MULTIATTACK_SEQUENCE_HOPS: Record<
+  MultiattackSequenceScope,
+  Record<MultiattackSequenceDepth, number>
+> = {
+  primary: { step: 4, choice: 6, menu: 3 },
+  alternative: { step: 5, choice: 7, menu: 4 },
 }
 
-/** Watches section rows from a use-choice row inside a step (`steps.0.choices.0.*`). */
+export function multiattackRowsDependsOn(section: MonsterActionSection, hops: number): string {
+  return `${'../'.repeat(hops)}${multiattackSectionRowsFieldTail(section)}`
+}
+
+export function multiattackSequenceRowsDependsOn(
+  section: MonsterActionSection,
+  scope: MultiattackSequenceScope,
+  depth: MultiattackSequenceDepth,
+): string {
+  return multiattackRowsDependsOn(section, MULTIATTACK_SEQUENCE_HOPS[scope][depth])
+}
+
+/** Watches the owning section's rows from a multiattack primary step field (`steps.0.*`). */
+export function multiattackStepScopeSectionRowsDependsOn(section: MonsterActionSection): string {
+  return multiattackSequenceRowsDependsOn(section, 'primary', 'step')
+}
+
+/** Watches section rows from a use-choice row inside a primary step (`steps.0.choices.0.*`). */
 export function multiattackUseChoiceRowSectionRowsDependsOn(section: MonsterActionSection): string {
-  return `../../../../../${multiattackSectionRowsFieldTail(section)}`
+  return multiattackSequenceRowsDependsOn(section, 'primary', 'choice')
 }
 
 /** Watches the section's rows from a multiattack row group (`replacement.*`, `alternative.*`). */
@@ -55,18 +80,10 @@ export function multiattackReplacementChoiceRowSectionRowsDependsOn(
 }
 
 export const MULTIATTACK_ROW_SCOPE_BONUS_ROWS_DEPENDS_ON = '../../../bonusActions' as const
-export const MULTIATTACK_STEP_SCOPE_BONUS_ROWS_DEPENDS_ON = '../../../../bonusActions' as const
-export const MULTIATTACK_REPLACEMENT_CHOICE_BONUS_ROWS_DEPENDS_ON =
-  '../../../../../bonusActions' as const
 
 function multiattackBonusRowsDependsOn(sectionRowsDependsOn: string): string {
-  if (sectionRowsDependsOn.includes('../../../../../')) {
-    return MULTIATTACK_REPLACEMENT_CHOICE_BONUS_ROWS_DEPENDS_ON
-  }
-  if (sectionRowsDependsOn.includes('../../../../')) {
-    return MULTIATTACK_STEP_SCOPE_BONUS_ROWS_DEPENDS_ON
-  }
-  return MULTIATTACK_ROW_SCOPE_BONUS_ROWS_DEPENDS_ON
+  const hopPrefix = sectionRowsDependsOn.match(/^(\.\.\/)*/)?.[0] ?? ''
+  return `${hopPrefix}bonusActions`
 }
 
 export function multiattackWatchedSectionRows(
@@ -128,10 +145,13 @@ export function multiattackAttackPickerRowsFromWatched(
   return multiattackDraftRowsFromWatched(watched, multiattackStepScopeSectionRowsDependsOn(section))
 }
 
-export function multiattackAttackPickerDependsOn(section: MonsterActionSection): readonly string[] {
-  const deps = [multiattackStepScopeSectionRowsDependsOn(section)]
+export function multiattackAttackPickerDependsOn(
+  section: MonsterActionSection,
+  scope: MultiattackSequenceScope = 'primary',
+): readonly string[] {
+  const deps = [multiattackSequenceRowsDependsOn(section, scope, 'step')]
   if (section === 'reactions') {
-    deps.push(multiattackStepScopeSectionRowsDependsOn('actions'))
+    deps.push(multiattackSequenceRowsDependsOn('actions', scope, 'step'))
   }
   return deps
 }
@@ -142,15 +162,17 @@ export function multiattackExecutableAttackOptionsFromWatched(input: {
   ctx: ContentFormCtx
   watched: Record<string, unknown>
   fallbackRows?: readonly MonsterActionDraftRow[]
+  scope?: MultiattackSequenceScope
 }): Option[] {
+  const scope = input.scope ?? 'primary'
   const sectionKey =
     input.section === 'reactions'
-      ? multiattackStepScopeSectionRowsDependsOn('actions')
-      : multiattackStepScopeSectionRowsDependsOn(input.section)
+      ? multiattackSequenceRowsDependsOn('actions', scope, 'step')
+      : multiattackSequenceRowsDependsOn(input.section, scope, 'step')
   const rows = multiattackRowsWithFallback(input.watched, sectionKey, input.fallbackRows)
   const bonusRows = multiattackDraftRowsFromWatched(
     input.watched,
-    MULTIATTACK_STEP_SCOPE_BONUS_ROWS_DEPENDS_ON,
+    multiattackBonusRowsDependsOn(sectionKey),
   )
   return multiattackExecutableAttackOptions(
     rows,
@@ -242,6 +264,66 @@ export function multiattackExecutableAttackOptions(
   return rows
     .filter((row) => multiattackRowEligibleForPurpose(row, 'executable-attack', { multiattackId }))
     .map((row) => ({ value: row.id, label: titles.get(row.id) ?? row.id }))
+}
+
+export function multiattackSequenceMenuContextDependsOn(
+  section: MonsterActionSection,
+  scope: MultiattackSequenceScope,
+): readonly string[] {
+  const rowsKey = multiattackSequenceRowsDependsOn(section, scope, 'menu')
+  return [rowsKey, multiattackBonusRowsDependsOn(rowsKey)]
+}
+
+/** Attack group plus one item per executable-use action. Omits empty groups. */
+export function multiattackSequenceAddMenuItems(input: {
+  section: MonsterActionSection
+  scope: MultiattackSequenceScope
+  multiattackId: string
+  ctx: ContentFormCtx
+  watched: Record<string, unknown>
+  fallbackRows?: readonly MonsterActionDraftRow[]
+}) {
+  const rowsKey = multiattackSequenceRowsDependsOn(input.section, input.scope, 'menu')
+  const rows = multiattackRowsWithFallback(input.watched, rowsKey, input.fallbackRows)
+  const bonusRows = multiattackDraftRowsFromWatched(
+    input.watched,
+    multiattackBonusRowsDependsOn(rowsKey),
+  )
+  const values = multiattackEligibilityValues(input.section, rows, bonusRows)
+  const items: {
+    id: string
+    label: string
+    groupId: string
+    appendDefaults: () => Record<string, unknown>
+  }[] = []
+  const attackOptions = multiattackExecutableAttackOptions(
+    rows,
+    input.multiattackId,
+    values,
+    input.ctx,
+  )
+  if (attackOptions.length > 0) {
+    items.push({
+      id: 'attack-group',
+      label: MONSTER_MULTIATTACK_ATTACK_GROUP_LABEL,
+      groupId: 'attack',
+      appendDefaults: () => ({ actionIds: [] }),
+    })
+  }
+  for (const option of multiattackExecutableUseOptions(
+    rows,
+    input.multiattackId,
+    values,
+    input.ctx,
+  )) {
+    items.push({
+      id: `use:${option.value}`,
+      label: option.label,
+      groupId: 'other-actions',
+      appendDefaults: () => ({ kind: 'use', mode: 'single', actionId: option.value }),
+    })
+  }
+  return items
 }
 
 export function multiattackExecutableUseOptions(

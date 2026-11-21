@@ -1,6 +1,6 @@
 # Multiattack use-action model audit (Phase 2)
 
-Records SRD-backed semantics for **Use an action** combinations and the clause-ownership decision that gates UI and schema work. Formatter defects are tracked in §8.11 of the cleanup plan, not here.
+Records SRD-backed semantics for action-use combinations and the clause-ownership decision that gates UI and schema work. The sequence menu adds an attack group or selects an existing eligible action directly; the created step is still a `kind: 'use'` clause, and the in-step Action selector remains editable. Formatter defects are tracked in §8.11 of the cleanup plan, not here.
 
 ## Clause ownership — variant A (retain)
 
