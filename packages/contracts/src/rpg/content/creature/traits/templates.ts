@@ -8,13 +8,16 @@ import {
   type CreatureRollAdjustment,
   type CreatureSaveOutcomeOverride,
 } from '../effects'
-import { formatLegendaryResistanceName } from '../../../runtime/creature/format-legendary-resistance'
 import { LEGENDARY_RESISTANCE_LABEL } from './legendary-resistance.constants'
 import { legendaryResistanceLimitedUse } from './legendary-resistance-limited-use'
 
 // ---------------------------------------------------------------------------
 // Versioned creature trait templates. Assignments store `templateId` plus
 // config and display overrides. Mechanics are read from this registry.
+//
+// `formatName` is the human-facing feature label for lists and generic display
+// (no lair, no stat-block parenthetical). Monster stat-block headings for
+// Legendary Resistance use `formatLegendaryResistanceStatBlockTitle` instead.
 // ---------------------------------------------------------------------------
 
 export const CREATURE_TRAIT_TEMPLATE_TERM = {
@@ -113,10 +116,7 @@ export const CREATURE_TRAIT_TEMPLATE_ENTRIES = {
     description: 'Choose to succeed on a failed saving throw a limited number of times per day.',
     rulesetIds: [DEFAULT_SYSTEM_RULESET_ID],
     configSchema: legendaryResistanceConfigSchema,
-    formatName: (config) => {
-      const parsed = legendaryResistanceConfigSchema.parse(config)
-      return formatLegendaryResistanceName(parsed)
-    },
+    formatName: () => LEGENDARY_RESISTANCE_LABEL,
     formatDescription: () =>
       'If this creature fails a saving throw, it can choose to succeed instead.',
     resolveGrants: (config) => {

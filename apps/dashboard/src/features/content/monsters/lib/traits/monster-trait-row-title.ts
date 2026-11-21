@@ -1,4 +1,4 @@
-import { contextualCountSchema, formatLegendaryResistanceStatBlockTitle } from '@rpg/contracts'
+import { LEGENDARY_RESISTANCE_LABEL } from '@rpg/contracts'
 
 import type { MasterDetailRowTitleConfig } from '../../../lib/master-detail/master-detail-row-title'
 import {
@@ -35,22 +35,8 @@ function isPresetRow(row: unknown): row is MonsterTraitTitleRow & { preset: stri
   return isRecord(row) && typeof row.preset === 'string' && !isTemplateRow(row)
 }
 
-function legendaryResistanceRowTitle(config: unknown, lairEnabled: boolean): string | undefined {
-  const parsed = contextualCountSchema.safeParse(
-    config && typeof config === 'object' && !Array.isArray(config)
-      ? (config as { uses?: unknown }).uses
-      : undefined,
-  )
-  if (!parsed.success) return undefined
-  return formatLegendaryResistanceStatBlockTitle({
-    uses: parsed.data,
-    lairEnabled,
-  })
-}
-
 export function resolveMonsterTraitRowTitleConfig(
   monsterName: string,
-  lairEnabled = false,
 ): MasterDetailRowTitleConfig<MonsterTraitTitleRow> {
   return {
     resolveRowTitle: (ctx) => {
@@ -63,13 +49,18 @@ export function resolveMonsterTraitRowTitleConfig(
       if (isTemplateRow(ctx.row)) {
         const templateRow = ctx.row
         if (templateRow.templateId === 'legendary-resistance') {
+          const stored = templateRow.nameOverride?.trim()
+          if (stored && stored !== LEGENDARY_RESISTANCE_LABEL) {
+            return {
+              strategy: 'override',
+              field: 'nameOverride',
+              resolveDerived: () => LEGENDARY_RESISTANCE_LABEL,
+              resetLabel: MONSTER_CLEAR_LEGENDARY_RESISTANCE_NAME_LABEL,
+            }
+          }
           return {
-            strategy: 'override',
-            field: 'nameOverride',
-            resolveDerived: () =>
-              legendaryResistanceRowTitle(templateRow.config, lairEnabled) ??
-              templateDerivedName(templateRow),
-            resetLabel: MONSTER_CLEAR_LEGENDARY_RESISTANCE_NAME_LABEL,
+            strategy: 'readonly',
+            resolveTitle: () => LEGENDARY_RESISTANCE_LABEL,
           }
         }
         return {

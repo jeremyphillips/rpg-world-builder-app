@@ -364,7 +364,7 @@ describe('monster-display', () => {
         },
       ],
       legendaryActions: {
-        uses: 3,
+        uses: { normal: 3 },
         actions: [
           {
             id: 'swipe',
@@ -534,4 +534,16 @@ it('prints resolved class labels in the shared detail classification phrase', ()
     catalogState: 'pending',
   })
   expect(viewModel.classificationLabel).toContain('Undead (Wizard)')
+})
+
+it('prints the Legendary Resistance stat-block heading on the lich trait row', () => {
+  const monster = pickMonster('lich')
+  const viewModel = buildMonsterDetailViewModel({
+    monster,
+    creatureTypeLabel: 'Undead',
+    equipmentById: new Map(),
+    catalogState: 'ready',
+  })
+  const trait = viewModel.traits.find((row) => row.id === 'legendary-resistance')
+  expect(trait?.name).toBe('Legendary Resistance (4/Day, or 5/Day in Lair)')
 })

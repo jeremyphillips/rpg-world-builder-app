@@ -21,7 +21,7 @@ function readOnlyInFormIds(row: unknown): readonly string[] | undefined {
   return ids.filter((id): id is string => typeof id === 'string')
 }
 
-/** Preview heading. Limited use stays on the stat block. */
+/** Action rules-preview heading — trait previews use `resolveTraitStatBlockRulesFacingForFormRow`. */
 export function formatMonsterEntryPreviewTitle(
   name: string,
   onlyInFormIds: readonly string[] | undefined,

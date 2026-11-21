@@ -11,14 +11,16 @@ function formatLegendaryResistanceDayNotation(uses: number): string {
   )
 }
 
-export type FormatLegendaryResistanceNameInput = {
+export type FormatLegendaryResistanceStatBlockTitleInput = {
   uses: ContextualCount
-  lairEnabled?: boolean
+  lairEnabled: boolean
 }
 
-/** Trait title from config; pass `lairEnabled` only when the owning monster has lair enhancements on. */
-export function formatLegendaryResistanceName(config: FormatLegendaryResistanceNameInput): string {
-  const { uses, lairEnabled = false } = config
+/** PDF-style trait line for monster stat blocks; pass `lairEnabled` only when the monster has lair enhancements on. */
+export function formatLegendaryResistanceStatBlockTitle(
+  config: FormatLegendaryResistanceStatBlockTitleInput,
+): string {
+  const { uses, lairEnabled } = config
   const normal = formatLegendaryResistanceDayNotation(uses.normal)
 
   if (!lairEnabled || uses.inLair === undefined) {
@@ -27,19 +29,4 @@ export function formatLegendaryResistanceName(config: FormatLegendaryResistanceN
 
   const inLair = formatLegendaryResistanceDayNotation(uses.inLair)
   return `${LEGENDARY_RESISTANCE_LABEL} (${normal}, or ${inLair} in ${LAIR_TERM.label})`
-}
-
-export type FormatLegendaryResistanceStatBlockTitleInput = {
-  uses: ContextualCount
-  lairEnabled: boolean
-}
-
-/** Monster stat block and editor row title when lair overrides may apply. */
-export function formatLegendaryResistanceStatBlockTitle(
-  config: FormatLegendaryResistanceStatBlockTitleInput,
-): string {
-  return formatLegendaryResistanceName({
-    uses: config.uses,
-    lairEnabled: config.lairEnabled,
-  })
 }

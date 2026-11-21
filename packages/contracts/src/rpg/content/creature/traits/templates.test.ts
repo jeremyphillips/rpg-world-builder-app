@@ -21,9 +21,9 @@ describe('creature trait templates', () => {
     expect(CREATURE_TRAIT_TEMPLATE_IDS).toHaveLength(4)
   })
 
-  it('prints Legendary Resistance as 3/Day', () => {
+  it('keeps Legendary Resistance as the canonical label without daily notation', () => {
     const template = getCreatureTraitTemplate('legendary-resistance')
-    expect(template?.formatName?.({ uses: { normal: 3 } })).toBe('Legendary Resistance (3/Day)')
+    expect(template?.formatName?.({ uses: { normal: 3 } })).toBe('Legendary Resistance')
     expect(template?.formatDescription({ uses: { normal: 3 } })).toBe(
       'If this creature fails a saving throw, it can choose to succeed instead.',
     )
@@ -35,7 +35,7 @@ describe('creature trait templates', () => {
         config: { uses: { normal: 3 } },
       }),
     )
-    expect(display.name).toBe('Legendary Resistance (3/Day)')
+    expect(display.name).toBe('Legendary Resistance')
     expect(display.descriptionHtml).toContain(
       'If this creature fails a saving throw, it can choose to succeed instead.',
     )

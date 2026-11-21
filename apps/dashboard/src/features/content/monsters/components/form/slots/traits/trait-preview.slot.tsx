@@ -1,19 +1,19 @@
-import { useWatch } from 'react-hook-form'
-
 import { useMasterDetailRowPrefix } from '../../../../../lib/master-detail/use-master-detail-row-prefix'
 import { MonsterActionRulesPreview } from '../../../../lib/actions/previews/monster-action-preview-presentation'
 import { MONSTER_TRAIT_PREVIEW_LABEL } from '../../../../lib/monster-form-labels'
-import { useMonsterTraitPreviewTitle } from '../../../../lib/monster-qualified-preview-title'
+import { useMonsterTraitRulesPreviewPresentation } from '../../../../lib/presentation/use-monster-trait-rules-preview'
+import { useWatch } from 'react-hook-form'
 
-export function MonsterTraitRulesPreview({ text }: { text: string }) {
+export function MonsterTraitRulesPreview() {
   const rowPrefix = useMasterDetailRowPrefix()
   const row = useWatch({ name: rowPrefix as never })
-  const title = useMonsterTraitPreviewTitle(row)
+  const presentation = useMonsterTraitRulesPreviewPresentation(row)
+  if (!presentation) return null
   return (
     <MonsterActionRulesPreview
       label={MONSTER_TRAIT_PREVIEW_LABEL}
-      title={title}
-      content={{ kind: 'prose', text }}
+      title={presentation.heading}
+      content={{ kind: 'prose', text: presentation.proseText }}
     />
   )
 }

@@ -42,8 +42,6 @@ import {
   analyzeCreatureFormDifferences,
   formatFormSpeechQualifier,
   formatMonsterForms,
-  formatMonsterQualifiedHeading,
-  resolveMonsterEntryHeading,
   formatMonsterShapeShift,
   formatMonsterSpeedStatRow,
   monsterHasFormRestrictions,
@@ -54,10 +52,8 @@ import {
   formatOnceUntilNextTurnSentence,
   resolveCreatureSenses,
   resolveCreatureTraitGrants,
-  resolveTraitDisplay,
   formatMonsterSaveAction,
   formatMonsterSpellEntry,
-  formatMonsterStatBlockSubject,
   type MonsterActionIdentitySubject,
   formatSavingThrowClauses,
   getAbilityLabel,
@@ -66,7 +62,6 @@ import {
   appendMonsterActionSupplementalHtml,
   appendMonsterActionSupplementalText,
   resolveMonsterActionIdentity,
-  limitedUseSchema,
   type ArmorClassRules,
   type DerivedMonsterAttackLine,
   type MonsterReferencedSpell,
@@ -84,11 +79,15 @@ import {
 import type { ContentStatRowData } from '../../lib/detail/metadata/content-stat-rows'
 
 import { buildMonsterMultiattackSentence } from './actions/previews/monster-action-multiattack-summary'
+import { applyMonsterEntryHeadingQualifiers } from './presentation/monster-entry-heading'
+import {
+  resolvePresetTraitStatBlockRulesFacing,
+  resolveTemplateTraitStatBlockRulesFacing,
+} from './presentation/resolve-trait-stat-block-rules-facing'
 import {
   nextDistinctTitle,
   presentActionReference,
 } from './actions/references/monster-action-reference-presentation'
-import { formatMonsterTemplateSentence } from './format-monster-template-sentence'
 import { MONSTER_HP_MINIMUM_NOTE } from './monster-form-labels'
 
 export { MONSTER_HP_MINIMUM_NOTE }
@@ -279,31 +278,8 @@ function findAttackLine(
   return derived?.attacks.find((line) => line.section === section && line.id === actionId)
 }
 
-function headingSource(row: unknown): {
-  limitedUse: unknown
-  onlyInFormIds: readonly string[] | undefined
-} {
-  if (!row || typeof row !== 'object') return { limitedUse: undefined, onlyInFormIds: undefined }
-  const source = row as { limitedUse?: unknown; onlyInFormIds?: unknown }
-  const ids = Array.isArray(source.onlyInFormIds)
-    ? source.onlyInFormIds.filter((id): id is string => typeof id === 'string')
-    : undefined
-  return { limitedUse: source.limitedUse, onlyInFormIds: ids }
-}
-
 function withQualifiedHeading(monster: Monster, name: string, row: unknown): string {
-  const source = headingSource(row)
-  const parsed = limitedUseSchema.safeParse(source.limitedUse)
-  const heading = resolveMonsterEntryHeading({
-    name,
-    onlyInFormIds: source.onlyInFormIds,
-    forms: monster.forms,
-    creatureName: monster.name,
-  })
-  return formatMonsterQualifiedHeading(heading.name, {
-    limitedUse: parsed.success ? parsed.data : undefined,
-    formQualifier: heading.formQualifier,
-  })
+  return applyMonsterEntryHeadingQualifiers(monster, name, row)
 }
 
 function actionDisplayIdentity(
@@ -1104,47 +1080,40 @@ function mapPresetMonsterTrait(
   monsterName: string,
 ): MonsterTraitItemViewModel | undefined {
   if (typeof record.preset !== 'string') return undefined
-  const formatted = formatCreatureTrait({
-    subject: formatMonsterStatBlockSubject(monsterName),
+  const facing = resolvePresetTraitStatBlockRulesFacing({
+    id: trait.id,
+    preset: record.preset,
+    monsterName,
     trait: trait as Parameters<typeof formatCreatureTrait>[0]['trait'],
   })
   return {
     id: trait.id,
-    name: formatted?.name ?? record.preset,
-    descriptionHtml: formatted ? `<p>${escapeTraitSentence(formatted.sentence)}</p>` : '',
+    name: facing.heading,
+    descriptionHtml: facing.descriptionHtml,
   }
 }
 
 function mapTemplateMonsterTrait(
   trait: Monster['traits'][number],
   record: Record<string, unknown>,
-  monsterName: string,
+  monster: Monster,
 ): MonsterTraitItemViewModel | undefined {
   if (record.kind !== 'template' || typeof record.templateId !== 'string') return undefined
   const nameOverride = typeof record.nameOverride === 'string' ? record.nameOverride : undefined
-  const display = resolveTraitDisplay({
-    kind: 'template',
+  const descriptionOverride =
+    typeof record.descriptionOverride === 'string' ? record.descriptionOverride : undefined
+  const facing = resolveTemplateTraitStatBlockRulesFacing({
     id: trait.id,
     templateId: record.templateId,
     config: record.config,
     nameOverride,
+    descriptionOverride,
+    monster,
   })
-  const sentence = formatMonsterTemplateSentence({
-    templateId: record.templateId,
-    config: record.config,
-    monsterName,
-  })
-  const extra =
-    typeof record.descriptionOverride === 'string' && record.descriptionOverride.trim()
-      ? record.descriptionOverride
-      : ''
-  const generated = sentence
-    ? `<p>${escapeTraitSentence(sentence)}</p>`
-    : (display.descriptionHtml ?? '')
   return {
     id: trait.id,
-    name: nameOverride?.trim() || display.name,
-    descriptionHtml: extra ? `${generated}${extra}` : generated,
+    name: facing.heading,
+    descriptionHtml: facing.descriptionHtml,
   }
 }
 
@@ -1176,7 +1145,7 @@ function mapMonsterTrait(
   const record = traitRecord(trait)
   const mapped =
     mapPresetMonsterTrait(trait, record, monster.name) ??
-    mapTemplateMonsterTrait(trait, record, monster.name) ??
+    mapTemplateMonsterTrait(trait, record, monster) ??
     mapNamedMonsterTrait(trait, record, monster, derived)
   const ids = 'onlyInFormIds' in trait ? trait.onlyInFormIds : undefined
   return {
