@@ -444,8 +444,13 @@ modals and one-off editors once at the composition boundary instead of threading
   [containers.md#display-fields](../../../../packages/ui/docs/forms/containers.md#display-fields)).
 - **Field visibility** — `visibility.dependsOn` paths are watched individually; `visibleWhen`
   receives a map keyed by those strings (`values['lair.enabled']`), not the nested RHF object
-  (`values.lair?.enabled`). Inside a named group, item-relative names apply (`dependsOn: ['mode']` →
-  `values.mode`). Parent-relative hops use `../` in `dependsOn`. Decision tree and slot policy →
+  (`values.lair?.enabled`). `group.name` (including optional-disclosure object groups) identifies
+  the group's RHF object for disclosure/clear — it does **not** extend `namePrefix` for nested
+  fields. At the form root, use fully qualified leaf `name`s and matching dotted `dependsOn` keys
+  (for example `lair.experience.mode` → `values['lair.experience.mode']`). Item-relative
+  `dependsOn` and short leaf names apply only when an ancestor already supplies `namePrefix`
+  (array rows, defined-form rows). Parent-relative hops use `../` in `dependsOn` inside those
+  scoped contexts. Decision tree and slot policy →
   [.cursor/rules/form-slots.mdc](../../../../.cursor/rules/form-slots.mdc).
 - **Escape hatch** — `kind: 'slot'` only after `display`, `visibility`, `optionsResolve`, `hint.resolve`,
   `derivedMeta`, `valueSyncs`, `dependent`, `optionalDisclosure`, and standard composition

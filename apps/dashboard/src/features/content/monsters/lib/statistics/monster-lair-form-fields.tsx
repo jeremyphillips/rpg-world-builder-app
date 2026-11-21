@@ -14,6 +14,8 @@ import {
 } from '../monster-form-labels'
 import {
   lairExperienceModeVisibility,
+  MONSTER_LAIR_EXPERIENCE_MODE_FIELD,
+  MONSTER_LAIR_EXPERIENCE_VALUE_FIELD,
   monsterLairEnabledVisibility,
   resolveMonsterLairCustomXpHint,
   resolveMonsterLairExperienceModeOptions,
@@ -28,7 +30,7 @@ function monsterLairSuggestedXpDisplay(): DisplayConfig {
     id: 'lair-suggested-xp',
     visibility: lairExperienceModeVisibility('suggested'),
     resolve: {
-      dependsOn: ['../../challengeRating', 'mode'],
+      dependsOn: ['challengeRating', MONSTER_LAIR_EXPERIENCE_MODE_FIELD],
       contentWhen: resolveMonsterLairSuggestedXpDisplayContent,
     },
   }
@@ -40,7 +42,7 @@ function monsterLairSuggestedXpCaptionDisplay(): DisplayConfig {
     id: 'lair-suggested-xp-caption',
     visibility: lairExperienceModeVisibility('suggested'),
     resolve: {
-      dependsOn: ['../../challengeRating', 'mode'],
+      dependsOn: ['challengeRating', MONSTER_LAIR_EXPERIENCE_MODE_FIELD],
       contentWhen: resolveMonsterLairSuggestedXpCaptionDisplayContent,
     },
   }
@@ -58,18 +60,16 @@ function monsterLairExperienceGroup(): FormItem {
       addLabel: MONSTER_ADD_IN_LAIR_XP_LABEL,
       removeLabel: MONSTER_LAIR_EXPERIENCE_REMOVE_LABEL,
       expandWhenPopulated: true,
-      watchPaths: ['lair.experience'],
-      clearPaths: ['lair.experience'],
       seedWhen: seedMonsterLairExperience,
     },
     fields: [
       {
         type: 'select',
-        name: 'mode',
+        name: MONSTER_LAIR_EXPERIENCE_MODE_FIELD,
         label: MONSTER_LAIR_EXPERIENCE_MODE_LABEL,
         placeholder: 'Choose',
         optionsResolve: {
-          dependsOn: ['../../challengeRating'],
+          dependsOn: ['challengeRating'],
           optionsWhen: resolveMonsterLairExperienceModeOptions,
         },
       },
@@ -77,14 +77,14 @@ function monsterLairExperienceGroup(): FormItem {
       monsterLairSuggestedXpCaptionDisplay(),
       {
         type: 'number',
-        name: 'value',
+        name: MONSTER_LAIR_EXPERIENCE_VALUE_FIELD,
         label: MONSTER_LAIR_EXPERIENCE_CUSTOM_LABEL,
         min: 0,
         digits: 5,
         visibility: lairExperienceModeVisibility('custom'),
         hint: {
           resolve: {
-            dependsOn: ['../../challengeRating', 'mode'],
+            dependsOn: ['challengeRating', MONSTER_LAIR_EXPERIENCE_MODE_FIELD],
             hintWhen: resolveMonsterLairCustomXpHint,
           },
         },

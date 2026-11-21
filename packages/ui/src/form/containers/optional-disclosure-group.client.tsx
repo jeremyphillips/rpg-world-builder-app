@@ -11,6 +11,7 @@ import {
 import type { GroupConfig } from '../field-config'
 import { collectDependentClearingFields } from '../config/confirm-before-clear.lib'
 import { useDependsOnValues } from '../config/form-depends-on.client'
+import { getValueAtPath, resolveDependsOnWatchName } from '../config/form-depends-on.lib'
 import { useConfirmBeforeClear } from '../config/use-confirm-before-clear.client'
 import {
   optionalDisclosureShellProps,
@@ -48,17 +49,23 @@ function watchedHasContent(value: unknown): boolean {
   return objectHasContent(value)
 }
 
-function rootPathHasContent(values: Record<string, unknown>, path: string): boolean {
-  return watchedHasContent(values[path])
+function rootPathHasContent(
+  values: Record<string, unknown>,
+  path: string,
+  namePrefix?: string,
+): boolean {
+  const resolved = resolveDependsOnWatchName(path, namePrefix)
+  return watchedHasContent(getValueAtPath(values, resolved))
 }
 
 function optionalGroupPopulated(
   values: Record<string, unknown>,
   disclosure: NonNullable<GroupConfig['optionalDisclosure']>,
   watched: unknown,
+  namePrefix?: string,
 ): boolean {
   if (disclosure.watchPaths && disclosure.watchPaths.length > 0) {
-    return disclosure.watchPaths.some((path) => rootPathHasContent(values, path))
+    return disclosure.watchPaths.some((path) => rootPathHasContent(values, path, namePrefix))
   }
   return watchedHasContent(watched)
 }
@@ -148,6 +155,7 @@ function OptionalDisclosureGroupBody({
     (formValues ?? getValues()) as Record<string, unknown>,
     disclosure,
     watched,
+    namePrefix,
   )
   const [manualOpen, setManualOpen] = useState(false)
   const { defaultValues } = useFormState({ name: fullName })

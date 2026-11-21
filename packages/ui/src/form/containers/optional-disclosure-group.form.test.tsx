@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { FormProvider, useForm, useFormContext } from 'react-hook-form'
+import { FormProvider, useForm, useFormContext, type UseFormReturn } from 'react-hook-form'
 
 import {
   fieldAnatomyStackVariants,
@@ -258,6 +258,184 @@ describe('group optionalDisclosure', () => {
       ...fieldStackRhythmVariants({ rhythm: resolveFormDensity().rhythm }).split(/\s+/),
     )
     expect(editorStack).toContainElement(screen.getByRole('textbox', { name: 'Walk' }))
+  })
+
+  it('opens when nested watchPaths resolve dotted root paths', () => {
+    const nested = {
+      kind: 'group',
+      name: 'lair.experience',
+      heading: { label: 'In-lair XP' },
+      optionalDisclosure: {
+        intent: 'add',
+        addLabel: 'Add in-lair XP',
+        removeLabel: 'Remove in-lair XP',
+        expandWhenPopulated: true,
+        watchPaths: ['lair.experience'],
+      },
+      fields: [{ type: 'text', name: 'mode', label: 'Mode' }],
+    } as const satisfies FormItem
+
+    function NestedHarness() {
+      const form = useForm({
+        defaultValues: {
+          lair: { enabled: true, experience: { mode: 'suggested' } },
+        },
+        shouldUnregister: true,
+      })
+      return (
+        <FormProvider {...form}>
+          <FormItems items={[nested]} idPrefix="nested" />
+        </FormProvider>
+      )
+    }
+
+    render(<NestedHarness />)
+    expect(screen.getByRole('group', { name: /In-lair XP/ })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Add in-lair XP' })).not.toBeInTheDocument()
+  })
+
+  it('opens when watchPaths resolve array-indexed paths', () => {
+    const indexed = {
+      kind: 'group',
+      name: 'extras',
+      heading: { label: 'Extras' },
+      optionalDisclosure: {
+        intent: 'add',
+        addLabel: 'Add extras',
+        removeLabel: 'Remove extras',
+        watchPaths: ['items.0.note'],
+      },
+      fields: [{ type: 'text', name: 'detail', label: 'Detail' }],
+    } as const satisfies FormItem
+
+    function IndexedHarness() {
+      const form = useForm({
+        defaultValues: { items: [{ note: 'present' }] },
+        shouldUnregister: true,
+      })
+      return (
+        <FormProvider {...form}>
+          <FormItems items={[indexed]} idPrefix="indexed" />
+        </FormProvider>
+      )
+    }
+
+    render(<IndexedHarness />)
+    expect(screen.getByRole('group', { name: /Extras/ })).toBeInTheDocument()
+  })
+
+  it('does not open when nested watchPaths point at empty nested values', () => {
+    const nested = {
+      kind: 'group',
+      name: 'lair.experience',
+      heading: { label: 'In-lair XP' },
+      optionalDisclosure: {
+        intent: 'add',
+        addLabel: 'Add in-lair XP',
+        removeLabel: 'Remove in-lair XP',
+        expandWhenPopulated: true,
+        watchPaths: ['lair.experience'],
+      },
+      fields: [{ type: 'text', name: 'mode', label: 'Mode' }],
+    } as const satisfies FormItem
+
+    function EmptyHarness() {
+      const form = useForm({
+        defaultValues: { lair: { enabled: true } },
+        shouldUnregister: true,
+      })
+      return (
+        <FormProvider {...form}>
+          <FormItems items={[nested]} idPrefix="empty" />
+        </FormProvider>
+      )
+    }
+
+    render(<EmptyHarness />)
+    expect(screen.getByRole('button', { name: 'Add in-lair XP' })).toBeInTheDocument()
+    expect(screen.queryByRole('group', { name: /In-lair XP/ })).not.toBeInTheDocument()
+  })
+
+  it('resolves row-relative watchPaths against namePrefix', () => {
+    const rowGroup = {
+      kind: 'group',
+      name: 'sizesOverride',
+      heading: { label: 'Sizes' },
+      optionalDisclosure: {
+        intent: 'override',
+        addLabel: 'Override sizes',
+        removeLabel: 'Use base sizes',
+        watchPaths: ['overrides.sizes'],
+      },
+      fields: [{ type: 'text', name: 'overrides.sizes', label: 'Size override' }],
+    } as const satisfies FormItem
+
+    const rows = {
+      kind: 'array',
+      name: 'definedForms',
+      fields: [rowGroup],
+    } as const satisfies FormItem
+
+    function RowHarness() {
+      const form = useForm({
+        defaultValues: {
+          definedForms: [{ overrides: { sizes: 'large' } }],
+        },
+        shouldUnregister: true,
+      })
+      return (
+        <FormProvider {...form}>
+          <FormItems items={[rows]} idPrefix="row" />
+        </FormProvider>
+      )
+    }
+
+    render(<RowHarness />)
+    expect(screen.getByRole('group', { name: /Sizes/ })).toBeInTheDocument()
+  })
+
+  it('reactively opens when a nested watchPath gains content', async () => {
+    const user = userEvent.setup()
+    const nested = {
+      kind: 'group',
+      name: 'lair.experience',
+      heading: { label: 'In-lair XP' },
+      optionalDisclosure: {
+        intent: 'add',
+        addLabel: 'Add in-lair XP',
+        removeLabel: 'Remove in-lair XP',
+        expandWhenPopulated: true,
+        watchPaths: ['lair.experience'],
+      },
+      fields: [{ type: 'text', name: 'mode', label: 'Mode' }],
+    } as const satisfies FormItem
+
+    function ReactiveHarness({ form }: { form: UseFormReturn<Record<string, unknown>> }) {
+      const { setValue } = form
+      return (
+        <FormProvider {...form}>
+          <button type="button" onClick={() => setValue('lair.experience', { mode: 'suggested' })}>
+            Seed XP
+          </button>
+          <FormItems items={[nested]} idPrefix="reactive" />
+        </FormProvider>
+      )
+    }
+
+    function Shell() {
+      const form = useForm({
+        defaultValues: { lair: { enabled: true } },
+        shouldUnregister: true,
+      })
+      return <ReactiveHarness form={form} />
+    }
+
+    render(<Shell />)
+    expect(screen.getByRole('button', { name: 'Add in-lair XP' })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Seed XP' }))
+    await waitFor(() => {
+      expect(screen.getByRole('group', { name: /In-lair XP/ })).toBeInTheDocument()
+    })
   })
 
   it('writes seedWhen when the group opens', async () => {

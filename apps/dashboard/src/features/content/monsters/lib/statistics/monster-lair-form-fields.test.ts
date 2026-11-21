@@ -5,6 +5,8 @@ import { getMonsterBySlug } from '@rpg/catalog/monsters'
 
 import { monsterLairFormFields } from './monster-lair-form-fields'
 import {
+  lairExperienceModeVisibility,
+  MONSTER_LAIR_EXPERIENCE_MODE_FIELD,
   monsterLairEnabledVisibility,
   resolveMonsterLairExperienceModeOptions,
   seedMonsterLairExperience,
@@ -24,6 +26,21 @@ function findLairExperienceGroup(items: FormItem[]): NamedGroupItem | undefined 
   )
 }
 
+describe('lairExperienceModeVisibility', () => {
+  it('reads the flat dependsOn watch map for experience mode', () => {
+    expect(
+      lairExperienceModeVisibility('suggested').visibleWhen({
+        [MONSTER_LAIR_EXPERIENCE_MODE_FIELD]: 'suggested',
+      }),
+    ).toBe(true)
+    expect(
+      lairExperienceModeVisibility('suggested').visibleWhen({
+        [MONSTER_LAIR_EXPERIENCE_MODE_FIELD]: 'custom',
+      }),
+    ).toBe(false)
+  })
+})
+
 describe('monsterLairEnabledVisibility', () => {
   it('reads the flat dependsOn watch map for lair.enabled', () => {
     expect(monsterLairEnabledVisibility.visibleWhen({ 'lair.enabled': true })).toBe(true)
@@ -38,6 +55,8 @@ describe('monsterLairFormFields', () => {
   it('declares optional in-lair XP with seedWhen', () => {
     expect(experienceGroup).toBeDefined()
     if (!experienceGroup) return
+    expect(experienceGroup.optionalDisclosure?.watchPaths).toBeUndefined()
+    expect(experienceGroup.optionalDisclosure?.clearPaths).toBeUndefined()
     expect(experienceGroup.optionalDisclosure?.seedWhen?.({ challengeRating: '21' })).toEqual({
       mode: 'suggested',
     })
@@ -48,7 +67,7 @@ describe('monsterLairFormFields', () => {
 
   it('omits Suggested mode when CR has no successor', () => {
     expect(
-      resolveMonsterLairExperienceModeOptions({ '../../challengeRating': '30' }).map(
+      resolveMonsterLairExperienceModeOptions({ challengeRating: '30' }).map(
         (option) => (option as { value: string }).value,
       ),
     ).toEqual(['custom'])

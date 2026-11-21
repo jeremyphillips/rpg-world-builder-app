@@ -42,7 +42,10 @@ visibleWhen: (values) => values['lair.enabled'] === true // correct
 visibleWhen: (values) => values.lair?.enabled === true
 ```
 
-Inside a named group, relative names work (`dependsOn: ['mode']` → `values.mode`). Cross-root paths use dotted `dependsOn` keys and bracket reads. Detail → [form-lib-conventions.md](../../apps/dashboard/docs/form-lib-conventions.md#field-visibility).
+`group.name` does not namespace children — only `namePrefix` from the parent context does (arrays, row
+scopes). Root-level leaves need fully qualified `name`s; `dependsOn` and `visibleWhen` use the same
+dotted keys (`values['lair.experience.mode']`). Detail →
+[form-lib-conventions.md](../../apps/dashboard/docs/form-lib-conventions.md#field-visibility).
 
 ## Slot implementation rules
 

@@ -25,9 +25,9 @@ a render file changes the ratchet key.
 
 ## Retired slots (config replacements)
 
-| Former slot / identity                      | Native config pattern                                                                                          | Notes                                                                                                                                                      |
-| ------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `lair` (`monster-lair-experience.slot.tsx`) | `switch` `lair.enabled`, named group `lair.experience` + `optionalDisclosure`, `select` + `display` + `number` | Replaced raw checkbox/inputs and button mode toggles. Shared `monsterLairEnabledVisibility` must use `values['lair.enabled']`, not `values.lair?.enabled`. |
+| Former slot / identity                      | Native config pattern                                                                                                                                              | Notes                                                                                                                                                                                                                               |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `lair` (`monster-lair-experience.slot.tsx`) | `switch` `lair.enabled`, named group `lair.experience` + `optionalDisclosure`, `select` + `display` + `number` on `lair.experience.mode` / `lair.experience.value` | Replaced raw checkbox/inputs and button mode toggles. Group `name` is the disclosure object path only — leaves use fully qualified paths. `monsterLairEnabledVisibility` uses `values['lair.enabled']`, not `values.lair?.enabled`. |
 
 ## Baseline (static literals per file)
 

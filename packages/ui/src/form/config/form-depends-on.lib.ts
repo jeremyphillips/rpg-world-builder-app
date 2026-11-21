@@ -6,7 +6,7 @@
  * appending the remaining path — e.g. `../level` inside `features.0.grants.0`
  * watches `features.0.level`.
  */
-function getValueAtPath(values: Record<string, unknown>, path: string): unknown {
+export function getValueAtPath(values: Record<string, unknown>, path: string): unknown {
   const segments = path.split('.')
   let current: unknown = values
   for (const segment of segments) {

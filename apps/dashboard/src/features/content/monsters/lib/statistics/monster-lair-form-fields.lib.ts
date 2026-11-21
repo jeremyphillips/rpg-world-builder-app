@@ -13,6 +13,9 @@ import {
   MONSTER_LAIR_EXPERIENCE_UNAVAILABLE_STORED,
 } from '../monster-form-labels'
 
+export const MONSTER_LAIR_EXPERIENCE_MODE_FIELD = 'lair.experience.mode'
+export const MONSTER_LAIR_EXPERIENCE_VALUE_FIELD = 'lair.experience.value'
+
 export const monsterLairEnabledVisibility: FieldVisibility = {
   dependsOn: ['lair.enabled'],
   visibleWhen: (values) => values['lair.enabled'] === true,
@@ -20,14 +23,13 @@ export const monsterLairEnabledVisibility: FieldVisibility = {
 
 export function lairExperienceModeVisibility(mode: 'suggested' | 'custom'): FieldVisibility {
   return {
-    dependsOn: ['mode'],
-    visibleWhen: (values) => values.mode === mode,
+    dependsOn: [MONSTER_LAIR_EXPERIENCE_MODE_FIELD],
+    visibleWhen: (values) => values[MONSTER_LAIR_EXPERIENCE_MODE_FIELD] === mode,
   }
 }
 
 export function readChallengeRating(values: Record<string, unknown>): ChallengeRating | undefined {
-  const raw =
-    values.challengeRating ?? values['../../challengeRating'] ?? values['../challengeRating']
+  const raw = values.challengeRating ?? values['challengeRating']
   return typeof raw === 'string' && raw.length > 0 ? (raw as ChallengeRating) : undefined
 }
 
@@ -60,7 +62,7 @@ export function resolveMonsterLairExperienceModeOptions(
 export function resolveMonsterLairSuggestedXpDisplayContent(
   values: Record<string, unknown>,
 ): FormDisplayBlock | undefined {
-  if (values.mode !== 'suggested') return undefined
+  if (values[MONSTER_LAIR_EXPERIENCE_MODE_FIELD] !== 'suggested') return undefined
   const challengeRating = readChallengeRating(values)
   if (!challengeRating) return undefined
   const suggestion = suggestInLairExperience(challengeRating)
@@ -81,7 +83,7 @@ export function resolveMonsterLairSuggestedXpDisplayContent(
 export function resolveMonsterLairSuggestedXpCaptionDisplayContent(
   values: Record<string, unknown>,
 ): FormDisplayBlock | undefined {
-  if (values.mode !== 'suggested') return undefined
+  if (values[MONSTER_LAIR_EXPERIENCE_MODE_FIELD] !== 'suggested') return undefined
   const challengeRating = readChallengeRating(values)
   if (!challengeRating) return undefined
   const suggestion = suggestInLairExperience(challengeRating)
@@ -96,7 +98,7 @@ export function resolveMonsterLairSuggestedXpCaptionDisplayContent(
 export function resolveMonsterLairCustomXpHint(
   values: Record<string, unknown>,
 ): string | undefined {
-  if (values.mode !== 'custom') return undefined
+  if (values[MONSTER_LAIR_EXPERIENCE_MODE_FIELD] !== 'custom') return undefined
   const challengeRating = readChallengeRating(values)
   if (!challengeRating) return MONSTER_LAIR_EXPERIENCE_UNAVAILABLE
   const suggestion = suggestInLairExperience(challengeRating)
