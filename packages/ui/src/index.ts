@@ -332,6 +332,10 @@ export {
   type StaticCardProps,
 } from './components/ui/card'
 export { CardNavInterior, NavigationChevron } from './components/ui/card.lib'
+export type {
+  NavigationChevronProps,
+  NavigationChevronSize,
+} from './components/ui/navigation-chevron.client'
 export {
   BORDER_STRENGTHS,
   borderStrength,

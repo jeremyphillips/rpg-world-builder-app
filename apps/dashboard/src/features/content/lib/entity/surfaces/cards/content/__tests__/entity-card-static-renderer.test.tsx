@@ -92,7 +92,7 @@ describe('EntityCardStaticRenderer', () => {
     expect(link).toHaveAttribute('href', '/locations/harbor')
     expect(link).toHaveClass('ui-focus-ring')
     expect(link).not.toHaveClass('ui-focus-ring--embedded')
-    expect(container.getElementsByClassName('ui-card__nav-chevron')).toHaveLength(1)
+    expect(container.getElementsByClassName('ui-nav-chevron')).toHaveLength(1)
   })
 
   it('hides navigation chevron when showNavigationChevron is false', () => {
@@ -106,7 +106,7 @@ describe('EntityCardStaticRenderer', () => {
         showNavigationChevron={false}
       />,
     )
-    expect(container.getElementsByClassName('ui-card__nav-chevron')).toHaveLength(0)
+    expect(container.getElementsByClassName('ui-nav-chevron')).toHaveLength(0)
   })
 
   it('activates navigable link on Enter when focused', async () => {

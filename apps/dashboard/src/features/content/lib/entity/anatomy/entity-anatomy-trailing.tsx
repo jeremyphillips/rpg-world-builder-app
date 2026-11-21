@@ -1,4 +1,4 @@
-import { Icon, RowAnatomyCell, Text } from '@rpg/ui'
+import { NavigationChevron, RowAnatomyCell, Text } from '@rpg/ui'
 
 import type { EntityAnatomyColumn } from './entity-anatomy.types'
 import { resolveEntityAnatomyTrailingCells } from './entity-anatomy-trailing.lib'
@@ -93,7 +93,7 @@ function EntityAnatomyTrailingPrimary({ trailing }: { trailing: EntityAnatomyTra
             <>
               <EntityAnatomyTrailingMeta meta={trailing.meta} />
               {trailing.variant === 'chevron' ? (
-                <Icon name="chevron-right" size="lg" className="shrink-0" />
+                <NavigationChevron size="lg" />
               ) : (
                 <EntityAnatomyTrailingQuantityLabel
                   quantity={trailing.quantity}

@@ -2,6 +2,7 @@ import {
   Icon,
   InlineInactiveStatus,
   InteractiveListRow,
+  NavigationChevron,
   ValidationIssueCountBadge,
   cn,
   dragHandleVariants,
@@ -89,11 +90,7 @@ export function MasterDetailListRow({
         selected={isSelected}
         startSlot={startSlot}
         content={<MasterDetailListRowContent item={item} issueCount={issueCount} />}
-        endSlot={
-          <span aria-hidden className="text-foreground">
-            <Icon name="chevron-right" size="lg" />
-          </span>
-        }
+        endSlot={<NavigationChevron size="lg" />}
         asChild
       >
         <button

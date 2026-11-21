@@ -109,7 +109,7 @@ function MasterDetailListAddButton({ addLabel, onAdd }: { addLabel?: string; onA
     <ActionButton
       action="add"
       variant="ghost"
-      size="icon"
+      size="icon-sm"
       aria-label={addLabel}
       onClick={() => onAdd()}
     />

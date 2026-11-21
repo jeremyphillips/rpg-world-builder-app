@@ -199,7 +199,8 @@ describe('ButtonDropdown', () => {
     )
 
     const trigger = screen.getByRole('button', { name: 'Add trait' })
-    expect(trigger).toHaveClass('ui-button--ghost', 'ui-button--icon-md')
+    expect(trigger).toHaveClass('ui-button--ghost', 'ui-button--icon-sm', 'shrink-0')
+    expect(trigger).not.toHaveClass('w-fit')
     expect(trigger).not.toHaveTextContent('Add trait')
 
     await user.click(trigger)

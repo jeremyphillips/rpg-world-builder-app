@@ -35,6 +35,10 @@ Within one dimension (size, appearance), every modifier declares the **same** pr
 
 `cn()` registers twMerge groups (`ui-button-size`, `ui-button-appearance`, …) so React composition matches DevTools. `ui-button--text` is a family treatment and is not in `ui-button-size`, so it composes with icon-only sizes. Compound rules in `button.css` (`.ui-button--text.ui-button--icon-*`) keep the square hit target.
 
+### Button icon-only geometry
+
+Icon-only `Button` / `ActionButton` sizes (`icon-xs`, `icon-sm`, `icon`, `icon-lg`) publish equal `width` and `height` on `ui-button--icon-*` in `button.css`. **Size modifiers own the hit target.** Consumer `className` may use layout utilities (`shrink-0`, alignment, order) but must not override intrinsic `width` or `height` (for example `w-fit`, `w-auto`, `h-auto`, or arbitrary size utilities). Labeled buttons may use `width="fit"` on pickers; `ButtonDropdown` `triggerPresentation="addIcon"` reuses the icon-only square instead of labeled `w-fit` chrome.
+
 ## Inspector acceptance
 
 For each migrated primitive, verify in Storybook DevTools:

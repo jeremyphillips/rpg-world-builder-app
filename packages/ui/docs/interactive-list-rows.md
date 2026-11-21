@@ -36,6 +36,10 @@ Surface hover and pressed mixes come from [surface-interaction.css](../src/compo
 
 Use [`ListGroupHeading`](../src/components/ui/list-group-heading.client.tsx) for the faint band above grouped rows (`label`, optional `count`, `first`, `follows`). It wraps `Eyebrow` at **`xs`** and owns padding, borders, and count styling in [list-group-heading.css](../src/components/ui/list-group-heading.css). Place headings **outside** the `InteractiveList` shell so row adjacency borders stay correct. Row-level type labels belong on [`IdentityRow`](../src/components/ui/identity-row.client.tsx) (`classification`), not on the section band. Consumers: `ButtonDropdown` groups, global search preview sections, optional `InteractiveListPanel.listGroupHeading`.
 
+## Drill-in chevron
+
+Selectable list rows that navigate or open detail (for example master-detail list rails) use `NavigationChevron` in `endSlot`, typically `size="lg"`. Do not pass a raw `chevron-right` icon or foreground color on the slot wrapper — see [icon-registry.md](./icon-registry.md#semantic-maps).
+
 ## Menu item contract
 
 `ui-menu-item` owns padding, type, and `data-highlighted` / focus wash (`--row-hover-bg`, foreground unchanged). Optional description uses `ui-menu-item__description` and stays `muted-foreground` when highlighted. Submenu triggers keep `data-state="open"` accent treatment. Checkbox and radio items are unchanged (`DropdownMenuCheckboxItem`, `DropdownMenuRadioItem`).

@@ -32,7 +32,7 @@ Compact-only presentation (status badge `sm`, caption classes, `InlineMetadata` 
 
 ### `DestinationItem` (discriminated union)
 
-**Shared:** `link` (required), `showNavigationChevron?` (default true)
+**Shared:** `link` (required), `showNavigationChevron?` (default true) — trailing glyph is `NavigationChevron` (`size` default `md`; see [icon-registry.md](./icon-registry.md))
 
 **Simple:** `title`, optional `description`, optional `metadata`
 

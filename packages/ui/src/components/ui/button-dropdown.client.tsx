@@ -148,7 +148,7 @@ export function ButtonDropdown({
   } = useButtonDropdownControl({ groups, items, enableSearch, onSelectItem })
   const groupedSections = groupHeadingsForItems(displayItems, groups, searchActive)
   const searchFieldSize = resolveComboboxSearchFieldSizeForButtonSize(
-    addIconTrigger ? 'icon' : size,
+    addIconTrigger ? 'icon-sm' : size,
   )
 
   const highlightIndexForItem = React.useCallback(
@@ -164,8 +164,8 @@ export function ButtonDropdown({
           <ActionButton
             action="add"
             variant="ghost"
-            size="icon"
-            className={cn('w-fit shrink-0', className)}
+            size="icon-sm"
+            className={cn('shrink-0', className)}
             aria-label={label}
             aria-haspopup="menu"
             aria-expanded={open}

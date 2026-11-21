@@ -28,6 +28,8 @@ Domain maps (`ACTION_ICONS`, `CONTENT_DISPLAY_FALLBACK_ICONS`, feature tab maps,
 
 `ActionButton` accepts only `action` (closed verb) plus normal `Button` props. Overflow triggers use `overflow`, `overflowVertical`, or `overflowMenu`.
 
+**Forward navigation chevron:** Use `NavigationChevron` (`size`: `md` | `lg`) for decorative drill-in affordances on cards, destination rows, and list rows. Do not render `<Icon name="chevron-right" />` for that pattern — `ui-nav-chevron` owns muted color and glyph opacity. Breadcrumbs, submenu triggers, and expand/collapse affordances are separate call sites. Layout classes on the host are allowed; do not set color or opacity on the glyph directly.
+
 | Verb      | Glyph  | Meaning                                        |
 | --------- | ------ | ---------------------------------------------- |
 | `details` | `info` | Reveal more information about the current item |

@@ -7,7 +7,7 @@ export type { PickerSearchOptions } from '../../lib/picker-search.types'
 
 export type ButtonDropdownWidth = 'full' | 'fit'
 
-/** `addIcon` — ghost icon-md add trigger (master-detail list header). */
+/** `addIcon` — ghost icon-sm add trigger (master-detail list header). */
 export type ButtonDropdownTriggerPresentation = 'labeled' | 'addIcon'
 
 export type ButtonDropdownItem = {
