@@ -306,6 +306,52 @@ describe('buildMonsterActionMultiattackPreview', () => {
     ).toBe('unavailable')
   })
 
+  it('resolves alternative afterUsingActionId from bonus actions', () => {
+    const ctx = readyCtx()
+    const values = monsterFormTestValues({
+      name: 'Clay Golem',
+      actions: [
+        {
+          id: 'slam',
+          kind: 'natural-weapon',
+          name: 'Slam',
+          mode: 'melee',
+          damageType: 'bludgeoning',
+          damage: { dice: { count: 2, faces: 8 } },
+        },
+        {
+          id: 'multiattack',
+          kind: 'multiattack',
+          name: 'Multiattack',
+          steps: [{ count: 2, actionIds: ['slam'] }],
+          alternative: {
+            steps: [{ count: 3, actionIds: ['slam'] }],
+            afterUsingActionId: 'hasten',
+          },
+        },
+      ] as MonsterFormValues['actions'],
+      bonusActions: [
+        {
+          id: 'hasten',
+          kind: 'take-actions',
+          name: 'Hasten',
+          standardActions: ['dash', 'disengage'],
+          combination: 'one',
+        },
+      ] as MonsterFormValues['bonusActions'],
+    })
+
+    const preview = buildMonsterActionMultiattackPreview({
+      values,
+      ctx,
+      actionId: 'multiattack',
+    })
+
+    expect(preview?.status).toBe('ready')
+    if (!preview || preview.status !== 'ready') return
+    expect(preview.prose).toMatch(/if it used hasten this turn/i)
+  })
+
   it('returns steps guidance when no steps are configured', () => {
     const ctx = readyCtx()
     const values = monsterFormTestValues({

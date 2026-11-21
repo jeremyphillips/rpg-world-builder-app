@@ -1,6 +1,7 @@
 import {
   collectFormAvailabilityAdvisories,
   isMultiattackAttackGroup,
+  isMultiattackUseClause,
   isWeaponEquipment,
   isWeaponProficientFromGrantSet,
   joinInlineMetadata,
@@ -106,6 +107,16 @@ function sectionRows(
   return monsterFormSectionRows(values, section)
 }
 
+function multiattackStepTargetIds(step: unknown): readonly string[] {
+  if (!step || typeof step !== 'object') return []
+  if (isMultiattackAttackGroup(step)) return step.actionIds ?? []
+  if (!isMultiattackUseClause(step)) return []
+  if (step.mode === 'choice' || (step.choices && step.choices.length > 0)) {
+    return (step.choices ?? []).flatMap((choice) => (choice.actionId ? [choice.actionId] : []))
+  }
+  return step.actionId ? [step.actionId] : []
+}
+
 function appendMultiattackAdvisories(
   advisories: MonsterFormAdvisory[],
   values: MonsterFormValues,
@@ -117,8 +128,7 @@ function appendMultiattackAdvisories(
   const path = `${monsterFormSectionRowNamePrefix(section)}.${index}`
   const seen = new Set<string>()
   for (const step of action.steps ?? []) {
-    if (!isMultiattackAttackGroup(step)) continue
-    for (const actionId of step.actionIds ?? []) {
+    for (const actionId of multiattackStepTargetIds(step)) {
       if (seen.has(actionId)) continue
       const target = sectionRows(values, 'actions').find((row) => row.id === actionId)
       if (!target || target.available !== false) continue

@@ -80,16 +80,21 @@ function actionIndex(body: FormAvailabilityBody): Map<string, FormAvailabilityRo
   return index
 }
 
+type MultiattackStepRow = NonNullable<FormAvailabilityRow['steps']>[number]
+
+/** Action ids referenced by one Multiattack step (attack group or use clause). */
+export function multiattackStepReferencedActionIds(step: MultiattackStepRow): readonly string[] {
+  if (step.actionIds?.length) return step.actionIds
+  if (step.kind === 'use' && step.actionId) return [step.actionId]
+  if (step.kind === 'use' && step.choices) {
+    return step.choices.flatMap((choice) => (choice.actionId ? [choice.actionId] : []))
+  }
+  return []
+}
+
 function referencedIds(row: FormAvailabilityRow): readonly string[] {
   if (row.kind === 'multiattack') {
-    return (row.steps ?? []).flatMap((step) => {
-      if (step.actionIds?.length) return step.actionIds
-      if (step.kind === 'use' && step.actionId) return [step.actionId]
-      if (step.kind === 'use' && step.choices) {
-        return step.choices.flatMap((choice) => (choice.actionId ? [choice.actionId] : []))
-      }
-      return []
-    })
+    return (row.steps ?? []).flatMap((step) => multiattackStepReferencedActionIds(step))
   }
   if (row.kind === 'action-reference') return row.actionIds ?? []
   if (row.kind === 'parry' && row.followUpActionId) return [row.followUpActionId]
@@ -123,7 +128,7 @@ function appendMultiattackAdvisories(
 ): void {
   if (row.kind !== 'multiattack') return
   for (const step of row.steps ?? []) {
-    const targets = (step.actionIds ?? []).flatMap((id) => {
+    const targets = multiattackStepReferencedActionIds(step).flatMap((id) => {
       const target = actions.get(id)
       return target ? [target] : []
     })

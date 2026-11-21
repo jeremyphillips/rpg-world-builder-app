@@ -116,16 +116,21 @@ That kind is not implemented.
 
 ## `multiattack`
 
-`steps` are `{ count, actionIds }`. Several ids in one step mean "in any
-combination." Extra clauses stay in `description` and are appended after the
-generated sentence.
+Published `steps` are attack groups (`count` + `actionIds`), use clauses (`kind: 'use'`
+with `mode: 'single' | 'choice'`), optional `replacement`, and optional `alternative`.
+Several attack ids in one group mean "in any combination." `description` appends after a
+ready generated sentence.
 
-Each id must be an action in `actions` whose kind is `weapon`, `natural-weapon`,
-or `attack`. Dangling ids, other kinds, self-reference, and repeated ids are
-errors. Draft mode reports broken references. Empty steps are a publish error.
+Semantic rules (references, eligibility, replacement budgets, spell repetition on use
+steps, redundant replacement choices, bonus-action prerequisites on alternatives) run on
+**publish** via `refinePublishedMultiattack`. Draft saves keep incomplete graphs so
+autosave does not discard in-progress edits; see
+[validation-messages.md § Multiattack](./validation-messages.md#multiattack-semantic-validation-publish-only).
 
-`formatMonsterMultiattack` builds the sentence from the monster name and resolved
-action names. Weapon names come from the equipment catalog.
+`formatMonsterMultiattackResult` builds the sentence from the monster name, resolved
+action and spell names, and optional `bonusActions` for `afterUsingActionId`. Weapon
+names come from the equipment catalog. Pattern coverage lives in
+`runtime/monster/multiattack-pattern-fixtures.data.ts`.
 
 ## Creature trait templates
 

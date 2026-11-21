@@ -39,6 +39,29 @@ describe('form availability advisories', () => {
     ).toEqual([])
   })
 
+  it('warns when a use-step multiattack form has no eligible attack', () => {
+    const advisories = collectFormAvailabilityAdvisories({
+      name: 'Shape Example',
+      forms: werebearForms,
+      actions: [
+        { id: 'roar', name: 'Roar', kind: 'special', onlyInFormIds: ['bear'] },
+        {
+          id: 'multi',
+          kind: 'multiattack',
+          name: 'Multiattack',
+          steps: [{ kind: 'use', mode: 'single', actionId: 'roar' }],
+        },
+      ],
+    })
+    expect(advisories).toEqual([
+      expect.objectContaining({
+        code: 'form-restricted-multiattack',
+        path: 'actions.1',
+        message: expect.stringContaining('Humanoid or Bear-humanoid hybrid'),
+      }),
+    ])
+  })
+
   it('warns when a multiattack form has no eligible attack', () => {
     const advisories = collectFormAvailabilityAdvisories({
       name: 'Werebear',

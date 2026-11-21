@@ -9,6 +9,36 @@ import {
 } from './monster-form-advisories'
 
 describe('collectMonsterFormAdvisories', () => {
+  it('warns when a use-step multiattack targets an unavailable action', () => {
+    const values = {
+      actions: [
+        { id: 'roar', kind: 'special', name: 'Roar', available: false },
+        {
+          id: 'multi',
+          kind: 'multiattack',
+          name: 'Multiattack',
+          steps: [
+            { count: 1, actionIds: ['bite-missing'] },
+            { kind: 'use', mode: 'single', actionId: 'roar' },
+          ],
+        },
+      ],
+      bonusActions: [],
+      reactions: [],
+      equipment: [],
+    } as unknown as MonsterFormValues
+
+    const advisories = collectMonsterFormAdvisories(values, new Map())
+
+    expect(advisories).toEqual([
+      {
+        code: 'multiattack-unavailable-action',
+        message: 'Roar is unavailable, so this multiattack cannot use it.',
+        path: 'actions.1',
+      },
+    ])
+  })
+
   it('warns when multiattack targets an unavailable action', () => {
     const values = {
       actions: [

@@ -9,6 +9,7 @@ import {
   type Monster,
   type MonsterAction,
   type MonsterActionDraft,
+  type MonsterBonusAction,
   type MonsterReferencedSpell,
 } from '@rpg/contracts'
 
@@ -113,6 +114,7 @@ export function buildMonsterMultiattackSentence(input: {
   monsterName: string
   action: MultiattackActionShape
   actions: readonly MonsterAction[]
+  bonusActions?: readonly MonsterBonusAction[]
   equipment: readonly EquipmentInstance[]
   equipmentCatalog: CreatureEquipmentCatalog
   magicPropertyProvider: MagicPropertyDefinitionProvider
@@ -123,6 +125,7 @@ export function buildMonsterMultiattackSentence(input: {
     monsterName: input.monsterName,
     action: input.action,
     actions: input.actions,
+    bonusActions: input.bonusActions,
     equipment: input.equipment,
     equipmentCatalog: input.equipmentCatalog,
     magicPropertyProvider: input.magicPropertyProvider,
@@ -149,6 +152,7 @@ function renderMultiattackProse(
     monsterName: normalized.name?.trim() || 'Creature',
     action: multiattack as MultiattackActionShape,
     actions: normalized.actions ?? [],
+    bonusActions: normalized.bonusActions ?? [],
     equipment: normalized.equipment ?? [],
     equipmentCatalog: monsterEquipmentCatalog(ctx),
     magicPropertyProvider: monsterMagicPropertyProvider(ctx),

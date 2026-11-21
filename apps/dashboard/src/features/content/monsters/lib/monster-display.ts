@@ -381,6 +381,7 @@ function formatMultiattackActionBody(
     monsterName: monster.name,
     action,
     actions: monster.actions,
+    bonusActions: monster.bonusActions,
     equipment: monster.equipment,
     equipmentCatalog: equipmentById,
     magicPropertyProvider,
