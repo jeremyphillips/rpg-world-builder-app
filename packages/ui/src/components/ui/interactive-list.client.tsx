@@ -25,8 +25,24 @@ export const InteractiveList = React.forwardRef<HTMLDivElement, InteractiveListP
 export interface InteractiveListEmptyProps {
   children: React.ReactNode
   className?: string
+  /** Default `center` — popover and combobox empty states. `start` matches flush compact list inset. */
+  align?: 'center' | 'start'
 }
 
-export function InteractiveListEmpty({ children, className }: InteractiveListEmptyProps) {
-  return <p className={cn('ui-interactive-list__empty', className)}>{children}</p>
+export function InteractiveListEmpty({
+  children,
+  className,
+  align = 'center',
+}: InteractiveListEmptyProps) {
+  return (
+    <p
+      className={cn(
+        'ui-interactive-list__empty',
+        align === 'start' && 'ui-interactive-list__empty--start',
+        className,
+      )}
+    >
+      {children}
+    </p>
+  )
 }

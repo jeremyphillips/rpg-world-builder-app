@@ -1,0 +1,38 @@
+/*
+ * Master-detail list rail chrome — header, count supplement, grouped section bands.
+ * Row dividers stay on `.ui-interactive-list` (subtle). One edge per seam: chrome uses
+ * border-bottom; section headers gain border-top only between scroll sections.
+ */
+@layer components {
+  .master-detail-list__header,
+  .master-detail-list__section-header {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: calc(var(--spacing) * 3);
+    padding: calc(var(--spacing) * 1) calc(var(--spacing) * 0.5) calc(var(--spacing) * 1)
+      calc(var(--spacing) * 2);
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: var(--ui-border-color);
+  }
+
+  .master-detail-list__supplement {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: calc(var(--spacing) * 2);
+    padding-inline: calc(var(--spacing) * 3);
+    padding-block: calc(var(--spacing) * 1.5);
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: var(--ui-border-color);
+  }
+
+  .master-detail-list__scroll > section + section .master-detail-list__section-header {
+    border-top-width: 1px;
+    border-top-style: solid;
+    border-top-color: var(--ui-border-color);
+  }
+}

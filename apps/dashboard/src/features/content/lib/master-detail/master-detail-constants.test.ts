@@ -4,6 +4,7 @@ import { CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN } from '../../classes/lib/class-f
 import { TRAIT_MASTER_DETAIL_ITEM_NOUN } from '../../species/lib/species-trait-form-labels'
 import {
   masterDetailEmptyListLabel,
+  masterDetailEmptySectionLabel,
   masterDetailEmptySelectionHeading,
   masterDetailEmptySelectionSubhead,
   masterDetailItemNounLabel,
@@ -17,6 +18,10 @@ describe('masterDetail empty-state copy', () => {
     expect(masterDetailEmptyListLabel(CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN)).toBe(
       'No features added.',
     )
+  })
+
+  it('formats grouped section empty copy from a caller phrase', () => {
+    expect(masterDetailEmptySectionLabel('bonus actions')).toBe('No bonus actions added.')
   })
 
   it('formats detail empty copy from vocabulary terms', () => {

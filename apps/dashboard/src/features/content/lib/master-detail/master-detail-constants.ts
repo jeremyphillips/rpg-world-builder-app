@@ -6,8 +6,13 @@ export function masterDetailItemNounLabel(itemNoun: MasterDetailItemNounTerm): s
   return getTermSentenceForm(itemNoun, 1)
 }
 
+/** Grouped sections and other caller-owned phrases — pass a lowercase section phrase (for example `bonus actions`). */
+export function masterDetailEmptySectionLabel(sectionPhrase: string): string {
+  return `No ${sectionPhrase} added.`
+}
+
 export function masterDetailEmptyListLabel(itemNoun: MasterDetailItemNounTerm): string {
-  return `No ${getTermSentenceForm(itemNoun, 2)} added.`
+  return masterDetailEmptySectionLabel(getTermSentenceForm(itemNoun, 2))
 }
 
 export function masterDetailEmptySelectionHeading(itemNoun: MasterDetailItemNounTerm): string {

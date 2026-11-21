@@ -82,16 +82,20 @@ export function RulesPreview({ label, title, context, content }: RulesPreviewPro
 
   return (
     <Panel tone="subtle" density="compact">
-      <div className="flex flex-col gap-3">
-        <div className="flex items-baseline justify-between gap-3">
-          <Eyebrow size="sm">{label}</Eyebrow>
-          {context ? (
-            <Text as="span" variant="supporting">
-              {context}
-            </Text>
-          ) : null}
-        </div>
-        {title ? <Text variant="emphasis">{title}</Text> : null}
+      <div className="flex items-baseline justify-between gap-3 mb-1">
+        <Eyebrow size="sm">{label}</Eyebrow>
+        {context ? (
+          <Text as="span" variant="supporting">
+            {context}
+          </Text>
+        ) : null}
+      </div>
+      {title ? (
+        <Text variant="emphasis" className="mb-0.5">
+          {title}
+        </Text>
+      ) : null}
+      <div className="flex flex-col gap-1">
         <RulesPreviewBody content={content} />
       </div>
     </Panel>

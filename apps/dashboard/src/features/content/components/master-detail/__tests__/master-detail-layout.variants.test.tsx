@@ -53,6 +53,7 @@ describe('master-detail layout variants', () => {
 
   it('wraps list scroll in a boundary region without reserving scrollbar gutter space', () => {
     expect(masterDetailListScrollRegionClasses).toContain('relative')
+    expect(masterDetailListScrollViewportClasses).toContain('master-detail-list__scroll')
     expect(masterDetailListScrollViewportClasses).toContain('overflow-y-auto')
     expect(masterDetailListScrollViewportClasses).toContain('scrollbar-slim')
     expect(masterDetailListScrollViewportClasses).toContain('pe-0')
@@ -78,6 +79,7 @@ describe('master-detail layout variants', () => {
   it('uses a bleed quiet panel for the list shell', () => {
     expect(masterDetailListShellClasses).toContain('ui-panel--quiet')
     expect(masterDetailListShellClasses).toContain('ui-panel--bleed')
+    expect(masterDetailListShellClasses).toContain('master-detail-list-shell')
     expect(masterDetailListShellClasses).not.toContain('bg-field-container')
   })
 })

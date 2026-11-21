@@ -146,6 +146,15 @@ describe('InteractiveList', () => {
     )
 
     expect(screen.getByText('No matches.')).toBeInTheDocument()
+    expect(screen.getByText('No matches.')).toHaveClass('ui-interactive-list__empty')
+    expect(screen.getByText('No matches.')).not.toHaveClass('ui-interactive-list__empty--start')
+  })
+
+  it('renders start-aligned empty copy for flush list rails', () => {
+    render(<InteractiveListEmpty align="start">No traits added.</InteractiveListEmpty>)
+
+    const empty = screen.getByText('No traits added.')
+    expect(empty).toHaveClass('ui-interactive-list__empty', 'ui-interactive-list__empty--start')
   })
 
   it('applies adjacent-row separator recipe on the list shell', () => {

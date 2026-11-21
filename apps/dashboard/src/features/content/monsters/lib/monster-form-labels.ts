@@ -35,6 +35,7 @@ import {
 export { formatEquipmentCustomizationRemovalSummary } from './equipment/equipment-entry-customization.lib'
 
 import { formatEquipmentRemovalInlineCount } from './equipment/equipment-entry-customization.lib'
+import { masterDetailEmptySectionLabel } from '../../lib/master-detail/master-detail-constants'
 import { defineMasterDetailItemNoun } from '../../lib/master-detail/master-detail-item-noun'
 
 import {
@@ -302,6 +303,10 @@ const MONSTER_ACTION_SECTION_HEADINGS = {
 
 export function monsterActionSectionHeading(section: MonsterActionSection): string {
   return MONSTER_ACTION_SECTION_HEADINGS[section]
+}
+
+export function monsterActionSectionEmptyLabel(section: MonsterActionSection): string {
+  return masterDetailEmptySectionLabel(monsterActionSectionHeading(section).toLowerCase())
 }
 
 export const MONSTER_ADD_LABEL = 'Add'

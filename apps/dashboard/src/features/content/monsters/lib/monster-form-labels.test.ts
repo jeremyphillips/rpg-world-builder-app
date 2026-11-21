@@ -17,12 +17,18 @@ const source = readFileSync(
   'utf8',
 )
 
+import { MONSTER_ACTION_SECTIONS } from '@rpg/contracts/content'
+
+import { masterDetailEmptySectionLabel } from '../../lib/master-detail/master-detail-constants'
 import {
   LEGENDARY_ACTION_CATEGORY_LABELS,
   MONSTER_ACTION_EDITOR_FALLBACK_TITLES,
   MONSTER_ACTIONS_HEADING,
   MONSTER_BONUS_ACTIONS_HEADING,
+  MONSTER_LEGENDARY_ACTIONS_HEADING,
   MONSTER_REACTIONS_HEADING,
+  monsterActionSectionEmptyLabel,
+  monsterActionSectionHeading,
 } from './monster-form-labels'
 
 describe('monster-form-labels', () => {
@@ -30,6 +36,20 @@ describe('monster-form-labels', () => {
     expect(MONSTER_ACTIONS_HEADING).toBe(getActionEconomySectionLabel('action'))
     expect(MONSTER_BONUS_ACTIONS_HEADING).toBe(getActionEconomySectionLabel('bonus-action'))
     expect(MONSTER_REACTIONS_HEADING).toBe(getActionEconomySectionLabel('reaction'))
+  })
+
+  it('formats section empty copy from section headings via the master-detail template', () => {
+    for (const section of MONSTER_ACTION_SECTIONS) {
+      expect(monsterActionSectionEmptyLabel(section)).toBe(
+        masterDetailEmptySectionLabel(monsterActionSectionHeading(section).toLowerCase()),
+      )
+    }
+    expect(monsterActionSectionEmptyLabel('bonusActions')).toBe(
+      masterDetailEmptySectionLabel('bonus actions'),
+    )
+    expect(monsterActionSectionEmptyLabel('legendaryActions')).toBe(
+      masterDetailEmptySectionLabel(MONSTER_LEGENDARY_ACTIONS_HEADING.toLowerCase()),
+    )
   })
 
   it('wires legendary reference category label from action kind vocabulary', () => {

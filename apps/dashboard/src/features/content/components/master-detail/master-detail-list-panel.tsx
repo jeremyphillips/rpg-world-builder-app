@@ -3,6 +3,7 @@ import {
   ActionButton,
   cn,
   Heading,
+  InteractiveList,
   InteractiveListEmpty,
   ScrollBoundaryRegion,
   scrollBoundaryRegionRootClasses,
@@ -14,12 +15,18 @@ import type { MasterDetailListItem } from '../../lib/master-detail/master-detail
 import type { MasterDetailItemMeta } from '../../lib/master-detail/master-detail-item-meta'
 import { MasterDetailListRow } from './master-detail-list-row'
 import { MasterDetailSortableListRows } from './master-detail-sortable-list-rows.client'
-import { masterDetailEmptyListLabel } from '../../lib/master-detail/master-detail-constants'
+import {
+  masterDetailEmptyListLabel,
+  masterDetailEmptySectionLabel,
+} from '../../lib/master-detail/master-detail-constants'
 import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
 import {
   masterDetailListBodyClasses,
+  masterDetailListHeaderClasses,
   masterDetailListScrollViewportClasses,
+  masterDetailListSectionHeaderClasses,
   masterDetailListShellClasses,
+  masterDetailListSupplementClasses,
 } from './master-detail-list-panel.layout'
 
 export type { MasterDetailItemMeta, MasterDetailListItem }
@@ -31,6 +38,8 @@ export type MasterDetailListGroup = {
   onAdd?: () => void
   addControl?: ReactNode
   items: MasterDetailListItem[]
+  /** Section empty copy — defaults to the panel's flat `itemNoun` empty label. */
+  emptyLabel?: ReactNode
 }
 
 export type MasterDetailListPanelProps = {
@@ -162,6 +171,28 @@ function MasterDetailListRows({
   )
 }
 
+function MasterDetailListSectionEmpty({ children }: { children: ReactNode }) {
+  return (
+    <InteractiveList density="compact" className={masterDetailListBodyClasses}>
+      <InteractiveListEmpty align="start">{children}</InteractiveListEmpty>
+    </InteractiveList>
+  )
+}
+
+function resolveGroupEmptyLabel(
+  group: MasterDetailListGroup,
+  defaultEmptyLabel: string,
+): ReactNode {
+  if (group.emptyLabel != null) return group.emptyLabel
+  if (typeof group.title === 'string') {
+    const trimmed = group.title.trim()
+    if (trimmed.length > 0) {
+      return masterDetailEmptySectionLabel(trimmed.toLowerCase())
+    }
+  }
+  return defaultEmptyLabel
+}
+
 function MasterDetailListScroll({
   groups,
   items,
@@ -196,7 +227,7 @@ function MasterDetailListScroll({
             key={group.id}
             aria-label={typeof group.title === 'string' ? group.title : group.id}
           >
-            <div className="flex shrink-0 items-center justify-between gap-3 border-b ui-border--subtle px-3 py-2.5">
+            <div className={masterDetailListSectionHeaderClasses}>
               <Heading as="div" variant="nav" className="min-w-0">
                 {group.title}
               </Heading>
@@ -211,7 +242,11 @@ function MasterDetailListScroll({
                 onSelectItem={onSelectItem}
                 selectedRowRef={selectedRowRef}
               />
-            ) : null}
+            ) : (
+              <MasterDetailListSectionEmpty>
+                {resolveGroupEmptyLabel(group, emptyLabel)}
+              </MasterDetailListSectionEmpty>
+            )}
           </section>
         ))}
       </ScrollBoundaryRegion>
@@ -219,7 +254,7 @@ function MasterDetailListScroll({
   }
 
   if (items.length === 0) {
-    return <InteractiveListEmpty className="text-start">{emptyLabel}</InteractiveListEmpty>
+    return <InteractiveListEmpty align="start">{emptyLabel}</InteractiveListEmpty>
   }
 
   return (
@@ -257,7 +292,7 @@ function MasterDetailCollectionHeader({
     ? null
     : (addControl ?? <MasterDetailListAddButton addLabel={addLabel} onAdd={onAdd} />)
   return (
-    <div className="flex shrink-0 items-center justify-between gap-3 border-b ui-border--subtle px-3 py-2.5">
+    <div className={masterDetailListHeaderClasses}>
       <Heading as="div" variant="nav" className="min-w-0">
         {listTitle}
       </Heading>
@@ -274,7 +309,8 @@ function MasterDetailCountRow({
   return (
     <div
       className={cn(
-        'flex shrink-0 items-center gap-2 border-b ui-border--subtle px-3 py-1.5 text-style-caption',
+        masterDetailListSupplementClasses,
+        'text-style-caption',
         countSupplement ? 'justify-between' : 'justify-end',
       )}
     >
