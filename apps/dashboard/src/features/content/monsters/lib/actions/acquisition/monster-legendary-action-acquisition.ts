@@ -1,5 +1,6 @@
 import {
   formatSpellCastAtLevelName,
+  getMonsterActionKindLabel,
   listDirectSpellCastingSources,
   type ResolvedSpellCastingSource,
   type SpellCastingSections,
@@ -20,6 +21,7 @@ import {
   LEGENDARY_SPELLCASTING_DEFAULT_NAME,
   LEGENDARY_SPELLCASTING_DESCRIPTION,
   LEGENDARY_SPELLCASTING_DISABLED_NOTE,
+  MONSTER_ACQUISITION_SAVE_DESCRIPTION,
 } from '../../monster-form-labels'
 import type { MonsterFormValues } from '../../monster-form-values'
 import { createSpellActionDraft } from './monster-action-acquisition'
@@ -112,6 +114,12 @@ export function legendaryActionAcquisitionItems(
       metadata: LEGENDARY_CAST_SPELL_DESCRIPTION,
       disabled: !catalogReady,
       note: catalogReady ? undefined : LEGENDARY_CAST_SPELL_DISABLED_NOTE,
+    },
+    {
+      id: 'create:save',
+      label: getMonsterActionKindLabel('save'),
+      groupId: 'new',
+      metadata: MONSTER_ACQUISITION_SAVE_DESCRIPTION,
     },
     {
       id: 'create:special',

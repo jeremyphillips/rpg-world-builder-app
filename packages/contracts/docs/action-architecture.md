@@ -4,6 +4,8 @@ Authoring and display only. There is no encounter resolver, turn order, or live
 attack roll. Shared math is limited to modifiers, save DC, dice averages, and
 stat-block sentences.
 
+Pattern-level SRD inventory (natural forms, Pounce, Swallow, legendary saves) → [srd-action-inventory.md](./srd-action-inventory.md).
+
 ## Layers
 
 | Layer           | Home                            | Owns                                                                                                                                                                                     |
@@ -27,7 +29,7 @@ Which kinds a section accepts is `MONSTER_SECTION_KINDS`. Actions keep the
 attack, save, spell, special, multiattack, and shape-shift kinds. Bonus Actions keep
 `attack`, `save`, `spell`, `special`, `leap`, `teleport`, `take-actions`, and `shape-shift`.
 Reactions keep `parry`, `action-reference`, `spell`, and `special`. Legendary
-Actions keep `action-reference`, `spell`, and `special`. `multiattack` is valid
+Actions keep `action-reference`, `spell`, `special`, and `save`. `multiattack` is valid
 only in `actions`. `leap`, `teleport`, and `take-actions` are valid only in
 Bonus Actions. Breath Weapon and Constrict presets are Actions presets even
 though they store `kind: 'save'`. Rows do not move into or out of Legendary

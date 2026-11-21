@@ -47,7 +47,7 @@ const reference = {
 }
 
 describe('legendary actions', () => {
-  it('accepts only a reference, a spell, or a custom ability', () => {
+  it('accepts a reference, spell, save, or custom ability', () => {
     expect(monsterLegendaryActionSchema.safeParse(reference).success).toBe(true)
     expect(
       monsterLegendaryActionSchema.safeParse({
@@ -60,7 +60,7 @@ describe('legendary actions', () => {
     expect(
       monsterLegendaryActionSchema.safeParse(legendarySpell('srd-cc-5.2.1:fear')).success,
     ).toBe(true)
-    for (const kind of ['weapon', 'save', 'multiattack'] as const) {
+    for (const kind of ['weapon', 'multiattack'] as const) {
       expect(monsterLegendaryActionSchema.safeParse({ id: 'row', kind, name: 'Row' }).success).toBe(
         false,
       )
@@ -69,6 +69,38 @@ describe('legendary actions', () => {
     expect(monsterReactionSchema.safeParse(reference).success).toBe(true)
     expect(
       monsterLegendaryActionDraftSchema.safeParse({ ...reference, actionIds: [] }).success,
+    ).toBe(true)
+    expect(
+      monsterLegendaryActionSchema.safeParse({
+        id: 'disrupt-life',
+        kind: 'save',
+        name: 'Disrupt Life',
+        onceUntilNextTurn: true,
+        dcSource: { kind: 'ability', ability: 'con', proficient: true },
+        resolution: {
+          selectionMode: 'self',
+          areaOfEffect: { shape: 'emanation', radius: { value: 20, unit: 'ft' } },
+          method: { kind: 'saving-throw', ability: 'con' },
+          effects: [
+            {
+              id: 'damage',
+              kind: 'damage',
+              roll: { dice: { count: 9, faces: 6 } },
+              damageType: 'necrotic',
+            },
+          ],
+          outcomes: [
+            {
+              result: 'failed-save',
+              effects: [{ kind: 'effect-reference', effectId: 'damage', amount: 'full' }],
+            },
+            {
+              result: 'successful-save',
+              effects: [{ kind: 'effect-reference', effectId: 'damage', amount: 'half' }],
+            },
+          ],
+        },
+      }).success,
     ).toBe(true)
   })
 

@@ -25,7 +25,7 @@ export const MONSTER_SECTION_KINDS = {
     'shape-shift',
   ],
   reactions: ['parry', 'action-reference', 'spell', 'special'],
-  legendaryActions: ['action-reference', 'spell', 'special'],
+  legendaryActions: ['action-reference', 'spell', 'special', 'save'],
 } as const satisfies Record<MonsterActionSection, readonly string[]>
 
 /** Named presets that belong on Actions. A shared `save` kind does not move them. */
