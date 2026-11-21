@@ -12,7 +12,7 @@ const UI_CARD_TITLE_CLASS = 'ui-card__title'
 const UI_CARD_DESCRIPTION_CLASS = 'ui-card__description'
 const UI_CARD_CONTENT_CLASS = 'ui-card__content'
 const UI_CARD_FOOTER_CLASS = 'ui-card__footer'
-const UI_CARD_NAV_CHEVRON_CLASS = 'ui-card__nav-chevron'
+const UI_CARD_NAV_CHEVRON_CLASS = 'ui-nav-chevron'
 
 const SPACING_PX = 4
 

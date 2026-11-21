@@ -9,7 +9,7 @@ export const TEXT_VARIANT_MAP = {
   micro: 'text-style-micro',
   label: 'text-style-label',
   emphasis: 'text-style-emphasis',
-  option: 'text-style-option',
+  option: 'text-style-option text-style-option--md',
   lead: 'text-style-lead',
   info: 'text-style-info',
   success: 'text-style-success',

@@ -16,6 +16,8 @@ import { monstersQueryKey, useMonsters } from '../hooks/use-monsters'
 import { buildMonsterTabs } from './monster-form-fields'
 import { buildMonsterPreviewIdentity, buildMonsterPreviewSections } from './monster-form-preview'
 import { buildMonsterActionRequirementValueSyncs } from './actions/monster-action-requirement-form-sync'
+import { buildMultiattackReplacementValueSyncs } from './actions/multiattack/monster-multiattack-replacement-form-sync'
+import { buildMultiattackUseRepetitionValueSyncs } from './actions/multiattack/monster-multiattack-use-repetition-form-sync'
 import { buildMonsterHitPointsFormValueSyncs } from './statistics/monster-hit-points-form.lib'
 import { resolveMonsterFormSchema } from './monster-form-schema'
 import {
@@ -55,6 +57,8 @@ function buildMonsterFormValueSyncs(): FormValueSync[] {
     },
     ...buildMonsterHitPointsFormValueSyncs(),
     ...buildMonsterActionRequirementValueSyncs(),
+    ...buildMultiattackReplacementValueSyncs(),
+    ...buildMultiattackUseRepetitionValueSyncs(),
   ]
 }
 

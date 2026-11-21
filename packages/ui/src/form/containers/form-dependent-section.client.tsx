@@ -10,8 +10,8 @@ import {
   resolveEffectiveFieldChrome,
 } from '../../components/ui/field-chrome.variants'
 import {
-  dependentSectionStackClasses,
   resolveDependentPresentation,
+  resolveDependentSectionStackClasses,
 } from '../../components/ui/field-dependent.variants'
 import { resolveFormDensity } from '../form-density'
 import {
@@ -25,6 +25,7 @@ import {
   resolveDependentsVisibility,
   resolveFieldConfigBoundNames,
   type DependentConfig,
+  type FieldConfig,
   type FieldVisibility,
   type FormItem,
   type GroupFieldItem,
@@ -96,7 +97,7 @@ export function DependentSection({
       data-field-dependent=""
       role={groupLabelledBy ? 'group' : undefined}
       aria-labelledby={groupLabelledBy}
-      className={cn(dependentSectionStackClasses, item.className)}
+      className={cn(resolveDependentSectionStackClasses(rhythm), item.className)}
     >
       <FormSectionContext.Provider value={childContext}>
         {item.confirmBeforeClear && controller.type === 'switch' ? (
@@ -110,6 +111,7 @@ export function DependentSection({
           <FieldNode config={controller} idPrefix={idPrefix} namePrefix={namePrefix} />
         )}
         <DependentFieldsRegion
+          controller={controller}
           dependentsVisibility={dependentsVisibility}
           dependentsChrome={item.dependents}
           rhythm={rhythm}
@@ -137,6 +139,7 @@ export function DependentSection({
 }
 
 interface DependentFieldsRegionProps {
+  controller: FieldConfig
   dependentsVisibility: FieldVisibility | null
   dependentsChrome: DependentConfig['dependents']
   rhythm: ReturnType<typeof resolveFormDensity>['rhythm']
@@ -183,6 +186,7 @@ function GatedDependentFieldsRegion({
 }
 
 function DependentFieldsRegionContent({
+  controller,
   dependentsChrome,
   rhythm,
   parentContext,
@@ -193,7 +197,10 @@ function DependentFieldsRegionContent({
   depth,
   renderNestedItems,
 }: Omit<DependentFieldsRegionProps, 'dependentsVisibility'>) {
-  const presentation = resolveDependentPresentation(dependentsChrome, rhythm, { surfaceHost })
+  const presentation = resolveDependentPresentation(dependentsChrome, rhythm, {
+    surfaceHost,
+    controller,
+  })
   const dependentsContent = renderNestedItems({
     items: dependents,
     idPrefix,
@@ -217,7 +224,7 @@ function DependentFieldsRegionContent({
 
   return (
     <div
-      className={cn(presentation.railClassName, presentation.nestShellClassName)}
+      className={presentation.nestClassName}
       data-field-dependent-fields=""
       data-field-dependent-nest=""
     >

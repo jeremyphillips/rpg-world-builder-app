@@ -6,6 +6,7 @@ import * as PopoverPrimitive from '@radix-ui/react-popover'
 import { resolveComboboxSearchFieldSizeForButtonSize } from '../../components/ui/field-sizing.variants'
 import { cn } from '../../lib/utils'
 import { POPOVER_INTERACTIVE_LIST_DENSITY } from './list-density.lib'
+import { ActionButton } from './action-button.client'
 import { Button } from './button.client'
 import { ComboboxSearchField } from './combobox-field-parts.client'
 import { comboboxContentVariants } from './combobox-field.variants'
@@ -121,8 +122,10 @@ export function ButtonDropdown({
   width = 'full',
   className,
   searchPlaceholder: searchPlaceholderProp,
+  triggerPresentation = 'labeled',
 }: ButtonDropdownProps) {
   const searchPlaceholder = resolveFieldSearchPlaceholder({ label }, searchPlaceholderProp)
+  const addIconTrigger = triggerPresentation === 'addIcon'
   const {
     open,
     searchActive,
@@ -144,7 +147,9 @@ export function ButtonDropdown({
     setActiveIndex,
   } = useButtonDropdownControl({ groups, items, enableSearch, onSelectItem })
   const groupedSections = groupHeadingsForItems(displayItems, groups, searchActive)
-  const searchFieldSize = resolveComboboxSearchFieldSizeForButtonSize(size)
+  const searchFieldSize = resolveComboboxSearchFieldSizeForButtonSize(
+    addIconTrigger ? 'icon-sm' : size,
+  )
 
   const highlightIndexForItem = React.useCallback(
     (item: ButtonDropdownItem) =>
@@ -155,19 +160,32 @@ export function ButtonDropdown({
   return (
     <PopoverPrimitive.Root open={open} onOpenChange={handleOpenChange}>
       <PopoverPrimitive.Trigger asChild>
-        <Button
-          type="button"
-          variant={variant ?? 'default'}
-          size={size}
-          className={cn(width === 'fit' && 'w-fit shrink-0', className)}
-          aria-haspopup="menu"
-          aria-expanded={open}
-          aria-controls={listboxId}
-        >
-          {leadingIcon}
-          {label}
-          <Icon name="chevron-down" size="lg" className="opacity-50" />
-        </Button>
+        {addIconTrigger ? (
+          <ActionButton
+            action="add"
+            variant="ghost"
+            size="icon-sm"
+            className={cn('shrink-0', className)}
+            aria-label={label}
+            aria-haspopup="menu"
+            aria-expanded={open}
+            aria-controls={listboxId}
+          />
+        ) : (
+          <Button
+            type="button"
+            variant={variant ?? 'default'}
+            size={size}
+            className={cn(width === 'fit' && 'w-fit shrink-0', className)}
+            aria-haspopup="menu"
+            aria-expanded={open}
+            aria-controls={listboxId}
+          >
+            {leadingIcon}
+            {label}
+            <Icon name="chevron-down" size="lg" className="opacity-50" />
+          </Button>
+        )}
       </PopoverPrimitive.Trigger>
       <PopoverPrimitive.Portal>
         <PopoverPrimitive.Content
@@ -228,35 +246,37 @@ export function ButtonDropdown({
                   ))}
                 </InteractiveList>
               ) : (
-                groupedSections.map(({ group, items: sectionItems }) => (
-                  <React.Fragment key={group?.id ?? '__ungrouped'}>
-                    {group ? (
-                      <ListGroupHeading
-                        id={`${generatedId}-group-${group.id}`}
-                        label={group.label}
-                      />
-                    ) : null}
-                    <InteractiveList
-                      density={POPOVER_INTERACTIVE_LIST_DENSITY}
-                      role="group"
-                      aria-labelledby={group ? `${generatedId}-group-${group.id}` : undefined}
-                    >
-                      {sectionItems.map((item) => (
-                        <ButtonDropdownItemRow
-                          key={item.id}
-                          item={item}
-                          optionId={`${generatedId}-option-${item.id}`}
-                          isHighlighted={highlightIndexForItem(item) === highlightedIndex}
-                          onHighlight={() => {
-                            const index = highlightIndexForItem(item)
-                            if (index >= 0) setActiveIndex(index)
-                          }}
-                          onSelect={() => selectItem(item.id)}
-                        />
-                      ))}
-                    </InteractiveList>
-                  </React.Fragment>
-                ))
+                groupedSections.map(({ group, items: sectionItems }) => {
+                  const groupLabel = group?.label.trim() ?? ''
+                  const groupHeadingId =
+                    group && groupLabel.length > 0 ? `${generatedId}-group-${group.id}` : undefined
+                  return (
+                    <React.Fragment key={group?.id ?? '__ungrouped'}>
+                      {groupHeadingId ? (
+                        <ListGroupHeading id={groupHeadingId} label={groupLabel} />
+                      ) : null}
+                      <InteractiveList
+                        density={POPOVER_INTERACTIVE_LIST_DENSITY}
+                        role="group"
+                        aria-labelledby={groupHeadingId}
+                      >
+                        {sectionItems.map((item) => (
+                          <ButtonDropdownItemRow
+                            key={item.id}
+                            item={item}
+                            optionId={`${generatedId}-option-${item.id}`}
+                            isHighlighted={highlightIndexForItem(item) === highlightedIndex}
+                            onHighlight={() => {
+                              const index = highlightIndexForItem(item)
+                              if (index >= 0) setActiveIndex(index)
+                            }}
+                            onSelect={() => selectItem(item.id)}
+                          />
+                        ))}
+                      </InteractiveList>
+                    </React.Fragment>
+                  )
+                })
               )}
             </div>
           </InteractiveListViewport>

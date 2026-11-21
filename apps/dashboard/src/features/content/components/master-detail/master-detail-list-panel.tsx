@@ -3,6 +3,7 @@ import {
   ActionButton,
   cn,
   Heading,
+  InteractiveList,
   InteractiveListEmpty,
   ScrollBoundaryRegion,
   scrollBoundaryRegionRootClasses,
@@ -14,12 +15,18 @@ import type { MasterDetailListItem } from '../../lib/master-detail/master-detail
 import type { MasterDetailItemMeta } from '../../lib/master-detail/master-detail-item-meta'
 import { MasterDetailListRow } from './master-detail-list-row'
 import { MasterDetailSortableListRows } from './master-detail-sortable-list-rows.client'
-import { masterDetailEmptyListLabel } from '../../lib/master-detail/master-detail-constants'
+import {
+  masterDetailEmptyListLabel,
+  masterDetailEmptySectionLabel,
+} from '../../lib/master-detail/master-detail-constants'
 import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
 import {
   masterDetailListBodyClasses,
+  masterDetailListHeaderClasses,
   masterDetailListScrollViewportClasses,
+  masterDetailListSectionHeaderClasses,
   masterDetailListShellClasses,
+  masterDetailListSupplementClasses,
 } from './master-detail-list-panel.layout'
 
 export type { MasterDetailItemMeta, MasterDetailListItem }
@@ -27,8 +34,12 @@ export type { MasterDetailItemMeta, MasterDetailListItem }
 export type MasterDetailListGroup = {
   id: string
   title: ReactNode
+  /** Ghost icon add — superseded by `addControl` (for example acquisition menus). */
+  onAdd?: () => void
   addControl?: ReactNode
   items: MasterDetailListItem[]
+  /** Section empty copy — defaults to the panel's flat `itemNoun` empty label. */
+  emptyLabel?: ReactNode
 }
 
 export type MasterDetailListPanelProps = {
@@ -44,6 +55,7 @@ export type MasterDetailListPanelProps = {
   items?: MasterDetailListItem[]
   /** Grouped collection: one nav, one scrollport, one count, per-group add. */
   groups?: MasterDetailListGroup[]
+  /** Accessible name for the default icon-only add control on a flat rail. */
   addLabel?: string
   /**
    * Replaces the default Add button on a flat rail. Grouped rails use each group's
@@ -100,6 +112,19 @@ function useScrollSelectedRowIntoView(
   }, [scrollRef, selectedItemId, selectedRowRef, visibleProjection])
 }
 
+function MasterDetailListAddButton({ addLabel, onAdd }: { addLabel?: string; onAdd?: () => void }) {
+  if (!onAdd) return null
+  return (
+    <ActionButton
+      action="add"
+      variant="ghost"
+      size="icon-sm"
+      aria-label={addLabel}
+      onClick={() => onAdd()}
+    />
+  )
+}
+
 /**
  * Generic sidebar for a master-detail editor: bordered collection shell with
  * list title + Add, and compact interactive-list row selection in the scrollport.
@@ -146,6 +171,28 @@ function MasterDetailListRows({
   )
 }
 
+function MasterDetailListSectionEmpty({ children }: { children: ReactNode }) {
+  return (
+    <InteractiveList density="compact" className={masterDetailListBodyClasses}>
+      <InteractiveListEmpty align="start">{children}</InteractiveListEmpty>
+    </InteractiveList>
+  )
+}
+
+function resolveGroupEmptyLabel(
+  group: MasterDetailListGroup,
+  defaultEmptyLabel: string,
+): ReactNode {
+  if (group.emptyLabel != null) return group.emptyLabel
+  if (typeof group.title === 'string') {
+    const trimmed = group.title.trim()
+    if (trimmed.length > 0) {
+      return masterDetailEmptySectionLabel(trimmed.toLowerCase())
+    }
+  }
+  return defaultEmptyLabel
+}
+
 function MasterDetailListScroll({
   groups,
   items,
@@ -155,6 +202,7 @@ function MasterDetailListScroll({
   selectedRowRef,
   scrollRef,
   onListMove,
+  addLabel,
 }: {
   groups?: MasterDetailListGroup[]
   items: readonly MasterDetailListItem[]
@@ -164,6 +212,7 @@ function MasterDetailListScroll({
   selectedRowRef: RefObject<HTMLButtonElement | null>
   scrollRef: RefObject<HTMLDivElement | null>
   onListMove?: (from: number, to: number) => void
+  addLabel?: string
 }) {
   if (groups) {
     return (
@@ -178,11 +227,13 @@ function MasterDetailListScroll({
             key={group.id}
             aria-label={typeof group.title === 'string' ? group.title : group.id}
           >
-            <div className="flex shrink-0 items-center justify-between gap-3 border-b ui-border--subtle px-3 py-2.5">
-              <Heading as="div" variant="card" className="min-w-0">
+            <div className={masterDetailListSectionHeaderClasses}>
+              <Heading as="div" variant="nav" className="min-w-0">
                 {group.title}
               </Heading>
-              {group.addControl}
+              {group.addControl ?? (
+                <MasterDetailListAddButton addLabel={addLabel} onAdd={group.onAdd} />
+              )}
             </div>
             {group.items.length > 0 ? (
               <MasterDetailListRows
@@ -191,7 +242,11 @@ function MasterDetailListScroll({
                 onSelectItem={onSelectItem}
                 selectedRowRef={selectedRowRef}
               />
-            ) : null}
+            ) : (
+              <MasterDetailListSectionEmpty>
+                {resolveGroupEmptyLabel(group, emptyLabel)}
+              </MasterDetailListSectionEmpty>
+            )}
           </section>
         ))}
       </ScrollBoundaryRegion>
@@ -199,7 +254,7 @@ function MasterDetailListScroll({
   }
 
   if (items.length === 0) {
-    return <InteractiveListEmpty className="text-start">{emptyLabel}</InteractiveListEmpty>
+    return <InteractiveListEmpty align="start">{emptyLabel}</InteractiveListEmpty>
   }
 
   return (
@@ -235,14 +290,10 @@ function MasterDetailCollectionHeader({
   if (groups && listTitle == null) return null
   const addButton = groups
     ? null
-    : (addControl ?? (
-        <ActionButton action="add" variant="outline" size="sm" onClick={() => onAdd?.()}>
-          {addLabel}
-        </ActionButton>
-      ))
+    : (addControl ?? <MasterDetailListAddButton addLabel={addLabel} onAdd={onAdd} />)
   return (
-    <div className="flex shrink-0 items-center justify-between gap-3 border-b ui-border--subtle px-3 py-2.5">
-      <Heading as="div" variant="card" className="min-w-0">
+    <div className={masterDetailListHeaderClasses}>
+      <Heading as="div" variant="nav" className="min-w-0">
         {listTitle}
       </Heading>
       {addButton}
@@ -258,7 +309,8 @@ function MasterDetailCountRow({
   return (
     <div
       className={cn(
-        'flex shrink-0 items-center gap-2 border-b ui-border--subtle px-3 py-1.5 text-style-caption',
+        masterDetailListSupplementClasses,
+        'text-style-caption',
         countSupplement ? 'justify-between' : 'justify-end',
       )}
     >
@@ -314,6 +366,7 @@ export function MasterDetailListPanel(props: MasterDetailListPanelProps) {
         selectedRowRef={selectedRowRef}
         scrollRef={scrollRef}
         onListMove={props.groups ? undefined : onListMove}
+        addLabel={props.addLabel}
       />
     </nav>
   )

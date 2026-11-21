@@ -1,6 +1,5 @@
-import { cn } from '../../lib/utils'
-import { textVariants } from './text.variants'
 import { RadioGroup, RadioGroupItem } from './radio-group.client'
+import { RadioGroupFieldOptions } from './radio-group-field-options.client'
 import { RadioFieldShell, type BaseRadioFieldProps } from './radio-field-shell'
 
 export interface RadioGroupFieldOption {
@@ -61,8 +60,10 @@ export function RadioGroupField({
       chrome={chrome}
     >
       {(labelId) => (
-        <RadioGroup
-          aria-labelledby={labelId}
+        <RadioGroupFieldOptions
+          id={id}
+          labelId={labelId}
+          options={options}
           name={name}
           disabled={disabled}
           value={value}
@@ -70,24 +71,7 @@ export function RadioGroupField({
           onValueChange={onValueChange}
           onBlur={onBlur}
           orientation={orientation}
-          className={cn(
-            orientation === 'horizontal'
-              ? 'flex flex-wrap items-center gap-x-6 gap-y-2'
-              : 'grid gap-2',
-          )}
-        >
-          {options.map((option) => {
-            const optionId = `${id}-${option.value}`
-            return (
-              <div key={option.value} className="flex items-center gap-2">
-                <RadioGroupItem id={optionId} value={option.value} disabled={option.disabled} />
-                <label htmlFor={optionId} className={textVariants({ variant: 'option' })}>
-                  {option.label}
-                </label>
-              </div>
-            )
-          })}
-        </RadioGroup>
+        />
       )}
     </RadioFieldShell>
   )

@@ -164,7 +164,9 @@
     --icon-size: var(--icon-glyph-lg);
   }
 
-  /* --- Icon-only sizes --- */
+  /* --- Icon-only sizes ---
+     Width and height are owned here (square hit targets). Callers may use layout
+     utilities such as shrink-0; do not override width or height on icon-only sizes. */
 
   .ui-button--icon-md {
     width: var(--control-height-md);

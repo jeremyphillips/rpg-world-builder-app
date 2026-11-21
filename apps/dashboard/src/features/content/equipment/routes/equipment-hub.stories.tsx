@@ -19,7 +19,7 @@ type Story = StoryObj
 export const Default: Story = {
   render: () => <EquipmentHubContent campaignId={STORY_CAMPAIGN_ID} />,
   play: async ({ canvasElement }) => {
-    const chevrons = canvasElement.querySelectorAll('.ui-card__nav-chevron')
+    const chevrons = canvasElement.querySelectorAll('.ui-nav-chevron')
     expect(chevrons.length).toBe(EQUIPMENT_FAMILY_PATHS.length)
   },
 }

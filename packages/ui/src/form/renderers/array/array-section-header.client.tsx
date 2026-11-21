@@ -17,7 +17,7 @@ import {
 } from '../../field-config'
 import type { ArrayLabelMode } from '../../config/array/resolve-array-heading.lib'
 import { FormSectionHeader } from '../../presentation/form-section-header.client'
-import { ArrayIssueLink } from './item/issues/array-item-issue.client'
+import { ArrayIssueLink, arraySectionIssueLinkVisible } from './item/issues/array-item-issue.client'
 
 export interface ArraySectionHeaderProps {
   labelMode: ArrayLabelMode
@@ -44,7 +44,11 @@ function resolveVisibleHeaderChrome(props: ArraySectionHeaderProps): {
   inlineAction: ReactNode | undefined
 } {
   const inlineAction = props.addActionLayout === 'inline' ? props.addControl : undefined
-  const labelAccessory = (
+  const labelAccessory = arraySectionIssueLinkVisible({
+    issueCount: props.arrayIssueCount,
+    invalidRowCount: props.invalidRowCount,
+    hasContainerIssue: props.hasContainerIssue,
+  }) ? (
     <ArrayIssueLink
       issueCount={props.arrayIssueCount}
       invalidRowCount={props.invalidRowCount}
@@ -52,7 +56,7 @@ function resolveVisibleHeaderChrome(props: ArraySectionHeaderProps): {
       sectionLabel={props.sectionLabel}
       onPress={props.onFocusFirstArrayIssue}
     />
-  )
+  ) : undefined
   return { labelAccessory, inlineAction }
 }
 

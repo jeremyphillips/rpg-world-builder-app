@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { Button } from '@rpg/ui'
 import { FormStickyScrollBody, formStickyScrollShellWithDockedFooterClasses } from '@rpg/ui/form'
 
 import { CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN } from '../../../classes/lib/class-feature-form-labels'
@@ -11,7 +10,6 @@ const meta = {
   component: MasterDetailListPanel,
   parameters: { layout: 'padded' },
   args: {
-    addControl: undefined,
     onAdd: () => {},
     onSelectItem: () => {},
   },
@@ -218,6 +216,7 @@ export const WithValidationIssues: Story = {
 export const Grouped: Story = {
   args: {
     ariaLabel: 'Actions',
+    addLabel: 'Add action',
     itemNoun: CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN,
     selectedItemId: 'bite',
     onSelectItem: () => {},
@@ -226,7 +225,7 @@ export const Grouped: Story = {
       {
         id: 'actions',
         title: 'Actions',
-        addControl: <Button type="button">Add</Button>,
+        onAdd: () => {},
         items: [
           { id: 'bite', title: 'Bite', meta: { provenance: 'homebrew', persistence: 'persisted' } },
           {
@@ -240,7 +239,7 @@ export const Grouped: Story = {
       {
         id: 'reactions',
         title: 'Reactions',
-        addControl: <Button type="button">Add</Button>,
+        onAdd: () => {},
         items: [
           {
             id: 'parry',

@@ -23,6 +23,7 @@ import {
   ArrayFieldItemContent,
   type ArrayFieldItemContentProps,
 } from './item/content/array-field-item-content.client'
+import { Eyebrow } from '../../../components/ui/eyebrow'
 import { resolveSortableArrayMove } from './sortable-array-list.lib'
 import { resolveFieldArrayRowKey } from './resolve-field-array-row-key.lib'
 
@@ -73,10 +74,19 @@ function ArrayFieldItem({ collapsedIds, onToggleCollapse, itemId, ...props }: Ar
   )
 }
 
+function ArrayItemConjunction({ label }: { label: string }) {
+  return (
+    <div className="flex justify-center">
+      <Eyebrow size="xs">{label}</Eyebrow>
+    </div>
+  )
+}
+
 export interface ArrayFieldItemListProps {
   fields: ReadonlyArray<Record<string, unknown>>
   keyName?: string
   sortableEnabled: boolean
+  itemConjunction?: string
   itemProps: (rhfField: Record<string, unknown>, index: number) => ArrayFieldItemProps
   onMove: (from: number, to: number) => void
 }
@@ -85,6 +95,7 @@ export function ArrayFieldItemList({
   fields,
   keyName,
   sortableEnabled,
+  itemConjunction,
   itemProps,
   onMove,
 }: ArrayFieldItemListProps) {
@@ -103,13 +114,18 @@ export function ArrayFieldItemList({
 
   const list = (
     <>
-      {fields.map((rhfField, index) => {
+      {fields.flatMap((rhfField, index) => {
         const rowKey = resolveFieldArrayRowKey(rhfField, keyName)
-        return sortableEnabled ? (
+        const item = sortableEnabled ? (
           <SortableArrayFieldItem key={rowKey} {...itemProps(rhfField, index)} />
         ) : (
           <ArrayFieldItem key={rowKey} {...itemProps(rhfField, index)} />
         )
+        if (!itemConjunction || index === 0) return [item]
+        return [
+          <ArrayItemConjunction key={`${rowKey}-conjunction`} label={itemConjunction} />,
+          item,
+        ]
       })}
     </>
   )

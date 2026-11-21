@@ -6,7 +6,7 @@ import {
   resolveCreatureFormsContext,
   resolveEquipmentInstanceReferenceLabel,
 } from '@rpg/contracts'
-import { ActionIcon, ButtonDropdown, ConfirmDialog } from '@rpg/ui'
+import { ButtonDropdown, ConfirmDialog } from '@rpg/ui'
 import { useFormContext } from 'react-hook-form'
 
 import { EquipmentPickerDrawer } from '@/features/character'
@@ -68,7 +68,10 @@ import {
   MONSTER_REACTIONS_HEADING,
   formatDropTriggerBody,
 } from '../../../lib/monster-form-labels'
-import { MONSTER_ACTION_ITEM_NOUN } from '../../../lib/monster-form-labels'
+import {
+  MONSTER_ACTION_ITEM_NOUN,
+  monsterActionSectionEmptyLabel,
+} from '../../../lib/monster-form-labels'
 import type { MonsterFormValues } from '../../../lib/monster-form-values'
 import { monsterActionRowResolveFields } from '../../../lib/monster-master-detail-validation-fields'
 import { useMonsterActionSections } from '../../../hooks/use-monster-action-sections'
@@ -169,10 +172,7 @@ function MonsterActionAddMenu({
   return (
     <ButtonDropdown
       label={MONSTER_ADD_LABEL}
-      leadingIcon={<ActionIcon action="add" size="sm" />}
-      width="fit"
-      size="sm"
-      variant="outline"
+      triggerPresentation="addIcon"
       groups={groups}
       items={items}
       onSelectItem={(id) => {
@@ -425,6 +425,7 @@ export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
           groups={MONSTER_ACTION_SECTIONS.map((section) => ({
             id: section,
             title: SECTION_HEADINGS[section],
+            emptyLabel: monsterActionSectionEmptyLabel(section),
             addControl: (
               <MonsterActionAddMenu
                 section={section}
@@ -456,6 +457,9 @@ export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
           sections={sections}
           located={collection.isSelectedVisible ? located : null}
           rows={located ? rowsBySection[located.section] : actionRows}
+          weapons={weapons}
+          weaponActions={weaponActionReferences(values)}
+          allowAddWeapon={allowAddWeapon}
         />
       </MasterDetailGrid>
       <MasterDetailDeleteDialog

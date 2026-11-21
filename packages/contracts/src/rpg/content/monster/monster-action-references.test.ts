@@ -38,7 +38,7 @@ describe('monster action references', () => {
           actions: [BITE_ACTION, multiattack([{ count: 1, actionIds: ['missing'] }])],
         }),
       ),
-    ).toContain('Choose an attack from Actions.')
+    ).toContain('This attack is no longer available. Select another.')
 
     expect(
       createMonsterDraftInputSchema.safeParse({
@@ -60,22 +60,20 @@ describe('monster action references', () => {
           actions: [BITE_ACTION, multiattack([{ count: 2, actionIds: ['bite', 'bite'] }])],
         }),
       ),
-    ).toContain('Each attack can be referenced only once.')
+    ).toContain('This attack is already selected.')
 
     expect(
-      issueMessages(
-        createMonsterInputSchema.safeParse({
-          ...MONSTER_TEST_INPUT,
-          actions: [
-            BITE_ACTION,
-            multiattack([
-              { count: 1, actionIds: ['bite'] },
-              { count: 1, actionIds: ['bite'] },
-            ]),
-          ],
-        }),
-      ),
-    ).toContain('Each attack can be referenced only once.')
+      createMonsterInputSchema.safeParse({
+        ...MONSTER_TEST_INPUT,
+        actions: [
+          BITE_ACTION,
+          multiattack([
+            { count: 1, actionIds: ['bite'] },
+            { count: 1, actionIds: ['bite'] },
+          ]),
+        ],
+      }).success,
+    ).toBe(true)
 
     for (const extra of [
       save,
@@ -93,7 +91,7 @@ describe('monster action references', () => {
         ...MONSTER_TEST_INPUT,
         actions: [extra, multiattack([{ count: 1, actionIds: [extra.id] }])],
       })
-      expect(issueMessages(parsed)).toContain('Choose an attack from Actions.')
+      expect(issueMessages(parsed)).toContain('Select an action that can be used as an attack.')
     }
 
     expect(
@@ -104,7 +102,7 @@ describe('monster action references', () => {
           bonusActions: [{ id: 'bite', kind: 'special', name: 'Bite', description: 'A bite.' }],
         }),
       ),
-    ).toContain('Choose an attack from Actions.')
+    ).toContain('This attack is no longer available. Select another.')
 
     expect(
       createMonsterInputSchema.safeParse({

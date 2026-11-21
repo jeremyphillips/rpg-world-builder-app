@@ -47,6 +47,8 @@ import {
   normalizeMonsterFormValues,
   type MonsterNormalizeBaseline,
 } from './normalize-monster-form-values'
+import { primeMultiattackReplacementActionsSnapshot } from './actions/multiattack/monster-multiattack-replacement-form-sync'
+import type { MonsterActionDraftRow } from './actions/monster-action-presets'
 import {
   EMPTY_CREATURE_WEAPON_PROFICIENCIES,
   createMonsterDraftInputSchema,
@@ -112,7 +114,7 @@ export type MonsterFormValues = FieldValues & {
 }
 
 export function resolveMonsterCreateDefaultValues(): MonsterFormValues {
-  return {
+  const values: MonsterFormValues = {
     name: '',
     sizes: [],
     abilityScores: neutralAbilityScores(),
@@ -144,6 +146,8 @@ export function resolveMonsterCreateDefaultValues(): MonsterFormValues {
     weaponProficiencyMode: MONSTER_DEFAULT_WEAPON_PROFICIENCY_MODE,
     weaponProficiencyReconciliationPending: false,
   }
+  primeMultiattackReplacementActionsSnapshot(values.actions as MonsterActionDraftRow[])
+  return values
 }
 
 function hitPointsAuthoringFromEntity(
@@ -219,7 +223,7 @@ export function monsterToFormValues(
   const weapons = coerceCreatureWeaponProficienciesForForm(entity.proficiencies.weapons)
   const parsedForms = entity.forms ? creatureFormsDraftSchema.safeParse(entity.forms) : undefined
 
-  return {
+  const values: MonsterFormValues = {
     name: entity.name,
     description: entity.description,
     sizes: entity.sizes,
@@ -275,6 +279,8 @@ export function monsterToFormValues(
       }
     })(),
   }
+  primeMultiattackReplacementActionsSnapshot(values.actions as MonsterActionDraftRow[])
+  return values
 }
 
 function baselineFromEntity(entity: Monster | undefined): MonsterNormalizeBaseline | undefined {

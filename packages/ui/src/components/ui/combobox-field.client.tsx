@@ -14,6 +14,10 @@ import {
   ComboboxTrigger,
 } from './combobox-field-parts.client'
 import { FieldClearAffordanceButton } from './field-clear-affordance.client'
+import {
+  UI_FIELD_GROUP_INPUT_COLUMN_CLASS,
+  resolveFieldGroupActionSegmentClasses,
+} from './field-group.styles'
 import { JoinedPair } from './joined-pair-field.client'
 import { normalizeSelected } from './combobox-field.lib'
 import type {
@@ -160,19 +164,21 @@ function ComboboxFieldControl(props: ComboboxFieldControlProps) {
   return (
     <div className="w-full min-w-0 space-y-0">
       {showClear ? (
-        <JoinedPair.Root layout="stretch" className="w-full">
-          <div className="min-w-0">{combobox}</div>
+        <JoinedPair.Root layout="stretch" size={size} className="w-full">
+          <div className={UI_FIELD_GROUP_INPUT_COLUMN_CLASS}>{combobox}</div>
           <JoinedPair.Divider />
-          <FieldClearAffordanceButton
-            size={size}
-            accessibleName={clearLabel}
-            onClear={() => {
-              onClear?.()
-              requestAnimationFrame(() => {
-                triggerRef.current?.focus()
-              })
-            }}
-          />
+          <div className={resolveFieldGroupActionSegmentClasses(size)}>
+            <FieldClearAffordanceButton
+              size={size}
+              accessibleName={clearLabel}
+              onClear={() => {
+                onClear?.()
+                requestAnimationFrame(() => {
+                  triggerRef.current?.focus()
+                })
+              }}
+            />
+          </div>
         </JoinedPair.Root>
       ) : (
         combobox

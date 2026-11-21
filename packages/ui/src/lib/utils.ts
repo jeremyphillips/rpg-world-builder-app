@@ -76,7 +76,6 @@ const TEXT_STYLE_UTILITIES = [
   'text-style-body-compact',
   'text-style-label',
   'text-style-emphasis',
-  'text-style-option',
   'text-style-lead',
   'text-style-field-label-sm',
   'text-style-field-label-md',
@@ -115,6 +114,12 @@ const TEXT_STYLE_SCORE_SIZE_UTILITIES = [
   'text-style-score--lg',
 ] as const
 
+/** Option row copy base. Weight and line-height; composes with a size modifier. */
+const TEXT_STYLE_OPTION_UTILITIES = ['text-style-option'] as const
+
+/** Option copy size modifiers. Mutually exclusive; compose with `text-style-option`. */
+const TEXT_STYLE_OPTION_SIZE_UTILITIES = ['text-style-option--sm', 'text-style-option--md'] as const
+
 const EYEBROW_STYLE_CONFLICT_GROUPS = [
   'font-size',
   'font-weight',
@@ -148,6 +153,8 @@ type TypographyClassGroupIds =
   | 'text-style-color'
   | 'text-style-score'
   | 'text-style-score-size'
+  | 'text-style-option'
+  | 'text-style-option-size'
   | 'text-action'
   | 'ui-button-size'
   | 'ui-button-appearance'
@@ -233,6 +240,8 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'text-style-color': [...TEXT_STYLE_COLOR_UTILITIES],
       'text-style-score': [...TEXT_STYLE_SCORE_UTILITIES],
       'text-style-score-size': [...TEXT_STYLE_SCORE_SIZE_UTILITIES],
+      'text-style-option': [...TEXT_STYLE_OPTION_UTILITIES],
+      'text-style-option-size': [...TEXT_STYLE_OPTION_SIZE_UTILITIES],
       'text-action': [...TEXT_ACTION_UTILITIES],
       'ui-button-size': [...UI_BUTTON_SIZE_CLASSES],
       'ui-button-appearance': [...UI_BUTTON_APPEARANCE_CLASSES],
@@ -281,6 +290,8 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'text-style-color': ['text-color'],
       'text-style-score': ['font-weight'],
       'text-style-score-size': ['font-size', 'leading'],
+      'text-style-option': ['font-weight', 'leading'],
+      'text-style-option-size': ['font-size'],
       'text-action': ['text-action'],
       'ui-button-size': ['ui-button-size'],
       'ui-button-appearance': ['ui-button-appearance'],
@@ -323,10 +334,22 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-toast-tone': ['ui-toast-tone', 'ui-border-strength'],
       'ui-semantic-text-tone': ['ui-semantic-text-tone'],
       'ui-semantic-text-emphasis': ['ui-semantic-text-emphasis'],
-      'font-size': ['heading-style', 'eyebrow-style', 'text-style', 'text-style-score-size'],
-      'font-weight': ['heading-style', 'eyebrow-style', 'text-style', 'text-style-score'],
+      'font-size': [
+        'heading-style',
+        'eyebrow-style',
+        'text-style',
+        'text-style-score-size',
+        'text-style-option-size',
+      ],
+      'font-weight': [
+        'heading-style',
+        'eyebrow-style',
+        'text-style',
+        'text-style-score',
+        'text-style-option',
+      ],
       tracking: ['heading-style', 'eyebrow-style'],
-      leading: ['heading-style', 'text-style', 'text-style-score-size'],
+      leading: ['heading-style', 'text-style', 'text-style-score-size', 'text-style-option'],
       'text-color': ['text-style-color'],
       'font-family': ['heading-style'],
       'text-transform': ['heading-style', 'eyebrow-style'],

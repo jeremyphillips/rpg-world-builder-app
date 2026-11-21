@@ -4,7 +4,7 @@ import type {
   SelectFieldOptionListItem,
 } from './field-options'
 import { flattenSelectFieldOptions, isFieldOptionGroup } from './field-options'
-import type { SelectFieldConfig } from './choice-fields.types'
+import type { ChipsFieldConfig, SelectFieldConfig } from './choice-fields.types'
 
 /** Applies `optionAvailability` to a flat option list without mutating the source. */
 export function applyOptionAvailabilityToFieldOptions(
@@ -39,6 +39,17 @@ export function resolveSelectFieldConfigOptions(
   config: SelectFieldConfig,
   values: Record<string, unknown>,
 ): SelectFieldOptionListItem[] {
+  if (config.optionsResolve) {
+    return [...config.optionsResolve.optionsWhen(values)]
+  }
+  return config.options ?? []
+}
+
+/** Resolves a chips field's option list, applying dynamic resolution when configured. */
+export function resolveChipsFieldConfigOptions(
+  config: ChipsFieldConfig,
+  values: Record<string, unknown>,
+): FieldOption[] {
   if (config.optionsResolve) {
     return [...config.optionsResolve.optionsWhen(values)]
   }

@@ -267,6 +267,18 @@ Optional `contextDependsOn` paths and `presentationWhen(watched, items)` refresh
 menu item `disabled` / `note` when watched form values change (alongside duplicate
 policy). Keep `presentationWhen` domain-free — callers map business rules to notes.
 
+A group with an empty `label` still orders its items, but the dropdown does not render a
+heading and does not set `aria-labelledby` on that section. Use it for a leading item that
+should sit above a named group. Do not use an empty label when the section needs its own
+accessible name. Ungrouped items still render after every group.
+
+## `itemConjunction`
+
+Optional string rendered between array items, starting at the second item. The text is the
+accessible name (CSS may uppercase it). Conjunction and items are sibling flex children with
+`gap-1` (4px) list spacing — omit `itemConjunction` to keep rhythm/tight/disclosure gaps.
+The node stays mounted during drag and sits outside the sortable element.
+
 ## Nested arrays
 
 `fields` may contain nested `kind: 'array'` items. Names cascade:

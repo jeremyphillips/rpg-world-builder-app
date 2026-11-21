@@ -134,6 +134,7 @@ export function ArrayFieldRendererFieldset({
               fields={fields as unknown as ReadonlyArray<Record<string, unknown>>}
               keyName={config.keyName}
               sortableEnabled={state.sortableEnabled}
+              itemConjunction={config.itemConjunction}
               itemProps={state.itemProps}
               onMove={onMove}
             />

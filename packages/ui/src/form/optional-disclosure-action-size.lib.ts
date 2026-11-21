@@ -8,12 +8,13 @@ export type OptionalDisclosureActionButtonSize = Extract<
   'xs' | 'sm' | 'default'
 >
 
-/** Collapsed action-only controls track field density; header and legend actions stay xs. */
+/** Collapsed action-only controls track field control scale; header actions stay xs. */
 export function resolveOptionalDisclosureActionButtonSize(input: {
   placement: OptionalDisclosureActionPlacement
   fieldSize: FieldSize
 }): OptionalDisclosureActionButtonSize {
   if (input.placement === 'inlineWithLabel') return 'xs'
+  if (input.fieldSize === 'xs') return 'xs'
   if (input.fieldSize === 'sm') return 'sm'
   return 'default'
 }

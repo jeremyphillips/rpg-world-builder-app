@@ -1,4 +1,3 @@
-import { Icon } from './icon/icon'
 import * as React from 'react'
 import { cn } from '../../lib/utils'
 import { renderNavigableLinkRoot } from './navigable-link-root.lib'
@@ -25,14 +24,10 @@ function CardHeaderRegion({ header }: { header: CardHeaderModel }) {
   )
 }
 
-/** Decorative trailing chevron for navigable Card and destination rows. */
-export function NavigationChevron({ className }: { className?: string }) {
-  return (
-    <span className={cn('ui-card__nav-chevron', className)} aria-hidden>
-      <Icon name="chevron-right" size="md" className="shrink-0" />
-    </span>
-  )
-}
+import { NavigationChevron } from './navigation-chevron.client'
+
+export { NavigationChevron } from './navigation-chevron.client'
+export type { NavigationChevronProps, NavigationChevronSize } from './navigation-chevron.client'
 
 function CardNavigationChevron() {
   return <NavigationChevron />

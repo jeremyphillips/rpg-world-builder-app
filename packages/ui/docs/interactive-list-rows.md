@@ -36,6 +36,17 @@ Surface hover and pressed mixes come from [surface-interaction.css](../src/compo
 
 Use [`ListGroupHeading`](../src/components/ui/list-group-heading.client.tsx) for the faint band above grouped rows (`label`, optional `count`, `first`, `follows`). It wraps `Eyebrow` at **`xs`** and owns padding, borders, and count styling in [list-group-heading.css](../src/components/ui/list-group-heading.css). Place headings **outside** the `InteractiveList` shell so row adjacency borders stay correct. Row-level type labels belong on [`IdentityRow`](../src/components/ui/identity-row.client.tsx) (`classification`), not on the section band. Consumers: `ButtonDropdown` groups, global search preview sections, optional `InteractiveListPanel.listGroupHeading`.
 
+## Empty list copy
+
+[`InteractiveListEmpty`](../src/components/ui/interactive-list.client.tsx) is static `<p>` copy inside a list shell — not a row, not selectable. Default alignment is centered for popovers; pass **`align="start"`** for flush master-detail rails (compact horizontal inset via `ui-interactive-list__empty--start` in [interactive-list.css](../src/components/ui/interactive-list.css)).
+
+- **Whole-list empty:** one `InteractiveListEmpty` when every row is gone (flat master-detail) or when a popover search/filter yields no items.
+- **Per-section empty (master-detail):** dashboard `MasterDetailListPanel` renders `InteractiveList` + `InteractiveListEmpty align="start"` under the section header when a group's `items` array is empty. Copy resolves in dashboard `lib/master-detail/master-detail-constants.ts`: optional `emptyLabel`, else lowercased string `title` via `masterDetailEmptySectionLabel`, else flat `masterDetailEmptyListLabel(itemNoun)`. Do not reuse this for `ButtonDropdown` grouped acquisition menus — those omit empty groups by design.
+
+## Drill-in chevron
+
+Selectable list rows that navigate or open detail (for example master-detail list rails) use `NavigationChevron` in `endSlot`, typically `size="lg"`. Do not pass a raw `chevron-right` icon or foreground color on the slot wrapper — see [icon-registry.md](./icon-registry.md#semantic-maps).
+
 ## Menu item contract
 
 `ui-menu-item` owns padding, type, and `data-highlighted` / focus wash (`--row-hover-bg`, foreground unchanged). Optional description uses `ui-menu-item__description` and stays `muted-foreground` when highlighted. Submenu triggers keep `data-state="open"` accent treatment. Checkbox and radio items are unchanged (`DropdownMenuCheckboxItem`, `DropdownMenuRadioItem`).

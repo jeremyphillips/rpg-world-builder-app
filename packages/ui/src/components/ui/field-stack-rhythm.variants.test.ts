@@ -108,6 +108,12 @@ describe('fieldArrayItemListClasses', () => {
   it('uses gap-3 for compact md sections', () => {
     expect(fieldArrayItemListClasses({ rhythm: 'compact', size: 'md' })).toContain('gap-3')
   })
+
+  it('uses gap-1 when list gap is conjunction', () => {
+    expect(
+      fieldArrayItemListClasses({ rhythm: 'comfortable', size: 'md' }, 'separated', 'conjunction'),
+    ).toContain('gap-1')
+  })
 })
 
 describe('field group legend helpers', () => {

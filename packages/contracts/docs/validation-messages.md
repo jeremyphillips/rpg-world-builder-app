@@ -79,6 +79,23 @@ Draft bodies apply `formatUntitledContentName` when `name` is blank. Publish-onl
 `superRefine` hooks and `validateBeforeWrite` run only on the publish path. Types
 without draft siblings fall back to publish schemas until their rollout phase.
 
+### Multiattack semantic validation (publish-only)
+
+Draft saves validate Multiattack **shape** (Zod draft unions, optional fields, normalization)
+but **not** cross-row semantics: dangling `actionId`s, use/replacement budgets, redundant
+choices, eligibility, or `afterUsingActionId` resolution. Those rules live in
+`refinePublishedMultiattack` and run only when `refineMultiattackReferences` receives
+`{ published: true }`. Incomplete or inconsistent Multiattack graphs may persist on draft
+autosave until the author repairs them or publish fails.
+
+Regression coverage: `content/monster/monster-multiattack-draft-publish.test.ts`.
+Authoring UX relies on dashboard preview, advisories, and publish errors keyed by Zod
+paths (for example `actions.{n}.steps.{m}.actionId`).
+
+**Follow-up (separate audit):** Legendary `action-reference` rows still refine missing
+`actionIds` on draft; Multiattack and Parry follow-ups do not. Harmonizing those policies
+is out of scope for the Multiattack editor rollout.
+
 **Dashboard form layer:** optional vocab fields on draft form schemas must use
 `draftOptionalSelect` (see
 [`apps/dashboard/docs/form-lib-conventions.md`](../../../apps/dashboard/docs/form-lib-conventions.md#draft-form-schemas-and-select-fields))

@@ -372,6 +372,7 @@ function formatMultiattackActionBody(
   equipmentById: Map<string, Equipment>,
   catalogState: MonsterCatalogLoadState,
   magicPropertyProvider: MagicPropertyDefinitionProvider,
+  spells: Pick<SpellDisplayContext, 'spellsById' | 'catalogStatus'>,
 ): string | undefined {
   if (catalogState !== 'ready') {
     return catalogState === 'error' ? MONSTER_UNRESOLVED_CATALOG_REFERENCE : undefined
@@ -380,9 +381,12 @@ function formatMultiattackActionBody(
     monsterName: monster.name,
     action,
     actions: monster.actions,
+    bonusActions: monster.bonusActions,
     equipment: monster.equipment,
     equipmentCatalog: equipmentById,
     magicPropertyProvider,
+    spellsById: spells.spellsById,
+    spellCatalogStatus: spells.catalogStatus,
   })
   return appendMonsterActionSupplementalText(generated, action.description) || undefined
 }
@@ -451,7 +455,7 @@ function withTurnLimit(
   html: boolean,
   hasSavingThrow = false,
 ): string | undefined {
-  if (action.onceUntilNextTurn !== true) return body
+  if (action.kind === 'multiattack' || action.onceUntilNextTurn !== true) return body
   const sentence = formatOnceUntilNextTurnSentence({
     monsterName,
     kind: action.kind,
@@ -589,6 +593,7 @@ function mapMultiattackActionItem(
     spells.equipmentById,
     catalogState,
     spells.magicPropertyProvider,
+    spells,
   )
   return {
     id: action.id,

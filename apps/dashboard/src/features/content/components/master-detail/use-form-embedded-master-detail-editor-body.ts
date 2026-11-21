@@ -89,7 +89,6 @@ export function useFormEmbeddedMasterDetailEditorBody<TRow = Record<string, unkn
     idPrefix,
     editor,
     access,
-    renderAddControl,
     listReorder = false,
   } = input
 
@@ -163,7 +162,7 @@ export function useFormEmbeddedMasterDetailEditorBody<TRow = Record<string, unkn
     rows.rowAt,
   )
 
-  const addControl = addControlProp ?? renderAddControl?.({ append: editor.appendRow })
+  const addControl = addControlProp
 
   return {
     rows,

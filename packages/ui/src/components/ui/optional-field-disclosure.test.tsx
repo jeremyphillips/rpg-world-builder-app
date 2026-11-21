@@ -156,6 +156,29 @@ describe('OptionalFieldDisclosure', () => {
     )
   })
 
+  it('uses xs text geometry for standalone collapsed add actions at xs control scale', () => {
+    render(
+      <OptionalFieldDisclosure
+        controlId="spell-field"
+        fieldLabel="Spell"
+        addLabel="Pin specific spell"
+        addAccessibleName="Pin specific spell"
+        removeLabel="Clear"
+        removeAccessibleName="Clear"
+        open={false}
+        onOpenChange={vi.fn()}
+        onRemove={vi.fn()}
+        size="xs"
+      >
+        {null}
+      </OptionalFieldDisclosure>,
+    )
+
+    expect(screen.getByRole('button', { name: 'Pin specific spell' })).toHaveClass(
+      'ui-button__text--xs',
+    )
+  })
+
   it('uses inline xs disclosure actions with matching emphasis', () => {
     const disclosureActionEmphasisClasses = [
       'ui-button__text--xs',

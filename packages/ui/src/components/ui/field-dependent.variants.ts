@@ -1,20 +1,24 @@
+import { cva } from 'class-variance-authority'
+
 import { cn } from '../../lib/utils'
 import type {
   DependentChrome,
   DependentDependentsConfig,
 } from '../../form/field-config/form-item.types'
 import { DEFAULT_DEPENDENT_CHROME } from '../../form/field-config/form-item.types'
+import type { FieldConfig } from '../../form/field-config'
+import {
+  DEPENDENT_NEST_ALIGN_FIELD_EDGE_CLASS,
+  DEPENDENT_NEST_BLOCK_CLASS,
+  DEPENDENT_NEST_HOST_CLASS,
+  DEPENDENT_NEST_RHYTHM_CLASS,
+} from './field-dependent-alignment.constants'
+import {
+  resolveControllerDependentAnatomy,
+  resolveDependentNestAlignmentClass,
+} from '../../form/presentation/resolve-controller-dependent-anatomy.lib'
 import type { FieldRhythm } from './field.variants'
-import {
-  resolveDependentNestRailClasses,
-  resolveFieldRailClasses,
-  type FieldRailTone,
-} from './field-rail.variants'
-import { establishSurfaceCurrent } from './surface-current.lib'
-import {
-  resolveFieldContainerChromeClasses,
-  type FieldContainerChromeOptions,
-} from './field-surface.variants'
+import { borderStrength } from './border-strength'
 
 export type {
   FieldContainerChromeOptions,
@@ -35,60 +39,49 @@ export {
   SEMANTIC_SURFACE_TONES,
 } from './field-surface.variants'
 export {
-  resolveFieldRailClasses,
-  resolveDependentNestRailClasses,
-  type FieldRailTone,
-} from './field-rail.variants'
-
-/** @deprecated Use {@link FieldDependentsScope}. */
-export type FieldDependentsScope = 'wrapper' | 'arrayItems'
+  DEPENDENT_NEST_BLOCK_CLASS,
+  DEPENDENT_NEST_HOST_CLASS,
+  DEPENDENT_NEST_RHYTHM_CLASS,
+} from './field-dependent-alignment.constants'
+export {
+  DEPENDENT_NEST_ALIGN_FIELD_EDGE_CLASS,
+  DEPENDENT_NEST_ALIGN_INLINE_CHECKBOX_CLASS,
+  DEPENDENT_NEST_ALIGN_INLINE_SWITCH_CLASS,
+} from './field-dependent-alignment.constants'
 
 /** Internal form nesting plane — not author-facing. */
 export type FormSurfaceHost = 'field-container' | 'array-item'
 
-export type FieldGroupRailTone = FieldRailTone
+/** Vertical gap between controller and dependents region — rhythm-aware (compact 4px / comfortable 8px). */
+export const dependentSectionStackVariants = cva('flex flex-col', {
+  variants: {
+    rhythm: {
+      compact: 'gap-1',
+      comfortable: 'gap-2',
+    },
+  },
+  defaultVariants: {
+    rhythm: 'comfortable',
+  },
+})
 
-/** Nest horizontal offset from controller — 44px (`ml-11`). */
-export const dependentNestMarginClasses = 'ml-11'
-
-/** Nest inner padding — 12px top/right/bottom, 16px left (`pt-3 pr-3 pb-3 pl-4`). */
-export const dependentNestPaddingClasses = 'pt-3 pr-3 pb-3 pl-4'
-
-/** Vertical gap between controller and dependents region — 16px (`gap-4`). */
-export const dependentSectionStackClasses = 'flex flex-col gap-4'
-
-/** @deprecated Panel chrome removed — retained for legacy call sites mapping to nest. */
-export function resolveFieldDependentsChromeClasses(options: FieldContainerChromeOptions): string {
-  return cn('rounded-md border p-3', resolveFieldContainerChromeClasses(options))
+export function resolveDependentSectionStackClasses(rhythm: FieldRhythm = 'comfortable'): string {
+  return dependentSectionStackVariants({ rhythm })
 }
 
-/** @deprecated Use {@link resolveDependentNestRailClasses}. */
-export function resolveDependentRailChromeClasses(
-  _rhythm: FieldRhythm = 'comfortable',
-  tone: FieldRailTone = 'neutral',
-): string {
-  return resolveFieldRailClasses(tone)
-}
-
-/** Host-aware wash for default dependent nests — no border or extra radius. */
-export function resolveDependentNestFillClasses(
-  surfaceHost: FormSurfaceHost = 'field-container',
-): string {
-  if (surfaceHost === 'array-item') {
-    return cn('bg-surface-faint', establishSurfaceCurrent('surface-faint'))
-  }
-
-  return cn('bg-background', establishSurfaceCurrent('background'))
-}
-
-/** Default dependent nest shell — margin, padding, and host-aware fill only. */
-export function resolveDependentNestShellClasses(
-  surfaceHost: FormSurfaceHost = 'field-container',
-): string {
+/** Default dependent nest host — block, rail border, alignment, rhythm, fill. */
+export function resolveDependentNestClasses(options: {
+  rhythm: FieldRhythm
+  surfaceHost: FormSurfaceHost
+  alignmentClassName?: string
+}): string {
+  const alignmentClassName = options.alignmentClassName ?? DEPENDENT_NEST_ALIGN_FIELD_EDGE_CLASS
   return cn(
-    dependentNestMarginClasses,
-    dependentNestPaddingClasses,
-    resolveDependentNestFillClasses(surfaceHost),
+    DEPENDENT_NEST_BLOCK_CLASS,
+    borderStrength('subtle'),
+    alignmentClassName,
+    DEPENDENT_NEST_RHYTHM_CLASS[options.rhythm],
+    DEPENDENT_NEST_HOST_CLASS[options.surfaceHost],
   )
 }
 
@@ -96,20 +89,22 @@ export type ResolvedDependentPresentation = {
   chrome: DependentChrome
   /** When true, renders the default dependent nest (rail + fill + inset). */
   showNest: boolean
-  /** Decorative rail on the nest wrapper. */
-  railClassName?: string
-  /** Nest shell — margin, padding, host-aware fill. */
-  nestShellClassName?: string
+  /** BEM classes for the nest host (`ui-field-dependent-nest` + modifiers). */
+  nestClassName?: string
 }
 
 /** Resolves default dependent nest vs flush opt-out. */
 export function resolveDependentPresentation(
   dependents: Pick<DependentDependentsConfig, 'chrome' | 'inset'>,
-  _rhythm: FieldRhythm,
-  options?: { surfaceHost?: FormSurfaceHost },
+  rhythm: FieldRhythm,
+  options?: { surfaceHost?: FormSurfaceHost; controller?: FieldConfig },
 ): ResolvedDependentPresentation {
   let { chrome = DEFAULT_DEPENDENT_CHROME } = dependents
   const surfaceHost = options?.surfaceHost ?? 'field-container'
+  const controller = options?.controller
+  const alignmentClassName = controller
+    ? resolveDependentNestAlignmentClass(resolveControllerDependentAnatomy(controller))
+    : DEPENDENT_NEST_ALIGN_FIELD_EDGE_CLASS
 
   if (dependents.inset === false) {
     chrome = 'none'
@@ -122,19 +117,10 @@ export function resolveDependentPresentation(
   return {
     chrome,
     showNest: true,
-    railClassName: resolveDependentNestRailClasses(),
-    nestShellClassName: resolveDependentNestShellClasses(surfaceHost),
+    nestClassName: resolveDependentNestClasses({
+      rhythm,
+      surfaceHost,
+      alignmentClassName,
+    }),
   }
-}
-
-/** @deprecated Use {@link resolveDependentPresentation}. */
-export type ResolvedDependentChromePresentation = ResolvedDependentPresentation
-
-/** @deprecated Use {@link resolveDependentPresentation}. */
-export function resolveDependentChromePresentation(
-  dependents: DependentDependentsConfig,
-  rhythm: FieldRhythm,
-  options?: { surfaceHost?: FormSurfaceHost },
-): ResolvedDependentPresentation {
-  return resolveDependentPresentation(dependents, rhythm, options)
 }

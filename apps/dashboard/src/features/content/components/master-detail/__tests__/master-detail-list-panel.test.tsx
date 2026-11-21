@@ -5,7 +5,10 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN } from '../../../classes/lib/class-feature-form-labels'
 import { isElementOutsideScrollport } from '../../../lib/master-detail/is-element-outside-scrollport'
-import { masterDetailEmptyListLabel } from '../../../lib/master-detail/master-detail-constants'
+import {
+  masterDetailEmptyListLabel,
+  masterDetailEmptySectionLabel,
+} from '../../../lib/master-detail/master-detail-constants'
 import { MasterDetailListPanel, type MasterDetailListItem } from '../master-detail-list-panel'
 
 vi.mock('../../../lib/master-detail/is-element-outside-scrollport', () => ({
@@ -50,11 +53,11 @@ describe('MasterDetailListPanel', () => {
     vi.mocked(HTMLElement.prototype.scrollIntoView as typeof vi.fn).mockClear()
   })
 
-  it('renders the list title at card heading scale (text-lg) independent of panel density', () => {
+  it('renders the list title at nav heading scale (16px) independent of panel density', () => {
     render(<MasterDetailListPanel {...baseProps()} />)
 
-    expect(screen.getByText('Features')).toHaveClass('heading-style-card')
-    expect(screen.getByText('Features')).not.toHaveClass('heading-style-section')
+    expect(screen.getByText('Features')).toHaveClass('heading-style-nav')
+    expect(screen.getByText('Features')).not.toHaveClass('heading-style-card')
   })
 
   it('renders addControl in place of the default add button', () => {
@@ -151,7 +154,10 @@ describe('MasterDetailListPanel', () => {
       masterDetailEmptyListLabel(CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN),
     )
     expect(emptyLabel).toBeInTheDocument()
-    expect(emptyLabel).toHaveClass('ui-interactive-list__empty', 'text-start')
+    expect(emptyLabel).toHaveClass(
+      'ui-interactive-list__empty',
+      'ui-interactive-list__empty--start',
+    )
     expect(document.querySelector('[data-master-detail-list-scroll]')).toBeNull()
   })
 
@@ -205,7 +211,9 @@ describe('MasterDetailListPanel', () => {
     expect(listShell).toHaveClass('master-detail-list-shell-viewport-cap')
     expect(scrollRegion).not.toContainElement(screen.getByRole('button', { name: /Add feature/i }))
     expect(scrollRegion).not.toContainElement(screen.getByText('2 available'))
-    expect(screen.getByText('2 available').closest('.border-b')).toBeInTheDocument()
+    expect(
+      screen.getByText('2 available').closest('.master-detail-list__supplement'),
+    ).toBeInTheDocument()
   })
 
   it('renders invalid item count aligned right in the count supplement row', () => {
@@ -217,7 +225,9 @@ describe('MasterDetailListPanel', () => {
       />,
     )
 
-    const supplementRow = screen.getByText(/22 available/i).closest('.border-b')
+    const supplementRow = screen
+      .getByText(/22 available/i)
+      .closest('.master-detail-list__supplement')
     expect(supplementRow).toHaveClass('justify-between')
     expect(screen.getByText('3', { selector: '[aria-hidden="true"]' })).toBeInTheDocument()
   })
@@ -278,25 +288,18 @@ describe('MasterDetailListPanel', () => {
         onSelectItem={onSelectItem}
         countSupplement={<span>2 available</span>}
         invalidItemCount={1}
+        addLabel="Add action"
         groups={[
           {
             id: 'actions',
             title: 'Actions',
-            addControl: (
-              <button type="button" onClick={onAddActions}>
-                Add action
-              </button>
-            ),
+            onAdd: onAddActions,
             items: [{ id: 'bite', title: 'Bite' }],
           },
           {
             id: 'reactions',
             title: 'Reactions',
-            addControl: (
-              <button type="button" onClick={onAddReactions}>
-                Add reaction
-              </button>
-            ),
+            onAdd: onAddReactions,
             items: [{ id: 'parry', title: 'Parry' }],
           },
         ]}
@@ -308,12 +311,113 @@ describe('MasterDetailListPanel', () => {
     expect(screen.getByRole('region', { name: 'Actions' })).toBeInTheDocument()
     expect(screen.getByRole('region', { name: 'Reactions' })).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: 'Add reaction' }))
+    const actionsSection = screen.getByRole('region', { name: 'Actions' })
+    const reactionsSection = screen.getByRole('region', { name: 'Reactions' })
+    expect(actionsSection.nextElementSibling).toBe(reactionsSection)
+    expect(document.querySelectorAll('.master-detail-list__section-header')).toHaveLength(2)
+    expect(document.querySelector('[data-master-detail-list-scroll]')).toHaveClass(
+      'master-detail-list__scroll',
+    )
+
+    const addButtons = screen.getAllByRole('button', { name: 'Add action' })
+    await user.click(addButtons[1]!)
     expect(onAddReactions).toHaveBeenCalledOnce()
     expect(onAddActions).not.toHaveBeenCalled()
 
     await user.click(screen.getByRole('button', { name: /Parry/i }))
     expect(onSelectItem).toHaveBeenCalledWith('parry')
+  })
+
+  it('renders contextual empty copy under an empty grouped section', () => {
+    render(
+      <MasterDetailListPanel
+        ariaLabel="Actions"
+        itemNoun={CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN}
+        selectedItemId={null}
+        onSelectItem={vi.fn()}
+        groups={[
+          {
+            id: 'actions',
+            title: 'Actions',
+            items: [{ id: 'bite', title: 'Bite' }],
+          },
+          {
+            id: 'bonus',
+            title: 'Bonus actions',
+            items: [],
+          },
+        ]}
+      />,
+    )
+
+    const empty = screen.getByText(masterDetailEmptySectionLabel('bonus actions'))
+    expect(empty).toHaveClass('ui-interactive-list__empty--start')
+    expect(empty.closest('.ui-interactive-list')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /bonus/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Bite/i })).toBeInTheDocument()
+  })
+
+  it('derives grouped empty copy from a string section title when emptyLabel is omitted', () => {
+    render(
+      <MasterDetailListPanel
+        ariaLabel="Actions"
+        itemNoun={CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN}
+        selectedItemId={null}
+        onSelectItem={vi.fn()}
+        groups={[
+          {
+            id: 'actions',
+            title: 'Actions',
+            items: [],
+          },
+        ]}
+      />,
+    )
+
+    expect(screen.getByText(masterDetailEmptySectionLabel('actions'))).toHaveClass(
+      'ui-interactive-list__empty--start',
+    )
+  })
+
+  it('falls back to the panel item noun when the section title is not a plain string', () => {
+    render(
+      <MasterDetailListPanel
+        ariaLabel="Features"
+        itemNoun={CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN}
+        selectedItemId={null}
+        onSelectItem={vi.fn()}
+        groups={[
+          {
+            id: 'features',
+            title: <span>Features</span>,
+            items: [],
+          },
+        ]}
+      />,
+    )
+
+    expect(
+      screen.getByText(masterDetailEmptyListLabel(CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN)),
+    ).toHaveClass('ui-interactive-list__empty--start')
+  })
+
+  it('renders empty placeholders for multiple consecutive empty groups', () => {
+    render(
+      <MasterDetailListPanel
+        ariaLabel="Actions"
+        itemNoun={CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN}
+        selectedItemId={null}
+        onSelectItem={vi.fn()}
+        groups={[
+          { id: 'bonus', title: 'Bonus actions', items: [] },
+          { id: 'reactions', title: 'Reactions', items: [] },
+        ]}
+      />,
+    )
+
+    expect(screen.getByText(masterDetailEmptySectionLabel('bonus actions'))).toBeInTheDocument()
+    expect(screen.getByText(masterDetailEmptySectionLabel('reactions'))).toBeInTheDocument()
+    expect(screen.queryByRole('list')).not.toBeInTheDocument()
   })
 
   itAxe('has no axe accessibility violations', async () => {

@@ -49,15 +49,25 @@ export const attackOnHitDraftSchema = z.object({
   effects: z.array(attackOnHitDraftEffectSchema).optional(),
 })
 
-export const multiattackDraftStepSchema = z.object({
-  count: z.number().int().min(1).optional(),
-  actionIds: z.array(z.string().min(1)),
-})
-
-export const multiattackPublishedStepSchema = z.object({
-  count: z.number().int().min(1),
-  actionIds: z.array(z.string().min(1)).min(1),
-})
+export {
+  multiattackDraftStepSchema,
+  multiattackPublishedStepSchema,
+  multiattackAttackGroupDraftSchema,
+  multiattackAttackGroupPublishedSchema,
+  multiattackReplacementDraftSchema,
+  multiattackReplacementSchema,
+  multiattackAlternativeDraftSchema,
+  multiattackAlternativePublishedSchema,
+  isMultiattackAttackGroup,
+  isMultiattackUseClause,
+  type MultiattackAttackGroup,
+  type MultiattackUseSingle,
+  type MultiattackUseChoice,
+  type MultiattackPublishedStep,
+  type MultiattackDraftStep,
+  type MultiattackReplacement,
+  type MultiattackAlternative,
+} from './multiattack-schemas'
 
 export const positiveWholeFeetSchema = z.number().int().min(1)
 

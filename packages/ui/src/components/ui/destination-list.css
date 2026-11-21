@@ -161,9 +161,6 @@
 
   .ui-destination-item__chevron {
     display: flex;
-    flex-shrink: 0;
-    align-items: center;
     align-self: center;
-    color: var(--muted-foreground);
   }
 }

@@ -241,10 +241,7 @@
     flex: 1 1 auto;
   }
 
-  .ui-card .ui-card__nav-chevron {
-    display: inline-flex;
-    flex-shrink: 0;
-    color: var(--muted-foreground);
+  .ui-card .ui-nav-chevron {
     padding-inline-end: var(--ui-card-inset-inline);
   }
 

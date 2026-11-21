@@ -31,17 +31,18 @@ describe('resolveDependsOnWatchName', () => {
     expect(resolveDependsOnWatchName('../../../../level', 'features.0.grants.0')).toBe('level')
   })
 
-  it('resolves monster defined-form movement override deps to root movement', () => {
-    expect(resolveDependsOnWatchName('../../../movement', 'forms.definedForms.0')).toBe('movement')
-    expect(resolveDependsOnWatchName('../../../hover', 'forms.definedForms.0')).toBe('hover')
+  it('resolves deep parent hops to a root-level field', () => {
+    expect(resolveDependsOnWatchName('../../../../../../rootField', 'a.0.b.0.c.0')).toBe(
+      'rootField',
+    )
   })
 
-  it('resolves target kind from nested monster action requirement arrays', () => {
-    expect(resolveDependsOnWatchName('../kind', 'actions.0.resolution.target.requirements')).toBe(
-      'actions.0.resolution.target.kind',
+  it('resolves parent hops from a nested item to a sibling on an ancestor', () => {
+    expect(resolveDependsOnWatchName('../../../sibling', 'root.0.mid.0.nested.0')).toBe(
+      'root.0.mid.sibling',
     )
-    expect(resolveDependsOnWatchName('../kind', 'resolution.target.requirements')).toBe(
-      'resolution.target.kind',
+    expect(resolveDependsOnWatchName('../peer', 'parent.0.child.grandchild')).toBe(
+      'parent.0.child.peer',
     )
   })
 })

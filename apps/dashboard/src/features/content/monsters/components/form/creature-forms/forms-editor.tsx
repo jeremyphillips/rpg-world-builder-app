@@ -99,22 +99,14 @@ export function MonsterFormsEditor({ ctx }: { ctx: ContentFormCtx }) {
     }),
     [editor, form, forms?.definedForms, getValues, lifecycle],
   )
-  const addControl = (
-    <Button
-      type="button"
-      variant="outline"
-      onClick={() => {
-        const row = makeEmptyMonsterDefinedForm()
-        editor.appendRow(row)
-        if (forms?.trueForm.kind === 'defined' && forms.definedForms.length === 0) {
-          setValue('forms.trueForm', { kind: 'defined', formId: row.id }, { shouldDirty: true })
-          void trigger(['forms.trueForm', 'forms.definedForms'])
-        }
-      }}
-    >
-      {MONSTER_FORMS_ADD_FORM_LABEL}
-    </Button>
-  )
+  const handleAddDefinedForm = useCallback(() => {
+    const row = makeEmptyMonsterDefinedForm()
+    editor.appendRow(row)
+    if (forms?.trueForm.kind === 'defined' && forms.definedForms.length === 0) {
+      setValue('forms.trueForm', { kind: 'defined', formId: row.id }, { shouldDirty: true })
+      void trigger(['forms.trueForm', 'forms.definedForms'])
+    }
+  }, [editor, forms?.definedForms, forms?.trueForm, setValue, trigger])
 
   if (!forms?.trueForm || !Array.isArray(forms.definedForms)) {
     return (
@@ -138,7 +130,7 @@ export function MonsterFormsEditor({ ctx }: { ctx: ContentFormCtx }) {
         listTitle={MONSTER_DEFINED_FORMS_LIST_HEADING}
         ariaLabel={MONSTER_DEFINED_FORMS_LIST_HEADING}
         addLabel={MONSTER_FORMS_ADD_FORM_LABEL}
-        addControl={addControl}
+        onAdd={handleAddDefinedForm}
         idPrefix="monster-defined-form"
         makeItemDefaults={makeDefaults}
         rowTitle={{

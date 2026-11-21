@@ -29,11 +29,13 @@ import {
   SAVING_THROW_TERM,
   SENSE_TERM,
   type CreatureArmorSlot,
+  multiattackPositiveInt,
 } from '@rpg/contracts'
 
 export { formatEquipmentCustomizationRemovalSummary } from './equipment/equipment-entry-customization.lib'
 
 import { formatEquipmentRemovalInlineCount } from './equipment/equipment-entry-customization.lib'
+import { masterDetailEmptySectionLabel } from '../../lib/master-detail/master-detail-constants'
 import { defineMasterDetailItemNoun } from '../../lib/master-detail/master-detail-item-noun'
 
 import {
@@ -131,7 +133,87 @@ export const MONSTER_ACTION_ATTACK_PREVIEW_LABEL = 'Attack preview'
 export const MONSTER_ACTION_SPELL_PREVIEW_LABEL = 'Spellcasting preview'
 export const MONSTER_REACTION_PREVIEW_LABEL = 'Reaction preview'
 export const MONSTER_ACTION_MULTIATTACK_PREVIEW_LABEL = 'Multiattack preview'
-export const MONSTER_MULTIATTACK_STEPS_LABEL = 'Steps'
+export const MONSTER_MULTIATTACK_STEPS_LABEL = 'Sequence'
+export const MONSTER_MULTIATTACK_ATTACKS_LABEL = 'Attacks'
+export const MONSTER_MULTIATTACK_PRIMARY_SEQUENCE_LABEL = 'Primary sequence'
+export const MONSTER_MULTIATTACK_ATTACKS_HINT =
+  'Add the attacks and other actions the creature uses as part of one Multiattack.'
+export const MONSTER_MULTIATTACK_COMBINATION_HINT = 'These attacks can be used in any combination.'
+export const MONSTER_MULTIATTACK_ATTACK_GROUP_LABEL = 'Attack group'
+export const MONSTER_MULTIATTACK_OTHER_ACTIONS_GROUP_LABEL = 'Other actions'
+export const MONSTER_MULTIATTACK_STEP_CONJUNCTION = 'and'
+export const MONSTER_MULTIATTACK_IN_ANY_COMBINATION_LABEL = 'in any combination'
+export const MONSTER_MULTIATTACK_CHOOSE_ATTACKS_LABEL = 'Choose attacks'
+export const MONSTER_MULTIATTACK_CHOOSE_AN_ACTION_LABEL = 'Choose an action'
+export const MONSTER_MULTIATTACK_CHOOSE_BETWEEN_ACTIONS_LABEL = 'Choose between actions'
+export const MONSTER_MULTIATTACK_ADD_TO_SEQUENCE_LABEL = 'Add to sequence'
+export const MONSTER_MULTIATTACK_ADD_ACTION_CHOICE_LABEL = 'Add action choice'
+export const MONSTER_MULTIATTACK_ADD_REPETITION_LABEL = 'Add repetition'
+export const MONSTER_MULTIATTACK_REMOVE_REPETITION_LABEL = 'Remove repetition'
+export const MONSTER_MULTIATTACK_COUNT_LABEL = 'Count'
+export const MONSTER_MULTIATTACK_ATTACKS_PICKER_LABEL = 'Attacks'
+export const MONSTER_MULTIATTACK_SEQUENCE_LABEL = 'Sequence'
+export const MONSTER_MULTIATTACK_REPLACEMENT_LABEL = 'Action replacement'
+export const MONSTER_MULTIATTACK_ADD_REPLACEMENT_LABEL = 'Add action replacement'
+export const MONSTER_MULTIATTACK_REPLACEMENT_HINT =
+  'Replace attacks with one of the selected actions.'
+export const MONSTER_MULTIATTACK_ATTACKS_REPLACED_LABEL = 'Attacks replaced'
+export const MONSTER_MULTIATTACK_ATTACKS_REPLACED_HINT =
+  'Number of attacks used up by this replacement.'
+export const MONSTER_MULTIATTACK_CHOICES_LABEL = 'Choices'
+export const MONSTER_MULTIATTACK_CHOICES_HINT =
+  'Choose one of these actions when making the replacement.'
+export const MONSTER_MULTIATTACK_ADD_CHOICE_LABEL = 'Add choice'
+export const MONSTER_MULTIATTACK_CHOICE_ACTION_LABEL = 'Action'
+export const MONSTER_MULTIATTACK_SPELL_LABEL = 'Spell'
+export const MONSTER_MULTIATTACK_SPELL_PLACEHOLDER = 'No specific spell'
+export const MONSTER_MULTIATTACK_PIN_SPELL_LABEL = 'Pin specific spell'
+export const MONSTER_MULTIATTACK_CLEAR_SPELL_LABEL = 'Clear spell'
+export const MONSTER_MULTIATTACK_SPELL_HINT =
+  'Optional. Choose a specific spell or leave unspecified.'
+export const MONSTER_MULTIATTACK_ALTERNATIVE_LABEL = 'Alternative sequence'
+export const MONSTER_MULTIATTACK_ADD_ALTERNATIVE_LABEL = 'Add alternative sequence'
+export const MONSTER_MULTIATTACK_REMOVE_ALTERNATIVE_LABEL = 'Remove alternative sequence'
+export const MONSTER_MULTIATTACK_ALTERNATIVE_HINT = 'The creature uses this sequence instead.'
+export const MONSTER_MULTIATTACK_ONLY_AFTER_USING_LABEL = 'Only after using'
+export const MONSTER_MULTIATTACK_NO_PREREQUISITE = 'No action can be required first.'
+export const MONSTER_MULTIATTACK_OPTIONAL_LABEL = 'Optional'
+export const MONSTER_MULTIATTACK_OPTIONAL_HINT =
+  'The creature can choose whether to use this action.'
+export const MONSTER_MULTIATTACK_TIMES_LABEL = 'Times'
+export const MONSTER_MULTIATTACK_USE_STYLE_LABEL = 'Use'
+export const MONSTER_MULTIATTACK_USE_SINGLE_LABEL = 'Single action'
+export const MONSTER_MULTIATTACK_USE_CHOICE_LABEL = 'Choose between actions'
+export const MONSTER_MULTIATTACK_ANY_ATTACK_LABEL = 'Allow repeated replacements'
+export const MONSTER_MULTIATTACK_ANY_ATTACK_HINT =
+  "Each eligible attack can be replaced separately with one use of the selected action, up to the available attack slots. The action's usage limits still apply."
+export const MONSTER_MULTIATTACK_REPLACES_ONE_ATTACK = 'Replaces 1 attack'
+export const MONSTER_MULTIATTACK_ADD_TARGET_ATTACK_LABEL = 'Add target attack'
+export const MONSTER_MULTIATTACK_TARGET_ATTACK_LABEL = 'Target attack'
+export const MONSTER_MULTIATTACK_EMPTY_ATTACKS_HEADING = 'No attack actions available'
+export const MONSTER_MULTIATTACK_EMPTY_ATTACKS_BODY =
+  'Add an attack action before configuring Multiattack.'
+export const MONSTER_MULTIATTACK_ADD_ATTACK_ACTION_LABEL = 'Add attack action'
+export const MONSTER_MULTIATTACK_REPLACEMENT_DISABLED_HINT =
+  'Add another action before configuring a replacement.'
+export const MONSTER_MULTIATTACK_REMOVE_ALTERNATIVE_FIRST = 'Remove the alternative sequence first.'
+export const MONSTER_MULTIATTACK_REMOVE_REPLACEMENT_FIRST = 'Remove the action replacement first.'
+export const MONSTER_MULTIATTACK_NO_SPELLS_IN_SPELLCASTING = 'No spells configured in Spellcasting.'
+
+export function multiattackStepAttackCountLabel(count: number): string {
+  return count === 1 ? '1 attack' : `${count} attacks`
+}
+
+export function multiattackUseOneOfActionsLabel(count: number): string {
+  return `Use one of ${count} actions`
+}
+
+export function multiattackStepUseRepetitionSuffix(count: unknown): string | undefined {
+  const parsed = multiattackPositiveInt(count)
+  if (parsed === 2) return 'twice'
+  if (parsed !== undefined && parsed > 2) return `${parsed} times`
+  return undefined
+}
 export const MONSTER_TRAIT_PREVIEW_LABEL = 'Trait preview'
 /** Stat-block preview row — not action-economy {@link getActionEconomyLabel} “Action”. */
 export const MONSTER_ACTION_ATTACK_PREVIEW_ATTACK_LABEL = 'Attack'
@@ -221,6 +303,10 @@ const MONSTER_ACTION_SECTION_HEADINGS = {
 
 export function monsterActionSectionHeading(section: MonsterActionSection): string {
   return MONSTER_ACTION_SECTION_HEADINGS[section]
+}
+
+export function monsterActionSectionEmptyLabel(section: MonsterActionSection): string {
+  return masterDetailEmptySectionLabel(monsterActionSectionHeading(section).toLowerCase())
 }
 
 export const MONSTER_ADD_LABEL = 'Add'

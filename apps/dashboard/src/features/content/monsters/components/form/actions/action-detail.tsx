@@ -105,11 +105,17 @@ export function MonsterActionDetail({
   sections,
   located,
   rows,
+  weapons,
+  weaponActions,
+  allowAddWeapon,
 }: {
   ctx: ContentFormCtx
   sections: Sections
   located: { action: MonsterActionDraftRow; section: MonsterActionSection; index: number } | null
   rows: ActionRows
+  weapons: readonly { entryId: string; label: string; equipped: boolean }[]
+  weaponActions: readonly { id: string; equipmentEntryId?: string }[]
+  allowAddWeapon: boolean
 }) {
   const values = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
   const action = located?.action
@@ -123,6 +129,7 @@ export function MonsterActionDetail({
   const editor = located ? sections.editors[located.section] : sections.editors.actions
   const fields = useMemo(() => {
     if (!located || !values || !action || !liveAction) return []
+    const sectionRows = (values[located.section] ?? []) as MonsterActionDraftRow[]
     return monsterActionDetailFields({
       ctx,
       action: liveAction,
@@ -136,15 +143,33 @@ export function MonsterActionDetail({
       attackOptions: attackChipOptions(
         (located.section === 'reactions'
           ? (values.actions ?? [])
-          : (values[located.section] ?? [])) as MonsterActionDraftRow[],
+          : sectionRows) as MonsterActionDraftRow[],
         action.id,
         values,
         ctx,
       ),
+      actionRows: sectionRows,
+      bonusActionRows: (values.bonusActions ?? []) as MonsterActionDraftRow[],
+      weapons,
+      weaponActions,
+      allowAddWeapon,
+      onAcquireAttack: (section, choice) => sections.addAcquisition(section, choice),
       referenceOptions: referenceOptionLabels(values, ctx),
       sourceSpellOptions: legendarySourceSpellOptions(values, liveAction, ctx.spellCatalogById),
     })
-  }, [action, ctx, liveAction, located, namePrefix, sections.setNotice, values])
+  }, [
+    action,
+    allowAddWeapon,
+    ctx,
+    liveAction,
+    located,
+    namePrefix,
+    sections.addAcquisition,
+    sections.setNotice,
+    values,
+    weaponActions,
+    weapons,
+  ])
 
   useEffect(() => {
     if (sections.focusToken === 0 || !action) return

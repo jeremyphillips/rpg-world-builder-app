@@ -81,6 +81,8 @@ describe('xs inline-row tier', () => {
       'ui-compact-control--stepper-button-xs',
     )
     expect(numberStepperRootVariants({ size: 'xs' })).toContain('h-6')
+    expect(numberStepperRootVariants({ size: 'xs' })).toContain('flex-none')
+    expect(numberStepperRootVariants({ size: 'xs' })).toContain('self-start')
   })
 
   it('bills the root width against a 3rem button track', () => {

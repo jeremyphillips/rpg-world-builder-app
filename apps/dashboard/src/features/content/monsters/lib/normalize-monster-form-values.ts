@@ -8,6 +8,8 @@ import {
   omitEmptySavingThrow,
   monsterLegendaryActionDraftSchema,
   monsterReactionDraftSchema,
+  isMultiattackUseClause,
+  multiattackPositiveInt,
   type ArmorClassRules,
   type ContentValidationIntent,
   type Monster,
@@ -236,11 +238,118 @@ function applySpellEntryDraft(cleaned: Record<string, unknown>): void {
   })
 }
 
+function keepMultiattackLiteralTrue(record: Record<string, unknown>, key: string): void {
+  if (record[key] === true) record[key] = true
+  else delete record[key]
+}
+
+function filterMultiattackChoiceRows(rows: unknown): unknown[] {
+  if (!Array.isArray(rows)) return []
+  return rows
+    .filter((row) => {
+      if (!isRecord(row)) return false
+      const actionId = row.actionId
+      return typeof actionId === 'string' && actionId.trim().length > 0
+    })
+    .map((row) => {
+      if (!isRecord(row)) return row
+      const next = { ...row }
+      if (next.spellId === '') delete next.spellId
+      return next
+    })
+}
+
+function normalizeMultiattackAttackGroupStep(step: Record<string, unknown>): void {
+  const count = multiattackPositiveInt(step.count)
+  if (count) step.count = count
+  else delete step.count
+}
+
+function normalizeMultiattackUseStepRow(step: Record<string, unknown>): void {
+  step.kind = 'use'
+  delete step.actionIds
+  if (step.mode !== 'single' && step.mode !== 'choice') step.mode = 'single'
+  const count = multiattackPositiveInt(step.count)
+  if (count) step.count = count
+  else delete step.count
+  if (step.mode !== 'choice') {
+    keepMultiattackLiteralTrue(step, 'optional')
+    if (step.actionId === '') delete step.actionId
+  } else {
+    step.choices = filterMultiattackChoiceRows(step.choices)
+  }
+  delete step.whenAvailable
+}
+
+function normalizeMultiattackDraftStep(step: Record<string, unknown>): void {
+  if (!isMultiattackUseClause(step)) {
+    normalizeMultiattackAttackGroupStep(step)
+    return
+  }
+  normalizeMultiattackUseStepRow(step)
+}
+
+function applyMultiattackDraft(cleaned: Record<string, unknown>): void {
+  if (cleaned.kind !== 'multiattack') return
+
+  if (Array.isArray(cleaned.steps)) {
+    cleaned.steps = cleaned.steps.map((step) => {
+      if (!isRecord(step)) return step
+      const next = { ...step }
+      normalizeMultiattackDraftStep(next)
+      return next
+    })
+  }
+
+  if (isRecord(cleaned.replacement)) {
+    const replacement = { ...cleaned.replacement }
+    const count = multiattackPositiveInt(replacement.count)
+    if (count) replacement.count = count
+    else delete replacement.count
+    if (replacement.replacesActionId === '') delete replacement.replacesActionId
+    replacement.choices = filterMultiattackChoiceRows(replacement.choices)
+    if (replacement.attackWord === true) replacement.attackWord = 'any'
+    if (replacement.attackWord !== 'any') delete replacement.attackWord
+    delete replacement.whenAvailable
+    cleaned.replacement = replacement
+  }
+
+  if (isRecord(cleaned.alternative)) {
+    const alternative = { ...cleaned.alternative }
+    if (Array.isArray(alternative.steps)) {
+      alternative.steps = alternative.steps.map((step) => {
+        if (!isRecord(step)) return step
+        const next = { ...step }
+        normalizeMultiattackDraftStep(next)
+        return next
+      })
+    }
+    cleaned.alternative = alternative
+  }
+}
+
+function normalizeActionMovementDraft(cleaned: Record<string, unknown>): void {
+  if (!isRecord(cleaned.movement)) {
+    delete cleaned.movement
+    return
+  }
+  const allowance = cleaned.movement.allowance
+  if (allowance !== 'half-speed' && allowance !== 'speed') {
+    delete cleaned.movement
+    return
+  }
+  if (cleaned.movement.withoutOpportunityAttacks !== true) {
+    delete cleaned.movement.withoutOpportunityAttacks
+  }
+}
+
 function applyTurnAndInvocationDraft(
   cleaned: Record<string, unknown>,
   section: 'actions' | 'bonusActions' | 'reactions' | 'legendaryActions',
 ): void {
-  if (cleaned.onceUntilNextTurn === true || cleaned.onceUntilNextTurn === 'true') {
+  if (cleaned.kind === 'multiattack') {
+    delete cleaned.onceUntilNextTurn
+  } else if (cleaned.onceUntilNextTurn === true || cleaned.onceUntilNextTurn === 'true') {
     cleaned.onceUntilNextTurn = true
   } else {
     delete cleaned.onceUntilNextTurn
@@ -261,18 +370,7 @@ function applyTurnAndInvocationDraft(
   if (Array.isArray(cleaned.actionIds)) {
     cleaned.actionIds = cleaned.actionIds.filter((id) => typeof id === 'string' && id.length > 0)
   }
-  if (!isRecord(cleaned.movement)) {
-    delete cleaned.movement
-    return
-  }
-  const allowance = cleaned.movement.allowance
-  if (allowance !== 'half-speed' && allowance !== 'speed') {
-    delete cleaned.movement
-    return
-  }
-  if (cleaned.movement.withoutOpportunityAttacks !== true) {
-    delete cleaned.movement.withoutOpportunityAttacks
-  }
+  normalizeActionMovementDraft(cleaned)
 }
 
 function stabilizeDraftActionKeys(
@@ -337,6 +435,7 @@ function normalizeAction(
   omitEmptyOnHit(cleaned)
   applyReactionTriggerDraft(cleaned, section)
   applyTurnAndInvocationDraft(cleaned, section)
+  applyMultiattackDraft(cleaned)
   applyLimitedUseDraft(cleaned)
   if (cleaned.kind === 'shape-shift' && typeof cleaned.prerequisite === 'string') {
     const prerequisite = normalizePrerequisite(cleaned.prerequisite)

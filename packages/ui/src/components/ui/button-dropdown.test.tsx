@@ -35,6 +35,35 @@ const items = [
 ]
 
 describe('ButtonDropdown', () => {
+  it('keeps an empty group label out of the accessibility tree and after labeled groups', async () => {
+    const user = userEvent.setup()
+    render(
+      <ButtonDropdown
+        label="Add to sequence"
+        enableSearch={false}
+        groups={[
+          { id: 'attack', label: '' },
+          { id: 'other', label: 'Other actions' },
+        ]}
+        items={[
+          { id: 'attack-group', label: 'Attack group', groupId: 'attack' },
+          { id: 'breath', label: 'Fire Breath', groupId: 'other' },
+          { id: 'loose', label: 'Loose item' },
+        ]}
+        onSelectItem={vi.fn()}
+      />,
+    )
+    await user.click(screen.getByRole('button', { name: 'Add to sequence' }))
+    const menu = screen.getByRole('menu', { name: 'Add to sequence' })
+    const text = menu.textContent ?? ''
+    expect(text.indexOf('Attack group')).toBeLessThan(text.indexOf('Other actions'))
+    expect(text.indexOf('Other actions')).toBeLessThan(text.indexOf('Loose item'))
+    const groups = screen.getAllByRole('group')
+    expect(groups[0]).not.toHaveAttribute('aria-labelledby')
+    expect(groups[1]).toHaveAttribute('aria-labelledby')
+    expect(screen.getByText('Other actions')).toBeInTheDocument()
+  })
+
   it('renders grouped sections when closed and opens a searchable menu', async () => {
     const user = userEvent.setup()
     render(
@@ -155,6 +184,27 @@ describe('ButtonDropdown', () => {
     expect(
       screen.getByRole('menu', { name: 'Add grant' }).parentElement?.parentElement,
     ).toHaveClass('ui-interactive-list__panel--fit')
+  })
+
+  it('renders a master-detail add icon trigger when triggerPresentation is addIcon', async () => {
+    const user = userEvent.setup()
+    render(
+      <ButtonDropdown
+        label="Add trait"
+        triggerPresentation="addIcon"
+        groups={groups}
+        items={items}
+        onSelectItem={vi.fn()}
+      />,
+    )
+
+    const trigger = screen.getByRole('button', { name: 'Add trait' })
+    expect(trigger).toHaveClass('ui-button--ghost', 'ui-button--icon-sm', 'shrink-0')
+    expect(trigger).not.toHaveClass('w-fit')
+    expect(trigger).not.toHaveTextContent('Add trait')
+
+    await user.click(trigger)
+    expect(screen.getByRole('searchbox', { name: 'Search add trait…' })).toBeInTheDocument()
   })
 
   it('does not apply fit width classes by default', () => {

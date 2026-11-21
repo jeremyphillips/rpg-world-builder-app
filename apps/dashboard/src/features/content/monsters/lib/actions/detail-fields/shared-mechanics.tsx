@@ -61,6 +61,8 @@ import {
 import { monsterSpellComponentRequirementsField } from '../spell/monster-spell-component-form-fields'
 import { monsterWeaponDamageOverrideField } from '../weapon/monster-weapon-damage-override'
 import type { MonsterFormValues } from '../../monster-form-values'
+import { monsterMultiattackMechanicFields } from '../multiattack/monster-multiattack-mechanic-fields'
+import type { MonsterActionAcquisitionChoice } from '../acquisition/monster-action-acquisition'
 import { monsterSpellCastAtLevelField } from '../spell/monster-spell-cast-at-level-form-fields'
 import { MONSTER_SPELL_PICKER_INTERCEPT } from '../../../components/form/spells/spell-picker-context'
 import {
@@ -410,7 +412,16 @@ export function monsterActionMechanicFields(input: {
   namePrefix: string
   sharedCastingOptions: { value: string; label: string }[]
   attackOptions: { value: string; label: string }[]
+  actionRows?: MonsterActionDraftRow[]
+  bonusActionRows?: MonsterActionDraftRow[]
   equipment: MonsterFormValues['equipment']
+  weapons?: readonly { entryId: string; label: string; equipped: boolean }[]
+  weaponActions?: readonly { id: string; equipmentEntryId?: string }[]
+  allowAddWeapon?: boolean
+  onAcquireAttack?: (
+    section: MonsterActionSection,
+    choice: Exclude<MonsterActionAcquisitionChoice, { type: 'add-weapon' }>,
+  ) => void
   onCastingSourceBlocked?: (message: string) => void
 }): FormItem[] {
   const { ctx, action, section, namePrefix } = input
@@ -518,22 +529,21 @@ export function monsterActionMechanicFields(input: {
     kindFields.push(monsterActionSaveSection(ctx, namePrefix, action.id))
   }
   if (action.kind === 'multiattack') {
-    kindFields.push({
-      kind: 'array',
-      name: 'steps',
-      heading: { label: 'Steps' },
-      addAction: { label: 'Add step' },
-      item: { header: { fallback: (index) => `Step ${index + 1}` } },
-      fields: [
-        { type: 'number', name: 'count', label: 'Count', min: 1 },
-        {
-          type: 'chips',
-          name: 'actionIds',
-          label: 'Attacks',
-          options: input.attackOptions,
-        },
-      ],
-    })
+    kindFields.push(
+      ...monsterMultiattackMechanicFields({
+        namePrefix,
+        section: input.section,
+        action,
+        ctx: input.ctx,
+        attackOptions: input.attackOptions,
+        actionRows: input.actionRows,
+        bonusActionRows: input.bonusActionRows,
+        weapons: input.weapons,
+        weaponActions: input.weaponActions,
+        allowAddWeapon: input.allowAddWeapon,
+        onAcquireAttack: input.onAcquireAttack,
+      }),
+    )
   }
   return [...trigger, ...saveGroup, ...kindFields, ...usage]
 }

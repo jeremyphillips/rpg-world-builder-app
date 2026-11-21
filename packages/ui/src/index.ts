@@ -332,6 +332,10 @@ export {
   type StaticCardProps,
 } from './components/ui/card'
 export { CardNavInterior, NavigationChevron } from './components/ui/card.lib'
+export type {
+  NavigationChevronProps,
+  NavigationChevronSize,
+} from './components/ui/navigation-chevron.client'
 export {
   BORDER_STRENGTHS,
   borderStrength,
@@ -750,11 +754,13 @@ export {
   type ResolveFieldRowColumnTracksResult,
 } from './components/ui/field-row-column-tracks.lib'
 export {
-  resolveFieldDependentsChromeClasses,
-  resolveFieldRailClasses,
-  type FieldDependentsScope,
-  type FieldRailTone,
+  resolveDependentNestClasses,
+  resolveDependentPresentation,
+  resolveDependentSectionStackClasses,
+  type FormSurfaceHost,
+  type ResolvedDependentPresentation,
 } from './components/ui/field-dependent.variants'
+export { resolveFieldRailClasses, type FieldRailTone } from './components/ui/field-rail.variants'
 export { FieldRow, type FieldRowProps } from './components/ui/field-row'
 
 export { FormCard, formCardContentClass } from './components/ui/form-card'

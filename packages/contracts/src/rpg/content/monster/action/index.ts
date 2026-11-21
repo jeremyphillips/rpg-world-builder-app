@@ -63,6 +63,47 @@ export {
   MULTIATTACK_SECTION_MESSAGE,
   actionReferenceInvalidKindMessage,
 } from './reference-messages'
+export {
+  multiattackEligibilityKinds,
+  multiattackRowEligibleForPurpose,
+  type MultiattackEligibilityPurpose,
+} from './multiattack-eligibility'
+export {
+  multiattackUseClauseHasRepetition,
+  multiattackUseClauseRepetitionEligible,
+  multiattackUseClauseRepetitionInvalid,
+  multiattackUseClauseRepetitionRepairRequired,
+} from './multiattack-use-repetition'
+export { multiattackValidationMessages } from './multiattack-validation-messages'
+export {
+  actionIdAppearsInAttackSteps,
+  meaningfulMultiattackTargetActionIds,
+  multiattackReplacementShowsStaticCount,
+  multiattackSequenceAttackIds,
+  primaryAttackSlotTotal,
+  replacementCountMax,
+  targetedAttackSlotTotal,
+} from './multiattack-replacement-budget'
+export {
+  classifyMultiattackReplacementChoice,
+  isMultiattackReplacementChoiceRedundant,
+  multiattackReplacementChoiceKey,
+  siblingMultiattackReplacementChoiceKeys,
+  type MultiattackReplacementChoiceRef,
+  type MultiattackReplacementRedundancy,
+} from './multiattack-replacement-choice-eligibility'
+export {
+  isMultiattackAttackGroup,
+  isMultiattackUseClause,
+  multiattackPositiveInt,
+  type MultiattackAlternative,
+  type MultiattackAttackGroup,
+  type MultiattackDraftStep,
+  type MultiattackPublishedStep,
+  type MultiattackReplacement,
+  type MultiattackUseChoice,
+  type MultiattackUseSingle,
+} from './multiattack-schemas'
 export { actionsReferencingAction, stripReferencedActionId } from './action-references'
 export type { ReferencedActionRow } from './action-references'
 export { planMonsterActionRemoval, shapeShiftRows } from './action-removal-plan'

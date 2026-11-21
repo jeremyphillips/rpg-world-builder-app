@@ -16,6 +16,7 @@ import {
   applyOptionAvailabilityToFieldOptions,
   applyOptionAvailabilityToSelectOptions,
   resolveFieldHintPresentation,
+  resolveChipsFieldConfigOptions,
   resolveComboboxFieldConfig,
   resolveSelectFieldConfigOptions,
 } from '../field-config'
@@ -173,23 +174,23 @@ export function resolveFieldRenderConfig(
     }
   }
 
-  if (!optionAvailability) {
+  if (config.type === 'chips') {
+    let options = resolveChipsFieldConfigOptions(config, dynamicValues)
+    if (optionAvailability) {
+      options = applyOptionAvailabilityToFieldOptions(options, optionAvailability, optionValues)
+    }
     return {
-      config,
+      config: {
+        ...config,
+        options,
+      } as FieldConfig,
       ...basePresentation,
     }
   }
 
-  if (config.type === 'chips') {
+  if (!optionAvailability) {
     return {
-      config: {
-        ...config,
-        options: applyOptionAvailabilityToFieldOptions(
-          config.options,
-          optionAvailability,
-          optionValues,
-        ),
-      } as FieldConfig,
+      config,
       ...basePresentation,
     }
   }

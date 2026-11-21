@@ -35,6 +35,10 @@ Within one dimension (size, appearance), every modifier declares the **same** pr
 
 `cn()` registers twMerge groups (`ui-button-size`, `ui-button-appearance`, …) so React composition matches DevTools. `ui-button--text` is a family treatment and is not in `ui-button-size`, so it composes with icon-only sizes. Compound rules in `button.css` (`.ui-button--text.ui-button--icon-*`) keep the square hit target.
 
+### Button icon-only geometry
+
+Icon-only `Button` / `ActionButton` sizes (`icon-xs`, `icon-sm`, `icon`, `icon-lg`) publish equal `width` and `height` on `ui-button--icon-*` in `button.css`. **Size modifiers own the hit target.** Consumer `className` may use layout utilities (`shrink-0`, alignment, order) but must not override intrinsic `width` or `height` (for example `w-fit`, `w-auto`, `h-auto`, or arbitrary size utilities). Labeled buttons may use `width="fit"` on pickers; `ButtonDropdown` `triggerPresentation="addIcon"` reuses the icon-only square instead of labeled `w-fit` chrome.
+
 ## Inspector acceptance
 
 For each migrated primitive, verify in Storybook DevTools:
@@ -122,7 +126,7 @@ Overlay notification counts use `ui-notification-unread-badge` (not pill geometr
 
 ## FieldGroup section chrome
 
-`ui-field-rail` and `ui-field-rail-nest` own decorative pseudo-element rails. Neutral fills read `--ui-border-color` from `ui-border--default` or `ui-border--subtle` on the host (border width stays 0). Primary rails set `::before` to `var(--primary)`. The offset field rail uses inline-start gutter `calc(var(--spacing) * 2)`; the nest rail is flush inline-start at 1px. Rail `tone` is `neutral | primary` (color), not border strength.
+`ui-field-rail` owns the offset group stack rail. `ui-field-dependent-nest` owns the dependent nest shell, rhythm inset (`--compact` / `--comfortable`), host fill (`--host-field-container` / `--host-array-item`), alignment modifiers, and the flush inline-start 1px `::before` rail. Neutral fills read `--ui-border-color` from `ui-border--default` or `ui-border--subtle` on the host (border width stays 0). Primary group rails set `::before` to `var(--primary)`. The offset field rail uses inline-start gutter `calc(var(--spacing) * 2)`. Rail `tone` is `neutral | primary` (color), not border strength.
 
 `ui-field-group-chrome--rail-{compact|comfortable}` owns field-stack `padding-inline-start` beside a group rail. `ui-field-group-chrome--divider-{top|bottom}` owns fieldset separators (each modifier resets both edge widths and both paddings). Divider `strength` is `default | subtle` via `ui-border--*`. `ui-field-group-chrome--accent-top` owns a 2px fieldset top border; neutral top edges use `ui-border--default`. Legend emphasis uses `ui-field-group-chrome__legend-rail`; neutral legend rails use `ui-border--default` on the host and `--ui-border-color` on `::before`. Accent `tone` is `neutral | primary |` status hues. Panel, outline, and callout group chrome still delegate to shared `resolveChromeClasses` — not these blocks.
 
@@ -152,7 +156,7 @@ Overlay notification counts use `ui-notification-unread-badge` (not pill geometr
 
 ## Text roles
 
-`text-style-*` utilities are the Text role ladder and the field label, legend, hint, and error maps. Self-contained roles are one `@utility` each, same as `heading-style-*`. A role with a shared contract and modifiers uses BEM: `text-style-score` plus `text-style-score--{sm|md|lg}`, and `text-style-score--muted` for color. Size-setting roles share the `text-style` twMerge group and conflict with font size, weight, and leading. Color-only roles (`text-style-body`, `text-style-muted`, the status tones, and `text-style-score--muted`) share `text-style-color`, which conflicts with text color only. Score size modifiers are their own group so they compose with the base and replace one another. SemanticText is not a Text role: it owns emphasis weight, the icon slot, and the `--semantic-*` readability palette.
+`text-style-*` utilities are the Text role ladder and the field label, legend, hint, and error maps. Self-contained roles are one `@utility` each, same as `heading-style-*`. A role with a shared contract and modifiers uses BEM: `text-style-score` plus `text-style-score--{sm|md|lg}`, and `text-style-score--muted` for color; `text-style-option` plus `text-style-option--{sm|md}` for checkbox and radio group rows. Size-setting roles share the `text-style` twMerge group and conflict with font size, weight, and leading. Color-only roles (`text-style-body`, `text-style-muted`, the status tones, and `text-style-score--muted`) share `text-style-color`, which conflicts with text color only. Score and option size modifiers are their own groups so they compose with the base and replace one another. SemanticText is not a Text role: it owns emphasis weight, the icon slot, and the `--semantic-*` readability palette.
 
 ## Popover content
 

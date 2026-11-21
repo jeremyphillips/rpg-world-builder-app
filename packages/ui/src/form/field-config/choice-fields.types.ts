@@ -139,7 +139,9 @@ export interface ChipsFieldConfig extends BaseFieldConfig {
    * Does not replace the field legend / accessible name.
    */
   introText?: ReactNode
-  options: FieldOption[]
+  /** Static options — omit when `optionsResolve` supplies the list at render time. */
+  options?: FieldOption[]
+  optionsResolve?: FieldDynamicComboboxOptions
   /** Disables individual options when `enabledWhen` is false for the current values. */
   optionAvailability?: FieldOptionAvailability
   /**

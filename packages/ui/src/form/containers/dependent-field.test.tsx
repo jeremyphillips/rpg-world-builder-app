@@ -4,9 +4,11 @@ import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { z } from 'zod'
 
+import { DEPENDENT_NEST_HOST_CLASS } from '../../components/ui/field-dependent-alignment.constants'
 import {
-  dependentNestMarginClasses,
-  dependentSectionStackClasses,
+  DEPENDENT_NEST_ALIGN_FIELD_EDGE_CLASS,
+  DEPENDENT_NEST_ALIGN_INLINE_SWITCH_CLASS,
+  resolveDependentSectionStackClasses,
 } from '../../components/ui/field-dependent.variants'
 import { fieldStackRhythmVariants } from '../../components/ui/field.variants'
 import { Form } from '../shells/form.client'
@@ -101,7 +103,7 @@ describe('dependent field', () => {
 
     const dependent = container.querySelector('[data-field-dependent]')
     expect(dependent).toBeInTheDocument()
-    expect(dependent).toHaveClass(dependentSectionStackClasses)
+    expect(dependent).toHaveClass(resolveDependentSectionStackClasses('comfortable'))
 
     const fieldContainer = container.querySelector('.bg-field-container')
     const switchControl = screen.getByRole('switch', { name: 'Enable feature' })
@@ -112,8 +114,8 @@ describe('dependent field', () => {
 
     await waitFor(() => {
       const region = queryDependentsRegion(container)
-      expect(region).toHaveClass(dependentNestMarginClasses)
-      expect(region).toHaveClass('bg-background')
+      expect(region).toHaveClass(DEPENDENT_NEST_ALIGN_INLINE_SWITCH_CLASS)
+      expect(region).toHaveClass(DEPENDENT_NEST_HOST_CLASS['field-container'])
       expect(region).toHaveAttribute('data-field-dependent-nest', '')
       expect(region).not.toContainElement(switchControl)
       expect(region).toContainElement(screen.getByLabelText('Feature value'))
@@ -134,9 +136,9 @@ describe('dependent field', () => {
 
     await waitFor(() => {
       const shell = queryChromeShell(container)
-      expect(shell).toHaveClass('bg-background')
-      expect(shell).not.toHaveClass('border')
-      expect(queryDependentsRegion(container)).toHaveClass(dependentNestMarginClasses)
+      expect(shell).toHaveClass(DEPENDENT_NEST_HOST_CLASS['field-container'])
+      expect(shell).not.toHaveClass('rounded-md')
+      expect(queryDependentsRegion(container)).toHaveClass(DEPENDENT_NEST_ALIGN_INLINE_SWITCH_CLASS)
     })
   })
 
@@ -163,7 +165,7 @@ describe('dependent field', () => {
 
     await waitFor(() => {
       const region = queryDependentsRegion(container)
-      expect(region).toHaveClass(dependentNestMarginClasses)
+      expect(region).toHaveClass(DEPENDENT_NEST_ALIGN_INLINE_SWITCH_CLASS)
       expect(region).toHaveAttribute('data-field-dependent-nest', '')
       expect(region).toContainElement(screen.getByLabelText('Feature value'))
       expect(container.querySelectorAll('.bg-field-container')).toHaveLength(1)
@@ -185,7 +187,7 @@ describe('dependent field', () => {
       const shell = queryChromeShell(container)
       if (expectNest) {
         expect(shell).toHaveAttribute('data-field-dependent-nest', '')
-        expect(shell).toHaveClass(dependentNestMarginClasses)
+        expect(shell).toHaveClass(DEPENDENT_NEST_ALIGN_INLINE_SWITCH_CLASS)
       } else {
         expect(shell).toBeNull()
       }
@@ -201,8 +203,8 @@ describe('dependent field', () => {
     await waitFor(() => {
       const region = queryDependentsRegion(container)
       expect(region).toHaveAttribute('data-field-dependent-nest', '')
-      expect(region).toHaveClass(dependentNestMarginClasses)
-      expect(region).toHaveClass('ui-field-rail-nest')
+      expect(region).toHaveClass(DEPENDENT_NEST_ALIGN_INLINE_SWITCH_CLASS)
+      expect(region).toHaveClass('ui-field-dependent-nest')
       expect(region?.querySelector(':scope > [data-field-dependent-nest]')).toBeNull()
     })
   })
@@ -269,15 +271,15 @@ describe('dependent field', () => {
 
     const regions = container.querySelectorAll('[data-field-dependent-nest]')
     expect(regions).toHaveLength(2)
-    expect(regions[0]).toHaveClass(dependentNestMarginClasses)
-    expect(regions[1]).toHaveClass(dependentNestMarginClasses)
+    expect(regions[0]).toHaveClass(DEPENDENT_NEST_ALIGN_INLINE_SWITCH_CLASS)
+    expect(regions[1]).toHaveClass(DEPENDENT_NEST_ALIGN_FIELD_EDGE_CLASS)
     expect(container.querySelectorAll('.bg-field-container')).toHaveLength(1)
     const fieldContainer = container.querySelector('.bg-field-container')
     expect(fieldContainer).toContainElement(screen.getByRole('switch', { name: 'Allow' }))
     expect(fieldContainer).toContainElement(screen.getByLabelText('Categories'))
   })
 
-  it('uses 16px stack rhythm on the outer dependent wrapper', async () => {
+  it('uses comfortable parent-child stack rhythm on the outer dependent wrapper', async () => {
     const user = userEvent.setup()
     const { container } = renderDependentForm()
 
@@ -285,7 +287,7 @@ describe('dependent field', () => {
 
     await waitFor(() => {
       const dependent = container.querySelector('[data-field-dependent]')
-      expect(dependent).toHaveClass(dependentSectionStackClasses)
+      expect(dependent).toHaveClass(resolveDependentSectionStackClasses('comfortable'))
     })
   })
 
@@ -384,7 +386,7 @@ describe('dependent field', () => {
 
     await waitFor(() => {
       const nest = queryChromeShell(container)
-      expect(nest).toHaveClass('bg-background')
+      expect(nest).toHaveClass(DEPENDENT_NEST_HOST_CLASS['field-container'])
       expect(screen.getByRole('group', { name: /Item #1/ })).toBeInTheDocument()
     })
   })

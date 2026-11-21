@@ -28,8 +28,12 @@ import { PRIMARY_SPELLCASTING_PROFILE } from '../spell-casting-source'
 import {
   attackModes,
   attackOnHitDraftSchema,
+  multiattackAlternativeDraftSchema,
+  multiattackAlternativePublishedSchema,
   multiattackDraftStepSchema,
   multiattackPublishedStepSchema,
+  multiattackReplacementDraftSchema,
+  multiattackReplacementSchema,
   naturalWeaponPropertySchema,
   type MonsterActionMode,
 } from './shared-fragments'
@@ -56,6 +60,7 @@ export function multiattackStepsSchema<M extends MonsterActionMode>(mode: M) {
     : typeof published
 }
 
+// fallow-ignore-next-line complexity
 export function monsterActionFields<M extends MonsterActionMode>(mode: M) {
   const limitedUse = (
     mode === 'draft' ? limitedUseDraftSchema : limitedUseSchema
@@ -196,6 +201,14 @@ export function monsterActionFields<M extends MonsterActionMode>(mode: M) {
       kind: z.literal('multiattack'),
       name: z.string().min(1).optional(),
       steps: multiattackStepsSchema(mode),
+      replacement:
+        mode === 'draft'
+          ? multiattackReplacementDraftSchema.optional()
+          : multiattackReplacementSchema.optional(),
+      alternative:
+        mode === 'draft'
+          ? multiattackAlternativeDraftSchema.optional()
+          : multiattackAlternativePublishedSchema.optional(),
     }),
     z.object({
       ...transformIdentity,

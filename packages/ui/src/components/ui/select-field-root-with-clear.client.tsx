@@ -22,6 +22,10 @@ import {
 } from '../../form/field-config/field-options'
 import { SelectOptionItem } from './select-option-item.client'
 import { SelectOptionRowContent } from './select-option-row-content.client'
+import {
+  UI_FIELD_GROUP_INPUT_COLUMN_CLASS,
+  resolveFieldGroupActionSegmentClasses,
+} from './field-group.styles'
 
 function renderSelectOption(option: FieldOption) {
   return <SelectOptionItem key={option.value} option={option} />
@@ -105,7 +109,7 @@ export function SelectRootWithClear({
       sizingLabels={triggerConfig.sizingLabels}
       grouped={showClear}
       groupedPosition={showClear ? 'start' : undefined}
-      className={showClear ? 'min-w-0 w-full' : undefined}
+      className={showClear ? 'min-w-0 max-w-full' : undefined}
       onBlur={triggerConfig.onBlur}
     >
       <SelectValue placeholder={triggerConfig.placeholder}>
@@ -142,23 +146,25 @@ export function SelectRootWithClear({
   const clearLabel = clearAccessibleName ?? `Clear ${label}`
 
   return (
-    <JoinedPair.Root layout="stretch" className="w-full">
-      <div className="min-w-0">{select}</div>
+    <JoinedPair.Root layout="stretch" size={size} className="w-full">
+      <div className={UI_FIELD_GROUP_INPUT_COLUMN_CLASS}>{select}</div>
       <JoinedPair.Divider />
-      <FieldClearAffordanceButton
-        size={size}
-        accessibleName={clearLabel}
-        onClear={() => {
-          if (onClear) {
-            onClear()
-          } else {
-            onValueChange?.('')
-          }
-          requestAnimationFrame(() => {
-            triggerRef.current?.focus()
-          })
-        }}
-      />
+      <div className={resolveFieldGroupActionSegmentClasses(size)}>
+        <FieldClearAffordanceButton
+          size={size}
+          accessibleName={clearLabel}
+          onClear={() => {
+            if (onClear) {
+              onClear()
+            } else {
+              onValueChange?.('')
+            }
+            requestAnimationFrame(() => {
+              triggerRef.current?.focus()
+            })
+          }}
+        />
+      </div>
     </JoinedPair.Root>
   )
 }

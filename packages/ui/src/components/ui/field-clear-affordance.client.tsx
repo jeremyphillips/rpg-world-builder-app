@@ -35,7 +35,10 @@ export function FieldClearAffordanceButton({
         className,
       )}
       aria-label={accessibleName}
-      onClick={onClear}
+      onClick={(event) => {
+        event.stopPropagation()
+        onClear()
+      }}
     >
       <Icon name="x" size="md" />
     </button>

@@ -1,0 +1,16 @@
+/*
+ * Decorative forward-navigation chevron — cards, destination rows, list drill-in rows.
+ * Callers may add layout classes on the host; do not override width/height on the icon.
+ */
+@layer components {
+  .ui-nav-chevron {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    color: var(--muted-foreground);
+  }
+
+  .ui-nav-chevron .ui-icon {
+    opacity: 0.5;
+  }
+}
