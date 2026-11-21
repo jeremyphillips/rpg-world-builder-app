@@ -308,4 +308,27 @@ describe('monster publish validation messages', () => {
       }),
     ])
   })
+
+  it('shows legendary uses when legendaryActions.actions is non-empty', () => {
+    const actionsTab = buildMonsterTabs(ctx).find((tab) => tab.id === 'actions')
+    const group = actionsTab?.fields.find(
+      (field) =>
+        'visibility' in field &&
+        field.heading &&
+        'label' in field.heading &&
+        field.heading.label === 'Legendary Actions',
+    )
+    expect(group && 'visibility' in group ? group.visibility : undefined).toEqual(
+      expect.objectContaining({
+        dependsOn: ['legendaryActions.actions'],
+      }),
+    )
+    const visibleWhen =
+      group && 'visibility' in group && group.visibility ? group.visibility.visibleWhen : undefined
+    expect(visibleWhen).toBeTypeOf('function')
+    if (!visibleWhen) return
+    expect(visibleWhen({ 'legendaryActions.actions': [{ id: 'wing' }] })).toBe(true)
+    expect(visibleWhen({ 'legendaryActions.actions': [] })).toBe(false)
+    expect(visibleWhen({ legendaryActions: { actions: [{ id: 'wing' }] } })).toBe(false)
+  })
 })

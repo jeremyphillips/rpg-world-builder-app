@@ -173,8 +173,8 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       visibility: {
         dependsOn: ['legendaryActions.actions'],
         visibleWhen: (values) => {
-          const block = values.legendaryActions as MonsterFormValues['legendaryActions']
-          return (block?.actions?.length ?? 0) > 0
+          const actions = values['legendaryActions.actions']
+          return Array.isArray(actions) && actions.length > 0
         },
       },
       fields: [
