@@ -60,12 +60,12 @@ describe('monsterTraitDetailFields', () => {
     const names = traitNames({
       id: 'legend',
       templateId: 'legendary-resistance',
-      config: { uses: 3 },
+      config: { uses: { normal: 3 } },
     })
     expect(names[0]).toBe('traitPreview')
-    expect(names).toContain('config.uses')
+    expect(names).toContain('config.uses.normal')
     expect(names.at(-1)).toBe('descriptionOverride')
-    expect(names.indexOf('config.uses')).toBeLessThan(names.indexOf('descriptionOverride'))
+    expect(names.indexOf('config.uses.normal')).toBeLessThan(names.indexOf('descriptionOverride'))
   })
 
   it('puts a fixed preset preview before the advisory and adds no body fields', () => {

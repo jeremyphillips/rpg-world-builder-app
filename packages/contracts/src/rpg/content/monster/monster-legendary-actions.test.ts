@@ -11,12 +11,10 @@ import { BITE_ACTION, MONSTER_TEST_INPUT, issueMessages } from './test-fixtures'
 
 function legendaryBlock(
   actions: unknown[],
-  uses?: number,
-  usesInLair?: number,
-): { uses?: number; usesInLair?: number; actions: unknown[] } {
+  uses?: { normal?: number; inLair?: number },
+): { uses?: { normal?: number; inLair?: number }; actions: unknown[] } {
   return {
     ...(uses !== undefined ? { uses } : {}),
-    ...(usesInLair !== undefined ? { usesInLair } : {}),
     actions,
   }
 }
@@ -85,7 +83,7 @@ describe('legendary actions', () => {
       ),
     ).toEqual(
       expect.arrayContaining([
-        expect.stringMatching(/Enter legendary action uses|expected number/),
+        expect.stringMatching(/Enter legendary action uses|expected object/),
       ]),
     )
 
@@ -93,30 +91,10 @@ describe('legendary actions', () => {
       issueMessages(
         createMonsterInputSchema.safeParse({
           ...MONSTER_TEST_INPUT,
-          legendaryActions: legendaryBlock([], 3),
+          legendaryActions: legendaryBlock([], { normal: 3 }),
         }),
       ),
     ).toContain('Legendary action uses require a legendary action.')
-
-    expect(
-      issueMessages(
-        createMonsterInputSchema.safeParse({
-          ...MONSTER_TEST_INPUT,
-          legendaryActions: legendaryBlock(
-            [
-              {
-                id: 'note',
-                kind: 'special',
-                name: 'Deathly Teleport',
-                description: '<p>The lich teleports.</p>',
-              },
-            ],
-            3,
-            3,
-          ),
-        }),
-      ),
-    ).toContain('In-lair uses must be greater than legendary action uses.')
 
     expect(
       createMonsterInputSchema.safeParse({
@@ -129,8 +107,7 @@ describe('legendary actions', () => {
               movement: { allowance: 'half-speed' },
             },
           ],
-          3,
-          4,
+          { normal: 3, inLair: 4 },
         ),
       }).success,
     ).toBe(true)
@@ -141,7 +118,7 @@ describe('legendary actions', () => {
       createMonsterInputSchema.safeParse({
         ...MONSTER_TEST_INPUT,
         actions: [spellcastingAction],
-        legendaryActions: legendaryBlock([legendarySpell('srd-cc-5.2.1:fear')], 3),
+        legendaryActions: legendaryBlock([legendarySpell('srd-cc-5.2.1:fear')], { normal: 3 }),
       }).success,
     ).toBe(true)
 
@@ -160,7 +137,7 @@ describe('legendary actions', () => {
                 ],
               },
             ],
-            3,
+            { normal: 3 },
           ),
         }),
       ),
@@ -187,7 +164,7 @@ describe('legendary actions', () => {
         actions: [spellcastingAction],
         legendaryActions: legendaryBlock(
           [legendarySpell('srd-cc-5.2.1:scorching-ray', 3, 'use-entry')],
-          3,
+          { normal: 3 },
         ),
       }).success,
     ).toBe(true)
@@ -198,7 +175,7 @@ describe('legendary actions', () => {
         actions: [spellcastingAction],
         legendaryActions: legendaryBlock(
           [legendarySpell('srd-cc-5.2.1:scorching-ray', undefined, 'use-entry')],
-          3,
+          { normal: 3 },
         ),
       }).success,
     ).toBe(true)
@@ -210,7 +187,7 @@ describe('legendary actions', () => {
           actions: [spellcastingAction],
           legendaryActions: legendaryBlock(
             [legendarySpell('srd-cc-5.2.1:fear', undefined, 'use-entry')],
-            3,
+            { normal: 3 },
           ),
         }),
       ),
@@ -223,7 +200,7 @@ describe('legendary actions', () => {
           actions: [spellcastingAction],
           legendaryActions: legendaryBlock(
             [legendarySpell('srd-cc-5.2.1:scorching-ray', 2, 'use-entry')],
-            3,
+            { normal: 3 },
           ),
         }),
       ),
@@ -235,7 +212,7 @@ describe('legendary actions', () => {
           ...MONSTER_TEST_INPUT,
           legendaryActions: legendaryBlock(
             [legendarySpell('srd-cc-5.2.1:scorching-ray', 3, 'use-entry')],
-            3,
+            { normal: 3 },
           ),
         }),
       ),
@@ -257,7 +234,7 @@ describe('legendary actions', () => {
                 spells: [{ spellId: 'srd-cc-5.2.1:scorching-ray' }],
               },
             ],
-            3,
+            { normal: 3 },
           ),
         }),
       ),
@@ -288,7 +265,7 @@ describe('legendary actions', () => {
                 spells: [{ spellId: 'srd-cc-5.2.1:suggestion' }],
               },
             ],
-            3,
+            { normal: 3 },
           ),
         }),
       ),
@@ -310,7 +287,7 @@ describe('legendary actions', () => {
                 description: '<p>The creature bites.</p>',
               },
             ],
-            3,
+            { normal: 3 },
           ),
         }),
       ),

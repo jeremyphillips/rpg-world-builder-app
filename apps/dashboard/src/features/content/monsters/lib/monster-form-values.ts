@@ -100,9 +100,9 @@ export type MonsterFormValues = FieldValues & {
   actions: MonsterActionDraft[]
   bonusActions: MonsterBonusActionDraft[]
   reactions: MonsterReactionDraft[]
+  lair?: Monster['lair']
   legendaryActions?: {
-    uses?: number
-    usesInLair?: number
+    uses?: { normal?: number; inLair?: number }
     actions: MonsterLegendaryActionDraft[]
   }
   [MONSTER_HIT_POINTS_USE_FIXED_FIELD]?: boolean
@@ -203,10 +203,7 @@ function legendaryActionFormValues(entity: Monster) {
   if (!entity.legendaryActions) return {}
   return {
     legendaryActions: {
-      uses: entity.legendaryActions.uses,
-      ...(entity.legendaryActions.usesInLair !== undefined
-        ? { usesInLair: entity.legendaryActions.usesInLair }
-        : {}),
+      ...(entity.legendaryActions.uses !== undefined ? { uses: entity.legendaryActions.uses } : {}),
       actions: hydrateOnHitInActionList(
         entity.legendaryActions.actions
           .map(mapWeaponActionDamageToForm)

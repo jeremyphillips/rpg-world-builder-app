@@ -569,8 +569,13 @@ function normalizedLegendaryBlock(
   )
   if (actions.length === 0) return undefined
   const normalized: Record<string, unknown> = { actions }
-  if (typeof block?.uses === 'number') normalized.uses = block.uses
-  if (typeof block?.usesInLair === 'number') normalized.usesInLair = block.usesInLair
+  const uses = block?.uses
+  if (uses && typeof uses === 'object') {
+    const count: Record<string, number> = {}
+    if (typeof uses.normal === 'number') count.normal = uses.normal
+    if (typeof uses.inLair === 'number') count.inLair = uses.inLair
+    if (Object.keys(count).length > 0) normalized.uses = count
+  }
   return normalized
 }
 

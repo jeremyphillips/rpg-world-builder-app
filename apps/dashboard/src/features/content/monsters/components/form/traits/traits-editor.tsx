@@ -69,8 +69,8 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
   )
 
   const traitRowTitle = useMemo(
-    () => resolveMonsterTraitRowTitleConfig(monsterName ?? ''),
-    [monsterName],
+    () => resolveMonsterTraitRowTitleConfig(monsterName ?? '', values?.lair?.enabled === true),
+    [monsterName, values?.lair?.enabled],
   )
 
   const resolveItemFields = useCallback(

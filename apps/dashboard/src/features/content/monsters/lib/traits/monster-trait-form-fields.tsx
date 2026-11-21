@@ -25,6 +25,8 @@ import {
   type OutsideWaterBreathDurationFields,
 } from '@/features/content/lib/creature-traits/outside-water-breath.lib'
 
+import { legendaryResistanceTemplateUseFields } from '@/features/content/lib/creature-traits/legendary-resistance-trait-fields'
+
 import { monsterTraitPresetFields } from './monster-trait-preset-fields'
 
 function visibleForCustomTrait(): FieldVisibility {
@@ -69,20 +71,34 @@ export function monsterTraitItemFields(input?: {
 }
 
 /** Config and optional display overrides for a monster `kind: 'template'` row. */
+const legendaryResistanceTemplateVisibility = {
+  dependsOn: ['templateId'],
+  visibleWhen: (watched: Record<string, unknown>) =>
+    watched['templateId'] === 'legendary-resistance',
+}
+
+function withLegendaryResistanceTemplateVisibility(field: FormItem): FormItem {
+  if (field.visibility === undefined) {
+    return { ...field, visibility: legendaryResistanceTemplateVisibility }
+  }
+  const prior = field.visibility
+  return {
+    ...field,
+    visibility: {
+      dependsOn: [
+        ...new Set([...prior.dependsOn, ...legendaryResistanceTemplateVisibility.dependsOn]),
+      ],
+      visibleWhen: (watched: Record<string, unknown>) =>
+        prior.visibleWhen(watched) && legendaryResistanceTemplateVisibility.visibleWhen(watched),
+    },
+  }
+}
+
 export function monsterTraitTemplateFields(): FormItem[] {
   return [
-    {
-      type: 'number',
-      name: 'config.uses',
-      label: 'Uses',
-      min: 1,
-      required: true,
-      hint: 'Printed on the trait name as N/Day after a long rest.',
-      visibility: {
-        dependsOn: ['templateId'],
-        visibleWhen: (watched) => watched['templateId'] === 'legendary-resistance',
-      },
-    },
+    ...legendaryResistanceTemplateUseFields({ includeInLair: true }).map(
+      withLegendaryResistanceTemplateVisibility,
+    ),
     {
       type: 'richtext',
       name: 'descriptionOverride',

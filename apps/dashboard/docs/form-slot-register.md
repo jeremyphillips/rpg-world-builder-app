@@ -174,6 +174,10 @@ field-array updates. Consequence copy stays as written.
 
 ## Value-mapping exception
 
+`lair` (Statistics → Lair group) is a slot: the switch, optional in-lair XP
+method (suggested vs custom), and add/remove controls map onto `lair.enabled`
+and `lair.experience` without writing defaults on mount.
+
 `_challengeRatingZeroXp` stays a slot. It is a checkbox for challenge rating
 `0`, and it maps that checkbox onto `experiencePointsOverride`. It is not a
 boolean field, and it is not a shared checkbox mapping. The select owns

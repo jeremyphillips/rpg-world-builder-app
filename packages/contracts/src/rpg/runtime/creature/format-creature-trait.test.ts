@@ -198,21 +198,6 @@ describe('formatCreatureTrait', () => {
     expect(
       formatCreatureTrait({
         subject,
-        trait: { preset: 'legendary-resistance', uses: 3, lair: false },
-      }),
-    ).toEqual({
-      name: 'Legendary Resistance (3/Day)',
-      sentence: 'If the hell hound fails a saving throw, it can choose to succeed instead.',
-    })
-    expect(
-      formatCreatureTrait({
-        subject,
-        trait: { preset: 'legendary-resistance', uses: 4, lair: true },
-      })?.name,
-    ).toBe('Legendary Resistance (4/Day, or 5/Day in Lair)')
-    expect(
-      formatCreatureTrait({
-        subject,
         trait: { preset: 'hold-breath', count: 60, unit: 'minute' },
       })?.sentence,
     ).toBe('The hell hound can hold its breath for 1 hour.')

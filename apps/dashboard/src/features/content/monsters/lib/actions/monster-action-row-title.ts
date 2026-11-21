@@ -1,4 +1,5 @@
 import {
+  getMonsterActionKindLabel,
   isPrimarySpellcastingAction,
   monsterActionAuthoring,
   MONSTER_SPELLCASTING_ACTION_NAME,
@@ -10,7 +11,10 @@ import type {
   MasterDetailRowTitleStrategy,
 } from '../../../lib/master-detail/master-detail-row-title'
 import { masterDetailItemTitle } from '../../../lib/master-detail/master-detail-constants'
-import { MONSTER_USE_DEFAULT_NAME_LABEL } from '../monster-form-labels'
+import {
+  MONSTER_MULTIATTACK_USE_LABEL,
+  MONSTER_USE_DEFAULT_NAME_LABEL,
+} from '../monster-form-labels'
 import type { MonsterFormValues } from '../monster-form-values'
 import { monsterActionEditorTitles } from './monster-action-editor-title'
 import type { MonsterActionDraftRow } from './monster-action-presets'
@@ -35,6 +39,23 @@ export function resolveMonsterActionRowTitleStrategy(input: {
     return {
       strategy: 'readonly',
       resolveTitle: () => MONSTER_SPELLCASTING_ACTION_NAME,
+    }
+  }
+
+  if (input.action.kind === 'multiattack') {
+    const canonical = getMonsterActionKindLabel('multiattack')
+    const stored = input.action.name?.trim()
+    if (stored && stored !== canonical) {
+      return {
+        strategy: 'override',
+        field: 'name',
+        resolveDerived: () => canonical,
+        resetLabel: MONSTER_MULTIATTACK_USE_LABEL,
+      }
+    }
+    return {
+      strategy: 'readonly',
+      resolveTitle: () => canonical,
     }
   }
 

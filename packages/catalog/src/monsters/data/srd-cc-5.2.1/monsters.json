@@ -952,6 +952,12 @@
       }
     ],
     "challengeRating": "21",
+    "lair": {
+      "enabled": true,
+      "experience": {
+        "mode": "suggested"
+      }
+    },
     "proficiencies": {
       "savingThrows": ["dex", "con", "int", "wis"],
       "skills": [
@@ -988,10 +994,11 @@
         "id": "legendary-resistance",
         "templateId": "legendary-resistance",
         "config": {
-          "uses": 4
-        },
-        "nameOverride": "Legendary Resistance (4/Day, or 5/Day in Lair)",
-        "descriptionOverride": "<p>If the lich fails a saving throw, it can choose to succeed instead.</p>"
+          "uses": {
+            "normal": 4,
+            "inLair": 5
+          }
+        }
       },
       {
         "kind": "custom",

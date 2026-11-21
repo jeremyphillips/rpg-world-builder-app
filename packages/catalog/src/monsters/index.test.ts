@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest'
 import {
   CHALLENGE_RATING_MECHANICS,
   deriveMonsterStatBlock,
+  formatCrStatRow,
   formatMonsterAttackAction,
+  resolveMonsterInLairExperiencePoints,
   formatMonsterMultiattack,
   formatMonsterParryResponse,
   formatMonsterParryTrigger,
@@ -285,6 +287,20 @@ describe('SRD 5.2.1 monster seed', () => {
         armorClassRules: systemDefaultArmorClassRules(),
         magicPropertyProvider: () => undefined,
       })
+      expect(lich?.lair?.enabled).toBe(true)
+      const lichXp = CHALLENGE_RATING_MECHANICS[lich.challengeRating].xp
+      const lichInLairXp = resolveMonsterInLairExperiencePoints({
+        challengeRating: lich.challengeRating,
+        lair: lich.lair!,
+      })
+      expect(
+        formatCrStatRow({
+          challengeRating: lich.challengeRating,
+          experiencePoints: lichXp,
+          proficiencyBonus: CHALLENGE_RATING_MECHANICS[lich.challengeRating].proficiencyBonus,
+          inLairExperiencePoints: lichInLairXp,
+        }),
+      ).toBe('21 (XP 33,000, or 41,000 in lair; PB +7)')
       expect(lichBlock.hp).toBe(315)
       expect(lichBlock.ac).toEqual(
         expect.objectContaining({

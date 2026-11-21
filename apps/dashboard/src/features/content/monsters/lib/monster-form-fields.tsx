@@ -3,6 +3,7 @@ import {
   CHALLENGE_RATING_IDS,
   CHALLENGE_RATING_MECHANICS,
   CREATURE_TYPE_TERM,
+  formatMonsterChallengeMetadata,
   getChallengeRatingLabel,
 } from '@rpg/contracts'
 import { toOptions, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
@@ -29,12 +30,16 @@ import { monsterArmorClassFields } from './statistics/monster-armor-class-fields
 import { monsterHitPointsFields } from './statistics/monster-hit-points-form-fields'
 import {
   MONSTER_CHALLENGE_HEADING,
+  MONSTER_CHALLENGE_SECTION_HEADING,
+  MONSTER_CHALLENGE_SECTION_HINT,
   MONSTER_FORM_NAME_LABEL,
   MONSTER_LEGENDARY_ACTIONS_HEADING,
+  MONSTER_LEGENDARY_LAIR_USES_HINT,
   MONSTER_LEGENDARY_LAIR_USES_LABEL,
   MONSTER_LEGENDARY_USES_LABEL,
   monsterEquipmentSectionLabel,
 } from './monster-form-labels'
+import { monsterLairFormFields } from './statistics/monster-lair-form-fields'
 import type { MonsterFormValues } from './monster-form-values'
 import { monsterClassificationFields } from './monster-classification-fields'
 import { MONSTER_FORM_TAB } from './monster-form-view'
@@ -58,10 +63,27 @@ const challengeRatingOptions = [...CHALLENGE_RATING_IDS]
     (left, right) =>
       CHALLENGE_RATING_MECHANICS[left].value - CHALLENGE_RATING_MECHANICS[right].value,
   )
-  .map((id) => ({
-    value: id,
-    label: getChallengeRatingLabel(id),
-  }))
+  .map((id) => {
+    const mechanics = CHALLENGE_RATING_MECHANICS[id]
+    return {
+      value: id,
+      label: getChallengeRatingLabel(id),
+      trailing: {
+        text: formatMonsterChallengeMetadata({
+          experiencePoints: mechanics.xp,
+          proficiencyBonus: mechanics.proficiencyBonus,
+        }),
+        variant: 'quiet' as const,
+      },
+      trailingScope: 'item' as const,
+    }
+  })
+
+const lairEnabledVisibility = {
+  dependsOn: ['lair.enabled'],
+  visibleWhen: (values: Record<string, unknown>) =>
+    (values.lair as { enabled?: boolean } | undefined)?.enabled === true,
+}
 
 function creatureTypeOptions(ctx: ContentFormCtx) {
   const vocabulary = ctx.creatureTypeVocabulary
@@ -111,13 +133,9 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
   ]
 
   const statistics: FormItem[] = [
-    { kind: 'slot', name: 'abilityScores', render: () => <AbilityScoresSlot ctx={ctx} /> },
-    ...monsterArmorClassFields(ctx),
-    ...monsterHitPointsFields(),
-    movementWithHoverGroup(),
     {
       kind: 'group',
-      heading: { label: MONSTER_CHALLENGE_HEADING },
+      heading: { label: MONSTER_CHALLENGE_SECTION_HEADING, hint: MONSTER_CHALLENGE_SECTION_HINT },
       fields: [
         {
           type: 'select',
@@ -135,6 +153,11 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
         ownedSlot('experiencePointsOverride'),
       ],
     },
+    ...monsterLairFormFields(),
+    { kind: 'slot', name: 'abilityScores', render: () => <AbilityScoresSlot ctx={ctx} /> },
+    ...monsterArmorClassFields(ctx),
+    ...monsterHitPointsFields(),
+    movementWithHoverGroup(),
     ownedSlot('proficiencies.savingThrows'),
   ]
 
@@ -183,19 +206,25 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
           fields: [
             {
               type: 'number',
-              name: 'legendaryActions.uses',
+              name: 'legendaryActions.uses.normal',
               label: MONSTER_LEGENDARY_USES_LABEL,
               min: 1,
               digits: 2,
               width: 'auto',
+              control: 'stepper',
+              shouldUnregister: false,
             },
             {
               type: 'number',
-              name: 'legendaryActions.usesInLair',
+              name: 'legendaryActions.uses.inLair',
               label: MONSTER_LEGENDARY_LAIR_USES_LABEL,
+              hint: MONSTER_LEGENDARY_LAIR_USES_HINT,
               min: 1,
               digits: 2,
               width: 'auto',
+              control: 'stepper',
+              shouldUnregister: false,
+              visibility: lairEnabledVisibility,
             },
           ],
         },

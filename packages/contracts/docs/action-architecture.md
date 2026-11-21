@@ -47,8 +47,8 @@ creature can see. `take-actions` stores Dash, Disengage, and Hide. One action
 prints that action. Two or more also store whether the creature chooses one or
 uses each. A missing choice prints nothing. None of the three kinds is an
 encounter movement or action resolver. Legendary actions spend one use from
-`legendaryActions.uses`. An optional `legendaryActions.usesInLair` is printed only when it is
-greater than that pool. There is no per-option cost.
+`legendaryActions.uses.normal`. An optional `legendaryActions.uses.inLair` is printed in the
+intro when `lair.enabled` is true and the in-lair total is set. There is no per-option cost.
 `shape-shift` is one row across Actions and Bonus Actions. It has no `onlyInFormIds` and is not a Multiattack, legendary, or reaction target. Its description is generated from centrally resolved transformation destinations. See [creature-forms.md](./creature-forms.md).
 `onceUntilNextTurn` prints one restriction sentence and is not `limitedUse`.
 `spellInvocation: 'use-entry'` is stored only on a legendary spell row and

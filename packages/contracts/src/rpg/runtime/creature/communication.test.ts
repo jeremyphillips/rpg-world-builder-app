@@ -1,8 +1,15 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatCreatureCommunication } from './communication'
+import { formatCreatureCommunication, formatExperiencePoints } from './communication'
 
 const formatLanguageLabel = (id: string) => id
+
+describe('formatExperiencePoints', () => {
+  it('groups thousands in the XP amount', () => {
+    expect(formatExperiencePoints(25_000)).toBe('XP 25,000')
+    expect(formatExperiencePoints(700)).toBe('XP 700')
+  })
+})
 
 describe('formatCreatureCommunication', () => {
   it('returns undefined when empty', () => {

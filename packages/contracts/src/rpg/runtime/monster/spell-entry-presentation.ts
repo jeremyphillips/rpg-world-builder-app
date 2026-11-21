@@ -183,13 +183,15 @@ function castingSentence(args: {
 
 export function formatLegendaryActionUsesIntro(args: {
   monsterName: string
-  uses: number
-  usesInLair?: number
+  uses: { normal: number; inLair?: number }
+  lairEnabled?: boolean
 }): string {
   const subject = formatMonsterStatBlockSubject(args.monsterName)
   const capitalSubject = subject.charAt(0).toUpperCase() + subject.slice(1)
-  const pool =
-    args.usesInLair === undefined ? String(args.uses) : `${args.uses} (${args.usesInLair} in Lair)`
+  const showInLair = args.lairEnabled === true && args.uses.inLair !== undefined
+  const pool = showInLair
+    ? `${args.uses.normal} (${args.uses.inLair} in Lair)`
+    : String(args.uses.normal)
   return `Legendary Action Uses: ${pool}. Immediately after another creature's turn, ${subject} can expend a use to take one of the following actions. ${capitalSubject} regains all expended uses at the start of each of its turns.`
 }
 

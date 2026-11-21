@@ -113,14 +113,6 @@ function refineDuration(
   }
 }
 
-const legendaryResistanceSchema = z.object({
-  ...idField,
-  preset: z.literal('legendary-resistance'),
-  uses: usesField,
-  lair: z.boolean().default(false),
-  ...entryProvenanceField,
-})
-
 const holdBreathSchema = z
   .object({
     ...idField,
@@ -244,7 +236,6 @@ const waterBreathingSchema = z
 
 const monsterPresetTraitUnionSchema = z.union([
   fixedPresetSchema,
-  legendaryResistanceSchema,
   holdBreathSchema,
   illuminationSchema,
   standingLeapSchema,
@@ -266,14 +257,6 @@ export const monsterPresetTraitSchema = z.preprocess(
   normalizePresetTraitInput,
   monsterPresetTraitUnionSchema,
 )
-
-const legendaryResistanceDraftSchema = z.object({
-  ...idField,
-  preset: z.literal('legendary-resistance'),
-  uses: usesField.optional(),
-  lair: z.boolean().optional(),
-  ...entryProvenanceField,
-})
 
 const holdBreathDraftSchema = z.object({
   ...idField,
@@ -374,7 +357,6 @@ const waterBreathingDraftSchema = z.object({
 
 export const monsterPresetTraitDraftSchema = z.union([
   fixedPresetSchema,
-  legendaryResistanceDraftSchema,
   holdBreathDraftSchema,
   illuminationDraftSchema,
   standingLeapDraftSchema,

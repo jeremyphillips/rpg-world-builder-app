@@ -58,20 +58,6 @@ export function monsterTraitPresetFields(
   ctx: Pick<ContentFormCtx, 'damageTypeVocabulary'> = {},
 ): FormItem[] {
   switch (preset) {
-    case 'legendary-resistance':
-      return [
-        distanceJoinedPairField({
-          amountName: 'uses',
-          label: 'Uses',
-          presets: LEGENDARY_RESISTANCE_USES,
-          fixedUnitLabel: '/Day',
-          allowCustom: true,
-          customMin: 1,
-          customMax: 12,
-          digits: 2,
-        }),
-        { type: 'switch', name: 'lair', label: 'In lair' },
-      ]
     case 'hold-breath':
       return [durationPair('count')]
     case 'illumination':
@@ -254,8 +240,6 @@ function waveTwoTraitFields(preset: string): FormItem[] {
 
 export function monsterTraitPresetDefaults(preset: string): Record<string, unknown> {
   switch (preset) {
-    case 'legendary-resistance':
-      return { uses: 3, lair: false }
     case 'hold-breath':
       return { count: 1, unit: 'hour' }
     case 'illumination':

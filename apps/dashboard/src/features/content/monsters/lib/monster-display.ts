@@ -13,8 +13,10 @@ import {
   joinInlineMetadata,
   formatMovementDisplay,
   formatCreatureCommunication,
+  formatCrStatRow as formatMonsterCrStatRow,
   formatExperiencePoints,
   formatProficiencyBonus,
+  resolveMonsterInLairExperiencePoints,
   formatPassivePerceptionStatPhrase,
   formatStatBlockRollExpression,
   type Equipment,
@@ -234,11 +236,22 @@ function formatSpeedStatRow(monster: Monster): ContentStatRowData {
 }
 
 function formatCrStatRow(monster: Monster, derived: DerivedMonsterStatBlock): ContentStatRowData {
-  const reward = `${formatExperiencePoints(derived.experiencePoints)}; ${formatProficiencyBonus(derived.proficiencyBonus)}`
+  const inLairXp =
+    monster.lair?.enabled === true && monster.lair.experience
+      ? resolveMonsterInLairExperiencePoints({
+          challengeRating: monster.challengeRating,
+          lair: monster.lair,
+        })
+      : undefined
   return {
     id: 'cr',
     label: 'CR',
-    value: `${monster.challengeRating} (${reward})`,
+    value: formatMonsterCrStatRow({
+      challengeRating: monster.challengeRating,
+      experiencePoints: derived.experiencePoints,
+      proficiencyBonus: derived.proficiencyBonus,
+      inLairExperiencePoints: inLairXp,
+    }),
   }
 }
 
@@ -1177,14 +1190,14 @@ function formatLegendaryActionsIntro(monster: Monster): string | undefined {
   if (
     availableBodyRows(monsterActionSectionRows<MonsterLegendaryAction>(monster, 'legendaryActions'))
       .length === 0 ||
-    block?.uses === undefined
+    block?.uses?.normal === undefined
   ) {
     return undefined
   }
   return formatLegendaryActionUsesIntro({
     monsterName: monster.name,
     uses: block.uses,
-    usesInLair: block.usesInLair,
+    lairEnabled: monster.lair?.enabled === true,
   })
 }
 

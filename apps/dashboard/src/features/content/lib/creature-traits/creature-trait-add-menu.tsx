@@ -11,7 +11,7 @@ const CUSTOM_GROUP_ID = 'custom'
 const CUSTOM_ITEM_ID = 'custom'
 
 export function creatureTraitTemplateRow(templateId: string, id: string): Record<string, unknown> {
-  const config = templateId === 'legendary-resistance' ? { uses: 3 } : undefined
+  const config = templateId === 'legendary-resistance' ? { uses: { normal: 3 } } : undefined
   return {
     id,
     kind: 'template',

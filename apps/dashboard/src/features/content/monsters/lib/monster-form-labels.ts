@@ -62,7 +62,38 @@ export const MONSTER_BODY_ARMOR_SLOT_HEADING = getCreatureArmorClassKindLabel('a
 export const MONSTER_SHIELD_SLOT_HEADING = getArmorCategoryLabel('shields')
 
 export const MONSTER_HIT_POINTS_HEADING = vocabularyFieldLabel(HIT_POINTS_TERM, { plural: true })
+export const MONSTER_CHALLENGE_SECTION_HEADING = 'Challenge'
+export const MONSTER_CHALLENGE_SECTION_HINT =
+  "A monster's Challenge Rating represents its intended challenge and determines its XP and proficiency bonus."
 export const MONSTER_CHALLENGE_HEADING = vocabularyFieldLabel(CHALLENGE_RATING_TERM)
+export const MONSTER_LAIR_SECTION_HINT =
+  'Configure benefits the creature gains when encountered in its lair.'
+export const MONSTER_HAS_LAIR_ENHANCEMENTS_LABEL = 'Has lair enhancements'
+export const MONSTER_HAS_LAIR_ENHANCEMENTS_HINT =
+  'Enables optional in-lair XP and use-count overrides. These apply only when the creature is in its lair.'
+export const MONSTER_ADD_IN_LAIR_XP_LABEL = 'Add in-lair XP'
+export const MONSTER_LAIR_EXPERIENCE_ADD_HINT = 'Leave unset to use the normal XP award.'
+export const MONSTER_LAIR_XP_GROUP_HEADING = 'XP in lair'
+export const MONSTER_LAIR_GROUP_HINT = ''
+export const MONSTER_LAIR_EXPERIENCE_MODE_LABEL = 'XP method'
+export const MONSTER_LAIR_EXPERIENCE_MODE_SUGGESTED = 'Suggested'
+export const MONSTER_LAIR_EXPERIENCE_MODE_CUSTOM = 'Custom'
+export const MONSTER_LAIR_EXPERIENCE_SUGGESTED_CAPTION =
+  'Based on the XP for the next Challenge Rating.'
+export const MONSTER_LAIR_EXPERIENCE_CUSTOM_LABEL = 'XP amount'
+export const MONSTER_LAIR_EXPERIENCE_CUSTOM_HINT_PREFIX = 'Suggested: '
+export const MONSTER_LAIR_EXPERIENCE_REMOVE_LABEL = 'Remove in-lair XP'
+export const MONSTER_LAIR_EXPERIENCE_UNAVAILABLE =
+  'No suggested in-lair XP is available at this CR.'
+export const MONSTER_LAIR_EXPERIENCE_UNAVAILABLE_STORED =
+  'No suggested in-lair XP is available at this CR. Enter a custom amount or remove in-lair XP.'
+export const MONSTER_LEGENDARY_LAIR_USES_HINT =
+  "Total uses while in the creature's lair. Leave empty to use the normal count."
+export const MONSTER_LEGENDARY_RESISTANCE_USES_HINT = 'Uses per day. Recovered after a long rest.'
+export const MONSTER_LEGENDARY_RESISTANCE_LAIR_USES_HINT =
+  "Total daily uses while in the creature's lair."
+export const MONSTER_MULTIATTACK_USE_LABEL = 'Use Multiattack'
+export { LEGENDARY_RESISTANCE_CLEAR_NAME_CONTROL_LABEL as MONSTER_CLEAR_LEGENDARY_RESISTANCE_NAME_LABEL } from '@rpg/contracts'
 export const MONSTER_SAVE_LABEL = SAVING_THROW_SHORT_LABEL
 export const MONSTER_SAVE_PROF_LABEL = 'Save prof.'
 

@@ -22,6 +22,7 @@ const TAB_BY_PREFIX: Record<string, string> = {
   hover: MONSTER_FORM_TAB.statistics,
   challengeRating: MONSTER_FORM_TAB.statistics,
   experiencePointsOverride: MONSTER_FORM_TAB.statistics,
+  lair: MONSTER_FORM_TAB.statistics,
   proficiencies: MONSTER_FORM_TAB.creatureDetails,
   senses: MONSTER_FORM_TAB.creatureDetails,
   communication: MONSTER_FORM_TAB.creatureDetails,
@@ -34,7 +35,8 @@ const TAB_BY_PREFIX: Record<string, string> = {
   reactions: MONSTER_FORM_TAB.actions,
   legendaryActions: MONSTER_FORM_TAB.actions,
   'legendaryActions.uses': MONSTER_FORM_TAB.actions,
-  'legendaryActions.usesInLair': MONSTER_FORM_TAB.actions,
+  'legendaryActions.uses.normal': MONSTER_FORM_TAB.actions,
+  'legendaryActions.uses.inLair': MONSTER_FORM_TAB.actions,
 }
 
 /** Maps a body issue path to a monster form tab. Saving throws stay on Statistics. */

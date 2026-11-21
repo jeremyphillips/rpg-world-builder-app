@@ -55,21 +55,6 @@ function presetLabel(preset: string, fallback: string): string {
   return getCreatureTraitVocabularyEntry(preset)?.label ?? fallback
 }
 
-function formatLegendaryResistance(
-  subject: string,
-  trait: CreatureTraitFormatRow,
-): FormattedTrait | undefined {
-  if (!isPositiveInt(trait.uses)) return undefined
-  const lair = trait.lair === true
-  const name = lair
-    ? `Legendary Resistance (${trait.uses}/Day, or ${trait.uses + 1}/Day in Lair)`
-    : `Legendary Resistance (${trait.uses}/Day)`
-  return {
-    name,
-    sentence: `If ${subject} fails a saving throw, it can choose to succeed instead.`,
-  }
-}
-
 function formatHoldBreath(
   subject: string,
   trait: CreatureTraitFormatRow,
@@ -260,7 +245,6 @@ const CONFIGURABLE_TRAIT_FORMATTERS: Record<
   string,
   (subject: string, trait: CreatureTraitFormatRow) => FormattedTrait | undefined
 > = {
-  'legendary-resistance': formatLegendaryResistance,
   'hold-breath': formatHoldBreath,
   illumination: formatIllumination,
   'standing-leap': formatStandingLeap,

@@ -5,6 +5,8 @@ import {
 } from '@rpg/contracts'
 import type { FieldVisibility, FormItem } from '@rpg/ui/form'
 
+import { legendaryResistanceTemplateUseFields } from './legendary-resistance-trait-fields'
+
 function visibleForTemplate(): FieldVisibility {
   return {
     dependsOn: ['kind'],
@@ -44,16 +46,7 @@ export function creatureTraitTemplateFields(): FormItem[] {
         visibility: visibleForTemplateId(templateId),
         fields: [
           ...(templateId === 'legendary-resistance'
-            ? [
-                {
-                  type: 'number' as const,
-                  name: 'config.uses',
-                  label: 'Uses',
-                  min: 1,
-                  required: true,
-                  hint: 'Printed on the trait name as N/Day after a long rest.',
-                },
-              ]
+            ? legendaryResistanceTemplateUseFields({ includeInLair: false })
             : []),
         ],
       },
@@ -73,7 +66,13 @@ export function creatureTraitTemplateFields(): FormItem[] {
       name: 'nameOverride',
       label: 'Name',
       placeholder: 'Leave blank to use the default',
-      visibility: visibleForTemplateOverrides(),
+      visibility: {
+        dependsOn: ['kind', 'overrideDisplay', 'templateId'],
+        visibleWhen: (watched) =>
+          watched['kind'] === 'template' &&
+          watched['overrideDisplay'] === true &&
+          watched['templateId'] !== 'legendary-resistance',
+      },
     },
     {
       type: 'richtext',

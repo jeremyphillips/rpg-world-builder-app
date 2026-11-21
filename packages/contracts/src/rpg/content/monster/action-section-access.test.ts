@@ -13,20 +13,20 @@ describe('readLegendaryActionsBlockFromUnknown', () => {
   it('parses pool scalars and action rows from a block object', () => {
     expect(
       readLegendaryActionsBlockFromUnknown({
-        uses: 3,
-        usesInLair: 4,
+        uses: { normal: 3, inLair: 4 },
         actions: [{ id: 'a' }],
       }),
-    ).toEqual({ uses: 3, usesInLair: 4, actions: [{ id: 'a' }] })
+    ).toEqual({ uses: { normal: 3, inLair: 4 }, actions: [{ id: 'a' }] })
   })
 })
 
 describe('mergeLegendaryActionsBlock', () => {
   it('preserves pool scalars when replacing rows', () => {
-    expect(mergeLegendaryActionsBlock({ uses: 3, usesInLair: 5 }, [{ id: 'new' }])).toEqual({
-      uses: 3,
-      usesInLair: 5,
-      actions: [{ id: 'new' }],
-    })
+    expect(mergeLegendaryActionsBlock({ uses: { normal: 3, inLair: 5 } }, [{ id: 'new' }])).toEqual(
+      {
+        uses: { normal: 3, inLair: 5 },
+        actions: [{ id: 'new' }],
+      },
+    )
   })
 })

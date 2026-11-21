@@ -44,10 +44,19 @@ export function monsterActionSectionsForEach(
   }
 }
 
-export type LegendaryActionsPoolScalars = Pick<
-  MonsterLegendaryActionsBlockDraft,
-  'uses' | 'usesInLair'
->
+export type LegendaryActionsPoolScalars = Pick<MonsterLegendaryActionsBlockDraft, 'uses'>
+
+function readUsesFromUnknown(uses: unknown): MonsterLegendaryActionsBlockDraft['uses'] | undefined {
+  if (!uses || typeof uses !== 'object' || Array.isArray(uses)) return undefined
+  const record = uses as Record<string, unknown>
+  const normal = record.normal
+  const inLair = record.inLair
+  if (typeof normal !== 'number' && typeof inLair !== 'number') return undefined
+  return {
+    ...(typeof normal === 'number' ? { normal } : {}),
+    ...(typeof inLair === 'number' ? { inLair } : {}),
+  }
+}
 
 /** Parse a persisted or authored legendary block; rejects legacy flat action arrays. */
 export function readLegendaryActionsBlockFromUnknown(
@@ -55,9 +64,9 @@ export function readLegendaryActionsBlockFromUnknown(
 ): (LegendaryActionsPoolScalars & { actions: unknown[] }) | undefined {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return undefined
   const record = value as Record<string, unknown>
+  const uses = readUsesFromUnknown(record.uses)
   return {
-    ...(typeof record.uses === 'number' ? { uses: record.uses } : {}),
-    ...(typeof record.usesInLair === 'number' ? { usesInLair: record.usesInLair } : {}),
+    ...(uses ? { uses } : {}),
     actions: Array.isArray(record.actions) ? record.actions : [],
   }
 }
@@ -69,7 +78,6 @@ export function mergeLegendaryActionsBlock<TAction>(
 ): MonsterLegendaryActionsBlockDraft {
   return {
     ...(pool?.uses !== undefined ? { uses: pool.uses } : {}),
-    ...(pool?.usesInLair !== undefined ? { usesInLair: pool.usesInLair } : {}),
     actions: [...actions] as MonsterLegendaryActionsBlockDraft['actions'],
   }
 }

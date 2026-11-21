@@ -112,6 +112,7 @@ export function monsterActionLimitedUseFields(options?: { addDisabled?: boolean 
             label: 'Uses',
             min: 1,
             digits: 2,
+            control: 'stepper',
             visibility: fixed,
           },
         ],
