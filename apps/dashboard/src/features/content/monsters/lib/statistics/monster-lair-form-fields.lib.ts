@@ -15,7 +15,7 @@ import {
 
 export const monsterLairEnabledVisibility: FieldVisibility = {
   dependsOn: ['lair.enabled'],
-  visibleWhen: (values) => (values.lair as { enabled?: boolean } | undefined)?.enabled === true,
+  visibleWhen: (values) => values['lair.enabled'] === true,
 }
 
 export function lairExperienceModeVisibility(mode: 'suggested' | 'custom'): FieldVisibility {

@@ -5,6 +5,7 @@ import { getMonsterBySlug } from '@rpg/catalog/monsters'
 
 import { monsterLairFormFields } from './monster-lair-form-fields'
 import {
+  monsterLairEnabledVisibility,
   resolveMonsterLairExperienceModeOptions,
   seedMonsterLairExperience,
 } from './monster-lair-form-fields.lib'
@@ -22,6 +23,14 @@ function findLairExperienceGroup(items: FormItem[]): NamedGroupItem | undefined 
       'kind' in field && field.kind === 'group' && field.name === 'lair.experience',
   )
 }
+
+describe('monsterLairEnabledVisibility', () => {
+  it('reads the flat dependsOn watch map for lair.enabled', () => {
+    expect(monsterLairEnabledVisibility.visibleWhen({ 'lair.enabled': true })).toBe(true)
+    expect(monsterLairEnabledVisibility.visibleWhen({ 'lair.enabled': false })).toBe(false)
+    expect(monsterLairEnabledVisibility.visibleWhen({ lair: { enabled: true } })).toBe(false)
+  })
+})
 
 describe('monsterLairFormFields', () => {
   const experienceGroup = findLairExperienceGroup(monsterLairFormFields())
