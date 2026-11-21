@@ -23,6 +23,12 @@ baseline row per row. Do not retune baseline counts to stand in for that rule.
 `kind: 'slot'` literals stay in the registration module. Moving a literal into
 a render file changes the ratchet key.
 
+## Retired slots (config replacements)
+
+| Former slot / identity                      | Native config pattern                                                                                          | Notes                                                                                                                                                      |
+| ------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `lair` (`monster-lair-experience.slot.tsx`) | `switch` `lair.enabled`, named group `lair.experience` + `optionalDisclosure`, `select` + `display` + `number` | Replaced raw checkbox/inputs and button mode toggles. Shared `monsterLairEnabledVisibility` must use `values['lair.enabled']`, not `values.lair?.enabled`. |
+
 ## Baseline (static literals per file)
 
 | File                                                                     | Literals |

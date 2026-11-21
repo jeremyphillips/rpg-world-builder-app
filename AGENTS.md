@@ -204,6 +204,10 @@ No nested routers in `*.stories.tsx` (preview provides `MemoryRouter`) — [.cur
   in [packages/ui/docs/forms.md](packages/ui/docs/forms.md). Dashboard feature
   `lib/` form modules (`*-form-fields`, `*-form-values`, …) →
   [apps/dashboard/docs/form-lib-conventions.md](apps/dashboard/docs/form-lib-conventions.md).
+  **`kind: 'slot'` is last resort** — follow the decision tree in
+  [.cursor/rules/form-slots.mdc](.cursor/rules/form-slots.mdc); register new slots in
+  [apps/dashboard/docs/form-slot-register.md](apps/dashboard/docs/form-slot-register.md).
+  Slot components must not use raw HTML form controls (use `@rpg/ui` primitives).
 - Entity surfaces: do not add consumer-local spacing, typography, border, radius,
   alignment, divider, or chrome overrides to `EntityAnatomyHost`,
   `EntityCardStaticRenderer`, or `EntityCardDisclosureRenderer`. First determine whether the

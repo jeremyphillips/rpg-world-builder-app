@@ -442,6 +442,11 @@ modals and one-off editors once at the composition boundary instead of threading
 - **Display** — `kind: 'display'` for read-only text, notices, and rules previews via
   `content` or `resolve.contentWhen` (see
   [containers.md#display-fields](../../../../packages/ui/docs/forms/containers.md#display-fields)).
+- **Field visibility** — `visibility.dependsOn` paths are watched individually; `visibleWhen`
+  receives a map keyed by those strings (`values['lair.enabled']`), not the nested RHF object
+  (`values.lair?.enabled`). Inside a named group, item-relative names apply (`dependsOn: ['mode']` →
+  `values.mode`). Parent-relative hops use `../` in `dependsOn`. Decision tree and slot policy →
+  [.cursor/rules/form-slots.mdc](../../../../.cursor/rules/form-slots.mdc).
 - **Escape hatch** — `kind: 'slot'` only after `display`, `visibility`, `optionsResolve`, `hint.resolve`,
   `derivedMeta`, `valueSyncs`, `dependent`, `optionalDisclosure`, and standard composition
   cannot express the behavior (for example an availability preflight switch). Extend

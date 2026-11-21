@@ -220,6 +220,31 @@ const dashboardDragHandleGuard = {
 }
 
 /** Form heading hierarchy — ban deprecated label and legend APIs in form field modules. */
+const dashboardFormSlotGuards = {
+  files: ['src/features/**/components/form/slots/**/*.{ts,tsx}'],
+  ignores: ['**/*.{test,integration.test,stories}.{ts,tsx}'],
+  rules: {
+    'no-restricted-syntax': [
+      'error',
+      {
+        selector: "JSXOpeningElement[name.name='input']",
+        message:
+          'Form slots must not use raw <input> — use @rpg/ui field primitives (CheckboxOption, SwitchField via config, etc.). Prefer FormItem[] over new slots; see apps/dashboard/docs/form-slot-register.md.',
+      },
+      {
+        selector: "JSXOpeningElement[name.name='select']",
+        message:
+          'Form slots must not use raw <select> — use schema-driven select/combobox fields or @rpg/ui primitives.',
+      },
+      {
+        selector: "JSXOpeningElement[name.name='textarea']",
+        message:
+          'Form slots must not use raw <textarea> — use schema-driven textarea fields or @rpg/ui primitives.',
+      },
+    ],
+  },
+}
+
 const dashboardFormFieldGuards = {
   files: ['src/**/*-form-fields.ts', 'src/**/lib/**/*-form-fields.ts'],
   ignores: ['**/*.{test,integration.test,stories}.{ts,tsx}'],
@@ -495,6 +520,7 @@ export default [
   dashboardSemanticStyleLayerGuards,
   dashboardDragHandleGuard,
   dashboardFormFieldGuards,
+  dashboardFormSlotGuards,
   dashboardContentPickerPolicyGuards,
   dashboardContentCharacterPickerChromeGuard,
   dashboardCharacterBuilderPlayActorGuard,
