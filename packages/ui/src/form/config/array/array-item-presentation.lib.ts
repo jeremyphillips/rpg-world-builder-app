@@ -11,7 +11,7 @@ export type ArrayItemResolvedPresentation = {
   disclosure: 'none' | 'collapsible'
   chrome: 'flat' | 'disclosure'
   stackTreatment: 'merged' | 'separated'
-  listGap: 'rhythm' | 'tight' | 'merged' | 'disclosure'
+  listGap: 'rhythm' | 'tight' | 'merged' | 'disclosure' | 'conjunction'
   reserveDragHandleSlot: boolean
   sortableEnabled: boolean
 }
@@ -142,7 +142,9 @@ export function resolveArrayItemPresentation({
   const headerAnatomy = resolveHeaderAnatomy(itemLabel, disclosure)
   const chrome = disclosure === 'collapsible' ? 'disclosure' : 'flat'
   const stackTreatment = resolveStackTreatment(chrome, itemLabel, disclosure)
-  const listGap = resolveListGap(stackTreatment, chrome, variant)
+  const listGap = config.itemConjunction?.trim()
+    ? 'conjunction'
+    : resolveListGap(stackTreatment, chrome, variant)
   const sortableEnabled = reorder === 'dragHandle' && fieldsLength > 1
   const reserveDragHandleSlot = sortableEnabled
 

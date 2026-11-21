@@ -426,8 +426,12 @@ export function fieldArrayItemListClasses(
     size: FieldSizeToken
   },
   stackTreatment: 'merged' | 'separated' = 'separated',
-  listGap: 'rhythm' | 'tight' | 'merged' | 'disclosure' = 'rhythm',
+  listGap: 'rhythm' | 'tight' | 'merged' | 'disclosure' | 'conjunction' = 'rhythm',
 ): string {
+  if (listGap === 'conjunction') {
+    return cn('flex flex-col', 'gap-1')
+  }
+
   if (stackTreatment === 'merged' || listGap === 'merged') {
     return cn('flex flex-col', 'gap-0')
   }
