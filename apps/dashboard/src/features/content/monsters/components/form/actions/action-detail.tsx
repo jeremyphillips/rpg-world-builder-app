@@ -69,8 +69,9 @@ function attackChipOptions(
   actionId: string,
   values: MonsterFormValues,
   ctx: ContentFormCtx,
+  section?: MonsterActionSection,
 ): { value: string; label: string }[] {
-  const titles = monsterActionEditorTitles(rows, values, ctx)
+  const titles = monsterActionEditorTitles(rows, values, ctx, section)
   return rows
     .filter(
       (row) =>
@@ -129,7 +130,7 @@ export function MonsterActionDetail({
   const editor = located ? sections.editors[located.section] : sections.editors.actions
   const fields = useMemo(() => {
     if (!located || !values || !action || !liveAction) return []
-    const sectionRows = (values[located.section] ?? []) as MonsterActionDraftRow[]
+    const sectionRows = monsterFormSectionRows(values, located.section)
     return monsterActionDetailFields({
       ctx,
       action: liveAction,
@@ -141,12 +142,15 @@ export function MonsterActionDetail({
       advisories: collectMonsterFormAdvisories(values, monsterEquipmentCatalog(ctx)),
       onCastingSourceBlocked: sections.setNotice,
       attackOptions: attackChipOptions(
-        (located.section === 'reactions'
+        (located.section === 'reactions' || located.section === 'legendaryActions'
           ? (values.actions ?? [])
           : sectionRows) as MonsterActionDraftRow[],
         action.id,
         values,
         ctx,
+        located.section === 'reactions' || located.section === 'legendaryActions'
+          ? 'actions'
+          : located.section,
       ),
       actionRows: sectionRows,
       bonusActionRows: (values.bonusActions ?? []) as MonsterActionDraftRow[],
