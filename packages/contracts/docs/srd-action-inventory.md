@@ -143,14 +143,14 @@ See plan Deliverable 3 — summarized: `kind: 'save'`, `effectResolutionSchema`,
 
 #### Lich — Disrupt Life (`legendary-save-disrupt-life`)
 
-| Field                 | Value                                                                                         |
-| --------------------- | --------------------------------------------------------------------------------------------- |
-| Structured            | `self` + emanation 20 ft, Con save, necrotic damage 9d6, half on success, `onceUntilNextTurn` |
-| Authoring path        | Legendary → **Saving throw** (`create:save`)                                                  |
-| Unsupported mechanics | “isn't an Undead” target filter → `description` until target requirements ship                |
-| Coverage              | **partial** (undead exclusion); **full** for DC/area/damage/turn limit                        |
-| Text fallback         | `description` for creature-type qualification only                                            |
-| Expected output       | SRD-style saving throw paragraph under **Legendary Actions** + Failure or Success lead-in     |
+| Field                 | Value                                                                                                  |
+| --------------------- | ------------------------------------------------------------------------------------------------------ |
+| Structured            | `self` + emanation 20 ft, Con save, necrotic damage 9d6, half on success, `onceUntilNextTurn`          |
+| Authoring path        | Legendary → **Saving throw** (`create:save`)                                                           |
+| Unsupported mechanics | Emanation **origin** phrase (`originating from the lich`) — shared area-origin gap only                |
+| Coverage              | **full** in seed (`srd-cc-5.2.1:lich`) for structured fields; PDF literal **partial** on origin phrase |
+| Text fallback         | None required for Undead exclusion (`occupantRequirements`)                                            |
+| Expected output       | SRD-style saving throw paragraph under **Legendary Actions** + Failure or Success lead-in              |
 
 #### Solar — Blinding Gaze (`legendary-save-blinding-gaze`)
 

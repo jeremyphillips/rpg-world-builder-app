@@ -9,7 +9,9 @@ import {
   formatMonsterParryResponse,
   formatMonsterParryTrigger,
   formatMonsterSaveAction,
+  formatLegendaryActionUsesIntro,
   formatMonsterSpellEntry,
+  formatOnceUntilNextTurnSentence,
   resolveCreatureTraitGrants,
   resolveMonsterActionIdentity,
   resolveTraitDisplay,
@@ -356,6 +358,42 @@ describe('SRD 5.2.1 monster seed', () => {
         saveDc: 20,
         attackBonus: 12,
       })
+      expect(lich.legendaryActions?.uses).toMatchObject({ normal: 3, inLair: 4 })
+      expect(
+        formatLegendaryActionUsesIntro({
+          monsterName: lich.name,
+          uses: lich.legendaryActions!.uses,
+          lairEnabled: true,
+        }),
+      ).toBe(
+        "Legendary Action Uses: 3 (4 in Lair). Immediately after another creature's turn, the lich can expend a use to take one of the following actions. The lich regains all expended uses at the start of each of its turns.",
+      )
+      const disrupt = lich.legendaryActions?.actions.find((row) => row.id === 'disrupt-life')
+      expect(disrupt?.kind).toBe('save')
+      if (disrupt?.kind === 'save') {
+        const disruptName = resolveMonsterActionIdentity({
+          action: disrupt,
+          equipmentCatalogStatus: 'ready',
+        }).displayName
+        const disruptSave = formatMonsterSaveAction({
+          action: disrupt,
+          name: disruptName,
+          abilityScores: lich.abilityScores,
+          proficiencyBonus: CHALLENGE_RATING_MECHANICS[lich.challengeRating].proficiencyBonus,
+          spellcastingAbilityScore: lich.abilityScores.int,
+        })
+        expect(disruptSave.body).toBe(
+          "Constitution Saving Throw: DC 20, each creature that isn't an Undead in a 20-foot Emanation. Failure: 31 (9d6) Necrotic damage. Success: Half damage.",
+        )
+        expect(formatOnceUntilNextTurnSentence({ monsterName: lich.name, kind: 'save' })).toBe(
+          "Failure or Success: The lich can't take this action again until the start of its next turn.",
+        )
+      }
+      const frighteningGaze = lich.legendaryActions?.actions.find(
+        (row) => row.id === 'frightening-gaze',
+      )
+      expect(frighteningGaze?.kind).toBe('spell')
+      expect(lich.legendaryActions?.actions.some((row) => row.id === 'deathly-teleport')).toBe(true)
     }
 
     for (const monster of [knight, mage, hound]) {
