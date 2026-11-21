@@ -13,6 +13,7 @@ import {
   type ArmorClassRules,
   type ContentValidationIntent,
   type Monster,
+  type MovementSpeeds,
 } from '@rpg/contracts'
 
 import { normalizeLimitedUse } from '../../lib/forms/limited-use/normalize-limited-use'
@@ -22,7 +23,10 @@ import { withDefaultSaveResolutionTarget } from './actions/save/monster-save-res
 import { weaponActionDamageToDraft } from './actions/weapon/monster-weapon-damage-form'
 
 import { applyEffectEndAuthoringToRow } from '../../lib/forms/mechanics/normalize-effect-end-authoring'
-import { movementRowsToRecordForPreview } from '../../lib/forms/fields/content-movement-form-fields'
+import {
+  movementRecordToRows,
+  movementRowsToRecordForPreview,
+} from '../../lib/forms/fields/content-movement-form-fields'
 
 import { weaponProficiencyGrantSetFromMode } from '@/lib/forms/grant-sets/weapon-proficiency-grant-mode.lib'
 
@@ -597,6 +601,18 @@ function normalizedActionSections(
   }
 }
 
+function isUsableMonsterForms(
+  forms: MonsterFormValues['forms'],
+): forms is NonNullable<MonsterFormValues['forms']> {
+  return (
+    forms != null &&
+    typeof forms.profileFormId === 'string' &&
+    forms.profileFormId.length > 0 &&
+    forms.trueForm != null &&
+    Array.isArray(forms.definedForms)
+  )
+}
+
 function normalizeLair(lair: MonsterFormValues['lair']): Record<string, unknown> | undefined {
   if (lair?.enabled !== true) return undefined
   const normalized: Record<string, unknown> = { enabled: true }
@@ -636,17 +652,25 @@ function normalizedMonsterCore(
     defenses: values.defenses,
     equipment: values.equipment,
     traits: normalizeTraitRichText(omitEmptyStrings(values.traits)),
-    ...(values.forms ? { forms: normalizeMonsterForms(values.forms) } : {}),
+    ...(isUsableMonsterForms(values.forms) ? { forms: normalizeMonsterForms(values.forms) } : {}),
     ...normalizedActionSections(values, options.intent),
     ...(lair ? { lair } : {}),
   }
+}
+
+function movementRowsForNormalize(movement: unknown) {
+  if (Array.isArray(movement)) return movement
+  if (movement && typeof movement === 'object') {
+    return movementRecordToRows(movement as MovementSpeeds)
+  }
+  return []
 }
 
 export function normalizeMonsterFormValues(
   values: MonsterFormValues,
   options: NormalizeMonsterFormOptions,
 ): Record<string, unknown> {
-  const movementRecord = movementRowsToRecordForPreview(values.movement ?? [])
+  const movementRecord = movementRowsToRecordForPreview(movementRowsForNormalize(values.movement))
   const hasFly = typeof movementRecord.fly === 'number'
   const challengeRating = values.challengeRating
 

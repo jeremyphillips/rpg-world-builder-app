@@ -30,6 +30,7 @@ import { ContentPreviewUiProvider } from '../../preview/content-preview-ui-conte
 import { resolveContentPublishSchema } from '../edit/content-edit-load'
 import { ContentFormPublishValidationBridge } from '../../validation/content-form-publish-validation.client'
 import { ContentCreatePublishValidationBridge } from './content-create-publish-validation-bridge.client'
+import { ContentDraftPublishValidationSurfaceBridge } from '../../validation/content-draft-publish-validation-surface.client'
 import { augmentTabsWithHoistedName } from './content-schema-form-tabs.lib'
 
 interface ContentSchemaFormShellProps<
@@ -198,6 +199,16 @@ function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
         formKey={formKey}
         form={form as UseFormReturn<FieldValues>}
       />
+      {formMode === 'edit' && headerProps.ctx.validationIntent === 'draft' ? (
+        <ContentDraftPublishValidationSurfaceBridge
+          def={headerProps.def}
+          ctx={headerProps.ctx}
+          validationIntent={headerProps.ctx.validationIntent}
+          publishFields={publishFields}
+          formId={formKey ?? 'content-form'}
+          onPublishIssuesChange={handlePublishIssuesChange}
+        />
+      ) : null}
       {previewEnabled ? (
         <>
           <ContentFormPublishValidationBridge

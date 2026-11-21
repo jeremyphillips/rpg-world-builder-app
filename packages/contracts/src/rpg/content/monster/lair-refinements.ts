@@ -3,14 +3,16 @@ import type { z } from 'zod'
 import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 import { CHALLENGE_RATING_MECHANICS, type ChallengeRating } from '../../vocab/challenge-rating'
 import { suggestInLairExperience } from '../../runtime/monster/suggest-in-lair-experience'
+import { resolveMonsterBaseExperiencePoints } from '../../runtime/monster/resolve-monster-base-experience'
+import { monsterLairInLairXpMustExceedBaseMessage } from './lair-experience-messages'
 import type { MonsterLair } from './lair-schema'
 
 export const MONSTER_LAIR_CUSTOM_XP_MESSAGE = 'Enter an in-lair XP amount.'
 export const MONSTER_LAIR_SUGGESTED_UNAVAILABLE_MESSAGE =
   'A suggested XP value is unavailable for this CR. Choose Custom or remove in-lair XP.'
-
 export type MonsterLairPublishBody = {
   challengeRating: ChallengeRating
+  experiencePointsOverride?: number
   lair?: MonsterLair
 }
 
@@ -26,6 +28,21 @@ export function resolveMonsterInLairExperiencePoints(
   return suggestion.experiencePoints
 }
 
+function inLairXpMustExceedBase(
+  inLairXp: number,
+  baseXp: number,
+  ctx: z.RefinementCtx,
+  pathSuffix: (string | number)[],
+  prefix: (string | number)[],
+): void {
+  if (inLairXp <= baseXp) {
+    addCustomRefinementIssue(ctx, monsterLairInLairXpMustExceedBaseMessage(baseXp), [
+      ...prefix,
+      ...pathSuffix,
+    ])
+  }
+}
+
 export function refineMonsterLair(
   body: MonsterLairPublishBody,
   ctx: z.RefinementCtx,
@@ -33,6 +50,8 @@ export function refineMonsterLair(
 ): void {
   const lair = body.lair
   if (!lair?.enabled || !lair.experience) return
+  const baseXp = resolveMonsterBaseExperiencePoints(body)
+
   if (lair.experience.mode === 'custom' && lair.experience.value === undefined) {
     addCustomRefinementIssue(ctx, MONSTER_LAIR_CUSTOM_XP_MESSAGE, [
       ...prefix,
@@ -40,7 +59,19 @@ export function refineMonsterLair(
       'experience',
       'value',
     ])
+    return
   }
+
+  if (lair.experience.mode === 'custom' && lair.experience.value !== undefined) {
+    inLairXpMustExceedBase(
+      lair.experience.value,
+      baseXp,
+      ctx,
+      ['lair', 'experience', 'value'],
+      prefix,
+    )
+  }
+
   if (lair.experience.mode === 'suggested') {
     const suggestion = suggestInLairExperience(body.challengeRating, CHALLENGE_RATING_MECHANICS)
     if (suggestion.status === 'unavailable') {
@@ -50,7 +81,15 @@ export function refineMonsterLair(
         'experience',
         'mode',
       ])
+      return
     }
+    inLairXpMustExceedBase(
+      suggestion.experiencePoints,
+      baseXp,
+      ctx,
+      ['lair', 'experience', 'mode'],
+      prefix,
+    )
   }
 }
 

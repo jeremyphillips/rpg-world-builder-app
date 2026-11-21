@@ -41,6 +41,7 @@ import {
   type ResolveMonsterActionAttackProfileInput,
   type ResolvedOnHitEffect,
 } from './resolve-monster-action-attack-profile'
+import { resolveMonsterBaseExperiencePoints } from './resolve-monster-base-experience'
 
 export type DerivedMonsterAttackLine = {
   id: string
@@ -141,14 +142,6 @@ export function resolveMonsterHitPoints(
     formula,
     clampedToMinimum: hp === 1 && unclamped < 1,
   })
-}
-
-function resolveExperiencePoints(monster: MonsterBody): number {
-  const derived = CHALLENGE_RATING_MECHANICS[monster.challengeRating].xp
-  if (monster.experiencePointsOverride !== undefined) {
-    return monster.experiencePointsOverride
-  }
-  return derived
 }
 
 function attackLineFromProfile(
@@ -278,7 +271,7 @@ export function deriveMonsterStatBlock({
     initiativeModifier,
     initiativeLabel: formatInitiativeLabel(initiativeModifier),
     proficiencyBonus,
-    experiencePoints: resolveExperiencePoints(monster),
+    experiencePoints: resolveMonsterBaseExperiencePoints(monster),
     passivePerception: resolvePassivePerception(perceptionMod),
     savingThrows,
     skills,

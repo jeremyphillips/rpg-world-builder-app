@@ -65,8 +65,12 @@ export function useFormValidationPresentation(fieldsOverride?: FormItem[]) {
     () => prepareFormIssues(errors, fields, formValues ?? {}),
     [errors, fields, formValues],
   )
+  // An empty live preview list must not hide errors already painted on the form.
+  // Preview issues still win when the publish attempt produced any routed issues.
   const rawIssues =
-    publishPresentationEnabled && hasAttemptedPublish ? publishPresentationIssues : rhfIssues
+    publishPresentationEnabled && hasAttemptedPublish && publishPresentationIssues.length > 0
+      ? publishPresentationIssues
+      : rhfIssues
   const inactivePaths = React.useMemo(
     () => collectInactiveFieldPaths(fields, formValues ?? {}),
     [fields, formValues],

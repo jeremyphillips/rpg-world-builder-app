@@ -84,7 +84,11 @@ function monsterLairExperienceGroup(): FormItem {
         visibility: lairExperienceModeVisibility('custom'),
         hint: {
           resolve: {
-            dependsOn: ['challengeRating', MONSTER_LAIR_EXPERIENCE_MODE_FIELD],
+            dependsOn: [
+              'challengeRating',
+              'experiencePointsOverride',
+              MONSTER_LAIR_EXPERIENCE_MODE_FIELD,
+            ],
             hintWhen: resolveMonsterLairCustomXpHint,
           },
         },

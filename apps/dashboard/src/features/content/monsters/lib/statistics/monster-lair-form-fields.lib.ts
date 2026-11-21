@@ -1,5 +1,7 @@
 import {
   formatExperiencePoints,
+  monsterLairCustomXpMinimumHint,
+  resolveMonsterBaseExperiencePoints,
   suggestInLairExperience,
   type ChallengeRating,
 } from '@rpg/contracts'
@@ -31,6 +33,27 @@ export function lairExperienceModeVisibility(mode: 'suggested' | 'custom'): Fiel
 export function readChallengeRating(values: Record<string, unknown>): ChallengeRating | undefined {
   const raw = values.challengeRating ?? values['challengeRating']
   return typeof raw === 'string' && raw.length > 0 ? (raw as ChallengeRating) : undefined
+}
+
+function readExperiencePointsOverride(values: Record<string, unknown>): number | undefined {
+  const raw = values.experiencePointsOverride ?? values['experiencePointsOverride']
+  return typeof raw === 'number' && Number.isFinite(raw) ? raw : undefined
+}
+
+export function resolveMonsterLairCustomXpHintValues(
+  values: Record<string, unknown>,
+): { baseXp: number; suggestionXp?: number } | undefined {
+  const challengeRating = readChallengeRating(values)
+  if (!challengeRating) return undefined
+  const baseXp = resolveMonsterBaseExperiencePoints({
+    challengeRating,
+    experiencePointsOverride: readExperiencePointsOverride(values),
+  })
+  const suggestion = suggestInLairExperience(challengeRating)
+  return {
+    baseXp,
+    suggestionXp: suggestion.status === 'available' ? suggestion.experiencePoints : undefined,
+  }
 }
 
 export function seedMonsterLairExperience(values: Record<string, unknown>) {
@@ -99,9 +122,11 @@ export function resolveMonsterLairCustomXpHint(
   values: Record<string, unknown>,
 ): string | undefined {
   if (values[MONSTER_LAIR_EXPERIENCE_MODE_FIELD] !== 'custom') return undefined
-  const challengeRating = readChallengeRating(values)
-  if (!challengeRating) return MONSTER_LAIR_EXPERIENCE_UNAVAILABLE
-  const suggestion = suggestInLairExperience(challengeRating)
-  if (suggestion.status === 'unavailable') return MONSTER_LAIR_EXPERIENCE_UNAVAILABLE
-  return `Suggested: ${formatExperiencePoints(suggestion.experiencePoints)}`
+  const resolved = resolveMonsterLairCustomXpHintValues(values)
+  if (!resolved) return MONSTER_LAIR_EXPERIENCE_UNAVAILABLE
+  const parts = [monsterLairCustomXpMinimumHint(resolved.baseXp)]
+  if (resolved.suggestionXp !== undefined) {
+    parts.push(`Suggested: ${formatExperiencePoints(resolved.suggestionXp)}`)
+  }
+  return parts.join(' ')
 }

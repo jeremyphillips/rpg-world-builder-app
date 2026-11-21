@@ -1064,6 +1064,12 @@ export {
   resolveMonsterInLairExperiencePoints,
 } from './monster/lair-refinements'
 export {
+  monsterLairCustomXpMinimumHint,
+  monsterLairInLairXpMustExceedBaseMessage,
+} from './monster/lair-experience-messages'
+export { resolveMonsterBaseExperiencePoints } from '../runtime/monster/resolve-monster-base-experience'
+export type { MonsterBaseExperienceInput } from '../runtime/monster/resolve-monster-base-experience'
+export {
   collectMonsterCatalogIssues,
   MONSTER_CATALOG_ISSUE_CODE,
 } from './monster/monster-catalog-issues'

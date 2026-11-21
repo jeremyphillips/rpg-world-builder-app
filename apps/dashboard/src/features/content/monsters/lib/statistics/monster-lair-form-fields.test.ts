@@ -4,10 +4,13 @@ import type { FormItem } from '@rpg/ui/form'
 import { getMonsterBySlug } from '@rpg/catalog/monsters'
 
 import { monsterLairFormFields } from './monster-lair-form-fields'
+import { monsterLairCustomXpMinimumHint, resolveMonsterBaseExperiencePoints } from '@rpg/contracts'
+
 import {
   lairExperienceModeVisibility,
   MONSTER_LAIR_EXPERIENCE_MODE_FIELD,
   monsterLairEnabledVisibility,
+  resolveMonsterLairCustomXpHint,
   resolveMonsterLairExperienceModeOptions,
   seedMonsterLairExperience,
 } from './monster-lair-form-fields.lib'
@@ -46,6 +49,27 @@ describe('monsterLairEnabledVisibility', () => {
     expect(monsterLairEnabledVisibility.visibleWhen({ 'lair.enabled': true })).toBe(true)
     expect(monsterLairEnabledVisibility.visibleWhen({ 'lair.enabled': false })).toBe(false)
     expect(monsterLairEnabledVisibility.visibleWhen({ lair: { enabled: true } })).toBe(false)
+  })
+})
+
+describe('resolveMonsterLairCustomXpHint', () => {
+  it('includes minimum normal XP and suggested in-lair XP', () => {
+    const baseXp = resolveMonsterBaseExperiencePoints({ challengeRating: '10' })
+    const hint = resolveMonsterLairCustomXpHint({
+      challengeRating: '10',
+      [MONSTER_LAIR_EXPERIENCE_MODE_FIELD]: 'custom',
+    })
+    expect(hint).toContain(monsterLairCustomXpMinimumHint(baseXp))
+    expect(hint).toContain('Suggested: XP')
+  })
+
+  it('uses experiencePointsOverride for the minimum hint at CR 0', () => {
+    const hint = resolveMonsterLairCustomXpHint({
+      challengeRating: '0',
+      experiencePointsOverride: 0,
+      [MONSTER_LAIR_EXPERIENCE_MODE_FIELD]: 'custom',
+    })
+    expect(hint).toContain(monsterLairCustomXpMinimumHint(0))
   })
 })
 

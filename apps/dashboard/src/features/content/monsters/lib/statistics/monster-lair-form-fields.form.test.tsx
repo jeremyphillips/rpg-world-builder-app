@@ -1,8 +1,14 @@
+import { useEffect } from 'react'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm, useFormContext } from 'react-hook-form'
 import { beforeAll, describe, expect, it } from 'vitest'
-import { formatExperiencePoints, suggestInLairExperience } from '@rpg/contracts'
+import {
+  formatExperiencePoints,
+  monsterLairCustomXpMinimumHint,
+  resolveMonsterBaseExperiencePoints,
+  suggestInLairExperience,
+} from '@rpg/contracts'
 import { FormItems } from '@rpg/ui/form'
 
 import { getMonsterBySlug } from '@rpg/catalog/monsters'
@@ -17,6 +23,8 @@ import {
   MONSTER_LAIR_EXPERIENCE_REMOVE_LABEL,
   MONSTER_LAIR_EXPERIENCE_SUGGESTED_CAPTION,
 } from '../monster-form-labels'
+import { createMonsterInputSchema } from '@rpg/contracts'
+
 import { normalizeMonsterFormValues } from '../normalize-monster-form-values'
 import { monsterLairFormFields } from './monster-lair-form-fields'
 import { monsterToFormValues, resolveMonsterCreateDefaultValues } from '../monster-form-values'
@@ -63,6 +71,25 @@ function lairState() {
 
 function LairHarness({ defaultValues }: { defaultValues: Record<string, unknown> }) {
   const form = useForm({ defaultValues, shouldUnregister: true })
+  return (
+    <FormProvider {...form}>
+      <LairStateProbe />
+      <FormItems items={monsterLairFormFields()} idPrefix="lair" />
+    </FormProvider>
+  )
+}
+
+function LairHarnessWithChallengeRating({
+  challengeRating,
+  defaultValues,
+}: {
+  challengeRating: string
+  defaultValues: Record<string, unknown>
+}) {
+  const form = useForm({ defaultValues, shouldUnregister: true })
+  useEffect(() => {
+    form.setValue('challengeRating', challengeRating, { shouldDirty: true })
+  }, [challengeRating, form])
   return (
     <FormProvider {...form}>
       <LairStateProbe />
@@ -277,5 +304,51 @@ describe('monsterLairFormFields optional disclosure', () => {
       enabled: true,
       experience: { mode: 'custom', value: 5000 },
     })
+  })
+
+  it('shows minimum normal XP in the custom field hint and updates when CR changes', async () => {
+    const base10 = resolveMonsterBaseExperiencePoints({ challengeRating: '10' })
+    const base21 = resolveMonsterBaseExperiencePoints({ challengeRating: '21' })
+    const lairDefaults = {
+      lair: { enabled: true, experience: { mode: 'custom', value: 7200 } },
+    }
+    const { rerender } = render(
+      <LairHarnessWithChallengeRating
+        challengeRating="10"
+        defaultValues={{ challengeRating: '10', ...lairDefaults }}
+      />,
+    )
+    expect(document.body).toHaveTextContent(monsterLairCustomXpMinimumHint(base10))
+
+    rerender(
+      <LairHarnessWithChallengeRating
+        challengeRating="21"
+        defaultValues={{ challengeRating: '10', ...lairDefaults }}
+      />,
+    )
+    await waitFor(() => {
+      expect(document.body).toHaveTextContent(monsterLairCustomXpMinimumHint(base21))
+    })
+    expect(
+      screen.getByRole('spinbutton', { name: MONSTER_LAIR_EXPERIENCE_CUSTOM_LABEL }),
+    ).toHaveValue(7200)
+  })
+
+  it('maps publish validation for sub-minimum custom XP to lair.experience.value', () => {
+    const values = resolveMonsterCreateDefaultValues()
+    values.name = 'Test'
+    values.sizes = ['medium']
+    values.creatureType = 'humanoid'
+    values.alignment = 'n'
+    values.challengeRating = '21'
+    values.lair = { enabled: true, experience: { mode: 'custom', value: 7200 } }
+    const body = normalizeMonsterFormValues(values, { intent: 'publish', mode: 'create' })
+    const parsed = createMonsterInputSchema.safeParse({ slug: 'lair-xp-invalid', ...body })
+    expect(parsed.success).toBe(false)
+    if (parsed.success) return
+    const valueIssue = parsed.error.issues.find(
+      (issue) => issue.path.join('.') === 'lair.experience.value',
+    )
+    expect(valueIssue?.message).toMatch(/In-lair XP must exceed/)
   })
 })

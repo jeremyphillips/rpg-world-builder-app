@@ -53,6 +53,7 @@ import {
   CONTENT_MEDIA_STALE_FORM_MESSAGE,
   extractStaleMediaFromError,
 } from './content-edit-stale-media.lib'
+import { draftPublishValidationSurface } from '../../validation/content-draft-publish-validation-surface.ref'
 
 function ContentEditFormHeading({
   heading,
@@ -424,6 +425,10 @@ function ContentEditFormBody({
         return
       }
 
+      if (validationIntent === 'draft') {
+        draftPublishValidationSurface.current?.(values as FieldValues)
+      }
+
       let saved: unknown
       try {
         saved = await mutation.mutateAsync(
@@ -466,6 +471,9 @@ function ContentEditFormBody({
         },
       )
       form.reset(baseline)
+      if (validationIntent === 'draft') {
+        draftPublishValidationSurface.current?.(baseline as FieldValues)
+      }
     },
     fallbackMessage: `Could not update ${def.routeKey}.`,
   })

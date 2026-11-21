@@ -56,6 +56,25 @@ describe('monster forms authoring architecture', () => {
     )
   })
 
+  it('does not register forms.definedForms before shape-shifting is added', () => {
+    let formRef: UseFormReturn<MonsterFormValues> | undefined
+
+    function Host() {
+      const form = useForm<MonsterFormValues>({
+        defaultValues: monsterFormTestValues({ name: 'Lich' }),
+      })
+      formRef = form
+      return (
+        <FormProvider {...form}>
+          {withMonsterFormsLifecycle(<MonsterFormsEditor ctx={ctx} />)}
+        </FormProvider>
+      )
+    }
+
+    render(<Host />)
+    expect(formRef?.getValues('forms')).toBeUndefined()
+  })
+
   it('creates recoverable defined-form defaults', () => {
     expect(makeEmptyMonsterDefinedForm()).toMatchObject({
       name: '',
