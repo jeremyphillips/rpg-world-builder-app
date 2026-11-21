@@ -7,6 +7,9 @@ export type { PickerSearchOptions } from '../../lib/picker-search.types'
 
 export type ButtonDropdownWidth = 'full' | 'fit'
 
+/** `addIcon` — ghost icon-md add trigger (master-detail list header). */
+export type ButtonDropdownTriggerPresentation = 'labeled' | 'addIcon'
+
 export type ButtonDropdownItem = {
   id: string
   label: string
@@ -41,4 +44,6 @@ export type ButtonDropdownProps = {
   /** Trigger width — `fit` sizes to content; defaults to `full` (no width override). */
   width?: ButtonDropdownWidth
   className?: string
+  /** Trigger chrome — `addIcon` matches master-detail default add control. */
+  triggerPresentation?: ButtonDropdownTriggerPresentation
 }

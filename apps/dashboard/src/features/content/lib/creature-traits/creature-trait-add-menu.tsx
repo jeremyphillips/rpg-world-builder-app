@@ -4,7 +4,7 @@ import {
   getCreatureTraitTemplate,
   listCreatureTraitTemplatesForRuleset,
 } from '@rpg/contracts'
-import { ActionIcon, ButtonDropdown } from '@rpg/ui'
+import { ButtonDropdown } from '@rpg/ui'
 
 const TEMPLATE_GROUP_ID = 'templates'
 const CUSTOM_GROUP_ID = 'custom'
@@ -35,10 +35,7 @@ export function CreatureTraitAddMenu({
   return (
     <ButtonDropdown
       label={label}
-      leadingIcon={<ActionIcon action="add" size="sm" />}
-      width="fit"
-      size="sm"
-      variant="outline"
+      triggerPresentation="addIcon"
       groups={[
         { id: TEMPLATE_GROUP_ID, label: 'Templates' },
         { id: CUSTOM_GROUP_ID, label: 'Custom' },

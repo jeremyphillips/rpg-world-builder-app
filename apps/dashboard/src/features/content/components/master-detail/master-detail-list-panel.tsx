@@ -27,6 +27,8 @@ export type { MasterDetailItemMeta, MasterDetailListItem }
 export type MasterDetailListGroup = {
   id: string
   title: ReactNode
+  /** Ghost icon add — superseded by `addControl` (for example acquisition menus). */
+  onAdd?: () => void
   addControl?: ReactNode
   items: MasterDetailListItem[]
 }
@@ -44,6 +46,7 @@ export type MasterDetailListPanelProps = {
   items?: MasterDetailListItem[]
   /** Grouped collection: one nav, one scrollport, one count, per-group add. */
   groups?: MasterDetailListGroup[]
+  /** Accessible name for the default icon-only add control on a flat rail. */
   addLabel?: string
   /**
    * Replaces the default Add button on a flat rail. Grouped rails use each group's
@@ -98,6 +101,19 @@ function useScrollSelectedRowIntoView(
       row.scrollIntoView({ block: 'nearest' })
     }
   }, [scrollRef, selectedItemId, selectedRowRef, visibleProjection])
+}
+
+function MasterDetailListAddButton({ addLabel, onAdd }: { addLabel?: string; onAdd?: () => void }) {
+  if (!onAdd) return null
+  return (
+    <ActionButton
+      action="add"
+      variant="ghost"
+      size="icon"
+      aria-label={addLabel}
+      onClick={() => onAdd()}
+    />
+  )
 }
 
 /**
@@ -155,6 +171,7 @@ function MasterDetailListScroll({
   selectedRowRef,
   scrollRef,
   onListMove,
+  addLabel,
 }: {
   groups?: MasterDetailListGroup[]
   items: readonly MasterDetailListItem[]
@@ -164,6 +181,7 @@ function MasterDetailListScroll({
   selectedRowRef: RefObject<HTMLButtonElement | null>
   scrollRef: RefObject<HTMLDivElement | null>
   onListMove?: (from: number, to: number) => void
+  addLabel?: string
 }) {
   if (groups) {
     return (
@@ -179,10 +197,12 @@ function MasterDetailListScroll({
             aria-label={typeof group.title === 'string' ? group.title : group.id}
           >
             <div className="flex shrink-0 items-center justify-between gap-3 border-b ui-border--subtle px-3 py-2.5">
-              <Heading as="div" variant="card" className="min-w-0">
+              <Heading as="div" variant="nav" className="min-w-0">
                 {group.title}
               </Heading>
-              {group.addControl}
+              {group.addControl ?? (
+                <MasterDetailListAddButton addLabel={addLabel} onAdd={group.onAdd} />
+              )}
             </div>
             {group.items.length > 0 ? (
               <MasterDetailListRows
@@ -235,14 +255,10 @@ function MasterDetailCollectionHeader({
   if (groups && listTitle == null) return null
   const addButton = groups
     ? null
-    : (addControl ?? (
-        <ActionButton action="add" variant="outline" size="sm" onClick={() => onAdd?.()}>
-          {addLabel}
-        </ActionButton>
-      ))
+    : (addControl ?? <MasterDetailListAddButton addLabel={addLabel} onAdd={onAdd} />)
   return (
     <div className="flex shrink-0 items-center justify-between gap-3 border-b ui-border--subtle px-3 py-2.5">
-      <Heading as="div" variant="card" className="min-w-0">
+      <Heading as="div" variant="nav" className="min-w-0">
         {listTitle}
       </Heading>
       {addButton}
@@ -314,6 +330,7 @@ export function MasterDetailListPanel(props: MasterDetailListPanelProps) {
         selectedRowRef={selectedRowRef}
         scrollRef={scrollRef}
         onListMove={props.groups ? undefined : onListMove}
+        addLabel={props.addLabel}
       />
     </nav>
   )

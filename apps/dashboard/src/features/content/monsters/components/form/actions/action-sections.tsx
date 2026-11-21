@@ -6,7 +6,7 @@ import {
   resolveCreatureFormsContext,
   resolveEquipmentInstanceReferenceLabel,
 } from '@rpg/contracts'
-import { ActionIcon, ButtonDropdown, ConfirmDialog } from '@rpg/ui'
+import { ButtonDropdown, ConfirmDialog } from '@rpg/ui'
 import { useFormContext } from 'react-hook-form'
 
 import { EquipmentPickerDrawer } from '@/features/character'
@@ -169,10 +169,7 @@ function MonsterActionAddMenu({
   return (
     <ButtonDropdown
       label={MONSTER_ADD_LABEL}
-      leadingIcon={<ActionIcon action="add" size="sm" />}
-      width="fit"
-      size="sm"
-      variant="outline"
+      triggerPresentation="addIcon"
       groups={groups}
       items={items}
       onSelectItem={(id) => {

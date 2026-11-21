@@ -5,7 +5,7 @@ import {
   getCreatureTraitTemplate,
   listCreatureTraitTemplatesForRuleset,
 } from '@rpg/contracts'
-import { ActionIcon, ButtonDropdown } from '@rpg/ui'
+import { ButtonDropdown } from '@rpg/ui'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import { creatureTraitTemplateRow } from '../../../../lib/creature-traits/creature-trait-add-menu'
@@ -115,10 +115,7 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
         <ButtonDropdown
           label={MONSTER_ADD_LABEL}
           searchPlaceholder="Search traits…"
-          leadingIcon={<ActionIcon action="add" size="sm" />}
-          width="fit"
-          size="sm"
-          variant="outline"
+          triggerPresentation="addIcon"
           groups={[
             { id: TEMPLATE_GROUP_ID, label: 'Templates' },
             ...MONSTER_TRAIT_ACQUISITION_GROUPS,

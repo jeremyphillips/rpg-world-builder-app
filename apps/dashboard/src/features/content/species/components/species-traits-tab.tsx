@@ -2,6 +2,7 @@ import { useCallback, useMemo } from 'react'
 
 import { CreatureTraitAddMenu } from '../../lib/creature-traits/creature-trait-add-menu'
 import { FormEmbeddedMasterDetailEditor } from '../../components/master-detail/form-embedded-master-detail-editor'
+import { useMasterDetailArray } from '../../lib/master-detail/use-master-detail-array'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import {
   traitItemFields,
@@ -26,9 +27,11 @@ export interface SpeciesTraitsTabProps {
 export function SpeciesTraitsTab({ formCtx }: SpeciesTraitsTabProps) {
   const fields = useMemo(() => traitItemFields(formCtx), [formCtx])
   const makeItemDefaults = useCallback(() => traitItemDefaultValues(fields), [fields])
+  const editor = useMasterDetailArray(TRAITS_FIELD_NAME, makeItemDefaults)
 
   return (
     <FormEmbeddedMasterDetailEditor
+      editor={editor}
       formCtx={formCtx}
       fieldName={TRAITS_FIELD_NAME}
       itemFields={fields}
@@ -37,14 +40,13 @@ export function SpeciesTraitsTab({ formCtx }: SpeciesTraitsTabProps) {
       ariaLabel="Traits"
       addLabel="Add trait"
       idPrefix="species-trait"
-      makeItemDefaults={makeItemDefaults}
-      renderAddControl={({ append }) => (
+      addControl={
         <CreatureTraitAddMenu
           label="Add trait"
           rulesetId={formCtx.rulesetId}
-          onCustom={() => append(makeItemDefaults())}
+          onCustom={() => editor.appendRow(makeItemDefaults())}
           onTemplate={(templateId) =>
-            append({
+            editor.appendRow({
               ...makeItemDefaults(),
               kind: 'template',
               templateId,
@@ -54,7 +56,7 @@ export function SpeciesTraitsTab({ formCtx }: SpeciesTraitsTabProps) {
             })
           }
         />
-      )}
+      }
       mapListItem={({ row, index }) => ({
         title: traitItemTitle((row ?? {}) as TraitRowForm, index),
       })}

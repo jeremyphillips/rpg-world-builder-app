@@ -50,11 +50,11 @@ describe('MasterDetailListPanel', () => {
     vi.mocked(HTMLElement.prototype.scrollIntoView as typeof vi.fn).mockClear()
   })
 
-  it('renders the list title at card heading scale (text-lg) independent of panel density', () => {
+  it('renders the list title at nav heading scale (16px) independent of panel density', () => {
     render(<MasterDetailListPanel {...baseProps()} />)
 
-    expect(screen.getByText('Features')).toHaveClass('heading-style-card')
-    expect(screen.getByText('Features')).not.toHaveClass('heading-style-section')
+    expect(screen.getByText('Features')).toHaveClass('heading-style-nav')
+    expect(screen.getByText('Features')).not.toHaveClass('heading-style-card')
   })
 
   it('renders addControl in place of the default add button', () => {
@@ -278,25 +278,18 @@ describe('MasterDetailListPanel', () => {
         onSelectItem={onSelectItem}
         countSupplement={<span>2 available</span>}
         invalidItemCount={1}
+        addLabel="Add action"
         groups={[
           {
             id: 'actions',
             title: 'Actions',
-            addControl: (
-              <button type="button" onClick={onAddActions}>
-                Add action
-              </button>
-            ),
+            onAdd: onAddActions,
             items: [{ id: 'bite', title: 'Bite' }],
           },
           {
             id: 'reactions',
             title: 'Reactions',
-            addControl: (
-              <button type="button" onClick={onAddReactions}>
-                Add reaction
-              </button>
-            ),
+            onAdd: onAddReactions,
             items: [{ id: 'parry', title: 'Parry' }],
           },
         ]}
@@ -308,7 +301,8 @@ describe('MasterDetailListPanel', () => {
     expect(screen.getByRole('region', { name: 'Actions' })).toBeInTheDocument()
     expect(screen.getByRole('region', { name: 'Reactions' })).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: 'Add reaction' }))
+    const addButtons = screen.getAllByRole('button', { name: 'Add action' })
+    await user.click(addButtons[1]!)
     expect(onAddReactions).toHaveBeenCalledOnce()
     expect(onAddActions).not.toHaveBeenCalled()
 

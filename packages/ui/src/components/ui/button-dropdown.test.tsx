@@ -186,6 +186,26 @@ describe('ButtonDropdown', () => {
     ).toHaveClass('ui-interactive-list__panel--fit')
   })
 
+  it('renders a master-detail add icon trigger when triggerPresentation is addIcon', async () => {
+    const user = userEvent.setup()
+    render(
+      <ButtonDropdown
+        label="Add trait"
+        triggerPresentation="addIcon"
+        groups={groups}
+        items={items}
+        onSelectItem={vi.fn()}
+      />,
+    )
+
+    const trigger = screen.getByRole('button', { name: 'Add trait' })
+    expect(trigger).toHaveClass('ui-button--ghost', 'ui-button--icon-md')
+    expect(trigger).not.toHaveTextContent('Add trait')
+
+    await user.click(trigger)
+    expect(screen.getByRole('searchbox', { name: 'Search add trait…' })).toBeInTheDocument()
+  })
+
   it('does not apply fit width classes by default', () => {
     render(
       <ButtonDropdown label="Add grant" groups={groups} items={items} onSelectItem={vi.fn()} />,

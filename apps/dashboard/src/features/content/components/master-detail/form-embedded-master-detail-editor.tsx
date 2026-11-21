@@ -41,8 +41,10 @@ type FormEmbeddedMasterDetailEditorBase = {
   /** Accessible name for the list nav — must remain independent from `listTitle`. */
   ariaLabel: string
   addLabel: string
-  /** Replaces the default Add button without going through `renderAddControl`. */
+  /** Replaces the default add control (for example a template picker menu). */
   addControl?: ReactNode
+  /** Overrides `editor.handleAdd` for the default icon add control. */
+  onAdd?: () => void
   /** Row-specific detail fields. When omitted, every row uses `itemFields`. */
   resolveItemFields?: (row: unknown) => FormItem[]
   /** Prefix for detail `FormItems` ids, e.g. `species-trait`. */
@@ -81,8 +83,6 @@ type FormEmbeddedMasterDetailEditorBase = {
   }) => FormItem[] | undefined
   /** Mutually exclusive row access presentation and filtering. */
   access?: FormEmbeddedMasterDetailAccessConfig
-  /** Replaces the default Add button. `append` inserts a caller-built row. */
-  renderAddControl?: (ctx: { append: (row: Record<string, unknown>) => void }) => ReactNode
   /** Enables drag-to-reorder on the flat list rail; calls `editor.move` on drop. */
   listReorder?: boolean
 }
@@ -147,6 +147,7 @@ function FormEmbeddedMasterDetailEditorBody<TRow = Record<string, unknown>>({
   listTitle,
   ariaLabel,
   addLabel,
+  onAdd,
   ...props
 }: FormEmbeddedMasterDetailEditorBodyProps<TRow>) {
   const body = useFormEmbeddedMasterDetailEditorBody(props)
@@ -172,7 +173,7 @@ function FormEmbeddedMasterDetailEditorBody<TRow = Record<string, unknown>>({
       invalidItemCount={body.invalidItemCount}
       onSelectItem={body.handleSelectItem}
       addControl={body.addControl}
-      onAdd={body.editor.handleAdd}
+      onAdd={onAdd ?? body.editor.handleAdd}
       editor={body.editor}
       itemFields={body.detailFields}
       fieldName={body.fieldName}
