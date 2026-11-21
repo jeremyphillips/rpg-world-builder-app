@@ -90,7 +90,7 @@ export const monsterFormDef: ContentFormDef<Monster, MonsterFormValues, CreateMo
     actions: entity.actions.map((action) => action.id),
     bonusActions: entity.bonusActions.map((action) => action.id),
     reactions: entity.reactions.map((action) => action.id),
-    legendaryActions: entity.legendaryActions?.actions.map((action) => action.id) ?? [],
+    'legendaryActions.actions': entity.legendaryActions?.actions.map((action) => action.id) ?? [],
   }),
   toFormValues: monsterToFormValues,
   enrichEditLayoutCtx: (ctx, entity) => ({
