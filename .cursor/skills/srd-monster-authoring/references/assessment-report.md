@@ -5,7 +5,8 @@ Chat deliverable for `assess`, `review`, and the read-only half of `author`. Do 
 ## A. Source identity
 
 - Monster name, SRD edition, Open5e key, `document.key`.
-- Retrieval completeness. Name any stat-block section the payload did not cover.
+- [SRD 5.2.1 PDF](https://media.dndbeyond.com/compendium-images/srd/5.2/SRD_CC_v5.2.1.pdf) cross-check: yes / no / partial. Note sections where Open5e and the PDF disagree.
+- Retrieval completeness. Name any stat-block section the payload did not cover (especially **Gear**, CR parenthetical, lair XP, legendary pools in lair).
 - Local catalog status: absent, or `srd-cc-5.2.1:{slug}` plus citation and excerpt ids.
 
 ## B. Stat derivation
@@ -14,11 +15,11 @@ For AC, HP and hit-dice formula, proficiency, saves, skills, attacks, damage, sp
 
 ## C. Source-feature inventory
 
-One row per applicable feature, not per sentence. Cover identity and statistics, defenses, traits, actions, bonus actions, reactions, legendary and other exceptional sections, attack riders, save outcomes, conditions, spellcasting and spell lists, usage and recharge, and any other rule that changes play. Mark inapplicable sections, including legendary actions when the source has none.
+One row per applicable feature, not per sentence. Cover identity and statistics, defenses, **Gear** (each PDF line item), traits, actions, bonus actions, reactions, legendary and other exceptional sections, **lair** (CR XP, legendary intro, contextual daily uses), attack riders, save outcomes, conditions, spellcasting and spell lists, usage and recharge, and any other rule that changes play. Mark inapplicable sections, including legendary actions when the source has none.
 
 Each row:
 
-- Source evidence: Open5e detail, excerpt cross-check, or inference.
+- Source evidence: PDF literal (preferred for Gear and lair), Open5e detail, excerpt cross-check, or inference.
 - Structured field or description destination.
 - Rendered section, or omitted.
 - Capability and verification, from [coverage-rubric.md](coverage-rubric.md).
@@ -59,7 +60,9 @@ Include this section for `review`. A seed that validates can still be mechanical
 - Seed id, slug, provenance, excerpt ids.
 - Inventory mapped to the stored representation.
 - Expected SRD value, stored input, and resolved output.
-- Equipment and action ownership against the skill's decision order.
+- Gear inventory vs PDF **Gear** line (`monster.equipment` instances, including non-weapon items).
+- Equipment and action ownership against the skill's gear pass and attack order.
+- Lair fields vs PDF (`lair`, `formatCrStatRow`, legendary `uses.inLair`, Legendary Resistance template).
 - Spellcasting rows and the spell-resolution status of referenced spells.
 - Confirmed discrepancies. For each: category, owner, severity, confirmed or uncertain.
 

@@ -987,7 +987,13 @@
       "immunities": ["necrotic", "poison"],
       "conditionImmunities": ["charmed", "exhaustion", "frightened", "paralyzed", "poisoned"]
     },
-    "equipment": [],
+    "equipment": [
+      {
+        "entryId": "component-pouch",
+        "equipmentId": "srd-cc-5.2.1:component-pouch",
+        "quantity": 1
+      }
+    ],
     "traits": [
       {
         "kind": "template",

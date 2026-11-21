@@ -287,6 +287,9 @@ describe('SRD 5.2.1 monster seed', () => {
         armorClassRules: systemDefaultArmorClassRules(),
         magicPropertyProvider: () => undefined,
       })
+      expect(
+        lich?.equipment?.some((entry) => entry.equipmentId === 'srd-cc-5.2.1:component-pouch'),
+      ).toBe(true)
       expect(lich?.lair?.enabled).toBe(true)
       const lichXp = CHALLENGE_RATING_MECHANICS[lich.challengeRating].xp
       const lichInLairXp = resolveMonsterInLairExperiencePoints({
