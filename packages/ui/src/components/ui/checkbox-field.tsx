@@ -1,15 +1,21 @@
+'use client'
+
 import type { ComponentProps, ReactNode } from 'react'
 
 import { useFieldRowParticipation } from './field-row-anatomy.context'
 import { Field, type FieldSize } from './field.client'
-import { FieldLabelLine } from './field-label-content'
-import { CheckboxFieldOptionLabel } from './checkbox-field-option-label'
 import { CheckboxOption, type CheckboxOptionShell } from './checkbox-option.client'
-import type { CheckboxOptionScale } from './checkbox-option.lib'
-import { fieldLabelHintStackClasses } from './field.variants'
+import { fieldSizeToOptionTypographyScale, type CheckboxOptionScale } from './checkbox-option.lib'
+import { choiceOptionLabelClassName } from './choice-option-typography.lib'
+import { type FieldHintPosition } from './field.variants'
 import type { FieldWidth } from './field-control.variants'
 import { resolveFieldPresentation } from './field-row-presentation.lib'
 import { FieldControlRegion, FieldLabelRegion, FieldMessageRegion } from './field-anatomy-regions'
+import { CheckboxFieldOptionLabel } from './checkbox-field-option-label'
+import {
+  buildCheckboxFieldLabelNode,
+  CheckboxFieldInlineToggle,
+} from './checkbox-field-inline.client'
 
 import { FieldChromeShell } from './field-chrome-shell'
 import type { FieldChromeProps } from './field-chrome.variants'
@@ -21,12 +27,13 @@ import { cn } from '../../lib/utils'
 
 export interface CheckboxFieldProps
   extends
-    Omit<ComponentProps<typeof CheckboxOption>, 'id' | 'label' | 'size'>,
+    Omit<ComponentProps<typeof CheckboxOption>, 'id' | 'label' | 'size' | 'hint'>,
     FieldValidationProps,
     FieldChromeProps,
     FieldLabelPresentationProps {
   id: string
   hint?: string
+  hintPosition?: FieldHintPosition
   info?: ReactNode
   required?: boolean
   width?: FieldWidth
@@ -38,10 +45,6 @@ export interface CheckboxFieldProps
   optionSize?: CheckboxOptionScale
 }
 
-function showHintBelowOption(shell: CheckboxOptionShell | undefined, inAnatomyRow: boolean) {
-  return shell !== 'outlined' && !inAnatomyRow
-}
-
 /** A single checkbox with an inline option label, bound to the compound `Field`. */
 export function CheckboxField({
   id,
@@ -51,6 +54,7 @@ export function CheckboxField({
   invalid,
   describedBy,
   hint,
+  hintPosition,
   info,
   required,
   width,
@@ -63,6 +67,7 @@ export function CheckboxField({
   ...checkboxProps
 }: CheckboxFieldProps) {
   const inAnatomyRow = useFieldRowParticipation()
+  const resolvedHintPosition = inAnatomyRow ? 'below-control' : (hintPosition ?? 'below-label')
   const rootWidth = resolveFieldAnatomyWidth(width, chrome)
   const presentation = resolveFieldPresentation({
     size,
@@ -70,7 +75,23 @@ export function CheckboxField({
     labelLayout: 'inline',
     controlBand: inAnatomyRow ? 'single-line' : 'content-sized',
   })
-  const hintBelowOption = showHintBelowOption(shell, inAnatomyRow)
+  const outlined = shell === 'outlined'
+  const showHintInLabelColumn = !inAnatomyRow && resolvedHintPosition === 'below-label'
+  const showHintInMessageRegion = inAnatomyRow || resolvedHintPosition === 'below-control'
+
+  const optionScale = optionSize ?? fieldSizeToOptionTypographyScale(controlSize ?? size)
+  const optionLabelClassName = choiceOptionLabelClassName(optionScale, 'ui-checkbox-option__label')
+  const optionLabel = (
+    <CheckboxFieldOptionLabel label={label} labelVisibility={labelVisibility} required={required} />
+  )
+  const labelNode = buildCheckboxFieldLabelNode({
+    id,
+    label,
+    labelVisibility,
+    required,
+    info,
+    optionLabelClassName,
+  })
 
   return (
     <Field.Root
@@ -79,43 +100,35 @@ export function CheckboxField({
       invalid={invalid}
       describedBy={describedBy}
       hint={hint}
-      hintPosition={inAnatomyRow ? 'below-control' : undefined}
+      hintPosition={resolvedHintPosition}
       required={required}
       width={rootWidth}
       size={size}
       controlSize={controlSize}
+      labelVisibility={labelVisibility}
       anatomy
     >
       <FieldChromeShell chrome={chrome} size={size} className={cn('flex flex-col')}>
         <FieldLabelRegion size={size} />
         <FieldControlRegion>
-          <div className={presentation.controlBandClassName}>
-            <div className={cn(hintBelowOption && fieldLabelHintStackClasses)}>
-              <FieldLabelLine label={label} info={info}>
-                <CheckboxOption
-                  id={id}
-                  label={
-                    <CheckboxFieldOptionLabel
-                      label={label}
-                      labelVisibility={labelVisibility}
-                      required={required}
-                    />
-                  }
-                  shell={shell}
-                  tone={tone}
-                  size={optionSize}
-                  invalid={invalid ?? Boolean(error)}
-                  describedBy={describedBy}
-                  required={required}
-                  {...checkboxProps}
-                />
-              </FieldLabelLine>
-              {hintBelowOption ? <Field.Hint /> : null}
-            </div>
-          </div>
+          <CheckboxFieldInlineToggle
+            id={id}
+            optionLabel={optionLabel}
+            labelNode={labelNode}
+            outlined={outlined}
+            shell={shell}
+            tone={tone}
+            optionSize={optionSize}
+            invalid={invalid}
+            error={error}
+            required={required}
+            showHintInLabelColumn={showHintInLabelColumn}
+            controlBandClassName={presentation.controlBandClassName}
+            {...checkboxProps}
+          />
         </FieldControlRegion>
         <FieldMessageRegion size={size}>
-          {inAnatomyRow && <Field.Hint />}
+          {showHintInMessageRegion ? <Field.Hint /> : null}
           <Field.Error />
         </FieldMessageRegion>
       </FieldChromeShell>
