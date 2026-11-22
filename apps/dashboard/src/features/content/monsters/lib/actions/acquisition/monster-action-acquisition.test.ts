@@ -20,7 +20,7 @@ import type { FormCastingSections } from '../../casting/spellcasting-sources.lib
 import {
   MONSTER_ACTION_ACQUISITION_GROUPS,
   MONSTER_ACTION_ALREADY_ADDED_NOTE,
-  createBonusActionDraft,
+  createActionDraft,
   createReactionActionDraft,
   createSpellActionDraft,
   monsterActionAcquisitionItems,
@@ -136,20 +136,20 @@ describe('monster action acquisition presentation', () => {
       'create:shape-shift',
       'create:spell-standalone',
     ])
-    expect(createBonusActionDraft('leap')).toMatchObject({
+    expect(createActionDraft('leap')).toMatchObject({
       kind: 'leap',
       name: 'Leap',
       distanceFeet: 30,
       movementFeet: 10,
     })
-    expect(createBonusActionDraft('teleport')).toMatchObject({ kind: 'teleport', name: 'Teleport' })
-    expect(createBonusActionDraft('teleport')).not.toHaveProperty('distanceFeet')
-    expect(createBonusActionDraft('take-actions')).toMatchObject({
+    expect(createActionDraft('teleport')).toMatchObject({ kind: 'teleport', name: 'Teleport' })
+    expect(createActionDraft('teleport')).not.toHaveProperty('distanceFeet')
+    expect(createActionDraft('take-actions')).toMatchObject({
       kind: 'take-actions',
       standardActions: [],
       combination: 'one',
     })
-    expect(createBonusActionDraft('take-actions')).not.toHaveProperty('name')
+    expect(createActionDraft('take-actions')).not.toHaveProperty('name')
     expect(parseMonsterActionAcquisitionId('create:leap')).toEqual({
       type: 'create',
       kind: 'leap',

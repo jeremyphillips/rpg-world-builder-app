@@ -145,6 +145,23 @@ describe('legendary actions', () => {
     ).toBe(true)
   })
 
+  it('rejects an in-lair legendary pool at or below normal', () => {
+    const base = {
+      ...MONSTER_TEST_INPUT,
+      actions: [BITE_ACTION],
+      legendaryActions: legendaryBlock([reference], { normal: 3, inLair: 3 }),
+    }
+    expect(createMonsterInputSchema.safeParse(base).success).toBe(false)
+    expect(
+      issueMessages(
+        createMonsterInputSchema.safeParse({
+          ...base,
+          legendaryActions: legendaryBlock([reference], { normal: 4, inLair: 3 }),
+        }),
+      ),
+    ).toContain('In-lair uses must be greater than normal uses.')
+  })
+
   it('requires exactly one spell and keeps use-entry inside Legendary Actions', () => {
     expect(
       createMonsterInputSchema.safeParse({

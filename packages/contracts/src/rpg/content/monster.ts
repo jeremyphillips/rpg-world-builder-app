@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { creatureFamilyIdSchema } from '../vocab/creature-family'
 
 import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
+import { refineContextualCountInLairExceedsNormal } from '../primitives/contextual-count'
 import { abilitySchema } from '../vocab/ability'
 import { challengeRatingSchema, CHALLENGE_RATING_MECHANICS } from '../vocab/challenge-rating'
 import {
@@ -730,6 +731,11 @@ function refineLegendaryPoolWithRows(
       ...legendaryPoolCountPath(prefix, 'normal'),
     ])
   }
+  refineContextualCountInLairExceedsNormal(
+    block.uses,
+    ctx,
+    legendaryPoolCountPath(prefix, 'inLair'),
+  )
 }
 
 function refineLegendaryActionPool(
@@ -929,13 +935,17 @@ function refineMonsterLegendaryResistanceTraits(
 ): void {
   traits.forEach((trait, index) => {
     if (trait.kind !== 'template' || trait.templateId !== 'legendary-resistance') return
-    if (trait.nameOverride === undefined) return
-    addCustomRefinementIssue(ctx, LEGENDARY_RESISTANCE_NAME_OVERRIDE_MESSAGE, [
-      ...prefix,
-      'traits',
-      index,
-      'nameOverride',
-    ])
+    const traitPath = [...prefix, 'traits', index]
+    if (trait.nameOverride !== undefined) {
+      addCustomRefinementIssue(ctx, LEGENDARY_RESISTANCE_NAME_OVERRIDE_MESSAGE, [
+        ...traitPath,
+        'nameOverride',
+      ])
+    }
+    const config = trait.config
+    if (!config || typeof config !== 'object' || Array.isArray(config)) return
+    const uses = (config as { uses?: { normal?: number; inLair?: number } }).uses
+    refineContextualCountInLairExceedsNormal(uses, ctx, [...traitPath, 'config', 'uses', 'inLair'])
   })
 }
 

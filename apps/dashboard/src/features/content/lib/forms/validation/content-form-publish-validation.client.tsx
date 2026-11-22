@@ -8,31 +8,43 @@ import {
   type TabbedFormTab,
 } from '@rpg/ui/form'
 
-import { evaluateContentPublishValidation } from './content-publish-validation.lib'
+import {
+  evaluateContentPublishValidation,
+  CONTENT_PUBLISH_VALIDATION_ROUTING_FAILED_MESSAGE,
+} from './content-publish-validation.lib'
 import {
   useContentPublishValidation,
   type ContentPublishValidation,
 } from './use-content-publish-validation'
 
+type RoutedPublishIssues = { status: 'ok'; issues: FormIssue[] } | { status: 'failed' }
+
 function routedPublishIssues(
   schema: ZodType<FieldValues>,
   values: FieldValues,
   fields: ReturnType<typeof collectTabbedFormResolverItems>,
-): FormIssue[] | null {
+): RoutedPublishIssues {
   try {
     const fresh = evaluateContentPublishValidation(schema, values, fields)
-    if (!fresh) return []
-    return prepareFormIssues(
-      fresh.map((issue) => ({
-        path: issue.path.split('.'),
-        message: issue.message,
-      })),
-      fields,
-      values as Record<string, unknown>,
-    )
+    if (!fresh) return { status: 'ok', issues: [] }
+    return {
+      status: 'ok',
+      issues: prepareFormIssues(
+        fresh.map((issue) => ({
+          path: issue.path.split('.'),
+          message: issue.message,
+        })),
+        fields,
+        values as Record<string, unknown>,
+      ),
+    }
   } catch {
-    return null
+    return { status: 'failed' }
   }
+}
+
+function routingFailedIssue(): FormIssue {
+  return { path: '', message: CONTENT_PUBLISH_VALIDATION_ROUTING_FAILED_MESSAGE }
 }
 
 /** Bridges live publish validation into {@link FormUiProvider} presentation props. */
@@ -51,14 +63,14 @@ export function ContentFormPublishValidationBridge({
 
   useEffect(() => {
     if (validation.isChecking) return
-    const fresh = routedPublishIssues(schema, getValues(), fields)
-    if (fresh === null) {
-      if (validation.issues.length > 0) onValidationChange({ issues: [...validation.issues] })
+    const routed = routedPublishIssues(schema, getValues(), fields)
+    if (routed.status === 'failed') {
+      onValidationChange({ issues: [routingFailedIssue()] })
       return
     }
     // Not-ready with no routed issues is a transient parse — keep the surfaced list.
-    if (fresh.length === 0 && !validation.isPublishReady) return
-    onValidationChange({ issues: fresh })
+    if (routed.issues.length === 0 && !validation.isPublishReady) return
+    onValidationChange({ issues: routed.issues })
   }, [
     fields,
     getValues,

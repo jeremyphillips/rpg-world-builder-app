@@ -501,9 +501,6 @@ export function createActionDraft(
   } as MonsterActionDraftRow
 }
 
-/** @deprecated Use `createActionDraft`. */
-export const createBonusActionDraft = createActionDraft
-
 export function createReactionActionDraft(
   category: 'reference' | 'parry' | 'cast-spell' | 'custom',
   sections: FormCastingSections,

@@ -10,6 +10,9 @@ import {
 import { resolveContentPublishSchema } from '../shells/edit/content-edit-load'
 import type { AnyContentFormDef, ContentFormCtx } from '../../registry/content-form-registry'
 
+export const CONTENT_PUBLISH_VALIDATION_ROUTING_FAILED_MESSAGE =
+  'Publish validation could not run. Refresh and try again.'
+
 export function applyValidationIssuesToForm<TFieldValues extends FieldValues>(
   form: UseFormReturn<TFieldValues>,
   issues: readonly Pick<ApiValidationIssue, 'path' | 'message'>[],

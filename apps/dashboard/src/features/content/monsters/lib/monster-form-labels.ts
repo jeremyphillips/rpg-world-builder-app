@@ -246,6 +246,8 @@ export function multiattackStepUseRepetitionSuffix(count: unknown): string | und
   return undefined
 }
 export const MONSTER_TRAIT_PREVIEW_LABEL = 'Trait preview'
+export const MONSTER_TRAIT_PREVIEW_UNAVAILABLE_GUIDANCE =
+  'Complete required trait fields to show the stat-block preview.'
 /** Stat-block preview row — not action-economy {@link getActionEconomyLabel} “Action”. */
 export const MONSTER_ACTION_ATTACK_PREVIEW_ATTACK_LABEL = 'Attack'
 export const MONSTER_ACTION_DAMAGE_FIELD_LABEL = getSpellAtomicEffectKindLabel('damage')

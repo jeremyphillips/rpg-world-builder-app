@@ -19,6 +19,7 @@ import {
   type DraftPublishValidationSurface,
 } from './content-draft-publish-validation-surface.ref'
 import {
+  CONTENT_PUBLISH_VALIDATION_ROUTING_FAILED_MESSAGE,
   evaluateContentPublishValidation,
   paintValidationIssuesOnForm,
 } from './content-publish-validation.lib'
@@ -63,6 +64,16 @@ export function ContentDraftPublishValidationSurfaceBridge({
       try {
         issues = evaluateContentPublishValidation(publishSchema, values, publishFields)
       } catch {
+        paintValidationIssuesOnForm(form, [
+          { path: '', message: CONTENT_PUBLISH_VALIDATION_ROUTING_FAILED_MESSAGE },
+        ])
+        currentUi.markSubmitAttempted()
+        if (currentUi.publishPresentationEnabled) {
+          currentUi.markPublishAttempted()
+          onPublishIssuesChangeRef.current({
+            issues: [{ path: '', message: CONTENT_PUBLISH_VALIDATION_ROUTING_FAILED_MESSAGE }],
+          })
+        }
         return null
       }
       if (!issues) return null

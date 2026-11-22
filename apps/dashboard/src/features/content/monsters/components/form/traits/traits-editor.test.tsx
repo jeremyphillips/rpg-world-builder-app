@@ -63,6 +63,23 @@ describe('MonsterTraitsEditor', () => {
     expect(screen.queryByText('Trait preview')).not.toBeInTheDocument()
   })
 
+  it('shows guidance when trait preview is not ready', () => {
+    const values = resolveMonsterCreateDefaultValues()
+    values.traits = [
+      {
+        kind: 'template',
+        id: 'lr',
+        templateId: 'legendary-resistance',
+        config: { uses: {} },
+      },
+    ]
+    render(<Host values={values} />)
+    const preview = screen.getByText('Trait preview').closest('.ui-panel')
+    expect(preview).toHaveTextContent(
+      'Complete required trait fields to show the stat-block preview.',
+    )
+  })
+
   it('previews legendary resistance with the stat-block heading when lair is enabled', () => {
     const values = resolveMonsterCreateDefaultValues()
     values.name = 'Lich'
