@@ -14,12 +14,17 @@ import {
   formatMonsterSpellEntry,
   formatOnceUntilNextTurnSentence,
 } from './spell-entry-presentation'
+import { joinStatBlockProseDocument } from './stat-block-prose'
 import type { MonsterReferencedSpell } from './reaction-trigger'
 
 const MONSTER_CHANGED = 'srd-cc-5.2.1:fireball'
 
 const spellsById = monsterFixtureSpellLookup()
 const spellsInBody = new Map([[SPELLCASTING_ACTION.id, SPELLCASTING_ACTION]])
+
+function spellEntryBody(rendered: ReturnType<typeof formatMonsterSpellEntry>): string {
+  return joinStatBlockProseDocument(rendered.bodyProse)
+}
 
 describe('formatMonsterSpellEntry', () => {
   it('renders spellcasting groups from structure, including Each only for multiple spells', () => {
@@ -31,15 +36,11 @@ describe('formatMonsterSpellEntry', () => {
       catalogStatus: 'ready',
       spellsInBody,
     })
-    expect(rendered.bodyHtml).toContain(
-      '<strong>At Will</strong>: <em>Mage Hand</em>, <em>Detect Magic</em>',
-    )
-    expect(rendered.bodyHtml).toContain(
-      '<strong>2/Day Each</strong>: <em>Fireball</em>, <em>Lightning Bolt</em>',
-    )
-    expect(rendered.bodyHtml).toContain('<strong>1/Day</strong>: <em>Raise Dead</em>')
-    expect(rendered.bodyHtml).not.toContain('At Will Each')
-    expect(rendered.bodyHtml).not.toContain('spell save DC')
+    expect(spellEntryBody(rendered)).toContain('At Will: Mage Hand, Detect Magic')
+    expect(spellEntryBody(rendered)).toContain('2/Day Each: Fireball, Lightning Bolt')
+    expect(spellEntryBody(rendered)).toContain('1/Day: Raise Dead')
+    expect(spellEntryBody(rendered)).not.toContain('At Will Each')
+    expect(spellEntryBody(rendered)).not.toContain('spell save DC')
   })
 
   it('prints a derived save DC only when a listed spell resolves with a saving throw', () => {
@@ -60,7 +61,7 @@ describe('formatMonsterSpellEntry', () => {
       spellsInBody,
       saveDc: 14,
     })
-    expect(rendered.bodyHtml).toContain(
+    expect(spellEntryBody(rendered)).toContain(
       'The mage casts one of the following spells, using Intelligence as the spellcasting ability (spell save DC 14):',
     )
 
@@ -73,8 +74,8 @@ describe('formatMonsterSpellEntry', () => {
       spellsInBody,
       saveDc: 14,
     })
-    expect(shared.bodyHtml).not.toContain('spell save DC')
-    expect(shared.bodyHtml).toContain('using the same spellcasting ability as Spellcasting')
+    expect(spellEntryBody(shared)).not.toContain('spell save DC')
+    expect(spellEntryBody(shared)).toContain('using the same spellcasting ability as Spellcasting')
   })
 
   it('renders grouped spellcasting intro with material-only omissions', () => {
@@ -98,7 +99,7 @@ describe('formatMonsterSpellEntry', () => {
       spellsInBody,
       saveDc: 19,
     })
-    expect(rendered.bodyHtml).toContain(
+    expect(spellEntryBody(rendered)).toContain(
       'The ancient red dragon casts one of the following spells, requiring no Material components and using Intelligence as the spellcasting ability (spell save DC 19):',
     )
   })
@@ -113,8 +114,8 @@ describe('formatMonsterSpellEntry', () => {
       spellsInBody,
     })
     expect(protective.heading).toBe('Protective Magic (3/Day)')
-    expect(protective.bodyHtml).toContain(
-      "The archmage casts <em>Counterspell</em> or <em>Shield</em> in response to the spell's trigger, using the same spellcasting ability as Spellcasting.",
+    expect(spellEntryBody(protective)).toContain(
+      "The archmage casts Counterspell or Shield in response to the spell's trigger, using the same spellcasting ability as Spellcasting.",
     )
 
     const misty = formatMonsterSpellEntry({
@@ -125,8 +126,8 @@ describe('formatMonsterSpellEntry', () => {
       catalogStatus: 'ready',
       spellsInBody,
     })
-    expect(misty.bodyHtml).toContain(
-      'The archmage casts <em>Misty Step</em>, using the same spellcasting ability as Spellcasting.',
+    expect(spellEntryBody(misty)).toContain(
+      'The archmage casts Misty Step, using the same spellcasting ability as Spellcasting.',
     )
   })
 
@@ -145,9 +146,9 @@ describe('formatMonsterSpellEntry', () => {
       catalogStatus: 'ready',
       spellsInBody,
     })
-    expect(changed.bodyHtml).toContain('Unavailable spell')
-    expect(changed.bodyHtml).not.toContain('missing')
-    expect(changed.bodyHtml).not.toContain('Mage Hand')
+    expect(spellEntryBody(changed)).toContain('Unavailable spell')
+    expect(spellEntryBody(changed)).not.toContain('missing')
+    expect(spellEntryBody(changed)).not.toContain('Mage Hand')
   })
 
   it('uses the spellcasting entry name without repeating its ability', () => {
@@ -166,9 +167,9 @@ describe('formatMonsterSpellEntry', () => {
       catalogStatus: 'ready',
       spellsInBody,
     })
-    expect(rendered.bodyHtml).toContain('The ancient red dragon uses Spellcasting to cast')
-    expect(rendered.bodyHtml).toContain('(level 5 version)')
-    expect(rendered.bodyHtml).not.toContain('spellcasting ability')
+    expect(spellEntryBody(rendered)).toContain('The ancient red dragon uses Spellcasting to cast')
+    expect(spellEntryBody(rendered)).toContain('(level 5 version)')
+    expect(spellEntryBody(rendered)).not.toContain('spellcasting ability')
   })
 
   it('prints legendary spell categories from structure', () => {
@@ -205,8 +206,8 @@ describe('formatMonsterSpellEntry', () => {
       catalogStatus: 'ready',
       spellsInBody: spells,
     })
-    expect(gaze.bodyHtml).toContain(
-      'The mummy lord casts <em>Fear</em>, using the same spellcasting ability as Spellcasting.',
+    expect(spellEntryBody(gaze)).toContain(
+      'The mummy lord casts Fear, using the same spellcasting ability as Spellcasting.',
     )
     expect(formatOnceUntilNextTurnSentence({ monsterName: 'Mummy Lord', kind: 'spell' })).toBe(
       "The mummy lord can't take this action again until the start of its next turn.",
@@ -227,8 +228,8 @@ describe('formatMonsterSpellEntry', () => {
       catalogStatus: 'ready',
       spellsInBody: spells,
     })
-    expect(presence.bodyHtml).toContain(
-      'The ancient red dragon uses Spellcasting to cast <em>Command</em> (level 2 version).',
+    expect(spellEntryBody(presence)).toContain(
+      'The ancient red dragon uses Spellcasting to cast Command (level 2 version).',
     )
 
     const inherited = formatMonsterSpellEntry({
@@ -246,7 +247,7 @@ describe('formatMonsterSpellEntry', () => {
       catalogStatus: 'ready',
       spellsInBody: spells,
     })
-    expect(inherited.bodyHtml).toContain('(level 2 version)')
+    expect(spellEntryBody(inherited)).toContain('(level 2 version)')
 
     const dread = formatMonsterSpellEntry({
       entry: {
@@ -262,8 +263,8 @@ describe('formatMonsterSpellEntry', () => {
       catalogStatus: 'ready',
       spellsInBody: spells,
     })
-    expect(dread.bodyHtml).toContain(
-      'The ancient red dragon casts <em>Command</em> (level 2 version), using the same spellcasting ability as Spellcasting.',
+    expect(spellEntryBody(dread)).toContain(
+      'The ancient red dragon casts Command (level 2 version), using the same spellcasting ability as Spellcasting.',
     )
 
     const beguileSpells = new Map(catalogSpells)
@@ -288,8 +289,8 @@ describe('formatMonsterSpellEntry', () => {
       spellsInBody: spells,
       saveDc: 17,
     })
-    expect(beguile.bodyHtml).toContain('spell save DC 17')
-    expect(beguile.bodyHtml).toContain('requiring no spell components')
+    expect(spellEntryBody(beguile)).toContain('spell save DC 17')
+    expect(spellEntryBody(beguile)).toContain('requiring no spell components')
   })
 })
 

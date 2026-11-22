@@ -160,6 +160,7 @@ export const MONSTER_ON_HIT_DETAILS_ADD_LABEL = 'Add details'
 export const MONSTER_ON_HIT_CONDITION_DETAILS_HINT =
   'Additional rules or restrictions that apply to this effect.'
 export const MONSTER_ON_HIT_CONDITION_DETAILS_PLACEHOLDER = 'E.g. (escape DC 15), from both claws'
+export const MONSTER_ACTION_PREVIEW_LABEL = 'Preview'
 export const MONSTER_ACTION_ATTACK_PREVIEW_LABEL = 'Attack preview'
 export const MONSTER_ACTION_SPELL_PREVIEW_LABEL = 'Spellcasting preview'
 export const MONSTER_REACTION_PREVIEW_LABEL = 'Reaction preview'

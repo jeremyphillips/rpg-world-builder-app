@@ -2,6 +2,8 @@ import {
   availableBodyRows,
   deriveMonsterStatBlock,
   formatMonsterSpellEntry,
+  joinStatBlockProseDocument,
+  type StatBlockProseDocument,
   getContentTypeTerm,
   resolveMonsterActionIdentity,
   type MonsterAction,
@@ -135,7 +137,7 @@ function tryDeriveSpellLine(
 
 export type MonsterActionSpellPreview =
   | { status: 'unavailable'; guidance: string }
-  | { status: 'ready'; bodyHtml: string }
+  | { status: 'ready'; rulesProse: StatBlockProseDocument }
 
 function unavailableSpellPreview(
   guidanceContext: MonsterActionSpellPreviewUnavailableContext,
@@ -164,7 +166,7 @@ function renderSpellPreviewBody(input: {
   section: MonsterActionSection
   draft: Extract<MonsterActionDraft, { kind: 'spell' }>
   spellsInBody: ReturnType<typeof buildMonsterSpellsInBody>
-}): string {
+}): StatBlockProseDocument {
   const armorClassRules = monsterArmorClassRules(input.ctx)!
   const normalized = normalizeMonsterDraftForPreview(input.values, {
     intent: 'draft',
@@ -188,7 +190,7 @@ function renderSpellPreviewBody(input: {
     catalogStatus: spellCatalogStatus(input.ctx),
     spellsInBody: input.spellsInBody,
     saveDc,
-  }).bodyHtml
+  }).bodyProse
 }
 
 export function buildMonsterActionSpellPreview(input: {
@@ -212,8 +214,10 @@ export function buildMonsterActionSpellPreview(input: {
     return unavailableSpellPreview(guidanceContext)
   }
 
-  const bodyHtml = renderSpellPreviewBody({ ...input, draft, spellsInBody })
-  if (!bodyHtml.trim()) return unavailableSpellPreview(guidanceContext)
+  const rulesProse = renderSpellPreviewBody({ ...input, draft, spellsInBody })
+  if (joinStatBlockProseDocument(rulesProse).trim().length === 0) {
+    return unavailableSpellPreview(guidanceContext)
+  }
 
-  return { status: 'ready', bodyHtml }
+  return { status: 'ready', rulesProse }
 }

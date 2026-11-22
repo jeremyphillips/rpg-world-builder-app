@@ -1,5 +1,6 @@
 export * from './derived-field'
 export * from './armor-class'
+export * from './stat-block-prose'
 export * from './format-monster-attack-action'
 export * from './format-monster-multiattack'
 export * from './format-monster-parry'

@@ -13,6 +13,8 @@ export type GameTermEntry = {
     readonly singular?: string
     readonly plural?: string
   }
+  /** SRD stat-block colon lead-in; falls back to `label` when absent. */
+  readonly statBlockLead?: string
 }
 
 /**
@@ -172,6 +174,11 @@ export function getTermSentenceForm(entry: GameTermEntry, count: number): string
 /** Compact-surface display label; falls back to `label` when `compactLabel` is absent. */
 export function getTermCompactLabel(entry: GameTermEntry): string {
   return entry.compactLabel ?? entry.label
+}
+
+/** SRD stat-block colon lead-in; falls back to `label` when `statBlockLead` is absent. */
+export function getTermStatBlockLead(entry: GameTermEntry): string {
+  return entry.statBlockLead ?? entry.label
 }
 
 /** Collection or set display label; falls back to capitalized plural sentence form. */

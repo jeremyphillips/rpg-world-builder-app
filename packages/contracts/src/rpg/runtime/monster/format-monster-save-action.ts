@@ -11,10 +11,22 @@ import { formatAreaGeometry } from '../../primitives/area-geometry'
 import { limitedUseSchema } from '../../primitives/limited-use'
 import type { Ability } from '../../vocab/ability'
 import { getAbilityLabel } from '../../vocab/ability'
+import {
+  getResolutionOutcomeResultStatBlockLead,
+  getResolutionRepeatSaveFailureTierStatBlockLead,
+} from '../../vocab/resolution'
 import { abilityModifier } from '../creature/ability-modifier'
 import { abilitySaveDc } from '../creature/spell-dc'
 import { resolveStatBlockDamagePart } from '../creature/stat-block-average'
 import { formatStatBlockDamageComponent } from './format-stat-block-damage'
+import {
+  joinStatBlockProseParagraph,
+  statBlockOutcomeLead,
+  statBlockProseSpacing,
+  statBlockSaveLead,
+  type StatBlockProse,
+  type StatBlockProseSegment,
+} from './stat-block-prose'
 import { formatMonsterLimitedUseHeading } from './spell-entry-presentation'
 
 type SaveAction = Extract<MonsterAction, { kind: 'save' }>
@@ -127,18 +139,15 @@ function outcomeBodyClauses(
   return outcomeEffectClauses(outcome.effects, effects)
 }
 
-function outcomeSentence(
+function outcomeProse(
   label: string,
   outcome: SaveOutcome,
   effects: SaveAction['resolution']['effects'],
-): string | undefined {
+): StatBlockProseSegment[] | undefined {
   const clauses = outcomeBodyClauses(outcome, effects)
   const body = clauses.join(' ')
-  return body ? `${label}: ${body}` : undefined
-}
-
-function compactSentence(sentence: string | undefined): string[] {
-  return sentence ? [sentence] : []
+  if (!body) return undefined
+  return statBlockOutcomeLead(label, body)
 }
 
 function proseSentence(text: string | undefined): string | undefined {
@@ -147,10 +156,10 @@ function proseSentence(text: string | undefined): string | undefined {
   return trimmed.endsWith('.') ? trimmed : `${trimmed}.`
 }
 
-function secondFailureSentence(
+function secondFailureProse(
   outcome: SaveOutcome,
   effects: SaveAction['resolution']['effects'],
-): string | undefined {
+): StatBlockProseSegment[] | undefined {
   const repeatSave = outcome.repeatSave
   if (!repeatSave) return undefined
   const clauses = [
@@ -160,26 +169,46 @@ function secondFailureSentence(
       : []),
   ]
   if (clauses.length === 0) return undefined
-  return `Second Failure: ${clauses.join(' ')}`
+  return statBlockOutcomeLead(
+    getResolutionRepeatSaveFailureTierStatBlockLead('secondFailure'),
+    clauses.join(' '),
+  )
 }
 
-function repeatSaveSentences(
+function repeatSaveProseSegments(
   outcome: SaveOutcome,
   effects: SaveAction['resolution']['effects'],
-): string[] {
+): StatBlockProseSegment[] {
   const repeatSave = outcome.repeatSave
   if (!repeatSave) return []
-  const second = secondFailureSentence(outcome, effects)
-  return [
-    formatRepeatSaveTransition(repeatSave.timing),
-    ...(proseSentence(repeatSave.eligibilityNote)
-      ? [proseSentence(repeatSave.eligibilityNote)!]
-      : []),
-    ...(repeatSave.successOnRepeatEndsEffect
-      ? ['On a success, the target ends the effect on itself.']
-      : []),
-    ...(second ? [second] : []),
-  ]
+  const segments: StatBlockProseSegment[] = []
+  const pushPlain = (sentence: string) => {
+    if (segments.length > 0) segments.push(statBlockProseSpacing())
+    segments.push({ kind: 'text', value: sentence })
+  }
+  pushPlain(formatRepeatSaveTransition(repeatSave.timing))
+  const eligibility = proseSentence(repeatSave.eligibilityNote)
+  if (eligibility) pushPlain(eligibility)
+  if (repeatSave.successOnRepeatEndsEffect) {
+    pushPlain('On a success, the target ends the effect on itself.')
+  }
+  const second = secondFailureProse(outcome, effects)
+  if (second) {
+    if (segments.length > 0) segments.push(statBlockProseSpacing())
+    segments.push(...second)
+  }
+  return segments
+}
+
+function failureOrSuccessProse(
+  outcome: SaveOutcome,
+  resolution: SaveAction['resolution'],
+): StatBlockProseSegment[] {
+  const line = formatResolutionOutcomeLine(outcome, resolution)
+  const failureOrSuccessLead = getResolutionOutcomeResultStatBlockLead('failed-or-successful-save')
+  const prefix = `${failureOrSuccessLead}: `
+  const body = line.startsWith(prefix) ? line.slice(prefix.length) : line
+  return statBlockOutcomeLead(failureOrSuccessLead, body)
 }
 
 function selectionPhrase(action: SaveAction): string {
@@ -196,6 +225,62 @@ function selectionPhrase(action: SaveAction): string {
   return 'the target'
 }
 
+function formatMonsterSaveActionProse(args: {
+  action: SaveAction
+  abilityScores: Record<Ability, number>
+  proficiencyBonus: number
+  spellcastingAbilityScore?: number
+}): StatBlockProse {
+  const { action } = args
+  const resolution = action.resolution
+  const dc = saveDc(args)
+  const ability =
+    resolution.method.kind === 'saving-throw'
+      ? getAbilityLabel(resolution.method.ability)
+      : 'Saving throw'
+  const failed = resolution.outcomes.find((outcome) => outcome.result === 'failed-save')
+  const saved = resolution.outcomes.find((outcome) => outcome.result === 'successful-save')
+  const failureOrSuccess = resolution.outcomes.find(
+    (outcome) => outcome.result === 'failed-or-successful-save',
+  )
+
+  const failureLabel = failed?.repeatSave
+    ? getResolutionRepeatSaveFailureTierStatBlockLead('firstFailure')
+    : getResolutionOutcomeResultStatBlockLead('failed-save')
+
+  const segments: StatBlockProseSegment[] = [
+    ...statBlockSaveLead(ability, dc, selectionPhrase(action)),
+  ]
+
+  if (failed) {
+    const failedProse = outcomeProse(failureLabel, failed, resolution.effects)
+    if (failedProse) {
+      segments.push(statBlockProseSpacing(), ...failedProse)
+    }
+    const repeat = repeatSaveProseSegments(failed, resolution.effects)
+    if (repeat.length > 0) {
+      segments.push(statBlockProseSpacing(), ...repeat)
+    }
+  }
+
+  if (saved) {
+    const savedProse = outcomeProse(
+      getResolutionOutcomeResultStatBlockLead('successful-save'),
+      saved,
+      resolution.effects,
+    )
+    if (savedProse) {
+      segments.push(statBlockProseSpacing(), ...savedProse)
+    }
+  }
+
+  if (failureOrSuccess) {
+    segments.push(statBlockProseSpacing(), ...failureOrSuccessProse(failureOrSuccess, resolution))
+  }
+
+  return segments
+}
+
 /** SRD stat-block heading and body for a monster saving-throw action. */
 export function formatMonsterSaveAction(args: {
   action: SaveAction
@@ -204,30 +289,9 @@ export function formatMonsterSaveAction(args: {
   abilityScores: Record<Ability, number>
   proficiencyBonus: number
   spellcastingAbilityScore?: number
-}): { heading: string; body: string } {
-  const { action } = args
-  const resolution = action.resolution
-  const dc = saveDc(args)
-  const ability =
-    resolution.method.kind === 'saving-throw'
-      ? getAbilityLabel(resolution.method.ability)
-      : 'Saving throw'
-  const limitedUse = limitedUseSchema.safeParse(action.limitedUse).data
+}): { heading: string; body: string; bodyProse: StatBlockProse } {
+  const limitedUse = limitedUseSchema.safeParse(args.action.limitedUse).data
   const heading = formatMonsterLimitedUseHeading(args.name, limitedUse)
-  const failed = resolution.outcomes.find((outcome) => outcome.result === 'failed-save')
-  const saved = resolution.outcomes.find((outcome) => outcome.result === 'successful-save')
-  const failureOrSuccess = resolution.outcomes.find(
-    (outcome) => outcome.result === 'failed-or-successful-save',
-  )
-
-  const failureLabel = failed?.repeatSave ? 'First Failure' : 'Failure'
-
-  const sentences = [
-    `${ability} Saving Throw: DC ${dc ?? '—'}, ${selectionPhrase(action)}.`,
-    ...(failed ? compactSentence(outcomeSentence(failureLabel, failed, resolution.effects)) : []),
-    ...(failed ? repeatSaveSentences(failed, resolution.effects) : []),
-    ...(saved ? compactSentence(outcomeSentence('Success', saved, resolution.effects)) : []),
-    ...(failureOrSuccess ? [formatResolutionOutcomeLine(failureOrSuccess, resolution)] : []),
-  ]
-  return { heading, body: sentences.join(' ') }
+  const bodyProse = formatMonsterSaveActionProse(args)
+  return { heading, body: joinStatBlockProseParagraph(bodyProse), bodyProse }
 }

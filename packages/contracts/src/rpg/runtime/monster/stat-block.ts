@@ -286,7 +286,7 @@ export function deriveMonsterStatBlock({
   }
 }
 
-function deriveSpellcastingLines(
+export function deriveSpellcastingLines(
   monster: MonsterBody,
   proficiencyBonus: number,
 ): DerivedMonsterSpellcastingLine[] {
@@ -322,6 +322,8 @@ export type DerivedDraftAttack = {
   id: string
   section: DerivedMonsterAttackLine['section']
   result: DerivedField<DerivedMonsterAttackLine>
+  /** Resolved attack profile retained for form preview metadata — not used on publish. */
+  profile?: MonsterActionAttackProfile
 }
 
 export type DerivedMonsterDraftStatBlock = {
@@ -350,22 +352,25 @@ type DraftMonsterSource = {
   legendaryActions?: MonsterBody['legendaryActions']
 }
 
-function draftAttackResult(args: {
+function resolveDraftAttackEntry(args: {
   action: MonsterAction | MonsterBonusAction | MonsterReaction | MonsterLegendaryAction
   monster: MonsterBody
   equipmentCatalog: CreatureEquipmentCatalog
   proficiencyBonus: number | undefined
   section: DerivedMonsterAttackLine['section']
   magicPropertyProvider: MagicPropertyDefinitionProvider
-}): DerivedField<DerivedMonsterAttackLine> {
+}): Pick<DerivedDraftAttack, 'result' | 'profile'> {
   const profile = resolveMonsterActionAttackProfile({
     ...args,
     action: args.action as MonsterAction,
   })
-  if (profile.status === 'unavailable') return profile
-  return resolvedField(
-    attackLineFromProfile(profile.value, args.action.id, args.section, args.monster.name),
-  )
+  if (profile.status === 'unavailable') return { result: profile }
+  return {
+    result: resolvedField(
+      attackLineFromProfile(profile.value, args.action.id, args.section, args.monster.name),
+    ),
+    profile: profile.value,
+  }
 }
 
 function draftAttacks(
@@ -394,7 +399,7 @@ function draftAttacks(
       attacks.push({
         id: action.id,
         section,
-        result: draftAttackResult({
+        ...resolveDraftAttackEntry({
           action,
           monster: asBody,
           equipmentCatalog,

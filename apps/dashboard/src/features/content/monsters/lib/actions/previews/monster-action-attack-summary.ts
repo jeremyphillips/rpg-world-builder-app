@@ -5,7 +5,6 @@ import {
   CHALLENGE_RATING_MECHANICS,
   formatProficiencyBonus,
   formatEffectEnd,
-  formatMonsterAttackAction,
   formatSignedModifier,
   type EffectEnd,
   getAbilityCompactLabel,
@@ -328,23 +327,6 @@ function attackDistanceRows(value: MonsterActionAttackProfile): MonsterActionAtt
   return rows
 }
 
-function attackPreviewSentence(
-  value: MonsterActionAttackProfile,
-  sourceName?: string,
-): string | undefined {
-  return formatMonsterAttackAction({
-    attackBonusLabel: formatSignedModifier(value.attackBonus),
-    damage: String(value.primary.average),
-    ...(value.primary.expression ? { damageExpression: value.primary.expression } : {}),
-    damageTypeId: value.primary.damageTypeId,
-    modes: [...value.modes],
-    ...(value.reach !== undefined ? { reach: value.reach } : {}),
-    ...(value.range ? { range: value.range } : {}),
-    ...(value.onHit.length > 0 ? { onHit: value.onHit } : {}),
-    ...(sourceName ? { sourceName } : {}),
-  })
-}
-
 export function buildMonsterActionAttackPreview(
   profile: DerivedField<MonsterActionAttackProfile>,
   abilityScores: Partial<Record<Ability, number>> | undefined,
@@ -376,12 +358,9 @@ export function buildMonsterActionAttackPreview(
   })
   rows.push(...attackDistanceRows(value))
 
-  const sentence = attackPreviewSentence(value, sourceName)
-
   return {
     status: 'ready',
     modeCaption: modeCaption(value),
     rows,
-    ...(sentence ? { sentence } : {}),
   }
 }

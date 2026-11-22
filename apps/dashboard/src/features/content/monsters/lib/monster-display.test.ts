@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { systemDefaultArmorClassRules, type Equipment, type Monster } from '@rpg/contracts'
+import {
+  joinStatBlockProseDocument,
+  systemDefaultArmorClassRules,
+  type Equipment,
+  type Monster,
+} from '@rpg/contracts'
 
 import { pickEquipment, pickMonster, pickSkillProficiency } from '@/test/fixtures/pick'
 
@@ -196,11 +201,15 @@ describe('monster-display', () => {
     expect(viewModel.reactions).toEqual([
       expect.objectContaining({
         name: 'Parry',
-        triggerLine: 'Trigger: When hit by a melee attack',
-        responseLabel: 'Response:',
         descriptionHtml: '<p>Adds 2 to AC.</p>',
       }),
     ])
+    expect(viewModel.reactions[0]?.triggerProse?.[0]).toEqual(
+      expect.objectContaining({ kind: 'lead', label: 'Trigger' }),
+    )
+    expect(viewModel.reactions[0]?.responseLeadProse?.[0]).toEqual(
+      expect.objectContaining({ kind: 'lead', label: 'Response' }),
+    )
   })
 
   it('generates a parry trigger from the creature name and hides an unresolved follow-up', () => {
@@ -226,10 +235,14 @@ describe('monster-display', () => {
     })
     expect(viewModel.reactions[0]).toEqual(
       expect.objectContaining({
-        triggerLine: 'Trigger: The knight is hit by a melee attack roll while holding a weapon.',
-        responseLabel: 'Response:',
         descriptionHtml:
           '<p>The knight adds 2 to its AC against that attack, possibly causing it to miss.</p>',
+      }),
+    )
+    expect(viewModel.reactions[0]?.triggerProse?.[1]).toEqual(
+      expect.objectContaining({
+        kind: 'text',
+        value: expect.stringContaining('knight is hit by a melee attack roll'),
       }),
     )
     const renamed = buildMonsterDetailViewModel({
@@ -239,8 +252,11 @@ describe('monster-display', () => {
       catalogState: 'ready',
       derived: null,
     })
-    expect(renamed.reactions[0]?.triggerLine).toBe(
-      'Trigger: The warrior veteran is hit by a melee attack roll while holding a weapon.',
+    expect(renamed.reactions[0]?.triggerProse?.[1]).toEqual(
+      expect.objectContaining({
+        kind: 'text',
+        value: expect.stringContaining('warrior veteran is hit by a melee attack roll'),
+      }),
     )
     expect(renamed.reactions[0]?.descriptionHtml).toContain('The warrior veteran adds 2')
     expect(renamed.reactions[0]?.descriptionHtml).not.toContain('missing-rapier')
@@ -266,8 +282,8 @@ describe('monster-display', () => {
       derived: null,
     })
 
-    expect(viewModel.reactions[0]?.triggerLine).toBeUndefined()
-    expect(viewModel.reactions[0]?.responseLabel).toBeUndefined()
+    expect(viewModel.reactions[0]?.triggerProse).toBeUndefined()
+    expect(viewModel.reactions[0]?.responseLeadProse).toBeUndefined()
   })
 
   it('renders structured save and multiattack bodies for hell hound', () => {
@@ -291,9 +307,12 @@ describe('monster-display', () => {
     expect(multiattack?.descriptionHtml).toContain('hell hound makes two Bite attacks')
 
     const breath = viewModel.actions.find((action) => action.id === 'fire-breath')
-    expect(breath?.descriptionHtml).toContain('Dexterity Saving Throw: DC 12')
-    expect(breath?.descriptionHtml).toContain('15-foot Cone')
-    expect(breath?.descriptionHtml).toContain('Success: Half damage')
+    expect(breath?.rulesProse?.length).toBeGreaterThan(0)
+    expect(breath?.descriptionHtml).toBeUndefined()
+    const breathPlain = joinStatBlockProseDocument(breath?.rulesProse ?? [])
+    expect(breathPlain).toContain('Dexterity Saving Throw')
+    expect(breathPlain).toContain('15-foot Cone')
+    expect(breathPlain).toContain('Success: Half damage')
   })
 
   it('omits unavailable traits and actions from the read-only projection', () => {

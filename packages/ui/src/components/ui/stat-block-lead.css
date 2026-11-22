@@ -1,0 +1,14 @@
+@layer components {
+  .stat-block-lead {
+    display: inline;
+  }
+
+  .stat-block-lead--inline {
+    font-style: italic;
+    font-weight: var(--font-weight-body);
+  }
+
+  .stat-block-lead--paragraph {
+    font-weight: var(--font-weight-body-emphasis);
+  }
+}

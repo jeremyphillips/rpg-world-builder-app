@@ -19,6 +19,7 @@ import {
   type MonsterActionSection,
 } from '../../../lib/actions/references/monster-action-equipment-references'
 import { MONSTER_MOVE_TO_LABEL } from '../../../lib/monster-form-labels'
+import { MonsterActionRulesPreviewShell } from './monster-action-rules-preview-shell'
 import { MonsterSpellPickerHost } from '../spells/spell-picker-host'
 import type { MonsterActionDraftRow } from '../../../lib/actions/monster-action-presets'
 import { monsterActionSectionHeading } from '../../../lib/actions/monster-action-presets'
@@ -225,6 +226,14 @@ export function MonsterActionDetail({
                 catalog={ctx.spellCatalogById}
               >
                 <FormRhythmStack>
+                  {values ? (
+                    <MonsterActionRulesPreviewShell
+                      ctx={ctx}
+                      action={liveAction ?? action}
+                      section={located.section}
+                      values={values}
+                    />
+                  ) : null}
                   <FormItems
                     items={fields}
                     idPrefix={`monster-action-${action.id}`}

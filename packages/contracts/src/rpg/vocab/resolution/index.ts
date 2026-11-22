@@ -1,4 +1,5 @@
 import type { GameTermEntry, VocabularyTerm } from '../types'
+import { getTermStatBlockLead } from '../types'
 
 // Closed sets for the content-neutral resolution envelope.
 // Spell attack deliveries and projectile patterns stay in the spell resolution module.
@@ -70,10 +71,12 @@ export const RESOLUTION_OUTCOME_RESULT_ENTRIES = {
   },
   'failed-save': {
     label: 'Failed save',
+    statBlockLead: 'Failure',
     description: 'The target failed its saving throw.',
   },
   'successful-save': {
     label: 'Successful save',
+    statBlockLead: 'Success',
     description: 'The target succeeded on its saving throw.',
   },
   'failed-or-successful-save': {
@@ -92,6 +95,31 @@ export const RESOLUTION_OUTCOME_RESULTS = Object.keys(RESOLUTION_OUTCOME_RESULT_
   ResolutionOutcomeResult,
   ...ResolutionOutcomeResult[],
 ]
+
+export const RESOLUTION_REPEAT_SAVE_FAILURE_TIER_TERM = {
+  label: 'Repeat Save Failure Tier',
+  description: 'Colon lead-ins for staged outcomes when a saving throw can be repeated.',
+  sentence: {
+    singular: 'repeat save failure tier',
+    plural: 'repeat save failure tiers',
+  },
+} as const satisfies VocabularyTerm
+
+export const RESOLUTION_REPEAT_SAVE_FAILURE_TIER_ENTRIES = {
+  firstFailure: {
+    label: 'First failure',
+    statBlockLead: 'First Failure',
+    description: 'The initial failed save before an optional repeat save.',
+  },
+  secondFailure: {
+    label: 'Second failure',
+    statBlockLead: 'Second Failure',
+    description: 'The outcome when the target fails the repeat save.',
+  },
+} as const satisfies Record<string, GameTermEntry>
+
+export type ResolutionRepeatSaveFailureTier =
+  keyof typeof RESOLUTION_REPEAT_SAVE_FAILURE_TIER_ENTRIES
 
 export const RESOLUTION_APPLICATION_AMOUNT_TERM = {
   label: 'Application Amount',
@@ -243,6 +271,17 @@ export function getResolutionTargetKindLabel(kind: string): string {
 
 export function getResolutionOutcomeResultLabel(result: string): string {
   return RESOLUTION_OUTCOME_RESULT_ENTRIES[result as ResolutionOutcomeResult]?.label ?? result
+}
+
+export function getResolutionOutcomeResultStatBlockLead(result: ResolutionOutcomeResult): string {
+  const entry = RESOLUTION_OUTCOME_RESULT_ENTRIES[result]
+  return entry ? getTermStatBlockLead(entry) : result
+}
+
+export function getResolutionRepeatSaveFailureTierStatBlockLead(
+  tier: ResolutionRepeatSaveFailureTier,
+): string {
+  return getTermStatBlockLead(RESOLUTION_REPEAT_SAVE_FAILURE_TIER_ENTRIES[tier])
 }
 
 export function getResolutionApplicationAmountLabel(amount: string): string {

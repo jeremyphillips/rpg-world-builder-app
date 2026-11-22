@@ -81,6 +81,8 @@ export {
   type RulesPreviewMetadataRow,
   type RulesPreviewProps,
 } from './components/ui/rules-preview'
+export { StatBlockLead, type StatBlockLeadProps } from './components/ui/stat-block-lead'
+export { StatBlockProseView } from './components/ui/stat-block-prose'
 export {
   alertVariants,
   ALERT_DENSITIES,

@@ -1,4 +1,13 @@
 import type { SavingThrowDcSource } from '../../content/lib/saving-throw/schema'
+import { getResolutionOutcomeResultStatBlockLead } from '../../vocab/resolution'
+import {
+  joinStatBlockProsePlainText,
+  statBlockOutcomeLead,
+  statBlockProseSpacing,
+  statBlockSaveLead,
+  type StatBlockProse,
+  type StatBlockProseSegment,
+} from '../monster/stat-block-prose'
 import { abilitySaveDc } from './spell-dc'
 
 function ensurePeriod(text: string): string {
@@ -18,6 +27,36 @@ export function resolveProseSavingThrowDc(args: {
   return abilitySaveDc(args.spellcastingAbilityScore, args.proficiencyBonus)
 }
 
+/** Structured stat-block saving throw paragraph for presentation. */
+export function formatSavingThrowClausesProse(args: {
+  abilityLabel: string
+  dc: number | undefined
+  targets: string
+  failure: string
+  success?: string
+}): StatBlockProse {
+  const prose: StatBlockProseSegment[] = [
+    ...statBlockSaveLead(args.abilityLabel, args.dc, args.targets),
+  ]
+  prose.push(
+    statBlockProseSpacing(),
+    ...statBlockOutcomeLead(
+      getResolutionOutcomeResultStatBlockLead('failed-save'),
+      ensurePeriod(args.failure),
+    ),
+  )
+  if (args.success?.trim()) {
+    prose.push(
+      statBlockProseSpacing(),
+      ...statBlockOutcomeLead(
+        getResolutionOutcomeResultStatBlockLead('successful-save'),
+        ensurePeriod(args.success),
+      ),
+    )
+  }
+  return prose
+}
+
 /**
  * Stat-block clauses for a prose saving throw.
  * The parent places this paragraph around its own rules text.
@@ -29,10 +68,5 @@ export function formatSavingThrowClauses(args: {
   failure: string
   success?: string
 }): string {
-  const lead = ensurePeriod(
-    `${args.abilityLabel} Saving Throw: DC ${args.dc ?? '—'}, ${args.targets.trim()}`,
-  )
-  const failure = `Failure: ${ensurePeriod(args.failure)}`
-  const success = args.success?.trim() ? `Success: ${ensurePeriod(args.success)}` : undefined
-  return [lead, failure, success].filter((clause): clause is string => Boolean(clause)).join(' ')
+  return joinStatBlockProsePlainText(formatSavingThrowClausesProse(args))
 }

@@ -81,14 +81,34 @@ function hitClause(line: FormattableMonsterAttack): string | undefined {
   return `Hit: ${body.join('. ')}`
 }
 
+export type MonsterAttackActionSentenceParts = {
+  attackLabel: string
+  bonusAndDistance: string
+  hitBody?: string
+}
+
+/** Attack label, bonus/distance, and hit clause — same pieces as `formatMonsterAttackAction`. */
+export function monsterAttackActionSentenceParts(
+  line: FormattableMonsterAttack,
+): MonsterAttackActionSentenceParts | undefined {
+  const attackLabel = attackPrefix(line.modes)
+  if (!attackLabel) return undefined
+  const distance = distanceClause(line)
+  const bonusAndDistance = distance
+    ? `${line.attackBonusLabel}, ${distance}`
+    : `${line.attackBonusLabel}.`
+  const hit = hitClause(line)
+  return {
+    attackLabel,
+    bonusAndDistance,
+    ...(hit ? { hitBody: hit.replace(/^Hit:\s*/, '') } : {}),
+  }
+}
+
 /** SRD attack sentence from a resolved attack line. Does not resolve the attack. */
 export function formatMonsterAttackAction(line: FormattableMonsterAttack): string | undefined {
-  const prefix = attackPrefix(line.modes)
-  if (!prefix) return undefined
-  const distance = distanceClause(line)
-  const opening = distance
-    ? `${prefix}: ${line.attackBonusLabel}, ${distance}`
-    : `${prefix}: ${line.attackBonusLabel}.`
-  const hit = hitClause(line)
-  return hit ? `${opening} ${hit}.` : opening
+  const parts = monsterAttackActionSentenceParts(line)
+  if (!parts) return undefined
+  const opening = `${parts.attackLabel}: ${parts.bonusAndDistance}`
+  return parts.hitBody ? `${opening} Hit: ${parts.hitBody}.` : opening
 }

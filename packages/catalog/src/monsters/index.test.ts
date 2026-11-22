@@ -12,6 +12,7 @@ import {
   formatLegendaryActionUsesIntro,
   formatMonsterSpellEntry,
   formatOnceUntilNextTurnSentence,
+  joinStatBlockProseDocument,
   resolveCreatureTraitGrants,
   resolveMonsterActionIdentity,
   resolveTraitDisplay,
@@ -251,10 +252,11 @@ describe('SRD 5.2.1 monster seed', () => {
         spellsInBody: new Map([[spellcasting.id, spellcasting]]),
         saveDc: 14,
       })
-      expect(rendered.bodyHtml).toContain(
+      const spellBody = joinStatBlockProseDocument(rendered.bodyProse)
+      expect(spellBody).toContain(
         'The mage casts one of the following spells, using Intelligence as the spellcasting ability (spell save DC 14):',
       )
-      expect(rendered.bodyHtml).not.toContain('spell attack')
+      expect(spellBody).not.toContain('spell attack')
     }
     expect(formatMultiattack(hound!)).toBe('The hell hound makes two Bite attacks.')
 

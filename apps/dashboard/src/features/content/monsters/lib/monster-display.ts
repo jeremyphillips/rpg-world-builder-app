@@ -44,6 +44,10 @@ import {
   type DerivedFieldReason,
   type DerivedMonsterStatBlock,
   type MagicPropertyDefinitionProvider,
+  statBlockReactionLead,
+  type StatBlockProse,
+  type StatBlockProseDocument,
+  type StatBlockProseSegment,
 } from '@rpg/contracts'
 
 import {
@@ -86,10 +90,14 @@ export type MonsterActionItemViewModel = {
   id: string
   name: string
   attackLine?: string
-  /** `Trigger: …` when the reaction has authored eligibility prose. */
-  triggerLine?: string
-  /** `Response:` when that authored trigger has a description or attack line. */
-  responseLabel?: string
+  derivedAttackLine?: DerivedMonsterAttackLine
+  rulesProse?: StatBlockProseDocument
+  /** Emphasized `Trigger:` lead when the reaction has authored eligibility prose. */
+  triggerProse?: StatBlockProse
+  /** Emphasized `Response:` lead before structured attack or supplemental rules copy. */
+  responseLeadProse?: StatBlockProse
+  /** Plain attack line folded into `Response:` when there is no derived attack sentence. */
+  responseAttackProse?: StatBlockProse
   descriptionHtml?: string
 }
 
@@ -264,7 +272,18 @@ function mapActionItems(
   catalogState: MonsterCatalogLoadState,
   spells: Parameters<typeof resolveActionStatBlockRulesFacingList>[4],
 ): MonsterActionItemViewModel[] {
-  return resolveActionStatBlockRulesFacingList(actions, section, derived, catalogState, spells)
+  return resolveActionStatBlockRulesFacingList(actions, section, derived, catalogState, spells).map(
+    (facing) => ({
+      id: facing.id,
+      name: facing.name,
+      attackLine: facing.attackLine,
+      descriptionHtml: facing.descriptionHtml,
+      derivedAttackLine: derived?.attacks.find(
+        (line) => line.id === facing.id && line.section === section,
+      ),
+      rulesProse: facing.rulesProse,
+    }),
+  )
 }
 
 function formsTrait(monster: Monster): MonsterTraitItemViewModel[] {
@@ -302,43 +321,57 @@ function mapReactionItems(
   return reactions.map((action) => {
     const triggerText =
       action.kind === 'parry' ? formatMonsterParryTrigger(spells.monsterName) : action.trigger?.text
+    const facing = resolveActionStatBlockRulesFacing(
+      action,
+      'reactions',
+      derived,
+      catalogState,
+      spells,
+      headings,
+    )
     return reactionItemView(
-      resolveActionStatBlockRulesFacing(
-        action,
-        'reactions',
-        derived,
-        catalogState,
-        spells,
-        headings,
-      ),
+      {
+        id: facing.id,
+        name: facing.name,
+        attackLine: facing.attackLine,
+        descriptionHtml: facing.descriptionHtml,
+        derivedAttackLine: derived?.attacks.find(
+          (line) => line.id === facing.id && line.section === 'reactions',
+        ),
+        rulesProse: facing.rulesProse,
+      },
       triggerText,
     )
   })
 }
 
+const responseLeadOnly: StatBlockProse = [
+  { kind: 'lead', treatment: 'inline', label: 'Response' } satisfies StatBlockProseSegment,
+]
+
+// fallow-ignore-next-line complexity
 function reactionItemView(
-  base: MonsterActionItemViewModel | undefined,
+  base: MonsterActionItemViewModel,
   triggerText: string | undefined,
 ): MonsterActionItemViewModel {
-  const hasBody = Boolean(base?.attackLine || base?.descriptionHtml)
+  const hasBody = Boolean(
+    base.attackLine ||
+    base.derivedAttackLine ||
+    base.descriptionHtml ||
+    (base.rulesProse && base.rulesProse.length > 0),
+  )
+  const showResponse = Boolean(triggerText && hasBody)
+  const responseAttackProse =
+    showResponse && base.attackLine && !base.derivedAttackLine
+      ? statBlockReactionLead('Response', base.attackLine)
+      : undefined
   return {
-    id: base?.id ?? '',
-    name: base?.name ?? '',
-    attackLine: base?.attackLine,
-    descriptionHtml: base?.descriptionHtml,
-    triggerLine: triggerLine(triggerText),
-    responseLabel: responseLabel(triggerText, hasBody),
+    ...base,
+    attackLine: responseAttackProse ? undefined : base.attackLine,
+    triggerProse: triggerText ? statBlockReactionLead('Trigger', triggerText) : undefined,
+    responseLeadProse: showResponse && !responseAttackProse ? responseLeadOnly : undefined,
+    responseAttackProse,
   }
-}
-
-function triggerLine(text: string | undefined): string | undefined {
-  if (!text) return undefined
-  return `Trigger: ${text}`
-}
-
-function responseLabel(text: string | undefined, hasBody: boolean): string | undefined {
-  if (!text || !hasBody) return undefined
-  return 'Response:'
 }
 
 function formatSenseLines(monster: Monster, passivePerception?: number): string {

@@ -20,6 +20,7 @@ import {
   type MonsterActionItemViewModel,
   type MonsterDetailViewModel,
 } from '../../lib/monster-display'
+import { MonsterActionRulesBody } from './monster-action-rules-body'
 
 type MonsterDetailBodyProps = {
   name: string
@@ -38,23 +39,7 @@ type MonsterDetailBodyProps = {
 }
 
 function ActionItemBody({ item }: { item: MonsterActionItemViewModel }) {
-  const attackLine =
-    item.responseLabel && item.attackLine
-      ? `${item.responseLabel} ${item.attackLine}`
-      : item.attackLine
-
-  return (
-    <>
-      {item.triggerLine ? <Text variant="body-compact">{item.triggerLine}</Text> : null}
-      {attackLine ? <Text variant="body-compact">{attackLine}</Text> : null}
-      {item.responseLabel && !item.attackLine ? (
-        <Text variant="body-compact">{item.responseLabel}</Text>
-      ) : null}
-      {item.descriptionHtml ? (
-        <RichTextContent html={item.descriptionHtml} {...contentDetailProseProps} />
-      ) : null}
-    </>
-  )
+  return <MonsterActionRulesBody item={item} />
 }
 
 function ActionSection({

@@ -4,6 +4,8 @@ import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form
 import { formatMonsterActionSpellPreviewConfigureHint } from '../../monster-form-labels'
 import { SPELLCASTING_ABILITY_FIELD_LABEL } from '../../../../lib/forms/mechanics/spellcasting-ability-field-copy'
 import { resolveMonsterCreateDefaultValues } from '../../monster-form-values'
+import { joinStatBlockProseDocument } from '@rpg/contracts'
+
 import { buildMonsterActionSpellPreview } from './monster-action-spell-summary'
 
 const mageHandId = 'srd-cc-5.2.1:mage-hand'
@@ -55,8 +57,9 @@ describe('buildMonsterActionSpellPreview', () => {
 
     expect(preview?.status).toBe('ready')
     if (!preview || preview.status !== 'ready') return
-    expect(preview.bodyHtml).toMatch(/casts.*Mage Hand.*Detect Magic/i)
-    expect(preview.bodyHtml).toContain('Intelligence')
+    const body = joinStatBlockProseDocument(preview.rulesProse)
+    expect(body).toMatch(/casts.*Mage Hand.*Detect Magic/i)
+    expect(body).toContain('Intelligence')
   })
 
   it('returns spellcasting-ability guidance when ability is unset', () => {
