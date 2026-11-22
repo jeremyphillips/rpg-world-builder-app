@@ -3,7 +3,7 @@ import { useMemo } from 'react'
 import { useWatch } from 'react-hook-form'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
-import { useMonsterActionPreviewTitle } from '../../monster-qualified-preview-title'
+import { useMonsterActionRulesPreviewTitle } from '../../presentation/use-monster-action-rules-preview'
 import type { MonsterActionDraftRow } from '../monster-action-presets'
 import type { MonsterActionSection } from '../references/monster-action-equipment-references'
 import type { MonsterFormValues } from '../../monster-form-values'
@@ -26,11 +26,6 @@ export function useMonsterActionPreviewContext(
     () => (values ? findMonsterFormActionDraft(values, ctx, action.id) : undefined),
     [action.id, ctx, values],
   )
-  const title = useMonsterActionPreviewTitle(
-    draft as MonsterActionDraftRow | undefined,
-    values,
-    ctx,
-    section,
-  )
+  const title = useMonsterActionRulesPreviewTitle(ctx, action, values, section)
   return { values, draft, title }
 }

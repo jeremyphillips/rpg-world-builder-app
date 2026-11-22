@@ -8,13 +8,14 @@ import {
 } from '../action-section-access'
 import { MONSTER_ACTION_SECTIONS, type MonsterActionSection } from '../action-sections'
 import {
+  refinePrimarySpellcastingDuplicate,
+  refinePrimarySpellcastingProfileRow,
+  refineReservedSpellcastingName,
+} from '../primary-spellcasting-profile'
+import {
   findSpellCastingSource,
   isPrimarySpellcastingAction,
   listDirectSpellCastingSources,
-  MONSTER_SPELLCASTING_ACTION_NAME,
-  PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE,
-  PRIMARY_SPELLCASTING_NAME_MESSAGE,
-  PRIMARY_SPELLCASTING_SECTION_MESSAGE,
 } from '../spell-casting-source'
 
 type SpellEntryLike = {
@@ -75,36 +76,6 @@ function spellEntryPath(
   return [...prefix, ...monsterActionSectionRowPath(section, index), ...suffix]
 }
 
-function refineReservedSpellcastingName(
-  row: LocatedSpell,
-  ctx: z.RefinementCtx,
-  prefix: (string | number)[],
-): void {
-  if (row.action.kind !== 'spell') return
-  if (row.action.name?.trim() !== MONSTER_SPELLCASTING_ACTION_NAME) return
-  if (isPrimarySpellcastingAction(row.action)) return
-  addCustomRefinementIssue(ctx, PRIMARY_SPELLCASTING_NAME_MESSAGE, [
-    ...spellEntryPath(prefix, row.section, row.index, 'name'),
-  ])
-}
-
-function refineOnePrimarySpellcastingProfile(
-  row: LocatedSpell,
-  ctx: z.RefinementCtx,
-  prefix: (string | number)[],
-  requireCanonicalName: boolean,
-): void {
-  if (row.section !== 'actions') {
-    addCustomRefinementIssue(ctx, PRIMARY_SPELLCASTING_SECTION_MESSAGE, [
-      ...spellEntryPath(prefix, row.section, row.index, 'profile'),
-    ])
-  }
-  if (!requireCanonicalName || row.action.name?.trim() === MONSTER_SPELLCASTING_ACTION_NAME) return
-  addCustomRefinementIssue(ctx, PRIMARY_SPELLCASTING_NAME_MESSAGE, [
-    ...spellEntryPath(prefix, row.section, row.index, 'name'),
-  ])
-}
-
 function refinePrimarySpellcastingProfiles(
   sections: MonsterActionSectionBody,
   ctx: z.RefinementCtx,
@@ -112,16 +83,27 @@ function refinePrimarySpellcastingProfiles(
   requireCanonicalName: boolean,
 ): void {
   const rows = spellRows(sections)
-  for (const row of rows) refineReservedSpellcastingName(row, ctx, prefix)
+  for (const row of rows) {
+    refineReservedSpellcastingName({
+      action: row.action,
+      path: spellEntryPath(prefix, row.section, row.index),
+      ctx,
+    })
+  }
   const profiles = rows.filter((row) => isPrimarySpellcastingAction(row.action))
   for (const row of profiles) {
-    refineOnePrimarySpellcastingProfile(row, ctx, prefix, requireCanonicalName)
+    refinePrimarySpellcastingProfileRow({
+      section: row.section,
+      action: row.action,
+      path: spellEntryPath(prefix, row.section, row.index),
+      ctx,
+      requireCanonicalName,
+    })
   }
-  for (const extra of profiles.slice(1)) {
-    addCustomRefinementIssue(ctx, PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE, [
-      ...spellEntryPath(prefix, extra.section, extra.index, 'profile'),
-    ])
-  }
+  refinePrimarySpellcastingDuplicate(
+    profiles.map((row) => ({ path: spellEntryPath(prefix, row.section, row.index) })),
+    ctx,
+  )
 }
 
 function refineOneSpellEntry(

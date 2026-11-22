@@ -70,6 +70,7 @@ import { BUILDING_FUNCTION_FAMILY_TERM } from './location/building/building-func
 import { EDITION_PRESET_TERM } from './mechanics/edition-preset'
 import { HIT_POINTS_TERM } from './mechanics/hit-points'
 import { EXPERIENCE_POINTS_TERM } from './mechanics/experience-points'
+import { LAIR_TERM } from './mechanics/lair'
 import { PROFICIENCY_BONUS_TERM } from './mechanics/proficiency-bonus'
 import { PASSIVE_PERCEPTION_TERM } from './mechanics/passive-perception'
 import { TELEPATHY_TERM } from './mechanics/telepathy'
@@ -227,6 +228,7 @@ const CONCEPT_ONLY_TERMS = [
   TELEPATHY_TERM,
   SAVING_THROW_TERM,
   SPECIES_HERITAGE_TERM,
+  LAIR_TERM,
 ] as const satisfies readonly VocabularyTerm[]
 
 const SPELL_RESOLUTION_TERMS = [
@@ -286,7 +288,7 @@ describe('primitives term coverage', () => {
 
 describe('concept-only term coverage', () => {
   it('defines vocab terms without *_ENTRIES maps', () => {
-    expect(CONCEPT_ONLY_TERMS).toHaveLength(7)
+    expect(CONCEPT_ONLY_TERMS).toHaveLength(8)
     for (const term of CONCEPT_ONLY_TERMS) {
       expectVocabularyTerm(term)
     }

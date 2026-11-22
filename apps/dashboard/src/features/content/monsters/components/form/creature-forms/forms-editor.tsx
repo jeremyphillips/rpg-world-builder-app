@@ -20,7 +20,10 @@ import {
 import type { MonsterFormValues } from '../../../lib/monster-form-values'
 import { monsterDefinedFormListMeta } from '../../../lib/forms/monster-defined-form-list-meta'
 import { monsterDefinedFormDetailFields } from '../../../lib/forms/monster-forms-form-fields'
-import type { MonsterDefinedFormDraft } from '../../../lib/forms/monster-forms-form-values'
+import type {
+  MonsterDefinedFormDraft,
+  MonsterFormsDraft,
+} from '../../../lib/forms/monster-forms-form-values'
 import { makeEmptyMonsterDefinedForm } from '../../../lib/forms/monster-forms-form-values'
 import { resortMonsterFormRestrictionIds } from '../../../lib/resort-monster-form-restriction-ids'
 import { monsterDefinedFormRowResolveFields } from '../../../lib/forms/monster-forms-validation-fields'
@@ -31,8 +34,13 @@ const MONSTER_FORM_ITEM_NOUN = defineMasterDetailItemNoun({
   plural: MONSTER_FORM_ITEM_NOUN_PLURAL,
 })
 
-export function MonsterFormsEditor({ ctx }: { ctx: ContentFormCtx }) {
-  const forms = useWatch<MonsterFormValues, 'forms'>({ name: 'forms' })
+function MonsterFormsDefinedFormsEditor({
+  ctx,
+  forms,
+}: {
+  ctx: ContentFormCtx
+  forms: MonsterFormsDraft
+}) {
   const form = useFormContext<MonsterFormValues>()
   const { getValues, setValue, trigger } = form
   const makeDefaults = useCallback(() => makeEmptyMonsterDefinedForm(), [])
@@ -46,7 +54,7 @@ export function MonsterFormsEditor({ ctx }: { ctx: ContentFormCtx }) {
     (row: unknown) => {
       const draft = row as MonsterDefinedFormDraft
       const fields = monsterDefinedFormDetailFields(ctx)
-      const designated = forms?.trueForm.kind === 'defined' && forms.trueForm.formId === draft?.id
+      const designated = forms.trueForm.kind === 'defined' && forms.trueForm.formId === draft?.id
       if (!designated) return fields
       const trueFormOverrideFieldNames = [
         'sizesOverride',
@@ -73,7 +81,7 @@ export function MonsterFormsEditor({ ctx }: { ctx: ContentFormCtx }) {
         } satisfies DisplayConfig,
       ]
     },
-    [ctx, forms?.trueForm],
+    [ctx, forms.trueForm],
   )
   const lifecycleEditor = useMemo(
     () => ({
@@ -86,7 +94,7 @@ export function MonsterFormsEditor({ ctx }: { ctx: ContentFormCtx }) {
         }
       },
       requestRemove: (index: number) => {
-        const definedForms = getValues('forms')?.definedForms ?? forms?.definedForms
+        const definedForms = getValues('forms')?.definedForms ?? forms.definedForms
         const formId = definedForms?.[index]?.id
         if (!formId) return
         lifecycle.requestDefinedFormRemoval(formId, () => {
@@ -97,26 +105,16 @@ export function MonsterFormsEditor({ ctx }: { ctx: ContentFormCtx }) {
         })
       },
     }),
-    [editor, form, forms?.definedForms, getValues, lifecycle],
+    [editor, form, forms.definedForms, getValues, lifecycle],
   )
   const handleAddDefinedForm = useCallback(() => {
     const row = makeEmptyMonsterDefinedForm()
     editor.appendRow(row)
-    if (forms?.trueForm.kind === 'defined' && forms.definedForms.length === 0) {
+    if (forms.trueForm.kind === 'defined' && forms.definedForms.length === 0) {
       setValue('forms.trueForm', { kind: 'defined', formId: row.id }, { shouldDirty: true })
       void trigger(['forms.trueForm', 'forms.definedForms'])
     }
-  }, [editor, forms?.definedForms, forms?.trueForm, setValue, trigger])
-
-  if (!forms?.trueForm || !Array.isArray(forms.definedForms)) {
-    return (
-      <>
-        <Button type="button" variant="secondary" onClick={lifecycle.addForms}>
-          {MONSTER_FORMS_ADD_LABEL}
-        </Button>
-      </>
-    )
-  }
+  }, [editor, forms.definedForms, forms.trueForm, setValue, trigger])
 
   return (
     <>
@@ -146,4 +144,19 @@ export function MonsterFormsEditor({ ctx }: { ctx: ContentFormCtx }) {
       </Button>
     </>
   )
+}
+
+export function MonsterFormsEditor({ ctx }: { ctx: ContentFormCtx }) {
+  const forms = useWatch<MonsterFormValues, 'forms'>({ name: 'forms' })
+  const lifecycle = useMonsterFormsLifecycleContext()
+
+  if (!forms?.trueForm || !Array.isArray(forms.definedForms)) {
+    return (
+      <Button type="button" variant="secondary" onClick={lifecycle.addForms}>
+        {MONSTER_FORMS_ADD_LABEL}
+      </Button>
+    )
+  }
+
+  return <MonsterFormsDefinedFormsEditor ctx={ctx} forms={forms} />
 }

@@ -1,6 +1,5 @@
 import { z } from 'zod'
 
-import { formatLimitedUseNotation } from '../../../primitives/limited-use'
 import { DEFAULT_SYSTEM_RULESET_ID } from '../../../primitives/ruleset'
 import type { VocabularyTerm } from '../../../vocab/types'
 import {
@@ -9,10 +8,16 @@ import {
   type CreatureRollAdjustment,
   type CreatureSaveOutcomeOverride,
 } from '../effects'
+import { LEGENDARY_RESISTANCE_LABEL } from './legendary-resistance.constants'
+import { legendaryResistanceLimitedUse } from './legendary-resistance-limited-use'
 
 // ---------------------------------------------------------------------------
 // Versioned creature trait templates. Assignments store `templateId` plus
 // config and display overrides. Mechanics are read from this registry.
+//
+// `formatName` is the human-facing feature label for lists and generic display
+// (no lair, no stat-block parenthetical). Monster stat-block headings for
+// Legendary Resistance use `formatLegendaryResistanceStatBlockTitle` instead.
 // ---------------------------------------------------------------------------
 
 export const CREATURE_TRAIT_TEMPLATE_TERM = {
@@ -41,21 +46,16 @@ export type CreatureTraitTemplate = {
 const NO_CONFIG = z.object({}).strict()
 
 const legendaryResistanceConfigSchema = z.object({
-  uses: z
-    .number({
-      error: () => 'Uses is required.',
-    })
-    .int()
-    .min(1),
+  uses: z.object({
+    normal: z
+      .number({
+        error: () => 'Uses is required.',
+      })
+      .int()
+      .min(1),
+    inLair: z.number().int().min(1).optional(),
+  }),
 })
-
-function legendaryResistanceLimitedUse(uses: number) {
-  return {
-    kind: 'uses' as const,
-    count: { kind: 'fixed' as const, value: uses },
-    recovery: { minimumRest: 'long' as const },
-  }
-}
 
 function rollGrant(adjustment: CreatureRollAdjustment): CreatureTraitGrantBody {
   return { kind: 'rollAdjustment', ...creatureRollAdjustmentSchema.parse(adjustment) }
@@ -112,25 +112,18 @@ export const CREATURE_TRAIT_TEMPLATE_ENTRIES = {
     ],
   },
   'legendary-resistance': {
-    label: 'Legendary Resistance',
+    label: LEGENDARY_RESISTANCE_LABEL,
     description: 'Choose to succeed on a failed saving throw a limited number of times per day.',
     rulesetIds: [DEFAULT_SYSTEM_RULESET_ID],
     configSchema: legendaryResistanceConfigSchema,
-    formatName: (config) => {
-      const { uses } = legendaryResistanceConfigSchema.parse(config)
-      const notation = formatLimitedUseNotation(legendaryResistanceLimitedUse(uses), 'stat-block')
-      return `Legendary Resistance (${notation})`
-    },
-    formatDescription: (config) => {
-      const { uses } = legendaryResistanceConfigSchema.parse(config)
-      const notation = formatLimitedUseNotation(legendaryResistanceLimitedUse(uses), 'stat-block')
-      return `If this creature fails a saving throw, it can choose to succeed instead (${notation}).`
-    },
+    formatName: () => LEGENDARY_RESISTANCE_LABEL,
+    formatDescription: () =>
+      'If this creature fails a saving throw, it can choose to succeed instead.',
     resolveGrants: (config) => {
-      const { uses } = legendaryResistanceConfigSchema.parse(config)
+      const parsed = legendaryResistanceConfigSchema.parse(config)
       const override = creatureSaveOutcomeOverrideSchema.parse({
         outcome: 'success',
-        limitedUse: legendaryResistanceLimitedUse(uses),
+        limitedUse: legendaryResistanceLimitedUse(parsed, { inLair: false }),
       })
       return [{ kind: 'saveOutcomeOverride', ...override }]
     },
@@ -170,6 +163,6 @@ export function readCreatureTraitTemplateConfig(
 export function defaultCreatureTraitTemplateConfig(
   templateId: string,
 ): Record<string, unknown> | undefined {
-  if (templateId === 'legendary-resistance') return { uses: 3 }
+  if (templateId === 'legendary-resistance') return { uses: { normal: 3 } }
   return undefined
 }

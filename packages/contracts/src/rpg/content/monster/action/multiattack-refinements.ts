@@ -18,12 +18,17 @@ import {
 import { isMultiattackReplacementChoiceRedundant } from './multiattack-replacement-choice-eligibility'
 import { primaryAttackSlotTotal, targetedAttackSlotTotal } from './multiattack-replacement-budget'
 import { multiattackUseClauseRepetitionInvalid } from './multiattack-use-repetition'
+import { getMonsterActionKindLabel } from '../../../vocab/monster-action-kind'
+
+export const MULTIATTACK_PUBLISH_NAME_MESSAGE =
+  'This action must be named Multiattack. Choose Use Multiattack.'
 
 type ActionRow = { id?: string; kind?: string; spells?: readonly { spellId?: string }[] }
 
 type MultiattackRow = {
   id?: string
   kind?: string
+  name?: string
   steps?: readonly MultiattackDraftStep[]
   replacement?: {
     count?: number
@@ -301,6 +306,11 @@ export function refinePublishedMultiattack(
   if (section !== 'actions') {
     addCustomRefinementIssue(ctx, MULTIATTACK_SECTION_MESSAGE, [...path, 'kind'])
     return
+  }
+
+  const canonicalName = getMonsterActionKindLabel('multiattack')
+  if (action.name !== undefined && action.name !== canonicalName) {
+    addCustomRefinementIssue(ctx, MULTIATTACK_PUBLISH_NAME_MESSAGE, [...path, 'name'])
   }
 
   const steps = action.steps ?? []

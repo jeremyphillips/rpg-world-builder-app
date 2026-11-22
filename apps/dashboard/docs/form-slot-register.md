@@ -4,7 +4,7 @@ Production `kind: 'slot'` declarations in the dashboard. Tests, stories, and
 prose mentions are not declarations. `locations/README.md` names `kind: 'slot'`
 and is not one.
 
-**91 static literals in 38 files, 89 identities.**
+**90 static literals in 37 files, 88 identities.**
 
 The ratchet allowlist is
 `apps/dashboard/src/test/form-slot-literal-baseline.json`. Each key is the
@@ -22,6 +22,12 @@ prefixes — `formAvailability` per row, `${sourcePath}.castingAbility`,
 baseline row per row. Do not retune baseline counts to stand in for that rule.
 `kind: 'slot'` literals stay in the registration module. Moving a literal into
 a render file changes the ratchet key.
+
+## Retired slots (config replacements)
+
+| Former slot / identity                      | Native config pattern                                                                                                                                              | Notes                                                                                                                                                                                                                               |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `lair` (`monster-lair-experience.slot.tsx`) | `switch` `lair.enabled`, named group `lair.experience` + `optionalDisclosure`, `select` + `display` + `number` on `lair.experience.mode` / `lair.experience.value` | Replaced raw checkbox/inputs and button mode toggles. Group `name` is the disclosure object path only — leaves use fully qualified paths. `monsterLairEnabledVisibility` uses `values['lair.enabled']`, not `values.lair?.enabled`. |
 
 ## Baseline (static literals per file)
 

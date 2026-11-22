@@ -83,6 +83,14 @@ use that pattern instead of `FormFieldStack`.
 `FieldGroup` (standalone) accepts `legend`, optional `hint`, `headingScale`, `size`, `chrome`, and `disclosure`.
 Groups may declare `visibility` — hidden groups unmount and clear nested values.
 
+**`GroupConfig.name` and RHF paths:** `name` on a group (required for optional-disclosure object
+groups) is the owned object path for disclosure, watch, and clear — not an automatic `namePrefix`
+for nested fields. `GroupFieldSection` passes the incoming `namePrefix` through unchanged; only
+array and similar wrappers extend it. Author **fully qualified** leaf `name`s at the form root, or
+short relative names only inside a scope that already sets `namePrefix` (for example array item
+fields). Optional-disclosure tests use fully qualified leaves such as `savingThrow.failure` under a
+`name: 'savingThrow'` group.
+
 `density` on `GroupConfig` overrides inherited section density for the group subtree.
 
 ### Group `chrome`

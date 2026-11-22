@@ -1,4 +1,3 @@
-import { formatCreatureTrait, formatMonsterStatBlockSubject } from '@rpg/contracts'
 import {
   SAVING_THROW_SPELLCASTING_HINT,
   savingThrowFieldGroup,
@@ -12,7 +11,6 @@ import { defineMasterDetailItemNoun } from '../../../lib/master-detail/master-de
 import { insertMonsterFormAvailabilityField } from '../forms/monster-form-availability-fields'
 import { OutsideWaterBreathSlot } from '../../components/form/slots/traits/outside-water-breath.slot'
 import { MonsterTraitRulesPreview } from '../../components/form/slots/traits/trait-preview.slot'
-import { formatMonsterTemplateSentence } from '../format-monster-template-sentence'
 import type { MonsterFormAdvisory } from '../monster-form-advisories'
 import {
   MONSTER_CUSTOM_DESCRIPTION_HINT,
@@ -24,6 +22,8 @@ import {
   outsideWaterBreathDurationEnabled,
   type OutsideWaterBreathDurationFields,
 } from '@/features/content/lib/creature-traits/outside-water-breath.lib'
+
+import { legendaryResistanceTemplateUseFields } from '@/features/content/lib/creature-traits/legendary-resistance-trait-fields'
 
 import { monsterTraitPresetFields } from './monster-trait-preset-fields'
 
@@ -69,20 +69,34 @@ export function monsterTraitItemFields(input?: {
 }
 
 /** Config and optional display overrides for a monster `kind: 'template'` row. */
+const legendaryResistanceTemplateVisibility = {
+  dependsOn: ['templateId'],
+  visibleWhen: (watched: Record<string, unknown>) =>
+    watched['templateId'] === 'legendary-resistance',
+}
+
+function withLegendaryResistanceTemplateVisibility(field: FormItem): FormItem {
+  if (field.visibility === undefined) {
+    return { ...field, visibility: legendaryResistanceTemplateVisibility }
+  }
+  const prior = field.visibility
+  return {
+    ...field,
+    visibility: {
+      dependsOn: [
+        ...new Set([...prior.dependsOn, ...legendaryResistanceTemplateVisibility.dependsOn]),
+      ],
+      visibleWhen: (watched: Record<string, unknown>) =>
+        prior.visibleWhen(watched) && legendaryResistanceTemplateVisibility.visibleWhen(watched),
+    },
+  }
+}
+
 export function monsterTraitTemplateFields(): FormItem[] {
   return [
-    {
-      type: 'number',
-      name: 'config.uses',
-      label: 'Uses',
-      min: 1,
-      required: true,
-      hint: 'Printed on the trait name as N/Day after a long rest.',
-      visibility: {
-        dependsOn: ['templateId'],
-        visibleWhen: (watched) => watched['templateId'] === 'legendary-resistance',
-      },
-    },
+    ...legendaryResistanceTemplateUseFields({ includeInLair: true }).map(
+      withLegendaryResistanceTemplateVisibility,
+    ),
     {
       type: 'richtext',
       name: 'descriptionOverride',
@@ -112,11 +126,11 @@ function isTemplateRow(row: unknown): row is { templateId: string; config?: unkn
   )
 }
 
-function traitPreviewSlot(text: string): FormItem {
+function traitPreviewSlot(): FormItem {
   return {
     kind: 'slot',
     name: 'traitPreview',
-    render: () => <MonsterTraitRulesPreview text={text} />,
+    render: () => <MonsterTraitRulesPreview />,
   }
 }
 
@@ -151,15 +165,8 @@ export function monsterTraitDetailFields(input: {
 }): FormItem[] {
   const advisoryItem = monsterFormAdvisoryDisplay(input.advisories, input.rowPath)
   if (isTemplateRow(input.row)) {
-    const sentence =
-      formatMonsterTemplateSentence({
-        templateId: input.row.templateId,
-        config: input.row.config,
-        monsterName: input.monsterName,
-      }) ?? ''
-    const preview = sentence ? [traitPreviewSlot(sentence)] : []
     return insertMonsterFormAvailabilityField([
-      ...preview,
+      traitPreviewSlot(),
       advisoryItem,
       ...monsterTraitTemplateFields(),
     ])
@@ -172,8 +179,5 @@ export function monsterTraitDetailFields(input: {
       }),
     ])
   }
-  const subject = formatMonsterStatBlockSubject(input.monsterName)
-  const formatted = formatCreatureTrait({ subject, trait: input.row })
-  const preview = formatted ? [traitPreviewSlot(formatted.sentence)] : []
-  return [...preview, advisoryItem, ...presetParameterFields(input.row, input.ctx)]
+  return [traitPreviewSlot(), advisoryItem, ...presetParameterFields(input.row, input.ctx)]
 }

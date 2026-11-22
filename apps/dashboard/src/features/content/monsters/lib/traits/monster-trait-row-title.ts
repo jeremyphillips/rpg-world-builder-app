@@ -1,5 +1,10 @@
+import { LEGENDARY_RESISTANCE_LABEL } from '@rpg/contracts'
+
 import type { MasterDetailRowTitleConfig } from '../../../lib/master-detail/master-detail-row-title'
-import { MONSTER_USE_DEFAULT_NAME_LABEL } from '../monster-form-labels'
+import {
+  MONSTER_CLEAR_LEGENDARY_RESISTANCE_NAME_LABEL,
+  MONSTER_USE_DEFAULT_NAME_LABEL,
+} from '../monster-form-labels'
 import {
   monsterCustomTraitFallbacks,
   monsterTraitResolvedTitle,
@@ -43,6 +48,21 @@ export function resolveMonsterTraitRowTitleConfig(
       }
       if (isTemplateRow(ctx.row)) {
         const templateRow = ctx.row
+        if (templateRow.templateId === 'legendary-resistance') {
+          const stored = templateRow.nameOverride?.trim()
+          if (stored && stored !== LEGENDARY_RESISTANCE_LABEL) {
+            return {
+              strategy: 'override',
+              field: 'nameOverride',
+              resolveDerived: () => LEGENDARY_RESISTANCE_LABEL,
+              resetLabel: MONSTER_CLEAR_LEGENDARY_RESISTANCE_NAME_LABEL,
+            }
+          }
+          return {
+            strategy: 'readonly',
+            resolveTitle: () => LEGENDARY_RESISTANCE_LABEL,
+          }
+        }
         return {
           strategy: 'override',
           field: 'nameOverride',

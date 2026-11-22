@@ -952,6 +952,12 @@
       }
     ],
     "challengeRating": "21",
+    "lair": {
+      "enabled": true,
+      "experience": {
+        "mode": "suggested"
+      }
+    },
     "proficiencies": {
       "savingThrows": ["dex", "con", "int", "wis"],
       "skills": [
@@ -981,17 +987,24 @@
       "immunities": ["necrotic", "poison"],
       "conditionImmunities": ["charmed", "exhaustion", "frightened", "paralyzed", "poisoned"]
     },
-    "equipment": [],
+    "equipment": [
+      {
+        "entryId": "component-pouch",
+        "equipmentId": "srd-cc-5.2.1:component-pouch",
+        "quantity": 1
+      }
+    ],
     "traits": [
       {
         "kind": "template",
         "id": "legendary-resistance",
         "templateId": "legendary-resistance",
         "config": {
-          "uses": 4
-        },
-        "nameOverride": "Legendary Resistance (4/Day, or 5/Day in Lair)",
-        "descriptionOverride": "<p>If the lich fails a saving throw, it can choose to succeed instead.</p>"
+          "uses": {
+            "normal": 4,
+            "inLair": 5
+          }
+        }
       },
       {
         "kind": "custom",
@@ -1221,6 +1234,104 @@
           }
         ]
       }
-    ]
+    ],
+    "legendaryActions": {
+      "uses": {
+        "normal": 3,
+        "inLair": 4
+      },
+      "actions": [
+        {
+          "id": "deathly-teleport",
+          "kind": "special",
+          "name": "Deathly Teleport",
+          "description": "<p>The lich teleports up to 60 feet to an unoccupied space it can see, and each creature within 10 feet of the space it left takes 11 (2d10) Necrotic damage.</p>"
+        },
+        {
+          "id": "disrupt-life",
+          "kind": "save",
+          "name": "Disrupt Life",
+          "onceUntilNextTurn": true,
+          "dcSource": {
+            "kind": "spellcasting",
+            "castingAbility": {
+              "kind": "shared",
+              "entryId": "spellcasting"
+            }
+          },
+          "resolution": {
+            "selectionMode": "self",
+            "areaOfEffect": {
+              "shape": "emanation",
+              "radius": {
+                "value": 20,
+                "unit": "ft"
+              }
+            },
+            "occupantRequirements": [
+              {
+                "kind": "creature-type",
+                "mode": "exclude",
+                "ids": ["undead"]
+              }
+            ],
+            "method": {
+              "kind": "saving-throw",
+              "ability": "con"
+            },
+            "effects": [
+              {
+                "id": "damage",
+                "kind": "damage",
+                "roll": {
+                  "dice": {
+                    "count": 9,
+                    "faces": 6
+                  }
+                },
+                "damageType": "necrotic"
+              }
+            ],
+            "outcomes": [
+              {
+                "result": "failed-save",
+                "effects": [
+                  {
+                    "kind": "effect-reference",
+                    "effectId": "damage",
+                    "amount": "full"
+                  }
+                ]
+              },
+              {
+                "result": "successful-save",
+                "effects": [
+                  {
+                    "kind": "effect-reference",
+                    "effectId": "damage",
+                    "amount": "half"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "frightening-gaze",
+          "kind": "spell",
+          "name": "Frightening Gaze",
+          "onceUntilNextTurn": true,
+          "castingAbility": {
+            "kind": "shared",
+            "entryId": "spellcasting"
+          },
+          "spells": [
+            {
+              "spellId": "srd-cc-5.2.1:fear"
+            }
+          ]
+        }
+      ]
+    }
   }
 ]

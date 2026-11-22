@@ -52,7 +52,7 @@ export function SpeciesTraitsTab({ formCtx }: SpeciesTraitsTabProps) {
               templateId,
               name: '',
               description: '',
-              ...(templateId === 'legendary-resistance' ? { config: { uses: 3 } } : {}),
+              ...(templateId === 'legendary-resistance' ? { config: { uses: { normal: 3 } } } : {}),
             })
           }
         />

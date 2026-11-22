@@ -228,7 +228,6 @@ export const CREATURE_TRAIT_PRESET_ENTRIES = {
 } as const satisfies Record<CreatureTraitVocabularyId, CreatureTraitPreset>
 
 export const CONFIGURABLE_CREATURE_TRAIT_PRESET_IDS = [
-  'legendary-resistance',
   'hold-breath',
   'illumination',
   'standing-leap',

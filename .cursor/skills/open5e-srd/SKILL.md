@@ -97,6 +97,8 @@ https://api.open5e.com/v2/creatures/?document__key=srd-2024&name__icontains=Gobl
 
 Creature reactions are not a `reactions` field. They are `actions` with `action_type` `REACTION`. Bonus actions use `BONUS_ACTION`, and legendary actions use `LEGENDARY_ACTION`.
 
+For **creature fidelity** (Gear, in-lair XP, legendary counts in lair), treat Open5e as incomplete. Cross-check the [SRD 5.2.1 PDF](https://media.dndbeyond.com/compendium-images/srd/5.2/SRD_CC_v5.2.1.pdf) and follow [`srd-monster-authoring`](../srd-monster-authoring/SKILL.md).
+
 Search (discovery only — then re-fetch with `document__key=srd-2024`):
 
 ```text

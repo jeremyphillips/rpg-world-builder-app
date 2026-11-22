@@ -37,7 +37,7 @@ describe('legendary action acquisition', () => {
     )
   })
 
-  it('groups the four choices and explains each disabled item', () => {
+  it('groups legendary choices and explains each disabled item', () => {
     const values = resolveMonsterCreateDefaultValues()
     const items = legendaryActionAcquisitionItems(values, ctx)
     expect(items.map((item) => [item.groupId, item.label, item.metadata])).toEqual([
@@ -48,6 +48,7 @@ describe('legendary action acquisition', () => {
         'Cast a spell from an existing action that already lists spells.',
       ],
       ['new', 'Cast a spell', 'Choose a spell from the catalog.'],
+      ['new', 'Saving throw', 'Saving throw effect'],
       ['new', 'Custom ability', 'Write a standalone legendary ability.'],
     ])
     expect(items.find((item) => item.id === 'legendary:reference')?.note).toBe(

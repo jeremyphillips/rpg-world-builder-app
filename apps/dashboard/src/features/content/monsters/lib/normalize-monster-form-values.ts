@@ -13,6 +13,7 @@ import {
   type ArmorClassRules,
   type ContentValidationIntent,
   type Monster,
+  type MovementSpeeds,
 } from '@rpg/contracts'
 
 import { normalizeLimitedUse } from '../../lib/forms/limited-use/normalize-limited-use'
@@ -22,7 +23,10 @@ import { withDefaultSaveResolutionTarget } from './actions/save/monster-save-res
 import { weaponActionDamageToDraft } from './actions/weapon/monster-weapon-damage-form'
 
 import { applyEffectEndAuthoringToRow } from '../../lib/forms/mechanics/normalize-effect-end-authoring'
-import { movementRowsToRecordForPreview } from '../../lib/forms/fields/content-movement-form-fields'
+import {
+  movementRecordToRows,
+  movementRowsToRecordForPreview,
+} from '../../lib/forms/fields/content-movement-form-fields'
 
 import { weaponProficiencyGrantSetFromMode } from '@/lib/forms/grant-sets/weapon-proficiency-grant-mode.lib'
 
@@ -38,6 +42,7 @@ export type MonsterNormalizeBaseline = {
   hover?: boolean
   description?: string
   experiencePointsOverride?: number
+  lair?: Monster['lair']
 }
 
 export type NormalizeMonsterFormOptions = {
@@ -569,8 +574,13 @@ function normalizedLegendaryBlock(
   )
   if (actions.length === 0) return undefined
   const normalized: Record<string, unknown> = { actions }
-  if (typeof block?.uses === 'number') normalized.uses = block.uses
-  if (typeof block?.usesInLair === 'number') normalized.usesInLair = block.usesInLair
+  const uses = block?.uses
+  if (uses && typeof uses === 'object') {
+    const count: Record<string, number> = {}
+    if (typeof uses.normal === 'number') count.normal = uses.normal
+    if (typeof uses.inLair === 'number') count.inLair = uses.inLair
+    if (Object.keys(count).length > 0) normalized.uses = count
+  }
   return normalized
 }
 
@@ -591,11 +601,37 @@ function normalizedActionSections(
   }
 }
 
+function isUsableMonsterForms(
+  forms: MonsterFormValues['forms'],
+): forms is NonNullable<MonsterFormValues['forms']> {
+  return (
+    forms != null &&
+    typeof forms.profileFormId === 'string' &&
+    forms.profileFormId.length > 0 &&
+    forms.trueForm != null &&
+    Array.isArray(forms.definedForms)
+  )
+}
+
+function normalizeLair(lair: MonsterFormValues['lair']): Record<string, unknown> | undefined {
+  if (lair?.enabled !== true) return undefined
+  const normalized: Record<string, unknown> = { enabled: true }
+  if (lair.experience) {
+    const experience: Record<string, unknown> = { mode: lair.experience.mode }
+    if (lair.experience.mode === 'custom' && lair.experience.value !== undefined) {
+      experience.value = lair.experience.value
+    }
+    normalized.experience = experience
+  }
+  return normalized
+}
+
 function normalizedMonsterCore(
   values: MonsterFormValues,
   options: NormalizeMonsterFormOptions,
   movement: Record<string, number>,
 ): Record<string, unknown> {
+  const lair = normalizeLair(values.lair)
   return {
     name: typeof values.name === 'string' ? values.name : '',
     sizes: values.sizes,
@@ -616,16 +652,25 @@ function normalizedMonsterCore(
     defenses: values.defenses,
     equipment: values.equipment,
     traits: normalizeTraitRichText(omitEmptyStrings(values.traits)),
-    ...(values.forms ? { forms: normalizeMonsterForms(values.forms) } : {}),
+    ...(isUsableMonsterForms(values.forms) ? { forms: normalizeMonsterForms(values.forms) } : {}),
     ...normalizedActionSections(values, options.intent),
+    ...(lair ? { lair } : {}),
   }
+}
+
+function movementRowsForNormalize(movement: unknown) {
+  if (Array.isArray(movement)) return movement
+  if (movement && typeof movement === 'object') {
+    return movementRecordToRows(movement as MovementSpeeds)
+  }
+  return []
 }
 
 export function normalizeMonsterFormValues(
   values: MonsterFormValues,
   options: NormalizeMonsterFormOptions,
 ): Record<string, unknown> {
-  const movementRecord = movementRowsToRecordForPreview(values.movement ?? [])
+  const movementRecord = movementRowsToRecordForPreview(movementRowsForNormalize(values.movement))
   const hasFly = typeof movementRecord.fly === 'number'
   const challengeRating = values.challengeRating
 
@@ -725,23 +770,26 @@ function applyOptionalScalars(
   }
 }
 
+function tombstoneClearableKey(
+  normalized: Record<string, unknown>,
+  key: string,
+  baselineValue: unknown,
+  shouldTombstone = true,
+): void {
+  if (baselineValue !== undefined && shouldTombstone && normalized[key] === undefined) {
+    normalized[key] = null
+  }
+}
+
 function applyClearableNulls(
   normalized: Record<string, unknown>,
   baseline: NonNullable<NormalizeMonsterFormOptions['baseline']>,
   hasFly: boolean,
 ): void {
-  if (baseline.creatureFamilyIds !== undefined && normalized.creatureFamilyIds === undefined)
-    normalized.creatureFamilyIds = null
-  if (baseline.classIds !== undefined && normalized.classIds === undefined)
-    normalized.classIds = null
-  if (baseline.description !== undefined && normalized.description === undefined) {
-    normalized.description = null
-  }
-  if (baseline.hover !== undefined && !hasFly) normalized.hover = null
-  if (
-    baseline.experiencePointsOverride !== undefined &&
-    normalized.experiencePointsOverride === undefined
-  ) {
-    normalized.experiencePointsOverride = null
-  }
+  tombstoneClearableKey(normalized, 'creatureFamilyIds', baseline.creatureFamilyIds)
+  tombstoneClearableKey(normalized, 'classIds', baseline.classIds)
+  tombstoneClearableKey(normalized, 'description', baseline.description)
+  tombstoneClearableKey(normalized, 'hover', baseline.hover, !hasFly)
+  tombstoneClearableKey(normalized, 'experiencePointsOverride', baseline.experiencePointsOverride)
+  tombstoneClearableKey(normalized, 'lair', baseline.lair)
 }

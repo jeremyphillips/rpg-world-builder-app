@@ -1,3 +1,4 @@
+import { LEGENDARY_RESISTANCE_LABEL } from '../../content/creature/traits/legendary-resistance.constants'
 import { keysFromEntries } from '../enum-schema'
 import type { GameTermEntry, VocabularyTerm } from '../types'
 
@@ -370,7 +371,7 @@ export const CREATURE_TRAIT_VOCABULARY_ENTRIES = {
     group: 'movement',
   },
   'legendary-resistance': {
-    label: 'Legendary Resistance',
+    label: LEGENDARY_RESISTANCE_LABEL,
     description: 'Can succeed on a failed save.',
     group: 'combat',
   },

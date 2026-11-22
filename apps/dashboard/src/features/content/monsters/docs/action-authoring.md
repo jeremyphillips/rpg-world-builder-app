@@ -20,7 +20,7 @@ monsterActionDetailFields + components/form/actions/* (detail body, previews)
 content/lib/forms (shared resolution, equipment range, requirement syncs)
 ```
 
-**Contracts:** [`packages/contracts/docs/action-architecture.md`](../../../../../packages/contracts/docs/action-architecture.md), effect resolution notes under `packages/contracts/docs/effect-resolution/`.
+**Contracts:** [`packages/contracts/docs/action-architecture.md`](../../../../../packages/contracts/docs/action-architecture.md), effect resolution notes under `packages/contracts/docs/effect-resolution/`, and the scoped SRD pattern inventory [`srd-action-inventory.md`](../../../../../packages/contracts/docs/srd-action-inventory.md).
 
 **Field order in detail bodies:** [action-trait-field-order.md](./action-trait-field-order.md) (preview → advisory → prose → mechanics regions).
 

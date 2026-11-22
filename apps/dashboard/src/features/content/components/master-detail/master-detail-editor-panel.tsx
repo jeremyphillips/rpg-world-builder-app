@@ -37,7 +37,7 @@ function omitInlineTitleField(fields: FormItem[], fieldName: string | undefined)
 export interface MasterDetailEditorPanelProps {
   editor: UseMasterDetailArrayResult
   itemFields: FormItem[]
-  /** Parent form field path, e.g. `traits` or `heritage.options`. */
+  /** Parent RHF field-array path, e.g. `traits` or `legendaryActions.actions` (not a section id). */
   fieldName: string
   /** Prefix for detail `FormItems` ids, e.g. `species-trait`. */
   idPrefix: string

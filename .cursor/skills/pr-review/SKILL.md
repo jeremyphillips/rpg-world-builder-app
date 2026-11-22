@@ -54,7 +54,7 @@ non-reusable.
 | 5   | **Silent failures**              | Errors masquerading as empty data, missing entities as loading, swallowed query failures, UI hiding without server enforcement                                   |
 | 6   | **Behavior or test regressions** | Changed flows, defaults, navigation, permissions, persisted state; deleted/weakened/stale tests                                                                  |
 | 7   | **Wiring gaps**                  | Partial landing across layers — see below                                                                                                                        |
-| 8   | **New form slots**               | A new production `kind: 'slot'` that `display`, `visibility`, `optionsResolve`, `hint.resolve`, `derivedMeta`, `valueSyncs`, `dependent`, or `optionalDisclosure` could express. A new or renamed identity must update the [slot register](../../../apps/dashboard/docs/form-slot-register.md) and `form-slot-literal-baseline.json`. Confirm-gated multi-path writes stay feature controllers plus `ConfirmDialog`. |
+| 8   | **New form slots**               | A new production `kind: 'slot'` that `display`, `visibility`, `optionsResolve`, `hint.resolve`, `derivedMeta`, `valueSyncs`, `dependent`, or `optionalDisclosure` could express. A new or renamed identity must update the [slot register](../../../apps/dashboard/docs/form-slot-register.md) and `form-slot-literal-baseline.json`. Confirm-gated multi-path writes stay feature controllers plus `ConfirmDialog`. Reject raw `<input>`, `<select>`, or `<textarea>` in `components/form/slots/**` (see [.cursor/rules/form-slots.mdc](../../../.cursor/rules/form-slots.mdc)). |
 
 ### SSOT rule
 

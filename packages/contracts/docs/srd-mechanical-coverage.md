@@ -41,7 +41,7 @@ Keep the evidence when a gap is verified. Deficiency types are not interchangeab
 ### `legendary-actions`
 
 - Concept: a legendary-action section on the shared monster action model.
-- Implemented: the section, one shared uses pool, optional in-lair uses, `action-reference` rows (including a movement allowance), shared-ability spells, `use-entry` spell references, catalog spells cast from the section, and the `onceUntilNextTurn` sentence. Legendary Actions store only `action-reference`, `spell`, and `special`.
+- Implemented: the section, one shared uses pool, optional in-lair uses, `action-reference` rows (including a movement allowance), shared-ability spells, `use-entry` spell references, catalog spells cast from the section, structured `save` rows (same schema and formatter as Actions), and the `onceUntilNextTurn` sentence. Legendary Actions store `action-reference`, `spell`, `special`, and `save`.
 - Not this model: per-option costs, movement execution, and encounter tracking of spent uses. A legendary save that is its own effect stays on `legendary-saves`. Condition riders stay on `save-conditions`.
 - Evidence: [action-architecture.md](./action-architecture.md) and [effect-resolution/monster-actions.md](./effect-resolution/monster-actions.md).
 - Representative: none seeded. Seeded SRD parity is unverified.
@@ -52,13 +52,12 @@ Keep the evidence when a gap is verified. Deficiency types are not interchangeab
 ### `legendary-saves`
 
 - Concept: a legendary action that is its own saving-throw effect, not a reference to an action in Actions.
-- Deficiency: missing structured capability. Legendary Actions accept only `action-reference`, `spell`, and `special`, so these saves are authored as Custom ability rules text.
-- Evidence: Lich Disrupt Life, Solar Blinding Gaze, Kraken Toxic Ink, Adult Black Dragon Cloud of Insects, Sphinx Weight of Years, and Adult Gold Dragon Banish (Open5e `srd-2024`).
-- Current fallback: `special` rules text, optionally with a prose saving throw (ability, fixed or spellcasting DC, targets, failure, and optional success). A turn limit on that row prints the SRD "Failure or Success:" lead-in. Damage averages and area geometry stay on `kind: 'save'`. The prose attachment does not close this gap.
+- **Implementation: partial.** Legendary Actions accept `kind: 'save'` and reuse the shared Save editor and `formatMonsterSaveAction`. End-to-end coverage is **`full`** for damage-area saves that fit the envelope (e.g. Lich Disrupt Life DC, emanation, half on success, `onceUntilNextTurn`) and **`partial`** when SRD qualifiers or condition-primary outcomes still need `description` or `save-conditions` work (e.g. Solar Blinding Gaze, compound teleport + save).
+- Evidence: Lich Disrupt Life, Solar Blinding Gaze, Kraken Toxic Ink, Adult Black Dragon Cloud of Insects, Sphinx Weight of Years, and Adult Gold Dragon Banish (Open5e `srd-2024`). Inventory and exemplar matrix → [srd-action-inventory.md](./srd-action-inventory.md).
+- Remaining fallback: `special` with prose `savingThrow` only when structured `save` cannot model the effect yet; do not duplicate envelope fields in prose.
 - Importance: common in 5.2.1 legendary sections.
 - Owner: the shared `save` kind and the monster legendary union. Condition-primary cases also depend on `save-conditions`.
-- Approval: deferred. Implementation: not started.
-- Reopen when: a legendary save needs a derived DC or damage math.
+- Approval: open for remaining exemplars. Implementation: section eligibility + dashboard acquisition; reference inlining (Approach A) not required when saves live in the legendary section.
 
 ### `save-conditions`
 

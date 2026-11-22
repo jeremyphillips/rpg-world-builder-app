@@ -754,7 +754,12 @@ describe('monster action section moves', () => {
     expect(monsterActionActiveKeys('special', 'reactions')).toContain('trigger')
     expect(monsterActionActiveKeys('leap', 'bonusActions')).toContain('distanceFeet')
     expect(monsterActionActiveKeys('leap', 'actions')).toEqual([])
+    expect(monsterActionActiveKeys('teleport', 'actions')).toContain('distanceFeet')
+    expect(monsterActionActiveKeys('teleport', 'bonusActions')).toContain('distanceFeet')
     expect(monsterActionSectionMoveAllowed({ kind: 'leap' }, 'bonusActions', 'actions')).toBe(false)
+    expect(monsterActionSectionMoveAllowed({ kind: 'teleport' }, 'bonusActions', 'actions')).toBe(
+      true,
+    )
     expect(monsterActionSectionMoveAllowed({ kind: 'teleport' }, 'bonusActions', 'reactions')).toBe(
       false,
     )

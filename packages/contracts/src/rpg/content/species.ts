@@ -22,6 +22,7 @@ import { speciesCharacterCreationSchema } from './species-character-creation'
 import { speciesCultureConfigSchema } from './species-culture'
 import { SPECIES_CONTENT_TYPE_TERM } from './lib/content-type-terms'
 import { createDraftInputSchema, draftStoredSchema } from './lib/content-input-schemas'
+import { refineSpeciesTraits } from './species-trait-refinements'
 
 // ---------------------------------------------------------------------------
 // Species — a playable people/ancestry. SRD-faithful prose lives in rich-text
@@ -129,13 +130,27 @@ export const speciesDraftStoredSchema = draftStoredSchema(speciesBodyDraftSchema
 export type SpeciesDraft = z.infer<typeof speciesDraftStoredSchema>
 
 // Homebrew authoring DTOs (forms). Server sets id/source/campaignId/timestamps.
-export const createSpeciesInputSchema = speciesBodySchema.extend({ slug: slugSchema })
+const speciesPublishTraitRefinement = (
+  input: { traits?: SpeciesBodyTrait[] },
+  ctx: Parameters<typeof refineSpeciesTraits>[1],
+): void => {
+  refineSpeciesTraits(input.traits ?? [], ctx)
+}
+
+export const createSpeciesInputSchema = speciesBodySchema
+  .extend({ slug: slugSchema })
+  .superRefine(speciesPublishTraitRefinement)
 export type CreateSpeciesInput = z.infer<typeof createSpeciesInputSchema>
 
 export const createSpeciesDraftInputSchema = createDraftInputSchema(speciesBodyDraftSchema)
 export type CreateSpeciesDraftInput = z.infer<typeof createSpeciesDraftInputSchema>
 
-export const updateSpeciesInputSchema = createSpeciesInputSchema.partial()
+export const updateSpeciesInputSchema = speciesBodySchema
+  .partial()
+  .extend({ slug: slugSchema.optional() })
+  .superRefine((input, ctx) => {
+    if (input.traits) refineSpeciesTraits(input.traits, ctx)
+  })
 export type UpdateSpeciesInput = z.infer<typeof updateSpeciesInputSchema>
 
 export const updateSpeciesDraftInputSchema = createSpeciesDraftInputSchema.partial()

@@ -1,0 +1,61 @@
+---
+description: Form slots are last resort; slot implementations use @rpg/ui primitives only
+globs: apps/dashboard/**/*form-fields*.ts, apps/dashboard/**/*form-fields*.tsx, apps/dashboard/**/components/form/slots/**
+alwaysApply: false
+---
+
+# Form slots — config first, no raw controls
+
+Dashboard forms are **`FormItem[]`** in `*-form-fields.ts`. Slots are an escape hatch only.
+
+## Before `kind: 'slot'`
+
+Check in order (stop at the first that fits):
+
+1. **`kind: 'display'`** — read-only copy, notices, rules previews (`resolve.contentWhen`).
+2. **`visibility`** — show/hide; `visibleWhen` reads the **flat** watch map (see below).
+3. **`optionsResolve`** — dynamic select/combobox options.
+4. **`hint.resolve`** — dynamic helper text (`hintWhen`).
+5. **`derivedMeta`** — read-only metadata beside a field.
+6. **`valueSyncs`** on `<Form>` / `<TabbedForm>` — writes that follow a driver field.
+7. **`kind: 'dependent'`** — controller field + conditional dependents.
+8. **`optionalDisclosure`** on a leaf or **named `kind: 'group'`** — optional objects (see monster lair XP, movement override).
+9. **`group` / `row` / `columns`** composition.
+10. **Extend `@rpg/ui/form`** when the same pattern appears twice.
+11. **Feature controller + `ConfirmDialog`** for confirm-gated multi-path writes (not a new Form API).
+
+If none apply, you may add a slot — record it in
+[form-slot-register.md](../../apps/dashboard/docs/form-slot-register.md) and bump
+[form-slot-literal-baseline.json](../../apps/dashboard/src/test/form-slot-literal-baseline.json).
+
+Registration stays in `*-form-fields.ts`; render lives under `components/form/slots/`.
+
+## `visibility.visibleWhen` contract
+
+`useDependsOnValues` passes `visibleWhen` a map keyed by each **`dependsOn` string**, not nested form shape.
+
+```ts
+// dependsOn: ['lair.enabled']
+visibleWhen: (values) => values['lair.enabled'] === true // correct
+
+// wrong — values.lair is undefined in this map
+visibleWhen: (values) => values.lair?.enabled === true
+```
+
+`group.name` does not namespace children — only `namePrefix` from the parent context does (arrays, row
+scopes). Root-level leaves need fully qualified `name`s; `dependsOn` and `visibleWhen` use the same
+dotted keys (`values['lair.experience.mode']`). Detail →
+[form-lib-conventions.md](../../apps/dashboard/docs/form-lib-conventions.md#field-visibility).
+
+## Slot implementation rules
+
+- **Never** use raw `<input>`, `<select>`, or `<textarea>` in `components/form/slots/**` (ESLint enforced).
+- Prefer **`@rpg/ui`** field primitives (`CheckboxOption`, `Button`, `Text`, …) when a slot must own UI.
+- Do not duplicate section chrome (legends, disclosure headers, settings rows) that `FormItem[]` already provides.
+
+## References
+
+- [form-config.mdc](./form-config.mdc) — parallel layout ban
+- [form-slot-register.md](../../apps/dashboard/docs/form-slot-register.md) — retained slots, retired migrations
+- [form-lib-conventions.md](../../apps/dashboard/docs/form-lib-conventions.md)
+- [packages/ui/docs/forms/containers.md](../../packages/ui/docs/forms/containers.md)

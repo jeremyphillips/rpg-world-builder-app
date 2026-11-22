@@ -6,12 +6,13 @@ import { PASSIVE_PERCEPTION_TERM } from '../../vocab/mechanics/passive-perceptio
 import { PROFICIENCY_BONUS_TERM } from '../../vocab/mechanics/proficiency-bonus'
 import { TELEPATHY_TERM } from '../../vocab/mechanics/telepathy'
 import { getTermCompactLabel } from '../../vocab/types'
+import { formatGroupedNumber } from '../../primitives/number-format'
 import { formatSignedModifier } from './weapon-attack'
 
 export { formatTelepathyRange } from '../../content/creature/communication'
 
 export function formatExperiencePoints(value: number): string {
-  return `${getTermCompactLabel(EXPERIENCE_POINTS_TERM)} ${value}`
+  return `${getTermCompactLabel(EXPERIENCE_POINTS_TERM)} ${formatGroupedNumber(value)}`
 }
 
 export function formatProficiencyBonus(value: number): string {

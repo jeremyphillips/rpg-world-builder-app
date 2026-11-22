@@ -52,7 +52,10 @@ export function monsterActionAuthoring(action: AuthoringSubject): MonsterActionA
   if (action.kind === 'attack' || action.kind === 'spell' || action.kind === 'action-reference') {
     return AUTHORED_NAME
   }
-  if (action.kind === 'natural-weapon' || action.kind === 'save' || action.kind === 'multiattack') {
+  if (action.kind === 'multiattack') {
+    return DERIVED_VOCABULARY
+  }
+  if (action.kind === 'natural-weapon' || action.kind === 'save') {
     if (action.preset) return DERIVED_VOCABULARY
     return AUTHORED_NAME
   }

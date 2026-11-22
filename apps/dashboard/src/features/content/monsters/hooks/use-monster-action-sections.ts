@@ -14,7 +14,7 @@ import { useMasterDetailArray } from '../../lib/master-detail/use-master-detail-
 import {
   createEquippedWeaponAcquisition,
   createMonsterActionFromAcquisition,
-  createBonusActionDraft,
+  createActionDraft,
   createReactionActionDraft,
   createSpellActionDraft,
   type MonsterActionAcquisitionChoice,
@@ -97,7 +97,12 @@ function acquisitionRowForChoice(
 ): MonsterActionDraftRow {
   if (choice.type === 'legendary') return createLegendaryActionDraft(choice.category, getValues())
   if (choice.type === 'reaction') return createReactionActionDraft(choice.category, getValues())
-  if (choice.type === 'bonus') return createBonusActionDraft(choice.category)
+  if (
+    choice.type === 'create' &&
+    (choice.kind === 'leap' || choice.kind === 'teleport' || choice.kind === 'take-actions')
+  ) {
+    return createActionDraft(choice.kind)
+  }
   if (choice.type === 'create' && choice.kind === 'spell') {
     return createSpellActionDraft(section, getValues(), choice.spellAcquisition)
   }

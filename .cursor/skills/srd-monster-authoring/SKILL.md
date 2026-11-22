@@ -11,7 +11,9 @@ description: >-
 
 Faithful SRD 5.2.1 stat blocks on the existing creature, equipment, action, and spell models. A gap is recorded. It is not fixed by a monster-only rule or a silent schema change.
 
-Source text → [`open5e-srd`](../open5e-srd/SKILL.md). Spell effects → [`spell-resolution`](../spell-resolution/SKILL.md). This skill does not restate those rules or the resolver formulas.
+Source text → [`open5e-srd`](../open5e-srd/SKILL.md) plus the [SRD 5.2.1 PDF](https://media.dndbeyond.com/compendium-images/srd/5.2/SRD_CC_v5.2.1.pdf). Spell effects → [`spell-resolution`](../spell-resolution/SKILL.md). This skill does not restate those rules or the resolver formulas.
+
+**SRD CC v5.2.1 PDF** is the fidelity anchor when Open5e detail is incomplete or wrong. Open5e is a fast first pass. It often omits or softens **Gear**, **in-lair XP**, **legendary pool counts in lair**, and **proficiency bonus on the CR line**. Cross-check those sections in the PDF (or the repo catalog excerpt) before fidelity Pass or seed edits.
 
 Report template → [references/assessment-report.md](references/assessment-report.md). Rubric → [references/coverage-rubric.md](references/coverage-rubric.md). Extension gate → [references/model-extension.md](references/model-extension.md). Gap registry → [`srd-mechanical-coverage.md`](../../../packages/contracts/docs/srd-mechanical-coverage.md).
 
@@ -35,15 +37,16 @@ Honor an explicit mode. Otherwise a slug in `seedMonsterSlugs('srd-cc-5.2.1')` i
 
 Use this for every mode. Do not keep a second scorer or a private damage formula.
 
-1. Open5e `srd-2024` detail. Confirm `document.key`. A missing property is a source-extraction concern, not proof the rule is absent and not automatically a modeling gap. Cross-check an incomplete record against the catalog excerpt or another full stat block before a fidelity claim.
-2. Source-feature inventory in the report template. One row per feature. Legendary actions are inapplicable when the source has none.
+1. Open5e `srd-2024` detail. Confirm `document.key`. A missing property is a source-extraction concern, not proof the rule is absent and not automatically a modeling gap. When Open5e disagrees with the PDF, or when Gear, CR parenthetical, lair XP, or `(N in Lair)` counts matter, **use the PDF** as the expected literal.
+2. Source-feature inventory in the report template. One row per feature. Legendary actions are inapplicable when the source has none. Include **Gear** and **lair** rows when the PDF prints them (see below).
 3. Read the owning doc, then stop. Do not copy formulas into the report beyond the inputs, the resolver name, and the expected value.
-4. Equipment and attack order below. Weapon totals go through `resolveInventoryWeaponAttackTotals` for `kind: 'weapon'`, and `resolveMonsterActionAttackProfile` for natural and authored attacks.
-5. Spellcasting rows identify ability, spell ids, limits, and cast level. Effect, range, save, condition, concentration, and duration questions follow the spell-resolution skill. Cite that spell's modeling status. Do not copy its effects onto the monster.
-6. Independent SRD literals for resolver-owned numbers. Do not derive the expected value from the same resolver.
-7. Coverage rubric, including signature mechanics.
-8. Gap lookup in `srd-mechanical-coverage.md`. One id per capability. `assess` and `review` propose new ids in the report. They do not write them.
-9. Related unseeded creatures via the Open5e skill. Paginate `/v2/creatures/?document__key=srd-2024`, then diff `seedMonsterSlugs()`. Do not seed them.
+4. **Gear pass** (non-attack inventory), then equipment and attack order below. Weapon totals go through `resolveInventoryWeaponAttackTotals` for `kind: 'weapon'`, and `resolveMonsterActionAttackProfile` for natural and authored attacks.
+5. **Lair pass** when the PDF CR line, legendary intro, or trait titles use lair overrides ([`srd-lair-legendary-audit.md`](../../../packages/contracts/docs/srd-lair-legendary-audit.md)).
+6. Spellcasting rows identify ability, spell ids, limits, and cast level. Effect, range, save, condition, concentration, and duration questions follow the spell-resolution skill. Cite that spell's modeling status. Do not copy its effects onto the monster.
+7. Independent SRD literals for resolver-owned numbers. Do not derive the expected value from the same resolver.
+8. Coverage rubric, including signature mechanics.
+9. Gap lookup in `srd-mechanical-coverage.md`. One id per capability. `assess` and `review` propose new ids in the report. They do not write them.
+10. Related unseeded creatures via the Open5e skill. Paginate `/v2/creatures/?document__key=srd-2024`, then diff `seedMonsterSlugs()`. Do not seed them.
 
 ### Where the rules live
 
@@ -51,7 +54,8 @@ Use this for every mode. Do not keep a second scorer or a private damage formula
 | --- | --- |
 | AC, HP, attacks, saves, spell DC | [`monster-stat-blocks.md`](../../../packages/contracts/docs/monster-stat-blocks.md), `deriveMonsterStatBlock` |
 | Hit die faces | `CREATURE_SIZE_HIT_DIE`. Largest permitted size wins in `resolveMonsterHitPoints`. Application convention for current SRD blocks. |
-| Proficiency and XP | `CHALLENGE_RATING_MECHANICS` |
+| Proficiency and XP | `CHALLENGE_RATING_MECHANICS`, `formatCrStatRow`, `suggestInLairExperience` |
+| Lair XP, legendary pools in lair | [`srd-lair-legendary-audit.md`](../../../packages/contracts/docs/srd-lair-legendary-audit.md), monster `lair`, `legendaryActions.uses`, Legendary Resistance template `uses.inLair` |
 | Layering | [`runtime-resolution-boundaries.md`](../../../packages/contracts/docs/runtime-resolution-boundaries.md). `runtime/monster/` is current. Extend `runtime/creature/` when characters need the same math. |
 | Action kinds, legendary, save conditions | [`action-architecture.md`](../../../packages/contracts/docs/action-architecture.md), [`monster-actions.md`](../../../packages/contracts/docs/effect-resolution/monster-actions.md) |
 | Equipment, magic, adjustments | [`equipment-loadout.md`](../../../packages/contracts/docs/equipment-loadout.md), [`magic-properties.md`](../../../packages/contracts/docs/magic-properties.md) |
@@ -83,7 +87,17 @@ Rendered sections come from [`monster-display.ts`](../../../apps/dashboard/src/f
 
 Prefer an explicit SRD statement and the shared resolver. Infer proficiency, governing ability, natural armor, or an exceptional adjustment only when the stat block omits that detail. Record the inputs. Two plausible derivations lower confidence. A matching total is not proof of the chosen model.
 
-Equipment order:
+### Gear (SRD **Gear** section)
+
+Run this before attack wiring. It is separate from the attack order.
+
+1. Read every item on the PDF **Gear** line. Open5e may omit the whole section or list fewer items.
+2. When a catalog row exists (`equipmentId` under `srd-cc-5.2.1`), add a plain `equipment` instance (`entryId`, `quantity`). No weapon action is required. Example: Lich **Component Pouch** → `srd-cc-5.2.1:component-pouch`; Mage **Wand** → `srd-cc-5.2.1:wand`.
+3. Worn armor and shields that affect AC use the same instances; tie attacks only when the SRD weapon line demands it.
+4. If the PDF lists gear with no catalog id, record a gap or custom description. Do not skip the inventory row in the report when the PDF printed the item.
+5. Rendered **Gear** comes from `monster.equipment` in [`monster-display.ts`](../../../apps/dashboard/src/features/content/monsters/lib/monster-display.ts). An empty array omits the section. That is a fidelity Fail when the PDF listed gear.
+
+### Equipment and attack order
 
 1. Innate attack, breath, or trait: natural-weapon preset, `save`, or `special`. No equipment row.
 2. A catalog weapon the creature carries: owned instance plus `kind: 'weapon'`.
@@ -93,6 +107,19 @@ Equipment order:
 6. No catalog weapon and no natural preset: `kind: 'attack'`.
 
 Name the rejected configuration when two setups can print the same line. `fixedAcOffset` needs a reason that natural armor and equipment cannot produce the AC. Natural weapons are proficient by policy. Catalog weapons use `proficiencies.weapons`. Do not infer proficiency from the attack bonus alone.
+
+### Lair authoring
+
+When the PDF shows lair-specific XP or use counts, author structured fields. Do not bake `(4 in Lair)` or `or N in lair` into custom trait names when a template or formatter owns the clause.
+
+| PDF signal | Seed / field | Verify |
+| --- | --- | --- |
+| CR line with in-lair XP (e.g. `XP 33,000, or 41,000 in lair`) | `lair.enabled: true`, `lair.experience` (`suggested` when next CR table XP matches; else `custom`) | `formatCrStatRow`, `resolveMonsterInLairExperiencePoints` |
+| Legendary intro `3 (4 in Lair)` | `legendaryActions.uses.normal` and `uses.inLair` | `formatLegendaryActionUsesIntro` |
+| Legendary Resistance `(4/Day, or 5/Day in Lair)` | `templateId: 'legendary-resistance'`, `config.uses.normal` / `uses.inLair` | `formatLegendaryResistanceStatBlockTitle` |
+| No in-lair XP (e.g. CR 30 Tarrasque) | `lair.enabled` may still apply for mechanics; `suggestInLairExperience` stays unavailable — do not invent XP | Audit doc exceptions |
+
+Open5e does not carry in-lair XP or lair pool numbers. Use the PDF and [`srd-lair-legendary-audit.md`](../../../packages/contracts/docs/srd-lair-legendary-audit.md) for expected patterns (+1 use in lair, in-lair XP = next CR table value through CR 29).
 
 ---
 
@@ -112,7 +139,7 @@ Known SRD behavior that the model cannot execute may use B. Incomplete or uncert
 
 1. `seedMonsterSlugs('srd-cc-5.2.1')` before writing. `getMonsterBySlug` throws when the slug is missing, so it is the wrong existence check.
 2. An existing slug is a diff and waits for an update decision. Do not insert a second row. Do not edit other monsters or shared catalog rows to force a pass.
-3. Reuse catalog equipment and spell ids. Add independent literals in `packages/catalog/src/monsters/index.test.ts`. Call `collectMonsterCatalogIssues` from that test when the seed adds those ids.
+3. Reuse catalog equipment and spell ids. Add independent literals in `packages/catalog/src/monsters/index.test.ts` (attacks, CR/lair lines, **Gear** when critical). Call `collectMonsterCatalogIssues` from that test when the seed adds those ids.
 4. Update the gap registry and append a capability-log entry only in this approved pass.
 
 ---

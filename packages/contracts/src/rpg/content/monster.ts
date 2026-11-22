@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { creatureFamilyIdSchema } from '../vocab/creature-family'
 
 import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
+import { refineContextualCountInLairExceedsNormal } from '../primitives/contextual-count'
 import { abilitySchema } from '../vocab/ability'
 import { challengeRatingSchema, CHALLENGE_RATING_MECHANICS } from '../vocab/challenge-rating'
 import {
@@ -29,6 +30,7 @@ import {
   monsterPresetTraitDraftSchema,
   monsterPresetTraitSchema,
 } from './creature/trait-preset-schema'
+import { LEGENDARY_RESISTANCE_NAME_OVERRIDE_MESSAGE } from './creature/traits/legendary-resistance.constants'
 import { refineCreatureTraitTemplate } from './creature/traits/validate'
 import {
   customContentTraitSchema,
@@ -84,6 +86,8 @@ import {
 } from './monster/forms'
 import { shapeShiftRows } from './monster/action/action-removal-plan'
 import { refineMonsterFormAvailability } from './monster/form-availability'
+import { monsterLairDraftSchema, monsterLairSchema } from './monster/lair-schema'
+import { refineMonsterLair } from './monster/lair-refinements'
 
 export { MONSTER_ACTION_SECTIONS }
 export type { MonsterActionSection } from './monster/action-sections'
@@ -332,6 +336,7 @@ export const monsterBodyFields = {
   communication: creatureCommunicationSchema.default(EMPTY_CREATURE_COMMUNICATION),
   challengeRating: challengeRatingSchema,
   experiencePointsOverride: z.number().int().min(0).optional(),
+  lair: monsterLairSchema.optional(),
   proficiencies: z.object({
     savingThrows: z.array(abilitySchema).default([]),
     skills: z.array(creatureSkillProficiencyEntrySchema).default([]),
@@ -365,6 +370,7 @@ const monsterBodyDraftSchemaBase = mediaBearingDraftAuthoredContentBodySchema(
   movement: creatureMovementSchema.optional(),
   senses: creatureSensesDraftSchema.optional(),
   challengeRating: challengeRatingSchema.optional(),
+  lair: monsterLairDraftSchema.optional(),
   actions: z.array(monsterActionDraftSchema).default([]),
   bonusActions: z.array(monsterBonusActionDraftSchema).default([]),
   reactions: z.array(monsterReactionDraftSchema).default([]),
@@ -686,16 +692,15 @@ function refineLegendaryActionReference(
 }
 
 type LegendaryPoolBlock = {
-  uses?: number
-  usesInLair?: number
+  uses?: { normal?: number; inLair?: number }
   actions?: readonly unknown[]
 }
 
-function legendaryPoolPath(
+function legendaryPoolCountPath(
   prefix: (string | number)[],
-  field: 'uses' | 'usesInLair',
+  field: 'normal' | 'inLair',
 ): (string | number)[] {
-  return [...prefix, 'legendaryActions', field]
+  return [...prefix, 'legendaryActions', 'uses', field]
 }
 
 function refineLegendaryPoolWithoutRows(
@@ -703,14 +708,15 @@ function refineLegendaryPoolWithoutRows(
   ctx: z.RefinementCtx,
   prefix: (string | number)[],
 ): void {
-  if (block?.uses !== undefined) {
+  const uses = block?.uses
+  if (uses?.normal !== undefined) {
     addCustomRefinementIssue(ctx, 'Legendary action uses require a legendary action.', [
-      ...legendaryPoolPath(prefix, 'uses'),
+      ...legendaryPoolCountPath(prefix, 'normal'),
     ])
   }
-  if (block?.usesInLair !== undefined) {
+  if (uses?.inLair !== undefined) {
     addCustomRefinementIssue(ctx, 'In-lair legendary action uses require a legendary action.', [
-      ...legendaryPoolPath(prefix, 'usesInLair'),
+      ...legendaryPoolCountPath(prefix, 'inLair'),
     ])
   }
 }
@@ -720,17 +726,16 @@ function refineLegendaryPoolWithRows(
   ctx: z.RefinementCtx,
   prefix: (string | number)[],
 ): void {
-  if (block.uses === undefined) {
+  if (block.uses?.normal === undefined) {
     addCustomRefinementIssue(ctx, 'Enter legendary action uses.', [
-      ...legendaryPoolPath(prefix, 'uses'),
-    ])
-    return
-  }
-  if (block.usesInLair !== undefined && block.usesInLair <= block.uses) {
-    addCustomRefinementIssue(ctx, 'In-lair uses must be greater than legendary action uses.', [
-      ...legendaryPoolPath(prefix, 'usesInLair'),
+      ...legendaryPoolCountPath(prefix, 'normal'),
     ])
   }
+  refineContextualCountInLairExceedsNormal(
+    block.uses,
+    ctx,
+    legendaryPoolCountPath(prefix, 'inLair'),
+  )
 }
 
 function refineLegendaryActionPool(
@@ -919,6 +924,29 @@ export function refineMonsterBody(
   refineShapeShiftForms(body, ctx, prefix)
   refineMonsterFormAvailability(body, ctx, prefix)
   refineExperiencePointsOverride(body, ctx, prefix)
+  refineMonsterLair(body, ctx, prefix)
+  refineMonsterLegendaryResistanceTraits(body.traits, ctx, prefix)
+}
+
+function refineMonsterLegendaryResistanceTraits(
+  traits: MonsterBody['traits'],
+  ctx: z.RefinementCtx,
+  prefix: (string | number)[],
+): void {
+  traits.forEach((trait, index) => {
+    if (trait.kind !== 'template' || trait.templateId !== 'legendary-resistance') return
+    const traitPath = [...prefix, 'traits', index]
+    if (trait.nameOverride !== undefined) {
+      addCustomRefinementIssue(ctx, LEGENDARY_RESISTANCE_NAME_OVERRIDE_MESSAGE, [
+        ...traitPath,
+        'nameOverride',
+      ])
+    }
+    const config = trait.config
+    if (!config || typeof config !== 'object' || Array.isArray(config)) return
+    const uses = (config as { uses?: { normal?: number; inLair?: number } }).uses
+    refineContextualCountInLairExceedsNormal(uses, ctx, [...traitPath, 'config', 'uses', 'inLair'])
+  })
 }
 
 /** Stored monster record — explicit meta + body (Zod superRefine omits output typing). */
@@ -1029,6 +1057,28 @@ export const updateMonsterDraftInputSchema = monsterDraftInputSchema
   })
   .superRefine((input, ctx) => refineMonsterDraftBody(input as MonsterBodyDraft, ctx))
 
+export {
+  monsterLairDraftSchema,
+  monsterLairExperienceDraftSchema,
+  monsterLairExperienceModeSchema,
+  monsterLairExperienceSchema,
+  monsterLairSchema,
+  type MonsterLair,
+  type MonsterLairDraft,
+} from './monster/lair-schema'
+export {
+  MONSTER_LAIR_CUSTOM_XP_MESSAGE,
+  MONSTER_LAIR_SUGGESTED_UNAVAILABLE_MESSAGE,
+  isMonsterLairExperienceActive,
+  refineMonsterLair,
+  resolveMonsterInLairExperiencePoints,
+} from './monster/lair-refinements'
+export {
+  monsterLairCustomXpMinimumHint,
+  monsterLairInLairXpMustExceedBaseMessage,
+} from './monster/lair-experience-messages'
+export { resolveMonsterBaseExperiencePoints } from '../runtime/monster/resolve-monster-base-experience'
+export type { MonsterBaseExperienceInput } from '../runtime/monster/resolve-monster-base-experience'
 export {
   collectMonsterCatalogIssues,
   MONSTER_CATALOG_ISSUE_CODE,

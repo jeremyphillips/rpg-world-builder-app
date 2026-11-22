@@ -19,6 +19,7 @@ import { buildMonsterActionRequirementValueSyncs } from './actions/monster-actio
 import { buildMultiattackReplacementValueSyncs } from './actions/multiattack/monster-multiattack-replacement-form-sync'
 import { buildMultiattackUseRepetitionValueSyncs } from './actions/multiattack/monster-multiattack-use-repetition-form-sync'
 import { buildMonsterHitPointsFormValueSyncs } from './statistics/monster-hit-points-form.lib'
+import { buildMonsterLairFormValueSyncs } from './statistics/monster-lair-form-value-sync'
 import { resolveMonsterFormSchema } from './monster-form-schema'
 import {
   buildMonsterInput,
@@ -59,6 +60,7 @@ function buildMonsterFormValueSyncs(): FormValueSync[] {
     ...buildMonsterActionRequirementValueSyncs(),
     ...buildMultiattackReplacementValueSyncs(),
     ...buildMultiattackUseRepetitionValueSyncs(),
+    ...buildMonsterLairFormValueSyncs(),
   ]
 }
 
@@ -88,7 +90,7 @@ export const monsterFormDef: ContentFormDef<Monster, MonsterFormValues, CreateMo
     actions: entity.actions.map((action) => action.id),
     bonusActions: entity.bonusActions.map((action) => action.id),
     reactions: entity.reactions.map((action) => action.id),
-    legendaryActions: entity.legendaryActions?.actions.map((action) => action.id) ?? [],
+    'legendaryActions.actions': entity.legendaryActions?.actions.map((action) => action.id) ?? [],
   }),
   toFormValues: monsterToFormValues,
   enrichEditLayoutCtx: (ctx, entity) => ({

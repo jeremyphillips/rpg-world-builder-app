@@ -4,15 +4,15 @@ List rows and detail headers share one resolved object. Domain editors supply cl
 
 ## Facts
 
-| Property       | Owner                     | Meaning                                                                                     |
-| -------------- | ------------------------- | ------------------------------------------------------------------------------------------- |
-| `provenance`   | Shared resolver           | `system` only when the row id was on a system entity at editor open. Otherwise `homebrew`.  |
-| `persistence`  | Shared resolver           | `persisted` when the row id is on the latest saved entity. Otherwise `new`.                 |
-| `kindLabel`    | Domain `mapListItem`      | What the row is, such as "Natural weapon".                                                  |
-| `summary`      | Domain `mapListItem`      | Optional list phrase when it differs from the kind. Detail still uses `kindLabel`.          |
-| `sectionLabel` | The editor for that array | Where it sits, such as "Actions". Shown on the detail caption only.                         |
-| `eyebrow`      | Domain `mapListItem`      | Leading list label, such as "Level 1". It stays above the title.                            |
-| `sourceName`   | Derived at render         | Original name while a custom name is stored. It is not saved again and is not a kind label. |
+| Property       | Owner                     | Meaning                                                                                                                                       |
+| -------------- | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `provenance`   | Shared resolver           | `system` only when the row id was on a system entity at editor open. Otherwise `homebrew`.                                                    |
+| `persistence`  | Shared resolver           | `persisted` when the row id is on the latest saved entity. Otherwise `new`.                                                                   |
+| `kindLabel`    | Domain `mapListItem`      | What the row is, such as "Natural weapon". Monster legendary rows use action kind (`getMonsterActionKindLabel`), not acquisition-menu labels. |
+| `summary`      | Domain `mapListItem`      | Optional list phrase when it differs from the kind. Detail still uses `kindLabel`.                                                            |
+| `sectionLabel` | The editor for that array | Where it sits, such as "Actions". Shown on the detail caption only.                                                                           |
+| `eyebrow`      | Domain `mapListItem`      | Leading list label, such as "Level 1". It stays above the title.                                                                              |
+| `sourceName`   | Derived at render         | Original name while a custom name is stored. It is not saved again and is not a kind label.                                                   |
 
 `mapListItem` cannot set provenance or persistence.
 

@@ -13,7 +13,7 @@ export function multiattackReferenceHasUsageRestriction(
   spellId?: string,
 ): boolean {
   if (!action) return false
-  if (action.onceUntilNextTurn === true) return true
+  if ('onceUntilNextTurn' in action && action.onceUntilNextTurn === true) return true
 
   if (action.kind === 'spell' && spellId) {
     const entry = action.spells?.find((row) => row.spellId === spellId)

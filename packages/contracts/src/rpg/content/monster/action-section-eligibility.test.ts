@@ -25,9 +25,13 @@ describe('monsterActionSectionMoveEligibility', () => {
       monsterActionSectionMoveEligibility({ kind: 'spell' }, 'bonusActions', 'actions'),
     ).toEqual({ allowed: true })
     expect(monsterSectionAllowsKind('reactions', 'parry')).toBe(true)
+    expect(monsterSectionAllowsKind('legendaryActions', 'save')).toBe(true)
     expect(
       monsterActionSectionMoveEligibility({ kind: 'leap' }, 'bonusActions', 'actions'),
     ).toEqual({ allowed: false, reason: 'kind' })
+    expect(
+      monsterActionSectionMoveEligibility({ kind: 'teleport' }, 'bonusActions', 'actions'),
+    ).toEqual({ allowed: true })
   })
 })
 

@@ -12,6 +12,7 @@ import {
 } from '../../../campaign-access/campaign-access-form-state'
 import { notifyCoordinatedContentSaveSuccess } from '@/lib/notify'
 import { useContentSaveSession } from './use-content-save-session'
+import { draftPublishValidationSurface } from '../../validation/content-draft-publish-validation-surface.ref'
 
 const toastSuccess = vi.hoisted(() => vi.fn())
 
@@ -183,6 +184,34 @@ describe('content save session integration', () => {
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeDisabled()
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'x')
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeEnabled()
+  })
+
+  it('re-surfaces draft publish validation after body save clears presentation', async () => {
+    const user = userEvent.setup()
+    const surface = vi.fn()
+    draftPublishValidationSurface.current = surface
+    const onSubmit = vi.fn(async () => {})
+
+    render(
+      <SaveSessionHarness
+        accessDirty={false}
+        accessSave={vi.fn(async () => ({ status: 'skipped' as const }))}
+        accessReset={vi.fn()}
+        onSubmit={onSubmit}
+      />,
+    )
+
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'x')
+    await user.click(screen.getByRole('button', { name: 'Save changes' }))
+
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledOnce()
+    })
+    await waitFor(() => {
+      expect(surface).toHaveBeenCalled()
+    })
+
+    draftPublishValidationSurface.current = null
   })
 
   it('saves access before body when both are dirty', async () => {

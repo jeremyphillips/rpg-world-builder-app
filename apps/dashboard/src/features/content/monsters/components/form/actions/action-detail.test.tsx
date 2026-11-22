@@ -15,6 +15,7 @@ import { MONSTER_ACTION_ITEM_NOUN } from '../../../lib/monster-form-labels'
 import type { MonsterActionDraftRow } from '../../../lib/actions/monster-action-presets'
 import { monsterFormTestValues } from '../../../lib/monster-form-test-values'
 import type { MonsterFormValues } from '../../../lib/monster-form-values'
+import { monsterFormSectionRowsFieldName } from '../../../lib/actions/monster-action-section-access'
 import { MonsterActionDetail } from './action-detail'
 
 const shortbow = pickEquipment('shortbow')
@@ -53,10 +54,11 @@ function Host({
 function Detail({ ctx, actionId }: { ctx: ContentFormCtx; actionId: string }) {
   const sections = useMonsterActionSections()
   const located = sections.locate(actionId)
+  const section = located?.section ?? 'actions'
   const rows = useEmbeddedMasterDetailRows({
     formCtx: ctx,
-    fieldName: located?.section ?? 'actions',
-    editor: sections.editors[located?.section ?? 'actions'],
+    fieldName: monsterFormSectionRowsFieldName(section),
+    editor: sections.editors[section],
     itemFields: [],
     itemNoun: MONSTER_ACTION_ITEM_NOUN,
     mapListItem: ({ row, index }) => ({

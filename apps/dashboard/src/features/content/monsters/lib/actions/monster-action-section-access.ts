@@ -5,8 +5,7 @@ import type { MonsterActionSection } from './references/monster-action-equipment
 import type { MonsterActionDraftRow } from './monster-action-presets'
 
 export type MonsterFormLegendaryActionsBlock = {
-  uses?: number
-  usesInLair?: number
+  uses?: { normal?: number; inLair?: number }
   actions: MonsterLegendaryActionDraft[]
 }
 

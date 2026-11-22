@@ -54,13 +54,51 @@ describe('MonsterTraitsEditor', () => {
     await user.click(screen.getByRole('button', { name: 'Add' }))
     await user.click(screen.getByRole('menuitem', { name: /Flyby/ }))
     const preview = screen.getByText('Trait preview').closest('.ui-panel')
+    expect(preview).toHaveTextContent('Flyby')
     expect(preview).toHaveTextContent(/The owl doesn't provoke an Opportunity Attack/)
-    expect(preview).not.toHaveTextContent('Flyby')
 
     await user.click(screen.getByRole('button', { name: 'Add' }))
     await user.click(screen.getByRole('menuitem', { name: /Custom trait/ }))
     expect(screen.getByRole('textbox', { name: 'Name' })).toBeInTheDocument()
     expect(screen.queryByText('Trait preview')).not.toBeInTheDocument()
+  })
+
+  it('shows guidance when trait preview is not ready', () => {
+    const values = resolveMonsterCreateDefaultValues()
+    values.traits = [
+      {
+        kind: 'template',
+        id: 'lr',
+        templateId: 'legendary-resistance',
+        config: { uses: {} },
+      },
+    ]
+    render(<Host values={values} />)
+    const preview = screen.getByText('Trait preview').closest('.ui-panel')
+    expect(preview).toHaveTextContent(
+      'Complete required trait fields to show the stat-block preview.',
+    )
+  })
+
+  it('previews legendary resistance with the stat-block heading when lair is enabled', () => {
+    const values = resolveMonsterCreateDefaultValues()
+    values.name = 'Lich'
+    values.lair = { enabled: true, experience: { mode: 'suggested' } }
+    values.traits = [
+      {
+        kind: 'template',
+        id: 'lr',
+        templateId: 'legendary-resistance',
+        config: { uses: { normal: 4, inLair: 5 } },
+      },
+    ]
+    render(<Host values={values} />)
+    const preview = screen.getByText('Trait preview').closest('.ui-panel')
+    expect(preview).toHaveTextContent('Legendary Resistance (4/Day, or 5/Day in Lair)')
+    expect(preview).toHaveTextContent('fails a saving throw')
+    const listRow = screen.getByRole('button', { current: true })
+    expect(listRow).toHaveTextContent('Legendary Resistance')
+    expect(listRow).not.toHaveTextContent('/Day')
   })
 
   it('previews a template trait and discloses name and description overrides', () => {
@@ -106,8 +144,8 @@ describe('MonsterTraitsEditor', () => {
     const alert = screen.getByText(/Tunneler uses half the creature's Burrow Speed/)
     expect(preview.compareDocumentPosition(alert) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(alert.closest('.ui-alert')).toHaveClass('ui-alert--warning')
+    expect(preview.closest('.ui-panel')).toHaveTextContent('Tunneler')
     expect(preview.closest('.ui-panel')).toHaveTextContent(/burrow through solid rock/)
-    expect(preview.closest('.ui-panel')).not.toHaveTextContent('Tunneler')
 
     formRef.current?.setValue('movement', [{ mode: 'burrow', feet: 20 }])
     await waitFor(() => {

@@ -4,6 +4,8 @@ import { useFormUiContext, useSchemaFormSubmit } from '@rpg/ui/form'
 
 import { hasDirtyFields } from '@/lib/form-dirty-state'
 
+import { draftPublishValidationSurface } from '../../validation/content-draft-publish-validation-surface.ref'
+
 import { useCampaignAccessForm } from '../../../campaign-access/campaign-access-form-state'
 import { useArmorClassAuthoringSave } from './armor-class-authoring-session.lib'
 import {
@@ -126,6 +128,11 @@ export function useContentSaveSession<TFieldValues extends FieldValues>({
       if (result.status === 'saved') {
         if (result.saved.bodySaved) {
           resetValidationPresentation()
+          // Edit shell paints publish-only issues before persist; save session reset clears that
+          // presentation — re-run after microtask so live publish bridge cannot clobber with [].
+          queueMicrotask(() => {
+            draftPublishValidationSurface.current?.(form.getValues() as FieldValues)
+          })
         }
         onSavedRef.current?.(result.saved)
       }

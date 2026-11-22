@@ -4,6 +4,8 @@ Authoring and display only. There is no encounter resolver, turn order, or live
 attack roll. Shared math is limited to modifiers, save DC, dice averages, and
 stat-block sentences.
 
+Pattern-level SRD inventory (natural forms, Pounce, Swallow, legendary saves) → [srd-action-inventory.md](./srd-action-inventory.md).
+
 ## Layers
 
 | Layer           | Home                            | Owns                                                                                                                                                                                     |
@@ -23,15 +25,30 @@ bonus + ability modifier). Area sentences for stat blocks use
 
 `weapon`, `natural-weapon`, `attack`, `save`, `multiattack`, `shape-shift`, `special`,
 `spell`, `action-reference`, `parry`, `leap`, `teleport`, and `take-actions`.
-Which kinds a section accepts is `MONSTER_SECTION_KINDS`. Actions keep the
-attack, save, spell, special, multiattack, and shape-shift kinds. Bonus Actions keep
-`attack`, `save`, `spell`, `special`, `leap`, `teleport`, `take-actions`, and `shape-shift`.
-Reactions keep `parry`, `action-reference`, `spell`, and `special`. Legendary
-Actions keep `action-reference`, `spell`, and `special`. `multiattack` is valid
-only in `actions`. `leap`, `teleport`, and `take-actions` are valid only in
-Bonus Actions. Breath Weapon and Constrict presets are Actions presets even
-though they store `kind: 'save'`. Rows do not move into or out of Legendary
-Actions, and a row cannot move into a section that does not allow its kind.
+Which kinds a section accepts is **`MONSTER_SECTION_KINDS`**, derived from the
+explicit schema tuple in [`section-tuples.ts`](../src/rpg/content/monster/action/section-tuples.ts).
+Each section union is `z.discriminatedUnion('kind', tuple)` with a placement
+error when a known kind is absent from that tuple. Intrinsic kind schemas are
+shared; reaction `trigger` overlays and separate reaction versus legendary
+`action-reference` shapes are tuple members, not filters.
+
+| Section           | Kinds                                                                                                      |
+| ----------------- | ---------------------------------------------------------------------------------------------------------- |
+| Actions           | `weapon`, `natural-weapon`, `attack`, `save`, `spell`, `special`, `multiattack`, `shape-shift`, `teleport` |
+| Bonus Actions     | `attack`, `save`, `spell`, `special`, `leap`, `teleport`, `take-actions`, `shape-shift`                    |
+| Reactions         | `spell`, `special`, `action-reference`, `parry`                                                            |
+| Legendary Actions | `action-reference`, `spell`, `special`, `save`                                                             |
+
+`multiattack` is valid only in Actions. `leap` and `take-actions` remain Bonus
+Actions-only. `teleport` is eligible in both Actions and Bonus Actions; adding
+another portable kind is primarily a tuple edit plus dashboard offer registration.
+Primary Spellcasting profile rules live in
+[`primary-spellcasting-profile.ts`](../src/rpg/content/monster/primary-spellcasting-profile.ts).
+Acquisition uses `create:{kind}` offers that follow eligibility (`monsterSectionAllowsKind`);
+repeatability locks are section-scoped where a Bonus Actions singleton must not
+block the same kind in Actions. Breath Weapon and Constrict presets are Actions
+presets even though they store `kind: 'save'`. Rows do not move into or out of
+Legendary Actions, and a row cannot move into a section that does not allow its kind.
 
 `action-reference` points at Actions rows by id. A legendary reference may list
 several attacks, and the creature makes one of them. One id may be an attack, a
@@ -47,8 +64,8 @@ creature can see. `take-actions` stores Dash, Disengage, and Hide. One action
 prints that action. Two or more also store whether the creature chooses one or
 uses each. A missing choice prints nothing. None of the three kinds is an
 encounter movement or action resolver. Legendary actions spend one use from
-`legendaryActions.uses`. An optional `legendaryActions.usesInLair` is printed only when it is
-greater than that pool. There is no per-option cost.
+`legendaryActions.uses.normal`. An optional `legendaryActions.uses.inLair` is printed in the
+intro when `lair.enabled` is true and the in-lair total is set. There is no per-option cost.
 `shape-shift` is one row across Actions and Bonus Actions. It has no `onlyInFormIds` and is not a Multiattack, legendary, or reaction target. Its description is generated from centrally resolved transformation destinations. See [creature-forms.md](./creature-forms.md).
 `onceUntilNextTurn` prints one restriction sentence and is not `limitedUse`.
 `spellInvocation: 'use-entry'` is stored only on a legendary spell row and
@@ -74,14 +91,14 @@ publish; repeat strikes belong in `multiattack` steps, not duplicate rows.
 is the contract SSOT shared with dashboard acquisition. Publish validation and
 the add menu read the same rules.
 
-| Constraint                                       | Basis                    | Notes                              |
-| ------------------------------------------------ | ------------------------ | ---------------------------------- |
-| Weapon                                           | `equipmentEntryId`       | One action per equipped entry      |
-| Natural weapon                                   | `form` when set          | Rows without `form` may repeat     |
-| Multiattack, Leap, Teleport, Take Actions, Parry | `kind`                   | Structural singleton               |
-| Constrict                                        | `preset === 'constrict'` | Breath Weapon preset is repeatable |
-| Primary Spellcasting                             | `profile: 'primary'`     | Existing spell refinements         |
-| Attack, Special, Spell, references               | —                        | Repeatable                         |
+| Constraint                                       | Basis                    | Notes                                                                                     |
+| ------------------------------------------------ | ------------------------ | ----------------------------------------------------------------------------------------- |
+| Weapon                                           | `equipmentEntryId`       | One action per equipped entry                                                             |
+| Natural weapon                                   | `form` when set          | Rows without `form` may repeat                                                            |
+| Multiattack, Leap, Teleport, Take Actions, Parry | `kind` (per section)     | Authoring singleton; Teleport repeatable across Actions once Bonus Actions lock is lifted |
+| Constrict                                        | `preset === 'constrict'` | Breath Weapon preset is repeatable                                                        |
+| Primary Spellcasting                             | `profile: 'primary'`     | Existing spell refinements                                                                |
+| Attack, Special, Spell, references               | —                        | Repeatable                                                                                |
 
 Reaction and legendary `action-reference` rows are repeatable; within-row
 reference rules and global action `id` uniqueness are unchanged.

@@ -5,12 +5,12 @@ Pure builders live here. Registered preview slot components live under
 
 ## Ownership
 
-| Layer                                | Owns                                                                                                                 |
-| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
-| `useMonsterActionPreviewContext`     | Whole-form `useWatch`, `findMonsterFormActionDraft`, `resolveMonsterEntryHeading` via `useMonsterActionPreviewTitle` |
-| `buildMonsterAction*Preview`         | Rules text, unavailable guidance, reference resolution                                                               |
-| `MonsterAction*RulesPreview` helpers | Mapping builder output → `RulesPreview` content kinds                                                                |
-| `*.slot.tsx`                         | Kind guard, builder call, labels, layout exceptions (e.g. shape-shift dual panels)                                   |
+| Layer                                | Owns                                                                                                  |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| `useMonsterActionPreviewContext`     | Whole-form `useWatch`, draft lookup, stat-block rules heading via `useMonsterActionRulesPreviewTitle` |
+| `buildMonsterAction*Preview`         | Rules text, unavailable guidance, reference resolution                                                |
+| `MonsterAction*RulesPreview` helpers | Mapping builder output → `RulesPreview` content kinds                                                 |
+| `*.slot.tsx`                         | Kind guard, builder call, labels, layout exceptions (e.g. shape-shift dual panels)                    |
 
 Headings: [`resolveMonsterEntryHeading`](../../../../../../../packages/contracts/src/rpg/runtime/monster/resolve-monster-entry-heading.ts) only — no preview-local fallbacks.
 
@@ -27,7 +27,7 @@ Draft lookup: [`findMonsterFormActionDraft`](./monster-action-draft-lookup.ts) o
 | Bonus (leap / teleport / take-actions) | `actions/sections/bonus-preview.slot.tsx`          | `buildMonsterActionBonusPreview`       | No unavailable branch      |
 | Shape-shift                            | `actions/shape-shift/shape-shift-summary.slot.tsx` | `buildMonsterActionShapeShiftPreview`  | Dual `RulesPreview` panels |
 
-Trait rules preview uses `useMonsterTraitPreviewTitle` and `MonsterActionRulesPreview` for presentation — shared heading helper, not action orchestration.
+Trait rules preview uses `useMonsterTraitRulesPreviewPresentation`; action slots share `MonsterActionRulesPreview` presentation only.
 
 ## Subscriptions
 

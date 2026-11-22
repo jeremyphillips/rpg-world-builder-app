@@ -21,20 +21,24 @@ describe('creature trait templates', () => {
     expect(CREATURE_TRAIT_TEMPLATE_IDS).toHaveLength(4)
   })
 
-  it('prints Legendary Resistance as 3/Day', () => {
+  it('keeps Legendary Resistance as the canonical label without daily notation', () => {
     const template = getCreatureTraitTemplate('legendary-resistance')
-    expect(template?.formatName?.({ uses: 3 })).toBe('Legendary Resistance (3/Day)')
-    expect(template?.formatDescription({ uses: 3 })).toContain('3/Day')
+    expect(template?.formatName?.({ uses: { normal: 3 } })).toBe('Legendary Resistance')
+    expect(template?.formatDescription({ uses: { normal: 3 } })).toBe(
+      'If this creature fails a saving throw, it can choose to succeed instead.',
+    )
     const display = resolveTraitDisplay(
       contentTraitSchema.parse({
         kind: 'template',
         id: 'legendary-resistance',
         templateId: 'legendary-resistance',
-        config: { uses: 3 },
+        config: { uses: { normal: 3 } },
       }),
     )
-    expect(display.name).toBe('Legendary Resistance (3/Day)')
-    expect(display.descriptionHtml).toContain('3/Day')
+    expect(display.name).toBe('Legendary Resistance')
+    expect(display.descriptionHtml).toContain(
+      'If this creature fails a saving throw, it can choose to succeed instead.',
+    )
   })
 
   it('rejects an unknown template id and an invalid config', () => {
@@ -49,7 +53,7 @@ describe('creature trait templates', () => {
         kind: 'template',
         id: 'legendary-resistance',
         templateId: 'legendary-resistance',
-        config: { uses: 0 },
+        config: { uses: { normal: 0 } },
       }).success,
     ).toBe(false)
   })

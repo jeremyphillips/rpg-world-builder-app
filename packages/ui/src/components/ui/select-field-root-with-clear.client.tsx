@@ -116,7 +116,7 @@ export function SelectRootWithClear({
         {selectedOption ? (
           <SelectOptionRowContent
             label={selectedOption.label}
-            trailing={selectedOption.trailing}
+            trailing={selectedOption.trailingScope === 'item' ? undefined : selectedOption.trailing}
             disabled={selectedOption.disabled}
             disabledReason={selectedOption.disabledReason}
             mode="trigger"

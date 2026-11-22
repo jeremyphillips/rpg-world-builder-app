@@ -23,7 +23,6 @@ import {
   weaponRangeSchema,
 } from '../../equipment/weapon-variant'
 import { shapeShiftEquipmentSchema } from '../../../vocab/shape-shift-equipment'
-import { MONSTER_SECTION_KINDS } from '../action-section-eligibility'
 import { PRIMARY_SPELLCASTING_PROFILE } from '../spell-casting-source'
 import {
   attackModes,
@@ -232,31 +231,31 @@ export function monsterActionFields<M extends MonsterActionMode>(mode: M) {
   ] as const
 }
 
-export function omitActionKinds<T extends { shape: { kind: z.ZodType } }>(
-  options: readonly T[],
-  kinds: readonly string[],
-) {
-  return options.filter(
-    (option) => !kinds.some((kind) => option.shape.kind.safeParse(kind).success),
-  ) as unknown as [T, T, ...T[]]
-}
-
 export const publishedActionFields = monsterActionFields('published')
 export const draftActionFields = monsterActionFields('draft')
 
-const ACTION_FIELD_KINDS = [
-  'weapon',
-  'natural-weapon',
-  'attack',
-  'save',
-  'special',
-  'spell',
-  'multiattack',
-  'shape-shift',
-  'action-reference',
-] as const
-
-export function omittedSectionKinds(section: 'actions' | 'bonusActions' | 'legendaryActions') {
-  const allowed = new Set<string>(MONSTER_SECTION_KINDS[section])
-  return ACTION_FIELD_KINDS.filter((kind) => !allowed.has(kind))
+/** Shared intrinsic kind schemas keyed by discriminant (not section-specific). */
+export function intrinsicActionSchemasByKind<M extends MonsterActionMode>(mode: M) {
+  const [
+    weapon,
+    naturalWeapon,
+    attack,
+    special,
+    spell,
+    save,
+    multiattack,
+    shapeShift,
+    actionReference,
+  ] = monsterActionFields(mode)
+  return {
+    weapon,
+    'natural-weapon': naturalWeapon,
+    attack,
+    special,
+    spell,
+    save,
+    multiattack,
+    'shape-shift': shapeShift,
+    'action-reference': actionReference,
+  } as const
 }

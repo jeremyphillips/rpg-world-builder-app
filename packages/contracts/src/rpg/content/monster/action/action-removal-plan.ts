@@ -8,8 +8,7 @@ export type MonsterActionPlanBody<T extends ReferencedActionRow> = {
   legendaryActions?:
     | {
         actions?: readonly T[]
-        uses?: number
-        usesInLair?: number
+        uses?: { normal?: number; inLair?: number }
       }
     | undefined
 }

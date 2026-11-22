@@ -95,7 +95,12 @@ describe('monster publish validation messages', () => {
       { id: 'attack', kind: 'attack', name: 'Slash' },
       { id: 'weapon', kind: 'weapon', onHit: { effects: [] } },
       { id: 'multi', kind: 'multiattack', steps: [] },
-      { id: 'step', kind: 'multiattack', steps: [{ actionIds: [] }] },
+      {
+        id: 'step',
+        kind: 'multiattack',
+        name: 'Multiattack',
+        steps: [{ count: 1, actionIds: [] }],
+      },
       {
         id: 'save',
         kind: 'save',
@@ -128,7 +133,6 @@ describe('monster publish validation messages', () => {
     expect(messageAt(result, 'actions.3.equipmentEntryId')).toBe('Required.')
     expect(messages(result).some((issue) => issue.path.startsWith('actions.3.onHit'))).toBe(false)
     expect(messageAt(result, 'actions.4.steps')).toBe('Add at least one item.')
-    expect(messageAt(result, 'actions.5.steps.0.count')).toBe('Required.')
     expect(messageAt(result, 'actions.5.steps.0.actionIds')).toBe('Add at least one item.')
     expect(messageAt(result, 'actions.6.resolution.selectionMode')).toBe(
       'Saving throw actions select an area from self or creatures in reach or at a distance.',
@@ -268,7 +272,12 @@ describe('monster publish validation messages', () => {
         { id: 'reek', preset: 'stench', dc: 0 },
         { id: 'mimic', preset: 'mimicry' },
         { id: 'air', preset: 'air-form' },
-        { id: 'template', kind: 'template', templateId: 'legendary-resistance', config: {} },
+        {
+          id: 'template',
+          kind: 'template',
+          templateId: 'legendary-resistance',
+          config: { uses: {} },
+        },
       ],
     )
     expect(messageAt(traits, 'traits.0.description')).toBe('Enter rules text or a saving throw.')
@@ -277,7 +286,7 @@ describe('monster publish validation messages', () => {
     expect(messageAt(traits, 'traits.2.radius')).toBe('Emanation radius is required.')
     expect(messageAt(traits, 'traits.3.sounds')).toBe('Choose which sounds it can mimic.')
     expect(messageAt(traits, 'traits.4.space')).toBe('Choose a space.')
-    expect(messageAt(traits, 'traits.5.config.uses')).toBe('Uses is required.')
+    expect(messageAt(traits, 'traits.5.config.uses.normal')).toBe('Uses is required.')
     expect(messages(traits).some((issue) => issue.path.endsWith('available'))).toBe(false)
   })
 
@@ -297,15 +306,40 @@ describe('monster publish validation messages', () => {
         : undefined
     expect(row && 'fields' in row ? row.fields : []).toEqual([
       expect.objectContaining({
-        name: 'legendaryActions.uses',
+        name: 'legendaryActions.uses.normal',
         digits: 2,
         width: 'auto',
+        control: 'stepper',
       }),
       expect.objectContaining({
-        name: 'legendaryActions.usesInLair',
+        name: 'legendaryActions.uses.inLair',
         digits: 2,
         width: 'auto',
+        control: 'stepper',
       }),
     ])
+  })
+
+  it('shows legendary uses when legendaryActions.actions is non-empty', () => {
+    const actionsTab = buildMonsterTabs(ctx).find((tab) => tab.id === 'actions')
+    const group = actionsTab?.fields.find(
+      (field) =>
+        'visibility' in field &&
+        field.heading &&
+        'label' in field.heading &&
+        field.heading.label === 'Legendary Actions',
+    )
+    expect(group && 'visibility' in group ? group.visibility : undefined).toEqual(
+      expect.objectContaining({
+        dependsOn: ['legendaryActions.actions'],
+      }),
+    )
+    const visibleWhen =
+      group && 'visibility' in group && group.visibility ? group.visibility.visibleWhen : undefined
+    expect(visibleWhen).toBeTypeOf('function')
+    if (!visibleWhen) return
+    expect(visibleWhen({ 'legendaryActions.actions': [{ id: 'wing' }] })).toBe(true)
+    expect(visibleWhen({ 'legendaryActions.actions': [] })).toBe(false)
+    expect(visibleWhen({ legendaryActions: { actions: [{ id: 'wing' }] } })).toBe(false)
   })
 })

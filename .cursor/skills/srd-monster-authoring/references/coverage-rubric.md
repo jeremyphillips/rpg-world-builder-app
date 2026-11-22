@@ -29,9 +29,9 @@ Phase A and `review` mark the fraction **estimated**. An approved authoring pass
 
 Essential weight 3: AC, HP and hit-dice formula, ability scores, primary attack bonus and damage, spell DC and spell attack when the creature casts, placement of primary features.
 
-Standard weight 2: saves, skills, movement, senses, defenses, reach and range, limits on primary features.
+Standard weight 2: saves, skills, movement, senses, defenses, reach and range, limits on primary features, **lair CR line and in-lair XP** when the PDF prints them.
 
-Supporting weight 1: languages, alignment, table XP, narrative traits.
+Supporting weight 1: languages, alignment, table XP, **Gear** (each listed item), narrative traits.
 
 Name signature mechanics and raise them to essential when the lists above would score them lower. Do not count a feature twice.
 

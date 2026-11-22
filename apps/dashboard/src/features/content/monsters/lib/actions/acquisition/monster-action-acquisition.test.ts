@@ -20,7 +20,7 @@ import type { FormCastingSections } from '../../casting/spellcasting-sources.lib
 import {
   MONSTER_ACTION_ACQUISITION_GROUPS,
   MONSTER_ACTION_ALREADY_ADDED_NOTE,
-  createBonusActionDraft,
+  createActionDraft,
   createReactionActionDraft,
   createSpellActionDraft,
   monsterActionAcquisitionItems,
@@ -127,33 +127,40 @@ describe('monster action acquisition presentation', () => {
       metadata: MONSTER_ACQUISITION_SAVE_DESCRIPTION,
     })
     expect(bonus.map((item) => item.id)).toEqual([
-      'bonus:leap',
-      'bonus:teleport',
-      'bonus:take-actions',
+      'create:teleport',
+      'create:leap',
+      'create:take-actions',
       'create:attack',
       'create:special',
       'create:save',
       'create:shape-shift',
       'create:spell-standalone',
     ])
-    expect(createBonusActionDraft('leap')).toMatchObject({
+    expect(createActionDraft('leap')).toMatchObject({
       kind: 'leap',
       name: 'Leap',
       distanceFeet: 30,
       movementFeet: 10,
     })
-    expect(createBonusActionDraft('teleport')).toMatchObject({ kind: 'teleport', name: 'Teleport' })
-    expect(createBonusActionDraft('teleport')).not.toHaveProperty('distanceFeet')
-    expect(createBonusActionDraft('take-actions')).toMatchObject({
+    expect(createActionDraft('teleport')).toMatchObject({ kind: 'teleport', name: 'Teleport' })
+    expect(createActionDraft('teleport')).not.toHaveProperty('distanceFeet')
+    expect(createActionDraft('take-actions')).toMatchObject({
       kind: 'take-actions',
       standardActions: [],
       combination: 'one',
     })
-    expect(createBonusActionDraft('take-actions')).not.toHaveProperty('name')
-    expect(parseMonsterActionAcquisitionId('bonus:leap')).toEqual({
-      type: 'bonus',
-      category: 'leap',
+    expect(createActionDraft('take-actions')).not.toHaveProperty('name')
+    expect(parseMonsterActionAcquisitionId('create:leap')).toEqual({
+      type: 'create',
+      kind: 'leap',
     })
+    const actions = monsterActionAcquisitionItems({
+      weapons: [],
+      allowAddWeapon: true,
+      section: 'actions',
+    })
+    expect(actions.some((item) => item.id === 'create:teleport')).toBe(true)
+    expect(actions.some((item) => item.id === 'create:leap')).toBe(false)
     const reactions = monsterActionAcquisitionItems({
       weapons,
       allowAddWeapon: true,

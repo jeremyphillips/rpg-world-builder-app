@@ -1,6 +1,8 @@
 import {
+  CHALLENGE_RATING_MECHANICS,
   collectFormAvailabilityAdvisories,
   isMultiattackAttackGroup,
+  type ChallengeRating,
   isMultiattackUseClause,
   isWeaponEquipment,
   isWeaponProficientFromGrantSet,
@@ -41,6 +43,18 @@ export const LEAP_ZERO_WALK_SPEED_MESSAGE = 'Leap spends movement, but Walk Spee
 export const LEAP_MOVEMENT_EXCEEDS_WALK_SPEED_MESSAGE =
   "Movement spent is greater than this creature's Walk Speed."
 
+export const LEGENDARY_ACTIONS_BELOW_CR_10_MESSAGE =
+  "Legendary Actions are uncommon below CR 10. The SRD's only example is the Unicorn at CR 5. Consider whether the extra actions fit this creature's intended challenge."
+
+export const LEGENDARY_ACTION_POOL_OUTSIDE_SRD_MESSAGE =
+  'SRD monsters with Legendary Actions have 3 uses. This creature has {normal}. Review the intended action economy.'
+
+export const IN_LAIR_USE_COUNT_OUTSIDE_SRD_MESSAGE =
+  'SRD examples increase this use count by 1 in a lair. This creature has {normal} normally and {inLair} in its lair.'
+
+export const LEGENDARY_RESISTANCE_USES_OUTSIDE_SRD_MESSAGE =
+  'In the SRD, Legendary Resistance has 3, 4, or 6 uses per day. This creature has {normal}.'
+
 export type MonsterFormAdvisory = {
   code:
     | 'weapon-not-equipped'
@@ -53,6 +67,10 @@ export type MonsterFormAdvisory = {
     | 'multiattack-unavailable-action'
     | 'form-restricted-reference'
     | 'form-restricted-multiattack'
+    | 'legendary-actions-below-cr-10'
+    | 'legendary-action-pool-outside-srd'
+    | 'in-lair-use-count-outside-srd'
+    | 'legendary-resistance-uses-outside-srd'
   message: string
   path: string
 }
@@ -213,6 +231,145 @@ function appendLeapAdvisories(
   }
 }
 
+function pushInLairUseCountAdvisory(
+  advisories: MonsterFormAdvisory[],
+  lairOn: boolean,
+  path: string,
+  normal: number,
+  inLair: number,
+): void {
+  if (lairOn && inLair === normal + 1) return
+  advisories.push({
+    code: 'in-lair-use-count-outside-srd',
+    message: IN_LAIR_USE_COUNT_OUTSIDE_SRD_MESSAGE.replace('{normal}', String(normal)).replace(
+      '{inLair}',
+      String(inLair),
+    ),
+    path,
+  })
+}
+
+function appendLegendaryBelowCr10Advisory(
+  advisories: MonsterFormAdvisory[],
+  challengeRating: MonsterFormValues['challengeRating'],
+): void {
+  if (typeof challengeRating !== 'string') return
+  if (CHALLENGE_RATING_MECHANICS[challengeRating as ChallengeRating].value >= 10) return
+  advisories.push({
+    code: 'legendary-actions-below-cr-10',
+    message: LEGENDARY_ACTIONS_BELOW_CR_10_MESSAGE,
+    path: 'legendaryActions.uses.normal',
+  })
+}
+
+function appendLegendaryPoolSizeAdvisory(
+  advisories: MonsterFormAdvisory[],
+  normalPool: number | undefined,
+): void {
+  if (typeof normalPool !== 'number' || normalPool === 3) return
+  advisories.push({
+    code: 'legendary-action-pool-outside-srd',
+    message: LEGENDARY_ACTION_POOL_OUTSIDE_SRD_MESSAGE.replace('{normal}', String(normalPool)),
+    path: 'legendaryActions.uses.normal',
+  })
+}
+
+function appendLegendaryInLairPoolAdvisory(
+  advisories: MonsterFormAdvisory[],
+  lairOn: boolean,
+  normalPool: number | undefined,
+  inLairPool: number | undefined,
+): void {
+  if (typeof normalPool !== 'number' || typeof inLairPool !== 'number') return
+  pushInLairUseCountAdvisory(
+    advisories,
+    lairOn,
+    'legendaryActions.uses.inLair',
+    normalPool,
+    inLairPool,
+  )
+}
+
+function collectLegendaryActionPoolAdvisories(values: MonsterFormValues): MonsterFormAdvisory[] {
+  const hasLegendaryRows = (values.legendaryActions?.actions?.length ?? 0) > 0
+  if (!hasLegendaryRows) return []
+
+  const advisories: MonsterFormAdvisory[] = []
+  const normalPool = values.legendaryActions?.uses?.normal
+  appendLegendaryBelowCr10Advisory(advisories, values.challengeRating)
+  appendLegendaryPoolSizeAdvisory(advisories, normalPool)
+  appendLegendaryInLairPoolAdvisory(
+    advisories,
+    values.lair?.enabled === true,
+    normalPool,
+    values.legendaryActions?.uses?.inLair,
+  )
+  return advisories
+}
+
+const SRD_LEGENDARY_RESISTANCE_USES = new Set([3, 4, 6])
+
+function legendaryResistanceUsesFromTrait(
+  trait: NonNullable<MonsterFormValues['traits']>[number],
+): { normal?: number; inLair?: number } | undefined {
+  if (trait.kind !== 'template' || trait.templateId !== 'legendary-resistance') return undefined
+  const config = trait.config
+  if (!config || typeof config !== 'object' || Array.isArray(config)) return undefined
+  return (config as { uses?: { normal?: number; inLair?: number } }).uses
+}
+
+function appendLegendaryResistanceTraitAdvisories(
+  advisories: MonsterFormAdvisory[],
+  traitIndex: number,
+  uses: { normal?: number; inLair?: number },
+  lairOn: boolean,
+): void {
+  const resistanceNormal = uses.normal
+  if (
+    typeof resistanceNormal === 'number' &&
+    !SRD_LEGENDARY_RESISTANCE_USES.has(resistanceNormal)
+  ) {
+    advisories.push({
+      code: 'legendary-resistance-uses-outside-srd',
+      message: LEGENDARY_RESISTANCE_USES_OUTSIDE_SRD_MESSAGE.replace(
+        '{normal}',
+        String(resistanceNormal),
+      ),
+      path: `traits.${traitIndex}.config.uses.normal`,
+    })
+  }
+  if (typeof resistanceNormal === 'number' && typeof uses.inLair === 'number') {
+    pushInLairUseCountAdvisory(
+      advisories,
+      lairOn,
+      `traits.${traitIndex}.config.uses.inLair`,
+      resistanceNormal,
+      uses.inLair,
+    )
+  }
+}
+
+function collectLegendaryResistanceTraitAdvisories(
+  traits: MonsterFormValues['traits'],
+  lairOn: boolean,
+): MonsterFormAdvisory[] {
+  const advisories: MonsterFormAdvisory[] = []
+  for (const [index, trait] of (traits ?? []).entries()) {
+    const uses = legendaryResistanceUsesFromTrait(trait)
+    if (!uses) continue
+    appendLegendaryResistanceTraitAdvisories(advisories, index, uses, lairOn)
+  }
+  return advisories
+}
+
+function collectLairAndLegendaryAdvisories(values: MonsterFormValues): MonsterFormAdvisory[] {
+  const lairOn = values.lair?.enabled === true
+  return [
+    ...collectLegendaryActionPoolAdvisories(values),
+    ...collectLegendaryResistanceTraitAdvisories(values.traits, lairOn),
+  ]
+}
+
 export function collectMonsterFormAdvisories(
   values: MonsterFormValues,
   equipmentById: ReadonlyMap<string, Equipment>,
@@ -234,5 +391,6 @@ export function collectMonsterFormAdvisories(
     ...advisories,
     ...collectTraitSpeedAdvisories(values),
     ...collectFormAvailabilityAdvisories(values),
+    ...collectLairAndLegendaryAdvisories(values),
   ]
 }

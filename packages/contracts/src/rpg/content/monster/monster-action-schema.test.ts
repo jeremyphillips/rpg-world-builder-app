@@ -11,6 +11,7 @@ import {
   monsterReactionSchema,
   type MonsterReaction,
 } from '../monster'
+import { monsterActionPlacementMessage } from './action/section-placement'
 import { MONSTER_TEST_INPUT } from './test-fixtures'
 
 describe('monsterActionSchema', () => {
@@ -226,6 +227,12 @@ describe('monsterBonusActionSchema', () => {
     expect(monsterActionSchema.safeParse({ id: 'leap', kind: 'leap', name: 'Leap' }).success).toBe(
       false,
     )
+    const leapOnActions = monsterActionSchema.safeParse({ id: 'leap', kind: 'leap', name: 'Leap' })
+    expect(
+      leapOnActions.error?.issues.some(
+        (issue) => issue.message === monsterActionPlacementMessage('leap', 'actions'),
+      ),
+    ).toBe(true)
     expect(
       monsterBonusActionDraftSchema.parse({ id: 'leap', kind: 'leap', name: 'Leap' }),
     ).toMatchObject({ kind: 'leap' })
