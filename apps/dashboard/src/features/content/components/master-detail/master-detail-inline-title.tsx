@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { get, useFormContext, useFormState, useWatch, type FieldErrors } from 'react-hook-form'
-import { ActionButton, cn, Input, Text } from '@rpg/ui'
+import { cn, InlineTitleEditActionButton, Input, Text } from '@rpg/ui'
 import { useFieldErrorPresentation, useFormValidationPresentation } from '@rpg/ui/form'
 
 import type { MasterDetailInlineTitle } from '../../lib/master-detail/master-detail-inline-title.types'
@@ -194,14 +194,8 @@ export function MasterDetailInlineTitleEditor({
         ) : (
           <div className={cn(MASTER_DETAIL_TITLE_TYPE_CLASS, 'min-w-0')}>{display}</div>
         )}
-        <ActionButton
-          action="edit"
-          variant="ghost"
-          size="icon-sm"
-          aria-label="Edit name"
-          aria-hidden={editing ? true : undefined}
-          tabIndex={editing ? -1 : 0}
-          className={editing ? 'invisible shrink-0' : 'shrink-0'}
+        <InlineTitleEditActionButton
+          editing={editing}
           onClick={() => {
             snapshotRef.current = storedName(getValues(path))
             setDraft(storedText(getValues(path)))

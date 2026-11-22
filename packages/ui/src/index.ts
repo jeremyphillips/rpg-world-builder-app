@@ -241,6 +241,11 @@ export {
 } from './components/ui/resolve-button-appearance'
 export { ActionButton, type ActionButtonProps } from './components/ui/action-button.client'
 export {
+  InlineTitleEditActionButton,
+  INLINE_TITLE_EDIT_ACTION_BUTTON_SIZE,
+  type InlineTitleEditActionButtonProps,
+} from './components/ui/inline-title-edit-action-button.client'
+export {
   ChoiceSelectionCounter,
   type ChoiceSelectionCounterProps,
 } from './components/ui/choice-selection-counter.client'
