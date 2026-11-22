@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
+import type { FormItem } from '@rpg/ui/form'
+
+import { CLASS_SPELLCASTING_ADDITIONAL_RULES_LABEL } from './class-spellcasting-authoring-copy'
 import {
+  classFeatureItemFields,
   createFeatureRowDraftFormSchema,
   createFeatureRowFormSchema,
   featureFromFormRow,
@@ -178,6 +182,55 @@ describe('formatFeatureRowSummary', () => {
         grants: [],
       }),
     ).toBe('Level 5')
+  })
+})
+
+function walkFormItems(items: readonly FormItem[], visit: (item: FormItem) => void): void {
+  for (const item of items) {
+    visit(item)
+    if (item.kind === 'dependent') {
+      walkFormItems([item.controller as FormItem], visit)
+      walkFormItems(item.dependents.fields, visit)
+    }
+    if (item.kind === 'row' || item.kind === 'columns' || item.kind === 'group') {
+      walkFormItems(item.fields as FormItem[], visit)
+    }
+    if (item.kind === 'array') {
+      walkFormItems(item.fields as FormItem[], visit)
+    }
+  }
+}
+
+function descriptionFields(items: readonly FormItem[]) {
+  const found: FormItem[] = []
+  walkFormItems(items, (item) => {
+    if ('type' in item && item.type === 'richtext' && item.name === 'description') {
+      found.push(item)
+    }
+  })
+  return found
+}
+
+describe('classFeatureItemFields description', () => {
+  const fields = classFeatureItemFields({} as Parameters<typeof classFeatureItemFields>[0])
+
+  it('uses optional disclosure for spellcasting granting features', () => {
+    const grantingDescriptions = descriptionFields(fields).filter(
+      (field) => 'optionalDisclosure' in field && field.optionalDisclosure !== undefined,
+    )
+    expect(grantingDescriptions).toHaveLength(1)
+    expect(grantingDescriptions[0]).toMatchObject({
+      label: CLASS_SPELLCASTING_ADDITIONAL_RULES_LABEL,
+      optionalDisclosure: { intent: 'add', actionSubject: 'additional rules' },
+    })
+  })
+
+  it('keeps a plain Description field for non-granting features', () => {
+    const ordinaryDescriptions = descriptionFields(fields).filter(
+      (field) => !('optionalDisclosure' in field && field.optionalDisclosure),
+    )
+    expect(ordinaryDescriptions).toHaveLength(1)
+    expect(ordinaryDescriptions[0]).toMatchObject({ label: 'Description' })
   })
 })
 

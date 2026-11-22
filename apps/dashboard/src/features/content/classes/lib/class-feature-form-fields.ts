@@ -35,6 +35,10 @@ import { applyStableIdsForUpdate } from '../../lib/forms/registry/content-form-k
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { ClassFeatureManagedSpellcastingGrantField } from '../components/class-feature-managed-spellcasting-grant-field'
 import { FeatureTablesField } from '../components/features/feature-tables-field'
+import {
+  CLASS_SPELLCASTING_ADDITIONAL_RULES_HINT,
+  CLASS_SPELLCASTING_ADDITIONAL_RULES_LABEL,
+} from './class-spellcasting-authoring-copy'
 import { classSpellcastingGrantingFeatureRulesDisplay } from './class-spellcasting-feature-rules.lib'
 import { isSpellcastingGrantingFeatureRow } from './class-spellcasting-lifecycle'
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
@@ -174,10 +178,34 @@ function sharedFeatureItemFields(
     {
       type: 'richtext',
       name: 'description',
+      label: CLASS_SPELLCASTING_ADDITIONAL_RULES_LABEL,
+      hint: CLASS_SPELLCASTING_ADDITIONAL_RULES_HINT,
+      linkable: true,
+      internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
+      contentTypeOptions: ctx.options?.richTextContentTypeOptions,
+      optionalDisclosure: { intent: 'add', actionSubject: 'additional rules' },
+      visibility: {
+        dependsOn: ['grants'],
+        visibleWhen: (watched) =>
+          isSpellcastingGrantingFeatureRow({
+            grants: watched.grants as FeatureRowForm['grants'],
+          }),
+      },
+    },
+    {
+      type: 'richtext',
+      name: 'description',
       label: 'Description',
       linkable: true,
       internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
       contentTypeOptions: ctx.options?.richTextContentTypeOptions,
+      visibility: {
+        dependsOn: ['grants'],
+        visibleWhen: (watched) =>
+          !isSpellcastingGrantingFeatureRow({
+            grants: watched.grants as FeatureRowForm['grants'],
+          }),
+      },
     },
     {
       kind: 'slot',

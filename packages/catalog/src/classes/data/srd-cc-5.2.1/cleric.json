@@ -13,6 +13,7 @@
   "spellcasting": {
     "slotProgressionId": "full-caster",
     "ability": "wis",
+    "focusKinds": ["holy_symbol"],
     "spellSelection": {
       "model": "prepareFromClassList",
       "change": {

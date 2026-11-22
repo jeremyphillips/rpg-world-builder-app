@@ -13,6 +13,7 @@
   "spellcasting": {
     "slotProgressionId": "half-caster",
     "ability": "cha",
+    "focusKinds": ["holy_symbol"],
     "spellSelection": {
       "model": "prepareFromClassList",
       "change": {

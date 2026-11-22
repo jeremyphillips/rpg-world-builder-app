@@ -13,6 +13,7 @@
   "spellcasting": {
     "slotProgressionId": "full-caster",
     "ability": "cha",
+    "focusKinds": ["arcane_focus"],
     "spellSelection": {
       "model": "limitedRepertoire",
       "change": {

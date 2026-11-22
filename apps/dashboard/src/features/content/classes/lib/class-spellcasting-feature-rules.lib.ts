@@ -1,34 +1,29 @@
 import {
   formatClassSpellcastingFeatureRules,
-  spellcastingSchema,
   type CharacterClass,
   type ResolvedSpellcastingProgressionConfig,
+  type Spellcasting,
   type StatBlockProseDocument,
 } from '@rpg/contracts'
 
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 
-import type { ClassFormValues } from './class-form-fields'
 import { featureFromFormRow, type FeatureRowForm } from './class-feature-form-fields'
 import { isSpellcastingGrantingFeatureRow } from './class-spellcasting-lifecycle'
-
-function parseSpellcastingFromForm(value: unknown): ClassFormValues['spellcasting'] | undefined {
-  if (!value || typeof value !== 'object') return undefined
-  const parsed = spellcastingSchema.safeParse(value)
-  return parsed.success ? parsed.data : undefined
-}
+import {
+  classSpellcastingPreviewParentDependsOn,
+  spellcastingFromClassFormWatch,
+} from './class-form-values'
 
 export function resolveSpellcastingGrantingFeatureRulesDocument(input: {
   className: string
   rulesetId: CharacterClass['rulesetId']
-  spellcasting: unknown
+  spellcasting: Spellcasting | undefined
   featureRow: FeatureRowForm
   spellcastingProgression: ResolvedSpellcastingProgressionConfig
 }): StatBlockProseDocument | null {
   if (!isSpellcastingGrantingFeatureRow(input.featureRow)) return null
-
-  const spellcasting = parseSpellcastingFromForm(input.spellcasting)
-  if (!spellcasting) return null
+  if (!input.spellcasting) return null
 
   const feature = featureFromFormRow({
     ...input.featureRow,
@@ -47,13 +42,13 @@ export function resolveSpellcastingGrantingFeatureRulesDocument(input: {
       weapons: { categories: [], items: [] },
     },
     features: [feature],
-    spellcasting,
+    spellcasting: input.spellcasting,
   } as CharacterClass
 
   return formatClassSpellcastingFeatureRules({
     characterClass,
     config: input.spellcastingProgression,
-    focusKinds: spellcasting.focusKinds,
+    focusKinds: input.spellcasting.focusKinds,
   })
 }
 
@@ -73,7 +68,13 @@ export function classSpellcastingGrantingFeatureRulesDisplay(
         }),
     },
     resolve: {
-      dependsOn: ['level', 'name', 'grants', '../../spellcasting', '../../name'],
+      dependsOn: [
+        'level',
+        'name',
+        'grants',
+        '../../name',
+        ...classSpellcastingPreviewParentDependsOn(),
+      ],
       contentWhen: (values) => {
         const progression = ctx.spellcastingProgression
         if (!progression) {
@@ -89,10 +90,11 @@ export function classSpellcastingGrantingFeatureRulesDisplay(
           }
         }
 
+        const spellcasting = spellcastingFromClassFormWatch(values)
         const document = resolveSpellcastingGrantingFeatureRulesDocument({
           className: String(values['../../name'] ?? ''),
           rulesetId: ctx.rulesetId,
-          spellcasting: values['../../spellcasting'],
+          spellcasting,
           featureRow: {
             id: 'preview',
             name: String(values.name ?? ''),

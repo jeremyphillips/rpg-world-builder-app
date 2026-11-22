@@ -358,6 +358,88 @@ function applyOptionalSpellcastingFields(
   }
 }
 
+/** Root class-form keys read by `spellcastingFromClassFormWatch` — keep in sync with that adapter. */
+export const CLASS_SPELLCASTING_PREVIEW_PARENT_FIELD_KEYS = [
+  'hasSpellcasting',
+  'grantsCantrips',
+  'spellcasting',
+  'spellSelectionModel',
+  'spellSelectionChangePackage',
+  'spellbookAcquisitionIrregular',
+  'spellbookAcquisitionStarting',
+  'spellbookAcquisitionPerLevel',
+  'spellbookAcquisitionThroughLevel',
+  'spellbookAcquisitionCurve',
+] as const
+
+export type ClassSpellcastingPreviewParentFieldKey =
+  (typeof CLASS_SPELLCASTING_PREVIEW_PARENT_FIELD_KEYS)[number]
+
+const CLASS_SPELLCASTING_FEATURE_ROW_PARENT_PREFIX = '../../' as const
+
+function readSpellcastingParentWatchValue(
+  values: Record<string, unknown>,
+  field: ClassSpellcastingPreviewParentFieldKey,
+  parentPrefix: string,
+): unknown {
+  return values[`${parentPrefix}${field}`]
+}
+
+/** Merge parent-level class form watch values and run the canonical spellcasting adapter. */
+export function spellcastingFromClassFormWatch(
+  values: Record<string, unknown>,
+  parentPrefix = CLASS_SPELLCASTING_FEATURE_ROW_PARENT_PREFIX,
+): Spellcasting | undefined {
+  const formSlice = {
+    hasSpellcasting: readSpellcastingParentWatchValue(values, 'hasSpellcasting', parentPrefix),
+    grantsCantrips: readSpellcastingParentWatchValue(values, 'grantsCantrips', parentPrefix),
+    spellcasting: readSpellcastingParentWatchValue(values, 'spellcasting', parentPrefix),
+    spellSelectionModel: readSpellcastingParentWatchValue(
+      values,
+      'spellSelectionModel',
+      parentPrefix,
+    ),
+    spellSelectionChangePackage: readSpellcastingParentWatchValue(
+      values,
+      'spellSelectionChangePackage',
+      parentPrefix,
+    ),
+    spellbookAcquisitionIrregular: readSpellcastingParentWatchValue(
+      values,
+      'spellbookAcquisitionIrregular',
+      parentPrefix,
+    ),
+    spellbookAcquisitionStarting: readSpellcastingParentWatchValue(
+      values,
+      'spellbookAcquisitionStarting',
+      parentPrefix,
+    ),
+    spellbookAcquisitionPerLevel: readSpellcastingParentWatchValue(
+      values,
+      'spellbookAcquisitionPerLevel',
+      parentPrefix,
+    ),
+    spellbookAcquisitionThroughLevel: readSpellcastingParentWatchValue(
+      values,
+      'spellbookAcquisitionThroughLevel',
+      parentPrefix,
+    ),
+    spellbookAcquisitionCurve: readSpellcastingParentWatchValue(
+      values,
+      'spellbookAcquisitionCurve',
+      parentPrefix,
+    ),
+  } as ClassFormValues
+
+  return spellcastingFromFormValues(formSlice)
+}
+
+export function classSpellcastingPreviewParentDependsOn(
+  parentPrefix = CLASS_SPELLCASTING_FEATURE_ROW_PARENT_PREFIX,
+): readonly string[] {
+  return CLASS_SPELLCASTING_PREVIEW_PARENT_FIELD_KEYS.map((key) => `${parentPrefix}${key}`)
+}
+
 export function spellcastingFromFormValues(values: ClassFormValues): Spellcasting | undefined {
   const { grantsCantrips, spellcasting, spellSelectionChangePackage } = values
   if (!hasCompleteSpellcastingCore(values) || !spellcasting) {

@@ -13,6 +13,7 @@
   "spellcasting": {
     "slotProgressionId": "half-caster",
     "ability": "wis",
+    "focusKinds": ["druidic_focus"],
     "spellSelection": {
       "model": "limitedRepertoire",
       "change": {
