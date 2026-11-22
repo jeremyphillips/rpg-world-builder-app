@@ -1072,10 +1072,14 @@ Delete is blocked with `409` when campaign characters reference the subclass (`c
 Class spellcasting splits **activation**, **configuration**, and **starting recommendations**:
 
 ```text
-features[] → managed Spellcasting / Pact Magic feature (level, name, description, available)
+features[] → managed Spellcasting / Pact Magic feature (level, name, optional intro, residual description, available)
            → grantGroups: [{ grants: [{ kind: 'spellcasting' }] }]
 spellcasting → slot reference, selection semantics, capacity curves, gear, recommendations[]
 ```
+
+The granting feature owns **unlock level**, optional narrative **`intro`**, and **residual** rules in `description` (recovery, cantrip replacement, unmodeled focus clauses). Player-facing text for **derived** mechanics (quotas, change policy, ability, inferable focus kinds) comes from `formatClassSpellcastingFeatureRules` → `StatBlockProseDocument`, shown in authoring via `RulesPreview` and on class detail via `StatBlockProseView`. Progression **curves stay absolute class levels**; moving the feature does not rebase them. `recommendations[]` are picker hints only — not feature description and not part of the generated rules document.
+
+**Bard focus gap:** a musical instrument may appear in starting equipment as a tool, but it is not a member of `SPELLCASTING_FOCUS_GEAR_KINDS`, so `resolveFocusKinds` returns nothing for Bard when focus is not authored on `focusKinds`. The formatter must not invent “musical instrument” from the class name; Bard’s Spellcasting Focus sentence stays in residual `description` until the focus model can represent it.
 
 The optional `spellcasting` block (`content/classes/spellcasting/spellcasting.ts`) owns **how** casting works. The dedicated granting feature in `features[]` owns **when** it unlocks. Rules Config owns **slot tables only**.
 
@@ -1083,16 +1087,16 @@ Publish requires config and exactly one spellcasting grant to coexist (see `refi
 
 ### Class record shape
 
-| Field               | Role                                                                                                                                                         |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `slotProgressionId` | Ruleset slot progression id (Full / Half / Pact / custom). Drives spell-slot columns only.                                                                   |
-| `spellSelection`    | L1+ selection semantics (`limitedRepertoire`, `prepareFromClassList`, `prepareFromLearnedCollection`) plus change policy and optional spellbook acquisition. |
-| `progression`       | Independent sparse capacity curves: `cantrips`, `repertoire`, `preparedSpells`. Absolute class levels — not rebased when the granting feature level changes. |
-| `ability`           | Spellcasting ability for this class.                                                                                                                         |
-| `requiredGear`      | Optional class-critical spellcasting gear (e.g. Wizard spellbook).                                                                                           |
-| `focusKinds`        | Optional spellcasting focus kinds this class can use.                                                                                                        |
-| `recommendedGear`   | Optional strong-tier spellcasting gear suggestions.                                                                                                          |
-| `recommendations`   | Optional advisory starting spell lists keyed by semantic target (`cantrips` \| `level1Plus`). Never grants spells or changes quotas.                         |
+| Field               | Role                                                                                                                                                                                                                                                                                       |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `slotProgressionId` | Ruleset slot progression id (Full / Half / Pact / custom). Drives spell-slot columns only.                                                                                                                                                                                                 |
+| `spellSelection`    | L1+ selection semantics (`limitedRepertoire`, `prepareFromClassList`, `prepareFromLearnedCollection`) plus change policy and optional spellbook acquisition.                                                                                                                               |
+| `progression`       | Independent sparse capacity curves: `cantrips`, `repertoire`, `preparedSpells`. Absolute class levels — not rebased when the granting feature level changes.                                                                                                                               |
+| `ability`           | Spellcasting ability for this class.                                                                                                                                                                                                                                                       |
+| `requiredGear`      | Optional class-critical spellcasting gear (e.g. Wizard spellbook).                                                                                                                                                                                                                         |
+| `focusKinds`        | Optional spellcasting focus kinds this class can use.                                                                                                                                                                                                                                      |
+| `recommendedGear`   | Optional strong-tier spellcasting gear suggestions.                                                                                                                                                                                                                                        |
+| `recommendations`   | Optional advisory starting spell lists keyed by semantic target (`cantrips` \| `level1Plus`). Omitted `classLevel` means the granting feature’s activation level. Eligibility uses `maxSelectableSpellLevel` at that level (no `spellLevel` field). Never grants spells or changes quotas. |
 
 SRD rules prose lives on the managed granting feature (`id: spellcasting` or `pact-magic`), not on `Class.spellcasting`. Do **not** persist `spellcasting.level` or `spellcasting.featureId`.
 
@@ -1111,7 +1115,7 @@ Contracts: `packages/contracts/src/rpg/campaign/rules/spellcasting-progression/`
 The class form Spellcasting tab (`class-spellcasting-form-fields.ts`) exposes:
 
 - **Has spellcasting** — form-only toggle; turning on reconciles config + managed granting feature; turning off confirms before removing both.
-- **Spellcasting feature summary** — links authors to the Features tab for level, name, description, and campaign availability.
+- **Spellcasting feature summary** — links authors to the Features tab for level, name, introduction, generated rules preview, residual description, and campaign availability.
 - **Slot progression** — combobox of resolved ruleset slot progressions.
 - **Spell selection model** — semantic L1+ selection (`limitedRepertoire`, prepare-from-list, prepare-from-learned-collection) plus change policy.
 - **Grants cantrips** — toggles the Cantrips column in the spellcasting progression table.

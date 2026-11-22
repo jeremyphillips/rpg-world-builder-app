@@ -7,7 +7,7 @@ import {
   statBlockSaveLead,
   type StatBlockProse,
   type StatBlockProseSegment,
-} from '../monster/stat-block-prose'
+} from '../prose/stat-block-prose'
 import { abilitySaveDc } from './spell-dc'
 
 function ensurePeriod(text: string): string {

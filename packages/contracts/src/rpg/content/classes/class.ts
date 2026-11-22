@@ -70,13 +70,21 @@ const classFeatureTablesField = {
   tables: z.array(contentTableSchema).optional(),
 } as const
 
+const classFeatureIntroField = {
+  intro: z.string().optional(),
+} as const
+
 export const customClassFeatureSchema = customContentTraitSchema
-  .extend({ level: absoluteLevelSchema, ...classFeatureTablesField })
+  .extend({ level: absoluteLevelSchema, ...classFeatureTablesField, ...classFeatureIntroField })
   .superRefine(refineClassFeatureGrantUnlockLevels)
   .superRefine(refineFeatureTablesOnFeature)
 
 export const subclassChoiceClassFeatureSchema = customContentTraitSchema
-  .extend({ kind: z.literal('subclass-choice'), level: absoluteLevelSchema })
+  .extend({
+    kind: z.literal('subclass-choice'),
+    level: absoluteLevelSchema,
+    ...classFeatureIntroField,
+  })
   .superRefine(refineClassFeatureGrantUnlockLevels)
 
 export const classFeatureSchema = z.preprocess(

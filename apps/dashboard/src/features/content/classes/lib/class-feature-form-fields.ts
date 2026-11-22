@@ -12,6 +12,7 @@ import {
   type ClassFeature,
   type ClassFeatureKind,
 } from '@rpg/contracts'
+import { normalizeRichTextHtml } from '@rpg/ui'
 import { type FormItem } from '@rpg/ui/form'
 
 import { grantArrayFields } from '../../lib/forms/grants/grant-form-fields'
@@ -34,6 +35,7 @@ import { applyStableIdsForUpdate } from '../../lib/forms/registry/content-form-k
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { ClassFeatureManagedSpellcastingGrantField } from '../components/class-feature-managed-spellcasting-grant-field'
 import { FeatureTablesField } from '../components/features/feature-tables-field'
+import { classSpellcastingGrantingFeatureRulesDisplay } from './class-spellcasting-feature-rules.lib'
 import { isSpellcastingGrantingFeatureRow } from './class-spellcasting-lifecycle'
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
 import { getLevelFieldOptions, levelSelectDigits } from '../../lib/form-options/level-field-options'
@@ -69,6 +71,7 @@ function createFeatureRowBaseFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) 
       id: z.string().min(1).optional(),
       kind: z.enum(CLASS_FEATURE_KINDS).optional(),
       name: z.string().min(1),
+      intro: z.string().optional(),
       description: z.string().optional(),
       level: levelField,
       grants: z.array(createGrantRowFormSchema(maxLevel)),
@@ -161,6 +164,15 @@ function sharedFeatureItemFields(
     },
     {
       type: 'richtext',
+      name: 'intro',
+      label: 'Introduction',
+      linkable: true,
+      internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
+      contentTypeOptions: ctx.options?.richTextContentTypeOptions,
+    },
+    classSpellcastingGrantingFeatureRulesDisplay(ctx),
+    {
+      type: 'richtext',
       name: 'description',
       label: 'Description',
       linkable: true,
@@ -225,6 +237,12 @@ export function classFeatureItemFields(
   ]
 }
 
+function optionalRichTextField(value: string | undefined): string | undefined {
+  if (value === undefined) return undefined
+  const normalized = normalizeRichTextHtml(value)
+  return normalized || undefined
+}
+
 export function featureToFormRow(feature: ClassFeature | ClassBodyFeature): FeatureRowForm {
   const grants = grantGroupsToFormRows(
     resolveGrantGroupsFromContent(feature, { level: feature.level }),
@@ -236,6 +254,7 @@ export function featureToFormRow(feature: ClassFeature | ClassBodyFeature): Feat
     id: feature.id,
     kind: feature.kind,
     name: feature.name,
+    intro: feature.intro,
     description: feature.description,
     level: feature.level,
     grants,
@@ -254,6 +273,7 @@ function subclassChoiceFeatureFromFormRow(
     kind: 'subclass-choice',
     id: row.id,
     name: row.name,
+    intro: optionalRichTextField(row.intro),
     description: row.description || undefined,
     level: row.level,
     ...(grantGroups.length ? { grantGroups } : {}),
@@ -271,6 +291,7 @@ function customFeatureFromFormRow(
     kind: 'custom',
     id: row.id,
     name: row.name,
+    intro: optionalRichTextField(row.intro),
     description: row.description || undefined,
     level: row.level,
     ...(grantGroups.length ? { grantGroups } : {}),
@@ -297,6 +318,7 @@ export function subclassFeatureFromFormRow(
     kind: row.kind ?? DEFAULT_CLASS_FEATURE_KIND,
     id: row.id,
     name: row.name,
+    intro: optionalRichTextField(row.intro),
     description: row.description || undefined,
     level: row.level,
     ...(grantGroups.length ? { grantGroups } : {}),

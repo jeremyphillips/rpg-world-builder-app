@@ -1,3 +1,5 @@
+import type { StatBlockProseDocument } from '@rpg/contracts'
+
 import { EmphasisDetailLine } from './emphasis-detail-line'
 import { RichTextContent } from './rich-text-content'
 import { Eyebrow } from './eyebrow'
@@ -5,6 +7,7 @@ import { Icon } from './icon/icon'
 import { MetadataList } from './metadata-list'
 import { Panel } from './panel'
 import { SemanticText } from './semantic-text/semantic-text'
+import { StatBlockProseView } from './stat-block-prose'
 import { Text } from './text'
 
 export type RulesPreviewMetadataRow = {
@@ -18,6 +21,7 @@ export type RulesPreviewContent =
   | { kind: 'metadata'; rows: readonly RulesPreviewMetadataRow[] }
   | { kind: 'prose'; text: string }
   | { kind: 'html'; html: string }
+  | { kind: 'rules'; document: StatBlockProseDocument }
   | { kind: 'guidance'; message: string }
 
 export type RulesPreviewProps = {
@@ -41,6 +45,8 @@ function rulesPreviewHasContent(content: RulesPreviewContent): boolean {
       return Boolean(content.html.trim())
     case 'metadata':
       return content.rows.length > 0
+    case 'rules':
+      return content.document.length > 0
     case 'guidance':
       return Boolean(content.message.trim())
   }
@@ -67,6 +73,7 @@ function RulesPreviewBody({ content }: { content: RulesPreviewContent }) {
   if (content.kind === 'html') {
     return <RichTextContent html={content.html} size="sm" tone="muted" />
   }
+  if (content.kind === 'rules') return <StatBlockProseView document={content.document} />
   return (
     <Text variant="caption">
       <SemanticText tone="neutral" emphasis="low" icon={<Icon name="info" size="xs" />}>

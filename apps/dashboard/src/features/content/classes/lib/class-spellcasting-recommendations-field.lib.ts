@@ -10,20 +10,21 @@ import { toSpellReferenceFieldOptions } from '../../lib/form-options/content-fie
 
 export const SPELLCASTING_RECOMMENDATION_TARGET_LABELS = {
   cantrips: getSpellCollectionKindLabel('cantrips'),
-  level1Plus: `Level 1 ${getContentTypeSentenceForm('spells', 2)}`,
+  level1Plus: getContentTypeSentenceForm('spells', 2),
 } as const
 
 export const SPELLCASTING_RECOMMENDATION_CANTRIPS_PLACEHOLDER = `Choose ${getSpellCollectionKindSentenceForm('cantrips', 2)}`
 
-export const SPELLCASTING_RECOMMENDATION_LEVEL1_PLACEHOLDER = `Choose level 1 ${getContentTypeSentenceForm('spells', 2)}`
+export const SPELLCASTING_RECOMMENDATION_LEVEL1_PLACEHOLDER = `Choose ${getContentTypeSentenceForm('spells', 2)}`
 
 export function spellOptionsForRecommendationTarget(
   spells: readonly Spell[] | undefined,
   target: SpellRecommendation['target'],
+  maxSelectableSpellLevel = 1,
 ) {
   const filtered = (spells ?? []).filter((spell) => {
     if (target === 'cantrips') return spell.level === 0
-    return spell.level === 1
+    return spell.level >= 1 && spell.level <= maxSelectableSpellLevel
   })
 
   return toSpellReferenceFieldOptions(filtered)
@@ -45,8 +46,6 @@ export function upsertRecommendationSpellIds(
   if (spellIds.length > 0) {
     next.push({
       target,
-      classLevel: 1,
-      ...(target === 'level1Plus' ? { spellLevel: 1 } : {}),
       spellIds,
     })
   }

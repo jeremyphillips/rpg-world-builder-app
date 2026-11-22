@@ -21,7 +21,7 @@ import {
   type StatBlockProse,
   type StatBlockProseDocument,
   type StatBlockProseSegment,
-} from './stat-block-prose'
+} from '../prose/stat-block-prose'
 
 type MonsterSpellPresentationSection = MonsterActionSectionId | 'legendaryActions'
 

@@ -118,6 +118,9 @@
                 },
                 "tables": {
                   "$ref": "#/definitions/__schema95"
+                },
+                "intro": {
+                  "$ref": "#/definitions/__schema119"
                 }
               },
               "required": [
@@ -150,6 +153,9 @@
                 },
                 "level": {
                   "$ref": "#/definitions/__schema17"
+                },
+                "intro": {
+                  "$ref": "#/definitions/__schema119"
                 }
               },
               "required": [
@@ -2908,6 +2914,9 @@
       "additionalProperties": false
     },
     "__schema119": {
+      "type": "string"
+    },
+    "__schema120": {
       "type": "string",
       "const": "subclass-choice",
       "description": "subclass-choice"

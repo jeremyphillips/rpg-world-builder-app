@@ -14,7 +14,7 @@ import {
   formatMonsterSpellEntry,
   formatOnceUntilNextTurnSentence,
 } from './spell-entry-presentation'
-import { joinStatBlockProseDocument } from './stat-block-prose'
+import { joinStatBlockProseDocument } from '../prose/stat-block-prose'
 import type { MonsterReferencedSpell } from './reaction-trigger'
 
 const MONSTER_CHANGED = 'srd-cc-5.2.1:fireball'

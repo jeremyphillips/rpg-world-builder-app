@@ -1,5 +1,6 @@
 import {
   availableClassFeatures,
+  formatClassSpellcastingFeatureRules,
   formatToolProficiencyPoolLabel,
   getAbilityCompactLabel,
   getAbilityLabel,
@@ -7,6 +8,7 @@ import {
   getToolCategoryEntry,
   getWeaponCategoryEntry,
   classSkillChoiceDisplaySummary,
+  isClassSpellcastingGrantingFeature,
   isMeaningfulToolProficiencyChoice,
   getProficiencyDomainCompactLabel,
   type CharacterClass,
@@ -14,6 +16,8 @@ import {
   type ClassFeature,
   type ContentTable,
   type ProficiencyChoice,
+  type ResolvedSpellcastingProgressionConfig,
+  type StatBlockProseDocument,
 } from '@rpg/contracts'
 
 import { isSubclassChoiceFeatureRow } from './class-subclass-choice-features'
@@ -87,6 +91,8 @@ export type ClassFeatureDetailItem = {
   id: string
   level: number
   title: string
+  introHtml?: string
+  rulesDocument?: StatBlockProseDocument
   bodyHtml?: string
   tables?: ContentTable[]
 }
@@ -107,6 +113,8 @@ export type ClassDetailViewModel = {
 export type BuildClassDetailViewModelOptions = {
   surface?: ClassDisplaySurface
   features?: CharacterClass['features']
+  spellcastingProgression?: ResolvedSpellcastingProgressionConfig
+  characterClass?: CharacterClass
 }
 
 function formatSlugLabel(slug: string): string {
@@ -346,11 +354,35 @@ function buildClassStatRows(
   ]
 }
 
-function mapFeatureToDetailItem(feature: ClassFeature): ClassFeatureDetailItem {
+function mapFeatureToDetailItem(
+  feature: ClassFeature,
+  options?: {
+    characterClass?: CharacterClass
+    spellcastingProgression?: ResolvedSpellcastingProgressionConfig
+  },
+): ClassFeatureDetailItem {
+  let rulesDocument: StatBlockProseDocument | undefined
+  if (
+    options?.characterClass?.spellcasting &&
+    options.spellcastingProgression &&
+    isClassSpellcastingGrantingFeature(feature)
+  ) {
+    rulesDocument =
+      formatClassSpellcastingFeatureRules({
+        characterClass: {
+          ...options.characterClass,
+          features: [feature],
+        },
+        config: options.spellcastingProgression,
+      }) ?? undefined
+  }
+
   return {
     id: feature.id,
     level: feature.level,
     title: feature.name,
+    introHtml: feature.intro,
+    rulesDocument,
     bodyHtml: feature.description,
     tables: feature.kind === 'custom' ? feature.tables : undefined,
   }
@@ -363,11 +395,17 @@ function sortFeatures(features: readonly ClassFeature[]): ClassFeature[] {
 function buildFeaturesSection(
   characterClass: ClassDetailViewModelSource,
   features: readonly ClassFeature[],
+  options?: BuildClassDetailViewModelOptions,
 ): Extract<ClassDetailViewModel['sections'][number], { id: 'features' }> {
   return {
     id: 'features',
     title: `${characterClass.name} Class Features`,
-    items: sortFeatures(features).map(mapFeatureToDetailItem),
+    items: sortFeatures(features).map((feature) =>
+      mapFeatureToDetailItem(feature, {
+        characterClass: options?.characterClass,
+        spellcastingProgression: options?.spellcastingProgression,
+      }),
+    ),
   }
 }
 
@@ -408,6 +446,9 @@ export function buildClassDetailViewModel(
   const surface = options.surface ?? 'content-detail'
   const features = options.features ?? characterClass.features
   const visibleFeatures = projectVisibleClassFeatures(features, { surface })
+  const characterClassForRules =
+    options.characterClass ??
+    ('spellcasting' in characterClass ? (characterClass as CharacterClass) : undefined)
 
   const sections: ClassDetailViewModel['sections'] = [
     {
@@ -419,7 +460,12 @@ export function buildClassDetailViewModel(
   ]
 
   if (visibleFeatures.length > 0) {
-    sections.push(buildFeaturesSection(characterClass, visibleFeatures))
+    sections.push(
+      buildFeaturesSection(characterClass, visibleFeatures, {
+        ...options,
+        characterClass: characterClassForRules,
+      }),
+    )
   }
 
   return {

@@ -7,11 +7,11 @@ import {
 import {
   joinStatBlockProseParagraph,
   joinStatBlockProsePlainText,
-  monsterAttackActionPartsToProse,
   statBlockLeadSeparator,
   statBlockOutcomeLead,
   statBlockReactionLead,
-} from './stat-block-prose'
+} from '../prose/stat-block-prose'
+import { monsterAttackActionPartsToProse } from './stat-block-prose'
 
 describe('stat-block prose', () => {
   it('joins saving throw clauses to the legacy plain string', () => {

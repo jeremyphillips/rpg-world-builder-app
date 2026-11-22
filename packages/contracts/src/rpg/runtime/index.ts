@@ -1,3 +1,4 @@
+export * from './prose'
 export * from './campaign'
 export * from './content'
 export * from './campaign-eligibility'

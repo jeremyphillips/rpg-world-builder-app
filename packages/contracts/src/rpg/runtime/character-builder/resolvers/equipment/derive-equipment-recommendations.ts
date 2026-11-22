@@ -114,7 +114,7 @@ function resolveFocusInferenceIds(
 }
 
 /** Authored `spellcasting.focusKinds` wins; otherwise infer from focus gear in starting packages. */
-function resolveFocusKinds(
+export function resolveFocusKinds(
   characterClass: CharacterClass,
   catalogIndex: CharacterBuildCatalogIndex,
   startingEquipmentIds: readonly string[],

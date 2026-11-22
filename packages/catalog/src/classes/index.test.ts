@@ -204,13 +204,10 @@ describe('SRD 5.2.1 class seed', () => {
     expect(bard.spellcasting?.recommendations).toEqual([
       {
         target: 'cantrips',
-        classLevel: 1,
         spellIds: ['srd-cc-5.2.1:dancing-lights', 'srd-cc-5.2.1:vicious-mockery'],
       },
       {
         target: 'level1Plus',
-        classLevel: 1,
-        spellLevel: 1,
         spellIds: [
           'srd-cc-5.2.1:charm-person',
           'srd-cc-5.2.1:color-spray',

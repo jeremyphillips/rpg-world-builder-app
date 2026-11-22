@@ -1,4 +1,13 @@
-import { cn, Heading, RichTextContent, Table, TableBody, TableCell, TableRow } from '@rpg/ui'
+import {
+  cn,
+  Heading,
+  RichTextContent,
+  StatBlockProseView,
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+} from '@rpg/ui'
 import type { ContentTable } from '@rpg/contracts'
 
 import { ContentTableView } from '../../../components/tables/content-table-view'
@@ -66,6 +75,10 @@ function ClassFeatureLevelGroupRows({ group }: { group: LevelGroup }) {
             >
               {item.title}
             </Heading>
+            {item.introHtml ? (
+              <RichTextContent html={item.introHtml} {...contentDetailProseProps} />
+            ) : null}
+            {item.rulesDocument ? <StatBlockProseView document={item.rulesDocument} /> : null}
             {item.bodyHtml ? (
               <RichTextContent html={item.bodyHtml} {...contentDetailProseProps} />
             ) : null}

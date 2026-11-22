@@ -79,6 +79,8 @@ export function ClassDetailContent({
   const viewModel = buildClassDetailViewModel(characterClass, vocabulary, {
     surface: 'content-detail',
     features: visibleFeatures,
+    characterClass,
+    spellcastingProgression,
   })
 
   return (

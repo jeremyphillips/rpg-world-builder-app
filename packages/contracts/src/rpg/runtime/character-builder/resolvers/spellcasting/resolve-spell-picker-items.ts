@@ -8,6 +8,11 @@ import {
 import { resolveAvailableChoices } from '../registry/resolve-choices'
 import { buildSpellPickerSearchText } from './format-spell-picker-metadata'
 import { buildSpellPickerCompactSummary } from './resolve-spell-picker-metadata'
+import { resolveClassSpellcastingActivationLevel } from '../../../../content/classes/spellcasting/class-spellcasting-ownership'
+import {
+  resolveClassSpellcasting,
+  resolveMaxSelectableSpellLevelFromClass,
+} from '../../../creature/resolve-class-spellcasting'
 import { resolveRecommendedSpellIdsForChoiceSet } from './resolve-spell-recommendations'
 import {
   NEUTRAL_OPTION_RECOMMENDATION,
@@ -104,11 +109,23 @@ export function resolveSpellPickerItems({
   const characterClass = draft.class.classId
     ? catalogIndex.classes.get(draft.class.classId)
     : undefined
+  const activationClassLevel = characterClass
+    ? (resolveClassSpellcastingActivationLevel(characterClass) ?? draft.class.level)
+    : draft.class.level
+  const resolvedClassSpellcasting = characterClass
+    ? resolveClassSpellcasting(characterClass, context.spellcastingProgression)
+    : null
+  const maxSelectableSpellLevel = resolvedClassSpellcasting
+    ? resolveMaxSelectableSpellLevelFromClass(resolvedClassSpellcasting, draft.class.level)
+    : 0
+
   const recommendedSpellIds = resolveRecommendedSpellIdsForChoiceSet({
     spellcasting: characterClass?.spellcasting,
     choiceSetId,
     classId: characterClass?.id ?? '',
     classLevel: draft.class.level,
+    activationClassLevel,
+    maxSelectableSpellLevel,
     choiceSetOptionIds: choiceSet.options.map((option) => option.id),
     catalogSpellsById: spellsById,
   })

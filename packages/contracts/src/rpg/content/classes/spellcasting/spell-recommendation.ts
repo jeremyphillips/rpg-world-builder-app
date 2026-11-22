@@ -12,7 +12,6 @@ export type SpellRecommendationTarget = z.infer<typeof spellRecommendationTarget
 export const spellRecommendationSchema = z.object({
   target: spellRecommendationTargetSchema,
   classLevel: absoluteLevelSchema.optional(),
-  spellLevel: z.number().int().min(0).max(9).optional(),
   spellIds: z.array(spellReferenceSchema).min(1),
 })
 

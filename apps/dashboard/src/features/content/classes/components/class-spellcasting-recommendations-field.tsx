@@ -70,7 +70,7 @@ export function ClassSpellcastingRecommendationsField({
       <ComboboxField
         id="class-spellcasting-recommended-level-1"
         label={SPELLCASTING_RECOMMENDATION_TARGET_LABELS.level1Plus}
-        hint="Suggested level 1 spells for new characters."
+        hint="Suggested spells eligible at spellcasting activation."
         options={level1Options}
         value={level1Ids}
         onChange={(next) => writeTarget('level1Plus', Array.isArray(next) ? next : [])}

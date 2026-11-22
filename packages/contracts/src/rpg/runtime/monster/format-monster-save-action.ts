@@ -26,7 +26,7 @@ import {
   statBlockSaveLead,
   type StatBlockProse,
   type StatBlockProseSegment,
-} from './stat-block-prose'
+} from '../prose/stat-block-prose'
 import { formatMonsterLimitedUseHeading } from './spell-entry-presentation'
 
 type SaveAction = Extract<MonsterAction, { kind: 'save' }>
