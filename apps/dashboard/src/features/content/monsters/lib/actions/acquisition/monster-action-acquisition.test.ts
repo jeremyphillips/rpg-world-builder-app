@@ -127,9 +127,9 @@ describe('monster action acquisition presentation', () => {
       metadata: MONSTER_ACQUISITION_SAVE_DESCRIPTION,
     })
     expect(bonus.map((item) => item.id)).toEqual([
-      'bonus:leap',
-      'bonus:teleport',
-      'bonus:take-actions',
+      'create:teleport',
+      'create:leap',
+      'create:take-actions',
       'create:attack',
       'create:special',
       'create:save',
@@ -150,10 +150,17 @@ describe('monster action acquisition presentation', () => {
       combination: 'one',
     })
     expect(createBonusActionDraft('take-actions')).not.toHaveProperty('name')
-    expect(parseMonsterActionAcquisitionId('bonus:leap')).toEqual({
-      type: 'bonus',
-      category: 'leap',
+    expect(parseMonsterActionAcquisitionId('create:leap')).toEqual({
+      type: 'create',
+      kind: 'leap',
     })
+    const actions = monsterActionAcquisitionItems({
+      weapons: [],
+      allowAddWeapon: true,
+      section: 'actions',
+    })
+    expect(actions.some((item) => item.id === 'create:teleport')).toBe(true)
+    expect(actions.some((item) => item.id === 'create:leap')).toBe(false)
     const reactions = monsterActionAcquisitionItems({
       weapons,
       allowAddWeapon: true,

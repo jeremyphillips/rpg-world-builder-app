@@ -13,6 +13,7 @@ import {
   PARRY_AC_BONUS_DEFAULT,
   PRIMARY_SPELLCASTING_PROFILE,
   acquisitionStateForItem,
+  monsterSectionAllowsKind,
   monsterSectionAllowsPreset,
   type ActionPresetId,
   type MonsterActionSectionRows,
@@ -77,11 +78,13 @@ export type MonsterActionAcquisitionChoice =
   | { type: 'natural'; presetId: ActionPresetId }
   | { type: 'other-natural' }
   | { type: 'preset'; presetId: ActionPresetId }
-  | { type: 'create'; kind: 'attack' | 'special' | 'save' | 'shape-shift' }
+  | {
+      type: 'create'
+      kind: 'attack' | 'special' | 'save' | 'shape-shift' | 'leap' | 'teleport' | 'take-actions'
+    }
   | { type: 'create'; kind: 'spell'; spellAcquisition: 'primary' | 'standalone' }
   | { type: 'legendary'; category: 'reference' | 'spellcasting' | 'cast-spell' }
   | { type: 'reaction'; category: 'reference' | 'parry' | 'cast-spell' | 'custom' }
-  | { type: 'bonus'; category: 'leap' | 'teleport' | 'take-actions' }
 
 const SPECIAL_MENU_ORDER = ['multiattack', 'constrict', 'breath-weapon'] as const
 
@@ -141,9 +144,12 @@ const EXACT_ACQUISITION_CHOICES: Record<string, MonsterActionAcquisitionChoice> 
   'reaction:parry': { type: 'reaction', category: 'parry' },
   'reaction:cast-spell': { type: 'reaction', category: 'cast-spell' },
   'reaction:custom': { type: 'reaction', category: 'custom' },
-  'bonus:leap': { type: 'bonus', category: 'leap' },
-  'bonus:teleport': { type: 'bonus', category: 'teleport' },
-  'bonus:take-actions': { type: 'bonus', category: 'take-actions' },
+  'create:leap': { type: 'create', kind: 'leap' },
+  'create:teleport': { type: 'create', kind: 'teleport' },
+  'create:take-actions': { type: 'create', kind: 'take-actions' },
+  'bonus:leap': { type: 'create', kind: 'leap' },
+  'bonus:teleport': { type: 'create', kind: 'teleport' },
+  'bonus:take-actions': { type: 'create', kind: 'take-actions' },
 }
 
 function legendaryAcquisitionChoice(value: string): MonsterActionAcquisitionChoice | undefined {
@@ -186,8 +192,9 @@ export const MONSTER_ACTION_ALREADY_ADDED_NOTE = 'Already added'
 function withAcquisitionPolicy(
   item: MonsterActionAcquisitionItem,
   sectionRows: MonsterActionSectionRows,
+  section?: MonsterActionSection,
 ): MonsterActionAcquisitionItem {
-  const state = acquisitionStateForItem(item.id, sectionRows)
+  const state = acquisitionStateForItem(item.id, sectionRows, { section })
   if (state.focusActionId) {
     return {
       ...item,
@@ -204,8 +211,34 @@ function withAcquisitionPolicy(
 function applyAcquisitionPolicies(
   items: MonsterActionAcquisitionItem[],
   sectionRows: MonsterActionSectionRows,
+  section?: MonsterActionSection,
 ): MonsterActionAcquisitionItem[] {
-  return items.map((item) => withAcquisitionPolicy(item, sectionRows))
+  return items.map((item) => withAcquisitionPolicy(item, sectionRows, section))
+}
+
+function portableMovementItems(
+  section: MonsterActionSection | undefined,
+): MonsterActionAcquisitionItem[] {
+  const items: MonsterActionAcquisitionItem[] = []
+  if (section && monsterSectionAllowsKind(section, 'teleport')) {
+    items.push({
+      id: 'create:teleport',
+      label: getMonsterActionKindLabel('teleport'),
+      groupId: 'movement',
+      metadata: MONSTER_TELEPORT_DESCRIPTION,
+    })
+  }
+  if (section === 'bonusActions') {
+    if (monsterSectionAllowsKind('bonusActions', 'leap')) {
+      items.push({
+        id: 'create:leap',
+        label: getMonsterActionKindLabel('leap'),
+        groupId: 'movement',
+        metadata: MONSTER_LEAP_DESCRIPTION,
+      })
+    }
+  }
+  return items
 }
 
 export function monsterActionAcquisitionItems(input: {
@@ -233,25 +266,10 @@ export function monsterActionAcquisitionItems(input: {
         input.spellCatalogReady !== false,
       ),
       sectionRows,
+      input.section,
     )
   }
-  const bonusMovement =
-    input.section === 'bonusActions'
-      ? [
-          {
-            id: 'bonus:leap',
-            label: getMonsterActionKindLabel('leap'),
-            groupId: 'movement' as const,
-            metadata: MONSTER_LEAP_DESCRIPTION,
-          },
-          {
-            id: 'bonus:teleport',
-            label: getMonsterActionKindLabel('teleport'),
-            groupId: 'movement' as const,
-            metadata: MONSTER_TELEPORT_DESCRIPTION,
-          },
-        ]
-      : []
+  const movement = portableMovementItems(input.section)
   const equipped = input.weapons.map((weapon) => {
     const existing = input.weaponActions?.find(
       (action) => action.equipmentEntryId === weapon.entryId,
@@ -329,10 +347,11 @@ export function monsterActionAcquisitionItems(input: {
           ]
         : []),
       ...special,
-      ...bonusMovement,
+      ...movement,
       ...generalAcquisitionItems(input.section),
     ],
     sectionRows,
+    input.section,
   )
   if (!input.shapeShiftDisabledReason) return items
   return items.map((item) =>
@@ -395,7 +414,7 @@ function generalAcquisitionItems(
   if (section === 'bonusActions') {
     return [
       {
-        id: 'bonus:take-actions',
+        id: 'create:take-actions',
         label: getMonsterActionKindLabel('take-actions'),
         groupId: 'other' as const,
         metadata: MONSTER_TAKE_ACTIONS_DESCRIPTION,
@@ -454,11 +473,11 @@ function draftFromPreset(presetId: ActionPresetId): MonsterActionDraftRow {
   }
 }
 
-export function createBonusActionDraft(
-  category: 'leap' | 'teleport' | 'take-actions',
+export function createActionDraft(
+  kind: 'leap' | 'teleport' | 'take-actions',
 ): MonsterActionDraftRow {
   const id = createMonsterRowId()
-  if (category === 'leap') {
+  if (kind === 'leap') {
     return {
       id,
       kind: 'leap',
@@ -467,7 +486,7 @@ export function createBonusActionDraft(
       movementFeet: LEAP_MOVEMENT_DEFAULT,
     }
   }
-  if (category === 'teleport') {
+  if (kind === 'teleport') {
     return {
       id,
       kind: 'teleport',
@@ -481,6 +500,9 @@ export function createBonusActionDraft(
     combination: 'one',
   } as MonsterActionDraftRow
 }
+
+/** @deprecated Use `createActionDraft`. */
+export const createBonusActionDraft = createActionDraft
 
 export function createReactionActionDraft(
   category: 'reference' | 'parry' | 'cast-spell' | 'custom',
@@ -528,7 +550,10 @@ function createSaveActionDraft(id: string): MonsterActionDraftRow {
 }
 
 function createActionKindDraft(
-  choice: Extract<MonsterActionAcquisitionChoice, { type: 'create' }>,
+  choice: Extract<
+    MonsterActionAcquisitionChoice,
+    { type: 'create'; kind: 'attack' | 'special' | 'save' | 'shape-shift' | 'spell' }
+  >,
   id: string,
 ): MonsterActionDraftRow {
   if (choice.kind === 'spell') {
@@ -550,7 +575,7 @@ function createActionKindDraft(
 export function createMonsterActionFromAcquisition(
   choice: Exclude<
     MonsterActionAcquisitionChoice,
-    { type: 'add-weapon' } | { type: 'legendary' } | { type: 'reaction' } | { type: 'bonus' }
+    { type: 'add-weapon' } | { type: 'legendary' } | { type: 'reaction' }
   >,
 ): MonsterActionDraftRow {
   const id = createMonsterRowId()
@@ -569,7 +594,12 @@ export function createMonsterActionFromAcquisition(
   if (choice.type === 'focus-existing') {
     throw new Error('focus-existing is not a create choice')
   }
-  if (choice.type === 'create') return createActionKindDraft(choice, id)
+  if (choice.type === 'create') {
+    if (choice.kind === 'leap' || choice.kind === 'teleport' || choice.kind === 'take-actions') {
+      return createActionDraft(choice.kind)
+    }
+    return createActionKindDraft(choice, id)
+  }
   return { id, kind: 'special' } as MonsterActionDraftRow
 }
 

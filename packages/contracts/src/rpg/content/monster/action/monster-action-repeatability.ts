@@ -165,13 +165,14 @@ function pushShapeShiftViolations(
   }
 }
 
-function hasSingletonKind(sections: MonsterActionSectionRows, kind: string): boolean {
-  for (const section of MONSTER_ACTION_SECTIONS) {
-    const kinds = MONSTER_SINGLETON_KINDS[section as keyof typeof MONSTER_SINGLETON_KINDS]
-    if (!kinds || !(kinds as readonly string[]).includes(kind)) continue
-    if (sectionRows(sections, section).some((row) => row.kind === kind)) return true
-  }
-  return false
+function hasSingletonKindInSection(
+  sections: MonsterActionSectionRows,
+  section: MonsterActionSection,
+  kind: string,
+): boolean {
+  const kinds = MONSTER_SINGLETON_KINDS[section as keyof typeof MONSTER_SINGLETON_KINDS]
+  if (!kinds || !(kinds as readonly string[]).includes(kind)) return false
+  return sectionRows(sections, section).some((row) => row.kind === kind)
 }
 
 function hasConstrictPreset(sections: MonsterActionSectionRows): boolean {
@@ -195,9 +196,10 @@ function primarySpellcastingRow(
 
 function disabledWhenSingleton(
   sections: MonsterActionSectionRows,
+  section: MonsterActionSection,
   kind: string,
 ): AcquisitionItemState {
-  if (!hasSingletonKind(sections, kind)) return {}
+  if (!hasSingletonKindInSection(sections, section, kind)) return {}
   return { disabled: true, note: monsterSingletonKindMessage(kind) }
 }
 
@@ -210,13 +212,17 @@ function acquisitionStateForFixedItem(
       ? { disabled: true, note: PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE }
       : {}
   }
-  if (itemId === 'preset:multiattack') return disabledWhenSingleton(sections, 'multiattack')
+  if (itemId === 'preset:multiattack') {
+    return disabledWhenSingleton(sections, 'actions', 'multiattack')
+  }
   if (itemId === 'preset:constrict') {
     return hasConstrictPreset(sections)
       ? { disabled: true, note: MONSTER_CONSTRICT_PRESET_DUPLICATE_MESSAGE }
       : {}
   }
-  if (itemId === 'reaction:parry') return disabledWhenSingleton(sections, 'parry')
+  if (itemId === 'reaction:parry') {
+    return disabledWhenSingleton(sections, 'reactions', 'parry')
+  }
   if (itemId === 'create:shape-shift') {
     for (const section of MONSTER_ACTION_SECTIONS) {
       if (sectionRows(sections, section).some((row) => row.kind === 'shape-shift')) {
@@ -233,7 +239,37 @@ function acquisitionStateForBonusItem(
   sections: MonsterActionSectionRows,
 ): AcquisitionItemState | undefined {
   if (!itemId.startsWith('bonus:')) return undefined
-  return disabledWhenSingleton(sections, itemId.slice('bonus:'.length))
+  return disabledWhenSingleton(sections, 'bonusActions', itemId.slice('bonus:'.length))
+}
+
+const PORTABLE_CREATE_KINDS = new Set(['leap', 'teleport', 'take-actions'])
+
+function portableCreateKindFromItemId(itemId: string): string | undefined {
+  const prefix = 'create:'
+  if (!itemId.startsWith(prefix)) return undefined
+  const kind = itemId.slice(prefix.length)
+  return PORTABLE_CREATE_KINDS.has(kind) ? kind : undefined
+}
+
+function singletonLockSectionForPortableKind(
+  kind: string,
+  menuSection: MonsterActionSection | undefined,
+): MonsterActionSection | undefined {
+  if (kind === 'teleport' && menuSection) return menuSection
+  if (menuSection === 'bonusActions') return 'bonusActions'
+  return undefined
+}
+
+function acquisitionStateForPortableCreateItem(
+  itemId: string,
+  sections: MonsterActionSectionRows,
+  section?: MonsterActionSection,
+): AcquisitionItemState | undefined {
+  const kind = portableCreateKindFromItemId(itemId)
+  if (!kind) return undefined
+  const lockSection = singletonLockSectionForPortableKind(kind, section)
+  if (!lockSection) return {}
+  return disabledWhenSingleton(sections, lockSection, kind)
 }
 
 function acquisitionStateForNaturalPreset(
@@ -252,10 +288,12 @@ function acquisitionStateForNaturalPreset(
 export function acquisitionStateForItem(
   itemId: string,
   sections: MonsterActionSectionRows,
+  options?: { section?: MonsterActionSection },
 ): AcquisitionItemState {
   return (
     acquisitionStateForFixedItem(itemId, sections) ??
     acquisitionStateForBonusItem(itemId, sections) ??
+    acquisitionStateForPortableCreateItem(itemId, sections, options?.section) ??
     acquisitionStateForNaturalPreset(itemId, sections)
   )
 }

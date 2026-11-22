@@ -115,7 +115,12 @@ describe('monster action repeatability', () => {
       note: PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE,
     })
     expect(acquisitionStateForItem('preset:multiattack', sections).disabled).toBe(true)
-    expect(acquisitionStateForItem('bonus:leap', sections).disabled).toBe(true)
+    expect(
+      acquisitionStateForItem('create:leap', sections, { section: 'bonusActions' }).disabled,
+    ).toBe(true)
+    expect(
+      acquisitionStateForItem('create:teleport', sections, { section: 'actions' }).disabled,
+    ).toBe(undefined)
     expect(acquisitionStateForItem('reaction:parry', sections).disabled).toBe(true)
     expect(acquisitionStateForItem('natural:bite', sections)).toMatchObject({
       focusActionId: 'bite',

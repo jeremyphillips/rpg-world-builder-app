@@ -4,22 +4,9 @@ import {
   contextualCountDraftSchema,
   contextualCountSchema,
 } from '../../../primitives/contextual-count'
-import {
-  draftActionFields,
-  omitActionKinds,
-  omittedSectionKinds,
-  publishedActionFields,
-} from './schema-helpers'
+import { monsterLegendaryActionDraftSchema, monsterLegendaryActionSchema } from './section-tuples'
 
-export const monsterLegendaryActionSchema = z.discriminatedUnion(
-  'kind',
-  omitActionKinds(publishedActionFields, omittedSectionKinds('legendaryActions')),
-)
-
-export const monsterLegendaryActionDraftSchema = z.discriminatedUnion(
-  'kind',
-  omitActionKinds(draftActionFields, omittedSectionKinds('legendaryActions')),
-)
+export { monsterLegendaryActionSchema, monsterLegendaryActionDraftSchema }
 
 export const monsterLegendaryActionsBlockSchema = z.object({
   uses: contextualCountSchema,

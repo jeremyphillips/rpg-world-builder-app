@@ -1,32 +1,9 @@
 import { getActionPreset } from '../action/action-presets'
+import { MONSTER_SECTION_KINDS } from './action/section-tuples'
 import { isPrimarySpellcastingAction } from './spell-casting-source'
 import type { MonsterActionSection } from './action-sections'
 
-/** Kinds a section may store. Menus and Move to read this list. */
-export const MONSTER_SECTION_KINDS = {
-  actions: [
-    'weapon',
-    'natural-weapon',
-    'attack',
-    'save',
-    'spell',
-    'special',
-    'multiattack',
-    'shape-shift',
-  ],
-  bonusActions: [
-    'attack',
-    'save',
-    'spell',
-    'special',
-    'leap',
-    'teleport',
-    'take-actions',
-    'shape-shift',
-  ],
-  reactions: ['parry', 'action-reference', 'spell', 'special'],
-  legendaryActions: ['action-reference', 'spell', 'special', 'save'],
-} as const satisfies Record<MonsterActionSection, readonly string[]>
+export { MONSTER_SECTION_KINDS }
 
 /** Named presets that belong on Actions. A shared `save` kind does not move them. */
 export const ACTIONS_ONLY_PRESET_IDS = ['breath-weapon', 'constrict', 'multiattack'] as const

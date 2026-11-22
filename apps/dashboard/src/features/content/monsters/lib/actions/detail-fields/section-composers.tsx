@@ -180,13 +180,12 @@ function monsterActionParryPreviewSlot(
   }
 }
 
-function bonusAuthoringFields(input: {
+function portableKindAuthoringFields(input: {
   ctx: ContentFormCtx
   action: MonsterActionDraftRow
   section: MonsterActionSection
   namePrefix: string
 }): FormItem[] | undefined {
-  if (input.section !== 'bonusActions') return undefined
   const preview: FormItem = {
     kind: 'slot',
     name: 'bonusPreview',
@@ -475,7 +474,7 @@ export function resolveMonsterActionSectionFields(
   const fields =
     reactionAuthoringFields(input) ??
     legendaryAuthoringFields(input) ??
-    bonusAuthoringFields(input) ??
+    portableKindAuthoringFields(input) ??
     sharedAuthoringFields(input)
   if (!monsterActionActiveKeys(input.action.kind, input.section).includes('onlyInFormIds')) {
     return fields
