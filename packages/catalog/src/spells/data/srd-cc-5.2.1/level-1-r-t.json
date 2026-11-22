@@ -157,6 +157,58 @@
     }
   },
   {
+    "id": "srd-cc-5.2.1:searing-smite",
+    "slug": "searing-smite",
+    "rulesetId": "srd-cc-5.2.1",
+    "catalogLayer": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Searing Smite",
+    "description": "<p>As you hit the target, it takes an extra 1d6 Fire damage from the attack. At the start of each of its turns until the spell ends, the target takes 1d6 Fire damage and then makes a Constitution saving throw. On a failed save, the spell continues. On a successful save, the spell ends.</p>",
+    "school": "evocation",
+    "level": 1,
+    "classIds": ["paladin"],
+    "tags": {
+      "damageTypes": ["fire"],
+      "roles": ["damage"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "bonus-action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "self"
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "minute"
+    },
+    "components": {
+      "verbal": true
+    },
+    "higherLevelSlotEffect": "<p>All the damage increases by 1d6 for each spell slot level above 1.</p>",
+    "modeling": {
+      "blocker": {
+        "code": "weapon-attack-modification-model-missing"
+      },
+      "gaps": [
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Initial weapon rider, ongoing fire damage, and Constitution save loop stay prose"
+        },
+        {
+          "code": "progression-schema-missing",
+          "note": "Slot scaling on smite damage stays prose"
+        }
+      ]
+    }
+  },
+  {
     "id": "srd-cc-5.2.1:shield",
     "slug": "shield",
     "rulesetId": "srd-cc-5.2.1",

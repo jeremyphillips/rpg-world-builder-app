@@ -77,7 +77,13 @@
         },
         "extension": "carryForward"
       }
-    }
+    },
+    "recommendations": [
+      {
+        "target": "level1Plus",
+        "spellIds": ["srd-cc-5.2.1:heroism", "srd-cc-5.2.1:searing-smite"]
+      }
+    ]
   },
   "proficiencies": {
     "savingThrows": ["wis", "cha"],

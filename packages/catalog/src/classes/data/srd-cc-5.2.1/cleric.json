@@ -116,7 +116,26 @@
         },
         "extension": "carryForward"
       }
-    }
+    },
+    "recommendations": [
+      {
+        "target": "cantrips",
+        "spellIds": [
+          "srd-cc-5.2.1:guidance",
+          "srd-cc-5.2.1:sacred-flame",
+          "srd-cc-5.2.1:thaumaturgy"
+        ]
+      },
+      {
+        "target": "level1Plus",
+        "spellIds": [
+          "srd-cc-5.2.1:bless",
+          "srd-cc-5.2.1:cure-wounds",
+          "srd-cc-5.2.1:guiding-bolt",
+          "srd-cc-5.2.1:shield-of-faith"
+        ]
+      }
+    ]
   },
   "proficiencies": {
     "savingThrows": ["wis", "cha"],

@@ -190,6 +190,159 @@
     }
   },
   {
+    "id": "srd-cc-5.2.1:produce-flame",
+    "slug": "produce-flame",
+    "rulesetId": "srd-cc-5.2.1",
+    "catalogLayer": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Produce Flame",
+    "description": "<p>A flickering flame appears in your hand and remains there for the duration. While there, the flame emits no heat and ignites nothing, and it sheds Bright Light in a 20-foot radius and Dim Light for an additional 20 feet. The spell ends if you cast it again. Until the spell ends, you can take a Magic action to hurl fire at a creature or an object within 60 feet of you. Make a ranged spell attack. On a hit, the target takes 1d8 Fire damage.</p>",
+    "school": "conjuration",
+    "level": 0,
+    "classIds": ["druid"],
+    "tags": {
+      "damageTypes": ["fire"],
+      "roles": ["damage"],
+      "functions": ["utility"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "bonus-action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "self"
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 10,
+      "unit": "minute"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    },
+    "deliveryMethod": "ranged-spell-attack",
+    "cantripScaling": "<p>The damage increases by 1d8 when you reach levels 5 (2d8), 11 (3d8), and 17 (4d8).</p>",
+    "modeling": {
+      "blocker": {
+        "code": "multi-mode-choice"
+      },
+      "gaps": [
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Held flame light and hurled attack modes stay prose"
+        },
+        {
+          "code": "progression-schema-missing",
+          "note": "Cantrip damage scaling stays prose"
+        }
+      ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:ray-of-frost",
+    "slug": "ray-of-frost",
+    "rulesetId": "srd-cc-5.2.1",
+    "catalogLayer": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Ray of Frost",
+    "description": "<p>A frigid beam of blue-white light streaks toward a creature within range. Make a ranged spell attack against the target. On a hit, it takes 1d8 Cold damage, and its Speed is reduced by 10 feet until the start of your next turn.</p>",
+    "school": "evocation",
+    "level": 0,
+    "classIds": ["sorcerer", "wizard"],
+    "tags": {
+      "damageTypes": ["cold"],
+      "roles": ["damage", "debuff"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 60,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    },
+    "deliveryMethod": "ranged-spell-attack",
+    "cantripScaling": "<p>The damage increases by 1d8 when you reach levels 5 (2d8), 11 (3d8), and 17 (4d8).</p>",
+    "modeling": {
+      "status": "meaningful-partial",
+      "gaps": [
+        {
+          "code": "duration-model-missing",
+          "note": "Speed reduction until start of your next turn stays prose"
+        }
+      ]
+    },
+    "resolution": {
+      "selectionMode": "targets",
+      "target": {
+        "count": 1,
+        "countKind": "exact",
+        "kind": "creature-or-object",
+        "proximity": {
+          "kind": "distance",
+          "distance": {
+            "value": 60,
+            "unit": "ft"
+          }
+        }
+      },
+      "effects": [
+        {
+          "id": "damage",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 1,
+              "faces": 8
+            }
+          },
+          "damageType": "cold"
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "hit",
+          "effects": [
+            {
+              "kind": "effect-reference",
+              "effectId": "damage",
+              "amount": "full"
+            },
+            {
+              "kind": "note",
+              "description": "Its Speed is reduced by 10 feet until the start of your next turn."
+            }
+          ]
+        }
+      ],
+      "method": {
+        "kind": "attack",
+        "attackType": "ranged-spell"
+      }
+    }
+  },
+  {
     "id": "srd-cc-5.2.1:resistance",
     "slug": "resistance",
     "rulesetId": "srd-cc-5.2.1",
@@ -347,6 +500,147 @@
     }
   },
   {
+    "id": "srd-cc-5.2.1:shocking-grasp",
+    "slug": "shocking-grasp",
+    "rulesetId": "srd-cc-5.2.1",
+    "catalogLayer": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Shocking Grasp",
+    "description": "<p>Lightning springs from you to a creature that you try to touch. Make a melee spell attack against the target. On a hit, the target takes 1d8 Lightning damage, and it can't make Opportunity Attacks until the start of its next turn.</p>",
+    "school": "evocation",
+    "level": 0,
+    "classIds": ["sorcerer", "wizard"],
+    "tags": {
+      "damageTypes": ["lightning"],
+      "roles": ["damage", "debuff"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "touch"
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    },
+    "deliveryMethod": "melee-spell-attack",
+    "cantripScaling": "<p>The damage increases by 1d8 when you reach levels 5 (2d8), 11 (3d8), and 17 (4d8).</p>",
+    "modeling": {
+      "status": "meaningful-partial",
+      "gaps": [
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Opportunity Attack suppression until start of target next turn stays prose"
+        }
+      ]
+    },
+    "resolution": {
+      "selectionMode": "targets",
+      "target": {
+        "count": 1,
+        "countKind": "exact",
+        "kind": "creature",
+        "proximity": {
+          "kind": "touch"
+        }
+      },
+      "effects": [
+        {
+          "id": "damage",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 1,
+              "faces": 8
+            }
+          },
+          "damageType": "lightning"
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "hit",
+          "effects": [
+            {
+              "kind": "effect-reference",
+              "effectId": "damage",
+              "amount": "full"
+            },
+            {
+              "kind": "note",
+              "description": "It can't make Opportunity Attacks until the start of its next turn."
+            }
+          ]
+        }
+      ],
+      "method": {
+        "kind": "attack",
+        "attackType": "melee-spell"
+      }
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:sorcerous-burst",
+    "slug": "sorcerous-burst",
+    "rulesetId": "srd-cc-5.2.1",
+    "catalogLayer": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Sorcerous Burst",
+    "description": "<p>You cast sorcerous energy at one creature or object within range. Make a ranged spell attack against the target. On a hit, the target takes 1d8 damage of a type you choose: Acid, Cold, Fire, Lightning, Poison, Psychic, or Thunder. If you roll an 8 on a d8 for this spell, you can roll another d8, and add it to the damage. When you cast this spell, the maximum number of these d8s you can add to the spell's damage equals your spellcasting ability modifier.</p>",
+    "school": "evocation",
+    "level": 0,
+    "classIds": ["sorcerer"],
+    "tags": {
+      "roles": ["damage"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 120,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    },
+    "deliveryMethod": "ranged-spell-attack",
+    "cantripScaling": "<p>The damage increases by 1d8 when you reach levels 5 (2d8), 11 (3d8), and 17 (4d8).</p>",
+    "modeling": {
+      "blocker": {
+        "code": "choice-model-missing"
+      },
+      "gaps": [
+        {
+          "code": "progression-schema-missing",
+          "note": "Exploding d8 rerolls capped by spellcasting modifier stay prose"
+        }
+      ]
+    }
+  },
+  {
     "id": "srd-cc-5.2.1:spare-the-dying",
     "slug": "spare-the-dying",
     "rulesetId": "srd-cc-5.2.1",
@@ -399,6 +693,108 @@
           "note": "Cantrip range scaling at levels 5/11/17 stays prose"
         }
       ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:starry-wisp",
+    "slug": "starry-wisp",
+    "rulesetId": "srd-cc-5.2.1",
+    "catalogLayer": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Starry Wisp",
+    "description": "<p>You launch a mote of light at one creature or object within range. Make a ranged spell attack against the target. On a hit, the target takes 1d8 Radiant damage, and until the end of your next turn, it emits Dim Light in a 10-foot radius and can't benefit from the Invisible condition.</p>",
+    "school": "evocation",
+    "level": 0,
+    "classIds": ["bard", "druid"],
+    "tags": {
+      "damageTypes": ["radiant"],
+      "roles": ["damage", "debuff"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 60,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "instantaneous"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true
+    },
+    "deliveryMethod": "ranged-spell-attack",
+    "cantripScaling": "<p>The damage increases by 1d8 when you reach levels 5 (2d8), 11 (3d8), and 17 (4d8).</p>",
+    "modeling": {
+      "status": "meaningful-partial",
+      "gaps": [
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Invisible condition and Dim Light riders stay prose"
+        },
+        {
+          "code": "duration-model-missing",
+          "note": "Riders until end of your next turn stay prose"
+        }
+      ]
+    },
+    "resolution": {
+      "selectionMode": "targets",
+      "target": {
+        "count": 1,
+        "countKind": "exact",
+        "kind": "creature-or-object",
+        "proximity": {
+          "kind": "distance",
+          "distance": {
+            "value": 60,
+            "unit": "ft"
+          }
+        }
+      },
+      "effects": [
+        {
+          "id": "damage",
+          "kind": "damage",
+          "roll": {
+            "dice": {
+              "count": 1,
+              "faces": 8
+            }
+          },
+          "damageType": "radiant"
+        }
+      ],
+      "outcomes": [
+        {
+          "result": "hit",
+          "effects": [
+            {
+              "kind": "effect-reference",
+              "effectId": "damage",
+              "amount": "full"
+            },
+            {
+              "kind": "note",
+              "description": "Until the end of your next turn, it emits Dim Light in a 10-foot radius and can't benefit from the Invisible condition."
+            }
+          ]
+        }
+      ],
+      "method": {
+        "kind": "attack",
+        "attackType": "ranged-spell"
+      }
     }
   },
   {

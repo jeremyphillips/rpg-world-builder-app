@@ -184,6 +184,35 @@ export const SRD_521_SPELL_SEED_RESOLUTION = {
     overrides: { method: { kind: 'automatic' }, selectionMode: 'self' },
   },
 
+  'guiding-bolt': {
+    kind: 'derived',
+    overrides: {
+      hitNote:
+        'The next attack roll made against it before the end of your next turn has Advantage.',
+    },
+  },
+  'ray-of-frost': {
+    kind: 'derived',
+    overrides: {
+      hitNote: 'Its Speed is reduced by 10 feet until the start of your next turn.',
+    },
+  },
+  'shocking-grasp': {
+    kind: 'derived',
+    overrides: {
+      proximity: { kind: 'touch' },
+      target: { kind: 'creature' },
+      hitNote: "It can't make Opportunity Attacks until the start of its next turn.",
+    },
+  },
+  'starry-wisp': {
+    kind: 'derived',
+    overrides: {
+      hitNote:
+        "Until the end of your next turn, it emits Dim Light in a 10-foot radius and can't benefit from the Invisible condition.",
+    },
+  },
+
   // Tier D — explicit deferral
   'true-strike': { kind: 'defer', reason: 'placeholder-damage' },
 } as const satisfies Record<string, SpellSeedResolutionEntry>
@@ -208,7 +237,11 @@ export const SRD_521_SPELL_SEED_RESOLUTION_TIER_A_SLUGS = [
   'thunderwave',
   'fireball',
   'finger-of-death',
+  'guiding-bolt',
   'lightning-bolt',
+  'ray-of-frost',
+  'shocking-grasp',
+  'starry-wisp',
   'wall-of-fire',
   'delayed-blast-fireball',
 ] as const satisfies readonly Srd521SpellSeedResolutionSlug[]

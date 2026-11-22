@@ -104,7 +104,17 @@
         },
         "extension": "carryForward"
       }
-    }
+    },
+    "recommendations": [
+      {
+        "target": "cantrips",
+        "spellIds": ["srd-cc-5.2.1:eldritch-blast", "srd-cc-5.2.1:prestidigitation"]
+      },
+      {
+        "target": "level1Plus",
+        "spellIds": ["srd-cc-5.2.1:charm-person", "srd-cc-5.2.1:hex"]
+      }
+    ]
   },
   "proficiencies": {
     "savingThrows": ["wis", "cha"],

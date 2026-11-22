@@ -123,6 +123,22 @@ const SRD_521_SPELL_MODELING_RESOLUTION_ENTRIES = {
     ),
     gap('object-state-awareness', 'Worn or carried carve-out on object ignition rider'),
   ]),
+  'guiding-bolt': editorEligible([
+    gap('duration-model-missing', 'Advantage rider until end of your next turn stays prose'),
+  ]),
+  'ray-of-frost': editorEligible([
+    gap('duration-model-missing', 'Speed reduction until start of your next turn stays prose'),
+  ]),
+  'shocking-grasp': editorEligible([
+    gap(
+      'conditional-effect-model-missing',
+      'Opportunity Attack suppression until start of target next turn stays prose',
+    ),
+  ]),
+  'starry-wisp': editorEligible([
+    gap('conditional-effect-model-missing', 'Invisible condition and Dim Light riders stay prose'),
+    gap('duration-model-missing', 'Riders until end of your next turn stay prose'),
+  ]),
   'hellish-rebuke': editorEligible([
     {
       code: 'reaction-trigger',
@@ -188,6 +204,13 @@ const SRD_521_SPELL_MODELING_RESOLUTION_ENTRIES = {
 
 /** Prose-only spells — blocked from editor promotion until blocker capability ships. */
 const SRD_521_SPELL_MODELING_PROSE_ONLY_ENTRIES = {
+  'animal-friendship': blockedProseOnly(
+    { code: 'effect-schema-missing', capabilityId: 'condition' },
+    [
+      gap('conditional-effect-model-missing', 'Charm ends when target takes damage'),
+      gap('object-state-awareness', 'Target must be a Beast'),
+    ],
+  ),
   aid: blockedProseOnly({ code: 'effect-schema-missing', capabilityId: 'stat-modifier' }, [
     gap('progression-schema-missing', 'Slot +5 HP scaling stays prose'),
   ]),
@@ -265,6 +288,13 @@ const SRD_521_SPELL_MODELING_PROSE_ONLY_ENTRIES = {
   'create-or-destroy-water': blockedProseOnly({ code: 'effect-schema-missing' }, [
     gap('multi-mode-choice', 'Create Water vs Destroy Water modes stay prose'),
     gap('progression-schema-missing', 'Cube size and gallon volume slot scaling stay prose'),
+  ]),
+  'ensnaring-strike': blockedProseOnly({ code: 'weapon-attack-modification-model-missing' }, [
+    gap(
+      'conditional-effect-model-missing',
+      'Restrained, ongoing damage, and Athletics escape stay prose',
+    ),
+    gap('object-state-awareness', 'Large or larger creatures have Advantage on the initial save'),
   ]),
   'dancing-lights': blockedProseOnly(
     {
@@ -363,6 +393,10 @@ const SRD_521_SPELL_MODELING_PROSE_ONLY_ENTRIES = {
   ),
   guidance: blockedProseOnly({ code: 'effect-schema-missing', capabilityId: 'stat-modifier' }, [
     gap('choice-model-missing', 'Chosen skill for ability check bonus stays prose'),
+  ]),
+  heroism: blockedProseOnly({ code: 'effect-schema-missing', capabilityId: 'stat-modifier' }, [
+    gap('modifier-model-missing', 'Temporary Hit Points equal to spellcasting modifier each turn'),
+    gap('conditional-effect-model-missing', 'Frightened immunity stays prose'),
   ]),
   hex: blockedProseOnly(
     {
@@ -493,6 +527,10 @@ const SRD_521_SPELL_MODELING_PROSE_ONLY_ENTRIES = {
     gap('choice-model-missing', 'Beast form choice stays prose'),
     gap('conditional-effect-model-missing', 'Save, THP tracking, early end stay prose'),
   ]),
+  'produce-flame': blockedProseOnly({ code: 'multi-mode-choice' }, [
+    gap('conditional-effect-model-missing', 'Held flame light and hurled attack modes stay prose'),
+    gap('progression-schema-missing', 'Cantrip damage scaling stays prose'),
+  ]),
   'power-word-kill': blockedProseOnly({ code: 'effect-schema-missing' }),
   'power-word-heal': blockedProseOnly(
     {
@@ -556,6 +594,19 @@ const SRD_521_SPELL_MODELING_PROSE_ONLY_ENTRIES = {
     gap('conditional-effect-model-missing', 'Once per turn benefit limit stays prose'),
   ]),
   revivify: blockedProseOnly({ code: 'resurrection-model-missing' }),
+  'searing-smite': blockedProseOnly({ code: 'weapon-attack-modification-model-missing' }, [
+    gap(
+      'conditional-effect-model-missing',
+      'Initial weapon rider, ongoing fire damage, and Constitution save loop stay prose',
+    ),
+    gap('progression-schema-missing', 'Slot scaling on smite damage stays prose'),
+  ]),
+  'sorcerous-burst': blockedProseOnly({ code: 'choice-model-missing' }, [
+    gap(
+      'progression-schema-missing',
+      'Exploding d8 rerolls capped by spellcasting modifier stay prose',
+    ),
+  ]),
   sanctuary: blockedProseOnly({ code: 'targeting-model-missing' }, [
     gap(
       'conditional-effect-model-missing',

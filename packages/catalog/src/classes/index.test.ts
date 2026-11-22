@@ -234,6 +234,97 @@ describe('SRD 5.2.1 class seed', () => {
     })
   })
 
+  it('seeds spellcasting recommendations for other SRD casters', () => {
+    expect(getClassBySlug(RULESET, 'cleric').spellcasting?.recommendations).toEqual([
+      {
+        target: 'cantrips',
+        spellIds: [
+          'srd-cc-5.2.1:guidance',
+          'srd-cc-5.2.1:sacred-flame',
+          'srd-cc-5.2.1:thaumaturgy',
+        ],
+      },
+      {
+        target: 'level1Plus',
+        spellIds: [
+          'srd-cc-5.2.1:bless',
+          'srd-cc-5.2.1:cure-wounds',
+          'srd-cc-5.2.1:guiding-bolt',
+          'srd-cc-5.2.1:shield-of-faith',
+        ],
+      },
+    ])
+    expect(getClassBySlug(RULESET, 'druid').spellcasting?.recommendations).toEqual([
+      {
+        target: 'cantrips',
+        spellIds: ['srd-cc-5.2.1:druidcraft', 'srd-cc-5.2.1:produce-flame'],
+      },
+      {
+        target: 'level1Plus',
+        spellIds: [
+          'srd-cc-5.2.1:animal-friendship',
+          'srd-cc-5.2.1:cure-wounds',
+          'srd-cc-5.2.1:faerie-fire',
+          'srd-cc-5.2.1:thunderwave',
+        ],
+      },
+    ])
+    expect(getClassBySlug(RULESET, 'paladin').spellcasting?.recommendations).toEqual([
+      {
+        target: 'level1Plus',
+        spellIds: ['srd-cc-5.2.1:heroism', 'srd-cc-5.2.1:searing-smite'],
+      },
+    ])
+    expect(getClassBySlug(RULESET, 'ranger').spellcasting?.recommendations).toEqual([
+      {
+        target: 'level1Plus',
+        spellIds: ['srd-cc-5.2.1:cure-wounds', 'srd-cc-5.2.1:ensnaring-strike'],
+      },
+    ])
+    expect(getClassBySlug(RULESET, 'sorcerer').spellcasting?.recommendations).toEqual([
+      {
+        target: 'cantrips',
+        spellIds: [
+          'srd-cc-5.2.1:light',
+          'srd-cc-5.2.1:prestidigitation',
+          'srd-cc-5.2.1:shocking-grasp',
+          'srd-cc-5.2.1:sorcerous-burst',
+        ],
+      },
+      {
+        target: 'level1Plus',
+        spellIds: ['srd-cc-5.2.1:burning-hands', 'srd-cc-5.2.1:detect-magic'],
+      },
+    ])
+    expect(getClassBySlug(RULESET, 'warlock').spellcasting?.recommendations).toEqual([
+      {
+        target: 'cantrips',
+        spellIds: ['srd-cc-5.2.1:eldritch-blast', 'srd-cc-5.2.1:prestidigitation'],
+      },
+      {
+        target: 'level1Plus',
+        spellIds: ['srd-cc-5.2.1:charm-person', 'srd-cc-5.2.1:hex'],
+      },
+    ])
+    expect(getClassBySlug(RULESET, 'wizard').spellcasting?.recommendations).toEqual([
+      {
+        target: 'cantrips',
+        spellIds: ['srd-cc-5.2.1:light', 'srd-cc-5.2.1:mage-hand', 'srd-cc-5.2.1:ray-of-frost'],
+      },
+      {
+        target: 'level1Plus',
+        spellIds: [
+          'srd-cc-5.2.1:detect-magic',
+          'srd-cc-5.2.1:feather-fall',
+          'srd-cc-5.2.1:mage-armor',
+          'srd-cc-5.2.1:magic-missile',
+          'srd-cc-5.2.1:sleep',
+          'srd-cc-5.2.1:thunderwave',
+        ],
+      },
+    ])
+  })
+
   it('College of Lore ships four subclass features with rich-text HTML', () => {
     const lore = getSubclassBySlug(RULESET, 'college-of-lore')
     expect(lore.features).toHaveLength(4)

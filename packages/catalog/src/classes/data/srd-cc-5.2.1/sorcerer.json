@@ -116,7 +116,22 @@
         },
         "extension": "carryForward"
       }
-    }
+    },
+    "recommendations": [
+      {
+        "target": "cantrips",
+        "spellIds": [
+          "srd-cc-5.2.1:light",
+          "srd-cc-5.2.1:prestidigitation",
+          "srd-cc-5.2.1:shocking-grasp",
+          "srd-cc-5.2.1:sorcerous-burst"
+        ]
+      },
+      {
+        "target": "level1Plus",
+        "spellIds": ["srd-cc-5.2.1:burning-hands", "srd-cc-5.2.1:detect-magic"]
+      }
+    ]
   },
   "proficiencies": {
     "savingThrows": ["con", "cha"],

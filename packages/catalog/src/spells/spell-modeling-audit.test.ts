@@ -28,8 +28,8 @@ describe('spell modeling audit (srd-cc-5.2.1)', () => {
   const audit = buildSpellModelingAudit(RULESET)
 
   it('covers all 100 seed spells', () => {
-    expect(audit.totalSpells).toBe(109)
-    expect(audit.entries).toHaveLength(109)
+    expect(audit.totalSpells).toBe(119)
+    expect(audit.entries).toHaveLength(119)
   })
 
   it('reports all spells as reviewed after manifest apply', () => {
@@ -177,7 +177,7 @@ describe('spell modeling audit (srd-cc-5.2.1)', () => {
 
   it('promotes resolution seeds to meaningful-partial or higher with editor eligibility', () => {
     const withResolution = audit.entries.filter((entry) => entry.hasResolution)
-    expect(withResolution).toHaveLength(23)
+    expect(withResolution).toHaveLength(27)
     for (const entry of withResolution) {
       expect(entry.editorEligible, entry.slug).toBe(true)
       expect(entry.explicitStatus, entry.slug).toBeDefined()
@@ -232,7 +232,7 @@ describe('spell modeling audit (srd-cc-5.2.1)', () => {
 
   it('derives prose-only for reviewed spells without resolution', () => {
     const proseOnly = audit.entries.filter((entry) => !entry.hasResolution)
-    expect(proseOnly).toHaveLength(86)
+    expect(proseOnly).toHaveLength(92)
     for (const entry of proseOnly) {
       expect(entry.effectiveStatus).toBe('prose-only')
       expect(entry.explicitStatus).toBeUndefined()

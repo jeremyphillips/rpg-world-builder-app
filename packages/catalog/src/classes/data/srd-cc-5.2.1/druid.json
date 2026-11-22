@@ -116,7 +116,22 @@
         },
         "extension": "carryForward"
       }
-    }
+    },
+    "recommendations": [
+      {
+        "target": "cantrips",
+        "spellIds": ["srd-cc-5.2.1:druidcraft", "srd-cc-5.2.1:produce-flame"]
+      },
+      {
+        "target": "level1Plus",
+        "spellIds": [
+          "srd-cc-5.2.1:animal-friendship",
+          "srd-cc-5.2.1:cure-wounds",
+          "srd-cc-5.2.1:faerie-fire",
+          "srd-cc-5.2.1:thunderwave"
+        ]
+      }
+    ]
   },
   "proficiencies": {
     "savingThrows": ["int", "wis"],

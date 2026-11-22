@@ -215,7 +215,24 @@
         },
         "extension": "carryForward"
       }
-    }
+    },
+    "recommendations": [
+      {
+        "target": "cantrips",
+        "spellIds": ["srd-cc-5.2.1:light", "srd-cc-5.2.1:mage-hand", "srd-cc-5.2.1:ray-of-frost"]
+      },
+      {
+        "target": "level1Plus",
+        "spellIds": [
+          "srd-cc-5.2.1:detect-magic",
+          "srd-cc-5.2.1:feather-fall",
+          "srd-cc-5.2.1:mage-armor",
+          "srd-cc-5.2.1:magic-missile",
+          "srd-cc-5.2.1:sleep",
+          "srd-cc-5.2.1:thunderwave"
+        ]
+      }
+    ]
   },
   "proficiencies": {
     "savingThrows": ["int", "wis"],

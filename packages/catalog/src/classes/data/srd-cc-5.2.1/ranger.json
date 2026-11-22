@@ -77,7 +77,13 @@
         },
         "extension": "carryForward"
       }
-    }
+    },
+    "recommendations": [
+      {
+        "target": "level1Plus",
+        "spellIds": ["srd-cc-5.2.1:cure-wounds", "srd-cc-5.2.1:ensnaring-strike"]
+      }
+    ]
   },
   "proficiencies": {
     "savingThrows": ["str", "dex"],
