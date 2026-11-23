@@ -4,7 +4,10 @@ import type {
   EquipmentPool,
   GrantedEquipmentItem,
 } from '@rpg/contracts'
-import { formatEquipmentGrantSentence, formatEquipmentPoolLabel } from '@rpg/contracts'
+import {
+  formatEquipmentGrantSentenceFromResolutions,
+  formatEquipmentPoolLabel,
+} from '@rpg/contracts'
 import type { FieldOption } from '@rpg/ui/form'
 
 import { formatCompactMetadataList } from '../grant-compact-metadata.lib'
@@ -15,11 +18,23 @@ import type {
   EquipmentGrantItemForm,
   GrantedEquipmentItemForm,
 } from './equipment-grant-form-fields'
+import type { GrantEquipmentReferencePresentation } from '../grant-row-presentation.lib'
 
-function formatExplicitPoolTitle(slugs: string[], equipmentOptions: FieldOption[]): string {
-  const labels = slugs.map(
-    (slug) => equipmentOptions.find((option) => option.value === slug)?.label ?? slug,
-  )
+function equipmentSlugsFromGrantRow(row: EquipmentGrantItemForm): string[] {
+  if (row.itemKind === 'grant' && row.equipmentSlug) {
+    return [row.equipmentSlug]
+  }
+  if (row.itemKind === 'choice' && row.poolSource === 'explicit') {
+    return row.poolEquipmentSlugs ?? []
+  }
+  return []
+}
+
+function formatExplicitPoolTitle(
+  slugs: string[],
+  equipmentReferences: GrantEquipmentReferencePresentation,
+): string {
+  const labels = slugs.map((slug) => equipmentReferences.displayName(slug))
   return labels.length <= 2 ? labels.join(', ') : `${labels.length} items`
 }
 
@@ -204,20 +219,21 @@ function equipmentGrantTitleForProficiencyChoice(
 function equipmentGrantTitleForEquipmentGrant(
   row: GrantedEquipmentItemForm,
   index: number,
-  equipmentOptions: FieldOption[],
+  equipmentReferences: GrantEquipmentReferencePresentation,
 ): string {
-  const label = equipmentOptions.find((option) => option.value === row.equipmentSlug)?.label
-  const name = label ?? row.equipmentSlug ?? `Item ${index + 1}`
+  const slug = row.equipmentSlug
+  if (!slug) return `Item ${index + 1}`
+  const name = equipmentReferences.displayName(slug)
   return formatQuantityPrefixedLabel(name, row.quantity ?? 1)
 }
 
 function equipmentGrantTitleForChoice(
   row: EquipmentGrantChoiceItemForm,
   index: number,
-  equipmentOptions: FieldOption[],
+  equipmentReferences: GrantEquipmentReferencePresentation,
 ): string {
   const choose = row.choose ?? 1
-  const poolLabel = resolveChoicePoolLabel(row, equipmentOptions)
+  const poolLabel = resolveChoicePoolLabel(row, equipmentReferences)
   if (!poolLabel) return `Item ${index + 1}`
 
   return `${poolLabel} — choose ${choose}`
@@ -225,10 +241,10 @@ function equipmentGrantTitleForChoice(
 
 function resolveChoicePoolLabel(
   row: EquipmentGrantChoiceItemForm,
-  equipmentOptions: FieldOption[],
+  equipmentReferences: GrantEquipmentReferencePresentation,
 ): string | undefined {
   if (row.poolSource === 'explicit') {
-    return formatExplicitPoolTitle(row.poolEquipmentSlugs ?? [], equipmentOptions)
+    return formatExplicitPoolTitle(row.poolEquipmentSlugs ?? [], equipmentReferences)
   }
 
   if (!row.poolEquipmentKind) return undefined
@@ -239,7 +255,7 @@ function resolveChoicePoolLabel(
 export function equipmentGrantTitle(
   row: EquipmentGrantItemForm | undefined,
   index: number,
-  equipmentOptions: FieldOption[] = [],
+  equipmentReferences: GrantEquipmentReferencePresentation,
   proficiencyChoiceOptions: FieldOption[] = [],
 ): string {
   if (!row) return `Item ${index + 1}`
@@ -248,10 +264,10 @@ export function equipmentGrantTitle(
     if (row.grantTargetSource === 'proficiency_choice') {
       return equipmentGrantTitleForProficiencyChoice(row, index, proficiencyChoiceOptions)
     }
-    return equipmentGrantTitleForEquipmentGrant(row, index, equipmentOptions)
+    return equipmentGrantTitleForEquipmentGrant(row, index, equipmentReferences)
   }
 
-  return equipmentGrantTitleForChoice(row, index, equipmentOptions)
+  return equipmentGrantTitleForChoice(row, index, equipmentReferences)
 }
 
 function equipmentGrantDetailForProficiencyChoice(
@@ -268,34 +284,32 @@ function equipmentGrantDetailForProficiencyChoice(
 
 function equipmentGrantDetailForEquipmentGrant(
   row: GrantedEquipmentItemForm,
-  equipmentOptions: FieldOption[],
+  equipmentReferences: GrantEquipmentReferencePresentation,
 ): string | undefined {
   if (!row.equipmentSlug) return undefined
-  const label = equipmentOptions.find((option) => option.value === row.equipmentSlug)?.label
-  return label ?? row.equipmentSlug
+  return equipmentReferences.displayName(row.equipmentSlug)
 }
 
 function equipmentGrantDetailForChoice(
   row: EquipmentGrantChoiceItemForm,
-  equipmentOptions: FieldOption[],
+  equipmentReferences: GrantEquipmentReferencePresentation,
 ): string | undefined {
   const choose = row.choose ?? 1
   if (row.poolSource === 'explicit') {
-    const labels = (row.poolEquipmentSlugs ?? []).map(
-      (slug) => equipmentOptions.find((option) => option.value === slug)?.label ?? slug,
-    )
+    const slugs = row.poolEquipmentSlugs ?? []
+    const labels = slugs.map((slug) => equipmentReferences.displayName(slug))
     const compact = formatCompactMetadataList(labels)
     return compact ? `${choose} from ${compact}` : undefined
   }
 
-  const poolLabel = resolveChoicePoolLabel(row, equipmentOptions)
+  const poolLabel = resolveChoicePoolLabel(row, equipmentReferences)
   if (!poolLabel) return undefined
   return `${choose} from ${poolLabel}`
 }
 
 export function equipmentGrantDetail(
   row: EquipmentGrantItemForm | undefined,
-  equipmentOptions: FieldOption[] = [],
+  equipmentReferences: GrantEquipmentReferencePresentation,
   proficiencyChoiceOptions: FieldOption[] = [],
 ): string | undefined {
   if (!row?.itemKind) return undefined
@@ -304,10 +318,10 @@ export function equipmentGrantDetail(
     if (row.grantTargetSource === 'proficiency_choice') {
       return equipmentGrantDetailForProficiencyChoice(row, proficiencyChoiceOptions)
     }
-    return equipmentGrantDetailForEquipmentGrant(row, equipmentOptions)
+    return equipmentGrantDetailForEquipmentGrant(row, equipmentReferences)
   }
 
-  return equipmentGrantDetailForChoice(row, equipmentOptions)
+  return equipmentGrantDetailForChoice(row, equipmentReferences)
 }
 
 function isEquipmentGrantSummaryComplete(row: EquipmentGrantItemForm): boolean {
@@ -327,7 +341,7 @@ function isEquipmentGrantSummaryComplete(row: EquipmentGrantItemForm): boolean {
 
 export function equipmentGrantSummary(
   row: EquipmentGrantItemForm | undefined,
-  equipmentOptions: FieldOption[] = [],
+  equipmentReferences: GrantEquipmentReferencePresentation,
 ): string {
   if (!row?.itemKind || !isEquipmentGrantSummaryComplete(row)) return ''
 
@@ -335,8 +349,20 @@ export function equipmentGrantSummary(
     return PROFICIENCY_LINK_SUMMARY
   }
 
-  const resolveEquipmentName = (slug: string) =>
-    equipmentOptions.find((option) => option.value === slug)?.label
+  const slugs = equipmentSlugsFromGrantRow(row)
+  const resolutions = equipmentReferences.outcomes(slugs)
+  return formatEquipmentGrantSentenceFromResolutions(equipmentGrantFromFormRow(row), resolutions)
+}
 
-  return formatEquipmentGrantSentence(equipmentGrantFromFormRow(row), resolveEquipmentName)
+export function equipmentGrantHeadingDetailFromReferences(
+  row: EquipmentGrantItemForm | undefined,
+  equipmentReferences: GrantEquipmentReferencePresentation,
+  proficiencyChoiceOptions: FieldOption[] = [],
+): { detail?: string; description: string } {
+  return {
+    ...(equipmentGrantDetail(row, equipmentReferences, proficiencyChoiceOptions)
+      ? { detail: equipmentGrantDetail(row, equipmentReferences, proficiencyChoiceOptions) }
+      : {}),
+    description: equipmentGrantSummary(row, equipmentReferences),
+  }
 }

@@ -1,6 +1,8 @@
 import {
+  createEquipmentCatalogContext,
   createSpellCatalogContext,
   formatDamageTypeGrantSentence,
+  formatEquipmentGrantSentenceFromResolutions,
   formatFeatChoiceGrantSentence,
   formatLanguageGrantSentence,
   formatMovementGrantAuthoringSummary,
@@ -9,10 +11,19 @@ import {
   formatSenseGrantSentence,
   formatSpellsGrantSentenceFromResolutions,
   getFeatCategorySentenceForm,
+  presentEquipmentReferenceDisplayName,
   presentSpellReferenceDisplayName,
+  resolveEquipmentSlugReference,
+  resolveEquipmentSlugReferenceOutcomes,
   resolveSpellReferenceOutcome,
   resolveSpellReferenceOutcomes,
+  type AuthoringEquipmentCatalogStatus,
   type AuthoringSpellCatalogStatus,
+  type Equipment,
+  type EquipmentCatalogContext,
+  type EquipmentCatalogScope,
+  type EquipmentReferenceResolution,
+  type EquipmentSlugReference,
   type FeatCategory,
   type MovementGrantPayload,
   type MovementMode,
@@ -59,9 +70,16 @@ export type GrantSpellReferencePresentation = {
   outcomes(spellIds: readonly SpellReference[]): SpellReferenceResolution[]
 }
 
+export type GrantEquipmentReferencePresentation = {
+  catalog: EquipmentCatalogContext
+  scope: EquipmentCatalogScope
+  displayName(slug: EquipmentSlugReference): string
+  outcomes(slugs: readonly EquipmentSlugReference[]): EquipmentReferenceResolution[]
+}
+
 export type GrantRowHeaderContext = {
   rowLabels: Record<string, string>
-  equipmentOptions: FieldOption[]
+  equipmentReferences: GrantEquipmentReferencePresentation
   weaponOptions: FieldOption[]
   toolOptions: FieldOption[]
   armorOptions: FieldOption[]
@@ -94,6 +112,38 @@ export function buildGrantSpellReferencePresentationFromAuthoring(args: {
     createSpellCatalogContext({
       status: args.status ?? 'pending',
       spellsById: args.spellsById,
+    }),
+  )
+}
+
+export function buildGrantEquipmentReferencePresentation(
+  catalog: EquipmentCatalogContext,
+): GrantEquipmentReferencePresentation {
+  const { scope } = catalog
+  return {
+    catalog,
+    scope,
+    displayName(slug) {
+      return presentEquipmentReferenceDisplayName(
+        resolveEquipmentSlugReference(slug, catalog, scope),
+      )
+    },
+    outcomes(slugs) {
+      return resolveEquipmentSlugReferenceOutcomes(slugs, catalog, scope)
+    },
+  }
+}
+
+export function buildGrantEquipmentReferencePresentationFromAuthoring(args: {
+  status?: AuthoringEquipmentCatalogStatus
+  scope: EquipmentCatalogScope
+  equipmentById?: ReadonlyMap<string, Equipment>
+}): GrantEquipmentReferencePresentation {
+  return buildGrantEquipmentReferencePresentation(
+    createEquipmentCatalogContext({
+      status: args.status ?? 'pending',
+      scope: args.scope,
+      equipmentById: args.equipmentById,
     }),
   )
 }
@@ -295,7 +345,7 @@ const GRANT_ROW_DESCRIPTION_BY_TYPE: Partial<Record<string, GrantRowDescriptionF
     })
   },
   equipment: (values, ctx) =>
-    equipmentGrantSummary(values as EquipmentGrantItemForm, ctx.equipmentOptions),
+    equipmentGrantSummary(values as EquipmentGrantItemForm, ctx.equipmentReferences),
   weaponProficiency: (values, ctx) =>
     weaponProficiencyGrantSummary(values as WeaponProficiencyItemForm, ctx.weaponOptions),
   toolProficiency: (values, ctx) =>

@@ -79,6 +79,7 @@ import { buildGrantArrayAddMenu } from './grant-add-menu.lib'
 import { grantFieldLabel } from './grant-field-terms'
 import { createGrantArrayItemShell } from './grant-array-item-shell.lib'
 import {
+  buildGrantEquipmentReferencePresentationFromAuthoring,
   buildGrantSpellReferencePresentationFromAuthoring,
   movementFormValuesToGrantPayload,
   resolveGrantRowPresentation,
@@ -765,7 +766,14 @@ function buildGrantRowHeaderContext(
     resolveDamageTypeLabel: (id) => getDamageTypeLabelFromVocabulary(damageTypeVocabulary, id),
     resolveLanguageLabel: (id) => getLanguageLabelFromVocabulary(languageVocabulary, id),
     resolveSenseLabel: (id) => getSenseLabelFromVocabulary(senseVocabulary, id),
-    equipmentOptions: referenceEquipmentFieldOptions(ctx.options?.equipment),
+    equipmentReferences: buildGrantEquipmentReferencePresentationFromAuthoring({
+      status: ctx.equipmentCatalogStatus,
+      equipmentById: ctx.equipmentCatalogById,
+      scope: {
+        rulesetId: ctx.rulesetId ?? '',
+        campaignId: ctx.campaignId ?? '',
+      },
+    }),
     weaponOptions: toSortedContentFieldOptions(
       referenceEquipment.filter(isWeaponEquipment),
       'equipment',

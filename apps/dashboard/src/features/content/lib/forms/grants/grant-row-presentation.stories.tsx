@@ -1,12 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
-import type { Spell } from '@rpg/contracts'
+import type { Equipment, Spell } from '@rpg/contracts'
 import { Text } from '@rpg/ui'
 
 import { EntityCard } from '../../entity/surfaces/cards/content/entity-card'
 import { projectArrayItemEntitySummary } from '../../entity/surfaces/cards/disclosure/array-item-entity-summary.lib'
 import { GRANT_ROW_TYPE_LABELS } from './grant-form-schema'
 import {
+  buildGrantEquipmentReferencePresentationFromAuthoring,
   buildGrantSpellReferencePresentationFromAuthoring,
   formatGrantRowToolbarAriaLabel,
   omitRedundantGrantDetail,
@@ -16,7 +17,15 @@ import {
 
 const headerContext = {
   rowLabels: GRANT_ROW_TYPE_LABELS,
-  equipmentOptions: [{ value: 'longsword', label: 'Longsword' }],
+  equipmentReferences: buildGrantEquipmentReferencePresentationFromAuthoring({
+    status: 'ready',
+    scope: { rulesetId: 'srd-cc-5.2.1', campaignId: 'campaign-1' },
+    equipmentById: new Map(
+      [{ id: 'srd-cc-5.2.1:longsword', slug: 'longsword', name: 'Longsword' } as Equipment].map(
+        (item) => [item.id, item],
+      ),
+    ),
+  }),
   weaponOptions: [{ value: 'longsword', label: 'Longsword' }],
   toolOptions: [{ value: 'thieves-tools', label: "Thieves' Tools" }],
   armorOptions: [],

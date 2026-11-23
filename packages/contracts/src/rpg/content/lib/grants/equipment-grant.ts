@@ -48,6 +48,10 @@ import {
   weaponCategorySchema,
 } from '../../../vocab/weapon/category'
 import { getTermSentenceForm, pluralizeTermLabel } from '../../../vocab/types'
+import {
+  presentEquipmentReferenceDisplayName,
+  type EquipmentReferenceResolution,
+} from '../../equipment/equipment-reference'
 import { formatVocabularySlugLabel } from '../../../vocab/format-slug-label'
 import {
   equipmentKindSchema,
@@ -418,13 +422,18 @@ function formatEquipmentPoolSentenceForm(
   return pluralizeTermLabel(fallbackLabel)
 }
 
-/** Human-readable summary for equipment grant array item headers. */
-export function formatEquipmentGrantSentence(
+function equipmentNamesFromGrantResolutions(
+  resolutions: readonly EquipmentReferenceResolution[],
+): string[] {
+  return resolutions.map(presentEquipmentReferenceDisplayName)
+}
+
+function formatEquipmentGrantSentenceWithNames(
   grant: EquipmentGrant,
-  resolveEquipmentName?: (slug: string) => string | undefined,
+  names: readonly string[],
 ): string {
   if (grant.kind === 'grant') {
-    const name = resolveEquipmentName?.(grant.equipmentSlug) ?? grant.equipmentSlug
+    const name = names[0]
     if (!name) return ''
     const quantity = grant.quantity ?? 1
     if (quantity === 1) {
@@ -437,7 +446,6 @@ export function formatEquipmentGrantSentence(
   const pool = grant.pool
 
   if (pool.source === 'explicit') {
-    const names = pool.equipmentSlugs.map((slug) => resolveEquipmentName?.(slug) ?? slug)
     const itemWord = choose === 1 ? 'item' : 'items'
     return `Character chooses ${choose} ${itemWord} from: ${names.join(', ')}.`
   }
@@ -445,6 +453,36 @@ export function formatEquipmentGrantSentence(
   const poolForm = formatEquipmentPoolSentenceForm(pool, choose)
   if (!poolForm) return ''
   return `Character chooses ${choose} ${poolForm}.`
+}
+
+/** Human-readable summary for equipment grant array item headers. */
+export function formatEquipmentGrantSentence(
+  grant: EquipmentGrant,
+  resolveEquipmentName?: (slug: string) => string | undefined,
+): string {
+  if (grant.kind === 'grant') {
+    const name = resolveEquipmentName?.(grant.equipmentSlug) ?? grant.equipmentSlug
+    return formatEquipmentGrantSentenceWithNames(grant, name ? [name] : [])
+  }
+
+  const pool = grant.pool
+  if (pool.source === 'explicit') {
+    const names = pool.equipmentSlugs.map((slug) => resolveEquipmentName?.(slug) ?? slug)
+    return formatEquipmentGrantSentenceWithNames(grant, names)
+  }
+
+  return formatEquipmentGrantSentenceWithNames(grant, [])
+}
+
+/** Equipment grant summary from pre-resolved catalog outcomes — preferred for dashboard UI. */
+export function formatEquipmentGrantSentenceFromResolutions(
+  grant: EquipmentGrant,
+  resolutions: readonly EquipmentReferenceResolution[],
+): string {
+  return formatEquipmentGrantSentenceWithNames(
+    grant,
+    equipmentNamesFromGrantResolutions(resolutions),
+  )
 }
 
 export type EquipmentGrantCompactResolver = {

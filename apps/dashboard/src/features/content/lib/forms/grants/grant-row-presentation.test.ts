@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { SPELL_REFERENCE_DISPLAY_MESSAGES, type Spell } from '@rpg/contracts'
+import {
+  EQUIPMENT_REFERENCE_DISPLAY_MESSAGES,
+  SPELL_REFERENCE_DISPLAY_MESSAGES,
+  type Equipment,
+  type Spell,
+} from '@rpg/contracts'
 
 import {
   buildSeedDamageTypeVocabulary,
@@ -13,6 +18,7 @@ import {
 
 import { GRANT_ROW_TYPE_LABELS } from './grant-form-schema'
 import {
+  buildGrantEquipmentReferencePresentationFromAuthoring,
   buildGrantSpellReferencePresentationFromAuthoring,
   formatCompactMetadataList,
   formatGrantRowDisclosureAriaLabel,
@@ -44,12 +50,43 @@ const seedDamageTypes = buildSeedDamageTypeVocabulary()
 const seedLanguages = buildSeedLanguageVocabulary()
 const seedSenses = buildSeedSenseVocabulary()
 
+const testEquipmentScope = { rulesetId: 'srd-cc-5.2.1', campaignId: 'campaign-1' }
+
+function equipmentCatalog(
+  entries: Array<{ id: string; slug: string; name: string; status?: string }>,
+): ReadonlyMap<string, Equipment> {
+  return new Map(
+    entries.map(
+      (entry) =>
+        [
+          entry.id,
+          {
+            id: entry.id,
+            slug: entry.slug,
+            name: entry.name,
+            rulesetId: testEquipmentScope.rulesetId,
+            catalogLayer: 'system',
+            campaignId: null,
+            status: entry.status ?? 'published',
+          } as Equipment,
+        ] as const,
+    ),
+  )
+}
+
 const headerContext = {
   rowLabels: GRANT_ROW_TYPE_LABELS,
   resolveDamageTypeLabel: (id: string) => getDamageTypeLabelFromVocabulary(seedDamageTypes, id),
   resolveLanguageLabel: (id: string) => getLanguageLabelFromVocabulary(seedLanguages, id),
   resolveSenseLabel: (id: string) => getSenseLabelFromVocabulary(seedSenses, id),
-  equipmentOptions: [],
+  equipmentReferences: buildGrantEquipmentReferencePresentationFromAuthoring({
+    status: 'ready',
+    scope: testEquipmentScope,
+    equipmentById: equipmentCatalog([
+      { id: 'srd-cc-5.2.1:longsword', slug: 'longsword', name: 'Longsword' },
+      { id: 'srd-cc-5.2.1:dagger', slug: 'dagger', name: 'Dagger', status: 'draft' },
+    ]),
+  }),
   weaponOptions: [{ value: 'longsword', label: 'Longsword' }],
   toolOptions: [{ value: 'thieves-tools', label: "Thieves' Tools" }],
   armorOptions: [],
@@ -113,6 +150,35 @@ describe('grant spell reference presentation', () => {
     })
     expect(presentation.displayName('srd-cc-5.2.1:aid')).toBe(
       SPELL_REFERENCE_DISPLAY_MESSAGES.catalogLoading,
+    )
+  })
+})
+
+describe('grant equipment reference presentation', () => {
+  it('resolves display names from the authoritative catalog, not pickers', () => {
+    const presentation = buildGrantEquipmentReferencePresentationFromAuthoring({
+      status: 'ready',
+      scope: testEquipmentScope,
+      equipmentById: equipmentCatalog([
+        { id: 'srd-cc-5.2.1:dagger', slug: 'dagger', name: 'Dagger', status: 'draft' },
+      ]),
+    })
+    expect(presentation.displayName('dagger')).toBe('Dagger')
+    expect(presentation.displayName('missing-slug')).toBe(
+      EQUIPMENT_REFERENCE_DISPLAY_MESSAGES.unknownEquipment,
+    )
+  })
+
+  it('does not fabricate names while the catalog is loading', () => {
+    const presentation = buildGrantEquipmentReferencePresentationFromAuthoring({
+      status: 'pending',
+      scope: testEquipmentScope,
+      equipmentById: equipmentCatalog([
+        { id: 'srd-cc-5.2.1:longsword', slug: 'longsword', name: 'Longsword' },
+      ]),
+    })
+    expect(presentation.displayName('longsword')).toBe(
+      EQUIPMENT_REFERENCE_DISPLAY_MESSAGES.catalogLoading,
     )
   })
 })
@@ -205,6 +271,20 @@ describe('resolveGrantRowPresentation', () => {
       expected: {
         heading: 'Damage resistance',
         detail: 'Cold',
+      },
+    },
+    {
+      name: 'equipment grant',
+      values: {
+        grantType: 'equipment',
+        itemKind: 'grant',
+        grantTargetSource: 'equipment',
+        equipmentSlug: 'dagger',
+        quantity: 1,
+      },
+      expected: {
+        heading: 'Equipment',
+        descriptionIncludes: 'dagger',
       },
     },
   ])('$name', ({ values, expected }) => {

@@ -32,6 +32,8 @@ export type EquipmentInstanceSummary = {
 
 export type ResolveEquipmentInstanceSummaryOptions = {
   visiblePropertyNameLimit?: number
+  /** Canonical catalog label when `item` is undefined (from `presentEquipmentReferenceDisplayName`). */
+  unresolvedCatalogName?: string
 }
 
 function resolveEnhancementBonus(magic: ResolvedEquipmentMagicProperties): number | undefined {
@@ -89,10 +91,11 @@ function resolveDisplayName(args: {
   entry: EquipmentInstance
   item: Equipment | undefined
   enhancementBonus: number | undefined
+  unresolvedCatalogName?: string
 }): string {
-  const { entry, item, enhancementBonus } = args
+  const { entry, item, enhancementBonus, unresolvedCatalogName } = args
   if (entry.customName) return entry.customName
-  if (!item) return entry.equipmentId
+  if (!item) return unresolvedCatalogName ?? entry.equipmentId
   if (enhancementBonus === undefined) return item.name
   return `${item.name} ${formatSignedModifier(enhancementBonus)}`
 }
@@ -109,7 +112,12 @@ export function resolveEquipmentInstanceSummary(
 
   const magic = item ? resolveEquipmentMagicProperties(normalized, item, provider) : undefined
   const enhancementBonus = magic ? resolveEnhancementBonus(magic) : undefined
-  const displayName = resolveDisplayName({ entry: normalized, item, enhancementBonus })
+  const displayName = resolveDisplayName({
+    entry: normalized,
+    item,
+    enhancementBonus,
+    unresolvedCatalogName: options?.unresolvedCatalogName,
+  })
 
   const metadataSegments = item
     ? buildPropertyNameSegments({

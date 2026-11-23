@@ -75,7 +75,10 @@ export type ContentFormCtx = {
   /** Campaign-resolved weapon property labels and active ids. */
   weaponPropertyVocabulary?: WeaponPropertyVocabulary
   options?: Partial<ContentFormOptionSets>
-  /** Full effective equipment catalog for monster catalog rules and derived AC. */
+  /**
+   * Equipment keyed by canonical `equipment.id` from the campaign list query.
+   * Authoritative for reference **resolution** — includes drafts not shown in `forReference()` pickers.
+   */
   equipmentCatalogById?: ReadonlyMap<string, Equipment>
   /** Effective skill proficiencies keyed by slug for monster catalog rules. */
   skillCatalogBySlug?: ReadonlyMap<string, SkillProficiency>

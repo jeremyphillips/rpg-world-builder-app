@@ -17,7 +17,7 @@ import {
   wealthGrantMoneyFromForm,
 } from '../../../lib/forms/fields/content-economy-form-fields'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
-import { referenceEquipmentFieldOptions } from '../../../lib/form-options/content-field-option.lib'
+import { buildGrantEquipmentReferencePresentationFromAuthoring } from '../../../lib/forms/grants/grant-row-presentation.lib'
 import {
   equipmentGrantChoiceItemFormSchema,
   equipmentGrantItemFields,
@@ -220,11 +220,11 @@ export function startingEquipmentOptionCompactSummary(
 export function startingEquipmentItemTitle(
   row: StartingEquipmentItemForm | undefined,
   _index: number,
-  equipmentOptions: FieldOption[] = [],
+  equipmentReferences: Parameters<typeof resolveStartingEquipmentRowPresentation>[1],
   proficiencyChoiceOptions: FieldOption[] = [],
 ): string | undefined {
   return (
-    resolveStartingEquipmentRowPresentation(row, equipmentOptions, proficiencyChoiceOptions)
+    resolveStartingEquipmentRowPresentation(row, equipmentReferences, proficiencyChoiceOptions)
       ?.detail ?? undefined
   )
 }
@@ -329,7 +329,14 @@ export function startingEquipmentItemFields(ctx: ContentFormCtx): FormItem[] {
 }
 
 export function startingEquipmentOptionItemFields(ctx: ContentFormCtx): FormItem[] {
-  const equipmentOptions = referenceEquipmentFieldOptions(ctx.options?.equipment)
+  const equipmentReferences = buildGrantEquipmentReferencePresentationFromAuthoring({
+    status: ctx.equipmentCatalogStatus,
+    equipmentById: ctx.equipmentCatalogById,
+    scope: {
+      rulesetId: ctx.rulesetId ?? '',
+      campaignId: ctx.campaignId ?? '',
+    },
+  })
   const proficiencyChoiceOptions = ctx.options?.proficiencyChoiceTargets ?? []
 
   return [
@@ -364,17 +371,20 @@ export function startingEquipmentOptionItemFields(ctx: ContentFormCtx): FormItem
           primary: (values) =>
             resolveStartingEquipmentRowPresentation(
               values as StartingEquipmentItemForm | undefined,
-              equipmentOptions,
+              equipmentReferences,
               proficiencyChoiceOptions,
             )?.heading,
           summary: (values) =>
             resolveStartingEquipmentRowPresentation(
               values as StartingEquipmentItemForm | undefined,
-              equipmentOptions,
+              equipmentReferences,
               proficiencyChoiceOptions,
             )?.description ?? '',
         },
-        renderShell: createStartingEquipmentItemShell(equipmentOptions, proficiencyChoiceOptions),
+        renderShell: createStartingEquipmentItemShell(
+          equipmentReferences,
+          proficiencyChoiceOptions,
+        ),
       },
       fields: startingEquipmentItemFields(ctx),
     },

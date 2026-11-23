@@ -10,6 +10,7 @@ import type { Spell } from '@rpg/contracts'
 import { createGrantArrayItemShell } from './grant-array-item-shell.lib'
 import { GRANT_ROW_TYPE_LABELS } from './grant-form-schema'
 import {
+  buildGrantEquipmentReferencePresentationFromAuthoring,
   buildGrantSpellReferencePresentationFromAuthoring,
   resolveGrantRowPresentation,
 } from './grant-row-presentation.lib'
@@ -29,7 +30,11 @@ const formSchema = z.object({
 
 const grantHeaderContext = {
   rowLabels: GRANT_ROW_TYPE_LABELS,
-  equipmentOptions: [],
+  equipmentReferences: buildGrantEquipmentReferencePresentationFromAuthoring({
+    status: 'ready',
+    scope: { rulesetId: 'srd-cc-5.2.1', campaignId: 'campaign-1' },
+    equipmentById: new Map(),
+  }),
   weaponOptions: [],
   toolOptions: [],
   armorOptions: [],

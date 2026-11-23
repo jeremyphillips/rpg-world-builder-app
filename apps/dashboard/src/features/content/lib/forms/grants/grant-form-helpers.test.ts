@@ -23,7 +23,10 @@ import {
   GRANT_TYPE_MISSING_PRIMARY,
   type GrantRowHeaderContext,
 } from './grant-form-fields'
-import { buildGrantSpellReferencePresentationFromAuthoring } from './grant-row-presentation.lib'
+import {
+  buildGrantEquipmentReferencePresentationFromAuthoring,
+  buildGrantSpellReferencePresentationFromAuthoring,
+} from './grant-row-presentation.lib'
 import {
   GRANT_ROW_TYPE_LABELS,
   GRANT_ROW_TYPES,
@@ -100,6 +103,7 @@ function walkDuplicateFormItemKeys(
       )
       continue
     }
+    if (!('fields' in item) || !item.fields) continue
     walkDuplicateFormItemKeys(item.fields, namePrefix, duplicates)
   }
 
@@ -457,7 +461,11 @@ describe('grant row summaries', () => {
         },
         {
           rowLabels: GRANT_ROW_TYPE_LABELS,
-          equipmentOptions: [],
+          equipmentReferences: buildGrantEquipmentReferencePresentationFromAuthoring({
+            status: 'ready',
+            scope: { rulesetId: 'srd-cc-5.2.1', campaignId: 'campaign-1' },
+            equipmentById: new Map(),
+          }),
           weaponOptions: [],
           toolOptions: [],
           armorOptions: [],
@@ -483,7 +491,11 @@ describe('grant row summaries', () => {
 
 const grantRowHeaderContext = {
   rowLabels: GRANT_ROW_TYPE_LABELS,
-  equipmentOptions: [],
+  equipmentReferences: buildGrantEquipmentReferencePresentationFromAuthoring({
+    status: 'ready',
+    scope: { rulesetId: 'srd-cc-5.2.1', campaignId: 'campaign-1' },
+    equipmentById: new Map(),
+  }),
   weaponOptions: [],
   toolOptions: [],
   armorOptions: [],

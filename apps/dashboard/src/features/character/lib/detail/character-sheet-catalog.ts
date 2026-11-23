@@ -1,7 +1,10 @@
 import {
   buildEquipmentCompactSummary,
   CHARACTER_EQUIPMENT_INVENTORY_BUCKETS,
+  createEquipmentCatalogContext,
   createSpellCatalogContext,
+  presentEquipmentReferenceDisplayName,
+  resolveEquipmentIdReference,
   formatSelectionSourceLabel,
   formatSpellConcentrationMarker,
   formatSpellRitualMarker,
@@ -23,7 +26,6 @@ import {
 
 import type { CatalogMetadataLine } from '@/features/content'
 
-import { formatContentReferenceLabel } from '../display/format-content-reference-label'
 import {
   buildMissingCatalogCard,
   buildResolvedCatalogCard,
@@ -125,12 +127,37 @@ function normalizeSheetSources(
   return [{ label }]
 }
 
+function resolveEquipmentCatalogScope(catalogIndex: CharacterBuildCatalogIndex): {
+  rulesetId: string
+  campaignId: string
+} {
+  const sample = catalogIndex.equipment.values().next().value
+  return {
+    rulesetId: sample?.rulesetId ?? 'srd-cc-5.2.1',
+    campaignId: sample?.campaignId ?? '',
+  }
+}
+
 function resolveEquipmentDisplayName(
   entry: CharacterEquipmentEntry,
   catalogIndex: CharacterBuildCatalogIndex,
 ): string {
+  if (entry.customName) return entry.customName
   const equipment = catalogIndex.equipment.get(entry.equipmentId)
-  return entry.customName ?? equipment?.name ?? formatContentReferenceLabel(entry.equipmentId)
+  if (equipment) return equipment.name
+
+  const scope = resolveEquipmentCatalogScope(catalogIndex)
+  return presentEquipmentReferenceDisplayName(
+    resolveEquipmentIdReference(
+      entry.equipmentId,
+      createEquipmentCatalogContext({
+        status: 'ready',
+        scope,
+        equipmentById: catalogIndex.equipment,
+      }),
+      scope,
+    ),
+  )
 }
 
 function resolveEquipmentOccurrenceId(

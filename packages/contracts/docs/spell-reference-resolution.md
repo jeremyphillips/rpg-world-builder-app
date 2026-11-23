@@ -84,7 +84,7 @@ P0–P2 spell-reference display paths are migrated. **Deferred (P3):** class-dis
 
 ## Cross-domain note
 
-Equipment, skills, and slug-keyed content types use different reference keys. Reuse the **pattern** (lifecycle + exact lookup + display table), not spell id rules.
+Equipment, skills, and slug-keyed content types use different reference keys. Reuse the **pattern** (lifecycle + exact lookup + display table), not spell id rules. Equipment detail: [equipment-reference-resolution.md](./equipment-reference-resolution.md). Shared lifecycle: [`catalog-lifecycle.ts`](../src/rpg/content/lib/catalog-lifecycle.ts).
 
 ## Implementation phases
 

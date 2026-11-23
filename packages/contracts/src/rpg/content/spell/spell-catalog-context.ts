@@ -1,16 +1,18 @@
-import { getContentTypeCapitalizedSentenceLabel } from '../../primitives/content/content-type-terms'
-
+import {
+  catalogLifecycleDisplayMessage,
+  catalogLifecycleUnresolvedReason,
+  isCatalogAuthoritativeForReferenceLookup,
+  mapAuthoringCatalogLoadState,
+  type AuthoringCatalogStatus,
+  type CatalogLoadState,
+} from '../lib/catalog-lifecycle'
 import type { Spell } from './body'
 import type { SpellReference } from './spell-reference'
 
-/**
- * Authoritative catalog lifecycle for spell **presentation** resolution.
- * Validation uses `ready | unavailable` only; do not collapse loading and error for UI.
- */
-export type SpellCatalogLoadState = 'loading' | 'error' | 'ready'
+export type SpellCatalogLoadState = CatalogLoadState
 
 /** Dashboard `ContentFormCtx.spellCatalogStatus` and equivalent authoring query states. */
-export type AuthoringSpellCatalogStatus = 'pending' | 'ready' | 'error'
+export type AuthoringSpellCatalogStatus = AuthoringCatalogStatus
 
 /**
  * Bundle passed to spell reference outcome resolution (Phase B).
@@ -35,22 +37,11 @@ export type SpellReferenceUnresolvedReason =
 
 export const SPELL_REFERENCE_DISPLAY_MESSAGES = {
   unknownSpell: 'Spell reference unavailable',
-  catalogLoading: `Loading ${getContentTypeCapitalizedSentenceLabel('spells', { plural: true })}…`,
-  catalogError: `Could not load ${getContentTypeCapitalizedSentenceLabel('spells', { plural: true })}.`,
+  catalogLoading: catalogLifecycleDisplayMessage('spells', 'catalog-loading'),
+  catalogError: catalogLifecycleDisplayMessage('spells', 'catalog-error'),
 } as const
 
-export function mapAuthoringSpellCatalogLoadState(
-  status: AuthoringSpellCatalogStatus,
-): SpellCatalogLoadState {
-  switch (status) {
-    case 'pending':
-      return 'loading'
-    case 'error':
-      return 'error'
-    case 'ready':
-      return 'ready'
-  }
-}
+export const mapAuthoringSpellCatalogLoadState = mapAuthoringCatalogLoadState
 
 export function createSpellCatalogContext(args: {
   status: AuthoringSpellCatalogStatus
@@ -63,11 +54,8 @@ export function createSpellCatalogContext(args: {
 }
 
 /** True when `spellsById.get(ref)` may establish not-found (`unknown-spell`). */
-export function isSpellCatalogAuthoritativeForReferenceLookup(
-  loadState: SpellCatalogLoadState,
-): boolean {
-  return loadState === 'ready'
-}
+export const isSpellCatalogAuthoritativeForReferenceLookup =
+  isCatalogAuthoritativeForReferenceLookup
 
 /**
  * Maps lifecycle to the presentation reason used before per-id lookup.
@@ -76,9 +64,7 @@ export function isSpellCatalogAuthoritativeForReferenceLookup(
 export function spellCatalogLifecycleUnresolvedReason(
   loadState: SpellCatalogLoadState,
 ): Exclude<SpellReferenceUnresolvedReason, 'unknown-spell' | 'catalog-unavailable'> | undefined {
-  if (loadState === 'loading') return 'catalog-loading'
-  if (loadState === 'error') return 'catalog-error'
-  return undefined
+  return catalogLifecycleUnresolvedReason(loadState)
 }
 
 export function spellReferenceDisplayMessageForUnresolvedReason(
