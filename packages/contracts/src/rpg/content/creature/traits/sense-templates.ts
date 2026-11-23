@@ -37,8 +37,6 @@ function senseTemplateEntry(senseId: SenseId): CreatureTraitTemplate & { senseId
     senseId,
     configSchema: senseTemplateConfigSchema,
     formatName: () => label,
-    formatDescription: (config) =>
-      `You have ${getSenseSentenceForm(senseId)} with a range of ${senseTemplateConfigSchema.parse(config).range} feet.`,
     formatRules: (config, voice: TraitRulesVoice) => {
       const range = senseTemplateConfigSchema.parse(config).range
       return `${traitSubjectCap(voice)} ${traitHasForVoice(voice)} ${getSenseSentenceForm(senseId)} with a range of ${range} feet.`

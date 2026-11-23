@@ -90,3 +90,29 @@ export function formatLimitedUseSentence(use?: RestLimitedUse): string {
   }
   return LIMITED_USE_SENTENCES.fixed[rest](count.value)
 }
+
+type AuthoringHintCell = () => string
+
+/** Recovery copy for limited-use authoring hints — not notation or facing prose. */
+export const LIMITED_USE_AUTHORING_HINTS = {
+  fixed: {
+    short: () => 'You regain all expended uses when you finish a short or long rest.',
+    long: () => 'You regain all expended uses when you finish a long rest.',
+  },
+  'proficiency-bonus': {
+    short: () => 'You regain all expended uses when you finish a short or long rest.',
+    long: () => 'You regain all expended uses when you finish a long rest.',
+  },
+} as const satisfies Record<UseCountKind, Record<RestKind, AuthoringHintCell>>
+
+/** Authoring hint for a rest-based uses limit. Recharge is not accepted. */
+export function formatLimitedUseAuthoringHint(use: RestLimitedUse): string {
+  const described = describeLimitedUse(use)
+  const count = described.count
+  if (!count) return 'You can use this ability at will.'
+  const rest = described.restRecovery.minimumRest
+  if (count.kind === 'proficiency-bonus') {
+    return LIMITED_USE_AUTHORING_HINTS['proficiency-bonus'][rest]()
+  }
+  return LIMITED_USE_AUTHORING_HINTS.fixed[rest]()
+}

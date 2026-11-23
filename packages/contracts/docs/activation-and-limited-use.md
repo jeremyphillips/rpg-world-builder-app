@@ -21,7 +21,7 @@ An absent `limitedUse` means the ability has no limit of its own (at will). Rech
 
 `describeLimitedUse` is the only interpreter. Notation and sentences are exhaustive tables. Adding a count kind, rest kind, or notation style is a compile error until every cell is filled. Recharge cannot be passed to `formatLimitedUseSentence`.
 
-Spell grants store only the `uses` variant (`restLimitedUseSchema`). A grant sentence reads `formatLimitedUseSentence`.
+Spell grants store only the `uses` variant (`restLimitedUseSchema`). A grant sentence reads `formatLimitedUseSentence`. Trait and monster limited-use controls use `formatLimitedUseAuthoringHint` for recovery copy on form hints — not notation or facing prose.
 
 ## Character entitlements
 

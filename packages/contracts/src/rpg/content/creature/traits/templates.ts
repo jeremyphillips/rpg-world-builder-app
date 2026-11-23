@@ -59,8 +59,6 @@ export type CreatureTraitTemplate = {
   senseId?: string
   configSchema: z.ZodTypeAny
   formatName?: (config: unknown) => string
-  /** Authoring hint copy — not facing prose. */
-  formatDescription: (config: unknown) => string
   formatRules: (config: unknown, voice: TraitRulesVoice) => string
   resolveGrants: (config: unknown) => CreatureTraitGrantBody[]
 }
@@ -96,8 +94,6 @@ export const CREATURE_TRAIT_TEMPLATE_ENTRIES = {
     hosts: SPECIES_AND_MONSTER_HOSTS,
     occurrence: 'one',
     configSchema: NO_CONFIG,
-    formatDescription: () =>
-      'This creature has Advantage on saving throws against spells and other magical effects.',
     formatRules: (_config, voice) =>
       `${traitSubjectCap(voice)} ${traitHasForVoice(voice)} Advantage on saving throws against spells and other magical effects.`,
     resolveGrants: () => [
@@ -116,8 +112,6 @@ export const CREATURE_TRAIT_TEMPLATE_ENTRIES = {
     hosts: SPECIES_AND_MONSTER_HOSTS,
     occurrence: 'one',
     configSchema: NO_CONFIG,
-    formatDescription: () =>
-      "This creature has Advantage on an attack roll against a creature if at least one of its allies is within 5 feet of the creature and the ally doesn't have the Incapacitated condition.",
     formatRules: (_config, voice) =>
       `${traitSubjectCap(voice)} ${traitHasForVoice(voice)} Advantage on an attack roll against a creature if at least one of ${traitPossessiveForVoice(voice)} allies is within 5 feet of the creature and the ally doesn't have the Incapacitated condition.`,
     resolveGrants: () => [
@@ -135,8 +129,6 @@ export const CREATURE_TRAIT_TEMPLATE_ENTRIES = {
     hosts: SPECIES_AND_MONSTER_HOSTS,
     occurrence: 'one',
     configSchema: NO_CONFIG,
-    formatDescription: () =>
-      'While in sunlight, this creature has Disadvantage on attack rolls and Wisdom (Perception) checks.',
     formatRules: (_config, voice) =>
       `While in sunlight, ${traitSubjectCap(voice)} ${traitHasForVoice(voice)} Disadvantage on attack rolls and Wisdom (Perception) checks.`,
     resolveGrants: () => [
@@ -158,8 +150,6 @@ export const CREATURE_TRAIT_TEMPLATE_ENTRIES = {
     occurrence: 'one',
     configSchema: legendaryResistanceConfigSchema,
     formatName: () => LEGENDARY_RESISTANCE_LABEL,
-    formatDescription: () =>
-      'If this creature fails a saving throw, it can choose to succeed instead.',
     formatRules: (_config, voice) => traitLegendaryResistanceRulesProse(voice),
     resolveGrants: (config) => {
       const parsed = legendaryResistanceConfigSchema.parse(config)

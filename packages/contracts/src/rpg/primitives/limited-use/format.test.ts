@@ -7,6 +7,7 @@ import {
   LIMITED_USE_NOTATION,
   LIMITED_USE_NOTATION_STYLES,
   RECHARGE_DIE_FACES,
+  formatLimitedUseAuthoringHint,
   formatLimitedUseNotation,
   formatLimitedUseSentence,
   limitedUseDraftSchema,
@@ -148,6 +149,18 @@ describe('limited use notation', () => {
         Record<RestKind, Record<LimitedUseNotationStyle, (count: number) => string>>
       >
     >()
+  })
+})
+
+describe('formatLimitedUseAuthoringHint', () => {
+  it('describes long-rest recovery without per-day notation', () => {
+    expect(
+      formatLimitedUseAuthoringHint({
+        kind: 'uses',
+        count: { kind: 'fixed', value: 3 },
+        recovery: { minimumRest: 'long' },
+      }),
+    ).toBe('You regain all expended uses when you finish a long rest.')
   })
 })
 

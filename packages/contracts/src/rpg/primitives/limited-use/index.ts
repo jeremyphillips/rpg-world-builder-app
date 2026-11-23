@@ -16,7 +16,9 @@ export {
   LIMITED_USE_NOTATION_STYLES,
   LIMITED_USE_SENTENCES,
   RECHARGE_NOTATION,
+  formatLimitedUseAuthoringHint,
   formatLimitedUseNotation,
   formatLimitedUseSentence,
+  LIMITED_USE_AUTHORING_HINTS,
   type LimitedUseNotationStyle,
 } from './format'

@@ -90,7 +90,6 @@ export const MONSTER_LAIR_EXPERIENCE_UNAVAILABLE_STORED =
   'No suggested in-lair XP is available at this CR. Enter a custom amount or remove in-lair XP.'
 export const MONSTER_LEGENDARY_LAIR_USES_HINT =
   "Total uses while in the creature's lair. Leave empty to use the normal count."
-export const MONSTER_LEGENDARY_RESISTANCE_USES_HINT = 'Uses per day. Recovered after a long rest.'
 export const MONSTER_LEGENDARY_RESISTANCE_LAIR_USES_HINT =
   "Total daily uses while in the creature's lair."
 export const MONSTER_MULTIATTACK_USE_LABEL = 'Use Multiattack'
