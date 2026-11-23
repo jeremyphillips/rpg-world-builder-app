@@ -18,8 +18,12 @@ Species, class, and feat traits: [content-types.md](../../../../../../../docs/co
 | [`outside-water-breath-toggle.tsx`](./outside-water-breath-toggle.tsx)     | Controlled hold-breath-outside-water checkbox (preset parameter) |
 | [`outside-water-breath.lib.ts`](./outside-water-breath.lib.ts)             | Duration-present predicate for those optional fields             |
 
-Monster and species template rows both use the template fields. The add menu
-lists template ids from the contract registry.
+Monster and species template rows both use the template fields. Each host’s add
+menu calls `listCreatureTraitTemplatesForRuleset(rulesetId, host)` with an
+explicit host (`'monster'` or `'species'`). Registry entries declare required
+`hosts`; `isCreatureTraitTemplateEligibleForHost` is the shared eligibility
+check for menus, form validation, and API write gates. Sense templates are
+species-only—monsters author senses under Creature Details, not trait templates.
 
 ## What is not here
 

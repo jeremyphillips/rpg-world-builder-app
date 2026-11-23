@@ -97,9 +97,10 @@ export function refinePublishedTraitRow(
     addCustomRefinementIssue(ctx, fieldValidationMessages.requiredText({ label: 'Name' }), ['name'])
   }
   if (row.kind === 'template') {
-    for (const issue of collectCreatureTraitTemplateIssues([
-      { kind: 'template', templateId: row.templateId, config: row.config },
-    ])) {
+    for (const issue of collectCreatureTraitTemplateIssues(
+      [{ kind: 'template', templateId: row.templateId, config: row.config }],
+      { host: 'species' },
+    )) {
       addCustomRefinementIssue(ctx, issue.message, issue.path.slice(1))
     }
   }

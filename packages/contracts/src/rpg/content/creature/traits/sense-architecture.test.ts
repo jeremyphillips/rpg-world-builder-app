@@ -13,7 +13,7 @@ import { proficiencyTestCatalog } from '../../../runtime/character-builder/profi
 import { unlockedGrantChoiceSets } from '../../../runtime/character-builder/resolvers/grants/unlocked-grant-choice-sets'
 import { resolveMechanicalGrantsFromContent } from '../../../runtime/creature/mechanical-grants'
 import type { Species } from '../../species'
-import { createMonsterInputSchema } from '../../monster'
+import { createMonsterDraftInputSchema, createMonsterInputSchema } from '../../monster'
 import {
   formatCreatureSenseCompactLine,
   formatCreatureSenseTraitRulesSentence,
@@ -189,7 +189,30 @@ describe('occurrence refinements', () => {
     expect(result.success).toBe(false)
   })
 
-  it('rejects sense templates on monsters', () => {
+  it('rejects sense templates on monster drafts and publish bodies', () => {
+    const draftBody = {
+      slug: 'bad-monster',
+      name: 'Bad',
+      creatureType: 'humanoid',
+      size: 'medium' as const,
+      alignment: ['neutral'],
+      armorClass: 10,
+      hitPoints: { average: 10 },
+      challengeRating: '0',
+      movement: { walk: 30 },
+      senses: [],
+      traits: [
+        contentTraitSchema.parse({
+          kind: 'template',
+          id: 'dv',
+          templateId: defineSenseTemplate('darkvision'),
+          config: { range: 60 },
+        }),
+      ],
+      actions: [] as const,
+    }
+    expect(createMonsterDraftInputSchema.safeParse(draftBody).success).toBe(false)
+
     const result = createMonsterInputSchema.safeParse({
       slug: 'bad-monster',
       name: 'Bad',

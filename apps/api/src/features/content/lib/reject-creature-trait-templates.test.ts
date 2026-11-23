@@ -1,3 +1,4 @@
+import { defineSenseTemplate } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import { HttpError } from '../../../lib/http-error'
@@ -32,7 +33,7 @@ describe('rejectInvalidCreatureTraitTemplates', () => {
     }
   })
 
-  it('allows custom rows and known templates', () => {
+  it('allows custom rows and known templates on the matching host', () => {
     expect(() =>
       rejectInvalidCreatureTraitTemplates(
         [
@@ -40,7 +41,25 @@ describe('rejectInvalidCreatureTraitTemplates', () => {
           { kind: 'template', id: 'pack', templateId: 'pack-tactics' },
         ],
         ['traits'],
+        { host: 'monster' },
       ),
     ).not.toThrow()
+  })
+
+  it('rejects species-only sense templates on monsters', () => {
+    expect(() =>
+      rejectInvalidCreatureTraitTemplates(
+        [
+          {
+            kind: 'template',
+            id: 'dv',
+            templateId: defineSenseTemplate('darkvision'),
+            config: { range: 60 },
+          },
+        ],
+        ['traits'],
+        { host: 'monster' },
+      ),
+    ).toThrow(HttpError)
   })
 })

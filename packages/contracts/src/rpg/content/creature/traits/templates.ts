@@ -45,7 +45,7 @@ export type CreatureTraitTemplate = {
   label: string
   description: string
   rulesetIds: readonly string[]
-  hosts?: readonly CreatureTraitTemplateHost[]
+  hosts: readonly CreatureTraitTemplateHost[]
   sourcePolicy?: CreatureTraitTemplateSourcePolicy
   acquisitionGroup?: string
   senseId?: string
@@ -56,6 +56,11 @@ export type CreatureTraitTemplate = {
 }
 
 const NO_CONFIG = z.object({}).strict()
+
+const SPECIES_AND_MONSTER_HOSTS = [
+  'species',
+  'monster',
+] as const satisfies readonly CreatureTraitTemplateHost[]
 
 const legendaryResistanceConfigSchema = z.object({
   uses: z.object({
@@ -78,6 +83,7 @@ export const CREATURE_TRAIT_TEMPLATE_ENTRIES = {
     label: 'Magic Resistance',
     description: 'Advantage on saving throws against spells and other magical effects.',
     rulesetIds: [DEFAULT_SYSTEM_RULESET_ID],
+    hosts: SPECIES_AND_MONSTER_HOSTS,
     configSchema: NO_CONFIG,
     formatDescription: () =>
       'This creature has Advantage on saving throws against spells and other magical effects.',
@@ -94,6 +100,7 @@ export const CREATURE_TRAIT_TEMPLATE_ENTRIES = {
     description:
       'Advantage on an attack roll when an ally is adjacent to the target and is not incapacitated.',
     rulesetIds: [DEFAULT_SYSTEM_RULESET_ID],
+    hosts: SPECIES_AND_MONSTER_HOSTS,
     configSchema: NO_CONFIG,
     formatDescription: () =>
       "This creature has Advantage on an attack roll against a creature if at least one of its allies is within 5 feet of the creature and the ally doesn't have the Incapacitated condition.",
@@ -109,6 +116,7 @@ export const CREATURE_TRAIT_TEMPLATE_ENTRIES = {
     label: 'Sunlight Sensitivity',
     description: 'Disadvantage on attack rolls and Wisdom (Perception) checks while in sunlight.',
     rulesetIds: [DEFAULT_SYSTEM_RULESET_ID],
+    hosts: SPECIES_AND_MONSTER_HOSTS,
     configSchema: NO_CONFIG,
     formatDescription: () =>
       'While in sunlight, this creature has Disadvantage on attack rolls and Wisdom (Perception) checks.',
@@ -127,6 +135,7 @@ export const CREATURE_TRAIT_TEMPLATE_ENTRIES = {
     label: LEGENDARY_RESISTANCE_LABEL,
     description: 'Choose to succeed on a failed saving throw a limited number of times per day.',
     rulesetIds: [DEFAULT_SYSTEM_RULESET_ID],
+    hosts: SPECIES_AND_MONSTER_HOSTS,
     configSchema: legendaryResistanceConfigSchema,
     formatName: () => LEGENDARY_RESISTANCE_LABEL,
     formatDescription: () =>
@@ -154,16 +163,24 @@ export function getCreatureTraitTemplate(templateId: string): CreatureTraitTempl
   return CREATURE_TRAIT_TEMPLATE_ENTRIES[templateId as CreatureTraitTemplateId]
 }
 
+/** Whether a registry template may be assigned on the given authoring host. */
+export function isCreatureTraitTemplateEligibleForHost(
+  templateId: string,
+  host: CreatureTraitTemplateHost,
+): boolean {
+  const entry = getCreatureTraitTemplate(templateId)
+  if (!entry) return false
+  return entry.hosts.includes(host)
+}
+
 export function listCreatureTraitTemplatesForRuleset(
   rulesetId: string,
-  host?: CreatureTraitTemplateHost,
+  host: CreatureTraitTemplateHost,
 ): CreatureTraitTemplateId[] {
   return CREATURE_TRAIT_TEMPLATE_IDS.filter((templateId) => {
     const entry = CREATURE_TRAIT_TEMPLATE_ENTRIES[templateId]
     if (!(entry.rulesetIds as readonly string[]).includes(rulesetId)) return false
-    if (!host) return true
-    const hosts = entry.hosts ?? (['species', 'monster'] as const)
-    return hosts.includes(host)
+    return isCreatureTraitTemplateEligibleForHost(templateId, host)
   })
 }
 

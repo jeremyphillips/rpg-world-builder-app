@@ -2,7 +2,11 @@ import type { RefinementCtx } from 'zod'
 
 import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
 import { isSenseCreatureTraitTemplateId } from './sense-templates'
-import { getCreatureTraitTemplate, type CreatureTraitTemplateHost } from './templates'
+import {
+  getCreatureTraitTemplate,
+  isCreatureTraitTemplateEligibleForHost,
+  type CreatureTraitTemplateHost,
+} from './templates'
 
 export type CreatureTraitTemplateIssue = {
   path: (string | number)[]
@@ -18,10 +22,6 @@ const SENSE_DESCRIPTION_OVERRIDE_MESSAGE =
 function templateRecord(value: unknown): Record<string, unknown> | undefined {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) return undefined
   return value as Record<string, unknown>
-}
-
-function templateHosts(templateId: string): readonly CreatureTraitTemplateHost[] {
-  return getCreatureTraitTemplate(templateId)?.hosts ?? (['species', 'monster'] as const)
 }
 
 function configIssuesForTemplate(
@@ -49,7 +49,7 @@ function eligibilityIssuesForTemplate(
   host?: CreatureTraitTemplateHost,
 ): CreatureTraitTemplateIssue[] {
   const issues: CreatureTraitTemplateIssue[] = []
-  if (host && !templateHosts(templateId).includes(host)) {
+  if (host && !isCreatureTraitTemplateEligibleForHost(templateId, host)) {
     issues.push({ path: [index, 'templateId'], message: HOST_INELIGIBLE_MESSAGE })
   }
   if (

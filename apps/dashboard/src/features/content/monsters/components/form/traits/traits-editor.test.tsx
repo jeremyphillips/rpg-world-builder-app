@@ -39,6 +39,17 @@ function Host({
 }
 
 describe('MonsterTraitsEditor', () => {
+  it('does not offer species-only sense templates in the add menu', async () => {
+    const user = userEvent.setup()
+    render(<Host />)
+    await user.click(screen.getByRole('button', { name: 'Add' }))
+    expect(screen.getByRole('menuitem', { name: /Magic Resistance/i })).toBeInTheDocument()
+    expect(screen.queryByRole('menuitem', { name: /^Darkvision$/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('menuitem', { name: /^Blindsight$/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('menuitem', { name: /^Tremorsense$/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('menuitem', { name: /^Truesight$/i })).not.toBeInTheDocument()
+  })
+
   it('finds Flyby from its discovery description', async () => {
     const user = userEvent.setup()
     render(<Host />)

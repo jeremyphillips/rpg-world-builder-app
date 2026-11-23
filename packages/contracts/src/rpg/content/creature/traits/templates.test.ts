@@ -2,9 +2,12 @@ import { describe, expect, it } from 'vitest'
 
 import { contentTraitSchema } from '../../lib/grants/grants'
 import { resolveTraitDisplay } from '../../lib/grants/trait-display'
+import { defineSenseTemplate } from './sense-templates'
 import {
+  CREATURE_TRAIT_TEMPLATE_ENTRIES,
   CREATURE_TRAIT_TEMPLATE_IDS,
   getCreatureTraitTemplate,
+  isCreatureTraitTemplateEligibleForHost,
   listCreatureTraitTemplatesForRuleset,
 } from './templates'
 import { collectCreatureTraitTemplateIssues } from './validate'
@@ -26,8 +29,43 @@ describe('creature trait templates', () => {
         'sense-darkvision',
       ]),
     )
-    expect(listCreatureTraitTemplatesForRuleset('other-ruleset')).toEqual([])
+    expect(listCreatureTraitTemplatesForRuleset('other-ruleset', 'monster')).toEqual([])
     expect(CREATURE_TRAIT_TEMPLATE_IDS).toHaveLength(8)
+  })
+
+  it('declares explicit hosts on every registry entry', () => {
+    for (const templateId of CREATURE_TRAIT_TEMPLATE_IDS) {
+      const entry = CREATURE_TRAIT_TEMPLATE_ENTRIES[templateId]
+      expect(entry.hosts.length, templateId).toBeGreaterThan(0)
+    }
+    expect(
+      isCreatureTraitTemplateEligibleForHost(defineSenseTemplate('darkvision'), 'species'),
+    ).toBe(true)
+    expect(
+      isCreatureTraitTemplateEligibleForHost(defineSenseTemplate('darkvision'), 'monster'),
+    ).toBe(false)
+    expect(isCreatureTraitTemplateEligibleForHost('pack-tactics', 'monster')).toBe(true)
+  })
+
+  it('rejects species-only sense templates for monster host validation', () => {
+    expect(
+      collectCreatureTraitTemplateIssues(
+        [
+          {
+            kind: 'template',
+            id: 'dv',
+            templateId: defineSenseTemplate('darkvision'),
+            config: { range: 60 },
+          },
+        ],
+        { host: 'monster' },
+      ),
+    ).toEqual([
+      {
+        path: [0, 'templateId'],
+        message: 'This creature trait template cannot be assigned on this host.',
+      },
+    ])
   })
 
   it('keeps Legendary Resistance as the canonical label without daily notation', () => {

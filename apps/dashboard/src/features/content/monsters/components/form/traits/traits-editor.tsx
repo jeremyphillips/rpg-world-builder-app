@@ -3,6 +3,7 @@ import { useWatch } from 'react-hook-form'
 import {
   DEFAULT_SYSTEM_RULESET_ID,
   getCreatureTraitTemplate,
+  isCreatureTraitTemplateEligibleForHost,
   listCreatureTraitTemplatesForRuleset,
 } from '@rpg/contracts'
 import { ButtonDropdown } from '@rpg/ui'
@@ -46,7 +47,8 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
   const traits = values?.traits
   const monsterName = values?.name
   const templateIds = useMemo(
-    () => listCreatureTraitTemplatesForRuleset(ctx.rulesetId ?? DEFAULT_SYSTEM_RULESET_ID),
+    () =>
+      listCreatureTraitTemplatesForRuleset(ctx.rulesetId ?? DEFAULT_SYSTEM_RULESET_ID, 'monster'),
     [ctx.rulesetId],
   )
   const templateIdSet = useMemo(() => new Set<string>(templateIds), [templateIds])
@@ -146,9 +148,9 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
           items={items}
           onSelectItem={(id) => {
             if (id.startsWith('template:')) {
-              editor.appendRow(
-                creatureTraitTemplateRow(id.slice('template:'.length), createMonsterRowId()),
-              )
+              const templateId = id.slice('template:'.length)
+              if (!isCreatureTraitTemplateEligibleForHost(templateId, 'monster')) return
+              editor.appendRow(creatureTraitTemplateRow(templateId, createMonsterRowId()))
               return
             }
             const choice = parseMonsterTraitAcquisitionId(id)
