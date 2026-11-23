@@ -83,9 +83,16 @@ export type ContentFormCtx = {
   equipmentCatalogStatus?: 'pending' | 'ready' | 'error'
   /** `ready` once `skillCatalogBySlug` is the campaign's effective catalog. */
   skillCatalogStatus?: 'pending' | 'ready' | 'error'
-  /** Spells keyed by canonical content id for monster spell actions. */
+  /**
+   * Spells keyed by canonical `spell.id` from the campaign list query (system + homebrew).
+   * Authoritative for reference **resolution** — includes drafts not shown in `forReference()` pickers.
+   * See `packages/contracts/docs/spell-reference-resolution.md`.
+   */
   spellCatalogById?: ReadonlyMap<string, Spell>
-  /** `ready` once `spellCatalogById` is the campaign's effective catalog. */
+  /**
+   * Spells query lifecycle. Maps to `SpellCatalogLoadState` via `mapAuthoringSpellCatalogLoadState`.
+   * Do not report `unknown-spell` while `pending` or `error`.
+   */
   spellCatalogStatus?: 'pending' | 'ready' | 'error'
   /** Campaign armor-class scale captured for this authoring session. */
   armorClassRules?: ArmorClassRules

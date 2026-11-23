@@ -66,8 +66,29 @@ export type GrantRowPresentation = {
 
 export { formatCompactMetadataList } from './grant-compact-metadata.lib'
 
+function spellIdLocalPart(spellId: string): string {
+  const colon = spellId.lastIndexOf(':')
+  return colon >= 0 ? spellId.slice(colon + 1) : spellId
+}
+
+function formatSpellIdSlugFallback(spellId: string): string {
+  return spellIdLocalPart(spellId)
+    .split('-')
+    .map((part) => (part.length > 0 ? part.charAt(0).toUpperCase() + part.slice(1) : part))
+    .join(' ')
+}
+
 export function resolveSpellGrantName(spellId: string, spellOptions: FieldOption[]): string {
-  return spellOptions.find((option) => option.value === spellId)?.label ?? spellId
+  const direct = spellOptions.find((option) => option.value === spellId)
+  if (direct) return direct.label
+
+  const localId = spellIdLocalPart(spellId)
+  const byLocalId = spellOptions.find(
+    (option) => option.value === localId || spellIdLocalPart(option.value) === localId,
+  )
+  if (byLocalId) return byLocalId.label
+
+  return formatSpellIdSlugFallback(spellId)
 }
 
 function normalizePresentationPart(value: string): string {

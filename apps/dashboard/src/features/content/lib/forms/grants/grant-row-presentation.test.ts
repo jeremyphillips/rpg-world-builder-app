@@ -71,9 +71,8 @@ describe('resolveSpellGrantName', () => {
     expect(resolveSpellGrantName('srd-cc-5.2.1:animate-dead', headerContext.spellOptions)).toBe(
       'Animate Dead',
     )
-    expect(resolveSpellGrantName('srd-cc-5.2.1:unknown-spell', [])).toBe(
-      'srd-cc-5.2.1:unknown-spell',
-    )
+    expect(resolveSpellGrantName('srd-cc-5.2.1:unknown-spell', [])).toBe('Unknown Spell')
+    expect(resolveSpellGrantName('srd-cc-5.2.1:aid', [{ value: 'aid', label: 'Aid' }])).toBe('Aid')
   })
 })
 

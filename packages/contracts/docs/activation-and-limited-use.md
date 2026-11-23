@@ -49,6 +49,14 @@ Persisted spell references are canonical content ids: `<rulesetId>:<slug>` for s
 
 Grants, class recommendations, monster `spells`, and character sheet rows all use that schema. `collectSpellReferenceIssues` reports `unknown_spell` whenever the catalog is ready, and `spell_not_referenceable` or `spell_catalog_unavailable` on publish. Campaign availability does not invalidate a reference. Deleting a spell that one of those records names is blocked. Rich-text `data-content-id` links are presentation only and are not part of this reference.
 
+### Catalog scope and presentation (authoring)
+
+Dashboard **`spellCatalogById`** is built from the full campaign spells list (system + homebrew), keyed by `spell.id`. Combobox options use `forReference()` and may omit draft spells from **new** selection; persisted ids still resolve from the map when present. **`unknown-spell`** not-found is allowed only after the catalog load state is `ready` — not while loading or on load error.
+
+Lifecycle mapping, display copy, consumer matrix, and migration phases: [spell-reference-resolution.md](./spell-reference-resolution.md). Types and messages: `spell-catalog-context.ts`.
+
+**Resolution** (definition exists?) is separate from **referenceability** (may newly reference?) and **validation** (legal on publish?). Resolved drafts display `spell.name`; eligibility problems use validation messages, not missing-reference labels.
+
 ## Grant rows
 
 Every grant row has an id that is unique within its owning trait, feature, or heritage option. Authored ids are opaque `grt_<uuid>` values from `createGrantRowId`. Seed ids are explicit readable slugs and are never regenerated or reused. The API assigns a missing id before strict parsing. A stored id is kept when the grant kind stays the same. A readable seed-format id that is not already stored is rejected, as is reusing an id for a different kind.

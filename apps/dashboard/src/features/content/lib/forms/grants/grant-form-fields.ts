@@ -66,6 +66,7 @@ import { senseRangeJoinedPairField } from '../fields/content-sense-range-form-fi
 import { getLevelFieldOptions, withLevelOptionLabels } from '../../form-options/level-field-options'
 import {
   referenceEquipmentFieldOptions,
+  referenceSpellFieldOptions,
   toSortedContentFieldOptions,
 } from '../../form-options/content-field-option.lib'
 import { getSpellcastingAbilityFieldOptions } from '../../form-options/spellcasting-ability-field-options'
@@ -429,7 +430,7 @@ export function grantItemFields<T extends string>(
   ctx: ContentFormCtx,
   options?: GrantItemFieldsOptions,
 ): FormItem[] {
-  const spellOptions = toSortedContentFieldOptions(ctx.options?.spells?.forReference(), 'spells')
+  const spellOptions = referenceSpellFieldOptions(ctx.options?.spells)
   const featOptions = toSortedContentFieldOptions(ctx.options?.feats?.forReference(), 'feats')
   const damageTypeOptions = buildActiveDamageTypeFieldOptions(ctx.damageTypeVocabulary)
   const senseTypeOptions = buildActiveSenseFieldOptions(ctx.senseVocabulary)
@@ -781,7 +782,7 @@ function buildGrantRowHeaderContext(
       ctx.options?.skills?.forReference(),
       'skill-proficiencies',
     ),
-    spellOptions: toSortedContentFieldOptions(ctx.options?.spells?.forReference(), 'spells'),
+    spellOptions: referenceSpellFieldOptions(ctx.options?.spells),
   }
 }
 
