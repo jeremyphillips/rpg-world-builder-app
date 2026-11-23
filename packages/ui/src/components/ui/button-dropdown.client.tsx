@@ -10,7 +10,11 @@ import { ActionButton } from './action-button.client'
 import { Button } from './button.client'
 import { ComboboxSearchField } from './combobox-field-parts.client'
 import { comboboxContentVariants } from './combobox-field.variants'
-import { InteractiveListEmpty, InteractiveList } from './interactive-list.client'
+import {
+  InteractiveListEmpty,
+  InteractiveList,
+  type InteractiveListProps,
+} from './interactive-list.client'
 import { ListGroupHeading } from './list-group-heading.client'
 import { InteractiveListRow } from './interactive-list-row.client'
 import { InteractiveListViewport } from './interactive-list-viewport.client'
@@ -141,7 +145,7 @@ function ButtonDropdownItemRows({
   highlightIndexForItem: (item: ButtonDropdownItem) => number
   setActiveIndex: (index: number) => void
   selectItem: (id: string) => void
-  listProps?: React.ComponentPropsWithoutRef<typeof InteractiveList>
+  listProps?: Omit<InteractiveListProps, 'children' | 'density'>
 }) {
   return (
     <InteractiveList density={POPOVER_INTERACTIVE_LIST_DENSITY} {...listProps}>
