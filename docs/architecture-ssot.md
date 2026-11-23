@@ -49,6 +49,18 @@ UI primitive           → plain string only
 
 New reusable domain-rule copy: [validation-messages.md § Agent checklist](../packages/contracts/docs/validation-messages.md#agent-checklist-new-domain-rule-message). Family disposition: [domain-message-inventory.md](../packages/contracts/docs/domain-message-inventory.md).
 
+### Domain-message enforcement (Phases 8–11)
+
+| Mechanism                                                             | Where                                                                                     | Prevents                                                             |
+| --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Acquisition adapter decode                                            | `to-acquisition-dropdown-item.ts` + `to-acquisition-dropdown-item.test.ts`                | Transport leak to dropdown copy                                      |
+| `expectPlainDisplayCopy` / `expectAcquisitionDropdownItemDisplayCopy` | `apps/dashboard/src/test/expect-plain-display-copy.ts`; class + monster acquisition tests | `\x00` prefix on UI-facing acquisition strings                       |
+| Agent checklist + pr-review skill                                     | `validation-messages.md`, `.cursor/skills/pr-review`                                      | New ad hoc cross-pipeline rule literals                              |
+| Pilot display asserts                                                 | `monster-action-repeatability.test.ts`, `monster-action-occurrence-messages.test.ts`      | `formatFieldMessage` wording for occurrence family                   |
+| Per-catalog id uniqueness + collision inventory                       | `validation-message-catalog-ids.test.ts`                                                  | Duplicate ids inside a catalog; ratchet on known cross-catalog reuse |
+
+Inline refine literals and legacy plain exports are tracked in [domain-message-inventory.md § Inline refine literals](../packages/contracts/docs/domain-message-inventory.md#inline-refine-literals-backlog--phase-12) — migrate module-by-module, not bulk.
+
 ## Identity vs metadata vs policy vs presentation
 
 | Layer            | Examples                                                  | Authority                                                                                                                                                                                                |

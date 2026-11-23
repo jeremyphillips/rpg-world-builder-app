@@ -88,7 +88,10 @@ New domain rules in these areas **must** use `defineMessage` — do not add para
 
 ---
 
-## Inline refine literals (backlog — Phase 12)
+## Inline refine literals (backlog — Phase 6 / 12)
+
+Phase **6** exit for this workstream: inventory and dispositions below — **not** a single bulk PR.
+Phase **12** executes module-scoped migrations when a file is already under change.
 
 Representative modules with `addCustomRefinementIssue(ctx, '…literal…')` and **no** catalog id:
 

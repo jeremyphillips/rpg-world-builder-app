@@ -36,6 +36,10 @@ Structured row collections share one master-detail anatomy: inline title from `r
 `classStoredBodySchema` enforces unique feature ids, at most one `subclass-choice`, and pairing of
 `Class.spellcasting` with exactly one `kind: 'spellcasting'` feature.
 
+Content add menus may carry **encoded validation transport** on disabled lines. Decode only in
+[`to-acquisition-dropdown-item.ts`](../apps/dashboard/src/features/content/lib/acquisition/to-acquisition-dropdown-item.ts)
+— see [validation-messages.md § Display boundaries](../packages/contracts/docs/validation-messages.md#display-boundaries).
+
 ## Adding a kind later
 
 1. Add a metadata entry to `CLASS_FEATURE_KIND_ENTRIES` (ids and `CLASS_FEATURE_KINDS` derive from it).

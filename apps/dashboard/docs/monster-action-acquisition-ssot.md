@@ -60,6 +60,16 @@ section-tuples (Zod) → MONSTER_SECTION_KINDS → monsterSectionAllowsKind → 
                                                       ↘ MONSTER_SINGLETON_KINDS / acquisitionStateForItem
 ```
 
+## Domain-rule messages vs readiness copy
+
+| Kind                                                                                            | Owner                                                                                                                                                                                                                                                                   | Shape                     | Display                                                                           |
+| ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- | --------------------------------------------------------------------------------- |
+| Occurrence duplicates (singleton kinds, weapon/natural/constrict, primary spellcasting profile) | [`monsterActionOccurrenceMessages`](../../../packages/contracts/src/rpg/content/monster/action/monster-action-occurrence-messages.ts) + [`monster-action-repeatability.ts`](../../../packages/contracts/src/rpg/content/monster/action/monster-action-repeatability.ts) | `defineMessage` transport | `formatFieldMessage` in acquisition tests; `toAcquisitionDropdownItem` at UI edge |
+| Legendary / cast-spell readiness (`LEGENDARY_*_DISABLED_NOTE`, catalog-not-ready lines)         | [`monster-form-labels.ts`](../src/features/content/monsters/lib/monster-form-labels.ts)                                                                                                                                                                                 | Plain presentation        | No catalog — eligibility policy stays in acquisition modules                      |
+
+Policy (`acquisitionStateForItem`, `collectRepeatabilityViolations`) emits **transport** for domain
+invariants; dashboard readiness strings stay plain unless the **policy** moves to contracts.
+
 ## Deferred / follow-up (outside this audit closure)
 
 - Section-scoped `create` kind unions tied to `MONSTER_SECTION_KINDS` (F4).
