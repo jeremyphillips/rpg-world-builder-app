@@ -1,48 +1,47 @@
+import type { ButtonDropdownItem } from '@rpg/ui'
 import {
   CREATURE_TRAIT_GROUPS,
   CREATURE_TRAIT_VOCABULARY_IDS,
+  creatureTraitTemplateOccurrenceMessage,
   getCreatureTraitGroupEntry,
   getCreatureTraitSearchTerms,
+  getCreatureTraitTemplate,
   getCreatureTraitVocabularyEntry,
   type CreatureTraitVocabularyId,
 } from '@rpg/contracts'
 
-import { MONSTER_ACTION_ALREADY_ADDED_NOTE } from '../actions/acquisition/monster-action-acquisition'
+import {
+  type AcquisitionOption,
+  resolveAcquisitionAvailability,
+  toAcquisitionDropdownItem,
+} from '../../../lib/acquisition'
+import { CREATURE_TRAIT_CUSTOM_DESCRIPTION } from '../../../lib/creature-traits/creature-trait-custom-description'
+import { CREATURE_TRAIT_CUSTOM_ITEM_ID } from '../../../lib/creature-traits/creature-trait-add-menu'
 
-export const MONSTER_TRAIT_CUSTOM_ID = 'custom'
+export const MONSTER_TRAIT_CUSTOM_ID = CREATURE_TRAIT_CUSTOM_ITEM_ID
 
-export const MONSTER_TRAIT_CUSTOM_DESCRIPTION = 'Write a name and description.'
+const TEMPLATE_GROUP_ID = 'templates'
 
-export const MONSTER_TRAIT_ACQUISITION_GROUPS = CREATURE_TRAIT_GROUPS.map((id) => ({
-  id,
-  label: getCreatureTraitGroupEntry(id)?.label ?? id,
-}))
+export const MONSTER_TRAIT_ACQUISITION_GROUPS = [
+  { id: TEMPLATE_GROUP_ID, label: 'Templates' },
+  ...CREATURE_TRAIT_GROUPS.map((id) => ({
+    id,
+    label: getCreatureTraitGroupEntry(id)?.label ?? id,
+  })),
+]
 
-export type MonsterTraitAcquisitionGroupId = (typeof MONSTER_TRAIT_ACQUISITION_GROUPS)[number]['id']
-
-export type MonsterTraitAcquisitionItem = {
-  id: string
-  label: string
-  groupId: MonsterTraitAcquisitionGroupId
-  metadata?: string
-  search?: { includeSupporting?: boolean }
-  searchTerms?: readonly string[]
-  note?: string
-}
+export type MonsterTraitAcquisitionGroupId =
+  | (typeof CREATURE_TRAIT_GROUPS)[number]
+  | typeof TEMPLATE_GROUP_ID
 
 export type MonsterTraitAcquisitionChoice =
   | { type: 'preset'; presetId: CreatureTraitVocabularyId }
-  | { type: 'focus'; traitId: string }
   | { type: 'custom' }
 
 export function parseMonsterTraitAcquisitionId(
   id: string,
 ): MonsterTraitAcquisitionChoice | undefined {
   if (id === MONSTER_TRAIT_CUSTOM_ID) return { type: 'custom' }
-  if (id.startsWith('focus:')) {
-    const traitId = id.slice('focus:'.length)
-    return traitId ? { type: 'focus', traitId } : undefined
-  }
   if (id.startsWith('preset:')) {
     const presetId = id.slice('preset:'.length)
     if (!getCreatureTraitVocabularyEntry(presetId)) return undefined
@@ -51,42 +50,84 @@ export function parseMonsterTraitAcquisitionId(
   return undefined
 }
 
-export function monsterTraitAcquisitionItems(input: {
+export function monsterTraitTemplateAcquisitionOptions(
+  templateIds: readonly string[],
+  traits: readonly { templateId?: string }[],
+): AcquisitionOption[] {
+  const seenTemplates = new Set(
+    traits.flatMap((trait) => (trait.templateId ? [trait.templateId] : [])),
+  )
+
+  return templateIds.flatMap((templateId) => {
+    const template = getCreatureTraitTemplate(templateId)
+    if (!template) return []
+    const occurrenceMessage = seenTemplates.has(templateId)
+      ? creatureTraitTemplateOccurrenceMessage(template.label)
+      : undefined
+    return [
+      {
+        id: `template:${templateId}`,
+        label: template.label,
+        groupId: TEMPLATE_GROUP_ID,
+        description: { status: 'ready', text: template.description },
+        availability: resolveAcquisitionAvailability({
+          occurrence: occurrenceMessage ? { message: occurrenceMessage } : undefined,
+        }),
+      },
+    ]
+  })
+}
+
+export function monsterTraitPresetAcquisitionOptions(input: {
   traits: readonly { id: string; preset?: string }[]
-}): MonsterTraitAcquisitionItem[] {
+}): AcquisitionOption[] {
   const existingByPreset = new Map<string, string>()
   for (const trait of input.traits) {
     if (trait.preset) existingByPreset.set(trait.preset, trait.id)
   }
 
-  const presets = CREATURE_TRAIT_VOCABULARY_IDS.map((presetId) => {
+  return CREATURE_TRAIT_VOCABULARY_IDS.map((presetId) => {
     const entry = getCreatureTraitVocabularyEntry(presetId)
-    const existingId = existingByPreset.get(presetId)
+    const label = entry?.label ?? presetId
+    const occurrenceMessage = existingByPreset.has(presetId)
+      ? creatureTraitTemplateOccurrenceMessage(label)
+      : undefined
     return {
-      presetId,
-      label: entry?.label ?? presetId,
+      id: `preset:${presetId}`,
+      label,
       groupId: entry?.group ?? 'combat',
-      metadata: entry?.description,
+      description: {
+        status: 'ready' as const,
+        text: entry?.description ?? '',
+      },
+      search: { includeSupporting: false as const },
       searchTerms: getCreatureTraitSearchTerms(presetId),
-      existingId,
+      availability: resolveAcquisitionAvailability({
+        occurrence: occurrenceMessage ? { message: occurrenceMessage } : undefined,
+      }),
     }
   }).sort((left, right) => left.label.localeCompare(right.label))
+}
 
+export function monsterTraitAcquisitionOptions(input: {
+  traits: readonly { id: string; preset?: string; templateId?: string }[]
+  templateIds: readonly string[]
+}): AcquisitionOption[] {
   return [
-    ...presets.map((preset) => ({
-      id: preset.existingId ? `focus:${preset.existingId}` : `preset:${preset.presetId}`,
-      label: preset.label,
-      groupId: preset.groupId,
-      metadata: preset.metadata,
-      search: { includeSupporting: false as const },
-      searchTerms: preset.searchTerms,
-      note: preset.existingId ? MONSTER_ACTION_ALREADY_ADDED_NOTE : undefined,
-    })),
+    ...monsterTraitTemplateAcquisitionOptions(input.templateIds, input.traits),
+    ...monsterTraitPresetAcquisitionOptions({ traits: input.traits }),
     {
       id: MONSTER_TRAIT_CUSTOM_ID,
       label: 'Custom trait',
       groupId: 'general',
-      metadata: MONSTER_TRAIT_CUSTOM_DESCRIPTION,
+      description: { status: 'ready', text: CREATURE_TRAIT_CUSTOM_DESCRIPTION },
+      availability: { status: 'available' },
     },
   ]
+}
+
+export function monsterTraitAcquisitionDropdownItems(
+  input: Parameters<typeof monsterTraitAcquisitionOptions>[0],
+): ButtonDropdownItem[] {
+  return monsterTraitAcquisitionOptions(input).map(toAcquisitionDropdownItem)
 }

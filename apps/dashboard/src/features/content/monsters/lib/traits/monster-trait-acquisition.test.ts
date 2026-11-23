@@ -7,19 +7,15 @@ import {
 } from '@rpg/contracts'
 
 import {
-  MONSTER_TRAIT_ACQUISITION_GROUPS,
-  MONSTER_TRAIT_CUSTOM_DESCRIPTION,
-  monsterTraitAcquisitionItems,
+  monsterTraitAcquisitionDropdownItems,
   parseMonsterTraitAcquisitionId,
 } from './monster-trait-acquisition'
-import { MONSTER_ACTION_ALREADY_ADDED_NOTE } from '../actions/acquisition/monster-action-acquisition'
+import { CREATURE_TRAIT_CUSTOM_DESCRIPTION } from '../../../lib/creature-traits/creature-trait-custom-description'
 
-describe('monsterTraitAcquisitionItems', () => {
-  const items = monsterTraitAcquisitionItems({ traits: [] })
+describe('monsterTraitAcquisitionDropdownItems', () => {
+  const items = monsterTraitAcquisitionDropdownItems({ traits: [], templateIds: [] })
 
   it('lists every preset under its vocabulary group, then custom', () => {
-    const groupOrder = MONSTER_TRAIT_ACQUISITION_GROUPS.map((group) => group.id)
-    expect(groupOrder).toEqual(['environment', 'movement', 'combat', 'form', 'general'])
     for (const presetId of CREATURE_TRAIT_VOCABULARY_IDS) {
       const entry = CREATURE_TRAIT_VOCABULARY_ENTRIES[presetId]
       expect(items.find((item) => item.id === `preset:${presetId}`)).toMatchObject({
@@ -32,24 +28,22 @@ describe('monsterTraitAcquisitionItems', () => {
       id: 'custom',
       label: 'Custom trait',
       groupId: 'general',
-      metadata: MONSTER_TRAIT_CUSTOM_DESCRIPTION,
+      metadata: CREATURE_TRAIT_CUSTOM_DESCRIPTION,
     })
     const labels = items.filter((item) => item.groupId === 'movement').map((item) => item.label)
     expect(labels).toEqual([...labels].sort((left, right) => left.localeCompare(right)))
   })
 
-  it('focuses a preset that is already on the monster', () => {
-    const taken = monsterTraitAcquisitionItems({
+  it('disables a preset that is already on the monster', () => {
+    const taken = monsterTraitAcquisitionDropdownItems({
       traits: [{ id: 'pack-1', preset: 'pack-tactics' }],
+      templateIds: [],
     })
     expect(taken.find((item) => item.label === 'Pack Tactics')).toMatchObject({
-      id: 'focus:pack-1',
-      note: MONSTER_ACTION_ALREADY_ADDED_NOTE,
+      id: 'preset:pack-tactics',
+      disabled: true,
+      disabledReason: 'Only one Pack Tactics is allowed.',
       metadata: CREATURE_TRAIT_VOCABULARY_ENTRIES['pack-tactics'].description,
-    })
-    expect(parseMonsterTraitAcquisitionId('focus:pack-1')).toEqual({
-      type: 'focus',
-      traitId: 'pack-1',
     })
     expect(parseMonsterTraitAcquisitionId('preset:flyby')).toEqual({
       type: 'preset',
