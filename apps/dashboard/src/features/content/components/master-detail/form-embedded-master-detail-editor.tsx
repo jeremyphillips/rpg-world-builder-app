@@ -27,7 +27,7 @@ import type { MasterDetailEditorIdentity } from './master-detail-editor-shell'
 import { MasterDetailGrid } from './master-detail-grid'
 import { MasterDetailListPanel, type MasterDetailListItem } from './master-detail-list-panel'
 import type { FacingHostConfig } from '../../facing/facing-host-config.types'
-import { StructuredFacingHostPanel } from '../../facing/structured-facing-host-panel'
+import type { MasterDetailItemFieldSections } from './master-detail-detail-body'
 
 export type { FormEmbeddedMasterDetailMapListItemContext }
 
@@ -49,6 +49,8 @@ type FormEmbeddedMasterDetailEditorBase = {
   onAdd?: () => void
   /** Row-specific detail fields. When omitted, every row uses `itemFields`. */
   resolveItemFields?: (row: unknown) => FormItem[]
+  /** Leading vs primary detail regions for the shell-owned rhythm stack. */
+  resolveFieldSections?: (row: unknown) => MasterDetailItemFieldSections
   /** Prefix for detail `FormItems` ids, e.g. `species-trait`. */
   idPrefix: string
   /**
@@ -87,8 +89,6 @@ type FormEmbeddedMasterDetailEditorBase = {
   access?: FormEmbeddedMasterDetailAccessConfig
   /** Enables drag-to-reorder on the flat list rail; calls `editor.move` on drop. */
   listReorder?: boolean
-  /** Canonical player-facing preview for the selected structured row. */
-  facing?: FacingHostConfig
 }
 
 export type FormEmbeddedMasterDetailEditorProps<TRow = Record<string, unknown>> =
@@ -96,6 +96,8 @@ export type FormEmbeddedMasterDetailEditorProps<TRow = Record<string, unknown>> 
     (
       | {
           rowTitle: MasterDetailRowTitleConfig<TRow>
+          /** Canonical player-facing preview — requires `rowTitle` on structured facing hosts. */
+          facing?: FacingHostConfig
           resolveListMeta?: (
             ctx: FormEmbeddedMasterDetailMapListItemContext,
           ) => MasterDetailListMetaInput
@@ -104,6 +106,7 @@ export type FormEmbeddedMasterDetailEditorProps<TRow = Record<string, unknown>> 
         }
       | {
           rowTitle?: never
+          facing?: never
           resolveListMeta?: never
           mapListItem: (
             ctx: FormEmbeddedMasterDetailMapListItemContext,
@@ -198,6 +201,7 @@ function FormEmbeddedMasterDetailEditorBody<TRow = Record<string, unknown>>({
       onConfirmDelete={body.editor.confirmRemove}
       campaignAccessDialog={campaignAccessDialog}
       facing={facing}
+      detailFieldSections={body.detailFieldSections}
     />
   )
 }
@@ -234,6 +238,7 @@ function EmbeddedMasterDetailLayout({
   onDuplicate,
   onListMove,
   facing,
+  detailFieldSections,
 }: {
   leadingContent?: ReactNode
   campaignAccessDialog: ReactNode
@@ -266,6 +271,7 @@ function EmbeddedMasterDetailLayout({
   onDuplicate?: () => void
   onListMove?: (from: number, to: number) => void
   facing?: FacingHostConfig
+  detailFieldSections?: MasterDetailItemFieldSections
 }) {
   const grid = (
     <MasterDetailGrid>
@@ -296,7 +302,8 @@ function EmbeddedMasterDetailLayout({
         availabilityNamePrefix={availabilityNamePrefix}
         availabilityDialogRef={availabilityDialogRef}
         onDuplicate={onDuplicate}
-        detailLeading={facing ? <StructuredFacingHostPanel facing={facing} /> : undefined}
+        facing={facing}
+        fieldSections={detailFieldSections}
       />
     </MasterDetailGrid>
   )

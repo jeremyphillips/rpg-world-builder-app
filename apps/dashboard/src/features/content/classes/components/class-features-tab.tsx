@@ -11,9 +11,11 @@ import { CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN } from '../lib/class-feature-form
 import {
   classFeatureItemFields,
   featureItemEyebrow,
-  featureItemTitle,
+  resolveClassFeatureFieldSections,
+  resolveClassFeatureItemFields,
   type FeatureRowForm,
 } from '../lib/class-feature-form-fields'
+import { createClassFeatureRowTitleConfig } from '../lib/class-feature-row-title'
 import { isSubclassChoiceFeatureRow } from '../lib/class-subclass-choice-features'
 import type { ClassFormValues } from '../lib/class-form-fields'
 import { CLASS_SPELLCASTING_REMOVE_CONFIRM } from '../lib/class-spellcasting-confirm-copy'
@@ -145,6 +147,18 @@ export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
     [],
   )
 
+  const rowTitle = useMemo(() => createClassFeatureRowTitleConfig(className ?? ''), [className])
+
+  const resolveItemFields = useCallback(
+    (row: unknown) => resolveClassFeatureItemFields(row as FeatureRowForm | undefined, formCtx),
+    [formCtx],
+  )
+
+  const resolveFieldSections = useCallback(
+    (row: unknown) => resolveClassFeatureFieldSections(row as FeatureRowForm | undefined, formCtx),
+    [formCtx],
+  )
+
   const facing = useClassFeatureFacingHost({
     formCtx,
     fieldName: FEATURES_FIELD_NAME,
@@ -168,6 +182,8 @@ export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
         formCtx={formCtx}
         fieldName={FEATURES_FIELD_NAME}
         itemFields={fields}
+        resolveItemFields={resolveItemFields}
+        resolveFieldSections={resolveFieldSections}
         itemNoun={CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN}
         listTitle="Features"
         ariaLabel="Features"
@@ -182,10 +198,10 @@ export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
             onAddRows={handleAddFeatureRows}
           />
         }
-        mapListItem={({ row }) => {
+        rowTitle={rowTitle}
+        resolveListMeta={({ row }) => {
           const featureRow = row as FeatureRowForm | undefined
           return {
-            title: featureItemTitle(featureRow, className),
             eyebrow: featureItemEyebrow(featureRow),
             kindLabel: classFeatureKindLabel(featureRow?.kind),
           }

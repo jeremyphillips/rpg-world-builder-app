@@ -4,12 +4,9 @@ import { CreatureTraitAddMenu } from '../../lib/creature-traits/creature-trait-a
 import { FormEmbeddedMasterDetailEditor } from '../../components/master-detail/form-embedded-master-detail-editor'
 import { useMasterDetailArray } from '../../lib/master-detail/use-master-detail-array'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
-import {
-  traitItemFields,
-  traitItemTitle,
-  type TraitRowForm,
-} from '../lib/species-trait-form-fields'
+import { traitItemFields } from '../lib/species-trait-form-fields'
 import { TRAIT_MASTER_DETAIL_ITEM_NOUN } from '../lib/species-trait-form-labels'
+import { createSpeciesTraitRowTitleConfig } from '../lib/species-trait-row-title'
 import { traitItemDefaultValues } from '../lib/species-trait-form-values'
 
 const TRAITS_FIELD_NAME = 'traits'
@@ -26,6 +23,7 @@ export interface SpeciesTraitsTabProps {
  */
 export function SpeciesTraitsTab({ formCtx }: SpeciesTraitsTabProps) {
   const fields = useMemo(() => traitItemFields(formCtx), [formCtx])
+  const rowTitle = useMemo(() => createSpeciesTraitRowTitleConfig(), [])
   const makeItemDefaults = useCallback(() => traitItemDefaultValues(fields), [fields])
   const editor = useMasterDetailArray(TRAITS_FIELD_NAME, makeItemDefaults)
 
@@ -57,9 +55,7 @@ export function SpeciesTraitsTab({ formCtx }: SpeciesTraitsTabProps) {
           }
         />
       }
-      mapListItem={({ row, index }) => ({
-        title: traitItemTitle((row ?? {}) as TraitRowForm, index),
-      })}
+      rowTitle={rowTitle}
       access={{ kind: 'availability', fieldName: 'available' }}
     />
   )

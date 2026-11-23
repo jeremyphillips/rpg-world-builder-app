@@ -1,9 +1,14 @@
+import { CLASS_FEATURE_KINDS } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import type { FormItem } from '@rpg/ui/form'
 
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import {
   classFeatureItemFields,
+  resolveClassFeatureFieldSections,
+  resolveClassFeatureItemFields,
+  subclassFeatureItemFields,
   createFeatureRowDraftFormSchema,
   createFeatureRowFormSchema,
   featureFromFormRow,
@@ -211,13 +216,47 @@ function descriptionFields(items: readonly FormItem[]) {
   return found
 }
 
-describe('classFeatureItemFields description', () => {
-  const fields = classFeatureItemFields({} as Parameters<typeof classFeatureItemFields>[0])
+function leafTextFieldNames(items: readonly FormItem[]): string[] {
+  const names: string[] = []
+  walkFormItems(items, (item) => {
+    if ('type' in item && item.type === 'text' && 'name' in item && typeof item.name === 'string') {
+      names.push(item.name)
+    }
+  })
+  return names
+}
 
-  it('exposes one Description field hidden for spellcasting granting rows', () => {
-    const descriptions = descriptionFields(fields)
+describe('class feature detail fields', () => {
+  const ctx = {} as ContentFormCtx
+
+  it('exposes one Description field on the custom template list', () => {
+    const descriptions = descriptionFields(classFeatureItemFields(ctx))
     expect(descriptions).toHaveLength(1)
     expect(descriptions[0]).toMatchObject({ label: 'Description' })
+  })
+
+  it('omits a body name field for every class master-detail kind', () => {
+    for (const kind of CLASS_FEATURE_KINDS) {
+      expect(leafTextFieldNames(resolveClassFeatureItemFields({ kind }, ctx))).not.toContain('name')
+    }
+  })
+
+  it('keeps name on subclass collapsible feature rows', () => {
+    expect(leafTextFieldNames(subclassFeatureItemFields(ctx))).toContain('name')
+  })
+
+  it('keeps spellcasting intro on spellcasting rows', () => {
+    const intro = resolveClassFeatureItemFields({ kind: 'spellcasting' }, ctx).find(
+      (item) => 'name' in item && item.name === 'intro',
+    )
+    expect(intro).toMatchObject({ label: 'Introduction' })
+  })
+
+  it('places level in leading fields and intro in primary for spellcasting sections', () => {
+    const sections = resolveClassFeatureFieldSections({ kind: 'spellcasting' }, ctx)
+    expect(JSON.stringify(sections.leading)).toContain('"name":"level"')
+    expect(JSON.stringify(sections.primary)).toContain('"name":"intro"')
+    expect(JSON.stringify(sections.primary)).not.toContain('"name":"level"')
   })
 })
 

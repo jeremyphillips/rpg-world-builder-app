@@ -62,19 +62,6 @@ export function creatureTraitTemplateFields(): FormItem[] {
       visibility: visibleForTemplate(),
     },
     {
-      type: 'text',
-      name: 'nameOverride',
-      label: 'Name',
-      placeholder: 'Leave blank to use the default',
-      visibility: {
-        dependsOn: ['kind', 'overrideDisplay', 'templateId'],
-        visibleWhen: (watched) =>
-          watched['kind'] === 'template' &&
-          watched['overrideDisplay'] === true &&
-          watched['templateId'] !== 'legendary-resistance',
-      },
-    },
-    {
       type: 'richtext',
       name: 'descriptionOverride',
       label: 'Description',

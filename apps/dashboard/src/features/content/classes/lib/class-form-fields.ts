@@ -30,6 +30,7 @@ import { ClassSubclassesTab } from '../components/class-subclasses-tab'
 import { coreAttributesFields } from './class-basics-form-fields'
 import {
   classFeatureItemFields,
+  classFeatureRowResolveFields,
   createFeatureRowDraftFormSchema,
   createFeatureRowFormSchema,
 } from './class-feature-form-fields'
@@ -239,6 +240,7 @@ export function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       ...embeddedMasterDetailTabValidation({
         path: 'features',
         itemLabel: 'Features',
+        resolveItemFields: classFeatureRowResolveFields(ctx),
         fields: classFeatureItemFields(ctx),
       }),
       header: createElement(ClassFeaturesTab, { formCtx: ctx }),

@@ -14,10 +14,22 @@ rows live on `feature.name` and are not rewritten when `slotProgressionId` chang
 
 ## Authoring (dashboard)
 
+Structured row collections share one master-detail anatomy: inline title from `rowTitle`, then
+`MasterDetailDetailBody` — a single outer `FormRhythmStack` for optional leading fields, shell-owned
+`StructuredFacingHostPanel`, and primary `FormItems`. Contextual notices use `contextualChrome`
+(outside the rhythm stack). Detail in
+[apps/dashboard/docs/master-detail-detail-body.md](../apps/dashboard/docs/master-detail-detail-body.md).
+
 - Add menu: Custom feature, ASI, Subclass (`ClassFeatureAddMenu`).
 - Spellcasting rows are created only from the Spellcasting tab (`reconcileSpellcastingOnEnable`).
-- Per-kind form fields and list `kindLabel` are centralized in `class-feature-authoring.ts` and
-  `class-feature-form-fields.ts`.
+- Per-kind **field lists** live in `class-feature-form-fields.ts` (`CLASS_FEATURE_KIND_FIELDS` /
+  `resolveClassFeatureItemFields`). **Title policy** is `createClassFeatureRowTitleConfig` in
+  `class-feature-row-title.ts`. List `kindLabel` and eyebrows stay in `class-feature-authoring.ts`.
+- Class master-detail rows omit a body `name` field; subclass feature arrays keep `name` on the
+  collapsible item header (`primaryField: 'name'`).
+- Species traits and heritage options use `species-trait-row-title.ts` (`authored` on `name` for
+  custom rows; `override` on `nameOverride` for grant and template rows).
+- `FormEmbeddedMasterDetailEditor` rejects `facing` without `rowTitle` at the type level.
 
 ## Validation
 

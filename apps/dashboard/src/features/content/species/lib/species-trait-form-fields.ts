@@ -140,13 +140,6 @@ export type TraitRowForm = z.infer<typeof traitRowFormSchema>
 export function traitItemFields(ctx: ContentFormCtx): FormItem[] {
   return [
     {
-      type: 'text',
-      name: 'name',
-      label: 'Name',
-      required: true,
-      visibility: visibleForTraitKind('custom'),
-    },
-    {
       type: 'richtext',
       name: 'description',
       label: 'Description',
@@ -168,13 +161,6 @@ export function traitItemFields(ctx: ContentFormCtx): FormItem[] {
           type: 'switch',
           name: 'overrideDisplay',
           label: TRAIT_OVERRIDE_DISPLAY_LABEL,
-        },
-        {
-          type: 'text',
-          name: 'nameOverride',
-          label: 'Name',
-          placeholder: 'Leave blank to use the default',
-          visibility: visibleForGrantOverrides(),
         },
         {
           type: 'richtext',

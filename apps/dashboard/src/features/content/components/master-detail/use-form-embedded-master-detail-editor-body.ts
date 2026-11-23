@@ -10,6 +10,7 @@ import { useEmbeddedMasterDetailRows } from '../../lib/master-detail/use-embedde
 import { useMasterDetailCollectionAvailability } from '../../lib/master-detail/use-master-detail-collection-availability'
 import type { UseMasterDetailArrayResult } from '../../lib/master-detail/use-master-detail-array'
 import type { MasterDetailEditorIdentity } from './master-detail-editor-shell'
+import type { MasterDetailItemFieldSections } from './master-detail-detail-body'
 import type { FormEmbeddedMasterDetailEditorProps } from './form-embedded-master-detail-editor'
 
 type EditorBodyInput<TRow> = Omit<
@@ -86,6 +87,7 @@ export function useFormEmbeddedMasterDetailEditorBody<TRow = Record<string, unkn
     itemNoun,
     addControl: addControlProp,
     resolveItemFields,
+    resolveFieldSections,
     idPrefix,
     editor,
     access,
@@ -162,6 +164,22 @@ export function useFormEmbeddedMasterDetailEditorBody<TRow = Record<string, unkn
     rows.rowAt,
   )
 
+  const detailFieldSections = useMemo((): MasterDetailItemFieldSections | undefined => {
+    if (!resolveFieldSections || !rows.selectedRow) return undefined
+    const row = rows.rowAt(rows.selectedRow.formIndex)
+    const sections = resolveFieldSections(row)
+    const titleField = rows.selectedIdentity?.inlineTitle?.field
+    if (titleField) {
+      const omitTitle = (items: FormItem[]) =>
+        items.filter((item) => !('name' in item) || item.name !== titleField)
+      return {
+        leading: sections.leading?.length ? omitTitle([...sections.leading]) : sections.leading,
+        primary: omitTitle([...sections.primary]),
+      }
+    }
+    return sections
+  }, [resolveFieldSections, rows])
+
   const addControl = addControlProp
 
   return {
@@ -174,6 +192,7 @@ export function useFormEmbeddedMasterDetailEditorBody<TRow = Record<string, unkn
     handleDuplicate,
     selectedIdentity,
     detailFields,
+    detailFieldSections,
     addControl,
     formCtx,
     fieldName,

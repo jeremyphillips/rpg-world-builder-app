@@ -1,5 +1,6 @@
 import { createElement } from 'react'
 import { z } from 'zod'
+import type { ArrayResolveFieldsFn } from '@rpg/ui/form'
 import {
   CLASS_FEATURE_KINDS,
   MAX_CHARACTER_LEVEL,
@@ -34,6 +35,7 @@ import {
 } from '../../lib/forms/grants/grant-form-values'
 import { applyStableIdsForUpdate } from '../../lib/forms/registry/content-form-key-helpers'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
+import type { MasterDetailItemFieldSections } from '../../components/master-detail/master-detail-detail-body'
 import { FeatureTablesField } from '../components/features/feature-tables-field'
 import { isSpellcastingFeatureRow } from './class-feature-authoring'
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
@@ -144,45 +146,167 @@ export function formatFeatureRowSummary(
   return joinFormArrayItemSummaryParts(parts)
 }
 
-function sharedFeatureItemFields(
+type FeatureFieldOptions = { defaultFeatureLevel?: number }
+
+function featureLevelSelectField(
   ctx: ContentFormCtx,
-  options?: { defaultFeatureLevel?: number },
-): FormItem[] {
+  options?: FeatureFieldOptions,
+): Extract<FormItem, { type: 'select' }> {
   const levelOptions = getLevelFieldOptions(ctx)
   const levelDigits = levelSelectDigits(ctx)
+  return {
+    type: 'select',
+    name: 'level',
+    label: 'Level',
+    options: levelOptions,
+    required: true,
+    digits: levelDigits,
+    width: 'auto',
+    ...(options?.defaultFeatureLevel !== undefined
+      ? { defaultValue: String(options.defaultFeatureLevel) }
+      : {}),
+  }
+}
 
-  return [
-    {
-      kind: 'row',
-      fields: [
-        {
-          type: 'select',
-          name: 'level',
-          label: 'Level',
-          options: levelOptions,
-          required: true,
-          digits: levelDigits,
-          width: 'auto',
-          ...(options?.defaultFeatureLevel !== undefined
-            ? { defaultValue: String(options.defaultFeatureLevel) }
-            : {}),
-        },
-        { type: 'text', name: 'name', label: 'Name', required: true },
-      ],
-    },
-    {
-      type: 'richtext',
-      name: 'intro',
-      label: 'Introduction',
-      hint: 'Optional introductory text shown before the generated rules.',
-      linkable: true,
-      internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
-      contentTypeOptions: ctx.options?.richTextContentTypeOptions,
-      visibility: {
-        dependsOn: ['kind'],
-        visibleWhen: (values) => values.kind === 'spellcasting',
+function featureLevelRow(ctx: ContentFormCtx, options?: FeatureFieldOptions): FormItem {
+  return {
+    kind: 'row',
+    fields: [featureLevelSelectField(ctx, options)],
+  }
+}
+
+function featureLevelAndNameRow(ctx: ContentFormCtx, options?: FeatureFieldOptions): FormItem {
+  return {
+    kind: 'row',
+    fields: [
+      featureLevelSelectField(ctx, options),
+      { type: 'text', name: 'name', label: 'Name', required: true },
+    ],
+  }
+}
+
+function customFeatureGrantFields(ctx: ContentFormCtx): FormItem[] {
+  return grantArrayFields(GRANT_TYPES, GRANT_TYPE_LABELS, ctx, {
+    inheritUnlockFromParentField: 'level',
+  })
+}
+
+function classFeatureCustomFieldSections(
+  ctx: ContentFormCtx,
+  options?: FeatureFieldOptions,
+): MasterDetailItemFieldSections {
+  return {
+    leading: [featureLevelRow(ctx, options)],
+    primary: [
+      {
+        type: 'richtext',
+        name: 'description',
+        label: 'Description',
+        linkable: true,
+        internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
+        contentTypeOptions: ctx.options?.richTextContentTypeOptions,
       },
-    },
+      ...customFeatureGrantFields(ctx),
+      {
+        kind: 'slot',
+        name: 'tables',
+        render: () => createElement(FeatureTablesField, { formCtx: ctx }),
+      },
+    ],
+  }
+}
+
+function classFeatureAsiFieldSections(
+  ctx: ContentFormCtx,
+  options?: FeatureFieldOptions,
+): MasterDetailItemFieldSections {
+  return {
+    leading: [featureLevelRow(ctx, options)],
+    primary: [
+      {
+        type: 'richtext',
+        name: 'description',
+        label: 'Description',
+        linkable: true,
+        internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
+        contentTypeOptions: ctx.options?.richTextContentTypeOptions,
+      },
+    ],
+  }
+}
+
+function classFeatureSpellcastingFieldSections(
+  ctx: ContentFormCtx,
+  options?: FeatureFieldOptions,
+): MasterDetailItemFieldSections {
+  return {
+    leading: [featureLevelRow(ctx, options)],
+    primary: [
+      {
+        type: 'richtext',
+        name: 'intro',
+        label: 'Introduction',
+        hint: 'Optional introductory text shown before the generated rules.',
+        linkable: true,
+        internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
+        contentTypeOptions: ctx.options?.richTextContentTypeOptions,
+      },
+    ],
+  }
+}
+
+function classFeatureSubclassChoiceFieldSections(
+  ctx: ContentFormCtx,
+  options?: FeatureFieldOptions,
+): MasterDetailItemFieldSections {
+  return {
+    leading: [featureLevelRow(ctx, options)],
+    primary: [],
+  }
+}
+
+const CLASS_FEATURE_KIND_FIELD_SECTIONS = {
+  custom: classFeatureCustomFieldSections,
+  asi: classFeatureAsiFieldSections,
+  spellcasting: classFeatureSpellcastingFieldSections,
+  'subclass-choice': classFeatureSubclassChoiceFieldSections,
+} as const satisfies Record<
+  ClassFeatureKind,
+  (ctx: ContentFormCtx, options?: FeatureFieldOptions) => MasterDetailItemFieldSections
+>
+
+export function resolveClassFeatureFieldSections(
+  row: Pick<FeatureRowForm, 'kind'> | undefined,
+  ctx: ContentFormCtx,
+  options?: FeatureFieldOptions,
+): MasterDetailItemFieldSections {
+  const kind = row?.kind ?? DEFAULT_CLASS_FEATURE_KIND
+  return CLASS_FEATURE_KIND_FIELD_SECTIONS[kind](ctx, options)
+}
+
+export function resolveClassFeatureItemFields(
+  row: Pick<FeatureRowForm, 'kind'> | undefined,
+  ctx: ContentFormCtx,
+  options?: FeatureFieldOptions,
+): FormItem[] {
+  const { leading, primary } = resolveClassFeatureFieldSections(row, ctx, options)
+  return [...(leading ?? []), ...primary]
+}
+
+export function classFeatureRowResolveFields(
+  ctx: ContentFormCtx,
+  options?: FeatureFieldOptions,
+): ArrayResolveFieldsFn {
+  return (row) => resolveClassFeatureItemFields(row as FeatureRowForm | undefined, ctx, options)
+}
+
+/** Subclass collapsible arrays keep `name` on the item header via `primaryField`. */
+export function subclassFeatureItemFields(
+  ctx: ContentFormCtx,
+  options?: FeatureFieldOptions,
+): FormItem[] {
+  return [
+    featureLevelAndNameRow(ctx, options),
     {
       type: 'richtext',
       name: 'description',
@@ -190,52 +314,17 @@ function sharedFeatureItemFields(
       linkable: true,
       internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
       contentTypeOptions: ctx.options?.richTextContentTypeOptions,
-      visibility: {
-        dependsOn: ['kind'],
-        visibleWhen: (values) => values.kind === 'custom' || values.kind === 'asi',
-      },
     },
-    ...grantArrayFields(GRANT_TYPES, GRANT_TYPE_LABELS, ctx, {
-      inheritUnlockFromParentField: 'level',
-    }).map(
-      (field): FormItem =>
-        'kind' in field && field.kind === 'array'
-          ? {
-              ...field,
-              visibility: {
-                dependsOn: ['kind'],
-                visibleWhen: (watched: Record<string, unknown>) => watched.kind === 'custom',
-              },
-            }
-          : field,
-    ),
+    ...customFeatureGrantFields(ctx),
   ]
 }
 
-/** Class and subclass feature rows share grants and prose; tables are class-only. */
-export function subclassFeatureItemFields(
-  ctx: ContentFormCtx,
-  options?: { defaultFeatureLevel?: number },
-): FormItem[] {
-  return sharedFeatureItemFields(ctx, options)
-}
-
+/** Default field list for validation wiring and empty-row templates. */
 export function classFeatureItemFields(
   ctx: ContentFormCtx,
-  options?: { defaultFeatureLevel?: number },
+  options?: FeatureFieldOptions,
 ): FormItem[] {
-  return [
-    ...sharedFeatureItemFields(ctx, options),
-    {
-      kind: 'slot',
-      name: 'tables',
-      visibility: {
-        dependsOn: ['kind'],
-        visibleWhen: (values) => values.kind !== 'subclass-choice',
-      },
-      render: () => createElement(FeatureTablesField, { formCtx: ctx }),
-    },
-  ]
+  return resolveClassFeatureItemFields({ kind: 'custom' }, ctx, options)
 }
 
 function optionalRichTextField(value: string | undefined): string | undefined {
