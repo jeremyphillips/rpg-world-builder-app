@@ -8,8 +8,16 @@ import { describe, expect, it } from 'vitest'
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import type { MonsterActionSection } from '../references/monster-action-equipment-references'
 import type { MonsterActionDraftRow } from '../monster-action-presets'
-import { MONSTER_ACTION_AUTHORING_WAIVERS } from './monster-action-authoring-waivers'
+import { monsterActionDetailComposerRoute } from './monster-action-kind-detail-composers'
 import { resolveMonsterActionSectionFields } from './section-composers'
+
+/** `${section}:${kind}` keys exempt from non-empty detail-field coverage (document reason). */
+type MonsterActionAuthoringWaiverKey = `${MonsterActionSection}:${MonsterActionKind}`
+
+const MONSTER_ACTION_AUTHORING_WAIVERS = {
+  // Legendary `save` rows use editor chrome outside legendary category fields; shared route is minimal.
+  'legendaryActions:save': 'legendary save uses shared mechanics without category overlay',
+} as const satisfies Partial<Record<MonsterActionAuthoringWaiverKey, string>>
 
 const SECTIONS = [
   'actions',
@@ -81,6 +89,12 @@ function minimalDraftForSectionKind(
 }
 
 describe('monster action authoring route coverage', () => {
+  it('maps every MONSTER_ACTION_KIND to a detail composer route', () => {
+    for (const kind of MONSTER_ACTION_KINDS) {
+      expect(monsterActionDetailComposerRoute(kind)).toBeTruthy()
+    }
+  })
+
   it('returns detail fields for every section-eligible kind unless waived', () => {
     const gaps: string[] = []
 

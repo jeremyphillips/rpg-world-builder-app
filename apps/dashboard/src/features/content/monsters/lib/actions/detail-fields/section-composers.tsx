@@ -1,5 +1,6 @@
 import {
   monsterActionAuthoring,
+  type MonsterActionKind,
   getContentTypeTerm,
   getActionVocabularyEntry,
   BONUS_STANDARD_ACTION_IDS,
@@ -59,6 +60,7 @@ import {
   monsterActionUsageEditor,
   monsterReactionConditionField,
 } from './shared-mechanics'
+import { monsterActionDetailComposerRoute } from './monster-action-kind-detail-composers'
 
 const monsterActionOptionalDescriptionField = {
   type: 'richtext',
@@ -108,6 +110,9 @@ function portableKindAuthoringFields(input: {
   section: MonsterActionSection
   namePrefix: string
 }): FormItem[] | undefined {
+  if (monsterActionDetailComposerRoute(input.action.kind as MonsterActionKind) !== 'portable') {
+    return undefined
+  }
   const usage = monsterActionUsageEditor(input.action, input.namePrefix)
   if (input.action.kind === 'leap') {
     return [...leapDistanceFields(), ...usage]

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { MONSTER_ACTION_KINDS } from '../../vocab/monster-action-kind'
 import { monsterActionUsageCapability } from './monster-action-authoring'
 
 describe('monsterActionUsageCapability', () => {
@@ -32,6 +33,13 @@ describe('monsterActionUsageCapability', () => {
       presentation: 'none',
       kinds: [],
     })
+  })
+
+  it('maps every known monster action kind through the registry (save uses preset overrides)', () => {
+    for (const kind of MONSTER_ACTION_KINDS) {
+      if (kind === 'save') continue
+      expect(() => monsterActionUsageCapability({ kind })).not.toThrow()
+    }
   })
 
   it('keeps full limits optional for other saves, specials, and spells', () => {

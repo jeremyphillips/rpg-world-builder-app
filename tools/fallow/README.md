@@ -23,7 +23,13 @@ pnpm exec fallow dead-code --production --save-baseline tools/fallow/dead-code-b
 # Full production dead-code report
 pnpm exec fallow dead-code --production --format human
 
-# PR-scoped audit (CI: fetch-depth 0, base origin/main)
+# PR-scoped gate (CI: `pnpm gate:fallow-dead-code`, fetch-depth 0, base origin/main)
+pnpm exec fallow dead-code \
+  --production \
+  --changed-since origin/main \
+  --baseline tools/fallow/dead-code-baseline.json
+
+# Broader audit (dead code + complexity + dupes on changed files; use for debugging)
 pnpm exec fallow audit \
   --production-dead-code \
   --changed-since origin/main \
@@ -44,9 +50,9 @@ pnpm exec fallow dead-code --production \
 
 ## Gate status
 
-| Phase | Behavior                                                           |
-| ----- | ------------------------------------------------------------------ | --- | ------ |
-| 1–2   | Baseline committed; `pnpm analyze` remains advisory (`             |     | true`) |
-| 6+    | Target: `fallow audit --gate new-only` on changed production files |
+| Phase | Behavior                                                                                                               |
+| ----- | ---------------------------------------------------------------------------------------------------------------------- |
+| 1–2   | Baseline committed; `pnpm analyze` remains advisory (`\|\| true`)                                                      |
+| 3–6   | `pnpm gate:fallow-dead-code` on CI (new-only vs baseline); set `FALLOW_DEAD_CODE_ADVISORY=1` locally for warnings-only |
 
 Do not auto-delete exports from Fallow output without triage (problem **C**).

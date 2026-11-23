@@ -1,3 +1,5 @@
+import type { MonsterActionKind } from '../../vocab/monster-action-kind'
+
 export type MonsterActionNameAuthority = 'derived' | 'authored'
 export type MonsterActionDescriptionAuthority = 'generated' | 'authored'
 export type MonsterActionSourceKind = 'equipment' | 'vocabulary' | 'none'
@@ -27,40 +29,61 @@ const DERIVED_VOCABULARY: MonsterActionAuthoring = {
   source: 'vocabulary',
 }
 
+const AUTHORED_GENERATED: MonsterActionAuthoring = {
+  name: 'authored',
+  description: 'generated',
+  source: 'none',
+}
+
+const AUTHORED_FULL: MonsterActionAuthoring = {
+  name: 'authored',
+  description: 'authored',
+  source: 'none',
+}
+
+const DERIVED_EQUIPMENT: MonsterActionAuthoring = {
+  name: 'derived',
+  description: 'generated',
+  source: 'equipment',
+}
+
+/** Default policy for `{ kind }` without preset or spell profile overrides. */
+const MONSTER_ACTION_AUTHORING_BY_KIND = {
+  weapon: DERIVED_EQUIPMENT,
+  'natural-weapon': AUTHORED_NAME,
+  attack: AUTHORED_NAME,
+  save: AUTHORED_NAME,
+  multiattack: DERIVED_VOCABULARY,
+  'action-reference': AUTHORED_NAME,
+  parry: AUTHORED_GENERATED,
+  leap: AUTHORED_GENERATED,
+  teleport: AUTHORED_GENERATED,
+  'take-actions': AUTHORED_GENERATED,
+  'shape-shift': AUTHORED_FULL,
+  special: AUTHORED_FULL,
+  spell: AUTHORED_NAME,
+} as const satisfies Record<MonsterActionKind, MonsterActionAuthoring>
+
+const PRESET_DERIVED_VOCABULARY_KINDS = new Set<MonsterActionKind>(['natural-weapon', 'save'])
+
 /**
  * Name and description authority for a monster action.
  * An unknown preset stays derived so a custom name cannot turn a broken source into an authored action.
  */
 export function monsterActionAuthoring(action: AuthoringSubject): MonsterActionAuthoring {
-  if (action.kind === 'weapon') {
-    return { name: 'derived', description: 'generated', source: 'equipment' }
-  }
-  if (action.kind === 'special') {
-    return { name: 'authored', description: 'authored', source: 'none' }
-  }
-  if (
-    action.kind === 'parry' ||
-    action.kind === 'leap' ||
-    action.kind === 'teleport' ||
-    action.kind === 'take-actions'
-  ) {
-    return { name: 'authored', description: 'generated', source: 'none' }
-  }
   if (action.kind === 'spell' && action.profile === 'primary') {
     return { name: 'derived', description: 'generated', source: 'none' }
   }
-  if (action.kind === 'attack' || action.kind === 'spell' || action.kind === 'action-reference') {
-    return AUTHORED_NAME
-  }
-  if (action.kind === 'multiattack') {
+  if (action.preset && PRESET_DERIVED_VOCABULARY_KINDS.has(action.kind as MonsterActionKind)) {
     return DERIVED_VOCABULARY
   }
-  if (action.kind === 'natural-weapon' || action.kind === 'save') {
-    if (action.preset) return DERIVED_VOCABULARY
-    return AUTHORED_NAME
+  if (action.kind in MONSTER_ACTION_AUTHORING_BY_KIND) {
+    return MONSTER_ACTION_AUTHORING_BY_KIND[
+      action.kind as keyof typeof MONSTER_ACTION_AUTHORING_BY_KIND
+    ]
   }
   // Intentional catch-all for unknown kinds in dev catalogs — not used for acquisition menu paths.
-  return { name: 'authored', description: 'authored', source: 'none' }
+  return AUTHORED_FULL
 }
 
 export const MONSTER_ACTION_USAGE_PRESENTATIONS = ['none', 'included', 'optional'] as const
@@ -87,6 +110,22 @@ const OPTIONAL_FULL_LIMIT = {
   kinds: ['recharge', 'uses'],
 } as const satisfies MonsterActionUsageCapability
 
+const MONSTER_ACTION_USAGE_CAPABILITY_BY_KIND = {
+  weapon: NO_USAGE,
+  'natural-weapon': OPTIONAL_RECHARGE,
+  attack: OPTIONAL_RECHARGE,
+  save: OPTIONAL_FULL_LIMIT,
+  multiattack: NO_USAGE,
+  'action-reference': NO_USAGE,
+  parry: NO_USAGE,
+  leap: OPTIONAL_FULL_LIMIT,
+  teleport: OPTIONAL_FULL_LIMIT,
+  'take-actions': OPTIONAL_FULL_LIMIT,
+  'shape-shift': NO_USAGE,
+  special: OPTIONAL_FULL_LIMIT,
+  spell: OPTIONAL_FULL_LIMIT,
+} as const satisfies Record<MonsterActionKind, MonsterActionUsageCapability>
+
 /**
  * Usage editor for an action. Preset ids distinguish the three save roles.
  * A preset's `defaults.limitedUse` is not an edit policy.
@@ -94,18 +133,15 @@ const OPTIONAL_FULL_LIMIT = {
 export function monsterActionUsageCapability(
   action: AuthoringSubject,
 ): MonsterActionUsageCapability {
-  if (action.kind === 'natural-weapon' || action.kind === 'attack') return OPTIONAL_RECHARGE
-  if (
-    action.kind === 'special' ||
-    action.kind === 'spell' ||
-    action.kind === 'leap' ||
-    action.kind === 'teleport' ||
-    action.kind === 'take-actions'
-  ) {
-    return OPTIONAL_FULL_LIMIT
+  if (action.kind === 'save') {
+    if (action.preset === 'breath-weapon') return INCLUDED_RECHARGE
+    if (action.preset === 'constrict') return NO_USAGE
+    return MONSTER_ACTION_USAGE_CAPABILITY_BY_KIND.save
   }
-  if (action.kind !== 'save') return NO_USAGE
-  if (action.preset === 'breath-weapon') return INCLUDED_RECHARGE
-  if (action.preset === 'constrict') return NO_USAGE
-  return OPTIONAL_FULL_LIMIT
+  if (action.kind in MONSTER_ACTION_USAGE_CAPABILITY_BY_KIND) {
+    return MONSTER_ACTION_USAGE_CAPABILITY_BY_KIND[
+      action.kind as keyof typeof MONSTER_ACTION_USAGE_CAPABILITY_BY_KIND
+    ]
+  }
+  return NO_USAGE
 }

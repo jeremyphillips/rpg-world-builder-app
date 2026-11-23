@@ -490,6 +490,13 @@ const dashboardMonsterAcquisitionSectionKindsGuard = {
               'Use monsterSectionAllowsKind for menu and placement eligibility. MONSTER_SECTION_KINDS is schema-derived tuple metadata.',
           },
         ],
+        patterns: [
+          {
+            group: ['**/section-tuples', '**/section-tuples.ts', '**/action/section-tuples*'],
+            message:
+              'Acquisition modules must use monsterSectionAllowsKind and eligibility helpers, not section schema tuples.',
+          },
+        ],
       },
     ],
   },

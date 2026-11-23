@@ -31,17 +31,14 @@ import {
 } from '../creature/weapon-attack'
 import { unavailableField, type DerivedField, type DerivedFieldReason } from './derived-field'
 import { resolveMonsterActionIdentity } from './resolve-monster-action-identity'
+import { isMonsterActionAttackKind } from '../../content/monster/action/attack-roll-kinds'
 
-export const MONSTER_ACTION_ATTACK_KINDS = ['weapon', 'natural-weapon', 'attack'] as const
-export type MonsterActionAttackKind = (typeof MONSTER_ACTION_ATTACK_KINDS)[number]
-
-export const MONSTER_ACTION_ATTACK_KIND_SET: ReadonlySet<MonsterActionAttackKind> = new Set(
+export {
+  isMonsterActionAttackKind,
   MONSTER_ACTION_ATTACK_KINDS,
-)
-
-export function isMonsterActionAttackKind(kind: string): kind is MonsterActionAttackKind {
-  return MONSTER_ACTION_ATTACK_KIND_SET.has(kind as MonsterActionAttackKind)
-}
+  MONSTER_ACTION_ATTACK_KIND_SET,
+  type MonsterActionAttackKind,
+} from '../../content/monster/action/attack-roll-kinds'
 
 export type MonsterActionAttackRoll = {
   expression: string

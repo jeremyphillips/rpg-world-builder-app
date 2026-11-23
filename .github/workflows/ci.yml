@@ -47,6 +47,9 @@ jobs:
       - name: Typecheck and lint (affected)
         run: pnpm gate:ci:quality
 
+      - name: Fallow dead-code regression (changed files)
+        run: pnpm gate:fallow-dead-code
+
       - name: Parallel quality gates
         run: pnpm analyze & pnpm gate:fallow-dupes & pnpm coverage & wait
 
