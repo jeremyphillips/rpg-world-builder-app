@@ -106,6 +106,44 @@ describe('RulesPreview', () => {
     expect(screen.getByText('Mage Hand').tagName).toBe('EM')
   })
 
+  it('defaults the eyebrow label to Preview', () => {
+    render(
+      <RulesPreview
+        content={{
+          kind: 'prose',
+          text: 'Body copy.',
+        }}
+      />,
+    )
+    expect(screen.getByText('Preview')).toHaveClass('eyebrow-style-sm')
+  })
+
+  it('renders introAndRules with introduction before rules prose', () => {
+    render(
+      <RulesPreview
+        title="Spellcasting"
+        content={{
+          kind: 'introAndRules',
+          introHtml: '<p>As a student of arcane magic, you have learned to cast spells.</p>',
+          rulesDocument: [
+            [
+              { kind: 'lead', treatment: 'paragraph', label: 'Cantrips' },
+              { kind: 'text', value: 'You know three Wizard cantrips of your choice.' },
+            ],
+          ],
+        }}
+      />,
+    )
+
+    const intro = screen.getByText(/student of arcane magic/)
+    const rules = screen.getByText(/Wizard cantrips/)
+    expect(intro.compareDocumentPosition(rules)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+    expect(screen.getByText('Cantrips:')).toBeTruthy()
+    expect(screen.getByText(/Cantrips:/).parentElement).toHaveTextContent(
+      'Cantrips: You know three Wizard cantrips of your choice.',
+    )
+  })
+
   it('renders guidance as neutral 12px copy inside the panel', () => {
     render(
       <RulesPreview

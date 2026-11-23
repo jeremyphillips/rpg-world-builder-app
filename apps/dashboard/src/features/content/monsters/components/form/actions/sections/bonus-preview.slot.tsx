@@ -6,8 +6,6 @@ import { buildMonsterActionBonusPreview } from '../../../../lib/actions/previews
 import { MonsterActionRulesPreview } from '../../../../lib/actions/previews/monster-action-preview-presentation'
 import { useMonsterActionPreviewContext } from '../../../../lib/actions/previews/use-monster-action-preview-context'
 import type { MonsterActionDraftRow } from '../../../../lib/actions/monster-action-presets'
-import { MONSTER_BONUS_ACTION_PREVIEW_LABEL } from '../../../../lib/monster-form-labels'
-
 const BONUS_PREVIEW_KINDS = new Set(['leap', 'teleport', 'take-actions'])
 
 export function MonsterActionBonusSummary({
@@ -32,10 +30,6 @@ export function MonsterActionBonusSummary({
   if (!preview) return null
 
   return (
-    <MonsterActionRulesPreview
-      label={MONSTER_BONUS_ACTION_PREVIEW_LABEL}
-      title={title}
-      content={{ kind: 'html', html: preview.bodyHtml }}
-    />
+    <MonsterActionRulesPreview title={title} content={{ kind: 'html', html: preview.bodyHtml }} />
   )
 }

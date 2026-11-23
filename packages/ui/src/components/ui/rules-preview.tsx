@@ -1,8 +1,9 @@
 import type { StatBlockProseDocument } from '@rpg/contracts'
 
 import { EmphasisDetailLine } from './emphasis-detail-line'
-import { RichTextContent } from './rich-text-content'
+import { FeatureRulesContent } from './feature-rules-content'
 import { Eyebrow } from './eyebrow'
+import { RichTextContent } from './rich-text-content'
 import { Icon } from './icon/icon'
 import { MetadataList } from './metadata-list'
 import { Panel } from './panel'
@@ -17,15 +18,23 @@ export type RulesPreviewMetadataRow = {
   secondary?: string
 }
 
+export const RULES_PREVIEW_DEFAULT_LABEL = 'Preview' as const
+
 export type RulesPreviewContent =
   | { kind: 'metadata'; rows: readonly RulesPreviewMetadataRow[] }
   | { kind: 'prose'; text: string }
   | { kind: 'html'; html: string }
   | { kind: 'rules'; document: StatBlockProseDocument }
+  | {
+      kind: 'introAndRules'
+      introHtml?: string
+      rulesDocument?: StatBlockProseDocument
+      guidance?: string
+    }
   | { kind: 'guidance'; message: string }
 
 export type RulesPreviewProps = {
-  label: string
+  label?: string
   /** Qualified stat-block heading between the eyebrow and body. */
   title?: string
   context?: string
@@ -47,6 +56,12 @@ function rulesPreviewHasContent(content: RulesPreviewContent): boolean {
       return content.rows.length > 0
     case 'rules':
       return content.document.length > 0
+    case 'introAndRules': {
+      const intro = Boolean(content.introHtml?.trim())
+      const rules = Boolean(content.rulesDocument?.length)
+      const guidance = Boolean(content.guidance?.trim()) && !rules
+      return intro || rules || guidance
+    }
     case 'guidance':
       return Boolean(content.message.trim())
   }
@@ -74,6 +89,15 @@ function RulesPreviewBody({ content }: { content: RulesPreviewContent }) {
     return <RichTextContent html={content.html} size="sm" tone="muted" />
   }
   if (content.kind === 'rules') return <StatBlockProseView document={content.document} />
+  if (content.kind === 'introAndRules') {
+    return (
+      <FeatureRulesContent
+        introHtml={content.introHtml}
+        rulesDocument={content.rulesDocument}
+        guidance={content.guidance}
+      />
+    )
+  }
   return (
     <Text variant="caption">
       <SemanticText tone="neutral" emphasis="low" icon={<Icon name="info" size="xs" />}>
@@ -84,7 +108,12 @@ function RulesPreviewBody({ content }: { content: RulesPreviewContent }) {
 }
 
 /** Compact rules panel. Callers supply the label and one content shape. */
-export function RulesPreview({ label, title, context, content }: RulesPreviewProps) {
+export function RulesPreview({
+  label = RULES_PREVIEW_DEFAULT_LABEL,
+  title,
+  context,
+  content,
+}: RulesPreviewProps) {
   if (!rulesPreviewHasContent(content)) return null
 
   return (

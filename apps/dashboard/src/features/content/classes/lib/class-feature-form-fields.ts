@@ -163,15 +163,16 @@ function sharedFeatureItemFields(
         { type: 'text', name: 'name', label: 'Name', required: true },
       ],
     },
+    classSpellcastingGrantingFeatureRulesDisplay(ctx),
     {
       type: 'richtext',
       name: 'intro',
       label: 'Introduction',
+      hint: 'Optional introductory text shown before the generated rules.',
       linkable: true,
       internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
       contentTypeOptions: ctx.options?.richTextContentTypeOptions,
     },
-    classSpellcastingGrantingFeatureRulesDisplay(ctx),
     {
       type: 'richtext',
       name: 'description',

@@ -160,7 +160,6 @@ export const MONSTER_ON_HIT_DETAILS_ADD_LABEL = 'Add details'
 export const MONSTER_ON_HIT_CONDITION_DETAILS_HINT =
   'Additional rules or restrictions that apply to this effect.'
 export const MONSTER_ON_HIT_CONDITION_DETAILS_PLACEHOLDER = 'E.g. (escape DC 15), from both claws'
-export const MONSTER_ACTION_PREVIEW_LABEL = 'Preview'
 export const MONSTER_ACTION_ATTACK_PREVIEW_LABEL = 'Attack preview'
 export const MONSTER_ACTION_SPELL_PREVIEW_LABEL = 'Spellcasting preview'
 export const MONSTER_REACTION_PREVIEW_LABEL = 'Reaction preview'
@@ -442,7 +441,6 @@ export const MONSTER_SHAPE_SHIFT_PREREQUISITE_LABEL = 'Prerequisite'
 export const MONSTER_SHAPE_SHIFT_PREREQUISITE_HINT =
   'Completes the sentence: If …, it shape-shifts.'
 export const MONSTER_SHAPE_SHIFT_DESTINATIONS_LABEL = 'Destinations'
-export const MONSTER_SHAPE_SHIFT_PREVIEW_LABEL = 'Preview'
 export const MONSTER_SHAPE_SHIFT_ACQUISITION_DESCRIPTION =
   'Changes among this creature’s alternate forms.'
 export const MONSTER_SHAPE_SHIFT_REQUIRES_ALTERNATE_FORM_NOTE =
@@ -735,7 +733,6 @@ export const MONSTER_TAKE_ACTIONS_CHOICE_EACH = 'Uses each'
 export const MONSTER_TAKE_ACTIONS_RESTRICTION_LABEL = 'Restriction'
 export const MONSTER_TAKE_ACTIONS_RESTRICTION_HINT = 'Leading clause, without a final period.'
 export const MONSTER_TAKE_ACTIONS_RESTRICTION_PLACEHOLDER = 'While in Dim Light or darkness'
-export const MONSTER_BONUS_ACTION_PREVIEW_LABEL = 'Preview'
 export const MONSTER_ACTION_REFERENCE_ACQUISITION_LABEL = 'Use existing action'
 export const MONSTER_ACTION_REFERENCE_UNNAMED_TITLE = 'Use action'
 export const MONSTER_ACTION_REFERENCE_CHOOSE_SOURCE = 'Choose a source action'

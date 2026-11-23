@@ -1,8 +1,8 @@
 import {
   cn,
+  FeatureRulesContent,
   Heading,
   RichTextContent,
-  StatBlockProseView,
   Table,
   TableBody,
   TableCell,
@@ -75,10 +75,13 @@ function ClassFeatureLevelGroupRows({ group }: { group: LevelGroup }) {
             >
               {item.title}
             </Heading>
-            {item.introHtml ? (
-              <RichTextContent html={item.introHtml} {...contentDetailProseProps} />
+            {item.rulesDocument || item.introHtml ? (
+              <FeatureRulesContent
+                introHtml={item.introHtml}
+                rulesDocument={item.rulesDocument}
+                introTone="default"
+              />
             ) : null}
-            {item.rulesDocument ? <StatBlockProseView document={item.rulesDocument} /> : null}
             {item.bodyHtml ? (
               <RichTextContent html={item.bodyHtml} {...contentDetailProseProps} />
             ) : null}

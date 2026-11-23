@@ -76,11 +76,16 @@ export {
   type AdvisoryTone,
 } from './components/ui/advisory-alert'
 export {
+  RULES_PREVIEW_DEFAULT_LABEL,
   RulesPreview,
   type RulesPreviewContent,
   type RulesPreviewMetadataRow,
   type RulesPreviewProps,
 } from './components/ui/rules-preview'
+export {
+  FeatureRulesContent,
+  type FeatureRulesContentProps,
+} from './components/ui/feature-rules-content'
 export { StatBlockLead, type StatBlockLeadProps } from './components/ui/stat-block-lead'
 export { StatBlockProseView } from './components/ui/stat-block-prose'
 export {

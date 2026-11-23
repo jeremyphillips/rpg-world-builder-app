@@ -10,7 +10,14 @@ export function MonsterActionRulesPreview({
   context,
   content,
 }: MonsterActionRulesPreviewProps) {
-  return <RulesPreview label={label} title={title} context={context} content={content} />
+  return (
+    <RulesPreview
+      {...(label !== undefined ? { label } : {})}
+      title={title}
+      context={context}
+      content={content}
+    />
+  )
 }
 
 export function MonsterActionUnavailableRulesPreview({
@@ -18,13 +25,13 @@ export function MonsterActionUnavailableRulesPreview({
   title,
   guidance,
 }: {
-  label: string
+  label?: string
   title?: string
   guidance: string
 }) {
   return (
     <MonsterActionRulesPreview
-      label={label}
+      {...(label !== undefined ? { label } : {})}
       title={title}
       content={{ kind: 'guidance', message: guidance }}
     />

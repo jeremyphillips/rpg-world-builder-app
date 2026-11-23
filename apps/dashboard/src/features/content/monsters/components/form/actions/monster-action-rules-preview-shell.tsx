@@ -7,10 +7,9 @@ import { MonsterActionUnavailableRulesPreview } from '../../../lib/actions/previ
 import { useMonsterActionPreviewTitle } from '../../../lib/monster-qualified-preview-title'
 import type { MonsterActionDraftRow } from '../../../lib/actions/monster-action-presets'
 import type { MonsterActionSection } from '../../../lib/actions/references/monster-action-equipment-references'
-import {
-  MONSTER_ACTION_PREVIEW_LABEL,
-  MONSTER_SHAPE_SHIFT_DESTINATIONS_LABEL,
-} from '../../../lib/monster-form-labels'
+import { RULES_PREVIEW_DEFAULT_LABEL } from '@rpg/ui'
+
+import { MONSTER_SHAPE_SHIFT_DESTINATIONS_LABEL } from '../../../lib/monster-form-labels'
 import type { MonsterFormValues } from '../../../lib/monster-form-values'
 import {
   monsterActionAttackPreviewMetadataRows,
@@ -21,12 +20,12 @@ import { resolveActionStatBlockRulesFacingForForm } from '../../../lib/presentat
 import { MonsterActionRulesBody } from '../../detail/monster-action-rules-body'
 
 function MonsterActionReadyPreview({
-  label,
+  label = RULES_PREVIEW_DEFAULT_LABEL,
   title,
   context,
   children,
 }: {
-  label: string
+  label?: string
   title?: string
   context?: string
   children: ReactNode
@@ -81,13 +80,7 @@ export function MonsterActionRulesPreviewShell({
   const title = outcome.status === 'ready' ? outcome.facing.name : editorTitle || undefined
 
   if (outcome.status !== 'ready') {
-    return (
-      <MonsterActionUnavailableRulesPreview
-        label={MONSTER_ACTION_PREVIEW_LABEL}
-        title={title}
-        guidance={outcome.guidance}
-      />
-    )
+    return <MonsterActionUnavailableRulesPreview title={title} guidance={outcome.guidance} />
   }
 
   const sourceName = values.name?.trim() || 'Creature'
@@ -105,11 +98,7 @@ export function MonsterActionRulesPreviewShell({
   if (hasRulesProse || hasDescription) {
     return (
       <>
-        <MonsterActionReadyPreview
-          label={MONSTER_ACTION_PREVIEW_LABEL}
-          title={title}
-          context={modeCaption}
-        >
+        <MonsterActionReadyPreview title={title} context={modeCaption}>
           <MonsterActionRulesBody item={outcome.facing} />
           {metadataRows.length > 0 ? (
             <MetadataList
@@ -140,7 +129,7 @@ export function MonsterActionRulesPreviewShell({
 
   return (
     <>
-      <MonsterActionReadyPreview label={MONSTER_ACTION_PREVIEW_LABEL} title={title}>
+      <MonsterActionReadyPreview title={title}>
         {outcome.facing.attackLine ? (
           <Text variant="body-compact">{outcome.facing.attackLine}</Text>
         ) : null}

@@ -19,4 +19,20 @@ describe('StatBlockProseView', () => {
     expect(container.textContent).toContain('Melee Attack Roll:')
     expect(container.textContent).toContain('Hit:')
   })
+
+  it('renders a space after paragraph leads before body text', () => {
+    const { container } = render(
+      <StatBlockProseView
+        document={[
+          [
+            { kind: 'lead', treatment: 'paragraph', label: 'Spellbook' },
+            { kind: 'text', value: 'Your spellbook contains the level 1+ spells you know.' },
+          ],
+        ]}
+      />,
+    )
+    expect(container.textContent).toBe(
+      'Spellbook: Your spellbook contains the level 1+ spells you know.',
+    )
+  })
 })

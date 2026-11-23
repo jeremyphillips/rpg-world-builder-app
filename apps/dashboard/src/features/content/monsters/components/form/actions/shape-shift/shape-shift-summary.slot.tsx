@@ -4,10 +4,7 @@ import { useMemo } from 'react'
 import type { ContentFormCtx } from '../../../../../lib/forms/registry/content-form-registry'
 import { buildMonsterActionShapeShiftPreview } from '../../../../lib/actions/previews/monster-action-shape-shift-summary'
 import type { MonsterActionDraftRow } from '../../../../lib/actions/monster-action-presets'
-import {
-  MONSTER_SHAPE_SHIFT_DESTINATIONS_LABEL,
-  MONSTER_SHAPE_SHIFT_PREVIEW_LABEL,
-} from '../../../../lib/monster-form-labels'
+import { MONSTER_SHAPE_SHIFT_DESTINATIONS_LABEL } from '../../../../lib/monster-form-labels'
 import { useMonsterActionPreviewContext } from '../../../../lib/actions/previews/use-monster-action-preview-context'
 
 export function MonsterActionShapeShiftSummary({
@@ -31,10 +28,7 @@ export function MonsterActionShapeShiftSummary({
         label={MONSTER_SHAPE_SHIFT_DESTINATIONS_LABEL}
         content={{ kind: 'prose', text: summary.destinationsProse }}
       />
-      <RulesPreview
-        label={MONSTER_SHAPE_SHIFT_PREVIEW_LABEL}
-        content={{ kind: 'prose', text: summary.rulesProse }}
-      />
+      <RulesPreview content={{ kind: 'prose', text: summary.rulesProse }} />
     </>
   )
 }

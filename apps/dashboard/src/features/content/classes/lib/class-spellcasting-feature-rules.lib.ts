@@ -16,14 +16,38 @@ import {
   spellcastingFromClassFormWatch,
 } from './class-form-values'
 
-export function resolveSpellcastingGrantingFeatureRulesDocument(input: {
+export const CLASS_SPELLCASTING_RULES_PROGRESSION_UNAVAILABLE =
+  'Spellcasting progression rules are unavailable.' as const
+
+export const CLASS_SPELLCASTING_RULES_INCOMPLETE_GUIDANCE =
+  'Spellcasting is inactive or incomplete. Configure spellcasting on the Spellcasting tab and set this feature’s level.' as const
+
+export type SpellcastingGrantingFeatureFacing = {
+  title: string
+  introHtml?: string
+  rulesDocument?: StatBlockProseDocument
+  guidance?: string
+}
+
+type ResolveSpellcastingGrantingFeatureFacingInput = {
   className: string
   rulesetId: CharacterClass['rulesetId']
   spellcasting: Spellcasting | undefined
   featureRow: FeatureRowForm
-  spellcastingProgression: ResolvedSpellcastingProgressionConfig
+  spellcastingProgression: ResolvedSpellcastingProgressionConfig | undefined
   spellsById?: ReadonlyMap<string, Spell>
-}): StatBlockProseDocument | null {
+}
+
+function normalizeIntroHtml(intro: string | undefined): string | undefined {
+  const trimmed = intro?.trim()
+  return trimmed ? intro : undefined
+}
+
+function resolveSpellcastingGrantingFeatureRulesDocumentFromInput(
+  input: Omit<ResolveSpellcastingGrantingFeatureFacingInput, 'spellcastingProgression'> & {
+    spellcastingProgression: ResolvedSpellcastingProgressionConfig
+  },
+): StatBlockProseDocument | null {
   if (!isSpellcastingGrantingFeatureRow(input.featureRow)) return null
   if (!input.spellcasting) return null
 
@@ -55,11 +79,61 @@ export function resolveSpellcastingGrantingFeatureRulesDocument(input: {
   })
 }
 
+/** Authoring + published spellcasting/Pact Magic granting feature body (intro + generated rules). */
+export function resolveSpellcastingGrantingFeatureFacing(
+  input: ResolveSpellcastingGrantingFeatureFacingInput,
+): SpellcastingGrantingFeatureFacing {
+  const title = String(input.featureRow.name ?? '').trim() || 'Spellcasting'
+  const introHtml = normalizeIntroHtml(input.featureRow.intro)
+
+  if (!isSpellcastingGrantingFeatureRow(input.featureRow)) {
+    return { title, introHtml }
+  }
+
+  if (!input.spellcastingProgression) {
+    return {
+      title,
+      introHtml,
+      guidance: CLASS_SPELLCASTING_RULES_PROGRESSION_UNAVAILABLE,
+    }
+  }
+
+  if (!input.spellcasting) {
+    return {
+      title,
+      introHtml,
+      guidance: CLASS_SPELLCASTING_RULES_INCOMPLETE_GUIDANCE,
+    }
+  }
+
+  const rulesDocument =
+    resolveSpellcastingGrantingFeatureRulesDocumentFromInput({
+      ...input,
+      spellcastingProgression: input.spellcastingProgression,
+    }) ?? undefined
+
+  if (!rulesDocument) {
+    return {
+      title,
+      introHtml,
+      guidance: CLASS_SPELLCASTING_RULES_INCOMPLETE_GUIDANCE,
+    }
+  }
+
+  return { title, introHtml, rulesDocument }
+}
+
+export function resolveSpellcastingGrantingFeatureRulesDocument(
+  input: Omit<ResolveSpellcastingGrantingFeatureFacingInput, 'spellcastingProgression'> & {
+    spellcastingProgression: ResolvedSpellcastingProgressionConfig
+  },
+): StatBlockProseDocument | null {
+  return resolveSpellcastingGrantingFeatureRulesDocumentFromInput(input)
+}
+
 export function classSpellcastingGrantingFeatureRulesDisplay(
   ctx: ContentFormCtx,
 ): import('@rpg/ui/form').DisplayConfig {
-  const SPELLCASTING_RULES_PREVIEW_LABEL = 'Generated rules' as const
-
   return {
     kind: 'display',
     id: 'class-spellcasting-granting-feature-rules',
@@ -72,6 +146,7 @@ export function classSpellcastingGrantingFeatureRulesDisplay(
     },
     resolve: {
       dependsOn: [
+        'intro',
         'level',
         'name',
         'grants',
@@ -79,56 +154,31 @@ export function classSpellcastingGrantingFeatureRulesDisplay(
         ...classSpellcastingPreviewParentDependsOn(),
       ],
       contentWhen: (values) => {
-        const progression = ctx.spellcastingProgression
-        if (!progression) {
-          return {
-            variant: 'rulesPreview',
-            preview: {
-              label: SPELLCASTING_RULES_PREVIEW_LABEL,
-              content: {
-                kind: 'guidance',
-                message: 'Spellcasting progression rules are unavailable.',
-              },
-            },
-          }
-        }
-
-        const spellcasting = spellcastingFromClassFormWatch(values)
-        const document = resolveSpellcastingGrantingFeatureRulesDocument({
+        const facing = resolveSpellcastingGrantingFeatureFacing({
           className: String(values['../../name'] ?? ''),
           rulesetId: ctx.rulesetId,
-          spellcasting,
+          spellcasting: spellcastingFromClassFormWatch(values),
           featureRow: {
             id: 'preview',
             name: String(values.name ?? ''),
             level: Number(values.level),
+            intro: String(values.intro ?? ''),
             grants: values.grants as FeatureRowForm['grants'],
           },
-          spellcastingProgression: progression,
+          spellcastingProgression: ctx.spellcastingProgression,
           spellsById: ctx.spellCatalogById,
         })
-
-        if (!document) {
-          return {
-            variant: 'rulesPreview',
-            preview: {
-              label: SPELLCASTING_RULES_PREVIEW_LABEL,
-              title: String(values.name ?? ''),
-              content: {
-                kind: 'guidance',
-                message:
-                  'Spellcasting is inactive or incomplete. Configure spellcasting on the Spellcasting tab and set this feature’s level.',
-              },
-            },
-          }
-        }
 
         return {
           variant: 'rulesPreview',
           preview: {
-            label: SPELLCASTING_RULES_PREVIEW_LABEL,
-            title: String(values.name ?? ''),
-            content: { kind: 'rules', document },
+            title: facing.title,
+            content: {
+              kind: 'introAndRules',
+              introHtml: facing.introHtml,
+              rulesDocument: facing.rulesDocument,
+              guidance: facing.guidance,
+            },
           },
         }
       },

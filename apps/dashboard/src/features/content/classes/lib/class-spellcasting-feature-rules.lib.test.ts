@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest'
 import { loadSeedClasses } from '@rpg/catalog/classes'
-import {
-  formatClassSpellcastingFeatureRules,
-  isClassSpellcastingGrantingFeature,
-} from '@rpg/contracts'
 import { resolveDisplayBlocks } from '@rpg/ui/form'
 
 import { featureFromFormRow, featureToFormRow } from './class-feature-form-fields'
@@ -14,13 +10,19 @@ import {
 } from './class-form-values'
 import {
   classSpellcastingGrantingFeatureRulesDisplay,
+  resolveSpellcastingGrantingFeatureFacing,
   resolveSpellcastingGrantingFeatureRulesDocument,
 } from './class-spellcasting-feature-rules.lib'
+import { buildClassDetailViewModel } from './class-display'
 import { srdSpellcastingProgressionFixture } from './fixtures/spellcasting-progression-fixture'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 
 const PROGRESSION = srdSpellcastingProgressionFixture()
 const RULESET = 'srd-cc-5.2.1' as const
+
+const vocabulary = {
+  resolveToolLabel: (slug: string) => slug,
+}
 
 function previewCtx(): ContentFormCtx {
   return {
@@ -55,6 +57,7 @@ describe('classSpellcastingGrantingFeatureRulesDisplay', () => {
       ...parentWatchFromFormValues(formValues),
       level: featureRow.level,
       name: featureRow.name,
+      intro: featureRow.intro ?? '',
       grants: featureRow.grants,
     }
 
@@ -65,9 +68,42 @@ describe('classSpellcastingGrantingFeatureRulesDisplay', () => {
     const preview = blocks[0]
     expect(preview?.variant).toBe('rulesPreview')
     if (preview?.variant !== 'rulesPreview') return
-    expect(preview.preview.content.kind).toBe('rules')
-    if (preview.preview.content.kind !== 'rules') return
-    expect(preview.preview.content.document.length).toBeGreaterThan(0)
+    expect(preview.preview.content.kind).toBe('introAndRules')
+    if (preview.preview.content.kind !== 'introAndRules') return
+    expect(preview.preview.content.rulesDocument?.length).toBeGreaterThan(0)
+    expect(preview.preview.content.introHtml?.trim().length).toBeGreaterThan(0)
+  })
+
+  it('keeps authored introduction when rules resolution is unavailable', () => {
+    const bard = loadSeedClasses(RULESET).find((c) => c.slug === 'bard')
+    if (!bard) throw new Error('missing bard seed')
+    const formValues = classFormDef.toFormValues(bard) as ClassFormValues
+    const featureRow = bardGrantingFeatureRow(formValues)
+
+    const watched = {
+      ...parentWatchFromFormValues({
+        ...formValues,
+        spellSelectionModel: undefined,
+      } as ClassFormValues),
+      level: featureRow.level,
+      name: featureRow.name,
+      intro: featureRow.intro ?? '',
+      grants: featureRow.grants,
+      '../../name': formValues.name,
+    }
+
+    const blocks = resolveDisplayBlocks(
+      classSpellcastingGrantingFeatureRulesDisplay(previewCtx()),
+      watched,
+    )
+    const preview = blocks[0]
+    if (preview?.variant !== 'rulesPreview') throw new Error('missing preview')
+    const content = preview.preview.content
+    expect(content.kind).toBe('introAndRules')
+    if (content.kind !== 'introAndRules') return
+    expect(content.introHtml?.trim().length).toBeGreaterThan(0)
+    expect(content.rulesDocument).toBeUndefined()
+    expect(content.guidance).toBeTruthy()
   })
 
   it('respects granting feature level changes', () => {
@@ -112,6 +148,12 @@ describe('classSpellcastingGrantingFeatureRulesDisplay', () => {
       } as ClassFormValues),
       level: 1,
       name: 'Spellcasting',
+      intro:
+        featureToFormRow(
+          loadSeedClasses(RULESET)
+            .find((c) => c.slug === 'bard')!
+            .features.find((f) => f.id === 'spellcasting')!,
+        ).intro ?? '',
       grants: featureToFormRow(
         loadSeedClasses(RULESET)
           .find((c) => c.slug === 'bard')!
@@ -127,7 +169,10 @@ describe('classSpellcastingGrantingFeatureRulesDisplay', () => {
     const preview = blocks[0]
     expect(preview?.variant).toBe('rulesPreview')
     if (preview?.variant !== 'rulesPreview') return
-    expect(preview.preview.content).toMatchObject({ kind: 'guidance' })
+    expect(preview.preview.content).toMatchObject({
+      kind: 'introAndRules',
+      guidance: expect.stringContaining('Spellcasting is inactive'),
+    })
   })
 })
 
@@ -142,7 +187,7 @@ const SRD_CASTERS = [
   'wizard',
 ] as const
 
-describe('resolveSpellcastingGrantingFeatureRulesDocument parity', () => {
+describe('resolveSpellcastingGrantingFeatureFacing parity', () => {
   it.each(SRD_CASTERS)('matches published detail formatter output for %s', (slug) => {
     const characterClass = loadSeedClasses(RULESET).find((c) => c.slug === slug)
     if (!characterClass) throw new Error(`missing ${slug} seed`)
@@ -155,7 +200,7 @@ describe('resolveSpellcastingGrantingFeatureRulesDocument parity', () => {
 
     const feature = featureFromFormRow({ ...featureRow, id: featureRow.id! })
 
-    const fromPreview = resolveSpellcastingGrantingFeatureRulesDocument({
+    const fromPreview = resolveSpellcastingGrantingFeatureFacing({
       className: characterClass.name,
       rulesetId: RULESET,
       spellcasting,
@@ -163,14 +208,16 @@ describe('resolveSpellcastingGrantingFeatureRulesDocument parity', () => {
       spellcastingProgression: PROGRESSION,
     })
 
-    const fromDetail =
-      characterClass.spellcasting &&
-      isClassSpellcastingGrantingFeature(feature) &&
-      formatClassSpellcastingFeatureRules({
-        characterClass: { ...characterClass, features: [feature] },
-        config: PROGRESSION,
-      })
+    const detail = buildClassDetailViewModel(characterClass, vocabulary, {
+      spellcastingProgression: PROGRESSION,
+      characterClass,
+    })
+    const featuresSection = detail.sections.find((section) => section.id === 'features')
+    if (!featuresSection || featuresSection.id !== 'features') throw new Error('missing features')
+    const detailItem = featuresSection?.items.find((item) => item.id === featureId)
 
-    expect(fromPreview).toEqual(fromDetail)
+    expect(fromPreview.introHtml).toBe(detailItem?.introHtml)
+    expect(fromPreview.rulesDocument).toEqual(detailItem?.rulesDocument)
+    expect(fromPreview.rulesDocument).toBeTruthy()
   })
 })

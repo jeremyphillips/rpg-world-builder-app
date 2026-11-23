@@ -29,7 +29,21 @@ function renderSegment(segment: StatBlockProseSegment, key: number): ReactNode {
 
 function renderParagraph(prose: StatBlockProse, key?: number): ReactNode {
   if (prose.length === 0) return null
-  const inner = prose.map((segment, index) => renderSegment(segment, index))
+  const inner: ReactNode[] = []
+  for (let index = 0; index < prose.length; index++) {
+    const segment = prose[index]!
+    const previous = index > 0 ? prose[index - 1] : undefined
+    if (
+      previous?.kind === 'lead' &&
+      previous.treatment === 'paragraph' &&
+      segment.kind === 'text' &&
+      segment.value.length > 0 &&
+      !segment.value.startsWith(' ')
+    ) {
+      inner.push(<span key={`${index}-lead-space`}> </span>)
+    }
+    inner.push(renderSegment(segment, index))
+  }
   if (key === undefined) return <>{inner}</>
   return (
     <Text key={key} as="p" variant="body-compact">
@@ -48,7 +62,7 @@ export function StatBlockProseView(props: StatBlockProseViewProps) {
 
   if (document.length === 0) return null
   if (document.length === 1) {
-    return <>{document[0]!.map((segment, index) => renderSegment(segment, index))}</>
+    return <>{renderParagraph(document[0]!)}</>
   }
   return (
     <div className="stat-block-prose flex flex-col gap-1">

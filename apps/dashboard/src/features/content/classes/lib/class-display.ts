@@ -1,6 +1,5 @@
 import {
   availableClassFeatures,
-  formatClassSpellcastingFeatureRules,
   formatToolProficiencyPoolLabel,
   getAbilityCompactLabel,
   getAbilityLabel,
@@ -21,6 +20,8 @@ import {
   type StatBlockProseDocument,
 } from '@rpg/contracts'
 
+import { featureToFormRow } from './class-feature-form-fields'
+import { resolveSpellcastingGrantingFeatureFacing } from './class-spellcasting-feature-rules.lib'
 import { isSubclassChoiceFeatureRow } from './class-subclass-choice-features'
 
 import type { ContentStatRowData } from '../../lib/detail/metadata/content-stat-rows'
@@ -364,28 +365,31 @@ function mapFeatureToDetailItem(
     spellsById?: ReadonlyMap<string, Spell>
   },
 ): ClassFeatureDetailItem {
+  let introHtml = feature.intro
   let rulesDocument: StatBlockProseDocument | undefined
+
   if (
-    options?.characterClass?.spellcasting &&
+    options?.characterClass &&
     options.spellcastingProgression &&
     isClassSpellcastingGrantingFeature(feature)
   ) {
-    rulesDocument =
-      formatClassSpellcastingFeatureRules({
-        characterClass: {
-          ...options.characterClass,
-          features: [feature],
-        },
-        config: options.spellcastingProgression,
-        spellsById: options.spellsById,
-      }) ?? undefined
+    const facing = resolveSpellcastingGrantingFeatureFacing({
+      className: options.characterClass.name,
+      rulesetId: options.characterClass.rulesetId,
+      spellcasting: options.characterClass.spellcasting,
+      featureRow: featureToFormRow(feature),
+      spellcastingProgression: options.spellcastingProgression,
+      spellsById: options.spellsById,
+    })
+    introHtml = facing.introHtml ?? introHtml
+    rulesDocument = facing.rulesDocument
   }
 
   return {
     id: feature.id,
     level: feature.level,
     title: feature.name,
-    introHtml: feature.intro,
+    introHtml,
     rulesDocument,
     bodyHtml: feature.description,
     tables: feature.kind === 'custom' ? feature.tables : undefined,

@@ -22,11 +22,22 @@ export function statBlockLeadSeparator(treatment: StatBlockLeadTreatment): strin
 
 export function joinStatBlockProseParagraph(segments: StatBlockProse): string {
   let out = ''
+  let afterParagraphLead = false
   for (const segment of segments) {
     if (segment.kind === 'lead') {
       out += `${segment.label}${statBlockLeadSeparator(segment.treatment)}`
+      afterParagraphLead = segment.treatment === 'paragraph'
       continue
     }
+    if (
+      afterParagraphLead &&
+      segment.kind === 'text' &&
+      segment.value.length > 0 &&
+      !segment.value.startsWith(' ')
+    ) {
+      out += ' '
+    }
+    afterParagraphLead = false
     out += segment.value
   }
   return out
