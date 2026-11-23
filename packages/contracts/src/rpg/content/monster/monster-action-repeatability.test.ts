@@ -122,9 +122,9 @@ describe('monster action repeatability', () => {
       acquisitionStateForItem('create:teleport', sections, { section: 'actions' }).disabled,
     ).toBe(undefined)
     expect(acquisitionStateForItem('reaction:parry', sections).disabled).toBe(true)
-    expect(acquisitionStateForItem('natural:bite', sections)).toMatchObject({
-      focusActionId: 'bite',
-      note: 'Already added',
+    expect(acquisitionStateForItem('natural:bite', sections)).toEqual({
+      disabled: true,
+      note: MONSTER_NATURAL_FORM_DUPLICATE_MESSAGE,
     })
   })
 

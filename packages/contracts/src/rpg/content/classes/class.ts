@@ -34,6 +34,8 @@ import { classValidationMessages } from './class-messages'
 import { contentSummaryRefSchema } from '../lib/content-summary-ref'
 import { contentTableSchema } from '../tables'
 import { refineFeatureTablesOnFeature } from './class-feature-table'
+import { keysFromEntries } from '../../vocab/enum-schema'
+import type { GameTermEntry } from '../../vocab/types'
 
 // ---------------------------------------------------------------------------
 // Class — SRD-faithful prose lives in rich-text HTML on `description` and
@@ -43,15 +45,34 @@ import { refineFeatureTablesOnFeature } from './class-feature-table'
 
 // --- Class features + proficiencies ----------------------------------------
 
-export const CLASS_FEATURE_KINDS = ['custom', 'asi', 'spellcasting', 'subclass-choice'] as const
-
-export type ClassFeatureKind = (typeof CLASS_FEATURE_KINDS)[number]
-
 export const CLASS_FEATURE_KIND_ENTRIES = {
-  asi: { label: 'Ability Score Improvement' },
-  spellcasting: { label: 'Spellcasting' },
-  'subclass-choice': { label: 'Subclass' },
-} as const satisfies Partial<Record<ClassFeatureKind, { label: string }>>
+  custom: {
+    label: 'Custom feature',
+    description: 'A named class feature described in prose with optional structured grants.',
+  },
+  asi: {
+    label: 'Ability Score Improvement',
+    description: 'Grants an ability score increase or an optional feat at a class level.',
+  },
+  spellcasting: {
+    label: 'Spellcasting',
+    description: 'Pairs the class spell list and progression with spellcasting configuration.',
+  },
+  'subclass-choice': {
+    label: 'Subclass',
+    description: 'A level where the character chooses a subclass for this class.',
+  },
+} as const satisfies Record<string, GameTermEntry>
+
+export type ClassFeatureKind = keyof typeof CLASS_FEATURE_KIND_ENTRIES
+
+export const CLASS_FEATURE_KINDS = keysFromEntries(CLASS_FEATURE_KIND_ENTRIES)
+
+export const classFeatureKindSchema = z.enum(CLASS_FEATURE_KINDS)
+
+export function isClassFeatureKind(value: unknown): value is ClassFeatureKind {
+  return typeof value === 'string' && (CLASS_FEATURE_KINDS as readonly string[]).includes(value)
+}
 
 const classFeatureIdentitySchema = {
   id: z.string().min(1),
@@ -277,6 +298,12 @@ function refineUniqueClassFeatureIds(features: ClassBodyFeature[], ctx: z.Refine
     }
     seen.add(feature.id)
   }
+}
+
+export function classSubclassChoiceAtOccurrenceLimit(
+  features: readonly Pick<ClassBodyFeature, 'kind'>[],
+): boolean {
+  return features.filter((feature) => feature.kind === 'subclass-choice').length >= 1
 }
 
 function refineSubclassChoiceCardinality(features: ClassBodyFeature[], ctx: z.RefinementCtx): void {

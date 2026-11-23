@@ -31,7 +31,12 @@ import {
   monsterPresetTraitSchema,
 } from './creature/trait-preset-schema'
 import { LEGENDARY_RESISTANCE_NAME_OVERRIDE_MESSAGE } from './creature/traits/legendary-resistance.constants'
+import {
+  creatureTraitTemplateAtOccurrenceLimit,
+  creatureTraitTemplateOccurrenceMessage,
+} from './creature/traits/creature-trait-template-occurrence'
 import { refineMonsterSenseOccurrence } from './creature/traits/sense-occurrence'
+import { getCreatureTraitVocabularyEntry } from '../vocab/creature/trait-vocabulary'
 import { refineCreatureTraitTemplate } from './creature/traits/validate'
 import {
   customContentTraitSchema,
@@ -444,21 +449,30 @@ function refineUniqueTraitPresets(
   ctx: z.RefinementCtx,
   path: (string | number)[],
 ): void {
-  const seen = new Set<string>()
+  const seenTemplates = new Set<string>()
+  const seenPresets = new Set<string>()
   traits.forEach((trait, index) => {
     const preset = 'preset' in trait && typeof trait.preset === 'string' ? trait.preset : undefined
     const templateId =
       'templateId' in trait && typeof trait.templateId === 'string' ? trait.templateId : undefined
-    const key = preset ?? templateId
-    if (!key) return
-    if (seen.has(key)) {
-      addCustomRefinementIssue(ctx, 'Trait presets must be unique.', [
+    if (templateId) {
+      const limit = creatureTraitTemplateAtOccurrenceLimit(templateId, seenTemplates)
+      if (limit.atLimit) {
+        addCustomRefinementIssue(ctx, limit.message, [...path, index, 'templateId'])
+      }
+      seenTemplates.add(templateId)
+      return
+    }
+    if (!preset) return
+    if (seenPresets.has(preset)) {
+      const label = getCreatureTraitVocabularyEntry(preset)?.label ?? preset
+      addCustomRefinementIssue(ctx, creatureTraitTemplateOccurrenceMessage(label), [
         ...path,
         index,
-        preset ? 'preset' : 'templateId',
+        'preset',
       ])
     }
-    seen.add(key)
+    seenPresets.add(preset)
   })
 }
 

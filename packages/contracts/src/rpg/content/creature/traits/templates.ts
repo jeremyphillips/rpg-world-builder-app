@@ -46,6 +46,7 @@ export type CreatureTraitTemplate = {
   description: string
   rulesetIds: readonly string[]
   hosts: readonly CreatureTraitTemplateHost[]
+  occurrence?: 'one'
   sourcePolicy?: CreatureTraitTemplateSourcePolicy
   acquisitionGroup?: string
   senseId?: string
@@ -84,6 +85,7 @@ export const CREATURE_TRAIT_TEMPLATE_ENTRIES = {
     description: 'Advantage on saving throws against spells and other magical effects.',
     rulesetIds: [DEFAULT_SYSTEM_RULESET_ID],
     hosts: SPECIES_AND_MONSTER_HOSTS,
+    occurrence: 'one',
     configSchema: NO_CONFIG,
     formatDescription: () =>
       'This creature has Advantage on saving throws against spells and other magical effects.',
@@ -101,6 +103,7 @@ export const CREATURE_TRAIT_TEMPLATE_ENTRIES = {
       'Advantage on an attack roll when an ally is adjacent to the target and is not incapacitated.',
     rulesetIds: [DEFAULT_SYSTEM_RULESET_ID],
     hosts: SPECIES_AND_MONSTER_HOSTS,
+    occurrence: 'one',
     configSchema: NO_CONFIG,
     formatDescription: () =>
       "This creature has Advantage on an attack roll against a creature if at least one of its allies is within 5 feet of the creature and the ally doesn't have the Incapacitated condition.",
@@ -117,6 +120,7 @@ export const CREATURE_TRAIT_TEMPLATE_ENTRIES = {
     description: 'Disadvantage on attack rolls and Wisdom (Perception) checks while in sunlight.',
     rulesetIds: [DEFAULT_SYSTEM_RULESET_ID],
     hosts: SPECIES_AND_MONSTER_HOSTS,
+    occurrence: 'one',
     configSchema: NO_CONFIG,
     formatDescription: () =>
       'While in sunlight, this creature has Disadvantage on attack rolls and Wisdom (Perception) checks.',
@@ -136,6 +140,7 @@ export const CREATURE_TRAIT_TEMPLATE_ENTRIES = {
     description: 'Choose to succeed on a failed saving throw a limited number of times per day.',
     rulesetIds: [DEFAULT_SYSTEM_RULESET_ID],
     hosts: SPECIES_AND_MONSTER_HOSTS,
+    occurrence: 'one',
     configSchema: legendaryResistanceConfigSchema,
     formatName: () => LEGENDARY_RESISTANCE_LABEL,
     formatDescription: () =>

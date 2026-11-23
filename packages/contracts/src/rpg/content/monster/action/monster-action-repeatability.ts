@@ -44,7 +44,6 @@ export type RepeatabilityViolation = {
 export type AcquisitionItemState = {
   disabled?: boolean
   note?: string
-  focusActionId?: string
 }
 
 function sectionRows(
@@ -281,7 +280,7 @@ function acquisitionStateForNaturalPreset(
   const preset = getActionPreset(presetId)
   if (preset?.mechanics !== 'attack-roll') return {}
   const existing = findNaturalByForm(sections, preset.defaults.naturalForm)
-  return existing?.id ? { focusActionId: existing.id, note: 'Already added' } : {}
+  return existing?.id ? { disabled: true, note: MONSTER_NATURAL_FORM_DUPLICATE_MESSAGE } : {}
 }
 
 /** Acquisition menu state for a known add-menu id. */

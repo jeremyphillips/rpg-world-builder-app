@@ -1,11 +1,30 @@
 import type { z } from 'zod'
 
 import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
-import { refineCreatureTraitTemplate, refineSpeciesTraitSenseOccurrence } from './creature/traits'
+import {
+  creatureTraitTemplateAtOccurrenceLimit,
+  refineCreatureTraitTemplate,
+  refineSpeciesTraitSenseOccurrence,
+} from './creature/traits'
 import type { SpeciesBodyTrait } from './species'
 
 export const SPECIES_TRAIT_IN_LAIR_COUNT_MESSAGE =
   'Species traits do not use an in-lair count. Remove it.'
+
+function refineSpeciesTraitTemplateOccurrence(
+  traits: SpeciesBodyTrait[],
+  ctx: z.RefinementCtx,
+): void {
+  const seenTemplateIds = new Set<string>()
+  traits.forEach((trait, index) => {
+    if (trait.kind !== 'template' || !trait.templateId) return
+    const limit = creatureTraitTemplateAtOccurrenceLimit(trait.templateId, seenTemplateIds)
+    if (limit.atLimit) {
+      addCustomRefinementIssue(ctx, limit.message, ['traits', index, 'templateId'])
+    }
+    seenTemplateIds.add(trait.templateId)
+  })
+}
 
 export function refineSpeciesTraits(
   traits: SpeciesBodyTrait[],
@@ -13,6 +32,7 @@ export function refineSpeciesTraits(
   options?: { publish?: boolean },
 ): void {
   refineSpeciesTraitSenseOccurrence(traits, ctx, options)
+  refineSpeciesTraitTemplateOccurrence(traits, ctx)
 
   traits.forEach((trait, index) => {
     if (trait.kind === 'template') {
