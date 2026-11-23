@@ -32,7 +32,7 @@ export type MonsterEquipmentEntryActions = {
   equipment: readonly MonsterEquipmentFormEntry[]
   catalog: ReturnType<typeof monsterEquipmentCatalog>
   weaponGrants: ReturnType<typeof resolveMonsterFormWeaponGrants>
-  rulesetId: SystemRulesetId
+  rulesetId: SystemRulesetId | undefined
   updateEquipment: (next: MonsterEquipmentFormEntry[]) => void
   removeEntry: (entryId: string) => void
   entryCard: (entry: MonsterEquipmentFormEntry) => ReactNode
@@ -75,8 +75,11 @@ export function useMonsterEquipmentEntryActions(ctx: ContentFormCtx): MonsterEqu
   const [pendingRemove, setPendingRemove] = useState<PendingRemove | null>(null)
 
   const catalog = monsterEquipmentCatalog(ctx)
-  const rulesetId = (ctx.rulesetId ?? 'srd-cc-5.2.1') as SystemRulesetId
-  const magicProvider = useMemo(() => createMagicPropertyDefinitionProvider(rulesetId), [rulesetId])
+  const rulesetId = ctx.rulesetId as SystemRulesetId | undefined
+  const magicProvider = useMemo(
+    () => (rulesetId ? createMagicPropertyDefinitionProvider(rulesetId) : undefined),
+    [rulesetId],
+  )
   const equipmentSource = values?.equipment
   const equipment = useMemo(() => equipmentSource ?? [], [equipmentSource])
   const weaponGrants = useMemo(() => resolveMonsterFormWeaponGrants(values), [values])
@@ -106,7 +109,7 @@ export function useMonsterEquipmentEntryActions(ctx: ContentFormCtx): MonsterEqu
   )
 
   const pendingRemoveCopy = useMemo(() => {
-    if (!pendingRemove || !values) return null
+    if (!pendingRemove || !values || !magicProvider) return null
     return buildPendingRemovalCopy(pendingRemove, values, equipment, catalog, magicProvider)
   }, [catalog, equipment, magicProvider, pendingRemove, values])
 

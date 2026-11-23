@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react'
 import { useWatch } from 'react-hook-form'
-import { DEFAULT_SYSTEM_RULESET_ID, listCreatureTraitTemplatesForRuleset } from '@rpg/contracts'
+import { listCreatureTraitTemplatesForRuleset } from '@rpg/contracts'
 import { ButtonDropdown } from '@rpg/ui'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
@@ -40,8 +40,7 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
   const traits = values?.traits
   const monsterName = values?.name
   const templateIds = useMemo(
-    () =>
-      listCreatureTraitTemplatesForRuleset(ctx.rulesetId ?? DEFAULT_SYSTEM_RULESET_ID, 'monster'),
+    () => (ctx.rulesetId ? listCreatureTraitTemplatesForRuleset(ctx.rulesetId, 'monster') : []),
     [ctx.rulesetId],
   )
   const templateIdSet = useMemo(() => new Set<string>(templateIds), [templateIds])

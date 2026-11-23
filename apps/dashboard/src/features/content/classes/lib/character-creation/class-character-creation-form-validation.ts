@@ -32,10 +32,11 @@ type ProficiencyLinkIssue = {
 
 function buildEligibleProficiencyChoiceIds(
   proficiencies: CharacterCreationProficienciesForm | undefined,
-  formCtx?: Pick<ContentFormCtx, 'options' | 'entityId'>,
+  formCtx?: Pick<ContentFormCtx, 'options' | 'entityId' | 'rulesetId'>,
 ): ReadonlySet<string> {
   const equipment = formCtx?.options?.equipment?.visible ?? []
-  if (!equipment.length) return new Set()
+  const rulesetId = formCtx?.rulesetId ?? equipment[0]?.rulesetId
+  if (!equipment.length || !rulesetId) return new Set()
 
   const characterCreationProficiencies =
     characterCreationProficienciesWithLiveToolLabel(proficiencies)
@@ -43,7 +44,7 @@ function buildEligibleProficiencyChoiceIds(
 
   const characterClass = {
     id: formCtx?.entityId ?? 'draft-class',
-    rulesetId: equipment[0]?.rulesetId ?? 'srd-cc-5.2.1',
+    rulesetId,
     characterCreation: { proficiencies: characterCreationProficiencies },
   } as CharacterClass
 

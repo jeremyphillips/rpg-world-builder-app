@@ -17,9 +17,11 @@ export function monsterArmorClassRules(ctx: ContentFormCtx): ArmorClassRules | u
   return ctx.armorClassRules
 }
 
-export function monsterMagicPropertyProvider(ctx: ContentFormCtx): MagicPropertyDefinitionProvider {
-  const rulesetId = (ctx.rulesetId ?? 'srd-cc-5.2.1') as SystemRulesetId
-  return createMagicPropertyDefinitionProvider(rulesetId)
+export function monsterMagicPropertyProvider(
+  ctx: ContentFormCtx,
+): MagicPropertyDefinitionProvider | undefined {
+  if (!ctx.rulesetId) return undefined
+  return createMagicPropertyDefinitionProvider(ctx.rulesetId as SystemRulesetId)
 }
 
 export function monsterSkillCatalog(ctx: ContentFormCtx): Map<string, SkillProficiency> {
@@ -39,6 +41,9 @@ export function deriveMonsterFormDraft(
   if (ctx.equipmentCatalogStatus !== 'ready') return null
   const armorClassRules = monsterArmorClassRules(ctx)
   if (!armorClassRules) return null
+  const magicPropertyProvider = monsterMagicPropertyProvider(ctx)
+  if (!magicPropertyProvider) return null
+
   const normalized = normalizeMonsterFormValues(values, {
     intent: 'draft',
     mode: 'create',
@@ -49,6 +54,6 @@ export function deriveMonsterFormDraft(
     equipmentCatalog: monsterEquipmentCatalog(ctx),
     skillCatalog: monsterSkillCatalog(ctx),
     armorClassRules,
-    magicPropertyProvider: monsterMagicPropertyProvider(ctx),
+    magicPropertyProvider,
   })
 }

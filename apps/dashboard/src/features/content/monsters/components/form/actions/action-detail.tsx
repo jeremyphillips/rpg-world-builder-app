@@ -88,6 +88,7 @@ function equipmentOptions(
 ): { value: string; label: string }[] {
   const catalog = monsterEquipmentCatalog(ctx)
   const provider = monsterMagicPropertyProvider(ctx)
+  if (!provider) return []
   const equipment = values.equipment ?? []
   return equipment.flatMap((entry) => {
     const item = catalog.get(entry.equipmentId)

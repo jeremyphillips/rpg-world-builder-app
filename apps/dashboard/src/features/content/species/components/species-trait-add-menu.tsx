@@ -1,4 +1,4 @@
-import { DEFAULT_SYSTEM_RULESET_ID, SENSE_SET_ID } from '@rpg/contracts'
+import { SENSE_SET_ID } from '@rpg/contracts'
 import { ButtonDropdown } from '@rpg/ui'
 
 import { buildLabelDescriptionActiveVocabulary, useVocabularySet } from '@/features/vocabulary'
@@ -33,8 +33,9 @@ export function SpeciesTraitAddMenu({
       ? 'error'
       : 'ready'
 
+  const resolvedRulesetId = formCtx.rulesetId ?? rulesetId
   const items = speciesTraitAcquisitionDropdownItems({
-    rulesetId: rulesetId ?? DEFAULT_SYSTEM_RULESET_ID,
+    rulesetId: resolvedRulesetId ?? '',
     traits,
     senseVocabulary,
     senseVocabularyStatus,

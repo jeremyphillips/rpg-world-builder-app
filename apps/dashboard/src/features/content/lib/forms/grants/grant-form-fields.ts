@@ -61,6 +61,8 @@ import {
   getContentTypeMidSentenceLabel,
 } from '@/features/content/lib/content-type-labels'
 
+import { equipmentReferenceScopeFromContentFormCtx } from '@/lib/content-form-equipment-reference-scope.lib'
+
 import type { ContentFormCtx } from '../registry/content-form-registry'
 import { senseRangeJoinedPairField } from '../fields/content-sense-range-form-fields'
 import { getLevelFieldOptions, withLevelOptionLabels } from '../../form-options/level-field-options'
@@ -767,11 +769,11 @@ function buildGrantRowHeaderContext(
     resolveLanguageLabel: (id) => getLanguageLabelFromVocabulary(languageVocabulary, id),
     resolveSenseLabel: (id) => getSenseLabelFromVocabulary(senseVocabulary, id),
     equipmentReferences: buildGrantEquipmentReferencePresentationFromAuthoring({
-      status: ctx.equipmentCatalogStatus,
+      status: ctx.rulesetId ? ctx.equipmentCatalogStatus : 'pending',
       equipmentById: ctx.equipmentCatalogById,
-      scope: {
-        rulesetId: ctx.rulesetId ?? '',
-        campaignId: ctx.campaignId ?? '',
+      scope: equipmentReferenceScopeFromContentFormCtx(ctx) ?? {
+        rulesetId: '',
+        campaignId: '',
       },
     }),
     weaponOptions: toSortedContentFieldOptions(

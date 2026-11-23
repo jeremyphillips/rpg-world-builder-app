@@ -16,6 +16,8 @@ import {
   wealthGrantMoneyField,
   wealthGrantMoneyFromForm,
 } from '../../../lib/forms/fields/content-economy-form-fields'
+import { equipmentReferenceScopeFromContentFormCtx } from '@/lib/content-form-equipment-reference-scope.lib'
+
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { buildGrantEquipmentReferencePresentationFromAuthoring } from '../../../lib/forms/grants/grant-row-presentation.lib'
 import {
@@ -330,11 +332,11 @@ export function startingEquipmentItemFields(ctx: ContentFormCtx): FormItem[] {
 
 export function startingEquipmentOptionItemFields(ctx: ContentFormCtx): FormItem[] {
   const equipmentReferences = buildGrantEquipmentReferencePresentationFromAuthoring({
-    status: ctx.equipmentCatalogStatus,
+    status: ctx.rulesetId ? ctx.equipmentCatalogStatus : 'pending',
     equipmentById: ctx.equipmentCatalogById,
-    scope: {
-      rulesetId: ctx.rulesetId ?? '',
-      campaignId: ctx.campaignId ?? '',
+    scope: equipmentReferenceScopeFromContentFormCtx(ctx) ?? {
+      rulesetId: '',
+      campaignId: '',
     },
   })
   const proficiencyChoiceOptions = ctx.options?.proficiencyChoiceTargets ?? []

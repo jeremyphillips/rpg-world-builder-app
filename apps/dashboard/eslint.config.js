@@ -591,6 +591,26 @@ const dashboardMonsterAcquisitionSectionKindsGuard = {
   },
 }
 
+const dashboardSystemRulesetLiteralGuard = {
+  files: ['src/**/*.{ts,tsx}'],
+  ignores: [
+    '**/*.{test,integration.test,stories}.{ts,tsx}',
+    '**/fixtures/**',
+    '**/*.fixtures.ts',
+    '**/*.fixtures.tsx',
+  ],
+  rules: {
+    'no-restricted-syntax': [
+      'error',
+      {
+        selector: "Literal[value='srd-cc-5.2.1']",
+        message:
+          'Import DEFAULT_SYSTEM_RULESET_ID from @rpg/contracts for the system default identity — do not inline the ruleset literal in production code.',
+      },
+    ],
+  },
+}
+
 const dashboardAuthApiContractsImportGuard = {
   files: ['src/features/auth/api/**/*.{ts,tsx}'],
   rules: {
@@ -643,6 +663,7 @@ export default [
   dashboardFastRefreshGuard,
   dashboardShellContractsImportGuard,
   dashboardAuthApiContractsImportGuard,
+  dashboardSystemRulesetLiteralGuard,
   dashboardMonsterAcquisitionSectionKindsGuard,
   dashboardFacingPresentationImportGuard,
   dashboardTraitPipelineImportGuard,

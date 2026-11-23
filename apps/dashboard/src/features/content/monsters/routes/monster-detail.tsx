@@ -77,10 +77,9 @@ export function MonsterDetailContent({
   const spellsQuery = useSpells(campaignId)
   const rulesetQuery = useRulesetPatch(campaignId)
   const rulesetPatch = rulesetQuery.data
-  const rulesetId = (monster.rulesetId ?? 'srd-cc-5.2.1') as SystemRulesetId
   const magicPropertyProvider = useMemo(
-    () => createMagicPropertyDefinitionProvider(rulesetId),
-    [rulesetId],
+    () => createMagicPropertyDefinitionProvider(monster.rulesetId),
+    [monster.rulesetId],
   )
   const armorClassRules = rulesetPatch?.mechanics.armorClass
   const equipment = equipmentQuery.data

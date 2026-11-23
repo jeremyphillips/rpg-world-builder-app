@@ -17,13 +17,16 @@ export function resolveClassFeatureDetailFacing(
   },
 ): FacingResolution {
   const characterClass = options?.characterClass
+  if (!characterClass?.rulesetId) {
+    return { status: 'incomplete', reason: { code: 'unresolvable-record' } }
+  }
   return resolveFacing({
     domain: 'classFeature',
     source: 'persisted',
     feature,
     host: {
       className: characterClass?.name ?? '',
-      rulesetId: characterClass?.rulesetId ?? 'srd-cc-5.2.1',
+      rulesetId: characterClass.rulesetId,
       spellcasting: characterClass?.spellcasting,
       spellcastingProgression: options?.spellcastingProgression,
       spellsById: options?.spellsById,
