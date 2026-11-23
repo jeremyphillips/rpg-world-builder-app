@@ -62,6 +62,25 @@ Tests assert through the definition, never a literal:
 expect(result.error.issues[0]?.message).toBe(levelValidationMessages.rangeGap({ level: 5 }))
 ```
 
+## Display boundaries
+
+`defineMessage()` catalog invocations return **transport** strings (structured encoding with a
+leading null prefix). UI surfaces must decode to plain English once per pipeline via
+`formatFieldMessage` — never render raw transport in labels, hints, or supporting lines.
+
+| Consumer                                 | Decode at                                                |
+| ---------------------------------------- | -------------------------------------------------------- |
+| Form field errors                        | `resolveFieldErrorMessage` (`@rpg/ui/form`)              |
+| Character builder alerts and step frames | `formatFieldMessage` at render or init                   |
+| Content acquisition add menus            | `formatFieldMessage` in `toAcquisitionDropdownItem` only |
+
+Acquisition policy layers (`resolveAcquisitionAvailability`, domain eligibility helpers) may carry
+transport on `AcquisitionOption` message fields. Producers pass catalog output or plain constants;
+only the acquisition→dropdown adapter decodes before `ButtonDropdownItem` / `InteractiveListRow`.
+
+Malformed transport (invalid prefix payload) follows `formatFieldMessage` passthrough: the raw
+string is returned unchanged.
+
 ## Draft vs publish contract families
 
 Catalog content types expose parallel Zod schema families keyed by
