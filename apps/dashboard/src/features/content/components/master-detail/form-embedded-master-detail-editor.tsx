@@ -26,6 +26,8 @@ import { MasterDetailEditorPanel } from './master-detail-editor-panel'
 import type { MasterDetailEditorIdentity } from './master-detail-editor-shell'
 import { MasterDetailGrid } from './master-detail-grid'
 import { MasterDetailListPanel, type MasterDetailListItem } from './master-detail-list-panel'
+import type { FacingHostConfig } from '../../facing/facing-host-config.types'
+import { StructuredFacingHostPanel } from '../../facing/structured-facing-host-panel'
 
 export type { FormEmbeddedMasterDetailMapListItemContext }
 
@@ -85,6 +87,8 @@ type FormEmbeddedMasterDetailEditorBase = {
   access?: FormEmbeddedMasterDetailAccessConfig
   /** Enables drag-to-reorder on the flat list rail; calls `editor.move` on drop. */
   listReorder?: boolean
+  /** Canonical player-facing preview for the selected structured row. */
+  facing?: FacingHostConfig
 }
 
 export type FormEmbeddedMasterDetailEditorProps<TRow = Record<string, unknown>> =
@@ -150,7 +154,8 @@ function FormEmbeddedMasterDetailEditorBody<TRow = Record<string, unknown>>({
   onAdd,
   ...props
 }: FormEmbeddedMasterDetailEditorBodyProps<TRow>) {
-  const body = useFormEmbeddedMasterDetailEditorBody(props)
+  const { facing, ...bodyProps } = props
+  const body = useFormEmbeddedMasterDetailEditorBody(bodyProps)
   const campaignAccessDialog = embeddedCampaignAccessDialog({
     access: props.access,
     formCtx: body.formCtx,
@@ -192,6 +197,7 @@ function FormEmbeddedMasterDetailEditorBody<TRow = Record<string, unknown>>({
       onCancelDelete={body.editor.cancelRemove}
       onConfirmDelete={body.editor.confirmRemove}
       campaignAccessDialog={campaignAccessDialog}
+      facing={facing}
     />
   )
 }
@@ -227,6 +233,7 @@ function EmbeddedMasterDetailLayout({
   availabilityDialogRef,
   onDuplicate,
   onListMove,
+  facing,
 }: {
   leadingContent?: ReactNode
   campaignAccessDialog: ReactNode
@@ -258,6 +265,7 @@ function EmbeddedMasterDetailLayout({
   availabilityDialogRef?: RefObject<HTMLDivElement | null>
   onDuplicate?: () => void
   onListMove?: (from: number, to: number) => void
+  facing?: FacingHostConfig
 }) {
   const grid = (
     <MasterDetailGrid>
@@ -288,6 +296,7 @@ function EmbeddedMasterDetailLayout({
         availabilityNamePrefix={availabilityNamePrefix}
         availabilityDialogRef={availabilityDialogRef}
         onDuplicate={onDuplicate}
+        detailLeading={facing ? <StructuredFacingHostPanel facing={facing} /> : undefined}
       />
     </MasterDetailGrid>
   )

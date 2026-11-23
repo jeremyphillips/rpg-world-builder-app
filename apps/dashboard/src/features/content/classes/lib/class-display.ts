@@ -7,22 +7,22 @@ import {
   getToolCategoryEntry,
   getWeaponCategoryEntry,
   classSkillChoiceDisplaySummary,
-  isSpellcastingClassFeature,
   isMeaningfulToolProficiencyChoice,
   getProficiencyDomainCompactLabel,
   type CharacterClass,
   type ClassBodyFeature,
   type ClassFeature,
-  type ContentTable,
+  type FacingResolution,
   type ProficiencyChoice,
   type ResolvedSpellcastingProgressionConfig,
   type Spell,
-  type StatBlockProseDocument,
 } from '@rpg/contracts'
 
-import { featureToFormRow } from './class-feature-form-fields'
-import { resolveSpellcastingGrantingFeatureFacing } from './class-spellcasting-feature-rules.lib'
 import { isSubclassChoiceFeatureRow } from './class-subclass-choice-features'
+import {
+  classFeatureDetailTitle,
+  resolveClassFeatureDetailFacing,
+} from './class-display-facing.lib'
 
 import type { ContentStatRowData } from '../../lib/detail/metadata/content-stat-rows'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
@@ -93,10 +93,7 @@ export type ClassFeatureDetailItem = {
   id: string
   level: number
   title: string
-  introHtml?: string
-  rulesDocument?: StatBlockProseDocument
-  bodyHtml?: string
-  tables?: ContentTable[]
+  facing: FacingResolution
 }
 
 export type ClassCardViewModel = {
@@ -365,34 +362,14 @@ function mapFeatureToDetailItem(
     spellsById?: ReadonlyMap<string, Spell>
   },
 ): ClassFeatureDetailItem {
-  let introHtml = feature.intro
-  let rulesDocument: StatBlockProseDocument | undefined
-
-  if (
-    options?.characterClass &&
-    options.spellcastingProgression &&
-    isSpellcastingClassFeature(feature)
-  ) {
-    const facing = resolveSpellcastingGrantingFeatureFacing({
-      className: options.characterClass.name,
-      rulesetId: options.characterClass.rulesetId,
-      spellcasting: options.characterClass.spellcasting,
-      featureRow: featureToFormRow(feature),
-      spellcastingProgression: options.spellcastingProgression,
-      spellsById: options.spellsById,
-    })
-    introHtml = facing.introHtml ?? introHtml
-    rulesDocument = facing.rulesDocument
-  }
+  const facing = resolveClassFeatureDetailFacing(feature, options)
+  const title = classFeatureDetailTitle(feature, facing)
 
   return {
     id: feature.id,
     level: feature.level,
-    title: feature.name,
-    introHtml,
-    rulesDocument,
-    bodyHtml: feature.description,
-    tables: feature.kind === 'custom' ? feature.tables : undefined,
+    title,
+    facing,
   }
 }
 

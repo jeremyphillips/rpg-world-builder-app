@@ -1,17 +1,6 @@
-import {
-  cn,
-  FeatureRulesContent,
-  Heading,
-  RichTextContent,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-} from '@rpg/ui'
-import type { ContentTable } from '@rpg/contracts'
+import { cn, Heading, Table, TableBody, TableCell, TableRow } from '@rpg/ui'
 
-import { ContentTableView } from '../../../components/tables/content-table-view'
-import { contentDetailProseProps } from '../../../lib/detail/page/content-detail-prose'
+import { FacingDetailBody } from '../../../facing/facing-detail-body'
 import { contentDetailNavItemId } from '../../../lib/detail/page/content-detail-nav-anchor-id'
 import { contentDetailSectionPanelContentHeadingClasses } from '../../../lib/detail/page/content-detail-section.variants'
 import { useContentDetailSectionNavLeaf } from '../../../lib/detail/page/use-content-detail-section-nav-leaf'
@@ -49,8 +38,6 @@ function ClassFeatureLevelGroupRows({ group }: { group: LevelGroup }) {
 
   return group.items.map((item, rowIndexInGroup) => {
     const isFirstInGroup = rowIndexInGroup === 0
-    const inlineTables = (item.tables ?? []).filter((table) => table.kind === 'general')
-
     return (
       <TableRow
         key={item.id}
@@ -75,23 +62,7 @@ function ClassFeatureLevelGroupRows({ group }: { group: LevelGroup }) {
             >
               {item.title}
             </Heading>
-            {item.rulesDocument || item.introHtml ? (
-              <FeatureRulesContent
-                introHtml={item.introHtml}
-                rulesDocument={item.rulesDocument}
-                introTone="default"
-              />
-            ) : null}
-            {item.bodyHtml ? (
-              <RichTextContent html={item.bodyHtml} {...contentDetailProseProps} />
-            ) : null}
-            {inlineTables.length > 0 ? (
-              <div className="space-y-4">
-                {inlineTables.map((table: ContentTable) => (
-                  <ContentTableView key={table.id} table={table} />
-                ))}
-              </div>
-            ) : null}
+            <FacingDetailBody resolution={item.facing} />
           </div>
         </TableCell>
       </TableRow>

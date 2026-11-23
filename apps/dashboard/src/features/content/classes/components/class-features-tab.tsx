@@ -24,6 +24,7 @@ import {
 } from '../lib/class-spellcasting-lifecycle'
 import { buildSpellcastingFeatureAvailabilityFormFields } from '../lib/class-spellcasting-feature-availability-form-fields'
 import { ClassFeatureAddMenu } from './class-feature-add-menu'
+import { useClassFeatureFacingHost } from '../../facing/use-class-feature-facing-host'
 
 const FEATURES_FIELD_NAME = 'features'
 
@@ -144,6 +145,12 @@ export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
     [],
   )
 
+  const facing = useClassFeatureFacingHost({
+    formCtx,
+    fieldName: FEATURES_FIELD_NAME,
+    selectedIndex: editor.selectedIndex,
+  })
+
   const handleConfirmSpellcastingRemove = useCallback(() => {
     const patch = removeSpellcastingFromFormValues(getValues())
     for (const [key, value] of Object.entries(patch)) {
@@ -186,6 +193,7 @@ export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
         resolveRowReasons={resolveRowReasons}
         resolveAvailabilityFormItems={resolveAvailabilityFormItems}
         access={{ kind: 'availability', fieldName: 'available' }}
+        facing={facing}
       />
       <ConfirmDialog
         open={spellcastingRemoveOpen}

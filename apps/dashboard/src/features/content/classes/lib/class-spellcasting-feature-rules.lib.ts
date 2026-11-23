@@ -7,14 +7,8 @@ import {
   type StatBlockProseDocument,
 } from '@rpg/contracts'
 
-import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
-
 import { featureFromFormRow, type FeatureRowForm } from './class-feature-form-fields'
 import { isSpellcastingGrantingFeatureRow } from './class-spellcasting-lifecycle'
-import {
-  classSpellcastingPreviewParentDependsOn,
-  spellcastingFromClassFormWatch,
-} from './class-form-values'
 
 export const CLASS_SPELLCASTING_RULES_PROGRESSION_UNAVAILABLE =
   'Spellcasting progression rules are unavailable.' as const
@@ -129,56 +123,4 @@ export function resolveSpellcastingGrantingFeatureRulesDocument(
   },
 ): StatBlockProseDocument | null {
   return resolveSpellcastingGrantingFeatureRulesDocumentFromInput(input)
-}
-
-export function classSpellcastingGrantingFeatureRulesDisplay(
-  ctx: ContentFormCtx,
-): import('@rpg/ui/form').DisplayConfig {
-  return {
-    kind: 'display',
-    id: 'class-spellcasting-granting-feature-rules',
-    visibility: {
-      dependsOn: ['kind'],
-      visibleWhen: (watched) => watched.kind === 'spellcasting',
-    },
-    resolve: {
-      dependsOn: [
-        'intro',
-        'level',
-        'name',
-        'kind',
-        '../../name',
-        ...classSpellcastingPreviewParentDependsOn(),
-      ],
-      contentWhen: (values) => {
-        const facing = resolveSpellcastingGrantingFeatureFacing({
-          className: String(values['../../name'] ?? ''),
-          rulesetId: ctx.rulesetId,
-          spellcasting: spellcastingFromClassFormWatch(values),
-          featureRow: {
-            id: 'preview',
-            name: String(values.name ?? ''),
-            level: Number(values.level),
-            intro: String(values.intro ?? ''),
-            grants: values.grants as FeatureRowForm['grants'],
-          },
-          spellcastingProgression: ctx.spellcastingProgression,
-          spellsById: ctx.spellCatalogById,
-        })
-
-        return {
-          variant: 'rulesPreview',
-          preview: {
-            title: facing.title,
-            content: {
-              kind: 'introAndRules',
-              introHtml: facing.introHtml,
-              rulesDocument: facing.rulesDocument,
-              guidance: facing.guidance,
-            },
-          },
-        }
-      },
-    },
-  }
 }

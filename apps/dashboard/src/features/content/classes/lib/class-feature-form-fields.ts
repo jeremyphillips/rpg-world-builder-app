@@ -36,7 +36,6 @@ import { applyStableIdsForUpdate } from '../../lib/forms/registry/content-form-k
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { FeatureTablesField } from '../components/features/feature-tables-field'
 import { isSpellcastingFeatureRow } from './class-feature-authoring'
-import { classSpellcastingGrantingFeatureRulesDisplay } from './class-spellcasting-feature-rules.lib'
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
 import { getLevelFieldOptions, levelSelectDigits } from '../../lib/form-options/level-field-options'
 
@@ -184,7 +183,6 @@ function sharedFeatureItemFields(
         visibleWhen: (values) => values.kind === 'spellcasting',
       },
     },
-    classSpellcastingGrantingFeatureRulesDisplay(ctx),
     {
       type: 'richtext',
       name: 'description',

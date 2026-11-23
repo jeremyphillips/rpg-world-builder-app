@@ -229,9 +229,14 @@ describe('class-display', () => {
       features && 'items' in features
         ? features.items.find((item) => item.id === 'spellcasting')
         : undefined
-    expect(spellcasting?.introHtml).toContain('bardic arts')
-    expect(spellcasting?.rulesDocument?.length).toBeGreaterThan(0)
-    expect(spellcasting?.bodyHtml).toBeUndefined()
+    expect(spellcasting?.facing.status).toBe('ready')
+    if (spellcasting?.facing.status !== 'ready') throw new Error('expected ready facing')
+    const introBlock = spellcasting.facing.document.blocks.find(
+      (block) => block.kind === 'richText',
+    )
+    const rulesBlock = spellcasting.facing.document.blocks.find((block) => block.kind === 'rules')
+    expect(introBlock?.kind === 'richText' ? introBlock.html : '').toContain('bardic arts')
+    expect(rulesBlock?.kind === 'rules' ? rulesBlock.document.length : 0).toBeGreaterThan(0)
     const seedFeature = bard.features.find((f) => f.id === 'spellcasting')
     expect(seedFeature && isSpellcastingClassFeature(seedFeature)).toBe(true)
   })

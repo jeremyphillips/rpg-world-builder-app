@@ -19,19 +19,37 @@ const items: ClassFeatureDetailItem[] = [
     id: 'fighting-style',
     level: 1,
     title: 'Fighting Style',
-    bodyHtml: '<p>Choose a style.</p>',
+    facing: {
+      status: 'ready',
+      document: {
+        title: 'Fighting Style',
+        blocks: [{ kind: 'richText', html: '<p>Choose a style.</p>' }],
+      },
+    },
   },
   {
     id: 'second-wind',
     level: 1,
     title: 'Second Wind',
-    bodyHtml: '<p>Regain hit points.</p>',
+    facing: {
+      status: 'ready',
+      document: {
+        title: 'Second Wind',
+        blocks: [{ kind: 'richText', html: '<p>Regain hit points.</p>' }],
+      },
+    },
   },
   {
     id: 'action-surge',
     level: 2,
     title: 'Action Surge',
-    bodyHtml: '<p>Take an extra action.</p>',
+    facing: {
+      status: 'ready',
+      document: {
+        title: 'Action Surge',
+        blocks: [{ kind: 'richText', html: '<p>Take an extra action.</p>' }],
+      },
+    },
   },
 ]
 

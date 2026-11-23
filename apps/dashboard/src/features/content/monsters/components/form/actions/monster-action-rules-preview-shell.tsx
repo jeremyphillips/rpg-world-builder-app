@@ -1,7 +1,8 @@
 import { useMemo, type ReactNode } from 'react'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
-import { MetadataList, Panel, Eyebrow, Text } from '@rpg/ui'
+import { FacingHostPanel, MetadataList, Panel, Eyebrow, Text } from '@rpg/ui'
+import { isMonsterActionAttackKind } from '@rpg/contracts'
 
 import { MonsterActionUnavailableRulesPreview } from '../../../lib/actions/previews/monster-action-preview-presentation'
 import { useMonsterActionPreviewTitle } from '../../../lib/monster-qualified-preview-title'
@@ -18,6 +19,7 @@ import {
 import { monsterActionShapeShiftDestinationsProse } from '../../../lib/presentation/monster-action-shape-shift-destinations'
 import { resolveActionStatBlockRulesFacingForForm } from '../../../lib/presentation/resolve-action-stat-block-rules-facing-for-form'
 import { MonsterActionRulesBody } from '../../detail/monster-action-rules-body'
+import { resolveFacing } from '../../../../facing/resolve-facing'
 
 function MonsterActionReadyPreview({
   label = RULES_PREVIEW_DEFAULT_LABEL,
@@ -63,6 +65,19 @@ export function MonsterActionRulesPreviewShell({
   values: MonsterFormValues
 }) {
   const editorTitle = useMonsterActionPreviewTitle(action, values, ctx, section)
+
+  const attackFacing = useMemo(() => {
+    if (!isMonsterActionAttackKind(action.kind)) return undefined
+    return resolveFacing({
+      domain: 'monsterAction',
+      source: 'draft',
+      values,
+      ctx,
+      actionId: action.id,
+      section,
+    })
+  }, [action.id, action.kind, ctx, section, values])
+
   const outcome = useMemo(
     () =>
       resolveActionStatBlockRulesFacingForForm({
@@ -76,6 +91,60 @@ export function MonsterActionRulesPreviewShell({
 
   const shapeShiftDestinations =
     action.kind === 'shape-shift' ? monsterActionShapeShiftDestinationsProse(values) : undefined
+
+  if (attackFacing) {
+    const sourceName = values.name?.trim() || 'Creature'
+    const attackOutcome =
+      outcome.status === 'ready'
+        ? outcome
+        : resolveActionStatBlockRulesFacingForForm({
+            values,
+            ctx,
+            actionId: action.id,
+            section,
+          })
+    const modeCaption =
+      attackOutcome.status === 'ready' && attackOutcome.attackProfile
+        ? monsterActionAttackPreviewModeCaption(attackOutcome.attackProfile, values, sourceName)
+        : undefined
+    const metadataRows =
+      attackOutcome.status === 'ready' && attackOutcome.attackProfile
+        ? monsterActionAttackPreviewMetadataRows(attackOutcome.attackProfile, values, sourceName)
+        : []
+
+    return (
+      <>
+        <FacingHostPanel
+          resolution={attackFacing}
+          context={modeCaption}
+          chromeTrailing={
+            metadataRows.length > 0 ? (
+              <MetadataList
+                size="sm"
+                columnGap="sm"
+                valueTrack="fill"
+                emphasis="value"
+                divider={false}
+                items={metadataRows.map((row) => ({
+                  id: row.id,
+                  label: row.label,
+                  value: row.primary,
+                }))}
+              />
+            ) : null
+          }
+        />
+        {shapeShiftDestinations ? (
+          <Text variant="supporting">
+            <Text as="span" variant="label">
+              {MONSTER_SHAPE_SHIFT_DESTINATIONS_LABEL}:{' '}
+            </Text>
+            {shapeShiftDestinations}
+          </Text>
+        ) : null}
+      </>
+    )
+  }
 
   const title = outcome.status === 'ready' ? outcome.facing.name : editorTitle || undefined
 
