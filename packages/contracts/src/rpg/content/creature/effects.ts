@@ -8,7 +8,6 @@ import {
   creatureEffectCircumstanceSchema,
   creatureRollAdjustmentModeSchema,
   type CreatureEffectCircumstance,
-  type CreatureRollAdjustmentMode,
 } from '../../vocab/creature-effect'
 import { getEffectConditionLabel } from '../../vocab/effect-condition'
 import { getSkillName, skillSchema } from '../skill-proficiency'
@@ -46,7 +45,7 @@ export const creatureSaveOutcomeOverrideSchema = z.object({
 
 export type CreatureSaveOutcomeOverride = z.infer<typeof creatureSaveOutcomeOverrideSchema>
 
-export function formatCreatureRollTarget(target: CreatureRollTarget): string {
+function formatRollTargetLabel(target: CreatureRollTarget): string {
   if (target.kind === 'attack') return 'attack rolls'
   if (target.kind === 'saving-throw') return 'saving throws'
   const ability = getAbilityLabel(target.ability)
@@ -62,7 +61,7 @@ function circumstanceClause(circumstance: CreatureEffectCircumstance | undefined
     case 'vs-condition':
       return ` to avoid or end the ${getEffectConditionLabel(circumstance.conditionId)} condition`
     case 'ally-adjacent-to-target':
-      return ' against a creature if at least one of this creature’s allies is within 5 feet of the creature and the ally doesn’t have the Incapacitated condition'
+      return " against a creature if at least one ally is within 5 feet of the creature and the ally doesn't have the Incapacitated condition"
     case 'in-sunlight':
       return ' while in sunlight'
     default: {
@@ -72,24 +71,14 @@ function circumstanceClause(circumstance: CreatureEffectCircumstance | undefined
   }
 }
 
+/** Subject-less grant summary — not rules-facing prose. */
 export function formatCreatureRollAdjustmentSentence(adjustment: CreatureRollAdjustment): string {
   const mode = CREATURE_ROLL_ADJUSTMENT_MODE_ENTRIES[adjustment.mode].label
-  const rolls = joinNaturalList(adjustment.rolls.map(formatCreatureRollTarget))
+  const rolls = joinNaturalList(adjustment.rolls.map(formatRollTargetLabel))
   return `${mode} on ${rolls}${circumstanceClause(adjustment.circumstance)}.`
-}
-
-export function formatCreatureRollAdjustmentModeLabel(mode: CreatureRollAdjustmentMode): string {
-  return CREATURE_ROLL_ADJUSTMENT_MODE_ENTRIES[mode].label
 }
 
 /** Stat-block use notation, such as `3/Day`. */
 export function formatCreatureSaveOutcomeOverrideNotation(limitedUse: RestLimitedUse): string {
   return formatLimitedUseNotation(limitedUse, 'stat-block')
-}
-
-export function formatCreatureSaveOutcomeOverrideSentence(
-  override: CreatureSaveOutcomeOverride,
-): string {
-  const notation = formatCreatureSaveOutcomeOverrideNotation(override.limitedUse)
-  return `If this creature fails a saving throw, it can choose to succeed instead (${notation}).`
 }
