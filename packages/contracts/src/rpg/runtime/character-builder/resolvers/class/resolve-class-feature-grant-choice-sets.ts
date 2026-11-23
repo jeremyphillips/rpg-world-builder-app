@@ -1,4 +1,5 @@
 import { classFeaturesUnlockedAtLevel } from '../../../../content/classes/class-feature-availability'
+import { resolveClassFeatureGrantGroups } from '../../../../content/classes/resolve-class-feature-grant-groups'
 import type { ChoiceSet } from '../../choice-set'
 import type { CharacterBuildCatalogIndex } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft/draft'
@@ -18,7 +19,7 @@ export function resolveClassFeatureGrantChoiceSets(
   return classFeaturesUnlockedAtLevel(characterClass.features, draft.class.level).flatMap(
     (feature) =>
       unlockedGrantChoiceSets(
-        feature,
+        { kind: feature.kind, grantGroups: [...resolveClassFeatureGrantGroups(feature)] },
         catalogIndex,
         {
           sourceType: 'class',

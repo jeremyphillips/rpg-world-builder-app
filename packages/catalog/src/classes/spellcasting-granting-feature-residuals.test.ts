@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { isClassSpellcastingGrantingFeature } from '@rpg/contracts'
+import { isSpellcastingClassFeature } from '@rpg/contracts'
 
 import { getClassBySlug } from './index'
 
@@ -17,18 +17,18 @@ const CASTERS = [
   'wizard',
 ] as const
 
-function grantingSpellcastingFeature(slug: (typeof CASTERS)[number]) {
+function spellcastingFeature(slug: (typeof CASTERS)[number]) {
   const cls = getClassBySlug(RULESET, slug)
   const feature = cls.features.find((f) => f.id === 'spellcasting' || f.id === 'pact-magic')
   expect(feature).toBeDefined()
-  expect(isClassSpellcastingGrantingFeature(feature!)).toBe(true)
+  expect(isSpellcastingClassFeature(feature!)).toBe(true)
   return feature!
 }
 
-describe('spellcasting granting feature residuals', () => {
+describe('spellcasting feature residuals', () => {
   it.each(CASTERS)('%s carries intro only (no description)', (slug) => {
-    const feature = grantingSpellcastingFeature(slug)
+    const feature = spellcastingFeature(slug)
     expect(feature.intro?.length).toBeGreaterThan(0)
-    expect(feature.description).toBeUndefined()
+    expect('description' in feature).toBe(false)
   })
 })

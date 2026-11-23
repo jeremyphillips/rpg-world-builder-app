@@ -17,11 +17,10 @@ const wizardSelection = {
 }
 
 const spellcastingGrantFeature = {
-  kind: 'custom' as const,
+  kind: 'spellcasting' as const,
   id: 'spellcasting',
   name: 'Spellcasting',
   level: 1,
-  grantGroups: [{ grants: [{ id: 'spellcasting-1', kind: 'spellcasting' as const }] }],
 }
 
 describe('spellcastingSchema', () => {

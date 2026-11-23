@@ -142,8 +142,9 @@ function featuresForInput(
   rows: ClassFormValues['features'],
   existing: readonly ClassFeature[] | undefined,
   validationIntent: ContentValidationIntent,
+  className: string,
 ): ClassFeature[] {
-  const features = featuresFromFormValues(rows, existing)
+  const features = featuresFromFormValues(rows, existing, { className })
   if (validationIntent === 'publish') return features
   return features.filter((feature) => classFeatureSchema.safeParse(feature).success)
 }
@@ -208,7 +209,12 @@ function classWirePayloadParts(
       values.armorProficiencyMode === 'specific',
       validationIntent,
     ),
-    features: featuresForInput(values.features, ctx?.entity?.features, validationIntent),
+    features: featuresForInput(
+      values.features,
+      ctx?.entity?.features,
+      validationIntent,
+      values.name,
+    ),
   }
 }
 

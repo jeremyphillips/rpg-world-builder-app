@@ -32,11 +32,10 @@ const defaultSkillChoices = {
 
 function spellcastingGrantFeature(usesPactMagic = false) {
   return {
-    kind: 'custom' as const,
+    kind: 'spellcasting' as const,
     id: usesPactMagic ? 'pact-magic' : 'spellcasting',
     name: usesPactMagic ? getSlotProgressionKindLabel('pact-magic') : 'Spellcasting',
     level: 1,
-    grantGroups: [{ grants: [{ id: 'spellcasting-1', kind: 'spellcasting' as const }] }],
   }
 }
 

@@ -7,8 +7,8 @@ import {
   campaignLevelSchema,
   classValidationMessages,
   contentTableSchema,
-  isClassSpellcastingGrantingFeature,
   resolveGrantGroupsFromContent,
+  subclassChoiceFeatureLabel,
   type ClassBodyFeature,
   type ClassFeature,
   type ClassFeatureKind,
@@ -34,10 +34,9 @@ import {
 } from '../../lib/forms/grants/grant-form-values'
 import { applyStableIdsForUpdate } from '../../lib/forms/registry/content-form-key-helpers'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
-import { ClassFeatureManagedSpellcastingGrantField } from '../components/class-feature-managed-spellcasting-grant-field'
 import { FeatureTablesField } from '../components/features/feature-tables-field'
+import { isSpellcastingFeatureRow } from './class-feature-authoring'
 import { classSpellcastingGrantingFeatureRulesDisplay } from './class-spellcasting-feature-rules.lib'
-import { isSpellcastingGrantingFeatureRow } from './class-spellcasting-lifecycle'
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
 import { getLevelFieldOptions, levelSelectDigits } from '../../lib/form-options/level-field-options'
 
@@ -114,8 +113,17 @@ export const subclassFeatureRowFormSchema = createSubclassFeatureRowFormSchema()
 export type FeatureRowForm = z.infer<typeof featureRowFormSchema>
 export type SubclassFeatureRowForm = z.infer<typeof subclassFeatureRowFormSchema>
 
-export function featureItemTitle(row: Pick<FeatureRowForm, 'name'> | undefined): string {
-  return typeof row?.name === 'string' ? row.name.trim() : ''
+export function featureItemTitle(
+  row: Pick<FeatureRowForm, 'name' | 'kind'> | undefined,
+  className?: string,
+): string {
+  if (!row) return ''
+  const name = typeof row.name === 'string' ? row.name.trim() : ''
+  if (row.kind === 'subclass-choice' && className) {
+    const derived = subclassChoiceFeatureLabel(className)
+    return name || derived
+  }
+  return name
 }
 
 export function featureItemEyebrow(
@@ -163,7 +171,6 @@ function sharedFeatureItemFields(
         { type: 'text', name: 'name', label: 'Name', required: true },
       ],
     },
-    classSpellcastingGrantingFeatureRulesDisplay(ctx),
     {
       type: 'richtext',
       name: 'intro',
@@ -172,7 +179,12 @@ function sharedFeatureItemFields(
       linkable: true,
       internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
       contentTypeOptions: ctx.options?.richTextContentTypeOptions,
+      visibility: {
+        dependsOn: ['kind'],
+        visibleWhen: (values) => values.kind === 'spellcasting',
+      },
     },
+    classSpellcastingGrantingFeatureRulesDisplay(ctx),
     {
       type: 'richtext',
       name: 'description',
@@ -181,24 +193,9 @@ function sharedFeatureItemFields(
       internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
       contentTypeOptions: ctx.options?.richTextContentTypeOptions,
       visibility: {
-        dependsOn: ['grants'],
-        visibleWhen: (watched) =>
-          !isSpellcastingGrantingFeatureRow({
-            grants: watched.grants as FeatureRowForm['grants'],
-          }),
+        dependsOn: ['kind'],
+        visibleWhen: (values) => values.kind === 'custom' || values.kind === 'asi',
       },
-    },
-    {
-      kind: 'slot',
-      name: 'managedSpellcastingGrant',
-      visibility: {
-        dependsOn: ['grants'],
-        visibleWhen: (watched) =>
-          isSpellcastingGrantingFeatureRow({
-            grants: watched.grants as FeatureRowForm['grants'],
-          }),
-      },
-      render: () => createElement(ClassFeatureManagedSpellcastingGrantField),
     },
     ...grantArrayFields(GRANT_TYPES, GRANT_TYPE_LABELS, ctx, {
       inheritUnlockFromParentField: 'level',
@@ -208,11 +205,8 @@ function sharedFeatureItemFields(
           ? {
               ...field,
               visibility: {
-                dependsOn: ['grants'],
-                visibleWhen: (watched: Record<string, unknown>) =>
-                  !isSpellcastingGrantingFeatureRow({
-                    grants: watched.grants as FeatureRowForm['grants'],
-                  }),
+                dependsOn: ['kind'],
+                visibleWhen: (watched: Record<string, unknown>) => watched.kind === 'custom',
               },
             }
           : field,
@@ -253,18 +247,20 @@ function optionalRichTextField(value: string | undefined): string | undefined {
 }
 
 export function featureToFormRow(feature: ClassFeature | ClassBodyFeature): FeatureRowForm {
-  const grants = grantGroupsToFormRows(
-    resolveGrantGroupsFromContent(feature, { level: feature.level }),
-  )
+  const grants =
+    feature.kind === 'custom'
+      ? grantGroupsToFormRows(resolveGrantGroupsFromContent(feature, { level: feature.level }))
+      : []
   const available = 'available' in feature && feature.available === false ? false : true
   const tables = feature.kind === 'custom' && feature.tables?.length ? [...feature.tables] : []
 
   return {
     id: feature.id,
     kind: feature.kind,
-    name: feature.name,
-    intro: feature.intro,
-    description: feature.description,
+    name: 'name' in feature ? feature.name : '',
+    intro: feature.kind === 'spellcasting' ? feature.intro : undefined,
+    description:
+      feature.kind === 'custom' || feature.kind === 'asi' ? feature.description : undefined,
     level: feature.level,
     grants,
     tables,
@@ -276,16 +272,41 @@ const DEFAULT_CLASS_FEATURE_KIND = CLASS_FEATURE_KINDS[0] satisfies ClassFeature
 
 function subclassChoiceFeatureFromFormRow(
   row: FeatureRowForm & { id: string },
-  grantGroups: ReturnType<typeof formRowsToGrantGroups>,
+  options?: { className?: string },
 ): ClassBodyFeature {
+  const trimmedName = row.name?.trim()
+  const derived =
+    options?.className !== undefined ? subclassChoiceFeatureLabel(options.className) : undefined
+  const name =
+    trimmedName && derived && trimmedName === derived ? undefined : trimmedName || undefined
+
   return {
     kind: 'subclass-choice',
     id: row.id,
+    ...(name ? { name } : {}),
+    level: row.level,
+    ...(row.available === false ? { available: false } : {}),
+  }
+}
+
+function asiFeatureFromFormRow(row: FeatureRowForm & { id: string }): ClassBodyFeature {
+  return {
+    kind: 'asi',
+    id: row.id,
     name: row.name,
-    intro: optionalRichTextField(row.intro),
     description: row.description || undefined,
     level: row.level,
-    ...(grantGroups.length ? { grantGroups } : {}),
+    ...(row.available === false ? { available: false } : {}),
+  }
+}
+
+function spellcastingFeatureFromFormRow(row: FeatureRowForm & { id: string }): ClassBodyFeature {
+  return {
+    kind: 'spellcasting',
+    id: row.id,
+    name: row.name,
+    intro: optionalRichTextField(row.intro),
+    level: row.level,
     ...(row.available === false ? { available: false } : {}),
   }
 }
@@ -295,14 +316,12 @@ function customFeatureFromFormRow(
   grantGroups: ReturnType<typeof formRowsToGrantGroups>,
 ): ClassBodyFeature {
   const tables = row.tables?.length ? row.tables : undefined
-  const isGranting = isClassSpellcastingGrantingFeature({ grantGroups })
 
   return {
     kind: 'custom',
     id: row.id,
     name: row.name,
-    intro: optionalRichTextField(row.intro),
-    ...(!isGranting && row.description ? { description: row.description } : {}),
+    ...(row.description ? { description: row.description } : {}),
     level: row.level,
     ...(grantGroups.length ? { grantGroups } : {}),
     ...(tables ? { tables } : {}),
@@ -310,13 +329,24 @@ function customFeatureFromFormRow(
   }
 }
 
-export function featureFromFormRow(row: FeatureRowForm & { id: string }): ClassBodyFeature {
+export function featureFromFormRow(
+  row: FeatureRowForm & { id: string },
+  options?: { className?: string },
+): ClassBodyFeature {
   const grantGroups = formRowsToGrantGroups(row.grants, { level: row.level })
   const kind = row.kind ?? DEFAULT_CLASS_FEATURE_KIND
 
-  return kind === 'subclass-choice'
-    ? subclassChoiceFeatureFromFormRow(row, grantGroups)
-    : customFeatureFromFormRow(row, grantGroups)
+  switch (kind) {
+    case 'subclass-choice':
+      return subclassChoiceFeatureFromFormRow(row, options)
+    case 'asi':
+      return asiFeatureFromFormRow(row)
+    case 'spellcasting':
+      return spellcastingFeatureFromFormRow(row)
+    case 'custom':
+    default:
+      return customFeatureFromFormRow(row, grantGroups)
+  }
 }
 
 /** Subclass feature rows omit campaign availability — use for subclass form save. */
@@ -325,10 +355,9 @@ export function subclassFeatureFromFormRow(
 ): ClassFeature {
   const grantGroups = formRowsToGrantGroups(row.grants, { level: row.level })
   return {
-    kind: row.kind ?? DEFAULT_CLASS_FEATURE_KIND,
+    kind: 'custom',
     id: row.id,
     name: row.name,
-    intro: optionalRichTextField(row.intro),
     description: row.description || undefined,
     level: row.level,
     ...(grantGroups.length ? { grantGroups } : {}),
@@ -345,8 +374,9 @@ export function subclassFeaturesFromFormValues(
 export function featuresFromFormValues(
   rows: FeatureRowForm[],
   existing?: readonly ClassBodyFeature[],
+  options?: { className?: string },
 ): ClassBodyFeature[] {
-  return applyStableIdsForUpdate(rows, existing).map((row) => featureFromFormRow(row))
+  return applyStableIdsForUpdate(rows, existing).map((row) => featureFromFormRow(row, options))
 }
 export function maxLevelFromCtx(ctx: ContentFormCtx): number {
   return effectiveMaxFromCtx(ctx)

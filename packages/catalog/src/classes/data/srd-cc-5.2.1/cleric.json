@@ -234,20 +234,10 @@
   },
   "features": [
     {
-      "kind": "custom",
+      "kind": "spellcasting",
       "id": "spellcasting",
       "name": "Spellcasting",
       "level": 1,
-      "grantGroups": [
-        {
-          "grants": [
-            {
-              "id": "spellcasting",
-              "kind": "spellcasting"
-            }
-          ]
-        }
-      ],
       "intro": "<p>You have learned to cast spells through prayer and meditation.</p>"
     },
     {
@@ -294,28 +284,14 @@
       "kind": "subclass-choice",
       "id": "cleric-subclass",
       "name": "Cleric Subclass",
-      "level": 3,
-      "description": ""
+      "level": 3
     },
     {
       "id": "ability-score-improvement-4",
       "name": "Ability Score Improvement",
       "level": 4,
       "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-      "grantGroups": [
-        {
-          "grants": [
-            {
-              "id": "general-feat",
-              "kind": "featChoice",
-              "category": "general",
-              "choose": 1,
-              "allowAnyQualifying": true,
-              "recommendedFeatIds": ["ability-score-improvement"]
-            }
-          ]
-        }
-      ]
+      "kind": "asi"
     },
     {
       "id": "sear-undead",
@@ -334,20 +310,7 @@
       "name": "Ability Score Improvement",
       "level": 8,
       "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-      "grantGroups": [
-        {
-          "grants": [
-            {
-              "id": "general-feat",
-              "kind": "featChoice",
-              "category": "general",
-              "choose": 1,
-              "allowAnyQualifying": true,
-              "recommendedFeatIds": ["ability-score-improvement"]
-            }
-          ]
-        }
-      ]
+      "kind": "asi"
     },
     {
       "id": "divine-intervention",
@@ -360,20 +323,7 @@
       "name": "Ability Score Improvement",
       "level": 12,
       "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-      "grantGroups": [
-        {
-          "grants": [
-            {
-              "id": "general-feat",
-              "kind": "featChoice",
-              "category": "general",
-              "choose": 1,
-              "allowAnyQualifying": true,
-              "recommendedFeatIds": ["ability-score-improvement"]
-            }
-          ]
-        }
-      ]
+      "kind": "asi"
     },
     {
       "id": "improved-blessed-strikes",
@@ -386,20 +336,7 @@
       "name": "Ability Score Improvement",
       "level": 16,
       "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-      "grantGroups": [
-        {
-          "grants": [
-            {
-              "id": "general-feat",
-              "kind": "featChoice",
-              "category": "general",
-              "choose": 1,
-              "allowAnyQualifying": true,
-              "recommendedFeatIds": ["ability-score-improvement"]
-            }
-          ]
-        }
-      ]
+      "kind": "asi"
     },
     {
       "id": "epic-boon",

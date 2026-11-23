@@ -276,12 +276,6 @@ const equipmentContentGrantSchema = z.object({
   grant: equipmentGrantSchema,
 })
 
-/** Class spellcasting activation — payload-less; authored only on the managed Spellcasting feature. */
-const spellcastingContentGrantSchema = z.object({
-  id: grantRowIdSchema,
-  kind: z.literal('spellcasting'),
-})
-
 /** Advantage or disadvantage on a closed set of rolls, optionally limited by circumstance. */
 const rollAdjustmentContentGrantSchema = creatureRollAdjustmentSchema.extend({
   id: grantRowIdSchema,
@@ -375,7 +369,6 @@ export const contentGrantSchema = z.discriminatedUnion('kind', [
   featChoiceContentGrantSchema,
   equipmentContentGrantSchema,
   spellsContentGrantSchema,
-  spellcastingContentGrantSchema,
   rollAdjustmentContentGrantSchema,
   saveOutcomeOverrideContentGrantSchema,
 ])

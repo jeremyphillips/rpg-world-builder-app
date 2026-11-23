@@ -14,15 +14,26 @@ describe('class feature intro', () => {
     expect(subclassFeatureSchema.safeParse(base).success).toBe(true)
   })
 
-  it('parses optional intro html', () => {
-    const withIntro = {
+  it('parses intro only on spellcasting features', () => {
+    const parsed = classBodyFeatureSchema.parse({
+      id: 'spellcasting',
+      kind: 'spellcasting',
+      name: 'Spellcasting',
+      level: 1,
+      intro: '<p>Flavor</p>',
+    })
+    expect(parsed.kind === 'spellcasting' && parsed.intro).toBe('<p>Flavor</p>')
+  })
+
+  it('strips intro from custom features', () => {
+    const parsed = classBodyFeatureSchema.parse({
       id: 'feature-1',
-      kind: 'custom' as const,
+      kind: 'custom',
       name: 'Feature',
       level: 1,
       intro: '<p>Flavor</p>',
-    }
-    const parsed = classBodyFeatureSchema.parse(withIntro)
-    expect(parsed.intro).toBe('<p>Flavor</p>')
+    })
+    expect(parsed.kind).toBe('custom')
+    expect('intro' in parsed).toBe(false)
   })
 })

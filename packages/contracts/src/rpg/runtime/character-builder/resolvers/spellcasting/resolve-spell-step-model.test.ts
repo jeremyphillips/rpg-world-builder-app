@@ -349,11 +349,10 @@ describe('resolveSpellStepModel', () => {
       },
       features: [
         {
-          kind: 'custom',
+          kind: 'spellcasting',
           id: 'spellcasting',
           name: 'Spellcasting',
           level: 1,
-          grantGroups: [{ grants: [{ id: 'spellcasting-4', kind: 'spellcasting' }] }],
         },
         {
           kind: 'custom',

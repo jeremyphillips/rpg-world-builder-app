@@ -89,6 +89,7 @@ describe('ClassFeaturesTab', () => {
     render(<TabShell />)
 
     await user.click(screen.getByRole('button', { name: /Add feature/i }))
+    await user.click(screen.getByRole('menuitem', { name: /Custom feature/i }))
 
     expect(
       within(screen.getByRole('navigation', { name: 'Features' })).getByRole('button', {
@@ -153,6 +154,7 @@ describe('ClassFeaturesTab', () => {
     render(<TabShell features={[rage]} entityCatalogLayer="system" />)
 
     await user.click(screen.getByRole('button', { name: /Add feature/i }))
+    await user.click(screen.getByRole('menuitem', { name: /Custom feature/i }))
 
     expect(screen.getByRole('button', { name: /Actions for Unnamed Feature/i })).toBeInTheDocument()
   })

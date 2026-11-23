@@ -5,11 +5,10 @@ import { classCapacityProgressionSchema } from './class-capacity-progression'
 import { spellcastingSchema } from './spellcasting'
 
 const spellcastingGrantFeature = (level: number) => ({
-  kind: 'custom' as const,
+  kind: 'spellcasting' as const,
   id: 'spellcasting',
   name: 'Spellcasting',
   level,
-  grantGroups: [{ grants: [{ id: 'spellcasting-1', kind: 'spellcasting' as const }] }],
 })
 
 describe('classCapacityProgressionSchema', () => {

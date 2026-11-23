@@ -17,11 +17,13 @@ import {
 import { isSubclassChoiceFeatureRow } from '../lib/class-subclass-choice-features'
 import type { ClassFormValues } from '../lib/class-form-fields'
 import { CLASS_SPELLCASTING_REMOVE_CONFIRM } from '../lib/class-spellcasting-confirm-copy'
+import { classFeatureKindLabel } from '../lib/class-feature-authoring'
 import {
   isSpellcastingGrantingFeatureRow,
   removeSpellcastingFromFormValues,
 } from '../lib/class-spellcasting-lifecycle'
 import { buildSpellcastingFeatureAvailabilityFormFields } from '../lib/class-spellcasting-feature-availability-form-fields'
+import { ClassFeatureAddMenu } from './class-feature-add-menu'
 
 const FEATURES_FIELD_NAME = 'features'
 
@@ -51,6 +53,8 @@ export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
   const [spellcastingRemoveOpen, setSpellcastingRemoveOpen] = useState(false)
 
   const features = useWatch({ name: FEATURES_FIELD_NAME }) as FeatureRowForm[] | undefined
+  const className = useWatch({ name: 'name' }) as string | undefined
+  const classSlug = useWatch({ name: 'slug' }) as string | undefined
 
   const handleRequestRemove = useCallback(
     (index: number) => {
@@ -70,6 +74,15 @@ export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
       requestRemove: handleRequestRemove,
     }),
     [baseEditor, handleRequestRemove],
+  )
+
+  const handleAddFeatureRows = useCallback(
+    (rows: FeatureRowForm[]) => {
+      for (const row of rows) {
+        editor.appendRow(row)
+      }
+    },
+    [editor],
   )
 
   const previousFieldsLengthRef = useRef(editor.fields.length)
@@ -154,10 +167,22 @@ export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
         addLabel="Add feature"
         idPrefix="class-feature"
         editor={editor}
-        mapListItem={({ row }) => ({
-          title: featureItemTitle(row as FeatureRowForm | undefined),
-          eyebrow: featureItemEyebrow(row as FeatureRowForm | undefined),
-        })}
+        addControl={
+          <ClassFeatureAddMenu
+            features={features}
+            className={className ?? ''}
+            classSlug={classSlug ?? ''}
+            onAddRows={handleAddFeatureRows}
+          />
+        }
+        mapListItem={({ row }) => {
+          const featureRow = row as FeatureRowForm | undefined
+          return {
+            title: featureItemTitle(featureRow, className),
+            eyebrow: featureItemEyebrow(featureRow),
+            kindLabel: classFeatureKindLabel(featureRow?.kind),
+          }
+        }}
         resolveRowReasons={resolveRowReasons}
         resolveAvailabilityFormItems={resolveAvailabilityFormItems}
         access={{ kind: 'availability', fieldName: 'available' }}

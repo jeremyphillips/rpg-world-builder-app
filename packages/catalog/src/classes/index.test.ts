@@ -24,7 +24,7 @@ import {
   isProgressionContentTable,
   resolveClassSpellcasting,
   resolveSpellsAvailableFromClass,
-  isClassSpellcastingGrantingFeature,
+  isSpellcastingClassFeature,
   type CharacterClass,
   type ProgressionTableColumn,
 } from '@rpg/contracts'
@@ -52,7 +52,7 @@ function spellcastingFeatureIntro(cls: CharacterClass): string | undefined {
 
 function asiLevelsFromFeatures(cls: CharacterClass): number[] {
   return cls.features
-    .filter((feature) => /^ability-score-improvement-\d+$/.test(feature.id))
+    .filter((feature) => feature.kind === 'asi')
     .map((feature) => feature.level)
     .sort((a, b) => a - b)
 }
@@ -109,12 +109,12 @@ function expectDiceColumnEntries(
 
 function expectClassFeatureDescriptions(cls: CharacterClass): void {
   for (const feature of cls.features) {
-    if (isSubclassChoiceFeature(cls, feature)) {
-      expect(feature.description).toBe('')
-    } else if (isClassSpellcastingGrantingFeature(feature)) {
+    if (feature.kind === 'subclass-choice') {
+      expect('description' in feature).toBe(false)
+    } else if (isSpellcastingClassFeature(feature)) {
       expect(feature.intro && feature.intro.length > 0).toBe(true)
-      expect(feature.description).toBeUndefined()
-    } else {
+      expect('description' in feature).toBe(false)
+    } else if (feature.kind === 'asi' || feature.kind === 'custom') {
       expect(feature.description && feature.description.length > 0).toBe(true)
     }
   }
@@ -185,8 +185,11 @@ describe('SRD 5.2.1 class seed', () => {
     for (const cls of classes) {
       expectRichTextHtml(cls.description)
       for (const feature of cls.features) {
-        if (isSubclassChoiceFeature(cls, feature)) {
-          expect(feature.description).toBe('')
+        if (
+          feature.kind === 'subclass-choice' ||
+          feature.kind === 'spellcasting' ||
+          !('description' in feature)
+        ) {
           continue
         }
         expectRichTextHtml(feature.description)

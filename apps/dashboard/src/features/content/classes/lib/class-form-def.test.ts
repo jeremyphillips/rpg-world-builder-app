@@ -460,9 +460,7 @@ describe('classFormDef round-trips', () => {
     expect(input).not.toHaveProperty('asiLevels')
 
     // Fighter has ASI at 4, 8, 12, 16 (and 6, 14 extra fighter ASIs)
-    const asiInInput = input.features.filter((f) =>
-      f.grantGroups?.[0]?.grants.some((g) => g.kind === 'featChoice'),
-    )
+    const asiInInput = input.features.filter((f) => f.kind === 'asi')
     expect(asiInInput.length).toBeGreaterThanOrEqual(4)
     expect(input.features.map((feature) => feature.id)).toContain('fighter-subclass')
   })

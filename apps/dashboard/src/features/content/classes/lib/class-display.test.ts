@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { loadSeedClasses } from '@rpg/catalog/classes'
-import { isClassSpellcastingGrantingFeature } from '@rpg/contracts'
+import { isSpellcastingClassFeature } from '@rpg/contracts'
 
 import { pickClass, pickEquipment } from '../../lib/fixtures/pick'
 import { FIGHTER, ROGUE } from '../fixtures'
@@ -233,7 +233,7 @@ describe('class-display', () => {
     expect(spellcasting?.rulesDocument?.length).toBeGreaterThan(0)
     expect(spellcasting?.bodyHtml).toBeUndefined()
     const seedFeature = bard.features.find((f) => f.id === 'spellcasting')
-    expect(seedFeature && isClassSpellcastingGrantingFeature(seedFeature)).toBe(true)
+    expect(seedFeature && isSpellcastingClassFeature(seedFeature)).toBe(true)
   })
 
   it('does not emit Suggested proficiencies copy in view model labels', () => {

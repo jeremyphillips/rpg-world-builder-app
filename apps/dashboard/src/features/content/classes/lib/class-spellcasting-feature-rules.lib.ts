@@ -138,18 +138,15 @@ export function classSpellcastingGrantingFeatureRulesDisplay(
     kind: 'display',
     id: 'class-spellcasting-granting-feature-rules',
     visibility: {
-      dependsOn: ['grants'],
-      visibleWhen: (watched) =>
-        isSpellcastingGrantingFeatureRow({
-          grants: watched.grants as FeatureRowForm['grants'],
-        }),
+      dependsOn: ['kind'],
+      visibleWhen: (watched) => watched.kind === 'spellcasting',
     },
     resolve: {
       dependsOn: [
         'intro',
         'level',
         'name',
-        'grants',
+        'kind',
         '../../name',
         ...classSpellcastingPreviewParentDependsOn(),
       ],

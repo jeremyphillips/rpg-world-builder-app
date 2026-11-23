@@ -1,33 +1,16 @@
-import { createGrantRowId, type ClassFeature } from '@rpg/contracts'
+import {
+  DEFAULT_ASI_FEATURE_DESCRIPTION,
+  DEFAULT_ASI_FEATURE_NAME,
+  type ClassFeature,
+} from '@rpg/contracts'
 
-export const ABILITY_SCORE_IMPROVEMENT_FEAT_ID = 'ability-score-improvement'
-
-export const ASI_FEATURE_NAME = 'Ability Score Improvement'
-
-export const ASI_FEATURE_DESCRIPTION =
-  '<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>'
-
-/** Creates an ASI class feature using the atomic `grantGroups` model. */
+/** Creates an ASI class feature (`kind: 'asi'`; grant choice is projected at read time). */
 export function createAsiFeature(level: number): ClassFeature {
   return {
-    kind: 'custom',
+    kind: 'asi',
     id: `ability-score-improvement-${level}`,
-    name: ASI_FEATURE_NAME,
+    name: DEFAULT_ASI_FEATURE_NAME,
     level,
-    description: ASI_FEATURE_DESCRIPTION,
-    grantGroups: [
-      {
-        grants: [
-          {
-            id: createGrantRowId(),
-            kind: 'featChoice',
-            category: 'general',
-            choose: 1,
-            allowAnyQualifying: true,
-            recommendedFeatIds: [ABILITY_SCORE_IMPROVEMENT_FEAT_ID],
-          },
-        ],
-      },
-    ],
+    description: DEFAULT_ASI_FEATURE_DESCRIPTION,
   }
 }

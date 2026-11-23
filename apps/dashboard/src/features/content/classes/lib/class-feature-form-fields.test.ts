@@ -224,7 +224,7 @@ describe('classFeatureItemFields description', () => {
 describe('featureFromFormRow spellcasting granting rows', () => {
   it('omits description when the row carries a spellcasting grant', () => {
     const row = {
-      ...featureToFormRow(createSpellcastingFeature({ usesPactMagic: false })),
+      ...featureToFormRow(createSpellcastingFeature({ slotProgressionId: 'full-caster' })),
       intro: '<p>Narrative</p>',
       description: '<p>Should not persist</p>',
     }

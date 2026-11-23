@@ -92,81 +92,39 @@
         "default": [],
         "type": "array",
         "items": {
-          "oneOf": [
-            {
-              "type": "object",
-              "properties": {
-                "kind": {
-                  "type": "string",
-                  "const": "custom",
-                  "description": "custom"
-                },
-                "id": {
-                  "$ref": "#/definitions/__schema11"
-                },
-                "name": {
-                  "$ref": "#/definitions/__schema12"
-                },
-                "description": {
-                  "$ref": "#/definitions/__schema13"
-                },
-                "grantGroups": {
-                  "$ref": "#/definitions/__schema14"
-                },
-                "level": {
-                  "$ref": "#/definitions/__schema17"
-                },
-                "tables": {
-                  "$ref": "#/definitions/__schema95"
-                },
-                "intro": {
-                  "$ref": "#/definitions/__schema119"
-                }
-              },
-              "required": [
-                "kind",
-                "id",
-                "name",
-                "level"
-              ],
-              "additionalProperties": false
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "custom",
+              "description": "custom"
             },
-            {
-              "type": "object",
-              "properties": {
-                "kind": {
-                  "type": "string",
-                  "const": "subclass-choice",
-                  "description": "subclass-choice"
-                },
-                "id": {
-                  "$ref": "#/definitions/__schema11"
-                },
-                "name": {
-                  "$ref": "#/definitions/__schema12"
-                },
-                "description": {
-                  "$ref": "#/definitions/__schema13"
-                },
-                "grantGroups": {
-                  "$ref": "#/definitions/__schema14"
-                },
-                "level": {
-                  "$ref": "#/definitions/__schema17"
-                },
-                "intro": {
-                  "$ref": "#/definitions/__schema119"
-                }
-              },
-              "required": [
-                "kind",
-                "id",
-                "name",
-                "level"
-              ],
-              "additionalProperties": false
+            "id": {
+              "$ref": "#/definitions/__schema11"
+            },
+            "name": {
+              "$ref": "#/definitions/__schema12"
+            },
+            "description": {
+              "$ref": "#/definitions/__schema13"
+            },
+            "grantGroups": {
+              "$ref": "#/definitions/__schema14"
+            },
+            "level": {
+              "$ref": "#/definitions/__schema17"
+            },
+            "tables": {
+              "$ref": "#/definitions/__schema95"
             }
-          ]
+          },
+          "required": [
+            "kind",
+            "id",
+            "name",
+            "level"
+          ],
+          "additionalProperties": false
         }
       }
     },
@@ -1047,24 +1005,6 @@
             "kind",
             "ability",
             "spellIds"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "id": {
-              "$ref": "#/definitions/__schema20"
-            },
-            "kind": {
-              "type": "string",
-              "const": "spellcasting",
-              "description": "spellcasting"
-            }
-          },
-          "required": [
-            "id",
-            "kind"
           ],
           "additionalProperties": false
         },
@@ -2912,14 +2852,6 @@
         "cells"
       ],
       "additionalProperties": false
-    },
-    "__schema119": {
-      "type": "string"
-    },
-    "__schema120": {
-      "type": "string",
-      "const": "subclass-choice",
-      "description": "subclass-choice"
     }
   }
 }

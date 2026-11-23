@@ -8,7 +8,7 @@ import {
 
 export const DEFAULT_SUBCLASS_CHOICE_LEVEL = 3
 
-export const SUBCLASS_CHOICE_FEATURE_KIND = CLASS_FEATURE_KINDS[1] satisfies ClassFeatureKind
+export const SUBCLASS_CHOICE_FEATURE_KIND = 'subclass-choice' satisfies ClassFeatureKind
 
 export function isSubclassChoiceFeatureRow(row: { kind?: string } | undefined): boolean {
   return row?.kind === SUBCLASS_CHOICE_FEATURE_KIND
@@ -29,6 +29,5 @@ export function createSubclassChoiceFeature({
     id: subclassChoiceFeatureId(classSlug),
     name: subclassChoiceFeatureLabel(className),
     level,
-    description: '',
   }
 }

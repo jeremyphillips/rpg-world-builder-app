@@ -327,28 +327,14 @@
       "kind": "subclass-choice",
       "id": "monk-subclass",
       "name": "Monk Subclass",
-      "level": 3,
-      "description": ""
+      "level": 3
     },
     {
       "id": "ability-score-improvement-4",
       "name": "Ability Score Improvement",
       "level": 4,
       "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-      "grantGroups": [
-        {
-          "grants": [
-            {
-              "id": "general-feat",
-              "kind": "featChoice",
-              "category": "general",
-              "choose": 1,
-              "allowAnyQualifying": true,
-              "recommendedFeatIds": ["ability-score-improvement"]
-            }
-          ]
-        }
-      ]
+      "kind": "asi"
     },
     {
       "id": "slow-fall",
@@ -385,20 +371,7 @@
       "name": "Ability Score Improvement",
       "level": 8,
       "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-      "grantGroups": [
-        {
-          "grants": [
-            {
-              "id": "general-feat",
-              "kind": "featChoice",
-              "category": "general",
-              "choose": 1,
-              "allowAnyQualifying": true,
-              "recommendedFeatIds": ["ability-score-improvement"]
-            }
-          ]
-        }
-      ]
+      "kind": "asi"
     },
     {
       "id": "acrobatic-movement",
@@ -423,20 +396,7 @@
       "name": "Ability Score Improvement",
       "level": 12,
       "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-      "grantGroups": [
-        {
-          "grants": [
-            {
-              "id": "general-feat",
-              "kind": "featChoice",
-              "category": "general",
-              "choose": 1,
-              "allowAnyQualifying": true,
-              "recommendedFeatIds": ["ability-score-improvement"]
-            }
-          ]
-        }
-      ]
+      "kind": "asi"
     },
     {
       "id": "deflect-energy",
@@ -461,20 +421,7 @@
       "name": "Ability Score Improvement",
       "level": 16,
       "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-      "grantGroups": [
-        {
-          "grants": [
-            {
-              "id": "general-feat",
-              "kind": "featChoice",
-              "category": "general",
-              "choose": 1,
-              "allowAnyQualifying": true,
-              "recommendedFeatIds": ["ability-score-improvement"]
-            }
-          ]
-        }
-      ]
+      "kind": "asi"
     },
     {
       "id": "superior-defense",

@@ -13,11 +13,10 @@ import {
 import { rangerClass } from './spellcasting-test-fixtures'
 
 const spellcastingGrantFeature = (level: number) => ({
-  kind: 'custom' as const,
+  kind: 'spellcasting' as const,
   id: 'spellcasting',
   name: 'Spellcasting',
   level,
-  grantGroups: [{ grants: [{ id: 'spellcasting-1', kind: 'spellcasting' as const }] }],
 })
 
 const bardSpellcasting = spellcastingSchema.parse({

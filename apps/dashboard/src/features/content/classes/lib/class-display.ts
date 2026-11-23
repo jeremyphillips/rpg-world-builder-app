@@ -7,7 +7,7 @@ import {
   getToolCategoryEntry,
   getWeaponCategoryEntry,
   classSkillChoiceDisplaySummary,
-  isClassSpellcastingGrantingFeature,
+  isSpellcastingClassFeature,
   isMeaningfulToolProficiencyChoice,
   getProficiencyDomainCompactLabel,
   type CharacterClass,
@@ -371,7 +371,7 @@ function mapFeatureToDetailItem(
   if (
     options?.characterClass &&
     options.spellcastingProgression &&
-    isClassSpellcastingGrantingFeature(feature)
+    isSpellcastingClassFeature(feature)
   ) {
     const facing = resolveSpellcastingGrantingFeatureFacing({
       className: options.characterClass.name,

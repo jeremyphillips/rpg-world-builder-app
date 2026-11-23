@@ -189,20 +189,10 @@
   },
   "features": [
     {
-      "kind": "custom",
+      "kind": "spellcasting",
       "id": "spellcasting",
       "name": "Spellcasting",
       "level": 1,
-      "grantGroups": [
-        {
-          "grants": [
-            {
-              "id": "spellcasting",
-              "kind": "spellcasting"
-            }
-          ]
-        }
-      ],
       "intro": "<p>You have learned to cast spells through prayer and meditation.</p>"
     },
     {
@@ -322,28 +312,14 @@
       "kind": "subclass-choice",
       "id": "paladin-subclass",
       "name": "Paladin Subclass",
-      "level": 3,
-      "description": ""
+      "level": 3
     },
     {
       "id": "ability-score-improvement-4",
       "name": "Ability Score Improvement",
       "level": 4,
       "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-      "grantGroups": [
-        {
-          "grants": [
-            {
-              "id": "general-feat",
-              "kind": "featChoice",
-              "category": "general",
-              "choose": 1,
-              "allowAnyQualifying": true,
-              "recommendedFeatIds": ["ability-score-improvement"]
-            }
-          ]
-        }
-      ]
+      "kind": "asi"
     },
     {
       "id": "extra-attack",
@@ -394,20 +370,7 @@
       "name": "Ability Score Improvement",
       "level": 8,
       "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-      "grantGroups": [
-        {
-          "grants": [
-            {
-              "id": "general-feat",
-              "kind": "featChoice",
-              "category": "general",
-              "choose": 1,
-              "allowAnyQualifying": true,
-              "recommendedFeatIds": ["ability-score-improvement"]
-            }
-          ]
-        }
-      ]
+      "kind": "asi"
     },
     {
       "id": "abjure-foes",
@@ -432,20 +395,7 @@
       "name": "Ability Score Improvement",
       "level": 12,
       "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-      "grantGroups": [
-        {
-          "grants": [
-            {
-              "id": "general-feat",
-              "kind": "featChoice",
-              "category": "general",
-              "choose": 1,
-              "allowAnyQualifying": true,
-              "recommendedFeatIds": ["ability-score-improvement"]
-            }
-          ]
-        }
-      ]
+      "kind": "asi"
     },
     {
       "id": "restoring-touch",
@@ -458,20 +408,7 @@
       "name": "Ability Score Improvement",
       "level": 16,
       "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-      "grantGroups": [
-        {
-          "grants": [
-            {
-              "id": "general-feat",
-              "kind": "featChoice",
-              "category": "general",
-              "choose": 1,
-              "allowAnyQualifying": true,
-              "recommendedFeatIds": ["ability-score-improvement"]
-            }
-          ]
-        }
-      ]
+      "kind": "asi"
     },
     {
       "id": "aura-expansion",

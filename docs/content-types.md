@@ -35,10 +35,13 @@ Species traits and heritage options share `contentTraitSchema` — a discriminat
 | `custom` | `name`, optional `description`, optional `grantGroups`                    | Use stored prose; grant groups supplement mechanics            |
 | `grant`  | `grantGroups` (required), optional `nameOverride` / `descriptionOverride` | Derive display via `resolveTraitDisplay()` in `@rpg/contracts` |
 
-**Class and subclass features are always `custom`** (`classFeatureSchema` extends the custom variant + `level`). Progression UI requires a stored feature name.
+**Class features** are a discriminated union on `kind`: `custom`, `asi`, `spellcasting`, and
+`subclass-choice`. Subclass `features[]` rows are **`custom` only**. Progression UI requires a
+stored feature name on kinds that carry `name`; subclass milestones may omit `name` when it matches
+the derived `<Class> Subclass` title.
 
-**Subclass choice milestones** are modeled as explicit class features (`{classSlug}-subclass`,
-named `<Class> Subclass`). The feature level is the source of truth for when subclass authoring
+**Subclass choice milestones** use `kind: 'subclass-choice'` (stable id such as `{slug}-subclass`).
+The feature level is the source of truth for when subclass authoring
 and default subclass feature levels unlock; there is no top-level `subclassChoiceLevel` field on
 the class body.
 
@@ -54,7 +57,8 @@ Legacy records without `kind` normalize to `custom` on parse (`normalizeContentT
 
 Class features, subclass features, and species traits that grant a feat choice store a
 `{ kind: "featChoice", ... }` grant inside `grantGroups` on the **source** record
-(Fighting Style, Epic Boon, Human Versatile, Ability Score Improvement milestones).
+(Fighting Style, Epic Boon, Human Versatile). **ASI milestones** use `kind: 'asi'`; the builder
+reads a projected feat choice via `resolveClassFeatureGrantGroups` (grant id `general-feat`).
 The character builder filters feats by `category`; granted feats do not need a matching
 `prerequisite` on the feat record.
 
@@ -1092,7 +1096,8 @@ The granting feature owns **unlock level** and optional narrative **`intro`** on
 
 The optional `spellcasting` block (`content/classes/spellcasting/spellcasting.ts`) owns **how** casting works. The dedicated granting feature in `features[]` owns **when** it unlocks. Rules Config owns **slot tables only**.
 
-Publish requires config and exactly one spellcasting grant to coexist (see `refineClassSpellcastingOwnership` in `class.ts`).
+Publish requires `Class.spellcasting` and exactly one `kind: 'spellcasting'` feature row together
+(see `refineClassBodyFeaturesAggregate` on `classStoredBodySchema`).
 
 ### Class record shape
 
