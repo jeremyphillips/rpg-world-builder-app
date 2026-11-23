@@ -1,3 +1,4 @@
+export * from './format-legendary-resistance'
 export * from './legendary-resistance.constants'
 export * from './sense-templates'
 export * from './templates'

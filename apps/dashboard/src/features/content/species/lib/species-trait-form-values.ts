@@ -54,19 +54,18 @@ function readTraitAvailability(trait: SpeciesBodyTrait): boolean {
 export function traitToFormRow(trait: SpeciesBodyTrait): TraitRowForm {
   const available = readTraitAvailability(trait)
   if (trait.kind === 'grant') {
-    const hasOverrides = Boolean(trait.nameOverride || trait.descriptionOverride)
+    const hasOverrides = Boolean(trait.nameOverride || trait.details)
     return {
       id: trait.id,
       kind: 'grant',
       overrideDisplay: hasOverrides,
       nameOverride: trait.nameOverride,
-      descriptionOverride: trait.descriptionOverride,
+      details: trait.details,
       grants: grantGroupsToFormRows(trait.grantGroups),
       available,
     }
   }
   if (trait.kind === 'template') {
-    const hasOverrides = Boolean(trait.nameOverride || trait.descriptionOverride)
     return {
       id: trait.id,
       kind: 'template',
@@ -75,9 +74,7 @@ export function traitToFormRow(trait: SpeciesBodyTrait): TraitRowForm {
         trait.config && typeof trait.config === 'object'
           ? (trait.config as TraitRowForm['config'])
           : undefined,
-      overrideDisplay: hasOverrides,
-      nameOverride: trait.nameOverride,
-      descriptionOverride: trait.descriptionOverride,
+      overrideDisplay: false,
       details: trait.details,
       grants: [],
       available,
@@ -110,7 +107,7 @@ function grantTraitFromFormRow(
     id: row.id,
     grantGroups: formRowsToGrantGroups(row.grants),
     nameOverride: row.nameOverride || undefined,
-    descriptionOverride: row.descriptionOverride || undefined,
+    details: row.details || undefined,
     ...unavailableFlag(available),
   }
 }
@@ -128,8 +125,6 @@ function templateTraitFromFormRow(
     id: row.id,
     templateId,
     ...(parsedConfig?.success ? { config: parsedConfig.data } : {}),
-    nameOverride: row.nameOverride || undefined,
-    descriptionOverride: row.descriptionOverride || undefined,
     details: row.details || undefined,
     ...unavailableFlag(available),
   }

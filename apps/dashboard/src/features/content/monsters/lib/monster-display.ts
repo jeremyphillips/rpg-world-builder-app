@@ -567,15 +567,12 @@ function mapTemplateMonsterTrait(
   monster: Monster,
 ): MonsterTraitItemViewModel | undefined {
   if (record.kind !== 'template' || typeof record.templateId !== 'string') return undefined
-  const nameOverride = typeof record.nameOverride === 'string' ? record.nameOverride : undefined
-  const descriptionOverride =
-    typeof record.descriptionOverride === 'string' ? record.descriptionOverride : undefined
+  const details = typeof record.details === 'string' ? record.details : undefined
   const facing = resolveTemplateTraitStatBlockRulesFacing({
     id: trait.id,
     templateId: record.templateId,
     config: record.config,
-    nameOverride,
-    descriptionOverride,
+    details,
     monster,
   })
   return {

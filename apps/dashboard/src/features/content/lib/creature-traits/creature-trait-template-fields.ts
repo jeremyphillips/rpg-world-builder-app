@@ -2,12 +2,10 @@ import {
   CREATURE_TRAIT_TEMPLATE_IDS,
   defaultCreatureTraitTemplateConfig,
   getCreatureTraitTemplate,
-  isSenseCreatureTraitTemplateId,
 } from '@rpg/contracts'
 import type { FieldVisibility, FormItem } from '@rpg/ui/form'
 
-import { legendaryResistanceTemplateUseFields } from './legendary-resistance-trait-fields'
-import { senseTraitTemplateFields } from './sense-trait-template-fields'
+import { assembleCreatureTraitTemplateFields } from './creature-trait-template-field-assembler'
 
 function visibleForTemplate(): FieldVisibility {
   return {
@@ -24,66 +22,30 @@ function visibleForTemplateId(templateId: string): FieldVisibility {
   }
 }
 
-function visibleForTemplateOverrides(): FieldVisibility {
-  return {
-    dependsOn: ['kind', 'overrideDisplay', 'templateId'],
-    visibleWhen: (watched) =>
-      watched['kind'] === 'template' &&
-      watched['overrideDisplay'] === true &&
-      (typeof watched['templateId'] !== 'string' ||
-        !isSenseCreatureTraitTemplateId(watched['templateId'])),
-  }
-}
-
-function visibleForNonSenseTemplateOverrides(): FieldVisibility {
-  return {
-    dependsOn: ['kind', 'templateId'],
-    visibleWhen: (watched) =>
-      watched['kind'] === 'template' &&
-      (typeof watched['templateId'] !== 'string' ||
-        !isSenseCreatureTraitTemplateId(watched['templateId'])),
-  }
-}
-
-/** Config and display-override fields for a `kind: 'template'` trait row. */
+/** Config fields for a `kind: 'template'` species trait row. */
 export function creatureTraitTemplateFields(): FormItem[] {
   const descriptions = CREATURE_TRAIT_TEMPLATE_IDS.flatMap((templateId) => {
     const template = getCreatureTraitTemplate(templateId)
     if (!template) return []
     const config = defaultCreatureTraitTemplateConfig(templateId) ?? {}
+    const hint = template.formatDescription(config)
     return [
       {
         kind: 'group' as const,
         heading: {
           label: template.label,
-          hint: template.formatDescription(config),
+          hint,
           labelVisibility: 'srOnly' as const,
         },
         visibility: visibleForTemplateId(templateId),
-        fields: [
-          ...(isSenseCreatureTraitTemplateId(templateId) ? senseTraitTemplateFields() : []),
-          ...(templateId === 'legendary-resistance'
-            ? legendaryResistanceTemplateUseFields({ includeInLair: false })
-            : []),
-        ],
+        fields: assembleCreatureTraitTemplateFields({
+          templateId,
+          host: 'species',
+          visibility: visibleForTemplateId(templateId),
+        }),
       },
     ]
   })
 
-  return [
-    ...descriptions,
-    {
-      type: 'switch',
-      name: 'overrideDisplay',
-      label: 'Override generated name and description',
-      visibility: visibleForNonSenseTemplateOverrides(),
-    },
-    {
-      type: 'richtext',
-      name: 'descriptionOverride',
-      label: 'Description',
-      hint: 'Leave blank to use the default',
-      visibility: visibleForTemplateOverrides(),
-    },
-  ]
+  return [...descriptions]
 }

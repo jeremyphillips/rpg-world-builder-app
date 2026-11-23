@@ -1,8 +1,8 @@
-import { LEGENDARY_RESISTANCE_LABEL } from '../../content/creature/traits/legendary-resistance.constants'
-import { legendaryResistanceLimitedUse } from '../../content/creature/traits/legendary-resistance-limited-use'
-import { formatLimitedUseNotation } from '../../primitives/limited-use'
-import type { ContextualCount } from '../../primitives/contextual-count'
-import { LAIR_TERM } from '../../vocab/mechanics/lair'
+import { formatLimitedUseNotation } from '../../../primitives/limited-use'
+import type { ContextualCount } from '../../../primitives/contextual-count'
+import { LAIR_TERM } from '../../../vocab/mechanics/lair'
+import { LEGENDARY_RESISTANCE_LABEL } from './legendary-resistance.constants'
+import { legendaryResistanceLimitedUse } from './legendary-resistance-limited-use'
 
 function formatLegendaryResistanceDayNotation(uses: number): string {
   return formatLimitedUseNotation(

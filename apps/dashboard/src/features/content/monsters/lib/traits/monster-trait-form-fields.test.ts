@@ -64,8 +64,8 @@ describe('monsterTraitDetailFields', () => {
     })
     expect(names[0]).toBe(TRAIT_ROW_ADVISORY_DISPLAY)
     expect(names).toContain('config.uses.normal')
-    expect(names.at(-1)).toBe('descriptionOverride')
-    expect(names.indexOf('config.uses.normal')).toBeLessThan(names.indexOf('descriptionOverride'))
+    expect(names.at(-1)).toBe('details')
+    expect(names.indexOf('config.uses.normal')).toBeLessThan(names.indexOf('details'))
   })
 
   it('puts a fixed preset preview before the advisory and adds no body fields', () => {

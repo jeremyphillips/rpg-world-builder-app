@@ -68,7 +68,7 @@ describe('creature trait templates', () => {
     ])
   })
 
-  it('keeps Legendary Resistance as the canonical label without daily notation', () => {
+  it('decorates legendary resistance list titles from configured uses', () => {
     const template = getCreatureTraitTemplate('legendary-resistance')
     expect(template?.formatName?.({ uses: { normal: 3 } })).toBe('Legendary Resistance')
     expect(template?.formatDescription({ uses: { normal: 3 } })).toBe(
@@ -82,9 +82,9 @@ describe('creature trait templates', () => {
         config: { uses: { normal: 3 } },
       }),
     )
-    expect(display.name).toBe('Legendary Resistance')
+    expect(display.name).toBe('Legendary Resistance (3/Day)')
     expect(display.descriptionHtml).toContain(
-      'If this creature fails a saving throw, it can choose to succeed instead.',
+      'If you fail a saving throw, you can choose to succeed instead.',
     )
   })
 
@@ -105,16 +105,13 @@ describe('creature trait templates', () => {
     ).toBe(false)
   })
 
-  it('keeps a description override ahead of the generated sentence', () => {
-    const display = resolveTraitDisplay(
-      contentTraitSchema.parse({
-        kind: 'template',
-        id: 'pack-tactics',
-        templateId: 'pack-tactics',
-        descriptionOverride: '<p>Cited prose.</p>',
-      }),
-    )
-    expect(display.name).toBe('Pack Tactics')
-    expect(display.descriptionHtml).toBe('<p>Cited prose.</p>')
+  it('strips legacy descriptionOverride on parse', () => {
+    const parsed = contentTraitSchema.parse({
+      kind: 'template',
+      id: 'pack-tactics',
+      templateId: 'pack-tactics',
+      descriptionOverride: '<p>Cited prose.</p>',
+    })
+    expect(parsed).not.toHaveProperty('descriptionOverride')
   })
 })

@@ -878,7 +878,7 @@
             "nameOverride": {
               "$ref": "#/definitions/__schema106"
             },
-            "descriptionOverride": {
+            "details": {
               "$ref": "#/definitions/__schema107"
             }
           },
@@ -906,14 +906,7 @@
               "minLength": 1
             },
             "config": {},
-            "nameOverride": {
-              "type": "string",
-              "minLength": 1
-            },
             "details": {
-              "type": "string"
-            },
-            "descriptionOverride": {
               "type": "string"
             }
           },

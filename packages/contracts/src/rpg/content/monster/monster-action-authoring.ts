@@ -59,7 +59,7 @@ const MONSTER_ACTION_AUTHORING_BY_KIND = {
   leap: AUTHORED_GENERATED,
   teleport: AUTHORED_GENERATED,
   'take-actions': AUTHORED_GENERATED,
-  'shape-shift': AUTHORED_FULL,
+  'shape-shift': AUTHORED_GENERATED,
   special: AUTHORED_FULL,
   spell: AUTHORED_NAME,
 } as const satisfies Record<MonsterActionKind, MonsterActionAuthoring>

@@ -1,7 +1,6 @@
 import type { RefinementCtx } from 'zod'
 
 import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
-import { isSenseCreatureTraitTemplateId } from './sense-templates'
 import {
   getCreatureTraitTemplate,
   isCreatureTraitTemplateEligibleForHost,
@@ -16,9 +15,6 @@ export type CreatureTraitTemplateIssue = {
 const UNKNOWN_TEMPLATE_MESSAGE = 'Unknown creature trait template.'
 const INVALID_CONFIG_MESSAGE = 'Creature trait template config is invalid.'
 const HOST_INELIGIBLE_MESSAGE = 'This creature trait template cannot be assigned on this host.'
-const SENSE_DESCRIPTION_OVERRIDE_MESSAGE =
-  'Sense templates use details instead of description override.'
-
 function templateRecord(value: unknown): Record<string, unknown> | undefined {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) return undefined
   return value as Record<string, unknown>
@@ -44,23 +40,13 @@ function configIssuesForTemplate(
 
 function eligibilityIssuesForTemplate(
   templateId: string,
-  trait: Record<string, unknown>,
+  _trait: Record<string, unknown>,
   index: number,
   host?: CreatureTraitTemplateHost,
 ): CreatureTraitTemplateIssue[] {
   const issues: CreatureTraitTemplateIssue[] = []
   if (host && !isCreatureTraitTemplateEligibleForHost(templateId, host)) {
     issues.push({ path: [index, 'templateId'], message: HOST_INELIGIBLE_MESSAGE })
-  }
-  if (
-    isSenseCreatureTraitTemplateId(templateId) &&
-    typeof trait.descriptionOverride === 'string' &&
-    trait.descriptionOverride.length > 0
-  ) {
-    issues.push({
-      path: [index, 'descriptionOverride'],
-      message: SENSE_DESCRIPTION_OVERRIDE_MESSAGE,
-    })
   }
   return issues
 }
@@ -106,7 +92,6 @@ export function refineCreatureTraitTemplate(
     kind?: string
     templateId?: unknown
     config?: unknown
-    descriptionOverride?: unknown
   },
   ctx: RefinementCtx,
   options?: { host?: CreatureTraitTemplateHost },

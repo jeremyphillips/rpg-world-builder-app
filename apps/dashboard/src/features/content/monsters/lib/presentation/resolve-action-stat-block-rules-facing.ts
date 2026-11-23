@@ -544,10 +544,16 @@ function mapGeneratedBonusActionFacing(
             combination: action.combination,
             restriction: action.restriction,
           })
+  const generated = body ? `<p>${escapeStatBlockText(body)}</p>` : ''
+  const supplemental =
+    action.description && !monsterRichTextIsEmpty(action.description)
+      ? action.description
+      : undefined
+  const descriptionHtml = supplemental ? `${generated}${supplemental}` : generated || undefined
   return {
     id: action.id,
     name,
-    descriptionHtml: body ? `<p>${escapeStatBlockText(body)}</p>` : undefined,
+    descriptionHtml,
   }
 }
 
@@ -596,10 +602,16 @@ function mapParryActionFacing(
     acBonus: action.acBonus,
     followUpAttackName: parryFollowUpName(action, spells),
   })
+  const generated = response ? `<p>${escapeStatBlockText(response)}</p>` : ''
+  const supplemental =
+    action.description && !monsterRichTextIsEmpty(action.description)
+      ? action.description
+      : undefined
+  const descriptionHtml = supplemental ? `${generated}${supplemental}` : generated || undefined
   return {
     id: action.id,
     name,
-    descriptionHtml: response ? `<p>${escapeStatBlockText(response)}</p>` : undefined,
+    descriptionHtml,
   }
 }
 

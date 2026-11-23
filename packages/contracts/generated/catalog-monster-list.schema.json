@@ -2103,14 +2103,7 @@
               "minLength": 1
             },
             "config": {},
-            "nameOverride": {
-              "type": "string",
-              "minLength": 1
-            },
             "details": {
-              "type": "string"
-            },
-            "descriptionOverride": {
               "type": "string"
             },
             "available": {

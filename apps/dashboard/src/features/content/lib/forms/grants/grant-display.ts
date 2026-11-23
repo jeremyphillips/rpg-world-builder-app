@@ -65,7 +65,7 @@
 import {
   formatCreatureSenseCompactLine,
   formatCreatureRollAdjustmentSentence,
-  formatCreatureSaveOutcomeOverrideSentence,
+  formatCreatureSaveOutcomeOverrideNotation,
   formatDamageTypeGrantCompact,
   formatLanguageGrantCompact,
   formatMovementGrantCompact,
@@ -445,17 +445,19 @@ const GRANT_ITEM_MAPPERS: Partial<Record<ContentGrant['kind'], GrantItemMapper>>
       grant.kind,
       level,
     ),
-  saveOutcomeOverride: (grant, _vocabulary, idPrefix, level) =>
-    createSupportedGrantItems(
+  saveOutcomeOverride: (grant, _vocabulary, idPrefix, level) => {
+    const override = grant as Extract<ContentGrant, { kind: 'saveOutcomeOverride' }>
+    const notation = formatCreatureSaveOutcomeOverrideNotation(override.limitedUse)
+    const label = `Succeed on a failed saving throw (${notation})`
+    return createSupportedGrantItems(
       idPrefix,
       'saveOutcomeOverride',
-      formatCreatureSaveOutcomeOverrideSentence(
-        grant as Extract<ContentGrant, { kind: 'saveOutcomeOverride' }>,
-      ).replace(/\.$/, ''),
+      label,
       'trait',
       grant.kind,
       level,
-    ),
+    )
+  },
 }
 
 function mapGrantToItems(

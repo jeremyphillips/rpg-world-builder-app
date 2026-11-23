@@ -59,13 +59,13 @@ describe('resolveTraitDisplay', () => {
       config: { range: 120 },
       details: '<p>Dim light appears as bright light.</p>',
     })
-    expect(resolveTraitFacingParts(trait)).toEqual({
+    expect(resolveTraitFacingParts(trait, { host: 'species' })).toEqual({
       title: 'Darkvision',
       rulesProse: 'You have Darkvision with a range of 120 feet.',
       supplementalHtml: '<p>Dim light appears as bright light.</p>',
     })
     expect(resolveTraitDisplay(trait).descriptionHtml).toBe(
-      '<p>You have Darkvision with a range of 120 feet.</p>',
+      '<p>You have Darkvision with a range of 120 feet.</p><p>Dim light appears as bright light.</p>',
     )
   })
 
@@ -77,7 +77,7 @@ describe('resolveTraitDisplay', () => {
       config: { range: 60 },
       details: '',
     })
-    expect(resolveTraitFacingParts(trait)).toEqual({
+    expect(resolveTraitFacingParts(trait, { host: 'species' })).toEqual({
       title: 'Darkvision',
       rulesProse: 'You have Darkvision with a range of 60 feet.',
     })

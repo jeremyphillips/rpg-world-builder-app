@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { LEGENDARY_RESISTANCE_LABEL } from '../../content/creature/traits/legendary-resistance.constants'
-import { LAIR_TERM } from '../../vocab/mechanics/lair'
+import { LAIR_TERM } from '../../../vocab/mechanics/lair'
+import { LEGENDARY_RESISTANCE_LABEL } from './legendary-resistance.constants'
 import { formatLegendaryResistanceStatBlockTitle } from './format-legendary-resistance'
 
 describe('formatLegendaryResistanceStatBlockTitle', () => {

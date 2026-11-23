@@ -9,6 +9,7 @@ import {
 } from '../../../vocab/sense'
 import type { SenseId } from '../../../vocab/sense'
 import type { CreatureTraitGrantBody, CreatureTraitTemplate } from './templates'
+import { traitHasForVoice, traitSubjectCap, type TraitRulesVoice } from './trait-rules-voice'
 
 export type CreatureTraitTemplateSourcePolicy = 'collapse-first' | 'emit-each'
 
@@ -38,6 +39,10 @@ function senseTemplateEntry(senseId: SenseId): CreatureTraitTemplate & { senseId
     formatName: () => label,
     formatDescription: (config) =>
       `You have ${getSenseSentenceForm(senseId)} with a range of ${senseTemplateConfigSchema.parse(config).range} feet.`,
+    formatRules: (config, voice: TraitRulesVoice) => {
+      const range = senseTemplateConfigSchema.parse(config).range
+      return `${traitSubjectCap(voice)} ${traitHasForVoice(voice)} ${getSenseSentenceForm(senseId)} with a range of ${range} feet.`
+    },
     resolveGrants: (config): CreatureTraitGrantBody[] => {
       const parsed = senseTemplateConfigSchema.parse(config)
       return [{ kind: 'sense', type: senseId, range: parsed.range }]

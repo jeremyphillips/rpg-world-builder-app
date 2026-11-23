@@ -30,7 +30,6 @@ import {
   monsterPresetTraitDraftSchema,
   monsterPresetTraitSchema,
 } from './creature/trait-preset-schema'
-import { LEGENDARY_RESISTANCE_NAME_OVERRIDE_MESSAGE } from './creature/traits/legendary-resistance.constants'
 import {
   creatureTraitTemplateAtOccurrenceLimit,
   creatureTraitTemplateOccurrenceMessage,
@@ -294,8 +293,7 @@ const monsterAuthoredTraitDraftSchema = z
         id: z.string().min(1),
         templateId: z.string().min(1).optional(),
         config: z.unknown().optional(),
-        nameOverride: z.string().min(1).optional(),
-        descriptionOverride: z.string().optional(),
+        details: z.string().optional(),
         ...monsterTraitAvailabilityFields,
       }),
     ]),
@@ -950,14 +948,9 @@ function refineMonsterLegendaryResistanceTraits(
   prefix: (string | number)[],
 ): void {
   traits.forEach((trait, index) => {
+    if (typeof trait !== 'object' || trait === null || !('kind' in trait)) return
     if (trait.kind !== 'template' || trait.templateId !== 'legendary-resistance') return
     const traitPath = [...prefix, 'traits', index]
-    if (trait.nameOverride !== undefined) {
-      addCustomRefinementIssue(ctx, LEGENDARY_RESISTANCE_NAME_OVERRIDE_MESSAGE, [
-        ...traitPath,
-        'nameOverride',
-      ])
-    }
     const config = trait.config
     if (!config || typeof config !== 'object' || Array.isArray(config)) return
     const uses = (config as { uses?: { normal?: number; inLair?: number } }).uses

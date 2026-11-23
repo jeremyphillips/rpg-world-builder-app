@@ -5,9 +5,11 @@ import {
   CREATURE_TYPE_TERM,
   formatCreatureSizeList,
   getVocabularyTermLabel,
+  renderTraitFacingBodyHtml,
   resolveCreatureMovement,
   resolveCreatureSenses,
   resolveCreatureTraitGrants,
+  resolveTraitFacingParts,
   type Species,
   type SpeciesBodyTrait,
 } from '@rpg/contracts'
@@ -18,7 +20,6 @@ import {
   formatGrantSummaryInline,
   type GrantDisplayVocabulary,
 } from '../../lib/forms/grants/grant-display'
-import { resolveFacing } from '../../facing/resolve-facing'
 import type { ContentStatRowData } from '../../lib/detail/metadata/content-stat-rows'
 import {
   projectVisibleHeritageOptions,
@@ -127,13 +128,10 @@ function buildSpeciesStatRows(
 }
 
 function facingTitleAndBody(trait: SpeciesBodyTrait): { title: string; bodyHtml?: string } {
-  const resolution = resolveFacing({ domain: 'trait', source: 'persisted', trait })
-  if (resolution.status === 'ready') {
-    const richText = resolution.document.blocks.find((block) => block.kind === 'richText')
-    return {
-      title: resolution.document.title,
-      bodyHtml: richText?.kind === 'richText' ? richText.html : undefined,
-    }
+  const parts = resolveTraitFacingParts(trait, { host: 'species' })
+  const bodyHtml = renderTraitFacingBodyHtml(parts)
+  if (bodyHtml || parts.title) {
+    return { title: parts.title, bodyHtml }
   }
   return { title: trait.kind === 'custom' ? trait.name : trait.id }
 }

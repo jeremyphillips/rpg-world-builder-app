@@ -23,7 +23,7 @@ import {
   resolveCreatureMovement,
   createDefaultCharacterVitalState,
   resolveEquippedArmorFromInventory,
-  resolveTraitDisplay,
+  resolveTraitName,
   resolveEquipmentInstanceSummary,
   getWeaponCategoryLabel,
   getArmorCategoryLabel,
@@ -347,11 +347,11 @@ function buildSpeciesTraitsSection(
   if (heritageOption) traits.push(heritageOption)
 
   const items = traits.map((trait) => {
-    const display = resolveTraitDisplay(trait)
+    const label = resolveTraitName(trait)
     return {
       id: trait.id,
-      label: display.name,
-      detail: display.descriptionHtml ? undefined : display.name,
+      label,
+      detail: label,
     }
   })
 

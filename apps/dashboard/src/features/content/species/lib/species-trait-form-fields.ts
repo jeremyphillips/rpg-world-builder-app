@@ -62,7 +62,6 @@ function traitRowObjectSchema<Kind extends z.ZodType>(kindSchema: Kind) {
     name: z.string().optional(),
     description: z.string().optional(),
     nameOverride: z.string().optional(),
-    descriptionOverride: z.string().optional(),
     details: z.string().optional(),
     templateId: z.string().min(1).optional(),
     config: z
@@ -88,7 +87,10 @@ export function refinePublishedTraitRow(
     kind?: string
     name?: string
     templateId?: string
-    config?: { uses?: number }
+    config?: {
+      uses?: number | { normal: number; inLair?: number }
+      range?: number
+    }
     grants: z.infer<typeof grantRowFormSchema>[]
   },
   ctx: z.RefinementCtx,
@@ -175,12 +177,12 @@ export function traitItemFields(ctx: ContentFormCtx): FormItem[] {
         },
         {
           type: 'richtext',
-          name: 'descriptionOverride',
-          label: 'Description',
+          name: 'details',
+          label: 'Details',
           linkable: true,
           internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
           contentTypeOptions: ctx.options?.richTextContentTypeOptions,
-          hint: 'Leave blank to use the default',
+          optionalDisclosure: { intent: 'add', actionSubject: 'details' },
           visibility: visibleForGrantOverrides(),
         },
       ],
@@ -209,8 +211,6 @@ export function traitItemTitle(values: Record<string, unknown>, index: number): 
       id: row.id ?? `trait-${index}`,
       templateId: row.templateId,
       config: row.config,
-      nameOverride: row.nameOverride,
-      descriptionOverride: row.descriptionOverride,
     })
   }
   if (row.kind === 'grant') {
@@ -221,7 +221,6 @@ export function traitItemTitle(values: Record<string, unknown>, index: number): 
         id: row.id ?? `trait-${index}`,
         grantGroups,
         nameOverride: row.nameOverride,
-        descriptionOverride: row.descriptionOverride,
       })
     }
   }

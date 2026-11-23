@@ -12,8 +12,8 @@ import { insertMonsterFormAvailabilityField } from '../forms/monster-form-availa
 import { OutsideWaterBreathSlot } from '../../components/form/slots/traits/outside-water-breath.slot'
 import type { MonsterFormAdvisory } from '../monster-form-advisories'
 import {
-  MONSTER_CUSTOM_DESCRIPTION_HINT,
   MONSTER_CUSTOM_DESCRIPTION_LABEL,
+  MONSTER_CUSTOM_DESCRIPTION_HINT,
   MONSTER_RULES_TEXT_LABEL,
 } from '../monster-form-labels'
 
@@ -22,7 +22,7 @@ import {
   type OutsideWaterBreathDurationFields,
 } from '@/features/content/lib/creature-traits/outside-water-breath.lib'
 
-import { legendaryResistanceTemplateUseFields } from '@/features/content/lib/creature-traits/legendary-resistance-trait-fields'
+import { assembleCreatureTraitTemplateFields } from '@/features/content/lib/creature-traits/creature-trait-template-field-assembler'
 
 import { monsterTraitPresetFields } from './monster-trait-preset-fields'
 
@@ -67,43 +67,39 @@ export function monsterTraitItemFields(input?: {
   ]
 }
 
-/** Config and optional display overrides for a monster `kind: 'template'` row. */
 const legendaryResistanceTemplateVisibility = {
   dependsOn: ['templateId'],
   visibleWhen: (watched: Record<string, unknown>) =>
     watched['templateId'] === 'legendary-resistance',
 }
 
-function withLegendaryResistanceTemplateVisibility(field: FormItem): FormItem {
-  if (field.visibility === undefined) {
-    return { ...field, visibility: legendaryResistanceTemplateVisibility }
+/** Config fields for a monster `kind: 'template'` row. */
+export function monsterTraitTemplateFields(templateId?: string): FormItem[] {
+  if (!templateId) {
+    return [
+      {
+        type: 'richtext',
+        name: 'details',
+        label: MONSTER_CUSTOM_DESCRIPTION_LABEL,
+        hint: MONSTER_CUSTOM_DESCRIPTION_HINT,
+        optionalDisclosure: { intent: 'add', actionSubject: 'details' },
+      },
+    ]
   }
-  const prior = field.visibility
-  return {
-    ...field,
-    visibility: {
-      dependsOn: [
-        ...new Set([...prior.dependsOn, ...legendaryResistanceTemplateVisibility.dependsOn]),
-      ],
-      visibleWhen: (watched: Record<string, unknown>) =>
-        prior.visibleWhen(watched) && legendaryResistanceTemplateVisibility.visibleWhen(watched),
-    },
-  }
-}
-
-export function monsterTraitTemplateFields(): FormItem[] {
-  return [
-    ...legendaryResistanceTemplateUseFields({ includeInLair: true }).map(
-      withLegendaryResistanceTemplateVisibility,
-    ),
-    {
-      type: 'richtext',
-      name: 'descriptionOverride',
-      label: MONSTER_CUSTOM_DESCRIPTION_LABEL,
-      hint: MONSTER_CUSTOM_DESCRIPTION_HINT,
-      optionalDisclosure: { intent: 'add', actionSubject: 'details' },
-    },
-  ]
+  return assembleCreatureTraitTemplateFields({
+    templateId,
+    host: 'monster',
+    visibility: legendaryResistanceTemplateVisibility,
+  }).map((field) => {
+    if (field.name === 'details') {
+      return {
+        ...field,
+        label: MONSTER_CUSTOM_DESCRIPTION_LABEL,
+        hint: MONSTER_CUSTOM_DESCRIPTION_HINT,
+      }
+    }
+    return field
+  })
 }
 
 function isPresetRow(row: unknown): row is { preset: string } & Record<string, unknown> {
@@ -156,7 +152,10 @@ export function monsterTraitDetailFields(input: {
 }): FormItem[] {
   const advisoryItem = monsterFormAdvisoryDisplay(input.advisories, input.rowPath)
   if (isTemplateRow(input.row)) {
-    return insertMonsterFormAvailabilityField([advisoryItem, ...monsterTraitTemplateFields()])
+    return insertMonsterFormAvailabilityField([
+      advisoryItem,
+      ...monsterTraitTemplateFields(input.row.templateId),
+    ])
   }
   if (!isPresetRow(input.row)) {
     return insertMonsterFormAvailabilityField([

@@ -362,11 +362,13 @@ describe('resolveTraitDisplay', () => {
           { grants: [{ id: 'sense-13', kind: 'sense', type: 'darkvision', range: 120 }] },
         ],
         nameOverride: 'Superior Darkvision',
-        descriptionOverride: '<p>Custom homebrew wording.</p>',
+        details: '<p>Custom homebrew wording.</p>',
       }),
     )
     expect(display.name).toBe('Superior Darkvision')
-    expect(display.descriptionHtml).toBe('<p>Custom homebrew wording.</p>')
+    expect(display.descriptionHtml).toBe(
+      '<p>You have Darkvision with a range of 120 feet.</p><p>Custom homebrew wording.</p>',
+    )
   })
 })
 
