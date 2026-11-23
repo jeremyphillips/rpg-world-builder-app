@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useStore } from 'zustand'
 
-import type { CharacterBuildContext } from '@rpg/contracts'
+import { DEFAULT_SYSTEM_RULESET_ID, type CharacterBuildContext } from '@rpg/contracts'
 import {
   resolveCharacterBuilderDraftKey,
   resolveCharacterBuilderDraftScope,
@@ -45,7 +45,7 @@ export function useCharacterBuilderStore<T>(
 const disabledStore = getCharacterBuilderStore('character-builder:disabled', {
   kind: 'standalone',
   userId: 'disabled',
-  rulesetId: 'srd-cc-5.2.1',
+  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
   characterKind: 'pc',
 })
 

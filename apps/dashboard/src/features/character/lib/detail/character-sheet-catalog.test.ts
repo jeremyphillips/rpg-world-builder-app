@@ -1,11 +1,12 @@
 import { systemDefaultArmorClassRules } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
-import { pickSpell } from '@/features/content'
+import { pickEquipment, pickSpell } from '@/features/content'
 
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
+  standaloneEquipmentReferenceScope,
 } from '../fixtures/character-builder-fixtures'
 import { SAMPLE_PC } from '../fixtures/character-fixtures'
 import {
@@ -21,6 +22,11 @@ const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
 
 describe('character-sheet-catalog', () => {
   it('uses entryId when present for stable equipment occurrence identity', () => {
+    const dagger = pickEquipment('dagger')
+    const catalogWithDagger = {
+      ...catalogIndex,
+      equipment: new Map([...catalogIndex.equipment, [dagger.id, dagger]]),
+    }
     const character = {
       ...SAMPLE_PC,
       equipment: {
@@ -38,8 +44,9 @@ describe('character-sheet-catalog', () => {
 
     const [card] = buildCharacterSheetEquipmentCards(
       character,
-      catalogIndex,
+      catalogWithDagger,
       systemDefaultArmorClassRules(),
+      standaloneEquipmentReferenceScope,
     )
     expect(card?.id).toBe('weapon-row-1')
     expect(card?.displayName).toBe('Dagger')
@@ -71,10 +78,42 @@ describe('character-sheet-catalog', () => {
       character,
       catalogIndex,
       systemDefaultArmorClassRules(),
+      standaloneEquipmentReferenceScope,
     )
     expect(cards).toHaveLength(2)
     expect(cards[0]?.id).not.toBe(cards[1]?.id)
     expect(buildSourceSignature(sourceA)).not.toBe(buildSourceSignature(sourceB))
+  })
+
+  it('preserves explicit equipment scope when the equipment catalog is empty', () => {
+    const emptyIndex = {
+      ...catalogIndex,
+      equipment: new Map(),
+    }
+    const character = {
+      ...SAMPLE_PC,
+      equipment: {
+        ...SAMPLE_PC.equipment,
+        gear: [
+          {
+            equipmentId: 'missing:gear',
+            quantity: 1,
+            sources: [{ kind: 'manual' as const }],
+          },
+        ],
+      },
+    }
+
+    const scope = { rulesetId: 'srd-cc-5.2.1', campaignId: 'campaign-a' }
+    const [card] = buildCharacterSheetEquipmentCards(
+      character,
+      emptyIndex,
+      systemDefaultArmorClassRules(),
+      scope,
+    )
+
+    expect(card?.displayName).toMatch(/unavailable/i)
+    expect(card?.status).toBe('missing')
   })
 
   it('marks missing equipment references as unavailable', () => {
@@ -96,6 +135,7 @@ describe('character-sheet-catalog', () => {
       character,
       catalogIndex,
       systemDefaultArmorClassRules(),
+      standaloneEquipmentReferenceScope,
     )
     expect(card?.status).toBe('missing')
     expect(toEquipmentCatalogHeaderModel(card!, systemDefaultArmorClassRules()).tone).toBe(

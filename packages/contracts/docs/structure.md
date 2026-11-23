@@ -186,6 +186,17 @@ primitives/
   (+ co-located *.test.ts for root modules)
 ```
 
+#### System ruleset identity (`primitives/ruleset.ts`)
+
+`DEFAULT_SYSTEM_RULESET_ID` is the sole authoritative literal for the default **system
+ruleset identity** (catalog version and content-id prefix). Use it only for explicit
+default-system behavior (seed UI, disabled sentinels, fixtures)—not when campaign or
+entity context is missing.
+
+Runtime scope for reference resolution (e.g. `EquipmentCatalogScope`) comes from
+authoritative host context (campaign record, `CharacterRulesScope`, `ContentFormCtx`).
+Reference resolvers must not infer ruleset or campaign from catalog row order.
+
 Weapon mode form hints live in `rpg/content/equipment/weapon-mode-compatibility-messages.ts`
 (equipment authoring presentation — re-exported from `rpg/content/equipment.ts`).
 

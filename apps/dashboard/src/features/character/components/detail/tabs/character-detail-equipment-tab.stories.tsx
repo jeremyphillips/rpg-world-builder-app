@@ -6,6 +6,7 @@ import { pickEquipment } from '@/features/content'
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
+  standaloneEquipmentReferenceScope,
 } from '../../../lib/fixtures/character-builder-fixtures'
 import { SAMPLE_PC } from '../../../lib/fixtures/character-fixtures'
 import { buildCharacterSheetEquipmentCards } from '../../../lib/detail/character-sheet-catalog'
@@ -44,6 +45,7 @@ const cards = buildCharacterSheetEquipmentCards(
     equipment: new Map([...catalogIndex.equipment, [dagger.id, dagger], [chainMail.id, chainMail]]),
   },
   systemDefaultArmorClassRules(),
+  standaloneEquipmentReferenceScope,
 )
 
 const meta = {
@@ -82,6 +84,7 @@ export const MissingReference: Story = {
       },
       catalogIndex,
       systemDefaultArmorClassRules(),
+      standaloneEquipmentReferenceScope,
     ),
     armorClassRules: systemDefaultArmorClassRules(),
     wealth: { label: 'Wealth', value: '0 gp' },

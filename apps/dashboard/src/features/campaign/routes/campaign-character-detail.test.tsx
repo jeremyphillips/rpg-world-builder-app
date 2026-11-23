@@ -7,6 +7,7 @@ import { renderWithProviders } from '@/test/render'
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
+  standaloneEquipmentReferenceScope,
 } from '@/features/character'
 import { buildCharacterDetailViewModel, toCharacterDetailSource } from '@/features/character'
 import { SAMPLE_PC } from '@/features/character'
@@ -44,6 +45,7 @@ const viewModel = buildCharacterDetailViewModel({
   source: toCharacterDetailSource(SAMPLE_PC),
   catalogIndex,
   rules: context.characterCreationRules,
+  equipmentReferenceScope: standaloneEquipmentReferenceScope,
   xpProgression: { entries: [{ level: 1, xpRequired: 0 }] },
 })
 

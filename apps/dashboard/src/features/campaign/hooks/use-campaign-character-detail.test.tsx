@@ -113,6 +113,7 @@ function viewModelFor(
     source: toCharacterDetailSource(character),
     catalogIndex: indexCharacterBuildCatalog(catalog),
     rules,
+    equipmentReferenceScope: { rulesetId: RULESET_ID, campaignId: 'camp-1' },
     xpProgression: resolveCampaignXpProgressionForRules(RULESET_ID, rules.progression),
     organizationReferences: [],
     locationReferences: [],

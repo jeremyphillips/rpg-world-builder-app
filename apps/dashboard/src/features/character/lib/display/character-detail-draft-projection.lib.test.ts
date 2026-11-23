@@ -5,6 +5,7 @@ import { createEmptyCharacterBuilderDraft, resolveAvailableChoices } from '@rpg/
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
+  standaloneEquipmentReferenceScope,
 } from '../fixtures/character-builder-fixtures'
 import { SAMPLE_PC } from '../fixtures/character-fixtures'
 import { PREVIEW_UNNAMED_CHARACTER } from '../builder-preview/preview-identity-summary'
@@ -23,6 +24,7 @@ describe('character detail draft projection', () => {
       source: toCharacterDetailSource(SAMPLE_PC),
       catalogIndex,
       rules: context.characterCreationRules,
+      equipmentReferenceScope: standaloneEquipmentReferenceScope,
       xpProgression: { entries: [{ level: 1, xpRequired: 0 }] },
     })
 

@@ -7,6 +7,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
+  standaloneEquipmentReferenceScope,
 } from '../../lib/fixtures/character-builder-fixtures'
 import {
   buildCharacterDetailViewModel,
@@ -33,12 +34,14 @@ const viewModel = buildCharacterDetailViewModel({
   source: toCharacterDetailSource(SAMPLE_PC),
   catalogIndex,
   rules: context.characterCreationRules,
+  equipmentReferenceScope: standaloneEquipmentReferenceScope,
   xpProgression: { entries: [{ level: 1, xpRequired: 0 }] },
 })
 const connectedViewModel = buildCharacterDetailViewModel({
   source: toCharacterDetailSource(SAMPLE_PC),
   catalogIndex,
   rules: context.characterCreationRules,
+  equipmentReferenceScope: standaloneEquipmentReferenceScope,
   xpProgression: { entries: [{ level: 1, xpRequired: 0 }] },
   organizationReferences: [
     {

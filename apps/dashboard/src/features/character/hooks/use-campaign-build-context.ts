@@ -18,6 +18,7 @@ import type { CharacterBuildAcquisition } from '@rpg/contracts/rpg/character-bui
 
 import { useCampaigns } from '@/features/campaign'
 import { useRulesetPatch } from '@/features/homebrew'
+import { lookupCampaignRulesetId } from '@/lib/campaign-ruleset.lib'
 
 import {
   campaignBuildContextQueryKey,
@@ -144,8 +145,15 @@ export function useCampaignBuildFoundation(
   options: { catalogScope: FetchCampaignBuilderCatalogOptions | undefined },
 ): CampaignBuildFoundationResult {
   const campaignsQuery = useCampaigns()
-  const rulesetId = campaignsQuery.data?.find((campaign) => campaign.id === campaignId)
-    ?.rulesetId as SystemRulesetId | undefined
+  const rulesetId = useMemo(() => {
+    const lookup = lookupCampaignRulesetId({
+      campaignId,
+      campaigns: campaignsQuery.data,
+      campaignsPending: campaignsQuery.isPending,
+      campaignsError: campaignsQuery.isError,
+    })
+    return lookup.status === 'resolved' ? lookup.rulesetId : undefined
+  }, [campaignId, campaignsQuery.data, campaignsQuery.isError, campaignsQuery.isPending])
   const catalogScope = options.catalogScope
   const catalogEnabled = Boolean(campaignId && rulesetId && catalogScope)
 

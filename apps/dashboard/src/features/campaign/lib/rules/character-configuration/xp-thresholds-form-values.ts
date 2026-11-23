@@ -1,12 +1,14 @@
-import type { XpThresholdOverrideEntry, XpThresholdsPatch } from '@rpg/contracts'
+import {
+  DEFAULT_SYSTEM_RULESET_ID,
+  type XpThresholdOverrideEntry,
+  type XpThresholdsPatch,
+} from '@rpg/contracts'
 
 import {
   buildXpThresholdsPatchInput,
   resolveSystemXpEntries,
   type XpThresholdOverrideFormEntry,
 } from './xp-thresholds-field.lib'
-
-const DEFAULT_RULESET_ID = 'srd-cc-5.2.1' as const
 
 export function mapXpThresholdOverridesToFormValues(
   patch: XpThresholdsPatch | undefined,
@@ -17,5 +19,5 @@ export function mapXpThresholdOverridesToFormValues(
 export function buildXpThresholdsProgressionPatchInput(
   overrides: readonly XpThresholdOverrideEntry[],
 ): XpThresholdsPatch | undefined {
-  return buildXpThresholdsPatchInput(overrides, resolveSystemXpEntries(DEFAULT_RULESET_ID))
+  return buildXpThresholdsPatchInput(overrides, resolveSystemXpEntries(DEFAULT_SYSTEM_RULESET_ID))
 }

@@ -59,6 +59,7 @@ export function useCampaignCharacterDetail(
       source: toCharacterDetailSource(character),
       catalogIndex,
       rules: rules.characterCreationRules,
+      equipmentReferenceScope: { rulesetId, campaignId: campaignId! },
       xpProgression: resolveCampaignXpProgressionForRules(
         rulesetId,
         rules.characterCreationRules.progression,

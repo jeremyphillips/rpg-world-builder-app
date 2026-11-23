@@ -7,6 +7,7 @@ import {
   type CampaignNpcBuildContext,
   type CampaignPcBuildContext,
   type CharacterBuildCatalogIndex,
+  type EquipmentCatalogScope,
   type StandaloneBuildContext,
 } from '@rpg/contracts'
 import { resolveIndexedCampaignSpellcastingProgressionConfig } from '@rpg/catalog/spellcasting-progressions'
@@ -46,6 +47,11 @@ export const homebrewSpeciesFixture = makeSpecies({
 })
 
 export { populatedBuilderCatalog }
+
+export const standaloneEquipmentReferenceScope = {
+  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
+  campaignId: '',
+} satisfies EquipmentCatalogScope
 
 function defaultSpellcastingProgression(rulesetId: StandaloneBuildContext['rulesetId']) {
   return resolveIndexedCampaignSpellcastingProgressionConfig(rulesetId, undefined)

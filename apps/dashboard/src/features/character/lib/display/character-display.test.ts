@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
+  standaloneEquipmentReferenceScope,
 } from '../fixtures/character-builder-fixtures'
 import {
   buildCharacterCardViewModel,
@@ -92,6 +93,7 @@ describe('buildCharacterDetailViewModel', () => {
       source: toCharacterDetailSource(SAMPLE_PC),
       catalogIndex,
       rules: context.characterCreationRules,
+      equipmentReferenceScope: standaloneEquipmentReferenceScope,
       xpProgression: { entries: [{ level: 1, xpRequired: 0 }] },
     })
 
@@ -136,6 +138,7 @@ describe('buildCharacterDetailViewModel', () => {
       source: toCharacterDetailSource(SAMPLE_PC),
       catalogIndex,
       rules: context.characterCreationRules,
+      equipmentReferenceScope: standaloneEquipmentReferenceScope,
       xpProgression: { entries: [{ level: 1, xpRequired: 0 }] },
       organizationReferences: [{ organizationId: 'organization-missing', organization: null }],
     })
@@ -154,6 +157,7 @@ describe('buildCharacterDetailViewModel', () => {
       source: toCharacterDetailSource(SAMPLE_PC),
       catalogIndex,
       rules: context.characterCreationRules,
+      equipmentReferenceScope: standaloneEquipmentReferenceScope,
       xpProgression: { entries: [{ level: 1, xpRequired: 0 }] },
       locationReferences: [
         {

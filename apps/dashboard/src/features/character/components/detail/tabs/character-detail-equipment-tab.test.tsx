@@ -9,6 +9,7 @@ import { pickEquipment } from '@/features/content'
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
+  standaloneEquipmentReferenceScope,
 } from '../../../lib/fixtures/character-builder-fixtures'
 import { SAMPLE_PC } from '../../../lib/fixtures/character-fixtures'
 import { buildCharacterSheetEquipmentCards } from '../../../lib/detail/character-sheet-catalog'
@@ -62,6 +63,7 @@ function buildEquipmentCards() {
       ]),
     },
     systemDefaultArmorClassRules(),
+    standaloneEquipmentReferenceScope,
   )
 }
 

@@ -21,6 +21,7 @@ import {
   type Equipment,
   type Character,
   type Spell,
+  type EquipmentCatalogScope,
   getCantripLevelLabel,
 } from '@rpg/contracts'
 
@@ -127,35 +128,24 @@ function normalizeSheetSources(
   return [{ label }]
 }
 
-function resolveEquipmentCatalogScope(catalogIndex: CharacterBuildCatalogIndex): {
-  rulesetId: string
-  campaignId: string
-} {
-  const sample = catalogIndex.equipment.values().next().value
-  return {
-    rulesetId: sample?.rulesetId ?? 'srd-cc-5.2.1',
-    campaignId: sample?.campaignId ?? '',
-  }
-}
-
 function resolveEquipmentDisplayName(
   entry: CharacterEquipmentEntry,
   catalogIndex: CharacterBuildCatalogIndex,
+  equipmentReferenceScope: EquipmentCatalogScope,
 ): string {
   if (entry.customName) return entry.customName
   const equipment = catalogIndex.equipment.get(entry.equipmentId)
   if (equipment) return equipment.name
 
-  const scope = resolveEquipmentCatalogScope(catalogIndex)
   return presentEquipmentReferenceDisplayName(
     resolveEquipmentIdReference(
       entry.equipmentId,
       createEquipmentCatalogContext({
         status: 'ready',
-        scope,
+        scope: equipmentReferenceScope,
         equipmentById: catalogIndex.equipment,
       }),
-      scope,
+      equipmentReferenceScope,
     ),
   )
 }
@@ -174,6 +164,7 @@ function buildEquipmentCards(
   character: Pick<Character, 'equipment'>,
   catalogIndex: CharacterBuildCatalogIndex,
   _armorClassRules: ArmorClassRules,
+  equipmentReferenceScope: EquipmentCatalogScope,
 ): CharacterSheetEquipmentCard[] {
   const occurrenceCounts = new Map<string, number>()
   const cards: CharacterSheetEquipmentCard[] = []
@@ -185,7 +176,7 @@ function buildEquipmentCards(
       occurrenceCounts.set(signature, occurrenceIndex + 1)
 
       const equipment = catalogIndex.equipment.get(entry.equipmentId)
-      const displayName = resolveEquipmentDisplayName(entry, catalogIndex)
+      const displayName = resolveEquipmentDisplayName(entry, catalogIndex, equipmentReferenceScope)
       const sources = normalizeSheetSources(entry.sources, catalogIndex)
       const base = {
         id: resolveEquipmentOccurrenceId(entry, bucket, occurrenceIndex),
@@ -242,8 +233,9 @@ export function buildCharacterSheetEquipmentCards(
   character: Pick<Character, 'equipment'>,
   catalogIndex: CharacterBuildCatalogIndex,
   armorClassRules: ArmorClassRules,
+  equipmentReferenceScope: EquipmentCatalogScope,
 ): CharacterSheetEquipmentCard[] {
-  return buildEquipmentCards(character, catalogIndex, armorClassRules)
+  return buildEquipmentCards(character, catalogIndex, armorClassRules, equipmentReferenceScope)
 }
 
 export function buildCharacterSheetSpellCards(

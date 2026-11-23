@@ -200,6 +200,7 @@ export {
   createStandaloneBuilderContextFixture,
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
+  standaloneEquipmentReferenceScope,
   createCampaignNpcBuilderContextFixture,
   createCampaignPcBuilderContextFixture,
 } from './lib/fixtures/character-builder-fixtures'
