@@ -42,4 +42,25 @@ describe('computeSpellcastingProgressionSparsePatch', () => {
     expect(patch?.slotProgressions).toHaveLength(1)
     expect(patch?.slotProgressions?.[0]?.id).toBe('full-caster')
   })
+
+  it('includes recovery-only slot progression diffs', () => {
+    const fullCaster = spellcastingProgressionTestSeed.slotProgressions.find(
+      (entry) => entry.id === 'full-caster',
+    )!
+    const resolved = resolveSpellcastingProgressionRecords(spellcastingProgressionTestSeed, {
+      slotProgressions: [
+        {
+          ...fullCaster,
+          recovery: { minimumRest: 'short' },
+        },
+      ],
+    })
+
+    const patch = computeSpellcastingProgressionSparsePatch(
+      resolved,
+      spellcastingProgressionTestSeed,
+    )
+
+    expect(patch?.slotProgressions?.[0]?.recovery).toEqual({ minimumRest: 'short' })
+  })
 })

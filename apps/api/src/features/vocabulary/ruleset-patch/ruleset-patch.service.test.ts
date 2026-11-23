@@ -131,6 +131,7 @@ describe('updateCharacterCreationPatch', () => {
               label: getSlotProgressionKindLabel('full-caster'),
               kind: 'leveled',
               extension: 'carryForward',
+              recovery: { minimumRest: 'long' },
               rows: [{ level: 1, slots: [3] }],
             },
           ],

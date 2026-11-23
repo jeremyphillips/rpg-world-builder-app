@@ -14,7 +14,10 @@
     "slotProgressionId": "full-caster",
     "ability": "int",
     "requiredGear": ["spellbook"],
-    "focusKinds": ["arcane_focus"],
+    "focusKinds": ["arcane_focus", "spellbook"],
+    "cantripSelection": {
+      "change": { "kind": "replace", "trigger": "longRest", "limit": 1 }
+    },
     "recommendedGear": ["component_pouch"],
     "spellSelection": {
       "model": "prepareFromLearnedCollection",

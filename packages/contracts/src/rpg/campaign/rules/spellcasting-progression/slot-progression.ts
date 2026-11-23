@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { absoluteLevelSchema } from '../../../primitives/level'
+import { restRecoverySchema } from '../../../primitives/rest-recovery'
 import { progressionExtensionSchema } from '../../../vocab/spell/progression-extension'
 
 import { normalizeSlotCounts } from './lookup'
@@ -31,6 +32,7 @@ const slotProgressionBaseSchema = z.object({
   id: z.string().min(1),
   label: z.string().min(1),
   extension: progressionExtensionSchema.default('carryForward'),
+  recovery: restRecoverySchema,
 })
 
 export const leveledSlotProgressionSchema = slotProgressionBaseSchema

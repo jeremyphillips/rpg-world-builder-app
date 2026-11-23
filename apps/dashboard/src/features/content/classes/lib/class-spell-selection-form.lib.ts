@@ -26,7 +26,7 @@ export const SPELL_SELECTION_MODEL_OPTIONS = [
   },
 ] as const
 
-export const SPELL_SELECTION_CHANGE_PACKAGE_OPTIONS = [
+export const SPELL_CHANGE_PACKAGE_OPTIONS = [
   {
     value: 'levelUp:1',
     label: joinInlineMetadata(['When gaining a class level', 'Replace 1']),
@@ -42,12 +42,16 @@ export const SPELL_SELECTION_CHANGE_PACKAGE_OPTIONS = [
   { value: 'none', label: 'Cannot normally replace' },
 ] as const
 
-export type SpellSelectionChangePackage =
-  (typeof SPELL_SELECTION_CHANGE_PACKAGE_OPTIONS)[number]['value']
+export type SpellChangePackage = (typeof SPELL_CHANGE_PACKAGE_OPTIONS)[number]['value']
 
-export function spellSelectionChangePackageFromPolicy(
+/** @deprecated Use `SpellChangePackage`. */
+export type SpellSelectionChangePackage = SpellChangePackage
+
+export const SPELL_SELECTION_CHANGE_PACKAGE_OPTIONS = SPELL_CHANGE_PACKAGE_OPTIONS
+
+export function spellChangePackageFromPolicy(
   change: SpellMutationPolicy | undefined,
-): SpellSelectionChangePackage {
+): SpellChangePackage {
   if (!change || change.kind === 'none') return 'none'
   if (change.trigger === 'levelUp' && change.limit === 1) return 'levelUp:1'
   if (change.trigger === 'longRest' && change.limit === 1) return 'longRest:1'
@@ -55,9 +59,7 @@ export function spellSelectionChangePackageFromPolicy(
   return 'none'
 }
 
-export function spellSelectionChangePolicyFromPackage(
-  value: SpellSelectionChangePackage,
-): SpellMutationPolicy {
+export function spellChangePolicyFromPackage(value: SpellChangePackage): SpellMutationPolicy {
   switch (value) {
     case 'levelUp:1':
       return { kind: 'replace', trigger: 'levelUp', limit: 1 }
@@ -69,6 +71,9 @@ export function spellSelectionChangePolicyFromPackage(
       return { kind: 'none' }
   }
 }
+
+export const spellSelectionChangePackageFromPolicy = spellChangePackageFromPolicy
+export const spellSelectionChangePolicyFromPackage = spellChangePolicyFromPackage
 
 export function detectRegularGain(acquisition: ClassGainProgression | undefined): {
   starting: number
@@ -175,7 +180,7 @@ export function spellSelectionFromForm(input: {
   acquisition?: ClassGainProgression
 }): ClassSpellSelection | undefined {
   if (!input.model) return undefined
-  const change = spellSelectionChangePolicyFromPackage(input.changePackage)
+  const change = spellChangePolicyFromPackage(input.changePackage)
   if (input.model === 'prepareFromLearnedCollection') {
     return {
       model: input.model,

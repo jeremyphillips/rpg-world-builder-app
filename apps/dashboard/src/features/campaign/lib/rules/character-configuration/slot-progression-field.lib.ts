@@ -1,7 +1,10 @@
 import type { z } from 'zod'
 import {
+  formatRestRecoveryLabel,
   formatSpellSlotLevelLabel,
   MAX_SPELL_SLOT_LEVEL,
+  type RestKind,
+  type RestRecovery,
   normalizeSlotCounts,
   refineLeveledSlotRows,
   refinePactSlotRows,
@@ -460,17 +463,42 @@ export function applySlotProgressionDraft(
   }
 }
 
+export const SLOT_PROGRESSION_RECOVERY_OPTIONS = [
+  {
+    value: 'long' as const satisfies RestKind,
+    label: formatRestRecoveryLabel({ minimumRest: 'long' }),
+  },
+  {
+    value: 'short' as const satisfies RestKind,
+    label: formatRestRecoveryLabel({ minimumRest: 'short' }),
+  },
+] as const
+
+export function defaultSlotProgressionRecovery(kind: SlotProgressionTableKind): RestRecovery {
+  return kind === 'pact' ? { minimumRest: 'short' } : { minimumRest: 'long' }
+}
+
+export function applySlotProgressionRecovery(
+  progression: SlotProgression,
+  recovery: RestRecovery,
+): SlotProgression {
+  return { ...progression, recovery }
+}
+
 export function createCustomSlotProgression(input: {
   id: string
   label: string
   kind: SlotProgressionTableKind
+  recovery?: RestRecovery
 }): SlotProgression {
+  const recovery = input.recovery ?? defaultSlotProgressionRecovery(input.kind)
   if (input.kind === 'pact') {
     return {
       id: input.id,
       label: input.label,
       kind: 'pact',
       extension: 'carryForward',
+      recovery,
       rows: [{ level: 1, slotCount: 1, slotLevel: 1 }],
     }
   }
@@ -480,6 +508,7 @@ export function createCustomSlotProgression(input: {
     label: input.label,
     kind: 'leveled',
     extension: 'carryForward',
+    recovery,
     rows: [{ level: 1, slots: [1] }],
   }
 }

@@ -6,6 +6,9 @@ import {
   formatRegularGainAlert,
   formatRegularGainSummary,
   materializeRegularGain,
+  spellChangePackageFromPolicy,
+  spellChangePolicyFromPackage,
+  type SpellChangePackage,
 } from './class-spell-selection-form.lib'
 
 describe('class-spell-selection-form.lib', () => {
@@ -84,6 +87,20 @@ describe('class-spell-selection-form.lib', () => {
 
     expect(aligned?.preparedSpells?.curve.rows).toEqual([{ level: 1, count: 2 }])
     expect(aligned?.repertoire).toBeUndefined()
+  })
+
+  it('round-trips seeded spell change packages', () => {
+    const seededPolicies = [
+      { kind: 'replace', trigger: 'levelUp', limit: 1 },
+      { kind: 'replace', trigger: 'longRest', limit: 1 },
+      { kind: 'replace', trigger: 'longRest', limit: 'all' },
+    ] as const
+
+    for (const policy of seededPolicies) {
+      const pkg = spellChangePackageFromPolicy(policy)
+      expect(pkg).not.toBe('none')
+      expect(spellChangePolicyFromPackage(pkg as SpellChangePackage)).toEqual(policy)
+    }
   })
 
   it('alignProgressionToModel moves prepared to repertoire for limited repertoire', () => {

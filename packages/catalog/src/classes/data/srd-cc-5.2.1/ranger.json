@@ -15,7 +15,7 @@
     "ability": "wis",
     "focusKinds": ["druidic_focus"],
     "spellSelection": {
-      "model": "limitedRepertoire",
+      "model": "prepareFromClassList",
       "change": {
         "kind": "replace",
         "trigger": "longRest",
@@ -23,7 +23,7 @@
       }
     },
     "progression": {
-      "repertoire": {
+      "preparedSpells": {
         "curve": {
           "rows": [
             {

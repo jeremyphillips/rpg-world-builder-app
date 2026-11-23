@@ -387,11 +387,11 @@ describe('resolveSpellStepModel', () => {
         slotProgressionId: 'half-caster',
         ability: 'wis',
         spellSelection: {
-          model: 'limitedRepertoire',
+          model: 'prepareFromClassList',
           change: { kind: 'replace', trigger: 'longRest', limit: 1 },
         },
         progression: {
-          repertoire: {
+          preparedSpells: {
             curve: { rows: [{ level: 1, count: 2 }] },
             extension: 'carryForward',
           },

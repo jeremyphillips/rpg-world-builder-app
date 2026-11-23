@@ -27,19 +27,23 @@
               ],
               "description": "carryForward | zero | explicit"
             },
+            "recovery": {
+              "$ref": "#/definitions/__schema4"
+            },
             "kind": {
               "type": "string",
               "const": "leveled",
               "description": "leveled"
             },
             "rows": {
-              "$ref": "#/definitions/__schema5"
+              "$ref": "#/definitions/__schema6"
             }
           },
           "required": [
             "id",
             "label",
             "extension",
+            "recovery",
             "kind",
             "rows"
           ],
@@ -64,19 +68,23 @@
               ],
               "description": "carryForward | zero | explicit"
             },
+            "recovery": {
+              "$ref": "#/definitions/__schema4"
+            },
             "kind": {
               "type": "string",
               "const": "pact",
               "description": "pact"
             },
             "rows": {
-              "$ref": "#/definitions/__schema9"
+              "$ref": "#/definitions/__schema10"
             }
           },
           "required": [
             "id",
             "label",
             "extension",
+            "recovery",
             "kind",
             "rows"
           ],
@@ -103,22 +111,39 @@
       "description": "carryForward | zero | explicit"
     },
     "__schema4": {
+      "type": "object",
+      "properties": {
+        "minimumRest": {
+          "type": "string",
+          "enum": [
+            "short",
+            "long"
+          ],
+          "description": "short | long"
+        }
+      },
+      "required": [
+        "minimumRest"
+      ],
+      "additionalProperties": false
+    },
+    "__schema5": {
       "type": "string",
       "const": "leveled",
       "description": "leveled"
     },
-    "__schema5": {
+    "__schema6": {
       "minItems": 1,
       "type": "array",
       "items": {
-        "$ref": "#/definitions/__schema6"
+        "$ref": "#/definitions/__schema7"
       }
     },
-    "__schema6": {
+    "__schema7": {
       "type": "object",
       "properties": {
         "level": {
-          "$ref": "#/definitions/__schema7"
+          "$ref": "#/definitions/__schema8"
         },
         "slots": {
           "type": "array",
@@ -135,28 +160,28 @@
       ],
       "additionalProperties": false
     },
-    "__schema7": {
+    "__schema8": {
       "type": "integer",
       "minimum": 1,
       "maximum": 100
     },
-    "__schema8": {
+    "__schema9": {
       "type": "string",
       "const": "pact",
       "description": "pact"
     },
-    "__schema9": {
+    "__schema10": {
       "minItems": 1,
       "type": "array",
       "items": {
-        "$ref": "#/definitions/__schema10"
+        "$ref": "#/definitions/__schema11"
       }
     },
-    "__schema10": {
+    "__schema11": {
       "type": "object",
       "properties": {
         "level": {
-          "$ref": "#/definitions/__schema7"
+          "$ref": "#/definitions/__schema8"
         },
         "slotCount": {
           "type": "integer",

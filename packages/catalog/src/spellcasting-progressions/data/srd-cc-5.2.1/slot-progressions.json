@@ -4,6 +4,7 @@
     "label": "Full caster",
     "kind": "leveled",
     "extension": "carryForward",
+    "recovery": { "minimumRest": "long" },
     "rows": [
       {
         "level": 1,
@@ -92,6 +93,7 @@
     "label": "Half caster",
     "kind": "leveled",
     "extension": "carryForward",
+    "recovery": { "minimumRest": "long" },
     "rows": [
       {
         "level": 1,
@@ -180,6 +182,7 @@
     "label": "Pact Magic",
     "kind": "pact",
     "extension": "carryForward",
+    "recovery": { "minimumRest": "short" },
     "rows": [
       {
         "level": 1,

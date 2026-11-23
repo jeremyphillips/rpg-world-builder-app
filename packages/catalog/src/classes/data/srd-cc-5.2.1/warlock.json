@@ -13,6 +13,9 @@
   "spellcasting": {
     "slotProgressionId": "pact-magic",
     "ability": "cha",
+    "cantripSelection": {
+      "change": { "kind": "replace", "trigger": "levelUp", "limit": 1 }
+    },
     "spellSelection": {
       "model": "limitedRepertoire",
       "change": {

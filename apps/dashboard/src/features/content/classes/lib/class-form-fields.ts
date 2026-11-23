@@ -86,6 +86,7 @@ export function createClassFormSchema(
       spellSelectionChangePackage: z
         .enum(['levelUp:1', 'longRest:1', 'longRest:all', 'none'])
         .optional(),
+      cantripChangePackage: z.enum(['levelUp:1', 'longRest:1', 'longRest:all', 'none']).optional(),
       spellbookAcquisitionStarting: z.coerce.number().int().min(0).optional(),
       spellbookAcquisitionPerLevel: z.coerce.number().int().min(0).optional(),
       spellbookAcquisitionThroughLevel: z.coerce.number().int().min(2).optional(),
@@ -165,6 +166,7 @@ export function createClassDraftFormSchema(
       spellSelectionChangePackage: z
         .enum(['levelUp:1', 'longRest:1', 'longRest:all', 'none'])
         .optional(),
+      cantripChangePackage: z.enum(['levelUp:1', 'longRest:1', 'longRest:all', 'none']).optional(),
       spellbookAcquisitionStarting: z.coerce.number().int().min(0).optional(),
       spellbookAcquisitionPerLevel: z.coerce.number().int().min(0).optional(),
       spellbookAcquisitionThroughLevel: z.coerce.number().int().min(2).optional(),
@@ -220,6 +222,7 @@ export function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
         'grantsCantrips',
         'spellSelectionModel',
         'spellSelectionChangePackage',
+        'cantripChangePackage',
         'spellbookAcquisitionStarting',
         'spellbookAcquisitionPerLevel',
         'spellbookAcquisitionThroughLevel',

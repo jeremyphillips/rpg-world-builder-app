@@ -37,6 +37,10 @@ export const spellcastingValidationMessages = {
     'validation.spellcasting.cantripsForbidden',
     () => 'Cantrip progression is not allowed when the class does not grant cantrips.',
   ),
+  cantripChangeForbidden: defineMessage(
+    'validation.spellcasting.cantripChangeForbidden',
+    () => 'Cantrip replacement policy requires cantrip progression.',
+  ),
   selectionProgressionForbidden: defineMessage(
     'validation.spellcasting.selectionProgressionForbidden',
     () => 'Repertoire and prepared spells progressions require a spell selection model.',
@@ -61,7 +65,7 @@ export function refinePublishedSpellcasting(
   const grantsCantrips = options?.grantsCantrips ?? hasCapacityRows(progression?.cantrips)
 
   refineSelectionAgainstProgression(selection, progression, ctx, pathPrefix)
-  refineCantripsAgainstGrant(progression, grantsCantrips, ctx, pathPrefix)
+  refineCantripsAgainstGrant(spellcasting, progression, grantsCantrips, ctx, pathPrefix)
 }
 
 // fallow-ignore-next-line complexity
@@ -142,11 +146,26 @@ function refineSelectionAgainstProgression(
 }
 
 function refineCantripsAgainstGrant(
+  spellcasting: Spellcasting,
   progression: ClassSpellcastingProgression | undefined,
   grantsCantrips: boolean,
   ctx: z.RefinementCtx,
   pathPrefix: (string | number)[],
 ): void {
+  if (spellcasting.cantripSelection?.change !== undefined) {
+    const cantripChange = spellcasting.cantripSelection.change
+    if (
+      !grantsCantrips ||
+      !hasCapacityRows(progression?.cantrips) ||
+      cantripChange.kind === 'none'
+    ) {
+      addCustomRefinementIssue(ctx, spellcastingValidationMessages.cantripChangeForbidden(), [
+        ...pathPrefix,
+        'cantripSelection',
+      ])
+    }
+  }
+
   if (grantsCantrips) {
     if (!hasCapacityRows(progression?.cantrips)) {
       addCustomRefinementIssue(ctx, spellcastingValidationMessages.cantripsRequired(), [

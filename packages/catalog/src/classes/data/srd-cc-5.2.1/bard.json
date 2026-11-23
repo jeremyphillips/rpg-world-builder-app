@@ -13,6 +13,10 @@
   "spellcasting": {
     "slotProgressionId": "full-caster",
     "ability": "cha",
+    "focusKinds": ["musical_instrument"],
+    "cantripSelection": {
+      "change": { "kind": "replace", "trigger": "levelUp", "limit": 1 }
+    },
     "spellSelection": {
       "model": "limitedRepertoire",
       "change": {

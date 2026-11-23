@@ -14,6 +14,9 @@
     "slotProgressionId": "full-caster",
     "ability": "wis",
     "focusKinds": ["holy_symbol"],
+    "cantripSelection": {
+      "change": { "kind": "replace", "trigger": "levelUp", "limit": 1 }
+    },
     "spellSelection": {
       "model": "prepareFromClassList",
       "change": {

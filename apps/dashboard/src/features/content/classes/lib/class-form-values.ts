@@ -22,8 +22,11 @@ import {
   alignProgressionToModel,
   detectRegularGain,
   materializeRegularGain,
+  spellChangePackageFromPolicy,
+  spellChangePolicyFromPackage,
   spellSelectionChangePackageFromPolicy,
   spellSelectionFromForm,
+  type SpellChangePackage,
   type SpellSelectionChangePackage,
 } from './class-spell-selection-form.lib'
 import { createAsiFeature } from './class-asi-features'
@@ -261,6 +264,13 @@ export function spellSelectionChangePackageToFormValues(
   return spellSelectionChangePackageFromPolicy(spellcasting.spellSelection.change)
 }
 
+export function cantripChangePackageToFormValues(
+  spellcasting: Spellcasting | undefined,
+): SpellChangePackage | undefined {
+  if (!spellcasting?.cantripSelection) return undefined
+  return spellChangePackageFromPolicy(spellcasting.cantripSelection.change)
+}
+
 export function spellbookAcquisitionToFormValues(spellcasting: Spellcasting | undefined): {
   irregular: boolean
   starting?: number
@@ -365,6 +375,7 @@ export const CLASS_SPELLCASTING_PREVIEW_PARENT_FIELD_KEYS = [
   'spellcasting',
   'spellSelectionModel',
   'spellSelectionChangePackage',
+  'cantripChangePackage',
   'spellbookAcquisitionIrregular',
   'spellbookAcquisitionStarting',
   'spellbookAcquisitionPerLevel',
@@ -404,6 +415,11 @@ export function spellcastingFromClassFormWatch(
       'spellSelectionChangePackage',
       parentPrefix,
     ),
+    cantripChangePackage: readSpellcastingParentWatchValue(
+      values,
+      'cantripChangePackage',
+      parentPrefix,
+    ),
     spellbookAcquisitionIrregular: readSpellcastingParentWatchValue(
       values,
       'spellbookAcquisitionIrregular',
@@ -441,7 +457,7 @@ export function classSpellcastingPreviewParentDependsOn(
 }
 
 export function spellcastingFromFormValues(values: ClassFormValues): Spellcasting | undefined {
-  const { grantsCantrips, spellcasting, spellSelectionChangePackage } = values
+  const { grantsCantrips, spellcasting, spellSelectionChangePackage, cantripChangePackage } = values
   if (!hasCompleteSpellcastingCore(values) || !spellcasting) {
     return undefined
   }
@@ -460,12 +476,21 @@ export function spellcastingFromFormValues(values: ClassFormValues): Spellcastin
     ...(spellSelection ? { spellSelection } : {}),
   }
   applyOptionalSpellcastingFields(result, spellcasting, grantsCantrips)
+
+  const cantripPackage = cantripChangePackage ?? 'none'
+  if (grantsCantrips && cantripPackage !== 'none') {
+    result.cantripSelection = {
+      change: spellChangePolicyFromPackage(cantripPackage),
+    }
+  }
+
   return result
 }
 
 export const classCreateDefaultValues: Partial<ClassFormValues> = {
   hasSpellcasting: false,
   grantsCantrips: false,
+  cantripChangePackage: 'none',
   spellbookAcquisitionIrregular: false,
   weaponProficiencyMode: 'categories',
   weaponProficiencyReconciliationPending: false,

@@ -4,7 +4,7 @@ import {
   isSpellcastingActiveAtLevel,
   resolveClassSpellcastingActivationLevel,
 } from '../../content/classes/spellcasting/class-spellcasting-ownership'
-import type { SpellcastingFocusGearKind } from '../../vocab/equipment/spellcasting-gear-kind'
+import type { ClassSpellcastingFocusKind } from '../../vocab/spell/class-spellcasting-focus-kind'
 import { resolveClassSpellcasting } from '../creature/resolve-class-spellcasting'
 import {
   activationAcquisitionRulesSentences,
@@ -18,7 +18,7 @@ import {
 export type FormatClassSpellcastingFeatureRulesInput = {
   characterClass: CharacterClass
   config: ResolvedSpellcastingProgressionConfig
-  focusKinds?: readonly SpellcastingFocusGearKind[]
+  focusKinds?: readonly ClassSpellcastingFocusKind[]
 }
 
 /** Player-facing spellcasting rules for the granting feature — derived from resolvers only. */

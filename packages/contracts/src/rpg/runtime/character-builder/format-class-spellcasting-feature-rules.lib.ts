@@ -9,9 +9,9 @@ import { resolveMaxAuthoredCurveLevel } from '../../campaign/rules/spellcasting-
 import { resolveProgressionValueAtLevel } from '../../campaign/rules/spellcasting-progression/lookup'
 import { getAbilityLabel, type Ability } from '../../vocab/ability'
 import {
-  getSpellcastingGearKindLabel,
-  type SpellcastingFocusGearKind,
-} from '../../vocab/equipment/spellcasting-gear-kind'
+  type ClassSpellcastingFocusKind,
+  getClassSpellcastingFocusKindLabel,
+} from '../../vocab/spell/class-spellcasting-focus-kind'
 import { resolveClassCantripCount } from '../creature/spellcasting'
 import {
   findCompiledChoiceProgressionBySuffix,
@@ -288,10 +288,10 @@ export function spellcastingAbilityRulesSentence(ability: Ability): string {
 }
 
 export function spellcastingFocusRulesSentence(
-  focusKinds: readonly SpellcastingFocusGearKind[],
+  focusKinds: readonly ClassSpellcastingFocusKind[],
 ): string | undefined {
   if (focusKinds.length === 0) return undefined
-  const labels = focusKinds.map((kind) => getSpellcastingGearKindLabel(kind))
+  const labels = focusKinds.map((kind) => getClassSpellcastingFocusKindLabel(kind))
   if (labels.length === 1) {
     return `You can use ${labels[0]} as a Spellcasting Focus for your spells.`
   }

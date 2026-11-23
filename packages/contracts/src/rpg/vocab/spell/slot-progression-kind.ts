@@ -27,8 +27,7 @@ export const SLOT_PROGRESSION_KIND_ENTRIES = {
   },
   'pact-magic': {
     label: 'Pact Magic',
-    description:
-      'Uses a small number of same-level spell slots that refresh after a Short or Long Rest.',
+    description: 'Uses a small number of spell slots that are always the same level.',
   },
 } as const satisfies Record<string, GameTermEntry>
 

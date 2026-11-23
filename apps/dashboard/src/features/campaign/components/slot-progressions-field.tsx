@@ -5,10 +5,12 @@ import {
   Button,
   ConfirmDialog,
   Panel,
+  SelectField,
   TextField,
   cn,
   fieldAnatomyStackVariants,
 } from '@rpg/ui'
+import type { RestKind } from '@rpg/contracts'
 import { FormSectionHeader, resolveFormDensity, useFormSectionContext } from '@rpg/ui/form'
 import type { SlotProgression } from '@rpg/contracts'
 
@@ -17,11 +19,14 @@ import { DetailOverflowMenu, FeatureTableRow } from '@/lib/content-table-surface
 
 import {
   applySlotProgressionDraft,
+  applySlotProgressionRecovery,
   buildLeveledSlotProgressionHostConfig,
   buildPactSlotProgressionHostConfig,
   buildSlotProgressionDraft,
   createCustomSlotProgression,
+  defaultSlotProgressionRecovery,
   formatSlotProgressionMetadata,
+  SLOT_PROGRESSION_RECOVERY_OPTIONS,
   type SlotProgressionTableKind,
 } from '../lib/rules/character-configuration/slot-progression-field.lib'
 import { buildEffectiveMaxLevel } from '../lib/rules/character-configuration/xp-thresholds-field.lib'
@@ -52,6 +57,7 @@ function slugifyId(label: string): string {
 // fallow-ignore-next-line complexity
 export function SlotProgressionsField() {
   const createLabelId = useId()
+  const createRecoveryId = useId()
   const form = useFormContext<SpellcastingRulesFormSlice>()
   const { density } = useFormSectionContext()
   const { size } = resolveFormDensity(density)
@@ -72,6 +78,7 @@ export function SlotProgressionsField() {
   const [modalState, setModalState] = useState<SlotModalState | null>(null)
   const [createLabelDraft, setCreateLabelDraft] = useState('')
   const [createKindDraft, setCreateKindDraft] = useState<SlotProgressionTableKind>('leveled')
+  const [createRecoveryDraft, setCreateRecoveryDraft] = useState<RestKind>('long')
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
 
@@ -91,6 +98,7 @@ export function SlotProgressionsField() {
             id: 'draft',
             label: modalState.label,
             kind: modalState.kind,
+            recovery: { minimumRest: createRecoveryDraft },
           })
         : undefined
 
@@ -119,6 +127,14 @@ export function SlotProgressionsField() {
     form.setValue('slotProgressions', next, { shouldDirty: true })
   }
 
+  function updateProgressionRecovery(id: string, minimumRest: RestKind) {
+    setSlotProgressions(
+      slotProgressions.map((entry) =>
+        entry.id === id ? applySlotProgressionRecovery(entry, { minimumRest }) : entry,
+      ),
+    )
+  }
+
   function handleSaveDraft(draft: TableBuilderFormValues) {
     if (modalState?.mode === 'edit') {
       const current = slotProgressions.find((entry) => entry.id === modalState.id)
@@ -135,6 +151,7 @@ export function SlotProgressionsField() {
         id: `custom:${slugifyId(modalState.label)}`,
         label: modalState.label,
         kind: modalState.kind,
+        recovery: { minimumRest: createRecoveryDraft },
       })
       setSlotProgressions([...slotProgressions, applySlotProgressionDraft(created, draft)])
     }
@@ -184,6 +201,20 @@ export function SlotProgressionsField() {
               typeLabel={progression.kind === 'pact' ? 'Pact' : 'Leveled'}
               editLabel="Edit table"
               onEdit={() => setModalState({ mode: 'edit', id: progression.id })}
+              description={
+                <SelectField
+                  id={`${progression.id}-recovery`}
+                  label="Slot recovery"
+                  size="sm"
+                  value={progression.recovery.minimumRest}
+                  options={[...SLOT_PROGRESSION_RECOVERY_OPTIONS]}
+                  onValueChange={(value) => {
+                    if (value === 'short' || value === 'long') {
+                      updateProgressionRecovery(progression.id, value)
+                    }
+                  }}
+                />
+              }
               overflowActions={
                 isSeedSlotProgressionId(progression.id) ? undefined : (
                   <DetailOverflowMenu
@@ -219,7 +250,10 @@ export function SlotProgressionsField() {
               type="button"
               size="sm"
               variant={createKindDraft === 'leveled' ? 'default' : 'outline'}
-              onClick={() => setCreateKindDraft('leveled')}
+              onClick={() => {
+                setCreateKindDraft('leveled')
+                setCreateRecoveryDraft(defaultSlotProgressionRecovery('leveled').minimumRest)
+              }}
             >
               Leveled
             </Button>
@@ -227,11 +261,26 @@ export function SlotProgressionsField() {
               type="button"
               size="sm"
               variant={createKindDraft === 'pact' ? 'default' : 'outline'}
-              onClick={() => setCreateKindDraft('pact')}
+              onClick={() => {
+                setCreateKindDraft('pact')
+                setCreateRecoveryDraft(defaultSlotProgressionRecovery('pact').minimumRest)
+              }}
             >
               Pact
             </Button>
           </div>
+          <SelectField
+            id={createRecoveryId}
+            label="Slot recovery"
+            size="sm"
+            value={createRecoveryDraft}
+            options={[...SLOT_PROGRESSION_RECOVERY_OPTIONS]}
+            onValueChange={(value) => {
+              if (value === 'short' || value === 'long') {
+                setCreateRecoveryDraft(value)
+              }
+            }}
+          />
           <div className="flex gap-2">
             <Button type="button" size="sm" onClick={handleCreateCustom}>
               Continue

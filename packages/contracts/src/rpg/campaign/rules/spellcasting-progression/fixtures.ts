@@ -11,6 +11,7 @@ export const spellcastingProgressionTestSeed: SpellcastingProgressionSeed = {
       label: getSlotProgressionKindLabel('full-caster'),
       kind: 'leveled',
       extension: 'carryForward',
+      recovery: { minimumRest: 'long' },
       rows: [
         { level: 1, slots: [2] },
         { level: 2, slots: [3] },
@@ -23,6 +24,7 @@ export const spellcastingProgressionTestSeed: SpellcastingProgressionSeed = {
       label: getSlotProgressionKindLabel('half-caster'),
       kind: 'leveled',
       extension: 'carryForward',
+      recovery: { minimumRest: 'long' },
       rows: [
         { level: 1, slots: [2] },
         { level: 5, slots: [4, 2] },
@@ -33,6 +35,7 @@ export const spellcastingProgressionTestSeed: SpellcastingProgressionSeed = {
       label: getSlotProgressionKindLabel('pact-magic'),
       kind: 'pact',
       extension: 'carryForward',
+      recovery: { minimumRest: 'short' },
       rows: [
         { level: 1, slotCount: 1, slotLevel: 1 },
         { level: 2, slotCount: 2, slotLevel: 1 },

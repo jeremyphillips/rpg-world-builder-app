@@ -5,6 +5,8 @@ import { loadSpellcastingProgressionSeed } from '@rpg/catalog/spellcasting-progr
 import {
   buildLeveledSlotProgressionDraft,
   buildPactSlotProgressionDraft,
+  createCustomSlotProgression,
+  defaultSlotProgressionRecovery,
   mapLeveledSlotProgressionDraftToRows,
   resolveLeveledSlotFixedColumns,
   resolvePactSlotFixedColumns,
@@ -142,5 +144,25 @@ describe('mapLeveledSlotProgressionDraftToRows', () => {
     }
 
     expect(mapLeveledSlotProgressionDraftToRows(draft)[0]).toEqual({ level: 1, slots: [2] })
+  })
+})
+
+describe('createCustomSlotProgression', () => {
+  it('defaults recovery by progression kind', () => {
+    expect(
+      createCustomSlotProgression({
+        id: 'custom:demo',
+        label: 'Demo',
+        kind: 'leveled',
+      }).recovery,
+    ).toEqual(defaultSlotProgressionRecovery('leveled'))
+
+    expect(
+      createCustomSlotProgression({
+        id: 'custom:pact',
+        label: 'Pact demo',
+        kind: 'pact',
+      }).recovery,
+    ).toEqual(defaultSlotProgressionRecovery('pact'))
   })
 })
