@@ -7,6 +7,7 @@ import {
   campaignLevelSchema,
   classValidationMessages,
   contentTableSchema,
+  isClassSpellcastingGrantingFeature,
   resolveGrantGroupsFromContent,
   type ClassBodyFeature,
   type ClassFeature,
@@ -35,10 +36,6 @@ import { applyStableIdsForUpdate } from '../../lib/forms/registry/content-form-k
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { ClassFeatureManagedSpellcastingGrantField } from '../components/class-feature-managed-spellcasting-grant-field'
 import { FeatureTablesField } from '../components/features/feature-tables-field'
-import {
-  CLASS_SPELLCASTING_ADDITIONAL_RULES_HINT,
-  CLASS_SPELLCASTING_ADDITIONAL_RULES_LABEL,
-} from './class-spellcasting-authoring-copy'
 import { classSpellcastingGrantingFeatureRulesDisplay } from './class-spellcasting-feature-rules.lib'
 import { isSpellcastingGrantingFeatureRow } from './class-spellcasting-lifecycle'
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
@@ -178,23 +175,6 @@ function sharedFeatureItemFields(
     {
       type: 'richtext',
       name: 'description',
-      label: CLASS_SPELLCASTING_ADDITIONAL_RULES_LABEL,
-      hint: CLASS_SPELLCASTING_ADDITIONAL_RULES_HINT,
-      linkable: true,
-      internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
-      contentTypeOptions: ctx.options?.richTextContentTypeOptions,
-      optionalDisclosure: { intent: 'add', actionSubject: 'additional rules' },
-      visibility: {
-        dependsOn: ['grants'],
-        visibleWhen: (watched) =>
-          isSpellcastingGrantingFeatureRow({
-            grants: watched.grants as FeatureRowForm['grants'],
-          }),
-      },
-    },
-    {
-      type: 'richtext',
-      name: 'description',
       label: 'Description',
       linkable: true,
       internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
@@ -314,13 +294,14 @@ function customFeatureFromFormRow(
   grantGroups: ReturnType<typeof formRowsToGrantGroups>,
 ): ClassBodyFeature {
   const tables = row.tables?.length ? row.tables : undefined
+  const isGranting = isClassSpellcastingGrantingFeature({ grantGroups })
 
   return {
     kind: 'custom',
     id: row.id,
     name: row.name,
     intro: optionalRichTextField(row.intro),
-    description: row.description || undefined,
+    ...(!isGranting && row.description ? { description: row.description } : {}),
     level: row.level,
     ...(grantGroups.length ? { grantGroups } : {}),
     ...(tables ? { tables } : {}),

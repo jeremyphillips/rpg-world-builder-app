@@ -38,7 +38,8 @@ function expectBardSpellcastingRoundTrip(): void {
   const fromInput = input.spellcasting!
   const spellcastingFeature = formValues.features.find((row) => row.id === 'spellcasting')
 
-  expect(spellcastingFeature?.description).toContain('cast spells through your bardic arts')
+  expect(spellcastingFeature?.intro).toContain('cast spells through your bardic arts')
+  expect(spellcastingFeature?.description).toBeUndefined()
   expect(spellcastingFeature?.level).toBe(1)
   expect(formValues.spellSelectionModel).toBe(expected.spellSelection?.model)
   expect(fromInput.recommendations).toEqual(expected.recommendations)

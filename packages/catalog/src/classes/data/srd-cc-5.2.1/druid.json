@@ -15,7 +15,11 @@
     "ability": "wis",
     "focusKinds": ["druidic_focus"],
     "cantripSelection": {
-      "change": { "kind": "replace", "trigger": "levelUp", "limit": 1 }
+      "change": {
+        "kind": "replace",
+        "trigger": "levelUp",
+        "limit": 1
+      }
     },
     "spellSelection": {
       "model": "prepareFromClassList",
@@ -247,7 +251,7 @@
           ]
         }
       ],
-      "description": "<p>You have learned to cast spells through studying the mystical forces of nature. See \"Spells\" for the rules on spellcasting. The information below details how you use those rules with Druid spells, which appear on the Druid spell list later in the class's description.</p><p>Whenever you gain a Druid level, you can replace one of your cantrips with another cantrip of your choice from the Druid spell list.</p><p><strong>Spell Slots.</strong> The Druid Features table shows how many spell slots you have to cast your level 1+ spells. You regain all expended slots when you finish a Long Rest.</p><p>If another Druid feature gives you spells that you always have prepared, those spells don't count against the number of spells you can prepare with this feature, but those spells otherwise count as Druid spells for you.</p>"
+      "intro": "<p>You have learned to cast spells through studying the mystical forces of nature.</p>"
     },
     {
       "id": "druidic",

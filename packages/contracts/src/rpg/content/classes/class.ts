@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
+import { stripHtmlTags } from '../../../lib/strip-html-tags'
 
 import { abilitySchema } from '../../vocab/ability'
 import { hitDieSchema } from '../../primitives/dice'
@@ -225,16 +226,32 @@ export function subclassChoiceFeatureLevel(
   return subclassChoiceFeature(characterClass)?.level
 }
 
-function refineClassSpellcastingOwnership(
+function refineGrantingFeatureDescriptions(
+  grantingFeatures: ClassBodyFeature[],
+  ctx: z.RefinementCtx,
+): boolean {
+  const hasForbiddenDescription = grantingFeatures.some((feature) =>
+    Boolean(stripHtmlTags(feature.description ?? '').trim()),
+  )
+  if (!hasForbiddenDescription) return false
+
+  addCustomRefinementIssue(
+    ctx,
+    classValidationMessages.spellcastingGrantingFeatureDescriptionForbidden(),
+    ['features'],
+  )
+  return true
+}
+
+function refineSpellcastingConfigGrantPairing(
   value: Pick<ClassStoredBody, 'spellcasting' | 'features'>,
+  grantingFeatures: ClassBodyFeature[],
   ctx: z.RefinementCtx,
 ): void {
-  const grantingFeatures = value.features.filter(isClassSpellcastingGrantingFeature)
   const hasConfig = value.spellcasting !== undefined
   const hasGrant = grantingFeatures.length > 0
 
   if (!hasConfig && !hasGrant) return
-
   if (hasConfig && grantingFeatures.length === 1) return
 
   if (hasConfig && !hasGrant) {
@@ -256,6 +273,16 @@ function refineClassSpellcastingOwnership(
       'features',
     ])
   }
+}
+
+function refineClassSpellcastingOwnership(
+  value: Pick<ClassStoredBody, 'spellcasting' | 'features'>,
+  ctx: z.RefinementCtx,
+): void {
+  const grantingFeatures = value.features.filter(isClassSpellcastingGrantingFeature)
+  if (refineGrantingFeatureDescriptions(grantingFeatures, ctx)) return
+
+  refineSpellcastingConfigGrantPairing(value, grantingFeatures, ctx)
 }
 
 // Homebrew authoring DTOs (forms). Server sets id/source/campaignId/timestamps.

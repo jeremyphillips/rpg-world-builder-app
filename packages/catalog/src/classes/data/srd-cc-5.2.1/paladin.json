@@ -203,7 +203,7 @@
           ]
         }
       ],
-      "description": "<p>You have learned to cast spells through prayer and meditation. See \"Spells\" for the rules on spellcasting. The information below details how you use those rules with Paladin spells, which appear in the Paladin spell list later in the class's description.</p><p><strong>Spell Slots.</strong> The Paladin Features table shows how many spell slots you have to cast your level 1+ spells. You regain all expended slots when you finish a Long Rest.</p><p>If another Paladin feature gives you spells that you always have prepared, those spells don't count against the number of spells you can prepare with this feature, but those spells otherwise count as Paladin spells for you.</p>"
+      "intro": "<p>You have learned to cast spells through prayer and meditation.</p>"
     },
     {
       "id": "lay-on-hands",

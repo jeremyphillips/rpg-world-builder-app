@@ -28,4 +28,9 @@ export const classValidationMessages = {
     () =>
       'The Spellcasting feature must contain exactly one default grant group with only a spellcasting grant.',
   ),
+  spellcastingGrantingFeatureDescriptionForbidden: defineMessage(
+    'validation.class.spellcastingGrantingFeatureDescriptionForbidden',
+    () =>
+      'Spellcasting and Pact Magic features cannot carry description HTML; use Introduction for narrative copy and rely on generated rules for mechanics.',
+  ),
 }

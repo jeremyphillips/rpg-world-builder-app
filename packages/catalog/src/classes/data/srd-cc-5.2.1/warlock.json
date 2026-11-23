@@ -14,7 +14,11 @@
     "slotProgressionId": "pact-magic",
     "ability": "cha",
     "cantripSelection": {
-      "change": { "kind": "replace", "trigger": "levelUp", "limit": 1 }
+      "change": {
+        "kind": "replace",
+        "trigger": "levelUp",
+        "limit": 1
+      }
     },
     "spellSelection": {
       "model": "limitedRepertoire",
@@ -228,7 +232,7 @@
           ]
         }
       ],
-      "description": "<p>Through occult ceremony, you have formed a pact with a mysterious entity to gain magical powers. The entity is a voice in the shadows—its identity unclear—but its boon to you is concrete: the ability to cast spells. See \"Spells\" for the rules on spellcasting. The information below details how you use those rules with Warlock spells, which appear in the Warlock spell list later in the class's description.</p><p>Whenever you gain a Warlock level, you can replace one of your cantrips from this feature with another Warlock cantrip of your choice.</p><p><strong>Spell Slots.</strong> The Warlock Features table shows how many spell slots you have to cast your Warlock spells of levels 1–5. The table also shows the level of those slots, all of which are the same level. You regain all expended Pact Magic spell slots when you finish a Short or Long Rest.</p><p>To cast the level 1 spell Charm Person, you must spend one of those slots, and you cast it as a level 3 spell.</p><p>If another Warlock feature gives you spells that you always have prepared, those spells don't count against the number of spells you can prepare with this feature, but those spells otherwise count as Warlock spells for you.</p>"
+      "intro": "<p>Through occult ceremony, you have formed a pact with a mysterious entity to gain magical powers. The entity is a voice in the shadows—its identity unclear—but its boon to you is concrete: the ability to cast spells.</p>"
     },
     {
       "id": "eldritch-invocations",

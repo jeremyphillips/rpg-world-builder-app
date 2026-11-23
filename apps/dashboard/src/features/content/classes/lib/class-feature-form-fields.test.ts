@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import type { FormItem } from '@rpg/ui/form'
 
-import { CLASS_SPELLCASTING_ADDITIONAL_RULES_LABEL } from './class-spellcasting-authoring-copy'
 import {
   classFeatureItemFields,
   createFeatureRowDraftFormSchema,
@@ -14,6 +13,7 @@ import {
   formatFeatureRowSummary,
 } from './class-feature-form-fields'
 import { GRANT_DEFAULT_UNLOCK_LEVEL } from '../../lib/forms/grants/grant-form-schema'
+import { createSpellcastingFeature } from './class-spellcasting-features'
 
 const rageProgressionTable = {
   id: 'rage-progression',
@@ -214,23 +214,23 @@ function descriptionFields(items: readonly FormItem[]) {
 describe('classFeatureItemFields description', () => {
   const fields = classFeatureItemFields({} as Parameters<typeof classFeatureItemFields>[0])
 
-  it('uses optional disclosure for spellcasting granting features', () => {
-    const grantingDescriptions = descriptionFields(fields).filter(
-      (field) => 'optionalDisclosure' in field && field.optionalDisclosure !== undefined,
-    )
-    expect(grantingDescriptions).toHaveLength(1)
-    expect(grantingDescriptions[0]).toMatchObject({
-      label: CLASS_SPELLCASTING_ADDITIONAL_RULES_LABEL,
-      optionalDisclosure: { intent: 'add', actionSubject: 'additional rules' },
-    })
+  it('exposes one Description field hidden for spellcasting granting rows', () => {
+    const descriptions = descriptionFields(fields)
+    expect(descriptions).toHaveLength(1)
+    expect(descriptions[0]).toMatchObject({ label: 'Description' })
   })
+})
 
-  it('keeps a plain Description field for non-granting features', () => {
-    const ordinaryDescriptions = descriptionFields(fields).filter(
-      (field) => !('optionalDisclosure' in field && field.optionalDisclosure),
-    )
-    expect(ordinaryDescriptions).toHaveLength(1)
-    expect(ordinaryDescriptions[0]).toMatchObject({ label: 'Description' })
+describe('featureFromFormRow spellcasting granting rows', () => {
+  it('omits description when the row carries a spellcasting grant', () => {
+    const row = {
+      ...featureToFormRow(createSpellcastingFeature({ usesPactMagic: false })),
+      intro: '<p>Narrative</p>',
+      description: '<p>Should not persist</p>',
+    }
+    const saved = featureFromFormRow({ ...row, id: row.id! })
+    expect(saved.intro).toBe('<p>Narrative</p>')
+    expect(saved).not.toHaveProperty('description')
   })
 })
 

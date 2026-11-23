@@ -48,6 +48,32 @@ describe('class spellcasting publish invariants', () => {
     ).toBe(true)
   })
 
+  it('rejects a description on the granting feature', () => {
+    expect(
+      createClassInputSchema.safeParse({
+        slug: 'test-caster',
+        ...minimalClassBody,
+        features: [
+          {
+            ...minimalClassBody.features[0]!,
+            description: '<p>leftover mechanics</p>',
+          },
+        ],
+        spellcasting: {
+          slotProgressionId: 'full-caster',
+          ability: 'int',
+          spellSelection: {
+            model: 'limitedRepertoire',
+            change: { kind: 'replace', trigger: 'levelUp', limit: 1 },
+          },
+          progression: {
+            repertoire: { curve: { rows: [{ level: 1, count: 4 }] } },
+          },
+        },
+      }).success,
+    ).toBe(false)
+  })
+
   it('rejects config without a granting feature', () => {
     expect(
       createClassInputSchema.safeParse({
