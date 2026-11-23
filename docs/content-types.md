@@ -1072,14 +1072,23 @@ Delete is blocked with `409` when campaign characters reference the subclass (`c
 Class spellcasting splits **activation**, **configuration**, and **starting recommendations**:
 
 ```text
-features[] → managed Spellcasting / Pact Magic feature (level, name, optional intro, residual description, available)
+features[] → managed Spellcasting / Pact Magic feature (level, name, optional intro, available)
            → grantGroups: [{ grants: [{ kind: 'spellcasting' }] }]
-spellcasting → slot reference, selection semantics, capacity curves, gear, recommendations[]
+spellcasting → slot reference, selection semantics, capacity curves, gear, recommendations[], focusKinds, cantripSelection
 ```
 
-The granting feature owns **unlock level**, optional narrative **`intro`**, and **additional** player-facing rules in `description` (recovery, cantrip replacement, unmodeled focus clauses — not generated mechanics). **Authoring order:** Introduction → Generated rules (`RulesPreview`) → Additional rules (optional-disclosure rich text on `description`). Player-facing text for **derived** mechanics (quotas, change policy, ability, inferable focus kinds) comes from `formatClassSpellcastingFeatureRules` → `StatBlockProseDocument`, shown in authoring via `RulesPreview` and on class detail via `StatBlockProseView`; the preview resolves spellcasting through the same `spellcastingFromFormValues` adapter as save. Progression **curves stay absolute class levels**; moving the feature does not rebase them. `recommendations[]` are picker hints only — not feature description and not part of the generated rules document. **Future:** feature-level `provenance.excerpt` (monster pattern) for SRD reference text — not `description` and not in scope until class entry provenance is registered.
+The granting feature owns **unlock level** and optional narrative **`intro`** only. Publish rejects non-empty **`description`** on that row (`spellcastingGrantingFeatureDescriptionForbidden` in `class.ts`). **Authoring order:** Introduction → generated rules (`RulesPreview`). Player-facing mechanics (quotas, recovery, change policy, ability, focus kinds, recommendations) come from **`formatClassSpellcastingFeatureRules`** → `StatBlockProseDocument`, shown in authoring via `RulesPreview` and on class detail via `StatBlockProseView` (intro HTML renders before the generated document). The preview uses the same `spellcastingFromFormValues` adapter as save. Progression **curves stay absolute class levels**; moving the feature does not rebase them.
 
-**Bard focus gap:** a musical instrument may appear in starting equipment as a tool, but it is not a member of `SPELLCASTING_FOCUS_GEAR_KINDS`, so `resolveFocusKinds` returns nothing for Bard when focus is not authored on `focusKinds`. The formatter must not invent “musical instrument” from the class name; Bard’s Spellcasting Focus sentence stays in residual `description` until the focus model can represent it.
+| Field                                     | Rules text role                                                                                                                                                                                                                           |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `SlotProgression.recovery` (Rules Config) | Slot restoration sentence in generated rules (`formatRestRecoveryClause`). Runtime restoration is not implemented — see gap `spell-slot-tracking` in [srd-mechanical-coverage.md](../packages/contracts/docs/srd-mechanical-coverage.md). |
+| `spellcasting.cantripSelection.change`    | Cantrip replacement clause from compiled cantrip `mutation`. Execution is not implemented — gap `spell-replacement-execution`.                                                                                                            |
+| `spellcasting.focusKinds`                 | Spellcasting Focus noun phrases (`class-spellcasting-focus-kind` vocabulary, including `musical_instrument` and `spellbook`). Authoring is SSOT; equipment inference does not backfill missing kinds for rules text.                      |
+| `recommendations[]`                       | Optional spell names in generated rules when catalog ids resolve; still picker hints only and never changes quotas.                                                                                                                       |
+
+**Wizard spellbook sidebar** (copying found spells, physical book details) is **not** generated — gap `learned-collection-acquisition` in [srd-mechanical-coverage.md](../packages/contracts/docs/srd-mechanical-coverage.md). Do not describe the Wizard document as full SRD parity.
+
+**Future:** feature-level `provenance.excerpt` (monster pattern) for SRD reference text — not `description` and not in scope until class entry provenance is registered.
 
 The optional `spellcasting` block (`content/classes/spellcasting/spellcasting.ts`) owns **how** casting works. The dedicated granting feature in `features[]` owns **when** it unlocks. Rules Config owns **slot tables only**.
 
@@ -1106,7 +1115,7 @@ SRD rules prose lives on the managed granting feature (`id: spellcasting` or `pa
 
 Authoring lives under **Character Configuration → Progression → Spellcasting**:
 
-- **Slot progressions** — shared spell slot tables (`full-caster`, `half-caster`, `pact-magic`, or custom). Leveled hosts use 1st–9th columns; pact hosts use slot count + slot level.
+- **Slot progressions** — shared spell slot tables (`full-caster`, `half-caster`, `pact-magic`, or custom). Each row includes required **`recovery`** (`long` vs `short` for Pact). Leveled hosts use 1st–9th columns; pact hosts use slot count + slot level.
 
 Contracts: `packages/contracts/src/rpg/campaign/rules/spellcasting-progression/`. Catalog seed: `packages/catalog/src/spellcasting-progressions/data/<ruleset>/slot-progressions.json`.
 
@@ -1115,10 +1124,10 @@ Contracts: `packages/contracts/src/rpg/campaign/rules/spellcasting-progression/`
 The class form Spellcasting tab (`class-spellcasting-form-fields.ts`) exposes:
 
 - **Has spellcasting** — form-only toggle; turning on reconciles config + managed granting feature; turning off confirms before removing both.
-- **Spellcasting feature summary** — links authors to the Features tab for level, name, introduction, generated rules preview, residual description, and campaign availability.
+- **Spellcasting feature summary** — links authors to the Features tab for level, name, introduction, generated rules preview, and campaign availability.
 - **Slot progression** — combobox of resolved ruleset slot progressions.
 - **Spell selection model** — semantic L1+ selection (`limitedRepertoire`, prepare-from-list, prepare-from-learned-collection) plus change policy.
-- **Grants cantrips** — toggles the Cantrips column in the spellcasting progression table.
+- **Grants cantrips** — toggles the Cantrips column; optional **cantrip change** package (`spellcasting.cantripSelection.change`) when cantrips are enabled.
 - **Spellcasting progression table** — merged cantrip / repertoire / prepared capacity curves (TableBuilder).
 - **Recommended starting spells** — cantrip and level-1 comboboxes authoring `recommendations[]`.
 - **Spellbook acquisition shorthand** — for learned-collection classes, regular mode uses Starting / per-level / through-level numbers that materialize to a gain curve on save; irregular curves use the table editor escape hatch.

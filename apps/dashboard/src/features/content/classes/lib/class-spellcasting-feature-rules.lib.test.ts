@@ -131,19 +131,32 @@ describe('classSpellcastingGrantingFeatureRulesDisplay', () => {
   })
 })
 
+const SRD_CASTERS = [
+  'bard',
+  'cleric',
+  'druid',
+  'paladin',
+  'ranger',
+  'sorcerer',
+  'warlock',
+  'wizard',
+] as const
+
 describe('resolveSpellcastingGrantingFeatureRulesDocument parity', () => {
-  it('matches published detail formatter output for bard', () => {
-    const bard = loadSeedClasses(RULESET).find((c) => c.slug === 'bard')
-    if (!bard) throw new Error('missing bard seed')
-    const formValues = classFormDef.toFormValues(bard) as ClassFormValues
-    const featureRow = bardGrantingFeatureRow(formValues)
+  it.each(SRD_CASTERS)('matches published detail formatter output for %s', (slug) => {
+    const characterClass = loadSeedClasses(RULESET).find((c) => c.slug === slug)
+    if (!characterClass) throw new Error(`missing ${slug} seed`)
+    const formValues = classFormDef.toFormValues(characterClass) as ClassFormValues
+    const featureId = slug === 'warlock' ? 'pact-magic' : 'spellcasting'
+    const featureRow = formValues.features.find((row) => row.id === featureId)
+    if (!featureRow) throw new Error(`missing ${featureId} feature row`)
     const spellcasting = spellcastingFromFormValues(formValues)
     expect(spellcasting).toBeDefined()
 
     const feature = featureFromFormRow({ ...featureRow, id: featureRow.id! })
 
     const fromPreview = resolveSpellcastingGrantingFeatureRulesDocument({
-      className: bard.name,
+      className: characterClass.name,
       rulesetId: RULESET,
       spellcasting,
       featureRow,
@@ -151,10 +164,10 @@ describe('resolveSpellcastingGrantingFeatureRulesDocument parity', () => {
     })
 
     const fromDetail =
-      bard.spellcasting &&
+      characterClass.spellcasting &&
       isClassSpellcastingGrantingFeature(feature) &&
       formatClassSpellcastingFeatureRules({
-        characterClass: { ...bard, features: [feature] },
+        characterClass: { ...characterClass, features: [feature] },
         config: PROGRESSION,
       })
 

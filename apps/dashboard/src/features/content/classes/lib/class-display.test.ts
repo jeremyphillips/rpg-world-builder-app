@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
+import { loadSeedClasses } from '@rpg/catalog/classes'
+import { isClassSpellcastingGrantingFeature } from '@rpg/contracts'
+
 import { pickClass, pickEquipment } from '../../lib/fixtures/pick'
 import { FIGHTER, ROGUE } from '../fixtures'
+import { srdSpellcastingProgressionFixture } from './fixtures/spellcasting-progression-fixture'
 
 import {
   buildClassCardViewModel,
@@ -210,6 +214,26 @@ describe('class-display', () => {
     expect(
       features && 'items' in features ? features.items.every((item) => item.level === 1) : false,
     ).toBe(true)
+  })
+
+  it('renders spellcasting granting features with intro and generated rules only', () => {
+    const bard = loadSeedClasses('srd-cc-5.2.1').find((entry) => entry.slug === 'bard')
+    if (!bard) throw new Error('missing bard seed')
+    const viewModel = buildClassDetailViewModel(bard, vocabulary, {
+      surface: 'content-detail',
+      characterClass: bard,
+      spellcastingProgression: srdSpellcastingProgressionFixture(),
+    })
+    const features = viewModel.sections.find((section) => section.id === 'features')
+    const spellcasting =
+      features && 'items' in features
+        ? features.items.find((item) => item.id === 'spellcasting')
+        : undefined
+    expect(spellcasting?.introHtml).toContain('bardic arts')
+    expect(spellcasting?.rulesDocument?.length).toBeGreaterThan(0)
+    expect(spellcasting?.bodyHtml).toBeUndefined()
+    const seedFeature = bard.features.find((f) => f.id === 'spellcasting')
+    expect(seedFeature && isClassSpellcastingGrantingFeature(seedFeature)).toBe(true)
   })
 
   it('does not emit Suggested proficiencies copy in view model labels', () => {

@@ -99,6 +99,15 @@ describe('formatClassSpellcastingFeatureRules', () => {
     expect(text).not.toContain('Cantrips:')
   })
 
+  it('renders mechanics without spell names when spellsById is omitted', () => {
+    const text = joinClassSpellcastingFeatureRulesPlainText({
+      characterClass: bardClass(),
+      config: spellcastingProgressionTestConfig,
+    })
+    expect(text?.toLowerCase()).toContain('you know two bard cantrips')
+    expect(text).not.toContain('Dancing Lights')
+  })
+
   it('returns structured prose with paragraph treatment on leads', () => {
     const document = formatClassSpellcastingFeatureRules({
       characterClass: bardClass(),

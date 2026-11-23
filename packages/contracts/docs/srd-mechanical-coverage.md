@@ -1,6 +1,6 @@
 # SRD mechanical coverage
 
-Shared-model gaps that monster and class-feature authoring runs into. This is not a monster-only ruleset and not a modeling schema. Spell effects stay in the spell-resolution docs. Stat-block math stays in [monster-stat-blocks.md](./monster-stat-blocks.md).
+Shared-model gaps that monster and class-feature authoring runs into. Class spellcasting ownership and generated rules text → [docs/content-types.md](../../../docs/content-types.md#class-spellcasting-reference). This is not a monster-only ruleset and not a modeling schema. Spell effects stay in the spell-resolution docs. Stat-block math stays in [monster-stat-blocks.md](./monster-stat-blocks.md).
 
 Agents assess and review monsters without editing this file. An approved authoring or implementation pass updates a gap and appends the capability log. Approving a prose fallback does not close the gap.
 
