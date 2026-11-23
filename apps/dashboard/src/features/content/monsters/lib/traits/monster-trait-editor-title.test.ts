@@ -56,7 +56,7 @@ describe('monster trait editor titles', () => {
     expect(monsterTraitPreviewBaseName(custom, 'Owl', rows)).toBe('Trait 1')
   })
 
-  it('auto-edits a new empty custom trait and keeps template overrides optional', () => {
+  it('auto-edits a new empty custom trait and keeps template titles readonly', () => {
     const config = resolveMonsterTraitRowTitleConfig('Owl')
 
     const custom = resolveMasterDetailRowTitle(config, {
@@ -88,21 +88,15 @@ describe('monster trait editor titles', () => {
     expect(reopened.inlineTitle?.initialEdit).toBeFalsy()
 
     const template = resolveMasterDetailRowTitle(config, {
-      row: { id: 'pack', kind: 'template', templateId: 'pack-tactics', nameOverride: 'Allies' },
-      rows: [{ id: 'pack', kind: 'template', templateId: 'pack-tactics', nameOverride: 'Allies' }],
+      row: { id: 'pack', kind: 'template', templateId: 'pack-tactics' },
+      rows: [{ id: 'pack', kind: 'template', templateId: 'pack-tactics' }],
       index: 0,
       fieldId: 'field-2',
       lastAddedFieldId: 'field-2',
       itemNoun: TRAIT_MASTER_DETAIL_ITEM_NOUN,
       rowReady: true,
     })
-    expect(template.inlineTitle).toMatchObject({
-      field: 'nameOverride',
-      mode: 'override',
-      resetLabel: 'Use default name',
-    })
-    expect(template.inlineTitle?.initialEdit).toBeUndefined()
-    expect(template.sourceName).toBeTruthy()
-    expect(template.displayTitle).toBe('Allies')
+    expect(template.inlineTitle).toBeUndefined()
+    expect(template.displayTitle).toBe('Pack Tactics')
   })
 })

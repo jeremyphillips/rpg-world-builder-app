@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { assembleCreatureTraitTemplateFields } from './creature-trait-template-field-assembler'
+import {
+  assembleCreatureTraitTemplateFields,
+  validateTraitTemplateFieldContributionForTest,
+  type TemplateConfigField,
+} from './creature-trait-template-field-assembler'
 
 describe('assembleCreatureTraitTemplateFields', () => {
   it('orders legendary resistance uses before details', () => {
@@ -26,12 +30,47 @@ describe('assembleCreatureTraitTemplateFields', () => {
     expect(monster.map((field) => field.name)).toContain('config.uses.inLair')
   })
 
-  it('rejects duplicate contribution paths', () => {
+  it('throws when contribution paths collide', () => {
     expect(() =>
-      assembleCreatureTraitTemplateFields({
-        templateId: 'collision-fixture',
-        host: 'species',
-      }),
-    ).not.toThrow()
+      validateTraitTemplateFieldContributionForTest(
+        {
+          shared: [
+            {
+              type: 'number',
+              name: 'config.uses.normal',
+              label: 'Uses',
+              min: 1,
+            } satisfies TemplateConfigField,
+            {
+              type: 'number',
+              name: 'config.uses.normal',
+              label: 'Uses again',
+              min: 1,
+            } satisfies TemplateConfigField,
+          ],
+        },
+        'species',
+        'fixture-template',
+      ),
+    ).toThrow(/Duplicate/)
+  })
+
+  it('throws when a contribution reserves the details path', () => {
+    expect(() =>
+      validateTraitTemplateFieldContributionForTest(
+        {
+          shared: [
+            {
+              type: 'number',
+              name: 'details',
+              label: 'Illegal',
+              min: 1,
+            } satisfies TemplateConfigField,
+          ],
+        },
+        'species',
+        'fixture-template',
+      ),
+    ).toThrow(/reserved/)
   })
 })

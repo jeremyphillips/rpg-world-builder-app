@@ -499,6 +499,71 @@ const dashboardFacingPresentationImportGuard = {
   },
 }
 
+const dashboardTraitPipelineImportGuard = {
+  files: ['src/**/*.{ts,tsx}'],
+  ignores: [
+    '**/*.{test,integration.test,stories}.{ts,tsx}',
+    'src/features/content/facing/domains/trait/**',
+  ],
+  rules: {
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: '@rpg/contracts',
+            importNames: ['formatLegendaryResistanceStatBlockTitle'],
+            message:
+              'Legendary Resistance headings are composed in trait facing adapters — do not call the heading helper directly.',
+          },
+        ],
+        patterns: [
+          {
+            group: ['**/format-legendary-resistance*'],
+            message:
+              'Do not deep-import formatLegendaryResistanceStatBlockTitle in dashboard feature code.',
+          },
+        ],
+      },
+    ],
+  },
+}
+
+const dashboardTraitComposerFormFieldImportGuard = {
+  files: [
+    'src/**/*-form-fields.ts',
+    'src/**/lib/**/*-form-fields.ts',
+    'src/features/content/lib/creature-traits/**/*.{ts,tsx}',
+  ],
+  ignores: ['**/*.{test,integration.test,stories}.{ts,tsx}', 'src/features/content/facing/**'],
+  rules: {
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: '@rpg/contracts',
+            importNames: [
+              'formatLegendaryResistanceStatBlockTitle',
+              'resolveTraitFacingParts',
+              'renderTraitFacingBodyHtml',
+            ],
+            message:
+              'Trait form modules use the field assembler and facing host — not the composer or heading helper.',
+          },
+        ],
+        patterns: [
+          {
+            group: ['**/format-legendary-resistance*', '**/trait-facing*'],
+            message:
+              'Trait form modules must not deep-import trait facing composers or heading helpers.',
+          },
+        ],
+      },
+    ],
+  },
+}
+
 const dashboardMonsterAcquisitionSectionKindsGuard = {
   files: ['src/features/content/monsters/lib/actions/acquisition/**/*.{ts,tsx}'],
   ignores: ['**/*.{test,integration.test,stories}.{ts,tsx}'],
@@ -580,4 +645,6 @@ export default [
   dashboardAuthApiContractsImportGuard,
   dashboardMonsterAcquisitionSectionKindsGuard,
   dashboardFacingPresentationImportGuard,
+  dashboardTraitPipelineImportGuard,
+  dashboardTraitComposerFormFieldImportGuard,
 ]

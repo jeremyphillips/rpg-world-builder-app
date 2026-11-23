@@ -139,7 +139,7 @@ function applySaveTargetDraft(cleaned: Record<string, unknown>): void {
   cleaned.resolution = withTarget.resolution
 }
 
-const RICH_TEXT_KEYS = ['description', 'descriptionOverride'] as const
+const RICH_TEXT_KEYS = ['description', 'details'] as const
 
 function applyRichTextFields(record: Record<string, unknown>): void {
   for (const key of RICH_TEXT_KEYS) {

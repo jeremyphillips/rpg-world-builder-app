@@ -67,6 +67,15 @@ function withOptionalVisibility(field: FormItem, visibility?: FormItem['visibili
   return visibility ? { ...field, visibility } : field
 }
 
+/** @internal Validation hook for contribution registry tests. */
+export function validateTraitTemplateFieldContributionForTest(
+  contribution: TemplateFieldContribution,
+  host: CreatureTraitTemplateHost,
+  templateId: string,
+): void {
+  validateContributionPaths(contribution, host, templateId)
+}
+
 function validateContributionPaths(
   contribution: TemplateFieldContribution,
   host: CreatureTraitTemplateHost,

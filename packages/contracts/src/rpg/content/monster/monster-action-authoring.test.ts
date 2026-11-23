@@ -20,7 +20,7 @@ const NO_PRESET_EXPECTED: Record<string, MonsterActionAuthoring> = {
   leap: { name: 'authored', description: 'generated', source: 'none' },
   teleport: { name: 'authored', description: 'generated', source: 'none' },
   'take-actions': { name: 'authored', description: 'generated', source: 'none' },
-  'shape-shift': { name: 'authored', description: 'authored', source: 'none' },
+  'shape-shift': { name: 'authored', description: 'generated', source: 'none' },
   special: { name: 'authored', description: 'authored', source: 'none' },
   spell: { name: 'authored', description: 'generated', source: 'none' },
 }

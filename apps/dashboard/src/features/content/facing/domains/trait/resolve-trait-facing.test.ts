@@ -96,6 +96,32 @@ describe('resolveSpeciesTraitDraftFacing', () => {
   })
 })
 
+describe('legendary resistance heading parity', () => {
+  it('matches species and monster composer titles for the same config', () => {
+    const row = {
+      id: 'lr',
+      kind: 'template' as const,
+      templateId: 'legendary-resistance',
+      config: { uses: { normal: 3 } },
+    }
+    const species = resolveSpeciesTraitDraftFacing({
+      ...row,
+      grants: [],
+      overrideDisplay: false,
+      available: true,
+    })
+    const monster = resolveMonsterTraitDraftFacing({
+      row,
+      monster: { name: 'Lich', lair: { enabled: false }, forms: [] },
+    })
+    expect(species?.status).toBe('ready')
+    expect(monster?.status).toBe('ready')
+    if (species?.status !== 'ready' || monster?.status !== 'ready') return
+    expect(species.document.title).toBe(monster.document.title)
+    expect(species.document.title).toBe('Legendary Resistance (3/Day)')
+  })
+})
+
 describe('resolveMonsterTraitDraftFacing', () => {
   it('previews preset sentences in the shell panel', () => {
     const resolution = resolveMonsterTraitDraftFacing({

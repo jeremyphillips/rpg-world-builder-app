@@ -13,7 +13,6 @@ function isTemplateRow(row: unknown): row is {
   id?: string
   templateId: string
   config?: unknown
-  nameOverride?: string
 } {
   return isRecord(row) && typeof row.templateId === 'string'
 }
@@ -93,8 +92,7 @@ export function monsterTraitPreviewBaseName(
 
 export function monsterTraitResolvedTitle(row: unknown, monsterName: string): string {
   if (isTemplateRow(row)) {
-    const override = storedText(row.nameOverride)
-    return override || templateDerivedName(row)
+    return templateDerivedName(row)
   }
   if (isPresetRow(row)) {
     const formatted = formatCreatureTrait({

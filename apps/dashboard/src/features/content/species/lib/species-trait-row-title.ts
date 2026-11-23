@@ -1,23 +1,7 @@
-import type { MasterDetailRowTitleConfig } from '../../lib/master-detail/master-detail-row-title'
-import type { TraitRowForm } from './species-trait-form-fields'
-import { resolveFacing } from '../../facing/resolve-facing'
+import { resolveTraitName, type ContentTrait } from '@rpg/contracts'
 
-function resolveSpeciesTraitDerivedTitle(row: TraitRowForm, index: number): string {
-  if (!row.kind || row.kind === 'custom') return ''
-  const id = row.id ?? `draft-${index}`
-  try {
-    const resolution = resolveFacing({
-      domain: 'trait',
-      source: 'draft',
-      hostId: 'species-traits',
-      row: { ...row, id },
-    })
-    if (resolution.status === 'ready') return resolution.document.title
-    return ''
-  } catch {
-    return ''
-  }
-}
+import type { MasterDetailRowTitleConfig } from '../../lib/master-detail/master-detail-row-title'
+import { traitItemTitle, type TraitRowForm } from './species-trait-form-fields'
 
 /** Inline title policy for species traits and heritage options. */
 export function createSpeciesTraitRowTitleConfig(): MasterDetailRowTitleConfig<TraitRowForm> {
@@ -27,10 +11,22 @@ export function createSpeciesTraitRowTitleConfig(): MasterDetailRowTitleConfig<T
       if (!kind || kind === 'custom') {
         return { strategy: 'authored', field: 'name' }
       }
+      if (kind === 'template' && ctx.row.templateId) {
+        return {
+          strategy: 'readonly',
+          resolveTitle: () =>
+            resolveTraitName({
+              kind: 'template',
+              id: ctx.row.id ?? `trait-${ctx.index}`,
+              templateId: ctx.row.templateId,
+              config: ctx.row.config,
+            } as ContentTrait),
+        }
+      }
       return {
         strategy: 'override',
         field: 'nameOverride',
-        resolveDerived: () => resolveSpeciesTraitDerivedTitle(ctx.row, ctx.index),
+        resolveDerived: () => traitItemTitle(ctx.row, ctx.index),
       }
     },
   }
