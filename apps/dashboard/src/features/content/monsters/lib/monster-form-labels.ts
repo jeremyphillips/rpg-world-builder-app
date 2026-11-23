@@ -7,6 +7,8 @@ import {
   CREATURE_ARMOR_CLASS_KIND_TERM,
   getActionEconomySectionLabel,
   getMonsterActionKindLabel,
+  getTermSentenceForm,
+  MONSTER_ACTION_KIND_ENTRIES,
   getSpellAtomicEffectKindLabel,
   getArmorCategoryLabel,
   getArmorCategorySentenceForm,
@@ -589,7 +591,8 @@ export function formatMonsterActionSpellPreviewConfigureHint(fieldLabel: string)
 }
 
 export function formatMonsterActionMultiattackPreviewConfigureHint(fieldLabel: string): string {
-  return `Configure ${fieldLabel} to preview this multiattack.`
+  const kindNoun = getTermSentenceForm(MONSTER_ACTION_KIND_ENTRIES.multiattack, 1)
+  return `Configure ${fieldLabel} to preview this ${kindNoun}.`
 }
 export const MONSTER_SAVE_FAILED_LEGEND = 'Failed save'
 export const MONSTER_SAVE_SUCCESSFUL_LEGEND = 'Successful save'

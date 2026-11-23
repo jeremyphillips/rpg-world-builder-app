@@ -7,6 +7,12 @@ import {
 } from '@rpg/contracts'
 
 import type { MonsterFormValues } from '../../../monsters/lib/monster-form-values'
+
+const TRAIT_FACING_COMPLETE_CONFIGURATION_GUIDANCE =
+  'Complete trait configuration to preview rules text.' as const
+
+const TRAIT_FACING_ADD_DETAILS_GUIDANCE =
+  'Add trait details to preview player-facing text.' as const
 import {
   resolveTraitStatBlockRulesFacingForFormRow,
   type TraitStatBlockRulesFacing,
@@ -51,7 +57,7 @@ function readyFacingFromStatBlock(facing: TraitStatBlockRulesFacing): FacingReso
   if (blocks.length === 0) {
     return {
       status: 'unavailable',
-      guidance: 'Complete trait configuration to preview rules text.',
+      guidance: TRAIT_FACING_COMPLETE_CONFIGURATION_GUIDANCE,
     }
   }
   return { status: 'ready', document: { title: facing.heading, blocks } }
@@ -76,12 +82,12 @@ function readyFacingFromDisplay(input: {
 }): FacingResolution {
   const blocks = facingBlocksFromTraitDisplay(input)
   if (blocks.length === 0 && !input.title.trim()) {
-    return { status: 'unavailable', guidance: 'Add trait details to preview player-facing text.' }
+    return { status: 'unavailable', guidance: TRAIT_FACING_ADD_DETAILS_GUIDANCE }
   }
   if (blocks.length === 0) {
     return {
       status: 'unavailable',
-      guidance: 'Complete trait configuration to preview rules text.',
+      guidance: TRAIT_FACING_COMPLETE_CONFIGURATION_GUIDANCE,
     }
   }
   return { status: 'ready', document: { title: input.title, blocks } }
@@ -113,7 +119,7 @@ export function resolveMonsterTraitDraftFacing(input: {
     if (!facing.proseText.trim() && !facing.descriptionHtml.trim()) {
       return {
         status: 'unavailable',
-        guidance: 'Complete trait configuration to preview rules text.',
+        guidance: TRAIT_FACING_COMPLETE_CONFIGURATION_GUIDANCE,
       }
     }
     return readyFacingFromStatBlock(facing)

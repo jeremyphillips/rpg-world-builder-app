@@ -1,15 +1,11 @@
 import type { ReactNode } from 'react'
-import type { ContentTable, FacingInvalidCode, FacingResolution } from '@rpg/contracts'
+import type { ContentTable, FacingResolution } from '@rpg/contracts'
+import {
+  FACING_INVALID_PANEL_MESSAGES as FACING_INVALID_MESSAGES,
+  facingInvalidMessage,
+} from '@rpg/contracts'
 
-export const FACING_INVALID_MESSAGES: Record<FacingInvalidCode, string> = {
-  'missing-kind': 'This row is missing a feature kind and cannot show a preview.',
-  'missing-id': 'This row is missing an identifier and cannot show a preview.',
-  'host-mismatch': 'This row does not belong on this editor host.',
-}
-
-export function facingInvalidMessage(code: FacingInvalidCode): string {
-  return FACING_INVALID_MESSAGES[code]
-}
+export { FACING_INVALID_MESSAGES, facingInvalidMessage }
 
 export function facingPanelTitle(
   resolution: Exclude<FacingResolution, { status: 'invalid' }>,

@@ -7,3 +7,9 @@ export {
   type FacingRulesBlock,
   type FacingTableBlock,
 } from './facing-document'
+export {
+  FACING_INVALID_DETAIL_MESSAGES,
+  FACING_INVALID_PANEL_MESSAGES,
+  facingInvalidMessage,
+  type FacingInvalidSurface,
+} from './facing-invalid-messages'

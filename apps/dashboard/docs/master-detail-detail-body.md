@@ -48,4 +48,6 @@ MasterDetailEditorPanel
 - Do not wrap preview + fields in a domain-owned outer `FormRhythmStack`.
 - Do not add margin utilities between facing and fields.
 
+Invalid facing rows and preview guidance copy: [facing-guidance-audit.md](./facing-guidance-audit.md).
+
 See [feature-authoring-architecture.md](../../../docs/feature-authoring-architecture.md).

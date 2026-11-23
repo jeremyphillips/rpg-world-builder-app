@@ -3,15 +3,16 @@
 High-level ownership and prevention policy for this monorepo. This document is a
 **navigation hub** — it does not replace domain playbooks.
 
-| Topic                        | Canonical detail                                                                                                                                                   |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Vocabulary patterns (A/B/C)  | [packages/contracts/docs/vocab-ssot.md](../packages/contracts/docs/vocab-ssot.md)                                                                                  |
-| Contracts package layers     | [packages/contracts/docs/structure.md](../packages/contracts/docs/structure.md)                                                                                    |
-| Catalog content types        | [content-types.md](./content-types.md)                                                                                                                             |
-| Validation / domain messages | [validation-messages.md](../packages/contracts/docs/validation-messages.md), [domain-message-inventory.md](../packages/contracts/docs/domain-message-inventory.md) |
-| Monster acquisition recipes  | [apps/dashboard/docs/monster-action-acquisition-ssot.md](../apps/dashboard/docs/monster-action-acquisition-ssot.md)                                                |
-| Dead-code / Fallow usage     | [tools/fallow/README.md](../tools/fallow/README.md)                                                                                                                |
-| PR review lenses             | [.cursor/skills/pr-review/SKILL.md](../.cursor/skills/pr-review/SKILL.md)                                                                                          |
+| Topic                        | Canonical detail                                                                                                                                                                        |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Vocabulary patterns (A/B/C)  | [packages/contracts/docs/vocab-ssot.md](../packages/contracts/docs/vocab-ssot.md)                                                                                                       |
+| Contracts package layers     | [packages/contracts/docs/structure.md](../packages/contracts/docs/structure.md)                                                                                                         |
+| Catalog content types        | [content-types.md](./content-types.md)                                                                                                                                                  |
+| Validation / domain messages | [validation-messages.md](../packages/contracts/docs/validation-messages.md), [domain-message-inventory.md](../packages/contracts/docs/domain-message-inventory.md)                      |
+| Facing invalid / guidance    | [facing-guidance-audit.md](../apps/dashboard/docs/facing-guidance-audit.md), [`facing-invalid-messages.ts`](../packages/contracts/src/rpg/primitives/facing/facing-invalid-messages.ts) |
+| Monster acquisition recipes  | [apps/dashboard/docs/monster-action-acquisition-ssot.md](../apps/dashboard/docs/monster-action-acquisition-ssot.md)                                                                     |
+| Dead-code / Fallow usage     | [tools/fallow/README.md](../tools/fallow/README.md)                                                                                                                                     |
+| PR review lenses             | [.cursor/skills/pr-review/SKILL.md](../.cursor/skills/pr-review/SKILL.md)                                                                                                               |
 
 ## Four prevention problems
 
@@ -50,12 +51,12 @@ New reusable domain-rule copy: [validation-messages.md § Agent checklist](../pa
 
 ## Identity vs metadata vs policy vs presentation
 
-| Layer            | Examples                                                  | Authority                                                                      |
-| ---------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| **Identity**     | `ContentTypeKey`, `MonsterActionKind`, `ClassFeatureKind` | `CONTENT_TYPE_KEYS`, `*_ENTRIES`, `keysFromEntries`                            |
-| **Metadata**     | Labels, descriptions, terms                               | `*_ENTRIES`, `CONTENT_TYPE_TERMS` (exhaustive against keys, not admission)     |
-| **Policy**       | Section eligibility, usage editors, singleton rules       | Contracts helpers (`monsterSectionAllowsKind`, `monsterActionUsageCapability`) |
-| **Presentation** | Dashboard copy, form labels, facing prose                 | Feature label modules; derive nouns via `getContentTypeTerm` / vocab helpers   |
+| Layer            | Examples                                                  | Authority                                                                                                                                                                                                |
+| ---------------- | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Identity**     | `ContentTypeKey`, `MonsterActionKind`, `ClassFeatureKind` | `CONTENT_TYPE_KEYS`, `*_ENTRIES`, `keysFromEntries`                                                                                                                                                      |
+| **Metadata**     | Labels, descriptions, terms                               | `*_ENTRIES`, `CONTENT_TYPE_TERMS` (exhaustive against keys, not admission)                                                                                                                               |
+| **Policy**       | Section eligibility, usage editors, singleton rules       | Contracts helpers (`monsterSectionAllowsKind`, `monsterActionUsageCapability`)                                                                                                                           |
+| **Presentation** | Dashboard copy, form labels, facing prose                 | Feature label modules; derive nouns via `getContentTypeTerm` / vocab helpers; invalid codes → [`facing-invalid-messages.ts`](../packages/contracts/src/rpg/primitives/facing/facing-invalid-messages.ts) |
 
 Admission for catalog types is **domain-first** (`CONTENT_TYPE_KEYS`), not terms-first.
 See [vocab-ssot.md](../packages/contracts/docs/vocab-ssot.md).

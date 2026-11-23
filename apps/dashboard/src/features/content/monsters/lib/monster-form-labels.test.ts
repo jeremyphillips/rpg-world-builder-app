@@ -8,6 +8,8 @@ import {
   getActionEconomySectionLabel,
   getMonsterActionKindLabel,
   getTermCollectionLabel,
+  getTermSentenceForm,
+  MONSTER_ACTION_KIND_ENTRIES,
 } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
@@ -20,6 +22,7 @@ import { MONSTER_ACTION_SECTIONS } from '@rpg/contracts/content'
 
 import { masterDetailEmptySectionLabel } from '../../lib/master-detail/master-detail-constants'
 import {
+  formatMonsterActionMultiattackPreviewConfigureHint,
   LEGENDARY_ACTION_CATEGORY_LABELS,
   MONSTER_ACTION_EDITOR_FALLBACK_TITLES,
   MONSTER_ACTIONS_HEADING,
@@ -48,6 +51,13 @@ describe('monster-form-labels', () => {
     )
     expect(monsterActionSectionEmptyLabel('legendaryActions')).toBe(
       masterDetailEmptySectionLabel(MONSTER_LEGENDARY_ACTIONS_HEADING.toLowerCase()),
+    )
+  })
+
+  it('derives multiattack preview configure hint noun from action kind vocab', () => {
+    const noun = getTermSentenceForm(MONSTER_ACTION_KIND_ENTRIES.multiattack, 1)
+    expect(formatMonsterActionMultiattackPreviewConfigureHint('steps')).toBe(
+      `Configure steps to preview this ${noun}.`,
     )
   })
 
