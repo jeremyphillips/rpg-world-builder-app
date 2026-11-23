@@ -81,6 +81,14 @@ only the acquisition→dropdown adapter decodes before `ButtonDropdownItem` / `I
 Malformed transport (invalid prefix payload) follows `formatFieldMessage` passthrough: the raw
 string is returned unchanged.
 
+### Acquisition display regression helpers
+
+Content acquisition tests import `expectPlainDisplayCopy` and
+`expectAcquisitionDropdownItemDisplayCopy` from
+[`apps/dashboard/src/test/expect-plain-display-copy.ts`](../../../apps/dashboard/src/test/expect-plain-display-copy.ts).
+Use them when asserting `ButtonDropdownItem.disabledReason` / `metadata` or rendered menu copy so
+encoded transport (`\x00` prefix, `{"f":…}` payloads, validation ids) cannot reach UI undetected.
+
 ## Domain-rule messages — new vs legacy
 
 **Default for new work:** reusable **domain-rule** messages (validation failures, occurrence

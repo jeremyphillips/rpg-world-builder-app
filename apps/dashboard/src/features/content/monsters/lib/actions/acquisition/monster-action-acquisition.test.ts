@@ -8,6 +8,8 @@ import {
 } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { expectAcquisitionDropdownItemDisplayCopy } from '@/test/expect-plain-display-copy'
+
 import {
   MONSTER_ACQUISITION_SPELL_PRIMARY_DESCRIPTION,
   MONSTER_ACQUISITION_SPELL_STANDALONE_DESCRIPTION,
@@ -61,12 +63,14 @@ describe('monsterActionAcquisitionItems', () => {
       ],
     })
     const sword = items.find((item) => item.id === 'weapon-entry:sword-1')
+    const weaponDuplicateTransport = monsterActionOccurrenceMessages.weaponEquipmentDuplicate()
     expect(sword).toMatchObject({
       disabled: true,
-      disabledReason: formatFieldMessage(
-        monsterActionOccurrenceMessages.weaponEquipmentDuplicate(),
-      ),
+      disabledReason: formatFieldMessage(weaponDuplicateTransport),
       metadata: MONSTER_ACTION_KIND_ENTRIES.weapon.description,
+    })
+    expectAcquisitionDropdownItemDisplayCopy(sword!, {
+      disabledReasonTransport: weaponDuplicateTransport,
     })
     expect(parseMonsterActionAcquisitionId(sword!.id)).toEqual({
       type: 'weapon-entry',
@@ -309,11 +313,14 @@ describe('primary Spellcasting acquisition', () => {
       section: 'actions',
       sectionRows: { actions: [spellcasting] },
     })
-    expect(taken.find((item) => item.id === 'create:spell')).toMatchObject({
+    const spellItem = taken.find((item) => item.id === 'create:spell')
+    const spellDuplicateTransport = monsterActionOccurrenceMessages.primarySpellcastingDuplicate()
+    expect(spellItem).toMatchObject({
       disabled: true,
-      disabledReason: formatFieldMessage(
-        monsterActionOccurrenceMessages.primarySpellcastingDuplicate(),
-      ),
+      disabledReason: formatFieldMessage(spellDuplicateTransport),
+    })
+    expectAcquisitionDropdownItemDisplayCopy(spellItem!, {
+      disabledReasonTransport: spellDuplicateTransport,
     })
 
     const bonus = monsterActionAcquisitionItems({
@@ -334,11 +341,16 @@ describe('repeatability acquisition', () => {
       section: 'actions',
       sectionRows: { actions: [{ id: 'ma', kind: 'multiattack' }] },
     })
-    expect(occupied.find((item) => item.id === 'preset:multiattack')).toMatchObject({
+    const multiattackItem = occupied.find((item) => item.id === 'preset:multiattack')
+    const multiattackTransport = monsterActionOccurrenceMessages.singletonKind({
+      kind: 'multiattack',
+    })
+    expect(multiattackItem).toMatchObject({
       disabled: true,
-      disabledReason: formatFieldMessage(
-        monsterActionOccurrenceMessages.singletonKind({ kind: 'multiattack' }),
-      ),
+      disabledReason: formatFieldMessage(multiattackTransport),
+    })
+    expectAcquisitionDropdownItemDisplayCopy(multiattackItem!, {
+      disabledReasonTransport: multiattackTransport,
     })
 
     const open = monsterActionAcquisitionItems({
@@ -355,9 +367,14 @@ describe('repeatability acquisition', () => {
       section: 'actions',
       sectionRows: { actions: [{ id: 'bite', kind: 'natural-weapon', form: 'bite' }] },
     })
-    expect(natural.find((item) => item.id === 'natural:bite')).toMatchObject({
+    const naturalItem = natural.find((item) => item.id === 'natural:bite')
+    const naturalTransport = monsterActionOccurrenceMessages.naturalFormDuplicate()
+    expect(naturalItem).toMatchObject({
       disabled: true,
-      disabledReason: formatFieldMessage(monsterActionOccurrenceMessages.naturalFormDuplicate()),
+      disabledReason: formatFieldMessage(naturalTransport),
+    })
+    expectAcquisitionDropdownItemDisplayCopy(naturalItem!, {
+      disabledReasonTransport: naturalTransport,
     })
   })
 })

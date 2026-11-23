@@ -1,6 +1,11 @@
 import { classValidationMessages, formatFieldMessage } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
+import {
+  expectAcquisitionDropdownItemDisplayCopy,
+  expectPlainDisplayCopy,
+} from '@/test/expect-plain-display-copy'
+
 import { toAcquisitionDropdownItem } from './to-acquisition-dropdown-item'
 
 const MALFORMED_TRANSPORT = '\x00{"not-field-payload":true}'
@@ -25,24 +30,24 @@ describe('toAcquisitionDropdownItem', () => {
   })
 
   it('maps unavailable options to disabledReason and keeps searchable metadata', () => {
-    expect(
-      toAcquisitionDropdownItem({
-        id: 'template:darkvision',
-        label: 'Darkvision',
-        description: { status: 'ready', text: 'See in dim light and darkness.' },
-        availability: {
-          status: 'unavailable',
-          code: 'occurrence',
-          message: 'This sense is already on the species trait list.',
-        },
-      }),
-    ).toEqual({
+    const item = toAcquisitionDropdownItem({
+      id: 'template:darkvision',
+      label: 'Darkvision',
+      description: { status: 'ready', text: 'See in dim light and darkness.' },
+      availability: {
+        status: 'unavailable',
+        code: 'occurrence',
+        message: 'This sense is already on the species trait list.',
+      },
+    })
+    expect(item).toEqual({
       id: 'template:darkvision',
       label: 'Darkvision',
       metadata: 'See in dim light and darkness.',
       disabled: true,
       disabledReason: 'This sense is already on the species trait list.',
     })
+    expectAcquisitionDropdownItemDisplayCopy(item)
   })
 
   it('maps unresolved available descriptions to supporting metadata', () => {
@@ -73,10 +78,11 @@ describe('toAcquisitionDropdownItem', () => {
       availability: { status: 'unavailable', code: 'occurrence', message: transport },
     })
 
-    expect(item.disabledReason).toBe(formatFieldMessage(transport))
-    expect(item.disabledReason).toBe('Only one subclass choice milestone is allowed per class.')
-    expect(item.disabledReason).not.toContain('validation.class.')
-    expect(item.disabledReason).not.toMatch(/\{/)
+    expectAcquisitionDropdownItemDisplayCopy(item, { disabledReasonTransport: transport })
+    expectPlainDisplayCopy(item.disabledReason, {
+      transport,
+      label: 'disabledReason',
+    })
   })
 
   it('decodes parameterized catalog messages in disabledReason', () => {

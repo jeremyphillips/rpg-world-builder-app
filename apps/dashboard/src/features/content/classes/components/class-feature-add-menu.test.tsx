@@ -3,6 +3,8 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
+import { expectPlainDisplayCopy } from '@/test/expect-plain-display-copy'
+
 import type { FeatureRowForm } from '../lib/class-feature-form-fields'
 import { ClassFeatureAddMenu } from './class-feature-add-menu'
 
@@ -36,9 +38,7 @@ describe('ClassFeatureAddMenu', () => {
 
     await user.click(screen.getByRole('button', { name: /Add feature/i }))
 
-    expect(screen.getByText(expectedDisplay)).toBeInTheDocument()
-    expect(document.body.textContent).not.toContain(transport)
-    expect(document.body.textContent).not.toMatch(/\{"f":/)
-    expect(document.body.textContent).not.toContain('validation.class.')
+    const visible = screen.getByText(expectedDisplay).textContent ?? ''
+    expectPlainDisplayCopy(visible, { transport, label: 'subclass-choice menu supporting copy' })
   })
 })
