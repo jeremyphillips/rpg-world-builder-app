@@ -1,4 +1,4 @@
-import { CLASS_FEATURE_KINDS, type ClassFeatureKind, type FacingInvalidCode } from '@rpg/contracts'
+import { isClassFeatureKind, type ClassFeatureKind, type FacingInvalidCode } from '@rpg/contracts'
 
 import type { FeatureRowForm } from '../../classes/lib/class-feature-form-fields'
 
@@ -8,11 +8,6 @@ export type ClassFeatureDraftAdaptation =
       record: FeatureRowForm & { id: string; kind: ClassFeatureKind }
     }
   | { status: 'invalid'; code: FacingInvalidCode }
-
-function isClassFeatureKind(value: unknown): value is ClassFeatureKind {
-  return typeof value === 'string' && (CLASS_FEATURE_KINDS as readonly string[]).includes(value)
-}
-
 /** Draft class feature rows must keep `id` and `kind` for live preview — save transforms stay elsewhere. */
 export function adaptClassFeatureDraftRow(row: unknown): ClassFeatureDraftAdaptation {
   const draft = row as FeatureRowForm | undefined

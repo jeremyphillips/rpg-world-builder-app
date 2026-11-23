@@ -3,6 +3,7 @@ import { z } from 'zod'
 import type { ArrayResolveFieldsFn } from '@rpg/ui/form'
 import {
   CLASS_FEATURE_KINDS,
+  classFeatureKindSchema,
   MAX_CHARACTER_LEVEL,
   addCustomRefinementIssue,
   campaignLevelSchema,
@@ -70,7 +71,7 @@ function createFeatureRowBaseFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) 
   return z
     .object({
       id: z.string().min(1).optional(),
-      kind: z.enum(CLASS_FEATURE_KINDS).optional(),
+      kind: classFeatureKindSchema.optional(),
       name: z.string().min(1),
       intro: z.string().optional(),
       description: z.string().optional(),
@@ -98,7 +99,7 @@ export function createFeatureRowDraftFormSchema(maxLevel: number = MAX_CHARACTER
   const levelField = z.coerce.number().pipe(campaignLevelSchema(maxLevel))
   return z.object({
     id: z.string().min(1).optional(),
-    kind: z.enum(CLASS_FEATURE_KINDS).optional(),
+    kind: classFeatureKindSchema.optional(),
     name: z.string(),
     description: z.string().optional(),
     level: levelField,

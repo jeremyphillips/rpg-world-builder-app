@@ -1,15 +1,20 @@
 import { ButtonDropdown } from '@rpg/ui'
-
 import {
-  CLASS_FEATURE_ACQUISITION_LABELS,
-  canAddSubclassChoiceFeature,
-} from '../lib/class-feature-authoring'
+  CLASS_FEATURE_KIND_ENTRIES,
+  CLASS_FEATURE_KINDS,
+  classSubclassChoiceAtOccurrenceLimit,
+  classValidationMessages,
+  isClassFeatureKind,
+} from '@rpg/contracts'
+
 import { type FeatureRowForm } from '../lib/class-feature-form-fields'
 import { createAsiFeature } from '../lib/class-asi-features'
 import { createSubclassChoiceFeature } from '../lib/class-subclass-choice-features'
 import { featureToFormRow } from '../lib/class-feature-form-fields'
+import { featureRowShowsInAddMenu } from '../lib/class-feature-authoring'
+import { toAcquisitionDropdownItem } from '../../lib/acquisition'
 
-const ADD_MENU_KINDS = ['custom', 'asi', 'subclass-choice'] as const
+const ADD_MENU_KINDS = CLASS_FEATURE_KINDS.filter(featureRowShowsInAddMenu)
 
 export function ClassFeatureAddMenu({
   features,
@@ -22,20 +27,35 @@ export function ClassFeatureAddMenu({
   classSlug: string
   onAddRows: (rows: FeatureRowForm[]) => void
 }) {
-  const items = ADD_MENU_KINDS.map((kind) => ({
-    id: kind,
-    label: CLASS_FEATURE_ACQUISITION_LABELS[kind],
-    disabled: kind === 'subclass-choice' ? !canAddSubclassChoiceFeature(features) : false,
-  }))
+  const items = ADD_MENU_KINDS.map((kind) =>
+    toAcquisitionDropdownItem({
+      id: kind,
+      label: CLASS_FEATURE_KIND_ENTRIES[kind].label,
+      description: {
+        status: 'ready',
+        text: CLASS_FEATURE_KIND_ENTRIES[kind].description,
+      },
+      availability:
+        kind === 'subclass-choice' && classSubclassChoiceAtOccurrenceLimit(features ?? [])
+          ? {
+              status: 'unavailable',
+              code: 'occurrence',
+              message: classValidationMessages.subclassChoiceFeatureDuplicate(),
+            }
+          : { status: 'available' },
+    }),
+  )
 
   return (
     <ButtonDropdown
       label="Add feature"
       triggerPresentation="addIcon"
+      supportingWrap
       groups={[]}
       items={items}
       onSelectItem={(itemId) => {
-        const kind = itemId as (typeof ADD_MENU_KINDS)[number]
+        if (!isClassFeatureKind(itemId) || !featureRowShowsInAddMenu(itemId)) return
+        const kind = itemId
         if (kind === 'custom') {
           onAddRows([
             { name: '', level: 1, grants: [], tables: [], available: true, kind: 'custom' },
@@ -46,7 +66,7 @@ export function ClassFeatureAddMenu({
           onAddRows([featureToFormRow(createAsiFeature(1))])
           return
         }
-        if (kind === 'subclass-choice' && canAddSubclassChoiceFeature(features)) {
+        if (kind === 'subclass-choice' && !classSubclassChoiceAtOccurrenceLimit(features ?? [])) {
           onAddRows([
             featureToFormRow(
               createSubclassChoiceFeature({

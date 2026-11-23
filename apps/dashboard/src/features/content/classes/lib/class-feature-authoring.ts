@@ -1,5 +1,6 @@
 import {
   CLASS_FEATURE_KIND_ENTRIES,
+  classSubclassChoiceAtOccurrenceLimit,
   resolveClassFeatureName,
   subclassChoiceFeatureLabel,
   type ClassFeatureKind,
@@ -8,15 +9,9 @@ import {
 import type { FeatureRowForm } from './class-feature-form-fields'
 import { isSubclassChoiceFeatureRow } from './class-subclass-choice-features'
 
-export const CLASS_FEATURE_ACQUISITION_LABELS = {
-  custom: 'Custom feature',
-  asi: 'Ability Score Improvement',
-  'subclass-choice': 'Subclass',
-} as const satisfies Record<Exclude<ClassFeatureKind, 'spellcasting'>, string>
-
 export function classFeatureKindLabel(kind: ClassFeatureKind | undefined): string | undefined {
   if (!kind || kind === 'custom') return undefined
-  return CLASS_FEATURE_KIND_ENTRIES[kind]?.label
+  return CLASS_FEATURE_KIND_ENTRIES[kind].label
 }
 
 export function countClassFeaturesByKind(
@@ -27,7 +22,7 @@ export function countClassFeaturesByKind(
 }
 
 export function canAddSubclassChoiceFeature(rows: readonly FeatureRowForm[] | undefined): boolean {
-  return countClassFeaturesByKind(rows, 'subclass-choice') === 0
+  return !classSubclassChoiceAtOccurrenceLimit(rows ?? [])
 }
 
 export function resolveClassFeatureRowTitle(
