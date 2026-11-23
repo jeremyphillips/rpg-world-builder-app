@@ -2,10 +2,12 @@ import {
   CREATURE_TRAIT_TEMPLATE_IDS,
   defaultCreatureTraitTemplateConfig,
   getCreatureTraitTemplate,
+  isSenseCreatureTraitTemplateId,
 } from '@rpg/contracts'
 import type { FieldVisibility, FormItem } from '@rpg/ui/form'
 
 import { legendaryResistanceTemplateUseFields } from './legendary-resistance-trait-fields'
+import { senseTraitTemplateFields } from './sense-trait-template-fields'
 
 function visibleForTemplate(): FieldVisibility {
   return {
@@ -24,8 +26,22 @@ function visibleForTemplateId(templateId: string): FieldVisibility {
 
 function visibleForTemplateOverrides(): FieldVisibility {
   return {
-    dependsOn: ['kind', 'overrideDisplay'],
-    visibleWhen: (watched) => watched['kind'] === 'template' && watched['overrideDisplay'] === true,
+    dependsOn: ['kind', 'overrideDisplay', 'templateId'],
+    visibleWhen: (watched) =>
+      watched['kind'] === 'template' &&
+      watched['overrideDisplay'] === true &&
+      (typeof watched['templateId'] !== 'string' ||
+        !isSenseCreatureTraitTemplateId(watched['templateId'])),
+  }
+}
+
+function visibleForNonSenseTemplateOverrides(): FieldVisibility {
+  return {
+    dependsOn: ['kind', 'templateId'],
+    visibleWhen: (watched) =>
+      watched['kind'] === 'template' &&
+      (typeof watched['templateId'] !== 'string' ||
+        !isSenseCreatureTraitTemplateId(watched['templateId'])),
   }
 }
 
@@ -45,6 +61,7 @@ export function creatureTraitTemplateFields(): FormItem[] {
         },
         visibility: visibleForTemplateId(templateId),
         fields: [
+          ...(isSenseCreatureTraitTemplateId(templateId) ? senseTraitTemplateFields() : []),
           ...(templateId === 'legendary-resistance'
             ? legendaryResistanceTemplateUseFields({ includeInLair: false })
             : []),
@@ -59,7 +76,7 @@ export function creatureTraitTemplateFields(): FormItem[] {
       type: 'switch',
       name: 'overrideDisplay',
       label: 'Override generated name and description',
-      visibility: visibleForTemplate(),
+      visibility: visibleForNonSenseTemplateOverrides(),
     },
     {
       type: 'richtext',

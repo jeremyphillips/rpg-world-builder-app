@@ -7,13 +7,7 @@ import { buildLabelDescriptionActiveVocabulary, useVocabularySet } from '@/featu
 
 import { useEntityCardUtilityControlSizes } from '../../../../../lib/entity/surfaces/cards/content/entity-card-utility-field-size.lib'
 import { EntityCard } from '@/features/content'
-import {
-  SENSE_RANGE_PLACEHOLDER,
-  SENSE_RANGE_UNIT,
-  SENSE_RANGE_UNIT_LABEL,
-  senseRangeAmountOptions,
-  senseRangeUnitOptions,
-} from '../../../../../lib/forms/fields/content-sense-range-form-fields'
+import { senseRangeJoinedPairParts } from '../../../../../lib/forms/fields/content-sense-range-form-fields'
 import type { ContentFormCtx } from '../../../../../lib/forms/registry/content-form-registry'
 import {
   MONSTER_ADD_SENSE_LABEL,
@@ -24,8 +18,11 @@ import { MonsterCreatureDetailsRemoveRowButton } from '../../creature-details/sl
 
 const CLEARED_RANGE = -1
 
-function clearableAmountOptions(options: readonly { value: number; label: string }[]) {
-  return [{ value: CLEARED_RANGE, label: SENSE_RANGE_PLACEHOLDER }, ...options]
+function clearableAmountOptions(
+  options: readonly { value: number; label: string }[],
+  placeholder: string,
+) {
+  return [{ value: CLEARED_RANGE, label: placeholder }, ...options]
 }
 
 function readRangeAmount(next: string | number | undefined): number | undefined {
@@ -46,6 +43,7 @@ function MonsterSenseRangeRowTrailing({
 }) {
   const form = useFormContext<MonsterFormValues>()
   const { fieldSize } = useEntityCardUtilityControlSizes()
+  const rangeParts = senseRangeJoinedPairParts()
 
   return (
     <div className="flex flex-wrap items-center justify-end gap-2">
@@ -60,9 +58,9 @@ function MonsterSenseRangeRowTrailing({
           kind: 'select',
           id: `monster-sense-range-${row.type}-amount`,
           value: row.range,
-          options: clearableAmountOptions(senseRangeAmountOptions),
-          digits: 3,
-          placeholder: SENSE_RANGE_PLACEHOLDER,
+          options: clearableAmountOptions(rangeParts.amountOptions, rangeParts.placeholder),
+          digits: rangeParts.digits,
+          placeholder: rangeParts.placeholder,
           ariaLabel: `${label} range value`,
           onChange: (next) => {
             form.setValue(`senses.${index}.range`, readRangeAmount(next), {
@@ -73,26 +71,26 @@ function MonsterSenseRangeRowTrailing({
         end={{
           kind: 'select',
           id: `monster-sense-range-${row.type}-unit`,
-          value: SENSE_RANGE_UNIT,
-          options: senseRangeUnitOptions,
-          sizingLabels: [SENSE_RANGE_UNIT_LABEL],
+          value: rangeParts.unitDefault,
+          options: rangeParts.unitOptions,
+          sizingLabels: [rangeParts.unitLabel],
           ariaLabel: `${label} range unit`,
           onChange: () => undefined,
         }}
         startOccupant={{
           kind: 'select',
           name: 'amount',
-          options: clearableAmountOptions(senseRangeAmountOptions),
-          digits: 3,
-          placeholder: SENSE_RANGE_PLACEHOLDER,
+          options: clearableAmountOptions(rangeParts.amountOptions, rangeParts.placeholder),
+          digits: rangeParts.digits,
+          placeholder: rangeParts.placeholder,
           ariaLabel: `${label} range value`,
         }}
         endOccupant={{
           kind: 'select',
           name: 'unit',
-          options: senseRangeUnitOptions,
-          defaultValue: SENSE_RANGE_UNIT,
-          sizingLabels: [SENSE_RANGE_UNIT_LABEL],
+          options: rangeParts.unitOptions,
+          defaultValue: rangeParts.unitDefault,
+          sizingLabels: [rangeParts.unitLabel],
           ariaLabel: `${label} range unit`,
         }}
       />

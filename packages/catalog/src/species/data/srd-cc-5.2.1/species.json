@@ -29,20 +29,12 @@
         "description": "<p>You have Resistance to the damage type determined by your Draconic Ancestry trait.</p>"
       },
       {
-        "kind": "grant",
+        "kind": "template",
         "id": "darkvision",
-        "grantGroups": [
-          {
-            "grants": [
-              {
-                "id": "darkvision",
-                "kind": "sense",
-                "type": "darkvision",
-                "range": 60
-              }
-            ]
-          }
-        ]
+        "templateId": "sense-darkvision",
+        "config": {
+          "range": 60
+        }
       },
       {
         "kind": "custom",
@@ -302,20 +294,12 @@
     "languageAffinities": ["dwarvish"],
     "traits": [
       {
-        "kind": "grant",
+        "kind": "template",
         "id": "darkvision",
-        "grantGroups": [
-          {
-            "grants": [
-              {
-                "id": "darkvision",
-                "kind": "sense",
-                "type": "darkvision",
-                "range": 120
-              }
-            ]
-          }
-        ]
+        "templateId": "sense-darkvision",
+        "config": {
+          "range": 120
+        }
       },
       {
         "kind": "custom",
@@ -371,20 +355,12 @@
     "languageAffinities": ["elvish"],
     "traits": [
       {
-        "kind": "grant",
+        "kind": "template",
         "id": "darkvision",
-        "grantGroups": [
-          {
-            "grants": [
-              {
-                "id": "darkvision",
-                "kind": "sense",
-                "type": "darkvision",
-                "range": 60
-              }
-            ]
-          }
-        ]
+        "templateId": "sense-darkvision",
+        "config": {
+          "range": 60
+        }
       },
       {
         "kind": "custom",
@@ -688,20 +664,12 @@
     "languageAffinities": ["gnomish"],
     "traits": [
       {
-        "kind": "grant",
+        "kind": "template",
         "id": "darkvision",
-        "grantGroups": [
-          {
-            "grants": [
-              {
-                "id": "darkvision",
-                "kind": "sense",
-                "type": "darkvision",
-                "range": 60
-              }
-            ]
-          }
-        ]
+        "templateId": "sense-darkvision",
+        "config": {
+          "range": 60
+        }
       },
       {
         "kind": "custom",
@@ -1040,20 +1008,12 @@
         "description": "<p>You can take the Dash action as a Bonus Action. When you do so, you gain a number of Temporary Hit Points equal to your Proficiency Bonus. You can use this trait a number of times equal to your Proficiency Bonus, and you regain all expended uses when you finish a Short or Long Rest.</p>"
       },
       {
-        "kind": "grant",
+        "kind": "template",
         "id": "darkvision",
-        "grantGroups": [
-          {
-            "grants": [
-              {
-                "id": "darkvision",
-                "kind": "sense",
-                "type": "darkvision",
-                "range": 120
-              }
-            ]
-          }
-        ]
+        "templateId": "sense-darkvision",
+        "config": {
+          "range": 120
+        }
       },
       {
         "kind": "custom",
@@ -1084,20 +1044,12 @@
     },
     "traits": [
       {
-        "kind": "grant",
+        "kind": "template",
         "id": "darkvision",
-        "grantGroups": [
-          {
-            "grants": [
-              {
-                "id": "darkvision",
-                "kind": "sense",
-                "type": "darkvision",
-                "range": 60
-              }
-            ]
-          }
-        ]
+        "templateId": "sense-darkvision",
+        "config": {
+          "range": 60
+        }
       },
       {
         "kind": "custom",

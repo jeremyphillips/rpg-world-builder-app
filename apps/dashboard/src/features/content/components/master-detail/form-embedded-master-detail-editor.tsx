@@ -25,7 +25,11 @@ import { MasterDetailDeleteDialog } from './master-detail-delete-dialog'
 import { MasterDetailEditorPanel } from './master-detail-editor-panel'
 import type { MasterDetailEditorIdentity } from './master-detail-editor-shell'
 import { MasterDetailGrid } from './master-detail-grid'
-import { MasterDetailListPanel, type MasterDetailListItem } from './master-detail-list-panel'
+import {
+  MasterDetailListPanel,
+  type MasterDetailListGroup,
+  type MasterDetailListItem,
+} from './master-detail-list-panel'
 import type { FacingHostConfig } from '../../facing/facing-host-config.types'
 import type { MasterDetailItemFieldSections } from './master-detail-detail-body'
 
@@ -89,6 +93,11 @@ type FormEmbeddedMasterDetailEditorBase = {
   access?: FormEmbeddedMasterDetailAccessConfig
   /** Enables drag-to-reorder on the flat list rail; calls `editor.move` on drop. */
   listReorder?: boolean
+  /** Optional grouped list rail — row order stays on the field array. */
+  resolveListGroups?: (ctx: {
+    visibleRows: Array<{ item: MasterDetailListItem; row: unknown; formIndex: number }>
+    addControl?: ReactNode
+  }) => MasterDetailListGroup[] | undefined
 }
 
 export type FormEmbeddedMasterDetailEditorProps<TRow = Record<string, unknown>> =
@@ -174,6 +183,7 @@ function FormEmbeddedMasterDetailEditorBody<TRow = Record<string, unknown>>({
     <EmbeddedMasterDetailLayout
       leadingContent={leadingContent}
       listItems={body.listItems}
+      listGroups={body.listGroups}
       selectedItemId={body.isSelectedRowVisible ? body.rows.selectedDomainId : null}
       listTitle={listTitle}
       ariaLabel={ariaLabel}
@@ -217,6 +227,7 @@ function EmbeddedMasterDetailLayout({
   onCancelDelete,
   onConfirmDelete,
   listItems,
+  listGroups,
   selectedItemId,
   listTitle,
   ariaLabel,
@@ -250,8 +261,9 @@ function EmbeddedMasterDetailLayout({
   onCancelDelete: () => void
   onConfirmDelete: () => void
   listItems: MasterDetailListItem[]
+  listGroups?: MasterDetailListGroup[]
   selectedItemId: string | null
-  listTitle: ReactNode
+  listTitle?: ReactNode
   ariaLabel: string
   addLabel: string
   countSupplement?: ReactNode
@@ -278,9 +290,10 @@ function EmbeddedMasterDetailLayout({
   const grid = (
     <MasterDetailGrid>
       <MasterDetailListPanel
-        items={listItems}
+        items={listGroups ? undefined : listItems}
+        groups={listGroups}
         selectedItemId={selectedItemId}
-        listTitle={listTitle}
+        listTitle={listGroups ? undefined : listTitle}
         ariaLabel={ariaLabel}
         addLabel={addLabel}
         itemNoun={itemNoun}

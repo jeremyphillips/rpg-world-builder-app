@@ -9,6 +9,7 @@ import type { EmbeddedMasterDetailRow } from '../../lib/master-detail/build-embe
 import { useEmbeddedMasterDetailRows } from '../../lib/master-detail/use-embedded-master-detail-rows'
 import { useMasterDetailCollectionAvailability } from '../../lib/master-detail/use-master-detail-collection-availability'
 import type { UseMasterDetailArrayResult } from '../../lib/master-detail/use-master-detail-array'
+import type { MasterDetailListGroup } from './master-detail-list-panel'
 import type { MasterDetailEditorIdentity } from './master-detail-editor-shell'
 import type { MasterDetailItemFieldSections } from './master-detail-detail-body'
 import type { FormEmbeddedMasterDetailEditorProps } from './form-embedded-master-detail-editor'
@@ -92,6 +93,7 @@ export function useFormEmbeddedMasterDetailEditorBody<TRow = Record<string, unkn
     editor,
     access,
     listReorder = false,
+    resolveListGroups,
   } = input
 
   const rows = useEmbeddedMasterDetailRows<TRow>(
@@ -182,9 +184,22 @@ export function useFormEmbeddedMasterDetailEditorBody<TRow = Record<string, unkn
 
   const addControl = addControlProp
 
+  const listGroups = useMemo((): MasterDetailListGroup[] | undefined => {
+    if (!resolveListGroups) return undefined
+    return resolveListGroups({
+      visibleRows: visibleRows.map((row) => ({
+        item: row.item,
+        row: rows.rowAt(row.formIndex),
+        formIndex: row.formIndex,
+      })),
+      addControl,
+    })
+  }, [addControl, resolveListGroups, rows, visibleRows])
+
   return {
     rows,
     listItems,
+    listGroups,
     invalidItemCount,
     isSelectedRowVisible,
     handleSelectItem,

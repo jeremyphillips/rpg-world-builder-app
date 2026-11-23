@@ -77,7 +77,7 @@ async function deleteViaOverflow(user: ReturnType<typeof userEvent.setup>, title
 describe('SpeciesTraitsTab', () => {
   it('shows the empty state when there are no traits', () => {
     render(<TabShell />)
-    expect(screen.getByText(/No traits added\./i)).toBeInTheDocument()
+    expect(screen.getByText(/No other traits added\./i)).toBeInTheDocument()
     expect(screen.getByText(/Select a trait to edit/i)).toBeInTheDocument()
   })
 
@@ -178,7 +178,7 @@ describe('SpeciesTraitsTab', () => {
     await user.click(screen.getByRole('button', { name: /^Delete$/ }))
 
     await waitFor(() => {
-      expect(screen.getByText(/No traits added\./i)).toBeInTheDocument()
+      expect(screen.getByText(/No other traits added\./i)).toBeInTheDocument()
     })
   })
 

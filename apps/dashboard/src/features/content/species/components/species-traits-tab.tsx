@@ -1,19 +1,28 @@
 import { useCallback, useMemo } from 'react'
+import { useWatch } from 'react-hook-form'
 
-import { CreatureTraitAddMenu } from '../../lib/creature-traits/creature-trait-add-menu'
+import { creatureTraitTemplateSenseId } from '@rpg/contracts'
+
+import { creatureTraitTemplateRow } from '../../lib/creature-traits/creature-trait-add-menu'
 import { FormEmbeddedMasterDetailEditor } from '../../components/master-detail/form-embedded-master-detail-editor'
 import { useMasterDetailArray } from '../../lib/master-detail/use-master-detail-array'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
-import { traitItemFields } from '../lib/species-trait-form-fields'
+import { traitItemFields, type TraitRowForm } from '../lib/species-trait-form-fields'
 import { TRAIT_MASTER_DETAIL_ITEM_NOUN } from '../lib/species-trait-form-labels'
 import { createSpeciesTraitRowTitleConfig } from '../lib/species-trait-row-title'
+import { buildSpeciesTraitListGroups } from '../lib/species-trait-list-groups'
 import { traitItemDefaultValues } from '../lib/species-trait-form-values'
 import { useSpeciesTraitFacingHost } from '../../facing/use-species-trait-facing-host'
+import { SpeciesTraitAddMenu } from './species-trait-add-menu'
 
 const TRAITS_FIELD_NAME = 'traits'
 
 export interface SpeciesTraitsTabProps {
   formCtx: ContentFormCtx
+}
+
+function defaultTemplateTraitId(templateId: string): string {
+  return creatureTraitTemplateSenseId(templateId) ?? templateId
 }
 
 /**
@@ -27,6 +36,7 @@ export function SpeciesTraitsTab({ formCtx }: SpeciesTraitsTabProps) {
   const rowTitle = useMemo(() => createSpeciesTraitRowTitleConfig(), [])
   const makeItemDefaults = useCallback(() => traitItemDefaultValues(fields), [fields])
   const editor = useMasterDetailArray(TRAITS_FIELD_NAME, makeItemDefaults)
+  const traits = (useWatch({ name: TRAITS_FIELD_NAME }) as TraitRowForm[] | undefined) ?? []
 
   const resolveFieldSections = useCallback(
     () => ({
@@ -41,6 +51,46 @@ export function SpeciesTraitsTab({ formCtx }: SpeciesTraitsTabProps) {
     hostId: 'species-traits',
   })
 
+  const addControl = (
+    <SpeciesTraitAddMenu
+      label="Add trait"
+      rulesetId={formCtx.rulesetId}
+      traits={traits}
+      onAcquire={(choice) => {
+        if (choice.type === 'focus') {
+          const index = traits.findIndex((trait) => trait.id === choice.traitId)
+          if (index >= 0) editor.select(index)
+          return
+        }
+        if (choice.type === 'custom') {
+          editor.appendRow(makeItemDefaults())
+          return
+        }
+        const traitId = defaultTemplateTraitId(choice.templateId)
+        editor.appendRow({
+          ...makeItemDefaults(),
+          ...creatureTraitTemplateRow(choice.templateId, traitId),
+          templateId: choice.templateId,
+        })
+      }}
+    />
+  )
+
+  const resolveListGroups = useCallback(
+    (ctx: {
+      visibleRows: Array<{ item: { id: string }; row: unknown }>
+      addControl?: typeof addControl
+    }) =>
+      buildSpeciesTraitListGroups(
+        ctx.visibleRows.map((entry) => ({
+          row: entry.row as TraitRowForm,
+          item: entry.item,
+        })),
+        { addControl: ctx.addControl ?? addControl },
+      ),
+    [addControl],
+  )
+
   return (
     <FormEmbeddedMasterDetailEditor
       editor={editor}
@@ -52,25 +102,10 @@ export function SpeciesTraitsTab({ formCtx }: SpeciesTraitsTabProps) {
       ariaLabel="Traits"
       addLabel="Add trait"
       idPrefix="species-trait"
-      addControl={
-        <CreatureTraitAddMenu
-          label="Add trait"
-          rulesetId={formCtx.rulesetId}
-          onCustom={() => editor.appendRow(makeItemDefaults())}
-          onTemplate={(templateId) =>
-            editor.appendRow({
-              ...makeItemDefaults(),
-              kind: 'template',
-              templateId,
-              name: '',
-              description: '',
-              ...(templateId === 'legendary-resistance' ? { config: { uses: { normal: 3 } } } : {}),
-            })
-          }
-        />
-      }
+      addControl={addControl}
       rowTitle={rowTitle}
       resolveFieldSections={resolveFieldSections}
+      resolveListGroups={resolveListGroups}
       facing={facing}
       access={{ kind: 'availability', fieldName: 'available' }}
     />

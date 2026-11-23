@@ -1,6 +1,8 @@
 import { SENSE_RANGES, TELEPATHY_MILE_FEET } from '@rpg/contracts'
 import type { JoinedPairFieldConfig } from '@rpg/ui/form'
 
+import { senseRangeJoinedPairParts } from './sense-range-joined-pair-parts'
+
 export const SENSE_RANGE_PLACEHOLDER = '—'
 
 export const SENSE_RANGE_UNIT = 'ft' as const
@@ -56,28 +58,32 @@ export function feetFromTelepathyRange(
 
 /** Grant-row sense range — preset feet select with a feet unit select. */
 export function senseRangeJoinedPairField(
-  overrides?: Partial<JoinedPairFieldConfig>,
+  overrides?: Partial<JoinedPairFieldConfig> & { amountName?: string },
 ): JoinedPairFieldConfig {
+  const { amountName, ...rest } = overrides ?? {}
+  const parts = senseRangeJoinedPairParts()
   return {
     type: 'joinedPair',
     label: 'Range',
     width: '1/3',
     start: {
       kind: 'select',
-      name: 'senseRange',
-      options: senseRangeAmountOptions,
-      placeholder: SENSE_RANGE_PLACEHOLDER,
-      digits: 3,
+      name: amountName ?? 'senseRange',
+      options: parts.amountOptions,
+      placeholder: parts.placeholder,
+      digits: parts.digits,
       ariaLabel: 'Range',
     },
     end: {
       kind: 'select',
       name: 'senseRangeUnit',
-      options: [...senseRangeUnitOptions],
-      defaultValue: SENSE_RANGE_UNIT,
-      sizingLabels: [SENSE_RANGE_UNIT_LABEL],
+      options: parts.unitOptions,
+      defaultValue: parts.unitDefault,
+      sizingLabels: [parts.unitLabel],
       ariaLabel: 'Range unit',
     },
-    ...overrides,
+    ...rest,
   }
 }
+
+export { senseRangeJoinedPairParts } from './sense-range-joined-pair-parts'
