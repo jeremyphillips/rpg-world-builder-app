@@ -1,5 +1,5 @@
-import { flattenGrantGroups, resolveGrantGroupsFromContent } from '@rpg/contracts'
-import type { ContentGrant, GrantGroups } from '@rpg/contracts'
+import { resolveMechanicalGrantsFromContent } from '@rpg/contracts'
+import type { ContentGrant } from '@rpg/contracts'
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
@@ -40,15 +40,19 @@ function collectFromTrait(
 ): void {
   if (!isRecord(trait)) return
 
-  const groups = resolveGrantGroupsFromContent(
+  const grants = resolveMechanicalGrantsFromContent(
     {
       kind: String(trait.kind ?? 'custom'),
-      grantGroups: trait.grantGroups as GrantGroups | undefined,
+      id: typeof trait.id === 'string' ? trait.id : undefined,
+      templateId: typeof trait.templateId === 'string' ? trait.templateId : undefined,
+      config: trait.config,
+      grantGroups: trait.grantGroups as { grants: ContentGrant[] }[] | undefined,
+      available: trait.available as boolean | undefined,
     },
-    { level: 1 },
+    { parentLevel: 1, level: 1, parentUnlock: { level: 1 }, source: String(trait.id ?? 'trait') },
   )
 
-  for (const { grant } of flattenGrantGroups(groups)) {
+  for (const grant of grants) {
     collectVocabularyIdsFromGrant(grant, damageIds, senseIds, languageIds)
   }
 }

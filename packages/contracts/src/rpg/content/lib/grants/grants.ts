@@ -633,6 +633,7 @@ export const grantContentTraitSchema = z
     /** Atomic grant groups — the single source of truth for grant traits. */
     grantGroups: grantGroupsSchema,
     nameOverride: z.string().min(1).optional(),
+    /** @deprecated Prefer template `details` for supplemental prose; still replaces generated HTML when set. */
     descriptionOverride: z.string().optional(),
   })
   .superRefine((val, ctx) => {
@@ -655,6 +656,9 @@ export const templateContentTraitSchema = z.object({
   templateId: z.string().min(1),
   config: z.unknown().optional(),
   nameOverride: z.string().min(1).optional(),
+  /** Optional rich-text prose after generated template rules (sense templates). */
+  details: z.string().optional(),
+  /** @deprecated Prefer `details` for supplemental prose; still replaces generated HTML when set. */
   descriptionOverride: z.string().optional(),
 })
 

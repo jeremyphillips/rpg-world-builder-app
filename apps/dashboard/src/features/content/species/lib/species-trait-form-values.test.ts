@@ -59,3 +59,48 @@ describe('trait form row hydration', () => {
     ).toBe(true)
   })
 })
+
+describe('template trait form round-trip', () => {
+  it('round-trips sense template range through configSchema', () => {
+    const hydrated = traitToFormRow({
+      kind: 'template',
+      id: 'darkvision',
+      templateId: 'sense-darkvision',
+      config: { range: 120 },
+    })
+    expect(hydrated.config?.range).toBe(120)
+
+    const saved = traitsFromFormValues([{ ...hydrated, id: 'darkvision' }])
+    expect(saved[0]).toMatchObject({
+      kind: 'template',
+      templateId: 'sense-darkvision',
+      config: { range: 120 },
+    })
+  })
+
+  it('does not coerce a missing range to 60 on save', () => {
+    const row = traitToFormRow({
+      kind: 'template',
+      id: 'darkvision',
+      templateId: 'sense-darkvision',
+    })
+    const saved = traitsFromFormValues([{ ...row, id: 'darkvision' }])
+    expect(saved[0]?.kind === 'template' && saved[0].config).toBeUndefined()
+  })
+
+  it('round-trips legendary resistance uses object', () => {
+    const hydrated = traitToFormRow({
+      kind: 'template',
+      id: 'legendary-resistance',
+      templateId: 'legendary-resistance',
+      config: { uses: { normal: 3 } },
+    })
+
+    const saved = traitsFromFormValues([{ ...hydrated, id: 'legendary-resistance' }])
+    expect(saved[0]).toMatchObject({
+      kind: 'template',
+      templateId: 'legendary-resistance',
+      config: { uses: { normal: 3 } },
+    })
+  })
+})

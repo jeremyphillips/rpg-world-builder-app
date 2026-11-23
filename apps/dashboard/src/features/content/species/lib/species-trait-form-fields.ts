@@ -63,10 +63,20 @@ function traitRowObjectSchema<Kind extends z.ZodType>(kindSchema: Kind) {
     description: z.string().optional(),
     nameOverride: z.string().optional(),
     descriptionOverride: z.string().optional(),
+    details: z.string().optional(),
     templateId: z.string().min(1).optional(),
     config: z
       .object({
-        uses: z.coerce.number().int().min(1).optional(),
+        uses: z
+          .union([
+            z.coerce.number().int().min(1),
+            z.object({
+              normal: z.coerce.number().int().min(1),
+              inLair: z.coerce.number().int().min(1).optional(),
+            }),
+          ])
+          .optional(),
+        range: z.coerce.number().int().min(0).optional(),
       })
       .optional(),
     grants: z.array(grantRowFormSchema),

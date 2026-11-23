@@ -1,3 +1,5 @@
 export * from './legendary-resistance.constants'
+export * from './sense-templates'
 export * from './templates'
 export * from './validate'
+export * from './sense-occurrence'

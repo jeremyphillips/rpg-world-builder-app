@@ -49,6 +49,23 @@ export const SENSE_RANGES = standardFeet(10, 120, 10) as unknown as readonly [
 ]
 export type StandardSenseRange = (typeof SENSE_RANGES)[number]
 
+export const STANDARD_SENSE_RANGE_MESSAGE = 'Choose a sense range in feet.'
+
+/** Authoring preset check — stored range may be any non-negative integer. */
+export function isStandardSenseRange(range: number): range is StandardSenseRange {
+  return (SENSE_RANGES as readonly number[]).includes(range)
+}
+
+/** Shared copy for preset range refinements (monster publish, sense templates). */
+export function standardSenseRangeValidationMessage(): string {
+  return STANDARD_SENSE_RANGE_MESSAGE
+}
+
+/** Trait and facing rules sentence for a resolved sense fact. */
+export function formatCreatureSenseTraitRulesSentence(sense: Sense): string {
+  return `You have ${getSenseSentenceForm(sense.type)} with a range of ${sense.range} feet.`
+}
+
 /** A special sense and its range in feet (e.g. Darkvision 60 ft). */
 export const senseSchema = z.object({
   type: senseIdSchema,

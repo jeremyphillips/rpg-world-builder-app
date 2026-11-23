@@ -2,6 +2,7 @@ import { isBodyRowAvailable } from '../../content/lib/campaign-access/body-row-a
 import type { ContentGrant, GrantGroups } from '../../content/lib/grants'
 import { resolveGrantGroupsFromContent } from '../../content/lib/grants'
 import {
+  getCreatureTraitTemplate,
   readCreatureTraitTemplateConfig,
   type CreatureTraitGrantBody,
 } from '../../content/creature/traits/templates'
@@ -70,11 +71,16 @@ function grantsFromTrait<TSource>(
     if (!templateId) return []
     const read = readCreatureTraitTemplateConfig(templateId, trait.config)
     if (!read) return []
+    const registry = getCreatureTraitTemplate(templateId)
+    const sourcePolicy = registry?.sourcePolicy ?? 'collapse-first'
     return read.template.resolveGrants(read.config).map((body, index) => ({
       grant: grantFromTemplateBody(templateId, index, body),
       sources: [source],
       unlockLevel: parentLevel,
-      templateKey: `${templateId}:${index}`,
+      templateKey:
+        sourcePolicy === 'emit-each'
+          ? `${templateId}:${index}:${assignment.trait.id}`
+          : `${templateId}:${index}`,
     }))
   }
 

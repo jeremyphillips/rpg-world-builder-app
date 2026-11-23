@@ -11,14 +11,23 @@ import { collectCreatureTraitTemplateIssues } from './validate'
 
 describe('creature trait templates', () => {
   it('covers the initial registry for the default ruleset', () => {
-    expect(listCreatureTraitTemplatesForRuleset('srd-cc-5.2.1')).toEqual([
+    expect(listCreatureTraitTemplatesForRuleset('srd-cc-5.2.1', 'monster')).toEqual([
       'magic-resistance',
       'pack-tactics',
       'sunlight-sensitivity',
       'legendary-resistance',
     ])
+    expect(listCreatureTraitTemplatesForRuleset('srd-cc-5.2.1', 'species')).toEqual(
+      expect.arrayContaining([
+        'magic-resistance',
+        'pack-tactics',
+        'sunlight-sensitivity',
+        'legendary-resistance',
+        'sense-darkvision',
+      ]),
+    )
     expect(listCreatureTraitTemplatesForRuleset('other-ruleset')).toEqual([])
-    expect(CREATURE_TRAIT_TEMPLATE_IDS).toHaveLength(4)
+    expect(CREATURE_TRAIT_TEMPLATE_IDS).toHaveLength(8)
   })
 
   it('keeps Legendary Resistance as the canonical label without daily notation', () => {

@@ -1,4 +1,4 @@
-import { collectCreatureTraitTemplateIssues } from '@rpg/contracts'
+import { collectCreatureTraitTemplateIssues, type CreatureTraitTemplateHost } from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
 
@@ -6,8 +6,9 @@ import { HttpError } from '../../../lib/http-error'
 export function rejectInvalidCreatureTraitTemplates(
   traits: unknown,
   prefix: (string | number)[] = [],
+  options?: { host?: CreatureTraitTemplateHost },
 ): void {
-  const issues = collectCreatureTraitTemplateIssues(traits).map((issue) => ({
+  const issues = collectCreatureTraitTemplateIssues(traits, options).map((issue) => ({
     ...issue,
     path: [...prefix, ...issue.path],
   }))

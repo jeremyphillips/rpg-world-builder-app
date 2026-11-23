@@ -1,7 +1,12 @@
 import { getDamageTypeSentenceForm } from '../../../vocab/damage/vocabulary'
 import { getLanguageSentenceForm } from '../../../vocab/language'
 import { formatMovementGrantSentence } from '../../../vocab/movement-mode'
-import { getSenseLabel, getSenseSentenceForm } from '../../../vocab/sense'
+import {
+  formatCreatureSenseTraitRulesSentence,
+  getSenseLabel,
+  getSenseSentenceForm,
+} from '../../../vocab/sense'
+import { isSenseCreatureTraitTemplateId } from '../../creature/traits/sense-templates'
 import { readCreatureTraitTemplateConfig } from '../../creature/traits/templates'
 import type {
   ContentTrait,
@@ -67,6 +72,20 @@ function htmlParagraph(text: string): string {
   return `<p>${text}</p>`
 }
 
+function senseTemplateRulesHtml(
+  templateId: string,
+  read: NonNullable<ReturnType<typeof readCreatureTraitTemplateConfig>>,
+): string | undefined {
+  if (!isSenseCreatureTraitTemplateId(templateId)) return undefined
+  const senseGrant = read.template
+    .resolveGrants(read.config)
+    .find(
+      (grant): grant is { kind: 'sense'; type: string; range: number } => grant.kind === 'sense',
+    )
+  if (!senseGrant) return undefined
+  return htmlParagraph(formatCreatureSenseTraitRulesSentence(senseGrant))
+}
+
 function resolveTemplateTraitDisplay(trait: TemplateContentTrait): TraitDisplay {
   const read = readCreatureTraitTemplateConfig(trait.templateId, trait.config)
   const derivedName = read
@@ -75,6 +94,12 @@ function resolveTemplateTraitDisplay(trait: TemplateContentTrait): TraitDisplay 
   const derivedDescription = read
     ? htmlParagraph(read.template.formatDescription(read.config))
     : undefined
+
+  const senseRules = read ? senseTemplateRulesHtml(trait.templateId, read) : undefined
+  if (senseRules) {
+    return { name: trait.nameOverride ?? derivedName, descriptionHtml: senseRules }
+  }
+
   return {
     name: trait.nameOverride ?? derivedName,
     descriptionHtml: trait.descriptionOverride ?? derivedDescription,

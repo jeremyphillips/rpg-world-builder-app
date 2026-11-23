@@ -11,7 +11,12 @@ import {
   creatureSizesSchema,
 } from '../vocab/creature-size'
 import { creatureTypeSchema } from '../vocab/creature-type'
-import { SENSE_RANGES, senseDraftSchema, senseSchema } from '../vocab/sense'
+import {
+  isStandardSenseRange,
+  senseDraftSchema,
+  senseSchema,
+  standardSenseRangeValidationMessage,
+} from '../vocab/sense'
 import { movementSpeedsSchema } from '../vocab/movement-mode'
 import { skillSchema } from './skill-proficiency'
 import { proficiencyRankSchema } from '../vocab/proficiency'
@@ -42,8 +47,6 @@ export const creatureSensesSchema = z.array(senseSchema).default([])
 
 export const creatureSensesDraftSchema = z.array(senseDraftSchema).default([])
 
-const SENSE_RANGE_PRESETS: readonly number[] = SENSE_RANGES
-
 export {
   TELEPATHY_MILE_FEET,
   creatureCommunicationSchema,
@@ -72,8 +75,12 @@ export function refineCreatureSenseRanges(
       ])
       return
     }
-    if (!SENSE_RANGE_PRESETS.includes(sense.range)) {
-      addCustomRefinementIssue(ctx, 'Choose a sense range in feet.', [...path, index, 'range'])
+    if (!isStandardSenseRange(sense.range)) {
+      addCustomRefinementIssue(ctx, standardSenseRangeValidationMessage(), [
+        ...path,
+        index,
+        'range',
+      ])
     }
   })
 }

@@ -30,10 +30,11 @@ When sub-choices are small, fixed sets owned by one catalog record (lineages, an
 
 Species traits and heritage options share `contentTraitSchema` — a discriminated union on `kind`:
 
-| Kind     | Stored fields                                                             | Rendering                                                      |
-| -------- | ------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| `custom` | `name`, optional `description`, optional `grantGroups`                    | Use stored prose; grant groups supplement mechanics            |
-| `grant`  | `grantGroups` (required), optional `nameOverride` / `descriptionOverride` | Derive display via `resolveTraitDisplay()` in `@rpg/contracts` |
+| Kind       | Stored fields                                                                                                            | Rendering                                                                                                    |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| `custom`   | `name`, optional `description`, optional `grantGroups`                                                                   | Use stored prose; grant groups supplement mechanics                                                          |
+| `grant`    | `grantGroups` (required), optional `nameOverride` / `descriptionOverride` (deprecated — prefer sense template `details`) | Derive display via `resolveTraitDisplay()` in `@rpg/contracts`                                               |
+| `template` | `templateId`, optional `config`, optional `details`, optional `nameOverride`                                             | Registry-backed mechanics via `resolveCreatureTraitGrants()`; passive species senses use `sense-*` templates |
 
 **Class features** are a discriminated union on `kind`: `custom`, `asi`, `spellcasting`, and
 `subclass-choice`. Subclass `features[]` rows are **`custom` only**. Progression UI requires a
@@ -45,7 +46,7 @@ The feature level is the source of truth for when subclass authoring
 and default subclass feature levels unlock; there is no top-level `subclassChoiceLevel` field on
 the class body.
 
-Grant-only traits must pass `isGrantGroupsEligible()` — exactly one default group containing exactly one sense, resistance, walk speed override, or language grant. Hybrids (Drow: senses + spells), named heritage options (Dragonborn ancestry), and supplemental rules stay `custom`.
+Grant-only traits must pass `isGrantGroupsEligible()` — exactly one default group containing exactly one sense, resistance, walk speed override, or language grant. On **publish**, species traits must not be a stored-only sense grant; passive senses use `sense-*` templates (`sense-darkvision`, etc.). Hybrids (Drow: senses + spells), named heritage options (Dragonborn ancestry), and supplemental rules stay `custom`.
 
 - **Render** trait lists with `resolveTraitDisplay(trait)` (name + description HTML).
 - **Aggregate** mechanics (e.g. species stat-row senses) with `flattenGrantGroups(resolveGrantGroupsFromContent(trait))` — read atomic grants, not derived prose.

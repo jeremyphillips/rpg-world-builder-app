@@ -8,8 +8,15 @@ import {
   type CreatureRollAdjustment,
   type CreatureSaveOutcomeOverride,
 } from '../effects'
+import type { Sense } from '../../../vocab/sense'
+import {
+  SENSE_CREATURE_TRAIT_TEMPLATE_ENTRIES,
+  type CreatureTraitTemplateSourcePolicy,
+} from './sense-templates'
 import { LEGENDARY_RESISTANCE_LABEL } from './legendary-resistance.constants'
 import { legendaryResistanceLimitedUse } from './legendary-resistance-limited-use'
+
+export type CreatureTraitTemplateHost = 'species' | 'monster'
 
 // ---------------------------------------------------------------------------
 // Versioned creature trait templates. Assignments store `templateId` plus
@@ -32,11 +39,17 @@ export const CREATURE_TRAIT_TEMPLATE_TERM = {
 export type CreatureTraitGrantBody =
   | ({ kind: 'rollAdjustment' } & CreatureRollAdjustment)
   | ({ kind: 'saveOutcomeOverride' } & CreatureSaveOutcomeOverride)
+  | ({ kind: 'sense' } & Sense)
 
 export type CreatureTraitTemplate = {
   label: string
   description: string
   rulesetIds: readonly string[]
+  hosts?: readonly CreatureTraitTemplateHost[]
+  sourcePolicy?: CreatureTraitTemplateSourcePolicy
+  acquisitionGroup?: string
+  listGroup?: string
+  senseId?: string
   configSchema: z.ZodTypeAny
   formatName?: (config: unknown) => string
   formatDescription: (config: unknown) => string
@@ -128,6 +141,7 @@ export const CREATURE_TRAIT_TEMPLATE_ENTRIES = {
       return [{ kind: 'saveOutcomeOverride', ...override }]
     },
   },
+  ...SENSE_CREATURE_TRAIT_TEMPLATE_ENTRIES,
 } as const satisfies Record<string, CreatureTraitTemplate>
 
 export type CreatureTraitTemplateId = keyof typeof CREATURE_TRAIT_TEMPLATE_ENTRIES
@@ -141,12 +155,17 @@ export function getCreatureTraitTemplate(templateId: string): CreatureTraitTempl
   return CREATURE_TRAIT_TEMPLATE_ENTRIES[templateId as CreatureTraitTemplateId]
 }
 
-export function listCreatureTraitTemplatesForRuleset(rulesetId: string): CreatureTraitTemplateId[] {
-  return CREATURE_TRAIT_TEMPLATE_IDS.filter((templateId) =>
-    (CREATURE_TRAIT_TEMPLATE_ENTRIES[templateId].rulesetIds as readonly string[]).includes(
-      rulesetId,
-    ),
-  )
+export function listCreatureTraitTemplatesForRuleset(
+  rulesetId: string,
+  host?: CreatureTraitTemplateHost,
+): CreatureTraitTemplateId[] {
+  return CREATURE_TRAIT_TEMPLATE_IDS.filter((templateId) => {
+    const entry = CREATURE_TRAIT_TEMPLATE_ENTRIES[templateId]
+    if (!(entry.rulesetIds as readonly string[]).includes(rulesetId)) return false
+    if (!host) return true
+    const hosts = entry.hosts ?? (['species', 'monster'] as const)
+    return hosts.includes(host)
+  })
 }
 
 export function readCreatureTraitTemplateConfig(
@@ -164,5 +183,6 @@ export function defaultCreatureTraitTemplateConfig(
   templateId: string,
 ): Record<string, unknown> | undefined {
   if (templateId === 'legendary-resistance') return { uses: { normal: 3 } }
+  if (templateId in SENSE_CREATURE_TRAIT_TEMPLATE_ENTRIES) return { range: 60 }
   return undefined
 }

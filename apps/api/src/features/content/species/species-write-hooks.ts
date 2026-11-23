@@ -44,13 +44,14 @@ export async function speciesValidateBeforeWrite(ctx: ContentWriteContext): Prom
         }
       : ctx.input
 
-  rejectInvalidCreatureTraitTemplates(inputForVocab.traits, ['traits'])
+  rejectInvalidCreatureTraitTemplates(inputForVocab.traits, ['traits'], { host: 'species' })
   const heritage = inputForVocab.heritage
   if (heritage && typeof heritage === 'object' && 'options' in heritage) {
-    rejectInvalidCreatureTraitTemplates((heritage as { options?: unknown }).options, [
-      'heritage',
-      'options',
-    ])
+    rejectInvalidCreatureTraitTemplates(
+      (heritage as { options?: unknown }).options,
+      ['heritage', 'options'],
+      { host: 'species' },
+    )
   }
 
   await assertDamageTypesActiveInCampaign(ctx.campaignId, [

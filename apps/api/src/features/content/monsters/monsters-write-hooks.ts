@@ -17,7 +17,7 @@ import { rejectInvalidCreatureTraitTemplates } from '../lib/reject-creature-trai
 
 export async function monstersValidateBeforeWrite(ctx: ContentWriteContext): Promise<void> {
   const rawBody = ctx.effectiveBody ?? ctx.input
-  rejectInvalidCreatureTraitTemplates(rawBody.traits, ['traits'])
+  rejectInvalidCreatureTraitTemplates(rawBody.traits, ['traits'], { host: 'monster' })
   const body = rawBody as Parameters<typeof collectMonsterCatalogIssues>[0]
   const [equipmentCatalog, skillCatalog, spellCatalog, classCatalog, familySet] = await Promise.all(
     [

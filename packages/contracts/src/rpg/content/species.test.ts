@@ -17,11 +17,10 @@ const ELF_BODY = {
   movement: { walk: 30 },
   traits: [
     {
-      kind: 'grant' as const,
+      kind: 'template' as const,
       id: 'darkvision',
-      grantGroups: [
-        { grants: [{ id: 'sense-1', kind: 'sense' as const, type: 'darkvision', range: 60 }] },
-      ],
+      templateId: 'sense-darkvision',
+      config: { range: 60 },
     },
     {
       kind: 'custom' as const,

@@ -76,6 +76,7 @@ import {
   formatWeaponProficiencyGrantCompact,
   getGrantGroupEffectiveUnlock,
   resolveGrantGroupsFromContent,
+  resolveMechanicalGrantsFromContent,
   type ContentGrant,
   type EquipmentKind,
   type GrantGroup,
@@ -574,19 +575,29 @@ export function buildSpellGrantVocabulary(
 export function buildGrantSummaryModel(
   grantGroups: GrantGroup[] | undefined,
   vocabulary: GrantDisplayVocabulary,
-  options?: { parentLevel?: number },
+  options?: {
+    parentLevel?: number
+    trait?: Parameters<typeof resolveMechanicalGrantsFromContent>[0]
+  },
 ): GrantSummaryModel {
   const parentLevel = options?.parentLevel ?? 1
   const parentUnlock = { level: parentLevel }
 
-  if (!grantGroups?.length) {
+  const normalizedGroups = grantGroups?.length
+    ? resolveGrantGroupsFromContent({ kind: 'custom', grantGroups }, parentUnlock)
+    : options?.trait
+      ? (() => {
+          const grants = resolveMechanicalGrantsFromContent(options.trait, {
+            parentLevel,
+            level: parentLevel,
+          })
+          return grants.length ? [{ grants, unlock: parentUnlock }] : []
+        })()
+      : []
+
+  if (normalizedGroups.length === 0) {
     return { groups: [], flatItems: [] }
   }
-
-  const normalizedGroups = resolveGrantGroupsFromContent(
-    { kind: 'custom', grantGroups },
-    parentUnlock,
-  )
 
   const groups: GrantSummaryGroup[] = normalizedGroups.map((group, groupIndex) => {
     const effectiveUnlock = getGrantGroupEffectiveUnlock(group, parentUnlock)!

@@ -31,6 +31,7 @@ import {
   monsterPresetTraitSchema,
 } from './creature/trait-preset-schema'
 import { LEGENDARY_RESISTANCE_NAME_OVERRIDE_MESSAGE } from './creature/traits/legendary-resistance.constants'
+import { refineMonsterSenseOccurrence } from './creature/traits/sense-occurrence'
 import { refineCreatureTraitTemplate } from './creature/traits/validate'
 import {
   customContentTraitSchema,
@@ -196,7 +197,7 @@ function refineMonsterTemplateTrait(
   trait: { kind?: string; templateId?: unknown; config?: unknown },
   ctx: z.RefinementCtx,
 ): void {
-  if (trait.kind === 'template') refineCreatureTraitTemplate(trait, ctx)
+  if (trait.kind === 'template') refineCreatureTraitTemplate(trait, ctx, { host: 'monster' })
 }
 
 const monsterAuthoredTraitSchema = z
@@ -296,7 +297,7 @@ const monsterAuthoredTraitDraftSchema = z
   )
   .superRefine((trait, ctx) => {
     if (trait.kind !== 'template' || trait.templateId === undefined) return
-    refineCreatureTraitTemplate(trait, ctx)
+    refineCreatureTraitTemplate(trait, ctx, { host: 'monster' })
   })
 
 export const monsterTraitDraftSchema = z.union([
@@ -908,6 +909,7 @@ export function refineMonsterBody(
   refineMultiattackReferences(body, ctx, prefix, { published: true })
   refineLegendaryActionPool(body, ctx, prefix)
   refineCreatureDamageDefenses(body.defenses, ctx, [...prefix, 'defenses'])
+  refineMonsterSenseOccurrence(body.senses, ctx, [...prefix, 'senses'])
   refineCreatureSenseRanges(body.senses, ctx, [...prefix, 'senses'])
   refineCreatureTelepathyRange(body.communication.telepathy, ctx, [
     ...prefix,
@@ -1007,6 +1009,7 @@ function refineMonsterDraftBody(
 ): void {
   const sections = draftActionSections(body)
   refineMonsterDraftIds(body, ctx, prefix)
+  refineMonsterSenseOccurrence(body.senses ?? [], ctx, [...prefix, 'senses'])
   refineMonsterSpellEntries(sections, ctx, prefix)
   refineWeaponEntryReferences({ equipment: body.equipment ?? [], ...sections }, ctx, prefix, {
     requirePresent: false,

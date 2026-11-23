@@ -1,4 +1,8 @@
-import { type SpeciesBodyTrait, resolveGrantGroupsFromContent } from '@rpg/contracts'
+import {
+  type SpeciesBodyTrait,
+  getCreatureTraitTemplate,
+  resolveGrantGroupsFromContent,
+} from '@rpg/contracts'
 import { buildItemDefaultValues, type FormItem } from '@rpg/ui/form'
 
 import { applyStableIdsForUpdate } from '../../lib/forms/registry/content-form-key-helpers'
@@ -74,6 +78,7 @@ export function traitToFormRow(trait: SpeciesBodyTrait): TraitRowForm {
       overrideDisplay: hasOverrides,
       nameOverride: trait.nameOverride,
       descriptionOverride: trait.descriptionOverride,
+      details: trait.details,
       grants: [],
       available,
     }
@@ -114,14 +119,18 @@ function templateTraitFromFormRow(
   row: TraitRowForm & { id: string },
   available: boolean | undefined,
 ): SpeciesBodyTrait {
-  const uses = row.config?.uses
+  const templateId = row.templateId ?? ''
+  const template = getCreatureTraitTemplate(templateId)
+  const parsedConfig = template?.configSchema.safeParse(row.config ?? {})
+
   return {
     kind: 'template',
     id: row.id,
-    templateId: row.templateId ?? '',
-    ...(uses ? { config: { uses: Number(uses) } } : {}),
+    templateId,
+    ...(parsedConfig?.success ? { config: parsedConfig.data } : {}),
     nameOverride: row.nameOverride || undefined,
     descriptionOverride: row.descriptionOverride || undefined,
+    details: row.details || undefined,
     ...unavailableFlag(available),
   }
 }
