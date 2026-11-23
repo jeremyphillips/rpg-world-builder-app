@@ -14,7 +14,7 @@ import {
   PRIMARY_SPELLCASTING_PROFILE,
   acquisitionStateForItem,
   MONSTER_ACTION_KIND_ENTRIES,
-  MONSTER_WEAPON_EQUIPMENT_DUPLICATE_MESSAGE,
+  monsterActionOccurrenceMessages,
   monsterSectionAllowsKind,
   monsterSectionAllowsPreset,
   type ActionPresetId,
@@ -290,7 +290,9 @@ export function monsterActionAcquisitionItems(input: {
       groupId: 'equipped' as const,
       description: { status: 'ready', text: kindDescription('weapon') },
       availability: resolveAcquisitionAvailability({
-        occurrence: existing ? { message: MONSTER_WEAPON_EQUIPMENT_DUPLICATE_MESSAGE } : undefined,
+        occurrence: existing
+          ? { message: monsterActionOccurrenceMessages.weaponEquipmentDuplicate() }
+          : undefined,
         prerequisite: !weapon.equipped ? { message: 'Not equipped' } : undefined,
       }),
     }

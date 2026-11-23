@@ -60,7 +60,7 @@ non-reusable.
 
 > Search for the same rule, inventory, label, route mapping, state classification, permission gate, or class stack elsewhere. Flag independently maintained copies even when their code is not textually identical.
 
-Classify findings as duplicate authority (**A**), missing integration (**B**), or orphaned export (**C**) per [architecture-ssot.md](../../../docs/architecture-ssot.md).
+Classify findings as duplicate authority (**A**), missing integration (**B**), orphaned export (**C**), or inconsistent domain messages (**D**) per [architecture-ssot.md](../../../docs/architecture-ssot.md). For **D**: flag new plain rule constants, inline `addCustomRefinementIssue` literals for reusable rules, or validation transport rendered without the documented display adapter ([validation-messages.md](../../../packages/contracts/docs/validation-messages.md#display-boundaries)).
 
 When a PR introduces or extends a rule/inventory/mapping, trace for existing
 owners before accepting the change.

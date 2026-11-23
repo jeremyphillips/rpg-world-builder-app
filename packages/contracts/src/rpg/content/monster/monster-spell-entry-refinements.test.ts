@@ -1,9 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE,
-  PRIMARY_SPELLCASTING_SECTION_MESSAGE,
-} from './spell-casting-source'
+import { monsterActionOccurrenceMessages } from './action/monster-action-occurrence-messages'
+import { PRIMARY_SPELLCASTING_SECTION_MESSAGE } from './spell-casting-source'
 import { createMonsterDraftInputSchema, createMonsterInputSchema } from '../monster'
 import { MONSTER_TEST_BODY } from './test-fixtures'
 
@@ -190,7 +188,8 @@ describe('monster spell entries', () => {
     if (!duplicate.success) {
       expect(
         duplicate.error.issues.some(
-          (issue) => issue.message === PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE,
+          (issue) =>
+            issue.message === monsterActionOccurrenceMessages.primarySpellcastingDuplicate(),
         ),
       ).toBe(true)
     }

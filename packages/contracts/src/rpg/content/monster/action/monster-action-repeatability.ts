@@ -1,6 +1,6 @@
 import { getActionPreset, type ActionPresetId } from '../../action/action-presets'
-import { PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE } from '../spell-casting-source'
 import { isPrimarySpellcastingAction } from '../spell-casting-source'
+import { monsterActionOccurrenceMessages } from './monster-action-occurrence-messages'
 import {
   monsterActionSectionRowPath,
   monsterActionSectionRows,
@@ -8,13 +8,6 @@ import {
 } from '../action-section-access'
 import type { MonsterActionSection } from '../action-sections'
 import { MONSTER_ACTION_SECTIONS } from '../action-sections'
-import {
-  MONSTER_CONSTRICT_PRESET_DUPLICATE_MESSAGE,
-  MONSTER_NATURAL_FORM_DUPLICATE_MESSAGE,
-  MONSTER_WEAPON_EQUIPMENT_DUPLICATE_MESSAGE,
-  monsterSingletonKindMessage,
-} from './repeatability-messages'
-
 export const MONSTER_SINGLETON_KINDS = {
   actions: ['multiattack'] as const,
   bonusActions: ['leap', 'teleport', 'take-actions'] as const,
@@ -66,7 +59,7 @@ function pushSingletonKindViolations(
       const matches = rows.flatMap((row, index) => (row.kind === kind ? [index] : []))
       for (const index of matches.slice(1)) {
         violations.push({
-          message: monsterSingletonKindMessage(kind),
+          message: monsterActionOccurrenceMessages.singletonKind({ kind }),
           path: [...prefix, ...monsterActionSectionRowPath(section, index, 'kind')],
         })
       }
@@ -83,7 +76,7 @@ function pushConstrictViolations(
   const matches = rows.flatMap((row, index) => (row.preset === 'constrict' ? [index] : []))
   for (const index of matches.slice(1)) {
     violations.push({
-      message: MONSTER_CONSTRICT_PRESET_DUPLICATE_MESSAGE,
+      message: monsterActionOccurrenceMessages.constrictPresetDuplicate(),
       path: [...prefix, 'actions', index, 'preset'],
     })
   }
@@ -101,7 +94,7 @@ function pushWeaponEquipmentViolations(
     const prior = seen.get(row.equipmentEntryId)
     if (prior !== undefined) {
       violations.push({
-        message: MONSTER_WEAPON_EQUIPMENT_DUPLICATE_MESSAGE,
+        message: monsterActionOccurrenceMessages.weaponEquipmentDuplicate(),
         path: [...prefix, 'actions', index, 'equipmentEntryId'],
       })
       return
@@ -122,7 +115,7 @@ function pushNaturalFormViolations(
     const prior = seen.get(row.form)
     if (prior !== undefined) {
       violations.push({
-        message: MONSTER_NATURAL_FORM_DUPLICATE_MESSAGE,
+        message: monsterActionOccurrenceMessages.naturalFormDuplicate(),
         path: [...prefix, 'actions', index, 'form'],
       })
       return
@@ -158,7 +151,7 @@ function pushShapeShiftViolations(
   }
   for (const match of matches.slice(1)) {
     violations.push({
-      message: monsterSingletonKindMessage('shape-shift'),
+      message: monsterActionOccurrenceMessages.singletonKind({ kind: 'shape-shift' }),
       path: [...prefix, ...monsterActionSectionRowPath(match.section, match.index, 'kind')],
     })
   }
@@ -199,7 +192,7 @@ function disabledWhenSingleton(
   kind: string,
 ): AcquisitionItemState {
   if (!hasSingletonKindInSection(sections, section, kind)) return {}
-  return { disabled: true, note: monsterSingletonKindMessage(kind) }
+  return { disabled: true, note: monsterActionOccurrenceMessages.singletonKind({ kind }) }
 }
 
 function acquisitionStateForFixedItem(
@@ -208,7 +201,7 @@ function acquisitionStateForFixedItem(
 ): AcquisitionItemState | undefined {
   if (itemId === 'create:spell') {
     return primarySpellcastingRow(sections)
-      ? { disabled: true, note: PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE }
+      ? { disabled: true, note: monsterActionOccurrenceMessages.primarySpellcastingDuplicate() }
       : {}
   }
   if (itemId === 'preset:multiattack') {
@@ -216,7 +209,7 @@ function acquisitionStateForFixedItem(
   }
   if (itemId === 'preset:constrict') {
     return hasConstrictPreset(sections)
-      ? { disabled: true, note: MONSTER_CONSTRICT_PRESET_DUPLICATE_MESSAGE }
+      ? { disabled: true, note: monsterActionOccurrenceMessages.constrictPresetDuplicate() }
       : {}
   }
   if (itemId === 'reaction:parry') {
@@ -225,7 +218,10 @@ function acquisitionStateForFixedItem(
   if (itemId === 'create:shape-shift') {
     for (const section of MONSTER_ACTION_SECTIONS) {
       if (sectionRows(sections, section).some((row) => row.kind === 'shape-shift')) {
-        return { disabled: true, note: monsterSingletonKindMessage('shape-shift') }
+        return {
+          disabled: true,
+          note: monsterActionOccurrenceMessages.singletonKind({ kind: 'shape-shift' }),
+        }
       }
     }
     return {}
@@ -280,7 +276,9 @@ function acquisitionStateForNaturalPreset(
   const preset = getActionPreset(presetId)
   if (preset?.mechanics !== 'attack-roll') return {}
   const existing = findNaturalByForm(sections, preset.defaults.naturalForm)
-  return existing?.id ? { disabled: true, note: MONSTER_NATURAL_FORM_DUPLICATE_MESSAGE } : {}
+  return existing?.id
+    ? { disabled: true, note: monsterActionOccurrenceMessages.naturalFormDuplicate() }
+    : {}
 }
 
 /** Acquisition menu state for a known add-menu id. */

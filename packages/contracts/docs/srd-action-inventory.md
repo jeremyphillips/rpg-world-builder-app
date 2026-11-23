@@ -27,11 +27,11 @@ Scoped inventory for natural attack anatomy, Pounce, Swallow, and legendary savi
 
 ### Repeatability decision (Phase 1)
 
-| Concern           | Policy                                                                                                                                                                                                                         |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Form identity** | Optional `form` on `natural-weapon`; new vocab ids only when anatomy acquisition benefits (Phase 2A gate).                                                                                                                     |
-| **Acquisition**   | `acquisitionStateForItem` / preset disable when duplicate `form` or preset policy applies.                                                                                                                                     |
-| **Publish**       | One row per `form` on published monsters (`MONSTER_NATURAL_FORM_DUPLICATE_MESSAGE`). Rows **without** `form` may repeat. `breath-weapon` and `constrict` preset saves are repeatable; `constrict` natural form is a singleton. |
+| Concern           | Policy                                                                                                                                                                                                                                       |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Form identity** | Optional `form` on `natural-weapon`; new vocab ids only when anatomy acquisition benefits (Phase 2A gate).                                                                                                                                   |
+| **Acquisition**   | `acquisitionStateForItem` / preset disable when duplicate `form` or preset policy applies.                                                                                                                                                   |
+| **Publish**       | One row per `form` on published monsters (`monsterActionOccurrenceMessages.naturalFormDuplicate`). Rows **without** `form` may repeat. `breath-weapon` and `constrict` preset saves are repeatable; `constrict` natural form is a singleton. |
 
 **Working hypothesis (confirmed):** One-row-per-`form` encodes one named anatomical strike per block; extra hits belong in Multiattack, not duplicate Bite rows. No SRD counterexample requiring two published `bite` forms on one block was found in the Phase 1 sample set.
 

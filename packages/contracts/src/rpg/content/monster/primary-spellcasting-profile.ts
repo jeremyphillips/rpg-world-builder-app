@@ -2,10 +2,10 @@ import type { z } from 'zod'
 
 import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 import type { MonsterActionSection } from './action-sections'
+import { monsterActionOccurrenceMessages } from './action/monster-action-occurrence-messages'
 import {
   isPrimarySpellcastingAction,
   MONSTER_SPELLCASTING_ACTION_NAME,
-  PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE,
   PRIMARY_SPELLCASTING_NAME_MESSAGE,
   PRIMARY_SPELLCASTING_SECTION_MESSAGE,
 } from './spell-casting-source'
@@ -38,7 +38,7 @@ export function refinePrimarySpellcastingDuplicate(
   ctx: z.RefinementCtx,
 ): void {
   for (const extra of profileRows.slice(1)) {
-    addCustomRefinementIssue(ctx, PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE, [
+    addCustomRefinementIssue(ctx, monsterActionOccurrenceMessages.primarySpellcastingDuplicate(), [
       ...extra.path,
       'profile',
     ])

@@ -3,18 +3,15 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
+import { formatFieldMessage } from '../../../validation/define-message'
 import {
   acquisitionStateForItem,
   collectRepeatabilityViolations,
-  MONSTER_CONSTRICT_PRESET_DUPLICATE_MESSAGE,
-  MONSTER_NATURAL_FORM_DUPLICATE_MESSAGE,
-  MONSTER_WEAPON_EQUIPMENT_DUPLICATE_MESSAGE,
-  monsterSingletonKindMessage,
+  monsterActionOccurrenceMessages,
 } from '../monster/action'
 import { createMonsterDraftInputSchema, createMonsterInputSchema } from '../monster'
 import {
   MONSTER_SPELLCASTING_ACTION_NAME,
-  PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE,
   PRIMARY_SPELLCASTING_PROFILE,
 } from './spell-casting-source'
 import { BITE_ACTION, MONSTER_TEST_INPUT } from './test-fixtures'
@@ -53,12 +50,22 @@ describe('monster action repeatability', () => {
     })
     expect(violations.map((v) => v.message)).toEqual(
       expect.arrayContaining([
-        monsterSingletonKindMessage('multiattack'),
-        monsterSingletonKindMessage('leap'),
-        monsterSingletonKindMessage('parry'),
-        MONSTER_CONSTRICT_PRESET_DUPLICATE_MESSAGE,
-        MONSTER_NATURAL_FORM_DUPLICATE_MESSAGE,
-        MONSTER_WEAPON_EQUIPMENT_DUPLICATE_MESSAGE,
+        monsterActionOccurrenceMessages.singletonKind({ kind: 'multiattack' }),
+        monsterActionOccurrenceMessages.singletonKind({ kind: 'leap' }),
+        monsterActionOccurrenceMessages.singletonKind({ kind: 'parry' }),
+        monsterActionOccurrenceMessages.constrictPresetDuplicate(),
+        monsterActionOccurrenceMessages.naturalFormDuplicate(),
+        monsterActionOccurrenceMessages.weaponEquipmentDuplicate(),
+      ]),
+    )
+    expect(violations.map((v) => formatFieldMessage(v.message))).toEqual(
+      expect.arrayContaining([
+        'Only one Multiattack action is allowed.',
+        'Only one Leap action is allowed.',
+        'Only one Parry action is allowed.',
+        'Only one Constrict action is allowed.',
+        'Each natural attack form can be defined only once.',
+        'Each equipped weapon can have only one weapon action.',
       ]),
     )
   })
@@ -112,7 +119,7 @@ describe('monster action repeatability', () => {
     }
     expect(acquisitionStateForItem('create:spell', sections)).toEqual({
       disabled: true,
-      note: PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE,
+      note: monsterActionOccurrenceMessages.primarySpellcastingDuplicate(),
     })
     expect(acquisitionStateForItem('preset:multiattack', sections).disabled).toBe(true)
     expect(
@@ -124,7 +131,7 @@ describe('monster action repeatability', () => {
     expect(acquisitionStateForItem('reaction:parry', sections).disabled).toBe(true)
     expect(acquisitionStateForItem('natural:bite', sections)).toEqual({
       disabled: true,
-      note: MONSTER_NATURAL_FORM_DUPLICATE_MESSAGE,
+      note: monsterActionOccurrenceMessages.naturalFormDuplicate(),
     })
   })
 

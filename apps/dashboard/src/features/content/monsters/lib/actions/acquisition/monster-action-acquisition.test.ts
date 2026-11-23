@@ -1,11 +1,9 @@
 import {
+  formatFieldMessage,
   getMonsterActionKindLabel,
   MONSTER_ACTION_KIND_ENTRIES,
-  MONSTER_NATURAL_FORM_DUPLICATE_MESSAGE,
   MONSTER_SPELLCASTING_ACTION_NAME,
-  MONSTER_WEAPON_EQUIPMENT_DUPLICATE_MESSAGE,
-  monsterSingletonKindMessage,
-  PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE,
+  monsterActionOccurrenceMessages,
   PRIMARY_SPELLCASTING_PROFILE,
 } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
@@ -65,7 +63,9 @@ describe('monsterActionAcquisitionItems', () => {
     const sword = items.find((item) => item.id === 'weapon-entry:sword-1')
     expect(sword).toMatchObject({
       disabled: true,
-      disabledReason: MONSTER_WEAPON_EQUIPMENT_DUPLICATE_MESSAGE,
+      disabledReason: formatFieldMessage(
+        monsterActionOccurrenceMessages.weaponEquipmentDuplicate(),
+      ),
       metadata: MONSTER_ACTION_KIND_ENTRIES.weapon.description,
     })
     expect(parseMonsterActionAcquisitionId(sword!.id)).toEqual({
@@ -311,7 +311,9 @@ describe('primary Spellcasting acquisition', () => {
     })
     expect(taken.find((item) => item.id === 'create:spell')).toMatchObject({
       disabled: true,
-      disabledReason: PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE,
+      disabledReason: formatFieldMessage(
+        monsterActionOccurrenceMessages.primarySpellcastingDuplicate(),
+      ),
     })
 
     const bonus = monsterActionAcquisitionItems({
@@ -334,7 +336,9 @@ describe('repeatability acquisition', () => {
     })
     expect(occupied.find((item) => item.id === 'preset:multiattack')).toMatchObject({
       disabled: true,
-      disabledReason: monsterSingletonKindMessage('multiattack'),
+      disabledReason: formatFieldMessage(
+        monsterActionOccurrenceMessages.singletonKind({ kind: 'multiattack' }),
+      ),
     })
 
     const open = monsterActionAcquisitionItems({
@@ -353,7 +357,7 @@ describe('repeatability acquisition', () => {
     })
     expect(natural.find((item) => item.id === 'natural:bite')).toMatchObject({
       disabled: true,
-      disabledReason: MONSTER_NATURAL_FORM_DUPLICATE_MESSAGE,
+      disabledReason: formatFieldMessage(monsterActionOccurrenceMessages.naturalFormDuplicate()),
     })
   })
 })

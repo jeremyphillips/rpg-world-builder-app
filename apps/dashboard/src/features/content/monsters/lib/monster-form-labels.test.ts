@@ -8,7 +8,6 @@ import {
   getActionEconomySectionLabel,
   getMonsterActionKindLabel,
   getTermCollectionLabel,
-  PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE,
 } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
@@ -68,7 +67,7 @@ describe('monster-form-labels', () => {
   })
 
   it('does not duplicate the primary spellcasting validation message', () => {
-    expect(source).not.toContain(PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE)
+    expect(source).not.toContain('Only one Spellcasting profile is allowed.')
   })
 
   it('does not embed catalog nouns as string literals', () => {

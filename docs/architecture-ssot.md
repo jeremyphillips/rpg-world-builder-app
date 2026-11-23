@@ -3,24 +3,26 @@
 High-level ownership and prevention policy for this monorepo. This document is a
 **navigation hub** — it does not replace domain playbooks.
 
-| Topic                       | Canonical detail                                                                                                    |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| Vocabulary patterns (A/B/C) | [packages/contracts/docs/vocab-ssot.md](../packages/contracts/docs/vocab-ssot.md)                                   |
-| Contracts package layers    | [packages/contracts/docs/structure.md](../packages/contracts/docs/structure.md)                                     |
-| Catalog content types       | [content-types.md](./content-types.md)                                                                              |
-| Monster acquisition recipes | [apps/dashboard/docs/monster-action-acquisition-ssot.md](../apps/dashboard/docs/monster-action-acquisition-ssot.md) |
-| Dead-code / Fallow usage    | [tools/fallow/README.md](../tools/fallow/README.md)                                                                 |
-| PR review lenses            | [.cursor/skills/pr-review/SKILL.md](../.cursor/skills/pr-review/SKILL.md)                                           |
+| Topic                        | Canonical detail                                                                                                                                                   |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Vocabulary patterns (A/B/C)  | [packages/contracts/docs/vocab-ssot.md](../packages/contracts/docs/vocab-ssot.md)                                                                                  |
+| Contracts package layers     | [packages/contracts/docs/structure.md](../packages/contracts/docs/structure.md)                                                                                    |
+| Catalog content types        | [content-types.md](./content-types.md)                                                                                                                             |
+| Validation / domain messages | [validation-messages.md](../packages/contracts/docs/validation-messages.md), [domain-message-inventory.md](../packages/contracts/docs/domain-message-inventory.md) |
+| Monster acquisition recipes  | [apps/dashboard/docs/monster-action-acquisition-ssot.md](../apps/dashboard/docs/monster-action-acquisition-ssot.md)                                                |
+| Dead-code / Fallow usage     | [tools/fallow/README.md](../tools/fallow/README.md)                                                                                                                |
+| PR review lenses             | [.cursor/skills/pr-review/SKILL.md](../.cursor/skills/pr-review/SKILL.md)                                                                                          |
 
-## Three prevention problems
+## Four prevention problems
 
-Tag every safeguard with the problem it solves — one tool does not fix all three.
+Tag every safeguard with the problem it solves — one tool does not fix all four.
 
-| Problem                       | Definition                                                             | Primary mechanisms                                                          |
-| ----------------------------- | ---------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| **A — Duplicate authority**   | Two places maintain the same identity, labels, or behavioral rule      | `*_ENTRIES`, derived types, `satisfies` subsets, single-module ownership    |
-| **B — Missing integration**   | Admitted kind/type lacks authoring, facing, validation, or menu wiring | Exhaustive `Record` / `switch` + `never`, drift tests, integration manifest |
-| **C — Orphaned declarations** | Export with no meaningful consumer                                     | `noUnusedLocals`, Fallow `dead-code` / `audit`, export lifecycle            |
+| Problem                              | Definition                                                                                                   | Primary mechanisms                                                                                                                                                |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **A — Duplicate authority**          | Two places maintain the same identity, labels, or behavioral rule                                            | `*_ENTRIES`, derived types, `satisfies` subsets, single-module ownership                                                                                          |
+| **B — Missing integration**          | Admitted kind/type lacks authoring, facing, validation, or menu wiring                                       | Exhaustive `Record` / `switch` + `never`, drift tests, integration manifest                                                                                       |
+| **C — Orphaned declarations**        | Export with no meaningful consumer                                                                           | `noUnusedLocals`, Fallow `dead-code` / `audit`, export lifecycle                                                                                                  |
+| **D — Inconsistent domain messages** | Same rule class mixes catalog transport, plain SSOT, or inline literals; transport reaches UI without decode | `defineMessage` catalogs, policy-owned eligibility, one display adapter per pipeline, [validation-messages.md](../packages/contracts/docs/validation-messages.md) |
 
 **SSOT violation (A):** independently maintained copies of the same closed identifier
 set, label map, eligibility rule, or policy — even when the code is not textually
@@ -29,6 +31,22 @@ identical.
 **Not automatically a violation:** intentional subsets (`Partial<Record<…>>`,
 `API_*` keys), dashboard acquisition recipes (Pattern C), or repeated string
 literals that are not domain identity.
+
+**D is not A** when a single plain constant is the shared SSOT for refine and acquisition (e.g.
+occurrence duplicate English today). **D is A or leakage** when a second literal defines the same
+rule, or catalog transport is passed to UI without `formatFieldMessage` at the pipeline edge.
+
+### Domain-message lifecycle
+
+```text
+Domain policy          → when disabled / invalid
+Message definition     → catalog or deliberate plain export (legacy class 2)
+Transport              → string on option/issue (may be encoded)
+Display adapter        → formatFieldMessage / resolveFieldErrorMessage (once)
+UI primitive           → plain string only
+```
+
+New reusable domain-rule copy: [validation-messages.md § Agent checklist](../packages/contracts/docs/validation-messages.md#agent-checklist-new-domain-rule-message). Family disposition: [domain-message-inventory.md](../packages/contracts/docs/domain-message-inventory.md).
 
 ## Identity vs metadata vs policy vs presentation
 
@@ -111,7 +129,7 @@ cleanups use importer verification (ripgrep) and recorded manifests — not base
 
 Before adding a string union, registry, exported helper, resolver, or kind:
 
-1. Find the **authoritative owner** (grep + trace) — classify problem **A**, **B**, or **C**.
+1. Find the **authoritative owner** (grep + trace) — classify problem **A**, **B**, **C**, or **D**.
 2. Prefer **derive** from existing `*_ENTRIES` or constrain with `satisfies`.
 3. For **B**, list registration points (facing, fields, manifest, tests).
 4. For new **exports**, name the consumer or public API role.
