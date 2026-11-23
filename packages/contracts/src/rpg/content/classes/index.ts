@@ -1,3 +1,4 @@
+export * from './class-progression-table'
 export * from './class-feature-availability'
 export * from './class-messages'
 export * from '../tables'

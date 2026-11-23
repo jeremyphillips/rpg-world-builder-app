@@ -2,6 +2,7 @@ import {
   formatClassSpellcastingFeatureRules,
   type CharacterClass,
   type ResolvedSpellcastingProgressionConfig,
+  type Spell,
   type Spellcasting,
   type StatBlockProseDocument,
 } from '@rpg/contracts'
@@ -21,6 +22,7 @@ export function resolveSpellcastingGrantingFeatureRulesDocument(input: {
   spellcasting: Spellcasting | undefined
   featureRow: FeatureRowForm
   spellcastingProgression: ResolvedSpellcastingProgressionConfig
+  spellsById?: ReadonlyMap<string, Spell>
 }): StatBlockProseDocument | null {
   if (!isSpellcastingGrantingFeatureRow(input.featureRow)) return null
   if (!input.spellcasting) return null
@@ -49,6 +51,7 @@ export function resolveSpellcastingGrantingFeatureRulesDocument(input: {
     characterClass,
     config: input.spellcastingProgression,
     focusKinds: input.spellcasting.focusKinds,
+    spellsById: input.spellsById,
   })
 }
 
@@ -102,6 +105,7 @@ export function classSpellcastingGrantingFeatureRulesDisplay(
             grants: values.grants as FeatureRowForm['grants'],
           },
           spellcastingProgression: progression,
+          spellsById: ctx.spellCatalogById,
         })
 
         if (!document) {

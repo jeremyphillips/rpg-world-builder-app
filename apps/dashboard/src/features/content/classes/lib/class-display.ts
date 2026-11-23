@@ -17,6 +17,7 @@ import {
   type ContentTable,
   type ProficiencyChoice,
   type ResolvedSpellcastingProgressionConfig,
+  type Spell,
   type StatBlockProseDocument,
 } from '@rpg/contracts'
 
@@ -115,6 +116,7 @@ export type BuildClassDetailViewModelOptions = {
   features?: CharacterClass['features']
   spellcastingProgression?: ResolvedSpellcastingProgressionConfig
   characterClass?: CharacterClass
+  spellsById?: ReadonlyMap<string, Spell>
 }
 
 function formatSlugLabel(slug: string): string {
@@ -359,6 +361,7 @@ function mapFeatureToDetailItem(
   options?: {
     characterClass?: CharacterClass
     spellcastingProgression?: ResolvedSpellcastingProgressionConfig
+    spellsById?: ReadonlyMap<string, Spell>
   },
 ): ClassFeatureDetailItem {
   let rulesDocument: StatBlockProseDocument | undefined
@@ -374,6 +377,7 @@ function mapFeatureToDetailItem(
           features: [feature],
         },
         config: options.spellcastingProgression,
+        spellsById: options.spellsById,
       }) ?? undefined
   }
 
@@ -404,6 +408,7 @@ function buildFeaturesSection(
       mapFeatureToDetailItem(feature, {
         characterClass: options?.characterClass,
         spellcastingProgression: options?.spellcastingProgression,
+        spellsById: options?.spellsById,
       }),
     ),
   }

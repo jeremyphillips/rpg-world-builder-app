@@ -6,6 +6,7 @@ import {
 import {
   formatSpellMutationCopyParts,
   type SpellMutationCopyParts,
+  type SpellMutationCopyTrigger,
 } from '../../vocab/spell/format-spell-mutation-policy'
 
 export type SpellAcquisitionCopy = {

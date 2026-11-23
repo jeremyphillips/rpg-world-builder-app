@@ -1,18 +1,16 @@
 import { describe, expect, it } from 'vitest'
 
+import { spellcastingSchema, type CharacterClass } from '@rpg/contracts'
+import { CLASS_PROGRESSION_TABLE_LABEL } from '../../content/classes/class-progression-table'
+import { formatRestRecoveryClause } from '../../primitives/rest-recovery'
+import { joinStatBlockProseDocument } from '../prose/stat-block-prose'
 import { spellcastingProgressionTestConfig } from '../../campaign/rules/spellcasting-progression/fixtures'
+import { CLASS_SPELLCASTING_RULES_LEADS } from './spellcasting-rules/class-spellcasting-rules-copy'
 import {
-  formatCantripAcquisitionCopy,
-  formatSpellAcquisitionCopy,
+  formatClassSpellcastingFeatureRules,
   joinClassSpellcastingFeatureRulesPlainText,
-  resolveClassCantripCount,
-  resolveClassSpellcasting,
-  resolveCompiledChoiceProgressionQuotaAtLevel,
-  findCompiledChoiceProgressionBySuffix,
-  CLASS_SPELLCASTING_CHOICE_SUFFIXES,
-  spellcastingSchema,
-  type CharacterClass,
-} from '@rpg/contracts'
+} from './format-class-spellcasting-feature-rules'
+import { rangerClass } from './spellcasting-test-fixtures'
 
 const spellcastingGrantFeature = (level: number) => ({
   kind: 'custom' as const,
@@ -25,7 +23,10 @@ const spellcastingGrantFeature = (level: number) => ({
 const bardSpellcasting = spellcastingSchema.parse({
   slotProgressionId: 'full-caster',
   ability: 'cha',
-  focusKinds: ['holy_symbol'],
+  focusKinds: ['musical_instrument'],
+  cantripSelection: {
+    change: { kind: 'replace', trigger: 'levelUp', limit: 1 },
+  },
   spellSelection: {
     model: 'limitedRepertoire',
     change: { kind: 'replace', trigger: 'levelUp', limit: 1 },
@@ -42,25 +43,6 @@ const bardSpellcasting = spellcastingSchema.parse({
     },
     repertoire: {
       curve: { rows: [{ level: 1, count: 4 }] },
-      extension: 'carryForward',
-    },
-  },
-})
-
-const pactSpellcasting = spellcastingSchema.parse({
-  slotProgressionId: 'pact-magic',
-  ability: 'cha',
-  spellSelection: {
-    model: 'limitedRepertoire',
-    change: { kind: 'replace', trigger: 'longRest', limit: 1 },
-  },
-  progression: {
-    cantrips: {
-      curve: { rows: [{ level: 1, count: 2 }] },
-      extension: 'carryForward',
-    },
-    repertoire: {
-      curve: { rows: [{ level: 1, count: 2 }] },
       extension: 'carryForward',
     },
   },
@@ -91,53 +73,45 @@ function bardClass(): CharacterClass {
 }
 
 describe('formatClassSpellcastingFeatureRules', () => {
-  it('matches bard activation quotas and limited repertoire copy', () => {
-    const bard = bardClass()
-    const resolved = resolveClassSpellcasting(bard, spellcastingProgressionTestConfig)!
-    const repertoire = findCompiledChoiceProgressionBySuffix(
-      resolved,
-      CLASS_SPELLCASTING_CHOICE_SUFFIXES.repertoire,
-      'capacity',
-    )!
-
+  it('emits paragraph leads and Class Progression table references for Bard', () => {
     const text = joinClassSpellcastingFeatureRulesPlainText({
-      characterClass: bard,
+      characterClass: bardClass(),
       config: spellcastingProgressionTestConfig,
     })
 
-    expect(text).toContain(
-      formatCantripAcquisitionCopy(
-        bard.name,
-        resolveClassCantripCount({ source: bard, classLevel: 1 }),
-        true,
-      ).lead,
-    )
-    expect(text).toContain(
-      formatSpellAcquisitionCopy({
-        spellSelection: bard.spellcasting?.spellSelection,
-        className: bard.name,
-        max: resolveCompiledChoiceProgressionQuotaAtLevel(repertoire, 1),
-        requiredToComplete: true,
-        destination: 'classList',
-      }).lead,
-    )
-    expect(text).toContain('Holy Symbol')
+    expect(text).toContain(`${CLASS_SPELLCASTING_RULES_LEADS.cantrips}:`)
+    expect(text).toContain(`${CLASS_SPELLCASTING_RULES_LEADS.spellSlots}:`)
+    expect(text).toContain(`${CLASS_SPELLCASTING_RULES_LEADS.preparedSpells}:`)
+    expect(text).toContain(CLASS_PROGRESSION_TABLE_LABEL)
+    expect(text).not.toContain('Features table')
+    expect(text).toContain(formatRestRecoveryClause({ minimumRest: 'long' }))
+    expect(text?.toLowerCase()).toContain('musical instrument')
   })
 
-  it('does not emit slot recovery for pact magic', () => {
-    const warlock = {
-      ...bardClass(),
-      name: 'Warlock',
-      spellcasting: pactSpellcasting,
-    }
-
+  it('covers half-caster prepared rules without cantrips', () => {
     const text = joinClassSpellcastingFeatureRulesPlainText({
-      characterClass: warlock,
+      characterClass: rangerClass,
       config: spellcastingProgressionTestConfig,
     })
 
-    expect(text).toBeTruthy()
-    expect(text?.toLowerCase()).not.toContain('regain')
-    expect(text?.toLowerCase()).not.toMatch(/finish a (short|long) rest/)
+    expect(text).toContain('Prepared Spells of Level 1+')
+    expect(text?.toLowerCase()).toContain('druidic focus')
+    expect(text).not.toContain('Cantrips:')
+  })
+
+  it('returns structured prose with paragraph treatment on leads', () => {
+    const document = formatClassSpellcastingFeatureRules({
+      characterClass: bardClass(),
+      config: spellcastingProgressionTestConfig,
+    })
+    expect(document?.some((paragraph) => paragraph[0]?.kind === 'lead')).toBe(true)
+    expect(
+      document?.every(
+        (paragraph) => paragraph[0]?.kind !== 'lead' || paragraph[0].treatment === 'paragraph',
+      ),
+    ).toBe(true)
+    expect(joinStatBlockProseDocument(document ?? []).toLowerCase()).toContain(
+      'you know two bard cantrips',
+    )
   })
 })
