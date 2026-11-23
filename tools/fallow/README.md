@@ -56,3 +56,18 @@ pnpm exec fallow dead-code --production \
 | 3–6   | `pnpm gate:fallow-dead-code` on CI (new-only vs baseline); set `FALLOW_DEAD_CODE_ADVISORY=1` locally for warnings-only |
 
 Do not auto-delete exports from Fallow output without triage (problem **C**).
+
+## Phase 7 — confirmed debt cleanup
+
+High-confidence **H2** orphans only (leaf modules, zero importers). Do **not** purge feature
+barrels or vocabulary `*_ENTRIES`.
+
+| Artifact                                                               | Role                                                                           |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| [`phase7-monster-form-labels.json`](./phase7-monster-form-labels.json) | Manifest of removed/unexported symbols from `monster-form-labels.ts` (2026-11) |
+
+After a cleanup batch, refresh the baseline:
+
+```sh
+pnpm exec fallow dead-code --production --save-baseline tools/fallow/dead-code-baseline.json
+```

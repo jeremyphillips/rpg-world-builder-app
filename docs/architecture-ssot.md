@@ -87,7 +87,8 @@ when root/contracts public API changes.
 Barrel re-exports and test imports do not alone prove a production consumer.
 
 Repo-wide unused-export counts are **diagnostic** until Fallow regression gates
-mature — see [tools/fallow/README.md](../tools/fallow/README.md).
+mature — see [tools/fallow/README.md](../tools/fallow/README.md). **Phase 7** leaf
+cleanups use importer verification (ripgrep) and recorded manifests — not baseline diffs alone.
 
 ## Module boundaries
 

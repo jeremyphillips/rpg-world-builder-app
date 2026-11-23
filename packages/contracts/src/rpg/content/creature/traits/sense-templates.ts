@@ -24,8 +24,6 @@ const senseTemplateConfigSchema = z.object({
     .refine(isStandardSenseRange, { message: standardSenseRangeValidationMessage() }),
 })
 
-type SenseTemplateConfig = z.infer<typeof senseTemplateConfigSchema>
-
 function senseTemplateEntry(senseId: SenseId): CreatureTraitTemplate & { senseId: SenseId } {
   const label = getSenseLabel(senseId)
   return {
