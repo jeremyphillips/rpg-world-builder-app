@@ -1,4 +1,10 @@
-import { CONTENT_TYPE_KEYS, type ContentTypeKey } from './content-type-keys'
+/**
+ * Presentation vocabulary for catalog content types — exhaustive against
+ * `ContentTypeKey` from [`content-type-keys.ts`](./content-type-keys.ts).
+ * Domain admission stays on `CONTENT_TYPE_KEYS`; adding a term alone does not
+ * register API routes or capabilities. See docs/content-types.md.
+ */
+import { type ContentTypeKey } from './content-type-keys'
 import { SKILL_PROFICIENCY_SENTENCE } from '../../vocab/proficiency-sentence'
 import { getTermSentenceForm, type VocabularyTerm } from '../../vocab/types'
 
@@ -102,6 +108,3 @@ export const SKILL_PROFICIENCY_CONTENT_TYPE_TERM = CONTENT_TYPE_TERMS['skill-pro
 export const ORGANIZATION_CONTENT_TYPE_TERM = CONTENT_TYPE_TERMS.organizations
 export const LOCATION_CONTENT_TYPE_TERM = CONTENT_TYPE_TERMS.locations
 export const MONSTER_CONTENT_TYPE_TERM = CONTENT_TYPE_TERMS.monsters
-
-/** Every `ContentTypeKey` has a registered term — drift guard for new catalog types. */
-export const CONTENT_TYPE_TERM_KEYS = CONTENT_TYPE_KEYS

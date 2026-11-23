@@ -397,8 +397,9 @@ The manifest covers **top-level** `ContentTypeKey` values only. Nested resources
 (e.g. subclasses) are excluded until a separate nested-resource manifest exists.
 See [`tools/content-types/README.md`](../tools/content-types/README.md).
 
-When adding a type: extend `CONTENT_TYPE_KEYS` and terms in contracts, add a
-manifest entry (`satisfies Record<ContentTypeKey, …>` enforces completeness),
+When adding a type: **admit** the key in `CONTENT_TYPE_KEYS` first (domain SSOT),
+then add matching `CONTENT_TYPE_TERMS` and `CONTENT_TYPE_CAPABILITIES` entries,
+add a manifest entry (`satisfies Record<ContentTypeKey, …>` enforces completeness),
 then wire catalog, API, and dashboard layers. API and dashboard metadata are
 declared when those integrations exist, so contracts-first phases do not need
 placeholder files. Per-layer drift tests remain strict for every declared

@@ -7,15 +7,14 @@ import { CONTENT_TYPE_CAPABILITIES } from './content-type-capabilities'
 import { CONTENT_TYPE_KEYS } from '../../primitives/content/content-type-keys'
 import {
   CONTENT_TYPE_TERMS,
-  CONTENT_TYPE_TERM_KEYS,
   getContentTypeCapitalizedSentenceLabel,
   getContentTypeSentenceForm,
   getContentTypeTerm,
 } from './content-type-terms'
 
 describe('content type terms', () => {
-  it('maps every content type key to a non-empty term', () => {
-    expect(CONTENT_TYPE_TERM_KEYS).toEqual(CONTENT_TYPE_KEYS)
+  it('maps every admitted content type key to a non-empty term', () => {
+    // Domain-first: CONTENT_TYPE_KEYS admits types; terms and capabilities must follow.
     expect(Object.keys(CONTENT_TYPE_TERMS).sort()).toEqual([...CONTENT_TYPE_KEYS].sort())
     expect(Object.keys(CONTENT_TYPE_CAPABILITIES).sort()).toEqual([...CONTENT_TYPE_KEYS].sort())
 

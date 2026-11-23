@@ -1,9 +1,10 @@
 import { z } from 'zod'
 
 // ---------------------------------------------------------------------------
-// Content type keys — SSOT for routable catalog types and API registry keys.
-// Full read/write wiring stays in apps/api `content-types.ts`; contracts only
-// own the string-literal unions those registries must satisfy.
+// Content type keys — domain admission SSOT for routable catalog types.
+// After adding a key here, also update CONTENT_TYPE_TERMS, CONTENT_TYPE_CAPABILITIES,
+// integration manifest, and (when wired) API_CONTENT_TYPE_KEYS / apps/api CONTENT_TYPES.
+// Presentation terms do not expand this union — see content-type-terms.ts.
 // ---------------------------------------------------------------------------
 
 /** Catalog types with overview/list/detail semantics (homebrew hub + generic list GET). */
