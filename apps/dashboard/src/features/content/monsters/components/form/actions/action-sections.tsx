@@ -31,7 +31,7 @@ import {
 import { monsterActionEditorTitles } from '../../../lib/actions/monster-action-editor-title'
 import { createMonsterActionRowTitleConfig } from '../../../lib/actions/monster-action-row-title'
 import { presentActionReference } from '../../../lib/actions/references/monster-action-reference-presentation'
-import { isLegendaryReferenceTarget } from '../../../lib/actions/legendary/legendary-action-category'
+import { isActionReferenceAcquisitionTarget } from '../../../lib/actions/reference/action-reference-acquisition'
 import {
   LEGENDARY_ACTION_ACQUISITION_GROUPS,
   legendaryActionAcquisitionItems,
@@ -147,7 +147,7 @@ function MonsterActionAddMenu({
           shapeShiftDisabledReason: shapeShiftDisabledReason(values),
           sectionRows: actionAcquisitionSectionRows(values),
           hasReferenceTargets: ((values.actions ?? []) as MonsterActionDraftRow[]).some(
-            isLegendaryReferenceTarget,
+            isActionReferenceAcquisitionTarget,
           ),
           spellCatalogReady: ctx.spellCatalogStatus === 'ready',
         })
@@ -160,6 +160,7 @@ function MonsterActionAddMenu({
     <ButtonDropdown
       label={MONSTER_ADD_LABEL}
       triggerPresentation="addIcon"
+      supportingWrap
       groups={groups}
       items={items}
       onSelectItem={(id) => {
@@ -424,10 +425,6 @@ export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
                 onSelect={(target, choice) => {
                   if (choice.type === 'add-weapon') {
                     setWeaponPickerSection(target)
-                    return
-                  }
-                  if (choice.type === 'focus-existing') {
-                    sections.selectAction(choice.actionId)
                     return
                   }
                   sections.addAcquisition(target, choice)

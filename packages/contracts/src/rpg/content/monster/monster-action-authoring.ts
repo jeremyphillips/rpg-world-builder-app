@@ -59,6 +59,7 @@ export function monsterActionAuthoring(action: AuthoringSubject): MonsterActionA
     if (action.preset) return DERIVED_VOCABULARY
     return AUTHORED_NAME
   }
+  // Intentional catch-all for unknown kinds in dev catalogs — not used for acquisition menu paths.
   return { name: 'authored', description: 'authored', source: 'none' }
 }
 

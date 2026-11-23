@@ -12,7 +12,7 @@ import {
   useMonsterActionFacingHost,
 } from '../../../../facing/use-monster-action-facing-host'
 import { sharedCastingOptions } from '../../../lib/actions/spell/monster-action-casting-summary'
-import { isLegendaryReferenceTarget } from '../../../lib/actions/legendary/legendary-action-category'
+import { isActionReferenceAcquisitionTarget } from '../../../lib/actions/reference/action-reference-acquisition'
 import { legendarySourceSpellOptions } from '../../../lib/actions/acquisition/monster-legendary-action-acquisition'
 import { monsterActionDetailFields } from '../../../lib/actions/detail-fields/monster-action-detail-fields'
 import { monsterActionSectionMoveAllowed } from '../../../lib/actions/monster-action-kind'
@@ -43,7 +43,7 @@ function referenceOptionLabels(values: MonsterFormValues, ctx: ContentFormCtx) {
   const actionRows = (values.actions ?? []) as MonsterActionDraftRow[]
   const titles = monsterActionEditorTitles(actionRows, values, ctx, 'actions')
   const unnamed = masterDetailItemTitle(undefined, MONSTER_ACTION_ITEM_NOUN)
-  return actionRows.filter(isLegendaryReferenceTarget).map((row) => ({
+  return actionRows.filter(isActionReferenceAcquisitionTarget).map((row) => ({
     value: row.id,
     label: titles.get(row.id) ?? unnamed,
   }))

@@ -23,7 +23,6 @@ function isAttackAcquisitionId(id: string): boolean {
   if (choice.type === 'add-weapon') return true
   if (choice.type === 'weapon-entry') return true
   if (choice.type === 'natural') return true
-  if (choice.type === 'focus-existing') return true
   if (choice.type === 'create') {
     return choice.kind === 'attack'
   }

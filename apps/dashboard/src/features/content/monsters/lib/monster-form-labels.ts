@@ -1,3 +1,4 @@
+import type { LegendaryActionCategory } from './actions/legendary/legendary-action-category'
 import {
   ABILITY_ENTRIES,
   ABILITY_SCORE_TERM,
@@ -550,7 +551,7 @@ export const LEGENDARY_ACTION_CATEGORY_LABELS = {
   spellcasting: LEGENDARY_SPELLCASTING_DEFAULT_NAME,
   'cast-spell': LEGENDARY_CAST_SPELL_LABEL,
   custom: LEGENDARY_CUSTOM_LABEL,
-} as const
+} as const satisfies Record<LegendaryActionCategory, string>
 
 export const LEGENDARY_ACTION_DEFAULT_NAMES = {
   spellcasting: LEGENDARY_SPELLCASTING_DEFAULT_NAME,

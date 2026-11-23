@@ -13,6 +13,8 @@ import {
   PARRY_AC_BONUS_DEFAULT,
   PRIMARY_SPELLCASTING_PROFILE,
   acquisitionStateForItem,
+  MONSTER_ACTION_KIND_ENTRIES,
+  MONSTER_WEAPON_EQUIPMENT_DUPLICATE_MESSAGE,
   monsterSectionAllowsKind,
   monsterSectionAllowsPreset,
   type ActionPresetId,
@@ -23,28 +25,30 @@ import type { FormCastingSections } from '../../casting/spellcasting-sources.lib
 import type { MonsterActionSection } from '../references/monster-action-equipment-references'
 
 import {
-  MONSTER_ACQUISITION_ATTACK_DESCRIPTION,
-  MONSTER_ACQUISITION_MULTIATTACK_DESCRIPTION,
-  MONSTER_ACQUISITION_SAVE_DESCRIPTION,
   MONSTER_ACQUISITION_SPELL_PRIMARY_DESCRIPTION,
   MONSTER_ACQUISITION_SPELL_STANDALONE_DESCRIPTION,
   MONSTER_CAST_SPELL_LABEL,
-  MONSTER_ACQUISITION_SPECIAL_DESCRIPTION,
-  MONSTER_LEAP_DESCRIPTION,
-  MONSTER_PARRY_DESCRIPTION,
-  MONSTER_TAKE_ACTIONS_DESCRIPTION,
-  MONSTER_TELEPORT_DESCRIPTION,
   MONSTER_REACTION_CAST_SPELL_DESCRIPTION,
   MONSTER_REACTION_CUSTOM_DESCRIPTION,
   MONSTER_REACTION_CUSTOM_LABEL,
   MONSTER_ACTION_REFERENCE_ACQUISITION_LABEL,
   MONSTER_SHAPE_SHIFT_ACQUISITION_DESCRIPTION,
   LEGENDARY_CAST_SPELL_DISABLED_NOTE,
-  LEGENDARY_REFERENCE_DESCRIPTION,
   LEGENDARY_REFERENCE_DISABLED_NOTE,
   monsterAddWeaponShortcut,
 } from '../../monster-form-labels'
+import type { ButtonDropdownItem } from '@rpg/ui'
+import {
+  type AcquisitionAvailabilityFacts,
+  type AcquisitionOption,
+  resolveAcquisitionAvailability,
+  toAcquisitionDropdownItem,
+} from '../../../../lib/acquisition'
 import { createMonsterRowId } from '../../monster-row-id'
+import {
+  isLegendaryAcquisitionCategory,
+  type LegendaryAcquisitionCategory,
+} from '../legendary/legendary-action-category'
 import type { MonsterActionDraftRow } from '../monster-action-presets'
 
 export const MONSTER_ACTION_ACQUISITION_GROUPS = [
@@ -60,20 +64,8 @@ export type MonsterActionAcquisitionGroupId =
   | 'existing'
   | 'new'
 
-export type MonsterActionAcquisitionItem = {
-  id: string
-  label: string
-  groupId: MonsterActionAcquisitionGroupId
-  metadata?: string
-  search?: { includeSupporting?: boolean }
-  searchTerms?: readonly string[]
-  disabled?: boolean
-  note?: string
-}
-
 export type MonsterActionAcquisitionChoice =
   | { type: 'weapon-entry'; entryId: string }
-  | { type: 'focus-existing'; actionId: string }
   | { type: 'add-weapon' }
   | { type: 'natural'; presetId: ActionPresetId }
   | { type: 'other-natural' }
@@ -83,43 +75,52 @@ export type MonsterActionAcquisitionChoice =
       kind: 'attack' | 'special' | 'save' | 'shape-shift' | 'leap' | 'teleport' | 'take-actions'
     }
   | { type: 'create'; kind: 'spell'; spellAcquisition: 'primary' | 'standalone' }
-  | { type: 'legendary'; category: 'reference' | 'spellcasting' | 'cast-spell' }
+  | { type: 'legendary'; category: LegendaryAcquisitionCategory }
   | { type: 'reaction'; category: 'reference' | 'parry' | 'cast-spell' | 'custom' }
 
 const SPECIAL_MENU_ORDER = ['multiattack', 'constrict', 'breath-weapon'] as const
 
-const OTHER_ITEMS: readonly MonsterActionAcquisitionItem[] = [
+function kindDescription(kind: keyof typeof MONSTER_ACTION_KIND_ENTRIES): string {
+  return MONSTER_ACTION_KIND_ENTRIES[kind].description
+}
+
+const OTHER_ITEMS: readonly AcquisitionOption[] = [
   {
     id: 'create:attack',
     label: 'Attack roll',
     groupId: 'other',
-    metadata: MONSTER_ACQUISITION_ATTACK_DESCRIPTION,
+    description: { status: 'ready', text: kindDescription('attack') },
+    availability: { status: 'available' },
   },
   {
     id: 'create:spell',
     label: MONSTER_SPELLCASTING_ACTION_NAME,
     groupId: 'other',
-    metadata: MONSTER_ACQUISITION_SPELL_PRIMARY_DESCRIPTION,
+    description: { status: 'ready', text: MONSTER_ACQUISITION_SPELL_PRIMARY_DESCRIPTION },
+    availability: { status: 'available' },
   },
   {
     id: 'create:spell-standalone',
     label: MONSTER_CAST_SPELL_LABEL,
     groupId: 'other',
-    metadata: MONSTER_ACQUISITION_SPELL_STANDALONE_DESCRIPTION,
+    description: { status: 'ready', text: MONSTER_ACQUISITION_SPELL_STANDALONE_DESCRIPTION },
+    availability: { status: 'available' },
   },
   {
     id: 'create:special',
     label: 'Custom ability',
     groupId: 'other',
-    metadata: MONSTER_ACQUISITION_SPECIAL_DESCRIPTION,
+    description: { status: 'ready', text: kindDescription('special') },
+    availability: { status: 'available' },
   },
 ]
 
-const SHAPE_SHIFT_ACQUISITION_ITEM: MonsterActionAcquisitionItem = {
+const SHAPE_SHIFT_ACQUISITION_ITEM: AcquisitionOption = {
   id: 'create:shape-shift',
   label: getMonsterActionKindLabel('shape-shift'),
   groupId: 'other',
-  metadata: MONSTER_SHAPE_SHIFT_ACQUISITION_DESCRIPTION,
+  description: { status: 'ready', text: MONSTER_SHAPE_SHIFT_ACQUISITION_DESCRIPTION },
+  availability: { status: 'available' },
 }
 
 function specialMenuRank(presetId: ActionPresetId): number {
@@ -153,10 +154,8 @@ const EXACT_ACQUISITION_CHOICES: Record<string, MonsterActionAcquisitionChoice> 
 }
 
 function legendaryAcquisitionChoice(value: string): MonsterActionAcquisitionChoice | undefined {
-  if (value === 'reference' || value === 'spellcasting' || value === 'cast-spell') {
-    return { type: 'legendary', category: value }
-  }
-  return undefined
+  if (!isLegendaryAcquisitionCategory(value)) return undefined
+  return { type: 'legendary', category: value }
 }
 
 function presetAcquisitionChoice(value: string): MonsterActionAcquisitionChoice | undefined {
@@ -172,7 +171,6 @@ function parsePrefixedAcquisitionId(id: string): MonsterActionAcquisitionChoice 
   const value = id.slice(separator + 1)
   if (!value) return undefined
   if (prefix === 'weapon-entry') return { type: 'weapon-entry', entryId: value }
-  if (prefix === 'focus-action') return { type: 'focus-existing', actionId: value }
   if (prefix === 'natural' && isAttackRollPreset(value as ActionPresetId)) {
     return { type: 'natural', presetId: value as ActionPresetId }
   }
@@ -187,45 +185,60 @@ export function parseMonsterActionAcquisitionId(
   return EXACT_ACQUISITION_CHOICES[id] ?? parsePrefixedAcquisitionId(id)
 }
 
-export const MONSTER_ACTION_ALREADY_ADDED_NOTE = 'Already added'
+function availabilityFactsFromOption(
+  availability: AcquisitionOption['availability'],
+): AcquisitionAvailabilityFacts {
+  if (availability.status === 'available') return {}
+  if (availability.code === 'occurrence') return { occurrence: { message: availability.message } }
+  if (availability.code === 'prerequisite') {
+    return { prerequisite: { message: availability.message } }
+  }
+  return { readiness: { message: availability.message } }
+}
 
 function withAcquisitionPolicy(
-  item: MonsterActionAcquisitionItem,
+  item: AcquisitionOption,
   sectionRows: MonsterActionSectionRows,
-  section?: MonsterActionSection,
-): MonsterActionAcquisitionItem {
+  section: MonsterActionSection | undefined,
+  prerequisiteMessage?: string,
+): AcquisitionOption {
   const state = acquisitionStateForItem(item.id, sectionRows, { section })
-  if (state.focusActionId) {
-    return {
-      ...item,
-      id: `focus-action:${state.focusActionId}`,
-      note: state.note ?? MONSTER_ACTION_ALREADY_ADDED_NOTE,
-    }
+  const prior = availabilityFactsFromOption(item.availability)
+  return {
+    ...item,
+    availability: resolveAcquisitionAvailability({
+      ...prior,
+      occurrence: state.disabled && state.note ? { message: state.note } : prior.occurrence,
+      prerequisite: prerequisiteMessage ? { message: prerequisiteMessage } : prior.prerequisite,
+    }),
   }
-  if (state.disabled) {
-    return { ...item, disabled: true, note: state.note }
-  }
-  return item
 }
 
 function applyAcquisitionPolicies(
-  items: MonsterActionAcquisitionItem[],
+  items: AcquisitionOption[],
   sectionRows: MonsterActionSectionRows,
-  section?: MonsterActionSection,
-): MonsterActionAcquisitionItem[] {
-  return items.map((item) => withAcquisitionPolicy(item, sectionRows, section))
+  section: MonsterActionSection | undefined,
+  shapeShiftDisabledReason?: string,
+): AcquisitionOption[] {
+  return items.map((item) =>
+    withAcquisitionPolicy(
+      item,
+      sectionRows,
+      section,
+      item.id === 'create:shape-shift' ? shapeShiftDisabledReason : undefined,
+    ),
+  )
 }
 
-function portableMovementItems(
-  section: MonsterActionSection | undefined,
-): MonsterActionAcquisitionItem[] {
-  const items: MonsterActionAcquisitionItem[] = []
+function portableMovementItems(section: MonsterActionSection | undefined): AcquisitionOption[] {
+  const items: AcquisitionOption[] = []
   if (section && monsterSectionAllowsKind(section, 'teleport')) {
     items.push({
       id: 'create:teleport',
       label: getMonsterActionKindLabel('teleport'),
       groupId: 'movement',
-      metadata: MONSTER_TELEPORT_DESCRIPTION,
+      description: { status: 'ready', text: kindDescription('teleport') },
+      availability: { status: 'available' },
     })
   }
   if (section === 'bonusActions') {
@@ -234,7 +247,8 @@ function portableMovementItems(
         id: 'create:leap',
         label: getMonsterActionKindLabel('leap'),
         groupId: 'movement',
-        metadata: MONSTER_LEAP_DESCRIPTION,
+        description: { status: 'ready', text: kindDescription('leap') },
+        availability: { status: 'available' },
       })
     }
   }
@@ -244,15 +258,13 @@ function portableMovementItems(
 export function monsterActionAcquisitionItems(input: {
   weapons: readonly { entryId: string; label: string; equipped: boolean }[]
   allowAddWeapon: boolean
-  /** Weapon actions in section order. The first match is the row Already added opens. */
   weaponActions?: readonly { id: string; equipmentEntryId?: string }[]
   section?: MonsterActionSection
   sectionRows?: MonsterActionSectionRows
-  /** Actions rows a reaction reference can use. */
   hasReferenceTargets?: boolean
   spellCatalogReady?: boolean
   shapeShiftDisabledReason?: string
-}): MonsterActionAcquisitionItem[] {
+}): ButtonDropdownItem[] {
   const sectionRows: MonsterActionSectionRows = input.sectionRows ?? {
     actions: [],
     bonusActions: [],
@@ -267,27 +279,22 @@ export function monsterActionAcquisitionItems(input: {
       ),
       sectionRows,
       input.section,
-    )
+    ).map(toAcquisitionDropdownItem)
   }
   const movement = portableMovementItems(input.section)
   const equipped = input.weapons.map((weapon) => {
     const existing = input.weaponActions?.find(
       (action) => action.equipmentEntryId === weapon.entryId,
     )
-    if (existing) {
-      return {
-        id: `focus-action:${existing.id}`,
-        label: weapon.label,
-        groupId: 'equipped' as const,
-        note: MONSTER_ACTION_ALREADY_ADDED_NOTE,
-      }
-    }
     return {
       id: `weapon-entry:${weapon.entryId}`,
       label: weapon.label,
       groupId: 'equipped' as const,
-      disabled: !weapon.equipped,
-      note: weapon.equipped ? undefined : 'Not equipped',
+      description: { status: 'ready', text: kindDescription('weapon') },
+      availability: resolveAcquisitionAvailability({
+        occurrence: existing ? { message: MONSTER_WEAPON_EQUIPMENT_DUPLICATE_MESSAGE } : undefined,
+        prerequisite: !weapon.equipped ? { message: 'Not equipped' } : undefined,
+      }),
     }
   })
   const natural = ACTION_PRESET_IDS.filter(isAttackRollPreset).map((presetId) => {
@@ -298,9 +305,11 @@ export function monsterActionAcquisitionItems(input: {
       id: `natural:${presetId}`,
       label: vocabulary?.label ?? presetId,
       groupId: 'natural' as const,
-      metadata: damageType ? getDamageTypeLabel(damageType) : undefined,
+      description: { status: 'ready' as const, text: vocabulary?.description ?? '' },
+      classification: damageType ? getDamageTypeLabel(damageType) : undefined,
       search: { includeSupporting: false as const },
       searchTerms: preset ? getActionVocabularySearchTerms(preset.vocabularyId) : [],
+      availability: { status: 'available' as const },
     }
   })
   const special = listSpecialMenuActionPresetIds()
@@ -318,15 +327,20 @@ export function monsterActionAcquisitionItems(input: {
         id: `preset:${presetId}`,
         label: vocabulary?.label ?? presetId,
         groupId: 'special' as const,
+        description: {
+          status: 'ready' as const,
+          text:
+            presetId === 'multiattack'
+              ? kindDescription('multiattack')
+              : (vocabulary?.description ?? ''),
+        },
         search: { includeSupporting: false as const },
         searchTerms: preset ? getActionVocabularySearchTerms(preset.vocabularyId) : [],
-        ...(presetId === 'multiattack'
-          ? { metadata: MONSTER_ACQUISITION_MULTIATTACK_DESCRIPTION }
-          : {}),
+        availability: { status: 'available' as const },
       }
     })
   const weaponsAllowed = input.section === undefined || input.section === 'actions'
-  const items = applyAcquisitionPolicies(
+  return applyAcquisitionPolicies(
     [
       ...(weaponsAllowed
         ? [
@@ -335,14 +349,20 @@ export function monsterActionAcquisitionItems(input: {
               id: 'add-weapon',
               label: monsterAddWeaponShortcut(),
               groupId: 'equipped' as const,
-              disabled: !input.allowAddWeapon,
-              note: input.allowAddWeapon ? undefined : 'Equipment catalog is not ready',
+              description: { status: 'ready', text: kindDescription('weapon') },
+              availability: resolveAcquisitionAvailability({
+                readiness: !input.allowAddWeapon
+                  ? { message: 'Equipment catalog is not ready' }
+                  : undefined,
+              }),
             },
             ...natural,
             {
               id: 'natural:other',
               label: 'Other natural attack',
               groupId: 'natural' as const,
+              description: { status: 'ready', text: kindDescription('natural-weapon') },
+              availability: { status: 'available' },
             },
           ]
         : []),
@@ -352,64 +372,64 @@ export function monsterActionAcquisitionItems(input: {
     ],
     sectionRows,
     input.section,
-  )
-  if (!input.shapeShiftDisabledReason) return items
-  return items.map((item) =>
-    item.id === 'create:shape-shift'
-      ? { ...item, disabled: true, note: input.shapeShiftDisabledReason }
-      : item,
-  )
+    input.shapeShiftDisabledReason,
+  ).map(toAcquisitionDropdownItem)
 }
 
 function reactionAcquisitionItems(
   hasReferenceTargets: boolean,
   spellCatalogReady: boolean,
-): MonsterActionAcquisitionItem[] {
+): AcquisitionOption[] {
   return [
     {
       id: 'reaction:reference',
       label: MONSTER_ACTION_REFERENCE_ACQUISITION_LABEL,
       groupId: 'existing',
-      metadata: LEGENDARY_REFERENCE_DESCRIPTION,
-      disabled: !hasReferenceTargets,
-      note: hasReferenceTargets ? undefined : LEGENDARY_REFERENCE_DISABLED_NOTE,
+      description: { status: 'ready', text: kindDescription('action-reference') },
+      availability: resolveAcquisitionAvailability({
+        prerequisite: !hasReferenceTargets
+          ? { message: LEGENDARY_REFERENCE_DISABLED_NOTE }
+          : undefined,
+      }),
     },
     {
       id: 'reaction:parry',
       label: getMonsterActionKindLabel('parry'),
       groupId: 'new',
-      metadata: MONSTER_PARRY_DESCRIPTION,
+      description: { status: 'ready', text: kindDescription('parry') },
+      availability: { status: 'available' },
     },
     {
       id: 'reaction:cast-spell',
       label: MONSTER_CAST_SPELL_LABEL,
       groupId: 'new',
-      metadata: MONSTER_REACTION_CAST_SPELL_DESCRIPTION,
-      disabled: !spellCatalogReady,
-      note: spellCatalogReady ? undefined : LEGENDARY_CAST_SPELL_DISABLED_NOTE,
+      description: { status: 'ready', text: MONSTER_REACTION_CAST_SPELL_DESCRIPTION },
+      availability: resolveAcquisitionAvailability({
+        readiness: !spellCatalogReady ? { message: LEGENDARY_CAST_SPELL_DISABLED_NOTE } : undefined,
+      }),
     },
     {
       id: 'reaction:custom',
       label: MONSTER_REACTION_CUSTOM_LABEL,
       groupId: 'new',
-      metadata: MONSTER_REACTION_CUSTOM_DESCRIPTION,
+      description: { status: 'ready', text: MONSTER_REACTION_CUSTOM_DESCRIPTION },
+      availability: { status: 'available' },
     },
   ]
 }
 
-function generalAcquisitionItems(
-  section: MonsterActionSection | undefined,
-): MonsterActionAcquisitionItem[] {
+function generalAcquisitionItems(section: MonsterActionSection | undefined): AcquisitionOption[] {
   const standalone = OTHER_ITEMS.filter((item) => item.id === 'create:spell-standalone')
   const rest = OTHER_ITEMS.filter(
     (item) => item.id !== 'create:spell' && item.id !== 'create:spell-standalone',
   )
   const spellcasting = OTHER_ITEMS.find((item) => item.id === 'create:spell')
-  const saveItem: MonsterActionAcquisitionItem = {
+  const saveItem: AcquisitionOption = {
     id: 'create:save',
     label: 'Saving throw',
     groupId: 'other',
-    metadata: MONSTER_ACQUISITION_SAVE_DESCRIPTION,
+    description: { status: 'ready', text: kindDescription('save') },
+    availability: { status: 'available' },
   }
   if (section === 'bonusActions') {
     return [
@@ -417,7 +437,8 @@ function generalAcquisitionItems(
         id: 'create:take-actions',
         label: getMonsterActionKindLabel('take-actions'),
         groupId: 'other' as const,
-        metadata: MONSTER_TAKE_ACTIONS_DESCRIPTION,
+        description: { status: 'ready', text: kindDescription('take-actions') },
+        availability: { status: 'available' },
       },
       ...rest,
       saveItem,
@@ -442,7 +463,9 @@ function authoredStartingDamage(): { dice: { count: 1; faces: 6 } } {
 function draftFromPreset(presetId: ActionPresetId): MonsterActionDraftRow {
   const preset = getActionPreset(presetId)
   const id = createMonsterRowId()
-  if (!preset) return { id, kind: 'special' }
+  if (!preset) {
+    throw new Error(`Unknown action preset: ${presetId}`)
+  }
   if (preset.mechanics === 'attack-roll') {
     return {
       id,
@@ -588,16 +611,23 @@ export function createMonsterActionFromAcquisition(
       damage: authoredStartingDamage(),
     } as MonsterActionDraftRow
   }
-  if (choice.type === 'focus-existing') {
-    throw new Error('focus-existing is not a create choice')
-  }
   if (choice.type === 'create') {
     if (choice.kind === 'leap' || choice.kind === 'teleport' || choice.kind === 'take-actions') {
       return createActionDraft(choice.kind)
     }
-    return createActionKindDraft(choice, id)
+    if (choice.kind === 'spell') {
+      return createSpellActionDraft('actions', {}, choice.spellAcquisition)
+    }
+    return createActionKindDraft(
+      choice as Extract<
+        MonsterActionAcquisitionChoice,
+        { type: 'create'; kind: 'attack' | 'special' | 'save' | 'shape-shift' }
+      >,
+      id,
+    )
   }
-  return { id, kind: 'special' } as MonsterActionDraftRow
+  const unreachable: never = choice
+  throw new Error(`Unsupported monster action acquisition choice: ${JSON.stringify(unreachable)}`)
 }
 
 /** Spell row for the add menu. Primary profile only when spellAcquisition is primary. */
