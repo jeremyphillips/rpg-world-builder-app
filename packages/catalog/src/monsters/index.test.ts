@@ -15,7 +15,8 @@ import {
   joinStatBlockProseDocument,
   resolveCreatureTraitGrants,
   resolveMonsterActionIdentity,
-  resolveTraitDisplay,
+  renderTraitFacingBodyHtml,
+  resolveTraitFacingParts,
   systemDefaultArmorClassRules,
 } from '@rpg/contracts'
 
@@ -87,16 +88,19 @@ describe('SRD 5.2.1 monster seed', () => {
     expect(
       formatMonsterAttackAction(skeletonBlock.attacks.find((line) => line.id === 'shortbow')!),
     ).toBe('Ranged Attack Roll: +5, range 80/320 ft. Hit: 6 (1d6 + 3) Piercing damage.')
-    const koboldTraits = kobold!.traits as Parameters<typeof resolveTraitDisplay>[0][]
+    const koboldTraits = kobold!.traits
     expect(koboldTraits.map((trait) => trait.kind)).toEqual(['template', 'template'])
     expect(koboldTraits[0]).not.toHaveProperty('descriptionOverride')
     expect(koboldTraits[1]).not.toHaveProperty('descriptionOverride')
-    expect(resolveTraitDisplay(koboldTraits[0]!).descriptionHtml).toContain(
-      'This creature has Advantage',
-    )
-    expect(resolveTraitDisplay(koboldTraits[1]!).descriptionHtml).toContain(
-      'this creature has Disadvantage',
-    )
+    const monsterTraitHost = {
+      host: 'monster' as const,
+      subject: 'this creature',
+      lairEnabled: false,
+    }
+    const koboldTraitBody = (index: number) =>
+      renderTraitFacingBodyHtml(resolveTraitFacingParts(koboldTraits[index]!, monsterTraitHost))
+    expect(koboldTraitBody(0)).toContain('This creature has Advantage')
+    expect(koboldTraitBody(1)).toContain('This creature has Disadvantage')
     const grants = resolveCreatureTraitGrants(
       koboldTraits.map((trait) => ({ trait, source: trait.id })),
     )

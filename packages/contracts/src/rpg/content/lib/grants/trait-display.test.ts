@@ -1,26 +1,48 @@
 import { describe, expect, it } from 'vitest'
 
 import { contentTraitSchema, grantContentTraitSchema } from './grants'
-import { resolveTraitDisplay, resolveTraitFacingParts } from './trait-display'
+import {
+  renderTraitFacingBodyHtml,
+  resolveTraitFacingParts,
+  resolveTraitName,
+} from './trait-display'
 import { defineSenseTemplate } from '../../creature/traits/sense-templates'
 
-describe('resolveTraitDisplay', () => {
-  it('returns stored name and description for custom traits', () => {
+const speciesHost = { host: 'species' as const }
+
+describe('resolveTraitName', () => {
+  it('returns stored name for custom traits', () => {
     expect(
-      resolveTraitDisplay({
+      resolveTraitName({
         kind: 'custom',
         id: 'fey-ancestry',
         name: 'Fey Ancestry',
         description: '<p>Advantage on Charm saves.</p>',
       }),
-    ).toEqual({
-      name: 'Fey Ancestry',
-      descriptionHtml: '<p>Advantage on Charm saves.</p>',
+    ).toBe('Fey Ancestry')
+  })
+})
+
+describe('resolveTraitFacingParts (species host)', () => {
+  it('returns stored description for custom traits', () => {
+    expect(
+      resolveTraitFacingParts(
+        {
+          kind: 'custom',
+          id: 'fey-ancestry',
+          name: 'Fey Ancestry',
+          description: '<p>Advantage on Charm saves.</p>',
+        },
+        speciesHost,
+      ),
+    ).toMatchObject({
+      title: 'Fey Ancestry',
+      supplementalHtml: '<p>Advantage on Charm saves.</p>',
     })
   })
 
   it('derives resistance display from grantGroups', () => {
-    const display = resolveTraitDisplay(
+    const parts = resolveTraitFacingParts(
       grantContentTraitSchema.parse({
         kind: 'grant',
         id: 'poison-resistance',
@@ -28,13 +50,14 @@ describe('resolveTraitDisplay', () => {
           { grants: [{ id: 'resistances-1', kind: 'resistances', damageTypes: ['poison'] }] },
         ],
       }),
+      speciesHost,
     )
-    expect(display.name).toBe('Damage Resistance')
-    expect(display.descriptionHtml).toBe('<p>You have Resistance to poison damage.</p>')
+    expect(parts.title).toBe('Damage Resistance')
+    expect(renderTraitFacingBodyHtml(parts)).toBe('<p>You have Resistance to poison damage.</p>')
   })
 
   it('derives movement bonus display from grantGroups', () => {
-    const display = resolveTraitDisplay(
+    const parts = resolveTraitFacingParts(
       grantContentTraitSchema.parse({
         kind: 'grant',
         id: 'speed',
@@ -46,9 +69,10 @@ describe('resolveTraitDisplay', () => {
           },
         ],
       }),
+      speciesHost,
     )
-    expect(display.name).toBe('Movement')
-    expect(display.descriptionHtml).toBe('<p>Your walking speed increases by 5 ft.</p>')
+    expect(parts.title).toBe('Movement')
+    expect(renderTraitFacingBodyHtml(parts)).toBe('<p>Your walking speed increases by 5 ft.</p>')
   })
 
   it('splits sense template rules and supplemental details for facing', () => {
@@ -59,12 +83,12 @@ describe('resolveTraitDisplay', () => {
       config: { range: 120 },
       details: '<p>Dim light appears as bright light.</p>',
     })
-    expect(resolveTraitFacingParts(trait, { host: 'species' })).toEqual({
+    expect(resolveTraitFacingParts(trait, speciesHost)).toEqual({
       title: 'Darkvision',
       rulesProse: 'You have Darkvision with a range of 120 feet.',
       supplementalHtml: '<p>Dim light appears as bright light.</p>',
     })
-    expect(resolveTraitDisplay(trait).descriptionHtml).toBe(
+    expect(renderTraitFacingBodyHtml(resolveTraitFacingParts(trait, speciesHost))).toBe(
       '<p>You have Darkvision with a range of 120 feet.</p><p>Dim light appears as bright light.</p>',
     )
   })
@@ -77,14 +101,14 @@ describe('resolveTraitDisplay', () => {
       config: { range: 60 },
       details: '',
     })
-    expect(resolveTraitFacingParts(trait, { host: 'species' })).toEqual({
+    expect(resolveTraitFacingParts(trait, speciesHost)).toEqual({
       title: 'Darkvision',
       rulesProse: 'You have Darkvision with a range of 60 feet.',
     })
   })
 
   it('derives language display from grantGroups', () => {
-    const display = resolveTraitDisplay(
+    const parts = resolveTraitFacingParts(
       grantContentTraitSchema.parse({
         kind: 'grant',
         id: 'common',
@@ -92,8 +116,9 @@ describe('resolveTraitDisplay', () => {
           { grants: [{ id: 'languages-3', kind: 'languages', languageIds: ['common'] }] },
         ],
       }),
+      speciesHost,
     )
-    expect(display.name).toBe('Language')
-    expect(display.descriptionHtml).toBe('<p>You know Common.</p>')
+    expect(parts.title).toBe('Language')
+    expect(renderTraitFacingBodyHtml(parts)).toBe('<p>You know Common.</p>')
   })
 })

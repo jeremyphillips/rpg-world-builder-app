@@ -26,7 +26,7 @@ import {
   normalizeGrantGroups,
   resolveGrantGroupsFromContent,
 } from './grants'
-import { resolveTraitDisplay } from './trait-display'
+import { renderTraitFacingBodyHtml, resolveTraitFacingParts } from './trait-display'
 
 describe('featChoiceGrantSchema', () => {
   it('parses a fighting-style feat choice', () => {
@@ -338,35 +338,35 @@ describe('normalizeContentTrait', () => {
   })
 })
 
-describe('resolveTraitDisplay', () => {
+describe('trait facing (species host)', () => {
+  const speciesHost = { host: 'species' as const }
+
   it('derives darkvision display from grant traits (grantGroups model)', () => {
-    const display = resolveTraitDisplay(
-      contentTraitSchema.parse({
-        kind: 'grant',
-        id: 'darkvision',
-        grantGroups: [
-          { grants: [{ id: 'sense-12', kind: 'sense', type: 'darkvision', range: 60 }] },
-        ],
-      }),
+    const trait = contentTraitSchema.parse({
+      kind: 'grant',
+      id: 'darkvision',
+      grantGroups: [{ grants: [{ id: 'sense-12', kind: 'sense', type: 'darkvision', range: 60 }] }],
+    })
+    const parts = resolveTraitFacingParts(trait, speciesHost)
+    expect(parts.title).toBe('Darkvision')
+    expect(renderTraitFacingBodyHtml(parts)).toBe(
+      '<p>You have Darkvision with a range of 60 feet.</p>',
     )
-    expect(display.name).toBe('Darkvision')
-    expect(display.descriptionHtml).toBe('<p>You have Darkvision with a range of 60 feet.</p>')
   })
 
   it('uses overrides on grant traits when present', () => {
-    const display = resolveTraitDisplay(
-      grantContentTraitSchema.parse({
-        kind: 'grant',
-        id: 'darkvision',
-        grantGroups: [
-          { grants: [{ id: 'sense-13', kind: 'sense', type: 'darkvision', range: 120 }] },
-        ],
-        nameOverride: 'Superior Darkvision',
-        details: '<p>Custom homebrew wording.</p>',
-      }),
-    )
-    expect(display.name).toBe('Superior Darkvision')
-    expect(display.descriptionHtml).toBe(
+    const trait = grantContentTraitSchema.parse({
+      kind: 'grant',
+      id: 'darkvision',
+      grantGroups: [
+        { grants: [{ id: 'sense-13', kind: 'sense', type: 'darkvision', range: 120 }] },
+      ],
+      nameOverride: 'Superior Darkvision',
+      details: '<p>Custom homebrew wording.</p>',
+    })
+    const parts = resolveTraitFacingParts(trait, speciesHost)
+    expect(parts.title).toBe('Superior Darkvision')
+    expect(renderTraitFacingBodyHtml(parts)).toBe(
       '<p>You have Darkvision with a range of 120 feet.</p><p>Custom homebrew wording.</p>',
     )
   })

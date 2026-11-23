@@ -4,9 +4,10 @@ import { expectRichTextHtml } from '../lib/expect-rich-text-html'
 import type { ContentTrait, GrantGroups } from '@rpg/contracts'
 import {
   normalizeGrantGroups,
+  renderTraitFacingBodyHtml,
   resolveCreatureSenses,
   resolveCreatureTraitGrants,
-  resolveTraitDisplay,
+  resolveTraitFacingParts,
 } from '@rpg/contracts'
 import { listLanguageSeedOptions } from '../vocabulary'
 import { loadSeedSpecies, seedSpeciesSlugs } from './index'
@@ -22,8 +23,10 @@ function grantGroupsOf(trait: {
   return trait.kind === 'template' ? undefined : trait.grantGroups
 }
 
+const speciesTraitHost = { host: 'species' as const }
+
 function traitDescriptionHtml(trait: ContentTrait): string | undefined {
-  return resolveTraitDisplay(trait).descriptionHtml
+  return renderTraitFacingBodyHtml(resolveTraitFacingParts(trait, speciesTraitHost))
 }
 
 function expectSpeciesRichTextDescriptions(entry: SeedSpecies): void {
@@ -130,9 +133,11 @@ describe('SRD 5.2.1 species seed', () => {
       templateId: 'sense-darkvision',
       config: { range: 60 },
     })
-    const display = resolveTraitDisplay(darkvision)
-    expect(display.name).toBe('Darkvision')
-    expect(display.descriptionHtml).toBe('<p>You have Darkvision with a range of 60 feet.</p>')
+    const parts = resolveTraitFacingParts(darkvision, speciesTraitHost)
+    expect(parts.title).toBe('Darkvision')
+    expect(renderTraitFacingBodyHtml(parts)).toBe(
+      '<p>You have Darkvision with a range of 60 feet.</p>',
+    )
   })
 
   it('Wood Elf grants +5 ft walking speed', () => {

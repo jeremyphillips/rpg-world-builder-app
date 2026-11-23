@@ -106,11 +106,10 @@ describe('MonsterTraitsEditor', () => {
     expect(preview).toHaveTextContent('Legendary Resistance (4/Day, or 5/Day in Lair)')
     expect(preview).toHaveTextContent('fails a saving throw')
     const listRow = screen.getByRole('button', { current: true })
-    expect(listRow).toHaveTextContent('Legendary Resistance')
-    expect(listRow).not.toHaveTextContent('/Day')
+    expect(listRow).toHaveTextContent('Legendary Resistance (4/Day)')
   })
 
-  it('previews a template trait and discloses name and description overrides', () => {
+  it('previews a template trait and offers supplemental details only', () => {
     const values = resolveMonsterCreateDefaultValues()
     values.name = 'Kobold Warrior'
     values.traits = [
@@ -131,7 +130,7 @@ describe('MonsterTraitsEditor', () => {
       screen.queryByRole('switch', { name: 'Override generated name and description' }),
     ).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Add custom name' })).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Edit name' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Edit name' })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add details' })).toBeInTheDocument()
   })
 

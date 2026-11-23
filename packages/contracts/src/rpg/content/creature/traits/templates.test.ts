@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import { contentTraitSchema } from '../../lib/grants/grants'
-import { resolveTraitDisplay } from '../../lib/grants/trait-display'
+import {
+  renderTraitFacingBodyHtml,
+  resolveTraitFacingParts,
+  resolveTraitName,
+} from '../../lib/grants/trait-display'
 import { defineSenseTemplate } from './sense-templates'
 import {
   CREATURE_TRAIT_TEMPLATE_ENTRIES,
@@ -74,16 +78,15 @@ describe('creature trait templates', () => {
     expect(template?.formatDescription({ uses: { normal: 3 } })).toBe(
       'If this creature fails a saving throw, it can choose to succeed instead.',
     )
-    const display = resolveTraitDisplay(
-      contentTraitSchema.parse({
-        kind: 'template',
-        id: 'legendary-resistance',
-        templateId: 'legendary-resistance',
-        config: { uses: { normal: 3 } },
-      }),
-    )
-    expect(display.name).toBe('Legendary Resistance (3/Day)')
-    expect(display.descriptionHtml).toContain(
+    const trait = contentTraitSchema.parse({
+      kind: 'template',
+      id: 'legendary-resistance',
+      templateId: 'legendary-resistance',
+      config: { uses: { normal: 3 } },
+    })
+    expect(resolveTraitName(trait)).toBe('Legendary Resistance (3/Day)')
+    const parts = resolveTraitFacingParts(trait, { host: 'species' })
+    expect(renderTraitFacingBodyHtml(parts)).toContain(
       'If you fail a saving throw, you can choose to succeed instead.',
     )
   })
