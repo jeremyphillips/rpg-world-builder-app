@@ -16,7 +16,7 @@
  * Sites that format grants outside this module — replace incrementally, not all at once.
  *
  * - `apps/dashboard/src/features/content/species/lib/species-display.ts` — `collectSenses`:
- *   sense stat row → sense summary items (Phase 4, pending)
+ *   uses `formatCreatureSensesCompactList` from contracts (done)
  * - `apps/dashboard/src/features/content/species/lib/species-display.ts` —
  *   `mapHeritageOptionToDetailItem`: grant summary lines via this helper (Phase 2, done)
  * - `apps/dashboard/src/features/content/species/lib/species-display.ts` — card
@@ -41,7 +41,7 @@
  *
  * | Grant kind | Model | Renderer | Notes |
  * |------------|-------|----------|-------|
- * | `sense` | yes | yes | e.g. `Darkvision 120 ft` |
+ * | `sense` | yes | yes | via `formatCreatureSenseCompactLine` |
  * | `spells` | yes | yes | e.g. `Dancing Lights cantrip` |
  * | `movement` | yes | yes | e.g. `Walk speed +5 ft` |
  * | `damageType` | yes | yes | e.g. `Acid damage type` |
@@ -63,6 +63,7 @@
  *   label builder yet (`kind: 'notRenderedYet'`). Formatters collapse these to `N more benefit(s)`.
  */
 import {
+  formatCreatureSenseCompactLine,
   formatCreatureRollAdjustmentSentence,
   formatCreatureSaveOutcomeOverrideSentence,
   formatDamageTypeGrantCompact,
@@ -190,11 +191,8 @@ function isHiddenKnownValidGrant(item: GrantSummaryItem): boolean {
   return item.kind === 'notRenderedYet'
 }
 
-function formatSenseCompactLabel(
-  grant: Extract<ContentGrant, { kind: 'sense' }>,
-  vocabulary: GrantDisplayVocabulary,
-): string {
-  return `${vocabulary.resolveSenseLabel(grant.type)} ${grant.range} ft`
+function formatSenseCompactLabel(grant: Extract<ContentGrant, { kind: 'sense' }>): string {
+  return formatCreatureSenseCompactLine(grant)
 }
 
 function formatSpellTypeSuffix(kind: 'cantrip' | 'spell'): string {
@@ -327,7 +325,7 @@ const GRANT_ITEM_MAPPERS: Partial<Record<ContentGrant['kind'], GrantItemMapper>>
     createSupportedGrantItems(
       idPrefix,
       'sense',
-      formatSenseCompactLabel(grant as Extract<ContentGrant, { kind: 'sense' }>, vocabulary),
+      formatSenseCompactLabel(grant as Extract<ContentGrant, { kind: 'sense' }>),
       'sense',
       grant.kind,
       level,

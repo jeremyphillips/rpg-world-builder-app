@@ -1,4 +1,5 @@
 import {
+  formatCreatureSensesCompactList,
   formatMovementDisplay,
   CREATURE_SIZE_TERM,
   CREATURE_TYPE_TERM,
@@ -82,17 +83,14 @@ export type SpeciesDetailViewModel = {
   >
 }
 
-function collectSenses(
-  traits: SpeciesBodyTrait[],
-  resolveSenseLabel: (type: string) => string,
-): string {
+function collectSenses(traits: SpeciesBodyTrait[]): string {
   const senses = resolveCreatureSenses({
     grants: resolveCreatureTraitGrants(traits.map((trait) => ({ trait, source: trait.id }))).map(
       (resolved) => resolved.grant,
     ),
   })
   if (senses.length === 0) return 'None'
-  return senses.map((sense) => `${resolveSenseLabel(sense.type)} ${sense.range} ft.`).join(', ')
+  return formatCreatureSensesCompactList(senses)
 }
 
 function buildSpeciesStatRows(
@@ -114,7 +112,7 @@ function buildSpeciesStatRows(
     },
     {
       label: SPECIES_STAT_LABELS.senses,
-      value: collectSenses(species.traits, vocabulary.resolveSenseLabel),
+      value: collectSenses(species.traits),
     },
   ]
 

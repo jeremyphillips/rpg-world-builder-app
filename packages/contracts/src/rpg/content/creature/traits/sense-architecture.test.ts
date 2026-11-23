@@ -14,6 +14,10 @@ import { unlockedGrantChoiceSets } from '../../../runtime/character-builder/reso
 import { resolveMechanicalGrantsFromContent } from '../../../runtime/creature/mechanical-grants'
 import type { Species } from '../../species'
 import { createMonsterInputSchema } from '../../monster'
+import {
+  formatCreatureSenseCompactLine,
+  formatCreatureSenseTraitRulesSentence,
+} from '../../../vocab/sense'
 import { defineSenseTemplate } from './sense-templates'
 
 const elfTemplateDarkvision: SpeciesBodyTrait = {
@@ -28,6 +32,33 @@ const drowDarkvisionGrant: SpeciesBodyTrait = {
   id: 'drow-superior-darkvision',
   grantGroups: [{ grants: [{ id: 'sense-drow', kind: 'sense', type: 'darkvision', range: 120 }] }],
 }
+
+describe('sense display parity', () => {
+  const senseFact = { type: 'darkvision' as const, range: 120 }
+
+  it('formats the same compact line and rules sentence from one sense fact', () => {
+    expect(formatCreatureSenseCompactLine(senseFact)).toBe('Darkvision 120 ft.')
+    expect(formatCreatureSenseTraitRulesSentence(senseFact)).toBe(
+      'You have Darkvision with a range of 120 feet.',
+    )
+  })
+
+  it('matches monster-authored and template-projected sense facts', () => {
+    const fromTemplate = resolveCreatureTraitGrants([
+      {
+        trait: { ...elfTemplateDarkvision, config: { range: 120 } },
+        source: 'species',
+      },
+    ])[0]?.grant
+    expect(fromTemplate).toMatchObject({ kind: 'sense', ...senseFact })
+    expect(resolveCreatureSenses({ authored: [senseFact], grants: [] })).toEqual([senseFact])
+    expect(
+      resolveCreatureSenses({
+        grants: [fromTemplate!],
+      }),
+    ).toEqual([senseFact])
+  })
+})
 
 describe('sense template registry', () => {
   it('projects a sense grant from template config', () => {

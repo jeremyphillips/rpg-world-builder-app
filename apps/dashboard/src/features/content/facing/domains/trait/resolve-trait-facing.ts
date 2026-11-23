@@ -1,6 +1,6 @@
 import {
   monsterRichTextIsEmpty,
-  resolveTraitDisplay,
+  resolveTraitFacingParts,
   type ContentTrait,
   type FacingBlock,
   type FacingResolution,
@@ -34,14 +34,6 @@ function facingBlocksFromTraitDisplay(input: {
   return blocks
 }
 
-function readyFacingFromDisplay(title: string, descriptionHtml?: string): FacingResolution {
-  const blocks = facingBlocksFromTraitDisplay({ title, descriptionHtml })
-  if (blocks.length === 0 && !title.trim()) {
-    return { status: 'unavailable', guidance: 'Add trait details to preview player-facing text.' }
-  }
-  return { status: 'ready', document: { title, blocks } }
-}
-
 function readyFacingFromStatBlock(facing: TraitStatBlockRulesFacing): FacingResolution {
   const blocks: FacingBlock[] = []
   const prose = facing.proseText.trim()
@@ -66,15 +58,33 @@ function readyFacingFromStatBlock(facing: TraitStatBlockRulesFacing): FacingReso
 }
 
 export function resolveTraitPersistedFacing(trait: ContentTrait): FacingResolution {
-  if (trait.kind === 'custom') {
-    const display = resolveTraitDisplay(trait)
-    if (!display.descriptionHtml?.trim()) {
-      return { status: 'ready', document: { title: display.name, blocks: [] } }
-    }
-    return readyFacingFromDisplay(display.name, display.descriptionHtml)
+  const parts = resolveTraitFacingParts(trait)
+  if (trait.kind === 'custom' && !parts.supplementalHtml?.trim()) {
+    return { status: 'ready', document: { title: parts.title, blocks: [] } }
   }
-  const display = resolveTraitDisplay(trait)
-  return readyFacingFromDisplay(display.name, display.descriptionHtml)
+  return readyFacingFromDisplay({
+    title: parts.title,
+    rulesProseText: parts.rulesProse,
+    descriptionHtml: parts.supplementalHtml,
+  })
+}
+
+function readyFacingFromDisplay(input: {
+  title: string
+  rulesProseText?: string
+  descriptionHtml?: string
+}): FacingResolution {
+  const blocks = facingBlocksFromTraitDisplay(input)
+  if (blocks.length === 0 && !input.title.trim()) {
+    return { status: 'unavailable', guidance: 'Add trait details to preview player-facing text.' }
+  }
+  if (blocks.length === 0) {
+    return {
+      status: 'unavailable',
+      guidance: 'Complete trait configuration to preview rules text.',
+    }
+  }
+  return { status: 'ready', document: { title: input.title, blocks } }
 }
 
 export function resolveSpeciesTraitDraftFacing(

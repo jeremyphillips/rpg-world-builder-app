@@ -66,6 +66,20 @@ export function formatCreatureSenseTraitRulesSentence(sense: Sense): string {
   return `You have ${getSenseSentenceForm(sense.type)} with a range of ${sense.range} feet.`
 }
 
+/** Compact stat line for one sense (e.g. `Darkvision 60 ft.`). */
+export function formatCreatureSenseCompactLine(sense: Sense): string {
+  return `${getSenseLabel(sense.type)} ${sense.range} ft.`
+}
+
+/** Joins compact sense lines for species and monster stat rows. */
+export function formatCreatureSensesCompactList(
+  senses: readonly Sense[],
+  separator = ', ',
+): string {
+  if (senses.length === 0) return ''
+  return senses.map((sense) => formatCreatureSenseCompactLine(sense)).join(separator)
+}
+
 /** A special sense and its range in feet (e.g. Darkvision 60 ft). */
 export const senseSchema = z.object({
   type: senseIdSchema,

@@ -10,7 +10,6 @@ import type { ContentFormCtx } from '../../lib/forms/registry/content-form-regis
 import { traitItemFields, type TraitRowForm } from '../lib/species-trait-form-fields'
 import { TRAIT_MASTER_DETAIL_ITEM_NOUN } from '../lib/species-trait-form-labels'
 import { createSpeciesTraitRowTitleConfig } from '../lib/species-trait-row-title'
-import { buildSpeciesTraitListGroups } from '../lib/species-trait-list-groups'
 import { traitItemDefaultValues } from '../lib/species-trait-form-values'
 import { useSpeciesTraitFacingHost } from '../../facing/use-species-trait-facing-host'
 import { SpeciesTraitAddMenu } from './species-trait-add-menu'
@@ -76,21 +75,6 @@ export function SpeciesTraitsTab({ formCtx }: SpeciesTraitsTabProps) {
     />
   )
 
-  const resolveListGroups = useCallback(
-    (ctx: {
-      visibleRows: Array<{ item: { id: string }; row: unknown }>
-      addControl?: typeof addControl
-    }) =>
-      buildSpeciesTraitListGroups(
-        ctx.visibleRows.map((entry) => ({
-          row: entry.row as TraitRowForm,
-          item: entry.item,
-        })),
-        { addControl: ctx.addControl ?? addControl },
-      ),
-    [addControl],
-  )
-
   return (
     <FormEmbeddedMasterDetailEditor
       editor={editor}
@@ -105,7 +89,6 @@ export function SpeciesTraitsTab({ formCtx }: SpeciesTraitsTabProps) {
       addControl={addControl}
       rowTitle={rowTitle}
       resolveFieldSections={resolveFieldSections}
-      resolveListGroups={resolveListGroups}
       facing={facing}
       access={{ kind: 'availability', fieldName: 'available' }}
     />

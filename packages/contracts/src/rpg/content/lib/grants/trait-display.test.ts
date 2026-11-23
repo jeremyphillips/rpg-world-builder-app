@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
-import { grantContentTraitSchema } from './grants'
-import { resolveTraitDisplay } from './trait-display'
+import { contentTraitSchema, grantContentTraitSchema } from './grants'
+import { resolveTraitDisplay, resolveTraitFacingParts } from './trait-display'
+import { defineSenseTemplate } from '../../creature/traits/sense-templates'
 
 describe('resolveTraitDisplay', () => {
   it('returns stored name and description for custom traits', () => {
@@ -48,6 +49,38 @@ describe('resolveTraitDisplay', () => {
     )
     expect(display.name).toBe('Movement')
     expect(display.descriptionHtml).toBe('<p>Your walking speed increases by 5 ft.</p>')
+  })
+
+  it('splits sense template rules and supplemental details for facing', () => {
+    const trait = contentTraitSchema.parse({
+      kind: 'template',
+      id: 'darkvision',
+      templateId: defineSenseTemplate('darkvision'),
+      config: { range: 120 },
+      details: '<p>Dim light appears as bright light.</p>',
+    })
+    expect(resolveTraitFacingParts(trait)).toEqual({
+      title: 'Darkvision',
+      rulesProse: 'You have Darkvision with a range of 120 feet.',
+      supplementalHtml: '<p>Dim light appears as bright light.</p>',
+    })
+    expect(resolveTraitDisplay(trait).descriptionHtml).toBe(
+      '<p>You have Darkvision with a range of 120 feet.</p>',
+    )
+  })
+
+  it('omits empty sense template details from facing', () => {
+    const trait = contentTraitSchema.parse({
+      kind: 'template',
+      id: 'darkvision',
+      templateId: defineSenseTemplate('darkvision'),
+      config: { range: 60 },
+      details: '',
+    })
+    expect(resolveTraitFacingParts(trait)).toEqual({
+      title: 'Darkvision',
+      rulesProse: 'You have Darkvision with a range of 60 feet.',
+    })
   })
 
   it('derives language display from grantGroups', () => {

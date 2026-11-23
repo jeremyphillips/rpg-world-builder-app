@@ -8,6 +8,7 @@ import {
   getDamageTypeLabel,
   getEffectConditionLabel,
   getLanguageLabel,
+  formatCreatureSenseCompactLine,
   getSenseLabel,
   joinInlineMetadata,
   formatMovementDisplay,
@@ -381,10 +382,9 @@ function formatSenseLines(monster: Monster, passivePerception?: number): string 
       monster.traits.flatMap((trait) => ('kind' in trait ? [{ trait, source: trait.id }] : [])),
     ).map((resolved) => resolved.grant),
   })
-  const senseParts = senses.map((sense) => {
-    const label = getSenseLabel(sense.type)
-    return sense.range != null ? `${label} ${sense.range} ft.` : label
-  })
+  const senseParts = senses.map((sense) =>
+    sense.range != null ? formatCreatureSenseCompactLine(sense) : getSenseLabel(sense.type),
+  )
   if (passivePerception != null) {
     senseParts.push(formatPassivePerceptionStatPhrase(passivePerception))
   }

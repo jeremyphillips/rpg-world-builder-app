@@ -34,7 +34,6 @@ function senseTemplateEntry(senseId: SenseId): CreatureTraitTemplate & { senseId
     rulesetIds: [DEFAULT_SYSTEM_RULESET_ID],
     hosts: ['species'],
     acquisitionGroup: 'senses',
-    listGroup: 'senses',
     sourcePolicy: 'emit-each',
     senseId,
     configSchema: senseTemplateConfigSchema,

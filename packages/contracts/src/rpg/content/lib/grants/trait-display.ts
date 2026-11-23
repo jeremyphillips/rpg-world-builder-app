@@ -1,11 +1,7 @@
 import { getDamageTypeSentenceForm } from '../../../vocab/damage/vocabulary'
 import { getLanguageSentenceForm } from '../../../vocab/language'
 import { formatMovementGrantSentence } from '../../../vocab/movement-mode'
-import {
-  formatCreatureSenseTraitRulesSentence,
-  getSenseLabel,
-  getSenseSentenceForm,
-} from '../../../vocab/sense'
+import { formatCreatureSenseTraitRulesSentence, getSenseLabel } from '../../../vocab/sense'
 import { isSenseCreatureTraitTemplateId } from '../../creature/traits/sense-templates'
 import { readCreatureTraitTemplateConfig } from '../../creature/traits/templates'
 import type {
@@ -21,6 +17,12 @@ export type TraitDisplay = {
   descriptionHtml?: string
 }
 
+export type TraitFacingParts = {
+  title: string
+  rulesProse?: string
+  supplementalHtml?: string
+}
+
 function deriveGrantGroupDisplay(groups: GrantGroups): TraitDisplay {
   const grant = groups[0]?.grants[0]
   if (!grant) return { name: 'Grant' }
@@ -29,7 +31,9 @@ function deriveGrantGroupDisplay(groups: GrantGroups): TraitDisplay {
     case 'sense':
       return {
         name: getSenseLabel(grant.type),
-        descriptionHtml: `<p>You have ${getSenseSentenceForm(grant.type)} with a range of ${grant.range} feet.</p>`,
+        descriptionHtml: htmlParagraph(
+          formatCreatureSenseTraitRulesSentence({ type: grant.type, range: grant.range }),
+        ),
       }
     case 'resistances':
       return {
@@ -104,6 +108,67 @@ function resolveTemplateTraitDisplay(trait: TemplateContentTrait): TraitDisplay 
     name: trait.nameOverride ?? derivedName,
     descriptionHtml: trait.descriptionOverride ?? derivedDescription,
   }
+}
+
+function resolveGrantTraitFacingParts(trait: GrantContentTrait): TraitFacingParts {
+  const derived = deriveGrantGroupDisplay(trait.grantGroups)
+  const title = trait.nameOverride ?? derived.name
+  if (trait.descriptionOverride?.trim()) {
+    return { title, supplementalHtml: trait.descriptionOverride }
+  }
+  const grant = trait.grantGroups[0]?.grants[0]
+  if (grant?.kind === 'sense') {
+    return {
+      title,
+      rulesProse: formatCreatureSenseTraitRulesSentence({
+        type: grant.type,
+        range: grant.range,
+      }),
+    }
+  }
+  return { title, supplementalHtml: derived.descriptionHtml }
+}
+
+function resolveTemplateTraitFacingParts(trait: TemplateContentTrait): TraitFacingParts {
+  const read = readCreatureTraitTemplateConfig(trait.templateId, trait.config)
+  const derivedName = read
+    ? (read.template.formatName?.(read.config) ?? read.template.label)
+    : trait.templateId
+  const title = trait.nameOverride ?? derivedName
+
+  if (read && isSenseCreatureTraitTemplateId(trait.templateId)) {
+    const senseGrant = read.template
+      .resolveGrants(read.config)
+      .find(
+        (grant): grant is { kind: 'sense'; type: string; range: number } => grant.kind === 'sense',
+      )
+    const rulesProse = senseGrant
+      ? formatCreatureSenseTraitRulesSentence({
+          type: senseGrant.type,
+          range: senseGrant.range,
+        })
+      : undefined
+    const details = trait.details?.trim() ? trait.details : undefined
+    return { title, rulesProse, supplementalHtml: details }
+  }
+
+  if (trait.descriptionOverride?.trim()) {
+    return { title, supplementalHtml: trait.descriptionOverride }
+  }
+
+  const derivedDescription = read
+    ? htmlParagraph(read.template.formatDescription(read.config))
+    : undefined
+  return { title, supplementalHtml: derivedDescription }
+}
+
+/** Player-facing blocks for trait preview and detail surfaces. */
+export function resolveTraitFacingParts(trait: ContentTrait): TraitFacingParts {
+  if (trait.kind === 'custom') {
+    return { title: trait.name, supplementalHtml: trait.description }
+  }
+  if (trait.kind === 'grant') return resolveGrantTraitFacingParts(trait)
+  return resolveTemplateTraitFacingParts(trait)
 }
 
 /** Resolves human-facing name and description HTML for a content trait. */

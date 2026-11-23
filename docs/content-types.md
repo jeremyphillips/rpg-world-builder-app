@@ -49,7 +49,9 @@ the class body.
 Grant-only traits must pass `isGrantGroupsEligible()` — exactly one default group containing exactly one sense, resistance, walk speed override, or language grant. On **publish**, species traits must not be a stored-only sense grant; passive senses use `sense-*` templates (`sense-darkvision`, etc.). Hybrids (Drow: senses + spells), named heritage options (Dragonborn ancestry), and supplemental rules stay `custom`.
 
 - **Render** trait lists with `resolveTraitDisplay(trait)` (name + description HTML).
-- **Aggregate** mechanics (e.g. species stat-row senses) with `flattenGrantGroups(resolveGrantGroupsFromContent(trait))` — read atomic grants, not derived prose.
+- **Preview** player-facing trait copy with `resolveTraitFacingParts()` / dashboard `resolveTraitPersistedFacing()` — sense templates emit a rules block from `formatCreatureSenseTraitRulesSentence()` plus optional `details` rich text (not `descriptionOverride`).
+- **Compact sense stat rows** (species traits tab and monster Creature Details) use `formatCreatureSensesCompactList()` / `formatCreatureSenseCompactLine()` from `@rpg/contracts`.
+- **Aggregate** mechanics (e.g. species stat-row senses) with `resolveCreatureTraitGrants()` and `resolveCreatureSenses()` — not derived prose alone.
 - **Vocab** (`SENSE_ENTRIES`, `DAMAGE_TYPE_ENTRIES`, etc.) holds reference definitions; grant traits omit redundant catalog copy when SRD player-facing wording is derivable.
 
 Legacy records without `kind` normalize to `custom` on parse (`normalizeContentTrait`). The species authoring form keeps `kind` as hidden form state: new traits and heritage options default to `custom`; existing `grant` traits keep a derived editor. The dashboard does not expose a kind selector.

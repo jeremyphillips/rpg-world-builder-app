@@ -1,5 +1,7 @@
+import { contentTraitSchema, defineSenseTemplate } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { traitToFormRow } from '../../../species/lib/species-trait-form-values'
 import {
   resolveMonsterTraitDraftFacing,
   resolveSpeciesTraitDraftFacing,
@@ -22,7 +24,7 @@ describe('resolveTraitPersistedFacing', () => {
     ])
   })
 
-  it('resolves grant trait display without overrides', () => {
+  it('resolves grant sense traits as a rules block', () => {
     const resolution = resolveTraitPersistedFacing({
       kind: 'grant',
       id: 'darkvision',
@@ -36,6 +38,45 @@ describe('resolveTraitPersistedFacing', () => {
     expect(resolution.status).toBe('ready')
     if (resolution.status !== 'ready') return
     expect(resolution.document.title).toMatch(/Darkvision/i)
+    expect(resolution.document.blocks).toEqual([
+      {
+        kind: 'rules',
+        document: [[{ kind: 'text', value: 'You have Darkvision with a range of 60 feet.' }]],
+      },
+    ])
+  })
+
+  it('composes sense template rules once and appends details as rich text', () => {
+    const trait = contentTraitSchema.parse({
+      kind: 'template',
+      id: 'darkvision',
+      templateId: defineSenseTemplate('darkvision'),
+      config: { range: 120 },
+      details: '<p>Extra author notes.</p>',
+    })
+    const resolution = resolveTraitPersistedFacing(trait)
+    expect(resolution.status).toBe('ready')
+    if (resolution.status !== 'ready') return
+    expect(resolution.document.blocks).toEqual([
+      {
+        kind: 'rules',
+        document: [[{ kind: 'text', value: 'You have Darkvision with a range of 120 feet.' }]],
+      },
+      { kind: 'richText', html: '<p>Extra author notes.</p>' },
+    ])
+  })
+})
+
+describe('sense facing parity', () => {
+  it('matches draft preview to persisted sense template facing', () => {
+    const trait = contentTraitSchema.parse({
+      kind: 'template',
+      id: 'darkvision',
+      templateId: defineSenseTemplate('darkvision'),
+      config: { range: 120 },
+    })
+    const row = { ...traitToFormRow(trait), id: trait.id }
+    expect(resolveSpeciesTraitDraftFacing(row)).toEqual(resolveTraitPersistedFacing(trait))
   })
 })
 

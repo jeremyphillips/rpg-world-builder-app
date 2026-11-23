@@ -292,8 +292,8 @@ function armorTrainingToGrant(row: GrantRowForm): GrantWithoutRowId | undefined 
 }
 
 function sensesToGrant(row: GrantRowForm): GrantWithoutRowId | undefined {
-  if (!row.senseType) return undefined
-  return { kind: 'sense', type: row.senseType as SenseId, range: row.senseRange ?? 60 }
+  if (!row.senseType || row.senseRange === undefined) return undefined
+  return { kind: 'sense', type: row.senseType as SenseId, range: row.senseRange }
 }
 
 function resistancesToGrant(row: GrantRowForm): GrantWithoutRowId | undefined {

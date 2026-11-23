@@ -3,6 +3,9 @@ import { describe, expect, it } from 'vitest'
 import {
   SENSE_RANGES,
   SENSE_SET_ID,
+  formatCreatureSenseCompactLine,
+  formatCreatureSensesCompactList,
+  formatCreatureSenseTraitRulesSentence,
   getSenseLabel,
   getSenseSentenceForm,
   senseIdSchema,
@@ -54,5 +57,14 @@ describe('sense vocabulary', () => {
   it('returns sentence forms for generated prose', () => {
     expect(getSenseSentenceForm('darkvision')).toBe('Darkvision')
     expect(getSenseSentenceForm('custom-sense')).toBe('Custom Sense')
+  })
+
+  it('formats compact stat lines and trait rules from the same sense fact', () => {
+    const sense = { type: 'darkvision' as const, range: 120 }
+    expect(formatCreatureSenseCompactLine(sense)).toBe('Darkvision 120 ft.')
+    expect(formatCreatureSensesCompactList([sense])).toBe('Darkvision 120 ft.')
+    expect(formatCreatureSenseTraitRulesSentence(sense)).toBe(
+      'You have Darkvision with a range of 120 feet.',
+    )
   })
 })

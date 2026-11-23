@@ -48,7 +48,6 @@ export type CreatureTraitTemplate = {
   hosts?: readonly CreatureTraitTemplateHost[]
   sourcePolicy?: CreatureTraitTemplateSourcePolicy
   acquisitionGroup?: string
-  listGroup?: string
   senseId?: string
   configSchema: z.ZodTypeAny
   formatName?: (config: unknown) => string
