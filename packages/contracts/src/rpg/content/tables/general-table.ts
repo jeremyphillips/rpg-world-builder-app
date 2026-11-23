@@ -3,6 +3,9 @@ import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-iss
 
 import { slugSchema } from '../lib/envelope'
 
+import { keysFromEntries } from '../../vocab/enum-schema'
+import type { GameTermEntry } from '../../vocab/types'
+
 import { generalTableValidationMessages } from './general-table-messages'
 import {
   diceTableColumnDefSchema,
@@ -18,9 +21,6 @@ import {
 // Spell description embeds reference these by id; contracts never parse HTML.
 // ---------------------------------------------------------------------------
 
-export const GENERAL_TABLE_KINDS = ['general'] as const
-export type GeneralTableKind = (typeof GENERAL_TABLE_KINDS)[number]
-
 export const GENERAL_TABLE_KIND_TERM = {
   label: 'General Table Kind',
   description: 'A dense authored-order table without level progression semantics.',
@@ -32,7 +32,11 @@ export const GENERAL_TABLE_KIND_ENTRIES = {
     label: 'General table',
     description: 'Authored-order rows with optional blank cells.',
   },
-} as const satisfies Record<GeneralTableKind, { label: string; description: string }>
+} as const satisfies Record<string, GameTermEntry>
+
+export type GeneralTableKind = keyof typeof GENERAL_TABLE_KIND_ENTRIES
+
+export const GENERAL_TABLE_KINDS = keysFromEntries(GENERAL_TABLE_KIND_ENTRIES)
 
 function refineUniqueColumnIds(
   columns: readonly { id: string }[],

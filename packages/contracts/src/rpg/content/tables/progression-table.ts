@@ -3,15 +3,15 @@ import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-iss
 
 import { slugSchema } from '../lib/envelope'
 
+import { keysFromEntries } from '../../vocab/enum-schema'
+import type { GameTermEntry } from '../../vocab/types'
+
 import { progressionTableValidationMessages } from './progression-table-messages'
 import { progressionTableColumnSchema, type ProgressionTableColumn } from './table-column'
 
 // ---------------------------------------------------------------------------
 // Progression tables — structured reference/progression data.
 // ---------------------------------------------------------------------------
-
-export const PROGRESSION_TABLE_KINDS = ['levelProgression'] as const
-export type ProgressionTableKind = (typeof PROGRESSION_TABLE_KINDS)[number]
 
 export const PROGRESSION_TABLE_KIND_TERM = {
   label: 'Progression Table Kind',
@@ -24,7 +24,11 @@ export const PROGRESSION_TABLE_KIND_ENTRIES = {
     label: 'Level progression',
     description: 'Sparse per-level breakpoints with carry-forward semantics.',
   },
-} as const satisfies Record<ProgressionTableKind, { label: string; description: string }>
+} as const satisfies Record<string, GameTermEntry>
+
+export type ProgressionTableKind = keyof typeof PROGRESSION_TABLE_KIND_ENTRIES
+
+export const PROGRESSION_TABLE_KINDS = keysFromEntries(PROGRESSION_TABLE_KIND_ENTRIES)
 
 function refineUniqueColumnIds(
   columns: readonly { id: string }[],

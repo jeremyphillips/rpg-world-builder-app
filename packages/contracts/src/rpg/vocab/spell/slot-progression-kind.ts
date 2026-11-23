@@ -1,3 +1,4 @@
+import { keysFromEntries } from '../enum-schema'
 import type { GameTermEntry, VocabularyTerm } from '../types'
 
 // ---------------------------------------------------------------------------
@@ -33,11 +34,7 @@ export const SLOT_PROGRESSION_KIND_ENTRIES = {
 
 export type SlotProgressionKindId = keyof typeof SLOT_PROGRESSION_KIND_ENTRIES
 
-export const SLOT_PROGRESSION_KIND_IDS = [
-  'full-caster',
-  'half-caster',
-  'pact-magic',
-] as const satisfies readonly SlotProgressionKindId[]
+export const SLOT_PROGRESSION_KIND_IDS = keysFromEntries(SLOT_PROGRESSION_KIND_ENTRIES)
 
 export function isSlotProgressionKindId(id: string): id is SlotProgressionKindId {
   return (SLOT_PROGRESSION_KIND_IDS as readonly string[]).includes(id)
