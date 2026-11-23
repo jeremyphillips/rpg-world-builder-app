@@ -1782,7 +1782,6 @@
     "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts:formatGrantRowSummary",
     "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts:formatGrantRowPrimary",
     "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts:resolveGrantRowPresentation",
-    "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts:resolveSpellGrantName",
     "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts:grantItemFields",
     "apps/dashboard/src/features/content/lib/forms/grants/grant-form-fields.ts:GRANT_ROW_TYPE_LABELS",
     "apps/dashboard/src/features/content/lib/forms/grants/grant-form-schema.ts:MANAGED_SPELLCASTING_GRANT_TYPE",

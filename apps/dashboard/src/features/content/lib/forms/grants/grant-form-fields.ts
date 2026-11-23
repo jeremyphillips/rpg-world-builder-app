@@ -79,9 +79,9 @@ import { buildGrantArrayAddMenu } from './grant-add-menu.lib'
 import { grantFieldLabel } from './grant-field-terms'
 import { createGrantArrayItemShell } from './grant-array-item-shell.lib'
 import {
+  buildGrantSpellReferencePresentationFromAuthoring,
   movementFormValuesToGrantPayload,
   resolveGrantRowPresentation,
-  resolveSpellGrantName,
   GRANT_TYPE_MISSING_PRIMARY,
   type GrantRowHeaderContext,
   type GrantRowValues,
@@ -422,7 +422,7 @@ export function formatGrantRowPrimary(
   return resolveGrantRowPresentation(values, ctx)?.heading
 }
 
-export { resolveGrantRowPresentation, resolveSpellGrantName }
+export { resolveGrantRowPresentation }
 
 export function grantItemFields<T extends string>(
   grantTypes: readonly T[],
@@ -782,7 +782,10 @@ function buildGrantRowHeaderContext(
       ctx.options?.skills?.forReference(),
       'skill-proficiencies',
     ),
-    spellOptions: referenceSpellFieldOptions(ctx.options?.spells),
+    spellReferences: buildGrantSpellReferencePresentationFromAuthoring({
+      status: ctx.spellCatalogStatus,
+      spellsById: ctx.spellCatalogById,
+    }),
   }
 }
 

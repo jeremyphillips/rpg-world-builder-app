@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import { createSpellCatalogContext } from '../../spell/spell-catalog-context'
+import { resolveSpellReferenceOutcomes } from '../../spell/spell-reference'
 import {
   contentGrantSchema,
   contentTraitSchema,
@@ -16,6 +18,7 @@ import {
   formatResistanceGrantSentence,
   formatSenseGrantSentence,
   formatSpellsGrantSentence,
+  formatSpellsGrantSentenceFromResolutions,
   getGrantGroupEffectiveUnlock,
   getUnlockedGrantsAtLevel,
   grantContentTraitSchema,
@@ -201,6 +204,24 @@ describe('grant sentence formatters', () => {
         () => 'Cure Wounds',
       ),
     ).toBe('Character has Cure Wounds always prepared.')
+  })
+
+  it('formats spell grants from resolution outcomes', () => {
+    const grant = {
+      id: 'spells-res',
+      kind: 'spells' as const,
+      ability: 'cha' as const,
+      casting: { mode: 'free_cast' as const },
+      spellIds: ['known', 'missing'],
+    }
+    const catalog = createSpellCatalogContext({
+      status: 'ready',
+      spellsById: new Map([['known', { id: 'known', name: 'Known Spell', level: 0 } as never]]),
+    })
+    const resolutions = resolveSpellReferenceOutcomes(grant.spellIds, catalog)
+    expect(formatSpellsGrantSentenceFromResolutions(grant, resolutions)).toBe(
+      'Character can cast Known Spell and Spell reference unavailable at will.',
+    )
   })
 })
 

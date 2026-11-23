@@ -78,6 +78,9 @@ import {
   getGrantGroupEffectiveUnlock,
   resolveGrantGroupsFromContent,
   resolveMechanicalGrantsFromContent,
+  createSpellCatalogContext,
+  presentSpellReferenceDisplayName,
+  resolveSpellReferenceOutcome,
   type ContentGrant,
   type EquipmentKind,
   type GrantGroup,
@@ -87,7 +90,7 @@ import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 export type GrantDisplayVocabulary = {
   resolveSenseLabel: (type: string) => string
-  resolveSpell: (slug: string) => { name: string; level: number } | undefined
+  resolveSpell: (spellId: string) => { name: string; level?: number }
   resolveSkillName?: (id: string) => string | undefined
   resolveToolName?: (slug: string) => string | undefined
   resolveWeaponName?: (slug: string) => string | undefined
@@ -163,13 +166,6 @@ const KNOWN_CONTENT_GRANT_KINDS = new Set<string>([
   'saveOutcomeOverride',
 ])
 
-function formatSlugLabel(slug: string): string {
-  return slug
-    .split('-')
-    .map((part) => (part.length > 0 ? part.charAt(0).toUpperCase() + part.slice(1) : part))
-    .join(' ')
-}
-
 function isKnownGrantKind(kind: string): kind is ContentGrant['kind'] {
   return KNOWN_CONTENT_GRANT_KINDS.has(kind)
 }
@@ -207,9 +203,8 @@ function mapSpellGrantToItems(
 ): GrantSummaryItem[] {
   return grant.spellIds.map((spellId, spellIndex) => {
     const resolved = vocabulary.resolveSpell(spellId)
-    const name = resolved?.name ?? formatSlugLabel(spellId)
-    const spellKind: GrantSummaryKind =
-      resolved?.level === 0 ? 'cantrip' : resolved ? 'spell' : 'spell'
+    const name = resolved.name
+    const spellKind: GrantSummaryKind = resolved.level === 0 ? 'cantrip' : 'spell'
 
     return {
       id: `${idPrefix}:spells:${spellIndex}`,
@@ -563,12 +558,17 @@ function applyMaxItems(
 export function buildSpellGrantVocabulary(
   spells: readonly Spell[],
 ): GrantDisplayVocabulary['resolveSpell'] {
-  const spellsById = new Map(spells.map((spell) => [spell.id, spell]))
+  const catalog = createSpellCatalogContext({
+    status: 'ready',
+    spellsById: new Map(spells.map((spell) => [spell.id, spell])),
+  })
 
   return (spellId) => {
-    const spell = spellsById.get(spellId)
-    if (!spell) return undefined
-    return { name: spell.name, level: spell.level }
+    const outcome = resolveSpellReferenceOutcome(spellId, catalog)
+    if (outcome.status === 'resolved') {
+      return { name: outcome.spell.name, level: outcome.spell.level }
+    }
+    return { name: presentSpellReferenceDisplayName(outcome) }
   }
 }
 

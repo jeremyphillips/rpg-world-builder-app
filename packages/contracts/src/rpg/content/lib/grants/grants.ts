@@ -19,7 +19,11 @@ import {
 import { getSenseSentenceForm, senseSchema } from '../../../vocab/sense'
 import { formatLimitedUseSentence } from '../../../primitives/limited-use'
 import { featCategorySchema, getFeatCategorySentenceForm } from '../../../vocab/feat'
-import { spellReferenceSchema } from '../../spell/spell-reference'
+import {
+  presentSpellReferenceDisplayName,
+  type SpellReferenceResolution,
+  spellReferenceSchema,
+} from '../../spell/spell-reference'
 import { spellGrantAvailabilitySchema } from '../../../vocab/spell/grant-availability'
 import { spellGrantCastingSchema } from '../../../vocab/spell/grant-casting'
 import { getSpellGrantAvailabilityEntry } from '../../../vocab/spell/grant-availability'
@@ -324,13 +328,17 @@ const spellsContentGrantSchema = z
 
 export type SpellsContentGrant = z.infer<typeof spellsContentGrantSchema>
 
-/** Human-readable summary for spell grants in trait and feature summaries. */
-export function formatSpellsGrantSentence(
+function spellNamesFromGrantResolutions(
+  resolutions: readonly SpellReferenceResolution[],
+): string[] {
+  return resolutions.map(presentSpellReferenceDisplayName)
+}
+
+function formatSpellsGrantSentenceWithNames(
   grant: SpellsContentGrant,
-  resolveSpellName?: (id: string) => string | undefined,
+  names: readonly string[],
 ): string {
-  const names = grant.spellIds.map((id) => resolveSpellName?.(id) ?? id)
-  const spellList = joinNaturalList(names)
+  const spellList = joinNaturalList([...names])
   const hasAvailability = grant.availability === 'always_prepared'
   const cadence = grant.casting ? formatLimitedUseSentence(grant.casting.limitedUse) : undefined
 
@@ -349,6 +357,23 @@ export function formatSpellsGrantSentence(
   }
 
   return `Character gains ${spellList}.`
+}
+
+/** Human-readable summary for spell grants in trait and feature summaries. */
+export function formatSpellsGrantSentence(
+  grant: SpellsContentGrant,
+  resolveSpellName?: (id: string) => string | undefined,
+): string {
+  const names = grant.spellIds.map((id) => resolveSpellName?.(id) ?? id)
+  return formatSpellsGrantSentenceWithNames(grant, names)
+}
+
+/** Spell grant summary from pre-resolved catalog outcomes — preferred for dashboard UI. */
+export function formatSpellsGrantSentenceFromResolutions(
+  grant: SpellsContentGrant,
+  resolutions: readonly SpellReferenceResolution[],
+): string {
+  return formatSpellsGrantSentenceWithNames(grant, spellNamesFromGrantResolutions(resolutions))
 }
 
 /**

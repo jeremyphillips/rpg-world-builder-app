@@ -1,11 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
+import type { Spell } from '@rpg/contracts'
 import { Text } from '@rpg/ui'
 
 import { EntityCard } from '../../entity/surfaces/cards/content/entity-card'
 import { projectArrayItemEntitySummary } from '../../entity/surfaces/cards/disclosure/array-item-entity-summary.lib'
 import { GRANT_ROW_TYPE_LABELS } from './grant-form-schema'
 import {
+  buildGrantSpellReferencePresentationFromAuthoring,
   formatGrantRowToolbarAriaLabel,
   omitRedundantGrantDetail,
   resolveGrantRowPresentation,
@@ -19,10 +21,15 @@ const headerContext = {
   toolOptions: [{ value: 'thieves-tools', label: "Thieves' Tools" }],
   armorOptions: [],
   skillOptions: [{ value: 'athletics', label: 'Athletics' }],
-  spellOptions: [
-    { value: 'aid', label: 'Aid' },
-    { value: 'animate-dead', label: 'Animate Dead' },
-  ],
+  spellReferences: buildGrantSpellReferencePresentationFromAuthoring({
+    status: 'ready',
+    spellsById: new Map(
+      [
+        { id: 'srd-cc-5.2.1:aid', name: 'Aid', level: 2 },
+        { id: 'srd-cc-5.2.1:animate-dead', name: 'Animate Dead', level: 3 },
+      ].map((spell) => [spell.id, spell as Spell]),
+    ),
+  }),
 } satisfies GrantRowHeaderContext
 
 const FIXTURES: Array<{ label: string; values: Record<string, unknown> }> = [
@@ -40,7 +47,7 @@ const FIXTURES: Array<{ label: string; values: Record<string, unknown> }> = [
       grantType: 'spells',
       spellAbility: 'cha',
       spellAvailability: true,
-      spellIds: ['aid', 'animate-dead'],
+      spellIds: ['srd-cc-5.2.1:aid', 'srd-cc-5.2.1:animate-dead'],
     },
   },
   {
@@ -129,7 +136,7 @@ export const SpellsPrepared: Story = {
           grantType: 'spells',
           spellAbility: 'wis',
           spellAvailability: true,
-          spellIds: ['aid', 'animate-dead'],
+          spellIds: ['srd-cc-5.2.1:aid', 'srd-cc-5.2.1:animate-dead'],
         }}
       />
     </div>

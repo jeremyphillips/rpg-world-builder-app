@@ -502,6 +502,8 @@ describe('buildSpellGrantVocabulary', () => {
     ])
 
     expect(resolveSpell('ruleset:dancing-lights')).toEqual({ name: 'Dancing Lights', level: 0 })
-    expect(resolveSpell('missing')).toBeUndefined()
+    expect(resolveSpell('missing')).toEqual({
+      name: 'Spell reference unavailable',
+    })
   })
 })

@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import { SPELL_REFERENCE_DISPLAY_MESSAGES, type Spell } from '@rpg/contracts'
+
 import {
   buildSeedDamageTypeVocabulary,
   buildSeedLanguageVocabulary,
@@ -11,15 +13,32 @@ import {
 
 import { GRANT_ROW_TYPE_LABELS } from './grant-form-schema'
 import {
+  buildGrantSpellReferencePresentationFromAuthoring,
   formatCompactMetadataList,
   formatGrantRowDisclosureAriaLabel,
   formatGrantRowToolbarAriaLabel,
   omitRedundantGrantDetail,
   resolveGrantRowPresentation,
-  resolveSpellGrantName,
   type GrantRowHeaderContext,
   type GrantRowPresentation,
 } from './grant-row-presentation.lib'
+
+function spellCatalog(entries: Array<{ id: string; name: string; status?: string }>) {
+  return new Map(
+    entries.map(
+      (entry) =>
+        [
+          entry.id,
+          {
+            id: entry.id,
+            name: entry.name,
+            level: 1,
+            status: entry.status ?? 'published',
+          } as Spell,
+        ] as const,
+    ),
+  )
+}
 
 const seedDamageTypes = buildSeedDamageTypeVocabulary()
 const seedLanguages = buildSeedLanguageVocabulary()
@@ -35,11 +54,14 @@ const headerContext = {
   toolOptions: [{ value: 'thieves-tools', label: "Thieves' Tools" }],
   armorOptions: [],
   skillOptions: [{ value: 'athletics', label: 'Athletics' }],
-  spellOptions: [
-    { value: 'srd-cc-5.2.1:aid', label: 'Aid' },
-    { value: 'srd-cc-5.2.1:animate-dead', label: 'Animate Dead' },
-    { value: 'srd-cc-5.2.1:dancing-lights', label: 'Dancing Lights' },
-  ],
+  spellReferences: buildGrantSpellReferencePresentationFromAuthoring({
+    status: 'ready',
+    spellsById: spellCatalog([
+      { id: 'srd-cc-5.2.1:aid', name: 'Aid' },
+      { id: 'srd-cc-5.2.1:animate-dead', name: 'Animate Dead' },
+      { id: 'srd-cc-5.2.1:dancing-lights', name: 'Dancing Lights' },
+    ]),
+  }),
 } satisfies GrantRowHeaderContext
 
 function assertGrantRowPresentation(presentation: GrantRowPresentation | undefined) {
@@ -66,13 +88,28 @@ describe('formatCompactMetadataList', () => {
   })
 })
 
-describe('resolveSpellGrantName', () => {
-  it('returns catalog proper names and title-case slug fallback', () => {
-    expect(resolveSpellGrantName('srd-cc-5.2.1:animate-dead', headerContext.spellOptions)).toBe(
-      'Animate Dead',
+describe('grant spell reference presentation', () => {
+  it('resolves display names from the authoritative catalog, not pickers', () => {
+    const presentation = buildGrantSpellReferencePresentationFromAuthoring({
+      status: 'ready',
+      spellsById: spellCatalog([
+        { id: 'srd-cc-5.2.1:draft-only', name: 'Draft Spell', status: 'draft' },
+      ]),
+    })
+    expect(presentation.displayName('srd-cc-5.2.1:draft-only')).toBe('Draft Spell')
+    expect(presentation.displayName('srd-cc-5.2.1:missing')).toBe(
+      SPELL_REFERENCE_DISPLAY_MESSAGES.unknownSpell,
     )
-    expect(resolveSpellGrantName('srd-cc-5.2.1:unknown-spell', [])).toBe('Unknown Spell')
-    expect(resolveSpellGrantName('srd-cc-5.2.1:aid', [{ value: 'aid', label: 'Aid' }])).toBe('Aid')
+  })
+
+  it('does not fabricate names while the catalog is loading', () => {
+    const presentation = buildGrantSpellReferencePresentationFromAuthoring({
+      status: 'pending',
+      spellsById: spellCatalog([{ id: 'srd-cc-5.2.1:aid', name: 'Aid' }]),
+    })
+    expect(presentation.displayName('srd-cc-5.2.1:aid')).toBe(
+      SPELL_REFERENCE_DISPLAY_MESSAGES.catalogLoading,
+    )
   })
 })
 

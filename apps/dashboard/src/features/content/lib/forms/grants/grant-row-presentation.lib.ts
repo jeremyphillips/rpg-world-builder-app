@@ -1,4 +1,5 @@
 import {
+  createSpellCatalogContext,
   formatDamageTypeGrantSentence,
   formatFeatChoiceGrantSentence,
   formatLanguageGrantSentence,
@@ -6,13 +7,21 @@ import {
   formatMovementGrantMetadataDetail,
   formatResistanceGrantSentence,
   formatSenseGrantSentence,
-  formatSpellsGrantSentence,
+  formatSpellsGrantSentenceFromResolutions,
   getFeatCategorySentenceForm,
+  presentSpellReferenceDisplayName,
+  resolveSpellReferenceOutcome,
+  resolveSpellReferenceOutcomes,
+  type AuthoringSpellCatalogStatus,
   type FeatCategory,
   type MovementGrantPayload,
   type MovementMode,
   type MovementOperation,
   type SenseId,
+  type Spell,
+  type SpellCatalogContext,
+  type SpellReference,
+  type SpellReferenceResolution,
 } from '@rpg/contracts'
 import { INLINE_METADATA_SEPARATOR } from '@rpg/contracts/primitives'
 
@@ -44,6 +53,12 @@ import type {
 
 export type GrantRowValues = Record<string, unknown>
 
+export type GrantSpellReferencePresentation = {
+  catalog: SpellCatalogContext
+  displayName(spellId: SpellReference): string
+  outcomes(spellIds: readonly SpellReference[]): SpellReferenceResolution[]
+}
+
 export type GrantRowHeaderContext = {
   rowLabels: Record<string, string>
   equipmentOptions: FieldOption[]
@@ -51,10 +66,36 @@ export type GrantRowHeaderContext = {
   toolOptions: FieldOption[]
   armorOptions: FieldOption[]
   skillOptions: FieldOption[]
-  spellOptions: FieldOption[]
+  spellReferences: GrantSpellReferencePresentation
   resolveDamageTypeLabel?: (id: string) => string
   resolveLanguageLabel?: (id: string) => string
   resolveSenseLabel?: (id: string) => string
+}
+
+export function buildGrantSpellReferencePresentation(
+  catalog: SpellCatalogContext,
+): GrantSpellReferencePresentation {
+  return {
+    catalog,
+    displayName(spellId) {
+      return presentSpellReferenceDisplayName(resolveSpellReferenceOutcome(spellId, catalog))
+    },
+    outcomes(spellIds) {
+      return resolveSpellReferenceOutcomes(spellIds, catalog)
+    },
+  }
+}
+
+export function buildGrantSpellReferencePresentationFromAuthoring(args: {
+  status?: AuthoringSpellCatalogStatus
+  spellsById?: ReadonlyMap<string, Spell>
+}): GrantSpellReferencePresentation {
+  return buildGrantSpellReferencePresentation(
+    createSpellCatalogContext({
+      status: args.status ?? 'pending',
+      spellsById: args.spellsById,
+    }),
+  )
 }
 
 /** Semantic row copy — renderer decides header band vs body description placement. */
@@ -65,31 +106,6 @@ export type GrantRowPresentation = {
 }
 
 export { formatCompactMetadataList } from './grant-compact-metadata.lib'
-
-function spellIdLocalPart(spellId: string): string {
-  const colon = spellId.lastIndexOf(':')
-  return colon >= 0 ? spellId.slice(colon + 1) : spellId
-}
-
-function formatSpellIdSlugFallback(spellId: string): string {
-  return spellIdLocalPart(spellId)
-    .split('-')
-    .map((part) => (part.length > 0 ? part.charAt(0).toUpperCase() + part.slice(1) : part))
-    .join(' ')
-}
-
-export function resolveSpellGrantName(spellId: string, spellOptions: FieldOption[]): string {
-  const direct = spellOptions.find((option) => option.value === spellId)
-  if (direct) return direct.label
-
-  const localId = spellIdLocalPart(spellId)
-  const byLocalId = spellOptions.find(
-    (option) => option.value === localId || spellIdLocalPart(option.value) === localId,
-  )
-  if (byLocalId) return byLocalId.label
-
-  return formatSpellIdSlugFallback(spellId)
-}
 
 function normalizePresentationPart(value: string): string {
   return value.trim().toLowerCase().replace(/\s+/g, ' ')
@@ -187,9 +203,8 @@ function resolveSpellGrantDetail(
   ctx: GrantRowHeaderContext,
 ): string | undefined {
   if (!spellIds?.length) return undefined
-  return formatCompactMetadataList(
-    spellIds.map((id) => resolveSpellGrantName(id, ctx.spellOptions)),
-  )
+  const outcomes = ctx.spellReferences.outcomes(spellIds)
+  return formatCompactMetadataList(outcomes.map(presentSpellReferenceDisplayName))
 }
 
 function resolveMovementDetail(values: GrantRowValues): string | undefined {
@@ -215,7 +230,8 @@ function resolveSpellGrantDescription(values: GrantRowValues, ctx: GrantRowHeade
       })
     : undefined
 
-  return formatSpellsGrantSentence(
+  const outcomes = ctx.spellReferences.outcomes(spellIds)
+  return formatSpellsGrantSentenceFromResolutions(
     {
       id: 'spells',
       kind: 'spells',
@@ -232,7 +248,7 @@ function resolveSpellGrantDescription(values: GrantRowValues, ctx: GrantRowHeade
           }
         : {}),
     },
-    (id) => resolveSpellGrantName(id, ctx.spellOptions),
+    outcomes,
   )
 }
 

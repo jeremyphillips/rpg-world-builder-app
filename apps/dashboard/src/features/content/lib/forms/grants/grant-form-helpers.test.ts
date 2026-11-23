@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { isOpaqueGrantRowId, type GrantGroups } from '@rpg/contracts'
+import { isOpaqueGrantRowId, type GrantGroups, type Spell } from '@rpg/contracts'
 import {
   isContainer,
   resolveColumnsCollapseSequence,
@@ -23,6 +23,7 @@ import {
   GRANT_TYPE_MISSING_PRIMARY,
   type GrantRowHeaderContext,
 } from './grant-form-fields'
+import { buildGrantSpellReferencePresentationFromAuthoring } from './grant-row-presentation.lib'
 import {
   GRANT_ROW_TYPE_LABELS,
   GRANT_ROW_TYPES,
@@ -461,7 +462,19 @@ describe('grant row summaries', () => {
           toolOptions: [],
           armorOptions: [],
           skillOptions: [],
-          spellOptions: [{ value: 'dancing-lights', label: 'Dancing Lights' }],
+          spellReferences: buildGrantSpellReferencePresentationFromAuthoring({
+            status: 'ready',
+            spellsById: new Map([
+              [
+                'dancing-lights',
+                {
+                  id: 'dancing-lights',
+                  name: 'Dancing Lights',
+                  level: 0,
+                } as Spell,
+              ],
+            ]),
+          }),
         },
       ),
     ).toBe('Character can cast Dancing Lights at will.')
@@ -475,10 +488,15 @@ const grantRowHeaderContext = {
   toolOptions: [],
   armorOptions: [],
   skillOptions: [],
-  spellOptions: [
-    { value: 'power-word-heal', label: 'Power Word Heal' },
-    { value: 'power-word-kill', label: 'Power Word Kill' },
-  ],
+  spellReferences: buildGrantSpellReferencePresentationFromAuthoring({
+    status: 'ready',
+    spellsById: new Map(
+      [
+        { id: 'power-word-heal', name: 'Power Word Heal', level: 9 },
+        { id: 'power-word-kill', name: 'Power Word Kill', level: 9 },
+      ].map((spell) => [spell.id, spell as Spell]),
+    ),
+  }),
 } satisfies GrantRowHeaderContext
 
 describe('formatGrantRowSummary', () => {

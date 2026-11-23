@@ -8,6 +8,11 @@ import {
   collectCatalogReferenceIssues,
 } from '../lib/catalog-reference-issues'
 import type { Spell } from './body'
+import type { SpellCatalogContext, SpellReferenceUnresolvedReason } from './spell-catalog-context'
+import {
+  spellCatalogLifecycleUnresolvedReason,
+  spellReferenceDisplayMessageForUnresolvedReason,
+} from './spell-catalog-context'
 
 /** Canonical spell content id. System spells use `<rulesetId>:<slug>`; homebrew uses the Mongo id. */
 export const spellReferenceSchema = z.string().min(1)
@@ -69,6 +74,45 @@ export function resolveSpellReference(
   spellsById: ReadonlyMap<string, Spell>,
 ): Spell | undefined {
   return spellsById.get(ref)
+}
+
+export type SpellReferenceResolution =
+  | { status: 'resolved'; spellId: SpellReference; spell: Spell }
+  | {
+      status: 'unresolved'
+      spellId: SpellReference
+      reason: SpellReferenceUnresolvedReason
+    }
+
+export function resolveSpellReferenceOutcome(
+  spellId: SpellReference,
+  catalog: SpellCatalogContext,
+): SpellReferenceResolution {
+  const lifecycleReason = spellCatalogLifecycleUnresolvedReason(catalog.loadState)
+  if (lifecycleReason) {
+    return { status: 'unresolved', spellId, reason: lifecycleReason }
+  }
+
+  const spell = resolveSpellReference(spellId, catalog.spellsById)
+  if (spell) {
+    return { status: 'resolved', spellId, spell }
+  }
+
+  return { status: 'unresolved', spellId, reason: 'unknown-spell' }
+}
+
+export function resolveSpellReferenceOutcomes(
+  spellIds: readonly SpellReference[],
+  catalog: SpellCatalogContext,
+): SpellReferenceResolution[] {
+  return spellIds.map((spellId) => resolveSpellReferenceOutcome(spellId, catalog))
+}
+
+export function presentSpellReferenceDisplayName(resolution: SpellReferenceResolution): string {
+  if (resolution.status === 'resolved') {
+    return resolution.spell.name
+  }
+  return spellReferenceDisplayMessageForUnresolvedReason(resolution.reason)
 }
 
 export function collectSpellReferenceIssues(args: {
