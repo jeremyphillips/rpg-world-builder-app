@@ -115,6 +115,26 @@ export function presentSpellReferenceDisplayName(resolution: SpellReferenceResol
   return spellReferenceDisplayMessageForUnresolvedReason(resolution.reason)
 }
 
+/**
+ * Monster stat block / reaction paths that collapse catalog lifecycle to `ready | unavailable`
+ * (validation-style). Unavailable skips per-id lookup and emits `catalog-unavailable`.
+ */
+export function resolveSpellReferenceOutcomeForCatalogStatus(
+  spellId: SpellReference,
+  args: {
+    catalogStatus: 'ready' | 'unavailable'
+    spellsById?: ReadonlyMap<string, Spell>
+  },
+): SpellReferenceResolution {
+  if (args.catalogStatus === 'unavailable') {
+    return { status: 'unresolved', spellId, reason: 'catalog-unavailable' }
+  }
+  return resolveSpellReferenceOutcome(spellId, {
+    loadState: 'ready',
+    spellsById: args.spellsById ?? new Map(),
+  })
+}
+
 export function collectSpellReferenceIssues(args: {
   refs: readonly { path: string; spellId: SpellReference }[]
   spellsById: ReadonlyMap<string, Spell>

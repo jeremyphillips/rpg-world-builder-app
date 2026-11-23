@@ -1,4 +1,6 @@
 import type { SpellCastingTime } from '../../vocab/spell/casting-time'
+import type { Spell } from '../../content/spell/body'
+import { resolveSpellReferenceOutcomeForCatalogStatus } from '../../content/spell/spell-reference'
 
 export type MonsterReferencedSpell = {
   name: string
@@ -45,8 +47,19 @@ export function resolveMonsterReactionTrigger(args: {
     spell.spellId ? [spell.spellId] : [],
   )
   const spells = spellIds.map((spellId) => {
-    if (args.catalogStatus === 'unavailable') {
-      return { spellId, status: 'unresolved' as const, reason: 'catalog-unavailable' as const }
+    const outcome = resolveSpellReferenceOutcomeForCatalogStatus(spellId, {
+      catalogStatus: args.catalogStatus,
+      spellsById: args.spellsById as ReadonlyMap<string, Spell> | undefined,
+    })
+    if (outcome.status === 'unresolved') {
+      return {
+        spellId,
+        status: 'unresolved' as const,
+        reason:
+          outcome.reason === 'unknown-spell'
+            ? ('unknown-spell' as const)
+            : ('catalog-unavailable' as const),
+      }
     }
     const spell = args.spellsById?.get(spellId)
     if (!spell) {

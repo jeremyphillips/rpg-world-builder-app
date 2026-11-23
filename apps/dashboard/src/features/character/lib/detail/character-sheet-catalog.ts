@@ -1,10 +1,13 @@
 import {
   buildEquipmentCompactSummary,
   CHARACTER_EQUIPMENT_INVENTORY_BUCKETS,
+  createSpellCatalogContext,
   formatSelectionSourceLabel,
   formatSpellConcentrationMarker,
   formatSpellRitualMarker,
   getSpellSchoolLabel,
+  presentSpellReferenceDisplayName,
+  resolveSpellReferenceOutcome,
   type ArmorClassRules,
   type CharacterBuildCatalogIndex,
   type CharacterEquipmentEntry,
@@ -182,9 +185,16 @@ function buildSpellCards(
   character: Pick<Character, 'spells'>,
   catalogIndex: CharacterBuildCatalogIndex,
 ): CharacterSheetSpellCard[] {
+  const spellCatalog = createSpellCatalogContext({
+    status: 'ready',
+    spellsById: catalogIndex.spells,
+  })
+
   return character.spells.map((entry, index) => {
     const spell = catalogIndex.spells.get(entry.spellId)
-    const displayName = spell?.name ?? formatContentReferenceLabel(entry.spellId)
+    const displayName = spell
+      ? spell.name
+      : presentSpellReferenceDisplayName(resolveSpellReferenceOutcome(entry.spellId, spellCatalog))
     const sources = normalizeSheetSources(entry.sources, catalogIndex)
     const base = {
       displayName,

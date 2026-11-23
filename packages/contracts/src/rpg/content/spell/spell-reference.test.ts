@@ -10,6 +10,7 @@ import {
   presentSpellReferenceDisplayName,
   resolveSpellReference,
   resolveSpellReferenceOutcome,
+  resolveSpellReferenceOutcomeForCatalogStatus,
   resolveSpellReferenceOutcomes,
   spellReferenceSchema,
 } from './spell-reference'
@@ -117,6 +118,18 @@ describe('resolveSpellReferenceOutcome', () => {
     expect(presentSpellReferenceDisplayName(outcome)).toBe(
       SPELL_REFERENCE_DISPLAY_MESSAGES.unknownSpell,
     )
+  })
+
+  it('scenario F: binary catalog status maps unavailable without unknown-spell', () => {
+    const unavailable = resolveSpellReferenceOutcomeForCatalogStatus(systemSpell.id, {
+      catalogStatus: 'unavailable',
+      spellsById,
+    })
+    expect(unavailable).toEqual({
+      status: 'unresolved',
+      spellId: systemSpell.id,
+      reason: 'catalog-unavailable',
+    })
   })
 
   it('resolveSpellReferenceOutcomes preserves order', () => {

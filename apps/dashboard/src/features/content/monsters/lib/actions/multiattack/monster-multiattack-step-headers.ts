@@ -1,12 +1,14 @@
 import {
+  createSpellCatalogContext,
   formatSpellCastAtLevelName,
   isMultiattackAttackGroup,
   isMultiattackUseClause,
   joinNaturalList,
   MONSTER_ACTION_UNRESOLVED_REFERENCE,
   multiattackPositiveInt,
+  presentSpellReferenceDisplayName,
+  resolveSpellReferenceOutcome,
   type MultiattackDraftStep,
-  type Spell,
 } from '@rpg/contracts'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
@@ -64,18 +66,38 @@ function resolveName(
   return titles.get(actionId) ?? MONSTER_ACTION_UNRESOLVED_REFERENCE
 }
 
-function spellName(
-  spellId: string | undefined,
-  spellCatalogById: ReadonlyMap<string, Spell> | undefined,
-): string | undefined {
+function spellName(spellId: string | undefined, ctx: ContentFormCtx): string | undefined {
   if (!spellId?.trim()) return undefined
-  const catalogSpell = spellCatalogById?.get(spellId)
-  if (!catalogSpell?.name) return undefined
-  return formatSpellCastAtLevelName({
-    name: catalogSpell.name,
-    castAtLevel: undefined,
-    spellLevel: catalogSpell.level,
+  const catalog = createSpellCatalogContext({
+    status: ctx.spellCatalogStatus ?? 'pending',
+    spellsById: ctx.spellCatalogById,
   })
+  const outcome = resolveSpellReferenceOutcome(spellId, catalog)
+  if (outcome.status !== 'resolved') {
+    return undefined
+  }
+  return formatSpellCastAtLevelName({
+    name: outcome.spell.name,
+    castAtLevel: undefined,
+    spellLevel: outcome.spell.level,
+  })
+}
+
+function spellNameForProse(spellId: string | undefined, ctx: ContentFormCtx): string | undefined {
+  if (!spellId?.trim()) return undefined
+  const catalog = createSpellCatalogContext({
+    status: ctx.spellCatalogStatus ?? 'pending',
+    spellsById: ctx.spellCatalogById,
+  })
+  const outcome = resolveSpellReferenceOutcome(spellId, catalog)
+  if (outcome.status === 'resolved') {
+    return formatSpellCastAtLevelName({
+      name: outcome.spell.name,
+      castAtLevel: undefined,
+      spellLevel: outcome.spell.level,
+    })
+  }
+  return presentSpellReferenceDisplayName(outcome)
 }
 
 function attackGroupPrimary(step: MultiattackDraftStep): string {
@@ -119,7 +141,7 @@ function singleUsePrimary(
   const name = resolveName(typeof step.actionId === 'string' ? step.actionId : undefined, titles)
   if (!name) return MONSTER_MULTIATTACK_CHOOSE_AN_ACTION_LABEL
   const spellId = typeof step.spellId === 'string' ? step.spellId : undefined
-  const spell = spellName(spellId, ctx.spellCatalogById)
+  const spell = spellNameForProse(spellId, ctx)
   if (spell) {
     const verb = step.optional === true ? 'Can cast' : 'Cast'
     const suffix = multiattackStepUseRepetitionSuffix(step.count)
@@ -137,7 +159,7 @@ function singleUseSummary(
   if (!name) return undefined
   const spellId = typeof step.spellId === 'string' ? step.spellId : undefined
   if (!spellId?.trim()) return undefined
-  const spell = spellName(spellId, ctx.spellCatalogById)
+  const spell = spellName(spellId, ctx)
   if (!spell) return MONSTER_ACTION_UNRESOLVED_REFERENCE
   return name
 }
@@ -154,7 +176,7 @@ function choicePhrase(
   if (!name) return undefined
   const spellId = typeof record.spellId === 'string' ? record.spellId : undefined
   if (!spellId?.trim()) return name
-  const spell = spellName(spellId, ctx.spellCatalogById)
+  const spell = spellNameForProse(spellId, ctx)
   return `${name} to cast ${spell ?? MONSTER_ACTION_UNRESOLVED_REFERENCE}`
 }
 

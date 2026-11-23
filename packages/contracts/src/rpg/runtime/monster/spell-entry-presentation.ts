@@ -14,6 +14,11 @@ import {
 import type { MonsterReferencedSpell } from './reaction-trigger'
 import { type MonsterActionSectionId } from '../../content/spell/casting-economy'
 import { formatSpellCastAtLevelName } from '../../content/spell/format-spell-cast-level'
+import {
+  presentSpellReferenceDisplayName,
+  resolveSpellReferenceOutcomeForCatalogStatus,
+} from '../../content/spell/spell-reference'
+import type { Spell } from '../../content/spell/body'
 
 import {
   joinStatBlockProsePlainText,
@@ -51,8 +56,12 @@ function spellPlainName(
   spellsById: ReadonlyMap<string, MonsterReferencedSpell> | undefined,
   catalogStatus: 'ready' | 'unavailable',
 ): string {
-  const spell = catalogStatus === 'ready' ? spellsById?.get(spellId) : undefined
-  return spell?.name ?? 'Unavailable spell'
+  return presentSpellReferenceDisplayName(
+    resolveSpellReferenceOutcomeForCatalogStatus(spellId, {
+      catalogStatus,
+      spellsById: spellsById as ReadonlyMap<string, Spell> | undefined,
+    }),
+  )
 }
 
 function listPhraseSegments(
@@ -83,7 +92,13 @@ function spellNamePlain(
   catalogStatus: 'ready' | 'unavailable',
   castAtLevel: number | undefined = spell.castAtLevel,
 ): string {
-  if (!spell.spellId) return 'Unavailable spell'
+  if (!spell.spellId) {
+    return presentSpellReferenceDisplayName({
+      status: 'unresolved',
+      spellId: '',
+      reason: 'unknown-spell',
+    })
+  }
   const plain = spellPlainName(spell.spellId, spellsById, catalogStatus)
   const level = catalogStatus === 'ready' ? spellsById?.get(spell.spellId)?.level : undefined
   return formatSpellCastAtLevelName({ name: plain, castAtLevel, spellLevel: level })

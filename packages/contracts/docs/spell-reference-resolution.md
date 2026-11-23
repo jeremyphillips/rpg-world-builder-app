@@ -43,10 +43,10 @@ Facing preview uses `FacingReason` `catalog-pending` / `catalog-error` with `Fac
 
 | Layer            | Question                                        | Owner                                                                           |
 | ---------------- | ----------------------------------------------- | ------------------------------------------------------------------------------- |
-| Resolution       | Definition exists in authoritative map?         | `resolveSpellReference` / Phase B `resolveSpellReferenceOutcome`                |
+| Resolution       | Definition exists in authoritative map?         | `resolveSpellReferenceOutcome` / `resolveSpellReferenceOutcomeForCatalogStatus` |
 | Referenceability | May this row be newly referenced?               | `isContentReferenceable`, `collectSpellReferenceIssues`                         |
 | Validation       | Legal on save/publish for this intent?          | API hooks, form schema, issue codes                                             |
-| Presentation     | What name or lifecycle label does the user see? | `SPELL_REFERENCE_DISPLAY_MESSAGES` → Phase B `presentSpellReferenceDisplayName` |
+| Presentation     | What name or lifecycle label does the user see? | `presentSpellReferenceDisplayName` + `SPELL_REFERENCE_DISPLAY_MESSAGES`         |
 
 Resolved draft spell in map → display **actual `spell.name`**. Publish eligibility → validation message, not faux missing state.
 
@@ -66,21 +66,21 @@ Consumers must not use `formatContentReferenceLabel`, slug title-case, raw ids, 
 
 ## Reconciliation with existing systems
 
-| System                          | Resolution                             | Display drift                 | Migration                            |
-| ------------------------------- | -------------------------------------- | ----------------------------- | ------------------------------------ |
-| `collectSpellReferenceIssues`   | Exact id; validation messages          | N/A                           | Keep                                 |
-| `resolveMonsterReactionTrigger` | `unknown-spell`, `catalog-unavailable` | Downstream prose              | Delegate to shared outcome (Phase D) |
-| Grant row presentation          | FieldOption / slug hacks               | Raw id / fabricated names     | Phase C                              |
-| `formatSpellsGrantSentence`     | Optional callback                      | `?? id`                       | Phase B `…FromResolutions`           |
-| `grant-display` compact summary | Vocabulary map                         | `formatSlugLabel`             | Phase D                              |
-| Character sheet spell cards     | `catalogIndex.spells.get`              | `formatContentReferenceLabel` | Phase D                              |
-| Monster `spellPlainName`        | Binary catalog flag                    | Collapsed unavailable         | Phase D                              |
+| System                          | Resolution                                            | Display drift                      | Migration             |
+| ------------------------------- | ----------------------------------------------------- | ---------------------------------- | --------------------- |
+| `collectSpellReferenceIssues`   | Exact id; validation messages                         | N/A                                | Keep                  |
+| `resolveMonsterReactionTrigger` | Shared `resolveSpellReferenceOutcomeForCatalogStatus` | Downstream prose                   | Done                  |
+| Grant row presentation          | `GrantSpellReferencePresentation`                     | Catalog-backed display             | Done                  |
+| `formatSpellsGrantSentence`     | `formatSpellsGrantSentenceFromResolutions`            | `?? id` callback (legacy)          | Done for dashboard UI |
+| `grant-display` compact summary | `buildSpellGrantVocabulary`                           | Shared presenter                   | Done                  |
+| Character sheet spell cards     | `resolveSpellReferenceOutcome`                        | `presentSpellReferenceDisplayName` | Done                  |
+| Monster `spellPlainName`        | `resolveSpellReferenceOutcomeForCatalogStatus`        | Shared display messages            | Done                  |
 
 Semantic reason for not-found: **`unknown-spell`** (same as reaction-trigger); do not introduce a parallel `unknown-reference` alias.
 
 ## Consumer matrix (tracking)
 
-Priorities from the spell reference resolution plan: grant rows P0; grant-display/builder P1; monster/character/class P2–P3. Every path is either migrated or listed with an explicit deferral — consolidated display is not complete while P0–P2 paths invent local fallbacks.
+P0–P2 spell-reference display paths are migrated. **Deferred (P3):** class-display slug helpers, character summary equipment non-spell `formatContentReferenceLabel` usages, species published preview without campaign spells.
 
 ## Cross-domain note
 
@@ -88,6 +88,9 @@ Equipment, skills, and slug-keyed content types use different reference keys. Re
 
 ## Implementation phases
 
-- **Phase A (this doc + `spell-catalog-context`)** — scope proof, lifecycle mapping, display ownership, reconciliation.
-- **Phase B** — `SpellReferenceResolution`, `resolveSpellReferenceOutcome`, `presentSpellReferenceDisplayName`, grant sentence formatter.
-- **Phase C+** — Grant UI and cross-surface migration per matrix.
+- **Phase A** — scope proof, lifecycle mapping, display ownership (`spell-catalog-context.ts`, this doc).
+- **Phase B** — `SpellReferenceResolution`, `resolveSpellReferenceOutcome`, `presentSpellReferenceDisplayName`, `formatSpellsGrantSentenceFromResolutions`.
+- **Phase C** — `GrantSpellReferencePresentation`; grant row header/detail/summary share one resolution pass.
+- **Phase D** — Grant-display vocabulary, monster stat block spell names, multiattack cast lines, character sheet spell cards.
+- **Phase E** — Export surface, fallow baseline, regression tests; removed `resolveSpellGrantName` / grant `spellOptions` presentation.
+- **Phase F** — Vitest paths in `spell-reference.test.ts`, grant row presentation, `spell-entry-presentation.test.ts`.

@@ -146,7 +146,7 @@ describe('formatMonsterSpellEntry', () => {
       catalogStatus: 'ready',
       spellsInBody,
     })
-    expect(spellEntryBody(changed)).toContain('Unavailable spell')
+    expect(spellEntryBody(changed)).toContain('Spell reference unavailable')
     expect(spellEntryBody(changed)).not.toContain('missing')
     expect(spellEntryBody(changed)).not.toContain('Mage Hand')
   })

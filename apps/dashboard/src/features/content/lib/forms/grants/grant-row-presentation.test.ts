@@ -89,6 +89,10 @@ describe('formatCompactMetadataList', () => {
 })
 
 describe('grant spell reference presentation', () => {
+  it('scenario F: removed option-based spell grant name resolver', async () => {
+    const exports = await import('./grant-form-fields')
+    expect('resolveSpellGrantName' in exports).toBe(false)
+  })
   it('resolves display names from the authoritative catalog, not pickers', () => {
     const presentation = buildGrantSpellReferencePresentationFromAuthoring({
       status: 'ready',
