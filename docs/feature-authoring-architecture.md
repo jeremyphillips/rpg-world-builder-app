@@ -38,7 +38,7 @@ Structured row collections share one master-detail anatomy: inline title from `r
 
 ## Adding a kind later
 
-1. Add the literal to `CLASS_FEATURE_KINDS`.
+1. Add a metadata entry to `CLASS_FEATURE_KIND_ENTRIES` (ids and `CLASS_FEATURE_KINDS` derive from it).
 2. Add a Zod variant (and restrict subclass host if needed).
 3. Branch `resolveClassFeatureGrantGroups`.
 4. Add a `CLASS_FEATURE_AUTHORING` entry.
