@@ -388,7 +388,9 @@ apps/dashboard/src/
 ### Integration manifest (`@rpg/content-types`)
 
 Semantic registries live in `@rpg/contracts` (`CONTENT_TYPE_KEYS`,
-`CONTENT_TYPE_TERMS`, `CONTENT_TYPE_CAPABILITIES`). Repository wiring metadata
+`CONTENT_TYPE_TERMS`, `CONTENT_TYPE_CAPABILITIES`). Domain admission and vocabulary
+patterns: [packages/contracts/docs/vocab-ssot.md](../packages/contracts/docs/vocab-ssot.md)
+(catalog content types use **domain-first** keys). Repository wiring metadata
 lives in **`tools/content-types/`** as `CONTENT_TYPE_INTEGRATION_MANIFEST` —
 path strings and flags only. Runtime registries remain authoritative; the
 manifest supports drift tests and future scaffolding.

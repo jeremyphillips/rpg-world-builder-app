@@ -588,6 +588,10 @@ Pattern: `*_TERM` + `*_ENTRIES` map → derived id tuple → `z.enum` schema →
 `vocabularyOptionIdSchema` and catalog seeds; see
 [docs/vocabulary.md](../../../docs/vocabulary.md).
 
+**SSOT ownership** (entries-first vs policy subsets vs dashboard acquisition):
+[vocab-ssot.md](vocab-ssot.md). Derive closed id tuples with `keysFromEntries` in
+[`enum-schema.ts`](../src/rpg/vocab/enum-schema.ts).
+
 **NPC roles** ([`npc-template.ts`](../src/rpg/vocab/npc/npc-template.ts)) follow the same
 two-layer pattern (`NPC_TEMPLATE_TERM` + `NPC_TEMPLATE_ENTRIES`) with an extended entry:
 class, skill, tool, and language preferences, an equipment bias
