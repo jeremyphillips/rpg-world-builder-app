@@ -1,5 +1,6 @@
 import {
   formatClassSpellcastingFeatureRules,
+  spellcastingGrantingFeatureDisplayName,
   type CharacterClass,
   type ResolvedSpellcastingProgressionConfig,
   type Spell,
@@ -77,7 +78,10 @@ function resolveSpellcastingGrantingFeatureRulesDocumentFromInput(
 export function resolveSpellcastingGrantingFeatureFacing(
   input: ResolveSpellcastingGrantingFeatureFacingInput,
 ): SpellcastingGrantingFeatureFacing {
-  const title = String(input.featureRow.name ?? '').trim() || 'Spellcasting'
+  const title = spellcastingGrantingFeatureDisplayName({
+    name: input.featureRow.name,
+    featureId: input.featureRow.id,
+  })
   const introHtml = normalizeIntroHtml(input.featureRow.intro)
 
   if (!isSpellcastingGrantingFeatureRow(input.featureRow)) {

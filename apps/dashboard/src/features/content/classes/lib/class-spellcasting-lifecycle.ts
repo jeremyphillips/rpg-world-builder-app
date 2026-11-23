@@ -1,4 +1,8 @@
-import { type Ability, type Spellcasting } from '@rpg/contracts'
+import {
+  spellcastingGrantingFeatureDisplayName,
+  type Ability,
+  type Spellcasting,
+} from '@rpg/contracts'
 
 import type { ClassFormValues } from './class-form-fields'
 import {
@@ -130,7 +134,10 @@ export function spellcastingFeatureSummaryFromRows(
   const level = typeof row.level === 'number' ? row.level : Number(row.level)
   if (!Number.isFinite(level)) return undefined
   return {
-    name: row.name.trim() || 'Spellcasting',
+    name: spellcastingGrantingFeatureDisplayName({
+      name: row.name,
+      featureId: row.id,
+    }),
     level,
     index,
   }

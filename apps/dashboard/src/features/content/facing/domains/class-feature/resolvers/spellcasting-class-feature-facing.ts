@@ -1,5 +1,6 @@
 import {
   formatClassSpellcastingFeatureRules,
+  spellcastingGrantingFeatureDisplayName,
   type CharacterClass,
   type ClassBodyFeature,
   type FacingBlock,
@@ -73,7 +74,10 @@ export function resolveSpellcastingClassFeatureFacing(
   row: FeatureRowForm & { id: string },
   host: ClassFacingHostContext,
 ): FacingResolution {
-  const title = String(row.name ?? '').trim() || 'Spellcasting'
+  const title = spellcastingGrantingFeatureDisplayName({
+    name: row.name,
+    featureId: row.id,
+  })
   const introHtml = normalizeIntroHtml(row.intro)
 
   if (!host.spellcastingProgression) {

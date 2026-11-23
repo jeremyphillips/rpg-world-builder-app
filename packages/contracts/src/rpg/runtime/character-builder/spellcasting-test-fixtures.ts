@@ -2,7 +2,11 @@ import { classSchema, type ClassStored } from '../../content/classes/class'
 import type { Spell } from '../../content/spell'
 import { resolveCharacterCreationPatch } from '../../campaign/patches/campaign-character-creation-patch'
 import { spellcastingProgressionTestConfig } from '../../campaign/rules/spellcasting-progression/fixtures'
-import { getSlotProgressionKindLabel } from '../../vocab/spell/slot-progression-kind'
+import {
+  PACT_MAGIC_SLOT_PROGRESSION_ID,
+  spellcastingGrantingFeatureDefaultName,
+  SPELLCASTING_GRANTING_FEATURE_ID,
+} from '../../content/classes/spellcasting/spellcasting-granting-feature'
 import { defaultCampaignMechanicsPatch } from '../../campaign/patches/campaign-mechanics-patch'
 import type { Species } from '../../content/species'
 import type { SkillProficiency } from '../../content/skill-proficiency'
@@ -33,8 +37,10 @@ const defaultSkillChoices = {
 function spellcastingGrantFeature(usesPactMagic = false) {
   return {
     kind: 'spellcasting' as const,
-    id: usesPactMagic ? 'pact-magic' : 'spellcasting',
-    name: usesPactMagic ? getSlotProgressionKindLabel('pact-magic') : 'Spellcasting',
+    id: usesPactMagic ? PACT_MAGIC_SLOT_PROGRESSION_ID : SPELLCASTING_GRANTING_FEATURE_ID,
+    name: spellcastingGrantingFeatureDefaultName({
+      slotProgressionId: usesPactMagic ? 'pact-magic' : 'full-caster',
+    }),
     level: 1,
   }
 }

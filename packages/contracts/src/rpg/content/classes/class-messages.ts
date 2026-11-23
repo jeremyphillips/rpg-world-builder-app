@@ -1,4 +1,10 @@
 import { defineMessage } from '../../../validation/define-message'
+import {
+  getSlotProgressionKindLabel,
+  PACT_MAGIC_SLOT_PROGRESSION_KIND_ID,
+} from '../../vocab/spell/slot-progression-kind'
+
+import { CLASS_FEATURE_KIND_ENTRIES } from './class'
 
 // ---------------------------------------------------------------------------
 // Class feature validation messages (tier 2).
@@ -20,7 +26,8 @@ export const classValidationMessages = {
   ),
   spellcastingGrantingFeatureDuplicate: defineMessage(
     'validation.class.spellcastingGrantingFeatureDuplicate',
-    () => 'Only one dedicated Spellcasting or Pact Magic feature is allowed.',
+    () =>
+      `Only one dedicated ${CLASS_FEATURE_KIND_ENTRIES.spellcasting.label} or ${getSlotProgressionKindLabel(PACT_MAGIC_SLOT_PROGRESSION_KIND_ID)} feature is allowed.`,
   ),
   duplicateClassFeatureId: defineMessage(
     'validation.class.duplicateClassFeatureId',

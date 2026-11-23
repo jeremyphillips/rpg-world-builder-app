@@ -34,6 +34,10 @@ export const SLOT_PROGRESSION_KIND_ENTRIES = {
 
 export type SlotProgressionKindId = keyof typeof SLOT_PROGRESSION_KIND_ENTRIES
 
+/** Standard ruleset id for Pact Magic slot progression (and the class granting feature id). */
+export const PACT_MAGIC_SLOT_PROGRESSION_KIND_ID =
+  'pact-magic' as const satisfies SlotProgressionKindId
+
 export const SLOT_PROGRESSION_KIND_IDS = keysFromEntries(SLOT_PROGRESSION_KIND_ENTRIES)
 
 export function isSlotProgressionKindId(id: string): id is SlotProgressionKindId {
