@@ -68,6 +68,8 @@
 
   .ui-alert__title {
     margin: 0;
+    font-size: var(--ui-copy-title-size);
+    line-height: var(--ui-copy-title-line-height);
     font-weight: var(--font-weight-heading);
     color: var(--foreground);
   }
@@ -78,7 +80,14 @@
 
   .ui-alert__description {
     margin: 0;
+    font-size: var(--ui-copy-supporting-size);
+    line-height: var(--ui-copy-supporting-line-height);
     color: var(--muted-foreground);
+  }
+
+  .ui-alert__copy > :not(.ui-alert__title):not(.ui-alert__description) {
+    font-size: var(--ui-copy-supporting-size);
+    line-height: var(--ui-copy-supporting-line-height);
   }
 
   .ui-alert__actions {

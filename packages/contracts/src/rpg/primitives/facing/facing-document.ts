@@ -1,6 +1,8 @@
 import type { ContentTable } from '../../content/tables/content-table'
 import type { StatBlockProseDocument } from '../../runtime/prose/stat-block-prose'
 
+import type { FacingReason } from './facing-reason'
+
 export type FacingRichTextBlock = {
   kind: 'richText'
   html: string
@@ -23,8 +25,6 @@ export type FacingDocument = {
   blocks: readonly FacingBlock[]
 }
 
-export type FacingInvalidCode = 'missing-kind' | 'missing-id' | 'host-mismatch'
-
 export type FacingResolution =
   | {
       status: 'ready'
@@ -32,18 +32,18 @@ export type FacingResolution =
     }
   | {
       status: 'incomplete'
-      guidance: string
+      reason: FacingReason
       document?: FacingDocument
     }
   | {
       status: 'unavailable'
-      guidance: string
+      reason: FacingReason
     }
   | {
       status: 'failed'
-      guidance: string
+      reason: FacingReason
     }
   | {
       status: 'invalid'
-      code: FacingInvalidCode
+      reason: FacingReason
     }

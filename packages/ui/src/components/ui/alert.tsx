@@ -76,7 +76,11 @@ export function Alert({
                 {description}
               </p>
             ) : null}
-            {children}
+            {children && title == null && description == null ? (
+              <p className="ui-alert__description ui-copy-supporting">{children}</p>
+            ) : children != null ? (
+              children
+            ) : null}
           </div>
         ) : null}
         {actions ? (

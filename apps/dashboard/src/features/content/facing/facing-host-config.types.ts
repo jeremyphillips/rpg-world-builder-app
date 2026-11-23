@@ -1,19 +1,14 @@
-import type { ReactNode } from 'react'
-import type { FacingResolution } from '@rpg/contracts'
+import type { FacingHostPanelModel } from '@rpg/ui'
 
 export type StructuredFacingHostId =
   | 'class-features'
-  | 'subclass-features'
   | 'monster-action-sections'
   | 'monster-traits'
   | 'species-traits'
   | 'heritage-options'
 
-/** Host-owned subscription resolves live facing for the selected structured row. */
+/** Host-owned subscription resolves the preview panel display model for the selected row. */
 export type FacingHostConfig = {
   hostId: StructuredFacingHostId
-  resolveSelectedFacing: () => FacingResolution | undefined
-  /** Optional preview chrome beside the panel (attack metadata, shape-shift destinations, …). */
-  chromeTrailing?: ReactNode
-  context?: string
+  resolvePanelModel: () => FacingHostPanelModel | undefined
 }

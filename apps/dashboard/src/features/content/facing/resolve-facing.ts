@@ -12,6 +12,7 @@ import {
 import type { ClassFacingHostContext } from './domains/class-feature/class-facing-host'
 import { resolveMonsterActionDraftFacing } from './domains/monster-action/resolve-monster-action-draft-facing'
 import {
+  resolveMonsterTraitDraftFacing,
   resolveSpeciesTraitDraftFacing,
   resolveTraitPersistedFacing,
 } from './domains/trait/resolve-trait-facing'
@@ -47,7 +48,14 @@ export type ResolveFacingRequest =
       domain: 'trait'
       source: 'draft'
       hostId: 'species-traits' | 'heritage-options'
-      row: TraitRowForm & { id: string }
+      row: TraitRowForm
+    }
+  | {
+      domain: 'trait'
+      source: 'draft'
+      hostId: 'monster-traits'
+      row: Record<string, unknown>
+      monster: Pick<MonsterFormValues, 'name' | 'lair' | 'forms'>
     }
 
 export function resolveFacing(request: ResolveFacingRequest): FacingResolution {
@@ -57,7 +65,12 @@ export function resolveFacing(request: ResolveFacingRequest): FacingResolution {
         return resolveClassFeaturePersistedFacing(request.feature, request.host)
       }
       const adapted = adaptClassFeatureDraftRow(request.row)
-      if (adapted.status === 'invalid') return { status: 'invalid', code: adapted.code }
+      if (adapted.status === 'incomplete') {
+        return { status: 'incomplete', reason: adapted.reason }
+      }
+      if (adapted.status === 'invalid') {
+        return { status: 'invalid', reason: adapted.reason }
+      }
       return resolveClassFeatureDraftFacing(adapted.record, request.host)
     }
     case 'monsterAction':
@@ -66,13 +79,20 @@ export function resolveFacing(request: ResolveFacingRequest): FacingResolution {
         ctx: request.ctx,
         actionId: request.actionId,
         section: request.section,
-      })
+      }).resolution
     case 'trait': {
       if (request.source === 'persisted') {
         return resolveTraitPersistedFacing(request.trait)
       }
+      if (request.hostId === 'monster-traits') {
+        const resolution = resolveMonsterTraitDraftFacing({
+          row: request.row,
+          monster: request.monster,
+        })
+        return resolution ?? { status: 'invalid', reason: { code: 'unsupported-kind' } }
+      }
       const resolution = resolveSpeciesTraitDraftFacing(request.row)
-      return resolution ?? { status: 'invalid', code: 'missing-kind' }
+      return resolution ?? { status: 'invalid', reason: { code: 'unresolvable-record' } }
     }
   }
 }

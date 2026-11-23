@@ -20,10 +20,14 @@ function blocksFromCustomRow(row: FeatureRowForm): FacingBlock[] {
 }
 
 export function resolveCustomClassFeatureFacing(
-  row: FeatureRowForm & { id: string },
+  row: FeatureRowForm & { kind: 'custom' },
 ): FacingResolution {
   const title = String(row.name ?? '').trim()
-  return { status: 'ready', document: { title, blocks: blocksFromCustomRow(row) } }
+  const blocks = blocksFromCustomRow(row)
+  if (blocks.length === 0) {
+    return { status: 'incomplete', reason: { code: 'missing-rules-text' } }
+  }
+  return { status: 'ready', document: { title, blocks } }
 }
 
 export function resolvePersistedCustomClassFeatureFacing(

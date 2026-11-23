@@ -65,7 +65,7 @@ describe('class feature spellcasting facing', () => {
         spellcastingProgression: PROGRESSION,
       },
     })
-    expect(facing).toEqual({ status: 'invalid', code: 'missing-kind' })
+    expect(facing).toEqual({ status: 'incomplete', reason: { code: 'missing-kind' } })
   })
 
   it('keeps introduction when spellcasting config is incomplete', () => {
@@ -90,7 +90,7 @@ describe('class feature spellcasting facing', () => {
     expect(facing.status).toBe('incomplete')
     if (facing.status !== 'incomplete') return
     expect(facing.document?.blocks.some((block) => block.kind === 'richText')).toBe(true)
-    expect(facing.guidance).toBeTruthy()
+    expect(facing.reason).toEqual({ code: 'incomplete-spellcasting' })
   })
 })
 

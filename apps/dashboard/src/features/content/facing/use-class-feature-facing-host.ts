@@ -11,6 +11,7 @@ import type { ContentFormCtx } from '../lib/forms/registry/content-form-registry
 import type { FacingHostConfig } from './facing-host-config.types'
 import type { ClassFacingHostContext } from './domains/class-feature/class-facing-host'
 import { resolveClassFeatureRowFacing } from './resolve-facing'
+import { toFacingPanelModel } from './structured-facing-host-panel'
 
 const CLASS_FEATURE_FACING_PARENT_WATCH = [
   'name',
@@ -57,6 +58,6 @@ export function useClassFeatureFacingHost(input: {
 
   return {
     hostId: 'class-features',
-    resolveSelectedFacing: () => resolution,
+    resolvePanelModel: () => toFacingPanelModel(resolution),
   }
 }

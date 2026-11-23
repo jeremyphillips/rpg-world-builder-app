@@ -1,7 +1,6 @@
 import {
   availableBodyRows,
   CHALLENGE_RATING_MECHANICS,
-  derivedFieldReasonLabel,
   deriveSpellcastingLines,
   isMonsterActionAttackKind,
   monsterActionSectionRows,
@@ -9,6 +8,7 @@ import {
   type DerivedFieldReason,
   type DerivedMonsterAttackLine,
   type DerivedMonsterStatBlock,
+  type FacingReason,
   type Monster,
   type MonsterAction,
   type MonsterActionAttackProfile,
@@ -18,7 +18,7 @@ import {
 } from '@rpg/contracts'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
-import { resolveMonsterActionAttackPreviewGuidance } from '../actions/previews/monster-action-attack-summary'
+import { resolveMonsterActionAttackPreviewReason } from '../actions/previews/monster-action-attack-summary'
 import { findMonsterFormActionDraft } from '../actions/previews/monster-action-draft-lookup'
 import type { MonsterActionSection } from '../actions/references/monster-action-equipment-references'
 import {
@@ -27,11 +27,6 @@ import {
   monsterEquipmentCatalog,
   monsterMagicPropertyProvider,
 } from '../monster-form-derivation'
-import {
-  MONSTER_EQUIPMENT_CATALOG_ERROR,
-  MONSTER_LOADING_EQUIPMENT,
-  formatMonsterActionAttackPreviewConfigureHint,
-} from '../monster-form-labels'
 import type { MonsterFormValues } from '../monster-form-values'
 import { normalizeMonsterDraftForPreview } from '../normalize-monster-form-values'
 
@@ -47,9 +42,9 @@ import {
 type PublishedAction = MonsterAction | MonsterBonusAction | MonsterReaction | MonsterLegendaryAction
 
 export type MonsterActionRulesPreviewOutcome =
-  | { status: 'unavailable'; guidance: string }
-  | { status: 'incomplete'; guidance: string }
-  | { status: 'failed'; guidance: string }
+  | { status: 'unavailable'; reason: FacingReason }
+  | { status: 'incomplete'; reason: FacingReason }
+  | { status: 'failed'; reason: FacingReason }
   | {
       status: 'ready'
       facing: MonsterActionRulesFacing
@@ -72,29 +67,60 @@ function derivedSection(
   return section
 }
 
-function catalogUnavailableGuidance(ctx: ContentFormCtx): string {
-  if (ctx.equipmentCatalogStatus === 'error') return MONSTER_EQUIPMENT_CATALOG_ERROR
-  if (ctx.spellCatalogStatus === 'error') {
-    return MONSTER_EQUIPMENT_CATALOG_ERROR
+function equipmentCatalogReason(ctx: ContentFormCtx): FacingReason {
+  if (ctx.equipmentCatalogStatus === 'error') {
+    return { code: 'catalog-error', catalog: 'equipment' }
   }
-  return MONSTER_LOADING_EQUIPMENT
+  return { code: 'catalog-pending', catalog: 'equipment' }
 }
 
-function reasonGuidance(
+function spellCatalogReason(ctx: ContentFormCtx): FacingReason {
+  if (ctx.spellCatalogStatus === 'error') {
+    return { code: 'catalog-error', catalog: 'spells' }
+  }
+  return { code: 'catalog-pending', catalog: 'spells' }
+}
+
+function catalogReferenceReason(ctx: ContentFormCtx): FacingReason {
+  if (ctx.equipmentCatalogStatus === 'pending' || ctx.equipmentCatalogStatus === 'error') {
+    return equipmentCatalogReason(ctx)
+  }
+  if (ctx.spellCatalogStatus === 'pending' || ctx.spellCatalogStatus === 'error') {
+    return spellCatalogReason(ctx)
+  }
+  return { code: 'catalog-pending', catalog: 'armor-class-rules' }
+}
+
+function derivedAttackReason(
   reason: DerivedFieldReason,
   values: MonsterFormValues,
   ctx: ContentFormCtx,
   actionId: string,
-): string {
+): FacingReason {
   if (reason === 'missing-input') {
     const draft = findMonsterFormActionDraft(values, ctx, actionId)
     if (draft && isMonsterActionAttackKind(draft.kind)) {
-      return resolveMonsterActionAttackPreviewGuidance({ ctx, values, action: draft })
+      return resolveMonsterActionAttackPreviewReason({ ctx, values, action: draft })
     }
-    return formatMonsterActionAttackPreviewConfigureHint('details')
+    return { code: 'missing-rules-text' }
   }
-  if (reason === 'missing-reference') return catalogUnavailableGuidance(ctx)
-  return derivedFieldReasonLabel(reason)
+  if (reason === 'missing-reference') return catalogReferenceReason(ctx)
+  if (reason === 'conflict') return { code: 'derived-conflict' }
+  return { code: 'unexpected' }
+}
+
+function incompleteReasonForAction(
+  action: ReturnType<typeof findMonsterFormActionDraft>,
+  values: MonsterFormValues,
+  ctx: ContentFormCtx,
+): FacingReason {
+  if (!action) return { code: 'missing-rules-text' }
+  if (action.kind === 'multiattack') return { code: 'missing-multiattack-steps' }
+  if (action.kind === 'spell') return { code: 'missing-spell-configuration' }
+  if (isMonsterActionAttackKind(action.kind)) {
+    return resolveMonsterActionAttackPreviewReason({ ctx, values, action })
+  }
+  return { code: 'missing-rules-text' }
 }
 
 // fallow-ignore-next-line complexity
@@ -185,15 +211,18 @@ export function resolveActionStatBlockRulesFacingForForm(input: {
     input.ctx.equipmentCatalogStatus === 'pending' ||
     input.ctx.equipmentCatalogStatus === 'error'
   ) {
-    return { status: 'unavailable', guidance: catalogUnavailableGuidance(input.ctx) }
+    return { status: 'unavailable', reason: equipmentCatalogReason(input.ctx) }
   }
   if (input.ctx.spellCatalogStatus === 'pending' || input.ctx.spellCatalogStatus === 'error') {
-    return { status: 'unavailable', guidance: catalogUnavailableGuidance(input.ctx) }
+    return { status: 'unavailable', reason: spellCatalogReason(input.ctx) }
   }
 
   const armorClassRules = monsterArmorClassRules(input.ctx)
   if (!armorClassRules) {
-    return { status: 'unavailable', guidance: catalogUnavailableGuidance(input.ctx) }
+    return {
+      status: 'unavailable',
+      reason: { code: 'catalog-pending', catalog: 'armor-class-rules' },
+    }
   }
 
   let normalized: Monster
@@ -217,16 +246,17 @@ export function resolveActionStatBlockRulesFacingForForm(input: {
       magicPropertyProvider: monsterMagicPropertyProvider(input.ctx),
     })
   } catch (error) {
-    const message = error instanceof Error ? error.message : derivedFieldReasonLabel('conflict')
-    return { status: 'failed', guidance: message }
+    console.error('resolveActionStatBlockRulesFacingForForm failed', {
+      actionId: input.actionId,
+      section: input.section,
+      error,
+    })
+    return { status: 'failed', reason: { code: 'unexpected' } }
   }
 
   const action = sectionRows(normalized, input.section).find((row) => row.id === input.actionId)
   if (!action) {
-    return {
-      status: 'incomplete',
-      guidance: formatMonsterActionAttackPreviewConfigureHint('details'),
-    }
+    return { status: 'incomplete', reason: { code: 'missing-rules-text' } }
   }
 
   if (isMonsterActionAttackKind(action.kind)) {
@@ -238,20 +268,20 @@ export function resolveActionStatBlockRulesFacingForForm(input: {
     )
     if (attackState.reason === 'conflict') {
       return {
-        status: 'failed',
-        guidance: reasonGuidance('conflict', input.values, input.ctx, input.actionId),
+        status: 'unavailable',
+        reason: derivedAttackReason('conflict', input.values, input.ctx, input.actionId),
       }
     }
     if (attackState.reason === 'missing-reference') {
       return {
         status: 'unavailable',
-        guidance: reasonGuidance('missing-reference', input.values, input.ctx, input.actionId),
+        reason: derivedAttackReason('missing-reference', input.values, input.ctx, input.actionId),
       }
     }
     if (attackState.reason === 'missing-input') {
       return {
         status: 'incomplete',
-        guidance: reasonGuidance('missing-input', input.values, input.ctx, input.actionId),
+        reason: derivedAttackReason('missing-input', input.values, input.ctx, input.actionId),
       }
     }
   }
@@ -269,15 +299,10 @@ export function resolveActionStatBlockRulesFacingForForm(input: {
 
   if (!facingHasRulesBody(facing)) {
     const draftAction = findMonsterFormActionDraft(input.values, input.ctx, input.actionId)
-    const guidance =
-      draftAction && isMonsterActionAttackKind(draftAction.kind)
-        ? resolveMonsterActionAttackPreviewGuidance({
-            ctx: input.ctx,
-            values: input.values,
-            action: draftAction,
-          })
-        : formatMonsterActionAttackPreviewConfigureHint('details')
-    return { status: 'incomplete', guidance }
+    return {
+      status: 'incomplete',
+      reason: incompleteReasonForAction(draftAction, input.values, input.ctx),
+    }
   }
 
   const attackDraft = isMonsterActionAttackKind(action.kind)

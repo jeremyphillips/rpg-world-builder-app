@@ -1,68 +1,60 @@
 import type { ReactNode } from 'react'
-import type { ContentTable, FacingResolution } from '@rpg/contracts'
+import type { ContentTable } from '@rpg/contracts'
 
 import { Eyebrow } from './eyebrow'
 import { Panel } from './panel'
 import { Text } from './text'
-import { FacingGuidance, FacingHostInvalidPanel } from './facing-host-panel-chrome'
+import { FacingGuidance } from './facing-host-panel-chrome'
 import { FacingHostPanelBody } from './facing-host-panel-body'
-import {
-  facingPanelGuidanceMessage,
-  facingPanelHasContent,
-  facingPanelTitle,
-} from './facing-host-panel.lib'
+import { FacingHostPanelMetadata } from './facing-host-panel-metadata'
+import type { FacingHostPanelModel } from './facing-host-panel-model'
+import { facingHostPanelLayout } from './facing-host-panel.lib'
 import { RULES_PREVIEW_DEFAULT_LABEL } from './rules-preview'
+
+export type { FacingHostPanelModel } from './facing-host-panel-model'
 
 export type FacingHostPanelProps = {
   label?: string
-  context?: string
-  resolution: FacingResolution | undefined
+  model: FacingHostPanelModel | undefined
   proseTone?: 'default' | 'muted'
   renderTable?: (table: ContentTable) => ReactNode
-  /** Attack-bonus metadata and similar chrome — not facing blocks. */
-  chromeTrailing?: ReactNode
 }
 
-/** Authoring preview shell for one structured row's facing resolution. */
+/** Authoring preview shell for one structured row's facing display model. */
 export function FacingHostPanel({
   label = RULES_PREVIEW_DEFAULT_LABEL,
-  context,
-  resolution,
+  model,
   proseTone = 'muted',
   renderTable,
-  chromeTrailing,
 }: FacingHostPanelProps) {
-  if (!resolution) return null
+  if (!model) return null
 
-  if (resolution.status === 'invalid') {
-    return <FacingHostInvalidPanel label={label} code={resolution.code} />
-  }
+  const layout = facingHostPanelLayout(model)
+  if (!layout.hasContent) return null
 
-  const title = facingPanelTitle(resolution)
-  const body = <FacingHostPanelBody resolution={resolution} options={{ proseTone, renderTable }} />
-  const guidance = facingPanelGuidanceMessage(resolution)
-
-  if (!facingPanelHasContent({ title, body, guidance, chromeTrailing })) return null
+  const body = <FacingHostPanelBody model={model} options={{ proseTone, renderTable }} />
 
   return (
     <Panel tone="subtle" density="compact">
       <div className="mb-1 flex items-baseline justify-between gap-3">
         <Eyebrow size="sm">{label}</Eyebrow>
-        {context ? (
+        {model.context ? (
           <Text as="span" variant="supporting">
-            {context}
+            {model.context}
           </Text>
         ) : null}
       </div>
-      {title ? (
+      {layout.title ? (
         <Text variant="emphasis" className="mb-0.5">
-          {title}
+          {layout.title}
         </Text>
       ) : null}
       <div className="flex flex-col gap-1">
         {body}
-        {guidance ? <FacingGuidance message={guidance} /> : null}
-        {chromeTrailing}
+        {layout.showStandaloneGuidance && layout.guidance ? (
+          <FacingGuidance message={layout.guidance} tone={layout.guidanceTone} />
+        ) : null}
+        {model.metadataRows ? <FacingHostPanelMetadata rows={model.metadataRows} /> : null}
       </div>
     </Panel>
   )

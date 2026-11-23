@@ -475,6 +475,30 @@ const dashboardSourceExcerptImportGuard = {
   },
 }
 
+const dashboardFacingPresentationImportGuard = {
+  files: ['src/features/**/*.{ts,tsx}'],
+  ignores: [
+    '**/*.{test,integration.test,stories}.{ts,tsx}',
+    'src/features/content/facing/structured-facing-host-panel.tsx',
+    'src/features/content/facing/facing-detail-body.tsx',
+  ],
+  rules: {
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: '@rpg/ui',
+            importNames: ['FacingHostPanel'],
+            message:
+              'Mount Rules Preview through StructuredFacingHostPanel / FacingDetailBody — features cannot import the host shell directly.',
+          },
+        ],
+      },
+    ],
+  },
+}
+
 const dashboardMonsterAcquisitionSectionKindsGuard = {
   files: ['src/features/content/monsters/lib/actions/acquisition/**/*.{ts,tsx}'],
   ignores: ['**/*.{test,integration.test,stories}.{ts,tsx}'],
@@ -555,4 +579,5 @@ export default [
   dashboardShellContractsImportGuard,
   dashboardAuthApiContractsImportGuard,
   dashboardMonsterAcquisitionSectionKindsGuard,
+  dashboardFacingPresentationImportGuard,
 ]

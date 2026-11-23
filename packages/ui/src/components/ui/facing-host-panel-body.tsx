@@ -1,35 +1,34 @@
-import type { FacingResolution } from '@rpg/contracts'
-
 import { FacingBody } from './facing-body'
 import { FacingGuidance } from './facing-host-panel-chrome'
+import type { FacingHostPanelModel } from './facing-host-panel-model'
 import type { FacingPanelBodyOptions } from './facing-host-panel.lib'
 
 export function FacingHostPanelBody({
-  resolution,
+  model,
   options,
 }: {
-  resolution: Exclude<FacingResolution, { status: 'invalid' }>
+  model: FacingHostPanelModel
   options: FacingPanelBodyOptions
 }) {
-  if (resolution.status === 'ready') {
+  if (model.status === 'ready' && model.document) {
     return (
       <FacingBody
-        blocks={resolution.document.blocks}
+        blocks={model.document.blocks}
         proseTone={options.proseTone}
         renderTable={options.renderTable}
       />
     )
   }
 
-  if (resolution.status === 'incomplete' && resolution.document) {
+  if (model.status === 'incomplete' && model.document) {
     return (
       <>
         <FacingBody
-          blocks={resolution.document.blocks}
+          blocks={model.document.blocks}
           proseTone={options.proseTone}
           renderTable={options.renderTable}
         />
-        <FacingGuidance message={resolution.guidance} />
+        {model.message ? <FacingGuidance message={model.message} /> : null}
       </>
     )
   }

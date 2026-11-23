@@ -22,8 +22,42 @@ const copyScaleCss = readFileSync(
   .replace(/\n}\s*$/, '')
 
 const SURFACE_TEST_TOKENS = `
-  :root { --spacing: 4px; }
+  :root {
+    --spacing: 4px;
+    --text-xs: 12px;
+    --text-xs--line-height: 16px;
+    --text-sm: 14px;
+    --text-sm--line-height: 20px;
+    --text-base: 16px;
+  }
 `
+
+function resolveCustomProperty(element: Element, token: string): string {
+  let node: Element | null = element
+  while (node) {
+    const specified = getComputedStyle(node).getPropertyValue(token).trim()
+    if (specified) return specified
+    node = node.parentElement
+  }
+  return getComputedStyle(document.documentElement).getPropertyValue(token).trim()
+}
+
+function resolveTokenPx(element: Element, token: string): string {
+  const raw = resolveCustomProperty(element, token)
+  const nested = raw.match(/^var\((--[^,)]+)/)?.[1]
+  if (nested) return resolveTokenPx(element, nested)
+  return raw
+}
+
+function expectComputedFontSize(element: Element, expected: string) {
+  const size = getComputedStyle(element).fontSize.trim()
+  const varRef = size.match(/^var\((--[^,)]+)/)?.[1]
+  if (varRef) {
+    expect(resolveTokenPx(element, varRef)).toBe(expected)
+    return
+  }
+  expect(size).toBe(expected)
+}
 
 function resolveSpacingTokenPx(element: Element, property: string): string {
   let node: Element | null = element
@@ -139,6 +173,25 @@ describe('Alert', () => {
       expect(resolveSpacingTokenPx(screen.getByRole('alert'), '--ui-surface-region-gap')).toBe(
         '12px',
       )
+    })
+
+    it('applies compact copy scale to title, description, and children-only message', () => {
+      const { rerender } = render(
+        <Alert density="compact" title="Compact title" description="Compact description" />,
+      )
+      expectComputedFontSize(screen.getByText('Compact title'), '14px')
+      expectComputedFontSize(screen.getByText('Compact description'), '12px')
+
+      rerender(<Alert density="compact">Children-only compact alert message</Alert>)
+      expectComputedFontSize(screen.getByText('Children-only compact alert message'), '12px')
+    })
+
+    it('applies comfortable title copy scale', () => {
+      render(
+        <Alert density="comfortable" title="Comfortable title" description="Comfortable copy" />,
+      )
+      expectComputedFontSize(screen.getByText('Comfortable title'), '16px')
+      expectComputedFontSize(screen.getByText('Comfortable copy'), '14px')
     })
   })
 

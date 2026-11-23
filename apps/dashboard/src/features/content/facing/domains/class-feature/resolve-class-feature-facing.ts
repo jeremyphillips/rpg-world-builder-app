@@ -26,11 +26,14 @@ const CLASS_FEATURE_FACING_RESOLVERS = {
   'subclass-choice': resolveSubclassChoiceClassFeatureFacing,
 } as const satisfies Record<
   ClassFeatureKind,
-  (row: FeatureRowForm & { id: string }, host: ClassFacingHostContext) => FacingResolution
+  (
+    row: FeatureRowForm & { kind: ClassFeatureKind },
+    host: ClassFacingHostContext,
+  ) => FacingResolution
 >
 
 export function resolveClassFeatureDraftFacing(
-  row: FeatureRowForm & { id: string; kind: ClassFeatureKind },
+  row: FeatureRowForm & { kind: ClassFeatureKind },
   host: ClassFacingHostContext,
 ): FacingResolution {
   return CLASS_FEATURE_FACING_RESOLVERS[row.kind](row, host)

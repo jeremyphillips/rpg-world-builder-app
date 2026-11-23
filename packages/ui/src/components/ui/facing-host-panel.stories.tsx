@@ -13,7 +13,7 @@ type Story = StoryObj<typeof meta>
 
 export const SpellcastingReady: Story = {
   args: {
-    resolution: {
+    model: {
       status: 'ready',
       document: {
         title: 'Spellcasting',
@@ -34,8 +34,11 @@ export const SpellcastingReady: Story = {
   },
 }
 
-export const InvalidKind: Story = {
+export const IncompleteMissingKind: Story = {
   args: {
-    resolution: { status: 'invalid', code: 'missing-kind' },
+    model: {
+      status: 'incomplete',
+      message: 'Choose a feature kind to preview rules text.',
+    },
   },
 }

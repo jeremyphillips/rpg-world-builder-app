@@ -1,7 +1,8 @@
-import { facingInvalidMessage, type FacingResolution } from '@rpg/contracts'
+import type { FacingResolution } from '@rpg/contracts'
 import { FacingBody, Icon, SemanticText, Text } from '@rpg/ui'
 
 import { ContentTableView } from '../components/tables/content-table-view'
+import { facingReasonMessage } from './facing-reason-message'
 
 function FacingDetailGuidance({ message }: { message: string }) {
   return (
@@ -15,10 +16,6 @@ function FacingDetailGuidance({ message }: { message: string }) {
 
 /** Published detail body for one structured facing resolution (no preview chrome). */
 export function FacingDetailBody({ resolution }: { resolution: FacingResolution }) {
-  if (resolution.status === 'invalid') {
-    return <FacingDetailGuidance message={facingInvalidMessage(resolution.code, 'detail')} />
-  }
-
   if (resolution.status === 'ready') {
     return (
       <FacingBody
@@ -28,6 +25,8 @@ export function FacingDetailBody({ resolution }: { resolution: FacingResolution 
       />
     )
   }
+
+  const message = facingReasonMessage(resolution.reason)
 
   if (resolution.status === 'incomplete') {
     return (
@@ -39,10 +38,10 @@ export function FacingDetailBody({ resolution }: { resolution: FacingResolution 
             renderTable={(table) => <ContentTableView table={table} />}
           />
         ) : null}
-        <FacingDetailGuidance message={resolution.guidance} />
+        <FacingDetailGuidance message={message} />
       </>
     )
   }
 
-  return <FacingDetailGuidance message={resolution.guidance} />
+  return <FacingDetailGuidance message={message} />
 }

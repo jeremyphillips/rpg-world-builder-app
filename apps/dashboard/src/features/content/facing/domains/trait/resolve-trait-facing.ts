@@ -8,11 +8,6 @@ import {
 
 import type { MonsterFormValues } from '../../../monsters/lib/monster-form-values'
 
-const TRAIT_FACING_COMPLETE_CONFIGURATION_GUIDANCE =
-  'Complete trait configuration to preview rules text.' as const
-
-const TRAIT_FACING_ADD_DETAILS_GUIDANCE =
-  'Add trait details to preview player-facing text.' as const
 import {
   resolveTraitStatBlockRulesFacingForFormRow,
   type TraitStatBlockRulesFacing,
@@ -55,10 +50,7 @@ function readyFacingFromStatBlock(facing: TraitStatBlockRulesFacing): FacingReso
     }
   }
   if (blocks.length === 0) {
-    return {
-      status: 'unavailable',
-      guidance: TRAIT_FACING_COMPLETE_CONFIGURATION_GUIDANCE,
-    }
+    return { status: 'incomplete', reason: { code: 'incomplete-trait' } }
   }
   return { status: 'ready', document: { title: facing.heading, blocks } }
 }
@@ -82,26 +74,21 @@ function readyFacingFromDisplay(input: {
 }): FacingResolution {
   const blocks = facingBlocksFromTraitDisplay(input)
   if (blocks.length === 0 && !input.title.trim()) {
-    return { status: 'unavailable', guidance: TRAIT_FACING_ADD_DETAILS_GUIDANCE }
+    return { status: 'incomplete', reason: { code: 'incomplete-trait' } }
   }
   if (blocks.length === 0) {
-    return {
-      status: 'unavailable',
-      guidance: TRAIT_FACING_COMPLETE_CONFIGURATION_GUIDANCE,
-    }
+    return { status: 'incomplete', reason: { code: 'incomplete-trait' } }
   }
   return { status: 'ready', document: { title: input.title, blocks } }
 }
 
-export function resolveSpeciesTraitDraftFacing(
-  row: TraitRowForm & { id: string },
-): FacingResolution | undefined {
+export function resolveSpeciesTraitDraftFacing(row: TraitRowForm): FacingResolution | undefined {
   if (row.kind === 'custom') return undefined
   try {
     const trait = traitFromFormRow(row)
     return resolveTraitPersistedFacing(trait)
   } catch {
-    return { status: 'invalid', code: 'missing-kind' }
+    return { status: 'invalid', reason: { code: 'unresolvable-record' } }
   }
 }
 
@@ -115,12 +102,11 @@ export function resolveMonsterTraitDraftFacing(input: {
       row: input.row,
       monster: input.monster,
     })
-    if (!facing) return { status: 'invalid', code: 'missing-kind' }
+    if (!facing) {
+      return { status: 'invalid', reason: { code: 'unresolvable-record' } }
+    }
     if (!facing.proseText.trim() && !facing.descriptionHtml.trim()) {
-      return {
-        status: 'unavailable',
-        guidance: TRAIT_FACING_COMPLETE_CONFIGURATION_GUIDANCE,
-      }
+      return { status: 'incomplete', reason: { code: 'incomplete-trait' } }
     }
     return readyFacingFromStatBlock(facing)
   }

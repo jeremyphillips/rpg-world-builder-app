@@ -87,7 +87,11 @@ export {
   type FeatureRulesContentProps,
 } from './components/ui/feature-rules-content'
 export { FacingBody, type FacingBodyProps } from './components/ui/facing-body'
-export { FacingHostPanel, type FacingHostPanelProps } from './components/ui/facing-host-panel'
+export {
+  FacingHostPanel,
+  type FacingHostPanelModel,
+  type FacingHostPanelProps,
+} from './components/ui/facing-host-panel'
 export { StatBlockLead, type StatBlockLeadProps } from './components/ui/stat-block-lead'
 export { StatBlockProseView } from './components/ui/stat-block-prose'
 export {

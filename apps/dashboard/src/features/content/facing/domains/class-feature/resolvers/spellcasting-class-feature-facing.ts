@@ -9,10 +9,6 @@ import {
 } from '@rpg/contracts'
 
 import {
-  CLASS_SPELLCASTING_RULES_INCOMPLETE_GUIDANCE,
-  CLASS_SPELLCASTING_RULES_PROGRESSION_UNAVAILABLE,
-} from '../../../../classes/lib/class-spellcasting-feature-rules.lib'
-import {
   featureFromFormRow,
   type FeatureRowForm,
 } from '../../../../classes/lib/class-feature-form-fields'
@@ -45,12 +41,15 @@ function previewCharacterClass(
 
 function spellcastingRulesDocument(
   host: ClassFacingHostContext,
-  row: FeatureRowForm & { id: string },
+  row: FeatureRowForm & { kind: 'spellcasting' },
 ) {
   if (!host.spellcasting || !host.spellcastingProgression) return null
-  if (row.kind !== 'spellcasting') return null
 
-  const feature = featureFromFormRow(row)
+  const feature = featureFromFormRow({
+    ...row,
+    id: row.id ?? 'spellcasting-rules-preview',
+  })
+
   return formatClassSpellcastingFeatureRules({
     characterClass: previewCharacterClass(host, feature),
     config: host.spellcastingProgression,
@@ -71,7 +70,7 @@ function introPartialDocument(
 }
 
 export function resolveSpellcastingClassFeatureFacing(
-  row: FeatureRowForm & { id: string },
+  row: FeatureRowForm & { kind: 'spellcasting' },
   host: ClassFacingHostContext,
 ): FacingResolution {
   const title = spellcastingGrantingFeatureDisplayName({
@@ -84,20 +83,20 @@ export function resolveSpellcastingClassFeatureFacing(
     return introHtml
       ? {
           status: 'incomplete',
-          guidance: CLASS_SPELLCASTING_RULES_PROGRESSION_UNAVAILABLE,
+          reason: { code: 'spellcasting-progression-unavailable' },
           document: introPartialDocument(title, introHtml),
         }
-      : { status: 'unavailable', guidance: CLASS_SPELLCASTING_RULES_PROGRESSION_UNAVAILABLE }
+      : { status: 'unavailable', reason: { code: 'spellcasting-progression-unavailable' } }
   }
 
   if (!host.spellcasting) {
     return introHtml
       ? {
           status: 'incomplete',
-          guidance: CLASS_SPELLCASTING_RULES_INCOMPLETE_GUIDANCE,
+          reason: { code: 'incomplete-spellcasting' },
           document: introPartialDocument(title, introHtml),
         }
-      : { status: 'incomplete', guidance: CLASS_SPELLCASTING_RULES_INCOMPLETE_GUIDANCE }
+      : { status: 'incomplete', reason: { code: 'incomplete-spellcasting' } }
   }
 
   const rulesDocument = spellcastingRulesDocument(host, row)
@@ -105,10 +104,10 @@ export function resolveSpellcastingClassFeatureFacing(
     return introHtml
       ? {
           status: 'incomplete',
-          guidance: CLASS_SPELLCASTING_RULES_INCOMPLETE_GUIDANCE,
+          reason: { code: 'incomplete-spellcasting' },
           document: introPartialDocument(title, introHtml),
         }
-      : { status: 'incomplete', guidance: CLASS_SPELLCASTING_RULES_INCOMPLETE_GUIDANCE }
+      : { status: 'incomplete', reason: { code: 'incomplete-spellcasting' } }
   }
 
   return {

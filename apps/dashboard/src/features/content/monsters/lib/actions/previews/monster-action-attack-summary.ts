@@ -21,6 +21,7 @@ import {
   type Ability,
   type ChallengeRating,
   type DerivedField,
+  type FacingReason,
   type MonsterActionAttackProfile,
   type MonsterActionAttackRoll,
   type MonsterActionDraft,
@@ -167,6 +168,77 @@ export function resolveMonsterActionAttackPreviewGuidance({
   if (action.kind === 'natural-weapon') return naturalWeaponPreviewGuidance(action, challengeBonus)
   if (action.kind === 'attack') return attackPreviewGuidance(action, values, challengeBonus)
   return configure(MONSTER_ATTACK_BONUS_LABEL)
+}
+
+function weaponPreviewReason(
+  action: Extract<MonsterActionDraft, { kind: 'weapon' }>,
+  challengeBonus: number | undefined,
+): FacingReason {
+  if (!action.equipmentEntryId) return { code: 'missing-attack-input', field: 'equipment' }
+  if (challengeBonus === undefined) {
+    return { code: 'missing-attack-input', field: 'challenge-rating' }
+  }
+  return { code: 'missing-attack-input', field: 'equipment' }
+}
+
+function naturalWeaponPreviewReason(
+  action: Extract<MonsterActionDraft, { kind: 'natural-weapon' }>,
+  challengeBonus: number | undefined,
+): FacingReason {
+  if (challengeBonus === undefined) {
+    return { code: 'missing-attack-input', field: 'challenge-rating' }
+  }
+  if (!actionHasStoredDamageRoll(action.damage)) {
+    return { code: 'missing-attack-input', field: 'damage' }
+  }
+  if (action.mode !== 'melee' && action.mode !== 'ranged') {
+    return { code: 'missing-attack-input', field: 'mode' }
+  }
+  return { code: 'missing-attack-input', field: 'damage' }
+}
+
+function attackPreviewReason(
+  action: Extract<MonsterActionDraft, { kind: 'attack' }>,
+  values: MonsterFormValues,
+  challengeBonus: number | undefined,
+): FacingReason {
+  if (attackBonusSourceIncomplete(action)) {
+    return { code: 'missing-attack-input', field: 'attack-bonus' }
+  }
+  if (!actionHasStoredDamageRoll(action.damage)) {
+    return { code: 'missing-attack-input', field: 'damage' }
+  }
+  if (authoredAttackUsesProficiencyBonus(action) && challengeBonus === undefined) {
+    return { code: 'missing-attack-input', field: 'challenge-rating' }
+  }
+  const ability = authoredAttackGoverningAbility(action)
+  if (ability && typeof values.abilityScores?.[ability] !== 'number') {
+    return {
+      code: 'missing-attack-input',
+      field: 'ability-score',
+      label: ABILITY_ENTRIES[ability].label,
+    }
+  }
+  return { code: 'missing-attack-input', field: 'attack-bonus' }
+}
+
+export function resolveMonsterActionAttackPreviewReason({
+  ctx,
+  values,
+  action,
+}: MonsterActionAttackPreviewGuidanceContext): FacingReason {
+  if (ctx.equipmentCatalogStatus === 'error') {
+    return { code: 'catalog-error', catalog: 'equipment' }
+  }
+  if (ctx.equipmentCatalogStatus !== 'ready') {
+    return { code: 'catalog-pending', catalog: 'equipment' }
+  }
+
+  const challengeBonus = proficiencyBonus(values.challengeRating)
+  if (action.kind === 'weapon') return weaponPreviewReason(action, challengeBonus)
+  if (action.kind === 'natural-weapon') return naturalWeaponPreviewReason(action, challengeBonus)
+  if (action.kind === 'attack') return attackPreviewReason(action, values, challengeBonus)
+  return { code: 'missing-attack-input', field: 'attack-bonus' }
 }
 
 export function resolveMonsterFormActionAttackProfile(

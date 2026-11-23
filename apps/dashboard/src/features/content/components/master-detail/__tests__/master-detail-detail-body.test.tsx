@@ -42,7 +42,10 @@ describe('MasterDetailDetailBody', () => {
           primaryItemFields={[{ type: 'richtext', name: 'intro', label: 'Introduction' }]}
           facing={{
             hostId: 'class-features',
-            resolveSelectedFacing: () => ({ status: 'ready', document: { blocks: [] } }),
+            resolvePanelModel: () => ({
+              status: 'ready',
+              document: { title: 'Feature', blocks: [] },
+            }),
           }}
           idPrefix="class-feature"
           selectedFieldId="row-1"

@@ -7,10 +7,7 @@ import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form
 import { MasterDetailEditorPanel } from '../../../../components/master-detail/master-detail-editor-panel'
 import { masterDetailItemTitle } from '../../../../lib/master-detail/master-detail-constants'
 import type { useEmbeddedMasterDetailRows } from '../../../../lib/master-detail/use-embedded-master-detail-rows'
-import {
-  monsterActionAdditionalDetails,
-  useMonsterActionFacingHost,
-} from '../../../../facing/use-monster-action-facing-host'
+import { useMonsterActionFacingHost } from '../../../../facing/use-monster-action-facing-host'
 import { sharedCastingOptions } from '../../../lib/actions/spell/monster-action-casting-summary'
 import { isActionReferenceAcquisitionTarget } from '../../../lib/actions/reference/action-reference-acquisition'
 import { legendarySourceSpellOptions } from '../../../lib/actions/acquisition/monster-legendary-action-acquisition'
@@ -186,11 +183,6 @@ export function MonsterActionDetail({
     section: located?.section,
   })
 
-  const additionalDetails = useMemo(
-    () => monsterActionAdditionalDetails(liveAction ?? action, values),
-    [action, liveAction, values],
-  )
-
   useEffect(() => {
     if (sections.focusToken === 0 || !action) return
     document.getElementById(`monster-action-focus-${action.id}`)?.focus()
@@ -245,7 +237,6 @@ export function MonsterActionDetail({
       overflowActions={moveOverflowActions(located, sections.requestMove)}
       contextualChrome={contextualChrome}
       facing={facing}
-      additionalDetails={additionalDetails}
       primaryScope={primaryScope}
     />
   )

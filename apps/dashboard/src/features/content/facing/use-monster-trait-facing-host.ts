@@ -2,8 +2,9 @@ import { useMemo } from 'react'
 import { useWatch } from 'react-hook-form'
 
 import type { FacingHostConfig } from './facing-host-config.types'
-import { resolveMonsterTraitDraftFacing } from './domains/trait/resolve-trait-facing'
+import { resolveFacing } from './resolve-facing'
 import type { MonsterFormValues } from '../monsters/lib/monster-form-values'
+import { toFacingPanelModel } from './structured-facing-host-panel'
 
 export function useMonsterTraitFacingHost(input: {
   fieldName: string
@@ -23,7 +24,12 @@ export function useMonsterTraitFacingHost(input: {
 
   const resolution = useMemo(() => {
     if (!selectedRow || typeof selectedRow !== 'object') return undefined
-    return resolveMonsterTraitDraftFacing({
+    if (selectedRow.kind === 'custom') return undefined
+    if (typeof selectedRow.preset !== 'string' && selectedRow.kind !== 'template') return undefined
+    return resolveFacing({
+      domain: 'trait',
+      source: 'draft',
+      hostId: 'monster-traits',
       row: selectedRow,
       monster: { name: name ?? '', lair, forms },
     })
@@ -33,6 +39,6 @@ export function useMonsterTraitFacingHost(input: {
 
   return {
     hostId: 'monster-traits',
-    resolveSelectedFacing: () => resolution,
+    resolvePanelModel: () => toFacingPanelModel(resolution),
   }
 }
