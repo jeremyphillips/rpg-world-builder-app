@@ -35,6 +35,21 @@ function baseValues(overrides: Partial<MonsterFormValues> = {}): MonsterFormValu
 }
 
 describe('resolveActionStatBlockRulesFacingForForm', () => {
+  it('returns unavailable when campaign ruleset is not on context', () => {
+    const outcome = resolveActionStatBlockRulesFacingForForm({
+      values: baseValues({
+        actions: [{ id: 'act', kind: 'special', name: 'Roar', description: '<p>Roar</p>' }],
+      }),
+      ctx: baseCtx({ rulesetId: undefined }),
+      actionId: 'act',
+      section: 'actions',
+    })
+    expect(outcome).toEqual({
+      status: 'unavailable',
+      reason: { code: 'catalog-pending', catalog: 'armor-class-rules' },
+    })
+  })
+
   it('returns unavailable when equipment catalog is pending', () => {
     const outcome = resolveActionStatBlockRulesFacingForForm({
       values: baseValues({

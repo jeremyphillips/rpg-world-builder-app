@@ -225,6 +225,14 @@ export function resolveActionStatBlockRulesFacingForForm(input: {
     }
   }
 
+  const magicPropertyProvider = monsterMagicPropertyProvider(input.ctx)
+  if (!input.ctx.rulesetId || !magicPropertyProvider) {
+    return {
+      status: 'unavailable',
+      reason: { code: 'catalog-pending', catalog: 'armor-class-rules' },
+    }
+  }
+
   let normalized: Monster
   let derived: DerivedMonsterStatBlock | null
   let spellContext: SpellDisplayContext
@@ -243,7 +251,7 @@ export function resolveActionStatBlockRulesFacingForForm(input: {
       catalogState,
       spellsById: input.ctx.spellCatalogById,
       spellCatalogStatus: input.ctx.spellCatalogStatus === 'ready' ? 'ready' : 'unavailable',
-      magicPropertyProvider: monsterMagicPropertyProvider(input.ctx),
+      magicPropertyProvider,
     })
   } catch (error) {
     console.error('resolveActionStatBlockRulesFacingForForm failed', {

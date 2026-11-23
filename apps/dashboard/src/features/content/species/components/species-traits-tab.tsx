@@ -53,7 +53,6 @@ export function SpeciesTraitsTab({ formCtx }: SpeciesTraitsTabProps) {
   const addControl = (
     <SpeciesTraitAddMenu
       label="Add trait"
-      rulesetId={formCtx.rulesetId}
       formCtx={formCtx}
       traits={traits}
       onAcquire={(choice) => {

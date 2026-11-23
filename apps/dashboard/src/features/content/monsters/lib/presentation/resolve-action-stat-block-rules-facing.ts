@@ -69,7 +69,7 @@ export type MonsterActionRulesFacing = {
 
 export type SpellDisplayContext = {
   monster: Monster
-  equipmentById: Map<string, Equipment>
+  equipmentById: ReadonlyMap<string, Equipment>
   monsterName: string
   spellsById?: ReadonlyMap<string, MonsterReferencedSpell>
   catalogStatus: 'ready' | 'unavailable'
@@ -80,7 +80,7 @@ export type SpellDisplayContext = {
 
 export function buildSpellDisplayContext(input: {
   monster: Monster
-  equipmentById: Map<string, Equipment>
+  equipmentById: ReadonlyMap<string, Equipment>
   catalogState: MonsterCatalogLoadState
   spellsById?: ReadonlyMap<string, MonsterReferencedSpell>
   spellCatalogStatus?: 'ready' | 'unavailable'
@@ -118,7 +118,7 @@ function findAttackLine(
 function actionDisplayIdentity(
   action: MonsterActionIdentitySubject,
   monster: Monster,
-  equipmentById: Map<string, Equipment>,
+  equipmentById: ReadonlyMap<string, Equipment>,
   catalogState: MonsterCatalogLoadState,
   magicPropertyProvider: MagicPropertyDefinitionProvider,
 ) {
@@ -283,7 +283,7 @@ function formatSaveActionContent(
 function formatMultiattackActionBody(
   monster: Monster,
   action: Extract<MonsterAction, { kind: 'multiattack' }>,
-  equipmentById: Map<string, Equipment>,
+  equipmentById: ReadonlyMap<string, Equipment>,
   catalogState: MonsterCatalogLoadState,
   magicPropertyProvider: MagicPropertyDefinitionProvider,
   spells: Pick<SpellDisplayContext, 'spellsById' | 'catalogStatus'>,

@@ -197,6 +197,7 @@ function equippedWeaponRows(
   catalog: ReturnType<typeof monsterEquipmentCatalog>,
   provider: ReturnType<typeof monsterMagicPropertyProvider>,
 ) {
+  if (!provider) return []
   return (values.equipment ?? []).flatMap((entry) => {
     const item = catalog.get(entry.equipmentId)
     if (!item || !isWeaponEquipment(item)) return []

@@ -33,10 +33,11 @@ function SpellClassesList({
   campaignId,
   section,
 }: {
-  campaignId: string
+  campaignId: string | undefined
   section: NonNullable<SpellDetailViewModel['classesSection']>
 }) {
   const { data: classes, isPending, isLoadingError } = useClasses(campaignId)
+  if (!campaignId) return null
   const classesBySlug = new Map((classes ?? []).map((cls) => [cls.slug, cls]))
 
   return (
@@ -159,14 +160,14 @@ function SpellDetailSections({
   campaignId,
 }: {
   viewModel: SpellDetailViewModel
-  campaignId: string
+  campaignId?: string
 }) {
   return (
     <>
       {viewModel.proseSections.cantripScaling || viewModel.proseSections.higherLevelSlotEffect ? (
         <SpellProseSections sections={viewModel.proseSections} />
       ) : null}
-      {viewModel.classesSection ? (
+      {viewModel.classesSection && campaignId ? (
         <SpellClassesList campaignId={campaignId} section={viewModel.classesSection} />
       ) : null}
       {viewModel.tagsSection ? <SpellTagsSection section={viewModel.tagsSection} /> : null}
@@ -185,7 +186,7 @@ export type SpellDetailBodyProps = {
   displayFallback?: ContentDisplayFallback
   mediaPresentation?: ContentDetailHeroMediaPresentation
   viewModel: SpellDetailViewModel
-  campaignId: string
+  campaignId?: string
   editHref?: string
   children?: ReactNode
 }

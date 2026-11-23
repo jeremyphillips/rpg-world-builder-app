@@ -35,7 +35,7 @@ function buildEligibleProficiencyChoiceIds(
   formCtx?: Pick<ContentFormCtx, 'options' | 'entityId' | 'rulesetId'>,
 ): ReadonlySet<string> {
   const equipment = formCtx?.options?.equipment?.visible ?? []
-  const rulesetId = formCtx?.rulesetId ?? equipment[0]?.rulesetId
+  const rulesetId = formCtx?.rulesetId
   if (!equipment.length || !rulesetId) return new Set()
 
   const characterCreationProficiencies =

@@ -12,13 +12,11 @@ import {
 
 export function SpeciesTraitAddMenu({
   label,
-  rulesetId,
   formCtx,
   traits,
   onAcquire,
 }: {
   label: string
-  rulesetId?: string
   formCtx: ContentFormCtx
   traits: readonly TraitRowForm[]
   onAcquire: (choice: NonNullable<ReturnType<typeof parseSpeciesTraitAcquisitionId>>) => void
@@ -33,13 +31,14 @@ export function SpeciesTraitAddMenu({
       ? 'error'
       : 'ready'
 
-  const resolvedRulesetId = formCtx.rulesetId ?? rulesetId
-  const items = speciesTraitAcquisitionDropdownItems({
-    rulesetId: resolvedRulesetId ?? '',
-    traits,
-    senseVocabulary,
-    senseVocabularyStatus,
-  })
+  const items = formCtx.rulesetId
+    ? speciesTraitAcquisitionDropdownItems({
+        rulesetId: formCtx.rulesetId,
+        traits,
+        senseVocabulary,
+        senseVocabularyStatus,
+      })
+    : []
 
   return (
     <ButtonDropdown

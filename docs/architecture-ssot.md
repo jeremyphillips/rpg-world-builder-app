@@ -3,16 +3,17 @@
 High-level ownership and prevention policy for this monorepo. This document is a
 **navigation hub** — it does not replace domain playbooks.
 
-| Topic                        | Canonical detail                                                                                                                                                                        |
-| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Vocabulary patterns (A/B/C)  | [packages/contracts/docs/vocab-ssot.md](../packages/contracts/docs/vocab-ssot.md)                                                                                                       |
-| Contracts package layers     | [packages/contracts/docs/structure.md](../packages/contracts/docs/structure.md)                                                                                                         |
-| Catalog content types        | [content-types.md](./content-types.md)                                                                                                                                                  |
-| Validation / domain messages | [validation-messages.md](../packages/contracts/docs/validation-messages.md), [domain-message-inventory.md](../packages/contracts/docs/domain-message-inventory.md)                      |
-| Facing invalid / guidance    | [facing-guidance-audit.md](../apps/dashboard/docs/facing-guidance-audit.md), [`facing-invalid-messages.ts`](../packages/contracts/src/rpg/primitives/facing/facing-invalid-messages.ts) |
-| Monster acquisition recipes  | [apps/dashboard/docs/monster-action-acquisition-ssot.md](../apps/dashboard/docs/monster-action-acquisition-ssot.md)                                                                     |
-| Dead-code / Fallow usage     | [tools/fallow/README.md](../tools/fallow/README.md)                                                                                                                                     |
-| PR review lenses             | [.cursor/skills/pr-review/SKILL.md](../.cursor/skills/pr-review/SKILL.md)                                                                                                               |
+| Topic                           | Canonical detail                                                                                                                                                                                                                           |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Vocabulary patterns (A/B/C)     | [packages/contracts/docs/vocab-ssot.md](../packages/contracts/docs/vocab-ssot.md)                                                                                                                                                          |
+| Contracts package layers        | [packages/contracts/docs/structure.md](../packages/contracts/docs/structure.md)                                                                                                                                                            |
+| Catalog content types           | [content-types.md](./content-types.md)                                                                                                                                                                                                     |
+| Validation / domain messages    | [validation-messages.md](../packages/contracts/docs/validation-messages.md), [domain-message-inventory.md](../packages/contracts/docs/domain-message-inventory.md)                                                                         |
+| Facing invalid / guidance       | [facing-guidance-audit.md](../apps/dashboard/docs/facing-guidance-audit.md), [`facing-invalid-messages.ts`](../packages/contracts/src/rpg/primitives/facing/facing-invalid-messages.ts)                                                    |
+| Monster acquisition recipes     | [apps/dashboard/docs/monster-action-acquisition-ssot.md](../apps/dashboard/docs/monster-action-acquisition-ssot.md)                                                                                                                        |
+| System ruleset identity & scope | [packages/contracts/docs/structure.md § System ruleset identity](../packages/contracts/docs/structure.md#system-ruleset-identity-primitivesrulesetts), plan [default_ruleset_ssot](../.cursor/plans/default_ruleset_ssot_c13d26cc.plan.md) |
+| Dead-code / Fallow usage        | [tools/fallow/README.md](../tools/fallow/README.md)                                                                                                                                                                                        |
+| PR review lenses                | [.cursor/skills/pr-review/SKILL.md](../.cursor/skills/pr-review/SKILL.md)                                                                                                                                                                  |
 
 ## Four prevention problems
 
@@ -99,6 +100,53 @@ requires completeness (capabilities, facing `never`, class feature field maps).
 
 Acquisition paths and authoring menus are stricter than forward-compat policy
 functions on parsed catalog rows.
+
+## System ruleset identity and runtime scope
+
+**Problem classes:** primarily **A** (duplicate `srd-cc-5.2.1` literals, parallel
+`DEFAULT_RULESET_ID`) and silent **forward-compat-style** fallbacks that treat missing
+campaign context as default-system behavior — which is **not** the same as documented
+forward compat on unknown persisted kinds.
+
+Two responsibilities must stay separate:
+
+| Responsibility                | Owner                                                                                                     | Symbol / API                                                                 |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| **System default identity**   | [`packages/contracts/src/rpg/primitives/ruleset.ts`](../packages/contracts/src/rpg/primitives/ruleset.ts) | `DEFAULT_SYSTEM_RULESET_ID`, `SystemRulesetId`                               |
+| **Runtime ruleset selection** | Host context (campaign record, entity, `ContentFormCtx`, `CharacterRulesScope`)                           | `lookupCampaignRulesetId` → resolved \| unresolved — no `WithDefault` helper |
+
+**Invariant:** absent or loading campaign context does **not** authorize
+`DEFAULT_SYSTEM_RULESET_ID` for campaign-scoped operations (builder, detail sheets,
+content forms, equipment reference resolution).
+
+**Catalog scope:** `EquipmentCatalogScope` and similar boundaries are passed **in** from
+hosts (`equipmentReferenceScopeFromContentFormCtx`, character detail
+`equipmentReferenceScope`). Resolvers must not sample catalog rows, row order, or inline
+literals to invent `rulesetId` / `campaignId`. Player preview and list hooks use
+[`contentAuthoringScopeFromCtx`](../apps/dashboard/src/features/content/lib/authoring/content-authoring-scope.lib.ts)
+— **not** the equipment scope helper — so `campaignId: ''` stays equipment-only.
+
+**Content authoring:** `ContentFormCtx.rulesetId` is the **campaign catalog** ruleset;
+`entityRulesetId` (edit) is entity artwork/identity only. Do not merge them for catalog or
+equipment resolution.
+
+**Effective rules:** campaign patches (`RulesetPatchRead`, `ResolvedCampaignRules`) are
+mechanics overlays on the same `rulesetId` key — not a second ruleset identity type.
+
+| Mechanism                  | Where                                                                                                                                                                                               | Prevents                                |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| Campaign lookup            | [`apps/dashboard/src/lib/campaign-ruleset.lib.ts`](../apps/dashboard/src/lib/campaign-ruleset.lib.ts), [`use-campaign-ruleset-lookup.ts`](../apps/dashboard/src/lib/use-campaign-ruleset-lookup.ts) | Defaulting while campaigns load or fail |
+| Content form gate          | [`useContentFormOptions`](../apps/dashboard/src/features/content/lib/form-options/content-form-options.ts)                                                                                          | `classes[0]?.rulesetId` sampling        |
+| Grant / sheet scope helper | [`content-form-equipment-reference-scope.lib.ts`](../apps/dashboard/src/lib/content-form-equipment-reference-scope.lib.ts)                                                                          | Empty `rulesetId` during unresolved ctx |
+| ESLint                     | [`dashboardSystemRulesetLiteralGuard`](../apps/dashboard/eslint.config.js) (`Literal[value='srd-cc-5.2.1']` in production)                                                                          | Reintroduced inline default literal     |
+
+Explicit **permitted** uses of `DEFAULT_SYSTEM_RULESET_ID`: seed campaign settings UI
+before patch load, disabled builder sentinel, standalone `CharacterRulesScope`, tests and
+fixtures, and content ids of the form `srd-cc-5.2.1:slug` (identity in the id string, not
+scope policy).
+
+Implementation history and acceptance matrix:
+[`.cursor/plans/default_ruleset_ssot_c13d26cc.plan.md`](../.cursor/plans/default_ruleset_ssot_c13d26cc.plan.md).
 
 ## Export and dead-code lifecycle
 

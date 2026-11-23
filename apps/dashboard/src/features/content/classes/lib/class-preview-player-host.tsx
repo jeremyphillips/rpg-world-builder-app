@@ -10,6 +10,10 @@ import {
   buildContentDisplayImageInput,
   type ContentPreviewDisplayImageValues,
 } from '../../lib/detail/page/content-display-image-input'
+import {
+  contentAuthoringCampaignIdForQueries,
+  contentEntityArtworkRulesetId,
+} from '../../lib/authoring/content-authoring-scope.lib'
 import type { ContentPreviewPlayerPreviewProps } from '../../lib/forms/preview/content-form-preview.types'
 import { CONTENT_PREVIEW_AS_PLAYER_LABEL } from '../../lib/forms/preview/content-form-preview-copy'
 import { useSkillProficiencies } from '../../skill-proficiencies/hooks/use-skill-proficiencies'
@@ -38,7 +42,7 @@ function classPreviewDisplayImage(
         media: (values as ContentPreviewDisplayImageValues).media ?? emptyContentMediaSchema,
         slug: values.slug ?? 'preview',
         catalogLayer: ctx.entityCatalogLayer ?? 'homebrew',
-        rulesetId: ctx.rulesetId,
+        rulesetId: contentEntityArtworkRulesetId(ctx),
       },
       'detail',
     ),
@@ -51,11 +55,12 @@ export function ClassPreviewPlayerHost({
   open,
   onOpenChange,
 }: ContentPreviewPlayerPreviewProps<ClassFormValues>) {
-  const campaignRules = useCampaignRules(ctx.campaignId)
-  const subclassesQuery = useSubclasses(ctx.campaignId, ctx.entityId)
-  const skillsQuery = useSkillProficiencies(ctx.campaignId)
-  const subclassesEnabled = Boolean(ctx.campaignId && ctx.entityId)
-  const skillsEnabled = Boolean(ctx.campaignId)
+  const queryCampaignId = contentAuthoringCampaignIdForQueries(ctx)
+  const campaignRules = useCampaignRules(queryCampaignId)
+  const subclassesQuery = useSubclasses(queryCampaignId, ctx.entityId)
+  const skillsQuery = useSkillProficiencies(queryCampaignId)
+  const subclassesEnabled = Boolean(queryCampaignId && ctx.entityId)
+  const skillsEnabled = Boolean(queryCampaignId)
 
   const name = values.name?.trim() || 'Unnamed class'
   const viewModel = buildClassPreviewDetailViewModel(values, ctx)
@@ -76,7 +81,7 @@ export function ClassPreviewPlayerHost({
         subclassesPending={subclassesEnabled && subclassesQuery.isPending}
         subclassesLoadingError={subclassesEnabled && subclassesQuery.isLoadingError}
         subclassingEnabled={campaignRules.subclassing.enabled}
-        campaignId={ctx.campaignId ?? ''}
+        campaignId={queryCampaignId}
         skillProficiencies={skillsQuery.data ?? []}
         skillsPending={skillsEnabled && skillsQuery.isPending}
         skillsLoadingError={skillsEnabled && skillsQuery.isLoadingError}

@@ -35,7 +35,7 @@ describe('mergeEditLayoutCtx', () => {
     expect(ctx.equipmentKind).toBe('armor')
   })
 
-  it('carries entity slug and ruleset for media resolution on edit', () => {
+  it('carries entity slug and separates campaign vs entity ruleset on edit', () => {
     const ctx = mergeEditLayoutCtx(
       { ...baseOptionsCtx, rulesetId: 'srd-cc-5.2.1' },
       undefined,
@@ -47,5 +47,19 @@ describe('mergeEditLayoutCtx', () => {
     expect(ctx.entitySlug).toBe('elf')
     expect(ctx.entityCatalogLayer).toBe('system')
     expect(ctx.rulesetId).toBe('srd-cc-5.2.1')
+    expect(ctx.entityRulesetId).toBe('srd-cc-5.2.1')
+  })
+
+  it('keeps campaign catalog ruleset when entity ruleset differs', () => {
+    const ctx = mergeEditLayoutCtx(
+      { ...baseOptionsCtx, rulesetId: 'srd-cc-5.2.1' },
+      undefined,
+      'c1',
+      'legacy:elf',
+      { catalogLayer: 'homebrew', slug: 'elf', rulesetId: 'legacy-ruleset' },
+    )
+
+    expect(ctx.rulesetId).toBe('srd-cc-5.2.1')
+    expect(ctx.entityRulesetId).toBe('legacy-ruleset')
   })
 })

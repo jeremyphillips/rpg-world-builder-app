@@ -142,6 +142,19 @@ describe('resolveEquipmentIdReference', () => {
     expect(resolveEquipmentIdReference('dagger', catalog, scope).status).toBe('unresolved')
   })
 
+  it('scenario B: homebrew resolves only under owning campaign scope', () => {
+    const catalog = createEquipmentCatalogContext({ status: 'ready', scope, equipmentById })
+    const otherCampaignScope: EquipmentCatalogScope = {
+      rulesetId: RULESET,
+      campaignId: 'campaign-2',
+    }
+    const outcome = resolveEquipmentIdReference(homebrewShield.id, catalog, otherCampaignScope)
+    expect(outcome.status).toBe('unresolved')
+    if (outcome.status === 'unresolved') {
+      expect(outcome.reason).toBe('catalog-scope-mismatch')
+    }
+  })
+
   it('scenario F: binary catalog status maps unavailable without unknown-equipment', () => {
     const unavailable = resolveEquipmentSlugReferenceOutcomeForCatalogStatus('dagger', {
       catalogStatus: 'unavailable',

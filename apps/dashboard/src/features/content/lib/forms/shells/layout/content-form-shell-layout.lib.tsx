@@ -146,7 +146,7 @@ export function ContentFormHeader({
             contentType={def.routeKey as ContentTypeKey}
             catalogLayer={entityCatalogLayer}
             entitySlug={ctx.entitySlug}
-            rulesetId={ctx.rulesetId}
+            rulesetId={ctx.entityRulesetId ?? ctx.rulesetId}
             formMode={formMode}
           />
         ) : null}

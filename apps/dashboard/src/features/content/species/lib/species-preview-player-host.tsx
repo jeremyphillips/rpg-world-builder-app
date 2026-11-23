@@ -14,6 +14,10 @@ import {
   buildContentDisplayImageInput,
   type ContentPreviewDisplayImageValues,
 } from '../../lib/detail/page/content-display-image-input'
+import {
+  contentAuthoringCampaignIdForQueries,
+  contentEntityArtworkRulesetId,
+} from '../../lib/authoring/content-authoring-scope.lib'
 import type { ContentPreviewPlayerPreviewProps } from '../../lib/forms/preview/content-form-preview.types'
 import { CONTENT_PREVIEW_AS_PLAYER_LABEL } from '../../lib/forms/preview/content-form-preview-copy'
 import { SpeciesDetailBody } from '../components/detail/species-detail-body'
@@ -26,9 +30,10 @@ export function SpeciesPreviewPlayerHost({
   open,
   onOpenChange,
 }: ContentPreviewPlayerPreviewProps<SpeciesFormValues>) {
-  const { vocabulary: creatureTypeVocabulary } = useCreatureTypeVocabulary(ctx.campaignId)
-  const { vocabulary: senseVocabulary } = useSenseVocabulary(ctx.campaignId)
-  const { vocabulary: languageVocabulary } = useLanguageVocabulary(ctx.campaignId)
+  const queryCampaignId = contentAuthoringCampaignIdForQueries(ctx)
+  const { vocabulary: creatureTypeVocabulary } = useCreatureTypeVocabulary(queryCampaignId)
+  const { vocabulary: senseVocabulary } = useSenseVocabulary(queryCampaignId)
+  const { vocabulary: languageVocabulary } = useLanguageVocabulary(queryCampaignId)
 
   const name = values.name?.trim() || 'Unnamed species'
   const viewModel = buildSpeciesPreviewDetailViewModel(values, {
@@ -53,7 +58,7 @@ export function SpeciesPreviewPlayerHost({
               media: (values as ContentPreviewDisplayImageValues).media ?? emptyContentMediaSchema,
               slug: values.slug ?? 'preview',
               catalogLayer: ctx.entityCatalogLayer ?? 'homebrew',
-              rulesetId: ctx.rulesetId,
+              rulesetId: contentEntityArtworkRulesetId(ctx),
             },
             'detail',
           ),
@@ -61,7 +66,7 @@ export function SpeciesPreviewPlayerHost({
         displayFallback={resolveDashboardDetailDisplayFallback('species')}
         imageName={name}
         viewModel={viewModel}
-        campaignId={ctx.campaignId ?? ''}
+        campaignId={queryCampaignId}
       />
     </DetailPreviewModal>
   )

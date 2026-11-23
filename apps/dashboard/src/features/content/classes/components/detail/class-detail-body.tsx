@@ -114,7 +114,7 @@ function ClassDetailSections({
   vocabulary,
 }: {
   sections: ClassDetailViewModel['sections']
-  campaignId: string
+  campaignId?: string
   skillProficiencies: SkillProficiency[]
   skillsPending: boolean
   skillsLoadingError: boolean
@@ -152,7 +152,7 @@ export type ClassDetailBodyProps = {
   subclassesPending?: boolean
   subclassesLoadingError?: boolean
   subclassingEnabled: boolean
-  campaignId: string
+  campaignId?: string
   skillProficiencies: SkillProficiency[]
   skillsPending: boolean
   skillsLoadingError?: boolean

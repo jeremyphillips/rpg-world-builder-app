@@ -37,7 +37,7 @@ function StartingEquipmentEditor({ formCtx }: { formCtx: ContentFormCtx }) {
   }) as StartingEquipmentForm | undefined
   const enrichedFormCtx = useMemo((): ContentFormCtx => {
     const equipmentEntities = formCtx.options?.equipment?.visible ?? []
-    const rulesetId = formCtx.rulesetId ?? equipmentEntities[0]?.rulesetId
+    const rulesetId = formCtx.rulesetId
     const proficiencyChoiceTargets = rulesetId
       ? buildProficiencyChoiceTargetOptions({
           rulesetId,

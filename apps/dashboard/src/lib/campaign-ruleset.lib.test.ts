@@ -31,4 +31,26 @@ describe('lookupCampaignRulesetId', () => {
       }),
     ).toEqual({ status: 'resolved', rulesetId: 'srd-cc-5.2.1' })
   })
+
+  it('does not default when campaign list errors', () => {
+    expect(
+      lookupCampaignRulesetId({
+        campaignId: 'campaign-1',
+        campaigns: [baseCampaign],
+        campaignsPending: false,
+        campaignsError: true,
+      }),
+    ).toEqual({ status: 'unresolved', reason: 'error' })
+  })
+
+  it('does not default when campaign is not in the list', () => {
+    expect(
+      lookupCampaignRulesetId({
+        campaignId: 'missing',
+        campaigns: [baseCampaign],
+        campaignsPending: false,
+        campaignsError: false,
+      }),
+    ).toEqual({ status: 'unresolved', reason: 'not_found' })
+  })
 })

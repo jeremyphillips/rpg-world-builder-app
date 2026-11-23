@@ -50,8 +50,10 @@ export type ContentFormCtx = {
   entityCatalogLayer?: CatalogLayer
   /** Immutable catalog slug on edit — omitted from RHF because slug is envelope-only. */
   entitySlug?: string
-  /** Ruleset for system artwork resolution in media fields. */
+  /** Campaign catalog ruleset from the campaign record (authoring catalogs, equipment scope, monster provider). */
   rulesetId?: string
+  /** Entity ruleset on edit — artwork and entity-facing identity; does not override campaign catalog ruleset. */
+  entityRulesetId?: string
   /** Resolved campaign rule overrides (defaults when absent). */
   campaignRules?: ResolvedCampaignRules
   /** Resolved spellcasting progression records (seed + campaign patch). */
