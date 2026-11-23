@@ -28,6 +28,11 @@ import {
   parseMonsterActionAcquisitionId,
 } from './monster-action-acquisition'
 
+type GeneralMonsterActionAcquisitionChoice = Exclude<
+  Parameters<typeof createMonsterActionFromAcquisition>[0],
+  never
+>
+
 const weapons = [
   { entryId: 'sword-1', label: 'Longsword', equipped: true },
   { entryId: 'sword-2', label: 'Longsword', equipped: true },
@@ -366,5 +371,13 @@ describe('acquisition identity hardening', () => {
         presetId: 'not-a-preset' as ActionPresetId,
       }),
     ).toThrow(/Unknown action preset/)
+  })
+
+  it('throws for unsupported acquisition choices instead of creating special', () => {
+    expect(() =>
+      createMonsterActionFromAcquisition({
+        type: 'bogus',
+      } as unknown as GeneralMonsterActionAcquisitionChoice),
+    ).toThrow(/Unsupported monster action acquisition choice/)
   })
 })

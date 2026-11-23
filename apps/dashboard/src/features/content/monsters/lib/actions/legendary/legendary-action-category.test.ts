@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { parseMonsterActionAcquisitionId } from '../acquisition/monster-action-acquisition'
 import {
   LEGENDARY_ACQUISITION_CATEGORIES,
   LEGENDARY_ACQUISITION_OPTION_ID,
@@ -36,5 +37,14 @@ describe('legendary action category vocabulary', () => {
   it('keeps acquisition categories assignable to editor categories', () => {
     const editor: LegendaryActionCategory[] = [...LEGENDARY_ACQUISITION_CATEGORIES]
     expect(editor).toHaveLength(3)
+  })
+
+  it('round-trips acquisition menu ids through the shared parser', () => {
+    for (const category of LEGENDARY_ACQUISITION_CATEGORIES) {
+      expect(parseMonsterActionAcquisitionId(LEGENDARY_ACQUISITION_OPTION_ID[category])).toEqual({
+        type: 'legendary',
+        category,
+      })
+    }
   })
 })

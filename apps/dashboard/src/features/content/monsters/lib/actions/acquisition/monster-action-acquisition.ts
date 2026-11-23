@@ -241,16 +241,14 @@ function portableMovementItems(section: MonsterActionSection | undefined): Acqui
       availability: { status: 'available' },
     })
   }
-  if (section === 'bonusActions') {
-    if (monsterSectionAllowsKind('bonusActions', 'leap')) {
-      items.push({
-        id: 'create:leap',
-        label: getMonsterActionKindLabel('leap'),
-        groupId: 'movement',
-        description: { status: 'ready', text: kindDescription('leap') },
-        availability: { status: 'available' },
-      })
-    }
+  if (section && monsterSectionAllowsKind(section, 'leap')) {
+    items.push({
+      id: 'create:leap',
+      label: getMonsterActionKindLabel('leap'),
+      groupId: 'movement',
+      description: { status: 'ready', text: kindDescription('leap') },
+      availability: { status: 'available' },
+    })
   }
   return items
 }
