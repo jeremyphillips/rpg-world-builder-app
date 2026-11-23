@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
+import { IMMUTABLE_SPELL_MUTATION } from '../../vocab/spell/spell-mutation-policy'
+import { CLASS_SPELLCASTING_CHOICE_SUFFIXES } from '../../content/classes/spellcasting'
 import { spellcastingProgressionTestConfig } from '../../campaign/rules/spellcasting-progression/fixtures'
 import { resolveSlotProgressionForClass } from '../../campaign/rules/spellcasting-progression/resolve-config'
 import { wizardClass } from '../character-builder/spellcasting-test-fixtures'
+import { findCompiledChoiceProgressionBySuffix } from './resolve-class-spellcasting'
 
 import {
   resolveClassSpellcasting,
@@ -24,6 +27,35 @@ describe('resolveClassSpellcasting', () => {
     const resolved = resolveClassSpellcasting(wizardClass, spellcastingProgressionTestConfig)
     expect(resolved).not.toBeNull()
     expect(resolveSpellsAvailableFromClass(resolved!, 1)).toBe(4)
+  })
+
+  it('compiles cantrip mutation from cantripSelection.change', () => {
+    const resolved = resolveClassSpellcasting(wizardClass, spellcastingProgressionTestConfig)
+    const cantrips = findCompiledChoiceProgressionBySuffix(
+      resolved!,
+      CLASS_SPELLCASTING_CHOICE_SUFFIXES.cantrips,
+    )
+    expect(cantrips?.mutation).toEqual({
+      kind: 'replace',
+      trigger: 'longRest',
+      limit: 1,
+    })
+  })
+
+  it('defaults cantrip mutation to immutable when change is absent', () => {
+    const withoutChange = {
+      ...wizardClass,
+      spellcasting: {
+        ...wizardClass.spellcasting!,
+        cantripSelection: undefined,
+      },
+    }
+    const resolved = resolveClassSpellcasting(withoutChange, spellcastingProgressionTestConfig)
+    const cantrips = findCompiledChoiceProgressionBySuffix(
+      resolved!,
+      CLASS_SPELLCASTING_CHOICE_SUFFIXES.cantrips,
+    )
+    expect(cantrips?.mutation).toEqual(IMMUTABLE_SPELL_MUTATION)
   })
 
   it('returns null when slot progression id is unknown', () => {

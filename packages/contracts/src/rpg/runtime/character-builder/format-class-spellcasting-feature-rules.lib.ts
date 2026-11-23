@@ -301,7 +301,12 @@ export function spellcastingFocusRulesSentence(
 
 function pushActivationCantripCopy(
   sentences: string[],
-  input: { className: string; activationLevel: number; source: CharacterClass },
+  input: {
+    className: string
+    activationLevel: number
+    source: CharacterClass
+    resolved: ResolvedClassSpellcasting
+  },
 ): void {
   const cantripCount = resolveClassCantripCount({
     source: input.source,
@@ -309,10 +314,15 @@ function pushActivationCantripCopy(
   })
   if (cantripCount <= 0) return
 
+  const cantripProgression = findCompiledChoiceProgressionBySuffix(
+    input.resolved,
+    CLASS_SPELLCASTING_CHOICE_SUFFIXES.cantrips,
+  )
   const copy = formatCantripAcquisitionCopy(
     input.className,
     cantripCount,
     REQUIRED_SPELLCASTING_RULES_TO_COMPLETE,
+    cantripProgression?.mutation,
   )
   sentences.push(...spellcastingRulesCopyLines(copy))
 }
@@ -390,7 +400,12 @@ export function activationAcquisitionRulesSentences(input: {
   const sentences: string[] = []
   const spellSelection = input.source.spellcasting?.spellSelection
 
-  pushActivationCantripCopy(sentences, input)
+  pushActivationCantripCopy(sentences, {
+    className: input.className,
+    activationLevel: input.activationLevel,
+    source: input.source,
+    resolved: input.resolved,
+  })
   pushActivationSpellbookGain(sentences, {
     className: input.className,
     activationLevel: input.activationLevel,

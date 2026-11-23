@@ -2,6 +2,7 @@ import {
   CLASS_SPELLCASTING_CHOICE_SUFFIXES,
   type ClassSpellSelection,
   type SpellRecommendation,
+  type SpellRecommendationTarget,
   type Spellcasting,
 } from '../../../../content/classes/spellcasting'
 import type { Spell } from '../../../../content/spell'
@@ -103,6 +104,44 @@ function recommendedOptionIdsForRecommendation(args: {
       catalogSpellsById: args.catalogSpellsById,
     }),
   )
+}
+
+/** Resolves recommendation spell ids for a semantic target at the given class level. */
+export function resolveApplicableRecommendationSpellIds(args: {
+  spellcasting: Spellcasting | undefined
+  target: SpellRecommendationTarget
+  classLevel: number
+  activationClassLevel: number
+  maxSelectableSpellLevel: number
+  catalogSpellsById?: ReadonlyMap<string, Spell>
+}): string[] {
+  const recommendations = args.spellcasting?.recommendations ?? []
+  if (recommendations.length === 0) return []
+
+  const result: string[] = []
+  for (const recommendation of recommendations) {
+    if (recommendation.target !== args.target) continue
+
+    if (!args.catalogSpellsById) {
+      const scheduleLevel = recommendationScheduleLevel(recommendation, args.activationClassLevel)
+      if (args.classLevel !== scheduleLevel) continue
+      result.push(...recommendation.spellIds)
+      continue
+    }
+
+    for (const spellId of recommendedOptionIdsForRecommendation({
+      recommendation,
+      optionIds: new Set(recommendation.spellIds),
+      classLevel: args.classLevel,
+      activationClassLevel: args.activationClassLevel,
+      maxSelectableSpellLevel: args.maxSelectableSpellLevel,
+      catalogSpellsById: args.catalogSpellsById,
+    })) {
+      result.push(spellId)
+    }
+  }
+
+  return result
 }
 
 /** Resolves recommended spell ids for the opened ChoiceSet; advisory only. */

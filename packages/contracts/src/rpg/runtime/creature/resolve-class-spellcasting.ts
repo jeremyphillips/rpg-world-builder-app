@@ -75,6 +75,7 @@ function capacityCurve(progression: ClassCapacityProgression | undefined): Progr
 }
 
 function compileCantripProgression(
+  spellcasting: Spellcasting,
   progression: ClassSpellcastingProgression | undefined,
 ): CompiledSpellcastingChoiceProgression | null {
   if (!progression?.cantrips) return null
@@ -85,7 +86,7 @@ function compileCantripProgression(
     extension: progression.cantrips.extension,
     source: { kind: 'classList' },
     destination: 'cantrips',
-    mutation: IMMUTABLE_SPELL_MUTATION,
+    mutation: spellcasting.cantripSelection?.change ?? IMMUTABLE_SPELL_MUTATION,
     label: getSpellCollectionKindLabel('cantrips'),
     curve: capacityCurve(progression.cantrips),
     showInTable: true,
@@ -174,7 +175,7 @@ function compileChoiceProgressions(
   spellcasting: Spellcasting,
 ): CompiledSpellcastingChoiceProgression[] {
   const progressions: CompiledSpellcastingChoiceProgression[] = []
-  const cantrip = compileCantripProgression(spellcasting.progression)
+  const cantrip = compileCantripProgression(spellcasting, spellcasting.progression)
   if (cantrip) progressions.push(cantrip)
   progressions.push(
     ...compileSelectionProgressions(spellcasting.spellSelection, spellcasting.progression),

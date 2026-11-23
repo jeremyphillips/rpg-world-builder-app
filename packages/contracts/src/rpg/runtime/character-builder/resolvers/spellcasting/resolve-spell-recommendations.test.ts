@@ -6,7 +6,10 @@ import {
 } from '../../../../content/classes/spellcasting'
 import type { Spell } from '../../../../content/spell'
 import { spellcastingChoiceSetId } from './resolve-spellcasting-choice-sets'
-import { resolveRecommendedSpellIdsForChoiceSet } from './resolve-spell-recommendations'
+import {
+  resolveApplicableRecommendationSpellIds,
+  resolveRecommendedSpellIdsForChoiceSet,
+} from './resolve-spell-recommendations'
 
 const CLASS_ID = 'srd-cc-5.2.1:bard'
 const RULESET = 'srd-cc-5.2.1'
@@ -52,6 +55,29 @@ function resolveForChoiceSet(args: {
     catalogSpellsById: new Map(args.spells.map((spell) => [spell.id, spell])),
   })
 }
+
+describe('resolveApplicableRecommendationSpellIds', () => {
+  it('resolves cantrip targets without a choice set id', () => {
+    const spellcasting: Spellcasting = {
+      slotProgressionId: 'full-caster',
+      ability: 'cha',
+      recommendations: [
+        { target: 'cantrips', classLevel: 1, spellIds: [`${RULESET}:dancing-lights`] },
+      ],
+    }
+
+    expect(
+      resolveApplicableRecommendationSpellIds({
+        spellcasting,
+        target: 'cantrips',
+        classLevel: 1,
+        activationClassLevel: 1,
+        maxSelectableSpellLevel: 1,
+        catalogSpellsById: new Map([[`${RULESET}:dancing-lights`, makeSpell('dancing-lights', 0)]]),
+      }),
+    ).toEqual([`${RULESET}:dancing-lights`])
+  })
+})
 
 describe('resolveRecommendedSpellIdsForChoiceSet', () => {
   it('returns an empty set when recommendations are absent', () => {

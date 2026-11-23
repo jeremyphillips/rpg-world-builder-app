@@ -1,9 +1,11 @@
 import type { ClassSpellSelection } from '../../content/classes/spellcasting/class-spell-selection'
-import { IMMUTABLE_SPELL_MUTATION } from '../../vocab/spell/spell-mutation-policy'
+import {
+  IMMUTABLE_SPELL_MUTATION,
+  type SpellMutationPolicy,
+} from '../../vocab/spell/spell-mutation-policy'
 import {
   formatSpellMutationCopyParts,
   type SpellMutationCopyParts,
-  type SpellMutationCopyTrigger,
 } from '../../vocab/spell/format-spell-mutation-policy'
 
 export type SpellAcquisitionCopy = {
@@ -147,14 +149,36 @@ function formatCantripCountPhrase(
   return `${countPhrase} ${noun} to learn from the ${className} spell list.`
 }
 
+function formatCantripReplaceChange(
+  className: string,
+  parts: SpellMutationCopyParts,
+): string | undefined {
+  if (!parts) return undefined
+
+  const trigger =
+    parts.trigger === 'when you gain a class level'
+      ? `Whenever you gain a ${className} level`
+      : `Whenever you finish a Long Rest`
+
+  if (parts.replaceCount === 'all') {
+    return `${trigger}, you can replace any of your cantrips from this feature with other ${className} cantrips of your choice.`
+  }
+
+  const countLabel = parts.replaceCount === 1 ? 'one' : String(parts.replaceCount)
+  return `${trigger}, you can replace ${countLabel} of your cantrips from this feature with another ${className} cantrip of your choice.`
+}
+
 /** Class-list cantrip acquisition copy. */
 export function formatCantripAcquisitionCopy(
   className: string,
   max: number,
   requiredToComplete: boolean,
+  changePolicy: SpellMutationPolicy = IMMUTABLE_SPELL_MUTATION,
 ): SpellAcquisitionCopy {
+  const parts = formatSpellMutationCopyParts(changePolicy)
   return {
     lead: formatCantripCountPhrase(className, max, requiredToComplete),
+    change: formatCantripReplaceChange(className, parts),
   }
 }
 

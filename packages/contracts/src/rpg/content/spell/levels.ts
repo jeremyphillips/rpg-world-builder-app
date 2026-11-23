@@ -19,3 +19,14 @@ export const spellLevelSchema = z.number().int().min(MIN_SPELL_LEVEL).max(MAX_SP
 export function formatSpellLevel(level: number): string {
   return formatOrdinal(level)
 }
+
+/** Player-facing spell level range for rules copy — "level 1", "levels 1 and 2", or "levels 1–3". */
+export function formatSpellLevelRange(levels: readonly number[]): string | undefined {
+  if (levels.length === 0) return undefined
+  if (levels.length === 1) return `level ${levels[0]}`
+  const low = levels[0]!
+  const high = levels.at(-1)!
+  if (high === low) return `level ${low}`
+  if (high === low + 1) return `levels ${low} and ${high}`
+  return `levels ${low}–${high}`
+}

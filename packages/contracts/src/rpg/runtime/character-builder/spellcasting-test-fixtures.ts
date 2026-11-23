@@ -75,6 +75,9 @@ export const wizardStored: ClassStored = {
       },
       change: { kind: 'replace', trigger: 'longRest', limit: 'all' },
     },
+    cantripSelection: {
+      change: { kind: 'replace', trigger: 'longRest', limit: 1 },
+    },
     progression: {
       cantrips: {
         curve: { rows: [{ level: 1, count: 3 }] },
@@ -123,6 +126,47 @@ export const paladinStored: ClassStored = {
 }
 
 export const paladinClass = classSchema.parse(paladinStored)
+
+export const rangerStored: ClassStored = {
+  ...baseMeta,
+  id: `${RULESET}:fixture-ranger`,
+  slug: 'fixture-ranger',
+  name: 'Ranger',
+  description: '<p>Wilderness hunter.</p>',
+  primaryAbilities: ['dex', 'wis'],
+  hitDie: 10,
+  proficiencies: {
+    savingThrows: ['str', 'dex'],
+    armor: { categories: ['light', 'medium', 'shields'], items: [] },
+    weapons: { categories: ['simple', 'martial'], items: [] },
+    skills: { categories: [], items: [] },
+  },
+  characterCreation: defaultSkillChoices,
+  features: [spellcastingGrantFeature()],
+  spellcasting: {
+    slotProgressionId: 'half-caster',
+    ability: 'wis',
+    focusKinds: ['druidic_focus'],
+    spellSelection: {
+      model: 'prepareFromClassList',
+      change: { kind: 'replace', trigger: 'longRest', limit: 1 },
+    },
+    progression: {
+      preparedSpells: {
+        curve: {
+          rows: [
+            { level: 1, count: 2 },
+            { level: 5, count: 6 },
+            { level: 20, count: 15 },
+          ],
+        },
+        extension: 'carryForward',
+      },
+    },
+  },
+}
+
+export const rangerClass = classSchema.parse(rangerStored)
 
 export const warlockStored: ClassStored = {
   ...baseMeta,
@@ -240,7 +284,7 @@ export const athleticsSkill = {
 
 export const spellcastingTestCatalog: CharacterBuildCatalog = {
   species: [testSpecies],
-  classes: [nonCasterClass, wizardClass, paladinClass, warlockClass],
+  classes: [nonCasterClass, wizardClass, paladinClass, rangerClass, warlockClass],
   spells: [
     ...wizardCantrips,
     ...wizardLevelOneSpells,
