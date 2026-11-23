@@ -83,6 +83,12 @@ function MonsterFormsDefinedFormsEditor({
     },
     [ctx, forms.trueForm],
   )
+  const resolveFieldSections = useCallback(
+    (row: unknown) => ({
+      primary: resolveItemFields(row),
+    }),
+    [resolveItemFields],
+  )
   const lifecycleEditor = useMemo(
     () => ({
       ...editor,
@@ -137,6 +143,7 @@ function MonsterFormsDefinedFormsEditor({
           resolveFallback: () => MONSTER_DEFINED_FORM_DISPLAY_FALLBACK,
         }}
         resolveListMeta={(mapCtx) => monsterDefinedFormListMeta(forms, mapCtx)}
+        resolveFieldSections={resolveFieldSections}
         listReorder
       />
       <Button type="button" variant="ghost" onClick={lifecycle.requestRemoveAll}>

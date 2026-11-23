@@ -8,6 +8,7 @@ import { traitItemFields } from '../lib/species-trait-form-fields'
 import { TRAIT_MASTER_DETAIL_ITEM_NOUN } from '../lib/species-trait-form-labels'
 import { createSpeciesTraitRowTitleConfig } from '../lib/species-trait-row-title'
 import { traitItemDefaultValues } from '../lib/species-trait-form-values'
+import { useSpeciesTraitFacingHost } from '../../facing/use-species-trait-facing-host'
 
 const TRAITS_FIELD_NAME = 'traits'
 
@@ -26,6 +27,19 @@ export function SpeciesTraitsTab({ formCtx }: SpeciesTraitsTabProps) {
   const rowTitle = useMemo(() => createSpeciesTraitRowTitleConfig(), [])
   const makeItemDefaults = useCallback(() => traitItemDefaultValues(fields), [fields])
   const editor = useMasterDetailArray(TRAITS_FIELD_NAME, makeItemDefaults)
+
+  const resolveFieldSections = useCallback(
+    () => ({
+      primary: traitItemFields(formCtx),
+    }),
+    [formCtx],
+  )
+
+  const facing = useSpeciesTraitFacingHost({
+    fieldName: TRAITS_FIELD_NAME,
+    selectedIndex: editor.selectedIndex,
+    hostId: 'species-traits',
+  })
 
   return (
     <FormEmbeddedMasterDetailEditor
@@ -56,6 +70,8 @@ export function SpeciesTraitsTab({ formCtx }: SpeciesTraitsTabProps) {
         />
       }
       rowTitle={rowTitle}
+      resolveFieldSections={resolveFieldSections}
+      facing={facing}
       access={{ kind: 'availability', fieldName: 'available' }}
     />
   )

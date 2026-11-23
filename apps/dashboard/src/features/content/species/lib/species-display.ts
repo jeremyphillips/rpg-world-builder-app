@@ -7,7 +7,6 @@ import {
   resolveCreatureMovement,
   resolveCreatureSenses,
   resolveCreatureTraitGrants,
-  resolveTraitDisplay,
   type Species,
   type SpeciesBodyTrait,
 } from '@rpg/contracts'
@@ -18,6 +17,7 @@ import {
   formatGrantSummaryInline,
   type GrantDisplayVocabulary,
 } from '../../lib/forms/grants/grant-display'
+import { resolveFacing } from '../../facing/resolve-facing'
 import type { ContentStatRowData } from '../../lib/detail/metadata/content-stat-rows'
 import {
   projectVisibleHeritageOptions,
@@ -128,12 +128,24 @@ function buildSpeciesStatRows(
   return rows
 }
 
+function facingTitleAndBody(trait: SpeciesBodyTrait): { title: string; bodyHtml?: string } {
+  const resolution = resolveFacing({ domain: 'trait', source: 'persisted', trait })
+  if (resolution.status === 'ready') {
+    const richText = resolution.document.blocks.find((block) => block.kind === 'richText')
+    return {
+      title: resolution.document.title,
+      bodyHtml: richText?.kind === 'richText' ? richText.html : undefined,
+    }
+  }
+  return { title: trait.kind === 'custom' ? trait.name : trait.id }
+}
+
 function mapTraitToDetailItem(trait: SpeciesBodyTrait): SpeciesDetailItem {
-  const display = resolveTraitDisplay(trait)
+  const { title, bodyHtml } = facingTitleAndBody(trait)
   return {
     id: trait.id,
-    title: display.name,
-    bodyHtml: display.descriptionHtml,
+    title,
+    bodyHtml,
   }
 }
 
@@ -148,7 +160,7 @@ function mapHeritageOptionToDetailItem(
   trait: SpeciesBodyTrait,
   vocabulary: SpeciesDisplayVocabulary,
 ): SpeciesDetailItem {
-  const display = resolveTraitDisplay(trait)
+  const { title, bodyHtml } = facingTitleAndBody(trait)
   const grantVocabulary = toGrantDisplayVocabulary(vocabulary)
   const summaryModel = buildGrantSummaryModel(
     trait.kind === 'template' ? undefined : trait.grantGroups,
@@ -165,8 +177,8 @@ function mapHeritageOptionToDetailItem(
 
   return {
     id: trait.id,
-    title: display.name,
-    bodyHtml: display.descriptionHtml,
+    title,
+    bodyHtml,
     summaryLines: groupedSummary.map(({ label, text }) => `${label}: ${text}`),
     summaryInline: formatGrantSummaryInline(summaryModel),
   }
@@ -176,7 +188,7 @@ export function buildSpeciesCardViewModel(species: Species): SpeciesCardViewMode
   return {
     label: species.name,
     summaryItems: truncateSpeciesCardSummaryItems(
-      species.traits.map((trait) => resolveTraitDisplay(trait).name),
+      species.traits.map((trait) => facingTitleAndBody(trait).title),
     ),
   }
 }

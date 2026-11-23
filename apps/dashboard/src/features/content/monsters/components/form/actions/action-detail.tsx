@@ -1,7 +1,6 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, type ReactNode } from 'react'
 import { isWeaponEquipment, resolveEquipmentInstanceReferenceLabel } from '@rpg/contracts'
 import { SemanticText, Text } from '@rpg/ui'
-import { FormItems } from '@rpg/ui/form'
 import { useWatch } from 'react-hook-form'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
@@ -207,19 +206,15 @@ export function MonsterActionDetail({
     <div id={`monster-action-focus-${action.id}`} tabIndex={-1} />
   ) : null
 
-  const renderPrimary =
+  const primaryScope =
     located && action
-      ? ({ namePrefix: rowPrefix }: { namePrefix: string }) => (
+      ? ({ namePrefix: rowPrefix, children }: { namePrefix: string; children: ReactNode }) => (
           <MonsterSpellPickerHost
             enabled={action.kind === 'spell' && located.section !== 'legendaryActions'}
             arrayName={`${rowPrefix}.spells`}
             catalog={ctx.spellCatalogById}
           >
-            <FormItems
-              items={fields}
-              idPrefix={`monster-action-${action.id}`}
-              namePrefix={rowPrefix}
-            />
+            {children}
           </MonsterSpellPickerHost>
         )
       : undefined
@@ -251,7 +246,7 @@ export function MonsterActionDetail({
       contextualChrome={contextualChrome}
       facing={facing}
       additionalDetails={additionalDetails}
-      renderPrimary={renderPrimary}
+      primaryScope={primaryScope}
     />
   )
 }

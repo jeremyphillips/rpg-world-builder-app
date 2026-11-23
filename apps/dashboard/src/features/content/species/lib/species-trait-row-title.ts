@@ -1,15 +1,19 @@
-import { resolveTraitDisplay } from '@rpg/contracts'
-
 import type { MasterDetailRowTitleConfig } from '../../lib/master-detail/master-detail-row-title'
 import type { TraitRowForm } from './species-trait-form-fields'
-import { traitFromFormRow } from './species-trait-form-values'
+import { resolveFacing } from '../../facing/resolve-facing'
 
 function resolveSpeciesTraitDerivedTitle(row: TraitRowForm, index: number): string {
-  const kind = row.kind ?? 'custom'
-  if (kind === 'custom') return ''
+  if (!row.kind || row.kind === 'custom') return ''
   const id = row.id ?? `draft-${index}`
   try {
-    return resolveTraitDisplay(traitFromFormRow({ ...row, id })).name
+    const resolution = resolveFacing({
+      domain: 'trait',
+      source: 'draft',
+      hostId: 'species-traits',
+      row: { ...row, id },
+    })
+    if (resolution.status === 'ready') return resolution.document.title
+    return ''
   } catch {
     return ''
   }
@@ -19,8 +23,8 @@ function resolveSpeciesTraitDerivedTitle(row: TraitRowForm, index: number): stri
 export function createSpeciesTraitRowTitleConfig(): MasterDetailRowTitleConfig<TraitRowForm> {
   return {
     resolveRowTitle: (ctx) => {
-      const kind = ctx.row?.kind ?? 'custom'
-      if (kind === 'custom') {
+      const kind = ctx.row?.kind
+      if (!kind || kind === 'custom') {
         return { strategy: 'authored', field: 'name' }
       }
       return {

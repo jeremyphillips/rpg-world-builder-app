@@ -62,7 +62,7 @@ describe('monsterTraitDetailFields', () => {
       templateId: 'legendary-resistance',
       config: { uses: { normal: 3 } },
     })
-    expect(names[0]).toBe('traitPreview')
+    expect(names[0]).toBe(TRAIT_ROW_ADVISORY_DISPLAY)
     expect(names).toContain('config.uses.normal')
     expect(names.at(-1)).toBe('descriptionOverride')
     expect(names.indexOf('config.uses.normal')).toBeLessThan(names.indexOf('descriptionOverride'))
@@ -70,14 +70,12 @@ describe('monsterTraitDetailFields', () => {
 
   it('puts a fixed preset preview before the advisory and adds no body fields', () => {
     const names = traitNames({ id: 'fly', preset: 'flyby' })
-    expect(names[0]).toBe('traitPreview')
-    expect(names[1]).toBe(TRAIT_ROW_ADVISORY_DISPLAY)
-    expect(names).toHaveLength(2)
+    expect(names[0]).toBe(TRAIT_ROW_ADVISORY_DISPLAY)
+    expect(names).toHaveLength(1)
   })
 
   it('keeps water-breathing duration behind the toggle until it is enabled', () => {
     expect(traitNames({ id: 'water', preset: 'water-breathing' })).toEqual([
-      'traitPreview',
       TRAIT_ROW_ADVISORY_DISPLAY,
       'outsideWaterBreathToggle',
     ])
@@ -89,7 +87,6 @@ describe('monsterTraitDetailFields', () => {
         outsideWaterBreathUnit: 'hour',
       }),
     ).toEqual([
-      'traitPreview',
       TRAIT_ROW_ADVISORY_DISPLAY,
       'outsideWaterBreathToggle',
       'outsideWaterBreathAmount',

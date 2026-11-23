@@ -75,7 +75,6 @@
   "features/content/monsters/lib/statistics/monster-armor-class-fields.tsx::armorClass.preview": 1,
   "features/content/monsters/lib/statistics/monster-armor-class-fields.tsx::armorClass.shield": 1,
   "features/content/monsters/lib/traits/monster-trait-form-fields.tsx::outsideWaterBreathToggle": 1,
-  "features/content/monsters/lib/traits/monster-trait-form-fields.tsx::traitPreview": 1,
   "features/content/species/lib/species-culture-form-fields.ts::culture.naming.personalNameComponents": 1,
   "features/content/spells/components/spell-effects-editor.tsx::_effectsPreview": 1,
   "features/content/spells/lib/spell-form-fields.ts::descriptionTablesHost": 1,

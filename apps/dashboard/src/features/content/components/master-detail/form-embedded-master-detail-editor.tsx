@@ -96,6 +96,8 @@ export type FormEmbeddedMasterDetailEditorProps<TRow = Record<string, unknown>> 
     (
       | {
           rowTitle: MasterDetailRowTitleConfig<TRow>
+          /** Primary (and optional leading) regions for the shell-owned detail body. */
+          resolveFieldSections: (row: unknown) => MasterDetailItemFieldSections
           /** Canonical player-facing preview — requires `rowTitle` on structured facing hosts. */
           facing?: FacingHostConfig
           resolveListMeta?: (

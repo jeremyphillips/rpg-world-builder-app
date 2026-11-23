@@ -196,6 +196,9 @@ describe('FormEmbeddedMasterDetailEditor', () => {
           addLabel="Add trait"
           idPrefix="species-trait"
           rowTitle={{ strategy: 'authored', field: 'name' }}
+          resolveFieldSections={() => ({
+            primary: [{ type: 'text', name: 'name', label: 'Name' }],
+          })}
         />
       </TestFormShell>,
     )

@@ -97,6 +97,7 @@ describe('class feature form round-trip', () => {
   it('omits tables when the form row has none', () => {
     const row = {
       id: 'second-wind',
+      kind: 'custom' as const,
       name: 'Second Wind',
       level: 1,
       grants: [],
@@ -133,6 +134,7 @@ describe('class feature form round-trip', () => {
   it('persists available false on class feature save and omits when true', () => {
     const row = {
       id: 'second-wind',
+      kind: 'custom' as const,
       name: 'Second Wind',
       level: 1,
       grants: [],
@@ -145,7 +147,7 @@ describe('class feature form round-trip', () => {
     expect(featureFromFormRow(availableRow)).not.toHaveProperty('available')
   })
 
-  it('defaults missing kind to custom on save', () => {
+  it('requires kind on save', () => {
     const row = {
       id: 'second-wind',
       name: 'Second Wind',
@@ -154,7 +156,9 @@ describe('class feature form round-trip', () => {
       tables: [],
       available: true,
     }
-    expect(featureFromFormRow(row).kind).toBe('custom')
+    expect(() => featureFromFormRow(row as Parameters<typeof featureFromFormRow>[0])).toThrow(
+      /missing kind/i,
+    )
   })
 })
 

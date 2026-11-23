@@ -1,4 +1,4 @@
-import type { ClassBodyFeature, FacingResolution } from '@rpg/contracts'
+import type { ClassBodyFeature, ContentTrait, FacingResolution } from '@rpg/contracts'
 
 import { adaptClassFeatureDraftRow } from './adapters/class-feature-draft.adapter'
 import type { FeatureRowForm } from '../classes/lib/class-feature-form-fields'
@@ -11,6 +11,11 @@ import {
 } from './domains/class-feature/resolve-class-feature-facing'
 import type { ClassFacingHostContext } from './domains/class-feature/class-facing-host'
 import { resolveMonsterActionDraftFacing } from './domains/monster-action/resolve-monster-action-draft-facing'
+import {
+  resolveSpeciesTraitDraftFacing,
+  resolveTraitPersistedFacing,
+} from './domains/trait/resolve-trait-facing'
+import type { TraitRowForm } from '../species/lib/species-trait-form-fields'
 
 export type ResolveFacingRequest =
   | {
@@ -33,6 +38,17 @@ export type ResolveFacingRequest =
       actionId: string
       section: MonsterActionSection
     }
+  | {
+      domain: 'trait'
+      source: 'persisted'
+      trait: ContentTrait
+    }
+  | {
+      domain: 'trait'
+      source: 'draft'
+      hostId: 'species-traits' | 'heritage-options'
+      row: TraitRowForm & { id: string }
+    }
 
 export function resolveFacing(request: ResolveFacingRequest): FacingResolution {
   switch (request.domain) {
@@ -51,6 +67,13 @@ export function resolveFacing(request: ResolveFacingRequest): FacingResolution {
         actionId: request.actionId,
         section: request.section,
       })
+    case 'trait': {
+      if (request.source === 'persisted') {
+        return resolveTraitPersistedFacing(request.trait)
+      }
+      const resolution = resolveSpeciesTraitDraftFacing(request.row)
+      return resolution ?? { status: 'invalid', code: 'missing-kind' }
+    }
   }
 }
 

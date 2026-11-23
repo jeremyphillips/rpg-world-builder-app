@@ -12,6 +12,11 @@ export type MasterDetailItemFieldSections = {
   primary: readonly FormItem[]
 }
 
+export type MasterDetailPrimaryScopeProps = {
+  namePrefix: string
+  children: ReactNode
+}
+
 export type MasterDetailDetailBodyProps = {
   leadingItemFields?: readonly FormItem[]
   primaryItemFields: readonly FormItem[]
@@ -21,10 +26,13 @@ export type MasterDetailDetailBodyProps = {
   namePrefix: string
   /** Domain composites that must sit inside the outer rhythm stack after primary fields. */
   additionalDetails?: ReactNode
-  renderPrimary?: (ctx: { namePrefix: string }) => ReactNode
+  /**
+   * Wraps shell-owned primary `FormItems` (context + drawer only — must render `children` unchanged).
+   */
+  primaryScope?: (ctx: MasterDetailPrimaryScopeProps) => ReactNode
 }
 
-function DetailBodyFormItems({
+function DetailBodyFormItemsContent({
   items,
   idPrefix,
   selectedFieldId,
@@ -39,14 +47,43 @@ function DetailBodyFormItems({
 }) {
   if (items.length === 0) return null
   return (
-    <MasterDetailDetailFormScope>
-      <FormItems
-        items={wrapMasterDetailDetailFields(items)}
-        idPrefix={`${idPrefix}-${selectedFieldId}-${region}`}
-        namePrefix={namePrefix}
-      />
-    </MasterDetailDetailFormScope>
+    <FormItems
+      items={wrapMasterDetailDetailFields(items)}
+      idPrefix={`${idPrefix}-${selectedFieldId}-${region}`}
+      namePrefix={namePrefix}
+    />
   )
+}
+
+function DetailBodyFormItems(props: Parameters<typeof DetailBodyFormItemsContent>[0]) {
+  const content = DetailBodyFormItemsContent(props)
+  if (!content) return null
+  return <MasterDetailDetailFormScope>{content}</MasterDetailDetailFormScope>
+}
+
+function DetailBodyPrimaryRegion({
+  primaryItemFields,
+  idPrefix,
+  selectedFieldId,
+  namePrefix,
+  primaryScope,
+}: Pick<
+  MasterDetailDetailBodyProps,
+  'primaryItemFields' | 'idPrefix' | 'selectedFieldId' | 'namePrefix' | 'primaryScope'
+>) {
+  const primaryFormItems = DetailBodyFormItemsContent({
+    items: primaryItemFields,
+    idPrefix,
+    selectedFieldId,
+    namePrefix,
+    region: 'primary',
+  })
+  if (!primaryFormItems) return null
+
+  const scoped = primaryScope
+    ? primaryScope({ namePrefix, children: primaryFormItems })
+    : primaryFormItems
+  return <MasterDetailDetailFormScope>{scoped}</MasterDetailDetailFormScope>
 }
 
 /**
@@ -61,10 +98,10 @@ export function MasterDetailDetailBody({
   selectedFieldId,
   namePrefix,
   additionalDetails,
-  renderPrimary,
+  primaryScope,
 }: MasterDetailDetailBodyProps) {
   const hasLeading = Boolean(leadingItemFields?.length)
-  const hasPrimary = primaryItemFields.length > 0 || Boolean(renderPrimary)
+  const hasPrimary = primaryItemFields.length > 0
 
   if (!hasLeading && !facing && !hasPrimary && !additionalDetails) {
     return null
@@ -82,17 +119,15 @@ export function MasterDetailDetailBody({
         />
       ) : null}
       {facing ? <StructuredFacingHostPanel facing={facing} /> : null}
-      {renderPrimary ? (
-        <MasterDetailDetailFormScope>{renderPrimary({ namePrefix })}</MasterDetailDetailFormScope>
-      ) : (
-        <DetailBodyFormItems
-          items={primaryItemFields}
+      {hasPrimary ? (
+        <DetailBodyPrimaryRegion
+          primaryItemFields={primaryItemFields}
           idPrefix={idPrefix}
           selectedFieldId={selectedFieldId}
           namePrefix={namePrefix}
-          region="primary"
+          primaryScope={primaryScope}
         />
-      )}
+      ) : null}
       {additionalDetails ?? null}
     </FormRhythmStack>
   )

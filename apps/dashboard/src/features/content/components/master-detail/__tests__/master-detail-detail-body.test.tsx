@@ -64,6 +64,23 @@ describe('MasterDetailDetailBody', () => {
     expect(facing.compareDocumentPosition(primary) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
+  it('renders shell-owned primary FormItems inside primaryScope', () => {
+    render(
+      <Shell>
+        <MasterDetailDetailBody
+          primaryItemFields={[{ type: 'text', name: 'spell', label: 'Spell' }]}
+          idPrefix="monster-action"
+          selectedFieldId="row-1"
+          namePrefix="actions.0"
+          primaryScope={({ children }) => <div data-testid="spell-scope">{children}</div>}
+        />
+      </Shell>,
+    )
+
+    const scope = screen.getByTestId('spell-scope')
+    expect(scope).toContainElement(screen.getByTestId('form-monster-action-row-1-primary'))
+  })
+
   it('omits empty leading sections without extra rhythm nodes', () => {
     const { container } = render(
       <Shell>

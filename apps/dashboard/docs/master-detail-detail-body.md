@@ -8,13 +8,13 @@ actions, monster traits) share one detail-body composition path.
 | Region                               | Owner                                            | Notes                                                             |
 | ------------------------------------ | ------------------------------------------------ | ----------------------------------------------------------------- |
 | Identity (title, metadata, overflow) | `MasterDetailEditorShell`                        | Unchanged                                                         |
-| Contextual chrome                    | `contextualChrome` / legacy `detailLeading`      | Notices, advisories, focus anchors — **outside** the rhythm stack |
+| Contextual chrome                    | `contextualChrome`                               | Notices, advisories, focus anchors — **outside** the rhythm stack |
 | Detail body                          | `MasterDetailDetailBody`                         | One outer `FormRhythmStack`                                       |
 | Leading fields                       | Domain `resolveFieldSections` / `fieldSections`  | Optional; rendered before facing                                  |
 | Facing                               | `facing` + `StructuredFacingHostPanel`           | Shell-mounted only                                                |
 | Primary fields                       | `FormItems` inside `MasterDetailDetailFormScope` | Kind field lists                                                  |
 | Additional details                   | `additionalDetails`                              | After primary fields inside the same stack                        |
-| Primary host                         | `renderPrimary`                                  | Spell picker and similar — must not add a second outer stack      |
+| Primary host                         | `primaryScope`                                   | Spell picker and similar — wraps shell `FormItems` only           |
 
 ## Component map
 
@@ -23,11 +23,11 @@ MasterDetailEditorPanel
 └── MasterDetailSelectedRowEditor
     ├── AvailabilityAlert (when inactive)
     ├── contextualChrome
-    └── MasterDetailDetailBody  OR  renderBody (deprecated escape hatch)
+    └── MasterDetailDetailBody
         └── FormRhythmStack
             ├── leading FormItems
             ├── StructuredFacingHostPanel
-            ├── primary FormItems (or renderPrimary)
+            ├── primaryScope → primary FormItems
             └── additionalDetails
 ```
 
@@ -38,12 +38,13 @@ MasterDetailEditorPanel
 | `FormEmbeddedMasterDetailEditor` | `facing` prop                | optional `resolveFieldSections`    |
 | Class features                   | `useClassFeatureFacingHost`  | `resolveClassFeatureFieldSections` |
 | Monster actions                  | `useMonsterActionFacingHost` | all fields in primary              |
-| Species / heritage               | none today                   | single primary list                |
+| Species traits                   | `useSpeciesTraitFacingHost`  | `resolveFieldSections`             |
+| Heritage options                 | none (custom rows only)      | `resolveFieldSections`             |
+| Monster traits                   | `useMonsterTraitFacingHost`  | `resolveFieldSections`             |
 
 ## Prohibitions
 
 - Do not mount `StructuredFacingHostPanel` from feature components.
-- Do not pass facing through `detailLeading`.
 - Do not wrap preview + fields in a domain-owned outer `FormRhythmStack`.
 - Do not add margin utilities between facing and fields.
 

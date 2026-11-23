@@ -15,6 +15,7 @@ import {
 import {
   MasterDetailDetailBody,
   type MasterDetailItemFieldSections,
+  type MasterDetailPrimaryScopeProps,
 } from './master-detail-detail-body'
 
 export type { MasterDetailEditorIdentity, MasterDetailInlineTitle }
@@ -63,8 +64,6 @@ export interface MasterDetailEditorPanelProps {
    * Do not mount facing previews or ordinary form fields here.
    */
   contextualChrome?: ReactNode
-  /** @deprecated Use `contextualChrome`. */
-  detailLeading?: ReactNode
   /** Shell-owned player-facing preview for the selected structured row. */
   facing?: FacingHostConfig
   /** Optional leading vs primary field regions (`leading` → facing → `primary`). */
@@ -72,19 +71,10 @@ export interface MasterDetailEditorPanelProps {
   /** Domain composites after primary fields inside the outer rhythm stack. */
   additionalDetails?: ReactNode
   /**
-   * Wraps primary `FormItems` when a domain host must own interactive context (spell picker).
+   * Wraps shell-owned primary `FormItems` when a domain host must own interactive context (spell picker).
    * Must not introduce a second outer rhythm stack.
    */
-  renderPrimary?: (ctx: { namePrefix: string }) => ReactNode
-  /**
-   * Escape hatch for tests and transitional shells. Do not compose facing or outer rhythm here.
-   * @deprecated Prefer `facing`, `fieldSections`, and `renderPrimary`.
-   */
-  renderBody?: (ctx: {
-    selectedFieldId: string
-    selectedIndex: number
-    namePrefix: string
-  }) => ReactNode
+  primaryScope?: (ctx: MasterDetailPrimaryScopeProps) => ReactNode
   onDuplicate?: () => void
   /** Replaces the default delete-confirm request. */
   onDelete?: () => void
@@ -105,12 +95,7 @@ interface MasterDetailSelectedRowEditorProps {
   facing?: FacingHostConfig
   fieldSections?: MasterDetailItemFieldSections
   additionalDetails?: ReactNode
-  renderPrimary?: (ctx: { namePrefix: string }) => ReactNode
-  renderBody?: (ctx: {
-    selectedFieldId: string
-    selectedIndex: number
-    namePrefix: string
-  }) => ReactNode
+  primaryScope?: (ctx: MasterDetailPrimaryScopeProps) => ReactNode
 }
 
 function MasterDetailSelectedRowEditor({
@@ -128,8 +113,7 @@ function MasterDetailSelectedRowEditor({
   facing,
   fieldSections,
   additionalDetails,
-  renderPrimary,
-  renderBody,
+  primaryScope,
 }: MasterDetailSelectedRowEditorProps) {
   const resolvedAvailabilityNamePrefix = availabilityNamePrefix ?? `${fieldName}.${selectedIndex}`
 
@@ -153,20 +137,16 @@ function MasterDetailSelectedRowEditor({
         </div>
       ) : null}
       {contextualChrome}
-      {renderBody ? (
-        renderBody({ selectedFieldId, selectedIndex, namePrefix: rowPrefix })
-      ) : (
-        <MasterDetailDetailBody
-          leadingItemFields={leadingItemFields}
-          primaryItemFields={primaryItemFields}
-          facing={facing}
-          idPrefix={idPrefix}
-          selectedFieldId={selectedFieldId}
-          namePrefix={rowPrefix}
-          additionalDetails={additionalDetails}
-          renderPrimary={renderPrimary}
-        />
-      )}
+      <MasterDetailDetailBody
+        leadingItemFields={leadingItemFields}
+        primaryItemFields={primaryItemFields}
+        facing={facing}
+        idPrefix={idPrefix}
+        selectedFieldId={selectedFieldId}
+        namePrefix={rowPrefix}
+        additionalDetails={additionalDetails}
+        primaryScope={primaryScope}
+      />
     </MasterDetailRowPrefixProvider>
   )
 }
@@ -191,12 +171,10 @@ export function MasterDetailEditorPanel({
   availabilityDialogRef,
   overflowActions,
   contextualChrome,
-  detailLeading,
   facing,
   fieldSections,
   additionalDetails,
-  renderPrimary,
-  renderBody,
+  primaryScope,
   onDuplicate,
   onDelete,
 }: MasterDetailEditorPanelProps) {
@@ -237,8 +215,6 @@ export function MasterDetailEditorPanel({
 
   const visibleFields = omitInlineTitleField(itemFields, inlineTitle?.field)
 
-  const resolvedContextualChrome = contextualChrome ?? detailLeading
-
   return (
     <MasterDetailEditorShell
       itemNoun={itemNoun}
@@ -270,12 +246,11 @@ export function MasterDetailEditorPanel({
           availabilityFormItems={availabilityFormItems}
           availabilityNamePrefix={availabilityNamePrefix}
           availabilityDialogRef={availabilityDialogRef}
-          contextualChrome={resolvedContextualChrome}
+          contextualChrome={contextualChrome}
           facing={facing}
           fieldSections={fieldSections}
           additionalDetails={additionalDetails}
-          renderPrimary={renderPrimary}
-          renderBody={renderBody}
+          primaryScope={primaryScope}
         />
       ) : null}
     </MasterDetailEditorShell>

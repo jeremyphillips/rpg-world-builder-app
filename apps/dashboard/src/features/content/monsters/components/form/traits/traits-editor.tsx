@@ -26,6 +26,7 @@ import {
 } from '../../../lib/traits/monster-trait-form-fields'
 import { monsterTraitRowResolveFields } from '../../../lib/monster-master-detail-validation-fields'
 import { resolveMonsterTraitRowTitleConfig } from '../../../lib/traits/monster-trait-row-title'
+import { useMonsterTraitFacingHost } from '../../../../facing/use-monster-trait-facing-host'
 import { monsterTraitPresetDefaults } from '../../../lib/traits/monster-trait-preset-fields'
 import type { MonsterFormValues } from '../../../lib/monster-form-values'
 
@@ -73,32 +74,52 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
     [monsterName],
   )
 
-  const resolveItemFields = useCallback(
-    (row: unknown) => {
-      const rowIndex =
-        row && traits
-          ? traits.findIndex(
-              (trait) =>
-                trait === row ||
-                (typeof row === 'object' &&
-                  row !== null &&
-                  'id' in row &&
-                  typeof trait?.id === 'string' &&
-                  trait.id === (row as { id: string }).id),
-            )
-          : -1
-      const index = rowIndex >= 0 ? rowIndex : (editor.selectedIndex ?? 0)
-      return monsterTraitDetailFields({
+  const traitDetailFieldsForRow = useCallback(
+    (row: unknown, index: number) =>
+      monsterTraitDetailFields({
         row,
         advisories,
         rowPath: `traits.${index}`,
         monsterName: monsterName ?? '',
         ctx,
         sharedCastingOptions: values ? sharedCastingOptions(values, '') : [],
-      })
-    },
-    [advisories, ctx, editor.selectedIndex, monsterName, traits, values],
+      }),
+    [advisories, ctx, monsterName, values],
   )
+
+  const resolveTraitRowIndex = useCallback(
+    (row: unknown) => {
+      if (!row || !traits) return editor.selectedIndex ?? 0
+      const rowIndex = traits.findIndex(
+        (trait) =>
+          trait === row ||
+          (typeof row === 'object' &&
+            row !== null &&
+            'id' in row &&
+            typeof trait?.id === 'string' &&
+            trait.id === (row as { id: string }).id),
+      )
+      return rowIndex >= 0 ? rowIndex : (editor.selectedIndex ?? 0)
+    },
+    [editor.selectedIndex, traits],
+  )
+
+  const resolveItemFields = useCallback(
+    (row: unknown) => traitDetailFieldsForRow(row, resolveTraitRowIndex(row)),
+    [resolveTraitRowIndex, traitDetailFieldsForRow],
+  )
+
+  const resolveFieldSections = useCallback(
+    (row: unknown) => ({
+      primary: traitDetailFieldsForRow(row, resolveTraitRowIndex(row)),
+    }),
+    [resolveTraitRowIndex, traitDetailFieldsForRow],
+  )
+
+  const facing = useMonsterTraitFacingHost({
+    fieldName: 'traits',
+    selectedIndex: editor.selectedIndex,
+  })
 
   return (
     <FormEmbeddedMasterDetailEditor
@@ -107,6 +128,8 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
       fieldName="traits"
       itemFields={traitResolver}
       resolveItemFields={resolveItemFields}
+      resolveFieldSections={resolveFieldSections}
+      facing={facing}
       itemNoun={MONSTER_TRAIT_ITEM_NOUN}
       listTitle={MONSTER_TRAITS_HEADING}
       ariaLabel={MONSTER_TRAITS_HEADING}

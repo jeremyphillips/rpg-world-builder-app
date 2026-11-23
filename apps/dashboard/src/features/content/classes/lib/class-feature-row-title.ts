@@ -9,8 +9,7 @@ export function createClassFeatureRowTitleConfig(
 ): MasterDetailRowTitleConfig<FeatureRowForm> {
   return {
     resolveRowTitle: (ctx) => {
-      const kind = ctx.row?.kind ?? 'custom'
-      if (kind === 'subclass-choice') {
+      if (ctx.row?.kind === 'subclass-choice') {
         return {
           strategy: 'override',
           field: 'name',

@@ -275,13 +275,21 @@ const CLASS_FEATURE_KIND_FIELD_SECTIONS = {
   (ctx: ContentFormCtx, options?: FeatureFieldOptions) => MasterDetailItemFieldSections
 >
 
+function assertClassFeatureKind(
+  row: Pick<FeatureRowForm, 'kind'> | undefined,
+): asserts row is Pick<FeatureRowForm, 'kind'> & { kind: ClassFeatureKind } {
+  if (!row?.kind) {
+    throw new Error('Class feature row is missing kind')
+  }
+}
+
 export function resolveClassFeatureFieldSections(
   row: Pick<FeatureRowForm, 'kind'> | undefined,
   ctx: ContentFormCtx,
   options?: FeatureFieldOptions,
 ): MasterDetailItemFieldSections {
-  const kind = row?.kind ?? DEFAULT_CLASS_FEATURE_KIND
-  return CLASS_FEATURE_KIND_FIELD_SECTIONS[kind](ctx, options)
+  assertClassFeatureKind(row)
+  return CLASS_FEATURE_KIND_FIELD_SECTIONS[row.kind](ctx, options)
 }
 
 export function resolveClassFeatureItemFields(
@@ -420,8 +428,11 @@ export function featureFromFormRow(
   row: FeatureRowForm & { id: string },
   options?: { className?: string },
 ): ClassBodyFeature {
+  if (!row.kind) {
+    throw new Error('Class feature row is missing kind')
+  }
   const grantGroups = formRowsToGrantGroups(row.grants, { level: row.level })
-  const kind = row.kind ?? DEFAULT_CLASS_FEATURE_KIND
+  const kind = row.kind
 
   switch (kind) {
     case 'subclass-choice':

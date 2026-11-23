@@ -33,6 +33,7 @@ import { HERITAGE_OPTION_ROW_TITLE } from '../lib/species-trait-row-title'
 import { useCampaignAccessForm } from '../../lib/campaign-access/campaign-access-form-state'
 import { resolveSpeciesParentCampaignAccess } from '../lib/resolve-species-parent-campaign-access'
 import { heritageOptionItemDefaultValues } from '../lib/species-trait-form-values'
+import type { MasterDetailItemFieldSections } from '../../components/master-detail/master-detail-detail-body'
 
 const HERITAGE_FIELD_NAME = 'heritage'
 const OPTIONS_FIELD_NAME = 'heritage.options'
@@ -157,6 +158,13 @@ function HeritageEditor({ formCtx }: { formCtx: ContentFormCtx }) {
     editor.cancelRemove()
   }, [editor, setValue])
 
+  const resolveFieldSections = useCallback(
+    (): MasterDetailItemFieldSections => ({
+      primary: traitFields,
+    }),
+    [traitFields],
+  )
+
   return (
     <FormEmbeddedMasterDetailEditor
       formCtx={formCtx}
@@ -176,6 +184,7 @@ function HeritageEditor({ formCtx }: { formCtx: ContentFormCtx }) {
         />
       }
       rowTitle={HERITAGE_OPTION_ROW_TITLE}
+      resolveFieldSections={resolveFieldSections}
       access={accessConfig}
     />
   )
