@@ -2,13 +2,14 @@ import {
   availableBodyRows,
   joinStatBlockProseDocument,
   MONSTER_ACTION_KIND_ENTRIES,
+  monsterActionSchema,
   monsterActionSectionRows,
   systemDefaultArmorClassRules,
   type MonsterLegendaryAction,
 } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
-import { pickMonster, pickSkillProficiency } from '@/test/fixtures/pick'
+import { pickMonster, pickSkillProficiency, pickSpell } from '@/test/fixtures/pick'
 
 import { buildMonsterDetailViewModel, tryDeriveMonsterStatBlock } from '../monster-display'
 
@@ -23,6 +24,40 @@ const TURN_LIMIT_SENTENCE = "can't take this action again until the start of its
 const SAVE_OPENING = 'Constitution Saving Throw: DC 20'
 
 describe('resolveActionStatBlockRulesFacing', () => {
+  it('composes the spell turn limit once and preserves the authored notes', () => {
+    const monster = pickMonster('hell-hound')
+    const spell = pickSpell('fireball')
+    const description = '<p>Supplemental text.</p>'
+    const action = monsterActionSchema.parse({
+      id: 'spell-with-notes',
+      kind: 'spell',
+      name: 'Spell with notes',
+      castingAbility: { kind: 'ability', ability: 'int' },
+      spells: [{ spellId: spell.id }],
+      onceUntilNextTurn: true,
+      description,
+    })
+    const context = buildSpellDisplayContext({
+      monster,
+      catalogState: 'ready',
+      equipmentById: new Map(),
+      spellsById: new Map([[spell.id, spell]]),
+      spellCatalogStatus: 'ready',
+    })
+
+    const result = resolveActionStatBlockRulesFacing(
+      action,
+      'actions',
+      null,
+      'ready',
+      context,
+      new Map(),
+    )
+
+    expect(JSON.stringify(result.rulesProse).split(TURN_LIMIT_SENTENCE)).toHaveLength(2)
+    expect(result.descriptionHtml).toBe(description)
+  })
+
   it('matches detail view model rules-facing fields for hell hound multiattack', () => {
     const monster = pickMonster('hell-hound')
     const derived = tryDeriveMonsterStatBlock(monster, [], [pickSkillProficiency('perception')], {

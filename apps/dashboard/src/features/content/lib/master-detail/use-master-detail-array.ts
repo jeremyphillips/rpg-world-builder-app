@@ -153,7 +153,8 @@ export function useMasterDetailArray(
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null)
   const [pendingSelectIndex, setPendingSelectIndex] = useState<number | null>(null)
   const [consumedAddedFieldId, setConsumedAddedFieldId] = useState<string | null>(null)
-  const [deleteIndex, setDeleteIndex] = useState<number | null>(null)
+  const [deleteFieldId, setDeleteFieldId] = useState<string | null>(null)
+  const deleteIndex = findIndexByFieldId(fields, deleteFieldId)
 
   const selectedIndex = useMemo(() => {
     if (fields.length === 0) return null
@@ -219,9 +220,12 @@ export function useMasterDetailArray(
     if (lastAddedFieldId) acknowledgeAcquisition(lastAddedFieldId)
   }, [acknowledgeAcquisition, lastAddedFieldId])
 
-  const requestRemove = useCallback((index: number) => setDeleteIndex(index), [])
+  const requestRemove = useCallback(
+    (index: number) => setDeleteFieldId(fields[index]?.id ?? null),
+    [fields],
+  )
 
-  const cancelRemove = useCallback(() => setDeleteIndex(null), [])
+  const cancelRemove = useCallback(() => setDeleteFieldId(null), [])
 
   const selectFieldAfterRemoval = useCallback(
     (index: number) => {
@@ -239,9 +243,8 @@ export function useMasterDetailArray(
   )
 
   const confirmRemove = useCallback(() => {
-    if (deleteIndex === null) return
-    selectFieldAfterRemoval(deleteIndex)
-    setDeleteIndex(null)
+    setDeleteFieldId(null)
+    if (deleteIndex !== null) selectFieldAfterRemoval(deleteIndex)
   }, [deleteIndex, selectFieldAfterRemoval])
 
   const appendRow = useCallback(

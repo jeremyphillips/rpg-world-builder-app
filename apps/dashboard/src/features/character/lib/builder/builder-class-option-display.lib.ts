@@ -1,3 +1,4 @@
+import { createElement } from 'react'
 import {
   getSkillName,
   getSlotProgressionKindEntry,
@@ -11,6 +12,7 @@ import {
   buildClassCardViewModel,
   buildClassDetailViewModel,
   CLASS_SECTION_LABELS,
+  FacingDetailBody,
 } from '@/features/content'
 import { getContentTypeItemLabel } from '@/features/content'
 
@@ -90,13 +92,20 @@ export type ClassDetailsSheetContent = {
 
 export function buildClassDetailsSheetContent(
   characterClass: CharacterClass,
-  catalog: Pick<CharacterBuildCatalog, 'equipment' | 'skillProficiencies'>,
+  catalog: Pick<CharacterBuildCatalog, 'equipment' | 'skillProficiencies'> &
+    Partial<Pick<CharacterBuildCatalog, 'spells'>>,
+  spellcastingProgression?: ResolvedSpellcastingProgressionConfig,
 ): ClassDetailsSheetContent {
   const builderVocabulary = buildBuilderClassVocabulary(catalog)
   const viewModel = buildClassDetailViewModel(
     characterClass,
     { resolveToolLabel: builderVocabulary.resolveToolLabel },
-    { surface: 'builder-sheet' },
+    {
+      surface: 'builder-sheet',
+      characterClass,
+      spellcastingProgression,
+      spellsById: new Map(catalog.spells?.map((spell) => [spell.id, spell])),
+    },
   )
 
   const sections: BuilderOptionDetailsSection[] = []
@@ -127,7 +136,7 @@ export function buildClassDetailsSheetContent(
       title: features.title,
       items: features.items.map((item) => ({
         title: item.title,
-        body: item.bodyHtml,
+        body: createElement(FacingDetailBody, { resolution: item.facing }),
       })),
     })
   }

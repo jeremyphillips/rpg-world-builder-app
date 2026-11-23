@@ -369,9 +369,7 @@ function mapSpellActionFacing(
     id: action.id,
     name: rendered.heading,
     rulesProse,
-    descriptionHtml: supplemental
-      ? withTurnLimit(supplemental, action, spells.monsterName, true)
-      : undefined,
+    descriptionHtml: supplemental,
   }
 }
 

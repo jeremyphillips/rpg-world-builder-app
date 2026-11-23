@@ -81,6 +81,7 @@ import {
   createSpellCatalogContext,
   presentSpellReferenceDisplayName,
   resolveSpellReferenceOutcome,
+  type SpellCatalogContext,
   type ContentGrant,
   type EquipmentKind,
   type GrantGroup,
@@ -90,7 +91,7 @@ import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 export type GrantDisplayVocabulary = {
   resolveSenseLabel: (type: string) => string
-  resolveSpell: (spellId: string) => { name: string; level?: number }
+  resolveSpell: (spellId: string) => { name: string; level?: number } | undefined
   resolveSkillName?: (id: string) => string | undefined
   resolveToolName?: (slug: string) => string | undefined
   resolveWeaponName?: (slug: string) => string | undefined
@@ -203,8 +204,14 @@ function mapSpellGrantToItems(
 ): GrantSummaryItem[] {
   return grant.spellIds.map((spellId, spellIndex) => {
     const resolved = vocabulary.resolveSpell(spellId)
-    const name = resolved.name
-    const spellKind: GrantSummaryKind = resolved.level === 0 ? 'cantrip' : 'spell'
+    const name =
+      resolved?.name ??
+      presentSpellReferenceDisplayName({
+        status: 'unresolved',
+        spellId,
+        reason: 'unknown-spell',
+      })
+    const spellKind: GrantSummaryKind = resolved?.level === 0 ? 'cantrip' : 'spell'
 
     return {
       id: `${idPrefix}:spells:${spellIndex}`,
@@ -563,6 +570,12 @@ export function buildSpellGrantVocabulary(
     spellsById: new Map(spells.map((spell) => [spell.id, spell])),
   })
 
+  return buildSpellGrantVocabularyFromCatalog(catalog)
+}
+
+export function buildSpellGrantVocabularyFromCatalog(
+  catalog: SpellCatalogContext,
+): GrantDisplayVocabulary['resolveSpell'] {
   return (spellId) => {
     const outcome = resolveSpellReferenceOutcome(spellId, catalog)
     if (outcome.status === 'resolved') {

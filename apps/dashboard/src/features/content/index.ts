@@ -392,3 +392,5 @@ export {
   resolveContentImagePresentationDefault,
   type ContentImagePresentationSurface,
 } from './lib/detail/page/content-image-presentation-defaults'
+
+export { FacingDetailBody } from './facing/facing-detail-body'

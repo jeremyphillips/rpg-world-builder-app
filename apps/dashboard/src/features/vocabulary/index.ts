@@ -1,3 +1,6 @@
+export * from './sets'
+export * from './fields'
+
 export {
   useVocabularySet,
   useVocabularyMutations,
@@ -17,9 +20,6 @@ export { useConditionVocabulary } from './hooks/use-condition-vocabulary'
 export { useWeaponPropertyVocabulary } from './hooks/use-weapon-property-vocabulary'
 export { useEquipmentCategoryVocabulary } from './hooks/use-equipment-category-vocabulary'
 export { useVocabularySetMaps } from './hooks/use-vocabulary-set-maps'
-
-export * from './sets'
-export * from './fields'
 
 export { buildLabelDescriptionActiveVocabulary } from './lib/build-vocabulary-maps'
 export {

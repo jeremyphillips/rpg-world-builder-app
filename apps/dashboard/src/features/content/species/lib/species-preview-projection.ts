@@ -2,6 +2,7 @@ import {
   SPECIES_CLASS_POLICY_MODES_REQUIRING_IDS,
   SPECIES_CONTENT_TYPE_TERM,
   getSpeciesHeritageLabel,
+  createSpellCatalogContext,
   type ContentMedia,
   type Species,
 } from '@rpg/contracts'
@@ -9,6 +10,7 @@ import { formatPreviewRailOverflowList, type PreviewRailFact } from '@rpg/ui'
 
 import { getLanguageLabelFromVocabulary, getSenseLabelFromVocabulary } from '@/features/vocabulary'
 
+import { buildSpellGrantVocabularyFromCatalog } from '../../lib/forms/grants/grant-display'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import {
   CONTENT_PREVIEW_DESCRIPTION_PLACEHOLDER,
@@ -97,7 +99,12 @@ function speciesPreviewVocabulary(ctx: ContentFormCtx): SpeciesDisplayVocabulary
       ctx.languageVocabulary ? getLanguageLabelFromVocabulary(ctx.languageVocabulary, id) : id,
     resolveSenseLabel: (type) =>
       ctx.senseVocabulary ? getSenseLabelFromVocabulary(ctx.senseVocabulary, type) : type,
-    resolveSpell: () => undefined,
+    resolveSpell: buildSpellGrantVocabularyFromCatalog(
+      createSpellCatalogContext({
+        status: ctx.spellCatalogStatus ?? 'pending',
+        spellsById: ctx.spellCatalogById,
+      }),
+    ),
   }
 }
 
@@ -311,8 +318,8 @@ export function buildSpeciesPreviewDetailViewModel(
   values: SpeciesFormValues,
   ctx: ContentFormCtx,
 ): SpeciesDetailViewModel {
-  return buildSpeciesDetailViewModel(speciesDetailSourceFromFormValues(values), {
-    ...speciesPreviewVocabulary(ctx),
-    resolveSpell: () => undefined,
-  })
+  return buildSpeciesDetailViewModel(
+    speciesDetailSourceFromFormValues(values),
+    speciesPreviewVocabulary(ctx),
+  )
 }
