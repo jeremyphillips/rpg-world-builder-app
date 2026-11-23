@@ -54,13 +54,9 @@ export function SpeciesTraitsTab({ formCtx }: SpeciesTraitsTabProps) {
     <SpeciesTraitAddMenu
       label="Add trait"
       rulesetId={formCtx.rulesetId}
+      formCtx={formCtx}
       traits={traits}
       onAcquire={(choice) => {
-        if (choice.type === 'focus') {
-          const index = traits.findIndex((trait) => trait.id === choice.traitId)
-          if (index >= 0) editor.select(index)
-          return
-        }
         if (choice.type === 'custom') {
           editor.appendRow(makeItemDefaults())
           return

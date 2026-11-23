@@ -1,29 +1,50 @@
-import { DEFAULT_SYSTEM_RULESET_ID } from '@rpg/contracts'
+import { DEFAULT_SYSTEM_RULESET_ID, SENSE_SET_ID } from '@rpg/contracts'
 import { ButtonDropdown } from '@rpg/ui'
 
+import { buildLabelDescriptionActiveVocabulary, useVocabularySet } from '@/features/vocabulary'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import type { TraitRowForm } from '../lib/species-trait-form-fields'
 import {
   parseSpeciesTraitAcquisitionId,
   SPECIES_TRAIT_ACQUISITION_GROUPS,
-  speciesTraitAcquisitionItems,
+  speciesTraitAcquisitionDropdownItems,
 } from '../lib/species-trait-acquisition'
 
 export function SpeciesTraitAddMenu({
   label,
   rulesetId,
+  formCtx,
   traits,
   onAcquire,
 }: {
   label: string
   rulesetId?: string
+  formCtx: ContentFormCtx
   traits: readonly TraitRowForm[]
   onAcquire: (choice: NonNullable<ReturnType<typeof parseSpeciesTraitAcquisitionId>>) => void
 }) {
-  const items = speciesTraitAcquisitionItems(rulesetId ?? DEFAULT_SYSTEM_RULESET_ID, traits)
+  const senseSetQuery = useVocabularySet(formCtx.campaignId, SENSE_SET_ID)
+  const senseVocabulary = senseSetQuery.data
+    ? buildLabelDescriptionActiveVocabulary(senseSetQuery.data)
+    : undefined
+  const senseVocabularyStatus = senseSetQuery.isPending
+    ? 'pending'
+    : senseSetQuery.isError
+      ? 'error'
+      : 'ready'
+
+  const items = speciesTraitAcquisitionDropdownItems({
+    rulesetId: rulesetId ?? DEFAULT_SYSTEM_RULESET_ID,
+    traits,
+    senseVocabulary,
+    senseVocabularyStatus,
+  })
+
   return (
     <ButtonDropdown
       label={label}
       triggerPresentation="addIcon"
+      supportingWrap
       groups={[...SPECIES_TRAIT_ACQUISITION_GROUPS]}
       items={items}
       onSelectItem={(id) => {
