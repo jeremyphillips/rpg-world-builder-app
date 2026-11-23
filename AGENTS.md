@@ -315,6 +315,10 @@ or directories without explicit instruction.
 Before closing a task, check whether any file in `*/docs/` needs updating. If
 unsure, ask. Recommend a new doc when substantial work has no existing home.
 
+SSOT ownership, duplicate authority vs missing integration vs orphaned exports,
+and the pre-abstraction checklist → [docs/architecture-ssot.md](docs/architecture-ssot.md).
+Vocabulary patterns → [packages/contracts/docs/vocab-ssot.md](packages/contracts/docs/vocab-ssot.md).
+
 ## Commits
 
 Conventional Commits enforced by `commitlint` on commit-msg (see

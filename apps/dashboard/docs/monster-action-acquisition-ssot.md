@@ -37,6 +37,8 @@ Declared only in [`monster-action-acquisition.ts`](../src/features/content/monst
 
 **Schema tuple** ([`section-tuples.ts`](../../../packages/contracts/src/rpg/content/monster/action/section-tuples.ts)) defines which kinds are mechanically valid per section. **`MONSTER_SECTION_KINDS`** is derived from those tuples. **Menu policy** should consult `monsterSectionAllowsKind` (and singleton / repeatability helpers), not hardcoded `section === '…'` checks, except where product rules intentionally scope an item (e.g. primary Spellcasting only on Actions).
 
+**ESLint:** `acquisition/**` must not import `MONSTER_SECTION_KINDS` from `@rpg/contracts` — use `monsterSectionAllowsKind` only ([`apps/dashboard/eslint.config.js`](../../eslint.config.js)).
+
 | Kind           | In `actions` tuple? | In `bonusActions` tuple? | Menu today                                                                   | To offer on another section                                                                                        |
 | -------------- | ------------------- | ------------------------ | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | `teleport`     | Yes                 | Yes                      | `portableMovementItems` when `monsterSectionAllowsKind(section, 'teleport')` | **Registry-only** — already on Actions                                                                             |

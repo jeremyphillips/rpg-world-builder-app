@@ -30,7 +30,7 @@ with user confirmation when checkout would overwrite local changes.
 1. Resolve target: current branch, named branch, PR head, or uncommitted only.
 2. Diff via merge base: `git merge-base HEAD <base>` → `git diff <merge-base>…`
    (default base: repo default branch).
-3. Read [`AGENTS.md`](../../../AGENTS.md) and touched-area docs as needed.
+3. Read [`AGENTS.md`](../../../AGENTS.md), [`docs/architecture-ssot.md`](../../../docs/architecture-ssot.md) when ownership is unclear, and touched-area docs as needed.
 4. Group changes by feature and layer.
 5. Trace user-visible flows; read deleted files/tests for lost guarantees.
 6. **SSOT search** — grep or trace for semantic duplication (see below).
@@ -59,6 +59,8 @@ non-reusable.
 ### SSOT rule
 
 > Search for the same rule, inventory, label, route mapping, state classification, permission gate, or class stack elsewhere. Flag independently maintained copies even when their code is not textually identical.
+
+Classify findings as duplicate authority (**A**), missing integration (**B**), or orphaned export (**C**) per [architecture-ssot.md](../../../docs/architecture-ssot.md).
 
 When a PR introduces or extends a rule/inventory/mapping, trace for existing
 owners before accepting the change.

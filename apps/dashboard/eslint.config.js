@@ -475,6 +475,26 @@ const dashboardSourceExcerptImportGuard = {
   },
 }
 
+const dashboardMonsterAcquisitionSectionKindsGuard = {
+  files: ['src/features/content/monsters/lib/actions/acquisition/**/*.{ts,tsx}'],
+  ignores: ['**/*.{test,integration.test,stories}.{ts,tsx}'],
+  rules: {
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: '@rpg/contracts',
+            importNames: ['MONSTER_SECTION_KINDS'],
+            message:
+              'Use monsterSectionAllowsKind for menu and placement eligibility. MONSTER_SECTION_KINDS is schema-derived tuple metadata.',
+          },
+        ],
+      },
+    ],
+  },
+}
+
 const dashboardAuthApiContractsImportGuard = {
   files: ['src/features/auth/api/**/*.{ts,tsx}'],
   rules: {
@@ -527,4 +547,5 @@ export default [
   dashboardFastRefreshGuard,
   dashboardShellContractsImportGuard,
   dashboardAuthApiContractsImportGuard,
+  dashboardMonsterAcquisitionSectionKindsGuard,
 ]

@@ -124,7 +124,8 @@ tuple is optional churn — defer unless it removes a second authority.
 
 ---
 
-## Related plans
+## Related
 
-- Contracts vocab implementation: `.cursor/plans/contracts_vocab_ssot_5a89b856.plan.md`
+- Repo-wide SSOT policy hub: [docs/architecture-ssot.md](../../../docs/architecture-ssot.md)
+- Contracts vocab plan: `.cursor/plans/contracts_vocab_ssot_5a89b856.plan.md`
 - Monster acquisition SSOT: `.cursor/plans/ssot_acquisition_audit_806f6d29.plan.md`
