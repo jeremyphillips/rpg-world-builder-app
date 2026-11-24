@@ -15,6 +15,7 @@ import {
   resolveCompiledChoiceProgressionQuotaAtLevel,
   findCompiledChoiceProgressionBySuffix,
   resolveDisplaySlotRowAtLevel,
+  resolveClassFeatureName,
   type ResolvedCampaignRules,
   type ResolvedClassSpellcasting,
   type ResolvedClassSpellcastingDisplayColumn,
@@ -41,6 +42,7 @@ function featuresAtLevel(
   features: CharacterClass['features'],
   level: number,
   subclassingEnabled: boolean,
+  className: string,
 ): string[] {
   return features
     .filter((feature) => {
@@ -48,7 +50,7 @@ function featuresAtLevel(
       if (!subclassingEnabled && isSubclassChoiceFeatureRow(feature)) return false
       return true
     })
-    .map((feature) => feature.name)
+    .map((feature) => resolveClassFeatureName(feature, className))
 }
 
 function buildProgressionValueRow(
@@ -106,7 +108,12 @@ function buildRow(
 ): ProgressionRow {
   const castingActive = isSpellcastingActiveAtLevel(characterClass, level)
 
-  const featureNames = featuresAtLevel(characterClass.features, level, subclassingEnabled)
+  const featureNames = featuresAtLevel(
+    characterClass.features,
+    level,
+    subclassingEnabled,
+    characterClass.name,
+  )
 
   return {
     level,

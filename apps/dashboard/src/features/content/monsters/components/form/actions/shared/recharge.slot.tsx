@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { NumberField, OptionalFieldDisclosure } from '@rpg/ui'
 import {
   optionalDisclosureShellProps,
@@ -25,7 +26,11 @@ export function MonsterActionRechargeField({
   presentation: 'included' | 'optional'
 }) {
   const controlSize = useFieldControlSize()
-  const { setValue } = useFormContext()
+  const form = useFormContext()
+  const { setValue } = form
+  useEffect(() => {
+    form.register(name as never, { shouldUnregister: false })
+  }, [form, name])
   const current = useWatch({ name })
   const recharge = completeRecharge(current)
   const open = presentation === 'included' || recharge !== undefined

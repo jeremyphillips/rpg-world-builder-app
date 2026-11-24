@@ -10,6 +10,18 @@ import {
 } from '@/features/vocabulary'
 import { SPECIES_STAT_LABELS } from '@/features/content'
 
+vi.mock('../../spells/hooks/use-spells', () => ({
+  useSpells: () =>
+    ({
+      data: [],
+      isPending: false,
+      isError: false,
+      isLoading: false,
+      isSuccess: true,
+    }) as never,
+  spellsQueryKey: () => ['spells'] as const,
+}))
+
 vi.mock('@/components/layout/breadcrumb/use-breadcrumb-label', () => ({
   useSetBreadcrumbLabel: vi.fn(),
 }))

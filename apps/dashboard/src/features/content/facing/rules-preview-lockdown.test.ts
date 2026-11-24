@@ -16,7 +16,7 @@ describe('rules preview lockdown', () => {
     expect(adapted.status).toBe('ok')
     if (adapted.status !== 'ok') return
 
-    const facing = resolveCustomClassFeatureFacing(adapted.record)
+    const facing = resolveCustomClassFeatureFacing(adapted.record as never)
     expect(facing.status).toBe('ready')
   })
 
@@ -41,7 +41,10 @@ describe('rules preview lockdown', () => {
         kind: 'custom',
         name: 'Notes',
         description: '<p>Freeform</p>',
-      }),
+        grants: [],
+        overrideDisplay: false,
+        available: true,
+      } as never),
     ).toBeUndefined()
   })
 

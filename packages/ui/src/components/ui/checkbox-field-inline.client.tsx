@@ -8,7 +8,6 @@ import { CheckboxFieldOptionLabel } from './checkbox-field-option-label'
 import { Checkbox } from './checkbox.client'
 import { CheckboxOption, type CheckboxOptionShell } from './checkbox-option.client'
 import type { CheckboxOptionScale } from './checkbox-option.lib'
-import { choiceOptionLabelClassName } from './choice-option-typography.lib'
 import {
   fieldInlineCheckboxControlColumnClasses,
   fieldInlineToggleRowClasses,

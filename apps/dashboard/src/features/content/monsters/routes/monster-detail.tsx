@@ -6,7 +6,6 @@ import {
   MONSTER_CLASSIFICATION_DISABLED,
   MONSTER_CLASSIFICATION_DRAFT,
   type Monster,
-  type SystemRulesetId,
 } from '@rpg/contracts'
 
 import { useRulesetPatch } from '@/features/homebrew'

@@ -33,14 +33,18 @@ function resolveControllerLabelLayout(controller: FieldConfig): FieldLabelLayout
     case 'boolean':
       return 'inline'
     case 'select':
-      return resolveStackedLabelLayout(controller.labelPosition)
+      return resolveStackedLabelLayout(
+        'labelPosition' in controller ? controller.labelPosition : undefined,
+      )
     case 'text':
     case 'number':
     case 'textarea':
     case 'richtext':
     case 'markdown':
     case 'json':
-      return resolveStackedLabelLayout(controller.labelPosition)
+      return resolveStackedLabelLayout(
+        'labelPosition' in controller ? controller.labelPosition : undefined,
+      )
     default:
       return 'stacked'
   }

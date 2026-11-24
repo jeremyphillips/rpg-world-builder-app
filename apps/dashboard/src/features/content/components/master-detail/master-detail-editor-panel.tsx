@@ -221,7 +221,7 @@ export function MasterDetailEditorPanel({
       namePrefix={
         hasSelectedRow && selectedIndex !== null ? `${fieldName}.${selectedIndex}` : undefined
       }
-      selectedFieldId={hasSelectedRow ? selectedFieldId : undefined}
+      selectedFieldId={hasSelectedRow ? (selectedFieldId ?? undefined) : undefined}
       onAcquisitionEditApplied={handleAcquisitionEditApplied}
       selectedIdentity={hasSelectedRow ? selectedIdentity : undefined}
       onDelete={

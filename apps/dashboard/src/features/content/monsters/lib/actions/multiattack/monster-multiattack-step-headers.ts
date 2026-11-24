@@ -8,7 +8,9 @@ import {
   multiattackPositiveInt,
   presentSpellReferenceDisplayName,
   resolveSpellReferenceOutcome,
-  type MultiattackDraftStep,
+  type MultiattackAttackGroup,
+  type MultiattackUseChoice,
+  type MultiattackUseSingle,
 } from '@rpg/contracts'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
@@ -100,20 +102,20 @@ function spellNameForProse(spellId: string | undefined, ctx: ContentFormCtx): st
   return presentSpellReferenceDisplayName(outcome)
 }
 
-function attackGroupPrimary(step: MultiattackDraftStep): string {
+function attackGroupPrimary(step: MultiattackAttackGroup): string {
   const count = multiattackPositiveInt(step.count)
   if (count === undefined) return MONSTER_MULTIATTACK_ATTACK_GROUP_LABEL
   return multiattackStepAttackCountLabel(count)
 }
 
-function attackIds(step: MultiattackDraftStep): string[] {
+function attackIds(step: MultiattackAttackGroup): string[] {
   return Array.isArray(step.actionIds)
     ? step.actionIds.filter((id): id is string => typeof id === 'string' && id.trim().length > 0)
     : []
 }
 
 function attackGroupSummary(
-  step: MultiattackDraftStep,
+  step: MultiattackAttackGroup,
   titles: Map<string, string>,
 ): string | undefined {
   const ids = attackIds(step)
@@ -127,14 +129,17 @@ function attackGroupSummary(
   return list
 }
 
-function useOperation(step: MultiattackDraftStep, name: string): string {
+function formatMultiattackUseOperation(
+  step: Pick<MultiattackUseSingle, 'optional' | 'count'>,
+  name: string,
+): string {
   const prefix = step.optional === true ? 'Can use' : 'Use'
   const suffix = multiattackStepUseRepetitionSuffix(step.count)
   return suffix ? `${prefix} ${name} ${suffix}` : `${prefix} ${name}`
 }
 
 function singleUsePrimary(
-  step: MultiattackDraftStep,
+  step: MultiattackUseSingle,
   titles: Map<string, string>,
   ctx: ContentFormCtx,
 ): string {
@@ -147,11 +152,11 @@ function singleUsePrimary(
     const suffix = multiattackStepUseRepetitionSuffix(step.count)
     return suffix ? `${verb} ${spell} ${suffix}` : `${verb} ${spell}`
   }
-  return useOperation(step, name)
+  return formatMultiattackUseOperation(step, name)
 }
 
 function singleUseSummary(
-  step: MultiattackDraftStep,
+  step: MultiattackUseSingle,
   titles: Map<string, string>,
   ctx: ContentFormCtx,
 ): string | undefined {
@@ -181,7 +186,7 @@ function choicePhrase(
 }
 
 function choicePhrases(
-  step: MultiattackDraftStep,
+  step: MultiattackUseChoice,
   titles: Map<string, string>,
   ctx: ContentFormCtx,
 ): string[] {
@@ -217,9 +222,9 @@ export function multiattackStepHeaderPrimary(
     ctx: ContentFormCtx
   },
 ): string | undefined {
-  if (isMultiattackAttackGroup(step)) return attackGroupPrimary(step as MultiattackDraftStep)
+  if (isMultiattackAttackGroup(step)) return attackGroupPrimary(step)
   if (!isMultiattackUseClause(step)) return MONSTER_MULTIATTACK_ATTACK_GROUP_LABEL
-  const useStep = step as MultiattackDraftStep
+  const useStep = step
   const rows = sectionRowsFromWatched(watched, input.section, input.fallbackRows)
   const titles = monsterActionEditorTitles(
     rows,
@@ -227,7 +232,7 @@ export function multiattackStepHeaderPrimary(
     input.ctx,
     input.section,
   )
-  if (useStep.mode === 'choice' || (Array.isArray(useStep.choices) && useStep.choices.length > 0)) {
+  if (useStep.mode === 'choice') {
     return choiceUsePrimary(choicePhrases(useStep, titles, input.ctx))
   }
   return singleUsePrimary(useStep, titles, input.ctx)
@@ -251,10 +256,10 @@ export function multiattackStepHeaderSummary(
       input.ctx,
       input.section,
     )
-    return attackGroupSummary(step as MultiattackDraftStep, titles)
+    return attackGroupSummary(step, titles)
   }
   if (!isMultiattackUseClause(step)) return undefined
-  const useStep = step as MultiattackDraftStep
+  const useStep = step
   const rows = sectionRowsFromWatched(watched, input.section, input.fallbackRows)
   const titles = monsterActionEditorTitles(
     rows,
@@ -262,7 +267,7 @@ export function multiattackStepHeaderSummary(
     input.ctx,
     input.section,
   )
-  if (useStep.mode === 'choice' || (Array.isArray(useStep.choices) && useStep.choices.length > 0)) {
+  if (useStep.mode === 'choice') {
     return choiceUseSummary(choicePhrases(useStep, titles, input.ctx))
   }
   return singleUseSummary(useStep, titles, input.ctx)

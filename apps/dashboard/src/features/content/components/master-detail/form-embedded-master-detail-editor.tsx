@@ -169,7 +169,9 @@ function FormEmbeddedMasterDetailEditorBody<TRow = Record<string, unknown>>({
   ...props
 }: FormEmbeddedMasterDetailEditorBodyProps<TRow>) {
   const { facing, ...bodyProps } = props
-  const body = useFormEmbeddedMasterDetailEditorBody(bodyProps)
+  const body = useFormEmbeddedMasterDetailEditorBody(bodyProps as Parameters<
+    typeof useFormEmbeddedMasterDetailEditorBody
+  >[0])
   const campaignAccessDialog = embeddedCampaignAccessDialog({
     access: props.access,
     formCtx: body.formCtx,

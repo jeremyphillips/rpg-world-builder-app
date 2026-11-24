@@ -11,6 +11,7 @@ import {
   DEFAULT_LEVEL_ZERO_RETAIN_SPECIES_LANGUAGES,
   DEFAULT_LEVEL_ZERO_RETAIN_SPECIES_TRAITS,
   DEFAULT_MULTICLASSING_ENABLED,
+  DEFAULT_SYSTEM_RULESET_ID,
   DEFAULT_PRIMARY_ABILITY_MINIMUM,
   DEFAULT_PRIMARY_ABILITY_MINIMUM_ENABLED,
   DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED,
@@ -131,7 +132,7 @@ const configRulesObjectSchema = z.object({
   speciesLevelLimitsEnabled: z.boolean().default(DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED),
   subclassChoicesEnabled: z.boolean().default(DEFAULT_SUBCLASS_CHOICES_ENABLED),
   startingWealth: startingWealthFormSchema.default(() =>
-    mapStartingWealthToFormValues(getStandardStartingWealthRules('srd-cc-5.2.1')),
+    mapStartingWealthToFormValues(getStandardStartingWealthRules(DEFAULT_SYSTEM_RULESET_ID)),
   ),
   languageProficiencyGrants: languageProficiencyGrantsFormSchema.default(
     () => languageProficiencyRulesDefaultValues().languageProficiencyGrants,
@@ -172,7 +173,7 @@ const configRulesObjectSchema = z.object({
   xpThresholdOverrides: xpThresholdOverrideEntriesSchema.default([]),
   slotProgressions: z
     .array(slotProgressionSchema)
-    .default(() => [...loadSpellcastingProgressionSeed('srd-cc-5.2.1').slotProgressions]),
+    .default(() => [...loadSpellcastingProgressionSeed(DEFAULT_SYSTEM_RULESET_ID).slotProgressions]),
 })
 
 type ConfigRulesValues = z.output<typeof configRulesObjectSchema>
@@ -254,7 +255,7 @@ function configRulesSuperRefine(values: ConfigRulesValues, ctx: z.RefinementCtx)
     requireEndAt: effectiveMax,
   })
 
-  const systemXpEntries = getStandardXpProgression('srd-cc-5.2.1').entries
+  const systemXpEntries = getStandardXpProgression(DEFAULT_SYSTEM_RULESET_ID).entries
   refineEffectiveXpProgression(
     {
       systemEntries: systemXpEntries,

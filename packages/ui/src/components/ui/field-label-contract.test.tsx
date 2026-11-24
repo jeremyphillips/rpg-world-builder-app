@@ -262,9 +262,9 @@ describe('field hint computed type', () => {
     const page = await browser.newPage()
     await page.setContent(`<!doctype html>
       <body>
-        <p id="hint-md" class="${hintMd}">Field hint</p>
-        <p id="caption" class="text-style-caption">Caption</p>
-        <p id="hint-sm" class="${hintSm}">Compact hint</p>
+        <span id="hint-md" class="${hintMd}">Field hint</span>
+        <span id="caption" class="text-style-caption">Caption</span>
+        <span id="hint-sm" class="${hintSm}">Compact hint</span>
       </body>`)
     await page.addStyleTag({ content: css })
 

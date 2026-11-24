@@ -12,7 +12,7 @@ import {
 } from '@rpg/ui/form'
 import type { ContentValidationIntent } from '@rpg/contracts'
 
-import type { AnyContentFormDef, ContentFormCtx } from '../../registry/content-form-registry'
+import type { AnyContentFormDef, ContentFormCtx } from '../registry/content-form-registry'
 import { resolveContentPublishSchema } from '../shells/edit/content-edit-load'
 import {
   draftPublishValidationSurface,
@@ -71,7 +71,13 @@ export function ContentDraftPublishValidationSurfaceBridge({
         if (currentUi.publishPresentationEnabled) {
           currentUi.markPublishAttempted()
           onPublishIssuesChangeRef.current({
-            issues: [{ path: '', message: CONTENT_PUBLISH_VALIDATION_ROUTING_FAILED_MESSAGE }],
+            issues: [
+              {
+                path: '',
+                message: CONTENT_PUBLISH_VALIDATION_ROUTING_FAILED_MESSAGE,
+                severity: 'crossRow',
+              },
+            ],
           })
         }
         return null

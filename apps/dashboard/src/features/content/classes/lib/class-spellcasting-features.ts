@@ -18,8 +18,6 @@ export function createSpellcastingFeature(input: {
     slotProgression: input.slotProgression,
     slotProgressionId: input.slotProgressionId,
   }
-  const usesPactMagic = usesPactMagicSlotProgression(pactProgression)
-
   return {
     kind: 'spellcasting',
     id: spellcastingGrantingFeatureId(pactProgression),

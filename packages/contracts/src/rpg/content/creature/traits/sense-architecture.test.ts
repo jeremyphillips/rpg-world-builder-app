@@ -108,6 +108,7 @@ describe('collectSourcedGrants with sense templates', () => {
     heritage: {
       id: 'lineage',
       name: 'Lineage',
+      choose: 1,
       options: [drowDarkvisionGrant],
     },
   } satisfies Species

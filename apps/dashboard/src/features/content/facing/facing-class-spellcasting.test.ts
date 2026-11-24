@@ -8,20 +8,12 @@ import { spellcastingFromFormValues } from '../classes/lib/class-form-values'
 import { srdSpellcastingProgressionFixture } from '../classes/lib/fixtures/spellcasting-progression-fixture'
 import { adaptClassFeatureDraftRow } from './adapters/class-feature-draft.adapter'
 import { resolveFacing } from './resolve-facing'
-import type { ContentFormCtx } from '../lib/forms/registry/content-form-registry'
 
 const PROGRESSION = srdSpellcastingProgressionFixture()
 const RULESET = 'srd-cc-5.2.1' as const
 
 const vocabulary = {
   resolveToolLabel: (slug: string) => slug,
-}
-
-function previewCtx(): ContentFormCtx {
-  return {
-    rulesetId: RULESET,
-    spellcastingProgression: PROGRESSION,
-  } as ContentFormCtx
 }
 
 describe('class feature spellcasting facing', () => {

@@ -1,10 +1,16 @@
 import { describe, expect, it } from 'vitest'
 
+import type { FormItem } from '@rpg/ui/form'
+
 import {
   assembleCreatureTraitTemplateFields,
   validateTraitTemplateFieldContributionForTest,
   type TemplateConfigField,
 } from './creature-trait-template-field-assembler'
+
+function fieldName(field: FormItem): string | undefined {
+  return 'name' in field && typeof field.name === 'string' ? field.name : undefined
+}
 
 describe('assembleCreatureTraitTemplateFields', () => {
   it('orders legendary resistance uses before details', () => {
@@ -12,7 +18,7 @@ describe('assembleCreatureTraitTemplateFields', () => {
       templateId: 'legendary-resistance',
       host: 'species',
     })
-    const names = fields.map((field) => field.name).filter(Boolean)
+    const names = fields.map((field) => fieldName(field)).filter(Boolean)
     expect(names).toEqual(['config.uses.normal', 'details'])
   })
 
@@ -21,13 +27,13 @@ describe('assembleCreatureTraitTemplateFields', () => {
       templateId: 'legendary-resistance',
       host: 'species',
     })
-    expect(species.map((field) => field.name)).not.toContain('config.uses.inLair')
+    expect(species.map((field) => fieldName(field))).not.toContain('config.uses.inLair')
 
     const monster = assembleCreatureTraitTemplateFields({
       templateId: 'legendary-resistance',
       host: 'monster',
     })
-    expect(monster.map((field) => field.name)).toContain('config.uses.inLair')
+    expect(monster.map((field) => fieldName(field))).toContain('config.uses.inLair')
   })
 
   it('throws when contribution paths collide', () => {

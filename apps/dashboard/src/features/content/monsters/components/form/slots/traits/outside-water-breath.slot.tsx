@@ -18,8 +18,8 @@ export function OutsideWaterBreathSlot({ namePrefix: namePrefixProp }: { namePre
   const amount = useWatch({ name: `${namePrefix}.outsideWaterBreathAmount` as never })
   const unit = useWatch({ name: `${namePrefix}.outsideWaterBreathUnit` as never })
   const enabled = outsideWaterBreathDurationEnabled({
-    outsideWaterBreathAmount: amount as number | undefined,
-    outsideWaterBreathUnit: unit as CreatureTraitDurationUnit | undefined,
+    outsideWaterBreathAmount: amount as unknown as number | undefined,
+    outsideWaterBreathUnit: unit as unknown as CreatureTraitDurationUnit | undefined,
   })
 
   return (

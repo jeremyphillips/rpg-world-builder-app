@@ -189,8 +189,7 @@ const SPELLS = {
 
 /** file -> slugs to insert (must exist in SPELLS). */
 const INSERTIONS = {
-  'level-1-a-f.json': ['animal-friendship'],
-  'level-1-a-f.json': ['ensnaring-strike'],
+  'level-1-a-f.json': ['animal-friendship', 'ensnaring-strike'],
   'level-1-f-i.json': ['guiding-bolt', 'heroism'],
   'level-0-p-t.json': [
     'produce-flame',

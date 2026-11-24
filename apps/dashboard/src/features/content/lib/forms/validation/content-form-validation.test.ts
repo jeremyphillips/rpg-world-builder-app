@@ -22,7 +22,7 @@ import '../registry/content-form-test-registry'
 import { createClassFormSchema } from '../../../classes/lib/class-form-fields'
 import {
   buildSubclassFields,
-  subclassFormSchema,
+  createSubclassFormSchema,
 } from '../../../classes/lib/subclasses/subclass-form-fields'
 import {
   heritageFormSchema,
@@ -453,8 +453,9 @@ describe('embedded content sub-forms validation', () => {
   it('subclass editor panel', () => {
     const fields = buildSubclassFields(ctx)
     assertFieldPathsRegistered(fields)
-    assertRegistryCoverage(subclassFormSchema, fields, { exemptPaths: SLUG_EXEMPT })
-    assertInvalidSubmitUsesRefinedMessages(subclassFormSchema, fields, {
+    const subclassSchema = createSubclassFormSchema()
+    assertRegistryCoverage(subclassSchema, fields, { exemptPaths: SLUG_EXEMPT })
+    assertInvalidSubmitUsesRefinedMessages(subclassSchema, fields, {
       invalidValue: { name: '', features: [] },
     })
   })

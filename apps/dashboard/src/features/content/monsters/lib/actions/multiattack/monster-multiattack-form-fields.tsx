@@ -23,7 +23,6 @@ import {
   MONSTER_MULTIATTACK_ATTACK_GROUP_LABEL,
   MONSTER_MULTIATTACK_CHOICES_HINT,
   MONSTER_MULTIATTACK_CHOICES_LABEL,
-  MONSTER_MULTIATTACK_CHOICE_ACTION_LABEL,
   MONSTER_MULTIATTACK_COUNT_LABEL,
   MONSTER_MULTIATTACK_NO_PREREQUISITE,
   MONSTER_MULTIATTACK_ONLY_AFTER_USING_LABEL,
@@ -237,13 +236,21 @@ function monsterMultiattackStepsArray(input: {
       reorder: 'dragHandle',
       header: {
         fallback: () => MONSTER_MULTIATTACK_ATTACK_GROUP_LABEL,
-        primary: (values, index, watched) =>
+        primary: (
+          values: Record<string, unknown>,
+          index: number,
+          watched?: Record<string, unknown>,
+        ) =>
           multiattackStepHeaderPrimary(values, index, watched, {
             section: input.section,
             fallbackRows: input.actionRows,
             ctx: input.ctx,
           }),
-        summary: (values, index, watched) =>
+        summary: (
+          values: Record<string, unknown>,
+          index: number,
+          watched?: Record<string, unknown>,
+        ) =>
           multiattackStepHeaderSummary(values, index, watched, {
             section: input.section,
             fallbackRows: input.actionRows,
@@ -275,7 +282,7 @@ function monsterMultiattackStepsArray(input: {
             options: [],
             optionsResolve: {
               dependsOn: [...multiattackAttackPickerDependsOn(input.section, scope)],
-              optionsWhen: (watched) =>
+              optionsWhen: (watched: Record<string, unknown>) =>
                 multiattackExecutableAttackOptionsFromWatched({
                   section: input.section,
                   multiattackId: input.action.id,
@@ -462,7 +469,7 @@ function monsterMultiattackAlternativeGroup(input: {
             multiattackRowScopeSectionRowsDependsOn(input.section),
             '../../../bonusActions',
           ],
-          optionsWhen: (watched) =>
+          optionsWhen: (watched: Record<string, unknown>) =>
             multiattackPrerequisiteOptionsFromWatched({
               section: input.section,
               multiattackId: input.action.id,

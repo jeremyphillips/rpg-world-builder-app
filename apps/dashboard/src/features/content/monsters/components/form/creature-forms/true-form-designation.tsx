@@ -1,7 +1,7 @@
 import { RadioGroupField, SelectField } from '@rpg/ui'
 import { useFormContext, useWatch } from 'react-hook-form'
 
-import { useMonsterFormsLifecycleContext } from '../../../hooks/monster-forms-lifecycle-provider'
+import { useMonsterFormsLifecycleContext } from '../../../hooks/use-monster-forms-lifecycle-context'
 import {
   MONSTER_DEFINED_FORM_DISPLAY_FALLBACK,
   MONSTER_TRUE_FORM_DEFINED_EMPTY_HINT,

@@ -4,7 +4,7 @@ import { useWatch } from 'react-hook-form'
 import type { TraitRowForm } from '../species/lib/species-trait-form-fields'
 import type { FacingHostConfig } from './facing-host-config.types'
 import { resolveFacing } from './resolve-facing'
-import { toFacingPanelModel } from './structured-facing-host-panel'
+import { toFacingPanelModel } from './structured-facing-panel-model.lib'
 
 export function useSpeciesTraitFacingHost(input: {
   fieldName: string

@@ -12,14 +12,12 @@ import {
   getSpellAtomicEffectKindLabel,
   getArmorCategoryLabel,
   getArmorCategorySentenceForm,
-  getAverageHitPointsLabel,
   getContentTypeSentenceForm,
   getCreatureArmorClassKindLabel,
   getCreatureLanguageFluencyLabel,
   getMonsterReactionFieldLabel,
   getMonsterTraitSectionLabel,
   getProficiencyDomainCollectionLabel,
-  joinInlineMetadata,
   joinNaturalList,
   getProficiencyGrantCompactAddLabel,
   getTermLabelSingular,
@@ -28,7 +26,6 @@ import {
   PASSIVE_PERCEPTION_TERM,
   PROFICIENCY_TERM,
   RECHARGE_DIE_FACES,
-  SAVING_THROW_SHORT_LABEL,
   SAVING_THROW_TERM,
   SENSE_TERM,
   type CreatureArmorSlot,
@@ -176,7 +173,7 @@ export const MONSTER_MULTIATTACK_CHOICES_HINT =
   'Choose one of these actions when making the replacement.'
 export const MONSTER_MULTIATTACK_ADD_CHOICE_LABEL = 'Add choice'
 export const MONSTER_MULTIATTACK_CHOICE_ACTION_LABEL = 'Action'
-export const MONSTER_MULTIATTACK_SPELL_LABEL = 'Spell'
+export const MONSTER_MULTIATTACK_SPELL_LABEL = getContentTypeItemLabel('spells')
 export const MONSTER_MULTIATTACK_SPELL_PLACEHOLDER = 'No specific spell'
 export const MONSTER_MULTIATTACK_PIN_SPELL_LABEL = 'Pin specific spell'
 export const MONSTER_MULTIATTACK_CLEAR_SPELL_LABEL = 'Clear spell'
@@ -399,7 +396,7 @@ export { formatMonsterMissingFormLabel } from '@rpg/contracts'
 
 export const MONSTER_FORM_NOTES_LABEL = 'Notes'
 export const MONSTER_FORM_NOTES_HINT = 'Completes the sentence: While in this form, …'
-export const MONSTER_SHAPE_SHIFT_EQUIPMENT_LABEL = 'Equipment'
+export const MONSTER_SHAPE_SHIFT_EQUIPMENT_LABEL = getContentTypeItemLabel('equipment')
 export const MONSTER_SHAPE_SHIFT_PREREQUISITE_LABEL = 'Prerequisite'
 export const MONSTER_SHAPE_SHIFT_PREREQUISITE_HINT =
   'Completes the sentence: If …, it shape-shifts.'

@@ -7,7 +7,7 @@ import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form
 import { FormEmbeddedMasterDetailEditor } from '../../../../components/master-detail/form-embedded-master-detail-editor'
 import { useMasterDetailArray } from '../../../../lib/master-detail/use-master-detail-array'
 import { defineMasterDetailItemNoun } from '../../../../lib/master-detail/master-detail-item-noun'
-import { useMonsterFormsLifecycleContext } from '../../../hooks/monster-forms-lifecycle-provider'
+import { useMonsterFormsLifecycleContext } from '../../../hooks/use-monster-forms-lifecycle-context'
 import {
   MONSTER_FORM_ITEM_NOUN_LABEL,
   MONSTER_FORM_ITEM_NOUN_PLURAL,

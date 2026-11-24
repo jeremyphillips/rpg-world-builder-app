@@ -14,6 +14,10 @@ const MONSTER_FORM_ADVISORY_TONE = {
   'multiattack-unavailable-action': 'warning',
   'form-restricted-reference': 'info',
   'form-restricted-multiattack': 'info',
+  'legendary-actions-below-cr-10': 'info',
+  'legendary-action-pool-outside-srd': 'info',
+  'in-lair-use-count-outside-srd': 'info',
+  'legendary-resistance-uses-outside-srd': 'info',
 } as const satisfies Record<MonsterFormAdvisory['code'], AdvisoryTone>
 
 /** Presentation tone for a collector code. Unknown codes still render, as warning. */

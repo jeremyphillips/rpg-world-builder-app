@@ -4,6 +4,7 @@ import {
   FORM_DIFFERENCES_PRESENTATION,
   FORM_DIFFERENCES_PRESENTATION_ENTRIES,
   shapeShiftRows,
+  type FormDifferencesPresentation,
 } from '@rpg/contracts'
 import { Alert } from '@rpg/ui'
 import { FormItems, toOptions } from '@rpg/ui/form'
@@ -16,6 +17,12 @@ import {
   MONSTER_FORM_DIFFERENCES_LABEL,
 } from '../../../lib/monster-form-labels'
 import { normalizeMonsterDraftForPreview } from '../../../lib/normalize-monster-form-values'
+
+const FORM_DIFFERENCES_PRESENTATION_LABELS = {
+  'stat-rows': FORM_DIFFERENCES_PRESENTATION_ENTRIES['stat-rows'].label,
+  'transformation-description': FORM_DIFFERENCES_PRESENTATION_ENTRIES['transformation-description']
+    .label,
+} as const satisfies Record<FormDifferencesPresentation, string>
 
 export function MonsterFormsDifferencePresentation() {
   const values = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
@@ -42,20 +49,18 @@ export function MonsterFormsDifferencePresentation() {
   return (
     <div className="space-y-2">
       <FormItems
+        idPrefix="forms-differences"
         items={[
           {
             type: 'radio',
             name: 'forms.differencesPresentation',
             label: MONSTER_FORM_DIFFERENCES_LABEL,
-            options: toOptions(
-              FORM_DIFFERENCES_PRESENTATION,
-              (key) => FORM_DIFFERENCES_PRESENTATION_ENTRIES[key].label,
-            ),
+            options: toOptions(FORM_DIFFERENCES_PRESENTATION, FORM_DIFFERENCES_PRESENTATION_LABELS),
           },
         ]}
       />
       {view.showFallback ? (
-        <Alert tone="info" title={MONSTER_FORM_DIFFERENCES_FALLBACK_NOTE} />
+        <Alert variant="info" title={MONSTER_FORM_DIFFERENCES_FALLBACK_NOTE} />
       ) : null}
     </div>
   )

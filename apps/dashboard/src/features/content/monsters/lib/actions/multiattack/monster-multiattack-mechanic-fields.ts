@@ -1,4 +1,4 @@
-import { replacementCountMax } from '@rpg/contracts'
+import { replacementCountMax, type MultiattackReplacement } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
@@ -71,10 +71,13 @@ export function monsterMultiattackMechanicFields(input: {
       actionRows,
       eligibilityValues,
       input.ctx,
-      input.action.replacement,
+      input.action.replacement as MultiattackReplacement | undefined,
     ),
     replacementCountMax: input.action.replacement
-      ? replacementCountMax(input.action.replacement, input.action.steps ?? [])
+      ? replacementCountMax(
+          input.action.replacement as MultiattackReplacement,
+          input.action.steps ?? [],
+        )
       : undefined,
     actionRows,
     hasAttackOptions: input.attackOptions.length > 0,

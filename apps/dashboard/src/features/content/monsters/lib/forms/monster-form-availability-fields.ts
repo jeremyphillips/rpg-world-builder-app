@@ -17,7 +17,9 @@ export function monsterFormAvailabilityField(): FormItem {
 
 export function insertMonsterFormAvailabilityField(fields: FormItem[]): FormItem[] {
   const slot = monsterFormAvailabilityField()
-  const advisoryIndex = fields.findIndex((item) => isMonsterRowAdvisoryDisplay(item))
+  const advisoryIndex = fields.findIndex((item) =>
+    isMonsterRowAdvisoryDisplay(item as { kind?: string; id?: string }),
+  )
   if (advisoryIndex < 0) return [slot, ...fields]
   return [...fields.slice(0, advisoryIndex + 1), slot, ...fields.slice(advisoryIndex + 1)]
 }

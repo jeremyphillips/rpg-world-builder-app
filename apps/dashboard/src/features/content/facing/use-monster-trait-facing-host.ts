@@ -4,7 +4,7 @@ import { useWatch } from 'react-hook-form'
 import type { FacingHostConfig } from './facing-host-config.types'
 import { resolveFacing } from './resolve-facing'
 import type { MonsterFormValues } from '../monsters/lib/monster-form-values'
-import { toFacingPanelModel } from './structured-facing-host-panel'
+import { toFacingPanelModel } from './structured-facing-panel-model.lib'
 
 export function useMonsterTraitFacingHost(input: {
   fieldName: string

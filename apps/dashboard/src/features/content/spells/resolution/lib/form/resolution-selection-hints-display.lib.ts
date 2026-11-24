@@ -2,7 +2,6 @@ import type { DisplayConfig, FormDisplayBlock } from '@rpg/ui/form'
 
 import { SPELL_AREA_GEOMETRY_NONE } from '../../../lib/spell-form-labels'
 import { RESOLUTION_SECTION_LABELS } from './resolution-form-labels'
-import type { ResolutionFormValues } from './resolution-form-schema'
 import { RESOLUTION_FIELD_NAME } from './resolution-form-constants'
 
 const RESOLUTION_SELECTION_HINT_DEPS = [

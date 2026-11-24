@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
+import {
+  featureDescription,
+  requireCustomClassFeature,
+  requireCustomSubclassFeature,
+} from './class-seed-test-helpers'
+import type { ContentGrant } from '@rpg/contracts'
+
 import { expectRichTextHtml } from '../lib/expect-rich-text-html'
 import {
   getClassBySlug,
@@ -24,7 +31,6 @@ import {
   isProgressionContentTable,
   resolveClassSpellcasting,
   resolveSpellsAvailableFromClass,
-  isSpellcastingClassFeature,
   type CharacterClass,
   type ProgressionTableColumn,
 } from '@rpg/contracts'
@@ -45,9 +51,10 @@ function spellsAvailableAtClassLevel(cls: CharacterClass, level: number): number
 }
 
 function spellcastingFeatureIntro(cls: CharacterClass): string | undefined {
-  return cls.features.find(
-    (feature) => feature.id === 'spellcasting' || feature.id === 'pact-magic',
-  )?.intro
+  const feature = cls.features.find(
+    (entry) => entry.id === 'spellcasting' || entry.id === 'pact-magic',
+  )
+  return feature?.kind === 'spellcasting' ? feature.intro : undefined
 }
 
 function asiLevelsFromFeatures(cls: CharacterClass): number[] {
@@ -73,7 +80,7 @@ function featureTableColumn(
   columnId: string,
 ): ProgressionTableColumn | undefined {
   const feature = cls.features.find((entry) => entry.id === featureId)
-  if (!feature || feature.kind === 'subclass-choice') return undefined
+  if (!feature || feature.kind !== 'custom') return undefined
   const table = feature.tables?.find((entry) => entry.id === tableId)
   if (!table || !isProgressionContentTable(table)) return undefined
   return table.columns.find((column) => column.id === columnId)
@@ -111,7 +118,7 @@ function expectClassFeatureDescriptions(cls: CharacterClass): void {
   for (const feature of cls.features) {
     if (feature.kind === 'subclass-choice') {
       expect('description' in feature).toBe(false)
-    } else if (isSpellcastingClassFeature(feature)) {
+    } else if (feature.kind === 'spellcasting') {
       expect(feature.intro && feature.intro.length > 0).toBe(true)
       expect('description' in feature).toBe(false)
     } else if (feature.kind === 'asi' || feature.kind === 'custom') {
@@ -151,7 +158,7 @@ describe('SRD 5.2.1 class seed', () => {
     const wizard = getClassBySlug(RULESET, 'wizard')
     expect(
       wizard.features.every(
-        (feature) => feature.kind === 'subclass-choice' || !feature.tables?.length,
+        (feature) => feature.kind !== 'custom' || !feature.tables?.length,
       ),
     ).toBe(true)
   })
@@ -232,8 +239,8 @@ describe('SRD 5.2.1 class seed', () => {
       { level: 10, value: { count: 1, faces: 10 } },
       { level: 15, value: { count: 1, faces: 12 } },
     ])
-    const words = bard.features.find((f) => f.id === 'words-of-creation')
-    const spellGrant = words?.grantGroups?.[0]?.grants?.find((g) => g.kind === 'spells')
+    const words = requireCustomClassFeature(bard.features, 'words-of-creation')
+    const spellGrant = words.grantGroups?.[0]?.grants?.find((g: ContentGrant) => g.kind === 'spells')
     expect(spellGrant).toMatchObject({
       kind: 'spells',
       availability: 'always_prepared',
@@ -352,8 +359,8 @@ describe('SRD 5.2.1 class seed', () => {
     expect(spellcastingFeatureIntro(ranger)).toContain('channel the magical essence of nature')
     expect(spellsAvailableAtClassLevel(ranger, 1)).toBe(2)
     expect(spellsAvailableAtClassLevel(ranger, 19)).toBe(15)
-    const favoredEnemy = ranger.features.find((f) => f.id === 'favored-enemy')
-    const spellGrant = favoredEnemy?.grantGroups?.[0]?.grants?.find((g) => g.kind === 'spells')
+    const favoredEnemy = requireCustomClassFeature(ranger.features, 'favored-enemy')
+    const spellGrant = favoredEnemy.grantGroups?.[0]?.grants?.find((g: ContentGrant) => g.kind === 'spells')
     expect(spellGrant).toMatchObject({
       kind: 'spells',
       availability: 'always_prepared',
@@ -401,9 +408,9 @@ describe('SRD 5.2.1 class seed', () => {
       items: ['thieves-tools'],
     })
     const cunningStrike = rogue.features.find((f) => f.id === 'cunning-strike')
-    expect(cunningStrike?.description).toContain('<strong>Poison (Cost: 1d6).</strong>')
+    expect(featureDescription(cunningStrike)).toContain('<strong>Poison (Cost: 1d6).</strong>')
     const expertise = rogue.features.find((f) => f.id === 'expertise')
-    expect(expertise?.description).toContain('At Rogue level 6')
+    expect(featureDescription(expertise)).toContain('At Rogue level 6')
   })
 
   it('Thief ships five subclass features with rich-text HTML', () => {
@@ -419,7 +426,7 @@ describe('SRD 5.2.1 class seed', () => {
     ])
     expect(thief.description).toContain('burglar, treasure hunter, and explorer')
     const useMagicDevice = thief.features.find((f) => f.id === 'use-magic-device')
-    expect(useMagicDevice?.description).toContain('<em>Spell Scroll</em>')
+    expect(featureDescription(useMagicDevice)).toContain('<em>Spell Scroll</em>')
   })
 
   it('Barbarian ships full feature prose, resource columns, and no ASI entry', () => {
@@ -428,10 +435,10 @@ describe('SRD 5.2.1 class seed', () => {
     expectClassFeatureDescriptions(barbarian)
     expect(asiLevelsFromFeatures(barbarian)).toEqual([4, 8, 12, 16])
     const rage = barbarian.features.find((f) => f.id === 'rage')
-    expect(rage?.description).toContain('<strong>Damage Resistance.</strong>')
-    expect(rage?.description).toContain('<strong>Duration.</strong>')
+    expect(featureDescription(rage)).toContain('<strong>Damage Resistance.</strong>')
+    expect(featureDescription(rage)).toContain('<strong>Duration.</strong>')
     const brutalStrike = barbarian.features.find((f) => f.id === 'brutal-strike')
-    expect(brutalStrike?.description).toContain('<strong>Forceful Blow.</strong>')
+    expect(featureDescription(brutalStrike)).toContain('<strong>Forceful Blow.</strong>')
     expectNumberColumnEntries(barbarian, 'rage', 'rage-progression', 'uses', [
       { level: 1, value: 2 },
       { level: 3, value: 3 },
@@ -492,15 +499,15 @@ describe('SRD 5.2.1 class seed', () => {
     expect(spellsAvailableAtClassLevel(cleric, 1)).toBe(4)
     expect(spellsAvailableAtClassLevel(cleric, 20)).toBe(22)
     const channelDivinity = cleric.features.find((f) => f.id === 'channel-divinity')
-    expect(channelDivinity?.description).toContain('<strong>Divine Spark.</strong>')
-    expect(channelDivinity?.description).toContain('<strong>Turn Undead.</strong>')
+    expect(featureDescription(channelDivinity)).toContain('<strong>Divine Spark.</strong>')
+    expect(featureDescription(channelDivinity)).toContain('<strong>Turn Undead.</strong>')
     expectNumberColumnEntries(cleric, 'channel-divinity', 'channel-divinity-progression', 'uses', [
       { level: 2, value: 2 },
       { level: 6, value: 3 },
       { level: 18, value: 4 },
     ])
     const greaterIntervention = cleric.features.find((f) => f.id === 'greater-divine-intervention')
-    expect(greaterIntervention?.description).toContain('<em>Wish</em>')
+    expect(featureDescription(greaterIntervention)).toContain('<em>Wish</em>')
   })
 
   it('Life Domain ships five subclass features with domain spell grants', () => {
@@ -549,23 +556,23 @@ describe('SRD 5.2.1 class seed', () => {
     expect(spellcastingFeatureIntro(druid)).toContain('studying the mystical forces of nature')
     expect(spellsAvailableAtClassLevel(druid, 1)).toBe(4)
     expect(spellsAvailableAtClassLevel(druid, 20)).toBe(22)
-    const druidic = druid.features.find((f) => f.id === 'druidic')
-    const druidicGrants = druidic?.grantGroups?.[0]?.grants ?? []
-    const druidicSpell = druidicGrants.find((g) => g.kind === 'spells')
+    const druidic = requireCustomClassFeature(druid.features, 'druidic')
+    const druidicGrants = druidic.grantGroups?.[0]?.grants ?? []
+    const druidicSpell = druidicGrants.find((g: ContentGrant) => g.kind === 'spells')
     expect(druidicSpell).toMatchObject({
       kind: 'spells',
       availability: 'always_prepared',
       spellIds: ['srd-cc-5.2.1:speak-with-animals'],
     })
-    const druidicLanguage = druidicGrants.find((g) => g.kind === 'languages')
+    const druidicLanguage = druidicGrants.find((g: ContentGrant) => g.kind === 'languages')
     expect(druidicLanguage).toEqual({
       id: 'druidic-language',
       kind: 'languages',
       languageIds: ['druidic'],
     })
     const wildShape = druid.features.find((f) => f.id === 'wild-shape')
-    expect(wildShape?.description).toContain('<strong>Beast Shapes.</strong>')
-    expect(wildShape?.description).toContain('<strong>Game Statistics.</strong>')
+    expect(featureDescription(wildShape)).toContain('<strong>Beast Shapes.</strong>')
+    expect(featureDescription(wildShape)).toContain('<strong>Game Statistics.</strong>')
     expectNumberColumnEntries(druid, 'wild-shape', 'wild-shape-progression', 'uses', [
       { level: 2, value: 2 },
       { level: 6, value: 3 },
@@ -586,10 +593,10 @@ describe('SRD 5.2.1 class seed', () => {
     ])
     expect(land.description).toContain('safeguard ancient knowledge and rites')
     const circleSpells = land.features.find((f) => f.id === 'circle-of-the-land-spells')
-    expect(circleSpells?.description).toContain('<strong>Arid Land.</strong>')
-    expect(circleSpells?.description).toContain('<em>Fireball</em>')
+    expect(featureDescription(circleSpells)).toContain('<strong>Arid Land.</strong>')
+    expect(featureDescription(circleSpells)).toContain('<em>Fireball</em>')
     const naturesWard = land.features.find((f) => f.id === 'natures-ward')
-    expect(naturesWard?.description).toContain('Temperate: Lightning')
+    expect(featureDescription(naturesWard)).toContain('Temperate: Lightning')
   })
 
   it('Fighter ships full feature prose, resource columns, and no ASI entry', () => {
@@ -641,8 +648,8 @@ describe('SRD 5.2.1 class seed', () => {
       { level: 13, value: 2 },
       { level: 17, value: 3 },
     ])
-    const fightingStyle = fighter.features.find((f) => f.id === 'fighting-style')
-    const fightingStyleGrant = fightingStyle?.grantGroups?.[0]?.grants?.find(
+    const fightingStyle = requireCustomClassFeature(fighter.features, 'fighting-style')
+    const fightingStyleGrant = fightingStyle.grantGroups?.[0]?.grants?.find(
       (g) => g.kind === 'featChoice',
     )
     expect(fightingStyleGrant).toMatchObject({
@@ -652,8 +659,8 @@ describe('SRD 5.2.1 class seed', () => {
       replaceable: true,
       recommendedFeatIds: ['defense'],
     })
-    const epicBoon = fighter.features.find((f) => f.id === 'epic-boon')
-    const epicGrant = epicBoon?.grantGroups?.[0]?.grants?.find((g) => g.kind === 'featChoice')
+    const epicBoon = requireCustomClassFeature(fighter.features, 'epic-boon')
+    const epicGrant = epicBoon.grantGroups?.[0]?.grants?.find((g: ContentGrant) => g.kind === 'featChoice')
     expect(epicGrant).toMatchObject({
       kind: 'featChoice',
       category: 'epic-boon',
@@ -677,13 +684,14 @@ describe('SRD 5.2.1 class seed', () => {
     ])
     expect(champion.description).toContain('relentless pursuit of victory')
     const survivor = champion.features.find((f) => f.id === 'survivor')
-    expect(survivor?.description).toContain('<strong>Defy Death.</strong>')
-    expect(survivor?.description).toContain('<strong>Heroic Rally.</strong>')
-    const additionalFightingStyle = champion.features.find(
-      (f) => f.id === 'additional-fighting-style',
+    expect(featureDescription(survivor)).toContain('<strong>Defy Death.</strong>')
+    expect(featureDescription(survivor)).toContain('<strong>Heroic Rally.</strong>')
+    const additionalFightingStyle = requireCustomSubclassFeature(
+      champion.features,
+      'additional-fighting-style',
     )
-    const champFightingStyleGrant = additionalFightingStyle?.grantGroups?.[0]?.grants?.find(
-      (g) => g.kind === 'featChoice',
+    const champFightingStyleGrant = additionalFightingStyle.grantGroups?.[0]?.grants?.find(
+      (g: ContentGrant) => g.kind === 'featChoice',
     )
     expect(champFightingStyleGrant).toMatchObject({
       kind: 'featChoice',
@@ -698,9 +706,9 @@ describe('SRD 5.2.1 class seed', () => {
     expectClassFeatureDescriptions(monk)
     expect(asiLevelsFromFeatures(monk)).toEqual([4, 8, 12, 16])
     const martialArts = monk.features.find((f) => f.id === 'martial-arts')
-    expect(martialArts?.description).toContain('<strong>Martial Arts Die.</strong>')
+    expect(featureDescription(martialArts)).toContain('<strong>Martial Arts Die.</strong>')
     const monksFocus = monk.features.find((f) => f.id === 'monks-focus')
-    expect(monksFocus?.description).toContain('<strong>Flurry of Blows.</strong>')
+    expect(featureDescription(monksFocus)).toContain('<strong>Flurry of Blows.</strong>')
     expectDiceColumnEntries(monk, 'martial-arts', 'martial-arts-progression', 'die', [
       { level: 1, value: { count: 1, faces: 6 } },
       { level: 5, value: { count: 1, faces: 8 } },
@@ -740,8 +748,8 @@ describe('SRD 5.2.1 class seed', () => {
     ])
     expect(openHand.description).toContain('masters of unarmed combat')
     const technique = openHand.features.find((f) => f.id === 'open-hand-technique')
-    expect(technique?.description).toContain('<strong>Addle.</strong>')
-    expect(technique?.description).toContain('<strong>Topple.</strong>')
+    expect(featureDescription(technique)).toContain('<strong>Addle.</strong>')
+    expect(featureDescription(technique)).toContain('<strong>Topple.</strong>')
   })
 
   it('Paladin ships spellcasting prose, prepared spells, Channel Divinity resource, and features', () => {
@@ -753,9 +761,9 @@ describe('SRD 5.2.1 class seed', () => {
     expect(spellsAvailableAtClassLevel(paladin, 1)).toBe(2)
     expect(spellsAvailableAtClassLevel(paladin, 19)).toBe(15)
     const channelDivinity = paladin.features.find((f) => f.id === 'channel-divinity')
-    expect(channelDivinity?.description).toContain('<strong>Divine Sense.</strong>')
-    const paladinsSmite = paladin.features.find((f) => f.id === 'paladins-smite')
-    const smiteSpell = paladinsSmite?.grantGroups?.[0]?.grants?.find((g) => g.kind === 'spells')
+    expect(featureDescription(channelDivinity)).toContain('<strong>Divine Sense.</strong>')
+    const paladinsSmite = requireCustomClassFeature(paladin.features, 'paladins-smite')
+    const smiteSpell = paladinsSmite.grantGroups?.[0]?.grants?.find((g: ContentGrant) => g.kind === 'spells')
     expect(smiteSpell).toMatchObject({
       kind: 'spells',
       availability: 'always_prepared',
@@ -798,8 +806,8 @@ describe('SRD 5.2.1 class seed', () => {
       ],
     })
     const holyNimbus = devotion.features.find((f) => f.id === 'holy-nimbus')
-    expect(holyNimbus?.description).toContain('<strong>Holy Ward.</strong>')
-    expect(holyNimbus?.description).toContain('<strong>Sunlight.</strong>')
+    expect(featureDescription(holyNimbus)).toContain('<strong>Holy Ward.</strong>')
+    expect(featureDescription(holyNimbus)).toContain('<strong>Sunlight.</strong>')
   })
 
   it('Sorcerer ships spellcasting prose, prepared spells, Sorcery Points resource, and features', () => {
@@ -812,10 +820,10 @@ describe('SRD 5.2.1 class seed', () => {
     expect(spellsAvailableAtClassLevel(sorcerer, 1)).toBe(2)
     expect(spellsAvailableAtClassLevel(sorcerer, 20)).toBe(22)
     const fontOfMagic = sorcerer.features.find((f) => f.id === 'font-of-magic')
-    expect(fontOfMagic?.description).toContain('<strong>Creating Spell Slots.</strong>')
-    expect(fontOfMagic?.description).toContain('Min. Sorcerer Level 9')
+    expect(featureDescription(fontOfMagic)).toContain('<strong>Creating Spell Slots.</strong>')
+    expect(featureDescription(fontOfMagic)).toContain('Min. Sorcerer Level 9')
     const innateSorcery = sorcerer.features.find((f) => f.id === 'innate-sorcery')
-    expect(innateSorcery?.description).toContain(
+    expect(featureDescription(innateSorcery)).toContain(
       'spell save DC of your Sorcerer spells increases by 1',
     )
     expectNumberColumnEntries(sorcerer, 'font-of-magic', 'font-of-magic-progression', 'points', [
@@ -854,7 +862,7 @@ describe('SRD 5.2.1 class seed', () => {
     ])
     expect(draconic.description).toContain('gift of a dragon')
     const draconicSpells = draconic.features.find((f) => f.id === 'draconic-spells')
-    expect(draconicSpells?.description).toContain('<strong>Draconic Spells.</strong>')
+    expect(featureDescription(draconicSpells)).toContain('<strong>Draconic Spells.</strong>')
     // level-3 entry → default group; 5/7/9 → level-gated groups
     expect(draconicSpells?.grantGroups).toHaveLength(4)
     expect(draconicSpells?.grantGroups?.[0]?.grants[0]).toMatchObject({
@@ -868,9 +876,9 @@ describe('SRD 5.2.1 class seed', () => {
       ],
     })
     expect(draconicSpells?.grantGroups?.[3]?.unlock).toEqual({ level: 9 })
-    const dragonCompanion = draconic.features.find((f) => f.id === 'dragon-companion')
-    expect(dragonCompanion?.description).toContain('<em>Summon Dragon</em>')
-    const dragonSpell = dragonCompanion?.grantGroups?.[0]?.grants?.find((g) => g.kind === 'spells')
+    const dragonCompanion = requireCustomClassFeature(draconic.features, 'dragon-companion')
+    expect(featureDescription(dragonCompanion)).toContain('<em>Summon Dragon</em>')
+    const dragonSpell = dragonCompanion.grantGroups?.[0]?.grants?.find((g: ContentGrant) => g.kind === 'spells')
     expect(dragonSpell).toMatchObject({
       kind: 'spells',
       casting: {
@@ -901,12 +909,12 @@ describe('SRD 5.2.1 class seed', () => {
     expect(spellsAvailableAtClassLevel(warlock, 1)).toBe(2)
     expect(spellsAvailableAtClassLevel(warlock, 19)).toBe(15)
     const invocations = warlock.features.find((f) => f.id === 'eldritch-invocations')
-    expect(invocations?.description).toContain('<strong>Prerequisites.</strong>')
-    expect(invocations?.description).toContain(
+    expect(featureDescription(invocations)).toContain('<strong>Prerequisites.</strong>')
+    expect(featureDescription(invocations)).toContain(
       '<strong>Replacing and Gaining Invocations.</strong>',
     )
-    const contactPatron = warlock.features.find((f) => f.id === 'contact-patron')
-    const contactGrants = contactPatron?.grantGroups?.[0]?.grants ?? []
+    const contactPatron = requireCustomClassFeature(warlock.features, 'contact-patron')
+    const contactGrants = contactPatron.grantGroups?.[0]?.grants ?? []
     expect(contactGrants).toHaveLength(1)
     expect(contactGrants[0]).toMatchObject({
       kind: 'spells',
@@ -952,7 +960,7 @@ describe('SRD 5.2.1 class seed', () => {
     ])
     expect(fiend.description).toContain('realms of perdition')
     const fiendSpells = fiend.features.find((f) => f.id === 'fiend-spells')
-    expect(fiendSpells?.description).toContain('<strong>Fiend Spells.</strong>')
+    expect(featureDescription(fiendSpells)).toContain('<strong>Fiend Spells.</strong>')
     // level-3 entry → default group; 5/7/9 → level-gated groups
     expect(fiendSpells?.grantGroups).toHaveLength(4)
     expect(fiendSpells?.grantGroups?.[0]?.grants[0]).toMatchObject({
@@ -967,7 +975,7 @@ describe('SRD 5.2.1 class seed', () => {
     })
     expect(fiendSpells?.grantGroups?.[3]?.unlock).toEqual({ level: 9 })
     const hurlThroughHell = fiend.features.find((f) => f.id === 'hurl-through-hell')
-    expect(hurlThroughHell?.description).toContain('8d10 Psychic damage')
+    expect(featureDescription(hurlThroughHell)).toContain('8d10 Psychic damage')
   })
 
   it('School of Evocation ships five subclass features with rich-text HTML', () => {
@@ -983,7 +991,7 @@ describe('SRD 5.2.1 class seed', () => {
     ])
     expect(evoker.description).toContain('bitter cold, searing flame')
     const overchannel = evoker.features.find((f) => f.id === 'overchannel')
-    expect(overchannel?.description).toContain('2d12 Necrotic damage')
+    expect(featureDescription(overchannel)).toContain('2d12 Necrotic damage')
   })
 
   it('Wizard ships spellcasting prose, prepared spells, and features', () => {
@@ -996,9 +1004,9 @@ describe('SRD 5.2.1 class seed', () => {
     expect(spellsAvailableAtClassLevel(wizard, 1)).toBe(4)
     expect(spellsAvailableAtClassLevel(wizard, 20)).toBe(25)
     const arcaneRecovery = wizard.features.find((f) => f.id === 'arcane-recovery')
-    expect(arcaneRecovery?.description).toContain('half your Wizard level')
+    expect(featureDescription(arcaneRecovery)).toContain('half your Wizard level')
     const signatureSpells = wizard.features.find((f) => f.id === 'signature-spells')
-    expect(signatureSpells?.description).toContain('Short or Long Rest')
+    expect(featureDescription(signatureSpells)).toContain('Short or Long Rest')
   })
 
   it('stores class skill options under characterCreation.proficiencies', () => {
@@ -1213,7 +1221,7 @@ describe('SRD 5.2.1 class seed', () => {
   it('all seed grantGroups are already in canonical form (normalizeGrantGroups round-trip is identity)', () => {
     for (const cls of classes) {
       for (const feature of cls.features) {
-        if (!feature.grantGroups) continue
+        if (feature.kind !== 'custom' || !feature.grantGroups) continue
         expect(normalizeGrantGroups(feature.grantGroups), `${cls.slug} > ${feature.id}`).toEqual(
           feature.grantGroups,
         )

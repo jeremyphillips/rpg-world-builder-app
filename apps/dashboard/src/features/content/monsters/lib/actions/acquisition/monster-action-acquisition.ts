@@ -369,7 +369,7 @@ export function monsterActionAcquisitionItems(input: {
       ...special,
       ...movement,
       ...generalAcquisitionItems(input.section),
-    ],
+    ] as AcquisitionOption[],
     sectionRows,
     input.section,
     input.shapeShiftDisabledReason,

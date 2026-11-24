@@ -71,6 +71,9 @@ const PRESET_DERIVED_VOCABULARY_KINDS = new Set<MonsterActionKind>(['natural-wea
  * An unknown preset stays derived so a custom name cannot turn a broken source into an authored action.
  */
 export function monsterActionAuthoring(action: AuthoringSubject): MonsterActionAuthoring {
+  if (!action || typeof action.kind !== 'string') {
+    return AUTHORED_FULL
+  }
   if (action.kind === 'spell' && action.profile === 'primary') {
     return { name: 'derived', description: 'generated', source: 'none' }
   }

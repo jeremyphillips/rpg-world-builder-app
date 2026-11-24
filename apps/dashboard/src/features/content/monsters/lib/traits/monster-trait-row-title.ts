@@ -40,9 +40,10 @@ export function resolveMonsterTraitRowTitleConfig(
         }
       }
       if (isTemplateRow(ctx.row)) {
+        const templateRow = ctx.row
         return {
           strategy: 'readonly',
-          resolveTitle: () => templateDerivedName(ctx.row),
+          resolveTitle: () => templateDerivedName(templateRow),
         }
       }
       return {

@@ -8,12 +8,12 @@ import {
   listCreatureTraitTemplatesForRuleset,
 } from '@rpg/contracts'
 
-import type { LabelDescriptionActiveVocabulary } from '@/features/vocabulary/lib/build-vocabulary-maps'
+import type { LabelDescriptionActiveVocabulary } from '@/features/vocabulary'
 import {
   type AcquisitionOption,
   resolveAcquisitionAvailability,
   toAcquisitionDropdownItem,
-} from '../../lib/acquisition'
+} from '@/features/content'
 import { CREATURE_TRAIT_CUSTOM_DESCRIPTION } from '../../lib/creature-traits/creature-trait-custom-description'
 import { CREATURE_TRAIT_CUSTOM_ITEM_ID } from '../../lib/creature-traits/creature-trait-add-menu'
 import type { TraitRowForm } from './species-trait-form-fields'

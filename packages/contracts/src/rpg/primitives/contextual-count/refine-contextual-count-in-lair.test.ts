@@ -8,7 +8,7 @@ import {
 
 describe('refineContextualCountInLairExceedsNormal', () => {
   it('rejects in-lair at or below normal', () => {
-    const schema = z.object({ uses: z.record(z.unknown()) }).superRefine((body, ctx) => {
+    const schema = z.object({ uses: z.record(z.string(), z.unknown()) }).superRefine((body, ctx) => {
       refineContextualCountInLairExceedsNormal(
         body.uses as { normal?: number; inLair?: number },
         ctx,
@@ -22,7 +22,7 @@ describe('refineContextualCountInLairExceedsNormal', () => {
   })
 
   it('surfaces the shared message', () => {
-    const schema = z.object({ uses: z.record(z.unknown()) }).superRefine((body, ctx) => {
+    const schema = z.object({ uses: z.record(z.string(), z.unknown()) }).superRefine((body, ctx) => {
       refineContextualCountInLairExceedsNormal(
         body.uses as { normal?: number; inLair?: number },
         ctx,

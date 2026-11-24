@@ -16,9 +16,11 @@ export function MonsterMultiattackUseStepChoiceAcquisitionSlot({
 }) {
   const controlSize = useFieldControlSize()
   const { setValue } = useFormContext()
+  const step = (useWatch({ name: namePrefix ?? '', disabled: !namePrefix }) ?? {}) as Record<
+    string,
+    unknown
+  >
   if (!namePrefix) return null
-
-  const step = (useWatch({ name: namePrefix }) ?? {}) as Record<string, unknown>
   const mode = step.mode
   const isSingle = mode !== 'choice' && !(Array.isArray(step.choices) && step.choices.length > 0)
   if (!isSingle) return null

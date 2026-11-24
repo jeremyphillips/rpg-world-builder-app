@@ -124,8 +124,10 @@ export function buildMonsterMultiattackSentence(input: {
   const result = formatMonsterMultiattackResult({
     monsterName: input.monsterName,
     action: input.action,
-    actions: input.actions,
-    bonusActions: input.bonusActions,
+    actions: input.actions as Parameters<typeof formatMonsterMultiattackResult>[0]['actions'],
+    bonusActions: input.bonusActions as Parameters<
+      typeof formatMonsterMultiattackResult
+    >[0]['bonusActions'],
     equipment: input.equipment,
     equipmentCatalog: input.equipmentCatalog,
     magicPropertyProvider: input.magicPropertyProvider,
@@ -151,8 +153,10 @@ function renderMultiattackProse(
   return buildMonsterMultiattackSentence({
     monsterName: normalized.name?.trim() || 'Creature',
     action: multiattack as MultiattackActionShape,
-    actions: normalized.actions ?? [],
-    bonusActions: normalized.bonusActions ?? [],
+    actions: (normalized.actions ?? []) as Parameters<typeof buildMonsterMultiattackSentence>[0]['actions'],
+    bonusActions: (normalized.bonusActions ?? []) as Parameters<
+      typeof buildMonsterMultiattackSentence
+    >[0]['bonusActions'],
     equipment: normalized.equipment ?? [],
     equipmentCatalog: monsterEquipmentCatalog(ctx),
     magicPropertyProvider: monsterMagicPropertyProvider(ctx),

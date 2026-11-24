@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { ReactElement, ReactNode } from 'react'
 import type { ContentTable, FacingBlock } from '@rpg/contracts'
 
 import { RichTextContent } from './rich-text-content'
@@ -20,15 +20,18 @@ function FacingBlockView({
   block: FacingBlock
   proseTone: 'default' | 'muted'
   renderTable?: (table: ContentTable) => ReactNode
-}) {
+}): ReactElement | null {
   switch (block.kind) {
     case 'richText':
       return <RichTextContent html={block.html} size="sm" tone={proseTone} />
     case 'rules':
       return <StatBlockProseView document={block.document} />
     case 'table':
-      return renderTable ? renderTable(block.table) : null
+      return renderTable ? <>{renderTable(block.table)}</> : null
   }
+
+  const unsupported: never = block
+  throw new Error('Unsupported facing block', { cause: unsupported })
 }
 
 /** Maps structured facing blocks to read-only presentation primitives. */

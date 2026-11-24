@@ -12,7 +12,9 @@ const TRAIT_ROW_ADVISORY_DISPLAY = 'monster-row-advisories-traits-0'
 function namesOf(items: readonly FormItem[]): string[] {
   const names: string[] = []
   for (const item of items) {
-    if (item.kind === 'display' && typeof item.id === 'string') names.push(item.id)
+    if ('kind' in item && item.kind === 'display' && 'id' in item && typeof item.id === 'string') {
+      names.push(item.id)
+    }
     if ('name' in item && typeof item.name === 'string') names.push(item.name)
     if ('fields' in item && Array.isArray(item.fields)) names.push(...namesOf(item.fields))
     if ('start' in item && item.start && typeof item.start === 'object' && 'name' in item.start) {

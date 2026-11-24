@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   buildLabelDescriptionActiveVocabulary,
   buildVocabularyFromSeedSet,
-} from '@/features/vocabulary/lib/build-vocabulary-maps'
+} from '@/features/vocabulary'
 import { DUPLICATE_SPECIES_SENSE_TRAIT_MESSAGE, SENSE_SET_ID } from '@rpg/contracts'
 
 import {
@@ -28,6 +28,8 @@ describe('speciesTraitAcquisitionDropdownItems', () => {
         templateId: 'sense-darkvision',
         config: { range: 60 },
         grants: [],
+        overrideDisplay: false,
+        available: true,
       },
     ]
     const items = speciesTraitAcquisitionDropdownItems({

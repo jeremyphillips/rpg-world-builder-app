@@ -552,7 +552,7 @@ function mapPresetMonsterTrait(
     id: trait.id,
     preset: record.preset,
     monsterName,
-    trait: trait as Monster['traits'][number],
+    trait: trait as never,
   })
   return {
     id: trait.id,

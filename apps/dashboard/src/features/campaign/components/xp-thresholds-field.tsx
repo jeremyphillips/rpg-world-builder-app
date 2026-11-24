@@ -3,7 +3,6 @@ import { useFormContext, useWatch } from 'react-hook-form'
 import {
   DEFAULT_SYSTEM_RULESET_ID,
   resolveXpThresholdsSummary,
-  type SystemRulesetId,
 } from '@rpg/contracts'
 import { InlineMetadata, SemanticText, Text } from '@rpg/ui'
 

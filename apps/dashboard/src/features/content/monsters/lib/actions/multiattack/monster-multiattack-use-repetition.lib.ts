@@ -1,5 +1,4 @@
 import {
-  multiattackUseClauseHasRepetition,
   multiattackUseClauseRepetitionEligible,
   multiattackUseClauseRepetitionRepairRequired,
 } from '@rpg/contracts'

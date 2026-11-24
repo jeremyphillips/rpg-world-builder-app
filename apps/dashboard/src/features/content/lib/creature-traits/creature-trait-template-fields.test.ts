@@ -86,14 +86,15 @@ describe('creature trait template form fields', () => {
   it('uses recovery authoring hint for legendary resistance uses', () => {
     const usesField = flattenFields(
       assembleCreatureTraitTemplateFields({ templateId: 'legendary-resistance', host: 'species' }),
-    ).find((field) => field.name === 'config.uses.normal')
+    ).find((field) => 'name' in field && field.name === 'config.uses.normal')
     expect(usesField?.hint).toBe('You regain all expended uses when you finish a long rest.')
     expect(usesField?.hint).not.toMatch(/per day/i)
   })
 
   it('omits heading hints on species template groups', () => {
-    for (const group of creatureTraitTemplateFields()) {
-      if (group.kind !== 'group') continue
+    for (const item of creatureTraitTemplateFields()) {
+      if (!('kind' in item) || item.kind !== 'group') continue
+      const group = item as Extract<typeof item, { kind: 'group' }>
       expect(group.heading?.hint).toBeUndefined()
     }
   })

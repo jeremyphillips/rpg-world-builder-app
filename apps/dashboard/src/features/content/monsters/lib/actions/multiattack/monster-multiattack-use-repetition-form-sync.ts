@@ -116,7 +116,11 @@ function clearSpellUseRepetitionOnActionChange(
   const next = after.map((row) => {
     if (!isMultiattackRow(row)) return row
     const beforeRow = before?.find((entry) => entry.id === row.id)
-    const reconciled = reconcileMultiattackRowSpellRepetition(beforeRow, row, after)
+    const reconciled = reconcileMultiattackRowSpellRepetition(
+      beforeRow && isMultiattackRow(beforeRow) ? beforeRow : undefined,
+      row,
+      after,
+    )
     if (reconciled.changed) changed = true
     return reconciled.next
   })

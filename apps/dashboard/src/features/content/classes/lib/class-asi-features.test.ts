@@ -15,7 +15,7 @@ describe('createAsiFeature', () => {
     expect(feature.id).toBe('ability-score-improvement-4')
     expect(feature.name).toBe(DEFAULT_ASI_FEATURE_NAME)
     expect(feature.level).toBe(4)
-    expect(feature.description).toBe(DEFAULT_ASI_FEATURE_DESCRIPTION)
+    expect(feature.kind === 'asi' && feature.description).toBe(DEFAULT_ASI_FEATURE_DESCRIPTION)
     expect(feature.kind).toBe('asi')
   })
 

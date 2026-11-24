@@ -1,10 +1,16 @@
 import { describe, expect, it } from 'vitest'
-import { resolveDependsOnWatchName } from '@rpg/ui/form'
+import { resolveDependsOnWatchName, type FormItem } from '@rpg/ui/form'
 
 import { monsterFormMovementOverrideGroup } from './monster-form-movement-override-fields'
 
 describe('monsterFormMovementOverrideGroup', () => {
-  const group = monsterFormMovementOverrideGroup()
+  const group = monsterFormMovementOverrideGroup() as FormItem & {
+    optionalDisclosure?: {
+      summary?: { dependsOn?: string[]; resolve?: (values: unknown, state: unknown) => string }
+      sourcePreview?: { resolve?: (values: unknown) => { label: string; text: string } }
+      seedWhen?: (values: unknown) => unknown
+    }
+  }
   const disclosure = group.optionalDisclosure
 
   it('depends on root movement via three parent hops from a defined-form row', () => {
@@ -23,10 +29,10 @@ describe('monsterFormMovementOverrideGroup', () => {
       '../../../hover': false,
     }
 
-    expect(disclosure?.summary?.resolve(dependencyValues, { open: false })).toBe(
+    expect(disclosure!.summary!.resolve!(dependencyValues, { open: false })).toBe(
       'Inherits: Walk 30 ft.',
     )
-    expect(disclosure?.sourcePreview?.resolve(dependencyValues)).toEqual({
+    expect(disclosure!.sourcePreview!.resolve!(dependencyValues)).toEqual({
       label: 'Base',
       text: 'Walk 30 ft.',
     })

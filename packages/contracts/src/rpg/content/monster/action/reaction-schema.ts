@@ -2,12 +2,12 @@ import type { z } from 'zod'
 
 import type { MonsterAction, MonsterActionDraft } from './actions-schema'
 import {
-  draftParrySchema,
-  draftReactionReferenceSchema,
+  type draftParrySchema,
+  type draftReactionReferenceSchema,
   monsterReactionDraftSchema as monsterReactionDraftSchemaBase,
   monsterReactionSchema as monsterReactionSchemaBase,
-  publishedParrySchema,
-  publishedReactionReferenceSchema,
+  type publishedParrySchema,
+  type publishedReactionReferenceSchema,
 } from './section-tuples'
 
 export const monsterReactionSchema =

@@ -1,5 +1,4 @@
 import { cn } from '../../lib/utils'
-import { borderStrength } from './border-strength'
 
 /** Neutral structural rail vs brand accent. */
 export type FieldRailTone = 'neutral' | 'primary'

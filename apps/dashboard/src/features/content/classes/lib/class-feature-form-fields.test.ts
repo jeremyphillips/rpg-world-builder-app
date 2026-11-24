@@ -197,15 +197,18 @@ describe('formatFeatureRowSummary', () => {
 function walkFormItems(items: readonly FormItem[], visit: (item: FormItem) => void): void {
   for (const item of items) {
     visit(item)
-    if (item.kind === 'dependent') {
+    if ('kind' in item && item.kind === 'dependent') {
       walkFormItems([item.controller as FormItem], visit)
       walkFormItems(item.dependents.fields, visit)
     }
-    if (item.kind === 'row' || item.kind === 'columns' || item.kind === 'group') {
-      walkFormItems(item.fields as FormItem[], visit)
+    if ('kind' in item && item.kind === 'row') {
+      walkFormItems(item.fields, visit)
     }
-    if (item.kind === 'array') {
-      walkFormItems(item.fields as FormItem[], visit)
+    if ('kind' in item && item.kind === 'group') {
+      walkFormItems(item.fields, visit)
+    }
+    if ('kind' in item && item.kind === 'array') {
+      walkFormItems(item.fields, visit)
     }
   }
 }
@@ -272,7 +275,7 @@ describe('featureFromFormRow spellcasting granting rows', () => {
       description: '<p>Should not persist</p>',
     }
     const saved = featureFromFormRow({ ...row, id: row.id! })
-    expect(saved.intro).toBe('<p>Narrative</p>')
+    expect(saved.kind === 'spellcasting' && saved.intro).toBe('<p>Narrative</p>')
     expect(saved).not.toHaveProperty('description')
   })
 })

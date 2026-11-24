@@ -244,9 +244,9 @@ describe('multiattack spell repetition — mounted form transition', () => {
       ...multiattackBase,
       steps: [
         { count: 1, actionIds: ['bite'] },
-        { kind: 'use', mode: 'single', actionId: 'fire-breath', count: 2 },
+        { kind: 'use' as const, mode: 'single' as const, actionId: 'fire-breath', count: 2 },
       ],
-    }
+    } as MonsterActionDraftRow
 
     render(
       <MultiattackHarness
@@ -284,11 +284,16 @@ describe('multiattack spell repetition — value sync reference identity', () =>
     primeMultiattackReplacementActionsSnapshot(structuredClone(beforeActions))
 
     const values = {
-      ...monsterFormTestValues({ name: 'Nested setValue', actions: beforeActions }),
+      ...monsterFormTestValues({
+        name: 'Nested setValue',
+        actions: beforeActions as unknown as MonsterFormValues['actions'],
+      }),
     } as Record<string, unknown>
 
     const actionsRef = values.actions as MonsterActionDraftRow[]
-    const useStep = (actionsRef[0]!.steps as { actionId?: string; count?: number }[])[1]!
+    const first = actionsRef[0]
+    if (!first || first.kind !== 'multiattack') throw new Error('expected multiattack row')
+    const useStep = first.steps[1] as { actionId?: string; count?: number }
     useStep.actionId = 'spellcasting'
     expect(values.actions).toBe(actionsRef)
 

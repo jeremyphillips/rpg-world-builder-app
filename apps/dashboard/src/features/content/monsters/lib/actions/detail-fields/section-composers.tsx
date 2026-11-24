@@ -317,7 +317,7 @@ function legendaryAuthoringFields(input: {
   ]
 }
 
-function sharedAuthoringFields(input: {
+export type MonsterActionDetailFieldsInput = {
   ctx: ContentFormCtx
   action: MonsterActionDraftRow
   section: MonsterActionSection
@@ -326,9 +326,42 @@ function sharedAuthoringFields(input: {
   equipment?: MonsterFormValues['equipment']
   sharedCastingOptions: { value: string; label: string }[]
   attackOptions?: { value: string; label: string }[]
+  actionRows?: MonsterActionDraftRow[]
+  bonusActionRows?: MonsterActionDraftRow[]
+  weapons?: readonly { entryId: string; label: string; equipped: boolean }[]
+  weaponActions?: readonly { id: string; equipmentEntryId?: string }[]
+  allowAddWeapon?: boolean
+  onAcquireAttack?: (
+    section: MonsterActionSection,
+    choice: Exclude<MonsterActionAcquisitionChoice, { type: 'add-weapon' }>,
+  ) => void
+  referenceOptions?: { value: string; label: string }[]
+  sourceSpellOptions?: { value: string; label: string }[]
   onCastingSourceBlocked?: (message: string) => void
   advisories?: readonly MonsterFormAdvisory[]
-}): FormItem[] {
+}
+
+function sharedAuthoringFields(
+  input: Pick<
+    MonsterActionDetailFieldsInput,
+    | 'ctx'
+    | 'action'
+    | 'section'
+    | 'namePrefix'
+    | 'equipmentOptions'
+    | 'equipment'
+    | 'sharedCastingOptions'
+    | 'attackOptions'
+    | 'actionRows'
+    | 'bonusActionRows'
+    | 'weapons'
+    | 'weaponActions'
+    | 'allowAddWeapon'
+    | 'onAcquireAttack'
+    | 'onCastingSourceBlocked'
+    | 'advisories'
+  >,
+): FormItem[] {
   const { ctx, action, section, namePrefix } = input
   const source =
     action.kind === 'weapon' ? [monsterActionEquipmentField(input.equipmentOptions)] : []
@@ -359,30 +392,6 @@ function sharedAuthoringFields(input: {
       : []),
     ...supplemental,
   ]
-}
-
-export type MonsterActionDetailFieldsInput = {
-  ctx: ContentFormCtx
-  action: MonsterActionDraftRow
-  section: MonsterActionSection
-  namePrefix: string
-  equipmentOptions: { value: string; label: string }[]
-  equipment?: MonsterFormValues['equipment']
-  sharedCastingOptions: { value: string; label: string }[]
-  attackOptions?: { value: string; label: string }[]
-  actionRows?: MonsterActionDraftRow[]
-  bonusActionRows?: MonsterActionDraftRow[]
-  weapons?: readonly { entryId: string; label: string; equipped: boolean }[]
-  weaponActions?: readonly { id: string; equipmentEntryId?: string }[]
-  allowAddWeapon?: boolean
-  onAcquireAttack?: (
-    section: MonsterActionSection,
-    choice: Exclude<MonsterActionAcquisitionChoice, { type: 'add-weapon' }>,
-  ) => void
-  referenceOptions?: { value: string; label: string }[]
-  sourceSpellOptions?: { value: string; label: string }[]
-  onCastingSourceBlocked?: (message: string) => void
-  advisories?: readonly MonsterFormAdvisory[]
 }
 
 export function resolveMonsterActionSectionFields(

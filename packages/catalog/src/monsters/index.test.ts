@@ -13,11 +13,15 @@ import {
   formatMonsterSpellEntry,
   formatOnceUntilNextTurnSentence,
   joinStatBlockProseDocument,
+  multiattackStepReferencedActionIds,
   resolveCreatureTraitGrants,
   resolveMonsterActionIdentity,
   renderTraitFacingBodyHtml,
   resolveTraitFacingParts,
   systemDefaultArmorClassRules,
+  type ContentTrait,
+  type CreatureTraitRow,
+  type MonsterTrait,
 } from '@rpg/contracts'
 
 import { loadSeedEquipment } from '../equipment'
@@ -25,6 +29,31 @@ import { loadSeedSpells } from '../spells'
 import { loadSeedMonsters, seedMonsterSlugs } from './index'
 
 const RULESET = 'srd-cc-5.2.1'
+
+function monsterTraitKind(trait: MonsterTrait): string {
+  return 'kind' in trait ? trait.kind : 'preset'
+}
+
+function monsterTraitAsCreatureRow(trait: MonsterTrait): CreatureTraitRow {
+  if ('kind' in trait) {
+    return {
+      kind: trait.kind,
+      id: trait.id,
+      name: 'name' in trait ? trait.name : undefined,
+      grantGroups: 'grantGroups' in trait ? trait.grantGroups : undefined,
+      templateId: 'templateId' in trait ? trait.templateId : undefined,
+      config: 'config' in trait ? trait.config : undefined,
+    }
+  }
+  return { kind: 'preset', id: trait.id }
+}
+
+function monsterTraitAsContentTrait(trait: MonsterTrait): ContentTrait {
+  if ('kind' in trait) {
+    return trait as ContentTrait
+  }
+  throw new Error(`Unexpected preset trait in facing test: ${trait.id}`)
+}
 
 describe('SRD 5.2.1 monster seed', () => {
   const monsters = loadSeedMonsters(RULESET)
@@ -89,7 +118,7 @@ describe('SRD 5.2.1 monster seed', () => {
       formatMonsterAttackAction(skeletonBlock.attacks.find((line) => line.id === 'shortbow')!),
     ).toBe('Ranged Attack Roll: +5, range 80/320 ft. Hit: 6 (1d6 + 3) Piercing damage.')
     const koboldTraits = kobold!.traits
-    expect(koboldTraits.map((trait) => trait.kind)).toEqual(['template', 'template'])
+    expect(koboldTraits.map(monsterTraitKind)).toEqual(['template', 'template'])
     expect(koboldTraits[0]).not.toHaveProperty('descriptionOverride')
     expect(koboldTraits[1]).not.toHaveProperty('descriptionOverride')
     const monsterTraitHost = {
@@ -98,11 +127,16 @@ describe('SRD 5.2.1 monster seed', () => {
       lairEnabled: false,
     }
     const koboldTraitBody = (index: number) =>
-      renderTraitFacingBodyHtml(resolveTraitFacingParts(koboldTraits[index]!, monsterTraitHost))
+      renderTraitFacingBodyHtml(
+        resolveTraitFacingParts(monsterTraitAsContentTrait(koboldTraits[index]!), monsterTraitHost),
+      )
     expect(koboldTraitBody(0)).toContain('This creature has Advantage')
     expect(koboldTraitBody(1)).toContain('This creature has Disadvantage')
     const grants = resolveCreatureTraitGrants(
-      koboldTraits.map((trait) => ({ trait, source: trait.id })),
+      koboldTraits.map((trait) => ({
+        trait: monsterTraitAsCreatureRow(trait),
+        source: trait.id,
+      })),
     )
     expect(grants.map((row) => row.templateId)).toEqual(['pack-tactics', 'sunlight-sensitivity'])
     expect(grants[0]?.grant).toMatchObject({
@@ -407,7 +441,7 @@ describe('SRD 5.2.1 monster seed', () => {
       for (const action of monster.actions) {
         if (action.kind !== 'multiattack') continue
         for (const step of action.steps) {
-          for (const id of step.actionIds) {
+          for (const id of multiattackStepReferencedActionIds(step)) {
             const target = monster.actions.find((entry) => entry.id === id)
             expect(['weapon', 'natural-weapon', 'attack']).toContain(target?.kind)
           }

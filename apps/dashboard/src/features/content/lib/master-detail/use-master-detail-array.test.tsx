@@ -98,6 +98,19 @@ describe('useMasterDetailArray', () => {
     expect(result.current.fields).toHaveLength(1)
   })
 
+  it('removes the original field after reordering during confirmation', () => {
+    const { result } = setup()
+    act(() => result.current.handleAdd())
+    act(() => result.current.handleAdd())
+    const remainingId = result.current.fields[1]?.id
+
+    act(() => result.current.requestRemove(0))
+    act(() => result.current.move(0, 1))
+    act(() => result.current.confirmRemove())
+
+    expect(result.current.fields.map((field) => field.id)).toEqual([remainingId])
+  })
+
   it('clamps selection when the selected row is confirmed for removal', () => {
     const { result } = setup()
     act(() => result.current.handleAdd())

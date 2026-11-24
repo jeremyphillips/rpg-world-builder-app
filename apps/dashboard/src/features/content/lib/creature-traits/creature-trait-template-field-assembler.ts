@@ -27,7 +27,10 @@ const CONTRIBUTIONS: Partial<Record<string, TemplateFieldContribution>> = {
     extend: {
       monster: legendaryResistanceTemplateUseFields({
         includeInLair: true,
-      }).filter((field) => field.name === 'config.uses.inLair') as TemplateConfigField[],
+      }).filter(
+        (field): field is TemplateConfigField =>
+          'name' in field && field.name === 'config.uses.inLair',
+      ),
     },
   },
 }
@@ -58,7 +61,7 @@ function assertPathOnSchema(path: string, templateId: string): void {
   const configKeys = Object.keys(shape.data as Record<string, unknown>)
   const nested = path.slice('config.'.length)
   const top = nested.split('.')[0]
-  if (!configKeys.includes(top)) {
+  if (!top || !configKeys.includes(top)) {
     throw new Error(`Trait template field "${path}" is not on ${templateId} config schema.`)
   }
 }
@@ -118,7 +121,7 @@ function senseTemplateConfigField(): TemplateConfigField {
     amountName: 'config.range',
     width: '1/3',
     required: true,
-  }) as TemplateConfigField
+  }) as unknown as TemplateConfigField
 }
 
 /** Assembles registry-backed trait config fields for one template and authoring host. */

@@ -1,8 +1,30 @@
 import type { z } from 'zod'
 
 import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
-import { monsterFormLabelById } from '../../runtime/creature/form-labels'
 import type { CreatureFormsDraft } from '../creature/forms'
+
+const MONSTER_UNTITLED_FORM_LABEL = 'Untitled form'
+
+function monsterFormLabelById(forms: CreatureFormsDraft, creatureName: string): Map<string, string> {
+  const names = new Map<string, string>()
+  const register = (id: string, label: string) => {
+    names.set(id, label.trim() || MONSTER_UNTITLED_FORM_LABEL)
+  }
+  if (!forms.profileFormId || !forms.trueForm || !Array.isArray(forms.definedForms)) {
+    return names
+  }
+  const profileName =
+    forms.trueForm.kind === 'profile' && forms.trueForm.name?.trim()
+      ? forms.trueForm.name.trim()
+      : creatureName.trim()
+  if (forms.trueForm.kind === 'profile') {
+    register(forms.profileFormId, profileName)
+  }
+  for (const form of forms.definedForms) {
+    if (form.id) register(form.id, form.name?.trim() ?? '')
+  }
+  return names
+}
 import {
   monsterActionSectionRowPath,
   monsterActionSectionRows,

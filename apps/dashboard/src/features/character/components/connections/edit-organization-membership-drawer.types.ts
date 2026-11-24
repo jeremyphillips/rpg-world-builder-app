@@ -9,6 +9,7 @@ import type {
 export type EditOrganizationMembershipOrganization = {
   id: string
   name: string
+  rulesetId?: string
   organizationDomain: OrganizationDomain
   organizationForm?: OrganizationForm
   functions?: readonly OrganizationFunction[]

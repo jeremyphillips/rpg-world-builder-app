@@ -116,13 +116,17 @@ function resolveVocabularyIdentity(
 export function resolveMonsterActionIdentity(
   input: ResolveMonsterActionIdentityInput,
 ): ResolvedMonsterActionIdentity {
-  const authoring = monsterActionAuthoring(input.action)
-  const stored = explicitName(input.action.name)
+  const action = input.action
+  if (!action || typeof action.kind !== 'string') {
+    return { authority: 'authored', sourceState: 'none', displayName: '' }
+  }
+  const authoring = monsterActionAuthoring(action)
+  const stored = explicitName(action.name)
   if (authoring.name === 'authored') {
     return { authority: 'authored', sourceState: 'none', displayName: stored ?? '' }
   }
   if (authoring.source === 'equipment') {
-    return resolveWeaponIdentity(input.action, input, stored)
+    return resolveWeaponIdentity(action, input, stored)
   }
-  return resolveVocabularyIdentity(input.action, stored)
+  return resolveVocabularyIdentity(action, stored)
 }

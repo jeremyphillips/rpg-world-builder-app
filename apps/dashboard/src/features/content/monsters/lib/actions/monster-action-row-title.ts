@@ -35,6 +35,12 @@ export function resolveMonsterActionRowTitleStrategy(input: {
   ctx: ContentFormCtx
   section?: MonsterActionSection
 }): MasterDetailRowTitleStrategy<MonsterActionDraftRow> {
+  if (!input.action?.id || typeof input.action.kind !== 'string') {
+    return {
+      strategy: 'readonly',
+      resolveTitle: () => masterDetailItemTitle(undefined, MONSTER_ACTION_ITEM_NOUN),
+    }
+  }
   if (isPrimarySpellcastingAction(input.action)) {
     return {
       strategy: 'readonly',
@@ -78,9 +84,10 @@ export function resolveMonsterActionRowTitleStrategy(input: {
       allowInitialEditOnAdd: input.action.kind !== 'action-reference',
       ...(storedReferenceName ? { resetLabel: MONSTER_USE_DEFAULT_NAME_LABEL } : {}),
       resolveFallback: (rowCtx) => {
-        const clearedRows = rowCtx.rows.map((row) =>
-          row.id === input.action.id ? withBlankName(row) : row,
-        )
+        const clearedRows = rowCtx.rows.flatMap((row) => {
+          if (!row?.id) return []
+          return [row.id === input.action.id ? withBlankName(row) : row]
+        })
         return (
           monsterActionEditorTitles(clearedRows, input.values, input.ctx, input.section).get(
             input.action.id,

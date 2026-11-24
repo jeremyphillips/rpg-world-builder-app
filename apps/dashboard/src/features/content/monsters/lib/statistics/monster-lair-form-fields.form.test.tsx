@@ -27,7 +27,11 @@ import { createMonsterInputSchema } from '@rpg/contracts'
 
 import { normalizeMonsterFormValues } from '../normalize-monster-form-values'
 import { monsterLairFormFields } from './monster-lair-form-fields'
-import { monsterToFormValues, resolveMonsterCreateDefaultValues } from '../monster-form-values'
+import {
+  monsterToFormValues,
+  resolveMonsterCreateDefaultValues,
+  type MonsterFormValues,
+} from '../monster-form-values'
 
 beforeAll(() => {
   if (!HTMLElement.prototype.hasPointerCapture) {
@@ -112,7 +116,9 @@ describe('monsterLairFormFields optional disclosure', () => {
     const values = monsterToFormValues(lich)
     const challengeRating = values.challengeRating as string
     const suggestion = suggestInLairExperience(challengeRating as '21')
-    expect(suggestion.status).toBe('available')
+    if (suggestion.status !== 'available') {
+      throw new Error('expected in-lair experience suggestion')
+    }
 
     render(
       <LairHarness
@@ -298,7 +304,7 @@ describe('monsterLairFormFields optional disclosure', () => {
 
     const values = resolveMonsterCreateDefaultValues()
     values.challengeRating = '21'
-    values.lair = lairState().lair ?? undefined
+    values.lair = (lairState().lair ?? undefined) as MonsterFormValues['lair']
     const normalized = normalizeMonsterFormValues(values, { intent: 'draft', mode: 'create' })
     expect(normalized.lair).toEqual({
       enabled: true,

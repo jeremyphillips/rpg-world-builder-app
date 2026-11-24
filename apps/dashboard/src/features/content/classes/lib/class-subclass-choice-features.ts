@@ -1,5 +1,4 @@
 import {
-  CLASS_FEATURE_KINDS,
   subclassChoiceFeatureId,
   subclassChoiceFeatureLabel,
   type ClassFeature,

@@ -1,7 +1,9 @@
 import {
   applyExtendedXpIncrement,
   computeXpThresholdsSparsePatch,
+  DEFAULT_SYSTEM_RULESET_ID,
   formatXpThresholdDerivedCallout,
+  type SystemRulesetId,
   formatXpThresholdValue,
   normalizeXpThresholdOverrides,
   resolveEffectiveXpProgression,
@@ -61,7 +63,9 @@ export function buildAllowedLevels(effectiveMaxLevel: number): number[] {
   return Array.from({ length: effectiveMaxLevel }, (_, index) => index + 1)
 }
 
-export function resolveSystemXpEntries(rulesetId: 'srd-cc-5.2.1'): readonly XpProgressionEntry[] {
+export function resolveSystemXpEntries(
+  rulesetId: SystemRulesetId = DEFAULT_SYSTEM_RULESET_ID,
+): readonly XpProgressionEntry[] {
   return getStandardXpProgression(rulesetId).entries
 }
 

@@ -54,10 +54,10 @@ const bite = {
 
 const spellcasting = {
   id: 'spellcasting',
-  kind: 'spell',
+  kind: 'spell' as const,
   name: 'Spellcasting',
   spells: [{ spellId: counterspellId }],
-}
+} satisfies MonsterActionDraftRow
 
 const multiattackBase = {
   id: 'multiattack',
@@ -121,11 +121,13 @@ describe('monsterMultiattackActionSpellDependent factory', () => {
       chrome: 'none',
       sectionRowsDependsOn: 'actions',
     })
-    expect(rail).toMatchObject({ kind: 'dependent', dependents: { chrome: 'rail' } })
-    expect(none).toMatchObject({ kind: 'dependent', dependents: { chrome: 'none' } })
-    expect(rail.dependents?.fields?.[0]).toMatchObject({ name: 'spellId', type: 'select' })
-    expect(rail.dependents?.visibility).toBeDefined()
-    expect(rail.dependents?.fields?.[0]).not.toHaveProperty('visibility')
+    const railDependent = rail as Extract<typeof rail, { kind: 'dependent' }>
+    const noneDependent = none as Extract<typeof none, { kind: 'dependent' }>
+    expect(railDependent).toMatchObject({ kind: 'dependent', dependents: { chrome: 'rail' } })
+    expect(noneDependent).toMatchObject({ kind: 'dependent', dependents: { chrome: 'none' } })
+    expect(railDependent.dependents?.fields?.[0]).toMatchObject({ name: 'spellId', type: 'select' })
+    expect(railDependent.dependents?.visibility).toBeDefined()
+    expect(railDependent.dependents?.fields?.[0]).not.toHaveProperty('visibility')
   })
 
   it('wires single-use helper with rail chrome', () => {
@@ -134,7 +136,7 @@ describe('monsterMultiattackActionSpellDependent factory', () => {
       multiattackId: 'multiattack',
       ctx,
       sectionRowsDependsOn: '../../../../actions',
-      actionRows: [multiattackBase, spellcasting],
+      actionRows: [multiattackBase, spellcasting as MonsterActionDraftRow],
     })
     expect(item).toMatchObject({ kind: 'dependent', dependents: { chrome: 'rail' } })
   })

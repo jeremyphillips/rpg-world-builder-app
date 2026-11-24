@@ -9,7 +9,10 @@ import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form
 import type { MonsterActionSection } from '../references/monster-action-equipment-references'
 import type { MonsterActionDraftRow } from '../monster-action-presets'
 import { monsterActionDetailComposerRoute } from './monster-action-kind-detail-composers'
-import { resolveMonsterActionSectionFields } from './section-composers'
+import {
+  resolveMonsterActionSectionFields,
+  type MonsterActionDetailFieldsInput,
+} from './section-composers'
 
 /** `${section}:${kind}` keys exempt from non-empty detail-field coverage (document reason). */
 type MonsterActionAuthoringWaiverKey = `${MonsterActionSection}:${MonsterActionKind}`
@@ -41,6 +44,9 @@ const baseInput = {
   actionRows: [],
   bonusActionRows: [],
   advisories: [],
+  weapons: [],
+  weaponActions: [],
+  allowAddWeapon: false,
 } as const
 
 function minimalDraftForSectionKind(
@@ -68,17 +74,17 @@ function minimalDraftForSectionKind(
       }
       return { id, kind, spells: [{ spellId: 'srd:fear' }] }
     case 'multiattack':
-      return { id, kind, preset: 'multiattack', sequences: [] }
+      return { id, kind, steps: [] }
     case 'shape-shift':
-      return { id, kind, equipment: 'keep-equipment' }
+      return { id, kind, equipment: 'unchanged' }
     case 'action-reference':
       return { id, kind, actionIds: ['source-action'] }
     case 'parry':
-      return { id, kind, acBonus: 2 }
+      return { id, kind, acBonus: 2, name: 'Parry' } as MonsterActionDraftRow
     case 'leap':
     case 'teleport':
     case 'take-actions':
-      return { id, kind }
+      return { id, kind, name: 'Movement' } as MonsterActionDraftRow
     case 'special':
       return { id, kind, description: '<p>Test</p>' }
     default: {
@@ -110,7 +116,7 @@ describe('monster action authoring route coverage', () => {
           ...baseInput,
           section,
           action,
-        })
+        } as unknown as MonsterActionDetailFieldsInput)
 
         if (fields.length === 0) {
           gaps.push(waiverKey)

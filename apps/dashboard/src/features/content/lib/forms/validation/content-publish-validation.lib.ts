@@ -8,7 +8,7 @@ import {
 } from '@rpg/ui/form'
 
 import { resolveContentPublishSchema } from '../shells/edit/content-edit-load'
-import type { AnyContentFormDef, ContentFormCtx } from '../../registry/content-form-registry'
+import type { AnyContentFormDef, ContentFormCtx } from '../registry/content-form-registry'
 
 export const CONTENT_PUBLISH_VALIDATION_ROUTING_FAILED_MESSAGE =
   'Publish validation could not run. Refresh and try again.'
@@ -91,7 +91,7 @@ export function surfaceContentDraftPublishValidation<TFieldValues extends FieldV
   values?: TFieldValues,
 ): ApiValidationIssue[] | null {
   const publishSchema = resolveContentPublishSchema(def, ctx) as ZodType<TFieldValues>
-  const fields = collectTabbedFormResolverItems(def.buildTabs(ctx))
+  const fields = def.buildTabs ? collectTabbedFormResolverItems(def.buildTabs(ctx)) : []
   const payload = values ?? (form.getValues() as TFieldValues)
   const issues = evaluateContentPublishValidation(publishSchema, payload, fields)
   if (!issues) return null

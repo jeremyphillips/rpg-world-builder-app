@@ -1,9 +1,8 @@
 import {
   CHALLENGE_RATING_MECHANICS,
   collectFormAvailabilityAdvisories,
-  isMultiattackAttackGroup,
+  multiattackStepReferencedActionIds,
   type ChallengeRating,
-  isMultiattackUseClause,
   isWeaponEquipment,
   isWeaponProficientFromGrantSet,
   joinInlineMetadata,
@@ -127,12 +126,9 @@ function sectionRows(
 
 function multiattackStepTargetIds(step: unknown): readonly string[] {
   if (!step || typeof step !== 'object') return []
-  if (isMultiattackAttackGroup(step)) return step.actionIds ?? []
-  if (!isMultiattackUseClause(step)) return []
-  if (step.mode === 'choice' || (step.choices && step.choices.length > 0)) {
-    return (step.choices ?? []).flatMap((choice) => (choice.actionId ? [choice.actionId] : []))
-  }
-  return step.actionId ? [step.actionId] : []
+  return multiattackStepReferencedActionIds(
+    step as Parameters<typeof multiattackStepReferencedActionIds>[0],
+  )
 }
 
 function appendMultiattackAdvisories(
@@ -312,7 +308,9 @@ const SRD_LEGENDARY_RESISTANCE_USES = new Set([3, 4, 6])
 function legendaryResistanceUsesFromTrait(
   trait: NonNullable<MonsterFormValues['traits']>[number],
 ): { normal?: number; inLair?: number } | undefined {
-  if (trait.kind !== 'template' || trait.templateId !== 'legendary-resistance') return undefined
+  if (!('kind' in trait) || trait.kind !== 'template' || trait.templateId !== 'legendary-resistance') {
+    return undefined
+  }
   const config = trait.config
   if (!config || typeof config !== 'object' || Array.isArray(config)) return undefined
   return (config as { uses?: { normal?: number; inLair?: number } }).uses
@@ -390,7 +388,9 @@ export function collectMonsterFormAdvisories(
   return [
     ...advisories,
     ...collectTraitSpeedAdvisories(values),
-    ...collectFormAvailabilityAdvisories(values),
+    ...collectFormAvailabilityAdvisories(
+      values as Parameters<typeof collectFormAvailabilityAdvisories>[0],
+    ),
     ...collectLairAndLegendaryAdvisories(values),
   ]
 }

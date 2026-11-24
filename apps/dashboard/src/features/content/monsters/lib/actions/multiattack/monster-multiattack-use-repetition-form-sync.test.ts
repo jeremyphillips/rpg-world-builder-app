@@ -46,7 +46,9 @@ describe('buildMultiattackUseRepetitionValueSyncs', () => {
     primeMultiattackReplacementActionsSnapshot(before)
 
     const patch = sync.apply({ actions: after }, ['actions'])
-    expect(patch?.actions?.[0]).toMatchObject({
+    expect(
+      (patch as { actions?: MonsterActionDraftRow[] } | undefined)?.actions?.[0],
+    ).toMatchObject({
       steps: [
         { count: 1, actionIds: ['bite'] },
         { kind: 'use', mode: 'single', actionId: 'spellcasting' },
@@ -88,7 +90,9 @@ describe('buildMultiattackUseRepetitionValueSyncs', () => {
     primeMultiattackReplacementActionsSnapshot(before as MonsterActionDraftRow[])
 
     const patch = sync.apply({ actions: after }, ['actions'])
-    expect(patch?.actions?.[0]).toMatchObject({
+    expect(
+      (patch as { actions?: MonsterActionDraftRow[] } | undefined)?.actions?.[0],
+    ).toMatchObject({
       alternative: {
         steps: [{ kind: 'use', mode: 'single', actionId: 'spellcasting' }],
       },

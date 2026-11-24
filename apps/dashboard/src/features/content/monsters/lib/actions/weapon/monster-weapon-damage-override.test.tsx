@@ -10,10 +10,19 @@ import type { MonsterActionDraftRow } from '../monster-action-presets'
 import { buildMonsterInput, resolveMonsterCreateDefaultValues } from '../../monster-form-values'
 import { mapWeaponActionDamageToForm } from './monster-weapon-damage-form'
 import {
+  MONSTER_WEAPON_DAMAGE_SOURCE_PREVIEW_LABEL,
+  MONSTER_WEAPON_DAMAGE_USING_LABEL,
+} from '../../monster-form-labels'
+import {
   monsterWeaponDamageOverrideAddDisabled,
   monsterWeaponDamageOverrideField,
   monsterWeaponDamageOverrideSummary,
 } from './monster-weapon-damage-override'
+
+function expectUsingWeaponDamageSummary(rollPhrase: string) {
+  expect(screen.getByText(`${MONSTER_WEAPON_DAMAGE_USING_LABEL} ·`)).toBeInTheDocument()
+  expect(screen.getByText(rollPhrase)).toBeInTheDocument()
+}
 
 const shortsword = {
   id: 'shortsword',
@@ -142,12 +151,14 @@ describe('monster weapon damage override', () => {
     const user = userEvent.setup()
     render(<Harness entryId="sword" />)
 
-    expect(screen.getByText('Using weapon base damage · 1d6 piercing')).toBeInTheDocument()
+    expectUsingWeaponDamageSummary('1d6 piercing')
     expect(state()).toMatchObject({ dirtyFields: {}, damage: null })
 
     await user.click(screen.getByRole('button', { name: 'Override Damage' }))
     expect(screen.queryByText(/Replacing weapon base roll/)).not.toBeInTheDocument()
-    expect(screen.getByText('Weapon base damage')).toBeInTheDocument()
+    expect(
+      screen.getByText(`${MONSTER_WEAPON_DAMAGE_SOURCE_PREVIEW_LABEL}:`),
+    ).toBeInTheDocument()
     expect(screen.getByText('1d6 piercing')).toBeInTheDocument()
     await waitFor(() => {
       expect(state().dirtyFields).not.toEqual({})
@@ -160,7 +171,7 @@ describe('monster weapon damage override', () => {
     expect(state().damage).toEqual({ dice: { count: 1, faces: 6 } })
 
     await user.click(screen.getByRole('button', { name: 'Use weapon default' }))
-    expect(screen.getByText('Using weapon base damage · 2d6 slashing')).toBeInTheDocument()
+    expectUsingWeaponDamageSummary('2d6 slashing')
     await waitFor(() => {
       expect(state()).toMatchObject({ dirtyFields: {}, damage: null })
     })

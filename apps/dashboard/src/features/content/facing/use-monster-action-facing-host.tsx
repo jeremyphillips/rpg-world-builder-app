@@ -6,7 +6,7 @@ import type { MonsterActionSection } from '../monsters/lib/actions/references/mo
 import type { MonsterFormValues } from '../monsters/lib/monster-form-values'
 import { resolveMonsterActionDraftFacing } from './domains/monster-action/resolve-monster-action-draft-facing'
 import type { FacingHostConfig } from './facing-host-config.types'
-import { toFacingPanelModel } from './structured-facing-host-panel'
+import { toFacingPanelModel } from './structured-facing-panel-model.lib'
 
 export function useMonsterActionFacingHost(input: {
   ctx: ContentFormCtx

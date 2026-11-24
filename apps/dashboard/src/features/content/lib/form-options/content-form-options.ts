@@ -314,15 +314,13 @@ export function useContentFormOptions(campaignId: string | undefined): {
   const rulesetQuery = useRulesetPatch(campaignId)
   const rulesetPatch = rulesetQuery.data
 
+  const spellcastingProgressionPatch = rulesetPatch?.characterCreation.progression.spellcasting
   const spellcastingProgression = useMemo(
     () =>
       rulesetId
-        ? resolveCampaignSpellcastingProgression(
-            rulesetId,
-            rulesetPatch?.characterCreation.progression.spellcasting,
-          )
+        ? resolveCampaignSpellcastingProgression(rulesetId, spellcastingProgressionPatch)
         : undefined,
-    [rulesetId, rulesetPatch?.characterCreation.progression.spellcasting],
+    [rulesetId, spellcastingProgressionPatch],
   )
 
   const options = useMemo(

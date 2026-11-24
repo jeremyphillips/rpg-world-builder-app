@@ -44,12 +44,9 @@ import { characterBuilderStepSelectionMessages } from '../rpg/runtime/character-
 import { abilityValidationMessages } from '../rpg/vocab/ability-messages'
 import { spellValidationMessages } from '../rpg/vocab/spell/spell-messages'
 import { vocabularyValidationMessages } from '../rpg/vocab/vocabulary-messages'
-import type { MessageDef } from './define-message'
 import { fieldValidationMessages } from './messages'
 
-type MessageCatalog = Record<string, MessageDef>
-
-const TIERED_MESSAGE_CATALOGS: Record<string, MessageCatalog> = {
+const TIERED_MESSAGE_CATALOGS = {
   fieldValidationMessages,
   levelValidationMessages,
   standardArrayValidationMessages,
@@ -95,7 +92,7 @@ const TIERED_MESSAGE_CATALOGS: Record<string, MessageCatalog> = {
   spellValidationMessages,
 }
 
-function idsFromCatalog(catalog: MessageCatalog): string[] {
+function idsFromCatalog(catalog: Record<string, { readonly id: string }>): string[] {
   return Object.values(catalog).map((entry) => entry.id)
 }
 

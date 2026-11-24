@@ -410,11 +410,16 @@ describe('group optionalDisclosure', () => {
       fields: [{ type: 'text', name: 'mode', label: 'Mode' }],
     } as const satisfies FormItem
 
-    function ReactiveHarness({ form }: { form: UseFormReturn<Record<string, unknown>> }) {
+    type ReactiveFormValues = { lair: { enabled: boolean; experience?: { mode: string } } }
+
+    function ReactiveHarness({ form }: { form: UseFormReturn<ReactiveFormValues> }) {
       const { setValue } = form
       return (
         <FormProvider {...form}>
-          <button type="button" onClick={() => setValue('lair.experience', { mode: 'suggested' })}>
+          <button
+            type="button"
+            onClick={() => setValue('lair.experience', { mode: 'suggested' })}
+          >
             Seed XP
           </button>
           <FormItems items={[nested]} idPrefix="reactive" />
@@ -423,7 +428,7 @@ describe('group optionalDisclosure', () => {
     }
 
     function Shell() {
-      const form = useForm({
+      const form = useForm<ReactiveFormValues>({
         defaultValues: { lair: { enabled: true } },
         shouldUnregister: true,
       })

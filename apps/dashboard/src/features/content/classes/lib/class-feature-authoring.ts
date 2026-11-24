@@ -2,7 +2,6 @@ import {
   CLASS_FEATURE_KIND_ENTRIES,
   classSubclassChoiceAtOccurrenceLimit,
   resolveClassFeatureName,
-  subclassChoiceFeatureLabel,
   type ClassFeatureKind,
 } from '@rpg/contracts'
 
@@ -32,7 +31,6 @@ export function resolveClassFeatureRowTitle(
   if (!row) return ''
   const kind = row.kind ?? 'custom'
   if (kind === 'subclass-choice') {
-    const derived = subclassChoiceFeatureLabel(className)
     const authored = row.name?.trim()
     return resolveClassFeatureName(
       { kind: 'subclass-choice', name: authored || undefined },

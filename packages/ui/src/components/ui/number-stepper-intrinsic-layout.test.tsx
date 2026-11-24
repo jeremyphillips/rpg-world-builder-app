@@ -210,9 +210,9 @@ describe('NumberStepper intrinsic width in layout', () => {
   })
 })
 
-function FormSectionHarness({ size, children }: { size: 'sm' | 'md' | 'lg'; children: ReactNode }) {
+function FormSectionHarness({ children }: { size: 'sm' | 'md' | 'lg'; children: ReactNode }) {
   return (
-    <FormSectionProvider density="comfortable" defaultControlSize={size}>
+    <FormSectionProvider density="comfortable">
       {children}
     </FormSectionProvider>
   )

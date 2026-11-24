@@ -52,7 +52,7 @@ function Host({
               },
             ] as MonsterFormValues['actions'],
             legendaryActions: {
-              uses: 3,
+              uses: { normal: 3 },
               actions: [action as MonsterLegendaryActionDraft],
             },
           })
@@ -81,7 +81,17 @@ function Detail({ actionId }: { actionId: string }) {
       title: (row as { name?: string } | undefined)?.name?.trim() || `Action ${index + 1}`,
     }),
   })
-  return <MonsterActionDetail ctx={ctx} sections={sections} located={located} rows={rows} />
+  return (
+    <MonsterActionDetail
+      ctx={ctx}
+      sections={sections}
+      located={located}
+      rows={rows}
+      weapons={[]}
+      weaponActions={[]}
+      allowAddWeapon={false}
+    />
+  )
 }
 
 const claw: MonsterActionDraftRow = {
@@ -95,12 +105,28 @@ const claw: MonsterActionDraftRow = {
 }
 
 export const Claw: Story = {
-  args: { ctx, sections: undefined as never, located: null, rows: undefined as never },
+  args: {
+    ctx,
+    sections: undefined as never,
+    located: null,
+    rows: undefined as never,
+    weapons: [],
+    weaponActions: [],
+    allowAddWeapon: false,
+  },
   render: () => <Host action={claw} />,
 }
 
 export const LegendaryActions: Story = {
-  args: { ctx, sections: undefined as never, located: null, rows: undefined as never },
+  args: {
+    ctx,
+    sections: undefined as never,
+    located: null,
+    rows: undefined as never,
+    weapons: [],
+    weaponActions: [],
+    allowAddWeapon: false,
+  },
   render: () => (
     <Host
       section="legendaryActions"
@@ -116,7 +142,15 @@ export const LegendaryActions: Story = {
 }
 
 export const WithDescriptionAndOnHit: Story = {
-  args: { ctx, sections: undefined as never, located: null, rows: undefined as never },
+  args: {
+    ctx,
+    sections: undefined as never,
+    located: null,
+    rows: undefined as never,
+    weapons: [],
+    weaponActions: [],
+    allowAddWeapon: false,
+  },
   render: () => (
     <Host
       action={{

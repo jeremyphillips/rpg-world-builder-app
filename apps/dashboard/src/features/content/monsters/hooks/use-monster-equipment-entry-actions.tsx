@@ -3,6 +3,7 @@ import { useFormContext, useWatch } from 'react-hook-form'
 import { createMagicPropertyDefinitionProvider } from '@rpg/catalog/magic-properties'
 import {
   buildEquipmentInventoryUnmodifiedContext,
+  DEFAULT_SYSTEM_RULESET_ID,
   resolveEquipmentInstanceSummary,
   type SystemRulesetId,
 } from '@rpg/contracts'
@@ -32,7 +33,7 @@ export type MonsterEquipmentEntryActions = {
   equipment: readonly MonsterEquipmentFormEntry[]
   catalog: ReturnType<typeof monsterEquipmentCatalog>
   weaponGrants: ReturnType<typeof resolveMonsterFormWeaponGrants>
-  rulesetId: SystemRulesetId | undefined
+  rulesetId: SystemRulesetId
   updateEquipment: (next: MonsterEquipmentFormEntry[]) => void
   removeEntry: (entryId: string) => void
   entryCard: (entry: MonsterEquipmentFormEntry) => ReactNode
@@ -75,9 +76,9 @@ export function useMonsterEquipmentEntryActions(ctx: ContentFormCtx): MonsterEqu
   const [pendingRemove, setPendingRemove] = useState<PendingRemove | null>(null)
 
   const catalog = monsterEquipmentCatalog(ctx)
-  const rulesetId = ctx.rulesetId as SystemRulesetId | undefined
+  const rulesetId = (ctx.rulesetId ?? DEFAULT_SYSTEM_RULESET_ID) as SystemRulesetId
   const magicProvider = useMemo(
-    () => (rulesetId ? createMagicPropertyDefinitionProvider(rulesetId) : undefined),
+    () => createMagicPropertyDefinitionProvider(rulesetId),
     [rulesetId],
   )
   const equipmentSource = values?.equipment

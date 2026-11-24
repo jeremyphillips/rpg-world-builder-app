@@ -28,7 +28,7 @@ function Shell({ children }: { children: ReactNode }) {
 
 describe('MasterDetailDetailBody', () => {
   it('uses one outer FormRhythmStack for leading fields, facing, and primary fields', () => {
-    const { container } = render(
+    render(
       <Shell>
         <MasterDetailDetailBody
           leadingItemFields={[

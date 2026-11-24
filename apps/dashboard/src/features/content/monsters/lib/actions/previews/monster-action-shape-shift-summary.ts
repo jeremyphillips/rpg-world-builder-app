@@ -62,7 +62,9 @@ export function buildMonsterActionShapeShiftPreview(input: {
     prerequisite: draft.prerequisite,
     description: draft.description,
     hasShapeShift: true,
-    hasFormRestrictions: monsterHasFormRestrictions(input.values),
+    hasFormRestrictions: monsterHasFormRestrictions(
+      input.values as Parameters<typeof monsterHasFormRestrictions>[0],
+    ),
   })
 
   return {

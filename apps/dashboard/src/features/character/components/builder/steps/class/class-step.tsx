@@ -76,8 +76,12 @@ export function ClassStep({ context, draft, validationIssues, onDraftChange }: C
 
   const detailsContent = useMemo(() => {
     if (!detailsClass) return null
-    return buildClassDetailsSheetContent(detailsClass, context.catalog)
-  }, [context.catalog, detailsClass])
+    return buildClassDetailsSheetContent(
+      detailsClass,
+      context.catalog,
+      context.spellcastingProgression,
+    )
+  }, [context.catalog, context.spellcastingProgression, detailsClass])
 
   const isDetailsClassSelected = detailsClassId != null && draft.class.classId === detailsClassId
 

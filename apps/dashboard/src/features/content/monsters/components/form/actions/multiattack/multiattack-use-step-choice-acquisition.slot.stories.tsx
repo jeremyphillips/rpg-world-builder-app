@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react-vite'
 import { FormProvider, useForm } from 'react-hook-form'
 
 import { MonsterMultiattackUseStepChoiceAcquisitionSlot } from './multiattack-use-step-choice-acquisition.slot'

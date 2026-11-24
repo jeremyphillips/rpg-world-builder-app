@@ -1,3 +1,4 @@
+/* eslint-disable boundaries/dependencies -- Facing blocks carry content table and stat-block prose shapes at integration boundaries. */
 import type { ContentTable } from '../../content/tables/content-table'
 import type { StatBlockProseDocument } from '../../runtime/prose/stat-block-prose'
 

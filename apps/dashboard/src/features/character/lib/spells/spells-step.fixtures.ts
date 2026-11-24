@@ -60,7 +60,7 @@ export const spellsStepWizardClass = makeClassStored({
       id: 'spellcasting',
       name: 'Spellcasting',
       level: 1,
-      grantGroups: [{ grants: [{ id: 'spellcasting-1', kind: 'spellcasting' }] }],
+      grantGroups: [],
     },
   ],
   spellcasting: {

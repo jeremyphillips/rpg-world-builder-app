@@ -50,8 +50,14 @@ jobs:
       - name: Fallow dead-code regression (changed files)
         run: pnpm gate:fallow-dead-code
 
-      - name: Parallel quality gates
-        run: pnpm analyze & pnpm gate:fallow-dupes & pnpm coverage & wait
+      - name: Advisory code analysis
+        run: pnpm analyze
+
+      - name: Duplication gate
+        run: pnpm gate:fallow-dupes
+
+      - name: Tests and coverage
+        run: pnpm coverage
 
       - name: Complexity and CRAP check
         run: pnpm gate:fallow-health:coverage
