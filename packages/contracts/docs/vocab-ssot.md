@@ -77,6 +77,22 @@ into contracts for symmetry.
 
 ---
 
+## PC / NPC character identity
+
+Builder `characterKind` and persisted `characterType` share one closed vocabulary (`pc`, `npc`).
+
+**Canonical module:** [`pc-npc-identity.ts`](../src/rpg/runtime/character/pc-npc-identity.ts)
+
+- Tuple: `CHARACTER_PC_NPC_IDS`
+- Zod: `characterPcNpcSchema` (aliases: `characterKindSchema`, `characterTypeSchema`)
+- Types: `CharacterPcNpc`; semantic aliases `CharacterKind`, `CharacterType`
+- Labels: `CHARACTER_TYPE_ENTRIES` in `character-type-display.ts` (`satisfies Record<CharacterKind, GameTermEntry>`)
+- Builder policies: `CHARACTER_KIND_POLICIES` keyed on `CharacterKind`
+
+`character-acquisition/kind.ts` and `sheet/core.ts` re-export compatibility names; do not define a second tuple or `z.enum(['pc', 'npc'])`. Location connection `characterKinds` (resides_at, owns, …) is unrelated — do not merge.
+
+---
+
 ## Catalog content types — domain-first admission
 
 **Identity:** [`CONTENT_TYPE_KEYS`](../src/rpg/primitives/content/content-type-keys.ts)  

@@ -1,4 +1,4 @@
-import { CHARACTER_TYPE_IDS, getCharacterTypeLabel } from '@rpg/contracts'
+import { CHARACTER_TYPE_IDS, getCharacterTypeLabel, type CharacterType } from '@rpg/contracts'
 
 import {
   createChipsFilter,
@@ -17,7 +17,7 @@ import {
 } from './relationship-filter.constants'
 
 export type CharacterRelationshipFilterState = {
-  characterType?: typeof RELATIONSHIP_FILTER_ALL | 'pc' | 'npc'
+  characterType?: typeof RELATIONSHIP_FILTER_ALL | CharacterType
   classId?: string
 }
 
@@ -43,7 +43,7 @@ export function resolveCharacterRelationshipFilterLayout<TData>(
 
 export type CreateCharacterRelationshipFilterSchemaArgs<TData> = {
   rows: readonly TData[]
-  getCharacterType: (row: TData) => 'pc' | 'npc'
+  getCharacterType: (row: TData) => CharacterType
   getClassIds: (row: TData) => readonly string[]
   resolveClassLabel: (classId: string) => string
 }
@@ -86,7 +86,7 @@ export function createCharacterRelationshipFilterSchema<TData>(
           { value: RELATIONSHIP_FILTER_ALL, label: RELATIONSHIP_FILTER_ALL_LABEL },
           ...typeOptions.map((characterType) => ({
             value: characterType,
-            label: getCharacterTypeLabel(characterType),
+            label: getCharacterTypeLabel(characterType as CharacterType),
           })),
         ],
         matches: (row, value) => args.getCharacterType(row) === value,

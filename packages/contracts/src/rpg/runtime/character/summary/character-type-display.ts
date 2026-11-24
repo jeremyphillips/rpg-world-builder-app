@@ -4,7 +4,7 @@ import {
   type VocabularyTerm,
 } from '../../../vocab/types'
 
-import { CHARACTER_TYPES, type CharacterType } from '../sheet/core'
+import { type CharacterKind, type CharacterType } from '../pc-npc-identity'
 
 export const CHARACTER_TYPE_TERM = {
   label: 'Character type',
@@ -34,22 +34,21 @@ export const CHARACTER_TYPE_ENTRIES = {
       plural: 'non-player characters',
     },
   },
-} as const satisfies Record<CharacterType, GameTermEntry>
+} as const satisfies Record<CharacterKind, GameTermEntry>
 
 export type CharacterTypeBulkActionDescriptor = {
   nounSingular: string
   nounPlural: string
 }
 
-/** Returns the display label for a character type id. Falls back to the raw value. */
-export function getCharacterTypeLabel(characterType: CharacterType | string): string {
-  return CHARACTER_TYPE_ENTRIES[characterType as CharacterType]?.label ?? characterType
+/** Returns the display label for a known character type id. */
+export function getCharacterTypeLabel(characterType: CharacterType): string {
+  return CHARACTER_TYPE_ENTRIES[characterType].label
 }
 
-/** Collection nav and overview heading — e.g. NPCs. Falls back to the raw value. */
-export function getCharacterTypeCollectionLabel(characterType: CharacterType | string): string {
-  const entry = CHARACTER_TYPE_ENTRIES[characterType as CharacterType]
-  return entry ? getTermCollectionLabel(entry) : characterType
+/** Collection nav and overview heading — e.g. NPCs. */
+export function getCharacterTypeCollectionLabel(characterType: CharacterType): string {
+  return getTermCollectionLabel(CHARACTER_TYPE_ENTRIES[characterType])
 }
 
 /** Singular/plural nouns for bulk action toasts and resolve copy. */
@@ -63,5 +62,8 @@ export function getCharacterTypeBulkActionDescriptor(
   }
 }
 
-/** Closed character type ids in canonical order. */
-export const CHARACTER_TYPE_IDS = CHARACTER_TYPES
+/** Display label for an unparsed or legacy character type string. */
+export function formatUnknownCharacterTypeLabel(value: string): string {
+  const entry = CHARACTER_TYPE_ENTRIES[value as CharacterType]
+  return entry?.label ?? value
+}

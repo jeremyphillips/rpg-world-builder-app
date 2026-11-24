@@ -1,4 +1,4 @@
-import type { ContentMedia } from '@rpg/contracts'
+import type { CharacterType, ContentMedia } from '@rpg/contracts'
 
 import { useUpdateCampaignCharacterMedia } from '@/features/campaign'
 
@@ -11,7 +11,7 @@ import { useUpdateNpcMedia } from '../../../npc/hooks/use-update-npc-media'
 import { CharacterDetailMediaSlot } from './character-detail-media-slot'
 
 export type CharacterDetailRouteMediaProps = {
-  characterType: 'pc' | 'npc'
+  characterType: CharacterType
   characterId: string
   userId?: string
   campaignId?: string

@@ -1,3 +1,4 @@
+import type { CharacterType } from '@rpg/contracts'
 import { applyFilterSchema, countModifiedFilters, setFilterValue } from '@rpg/ui/filters'
 import { describe, expect, it } from 'vitest'
 
@@ -8,7 +9,7 @@ import {
 
 type CharacterRow = {
   id: string
-  characterType: 'pc' | 'npc'
+  characterType: CharacterType
   classIds: readonly string[]
 }
 

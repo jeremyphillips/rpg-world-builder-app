@@ -1,4 +1,4 @@
-import type { CampaignRole, ContentUsageBlocker } from '@rpg/contracts'
+import type { CampaignRole, CharacterType, ContentUsageBlocker } from '@rpg/contracts'
 import { isCampaignManager, USAGE_BLOCKER_SOURCE_KEYS } from '@rpg/contracts'
 
 import { listOpenParticipationsForCampaign } from '../../../campaign'
@@ -16,7 +16,7 @@ export type VocabularyUsageViewerContext = {
 type CharacterLanguageHit = {
   _id: unknown
   name: string
-  characterType: 'pc' | 'npc'
+  characterType: CharacterType
   proficiencies?: {
     languages?: Array<{ language: string }>
   }

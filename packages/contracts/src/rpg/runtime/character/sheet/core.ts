@@ -10,11 +10,12 @@ import { creatureRuntimeHitPointsSchema } from '../../../content/creature'
 // Core identity and progression
 // ---------------------------------------------------------------------------
 
-export const CHARACTER_TYPES = ['pc', 'npc'] as const
-
-export const characterTypeSchema = z.enum(CHARACTER_TYPES)
-
-export type CharacterType = z.infer<typeof characterTypeSchema>
+export {
+  CHARACTER_TYPES,
+  CHARACTER_TYPE_IDS,
+  type CharacterType,
+  characterTypeSchema,
+} from '../pc-npc-identity'
 
 export const characterClassEntrySchema = z.object({
   /** Opaque class content id. */

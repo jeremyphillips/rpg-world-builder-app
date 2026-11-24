@@ -1,4 +1,8 @@
-import type { ContentDeletionAvailability, ContentUsageBlocker } from '@rpg/contracts'
+import type {
+  CharacterType,
+  ContentDeletionAvailability,
+  ContentUsageBlocker,
+} from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
 import { listOpenParticipationsForCampaign } from '../../campaign'
@@ -10,7 +14,7 @@ import { speciesWriteConfig } from './species.config'
 type HeritageUsageCharacterHit = {
   _id: unknown
   name: string
-  characterType: 'pc' | 'npc'
+  characterType: CharacterType
 }
 
 async function resolveHeritageOptionUsageBlockers(input: {

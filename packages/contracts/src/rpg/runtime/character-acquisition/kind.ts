@@ -1,3 +1,7 @@
-export const CHARACTER_KINDS = ['pc', 'npc'] as const
-
-export type CharacterKind = (typeof CHARACTER_KINDS)[number]
+export {
+  CHARACTER_KINDS,
+  CHARACTER_PC_NPC_IDS,
+  type CharacterKind,
+  type CharacterPcNpc,
+  characterKindSchema,
+} from '../character/pc-npc-identity'
