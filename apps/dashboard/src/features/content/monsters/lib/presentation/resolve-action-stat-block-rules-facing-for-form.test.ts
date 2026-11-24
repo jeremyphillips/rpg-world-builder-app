@@ -1,4 +1,4 @@
-import { systemDefaultArmorClassRules } from '@rpg/contracts'
+import { joinStatBlockProseDocument, systemDefaultArmorClassRules } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import { pickMonster } from '@/test/fixtures/pick'
@@ -24,6 +24,7 @@ function baseCtx(overrides: Partial<ContentFormCtx> = {}): ContentFormCtx {
 
 function baseValues(overrides: Partial<MonsterFormValues> = {}): MonsterFormValues {
   return {
+    ...pickMonster('hell-hound'),
     name: 'Test creature',
     challengeRating: '1',
     abilityScores: { str: 10, dex: 14, con: 10, int: 10, wis: 10, cha: 10 },
@@ -48,6 +49,19 @@ describe('resolveActionStatBlockRulesFacingForForm', () => {
       status: 'unavailable',
       reason: { code: 'catalog-pending', catalog: 'armor-class-rules' },
     })
+  })
+
+  it('keeps authored Special Ability prose visible when unrelated catalogs fail', () => {
+    const description = '<p>The creature roars.</p>'
+    const outcome = resolveActionStatBlockRulesFacingForForm({
+      values: baseValues({
+        actions: [{ id: 'roar', kind: 'special', name: 'Roar', description }],
+      }),
+      ctx: baseCtx({ equipmentCatalogStatus: 'error', spellCatalogStatus: 'error' }),
+      actionId: 'roar',
+      section: 'actions',
+    })
+    expect(outcome).toMatchObject({ status: 'ready', facing: { descriptionHtml: description } })
   })
 
   it('returns unavailable when equipment catalog is pending', () => {
@@ -101,7 +115,9 @@ describe('resolveActionStatBlockRulesFacingForForm', () => {
     })
     expect(outcome.status).toBe('ready')
     if (outcome.status === 'ready') {
-      expect(outcome.facing.attackLine).toBeTruthy()
+      expect(joinStatBlockProseDocument(outcome.facing.rulesProse ?? [])).toContain(
+        'Melee Attack Roll',
+      )
     }
   })
 })

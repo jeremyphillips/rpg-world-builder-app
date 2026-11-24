@@ -81,14 +81,18 @@ function spellCatalogReason(ctx: ContentFormCtx): FacingReason {
   return { code: 'catalog-pending', catalog: 'spells' }
 }
 
-function catalogReferenceReason(ctx: ContentFormCtx): FacingReason {
+function unavailableActionCatalog(ctx: ContentFormCtx): FacingReason | undefined {
   if (ctx.equipmentCatalogStatus === 'pending' || ctx.equipmentCatalogStatus === 'error') {
     return equipmentCatalogReason(ctx)
   }
   if (ctx.spellCatalogStatus === 'pending' || ctx.spellCatalogStatus === 'error') {
     return spellCatalogReason(ctx)
   }
-  return { code: 'catalog-pending', catalog: 'armor-class-rules' }
+  return undefined
+}
+
+function catalogReferenceReason(ctx: ContentFormCtx): FacingReason {
+  return unavailableActionCatalog(ctx) ?? { code: 'catalog-pending', catalog: 'armor-class-rules' }
 }
 
 function derivedAttackReason(
@@ -207,16 +211,6 @@ export function resolveActionStatBlockRulesFacingForForm(input: {
   actionId: string
   section: MonsterActionSection
 }): MonsterActionRulesPreviewOutcome {
-  if (
-    input.ctx.equipmentCatalogStatus === 'pending' ||
-    input.ctx.equipmentCatalogStatus === 'error'
-  ) {
-    return { status: 'unavailable', reason: equipmentCatalogReason(input.ctx) }
-  }
-  if (input.ctx.spellCatalogStatus === 'pending' || input.ctx.spellCatalogStatus === 'error') {
-    return { status: 'unavailable', reason: spellCatalogReason(input.ctx) }
-  }
-
   const armorClassRules = monsterArmorClassRules(input.ctx)
   if (!armorClassRules) {
     return {
@@ -234,6 +228,7 @@ export function resolveActionStatBlockRulesFacingForForm(input: {
   }
 
   let normalized: Monster
+  let action: PublishedAction
   let derived: DerivedMonsterStatBlock | null
   let spellContext: SpellDisplayContext
 
@@ -243,7 +238,17 @@ export function resolveActionStatBlockRulesFacingForForm(input: {
       mode: 'create',
       armorClassRules,
     })
-    derived = derivedForFacing(input.values, input.ctx)
+    const selected = sectionRows(normalized, input.section).find((row) => row.id === input.actionId)
+    if (!selected) return { status: 'incomplete', reason: { code: 'missing-rules-text' } }
+
+    action = selected
+    const authoredOnly = action.kind === 'special' && !action.savingThrow
+    if (!authoredOnly) {
+      const reason = unavailableActionCatalog(input.ctx)
+      if (reason) return { status: 'unavailable', reason }
+    }
+
+    derived = authoredOnly ? null : derivedForFacing(input.values, input.ctx)
     const catalogState = 'ready' as const
     spellContext = buildSpellDisplayContext({
       monster: normalized,
@@ -262,31 +267,24 @@ export function resolveActionStatBlockRulesFacingForForm(input: {
     return { status: 'failed', reason: { code: 'unexpected' } }
   }
 
-  const action = sectionRows(normalized, input.section).find((row) => row.id === input.actionId)
-  if (!action) {
-    return { status: 'incomplete', reason: { code: 'missing-rules-text' } }
-  }
+  const attackDraft = isMonsterActionAttackKind(action.kind)
+    ? attackDraftState(input.values, input.ctx, input.actionId, derivedSection(input.section))
+    : undefined
 
-  if (isMonsterActionAttackKind(action.kind)) {
-    const attackState = attackDraftState(
-      input.values,
-      input.ctx,
-      input.actionId,
-      derivedSection(input.section),
-    )
-    if (attackState.reason === 'conflict') {
+  if (attackDraft) {
+    if (attackDraft.reason === 'conflict') {
       return {
         status: 'unavailable',
         reason: derivedAttackReason('conflict', input.values, input.ctx, input.actionId),
       }
     }
-    if (attackState.reason === 'missing-reference') {
+    if (attackDraft.reason === 'missing-reference') {
       return {
         status: 'unavailable',
         reason: derivedAttackReason('missing-reference', input.values, input.ctx, input.actionId),
       }
     }
-    if (attackState.reason === 'missing-input') {
+    if (attackDraft.reason === 'missing-input') {
       return {
         status: 'incomplete',
         reason: derivedAttackReason('missing-input', input.values, input.ctx, input.actionId),
@@ -312,10 +310,6 @@ export function resolveActionStatBlockRulesFacingForForm(input: {
       reason: incompleteReasonForAction(draftAction, input.values, input.ctx),
     }
   }
-
-  const attackDraft = isMonsterActionAttackKind(action.kind)
-    ? attackDraftState(input.values, input.ctx, input.actionId, derivedSection(input.section))
-    : undefined
 
   return {
     status: 'ready',

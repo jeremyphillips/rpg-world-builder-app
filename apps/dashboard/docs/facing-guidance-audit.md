@@ -28,6 +28,8 @@ Incomplete with a partial document shows both document and guidance.
 Resolver `undefined` (not applicable) is separate from `FacingResolution` statuses.
 Custom species and monster traits resolve to an inapplicable result through the facing facade. An empty selection supplies no request. Custom class features with authored content can resolve to a rules document.
 
+Monster draft facing identifies the selected action before checking equipment and spell catalog readiness. An authored Special Ability without a configured saving throw uses the shared rules composer independently of those catalog states. Structured actions still use their existing readiness checks.
+
 ## Spellbook Alert gap
 
 Some call sites still wrap Alert children in `Text variant="supporting"` (14px fixed).
