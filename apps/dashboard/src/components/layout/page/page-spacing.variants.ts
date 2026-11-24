@@ -24,6 +24,3 @@ export type PageRhythm = keyof typeof pageSpacingClasses
 
 /** Stack spacing between `PageHeader` and the section directly below it. */
 export const pageHeaderSectionGapClasses = 'flex flex-col gap-4'
-
-/** @deprecated Use {@link PageRhythm} — spacing prop now means shell inset only. */
-export type PageSpacing = PageRhythm

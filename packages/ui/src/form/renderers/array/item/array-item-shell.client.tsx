@@ -148,7 +148,7 @@ export interface ArrayItemShellProps extends ArrayItemLeadingChromeOptions {
 export function ArrayItemShell({
   titleId,
   itemPrefix,
-  showDragHandle,
+  reserveDragHandleSlot,
   collapsible,
   dragging = false,
   layout = 'default',
@@ -165,7 +165,7 @@ export function ArrayItemShell({
     <CollapsibleListItemShell
       titleId={titleId}
       itemPrefix={itemPrefix}
-      showDragHandle={showDragHandle}
+      reserveDragHandleSlot={reserveDragHandleSlot}
       collapsible={collapsible}
       dragging={dragging}
       layout={layout}

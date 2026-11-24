@@ -12,26 +12,32 @@ import {
 } from '@/features/character/lib/fixtures/character-builder-fixtures'
 import { pickEquipment } from '@/test/fixtures/pick'
 
-import { resolveQuickNpcClassChangeAuthoringState } from './quick-npc-class-change.lib'
+import { dropClassOwnedChoiceOverrides } from '@rpg/contracts'
+
+import { reconcileQuickNpcEquipmentSelections } from './quick-npc-equipment-selections.lib'
 import { resolveQuickNpcSetupChangeAuthoringState } from './quick-npc-setup-change.lib'
 
 const RULESET = 'srd-cc-5.2.1' as const
 const FIGHTER_ID = `${RULESET}:fighter`
 const WIZARD_ID = `${RULESET}:wizard`
 
-describe('resolveQuickNpcClassChangeAuthoringState', () => {
+describe('quick npc class change reconciliation', () => {
   it('drops the previous class package and nested pools and keeps manual equipment', () => {
     const fighterPackageId = buildChoiceSetId('class', FIGHTER_ID, 'starting-equipment')
     const nestedPoolId = nestedStartingEquipmentChoiceSetId(FIGHTER_ID, 'heavy-armor', 0)
     const heritageId = buildChoiceSetId('species', `${RULESET}:human`, 'heritage')
 
-    const next = resolveQuickNpcClassChangeAuthoringState({
+    const startingChoiceOverrides = dropClassOwnedChoiceOverrides({
       overrides: {
         [fighterPackageId]: ['heavy-armor'],
         [nestedPoolId]: [`${RULESET}:javelin`],
         [heritageId]: [`${RULESET}:heritage`],
       },
-      equipmentSelections: [
+      previousClassId: FIGHTER_ID,
+      nextClassId: WIZARD_ID,
+    })
+    const equipmentSelections = reconcileQuickNpcEquipmentSelections({
+      current: [
         {
           equipmentId: toEquipmentContentId(RULESET, 'spear'),
           quantity: 1,
@@ -48,10 +54,10 @@ describe('resolveQuickNpcClassChangeAuthoringState', () => {
       },
     })
 
-    expect(next.startingChoiceOverrides).toEqual({
+    expect(startingChoiceOverrides).toEqual({
       [heritageId]: [`${RULESET}:heritage`],
     })
-    expect(next.equipmentSelections).toEqual([
+    expect(equipmentSelections).toEqual([
       { equipmentId: toEquipmentContentId(RULESET, 'rope'), quantity: 1, origin: 'manual' },
     ])
   })

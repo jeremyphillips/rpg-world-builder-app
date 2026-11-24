@@ -25,8 +25,3 @@ export function createGrantArrayItemShell(ctx: GrantRowHeaderContext) {
     })
   }
 }
-
-/** @deprecated Use createGrantArrayItemShell(ctx) so presentation context is available. */
-export function renderGrantArrayItemShell(props: ArrayItemShellRenderProps) {
-  return createElement(EntityDisclosureArrayItemShell, props)
-}

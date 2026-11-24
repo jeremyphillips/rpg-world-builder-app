@@ -27,7 +27,6 @@ import {
   spellSelectionChangePackageFromPolicy,
   spellSelectionFromForm,
   type SpellChangePackage,
-  type SpellSelectionChangePackage,
 } from './class-spell-selection-form.lib'
 import { createAsiFeature } from './class-asi-features'
 import { createSubclassChoiceFeature } from './class-subclass-choice-features'
@@ -265,7 +264,7 @@ export function spellSelectionModelToFormValues(
 
 export function spellSelectionChangePackageToFormValues(
   spellcasting: Spellcasting | undefined,
-): SpellSelectionChangePackage | undefined {
+): SpellChangePackage | undefined {
   if (!spellcasting?.spellSelection) return undefined
   return spellSelectionChangePackageFromPolicy(spellcasting.spellSelection.change)
 }

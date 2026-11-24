@@ -10,7 +10,6 @@ import {
   resolveEquipmentInventoryManageSources,
   resolveEquipmentInventoryRowManagementMode,
   usesInlineManagement,
-  usesMixedSourceManagement,
 } from '../manage/equipment-inventory-manage.lib'
 
 function row(
@@ -58,7 +57,6 @@ describe('equipment-inventory-manage.lib', () => {
       'magicItemGrant',
       'purchase',
     ])
-    expect(usesMixedSourceManagement([grant, purchase])).toBe(true)
     expect(
       usesInlineManagement({
         sourceKinds: resolveDistinctAcquisitionSourceKinds([grant, purchase]),
@@ -66,13 +64,22 @@ describe('equipment-inventory-manage.lib', () => {
       }),
     ).toBe(true)
     expect(
-      usesMixedSourceManagement([
-        purchase,
-        {
-          ...purchase,
-          removeTarget: { kind: 'purchase', purchaseId: 'purchase-2' },
-        },
-      ]),
+      usesInlineManagement({
+        sourceKinds: resolveDistinctAcquisitionSourceKinds([
+          purchase,
+          {
+            ...purchase,
+            removeTarget: { kind: 'purchase', purchaseId: 'purchase-2' },
+          },
+        ]),
+        grantedQuantity: grantedQuantity([
+          purchase,
+          {
+            ...purchase,
+            removeTarget: { kind: 'purchase', purchaseId: 'purchase-2' },
+          },
+        ]),
+      }),
     ).toBe(false)
   })
 

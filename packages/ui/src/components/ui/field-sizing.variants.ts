@@ -10,11 +10,7 @@ import {
   resolveFieldControlMultilineSizeClass,
   resolveFieldControlSizeClass,
 } from './field-control.styles'
-import {
-  resolveFieldGroupActionSegmentClasses,
-  resolveFieldGroupInputSegmentClasses,
-  resolveFieldGroupSizeClass,
-} from './field-group.styles'
+import { resolveFieldGroupSizeClass } from './field-group.styles'
 
 export type FieldSizeToken = 'xs' | 'sm' | 'md' | 'lg'
 
@@ -31,22 +27,6 @@ export const fieldControlSizeClasses = {
   sm: resolveFieldControlSizeClass('sm'),
   md: resolveFieldControlSizeClass('md'),
   lg: resolveFieldControlSizeClass('lg'),
-} as const satisfies Record<FieldSizeToken, string>
-
-/** @deprecated Prefer {@link resolveFieldGroupActionSegmentClasses}. */
-export const fieldGroupedControlHeightClasses = {
-  xs: resolveFieldGroupActionSegmentClasses('xs'),
-  sm: resolveFieldGroupActionSegmentClasses('sm'),
-  md: resolveFieldGroupActionSegmentClasses('md'),
-  lg: resolveFieldGroupActionSegmentClasses('lg'),
-} as const satisfies Record<FieldSizeToken, string>
-
-/** @deprecated Prefer {@link resolveFieldGroupInputSegmentClasses}. */
-export const fieldGroupedControlSizeClasses = {
-  xs: resolveFieldGroupInputSegmentClasses('xs'),
-  sm: resolveFieldGroupInputSegmentClasses('sm'),
-  md: resolveFieldGroupInputSegmentClasses('md'),
-  lg: resolveFieldGroupInputSegmentClasses('lg'),
 } as const satisfies Record<FieldSizeToken, string>
 
 /** Multi-line controls (Textarea, JSON editor): min-height + padding + type scale. */

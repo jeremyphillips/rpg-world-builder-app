@@ -91,23 +91,6 @@ export const dialogPanelInnerLeadingScrollViewportClasses = cn(
 )
 
 /**
- * @deprecated Use {@link dialogPanelSectionScrollViewportClasses} or
- * {@link dialogPanelInnerScrollViewportClasses}.
- */
-export const dialogPanelScrollRegionViewportClasses = dialogPanelSectionScrollViewportClasses
-
-/**
- * Layout classes for overlay inner scroll regions inside `stableBody`.
- * Prefer {@link DialogPanelScrollRegion} with `inset="inner"`.
- *
- * @deprecated Use {@link DialogPanelScrollRegion} — kept for class-string assertions and aliases.
- */
-export const dialogPanelScrollRegionClasses = cn(
-  'min-h-0 flex-1',
-  dialogPanelInnerScrollViewportClasses,
-)
-
-/**
  * Subtle separator color shared by overlay panel header and footer section borders.
  * Pair with `border-t` on footers and `border-b` on headers.
  */

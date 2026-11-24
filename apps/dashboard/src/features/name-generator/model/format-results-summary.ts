@@ -1,9 +1,11 @@
 import { getLanguageLabel } from '@rpg/contracts'
 import { loadSeedSpecies } from '@rpg/catalog/species'
 import type { NamingRecommendation } from '@rpg/contracts/name-generator'
-import { getConvention } from '@rpg/name-generator-data'
+import { getStaticConvention } from '@rpg/name-generator-data'
 
-import { DEFAULT_RULESET_ID, GENDER_STYLE_LABELS } from './name-generator.constants'
+import { DEFAULT_SYSTEM_RULESET_ID } from '@rpg/contracts'
+
+import { GENDER_STYLE_LABELS } from './name-generator.constants'
 import type { NameGeneratorFilters, NameGeneratorResultsSummary } from './name-generator-filters'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
@@ -12,7 +14,7 @@ function getSpeciesLabel(speciesId: string | undefined): string | undefined {
     return undefined
   }
 
-  const species = loadSeedSpecies(DEFAULT_RULESET_ID).find((entry) => entry.id === speciesId)
+  const species = loadSeedSpecies(DEFAULT_SYSTEM_RULESET_ID).find((entry) => entry.id === speciesId)
   return species?.name ?? speciesId
 }
 
@@ -48,7 +50,7 @@ export function formatResultsSummary(
   filters: NameGeneratorFilters,
   matches: readonly NamingRecommendation[],
   partialCount?: { generated: number; requested: number },
-  getConventionById: (conventionId: string) => { label: string } | undefined = getConvention,
+  getConventionById: (conventionId: string) => { label: string } | undefined = getStaticConvention,
 ): NameGeneratorResultsSummary {
   if (partialCount !== undefined && partialCount.generated < partialCount.requested) {
     return {

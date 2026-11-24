@@ -1,5 +1,6 @@
 import {
   spellcastingGrantingFeatureDisplayName,
+  usesPactMagicSlotProgression,
   type Ability,
   type Spellcasting,
 } from '@rpg/contracts'
@@ -7,10 +8,7 @@ import {
 import type { ClassFormValues } from './class-form-fields'
 import { featureToFormRow, type FeatureRowForm } from './class-feature-form-fields'
 import { isSpellcastingFeatureRow } from './class-feature-authoring'
-import {
-  createSpellcastingFeature,
-  usesPactMagicFromSlotProgression,
-} from './class-spellcasting-features'
+import { createSpellcastingFeature } from './class-spellcasting-features'
 
 const DEFAULT_SPELLCASTING_ABILITY = 'int' satisfies Ability
 
@@ -58,7 +56,9 @@ function defaultSpellcastingConfig(
   existing?: Spellcasting,
   usesPactMagic?: boolean,
 ): NonNullable<ClassFormValues['spellcasting']> {
-  const pact = usesPactMagic ?? usesPactMagicFromSlotProgression(existing?.slotProgressionId)
+  const pact =
+    usesPactMagic ??
+    usesPactMagicSlotProgression({ slotProgressionId: existing?.slotProgressionId })
   return spellcastingConfigFromExisting(existing, pact)
 }
 
@@ -67,7 +67,7 @@ export function reconcileSpellcastingOnEnable(values: ClassFormValues): Partial<
   const existingFeature = resolveSpellcastingFeatureRow(values.features)
   const existingConfig = values.spellcasting
   const usesPactMagic = existingConfig?.slotProgressionId
-    ? usesPactMagicFromSlotProgression(existingConfig.slotProgressionId)
+    ? usesPactMagicSlotProgression({ slotProgressionId: existingConfig.slotProgressionId })
     : existingFeature?.id === 'pact-magic'
 
   const nextFeatures = [...(values.features ?? [])]
@@ -137,11 +137,6 @@ export function spellcastingFeatureSummaryFromRows(
     level,
     index,
   }
-}
-
-/** @deprecated Use isSpellcastingFeatureRow — kept for tests migrating off grant detection. */
-export function findSpellcastingGrantingFeatureIndex(rows: FeatureRowForm[] | undefined): number {
-  return findSpellcastingFeatureIndex(rows)
 }
 
 export function resolveSpellcastingGrantingFeatureRow(

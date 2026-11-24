@@ -13,7 +13,7 @@ import {
 describe('resolveCollapsibleListItemLeadingChrome', () => {
   it('names the caret and grip columns instead of publishing an inline style', () => {
     const resolved = resolveCollapsibleListItemLeadingChrome({
-      showDragHandle: true,
+      reserveDragHandleSlot: true,
       collapsible: true,
     })
 
@@ -28,7 +28,7 @@ describe('resolveCollapsibleListItemLeadingChrome', () => {
 
   it('reserves only the caret modifier when the list keeps the column without a grip', () => {
     const resolved = resolveCollapsibleListItemLeadingChrome({
-      showDragHandle: false,
+      reserveDragHandleSlot: false,
       collapsible: false,
       reserveCaretSlot: true,
     })

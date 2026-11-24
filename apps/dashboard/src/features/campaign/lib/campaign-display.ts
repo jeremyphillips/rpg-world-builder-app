@@ -8,9 +8,6 @@ import { resolveCampaignEmblemImageUrl } from './overview/campaign-overview-hero
 
 export const CAMPAIGN_UNKNOWN_NAME = 'Unknown campaign' as const
 
-/** @deprecated Use CAMPAIGN_UNKNOWN_NAME */
-export const CAMPAIGN_DISPLAY_FALLBACK_NAME = CAMPAIGN_UNKNOWN_NAME
-
 export const CAMPAIGNS_QUERY_ERROR_MESSAGE = "Couldn't load campaigns" as const
 
 /**

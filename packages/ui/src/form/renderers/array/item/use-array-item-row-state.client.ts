@@ -17,7 +17,6 @@ import {
 } from './issues/array-field-item-issue-summary.lib'
 import { resolveShowArrayItemIssueBadge } from './issues/resolve-show-array-item-issue-badge.lib'
 import { useArrayItemFocusIssue } from './issues/use-array-item-focus-issue.client'
-import type { ArrayItemIssueSummaryProps } from './issues/array-item-issue.client'
 import { useFormUiContext } from '../../../context/form-ui.context'
 
 export interface UseArrayItemRowStateArgs {
@@ -111,7 +110,6 @@ export function useArrayItemRowState({
     fieldJoinSummaryId,
   })
   const issueSummaries = arrayItemIssueSummaries(validationPresentation)
-  const issueSummary = issueSummaries[0]
   const showIssueBadge = resolveShowArrayItemIssueBadge({
     showIssueChrome,
     variant,
@@ -128,7 +126,6 @@ export function useArrayItemRowState({
     arrayContext,
     suppressFieldErrorText,
     focusIssue,
-    issueSummary: issueSummary as ArrayItemIssueSummaryProps | undefined,
     issueSummaries,
     validationPresentation,
     fieldJoinSummaryId,

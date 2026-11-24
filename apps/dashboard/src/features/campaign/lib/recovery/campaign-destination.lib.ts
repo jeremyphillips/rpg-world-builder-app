@@ -37,9 +37,6 @@ export type CampaignRecoveryDestinationInput =
   | CampaignListItem
   | { campaignId: string; viewerState: CampaignViewerState }
 
-/** @deprecated Use `CampaignDestination`. */
-export type CampaignPickerRowDestination = CampaignDestination
-
 function resolveCampaignRecoveryDestinationInput(input: CampaignRecoveryDestinationInput): {
   campaignId: string
   viewerState: CampaignViewerState
@@ -122,14 +119,6 @@ export function resolveCampaignRecoveryDestination(
 
   return { href: null, actionLabel: null }
 }
-
-/** @deprecated Use {@link resolveCampaignEntryDestination}. */
-export function resolveCampaignDestination(campaign: CampaignListItem): CampaignDestination {
-  return resolveCampaignEntryDestination(campaign)
-}
-
-/** @deprecated Use `resolveCampaignDestination`. */
-export const resolveCampaignPickerRowDestination = resolveCampaignEntryDestination
 
 export function resolveEntryBadgeLabel(campaign: CampaignListItem): string | null {
   const { viewerState } = campaign

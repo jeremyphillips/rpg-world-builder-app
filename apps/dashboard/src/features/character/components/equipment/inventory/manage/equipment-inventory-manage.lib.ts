@@ -90,14 +90,6 @@ export function usesInlineManagement(args: {
   return args.sourceKinds.length > 1 || args.grantedQuantity > 1
 }
 
-/** @deprecated Use {@link usesInlineManagement}. */
-export function usesMixedSourceManagement(rows: readonly EquipmentInventoryRow[]): boolean {
-  return usesInlineManagement({
-    sourceKinds: resolveDistinctAcquisitionSourceKinds(rows),
-    grantedQuantity: grantedQuantity(rows),
-  })
-}
-
 function sumRowQuantity(rows: readonly EquipmentInventoryRow[]): number {
   return rows.reduce((sum, row) => sum + row.entry.quantity, 0)
 }

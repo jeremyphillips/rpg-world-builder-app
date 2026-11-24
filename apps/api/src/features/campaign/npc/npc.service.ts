@@ -1,7 +1,7 @@
 import type {
   CampaignNpcDetail,
   CampaignNpcListItem,
-  CampaignNpcStatusPatch,
+  CampaignParticipatingCharacterStatusPatch,
   CharacterMediaPatchInput,
   ContentDeletionResult,
   CreateNpcRequestInput,
@@ -248,7 +248,7 @@ export async function deleteCampaignNpc(
 export async function patchCampaignNpcStatus(
   campaignId: string,
   npcId: string,
-  patch: CampaignNpcStatusPatch,
+  patch: CampaignParticipatingCharacterStatusPatch,
 ): Promise<CampaignNpcDetail | null> {
   const campaign = await findCampaignById(campaignId)
   if (!campaign) {

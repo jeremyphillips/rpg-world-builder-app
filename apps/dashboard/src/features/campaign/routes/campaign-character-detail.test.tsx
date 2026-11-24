@@ -10,7 +10,7 @@ import {
   standaloneEquipmentReferenceScope,
 } from '@/features/character'
 import { buildCharacterDetailViewModel, toCharacterDetailSource } from '@/features/character'
-import { SAMPLE_PC } from '@/features/character'
+import { makePcCharacter } from '@/features/character'
 import type * as CharacterFeature from '@/features/character'
 
 import { CampaignCharacterDetail } from './campaign-character-detail'
@@ -42,7 +42,7 @@ const useCampaignCharacterNavigationContext = vi.mocked(useCampaignCharacterNavi
 const context = createPopulatedStandaloneBuilderContextFixture()
 const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
 const viewModel = buildCharacterDetailViewModel({
-  source: toCharacterDetailSource(SAMPLE_PC),
+  source: toCharacterDetailSource(makePcCharacter()),
   catalogIndex,
   rules: context.characterCreationRules,
   equipmentReferenceScope: standaloneEquipmentReferenceScope,
@@ -77,7 +77,7 @@ describe('CampaignCharacterDetail', () => {
   it('renders the campaign character sheet for authorized viewers', () => {
     useCampaignCharacterDetail.mockReturnValue({
       campaignCharacter: {
-        character: SAMPLE_PC,
+        character: makePcCharacter(),
         capabilities: { canEdit: false, canManage: false, canDelete: false },
         participation: { roster: { status: 'active' } },
       },
@@ -110,7 +110,7 @@ describe('CampaignCharacterDetail', () => {
   it('allows campaign managers to edit another player character images', () => {
     useCampaignCharacterDetail.mockReturnValue({
       campaignCharacter: {
-        character: SAMPLE_PC,
+        character: makePcCharacter(),
         capabilities: { canEdit: false, canManage: true, canDelete: false },
         participation: { roster: { status: 'active' } },
       },
@@ -141,7 +141,7 @@ describe('CampaignCharacterDetail', () => {
   it('shows delete for owners via campaign capabilities', () => {
     useCampaignCharacterDetail.mockReturnValue({
       campaignCharacter: {
-        character: SAMPLE_PC,
+        character: makePcCharacter(),
         capabilities: { canEdit: true, canManage: false, canDelete: true },
         participation: { roster: { status: 'active' } },
       },

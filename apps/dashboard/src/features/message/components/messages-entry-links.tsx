@@ -63,28 +63,3 @@ export function MessagesEntryLinks({
     </div>
   )
 }
-
-/** @deprecated Use `MessagesEntryLinks` with `campaignId`. */
-export function MessagesCampaignEntryLinks({
-  campaignId,
-  layout = 'inline',
-}: {
-  campaignId: string
-  layout?: MessagesEntryLinksLayout
-}) {
-  return <MessagesEntryLinks campaignId={campaignId} layout={layout} />
-}
-
-/** @deprecated Use `MessagesEntryLinks` without `campaignId`. */
-export function MessagesGlobalEntryLink({
-  layout = 'inline',
-}: {
-  layout?: MessagesEntryLinksLayout
-}) {
-  return <MessagesEntryLinks layout={layout} />
-}
-
-/** @deprecated Use `MessagesEntryLinks` with `tone="overview"`. */
-export function MessagesOverviewEntryActions({ campaignId }: { campaignId: string }) {
-  return <MessagesEntryLinks campaignId={campaignId} tone="overview" />
-}

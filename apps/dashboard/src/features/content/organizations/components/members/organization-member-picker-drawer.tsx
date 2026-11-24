@@ -13,7 +13,7 @@ import {
   buildCharacterEntityCardModel,
   formatContentReferenceLabel,
   hasCatalogPickerResetViewCriteria,
-  titleFromMembershipRadioValue,
+  membershipTitleIdFromRadioValue,
   type QuickNpcCreateFormOrganization,
 } from '@/features/character'
 
@@ -186,7 +186,7 @@ export function OrganizationMemberPickerDrawer({
 
       const { membershipTitleId } = resolveOrganizationMembershipMetadata({
         titles: organization.members?.titles ?? [],
-        selectedMembershipTitleId: titleFromMembershipRadioValue(selectedTitle),
+        selectedMembershipTitleId: membershipTitleIdFromRadioValue(selectedTitle),
       })
 
       setPending(true)

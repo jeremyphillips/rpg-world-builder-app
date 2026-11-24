@@ -11,21 +11,21 @@ import {
   formatCharacterSummaryFromCatalog,
   toCharacterDetailSource,
 } from './character-display'
-import { SAMPLE_PC, makeCampaignNpcListItem } from '../fixtures/character-fixtures'
+import { makePcCharacter, makeCampaignNpcListItem } from '../fixtures/character-fixtures'
 
 const context = createPopulatedStandaloneBuilderContextFixture()
 const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
 
 describe('formatCharacterSummaryFromCatalog', () => {
   it('formats a single-class character summary', () => {
-    expect(formatCharacterSummaryFromCatalog(SAMPLE_PC, catalogIndex)).toBe(
+    expect(formatCharacterSummaryFromCatalog(makePcCharacter(), catalogIndex)).toBe(
       'Dwarf · Level 1 Fighter',
     )
   })
 
   it('includes subclass labels when present', () => {
     const character = {
-      ...SAMPLE_PC,
+      ...makePcCharacter(),
       classes: [
         {
           classId: 'srd-cc-5.2.1:fighter',
@@ -42,7 +42,7 @@ describe('formatCharacterSummaryFromCatalog', () => {
 
   it('formats multiclass summaries with class allocation', () => {
     const character = {
-      ...SAMPLE_PC,
+      ...makePcCharacter(),
       classes: [
         { classId: 'srd-cc-5.2.1:fighter', level: 3 },
         { classId: 'srd-cc-5.2.1:rogue', level: 1 },
@@ -56,7 +56,7 @@ describe('formatCharacterSummaryFromCatalog', () => {
 
   it('does not append per-class level for single-class summaries', () => {
     const character = {
-      ...SAMPLE_PC,
+      ...makePcCharacter(),
       classes: [{ classId: 'srd-cc-5.2.1:fighter', level: 4 }],
     }
 
@@ -69,7 +69,7 @@ describe('formatCharacterSummaryFromCatalog', () => {
 
 describe('buildCharacterCardViewModel', () => {
   it('maps roster card fields from the character sheet', () => {
-    expect(buildCharacterCardViewModel(SAMPLE_PC, catalogIndex)).toEqual({
+    expect(buildCharacterCardViewModel(makePcCharacter(), catalogIndex)).toEqual({
       id: 'char-sample-1',
       name: 'Verna',
       summary: 'Dwarf · Level 1 Fighter',
@@ -90,7 +90,7 @@ describe('buildCharacterCardViewModel', () => {
 describe('buildCharacterDetailViewModel', () => {
   it('derives combat stats, XP, and structured ability tiles from the persisted sheet', () => {
     const viewModel = buildCharacterDetailViewModel({
-      source: toCharacterDetailSource(SAMPLE_PC),
+      source: toCharacterDetailSource(makePcCharacter()),
       catalogIndex,
       rules: context.characterCreationRules,
       equipmentReferenceScope: standaloneEquipmentReferenceScope,
@@ -135,7 +135,7 @@ describe('buildCharacterDetailViewModel', () => {
 
   it('maps saved organization reference resolutions for character detail', () => {
     const viewModel = buildCharacterDetailViewModel({
-      source: toCharacterDetailSource(SAMPLE_PC),
+      source: toCharacterDetailSource(makePcCharacter()),
       catalogIndex,
       rules: context.characterCreationRules,
       equipmentReferenceScope: standaloneEquipmentReferenceScope,
@@ -154,7 +154,7 @@ describe('buildCharacterDetailViewModel', () => {
 
   it('uses forward edge labels for character location connection detail', () => {
     const viewModel = buildCharacterDetailViewModel({
-      source: toCharacterDetailSource(SAMPLE_PC),
+      source: toCharacterDetailSource(makePcCharacter()),
       catalogIndex,
       rules: context.characterCreationRules,
       equipmentReferenceScope: standaloneEquipmentReferenceScope,

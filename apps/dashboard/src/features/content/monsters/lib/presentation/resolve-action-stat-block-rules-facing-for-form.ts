@@ -357,14 +357,3 @@ export function resolveActionStatBlockRulesFacingForForm(input: {
     ...(attackLine ? { attackLine } : {}),
   }
 }
-
-/** @deprecated Use `resolveActionStatBlockRulesFacingForForm` — kept for title hook migration. */
-export function tryResolveActionStatBlockRulesFacingForForm(input: {
-  values: MonsterFormValues
-  ctx: ContentFormCtx
-  actionId: string
-  section: MonsterActionSection
-}): MonsterActionRulesFacing | null {
-  const outcome = resolveActionStatBlockRulesFacingForForm(input)
-  return outcome.status === 'ready' ? outcome.facing : null
-}

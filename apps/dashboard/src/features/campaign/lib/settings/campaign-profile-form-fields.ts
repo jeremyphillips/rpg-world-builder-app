@@ -113,13 +113,6 @@ export function buildSettingsIdentityTabFields(campaignId: string): FormItem[] {
   ]
 }
 
-/** @deprecated Use createIdentitySchema or settingsIdentitySchema. */
-export const identitySchema = createIdentitySchema
-/** @deprecated Use createIdentityFields or settingsIdentityFields. */
-export const identityFields = createIdentityFields
-/** @deprecated Use CreateIdentityValues or SettingsIdentityValues. */
-export type IdentityValues = CreateIdentityValues
-
 // ---------------------------------------------------------------------------
 // Flavor — maps to campaign.configuration.flavor.*
 // ---------------------------------------------------------------------------

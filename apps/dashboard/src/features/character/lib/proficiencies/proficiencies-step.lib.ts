@@ -47,7 +47,7 @@ export function formatProficiencyChoiceAddLabel(choiceSet: ChoiceSet): string {
   })
 }
 
-export { formatProficiencyChosenCounter } from '@rpg/contracts'
+export { formatChoiceChosenCounter as formatProficiencyChosenCounter } from '@rpg/contracts'
 
 export function reconcileProficiencyStepReadiness(
   readiness: BuilderStepReadinessState,

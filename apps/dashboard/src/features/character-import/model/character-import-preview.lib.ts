@@ -156,11 +156,6 @@ export function shouldShowExtractionIssue(result: CharacterImportFieldResult<unk
   return result.issues.length > 0
 }
 
-/** @deprecated Use {@link extractionValueTone} */
-export function extractionFieldTone(result: CharacterImportFieldResult<unknown>): SemanticTextTone {
-  return extractionValueTone(result)
-}
-
 export function extractionIssueReason(status: CharacterImportFieldStatus): string {
   switch (status) {
     case 'missing-source':

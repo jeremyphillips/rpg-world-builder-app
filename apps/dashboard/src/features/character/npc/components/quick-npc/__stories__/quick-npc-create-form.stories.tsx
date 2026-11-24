@@ -6,7 +6,7 @@ import {
   populatedBuilderCatalog,
 } from '../../../../lib/fixtures/character-builder-fixtures'
 import {
-  quickNpcMemberSetupWithNoTitle,
+  quickNpcMemberSetupWithChosenTitle,
   quickNpcOrganizationMemberCreateContext,
   quickNpcTestOrganization,
 } from '../../../lib/quick-npc/quick-npc-test-fixtures'
@@ -42,7 +42,7 @@ const buildContext = createCampaignNpcBuilderContextFixture({
   },
 })
 
-const setup = quickNpcMemberSetupWithNoTitle({
+const setup = quickNpcMemberSetupWithChosenTitle({
   speciesId: populatedBuilderCatalog.species[0]!.id,
   classId: populatedBuilderCatalog.classes[0]!.id,
   level: 1,
@@ -90,7 +90,7 @@ export const ResolutionError: Story = {
         organizations: buildContext.catalog.organizations,
       },
     }),
-    setup: quickNpcMemberSetupWithNoTitle({
+    setup: quickNpcMemberSetupWithChosenTitle({
       speciesId: populatedBuilderCatalog.species[0]!.id,
       classId: unsatisfiableClass.id,
       level: 1,

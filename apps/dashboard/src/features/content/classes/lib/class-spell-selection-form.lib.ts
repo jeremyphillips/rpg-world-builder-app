@@ -44,9 +44,6 @@ export const SPELL_CHANGE_PACKAGE_OPTIONS = [
 
 export type SpellChangePackage = (typeof SPELL_CHANGE_PACKAGE_OPTIONS)[number]['value']
 
-/** @deprecated Use `SpellChangePackage`. */
-export type SpellSelectionChangePackage = SpellChangePackage
-
 export const SPELL_SELECTION_CHANGE_PACKAGE_OPTIONS = SPELL_CHANGE_PACKAGE_OPTIONS
 
 export function spellChangePackageFromPolicy(
@@ -176,7 +173,7 @@ export const SPELLBOOK_GAIN_MODE_OPTIONS = [
 
 export function spellSelectionFromForm(input: {
   model: ClassSpellSelection['model'] | undefined
-  changePackage: SpellSelectionChangePackage
+  changePackage: SpellChangePackage
   acquisition?: ClassGainProgression
 }): ClassSpellSelection | undefined {
   if (!input.model) return undefined

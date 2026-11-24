@@ -49,6 +49,3 @@ export function formatChoiceChosenCounter(
 export function formatChoiceProgressCounter(selectedCount: number, max: number): string {
   return `${selectedCount} / ${max}`
 }
-
-/** @deprecated Use {@link formatChoiceChosenCounter}. */
-export const formatProficiencyChosenCounter = formatChoiceChosenCounter

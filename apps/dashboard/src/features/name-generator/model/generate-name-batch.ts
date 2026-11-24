@@ -7,7 +7,11 @@ import {
   type NamingRecommendation,
 } from '@rpg/contracts/name-generator'
 import { generateName } from '@rpg/name-generator-core'
-import { getConvention, listStaticConventions, loadNameCollection } from '@rpg/name-generator-data'
+import {
+  getStaticConvention,
+  listStaticConventions,
+  loadNameCollection,
+} from '@rpg/name-generator-data'
 
 import { allocateNameCounts, buildWeightedRoundRobinOrder } from './allocate-name-counts'
 import { buildNamingContext } from './build-naming-context'
@@ -25,7 +29,7 @@ export type GenerateNameBatchResult = {
 
 export type GenerateNameBatchDeps = {
   conventions?: readonly NamingConvention[]
-  getConvention?: (conventionId: string) => NamingConvention | undefined
+  getStaticConvention?: (conventionId: string) => NamingConvention | undefined
   loadCollection?: LoadNameCollectionFn
 }
 
@@ -111,16 +115,16 @@ async function generateNameForSlot(
 
 function resolveMatchedConventions(
   matches: readonly NamingRecommendation[],
-  getConventionById: typeof getConvention,
+  getStaticConventionById: typeof getStaticConvention,
 ): NamingConvention[] {
   return matches
-    .map((match) => getConventionById(match.conventionId))
+    .map((match) => getStaticConventionById(match.conventionId))
     .filter((convention): convention is NamingConvention => convention !== undefined)
 }
 
 async function collectBatchResults(
   emitOrder: readonly string[],
-  getConventionById: typeof getConvention,
+  getStaticConventionById: typeof getStaticConvention,
   collections: ReadonlyMap<string, NameCollection>,
   seed: string,
   genderStyle: NameGeneratorFilters['genderStyle'],
@@ -129,7 +133,7 @@ async function collectBatchResults(
   const seen = new Set<string>()
 
   for (const [slotIndex, conventionId] of emitOrder.entries()) {
-    const convention = getConventionById(conventionId)
+    const convention = getStaticConventionById(conventionId)
     if (convention === undefined) {
       continue
     }
@@ -163,7 +167,7 @@ export async function generateNameBatch(
   deps: GenerateNameBatchDeps = {},
 ): Promise<GenerateNameBatchResult> {
   const conventions = deps.conventions ?? listStaticConventions()
-  const getConventionById = deps.getConvention ?? getConvention
+  const getStaticConventionById = deps.getStaticConvention ?? getStaticConvention
   const loadCollection = deps.loadCollection ?? loadNameCollection
 
   const context = buildNamingContext(filters)
@@ -179,11 +183,11 @@ export async function generateNameBatch(
     matches,
     allocateNameCounts(matches, requestedCount),
   )
-  const matchedConventions = resolveMatchedConventions(matches, getConventionById)
+  const matchedConventions = resolveMatchedConventions(matches, getStaticConventionById)
   const collections = await loadConventionCollections(matchedConventions, loadCollection)
   const results = await collectBatchResults(
     emitOrder,
-    getConventionById,
+    getStaticConventionById,
     collections,
     seed,
     filters.genderStyle,

@@ -77,7 +77,6 @@ function FlatLabeledArrayFieldItem({
         leadingChrome={{
           reserveDragHandleSlot,
           reserveCaretSlot,
-          showDragHandle: reserveDragHandleSlot,
           collapsible: false,
         }}
       />
@@ -92,7 +91,7 @@ function FlatLabeledArrayFieldItem({
       collapsible={false}
       collapsed={false}
       reserveCaretSlot={reserveCaretSlot}
-      showDragHandle={reserveDragHandleSlot}
+      reserveDragHandleSlot={reserveDragHandleSlot}
       dragHandleProps={
         sortableEnabled && dragHandleProps
           ? {
@@ -136,7 +135,6 @@ export interface DetailedArrayFieldItemProps extends ArrayFieldItemChromeProps {
   leadingChrome: {
     reserveDragHandleSlot: boolean
     reserveCaretSlot: boolean
-    showDragHandle: boolean
     collapsible: boolean
   }
   actionsRail: React.ReactNode
@@ -188,7 +186,7 @@ function DetailedArrayFieldItem({
       collapsed={collapsed}
       onToggleCollapse={onToggleCollapse}
       reserveCaretSlot={leadingChrome.reserveCaretSlot}
-      showDragHandle={reserveDragHandleSlot}
+      reserveDragHandleSlot={reserveDragHandleSlot}
       dragHandleProps={
         sortableEnabled && dragHandleProps
           ? {

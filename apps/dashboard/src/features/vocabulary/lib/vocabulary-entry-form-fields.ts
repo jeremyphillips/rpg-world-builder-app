@@ -27,18 +27,6 @@ export const vocabularyEntrySheetFormSchema = z.object({
 
 export type VocabularyEntrySheetFormValues = z.infer<typeof vocabularyEntrySheetFormSchema>
 
-/** @deprecated Use vocabularyEntrySheetFormSchema */
-export const vocabularyEntryCreateFormSchema = vocabularyEntrySheetFormSchema
-
-/** @deprecated Use vocabularyEntrySheetFormSchema */
-export const vocabularyEntryEditFormSchema = vocabularyEntrySheetFormSchema
-
-/** @deprecated Use VocabularyEntrySheetFormValues */
-export type VocabularyEntryCreateFormValues = VocabularyEntrySheetFormValues
-
-/** @deprecated Use VocabularyEntrySheetFormValues */
-export type VocabularyEntryEditFormValues = VocabularyEntrySheetFormValues
-
 const sharedVocabularyEntryFields: FormItem[] = [
   {
     type: 'text',
@@ -71,25 +59,6 @@ export function buildVocabularyEntrySheetFields(ctx: VocabularyEntrySheetFieldCt
     }),
   ]
 }
-
-/** @deprecated Use buildVocabularyEntrySheetFields */
-export const vocabularyEntryCreateFields: FormItem[] = buildVocabularyEntrySheetFields({
-  groupId: 'vocabulary-entry-create-registry',
-  pending: false,
-  available: true,
-})
-
-/** @deprecated Use buildVocabularyEntrySheetFields */
-export function buildVocabularyEntryEditFields(ctx: VocabularyEntrySheetFieldCtx): FormItem[] {
-  return buildVocabularyEntrySheetFields(ctx)
-}
-
-/** @deprecated Use buildVocabularyEntrySheetFields — kept for registry static coverage. */
-export const vocabularyEntryEditFields: FormItem[] = buildVocabularyEntrySheetFields({
-  groupId: 'vocabulary-entry-edit-registry',
-  pending: false,
-  available: true,
-})
 
 export function vocabularyStatusFromAvailable(available: boolean): VocabularyEntryStatus {
   return available ? 'active' : 'disabled'

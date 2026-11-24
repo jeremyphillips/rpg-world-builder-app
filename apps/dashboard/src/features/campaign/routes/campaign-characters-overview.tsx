@@ -7,7 +7,7 @@ import { OverviewPageShell } from '@/components/layout/page/overview-page-shell'
 import { CharacterListCard } from '@/features/character'
 import { normalizeListController, resolveCharacterControllerDisplay } from '@/features/character'
 
-import { useCampaignBuildContext } from '@/features/character'
+import { useCampaignNpcBuildContext } from '@/features/character'
 import { resolveQueryErrorLabel } from '@/lib/query/query-state.lib'
 import { useCampaignCharacterNavigationContext } from '../hooks/use-campaign-character-navigation-context'
 import { useCampaignCharacters } from '../hooks/use-campaign-characters'
@@ -70,7 +70,7 @@ export function CampaignCharactersOverview() {
     isPending: isContextPending,
     isError: isContextError,
     error: contextError,
-  } = useCampaignBuildContext(campaignId)
+  } = useCampaignNpcBuildContext(campaignId)
 
   const isPending = isCharactersPending || isContextPending
   const isError = isCharactersError || isContextError

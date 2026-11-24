@@ -4,7 +4,7 @@ import {
   Input,
   Text,
   cn,
-  fieldArrayItemClasses,
+  fieldArrayItemVariants,
   fieldLabelVariants,
 } from '@rpg/ui'
 
@@ -37,7 +37,10 @@ export function LocationSettlementStartingDistrictsSlot() {
             const inputId = `starting-district-${district.id}`
 
             return (
-              <li key={district.id} className={cn(fieldArrayItemClasses, 'items-end gap-2')}>
+              <li
+                key={district.id}
+                className={cn(fieldArrayItemVariants({ variant: 'detailed' }), 'items-end gap-2')}
+              >
                 <div className="min-w-0 flex-1 space-y-1">
                   <label htmlFor={inputId} className={fieldLabelVariants()}>
                     District name

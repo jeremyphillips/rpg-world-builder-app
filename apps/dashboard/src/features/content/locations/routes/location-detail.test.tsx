@@ -26,7 +26,7 @@ vi.mock('@/features/character', async (importOriginal) => {
   const actual = (await importOriginal()) as Record<string, unknown>
   return {
     ...actual,
-    useCampaignBuildContext: vi.fn(() => ({ catalogIndex: undefined })),
+    useCampaignNpcBuildContext: vi.fn(() => ({ catalogIndex: undefined })),
     useNpcs: vi.fn(() => ({ data: [] })),
   }
 })

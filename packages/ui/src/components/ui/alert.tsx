@@ -41,6 +41,7 @@ function resolveAnnouncementRole(
  * Non-blocking status surface for contextual guidance. Variants map to global
  * status tokens (`info`, `success`, `warning`, `destructive`, or `default`).
  */
+// fallow-ignore-next-line complexity — optional title/description/children slots are intentional anatomy
 export function Alert({
   variant = 'default',
   density = 'comfortable',

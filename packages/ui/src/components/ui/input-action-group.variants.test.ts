@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { fieldGroupedControlHeightClasses } from './field-sizing.variants'
+import { resolveFieldGroupActionSegmentClasses } from './field-group.styles'
 import { inputActionGroupActionSegmentVariants } from './input-action-group.variants'
 
 const TYPOGRAPHY_PATTERN = /\b(text-|font-)/
@@ -12,7 +12,7 @@ describe('inputActionGroupActionSegmentVariants', () => {
       const classes = inputActionGroupActionSegmentVariants({ size })
       expect(classes).not.toMatch(TYPOGRAPHY_PATTERN)
       expect(classes).not.toMatch(PADDING_PATTERN)
-      expect(classes).toContain(fieldGroupedControlHeightClasses[size])
+      expect(classes).toContain(resolveFieldGroupActionSegmentClasses(size))
       expect(classes).toContain('shrink-0')
       expect(classes).toContain('overflow-hidden')
     }

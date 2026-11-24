@@ -344,11 +344,6 @@ export function useCampaignPcOnboardingBuildContext(
   })
 }
 
-/** @deprecated Prefer `useCampaignNpcBuildContext` for campaign NPC authoring. */
-export function useCampaignBuildContext(campaignId: string | undefined) {
-  return useCampaignNpcBuildContext(campaignId)
-}
-
 export type CampaignBuildContextResult = ReturnType<typeof useCampaignCharacterBuildContext>
 
 export type { CampaignBuildContext, SystemRulesetId }

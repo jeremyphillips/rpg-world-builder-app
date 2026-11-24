@@ -31,10 +31,6 @@ export interface UseSubmitHandlerOptions<TValues extends FieldValues> {
    * this unset so callers can gate success chrome on a rejected submit Promise.
    */
   absorbErrors?: boolean
-  /**
-   * @deprecated Use default rejection behavior or `absorbErrors: true` when needed.
-   */
-  propagateErrors?: boolean
 }
 
 export interface UseSubmitHandlerResult<TValues extends FieldValues> {

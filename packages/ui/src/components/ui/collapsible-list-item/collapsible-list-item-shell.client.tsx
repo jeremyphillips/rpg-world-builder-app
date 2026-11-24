@@ -85,7 +85,7 @@ function resolveShellChromeClasses({
 export function CollapsibleListItemShell({
   titleId,
   itemPrefix,
-  showDragHandle,
+  reserveDragHandleSlot,
   reserveCaretSlot,
   collapsible,
   dragging = false,
@@ -104,7 +104,7 @@ export function CollapsibleListItemShell({
   actions,
 }: CollapsibleListItemShellProps) {
   const leadingChrome: CollapsibleListItemLeadingChromeOptions = {
-    showDragHandle,
+    reserveDragHandleSlot,
     reserveCaretSlot,
     collapsible,
   }

@@ -35,6 +35,7 @@ export function resolveVocabularySet(
   )
   const campaignById = new Map(campaignEntries.map((entry) => [entry.id, entry]))
 
+  // fallow-ignore-next-line complexity — per-option patch merge keeps seed/patch precedence local
   const resolvedSystem = seed.options.map((seedOption) => {
     const patch = systemPatches.get(seedOption.id)
     const languageAffinities = resolveLanguageAffinities(

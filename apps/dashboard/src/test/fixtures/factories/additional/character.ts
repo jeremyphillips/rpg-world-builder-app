@@ -56,9 +56,6 @@ export function makePcCharacter(overrides: Partial<PcCharacter> = {}): PcCharact
   }
 }
 
-/** @deprecated Prefer makePcCharacter() — kept for existing imports. */
-export const SAMPLE_PC = makePcCharacter()
-
 const DEFAULT_JOINED_AT = CONTENT_TIMESTAMP
 
 const DEFAULT_NPC_LIST_CHARACTER: CampaignNpcListItem['character'] = {

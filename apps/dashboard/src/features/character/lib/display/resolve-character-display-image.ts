@@ -30,6 +30,3 @@ export function resolveCharacterDisplayImagesByRoleForRecord(
     resolveUploadSrc,
   })
 }
-
-/** @deprecated Use {@link resolveCharacterDisplayImageForSurface} or {@link resolveCharacterDisplayImagesByRoleForRecord}. */
-export const resolveCharacterPrimaryDisplayImage = resolveCharacterDisplayImageForSurface

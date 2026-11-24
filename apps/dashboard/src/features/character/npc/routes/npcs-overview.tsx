@@ -10,7 +10,7 @@ import { useCanManageCampaign } from '@/features/campaign'
 import { NpcsOverviewTable } from '../components/npcs-overview-table'
 import { QuickNpcCreateModal } from '../components/quick-npc/quick-npc-create-modal'
 import { buildCharacterBuilderDraftFromQuickNpcSetup } from '../lib/quick-npc/build-character-builder-draft-from-quick-npc-setup.lib'
-import { useCampaignBuildContext } from '../../hooks/use-campaign-build-context'
+import { useCampaignNpcBuildContext } from '../../hooks/use-campaign-build-context'
 import { resolveQueryErrorLabel } from '@/lib/query/query-state.lib'
 import { useNpcs } from '../hooks/use-npcs'
 import {
@@ -38,7 +38,7 @@ export function NpcsOverview() {
     isPending: isContextPending,
     isError: isContextError,
     error: contextError,
-  } = useCampaignBuildContext(campaignId)
+  } = useCampaignNpcBuildContext(campaignId)
 
   const isPending = isNpcsPending || isContextPending
   const isError = isNpcsError || isContextError

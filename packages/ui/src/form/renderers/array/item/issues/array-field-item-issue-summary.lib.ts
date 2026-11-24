@@ -107,33 +107,3 @@ export function arrayItemIssueSummaries(
   if (presentation.fieldJoin) summaries.push(presentation.fieldJoin)
   return summaries
 }
-
-/**
- * @deprecated Use {@link resolveArrayItemValidationPresentation} and {@link arrayItemIssueSummaries}.
- * Returns the first visible summary for legacy single-slot callers.
- */
-export function resolveArrayItemIssueSummary(options: {
-  showIssueChrome: boolean
-  variant: 'compact' | 'detailed'
-  collapsed: boolean
-  suppressFieldErrorText: boolean
-  hasVisibleBodyFields?: boolean
-  issueGroup: ArrayItemIssueGroup
-  rowSummaryId: string
-  onFocusIssue: () => void
-}): ArrayItemIssueSummaryProps | undefined {
-  const fieldJoinSummaryId = `${options.rowSummaryId}-fields`
-  const presentation = resolveArrayItemValidationPresentation({
-    showIssueChrome: options.showIssueChrome,
-    suppressFieldErrorText: options.suppressFieldErrorText,
-    hasVisibleBodyFields: options.hasVisibleBodyFields ?? true,
-    collapsed: options.collapsed,
-    itemPrefix: options.issueGroup.itemPrefix,
-    fieldOrder: [],
-    inactivePaths: new Set(),
-    issueGroup: options.issueGroup,
-    rowSummaryId: options.rowSummaryId,
-    fieldJoinSummaryId,
-  })
-  return arrayItemIssueSummaries(presentation)[0]
-}

@@ -1,8 +1,4 @@
 import type { NameSubjectKind } from '@rpg/contracts/name-generator'
-import { DEFAULT_SYSTEM_RULESET_ID } from '@rpg/contracts'
-
-/** @deprecated Prefer `DEFAULT_SYSTEM_RULESET_ID` from `@rpg/contracts`. */
-export const DEFAULT_RULESET_ID = DEFAULT_SYSTEM_RULESET_ID
 
 export const GENERATE_COUNT = 10
 

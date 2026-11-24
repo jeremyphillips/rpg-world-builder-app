@@ -7,6 +7,7 @@ function isLeafField(item: FormItem | GroupFieldItem | RowConfig): item is Field
   return 'type' in item && typeof item.type === 'string'
 }
 
+// fallow-ignore-next-line complexity — recursive form item tree; extraction would obscure path semantics
 function assertLeafFieldLabels(
   items: readonly (FormItem | GroupFieldItem | RowConfig)[],
   path: string,

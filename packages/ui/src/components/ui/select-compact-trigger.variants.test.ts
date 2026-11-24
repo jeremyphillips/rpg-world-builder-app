@@ -4,14 +4,16 @@ import {
   groupedEndLabelSegmentShellClasses,
   groupedSelectSegmentShellClasses,
   groupedValueSlotClasses,
-  selectCaretSlotWidthClasses,
+  selectCaretSlotClasses,
   selectDigitValueMinWidthVariants,
   selectTriggerShellClasses,
 } from './select-compact-trigger.variants'
 
 describe('select-compact-trigger variants', () => {
   it('keeps caret slot on semantic field-group caret class', () => {
-    expect(selectCaretSlotWidthClasses.md).toContain('ui-field-group__caret-slot')
+    expect(selectCaretSlotClasses('md', { groupedStart: false })).toContain(
+      'ui-field-group__caret-slot',
+    )
   })
 
   it('uses height-only grouped select shells with p-0', () => {

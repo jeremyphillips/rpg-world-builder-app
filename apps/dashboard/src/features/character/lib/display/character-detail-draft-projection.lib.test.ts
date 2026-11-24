@@ -7,7 +7,7 @@ import {
   createStandaloneBuilderCatalogIndexFixture,
   standaloneEquipmentReferenceScope,
 } from '../fixtures/character-builder-fixtures'
-import { SAMPLE_PC } from '../fixtures/character-fixtures'
+import { makePcCharacter } from '../fixtures/character-fixtures'
 import { PREVIEW_UNNAMED_CHARACTER } from '../builder-preview/preview-identity-summary'
 import { buildCharacterDetailViewModel, toCharacterDetailSource } from './character-display'
 import {
@@ -21,7 +21,7 @@ describe('character detail draft projection', () => {
 
   it('matches persisted detail view models through toCharacterDetailSource', () => {
     const fromCharacter = buildCharacterDetailViewModel({
-      source: toCharacterDetailSource(SAMPLE_PC),
+      source: toCharacterDetailSource(makePcCharacter()),
       catalogIndex,
       rules: context.characterCreationRules,
       equipmentReferenceScope: standaloneEquipmentReferenceScope,

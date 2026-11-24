@@ -9,7 +9,7 @@ import {
   buildCharacterDetailViewModel,
   toCharacterDetailSource,
 } from '../../lib/display/character-display'
-import { SAMPLE_PC } from '../../lib/fixtures/character-fixtures'
+import { makePcCharacter } from '../../lib/fixtures/character-fixtures'
 import { CharacterDetailSheet } from './character-detail-sheet'
 
 const context = createPopulatedStandaloneBuilderContextFixture()
@@ -27,7 +27,7 @@ type Story = StoryObj<typeof CharacterDetailSheet>
 export const Default: Story = {
   args: {
     viewModel: buildCharacterDetailViewModel({
-      source: toCharacterDetailSource(SAMPLE_PC),
+      source: toCharacterDetailSource(makePcCharacter()),
       catalogIndex,
       rules: context.characterCreationRules,
       equipmentReferenceScope: standaloneEquipmentReferenceScope,

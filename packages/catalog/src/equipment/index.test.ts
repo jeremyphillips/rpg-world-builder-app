@@ -1,26 +1,46 @@
 import { describe, expect, it } from 'vitest'
-import { EQUIPMENT_KINDS, getArmorAcDisplay, systemDefaultArmorClassRules } from '@rpg/contracts'
+import {
+  EQUIPMENT_KINDS,
+  getArmorAcDisplay,
+  systemDefaultArmorClassRules,
+  type ArmorEquipment,
+  type WeaponEquipment,
+} from '@rpg/contracts'
 
 import {
   EQUIPMENT_KIND_FILES,
-  getArmorBySlug,
   getEquipmentBySlug,
-  getWeaponBySlug,
-  loadSeedArmor,
   loadSeedEquipment,
   loadSeedEquipmentByKind,
-  loadSeedWeapons,
   seedEquipmentSlugs,
 } from './index'
 
 const RULESET = 'srd-cc-5.2.1'
 
 function weapons() {
-  return loadSeedWeapons(RULESET)
+  return loadSeedEquipment(RULESET).filter(
+    (item): item is WeaponEquipment => item.kind === 'weapon',
+  )
 }
 
 function armor() {
-  return loadSeedArmor(RULESET)
+  return loadSeedEquipment(RULESET).filter((item): item is ArmorEquipment => item.kind === 'armor')
+}
+
+function weaponAt(slug: string): WeaponEquipment {
+  const item = getEquipmentBySlug(RULESET, slug)
+  if (item.kind !== 'weapon') {
+    throw new Error(`Equipment slug "${slug}" is not a weapon (kind: ${item.kind})`)
+  }
+  return item
+}
+
+function armorAt(slug: string): ArmorEquipment {
+  const item = getEquipmentBySlug(RULESET, slug)
+  if (item.kind !== 'armor') {
+    throw new Error(`Equipment slug "${slug}" is not armor (kind: ${item.kind})`)
+  }
+  return item
 }
 
 describe('SRD 5.2.1 equipment seed', () => {
@@ -133,24 +153,24 @@ describe('weapon records in unified seed', () => {
   })
 
   it('blowgun has flat damage of 1', () => {
-    expect(getWeaponBySlug(RULESET, 'blowgun').damage).toEqual({ flat: 1 })
+    expect(weaponAt('blowgun').damage).toEqual({ flat: 1 })
   })
 
   it('quarterstaff has versatileDamage 1d8', () => {
-    expect(getWeaponBySlug(RULESET, 'quarterstaff').versatileDamage).toEqual({
+    expect(weaponAt('quarterstaff').versatileDamage).toEqual({
       count: 1,
       faces: 8,
     })
   })
 
   it('greatsword has 2d6 dice damage', () => {
-    expect(getWeaponBySlug(RULESET, 'greatsword').damage).toEqual({
+    expect(weaponAt('greatsword').damage).toEqual({
       dice: { count: 2, faces: 6 },
     })
   })
 
   it('lance has specialRules', () => {
-    expect(getWeaponBySlug(RULESET, 'lance').specialRules).toBeTruthy()
+    expect(weaponAt('lance').specialRules).toBeTruthy()
   })
 
   it('ranged weapons have a range field', () => {
@@ -187,26 +207,24 @@ describe('armor records in unified seed', () => {
   })
 
   it('plate follows heavy armor and requires STR 15', () => {
-    const plate = getArmorBySlug(RULESET, 'plate-armor')
+    const plate = armorAt('plate-armor')
     expect(getArmorAcDisplay(plate, systemDefaultArmorClassRules())).toBe('18 (no Dex)')
     expect(plate.abilityScoreRequirements).toEqual({ str: 15 })
   })
 
   it('splint requires STR 15 and ring mail has no ability requirement', () => {
-    expect(getArmorBySlug(RULESET, 'splint').abilityScoreRequirements).toEqual({ str: 15 })
-    expect(getArmorBySlug(RULESET, 'ring-mail').abilityScoreRequirements).toBeUndefined()
+    expect(armorAt('splint').abilityScoreRequirements).toEqual({ str: 15 })
+    expect(armorAt('ring-mail').abilityScoreRequirements).toBeUndefined()
   })
 
   it('derives light and medium DEX phrases from category', () => {
     const rules = systemDefaultArmorClassRules()
-    expect(getArmorAcDisplay(getArmorBySlug(RULESET, 'leather-armor'), rules)).toBe('11 + Dex')
-    expect(getArmorAcDisplay(getArmorBySlug(RULESET, 'chain-shirt'), rules)).toBe(
-      '13 + Dex (max 2)',
-    )
+    expect(getArmorAcDisplay(armorAt('leather-armor'), rules)).toBe('11 + Dex')
+    expect(getArmorAcDisplay(armorAt('chain-shirt'), rules)).toBe('13 + Dex (max 2)')
   })
 
   it('chain-mail requires STR 13', () => {
-    expect(getArmorBySlug(RULESET, 'chain-mail').abilityScoreRequirements).toEqual({ str: 13 })
+    expect(armorAt('chain-mail').abilityScoreRequirements).toEqual({ str: 13 })
   })
 
   it('heavy armor has stealthDisadvantage true', () => {

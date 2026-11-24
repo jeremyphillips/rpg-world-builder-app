@@ -6,7 +6,7 @@ import { cn } from '../../lib/utils'
 import { NumberInputSteppers } from './number-input-steppers.client'
 import { useNumberInput } from './number-input.use.client'
 import { resolveDigitInlineSizeClasses } from './field-digit-metrics'
-import { fieldGroupedControlSizeClasses } from './field-sizing.variants'
+import { resolveFieldGroupInputSegmentClasses } from './field-group.styles'
 import { fieldControlVariants } from './field-control.variants'
 import {
   numberInputCompositeShellFieldClasses,
@@ -111,7 +111,7 @@ const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
           className={cn(
             hideSteppers && grouped
               ? cn(
-                  fieldGroupedControlSizeClasses[resolvedSize],
+                  resolveFieldGroupInputSegmentClasses(resolvedSize),
                   'min-w-0 w-full border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0',
                   compositeShell ? numberInputCompositeShellFieldClasses : 'rounded-none',
                 )

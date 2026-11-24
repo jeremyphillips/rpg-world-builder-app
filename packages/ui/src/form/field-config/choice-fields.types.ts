@@ -175,8 +175,6 @@ export interface ChooseFromChipsFieldConfig extends BaseFieldConfig {
 
 /**
  * Inline “Choose [N] …” sentence with a numeric count input only.
- *
- * @deprecated Prefer `inlineSentence`.
  */
 export interface InlineChooseCountFieldConfig extends BaseFieldConfig {
   type: 'inlineChooseCount'

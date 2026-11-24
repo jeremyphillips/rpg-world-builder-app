@@ -3,7 +3,6 @@ import {
   spellcastingGrantingFeatureId,
   type ClassBodyFeature,
   type SlotProgression,
-  usesPactMagicSlotProgression,
 } from '@rpg/contracts'
 
 export function createSpellcastingFeature(input: {
@@ -25,9 +24,4 @@ export function createSpellcastingFeature(input: {
     level,
     ...(input.intro ? { intro: input.intro } : {}),
   }
-}
-
-/** @deprecated Prefer `usesPactMagicSlotProgression` from `@rpg/contracts`. */
-export function usesPactMagicFromSlotProgression(slotProgressionId: string | undefined): boolean {
-  return usesPactMagicSlotProgression({ slotProgressionId })
 }

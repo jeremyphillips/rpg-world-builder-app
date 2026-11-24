@@ -208,9 +208,6 @@ export function canMergeEquipmentPurchases(args: {
   return true
 }
 
-/** @deprecated Use {@link canMergeEquipmentPurchases}. */
-export const equipmentPurchasesAreMergeCompatible = canMergeEquipmentPurchases
-
 export function findEquipmentPurchaseById(
   purchases: readonly NormalizedCharacterBuilderDraftEquipmentPurchase[],
   purchaseId: string,

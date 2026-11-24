@@ -41,6 +41,7 @@ function childItems(item: NavigationContainer): FormItem[] {
   return item.fields as FormItem[]
 }
 
+// fallow-ignore-next-line complexity — depth-first navigation harvest over heterogeneous form items
 function walkNavigationContainers(
   items: readonly FormItem[],
   options: { sectionId?: string; depth: number },

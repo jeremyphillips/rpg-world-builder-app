@@ -17,7 +17,6 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useCanManageCampaign, useCampaignCharacters } from '@/features/campaign'
 import {
   createCharacterClassFilterLabelResolver,
-  useCampaignBuildContext,
   useCampaignNpcBuildContext,
   useNpcs,
 } from '@/features/character'
@@ -239,7 +238,7 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
   )
   const campaignCharactersQuery = useCampaignCharacters(campaignId)
   const npcsQuery = useNpcs(campaignId)
-  const { catalogIndex } = useCampaignBuildContext(campaignId)
+  const { catalogIndex } = useCampaignNpcBuildContext(campaignId)
   const resolveClassLabel = React.useMemo(
     () => createCharacterClassFilterLabelResolver(catalogIndex),
     [catalogIndex],

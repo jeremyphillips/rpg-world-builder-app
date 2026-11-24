@@ -6,7 +6,7 @@ import {
   CatalogMetadataRenderer,
   type EntitySummaryProvenanceItem,
 } from '@/features/content'
-import { useEquipmentAcquisitionQuantityCommit } from '../../../../hooks/use-equipment-acquisition-quantity-commit'
+import { useEquipmentAcquisitionCommitConfirmation } from '../../acquisition/use-equipment-acquisition-commit-confirmation'
 import { resolvePickerMutationCopy } from '../../../../lib/picker/picker-mutation-family'
 import { resolvePickerSelectionStateLine } from '../../../../lib/picker/picker-selection-state'
 import { mapEquipmentCompactSummaryToMetadataLines } from '../map-equipment-compact-summary-to-metadata-lines'
@@ -67,7 +67,7 @@ export function EquipmentPickerDisclosureRow({
   onReleaseChoice,
   onRemovePurchaseOne,
 }: EquipmentPickerDisclosureRowProps) {
-  const { isPending, commitFailed, commitQuantity } = useEquipmentAcquisitionQuantityCommit({
+  const { isPending, commitFailed, confirm } = useEquipmentAcquisitionCommitConfirmation({
     commit: () => onCommitAdd?.() ?? false,
   })
 
@@ -118,7 +118,7 @@ export function EquipmentPickerDisclosureRow({
               addLabel={resolvePickerMutationCopy('genericSelection').acquire}
               isPending={isPending}
               commitFailed={commitFailed}
-              onAdd={() => commitQuantity(1)}
+              onAdd={() => confirm(1)}
               onSetPurchasedQuantity={(total) => onSetPurchasedQuantity?.(total)}
               onRelease={(allowanceId) => onReleaseChoice?.(allowanceId)}
               onRemovePurchase={() => onRemovePurchaseOne?.()}

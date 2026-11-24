@@ -223,7 +223,6 @@ export {
   type CollectionAddControlProps,
 } from './components/ui/collection-add-control.client'
 export {
-  emptyStateWellBodyClasses,
   emptyStateWellIconInkClasses,
   emptyStateWellIconLgClasses,
   emptyStateWellIconMdClasses,
@@ -424,8 +423,6 @@ export {
   fieldDigitSizeClasses,
   fieldDigitTrailingColumnClasses,
   fieldDigitTrailingPaddingClasses,
-  fieldGroupedControlHeightClasses,
-  fieldGroupedControlSizeClasses,
   buttonTextSizeToComboboxFieldSize,
   COMBOBOX_SEARCH_FIELD_SIZE_FOR_ICON_BUTTON,
   resolveComboboxSearchFieldSizeForButtonSize,
@@ -525,7 +522,6 @@ export {
   type DiceFormulaLabelPosition,
   type DiceFormulaModifier,
   type DiceFormulaModifierMode,
-  type DiceFormulaOperator,
   type DiceFormulaValue,
 } from './components/ui/dice-formula-field.lib'
 export { joinArrayItemSummaryParts } from './form/config/array/array-item-config.lib'
@@ -712,7 +708,6 @@ export type {
 export type { FieldChrome } from './components/ui/field-chrome.variants'
 export {
   fieldAnatomyStackVariants,
-  fieldArrayItemClasses,
   fieldArrayItemListClasses,
   fieldArrayItemVariants,
   fieldGroupBottomMarginClasses,
@@ -729,7 +724,6 @@ export {
   fieldLabelVariants,
   fieldMessageRegionVariants,
   fieldControlRegionClasses,
-  fieldRowLayoutClasses,
   fieldSeparatorVariants,
   fieldStackRhythmVariants,
   fieldSettingsRowClasses,
@@ -930,7 +924,6 @@ export {
   CONTENT_CARD_DENSITIES,
   type ContentCardDensity,
   type ContentCardChrome,
-  type ContentCardSurface,
 } from './components/ui/content-card.variants'
 export { resolveContentCardHeadingRowRhythm } from './components/ui/content-card.lib'
 export {
@@ -1027,11 +1020,6 @@ export {
   type CheckboxOptionScale,
   type ResolvedCheckboxOptionScale,
 } from './components/ui/checkbox-option.lib'
-/** @deprecated Use {@link CheckboxOption} with `shell="outlined"` where a pill is needed. */
-export {
-  CheckboxOption as BooleanField,
-  type CheckboxOptionProps as BooleanFieldProps,
-} from './components/ui/checkbox-option.client'
 export type { ChoiceTone } from './components/ui/choice-control.styles'
 export { RadioGroup, RadioGroupItem } from './components/ui/radio-group.client'
 export { Switch } from './components/ui/switch.client'
@@ -1142,9 +1130,7 @@ export {
 export {
   dialogPanelActionRowClasses,
   dialogPanelScrollRegionBottomInsetClasses,
-  dialogPanelScrollRegionClasses,
   dialogPanelScrollRegionTopInsetClasses,
-  dialogPanelScrollRegionViewportClasses,
   dialogPanelSectionScrollViewportClasses,
   dialogPanelInnerScrollViewportClasses,
   dialogPanelInnerLeadingScrollViewportClasses,

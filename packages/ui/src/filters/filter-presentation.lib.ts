@@ -1,6 +1,9 @@
 import { fieldWidthVariants } from '../components/ui/field-control.variants'
 import type { FieldLabelLayout } from '../components/ui/field-row-presentation.lib'
-import { resolveFieldPresentation } from '../components/ui/field-row-presentation.lib'
+import {
+  resolveFieldLabelAlignClassName,
+  resolveFieldPresentation,
+} from '../components/ui/field-row-presentation.lib'
 import { cn } from '../lib/utils'
 import type { FilterChromeContextValue, FilterSelectPresentation } from './filter-chrome.context'
 import {
@@ -156,7 +159,7 @@ export function resolveFilterFieldPresentation(
     labelClassName,
     groupClassName,
     controlBandClassName: base.controlBandClassName,
-    alignmentAnchorClassName: base.alignmentAnchorClassName,
+    alignmentAnchorClassName: resolveFieldLabelAlignClassName(labelLayout, controlSize),
   }
 
   if (field.type === 'text') {

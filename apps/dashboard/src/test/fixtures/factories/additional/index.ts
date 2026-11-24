@@ -3,12 +3,7 @@ export { makeCampaign, makeCampaignListItem, VIEWER_STATE } from './campaign'
 export { makeClassStored, storedDruidClassStored, storedFighterClassStored } from './class-stored'
 export { makeCharacterBuildCatalog, populatedBuilderCatalog } from './character-build-catalog'
 export { makeSubclass } from './subclass'
-export {
-  makePcCharacter,
-  makeCampaignNpcListItem,
-  makeCampaignNpcDetail,
-  SAMPLE_PC,
-} from './character'
+export { makePcCharacter, makeCampaignNpcListItem, makeCampaignNpcDetail } from './character'
 export {
   makeLocationCreateIntent,
   makeBuildingLocationCreateIntent,

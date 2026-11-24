@@ -9,7 +9,7 @@ import {
   type CharacterBuildContext,
 } from '@rpg/contracts'
 
-import { titleFromMembershipRadioValue } from '../../../lib/organization-membership/organization-membership-title.lib'
+import { membershipTitleIdFromRadioValue } from '../../../lib/organization-membership/organization-membership-title.lib'
 import type { QuickNpcCreateContext } from './quick-npc-create-context'
 import {
   prepareQuickNpcCreate,
@@ -35,7 +35,7 @@ function resolveQuickNpcMembershipPayload(
 ) {
   const membershipMetadata = resolveOrganizationMembershipMetadata({
     titles: createContext.organization.members?.titles ?? [],
-    selectedMembershipTitleId: titleFromMembershipRadioValue(
+    selectedMembershipTitleId: membershipTitleIdFromRadioValue(
       isQuickNpcOrganizationMemberSetup(setup) ? (setup.membershipTitle ?? '') : '',
     ),
   })

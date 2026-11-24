@@ -8,9 +8,6 @@ import { npcQueryKey } from '../npc/hooks/use-npcs'
 
 export type CharacterRelationshipSubjectKind = 'pc' | 'npc'
 
-/** @deprecated Use CharacterRelationshipSubjectKind */
-export type CharacterOrganizationMembershipSubjectKind = CharacterRelationshipSubjectKind
-
 export type CharacterRelationshipInvalidationTarget = {
   characterId: string
   subjectKind?: CharacterRelationshipSubjectKind

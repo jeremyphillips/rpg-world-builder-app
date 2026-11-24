@@ -4,7 +4,7 @@ import {
   characterBuilderLevelMessages,
   formatFieldMessage,
   resolveAvailableChoices,
-  resolveBuilderLevelConstraints,
+  resolveCharacterLevelConstraints,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
 } from '@rpg/contracts'
@@ -76,7 +76,15 @@ export function CharacterBuilderLevelControl({
   draft,
   onApplyLevelDraft,
 }: CharacterBuilderLevelControlProps) {
-  const constraints = useMemo(() => resolveBuilderLevelConstraints(context), [context])
+  const constraints = useMemo(
+    () =>
+      resolveCharacterLevelConstraints({
+        characterKind: context.characterKind,
+        rulesScope: context.rulesScope,
+        characterCreationRules: context.characterCreationRules,
+      }),
+    [context],
+  )
   const helperText = useMemo(() => resolveBuilderLevelHelperText(constraints), [constraints])
   const levelOptions = useMemo(() => buildBuilderLevelSelectOptions(constraints), [constraints])
   const [pendingLevel, setPendingLevel] = useState<number | null>(null)

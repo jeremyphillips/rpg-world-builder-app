@@ -6,8 +6,8 @@ import {
   fieldDigitSizeClasses,
   fieldDigitTrailingColumnClasses,
   fieldDigitTrailingPaddingClasses,
-  fieldGroupedControlSizeClasses,
 } from './field-sizing.variants'
+import { resolveFieldGroupInputSegmentClasses } from './field-group.styles'
 
 describe('fieldDigitWidthVariants', () => {
   it('uses literal N*1ch calc classes for every size and digit slot', () => {
@@ -25,8 +25,8 @@ describe('fieldDigitWidthVariants', () => {
 
   it('centralizes md control, grouped segment, and digit sizing classes', () => {
     expect(fieldControlSizeClasses.md).toBe('ui-field-control--md')
-    expect(fieldGroupedControlSizeClasses.md).toContain('ui-field-group__input-segment')
-    expect(fieldGroupedControlSizeClasses.md).toContain('ui-field-group--md')
+    expect(resolveFieldGroupInputSegmentClasses('md')).toContain('ui-field-group__input-segment')
+    expect(resolveFieldGroupInputSegmentClasses('md')).toContain('ui-field-group--md')
     expect(fieldDigitTrailingPaddingClasses.md).toBe('pe-6')
     expect(fieldDigitSizeClasses.md).toBe('ui-field-control--digits-md')
     expect(fieldDigitTrailingColumnClasses.md).toBe('w-5')

@@ -10,13 +10,13 @@ import {
   buildCharacterDetailViewModel,
   toCharacterDetailSource,
 } from '../../../lib/display/character-display'
-import { SAMPLE_PC } from '../../../lib/fixtures/character-fixtures'
+import { makePcCharacter } from '../../../lib/fixtures/character-fixtures'
 import { CharacterDetailAbilitiesRow } from './character-detail-abilities-row'
 
 const context = createPopulatedStandaloneBuilderContextFixture()
 const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
 const viewModel = buildCharacterDetailViewModel({
-  source: toCharacterDetailSource(SAMPLE_PC),
+  source: toCharacterDetailSource(makePcCharacter()),
   catalogIndex,
   rules: context.characterCreationRules,
   equipmentReferenceScope: standaloneEquipmentReferenceScope,
@@ -39,7 +39,7 @@ describe('CharacterDetailAbilitiesRow', () => {
       <CharacterDetailAbilitiesRow
         abilities={viewModel.abilities}
         abilityScoreEditor={{
-          abilityScores: SAMPLE_PC.abilityScores,
+          abilityScores: makePcCharacter().abilityScores,
           onCommit: vi.fn(),
           isAbilityPending: () => false,
         }}
