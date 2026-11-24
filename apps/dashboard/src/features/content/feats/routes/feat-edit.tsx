@@ -7,8 +7,7 @@ import {
 } from '@/features/content/lib/content-type-labels'
 import { ContentEditShell } from '../../lib/forms/shells/edit/content-edit-shell'
 import { useFeats } from '../hooks/use-feats'
-// Registers the feat form def into the content form registry on module load.
-import '../lib/feat-form-def'
+import { featFormDef } from '../lib/feat-form-def'
 
 export function FeatEdit() {
   const { campaignId = '', featId = '' } = useParams<{
@@ -19,7 +18,7 @@ export function FeatEdit() {
 
   return (
     <ContentEditShell
-      contentType="feats"
+      def={featFormDef}
       campaignId={campaignId}
       entityId={featId}
       isPending={isPending}
@@ -28,7 +27,6 @@ export function FeatEdit() {
       notFoundLabel={formatContentNotFoundMessage('feats')}
       backHref={ROUTES.content.feats.detail(campaignId, featId)}
       overviewHref={ROUTES.content.feats.overview(campaignId)}
-      contentTypeKey="feats"
     />
   )
 }

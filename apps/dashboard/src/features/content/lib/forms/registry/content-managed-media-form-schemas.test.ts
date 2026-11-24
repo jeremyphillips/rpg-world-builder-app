@@ -3,12 +3,6 @@ import { loadSeedSpecies } from '@rpg/catalog/species'
 import { CONTENT_TYPE_MEDIA_ENABLED_KEYS, contentMediaSchema } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
-import '../../../classes/lib/class-form-def'
-import '../../../equipment/lib/equipment-form-def'
-import '../../../locations/lib/forms/location-form-def'
-import '../../../organizations/lib/organization-form-def'
-import '../../../species/lib/species-form-def'
-import '../../../monsters/lib/monster-form-def'
 import { classFormDef } from '../../../classes/lib/class-form-def'
 import { classDraftFormSchema, classFormSchema } from '../../../classes/lib/class-form-fields'
 import { equipmentFormDef } from '../../../equipment/lib/equipment-form-def'
@@ -28,7 +22,7 @@ import {
 } from '../organization-form-projection'
 import { speciesFormDef } from '../../../species/lib/species-form-def'
 import { speciesDraftFormSchema, speciesFormSchema } from '../../../species/lib/species-form-fields'
-import { contentFormRegistry } from './content-form-registry'
+import { contentFormRegistry } from './content-form-test-registry'
 
 const sampleMedia = contentMediaSchema.parse({
   revision: 1,

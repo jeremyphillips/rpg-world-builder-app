@@ -19,11 +19,7 @@ import { SubclassUnsavedEditsProvider } from '@/features/content/classes/hooks/s
 import { stripEditEnvelopeFromFormDefaults } from '../../registry/content-form-key-helpers'
 import { serializeContentFormInput } from '../../registry/content-form-serialize-input.lib'
 import { useContentWriteMutation } from '../../../list/use-content-mutations'
-import {
-  contentFormRegistry,
-  type AnyContentFormDef,
-  type ContentFormCtx,
-} from '../../registry/content-form-registry'
+import { type AnyContentFormDef, type ContentFormCtx } from '../../registry/content-form-registry'
 import {
   findContentEditEntity,
   loadContentEditFormState,
@@ -39,11 +35,7 @@ import {
   useArmorClassAuthoringSession,
 } from '../session/armor-class-authoring-session.lib'
 import { useContentEditEntityFormState } from './content-edit-entity-form-state'
-import {
-  ContentFormNotRegistered,
-  ContentFormOptionsGate,
-  ContentFormLayout,
-} from '../layout/content-form-shell-layout'
+import { ContentFormOptionsGate, ContentFormLayout } from '../layout/content-form-shell-layout'
 import { ContentAuthoringGate } from '../layout/content-authoring-gate'
 import { ContentEditLifecycleActions } from './content-edit-lifecycle-actions'
 import { ContentEditPublishProvider } from './content-edit-publish-context'
@@ -92,8 +84,7 @@ function ContentEditFormHeading({
 }
 
 export interface ContentEditShellProps {
-  /** Route key identifying the content type (e.g. `'species'`). */
-  contentType: string
+  def: AnyContentFormDef
   campaignId: string
   entityId: string
   /** Loading state from the parent list query (used to resolve the entity). */
@@ -107,8 +98,6 @@ export interface ContentEditShellProps {
   backHref: string
   /** Href for post-delete navigation (typically the type overview). */
   overviewHref: string
-  /** Content type key for delete copy and API routing. */
-  contentTypeKey: ContentTypeKey
   /** Merged into the form layout context (e.g. family-scoped equipment kind). */
   formCtx?: Partial<ContentFormCtx>
 }
@@ -523,7 +512,7 @@ function ContentEditForm(props: ContentEditFormProps) {
  * extra network round-trip.
  */
 export function ContentEditShell({
-  contentType,
+  def,
   campaignId,
   entityId,
   isPending,
@@ -533,42 +522,28 @@ export function ContentEditShell({
   heading,
   backHref,
   overviewHref,
-  contentTypeKey,
   formCtx,
 }: ContentEditShellProps) {
-  const def = contentFormRegistry[contentType]
-  const layout = def != null ? resolveContentFormLayout(def) : null
+  const layout = resolveContentFormLayout(def)
 
   if (isPending) {
-    return layout ? (
+    return (
       <ContentFormPageShell scrollMode={layout.scrollMode} pageWidth={layout.pageWidth}>
         <div className="flex justify-center">
           <Spinner />
         </div>
       </ContentFormPageShell>
-    ) : (
-      <div className="flex justify-center">
-        <Spinner />
-      </div>
     )
   }
 
   if (isError) {
-    return layout ? (
+    return (
       <ContentFormPageShell scrollMode={layout.scrollMode} pageWidth={layout.pageWidth}>
         <Text variant="destructive" role="alert">
           {loadErrorLabel}
         </Text>
       </ContentFormPageShell>
-    ) : (
-      <Text variant="destructive" role="alert">
-        {loadErrorLabel}
-      </Text>
     )
-  }
-
-  if (!def) {
-    return <ContentFormNotRegistered />
   }
 
   return (
@@ -580,7 +555,7 @@ export function ContentEditShell({
       heading={heading}
       backHref={backHref}
       overviewHref={overviewHref}
-      contentTypeKey={contentTypeKey}
+      contentTypeKey={def.routeKey}
       formCtx={formCtx}
     />
   )

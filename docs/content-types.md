@@ -947,23 +947,12 @@ route-manifest drift test only verifies the `CONTENT_ROUTES` entry itself.
 
 ### 16. Lazy routes (`apps/dashboard/src/app/lazy-routes.ts`)
 
-Register four lazy exports — import **route module paths directly**, never from
-`@/features/content`:
-
-```typescript
-export const <TypeName>sOverviewRoute = withRouteSuspense(
-  lazyNamed(() => import('@/features/content/<folder>/routes/<kebab-plural>-overview'), '<TypeName>sOverview'),
-)
-export const <TypeName>DetailRoute = withRouteSuspense(
-  lazyNamed(() => import('@/features/content/<folder>/routes/<kebab-singular>-detail'), '<TypeName>Detail'),
-)
-export const <TypeName>CreateRoute = withRouteSuspense(
-  lazyNamed(() => import('@/features/content/<folder>/routes/<kebab-singular>-create'), '<TypeName>Create'),
-)
-export const <TypeName>EditRoute = withRouteSuspense(
-  lazyNamed(() => import('@/features/content/<folder>/routes/<kebab-singular>-edit'), '<TypeName>Edit'),
-)
-```
+Import route modules directly. Use `lazyNamed` and `withRouteSuspense` for overview
+and detail. Add both create and edit to the typed `contentFormRouteLoaders` map
+and use those loaders to build the suspended route wrappers. Each create and
+edit route passes its owning definition directly to the shared shell. The route
+contract tests verify that both shells receive the definition for the mapped
+content type.
 
 ### 17. React Router (`apps/dashboard/src/app/router.tsx`)
 

@@ -3,7 +3,6 @@ import type { FormValueSync } from '@rpg/ui/form'
 
 import {
   contentFormFields,
-  contentFormRegistry,
   type ContentFormDef,
 } from '../../lib/forms/registry/content-form-registry'
 import {
@@ -64,7 +63,9 @@ function buildMonsterFormValueSyncs(): FormValueSync[] {
   ]
 }
 
-export const monsterFormDef: ContentFormDef<Monster, MonsterFormValues, CreateMonsterInput> = {
+export const monsterFormDef: ContentFormDef<Monster, MonsterFormValues, CreateMonsterInput> & {
+  routeKey: 'monsters'
+} = {
   routeKey: 'monsters',
   armorClassRulesSensitive: true,
   ...monsterMediaFields,
@@ -106,5 +107,3 @@ export const monsterFormDef: ContentFormDef<Monster, MonsterFormValues, CreateMo
     buildSections: buildMonsterPreviewSections,
   },
 }
-
-contentFormRegistry['monsters'] = monsterFormDef

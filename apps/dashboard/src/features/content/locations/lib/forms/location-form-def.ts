@@ -1,9 +1,6 @@
 import type { CreateLocationInput, Location } from '@rpg/contracts'
 
-import {
-  contentFormRegistry,
-  type ContentFormDef,
-} from '../../../lib/forms/registry/content-form-registry'
+import { type ContentFormDef } from '../../../lib/forms/registry/content-form-registry'
 import { managedMediaFormDefFields } from '../../../lib/forms/registry/managed-media-form-def.lib'
 import { locationsQueryKey, useLocations } from '../../hooks/use-locations'
 import {
@@ -20,7 +17,9 @@ import {
   locationToFormValues,
 } from './location-form-values'
 
-const locationFormDef: ContentFormDef<Location, LocationFormValues, CreateLocationInput> = {
+const locationFormDef: ContentFormDef<Location, LocationFormValues, CreateLocationInput> & {
+  routeKey: 'locations'
+} = {
   routeKey: 'locations',
   ...managedMediaFormDefFields('locations'),
   schema: locationFormSchema,
@@ -39,7 +38,5 @@ const locationFormDef: ContentFormDef<Location, LocationFormValues, CreateLocati
   useListQuery: useLocations,
   queryKey: locationsQueryKey,
 }
-
-contentFormRegistry.locations = locationFormDef
 
 export { locationFormDef, locationFormSchema, locationDraftFormSchema }

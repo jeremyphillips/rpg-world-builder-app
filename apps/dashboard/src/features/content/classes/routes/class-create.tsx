@@ -3,14 +3,13 @@ import { useParams } from 'react-router-dom'
 import { ROUTES } from '@/app/routes'
 import { formatContentCreateHeading } from '@/features/content/lib/content-type-labels'
 import { ContentCreateShell } from '../../lib/forms/shells/create/content-create-shell'
-// Registers the class form def into the content form registry on module load.
-import '../lib/class-form-def'
+import { classFormDef } from '../lib/class-form-def'
 
 export function ClassCreate() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()
   return (
     <ContentCreateShell
-      contentType="classes"
+      def={classFormDef}
       campaignId={campaignId}
       heading={formatContentCreateHeading('classes')}
       backHref={ROUTES.content.classes.overview(campaignId)}

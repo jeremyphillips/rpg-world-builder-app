@@ -8,14 +8,14 @@ campaign settings, homebrew rules). UI layer detail lives in
 
 ## File suffixes
 
-| Suffix             | Responsibility                                                                                                 |
-| ------------------ | -------------------------------------------------------------------------------------------------------------- |
-| `*-form-def.ts`    | **`ContentFormDef` + registry side-effect only** — one per content type (`class-form-def`, `species-form-def`) |
-| `*-form-fields.ts` | Zod schemas, `FormItem[]`, field/section builders, list-row display helpers tied to form config                |
-| `*-form-values.ts` | Entity ↔ form mapping, API input fragments, create/edit defaults                                               |
-| `*-form-labels.ts` | Enum/display labels and UI copy strings (when not from `@rpg/contracts`)                                       |
-| `*-form.ts`        | Thin compose layer (optional; re-exports + wiring)                                                             |
-| `*-constants.ts`   | Field names, sentinels, mode tuples — not display text                                                         |
+| Suffix             | Responsibility                                                                                  |
+| ------------------ | ----------------------------------------------------------------------------------------------- |
+| `*-form-def.ts`    | **`ContentFormDef` only** — one per content type (`class-form-def`, `species-form-def`)         |
+| `*-form-fields.ts` | Zod schemas, `FormItem[]`, field/section builders, list-row display helpers tied to form config |
+| `*-form-values.ts` | Entity ↔ form mapping, API input fragments, create/edit defaults                                |
+| `*-form-labels.ts` | Enum/display labels and UI copy strings (when not from `@rpg/contracts`)                        |
+| `*-form.ts`        | Thin compose layer (optional; re-exports + wiring)                                              |
+| `*-constants.ts`   | Field names, sentinels, mode tuples — not display text                                          |
 
 Campaign settings follow the same suffixes under `features/campaign/lib/` (e.g.
 `campaign-profile-form-fields.ts`, `mechanics-form-values.ts`).
@@ -35,7 +35,7 @@ Reference: locations Location type projection —
 
 ### ContentFormDef → ContentFormHost projection
 
-When a `ContentFormDef` registry entry is wired directly to
+When a `ContentFormDef` is wired directly to
 [`ContentFormHost`](../src/features/content/lib/forms/shells/host/content-form-host.tsx)
 (modals, drawers, nested create flows), use
 [`resolveContentFormHostConfig`](../src/features/content/lib/forms/shells/host/content-form-host-projection.ts)

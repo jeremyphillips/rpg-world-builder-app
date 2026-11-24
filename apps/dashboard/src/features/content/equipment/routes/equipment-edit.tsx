@@ -6,8 +6,7 @@ import {
   formatContentListLoadErrorMessage,
 } from '@/features/content/lib/content-type-labels'
 import { ContentEditShell } from '../../lib/forms/shells/edit/content-edit-shell'
-// Registers the equipment form def into the content form registry on module load.
-import '../lib/equipment-form-def'
+import { equipmentFormDef } from '../lib/equipment-form-def'
 import { useEquipment } from '../hooks/use-equipment'
 import { EquipmentFamilyMismatchAlert } from '../lib/shared/equipment-family-mismatch-alert'
 import { shouldShowEquipmentFamilyMismatch } from '../lib/shared/equipment-family-route-guard'
@@ -35,7 +34,7 @@ export function EquipmentEdit({ family }: EquipmentEditProps) {
 
   return (
     <ContentEditShell
-      contentType="equipment"
+      def={equipmentFormDef}
       campaignId={campaignId}
       entityId={equipmentId}
       isPending={isPending}
@@ -44,7 +43,6 @@ export function EquipmentEdit({ family }: EquipmentEditProps) {
       notFoundLabel={formatContentNotFoundMessage('equipment')}
       backHref={ROUTES.content.equipment.detail(campaignId, family, equipmentId)}
       overviewHref={ROUTES.content.equipment.family(campaignId, family)}
-      contentTypeKey="equipment"
       formCtx={expectedKind ? { equipmentKind: expectedKind, equipmentFamily: family } : undefined}
     />
   )

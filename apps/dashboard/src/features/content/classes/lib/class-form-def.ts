@@ -6,7 +6,6 @@ import {
 } from '@rpg/contracts'
 
 import {
-  contentFormRegistry,
   contentFormFields,
   type ContentFormDef,
 } from '../../lib/forms/registry/content-form-registry'
@@ -158,8 +157,6 @@ const classFormDef: ContentFormDef<
     renderPlayerPreview: ClassPreviewPlayerHost,
   },
 }
-
-contentFormRegistry['classes'] = classFormDef
 
 export { classFormDef, createClassFormSchema, createClassDraftFormSchema, classDraftFormSchema }
 export type { ClassFormValues }

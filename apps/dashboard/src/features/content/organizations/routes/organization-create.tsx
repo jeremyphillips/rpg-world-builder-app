@@ -6,14 +6,14 @@ import { ContentCreateShell } from '../../lib/forms/shells/create/content-create
 import { OrganizationAuthoringFormShell } from '../components/create/organization-authoring-form-shell'
 import { OrganizationAuthoringPresetBridge } from '../components/create/organization-authoring-preset-bridge'
 import { useOrganizationAuthoringContext } from '../components/authoring/use-organization-authoring-context'
-import '../lib/organization-form-def'
+import { organizationFormDef } from '../lib/organization-form-def'
 
 function OrganizationCreateForm({ campaignId }: { campaignId: string }) {
   const { practiceRecommendations } = useOrganizationAuthoringContext()
 
   return (
     <ContentCreateShell
-      contentType="organizations"
+      def={organizationFormDef}
       campaignId={campaignId}
       heading={formatContentCreateHeading('organizations')}
       backHref={ROUTES.content.organizations.overview(campaignId)}

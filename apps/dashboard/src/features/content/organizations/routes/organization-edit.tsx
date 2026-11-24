@@ -8,7 +8,7 @@ import {
 import { ContentEditShell } from '../../lib/forms/shells/edit/content-edit-shell'
 import { OrganizationAuthoringProvider } from '../components/authoring/organization-authoring-context'
 import { useOrganizations } from '../hooks/use-organizations'
-import '../lib/organization-form-def'
+import { organizationFormDef } from '../lib/organization-form-def'
 
 export function OrganizationEdit() {
   const { campaignId = '', organizationId = '' } = useParams<{
@@ -19,7 +19,7 @@ export function OrganizationEdit() {
   return (
     <OrganizationAuthoringProvider>
       <ContentEditShell
-        contentType="organizations"
+        def={organizationFormDef}
         campaignId={campaignId}
         entityId={organizationId}
         isPending={isPending}
@@ -28,7 +28,6 @@ export function OrganizationEdit() {
         notFoundLabel={formatContentNotFoundMessage('organizations')}
         backHref={ROUTES.content.organizations.detail(campaignId, organizationId)}
         overviewHref={ROUTES.content.organizations.overview(campaignId)}
-        contentTypeKey="organizations"
       />
     </OrganizationAuthoringProvider>
   )

@@ -1,7 +1,6 @@
 import { type CreateSpellInput, type Spell } from '@rpg/contracts'
 
 import {
-  contentFormRegistry,
   contentFormFields,
   type ContentFormDef,
 } from '../../lib/forms/registry/content-form-registry'
@@ -21,7 +20,9 @@ import {
 import { buildSpellPreviewIdentity, buildSpellPreviewSections } from './spell-preview-projection'
 import { SpellPreviewPlayerHost } from './spell-preview-player-host'
 
-const spellFormDef: ContentFormDef<Spell, SpellFormValues, CreateSpellInput> = {
+const spellFormDef: ContentFormDef<Spell, SpellFormValues, CreateSpellInput> & {
+  routeKey: 'spells'
+} = {
   routeKey: 'spells',
   schema: spellFormSchema,
   draftSchema: spellDraftFormSchema,
@@ -42,8 +43,6 @@ const spellFormDef: ContentFormDef<Spell, SpellFormValues, CreateSpellInput> = {
     renderPlayerPreview: SpellPreviewPlayerHost,
   },
 }
-
-contentFormRegistry['spells'] = spellFormDef
 
 export { spellFormDef, spellFormSchema, spellDraftFormSchema }
 export type { SpellFormValues }

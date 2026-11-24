@@ -6,9 +6,7 @@ import type {
   ContentTypeKey,
   ResolvedContentCampaignAccess,
 } from '@rpg/contracts'
-import { Heading, InsetPanel } from '@rpg/ui'
 
-import { PageShell } from '@/components/layout/page/page-shell'
 import { weaponAdvisorySubmitOptions } from '../../../../equipment/weapons'
 import { resolveContentFormValueSyncs } from '../host/content-form-host-projection'
 import { useContentFormOptions } from '../../../form-options/content-form-options'
@@ -27,25 +25,6 @@ import {
   CONTENT_FORM_IDENTITY_LAYOUT_INLINE,
 } from '../content-form-presentation.lib'
 import type { UnsavedChangesConfirmController } from '@/lib/form-unsaved-changes-guard'
-
-export function ContentFormComingSoon() {
-  return (
-    <InsetPanel borderStyle="dashed" size="lg" align="center">
-      <InsetPanel.Text>Form coming soon.</InsetPanel.Text>
-    </InsetPanel>
-  )
-}
-
-export function ContentFormNotRegistered({ heading = 'Edit' }: { heading?: string }) {
-  return (
-    <PageShell width="narrow" rhythm="relaxed" className="pb-10">
-      <Heading variant="page" as="h1">
-        {heading}
-      </Heading>
-      <ContentFormComingSoon />
-    </PageShell>
-  )
-}
 
 interface ContentFormLayoutProps<TFormValues extends FieldValues> {
   def: AnyContentFormDef

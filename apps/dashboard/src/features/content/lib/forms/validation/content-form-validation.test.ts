@@ -13,11 +13,10 @@ import {
 import {
   contentFormAllFields,
   contentFormFields,
-  contentFormRegistry,
   type ContentFormDef,
 } from '../registry/content-form-registry'
 
-import '../registry/content-form-test-registry'
+import { contentFormRegistry } from '../registry/content-form-test-registry'
 
 import { createClassFormSchema } from '../../../classes/lib/class-form-fields'
 import {

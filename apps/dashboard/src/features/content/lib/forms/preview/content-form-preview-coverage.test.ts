@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { contentFormRegistry } from '../registry/content-form-registry'
 import { hasContentFormPreview } from './content-form-preview.types'
-import '../registry/content-form-test-registry'
+import { contentFormRegistry } from '../registry/content-form-test-registry'
 
 describe('ContentFormDef preview coverage', () => {
   const previewEntries = Object.values(contentFormRegistry).filter((def) =>

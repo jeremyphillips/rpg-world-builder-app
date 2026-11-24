@@ -12,7 +12,7 @@ import {
 } from './content-form-serialize-input.lib'
 
 const mediaEnabledDef = {
-  routeKey: 'classes',
+  routeKey: 'classes' as const,
   supportsManagedMedia: true as const,
   mediaDomain: 'class' as const,
   toInput: vi.fn(() => ({ name: 'Test Class' })),
@@ -131,7 +131,7 @@ describe('serializeContentFormInput', () => {
 
   it('skips media merge when def does not support managed media', () => {
     const def = {
-      routeKey: 'spells',
+      routeKey: 'spells' as const,
       supportsManagedMedia: false,
       toInput: vi.fn(() => ({ name: 'Spell' })),
     }

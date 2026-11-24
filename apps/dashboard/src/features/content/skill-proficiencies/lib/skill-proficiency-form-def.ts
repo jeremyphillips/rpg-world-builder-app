@@ -1,6 +1,6 @@
 import { type CreateSkillProficiencyInput, type SkillProficiency } from '@rpg/contracts'
 
-import { contentFormRegistry, type ContentFormDef } from '../../lib/forms/registry/content-form-registry'
+import { type ContentFormDef } from '../../lib/forms/registry/content-form-registry'
 import { useSkillProficiencies, skillProficienciesQueryKey } from '../hooks/use-skill-proficiencies'
 import {
   buildSkillProficiencyFields,
@@ -32,8 +32,6 @@ const skillProficiencyFormDef: ContentFormDef<
   useListQuery: useSkillProficiencies,
   queryKey: skillProficienciesQueryKey,
 }
-
-contentFormRegistry['skill-proficiencies'] = skillProficiencyFormDef
 
 export { skillProficiencyFormDef, skillProficiencyFormSchema, skillProficiencyDraftFormSchema }
 export type { SkillProficiencyFormValues }

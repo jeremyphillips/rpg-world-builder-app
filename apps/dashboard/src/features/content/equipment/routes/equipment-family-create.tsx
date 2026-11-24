@@ -2,8 +2,7 @@ import { useParams } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
 import { ContentCreateShell } from '../../lib/forms/shells/create/content-create-shell'
-// Registers the equipment form def into the content form registry on module load.
-import '../lib/equipment-form-def'
+import { equipmentFormDef } from '../lib/equipment-form-def'
 import {
   familyPathToEquipmentKind,
   getEquipmentFamilyLabel,
@@ -22,7 +21,7 @@ export function EquipmentFamilyCreate({ family }: EquipmentFamilyCreateProps) {
 
   return (
     <ContentCreateShell
-      contentType="equipment"
+      def={equipmentFormDef}
       campaignId={campaignId}
       heading={`New ${label.replace(/s$/, '')}`}
       backHref={ROUTES.content.equipment.family(campaignId, family)}

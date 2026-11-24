@@ -5,6 +5,7 @@ import type { FormItem, FormValueSync, TabbedFormTab } from '@rpg/ui/form'
 import type {
   ArmorClassRules,
   ContentMediaDomain,
+  ContentTypeKey,
   CatalogLayer,
   ContentValidationIntent,
   Equipment,
@@ -148,8 +149,7 @@ export type ContentFormInputCtx<TEntity> = {
 }
 
 /**
- * The per-type definition that the content form registry holds. Each entry
- * describes how to:
+ * Each content type owns a form definition that describes how to:
  * - Render fields (`buildFields`)
  * - Seed the edit form from a stored entity (`toFormValues`)
  * - Map validated form values to the create API input (`toInput`)
@@ -164,7 +164,7 @@ export interface ContentFormDef<
   TPreviewResources = unknown,
 > {
   /** Kebab-case route key used in URLs and API paths (e.g. `'species'`). */
-  routeKey: string
+  routeKey: ContentTypeKey
   /** When true, {@link serializeContentFormInput} may attach validated form `media`. */
   supportsManagedMedia?: boolean
   /** Content media policy domain; set when `supportsManagedMedia` is true. */
@@ -251,16 +251,8 @@ export type ContentFormValuesCtx = {
   armorClassRules?: ArmorClassRules
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- all params are erased at the registry boundary; each def is strongly typed internally
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- all params are erased at the shared form boundary; each def is strongly typed internally
 export type AnyContentFormDef = ContentFormDef<any, any, any, any>
-
-/**
- * The global content form registry. Each content type that supports create/edit
- * registers one entry here. The key is the `routeKey`.
- *
- * Phase 3 registers `species`; subsequent phases register the remaining types.
- */
-export const contentFormRegistry: Record<string, AnyContentFormDef> = {}
 
 /** Create-shell default values — prefers `resolveCreateDefaultValues` when the def provides it. */
 export function resolveContentFormCreateDefaultValues(

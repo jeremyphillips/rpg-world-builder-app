@@ -7,8 +7,7 @@ import {
 } from '@/features/content/lib/content-type-labels'
 import { ContentEditShell } from '../../lib/forms/shells/edit/content-edit-shell'
 import { useSkillProficiencies } from '../hooks/use-skill-proficiencies'
-// Registers the skill proficiency form def into the content form registry on module load.
-import '../lib/skill-proficiency-form-def'
+import { skillProficiencyFormDef } from '../lib/skill-proficiency-form-def'
 
 export function SkillProficiencyEdit() {
   const { campaignId = '', skillId = '' } = useParams<{
@@ -19,7 +18,7 @@ export function SkillProficiencyEdit() {
 
   return (
     <ContentEditShell
-      contentType="skill-proficiencies"
+      def={skillProficiencyFormDef}
       campaignId={campaignId}
       entityId={skillId}
       isPending={isPending}
@@ -28,7 +27,6 @@ export function SkillProficiencyEdit() {
       notFoundLabel={formatContentNotFoundMessage('skill-proficiencies')}
       backHref={ROUTES.content.skillProficiencies.detail(campaignId, skillId)}
       overviewHref={ROUTES.content.skillProficiencies.overview(campaignId)}
-      contentTypeKey="skill-proficiencies"
     />
   )
 }

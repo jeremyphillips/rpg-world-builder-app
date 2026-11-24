@@ -356,7 +356,6 @@ export {
   type GrantSummaryModel,
 } from './lib/forms/grants/grant-display'
 export {
-  contentFormRegistry,
   type ContentFormDef,
   type ContentFormCtx,
 } from './lib/forms/registry/content-form-registry'

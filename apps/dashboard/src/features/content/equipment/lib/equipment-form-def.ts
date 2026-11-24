@@ -1,10 +1,7 @@
 import type { ZodType } from 'zod'
 import { type CreateEquipmentInput, type Equipment } from '@rpg/contracts'
 
-import {
-  contentFormRegistry,
-  type ContentFormDef,
-} from '../../lib/forms/registry/content-form-registry'
+import { type ContentFormDef } from '../../lib/forms/registry/content-form-registry'
 import { managedMediaFormDefFields } from '../../lib/forms/registry/managed-media-form-def.lib'
 import { nameField } from '../../lib/forms/fields/content-identity-form-fields'
 import { useEquipment, equipmentQueryKey } from '../hooks/use-equipment'
@@ -18,7 +15,9 @@ import {
 } from './equipment-form-fields'
 import { equipmentFormToInput, equipmentToFormValues } from './equipment-form-values'
 
-const equipmentFormDef: ContentFormDef<Equipment, EquipmentFormValues, CreateEquipmentInput> = {
+const equipmentFormDef: ContentFormDef<Equipment, EquipmentFormValues, CreateEquipmentInput> & {
+  routeKey: 'equipment'
+} = {
   routeKey: 'equipment',
   armorClassRulesSensitive: true,
   ...managedMediaFormDefFields('equipment'),
@@ -38,8 +37,6 @@ const equipmentFormDef: ContentFormDef<Equipment, EquipmentFormValues, CreateEqu
   useListQuery: useEquipment,
   queryKey: equipmentQueryKey,
 }
-
-contentFormRegistry['equipment'] = equipmentFormDef
 
 export { equipmentFormDef, equipmentFormSchema, equipmentFormDraftSchema }
 export type { EquipmentFormValues }
