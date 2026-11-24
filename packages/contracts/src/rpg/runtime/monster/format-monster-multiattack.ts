@@ -13,7 +13,10 @@ import {
 import { formatSpellCastAtLevelName } from '../../content/spell/format-spell-cast-level'
 import { formatCardinalWord, joinNaturalList } from '../../primitives/prose'
 import { MOVEMENT_ALLOWANCE_ENTRIES, type MovementAllowance } from '../../vocab/movement-allowance'
-import { resolveMonsterActionIdentity } from './resolve-monster-action-identity'
+import {
+  resolveMonsterActionIdentity,
+  type MonsterActionEquipmentCatalogStatus,
+} from './resolve-monster-action-identity'
 import { formatMonsterStatBlockSubject } from './spell-entry-presentation'
 import type { MonsterReferencedSpell } from './reaction-trigger'
 import { multiattackIfAvailableSuffix } from './multiattack-if-available'
@@ -45,6 +48,7 @@ type FormatContext = {
   bonusActions?: readonly MonsterAction[]
   equipment: readonly EquipmentInstance[]
   equipmentCatalog: CreatureEquipmentCatalog
+  equipmentCatalogStatus?: MonsterActionEquipmentCatalogStatus
   magicPropertyProvider?: MagicPropertyDefinitionProvider
   spellsById?: ReadonlyMap<string, MonsterReferencedSpell>
   spellCatalogStatus?: 'ready' | 'unavailable'
@@ -69,8 +73,9 @@ function referencedActionName(
     equipment: ctx.equipment,
     equipmentCatalog: ctx.equipmentCatalog,
     magicPropertyProvider: ctx.magicPropertyProvider,
-    equipmentCatalogStatus: 'ready',
+    equipmentCatalogStatus: ctx.equipmentCatalogStatus ?? 'ready',
   })
+  if (action.kind === 'weapon' && identity.sourceState !== 'resolved') return {}
   const name = identity.displayName.trim()
   return {
     name: name.length > 0 ? name : undefined,
@@ -432,6 +437,7 @@ export function formatMonsterActionReference(args: {
   actions: readonly MonsterAction[]
   equipment: readonly EquipmentInstance[]
   equipmentCatalog: CreatureEquipmentCatalog
+  equipmentCatalogStatus?: MonsterActionEquipmentCatalogStatus
   magicPropertyProvider?: MagicPropertyDefinitionProvider
 }): string {
   const provider = args.magicPropertyProvider ?? (() => undefined)
@@ -440,6 +446,7 @@ export function formatMonsterActionReference(args: {
     actions: args.actions,
     equipment: args.equipment,
     equipmentCatalog: args.equipmentCatalog,
+    equipmentCatalogStatus: args.equipmentCatalogStatus,
     magicPropertyProvider: provider,
   }
   const subject = capitalizeSubject(args.monsterName)

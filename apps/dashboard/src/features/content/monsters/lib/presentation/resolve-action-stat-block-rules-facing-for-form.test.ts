@@ -224,6 +224,7 @@ describe('resolveActionStatBlockRulesFacingForForm', () => {
 
   it('requires a direct shared casting source for a legendary spell invocation', () => {
     const spell = pickSpell('fireball')
+    const description = '<p>Authored invocation notes.</p>'
     const source = {
       id: 'casting',
       name: 'Spellcasting',
@@ -242,6 +243,7 @@ describe('resolveActionStatBlockRulesFacingForForm', () => {
             name: 'Invoke',
             castingAbility: { kind: 'shared', entryId: source.id },
             spellInvocation: 'use-entry',
+            description,
             spells: [{ spellId: spell.id }],
           },
         ],
@@ -267,6 +269,15 @@ describe('resolveActionStatBlockRulesFacingForForm', () => {
         values: { ...values, actions: [] },
       }),
     ).toEqual({ status: 'unavailable', reason: { code: 'missing-action-reference' } })
+    const published = buildMonsterDetailViewModel({
+      monster: { ...values, actions: [] } as unknown as Monster,
+      creatureTypeLabel: 'Fiend',
+      equipmentById: new Map(),
+      catalogState: 'ready',
+      spellsById: new Map([[spell.id, spell]]),
+      spellCatalogStatus: 'ready',
+    }).legendaryActions.find((row) => row.id === request.actionId)
+    expect(published).toMatchObject({ descriptionHtml: description, rulesProse: undefined })
   })
 
   it.each(['natural-weapon', 'attack'] as const)(
@@ -374,6 +385,13 @@ describe('resolveActionStatBlockRulesFacingForForm', () => {
         section: 'actions',
       }),
     ).toEqual({ status: 'unavailable', reason: { code: 'catalog-pending', catalog: 'equipment' } })
+    const missing = buildMonsterDetailViewModel({
+      monster: body,
+      creatureTypeLabel: 'Dragon',
+      equipmentById: new Map(),
+      catalogState: 'ready',
+    }).actions.find((row) => row.id === 'combo')
+    expect(missing).toMatchObject({ descriptionHtml: undefined })
   })
 
   it('uses the spell catalog for an explicit multiattack spell choice', () => {
@@ -576,16 +594,66 @@ describe('resolveActionStatBlockRulesFacingForForm', () => {
         }),
       )
       expect(published.descriptionHtml).toMatch(/dagger/i)
-      expect(
-        resolveActionStatBlockRulesFacingForForm({
-          values: body as unknown as MonsterFormValues,
-          ctx: baseCtx({ equipmentCatalogStatus: 'error' }),
-          actionId: id,
-          section,
-        }),
-      ).toEqual({ status: 'unavailable', reason: { code: 'catalog-error', catalog: 'equipment' } })
+      const withoutSource: Monster = { ...body, actions: [] }
+      const unavailableCases = [
+        { body, status: 'pending', reason: { code: 'catalog-pending', catalog: 'equipment' } },
+        { body, status: 'error', reason: { code: 'catalog-error', catalog: 'equipment' } },
+        { body, status: 'ready', reason: { code: 'missing-equipment-reference' } },
+        {
+          body: withoutSource,
+          status: 'ready',
+          reason: { code: 'missing-action-reference' },
+        },
+      ] as const
+      for (const unavailable of unavailableCases) {
+        expect(
+          resolveActionStatBlockRulesFacingForForm({
+            values: unavailable.body as unknown as MonsterFormValues,
+            ctx: baseCtx({ equipmentCatalogStatus: unavailable.status }),
+            actionId: id,
+            section,
+          }),
+        ).toEqual({ status: 'unavailable', reason: unavailable.reason })
+
+        const detail = buildMonsterDetailViewModel({
+          monster: unavailable.body,
+          creatureTypeLabel: 'Dragon',
+          equipmentById: new Map(),
+          catalogState: unavailable.status,
+        })[section].find((row) => row.id === id)
+        expect(detail).toBeDefined()
+        if (section === 'reactions') {
+          expect(detail?.descriptionHtml).toContain('adds 2 to its AC')
+          expect(detail?.descriptionHtml).not.toContain('On a miss')
+        } else {
+          expect(detail?.descriptionHtml).toBeUndefined()
+        }
+      }
     },
   )
+
+  it('preserves published reaction notes when the referenced action is missing', () => {
+    const monster = pickMonster('hell-hound')
+    const description = '<p>Authored reaction notes.</p>'
+    const detail = buildMonsterDetailViewModel({
+      monster: {
+        ...monster,
+        reactions: [
+          {
+            id: 'reflex',
+            kind: 'action-reference',
+            actionIds: ['missing'],
+            description,
+            trigger: { text: 'The creature is hit.' },
+          },
+        ],
+      },
+      creatureTypeLabel: 'Fiend',
+      equipmentById: new Map(),
+      catalogState: 'ready',
+    })
+    expect(detail.reactions[0]?.descriptionHtml).toBe(description)
+  })
 
   it('distinguishes weapon selection, equipment lifecycle, and missing references', () => {
     const monster = pickMonster('kobold-warrior')

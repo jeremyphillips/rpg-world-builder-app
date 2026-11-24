@@ -326,14 +326,27 @@ function parryFollowUpName(
   if (!action.followUpActionId) return undefined
   const target = spells.monster.actions.find((row) => row.id === action.followUpActionId)
   if (!target || !isMonsterActionAttackKind(target.kind)) return undefined
-  const name = actionDisplayIdentity(
+  const identity = actionDisplayIdentity(
     target,
     spells.monster,
     spells.equipmentById,
     spells.catalogState,
     spells.magicPropertyProvider,
-  ).displayName.trim()
+  )
+  if (target.kind === 'weapon' && identity.sourceState !== 'resolved') return undefined
+  const name = identity.displayName.trim()
   return name.length > 0 ? name : undefined
+}
+
+function hasMissingInvocationSource(
+  action: Extract<MonsterAction | MonsterReaction | MonsterLegendaryAction, { kind: 'spell' }>,
+  monster: Monster,
+): boolean {
+  return (
+    action.spellInvocation === 'use-entry' &&
+    action.castingAbility?.kind === 'shared' &&
+    !findSpellCastingSource(monster, action.castingAbility.entryId)
+  )
 }
 
 function mapSpellActionFacing(
@@ -360,12 +373,9 @@ function mapSpellActionFacing(
     spellsInBody: spells.spellsInBody,
     saveDc: spellLine?.saveDc,
   })
-  const rulesProse = appendTurnLimitToDocument(
-    rendered.bodyProse,
-    action,
-    spells.monsterName,
-    false,
-  )
+  const rulesProse = hasMissingInvocationSource(action, spells.monster)
+    ? undefined
+    : appendTurnLimitToDocument(rendered.bodyProse, action, spells.monsterName, false)
   const supplemental =
     action.description && !monsterRichTextIsEmpty(action.description)
       ? action.description
@@ -423,11 +433,14 @@ function mapActionReferenceFacing(
     actions: spells.monster.actions,
     equipment: spells.monster.equipment,
     equipmentCatalog: spells.equipmentById,
+    equipmentCatalogStatus: spells.catalogState,
     magicPropertyProvider: spells.magicPropertyProvider,
   })
   const text = generated ? withTurnLimit(generated, action, spells.monsterName, false) : ''
-  const rules = 'description' in action && action.description ? action.description : ''
-  const descriptionHtml = text ? `<p>${escapeStatBlockText(text)}</p>${rules}` : undefined
+  const supplemental = 'description' in action ? action.description : undefined
+  const descriptionHtml = text
+    ? `<p>${escapeStatBlockText(text)}</p>${supplemental ?? ''}`
+    : supplemental
   return { id: action.id, name, descriptionHtml }
 }
 
