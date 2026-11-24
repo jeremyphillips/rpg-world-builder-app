@@ -71,8 +71,6 @@ export function resolveCampaignBuildContext(
   const shared = {
     channel: 'build' as const,
     surface: 'dashboard' as const,
-    mode: 'dashboard' as const,
-    scope: { type: 'campaign' as const, campaignId, rulesetId },
     rulesScope,
     rulesetId,
     catalog,

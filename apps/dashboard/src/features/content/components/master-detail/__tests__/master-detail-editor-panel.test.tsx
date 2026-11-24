@@ -33,7 +33,6 @@ function makeEditor(
     replaceRows: vi.fn(),
     lastAddedFieldId: null,
     acknowledgeAcquisition: vi.fn(),
-    clearLastAddedFieldId: vi.fn(),
     deleteIndex: null,
     requestRemove: vi.fn(),
     cancelRemove: vi.fn(),

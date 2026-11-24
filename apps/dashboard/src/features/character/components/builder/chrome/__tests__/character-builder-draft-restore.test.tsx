@@ -15,8 +15,7 @@ const context = {
   channel: 'build' as const,
   surface: 'dashboard' as const,
   characterKind: 'pc' as const,
-  mode: 'dashboard' as const,
-  scope: { type: 'standalone' as const, rulesetId: 'srd-cc-5.2.1' as const },
+
   rulesScope: { type: 'ruleset' as const, rulesetId: 'srd-cc-5.2.1' as const },
   ownershipTarget: { type: 'user' as const },
 }

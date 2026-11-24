@@ -15,7 +15,7 @@ import { normalizeCharacterBuilderDraft } from '../equipment/equipment-purchase'
 export const CHARACTER_BUILDER_DRAFT_STORAGE_KEY_PREFIX = 'character-builder'
 
 export type CharacterBuilderDraftStorageRetainedDimensions = {
-  mode?: CharacterBuildContext['mode']
+  surface?: CharacterBuildContext['surface']
 }
 
 export type CharacterBuilderDraftStorageLoadResult =
@@ -80,8 +80,8 @@ export function resolveCharacterBuilderDraftKey(
     return `${CHARACTER_BUILDER_DRAFT_STORAGE_KEY_PREFIX}:campaign:${scope.campaignId}:${scope.characterKind}`
   }
 
-  const mode = retained.mode ?? 'dashboard'
-  return `${CHARACTER_BUILDER_DRAFT_STORAGE_KEY_PREFIX}:standalone:${mode}:${scope.userId}:${scope.rulesetId}:${scope.characterKind}`
+  const surface = retained.surface ?? 'dashboard'
+  return `${CHARACTER_BUILDER_DRAFT_STORAGE_KEY_PREFIX}:standalone:${surface}:${scope.userId}:${scope.rulesetId}:${scope.characterKind}`
 }
 
 export function reportCharacterBuilderDraftStorageIssue(

@@ -3,11 +3,11 @@ import { describe, expect, it } from 'vitest'
 import { getCharacterBuilderStorageKey } from './storage-key'
 
 describe('getCharacterBuilderStorageKey', () => {
-  it('keys standalone drafts by mode, user, ruleset, and character kind', () => {
+  it('keys standalone drafts by surface, user, ruleset, and character kind', () => {
     expect(
       getCharacterBuilderStorageKey(
         {
-          mode: 'dashboard',
+          surface: 'dashboard',
           characterKind: 'pc',
           rulesScope: { type: 'ruleset', rulesetId: 'srd-cc-5.2.1' },
         },
@@ -19,7 +19,7 @@ describe('getCharacterBuilderStorageKey', () => {
   it('keys campaign drafts by campaign and character kind', () => {
     expect(
       getCharacterBuilderStorageKey({
-        mode: 'dashboard',
+        surface: 'dashboard',
         characterKind: 'npc',
         rulesScope: {
           type: 'campaign',
@@ -33,18 +33,18 @@ describe('getCharacterBuilderStorageKey', () => {
   it('returns null for standalone drafts without a user id', () => {
     expect(
       getCharacterBuilderStorageKey({
-        mode: 'dashboard',
+        surface: 'dashboard',
         characterKind: 'pc',
         rulesScope: { type: 'ruleset', rulesetId: 'srd-cc-5.2.1' },
       }),
     ).toBeNull()
   })
 
-  it('does not collide across modes, kinds, or scopes', () => {
+  it('does not collide across surfaces, kinds, or scopes', () => {
     const keys = [
       getCharacterBuilderStorageKey(
         {
-          mode: 'public',
+          surface: 'public',
           characterKind: 'pc',
           rulesScope: { type: 'ruleset', rulesetId: 'srd-cc-5.2.1' },
         },
@@ -52,14 +52,14 @@ describe('getCharacterBuilderStorageKey', () => {
       ),
       getCharacterBuilderStorageKey(
         {
-          mode: 'dashboard',
+          surface: 'dashboard',
           characterKind: 'pc',
           rulesScope: { type: 'ruleset', rulesetId: 'srd-cc-5.2.1' },
         },
         'user_1',
       ),
       getCharacterBuilderStorageKey({
-        mode: 'dashboard',
+        surface: 'dashboard',
         characterKind: 'npc',
         rulesScope: {
           type: 'campaign',

@@ -132,7 +132,7 @@ describe('CharacterBuilderShell', () => {
     }
 
     sessionStorage.setItem(
-      resolveCharacterBuilderDraftKey(draftScope, { mode: context.mode }),
+      resolveCharacterBuilderDraftKey(draftScope, { surface: context.surface }),
       JSON.stringify({
         state: createPersistedCharacterBuilderState(persistedDraft, draftScope),
         version: 0,

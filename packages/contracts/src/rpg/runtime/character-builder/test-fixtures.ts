@@ -151,8 +151,6 @@ export function createCharacterBuildContext(
     channel: 'build',
     surface: 'dashboard',
     characterKind,
-    mode: 'dashboard',
-    scope: { type: 'standalone', rulesetId },
     rulesScope,
     ownershipTarget: resolveCharacterOwnershipTarget(characterKind, rulesScope),
     rulesetId,

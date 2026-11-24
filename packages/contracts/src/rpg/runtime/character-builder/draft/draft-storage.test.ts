@@ -23,8 +23,8 @@ const campaignScope: CharacterBuilderDraftScope = {
 }
 
 describe('resolveCharacterBuilderDraftKey', () => {
-  it('keys standalone drafts by mode, user, ruleset, and character kind', () => {
-    expect(resolveCharacterBuilderDraftKey(standaloneScope, { mode: 'dashboard' })).toBe(
+  it('keys standalone drafts by surface, user, ruleset, and character kind', () => {
+    expect(resolveCharacterBuilderDraftKey(standaloneScope, { surface: 'dashboard' })).toBe(
       'character-builder:standalone:dashboard:user_1:srd-cc-5.2.1:pc',
     )
   })
@@ -37,8 +37,8 @@ describe('resolveCharacterBuilderDraftKey', () => {
 
   it('isolates drafts across scopes', () => {
     const keys = [
-      resolveCharacterBuilderDraftKey(standaloneScope, { mode: 'dashboard' }),
-      resolveCharacterBuilderDraftKey(standaloneScope, { mode: 'public' }),
+      resolveCharacterBuilderDraftKey(standaloneScope, { surface: 'dashboard' }),
+      resolveCharacterBuilderDraftKey(standaloneScope, { surface: 'public' }),
       resolveCharacterBuilderDraftKey({
         ...standaloneScope,
         userId: 'user_2',

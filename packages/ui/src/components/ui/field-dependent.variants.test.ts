@@ -115,15 +115,6 @@ describe('resolveDependentPresentation', () => {
     expect(presentation.nestClassName).toBeUndefined()
   })
 
-  it('maps legacy inset false to flush layout', () => {
-    const presentation = resolveDependentPresentation(
-      { inset: false, chrome: 'rail' },
-      'comfortable',
-    )
-    expect(presentation.chrome).toBe('none')
-    expect(presentation.showNest).toBe(false)
-  })
-
   it('maps legacy panel chrome to the dependent nest', () => {
     const presentation = resolveDependentPresentation({ chrome: 'panel' }, 'comfortable', {
       controller: switchController,

@@ -37,8 +37,7 @@ function createCampaignNpcContext(): CampaignNpcBuildContext {
     channel: 'build',
     surface: 'dashboard',
     characterKind: 'npc',
-    mode: 'dashboard',
-    scope: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID, rulesetId: TEST_RULESET_ID },
+
     rulesScope: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID, rulesetId: TEST_RULESET_ID },
     ownershipTarget: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID },
     acquisition: { kind: 'campaign_npc', campaignId: TEST_CAMPAIGN_ID },
@@ -56,8 +55,6 @@ function createCampaignPcContext(): CampaignPcBuildContext {
     channel: 'build',
     surface: 'dashboard',
     characterKind: 'pc',
-    mode: 'dashboard',
-    scope: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID, rulesetId: TEST_RULESET_ID },
     rulesScope: { type: 'campaign', campaignId: TEST_CAMPAIGN_ID, rulesetId: TEST_RULESET_ID },
     ownershipTarget: { type: 'user', userId: 'user_1' },
     acquisition: {
@@ -171,8 +168,6 @@ describe('character build context helpers', () => {
         channel: 'build',
         surface: 'dashboard',
         characterKind: 'pc',
-        mode: 'dashboard',
-        scope: { type: 'standalone', rulesetId: TEST_RULESET_ID },
         rulesScope: { type: 'ruleset', rulesetId: TEST_RULESET_ID },
         ownershipTarget: { type: 'user' },
         rulesetId: TEST_RULESET_ID,

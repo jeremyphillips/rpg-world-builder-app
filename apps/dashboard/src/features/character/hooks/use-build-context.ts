@@ -43,8 +43,6 @@ export function useBuildContext(rulesetId: SystemRulesetId | undefined) {
       channel: 'build',
       surface: 'dashboard',
       characterKind: 'pc',
-      mode: 'dashboard',
-      scope: { type: 'standalone', rulesetId },
       rulesScope: { type: 'ruleset', rulesetId },
       ownershipTarget: { type: 'user' },
       rulesetId,
@@ -74,7 +72,8 @@ export function useBuildContext(rulesetId: SystemRulesetId | undefined) {
   }, [context, session?.user.id])
 
   const storageKey = useMemo(
-    () => (draftScope ? resolveCharacterBuilderDraftKey(draftScope, { mode: 'dashboard' }) : null),
+    () =>
+      draftScope ? resolveCharacterBuilderDraftKey(draftScope, { surface: 'dashboard' }) : null,
     [draftScope],
   )
 

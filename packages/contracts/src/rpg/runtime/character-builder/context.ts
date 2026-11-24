@@ -21,15 +21,7 @@ import type {
   CharacterOwnershipTarget,
   CharacterRulesScope,
 } from '../character-acquisition'
-import type {
-  CharacterBuilderMode,
-  CharacterBuildScope,
-  CampaignCharacterBuildScope,
-  StandaloneCharacterBuilderMode,
-  StandaloneCharacterBuildScope,
-} from './mode-scope'
 import type { CharacterBuildAcquisition } from './acquisition'
-
 // ---------------------------------------------------------------------------
 // CharacterBuildContext — the normalized input the builder UI and resolvers
 // consume. Consumers must not care whether rules came from standalone
@@ -117,10 +109,6 @@ export type CharacterBuildContext = {
   channel: CharacterAcquisitionChannel
   surface: CharacterAuthoringSurface
   characterKind: CharacterKind
-  /** @deprecated Prefer `surface` + `characterKind`. */
-  mode: CharacterBuilderMode
-  /** @deprecated Prefer `rulesScope` from acquisition types. */
-  scope: CharacterBuildScope
   ownershipTarget: CharacterOwnershipTarget
   rulesScope: CharacterRulesScope
   rulesetId: SystemRulesetId
@@ -139,8 +127,6 @@ export type CampaignPcPlayActor =
 
 /** MVP instantiation — no campaign patch/membership context. */
 export type StandaloneBuildContext = CharacterBuildContext & {
-  mode: StandaloneCharacterBuilderMode
-  scope: StandaloneCharacterBuildScope
   rulesScope: Extract<CharacterRulesScope, { type: 'ruleset' }>
   ownershipTarget: { type: 'user' }
   characterKind: 'pc'
@@ -149,8 +135,6 @@ export type StandaloneBuildContext = CharacterBuildContext & {
 
 /** Campaign-scoped NPC authoring — rules and catalog from campaign patch + content. */
 export type CampaignNpcBuildContext = CharacterBuildContext & {
-  mode: 'dashboard'
-  scope: CampaignCharacterBuildScope
   rulesScope: Extract<CharacterRulesScope, { type: 'campaign' }>
   ownershipTarget: { type: 'campaign'; campaignId: string }
   characterKind: 'npc'
@@ -160,8 +144,6 @@ export type CampaignNpcBuildContext = CharacterBuildContext & {
 
 /** Campaign-scoped PC authoring — owned by the inviting user, rules from campaign. */
 export type CampaignPcBuildContext = CharacterBuildContext & {
-  mode: 'dashboard'
-  scope: CampaignCharacterBuildScope
   rulesScope: Extract<CharacterRulesScope, { type: 'campaign' }>
   ownershipTarget: { type: 'user'; userId: string }
   characterKind: 'pc'

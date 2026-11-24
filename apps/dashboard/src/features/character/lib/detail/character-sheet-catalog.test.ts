@@ -164,8 +164,8 @@ describe('character-sheet-catalog', () => {
               grantId: 'cantrips',
             },
           ],
-          access: { classKnown: true },
-          selection: { prepared: true },
+          access: {},
+          collections: [{ kind: 'prepared' as const }],
         },
       ],
     }

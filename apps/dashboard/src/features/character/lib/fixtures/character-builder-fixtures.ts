@@ -66,8 +66,7 @@ export function createStandaloneBuilderContextFixture(
     channel: 'build',
     surface: 'dashboard',
     characterKind: 'pc',
-    mode: 'dashboard',
-    scope: { type: 'standalone', rulesetId },
+
     rulesScope: { type: 'ruleset', rulesetId },
     ownershipTarget: { type: 'user' },
     rulesetId,
@@ -109,8 +108,6 @@ export function createCampaignNpcBuilderContextFixture(
     channel: 'build',
     surface: 'dashboard',
     characterKind: 'npc',
-    mode: 'dashboard',
-    scope: { type: 'campaign', campaignId, rulesetId },
     rulesScope: { type: 'campaign', campaignId, rulesetId },
     ownershipTarget: { type: 'campaign', campaignId },
     acquisition: { kind: 'campaign_npc', campaignId },
@@ -139,8 +136,6 @@ export function createCampaignPcBuilderContextFixture(
     channel: 'build',
     surface: 'dashboard',
     characterKind: 'pc',
-    mode: 'dashboard',
-    scope: { type: 'campaign', campaignId, rulesetId },
     rulesScope: { type: 'campaign', campaignId, rulesetId },
     ownershipTarget: { type: 'user', userId: 'user-test-1' },
     acquisition: {

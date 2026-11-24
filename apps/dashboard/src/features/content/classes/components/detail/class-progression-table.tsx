@@ -269,8 +269,6 @@ type ClassProgressionTableProps = {
   characterClass: CharacterClass
   spellcastingProgression: ResolvedSpellcastingProgressionConfig
   campaignRules?: ResolvedCampaignRules
-  /** @deprecated Prefer `campaignRules`. */
-  maxCharacterLevel?: number
 }
 
 const DEFAULT_CAMPAIGN_RULES: ResolvedCampaignRules = {
@@ -286,12 +284,8 @@ export function ClassProgressionTable({
   characterClass,
   spellcastingProgression,
   campaignRules,
-  maxCharacterLevel,
 }: ClassProgressionTableProps) {
-  const rules = campaignRules ?? {
-    ...DEFAULT_CAMPAIGN_RULES,
-    maxCharacterLevel: maxCharacterLevel ?? MAX_CHARACTER_LEVEL,
-  }
+  const rules = campaignRules ?? DEFAULT_CAMPAIGN_RULES
   const progressionColumns = collectFeatureProgressionColumns(characterClass.features)
   const resolved = characterClass.spellcasting
     ? resolveClassSpellcasting(characterClass, spellcastingProgression)

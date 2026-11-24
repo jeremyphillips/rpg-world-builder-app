@@ -38,8 +38,6 @@ export interface UseMasterDetailArrayResult {
    * No-ops for stale or mismatched ids.
    */
   acknowledgeAcquisition: (fieldId: string) => void
-  /** @deprecated Prefer `acknowledgeAcquisition(fieldId)`. */
-  clearLastAddedFieldId: () => void
   /** Row index pending delete confirmation, or `null` when no dialog is open. */
   deleteIndex: number | null
   /** Opens the delete-confirmation flow for a row. */
@@ -216,10 +214,6 @@ export function useMasterDetailArray(
     [lastAddedFieldId, resolvedSelectedFieldId],
   )
 
-  const clearLastAddedFieldId = useCallback(() => {
-    if (lastAddedFieldId) acknowledgeAcquisition(lastAddedFieldId)
-  }, [acknowledgeAcquisition, lastAddedFieldId])
-
   const requestRemove = useCallback(
     (index: number) => setDeleteFieldId(fields[index]?.id ?? null),
     [fields],
@@ -327,7 +321,6 @@ export function useMasterDetailArray(
     replaceRows,
     lastAddedFieldId,
     acknowledgeAcquisition,
-    clearLastAddedFieldId,
     deleteIndex,
     requestRemove,
     cancelRemove,

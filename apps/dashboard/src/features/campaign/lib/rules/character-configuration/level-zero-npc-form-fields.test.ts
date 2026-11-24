@@ -35,7 +35,6 @@ describe('levelZeroNpcsFields', () => {
       label: 'Allow',
     })
     expect(allow.dependents.chrome).toBeUndefined()
-    expect(allow.dependents.inset).not.toBe(false)
     expect(
       allow.dependents.fields.some(
         (field) => isContainer(field) && field.kind === 'group' && 'chrome' in field,
@@ -117,8 +116,7 @@ describe('levelZeroNpcsFields', () => {
     expect(nestedDependents.length).toBeGreaterThanOrEqual(2)
     for (const nested of nestedDependents) {
       expect(nested.dependents.chrome).toBeUndefined()
-      expect(nested.dependents.inset).not.toBe(false)
-      expect(nested.dependents).not.toHaveProperty('panel')
+      expect(nested.dependents.chrome).not.toBe('none')
     }
   })
 })

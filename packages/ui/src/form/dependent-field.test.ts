@@ -15,8 +15,6 @@ describe('DependentConfig helpers', () => {
     controller: { type: 'switch', name: 'enabled', label: 'Enabled', defaultValue: false },
     dependents: {
       chrome: 'panel',
-      panel: { surface: { emphasis: 'subtle' } },
-      scope: 'arrayItems',
       fields: [
         {
           type: 'number',

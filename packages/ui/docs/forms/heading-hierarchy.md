@@ -90,12 +90,11 @@ An `srOnly` label stays in the accessibility tree and does not occupy the label 
 | Concept            | Meaning                                                                                                                                                                                                      |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Dependent nest** | Default when `dependents.chrome` is omitted or `'rail'` / legacy `'panel'` — `ui-field-dependent-nest` with anatomy alignment, rhythm inset, flush rail, and host fill modifiers. No border or extra radius. |
-| **Opt out**        | `dependents.chrome: 'none'` — no rail, fill, or nest inset. Legacy `inset: false` maps to flush layout at render time.                                                                                       |
+| **Opt out**        | `dependents.chrome: 'none'` — no rail, fill, or nest inset.                                                                                                                                                  |
 
 - Controller → dependents gap is **4px compact / 8px comfortable** via `resolveDependentSectionStackClasses` on `data-field-dependent`.
 - Nested dependent regions keep nest decoration but do **not** get additional field containers.
 - Shared factories inherit the default nest; pass `dependents: { chrome: 'none' }` to override.
-- **`dependents.inset`**, **`dependents.panel`**, and **`dependents.scope`** are deprecated — ignored except `inset: false`, which opts out.
 
 Chrome does not affect tier resolution, label visibility, or grouping. Detail → [containers.md](./containers.md#stacks).
 

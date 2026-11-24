@@ -104,7 +104,7 @@ describe('viewer character relationship extractors', () => {
         _id: 'char-1',
         name: 'Aric',
         characterType: 'pc',
-        spells: [{ spellId: 'fireball-id', selection: { prepared: true } }],
+        spells: [{ spellId: 'fireball-id', collections: [{ kind: 'prepared' as const }] }],
       },
       {
         _id: 'char-2',

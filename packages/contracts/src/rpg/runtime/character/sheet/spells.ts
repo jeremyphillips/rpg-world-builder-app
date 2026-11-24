@@ -15,20 +15,11 @@ import {
 // ---------------------------------------------------------------------------
 
 export const characterSpellAccessSchema = z.object({
-  /** @deprecated Prefer `collections` membership for class spellcasting rows. */
-  classKnown: z.boolean().optional(),
   alwaysPrepared: z.boolean().optional(),
   granted: z.boolean().optional(),
 })
 
 export type CharacterSpellAccess = z.infer<typeof characterSpellAccessSchema>
-
-/** @deprecated Prefer `collections` with kind `prepared`. */
-export const characterSpellSelectionSchema = z.object({
-  prepared: z.boolean(),
-})
-
-export type CharacterSpellSelection = z.infer<typeof characterSpellSelectionSchema>
 
 export const characterSpellCollectionMembershipSchema = z.object({
   kind: spellCollectionKindSchema,
@@ -56,8 +47,6 @@ export const characterSpellEntrySchema = z.object({
   sources: characterSelectionSourcesSchema,
   access: characterSpellAccessSchema,
   collections: z.array(characterSpellCollectionMembershipSchema).optional(),
-  /** @deprecated Prefer `collections` with kind `prepared`. */
-  selection: characterSpellSelectionSchema.optional(),
   castingEntitlements: z.array(characterSpellCastingEntitlementSchema).optional(),
   notes: z.string().optional(),
 })
@@ -71,10 +60,9 @@ export function characterSpellHasCollection(
   return entry.collections?.some((membership) => membership.kind === kind) ?? false
 }
 
-/** Whether the spell is in the prepared loadout (collections or legacy selection). */
+/** Whether the spell is in the prepared loadout via collection membership. */
 export function characterSpellIsPrepared(entry: CharacterSpellEntry): boolean {
-  if (characterSpellHasCollection(entry, 'prepared')) return true
-  return entry.selection?.prepared === true
+  return characterSpellHasCollection(entry, 'prepared')
 }
 
 export function mergeCharacterSpellCollections(

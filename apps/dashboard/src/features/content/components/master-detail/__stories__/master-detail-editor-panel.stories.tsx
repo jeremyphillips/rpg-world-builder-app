@@ -21,7 +21,6 @@ const selectedEditor: UseMasterDetailArrayResult = {
   replaceRows: () => {},
   lastAddedFieldId: null,
   acknowledgeAcquisition: () => {},
-  clearLastAddedFieldId: () => {},
   deleteIndex: null,
   requestRemove: () => {},
   cancelRemove: () => {},

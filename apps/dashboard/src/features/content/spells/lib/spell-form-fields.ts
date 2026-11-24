@@ -291,7 +291,6 @@ function spellScalingDependent(input: {
       defaultValue: false,
     },
     dependents: {
-      inset: false,
       chrome: 'none',
       fields: [
         {

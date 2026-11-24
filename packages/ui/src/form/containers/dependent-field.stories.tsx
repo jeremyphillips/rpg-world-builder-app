@@ -89,7 +89,6 @@ const dependentErrorToneFields: FormItem[] = [
     },
     dependents: {
       chrome: 'panel',
-      panel: { tone: 'destructive' },
       fields: [
         {
           type: 'number',
@@ -131,7 +130,6 @@ const selectDependentFields: FormItem[] = [
         visibleWhen: (values) => values.classPolicyMode !== 'all',
       },
       chrome: 'panel',
-      panel: { surface: { emphasis: 'subtle' } },
       fields: [
         {
           type: 'combobox',
@@ -196,7 +194,6 @@ export const DependentFieldComfortable: Story = {
         },
         dependents: {
           chrome: 'panel',
-          panel: { surface: { emphasis: 'subtle' } },
           fields: dependentFieldItems,
         },
       },
@@ -241,8 +238,6 @@ export const DependentFieldArrayItemsScope: Story = {
           },
           dependents: {
             chrome: 'panel',
-            panel: { surface: { emphasis: 'subtle' } },
-            scope: 'arrayItems',
             fields: [
               {
                 kind: 'array',

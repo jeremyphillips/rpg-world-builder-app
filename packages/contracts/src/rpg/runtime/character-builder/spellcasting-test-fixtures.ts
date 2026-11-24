@@ -309,8 +309,7 @@ export const spellcastingTestContext: CharacterBuildContext = {
   channel: 'build',
   surface: 'dashboard',
   characterKind: 'pc',
-  mode: 'dashboard',
-  scope: { type: 'standalone', rulesetId: RULESET },
+
   rulesScope: { type: 'ruleset', rulesetId: RULESET },
   ownershipTarget: resolveCharacterOwnershipTarget('pc', { type: 'ruleset', rulesetId: RULESET }),
   rulesetId: RULESET,

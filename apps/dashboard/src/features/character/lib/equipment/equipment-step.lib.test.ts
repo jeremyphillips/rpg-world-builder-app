@@ -85,8 +85,6 @@ function createEquipmentStepContextWithStartingWealth(
     channel: 'build',
     surface: 'dashboard',
     characterKind: 'pc',
-    mode: 'dashboard',
-    scope: { type: 'standalone', rulesetId: equipmentStepBardClassFixture.rulesetId },
     rulesScope: { type: 'ruleset', rulesetId: equipmentStepBardClassFixture.rulesetId },
     ownershipTarget: { type: 'user' },
     rulesetId: equipmentStepBardClassFixture.rulesetId,

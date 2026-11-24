@@ -277,7 +277,8 @@ export function useCampaignCharacterBuildContext({
   }, [context])
 
   const storageKey = useMemo(
-    () => (draftScope ? resolveCharacterBuilderDraftKey(draftScope, { mode: 'dashboard' }) : null),
+    () =>
+      draftScope ? resolveCharacterBuilderDraftKey(draftScope, { surface: 'dashboard' }) : null,
     [draftScope],
   )
 

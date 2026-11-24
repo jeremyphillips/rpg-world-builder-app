@@ -13,8 +13,6 @@ import {
 import { fieldStackRhythmVariants } from '../../components/ui/field.variants'
 import { Form } from '../shells/form.client'
 import type { FormItem } from '../field-config'
-import type { SurfaceConfig } from '../../components/ui/visual-vocabulary.types'
-
 const schema = z.object({
   featureEnabled: z.boolean(),
   featureValue: z.number().optional(),
@@ -25,10 +23,7 @@ type Values = z.infer<typeof schema>
 
 const dependentField = (
   options: {
-    inset?: boolean
     chrome?: 'none' | 'rail' | 'panel'
-    panel?: { surface?: SurfaceConfig; tone?: 'destructive' }
-    scope?: 'wrapper' | 'arrayItems'
     includeNote?: boolean
   } = {},
 ): FormItem => ({
@@ -41,10 +36,7 @@ const dependentField = (
     defaultValue: false,
   },
   dependents: {
-    ...(options.inset === false ? { inset: false } : {}),
     ...(options.chrome ? { chrome: options.chrome } : {}),
-    ...(options.panel ? { panel: options.panel } : {}),
-    ...(options.scope ? { scope: options.scope } : {}),
     fields: [
       {
         type: 'number',
@@ -128,7 +120,6 @@ describe('dependent field', () => {
     const { container } = renderDependentForm([
       dependentField({
         chrome: 'panel',
-        panel: { surface: { emphasis: 'subtle' } },
       }),
     ])
 
@@ -177,9 +168,7 @@ describe('dependent field', () => {
     { chrome: 'rail' as const, expectNest: true },
   ])('chrome=$chrome controls nest rendering', async ({ chrome, expectNest }) => {
     const user = userEvent.setup()
-    const { container } = renderDependentForm([
-      dependentField({ inset: chrome === 'none' ? false : undefined, chrome }),
-    ])
+    const { container } = renderDependentForm([dependentField({ chrome })])
 
     await user.click(screen.getByRole('switch', { name: 'Enable feature' }))
 
@@ -296,7 +285,6 @@ describe('dependent field', () => {
     const { container } = renderDependentForm([
       dependentField({
         chrome: 'panel',
-        panel: { surface: { emphasis: 'subtle' } },
         includeNote: true,
       }),
     ])
@@ -359,8 +347,6 @@ describe('dependent field', () => {
         },
         dependents: {
           chrome: 'panel',
-          panel: { surface: { emphasis: 'subtle' } },
-          scope: 'arrayItems',
           fields: [
             {
               kind: 'array',
@@ -417,7 +403,6 @@ describe('dependent field', () => {
             visibleWhen: (values) => values.mode !== 'all',
           },
           chrome: 'panel',
-          panel: { surface: { emphasis: 'subtle' } },
           fields: [
             {
               type: 'combobox',
@@ -491,7 +476,6 @@ describe('dependent field', () => {
             visibleWhen: (values) => values.mode !== 'all',
           },
           chrome: 'panel',
-          panel: { surface: { emphasis: 'subtle' } },
           fields: [
             {
               type: 'combobox',
@@ -598,7 +582,6 @@ describe('dependent confirmBeforeClear', () => {
         defaultValue: true,
       },
       dependents: {
-        inset: false,
         chrome: 'none',
         fields: [
           {
