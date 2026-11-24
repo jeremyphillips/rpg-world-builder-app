@@ -1,7 +1,7 @@
 import { joinStatBlockProseDocument, systemDefaultArmorClassRules } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
-import { pickMonster } from '@/test/fixtures/pick'
+import { pickMonster, pickSpell } from '@/test/fixtures/pick'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import type { MonsterFormValues } from '../monster-form-values'
@@ -62,6 +62,70 @@ describe('resolveActionStatBlockRulesFacingForForm', () => {
       section: 'actions',
     })
     expect(outcome).toMatchObject({ status: 'ready', facing: { descriptionHtml: description } })
+  })
+
+  it('keeps generated bonus-action prose available during catalog failures', () => {
+    const outcome = resolveActionStatBlockRulesFacingForForm({
+      values: baseValues({
+        bonusActions: [{ id: 'step', kind: 'teleport', name: 'Teleport', distanceFeet: 40 }],
+      }),
+      ctx: baseCtx({ equipmentCatalogStatus: 'error', spellCatalogStatus: 'error' }),
+      actionId: 'step',
+      section: 'bonusActions',
+    })
+    expect(outcome).toMatchObject({
+      status: 'ready',
+      facing: { descriptionHtml: expect.stringContaining('40 feet') },
+    })
+  })
+
+  it('resolves spell previews from the spell catalog even when equipment fails', () => {
+    const spell = pickSpell('fireball')
+    const values = baseValues({
+      actions: [
+        {
+          id: 'cast',
+          kind: 'spell',
+          name: 'Spellcasting',
+          castingAbility: { kind: 'ability', ability: 'int' },
+          spells: [{ spellId: spell.id }],
+        },
+      ],
+    })
+    const request = { values, actionId: 'cast', section: 'actions' } as const
+
+    const ready = resolveActionStatBlockRulesFacingForForm({
+      ...request,
+      ctx: baseCtx({
+        equipmentCatalogStatus: 'error',
+        spellCatalogById: new Map([[spell.id, spell]]),
+      }),
+    })
+    expect(ready.status).toBe('ready')
+    if (ready.status === 'ready') {
+      expect(joinStatBlockProseDocument(ready.facing.rulesProse ?? [])).toMatch(/fireball/i)
+    }
+
+    expect(
+      resolveActionStatBlockRulesFacingForForm({
+        ...request,
+        ctx: baseCtx({ equipmentCatalogStatus: 'error', spellCatalogStatus: 'pending' }),
+      }),
+    ).toEqual({ status: 'unavailable', reason: { code: 'catalog-pending', catalog: 'spells' } })
+
+    expect(
+      resolveActionStatBlockRulesFacingForForm({
+        ...request,
+        ctx: baseCtx({ spellCatalogStatus: 'error' }),
+      }),
+    ).toEqual({ status: 'unavailable', reason: { code: 'catalog-error', catalog: 'spells' } })
+
+    expect(
+      resolveActionStatBlockRulesFacingForForm({
+        ...request,
+        ctx: baseCtx(),
+      }),
+    ).toEqual({ status: 'unavailable', reason: { code: 'missing-spell-reference' } })
   })
 
   it('returns unavailable when equipment catalog is pending', () => {

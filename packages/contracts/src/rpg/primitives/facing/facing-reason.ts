@@ -17,6 +17,7 @@ export type FacingReason =
   | { code: 'missing-attack-input'; field: FacingAttackInputField; label?: string }
   | { code: 'missing-multiattack-steps' }
   | { code: 'missing-spell-configuration' }
+  | { code: 'missing-spell-reference' }
   | { code: 'incomplete-spellcasting' }
   | { code: 'spellcasting-progression-unavailable' }
   | { code: 'incomplete-trait' }

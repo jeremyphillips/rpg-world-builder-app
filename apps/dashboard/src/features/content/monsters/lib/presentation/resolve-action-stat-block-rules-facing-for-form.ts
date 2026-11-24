@@ -2,6 +2,8 @@ import {
   availableBodyRows,
   CHALLENGE_RATING_MECHANICS,
   deriveSpellcastingLines,
+  createSpellCatalogContext,
+  resolveSpellReferenceOutcome,
   isMonsterActionAttackKind,
   monsterActionSectionRows,
   monsterRichTextIsEmpty,
@@ -87,6 +89,44 @@ function unavailableActionCatalog(ctx: ContentFormCtx): FacingReason | undefined
   }
   if (ctx.spellCatalogStatus === 'pending' || ctx.spellCatalogStatus === 'error') {
     return spellCatalogReason(ctx)
+  }
+  return undefined
+}
+
+function canResolveWithoutDerivedStats(action: PublishedAction): boolean {
+  switch (action.kind) {
+    case 'special':
+      return !action.savingThrow
+    case 'leap':
+    case 'teleport':
+    case 'take-actions':
+    case 'shape-shift':
+      return true
+    default:
+      return false
+  }
+}
+
+function selectedActionCatalogReason(
+  action: PublishedAction,
+  ctx: ContentFormCtx,
+): FacingReason | undefined {
+  if (canResolveWithoutDerivedStats(action)) return undefined
+  if (action.kind !== 'spell') return unavailableActionCatalog(ctx)
+  if (ctx.spellCatalogStatus !== 'ready') return spellCatalogReason(ctx)
+
+  const catalog = createSpellCatalogContext({
+    status: ctx.spellCatalogStatus,
+    spellsById: ctx.spellCatalogById,
+  })
+  if (
+    action.spells.some(
+      ({ spellId }) =>
+        spellId !== undefined &&
+        resolveSpellReferenceOutcome(spellId, catalog).status === 'unresolved',
+    )
+  ) {
+    return { code: 'missing-spell-reference' }
   }
   return undefined
 }
@@ -242,13 +282,12 @@ export function resolveActionStatBlockRulesFacingForForm(input: {
     if (!selected) return { status: 'incomplete', reason: { code: 'missing-rules-text' } }
 
     action = selected
-    const authoredOnly = action.kind === 'special' && !action.savingThrow
-    if (!authoredOnly) {
-      const reason = unavailableActionCatalog(input.ctx)
-      if (reason) return { status: 'unavailable', reason }
-    }
+    const reason = selectedActionCatalogReason(action, input.ctx)
+    if (reason) return { status: 'unavailable', reason }
 
-    derived = authoredOnly ? null : derivedForFacing(input.values, input.ctx)
+    derived = canResolveWithoutDerivedStats(action)
+      ? null
+      : derivedForFacing(input.values, input.ctx)
     const catalogState = 'ready' as const
     spellContext = buildSpellDisplayContext({
       monster: normalized,
