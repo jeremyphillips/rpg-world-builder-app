@@ -15,7 +15,7 @@ function visibleForTemplateId(templateId: string): FieldVisibility {
 export function creatureTraitTemplateFields(): FormItem[] {
   return CREATURE_TRAIT_TEMPLATE_IDS.flatMap((templateId) => {
     const template = getCreatureTraitTemplate(templateId)
-    if (!template) return []
+    if (!template?.hosts.includes('species')) return []
     return [
       {
         kind: 'group' as const,

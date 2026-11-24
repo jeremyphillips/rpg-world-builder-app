@@ -1,7 +1,6 @@
 import { formatLimitedUseAuthoringHint } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 
-import { monsterLairEnabledVisibility } from '@/features/content/monsters/lib/statistics/monster-lair-form-fields'
 import {
   MONSTER_LEGENDARY_LAIR_USES_LABEL,
   MONSTER_LEGENDARY_RESISTANCE_LAIR_USES_HINT,
@@ -14,10 +13,14 @@ const LEGENDARY_RESISTANCE_USES_AUTHORING_HINT = formatLimitedUseAuthoringHint({
   recovery: { minimumRest: 'long' },
 })
 
+const TRAIT_LAIR_ENABLED_PATH = '../../lair.enabled'
+
+type UsesField = Extract<FormItem, { type: 'number' }>
+
 export function legendaryResistanceTemplateUseFields(options: {
   includeInLair: boolean
-}): FormItem[] {
-  const fields: FormItem[] = [
+}): [UsesField, ...UsesField[]] {
+  const fields: [UsesField, ...UsesField[]] = [
     {
       type: 'number',
       name: 'config.uses.normal',
@@ -39,7 +42,10 @@ export function legendaryResistanceTemplateUseFields(options: {
       digits: 2,
       control: 'stepper',
       width: 'auto',
-      visibility: monsterLairEnabledVisibility,
+      visibility: {
+        dependsOn: [TRAIT_LAIR_ENABLED_PATH],
+        visibleWhen: (values) => values[TRAIT_LAIR_ENABLED_PATH] === true,
+      },
     })
   }
   return fields

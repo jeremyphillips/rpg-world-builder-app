@@ -1,82 +1,116 @@
+import {
+  CREATURE_TRAIT_TEMPLATE_IDS,
+  getCreatureTraitTemplate,
+  type CreatureTraitTemplateHost,
+} from '@rpg/contracts'
+import { resolveDependsOnWatchName, type FormItem } from '@rpg/ui/form'
 import { describe, expect, it } from 'vitest'
 
-import type { FormItem } from '@rpg/ui/form'
-
+import { monsterTraitTemplateFields } from '../../monsters/lib/traits/monster-trait-form-fields'
+import { senseRangeJoinedPairField } from '../forms/fields/content-sense-range-form-fields'
 import {
   assembleCreatureTraitTemplateFields,
-  validateTraitTemplateFieldContributionForTest,
-  type TemplateConfigField,
+  validateTraitTemplateConfigFields,
 } from './creature-trait-template-field-assembler'
+
+const HOSTS = ['species', 'monster'] as const satisfies readonly CreatureTraitTemplateHost[]
+const LEGENDARY_RESISTANCE = 'legendary-resistance'
+const DARKVISION = 'sense-darkvision'
+const NORMAL_USES = 'config.uses.normal'
+const LAIR_USES = 'config.uses.inLair'
 
 function fieldName(field: FormItem): string | undefined {
   return 'name' in field && typeof field.name === 'string' ? field.name : undefined
 }
 
+function numberField(name: string) {
+  return { type: 'number', name, label: 'Fixture value' } as const
+}
+
 describe('assembleCreatureTraitTemplateFields', () => {
-  it('orders legendary resistance uses before details', () => {
-    const fields = assembleCreatureTraitTemplateFields({
-      templateId: 'legendary-resistance',
-      host: 'species',
-    })
-    const names = fields.map((field) => fieldName(field)).filter(Boolean)
-    expect(names).toEqual(['config.uses.normal', 'details'])
+  it.each(CREATURE_TRAIT_TEMPLATE_IDS)('classifies every host for %s', (templateId) => {
+    const template = getCreatureTraitTemplate(templateId)!
+    for (const host of HOSTS) {
+      const fields = assembleCreatureTraitTemplateFields({ templateId, host })
+      if (!template.hosts.includes(host)) {
+        expect(fields).toEqual([])
+      } else {
+        expect(fields.filter((field) => fieldName(field) === 'details')).toHaveLength(1)
+      }
+    }
   })
 
-  it('includes in-lair uses only for monsters', () => {
-    const species = assembleCreatureTraitTemplateFields({
-      templateId: 'legendary-resistance',
-      host: 'species',
-    })
-    expect(species.map((field) => fieldName(field))).not.toContain('config.uses.inLair')
-
-    const monster = assembleCreatureTraitTemplateFields({
-      templateId: 'legendary-resistance',
+  it('adds only Details for a fieldless template', () => {
+    const fields = assembleCreatureTraitTemplateFields({
+      templateId: 'magic-resistance',
       host: 'monster',
     })
-    expect(monster.map((field) => fieldName(field))).toContain('config.uses.inLair')
+    expect(fields.map(fieldName)).toEqual(['details'])
   })
 
-  it('throws when contribution paths collide', () => {
+  it('keeps legendary resistance use fields in order across both supported hosts', () => {
+    const exampleConfig = { uses: { normal: 5, inLair: 7 } }
+    expect(
+      getCreatureTraitTemplate(LEGENDARY_RESISTANCE)?.configSchema.parse(exampleConfig),
+    ).toEqual(exampleConfig)
+
+    const species = assembleCreatureTraitTemplateFields({
+      templateId: LEGENDARY_RESISTANCE,
+      host: 'species',
+    })
+    expect(species.map(fieldName)).toEqual([NORMAL_USES, 'details'])
+
+    const monster = monsterTraitTemplateFields(LEGENDARY_RESISTANCE)
+    expect(monster.map(fieldName)).toEqual([NORMAL_USES, LAIR_USES, 'details'])
+    const visibility = monster.find((field) => fieldName(field) === LAIR_USES)?.visibility
+    if (!visibility) throw new Error('Missing lair visibility')
+    const [dependency] = visibility.dependsOn
+    expect(resolveDependsOnWatchName(dependency!, 'traits.0')).toBe('lair.enabled')
+    expect(visibility.visibleWhen({ [dependency!]: true })).toBe(true)
+    expect(visibility.visibleWhen({ [dependency!]: false })).toBe(false)
+  })
+
+  it('binds a non-default species sense range with a static feet label', () => {
+    const [range] = assembleCreatureTraitTemplateFields({ templateId: DARKVISION, host: 'species' })
+    expect(range).toMatchObject({
+      type: 'joinedPair',
+      start: {
+        name: 'config.range',
+        options: expect.arrayContaining([{ value: 90, label: '90' }]),
+      },
+      end: { kind: 'label' },
+    })
+    expect(getCreatureTraitTemplate(DARKVISION)?.configSchema.parse({ range: 90 })).toEqual({
+      range: 90,
+    })
+  })
+
+  it.each(['sense-unknown', 'toString'])('omits fields for unknown template %s', (templateId) => {
+    expect(assembleCreatureTraitTemplateFields({ templateId, host: 'species' })).toEqual([])
+  })
+
+  it('rejects a duplicate path across joined and ordinary fields', () => {
+    const rangePath = 'config.range'
     expect(() =>
-      validateTraitTemplateFieldContributionForTest(
-        {
-          shared: [
-            {
-              type: 'number',
-              name: 'config.uses.normal',
-              label: 'Uses',
-              min: 1,
-            } satisfies TemplateConfigField,
-            {
-              type: 'number',
-              name: 'config.uses.normal',
-              label: 'Uses again',
-              min: 1,
-            } satisfies TemplateConfigField,
-          ],
-        },
-        'species',
-        'fixture-template',
+      validateTraitTemplateConfigFields(
+        [senseRangeJoinedPairField({ amountName: rangePath }), numberField(rangePath)],
+        DARKVISION,
       ),
     ).toThrow(/Duplicate/)
   })
 
-  it('throws when a contribution reserves the details path', () => {
+  it.each(['config.uses.unknown', 'config.uses', 'uses.normal'])(
+    'rejects invalid config binding %s even when the template has required inputs',
+    (path) => {
+      expect(() =>
+        validateTraitTemplateConfigFields([numberField(path)], LEGENDARY_RESISTANCE),
+      ).toThrow(/not a field on/)
+    },
+  )
+
+  it.each(['details', 'details.extra'])('reserves %s for the owning surface', (path) => {
     expect(() =>
-      validateTraitTemplateFieldContributionForTest(
-        {
-          shared: [
-            {
-              type: 'number',
-              name: 'details',
-              label: 'Illegal',
-              min: 1,
-            } satisfies TemplateConfigField,
-          ],
-        },
-        'species',
-        'fixture-template',
-      ),
+      validateTraitTemplateConfigFields([numberField(path)], LEGENDARY_RESISTANCE),
     ).toThrow(/reserved/)
   })
 })

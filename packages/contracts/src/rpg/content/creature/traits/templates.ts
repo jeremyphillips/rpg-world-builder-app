@@ -171,7 +171,9 @@ export const CREATURE_TRAIT_TEMPLATE_IDS = Object.keys(CREATURE_TRAIT_TEMPLATE_E
 ]
 
 export function getCreatureTraitTemplate(templateId: string): CreatureTraitTemplate | undefined {
-  return CREATURE_TRAIT_TEMPLATE_ENTRIES[templateId as CreatureTraitTemplateId]
+  return Object.hasOwn(CREATURE_TRAIT_TEMPLATE_ENTRIES, templateId)
+    ? CREATURE_TRAIT_TEMPLATE_ENTRIES[templateId as CreatureTraitTemplateId]
+    : undefined
 }
 
 /** Whether a registry template may be assigned on the given authoring host. */

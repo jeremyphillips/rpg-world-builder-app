@@ -1,127 +1,120 @@
-import { getCreatureTraitTemplate, type CreatureTraitTemplateHost } from '@rpg/contracts'
+import {
+  getCreatureTraitTemplate,
+  type CreatureTraitTemplateHost,
+  type CreatureTraitTemplateId,
+} from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
+import { z } from 'zod'
 
-import { senseRangeJoinedPairField } from '../forms/fields/content-sense-range-form-fields'
+import {
+  SENSE_RANGE_UNIT_LABEL,
+  senseRangeJoinedPairField,
+} from '../forms/fields/content-sense-range-form-fields'
 import { legendaryResistanceTemplateUseFields } from './legendary-resistance-trait-fields'
 
-export type TemplateConfigField = Extract<
+type TemplateConfigField = Extract<
   FormItem,
-  { type: 'number' | 'text' | 'select' | 'checkbox' | 'switch' }
+  { type: 'number' | 'text' | 'select' | 'checkbox' | 'switch' | 'joinedPair' }
 >
 
-export type TemplateFieldContribution = {
-  shared: readonly TemplateConfigField[]
-  extend?: Partial<Record<CreatureTraitTemplateHost, readonly TemplateConfigField[]>>
-}
+type TemplateFieldPolicy =
+  | { kind: 'configurable'; fields: () => readonly [TemplateConfigField, ...TemplateConfigField[]] }
+  | { kind: 'fieldless' | 'unsupported' }
 
+const FIELDLESS = { kind: 'fieldless' } as const
+const UNSUPPORTED = { kind: 'unsupported' } as const
+
+const FIELDLESS_ON_BOTH_HOSTS = { species: FIELDLESS, monster: FIELDLESS }
+const SENSE_FIELD_POLICY = {
+  species: {
+    kind: 'configurable',
+    fields: () => [
+      senseRangeJoinedPairField({
+        amountName: 'config.range',
+        required: true,
+        end: { kind: 'label', text: SENSE_RANGE_UNIT_LABEL, ariaLabel: 'Range unit' },
+      }),
+    ],
+  },
+  monster: UNSUPPORTED,
+} satisfies Record<CreatureTraitTemplateHost, TemplateFieldPolicy>
+
+const FIELD_POLICIES = {
+  'magic-resistance': FIELDLESS_ON_BOTH_HOSTS,
+  'pack-tactics': FIELDLESS_ON_BOTH_HOSTS,
+  'sunlight-sensitivity': FIELDLESS_ON_BOTH_HOSTS,
+  'legendary-resistance': {
+    species: {
+      kind: 'configurable',
+      fields: () => legendaryResistanceTemplateUseFields({ includeInLair: false }),
+    },
+    monster: {
+      kind: 'configurable',
+      fields: () => legendaryResistanceTemplateUseFields({ includeInLair: true }),
+    },
+  },
+  'sense-blindsight': SENSE_FIELD_POLICY,
+  'sense-darkvision': SENSE_FIELD_POLICY,
+  'sense-tremorsense': SENSE_FIELD_POLICY,
+  'sense-truesight': SENSE_FIELD_POLICY,
+} satisfies Record<CreatureTraitTemplateId, Record<CreatureTraitTemplateHost, TemplateFieldPolicy>>
+
+const CONFIG_PREFIX = 'config.'
+const DETAILS_PATH = 'details'
 const RESERVED_PATHS = new Set([
-  'details',
+  DETAILS_PATH,
   'descriptionOverride',
   'overrideDisplay',
   'nameOverride',
 ])
 
-const CONTRIBUTIONS: Partial<Record<string, TemplateFieldContribution>> = {
-  'legendary-resistance': {
-    shared: legendaryResistanceTemplateUseFields({ includeInLair: false }) as TemplateConfigField[],
-    extend: {
-      monster: legendaryResistanceTemplateUseFields({
-        includeInLair: true,
-      }).filter(
-        (field): field is TemplateConfigField =>
-          'name' in field && field.name === 'config.uses.inLair',
-      ),
-    },
-  },
-}
-
 function supplementalDetailsField(): FormItem {
   return {
     type: 'richtext',
-    name: 'details',
+    name: DETAILS_PATH,
     label: 'Details',
-    optionalDisclosure: { intent: 'add', actionSubject: 'details' },
+    optionalDisclosure: { intent: 'add', actionSubject: DETAILS_PATH },
   }
 }
 
-function assertFieldPath(path: string, templateId: string): void {
-  if (RESERVED_PATHS.has(path)) {
-    throw new Error(`Trait template field "${path}" is reserved (${templateId}).`)
+function boundPaths(field: TemplateConfigField): string[] {
+  if (field.type !== 'joinedPair') return [field.name]
+  return field.end.kind === 'select' ? [field.start.name, field.end.name] : [field.start.name]
+}
+
+function schemaHasFieldPath(schema: z.ZodType | undefined, path: string): boolean {
+  if (!path.startsWith(CONFIG_PREFIX)) return false
+  for (const segment of path.slice(CONFIG_PREFIX.length).split('.')) {
+    if (!(schema instanceof z.ZodObject) || !Object.hasOwn(schema.shape, segment)) return false
+    schema = schema.shape[segment]
   }
+  return schema !== undefined && !(schema instanceof z.ZodObject)
 }
 
-function assertPathOnSchema(path: string, templateId: string): void {
-  if (!path.startsWith('config.')) return
-  const template = getCreatureTraitTemplate(templateId)
-  if (!template) return
-  const key = path.slice('config.'.length).split('.')[0]
-  if (!key) return
-  const shape = template.configSchema.safeParse({})
-  if (!shape.success) return
-  const configKeys = Object.keys(shape.data as Record<string, unknown>)
-  const nested = path.slice('config.'.length)
-  const top = nested.split('.')[0]
-  if (!top || !configKeys.includes(top)) {
-    throw new Error(`Trait template field "${path}" is not on ${templateId} config schema.`)
-  }
-}
-
-function withOptionalVisibility(field: FormItem, visibility?: FormItem['visibility']): FormItem {
-  return visibility ? { ...field, visibility } : field
-}
-
-/** @internal Validation hook for contribution registry tests. */
-export function validateTraitTemplateFieldContributionForTest(
-  contribution: TemplateFieldContribution,
-  host: CreatureTraitTemplateHost,
-  templateId: string,
+/** Validates persisted config bindings against the template schema, including nested fields. */
+export function validateTraitTemplateConfigFields(
+  fields: readonly TemplateConfigField[],
+  templateId: CreatureTraitTemplateId,
 ): void {
-  validateContributionPaths(contribution, host, templateId)
-}
-
-function validateContributionPaths(
-  contribution: TemplateFieldContribution,
-  host: CreatureTraitTemplateHost,
-  templateId: string,
-): void {
-  const paths = [
-    ...contribution.shared.map((field) => field.name),
-    ...(contribution.extend?.[host] ?? []).map((field) => field.name),
-  ]
+  const schema = getCreatureTraitTemplate(templateId)?.configSchema
+  const paths = fields.flatMap(boundPaths)
   const seen = new Set<string>()
   for (const path of paths) {
+    if (RESERVED_PATHS.has(path.split('.')[0]!)) {
+      throw new Error(`Trait template field "${path}" is reserved (${templateId}).`)
+    }
     if (seen.has(path)) {
       throw new Error(`Duplicate trait template field "${path}" (${templateId}).`)
     }
     seen.add(path)
-    assertFieldPath(path, templateId)
-    assertPathOnSchema(path, templateId)
   }
-}
-
-function contributionFields(
-  contribution: TemplateFieldContribution,
-  host: CreatureTraitTemplateHost,
-  visibility?: FormItem['visibility'],
-): FormItem[] {
-  const fields: FormItem[] = contribution.shared.map((field) =>
-    withOptionalVisibility(field, visibility),
-  )
-  for (const field of contribution.extend?.[host] ?? []) {
-    if (contribution.shared.some((shared) => shared.name === field.name)) {
-      throw new Error(`Trait template field "${field.name}" cannot extend a shared path.`)
+  for (const path of paths) {
+    if (!schemaHasFieldPath(schema, path)) {
+      throw new Error(
+        `Trait template field "${path}" is not a field on ${templateId} config schema.`,
+      )
     }
-    fields.push(withOptionalVisibility(field, visibility))
   }
-  return fields
-}
-
-function senseTemplateConfigField(): TemplateConfigField {
-  return senseRangeJoinedPairField({
-    amountName: 'config.range',
-    width: '1/3',
-    required: true,
-  }) as unknown as TemplateConfigField
 }
 
 /** Assembles registry-backed trait config fields for one template and authoring host. */
@@ -130,15 +123,23 @@ export function assembleCreatureTraitTemplateFields(input: {
   host: CreatureTraitTemplateHost
   visibility?: FormItem['visibility']
 }): FormItem[] {
-  const contribution = CONTRIBUTIONS[input.templateId]
-  const configFields: FormItem[] = contribution
-    ? (validateContributionPaths(contribution, input.host, input.templateId),
-      contributionFields(contribution, input.host, input.visibility))
-    : input.templateId.startsWith('sense-')
-      ? [senseTemplateConfigField()]
-      : getCreatureTraitTemplate(input.templateId)
-        ? []
-        : []
+  const template = getCreatureTraitTemplate(input.templateId)
+  if (!template) return []
 
-  return [...configFields, supplementalDetailsField()]
+  const templateId = input.templateId as CreatureTraitTemplateId
+  const policy = FIELD_POLICIES[templateId]?.[input.host]
+  if (!policy || template.hosts.includes(input.host) === (policy.kind === 'unsupported')) {
+    throw new Error(`Trait template field policy does not match ${templateId} on ${input.host}.`)
+  }
+  if (policy.kind === 'unsupported') return []
+  if (policy.kind === 'fieldless') return [supplementalDetailsField()]
+
+  const fields = policy.fields()
+  validateTraitTemplateConfigFields(fields, templateId)
+  return [
+    ...fields.map((field) =>
+      input.visibility ? { ...field, visibility: input.visibility } : field,
+    ),
+    supplementalDetailsField(),
+  ]
 }

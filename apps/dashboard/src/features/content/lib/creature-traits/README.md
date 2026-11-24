@@ -24,12 +24,17 @@ import `resolveTraitFacingParts` or `formatLegendaryResistanceStatBlockTitle` (E
 guards + `src/test/trait-eslint-guard.test.ts`). A module outside the form-field glob
 can still hand-build `FormItem[]` literals — that bypass is residual.
 
-Each host’s add
-menu calls `listCreatureTraitTemplatesForRuleset(rulesetId, host)` with an
-explicit host (`'monster'` or `'species'`). Registry entries declare required
-`hosts`; `isCreatureTraitTemplateEligibleForHost` is the shared eligibility
-check for menus, form validation, and API write gates. Sense templates are
-species-only—monsters author senses under Creature Details, not trait templates.
+Each host’s add menu calls `listCreatureTraitTemplatesForRuleset(rulesetId, host)`.
+Registry entries declare eligible hosts. The dashboard field matrix requires a
+configurable, fieldless, or unsupported policy for every registered template
+and host. Configurable entries supply at least one field. The assembler checks
+bound control paths against the registered config schema and appends Details
+once for eligible hosts.
+
+Species sense templates use a fixed feet label and store the range in
+`config.range`. Monsters author their senses under Creature Details. Legendary
+Resistance exposes normal uses on both hosts and adds in-lair uses when the
+monster’s lair is enabled.
 
 ## What is not here
 

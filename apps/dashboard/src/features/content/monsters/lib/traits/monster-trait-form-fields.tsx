@@ -67,12 +67,6 @@ export function monsterTraitItemFields(input?: {
   ]
 }
 
-const legendaryResistanceTemplateVisibility = {
-  dependsOn: ['templateId'],
-  visibleWhen: (watched: Record<string, unknown>) =>
-    watched['templateId'] === 'legendary-resistance',
-}
-
 /** Config fields for a monster `kind: 'template'` row. */
 export function monsterTraitTemplateFields(templateId?: string): FormItem[] {
   if (!templateId) {
@@ -89,7 +83,6 @@ export function monsterTraitTemplateFields(templateId?: string): FormItem[] {
   return assembleCreatureTraitTemplateFields({
     templateId,
     host: 'monster',
-    visibility: legendaryResistanceTemplateVisibility,
   }).map((field) => {
     if ('name' in field && field.name === 'details') {
       return {
