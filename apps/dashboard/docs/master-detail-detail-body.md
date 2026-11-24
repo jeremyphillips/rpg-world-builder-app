@@ -1,7 +1,9 @@
 # Master–detail detail-body anatomy
 
 Structured row editors (class features, species traits, heritage options, monster
-actions, monster traits) share one detail-body composition path.
+actions, monster traits) share one detail-body composition path. The embedded
+row builder owns list identity, provenance, persistence, issue counts, and
+availability for editors with and without availability controls.
 
 ## Ownership
 

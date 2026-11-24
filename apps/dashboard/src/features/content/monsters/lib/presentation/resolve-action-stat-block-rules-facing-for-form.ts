@@ -24,7 +24,6 @@ import {
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { resolveMonsterActionAttackPreviewReason } from '../actions/previews/monster-action-attack-summary'
-import { findMonsterFormActionDraft } from '../actions/previews/monster-action-draft-lookup'
 import type { MonsterActionSection } from '../actions/references/monster-action-equipment-references'
 import {
   monsterArmorClassRules,
@@ -64,12 +63,6 @@ function sectionRows(monster: Monster, section: MonsterActionSection): Published
     )
   }
   return availableBodyRows(monster[section] as PublishedAction[])
-}
-
-function derivedSection(
-  section: MonsterActionSection,
-): 'actions' | 'bonusActions' | 'reactions' | 'legendaryActions' {
-  return section
 }
 
 function equipmentCatalogReason(ctx: ContentFormCtx): FacingReason {
@@ -213,29 +206,22 @@ function derivedAttackReason(
   reason: DerivedFieldReason,
   values: MonsterFormValues,
   ctx: ContentFormCtx,
-  actionId: string,
+  action: PublishedAction,
 ): FacingReason {
-  if (reason === 'missing-input') {
-    const draft = findMonsterFormActionDraft(values, ctx, actionId)
-    if (draft && isMonsterActionAttackKind(draft.kind)) {
-      return resolveMonsterActionAttackPreviewReason({ ctx, values, action: draft })
-    }
-    return { code: 'missing-rules-text' }
-  }
+  if (reason === 'missing-input') return incompleteReasonForAction(action, values, ctx)
   if (reason === 'missing-reference') return { code: 'unresolvable-record' }
   if (reason === 'conflict') return { code: 'derived-conflict' }
   return { code: 'unexpected' }
 }
 
 function incompleteReasonForAction(
-  action: ReturnType<typeof findMonsterFormActionDraft>,
+  action: PublishedAction,
   values: MonsterFormValues,
   ctx: ContentFormCtx,
 ): FacingReason {
-  if (!action) return { code: 'missing-rules-text' }
   if (action.kind === 'multiattack') return { code: 'missing-multiattack-steps' }
   if (action.kind === 'spell') return { code: 'missing-spell-configuration' }
-  if (isMonsterActionAttackKind(action.kind)) {
+  if (action.kind === 'weapon' || action.kind === 'natural-weapon' || action.kind === 'attack') {
     return resolveMonsterActionAttackPreviewReason({ ctx, values, action })
   }
   return { code: 'missing-rules-text' }
@@ -259,6 +245,7 @@ export function resolveActionStatBlockRulesFacingForForm(input: {
 }): MonsterActionRulesPreviewOutcome {
   let normalized: Monster
   let action: PublishedAction
+  let rows: PublishedAction[]
   let attackDraft: ReturnType<typeof resolveMonsterDraftAttackEntry> | undefined
   let spellContext: SpellDisplayContext
 
@@ -268,7 +255,8 @@ export function resolveActionStatBlockRulesFacingForForm(input: {
       mode: 'create',
       armorClassRules: monsterArmorClassRules(input.ctx),
     })
-    const selected = sectionRows(normalized, input.section).find((row) => row.id === input.actionId)
+    rows = sectionRows(normalized, input.section)
+    const selected = rows.find((row) => row.id === input.actionId)
     if (!selected) return { status: 'incomplete', reason: { code: 'missing-rules-text' } }
 
     if (!MONSTER_ACTION_KINDS.includes(selected.kind)) {
@@ -290,7 +278,7 @@ export function resolveActionStatBlockRulesFacingForForm(input: {
       attackDraft = resolveMonsterDraftAttackEntry({
         action,
         monster: normalized,
-        section: derivedSection(input.section),
+        section: input.section,
         equipmentCatalog: monsterEquipmentCatalog(input.ctx),
         proficiencyBonus: CHALLENGE_RATING_MECHANICS[normalized.challengeRating]?.proficiencyBonus,
         magicPropertyProvider,
@@ -318,7 +306,7 @@ export function resolveActionStatBlockRulesFacingForForm(input: {
     const { reason } = attackDraft.result
     return {
       status: reason === 'missing-input' ? 'incomplete' : 'unavailable',
-      reason: derivedAttackReason(reason, input.values, input.ctx, input.actionId),
+      reason: derivedAttackReason(reason, input.values, input.ctx, action),
     }
   }
 
@@ -331,11 +319,11 @@ export function resolveActionStatBlockRulesFacingForForm(input: {
         spellcasting: [],
       }
     : null
-  const headings = actionReferenceHeadings(sectionRows(normalized, input.section), spellContext)
+  const headings = actionReferenceHeadings(rows, spellContext)
 
   const facing = resolveActionStatBlockRulesFacing(
     action,
-    derivedSection(input.section),
+    input.section,
     derived,
     'ready',
     spellContext,
@@ -343,10 +331,9 @@ export function resolveActionStatBlockRulesFacingForForm(input: {
   )
 
   if (!facingHasRulesBody(facing)) {
-    const draftAction = findMonsterFormActionDraft(input.values, input.ctx, input.actionId)
     return {
       status: 'incomplete',
-      reason: incompleteReasonForAction(draftAction, input.values, input.ctx),
+      reason: incompleteReasonForAction(action, input.values, input.ctx),
     }
   }
 

@@ -7,13 +7,10 @@ import type { EmbeddedArrayResolverFieldInput } from '../forms/validation/tabbed
 import type { Availability, AvailabilityReason } from '@/lib/availability'
 import { openCampaignAvailabilityDialog } from '../campaign-access/open-campaign-availability-dialog.lib'
 import type { ContentFormCtx } from '../forms/registry/content-form-registry'
-import { buildEmbeddedMasterDetailListItem } from './build-embedded-master-detail-list-item'
 import {
   buildEmbeddedMasterDetailRows,
   findEmbeddedMasterDetailRowByFieldId,
-  type EmbeddedMasterDetailRow,
 } from './build-embedded-master-detail-rows'
-import { resolveMasterDetailRowKey } from './content-campaign-availability'
 import { buildSelectedMasterDetailIdentity } from './build-selected-master-detail-identity'
 import {
   buildEmbeddedFieldArrayRowSnapshot,
@@ -143,9 +140,9 @@ export function useEmbeddedMasterDetailRows<TRow = Record<string, unknown>>({
     [editor.lastAddedFieldId, itemNoun, mapListItem, resolveListMeta, rowTitle, rowsSnapshot],
   )
 
-  const allRows = useMemo((): EmbeddedMasterDetailRow[] => {
-    if (access) {
-      return buildEmbeddedMasterDetailRows({
+  const allRows = useMemo(
+    () =>
+      buildEmbeddedMasterDetailRows({
         fields: editor.fields,
         rowsSnapshot,
         formCtx,
@@ -158,64 +155,22 @@ export function useEmbeddedMasterDetailRows<TRow = Record<string, unknown>>({
         systemOriginRowIds,
         sectionLabel,
         resolveRowReasons,
-      })
-    }
-
-    return editor.fields.map((field, formIndex) => {
-      const row = rowsSnapshot[formIndex]
-      const listDisplay = resolveListDisplay({
-        field,
-        index: formIndex,
-        row,
-        entityCatalogLayer: formCtx.entityCatalogLayer,
-        getRowIssueCount,
-      })
-      const item = buildEmbeddedMasterDetailListItem({
-        field,
-        index: formIndex,
-        row: row as { id?: string } | undefined,
-        entityCatalogLayer: formCtx.entityCatalogLayer,
-        persistedRowIds,
-        systemOriginRowIds,
-        getRowIssueCount,
-        title: embeddedListItemTitle(listDisplay, itemNoun),
-        eyebrow: listDisplay.eyebrow,
-        kindLabel: listDisplay.kindLabel,
-        summary: listDisplay.summary,
-        sectionLabel,
-        showDelete,
-        extraReasons:
-          resolveRowReasons?.({
-            row,
-            rowKey: resolveMasterDetailRowKey(field.id, row as { id?: string } | undefined),
-            index: formIndex,
-          }) ?? [],
-      })
-      return {
-        fieldId: field.id,
-        formIndex,
-        item,
-        availability: {
-          rowId: item.id,
-          isAvailable: true,
-          statusLabel: 'Available' as const,
-        },
-      }
-    })
-  }, [
-    access,
-    editor.fields,
-    formCtx,
-    getRowIssueCount,
-    itemNoun,
-    resolveListDisplay,
-    resolveRowReasons,
-    persistedRowIds,
-    systemOriginRowIds,
-    sectionLabel,
-    showDelete,
-    rowsSnapshot,
-  ])
+      }),
+    [
+      access,
+      editor.fields,
+      formCtx,
+      getRowIssueCount,
+      itemNoun,
+      resolveListDisplay,
+      resolveRowReasons,
+      persistedRowIds,
+      systemOriginRowIds,
+      sectionLabel,
+      showDelete,
+      rowsSnapshot,
+    ],
+  )
 
   const selectedRow = useMemo(
     () => findEmbeddedMasterDetailRowByFieldId(allRows, editor.selectedFieldId),

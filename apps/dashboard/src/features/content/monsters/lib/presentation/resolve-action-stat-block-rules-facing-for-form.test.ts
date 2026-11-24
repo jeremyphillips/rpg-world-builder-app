@@ -705,6 +705,31 @@ describe('resolveActionStatBlockRulesFacingForForm', () => {
     })
   })
 
+  it('reports missing damage from the selected section when another section shares its id', () => {
+    const actionId = 'shared-id'
+    const values = baseValues({
+      actions: [{ id: actionId, kind: 'special', name: 'Roar', description: '<p>Roar.</p>' }],
+      bonusActions: [
+        {
+          id: actionId,
+          kind: 'attack',
+          name: 'Scratch',
+          modes: ['melee'],
+          bonusSource: { kind: 'ability', ability: 'str', proficient: true },
+          reach: 5,
+        },
+      ],
+    })
+    expect(
+      resolveActionStatBlockRulesFacingForForm({
+        values,
+        ctx: baseCtx(),
+        actionId,
+        section: 'bonusActions',
+      }),
+    ).toEqual({ status: 'incomplete', reason: { code: 'missing-attack-input', field: 'damage' } })
+  })
+
   it('keeps a finished attack ready when a sibling attack has no damage', () => {
     const monster = pickMonster('hell-hound')
     const values = normalizeMonsterFormValues(
