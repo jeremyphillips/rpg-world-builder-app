@@ -1922,7 +1922,6 @@
     "findBrowsableVocabularyCategory",
     "findCanonicalPlainEntry",
     "findCompiledChoiceProgressionBySuffix",
-    "findEquipmentPurchaseById",
     "findOrganizationLocationConnectionOfKindForOrganization",
     "findOutcomeByResult",
     "findRemovedOrganizationMembershipTitleIds",
