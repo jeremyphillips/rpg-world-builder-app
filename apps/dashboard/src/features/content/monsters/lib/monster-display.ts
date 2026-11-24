@@ -141,6 +141,7 @@ export type BuildMonsterDetailViewModelInput = {
   classLabel?: (id: string) => string
   equipmentById: Map<string, Equipment>
   catalogState: MonsterCatalogLoadState
+  equipmentCatalogState?: MonsterCatalogLoadState
   derived?: DerivedMonsterStatBlock | null
   spellsById?: ReadonlyMap<string, MonsterReferencedSpell>
   spellCatalogStatus?: 'ready' | 'unavailable'
@@ -643,6 +644,7 @@ export function buildMonsterDetailViewModel({
   classLabel,
   equipmentById,
   catalogState,
+  equipmentCatalogState = catalogState,
   derived,
   spellsById,
   spellCatalogStatus = 'unavailable',
@@ -651,7 +653,7 @@ export function buildMonsterDetailViewModel({
   const spellContext = buildSpellDisplayContext({
     monster,
     equipmentById,
-    catalogState,
+    catalogState: equipmentCatalogState,
     spellsById,
     spellCatalogStatus,
     magicPropertyProvider,
@@ -699,20 +701,20 @@ export function buildMonsterDetailViewModel({
       availableBodyRows(monster.actions),
       'actions',
       derived,
-      catalogState,
+      equipmentCatalogState,
       spellContext,
     ),
     bonusActions: mapActionItems(
       availableBodyRows(monster.bonusActions),
       'bonusActions',
       derived,
-      catalogState,
+      equipmentCatalogState,
       spellContext,
     ),
     reactions: mapReactionItems(
       availableBodyRows(monster.reactions),
       derived,
-      catalogState,
+      equipmentCatalogState,
       spellContext,
     ),
     legendaryActions: mapActionItems(
@@ -721,7 +723,7 @@ export function buildMonsterDetailViewModel({
       ),
       'legendaryActions',
       derived,
-      catalogState,
+      equipmentCatalogState,
       spellContext,
     ),
     legendaryActionsIntro: formatLegendaryActionsIntro(monster),

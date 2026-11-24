@@ -181,6 +181,7 @@ describe('MonsterDetailContent authoring', () => {
     expect(
       screen.queryByText('Some mechanical details could not be resolved from campaign catalogs.'),
     ).not.toBeInTheDocument()
+    expect(screen.getByText(/Melee or Ranged Attack Roll/)).toBeInTheDocument()
     expect(screen.queryByText('Initiative')).not.toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: 'Abilities' })).not.toBeInTheDocument()
   })
@@ -216,6 +217,26 @@ describe('MonsterDetailContent authoring', () => {
     expect(screen.getByRole('alert')).toHaveTextContent(
       'Could not load equipment or skill proficiencies.',
     )
+  })
+
+  it('renders natural attack rules when equipment fails to load', () => {
+    useEquipmentMock.mockReturnValue({
+      isPending: false,
+      isLoadingError: true,
+    } as ReturnType<typeof useEquipment>)
+
+    render(
+      <MemoryRouter>
+        <MonsterDetailContent
+          monster={pickMonster('hell-hound')}
+          campaignId="camp_1"
+          monsterId="hell-hound"
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Could not load equipment.')
+    expect(screen.getByText(/Melee Attack Roll/)).toBeInTheDocument()
   })
 
   it('keeps derived content when a catalog refetch fails', () => {

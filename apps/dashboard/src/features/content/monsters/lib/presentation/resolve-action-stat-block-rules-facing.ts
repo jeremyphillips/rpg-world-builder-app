@@ -22,6 +22,7 @@ import {
   monsterReferencedActionIds,
   monsterRichTextIsEmpty,
   resolveMonsterActionIdentity,
+  resolveMonsterDraftAttackEntry,
   resolveProseSavingThrowDc,
   shapeShiftRows,
   type CastingAbility,
@@ -605,6 +606,22 @@ function mapParryActionFacing(
   }
 }
 
+function deriveActionAttackLine(
+  action: Parameters<typeof resolveMonsterDraftAttackEntry>[0]['action'],
+  section: DerivedMonsterAttackLine['section'],
+  spells: SpellDisplayContext,
+): DerivedMonsterAttackLine | undefined {
+  const { result } = resolveMonsterDraftAttackEntry({
+    action,
+    monster: spells.monster,
+    section,
+    equipmentCatalog: spells.equipmentById,
+    proficiencyBonus: CHALLENGE_RATING_MECHANICS[spells.monster.challengeRating]?.proficiencyBonus,
+    magicPropertyProvider: spells.magicPropertyProvider,
+  })
+  return result.status === 'resolved' ? result.value : undefined
+}
+
 function mapAttackActionFacing(
   action: MonsterAction | MonsterBonusAction | MonsterReaction | MonsterLegendaryAction,
   section: DerivedMonsterAttackLine['section'],
@@ -613,10 +630,14 @@ function mapAttackActionFacing(
   catalogState: MonsterCatalogLoadState,
   spells: SpellDisplayContext,
 ): MonsterActionRulesFacing {
-  const attack = findAttackLine(derived, section, action.id)
-  const attackLine = resolveActionAttackLine(catalogState, attack)
+  const attackCatalogState = action.kind === 'weapon' ? catalogState : 'ready'
+  const attack =
+    derived || attackCatalogState !== 'ready'
+      ? findAttackLine(derived, section, action.id)
+      : deriveActionAttackLine(action, section, spells)
+  const attackLine = resolveActionAttackLine(attackCatalogState, attack)
   const parts =
-    attack && catalogState === 'ready' ? monsterAttackActionSentenceParts(attack) : undefined
+    attack && attackCatalogState === 'ready' ? monsterAttackActionSentenceParts(attack) : undefined
   const rulesProse =
     parts && attackLine !== MONSTER_UNRESOLVED_CATALOG_REFERENCE
       ? [monsterAttackActionPartsToProse(parts)]

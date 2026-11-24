@@ -270,7 +270,7 @@ describe('resolveActionStatBlockRulesFacingForForm', () => {
   })
 
   it.each(['natural-weapon', 'attack'] as const)(
-    'preserves %s preview rules and metadata during catalog failures',
+    'preserves %s rules in draft and published detail during catalog failures',
     (kind) => {
       const attack = {
         id: 'claw',
@@ -288,11 +288,17 @@ describe('resolveActionStatBlockRulesFacingForForm', () => {
               modes: ['melee' as const],
               bonusSource: { kind: 'ability', ability: 'str', proficient: true } as const,
             }
-          : { ...attack, kind }
+          : { ...attack, kind, properties: [] }
+      const section = action.kind === 'attack' ? 'bonusActions' : 'actions'
+      const monster = {
+        ...pickMonster('hell-hound'),
+        actions: action.kind === 'natural-weapon' ? [action] : [],
+        bonusActions: action.kind === 'attack' ? [action] : [],
+      }
       const request = {
-        values: baseValues({ actions: [action] }),
+        values: monster as unknown as MonsterFormValues,
         actionId: attack.id,
-        section: 'actions',
+        section,
       } as const
       const ready = resolveActionStatBlockRulesFacingForForm({ ...request, ctx: baseCtx() })
 
@@ -303,12 +309,9 @@ describe('resolveActionStatBlockRulesFacingForForm', () => {
         attackLine: expect.any(Object),
       })
       for (const equipmentCatalogStatus of ['pending', 'error'] as const) {
-        expect(
-          resolveActionStatBlockRulesFacingForForm({
-            ...request,
-            ctx: baseCtx({ equipmentCatalogStatus, spellCatalogStatus: 'error' }),
-          }),
-        ).toEqual(ready)
+        const ctx = baseCtx({ equipmentCatalogStatus, spellCatalogStatus: 'error' })
+        expect(resolveActionStatBlockRulesFacingForForm({ ...request, ctx })).toEqual(ready)
+        expectPublishedParity(monster, section, attack.id, ctx)
       }
     },
   )

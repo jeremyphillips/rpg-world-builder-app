@@ -84,6 +84,12 @@ export function MonsterDetailContent({
   const equipment = equipmentQuery.data
   const skillProficiencies = skillsQuery.data
 
+  const equipmentCatalogState = equipmentQuery.isPending
+    ? 'pending'
+    : equipmentQuery.isLoadingError
+      ? 'error'
+      : 'ready'
+
   const catalogState: MonsterCatalogLoadState = useMemo(() => {
     if (equipmentQuery.isPending || skillsQuery.isPending || rulesetQuery.isPending)
       return 'pending'
@@ -138,6 +144,7 @@ export function MonsterDetailContent({
         },
         equipmentById,
         catalogState: derived === null && catalogState === 'ready' ? 'error' : catalogState,
+        equipmentCatalogState,
         derived,
         spellsById: new Map((spellsQuery.data ?? []).map((spell) => [spell.id, spell])),
         spellCatalogStatus: spellsQuery.isError
@@ -154,6 +161,7 @@ export function MonsterDetailContent({
       classesQuery.data,
       derived,
       equipmentById,
+      equipmentCatalogState,
       monster,
       spellsQuery.data,
       magicPropertyProvider,
