@@ -24,8 +24,6 @@ export function useMonsterTraitFacingHost(input: {
 
   const resolution = useMemo(() => {
     if (!selectedRow || typeof selectedRow !== 'object') return undefined
-    if (selectedRow.kind === 'custom') return undefined
-    if (typeof selectedRow.preset !== 'string' && selectedRow.kind !== 'template') return undefined
     return resolveFacing({
       domain: 'trait',
       source: 'draft',

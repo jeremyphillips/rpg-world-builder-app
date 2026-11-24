@@ -58,7 +58,13 @@ export type ResolveFacingRequest =
       monster: Pick<MonsterFormValues, 'name' | 'lair' | 'forms'>
     }
 
-export function resolveFacing(request: ResolveFacingRequest): FacingResolution {
+type DraftTraitFacingRequest = Extract<ResolveFacingRequest, { domain: 'trait'; source: 'draft' }>
+
+export function resolveFacing(
+  request: Exclude<ResolveFacingRequest, DraftTraitFacingRequest>,
+): FacingResolution
+export function resolveFacing(request: ResolveFacingRequest): FacingResolution | undefined
+export function resolveFacing(request: ResolveFacingRequest): FacingResolution | undefined {
   switch (request.domain) {
     case 'classFeature': {
       if (request.source === 'persisted') {
@@ -80,21 +86,27 @@ export function resolveFacing(request: ResolveFacingRequest): FacingResolution {
         actionId: request.actionId,
         section: request.section,
       }).resolution
-    case 'trait': {
-      if (request.source === 'persisted') {
-        return resolveTraitPersistedFacing(request.trait)
-      }
-      if (request.hostId === 'monster-traits') {
-        const resolution = resolveMonsterTraitDraftFacing({
-          row: request.row,
-          monster: request.monster,
-        })
-        return resolution ?? { status: 'invalid', reason: { code: 'unsupported-kind' } }
-      }
-      const resolution = resolveSpeciesTraitDraftFacing(request.row)
-      return resolution ?? { status: 'invalid', reason: { code: 'unresolvable-record' } }
-    }
+    case 'trait':
+      return resolveTraitFacing(request)
   }
+}
+
+function resolveTraitFacing(
+  request: Extract<ResolveFacingRequest, { domain: 'trait' }>,
+): FacingResolution | undefined {
+  if (request.source === 'persisted') {
+    return resolveTraitPersistedFacing(request.trait)
+  }
+  if (request.row.kind === 'custom') return undefined
+  if (request.hostId === 'monster-traits') {
+    const resolution = resolveMonsterTraitDraftFacing({
+      row: request.row,
+      monster: request.monster,
+    })
+    return resolution ?? { status: 'invalid', reason: { code: 'unsupported-kind' } }
+  }
+  const resolution = resolveSpeciesTraitDraftFacing(request.row)
+  return resolution ?? { status: 'invalid', reason: { code: 'unresolvable-record' } }
 }
 
 export function resolveClassFeatureRowFacing(

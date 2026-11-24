@@ -21,7 +21,6 @@ export function useSpeciesTraitFacingHost(input: {
 
   const resolution = useMemo(() => {
     if (!selectedRow) return undefined
-    if (selectedRow.kind === 'custom') return undefined
     return resolveFacing({
       domain: 'trait',
       source: 'draft',

@@ -221,7 +221,10 @@ const dashboardDragHandleGuard = {
 
 /** Form heading hierarchy — ban deprecated label and legend APIs in form field modules. */
 const dashboardFormSlotGuards = {
-  files: ['src/features/**/components/form/slots/**/*.{ts,tsx}'],
+  files: [
+    'src/features/**/components/form/slots/**/*.{ts,tsx}',
+    'src/features/content/monsters/components/form/actions/**/*.slot.{ts,tsx}',
+  ],
   ignores: ['**/*.{test,integration.test,stories}.{ts,tsx}'],
   rules: {
     'no-restricted-syntax': [
@@ -476,22 +479,21 @@ const dashboardSourceExcerptImportGuard = {
 }
 
 const dashboardFacingPresentationImportGuard = {
-  files: ['src/features/**/*.{ts,tsx}'],
+  files: ['src/**/*.{ts,tsx}'],
   ignores: [
     '**/*.{test,integration.test,stories}.{ts,tsx}',
     'src/features/content/facing/structured-facing-host-panel.tsx',
     'src/features/content/facing/facing-detail-body.tsx',
   ],
   rules: {
-    'no-restricted-imports': [
+    '@typescript-eslint/no-restricted-imports': [
       'error',
       {
         paths: [
           {
             name: '@rpg/ui',
             importNames: ['FacingHostPanel'],
-            message:
-              'Mount Rules Preview through StructuredFacingHostPanel / FacingDetailBody — features cannot import the host shell directly.',
+            message: 'Mount structured previews through StructuredFacingHostPanel.',
           },
         ],
       },
@@ -656,7 +658,6 @@ export default [
   dashboardSemanticStyleLayerGuards,
   dashboardDragHandleGuard,
   dashboardFormFieldGuards,
-  dashboardFormSlotGuards,
   dashboardContentPickerPolicyGuards,
   dashboardContentCharacterPickerChromeGuard,
   dashboardCharacterBuilderPlayActorGuard,
@@ -664,6 +665,15 @@ export default [
   dashboardShellContractsImportGuard,
   dashboardAuthApiContractsImportGuard,
   dashboardSystemRulesetLiteralGuard,
+  {
+    ...dashboardFormSlotGuards,
+    rules: {
+      'no-restricted-syntax': [
+        ...dashboardSystemRulesetLiteralGuard.rules['no-restricted-syntax'],
+        ...dashboardFormSlotGuards.rules['no-restricted-syntax'].slice(1),
+      ],
+    },
+  },
   dashboardMonsterAcquisitionSectionKindsGuard,
   dashboardFacingPresentationImportGuard,
   dashboardTraitPipelineImportGuard,
