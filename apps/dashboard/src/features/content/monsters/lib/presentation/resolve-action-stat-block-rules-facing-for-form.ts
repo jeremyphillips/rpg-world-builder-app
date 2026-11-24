@@ -149,40 +149,64 @@ function spellCatalogReferenceReason(
   return undefined
 }
 
-function savingThrowSourceReason(
-  action: Extract<PublishedAction, { kind: 'save' | 'special' }>,
+function sharedCastingSourceReason(
+  castingAbility: Extract<PublishedAction, { kind: 'spell' }>['castingAbility'] | undefined,
   monster: Monster,
 ): FacingReason | undefined {
-  const source = action.kind === 'save' ? action.dcSource : action.savingThrow?.dcSource
-  if (source?.kind !== 'spellcasting' || source.castingAbility?.kind !== 'shared') return undefined
-  if (!findSpellCastingSource(monster, source.castingAbility.entryId)) {
+  if (castingAbility?.kind !== 'shared') return undefined
+  if (!castingAbility.entryId || !findSpellCastingSource(monster, castingAbility.entryId)) {
     return { code: 'missing-action-reference' }
   }
   return undefined
 }
 
-function selectedActionCatalogReason(
+function multiattackDependencyReason(
+  action: Extract<PublishedAction, { kind: 'multiattack' }>,
+  monster: Monster,
+  ctx: ContentFormCtx,
+): FacingReason | undefined {
+  const reason = referencedActionReason(action, monster, ctx)
+  if (reason) return reason
+  const spells = multiattackSpellChoices(action)
+  return spells.some(({ spellId }) => spellId !== undefined)
+    ? spellCatalogReferenceReason(spells, ctx)
+    : undefined
+}
+
+function savingThrowDependencyReason(
+  action: Extract<PublishedAction, { kind: 'save' | 'special' }>,
+  monster: Monster,
+): FacingReason | undefined {
+  const source = action.kind === 'save' ? action.dcSource : action.savingThrow?.dcSource
+  return source?.kind === 'spellcasting'
+    ? sharedCastingSourceReason(source.castingAbility, monster)
+    : undefined
+}
+
+function selectedActionDependencyReason(
   action: PublishedAction,
   monster: Monster,
   ctx: ContentFormCtx,
 ): FacingReason | undefined {
-  if (action.kind === 'multiattack') {
-    const reason = referencedActionReason(action, monster, ctx)
-    if (reason) return reason
-    const spells = multiattackSpellChoices(action)
-    return spells.some(({ spellId }) => spellId !== undefined)
-      ? spellCatalogReferenceReason(spells, ctx)
-      : undefined
+  switch (action.kind) {
+    case 'multiattack':
+      return multiattackDependencyReason(action, monster, ctx)
+    case 'action-reference':
+    case 'parry':
+      return referencedActionReason(action, monster, ctx)
+    case 'save':
+    case 'special':
+      return savingThrowDependencyReason(action, monster)
+    case 'weapon':
+      return attackCatalogReason(action, monster, ctx)
+    case 'spell':
+      return (
+        sharedCastingSourceReason(action.castingAbility, monster) ??
+        spellCatalogReferenceReason(action.spells, ctx)
+      )
+    default:
+      return undefined
   }
-  if (action.kind === 'action-reference' || action.kind === 'parry') {
-    return referencedActionReason(action, monster, ctx)
-  }
-  if (action.kind === 'save' || action.kind === 'special') {
-    return savingThrowSourceReason(action, monster)
-  }
-  if (isMonsterActionAttackKind(action.kind)) return attackCatalogReason(action, monster, ctx)
-  if (action.kind === 'spell') return spellCatalogReferenceReason(action.spells, ctx)
-  return undefined
 }
 
 function derivedAttackReason(
@@ -255,7 +279,10 @@ export function resolveActionStatBlockRulesFacingForForm(input: {
     if (action.kind === 'weapon' && !action.equipmentEntryId) {
       return { status: 'incomplete', reason: { code: 'missing-attack-input', field: 'equipment' } }
     }
-    const reason = selectedActionCatalogReason(action, normalized, input.ctx)
+    if (action.kind === 'spell' && !action.spells?.some(({ spellId }) => Boolean(spellId))) {
+      return { status: 'incomplete', reason: { code: 'missing-spell-configuration' } }
+    }
+    const reason = selectedActionDependencyReason(action, normalized, input.ctx)
     if (reason) return { status: 'unavailable', reason }
 
     const magicPropertyProvider = monsterMagicPropertyProvider(input.ctx)

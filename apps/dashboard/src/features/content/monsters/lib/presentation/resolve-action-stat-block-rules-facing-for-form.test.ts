@@ -1,5 +1,6 @@
 import {
   joinStatBlockProseDocument,
+  type Monster,
   monsterActionSectionRows,
   systemDefaultArmorClassRules,
 } from '@rpg/contracts'
@@ -8,6 +9,7 @@ import { describe, expect, it } from 'vitest'
 import { pickEquipment, pickMonster, pickSpell } from '@/test/fixtures/pick'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
+import { buildMonsterDetailViewModel } from '../monster-display'
 import type { MonsterFormValues } from '../monster-form-values'
 import { normalizeMonsterFormValues } from '../normalize-monster-form-values'
 
@@ -42,6 +44,38 @@ function baseValues(overrides: Partial<MonsterFormValues> = {}): MonsterFormValu
     reactions: [],
     ...overrides,
   } as MonsterFormValues
+}
+
+function expectPublishedParity(
+  monster: Monster,
+  section: keyof Pick<Monster, 'actions' | 'bonusActions' | 'reactions' | 'legendaryActions'>,
+  actionId: string,
+  ctx: ContentFormCtx,
+) {
+  const preview = resolveActionStatBlockRulesFacingForForm({
+    values: monster as unknown as MonsterFormValues,
+    ctx,
+    actionId,
+    section,
+  })
+  if (preview.status !== 'ready') throw new Error(JSON.stringify(preview))
+
+  const published = buildMonsterDetailViewModel({
+    monster,
+    creatureTypeLabel: 'Fiend',
+    equipmentById: new Map(ctx.equipmentCatalogById),
+    catalogState: ctx.equipmentCatalogStatus ?? 'pending',
+    spellsById: ctx.spellCatalogById,
+    spellCatalogStatus: ctx.spellCatalogStatus === 'ready' ? 'ready' : 'unavailable',
+  })[section].find((row) => row.id === actionId)
+
+  if (!published) throw new Error('Missing published action')
+  expect(published).toMatchObject({
+    name: preview.facing.name,
+    descriptionHtml: preview.facing.descriptionHtml,
+    rulesProse: preview.facing.rulesProse,
+  })
+  return published
 }
 
 describe('resolveActionStatBlockRulesFacingForForm', () => {
@@ -131,6 +165,110 @@ describe('resolveActionStatBlockRulesFacingForForm', () => {
     ).toEqual({ status: 'unavailable', reason: { code: 'missing-spell-reference' } })
   })
 
+  it('preserves bonus-action spell usage and authored notes while equipment is unavailable', () => {
+    const spell = pickSpell('fireball')
+    const description = '<p>Supplemental text.</p>'
+    const action = {
+      id: 'cast',
+      kind: 'spell',
+      name: 'Spellcasting',
+      castingAbility: { kind: 'ability', ability: 'int' },
+      spells: [{ spellId: spell.id }],
+      onceUntilNextTurn: true,
+      description,
+    } as const
+    const monster = {
+      ...pickMonster('hell-hound'),
+      bonusActions: [{ ...action, spells: [...action.spells] }],
+    }
+    const published = expectPublishedParity(
+      monster,
+      'bonusActions',
+      action.id,
+      baseCtx({
+        equipmentCatalogStatus: 'error',
+        spellCatalogById: new Map([[spell.id, spell]]),
+      }),
+    )
+    const rules = joinStatBlockProseDocument(published.rulesProse ?? [])
+    expect(rules).toMatch(/fireball.*until the start of its next turn/is)
+    expect(rules.match(/until the start of its next turn/g)).toHaveLength(1)
+    expect(published.descriptionHtml).toBe(description)
+  })
+
+  it.each(['ready', 'pending', 'error'] as const)(
+    'reports an empty spell selection as incomplete when the spell catalog is %s',
+    (spellCatalogStatus) => {
+      const outcome = resolveActionStatBlockRulesFacingForForm({
+        values: baseValues({
+          actions: [
+            {
+              id: 'cast',
+              kind: 'spell',
+              name: 'Spellcasting',
+              castingAbility: { kind: 'ability', ability: 'int' },
+              spells: [],
+            },
+          ],
+        }),
+        ctx: baseCtx({ spellCatalogStatus }),
+        actionId: 'cast',
+        section: 'actions',
+      })
+      expect(outcome).toEqual({
+        status: 'incomplete',
+        reason: { code: 'missing-spell-configuration' },
+      })
+    },
+  )
+
+  it('requires a direct shared casting source for a legendary spell invocation', () => {
+    const spell = pickSpell('fireball')
+    const source = {
+      id: 'casting',
+      name: 'Spellcasting',
+      kind: 'spell' as const,
+      castingAbility: { kind: 'ability' as const, ability: 'int' as const },
+      spells: [{ spellId: spell.id, castAtLevel: 4 }],
+    }
+    const values = baseValues({
+      actions: [source],
+      legendaryActions: {
+        uses: { normal: 3 },
+        actions: [
+          {
+            id: 'invoke',
+            kind: 'spell',
+            name: 'Invoke',
+            castingAbility: { kind: 'shared', entryId: source.id },
+            spellInvocation: 'use-entry',
+            spells: [{ spellId: spell.id }],
+          },
+        ],
+      },
+    })
+    const request = {
+      actionId: 'invoke',
+      section: 'legendaryActions',
+      ctx: baseCtx({ spellCatalogById: new Map([[spell.id, spell]]) }),
+    } as const
+
+    const ready = resolveActionStatBlockRulesFacingForForm({ ...request, values })
+    expect(ready.status).toBe('ready')
+    if (ready.status === 'ready') {
+      const rules = joinStatBlockProseDocument(ready.facing.rulesProse ?? [])
+      expect(rules).toContain(source.name)
+      expect(rules).toMatch(/fireball/i)
+    }
+
+    expect(
+      resolveActionStatBlockRulesFacingForForm({
+        ...request,
+        values: { ...values, actions: [] },
+      }),
+    ).toEqual({ status: 'unavailable', reason: { code: 'missing-action-reference' } })
+  })
+
   it.each(['natural-weapon', 'attack'] as const)(
     'preserves %s preview rules and metadata during catalog failures',
     (kind) => {
@@ -181,10 +319,13 @@ describe('resolveActionStatBlockRulesFacingForForm', () => {
     const ctx = baseCtx({ equipmentCatalogStatus: 'error', spellCatalogStatus: 'error' })
     const request = { actionId: 'multiattack', section: 'actions', ctx } as const
 
-    expect(resolveActionStatBlockRulesFacingForForm({ ...request, values })).toMatchObject({
-      status: 'ready',
-      facing: { descriptionHtml: expect.stringContaining('Bite') },
-    })
+    const published = expectPublishedParity(
+      values as unknown as Monster,
+      request.section,
+      request.actionId,
+      ctx,
+    )
+    expect(published.descriptionHtml).toContain('Bite')
 
     expect(
       resolveActionStatBlockRulesFacingForForm({
@@ -199,8 +340,8 @@ describe('resolveActionStatBlockRulesFacingForForm', () => {
     const action = monster.actions.find((row) => row.kind === 'weapon')
     if (!action) throw new Error('Missing weapon fixture')
 
-    const values = baseValues({
-      equipment: monster.equipment,
+    const body: Monster = {
+      ...monster,
       actions: [
         action,
         {
@@ -210,10 +351,21 @@ describe('resolveActionStatBlockRulesFacingForForm', () => {
           steps: [{ actionIds: [action.id], count: 2 }],
         },
       ],
-    })
+    }
+    const dagger = pickEquipment('dagger')
+    const published = expectPublishedParity(
+      body,
+      'actions',
+      'combo',
+      baseCtx({
+        equipmentCatalogById: new Map([[dagger.id, dagger]]),
+        spellCatalogStatus: 'error',
+      }),
+    )
+    expect(published.descriptionHtml).toMatch(/dagger/i)
     expect(
       resolveActionStatBlockRulesFacingForForm({
-        values,
+        values: body as unknown as MonsterFormValues,
         ctx: baseCtx({ equipmentCatalogStatus: 'pending', spellCatalogStatus: 'error' }),
         actionId: 'combo',
         section: 'actions',
@@ -261,6 +413,12 @@ describe('resolveActionStatBlockRulesFacingForForm', () => {
       status: 'ready',
       facing: { descriptionHtml: expect.stringContaining('Fireball') },
     })
+    expectPublishedParity(
+      values as unknown as Monster,
+      request.section,
+      request.actionId,
+      baseCtx({ equipmentCatalogStatus: 'error', spellCatalogById: new Map([[spell.id, spell]]) }),
+    )
   })
 
   it('resolves a saving throw from a shared casting ability without either catalog', () => {
@@ -388,6 +546,43 @@ describe('resolveActionStatBlockRulesFacingForForm', () => {
       }),
     ).toEqual({ status: 'invalid', reason: { code: 'unsupported-kind' } })
   })
+
+  it.each(['reactions', 'legendaryActions'] as const)(
+    'preserves weapon reference rules in %s once equipment is ready',
+    (section) => {
+      const monster = pickMonster('kobold-warrior')
+      const weapon = monster.actions.find((row) => row.kind === 'weapon')
+      if (!weapon) throw new Error('Missing weapon fixture')
+      const dagger = pickEquipment('dagger')
+      const id = 'follow-up'
+      const body: Monster = {
+        ...monster,
+        reactions: [{ id, kind: 'parry', name: 'Parry', acBonus: 2, followUpActionId: weapon.id }],
+        legendaryActions: {
+          uses: { normal: 3 },
+          actions: [{ id, kind: 'action-reference', actionIds: [weapon.id] }],
+        },
+      }
+      const published = expectPublishedParity(
+        body,
+        section,
+        id,
+        baseCtx({
+          equipmentCatalogById: new Map([[dagger.id, dagger]]),
+          spellCatalogStatus: 'error',
+        }),
+      )
+      expect(published.descriptionHtml).toMatch(/dagger/i)
+      expect(
+        resolveActionStatBlockRulesFacingForForm({
+          values: body as unknown as MonsterFormValues,
+          ctx: baseCtx({ equipmentCatalogStatus: 'error' }),
+          actionId: id,
+          section,
+        }),
+      ).toEqual({ status: 'unavailable', reason: { code: 'catalog-error', catalog: 'equipment' } })
+    },
+  )
 
   it('distinguishes weapon selection, equipment lifecycle, and missing references', () => {
     const monster = pickMonster('kobold-warrior')

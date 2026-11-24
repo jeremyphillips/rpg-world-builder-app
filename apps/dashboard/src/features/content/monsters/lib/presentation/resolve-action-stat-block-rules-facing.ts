@@ -19,6 +19,7 @@ import {
   isMonsterActionAttackKind,
   monsterActionSectionRows,
   monsterHasFormRestrictions,
+  monsterReferencedActionIds,
   monsterRichTextIsEmpty,
   resolveMonsterActionIdentity,
   resolveProseSavingThrowDc,
@@ -281,7 +282,13 @@ function formatMultiattackActionBody(
   spells: Pick<SpellDisplayContext, 'spellsById' | 'catalogStatus'>,
 ): string | undefined {
   if (catalogState !== 'ready') {
-    return catalogState === 'error' ? MONSTER_UNRESOLVED_CATALOG_REFERENCE : undefined
+    const references = monsterReferencedActionIds(action)
+    const needsEquipment = monster.actions.some(
+      (target) => target.kind === 'weapon' && references.includes(target.id),
+    )
+    if (needsEquipment) {
+      return catalogState === 'error' ? MONSTER_UNRESOLVED_CATALOG_REFERENCE : undefined
+    }
   }
   const generated = formatMonsterMultiattackResult({
     monsterName: monster.name,
