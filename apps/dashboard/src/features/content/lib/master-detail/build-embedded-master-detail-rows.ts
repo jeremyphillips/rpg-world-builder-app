@@ -27,7 +27,7 @@ export type BuildEmbeddedMasterDetailRowsParams = {
   formCtx: ContentFormCtx
   itemNoun: MasterDetailItemNounTerm
   showDelete: boolean
-  access: FormEmbeddedMasterDetailAccessConfig
+  access?: FormEmbeddedMasterDetailAccessConfig
   resolveListDisplay: (ctx: {
     field: { id: string }
     index: number
@@ -54,8 +54,9 @@ function readRowLocalAvailability(row: unknown, fieldName: string): boolean {
 
 function resolveRowLocalAvailability(
   row: unknown,
-  access: FormEmbeddedMasterDetailAccessConfig,
+  access?: FormEmbeddedMasterDetailAccessConfig,
 ): { isAvailable: boolean; localCampaignAccess?: ResolvedContentCampaignAccess } {
+  if (!access) return { isAvailable: true }
   if (access.kind === 'availability') {
     return { isAvailable: readRowLocalAvailability(row, access.fieldName) }
   }
@@ -124,7 +125,7 @@ export function buildEmbeddedMasterDetailRows({
         ...(isAvailable ? {} : { availabilityStatusLabel: 'Unavailable' as const }),
       },
       availability,
-      localCampaignAccess,
+      ...(access ? { localCampaignAccess } : {}),
     }
   })
 }

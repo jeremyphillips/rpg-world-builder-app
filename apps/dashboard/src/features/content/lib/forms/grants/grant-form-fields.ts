@@ -61,11 +61,13 @@ import {
   getContentTypeMidSentenceLabel,
 } from '@/features/content/lib/content-type-labels'
 
+import { equipmentReferenceScopeFromContentFormCtx } from '@/lib/content-form-equipment-reference-scope.lib'
+
 import type { ContentFormCtx } from '../registry/content-form-registry'
 import { senseRangeJoinedPairField } from '../fields/content-sense-range-form-fields'
 import { getLevelFieldOptions, withLevelOptionLabels } from '../../form-options/level-field-options'
 import {
-  referenceEquipmentFieldOptions,
+  referenceSpellFieldOptions,
   toSortedContentFieldOptions,
 } from '../../form-options/content-field-option.lib'
 import { getSpellcastingAbilityFieldOptions } from '../../form-options/spellcasting-ability-field-options'
@@ -78,9 +80,10 @@ import { buildGrantArrayAddMenu } from './grant-add-menu.lib'
 import { grantFieldLabel } from './grant-field-terms'
 import { createGrantArrayItemShell } from './grant-array-item-shell.lib'
 import {
+  buildGrantEquipmentReferencePresentationFromAuthoring,
+  buildGrantSpellReferencePresentationFromAuthoring,
   movementFormValuesToGrantPayload,
   resolveGrantRowPresentation,
-  resolveSpellGrantName,
   GRANT_TYPE_MISSING_PRIMARY,
   type GrantRowHeaderContext,
   type GrantRowValues,
@@ -421,7 +424,7 @@ export function formatGrantRowPrimary(
   return resolveGrantRowPresentation(values, ctx)?.heading
 }
 
-export { resolveGrantRowPresentation, resolveSpellGrantName }
+export { resolveGrantRowPresentation }
 
 export function grantItemFields<T extends string>(
   grantTypes: readonly T[],
@@ -429,7 +432,7 @@ export function grantItemFields<T extends string>(
   ctx: ContentFormCtx,
   options?: GrantItemFieldsOptions,
 ): FormItem[] {
-  const spellOptions = toSortedContentFieldOptions(ctx.options?.spells?.forReference(), 'spells')
+  const spellOptions = referenceSpellFieldOptions(ctx.options?.spells)
   const featOptions = toSortedContentFieldOptions(ctx.options?.feats?.forReference(), 'feats')
   const damageTypeOptions = buildActiveDamageTypeFieldOptions(ctx.damageTypeVocabulary)
   const senseTypeOptions = buildActiveSenseFieldOptions(ctx.senseVocabulary)
@@ -764,7 +767,14 @@ function buildGrantRowHeaderContext(
     resolveDamageTypeLabel: (id) => getDamageTypeLabelFromVocabulary(damageTypeVocabulary, id),
     resolveLanguageLabel: (id) => getLanguageLabelFromVocabulary(languageVocabulary, id),
     resolveSenseLabel: (id) => getSenseLabelFromVocabulary(senseVocabulary, id),
-    equipmentOptions: referenceEquipmentFieldOptions(ctx.options?.equipment),
+    equipmentReferences: buildGrantEquipmentReferencePresentationFromAuthoring({
+      status: ctx.rulesetId ? ctx.equipmentCatalogStatus : 'pending',
+      equipmentById: ctx.equipmentCatalogById,
+      scope: equipmentReferenceScopeFromContentFormCtx(ctx) ?? {
+        rulesetId: '',
+        campaignId: '',
+      },
+    }),
     weaponOptions: toSortedContentFieldOptions(
       referenceEquipment.filter(isWeaponEquipment),
       'equipment',
@@ -781,7 +791,10 @@ function buildGrantRowHeaderContext(
       ctx.options?.skills?.forReference(),
       'skill-proficiencies',
     ),
-    spellOptions: toSortedContentFieldOptions(ctx.options?.spells?.forReference(), 'spells'),
+    spellReferences: buildGrantSpellReferencePresentationFromAuthoring({
+      status: ctx.spellCatalogStatus,
+      spellsById: ctx.spellCatalogById,
+    }),
   }
 }
 

@@ -20,6 +20,7 @@ import {
   formatBuilderDraftCharacterSummary,
   PREVIEW_UNNAMED_CHARACTER,
 } from '../builder-preview/preview-identity-summary'
+import { equipmentReferenceScopeFromCharacterRulesScope } from '../detail/equipment-reference-scope.lib'
 import { buildCharacterDetailViewModel } from './character-detail-view-model.lib'
 import type {
   CharacterDetailProjectionCompleteness,
@@ -184,6 +185,9 @@ export function projectCharacterDraftDetailSource(args: ProjectCharacterDraftDet
       source,
       catalogIndex: args.catalogIndex,
       rules: args.context.characterCreationRules,
+      equipmentReferenceScope: equipmentReferenceScopeFromCharacterRulesScope(
+        args.context.rulesScope,
+      ),
       xpProgression: args.xpProgression,
     }),
     completeness,

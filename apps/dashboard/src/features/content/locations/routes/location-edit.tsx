@@ -7,7 +7,7 @@ import {
 } from '@/features/content/lib/content-type-labels'
 import { ContentEditShell } from '../../lib/forms/shells/edit/content-edit-shell'
 import { useLocations } from '../hooks/use-locations'
-import '../lib/forms/location-form-def'
+import { locationFormDef } from '../lib/forms/location-form-def'
 
 export function LocationEdit() {
   const { campaignId = '', locationId = '' } = useParams<{
@@ -18,7 +18,7 @@ export function LocationEdit() {
 
   return (
     <ContentEditShell
-      contentType="locations"
+      def={locationFormDef}
       campaignId={campaignId}
       entityId={locationId}
       isPending={isPending}
@@ -27,7 +27,6 @@ export function LocationEdit() {
       notFoundLabel={formatContentNotFoundMessage('locations')}
       backHref={ROUTES.content.locations.detail(campaignId, locationId)}
       overviewHref={ROUTES.content.locations.overview(campaignId)}
-      contentTypeKey="locations"
     />
   )
 }

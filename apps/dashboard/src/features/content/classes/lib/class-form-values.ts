@@ -22,9 +22,11 @@ import {
   alignProgressionToModel,
   detectRegularGain,
   materializeRegularGain,
+  spellChangePackageFromPolicy,
+  spellChangePolicyFromPackage,
   spellSelectionChangePackageFromPolicy,
   spellSelectionFromForm,
-  type SpellSelectionChangePackage,
+  type SpellChangePackage,
 } from './class-spell-selection-form.lib'
 import { createAsiFeature } from './class-asi-features'
 import { createSubclassChoiceFeature } from './class-subclass-choice-features'
@@ -139,8 +141,9 @@ function featuresForInput(
   rows: ClassFormValues['features'],
   existing: readonly ClassFeature[] | undefined,
   validationIntent: ContentValidationIntent,
+  className: string,
 ): ClassFeature[] {
-  const features = featuresFromFormValues(rows, existing)
+  const features = featuresFromFormValues(rows, existing, { className })
   if (validationIntent === 'publish') return features
   return features.filter((feature) => classFeatureSchema.safeParse(feature).success)
 }
@@ -205,7 +208,12 @@ function classWirePayloadParts(
       values.armorProficiencyMode === 'specific',
       validationIntent,
     ),
-    features: featuresForInput(values.features, ctx?.entity?.features, validationIntent),
+    features: featuresForInput(
+      values.features,
+      ctx?.entity?.features,
+      validationIntent,
+      values.name,
+    ),
   }
 }
 
@@ -256,9 +264,16 @@ export function spellSelectionModelToFormValues(
 
 export function spellSelectionChangePackageToFormValues(
   spellcasting: Spellcasting | undefined,
-): SpellSelectionChangePackage | undefined {
+): SpellChangePackage | undefined {
   if (!spellcasting?.spellSelection) return undefined
   return spellSelectionChangePackageFromPolicy(spellcasting.spellSelection.change)
+}
+
+export function cantripChangePackageToFormValues(
+  spellcasting: Spellcasting | undefined,
+): SpellChangePackage | undefined {
+  if (!spellcasting?.cantripSelection) return undefined
+  return spellChangePackageFromPolicy(spellcasting.cantripSelection.change)
 }
 
 export function spellbookAcquisitionToFormValues(spellcasting: Spellcasting | undefined): {
@@ -358,8 +373,87 @@ function applyOptionalSpellcastingFields(
   }
 }
 
+export {
+  CLASS_SPELLCASTING_PREVIEW_PARENT_FIELD_KEYS,
+  type ClassSpellcastingPreviewParentFieldKey,
+} from './class-spellcasting-preview-parent-field-keys'
+import {
+  CLASS_SPELLCASTING_PREVIEW_PARENT_FIELD_KEYS,
+  type ClassSpellcastingPreviewParentFieldKey,
+} from './class-spellcasting-preview-parent-field-keys'
+
+const CLASS_SPELLCASTING_FEATURE_ROW_PARENT_PREFIX = '../../' as const
+
+function readSpellcastingParentWatchValue(
+  values: Record<string, unknown>,
+  field: ClassSpellcastingPreviewParentFieldKey,
+  parentPrefix: string,
+): unknown {
+  return values[`${parentPrefix}${field}`]
+}
+
+/** Merge parent-level class form watch values and run the canonical spellcasting adapter. */
+export function spellcastingFromClassFormWatch(
+  values: Record<string, unknown>,
+  parentPrefix = CLASS_SPELLCASTING_FEATURE_ROW_PARENT_PREFIX,
+): Spellcasting | undefined {
+  const formSlice = {
+    hasSpellcasting: readSpellcastingParentWatchValue(values, 'hasSpellcasting', parentPrefix),
+    grantsCantrips: readSpellcastingParentWatchValue(values, 'grantsCantrips', parentPrefix),
+    spellcasting: readSpellcastingParentWatchValue(values, 'spellcasting', parentPrefix),
+    spellSelectionModel: readSpellcastingParentWatchValue(
+      values,
+      'spellSelectionModel',
+      parentPrefix,
+    ),
+    spellSelectionChangePackage: readSpellcastingParentWatchValue(
+      values,
+      'spellSelectionChangePackage',
+      parentPrefix,
+    ),
+    cantripChangePackage: readSpellcastingParentWatchValue(
+      values,
+      'cantripChangePackage',
+      parentPrefix,
+    ),
+    spellbookAcquisitionIrregular: readSpellcastingParentWatchValue(
+      values,
+      'spellbookAcquisitionIrregular',
+      parentPrefix,
+    ),
+    spellbookAcquisitionStarting: readSpellcastingParentWatchValue(
+      values,
+      'spellbookAcquisitionStarting',
+      parentPrefix,
+    ),
+    spellbookAcquisitionPerLevel: readSpellcastingParentWatchValue(
+      values,
+      'spellbookAcquisitionPerLevel',
+      parentPrefix,
+    ),
+    spellbookAcquisitionThroughLevel: readSpellcastingParentWatchValue(
+      values,
+      'spellbookAcquisitionThroughLevel',
+      parentPrefix,
+    ),
+    spellbookAcquisitionCurve: readSpellcastingParentWatchValue(
+      values,
+      'spellbookAcquisitionCurve',
+      parentPrefix,
+    ),
+  } as ClassFormValues
+
+  return spellcastingFromFormValues(formSlice)
+}
+
+export function classSpellcastingPreviewParentDependsOn(
+  parentPrefix = CLASS_SPELLCASTING_FEATURE_ROW_PARENT_PREFIX,
+): readonly string[] {
+  return CLASS_SPELLCASTING_PREVIEW_PARENT_FIELD_KEYS.map((key) => `${parentPrefix}${key}`)
+}
+
 export function spellcastingFromFormValues(values: ClassFormValues): Spellcasting | undefined {
-  const { grantsCantrips, spellcasting, spellSelectionChangePackage } = values
+  const { grantsCantrips, spellcasting, spellSelectionChangePackage, cantripChangePackage } = values
   if (!hasCompleteSpellcastingCore(values) || !spellcasting) {
     return undefined
   }
@@ -378,12 +472,21 @@ export function spellcastingFromFormValues(values: ClassFormValues): Spellcastin
     ...(spellSelection ? { spellSelection } : {}),
   }
   applyOptionalSpellcastingFields(result, spellcasting, grantsCantrips)
+
+  const cantripPackage = cantripChangePackage ?? 'none'
+  if (grantsCantrips && cantripPackage !== 'none') {
+    result.cantripSelection = {
+      change: spellChangePolicyFromPackage(cantripPackage),
+    }
+  }
+
   return result
 }
 
 export const classCreateDefaultValues: Partial<ClassFormValues> = {
   hasSpellcasting: false,
   grantsCantrips: false,
+  cantripChangePackage: 'none',
   spellbookAcquisitionIrregular: false,
   weaponProficiencyMode: 'categories',
   weaponProficiencyReconciliationPending: false,

@@ -1,4 +1,4 @@
-import type { ClassHitDie } from '../../../primitives/dice'
+import type { HitDie } from '../../../primitives/dice'
 import type { Ability } from '../../../vocab/ability'
 // ---------------------------------------------------------------------------
 // Derived stat helpers — pure functions over raw scores and catalog data.
@@ -27,12 +27,12 @@ import { abilityModifier } from '../../creature/ability-modifier'
  * Level-1 maximum HP: hit die max + CON modifier.
  * Single class only — multiclass HP aggregation lives in buildCharacterPreview.
  */
-export function levelOneMaxHp(hitDie: ClassHitDie, conScore: number): number {
+export function levelOneMaxHp(hitDie: HitDie, conScore: number): number {
   return resolveLevelOneMaxHp({ hitDie, conScore })
 }
 
 export type ResolveLevelOneMaxHpInput = {
-  hitDie: ClassHitDie
+  hitDie: HitDie
   conScore: number | undefined
   /** Used when `conScore` is unset — preview default, not an assigned ability score. */
   defaultConModifier?: number

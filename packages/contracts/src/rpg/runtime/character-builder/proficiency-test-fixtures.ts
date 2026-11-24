@@ -215,8 +215,7 @@ export const proficiencyTestContext: CharacterBuildContext = {
   channel: 'build',
   surface: 'dashboard',
   characterKind: 'pc',
-  mode: 'dashboard',
-  scope: { type: 'standalone', rulesetId: 'srd-cc-5.2.1' },
+
   rulesScope: { type: 'ruleset', rulesetId: 'srd-cc-5.2.1' },
   ownershipTarget: resolveCharacterOwnershipTarget('pc', {
     type: 'ruleset',

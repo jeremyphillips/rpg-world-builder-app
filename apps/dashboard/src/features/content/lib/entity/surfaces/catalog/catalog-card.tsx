@@ -152,7 +152,7 @@ function CatalogCardDisclosureBody({
         collapsible
         collapsed={collapsed}
         onToggleCollapse={onToggleCollapse}
-        showDragHandle={false}
+        reserveDragHandleSlot={false}
         bodyClassName={entityCardBodyClassName('catalog')}
         header={
           <EntityCardContent>

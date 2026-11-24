@@ -1,5 +1,6 @@
 import { createMagicPropertyDefinitionProvider } from '@rpg/catalog/magic-properties'
 import {
+  DEFAULT_SYSTEM_RULESET_ID,
   deriveMonsterDraftStatBlock,
   type ArmorClassRules,
   type DerivedMonsterDraftStatBlock,
@@ -18,7 +19,7 @@ export function monsterArmorClassRules(ctx: ContentFormCtx): ArmorClassRules | u
 }
 
 export function monsterMagicPropertyProvider(ctx: ContentFormCtx): MagicPropertyDefinitionProvider {
-  const rulesetId = (ctx.rulesetId ?? 'srd-cc-5.2.1') as SystemRulesetId
+  const rulesetId = (ctx.rulesetId ?? DEFAULT_SYSTEM_RULESET_ID) as SystemRulesetId
   return createMagicPropertyDefinitionProvider(rulesetId)
 }
 
@@ -39,6 +40,9 @@ export function deriveMonsterFormDraft(
   if (ctx.equipmentCatalogStatus !== 'ready') return null
   const armorClassRules = monsterArmorClassRules(ctx)
   if (!armorClassRules) return null
+  const magicPropertyProvider = monsterMagicPropertyProvider(ctx)
+  if (!magicPropertyProvider) return null
+
   const normalized = normalizeMonsterFormValues(values, {
     intent: 'draft',
     mode: 'create',
@@ -49,6 +53,6 @@ export function deriveMonsterFormDraft(
     equipmentCatalog: monsterEquipmentCatalog(ctx),
     skillCatalog: monsterSkillCatalog(ctx),
     armorClassRules,
-    magicPropertyProvider: monsterMagicPropertyProvider(ctx),
+    magicPropertyProvider,
   })
 }

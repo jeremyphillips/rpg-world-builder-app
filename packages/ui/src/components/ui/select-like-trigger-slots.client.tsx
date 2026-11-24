@@ -42,8 +42,6 @@ export function SelectLikeSizingGhosts({
 export function SelectLikeValueSlot({
   size,
   position,
-  /** @deprecated Prefer `position`. */
-  edge,
   trailing,
   /** Shorthand for `trailing="slot"` when a sibling trailing column follows. */
   trailingSlot,
@@ -56,7 +54,6 @@ export function SelectLikeValueSlot({
 }: {
   size: FieldSize
   position?: GroupedValueSlotPosition
-  edge?: GroupedValueSlotPosition
   trailing?: GroupedValueSlotTrailing
   trailingSlot?: boolean
   digits?: Parameters<typeof groupedValueSlotClasses>[1]['digits']
@@ -66,7 +63,7 @@ export function SelectLikeValueSlot({
   children: ReactNode
   className?: string
 }) {
-  const resolvedPosition = position ?? edge ?? 'standalone'
+  const resolvedPosition = position ?? 'standalone'
   const resolvedTrailing = trailingSlot ? 'slot' : (trailing ?? 'content')
   const resolvedTextSizing =
     textSizing ?? (sizingGhostLabels != null && sizingGhostLabels.length > 0)

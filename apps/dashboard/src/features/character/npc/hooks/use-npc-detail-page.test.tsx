@@ -162,6 +162,7 @@ describe('useNpcDetailPage', () => {
         source: toCharacterDetailSource(npcDetail.character),
         catalogIndex: indexCharacterBuildCatalog(emptyCatalog),
         rules,
+        equipmentReferenceScope: { rulesetId: RULESET_ID, campaignId: 'camp-1' },
         xpProgression: resolveCampaignXpProgressionForRules(RULESET_ID, rules.progression),
         organizationReferences: [],
         locationReferences: [],

@@ -8,7 +8,7 @@ import { ContentFormOptionsGate } from '../../../lib/forms/shells/layout/content
 import {
   buildOrganizationFields,
   buildOrganizationFormValueSyncs,
-  organizationCreateDefaultValues,
+  createOrganizationCreateDefaultValues,
   organizationFormSchema,
 } from '../../../lib/forms/organization-form-projection'
 import { OrganizationAuthoringPresetBridge } from './organization-authoring-preset-bridge'
@@ -25,7 +25,7 @@ function OrganizationAuthoringFormBody({ ctx }: { ctx: ContentFormCtx }) {
         ...ctx,
         organizationPracticeRecommendationIds: practiceRecommendations,
       })}
-      defaultValues={organizationCreateDefaultValues}
+      defaultValues={createOrganizationCreateDefaultValues()}
       valueSyncs={buildOrganizationFormValueSyncs()}
       onSubmit={() => undefined}
       header={() => <OrganizationAuthoringPresetBridge />}

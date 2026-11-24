@@ -1,4 +1,4 @@
-import type { CharacterClass, ClassListItem } from '@rpg/contracts'
+import { resolveClassFeatureName, type CharacterClass, type ClassListItem } from '@rpg/contracts'
 import type { CollectionSummaryItem } from '@rpg/ui'
 
 export function resolveSubclassSummaryItems(entity: ClassListItem): CollectionSummaryItem[] {
@@ -11,7 +11,7 @@ export function resolveSubclassSummaryItems(entity: ClassListItem): CollectionSu
 export function resolveClassFeatureSummaryItems(entity: CharacterClass): CollectionSummaryItem[] {
   return entity.features.map((feature) => ({
     id: feature.id,
-    label: feature.name,
+    label: resolveClassFeatureName(feature, entity.name),
     secondary: feature.level != null ? `Level ${feature.level}` : undefined,
   }))
 }

@@ -8,7 +8,11 @@ export function entityEquipmentKind(entity: unknown): ContentFormCtx['equipmentK
   return undefined
 }
 
-/** Merges catalog options, route form context, and resolved entity metadata for edit forms. */
+/**
+ * Merges catalog options, route form context, and resolved entity metadata for edit forms.
+ * `rulesetId` stays the campaign catalog ruleset from `optionsCtx`. Entity ruleset is
+ * exposed separately for artwork and entity-facing display (`entityRulesetId`).
+ */
 export function mergeEditLayoutCtx(
   optionsCtx: ContentFormCtx,
   formCtx: Partial<ContentFormCtx> | undefined,
@@ -31,7 +35,8 @@ export function mergeEditLayoutCtx(
     mode: 'edit',
     entityCatalogLayer: entity?.catalogLayer,
     entitySlug: entity?.slug,
-    rulesetId: entity?.rulesetId ?? optionsCtx.rulesetId,
+    rulesetId: optionsCtx.rulesetId,
+    entityRulesetId: entity?.rulesetId,
     equipmentKind: formCtx?.equipmentKind ?? entityEquipmentKind(entity),
   }
 }

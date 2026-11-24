@@ -171,6 +171,9 @@ export {
 export { resolveEquipmentInstanceReferenceLabel } from './equipment/instance/resolve-equipment-instance-reference-label'
 export { formatEquipmentEntryDisplayToken } from './equipment/instance/equipment-entry-display-token'
 
+export * from './equipment/equipment-catalog-context'
+export * from './equipment/equipment-reference'
+
 export {
   getEquipmentSpellcastingGearKind,
   type AdventuringGearEquipmentKindFields,

@@ -24,7 +24,7 @@ export interface ArrayFieldItemContentProps {
   itemBodyStackClasses: string
   canRemove: boolean
   showDefaultItemRemove: boolean
-  showDragHandle: boolean
+  reserveDragHandleSlot: boolean
   fieldsLength: number
   collapsible: boolean
   /** List-level caret column. Summary rows keep the inset when a sibling can expand. */
@@ -121,7 +121,7 @@ export function ArrayFieldItemContent({
   itemBodyStackClasses,
   canRemove,
   showDefaultItemRemove,
-  showDragHandle: _showDragHandle,
+  reserveDragHandleSlot: _reserveDragHandleSlot,
   fieldsLength,
   collapsible,
   reserveCaretSlot = false,

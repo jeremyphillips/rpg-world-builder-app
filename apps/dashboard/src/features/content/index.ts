@@ -1,5 +1,10 @@
 // Lightweight cross-feature surface — keep before route/form exports to avoid barrel init cycles.
 export {
+  resolveAcquisitionAvailability,
+  toAcquisitionDropdownItem,
+  type AcquisitionOption,
+} from './lib/acquisition'
+export {
   outsideWaterBreathDurationEnabled,
   type OutsideWaterBreathDurationFields,
 } from './lib/creature-traits/outside-water-breath.lib'
@@ -351,7 +356,6 @@ export {
   type GrantSummaryModel,
 } from './lib/forms/grants/grant-display'
 export {
-  contentFormRegistry,
   type ContentFormDef,
   type ContentFormCtx,
 } from './lib/forms/registry/content-form-registry'
@@ -392,3 +396,5 @@ export {
   resolveContentImagePresentationDefault,
   type ContentImagePresentationSurface,
 } from './lib/detail/page/content-image-presentation-defaults'
+
+export { FacingDetailBody } from './facing/facing-detail-body'

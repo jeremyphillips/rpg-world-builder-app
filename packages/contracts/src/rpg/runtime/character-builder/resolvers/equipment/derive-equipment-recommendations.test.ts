@@ -236,11 +236,10 @@ const storedWizard: ClassStored = {
   },
   features: [
     {
-      kind: 'custom',
+      kind: 'spellcasting',
       id: 'spellcasting',
       name: 'Spellcasting',
       level: 1,
-      grantGroups: [{ grants: [{ id: 'spellcasting-1', kind: 'spellcasting' }] }],
     },
   ],
   characterCreation: {
@@ -697,11 +696,10 @@ describe('deriveEquipmentRecommendations', () => {
       name: 'Cleric',
       features: [
         {
-          kind: 'custom',
+          kind: 'spellcasting',
           id: 'spellcasting',
           name: 'Spellcasting',
           level: 1,
-          grantGroups: [{ grants: [{ id: 'spellcasting-2', kind: 'spellcasting' }] }],
         },
       ],
       spellcasting: {

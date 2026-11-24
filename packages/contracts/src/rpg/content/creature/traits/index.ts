@@ -1,3 +1,7 @@
+export * from './format-legendary-resistance'
 export * from './legendary-resistance.constants'
+export * from './sense-templates'
 export * from './templates'
 export * from './validate'
+export * from './sense-occurrence'
+export * from './creature-trait-template-occurrence'

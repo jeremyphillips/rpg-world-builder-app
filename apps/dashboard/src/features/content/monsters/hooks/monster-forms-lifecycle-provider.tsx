@@ -1,11 +1,7 @@
-import { createContext, useContext, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
-import {
-  useMonsterFormsLifecycle,
-  type MonsterFormsLifecycleApi,
-} from './use-monster-forms-lifecycle'
-
-const MonsterFormsLifecycleContext = createContext<MonsterFormsLifecycleApi | null>(null)
+import { MonsterFormsLifecycleContext } from './monster-forms-lifecycle.context'
+import { useMonsterFormsLifecycle } from './use-monster-forms-lifecycle'
 
 export function MonsterFormsLifecycleProvider({ children }: { children: ReactNode }) {
   const { dialog, ...api } = useMonsterFormsLifecycle()
@@ -15,12 +11,4 @@ export function MonsterFormsLifecycleProvider({ children }: { children: ReactNod
       {dialog}
     </MonsterFormsLifecycleContext.Provider>
   )
-}
-
-export function useMonsterFormsLifecycleContext(): MonsterFormsLifecycleApi {
-  const context = useContext(MonsterFormsLifecycleContext)
-  if (!context) {
-    throw new Error('useMonsterFormsLifecycleContext requires MonsterFormsLifecycleProvider')
-  }
-  return context
 }

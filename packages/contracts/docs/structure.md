@@ -186,6 +186,17 @@ primitives/
   (+ co-located *.test.ts for root modules)
 ```
 
+#### System ruleset identity (`primitives/ruleset.ts`)
+
+`DEFAULT_SYSTEM_RULESET_ID` is the sole authoritative literal for the default **system
+ruleset identity** (catalog version and content-id prefix). Use it only for explicit
+default-system behavior (seed UI, disabled sentinels, fixtures)—not when campaign or
+entity context is missing.
+
+Runtime scope for reference resolution (e.g. `EquipmentCatalogScope`) comes from
+authoritative host context (campaign record, `CharacterRulesScope`, `ContentFormCtx`).
+Reference resolvers must not infer ruleset or campaign from catalog row order.
+
 Weapon mode form hints live in `rpg/content/equipment/weapon-mode-compatibility-messages.ts`
 (equipment authoring presentation — re-exported from `rpg/content/equipment.ts`).
 
@@ -587,6 +598,10 @@ Pattern: `*_TERM` + `*_ENTRIES` map → derived id tuple → `z.enum` schema →
 `get*Entry` / `get*Label` helpers. Open vocabulary sets define a `*_TERM` plus
 `vocabularyOptionIdSchema` and catalog seeds; see
 [docs/vocabulary.md](../../../docs/vocabulary.md).
+
+**SSOT ownership** (entries-first vs policy subsets vs dashboard acquisition):
+[vocab-ssot.md](vocab-ssot.md). Derive closed id tuples with `keysFromEntries` in
+[`enum-schema.ts`](../src/rpg/vocab/enum-schema.ts).
 
 **NPC roles** ([`npc-template.ts`](../src/rpg/vocab/npc/npc-template.ts)) follow the same
 two-layer pattern (`NPC_TEMPLATE_TERM` + `NPC_TEMPLATE_ENTRIES`) with an extended entry:

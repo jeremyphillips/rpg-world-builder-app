@@ -29,10 +29,8 @@ describe('boolean field', () => {
     render(<Harness />)
 
     const control = screen.getByRole('checkbox', { name: 'Cannot speak' })
-    const option = control.closest('.ui-checkbox-option')
-    expect(option).toBeTruthy()
-    expect(option).not.toHaveAttribute('data-shell', 'outlined')
-    expect(option?.querySelector('.text-style-option')).toHaveTextContent('Cannot speak')
+    expect(control.closest('.ui-checkbox-option')).toBeNull()
+    expect(screen.getByText('Cannot speak')).toHaveClass('text-style-option')
 
     await user.click(control)
     expect(control).toBeChecked()

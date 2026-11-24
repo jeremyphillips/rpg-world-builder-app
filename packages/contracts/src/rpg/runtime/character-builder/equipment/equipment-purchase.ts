@@ -208,18 +208,6 @@ export function canMergeEquipmentPurchases(args: {
   return true
 }
 
-/** @deprecated Use {@link canMergeEquipmentPurchases}. */
-export const equipmentPurchasesAreMergeCompatible = canMergeEquipmentPurchases
-
-export function findEquipmentPurchaseById(
-  purchases: readonly NormalizedCharacterBuilderDraftEquipmentPurchase[],
-  purchaseId: string,
-): { purchase: NormalizedCharacterBuilderDraftEquipmentPurchase; index: number } | undefined {
-  const index = purchases.findIndex((purchase) => purchase.id === purchaseId)
-  if (index < 0) return undefined
-  return { purchase: purchases[index]!, index }
-}
-
 export function resolveEquipmentPurchaseIndex(
   purchases: readonly PersistedCharacterBuilderDraftEquipmentPurchase[],
   purchaseId: string,

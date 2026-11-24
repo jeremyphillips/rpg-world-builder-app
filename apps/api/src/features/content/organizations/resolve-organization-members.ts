@@ -1,4 +1,9 @@
-import type { Organization, OrganizationMemberSummary, PaginatedItems } from '@rpg/contracts'
+import type {
+  CharacterType,
+  Organization,
+  OrganizationMemberSummary,
+  PaginatedItems,
+} from '@rpg/contracts'
 import {
   projectOrganizationMemberMembership,
   resolveOrganizationMembershipPriority,
@@ -16,7 +21,7 @@ import { organizationWriteConfig } from './organizations.config'
 type CharacterMemberHit = {
   _id: unknown
   name: string
-  characterType: 'pc' | 'npc'
+  characterType: CharacterType
   classes: Array<{ classId: string; level: number; subclassId?: string }>
   species: { id: string }
 }
@@ -32,7 +37,7 @@ type MemberSortRow = {
   id: string
   name: string
   priority?: number
-  characterType: 'pc' | 'npc'
+  characterType: CharacterType
   membershipTitleId?: string
   hit: CharacterMemberHit
 }

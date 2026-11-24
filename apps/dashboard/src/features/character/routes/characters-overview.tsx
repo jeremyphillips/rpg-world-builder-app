@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { DEFAULT_SYSTEM_RULESET_ID, type SystemRulesetId } from '@rpg/contracts'
+import type { SystemRulesetId } from '@rpg/contracts'
 import { ButtonLink, Heading } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
@@ -59,7 +59,11 @@ export function CharactersOverview() {
     isError: isCharactersError,
     error: charactersError,
   } = useCharacters()
-  const rulesetId = (characters?.[0]?.rulesetId ?? DEFAULT_SYSTEM_RULESET_ID) as SystemRulesetId
+  const rulesetId = useMemo((): SystemRulesetId | undefined => {
+    return characters?.find((character) => character.rulesetId)?.rulesetId as
+      | SystemRulesetId
+      | undefined
+  }, [characters])
   const {
     catalogIndex,
     isPending: isCatalogPending,

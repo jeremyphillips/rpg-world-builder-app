@@ -1,6 +1,7 @@
 import { DetailPreviewModal } from '@rpg/ui'
 
 import { useDamageTypeVocabulary, useSpellSchoolVocabulary } from '@/features/vocabulary'
+import { contentAuthoringCampaignIdForQueries } from '../../lib/authoring/content-authoring-scope.lib'
 import type { ContentPreviewPlayerPreviewProps } from '../../lib/forms/preview/content-form-preview.types'
 import { CONTENT_PREVIEW_AS_PLAYER_LABEL } from '../../lib/forms/preview/content-form-preview-copy'
 import { SpellDetailBody } from '../components/spell-detail-body'
@@ -13,8 +14,9 @@ export function SpellPreviewPlayerHost({
   open,
   onOpenChange,
 }: ContentPreviewPlayerPreviewProps<SpellFormValues>) {
-  const { vocabulary: damageTypeVocabulary } = useDamageTypeVocabulary(ctx.campaignId)
-  const { vocabulary: spellSchoolVocabulary } = useSpellSchoolVocabulary(ctx.campaignId)
+  const queryCampaignId = contentAuthoringCampaignIdForQueries(ctx)
+  const { vocabulary: damageTypeVocabulary } = useDamageTypeVocabulary(queryCampaignId)
+  const { vocabulary: spellSchoolVocabulary } = useSpellSchoolVocabulary(queryCampaignId)
 
   const name = values.name?.trim() || 'Unnamed spell'
   const viewModel = buildSpellPreviewDetailViewModel(values, {
@@ -33,7 +35,7 @@ export function SpellPreviewPlayerHost({
         name={name}
         imageName={name}
         viewModel={viewModel}
-        campaignId={ctx.campaignId ?? ''}
+        campaignId={queryCampaignId}
       />
     </DetailPreviewModal>
   )

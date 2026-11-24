@@ -349,11 +349,10 @@ describe('resolveSpellStepModel', () => {
       },
       features: [
         {
-          kind: 'custom',
+          kind: 'spellcasting',
           id: 'spellcasting',
           name: 'Spellcasting',
           level: 1,
-          grantGroups: [{ grants: [{ id: 'spellcasting-4', kind: 'spellcasting' }] }],
         },
         {
           kind: 'custom',
@@ -387,11 +386,11 @@ describe('resolveSpellStepModel', () => {
         slotProgressionId: 'half-caster',
         ability: 'wis',
         spellSelection: {
-          model: 'limitedRepertoire',
+          model: 'prepareFromClassList',
           change: { kind: 'replace', trigger: 'longRest', limit: 1 },
         },
         progression: {
-          repertoire: {
+          preparedSpells: {
             curve: { rows: [{ level: 1, count: 2 }] },
             extension: 'carryForward',
           },

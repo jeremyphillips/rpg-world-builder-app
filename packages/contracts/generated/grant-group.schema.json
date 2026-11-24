@@ -677,24 +677,6 @@
         {
           "type": "object",
           "properties": {
-            "id": {
-              "$ref": "#/definitions/__schema3"
-            },
-            "kind": {
-              "type": "string",
-              "const": "spellcasting",
-              "description": "spellcasting"
-            }
-          },
-          "required": [
-            "id",
-            "kind"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
             "mode": {
               "type": "string",
               "enum": [

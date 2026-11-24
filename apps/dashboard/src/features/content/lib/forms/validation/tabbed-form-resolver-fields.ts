@@ -73,7 +73,11 @@ function prefixFormItem(item: FormItem, prefix: string): FormItem {
     }
   }
 
-  return { ...item, fields: prefixFormItems(item.fields, prefix) }
+  if (item.kind === 'group') {
+    return { ...item, fields: prefixFormItems(item.fields, prefix) }
+  }
+
+  return item
 }
 
 export type EmbeddedArrayResolverFieldInput =

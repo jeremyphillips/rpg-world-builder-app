@@ -1,6 +1,14 @@
+import { CLASS_FEATURE_KINDS } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
+import type { FormItem } from '@rpg/ui/form'
+
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import {
+  classFeatureItemFields,
+  resolveClassFeatureFieldSections,
+  resolveClassFeatureItemFields,
+  subclassFeatureItemFields,
   createFeatureRowDraftFormSchema,
   createFeatureRowFormSchema,
   featureFromFormRow,
@@ -10,6 +18,7 @@ import {
   formatFeatureRowSummary,
 } from './class-feature-form-fields'
 import { GRANT_DEFAULT_UNLOCK_LEVEL } from '../../lib/forms/grants/grant-form-schema'
+import { createSpellcastingFeature } from './class-spellcasting-features'
 
 const rageProgressionTable = {
   id: 'rage-progression',
@@ -88,6 +97,7 @@ describe('class feature form round-trip', () => {
   it('omits tables when the form row has none', () => {
     const row = {
       id: 'second-wind',
+      kind: 'custom' as const,
       name: 'Second Wind',
       level: 1,
       grants: [],
@@ -124,6 +134,7 @@ describe('class feature form round-trip', () => {
   it('persists available false on class feature save and omits when true', () => {
     const row = {
       id: 'second-wind',
+      kind: 'custom' as const,
       name: 'Second Wind',
       level: 1,
       grants: [],
@@ -136,7 +147,7 @@ describe('class feature form round-trip', () => {
     expect(featureFromFormRow(availableRow)).not.toHaveProperty('available')
   })
 
-  it('defaults missing kind to custom on save', () => {
+  it('requires kind on save', () => {
     const row = {
       id: 'second-wind',
       name: 'Second Wind',
@@ -145,7 +156,9 @@ describe('class feature form round-trip', () => {
       tables: [],
       available: true,
     }
-    expect(featureFromFormRow(row).kind).toBe('custom')
+    expect(() => featureFromFormRow(row as Parameters<typeof featureFromFormRow>[0])).toThrow(
+      /missing kind/i,
+    )
   })
 })
 
@@ -178,6 +191,92 @@ describe('formatFeatureRowSummary', () => {
         grants: [],
       }),
     ).toBe('Level 5')
+  })
+})
+
+function walkFormItems(items: readonly FormItem[], visit: (item: FormItem) => void): void {
+  for (const item of items) {
+    visit(item)
+    if ('kind' in item && item.kind === 'dependent') {
+      walkFormItems([item.controller as FormItem], visit)
+      walkFormItems(item.dependents.fields, visit)
+    }
+    if ('kind' in item && item.kind === 'row') {
+      walkFormItems(item.fields, visit)
+    }
+    if ('kind' in item && item.kind === 'group') {
+      walkFormItems(item.fields, visit)
+    }
+    if ('kind' in item && item.kind === 'array') {
+      walkFormItems(item.fields, visit)
+    }
+  }
+}
+
+function descriptionFields(items: readonly FormItem[]) {
+  const found: FormItem[] = []
+  walkFormItems(items, (item) => {
+    if ('type' in item && item.type === 'richtext' && item.name === 'description') {
+      found.push(item)
+    }
+  })
+  return found
+}
+
+function leafTextFieldNames(items: readonly FormItem[]): string[] {
+  const names: string[] = []
+  walkFormItems(items, (item) => {
+    if ('type' in item && item.type === 'text' && 'name' in item && typeof item.name === 'string') {
+      names.push(item.name)
+    }
+  })
+  return names
+}
+
+describe('class feature detail fields', () => {
+  const ctx = {} as ContentFormCtx
+
+  it('exposes one Description field on the custom template list', () => {
+    const descriptions = descriptionFields(classFeatureItemFields(ctx))
+    expect(descriptions).toHaveLength(1)
+    expect(descriptions[0]).toMatchObject({ label: 'Description' })
+  })
+
+  it('omits a body name field for every class master-detail kind', () => {
+    for (const kind of CLASS_FEATURE_KINDS) {
+      expect(leafTextFieldNames(resolveClassFeatureItemFields({ kind }, ctx))).not.toContain('name')
+    }
+  })
+
+  it('keeps name on subclass collapsible feature rows', () => {
+    expect(leafTextFieldNames(subclassFeatureItemFields(ctx))).toContain('name')
+  })
+
+  it('keeps spellcasting intro on spellcasting rows', () => {
+    const intro = resolveClassFeatureItemFields({ kind: 'spellcasting' }, ctx).find(
+      (item) => 'name' in item && item.name === 'intro',
+    )
+    expect(intro).toMatchObject({ label: 'Introduction' })
+  })
+
+  it('places level in leading fields and intro in primary for spellcasting sections', () => {
+    const sections = resolveClassFeatureFieldSections({ kind: 'spellcasting' }, ctx)
+    expect(JSON.stringify(sections.leading)).toContain('"name":"level"')
+    expect(JSON.stringify(sections.primary)).toContain('"name":"intro"')
+    expect(JSON.stringify(sections.primary)).not.toContain('"name":"level"')
+  })
+})
+
+describe('featureFromFormRow spellcasting granting rows', () => {
+  it('omits description when the row carries a spellcasting grant', () => {
+    const row = {
+      ...featureToFormRow(createSpellcastingFeature({ slotProgressionId: 'full-caster' })),
+      intro: '<p>Narrative</p>',
+      description: '<p>Should not persist</p>',
+    }
+    const saved = featureFromFormRow({ ...row, id: row.id! })
+    expect(saved.kind === 'spellcasting' && saved.intro).toBe('<p>Narrative</p>')
+    expect(saved).not.toHaveProperty('description')
   })
 })
 

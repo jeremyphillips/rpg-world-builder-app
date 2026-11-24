@@ -25,7 +25,13 @@ import { MasterDetailDeleteDialog } from './master-detail-delete-dialog'
 import { MasterDetailEditorPanel } from './master-detail-editor-panel'
 import type { MasterDetailEditorIdentity } from './master-detail-editor-shell'
 import { MasterDetailGrid } from './master-detail-grid'
-import { MasterDetailListPanel, type MasterDetailListItem } from './master-detail-list-panel'
+import {
+  MasterDetailListPanel,
+  type MasterDetailListGroup,
+  type MasterDetailListItem,
+} from './master-detail-list-panel'
+import type { FacingHostConfig } from '../../facing/facing-host-config.types'
+import type { MasterDetailItemFieldSections } from './master-detail-detail-body'
 
 export type { FormEmbeddedMasterDetailMapListItemContext }
 
@@ -47,6 +53,8 @@ type FormEmbeddedMasterDetailEditorBase = {
   onAdd?: () => void
   /** Row-specific detail fields. When omitted, every row uses `itemFields`. */
   resolveItemFields?: (row: unknown) => FormItem[]
+  /** Leading vs primary detail regions for the shell-owned rhythm stack. */
+  resolveFieldSections?: (row: unknown) => MasterDetailItemFieldSections
   /** Prefix for detail `FormItems` ids, e.g. `species-trait`. */
   idPrefix: string
   /**
@@ -85,6 +93,11 @@ type FormEmbeddedMasterDetailEditorBase = {
   access?: FormEmbeddedMasterDetailAccessConfig
   /** Enables drag-to-reorder on the flat list rail; calls `editor.move` on drop. */
   listReorder?: boolean
+  /** Optional grouped list rail — row order stays on the field array. */
+  resolveListGroups?: (ctx: {
+    visibleRows: Array<{ item: MasterDetailListItem; row: unknown; formIndex: number }>
+    addControl?: ReactNode
+  }) => MasterDetailListGroup[] | undefined
 }
 
 export type FormEmbeddedMasterDetailEditorProps<TRow = Record<string, unknown>> =
@@ -92,6 +105,10 @@ export type FormEmbeddedMasterDetailEditorProps<TRow = Record<string, unknown>> 
     (
       | {
           rowTitle: MasterDetailRowTitleConfig<TRow>
+          /** Primary (and optional leading) regions for the shell-owned detail body. */
+          resolveFieldSections: (row: unknown) => MasterDetailItemFieldSections
+          /** Canonical player-facing preview — requires `rowTitle` on structured facing hosts. */
+          facing?: FacingHostConfig
           resolveListMeta?: (
             ctx: FormEmbeddedMasterDetailMapListItemContext,
           ) => MasterDetailListMetaInput
@@ -100,6 +117,7 @@ export type FormEmbeddedMasterDetailEditorProps<TRow = Record<string, unknown>> 
         }
       | {
           rowTitle?: never
+          facing?: never
           resolveListMeta?: never
           mapListItem: (
             ctx: FormEmbeddedMasterDetailMapListItemContext,
@@ -150,7 +168,10 @@ function FormEmbeddedMasterDetailEditorBody<TRow = Record<string, unknown>>({
   onAdd,
   ...props
 }: FormEmbeddedMasterDetailEditorBodyProps<TRow>) {
-  const body = useFormEmbeddedMasterDetailEditorBody(props)
+  const { facing, ...bodyProps } = props
+  const body = useFormEmbeddedMasterDetailEditorBody(
+    bodyProps as Parameters<typeof useFormEmbeddedMasterDetailEditorBody>[0],
+  )
   const campaignAccessDialog = embeddedCampaignAccessDialog({
     access: props.access,
     formCtx: body.formCtx,
@@ -164,6 +185,7 @@ function FormEmbeddedMasterDetailEditorBody<TRow = Record<string, unknown>>({
     <EmbeddedMasterDetailLayout
       leadingContent={leadingContent}
       listItems={body.listItems}
+      listGroups={body.listGroups}
       selectedItemId={body.isSelectedRowVisible ? body.rows.selectedDomainId : null}
       listTitle={listTitle}
       ariaLabel={ariaLabel}
@@ -192,6 +214,8 @@ function FormEmbeddedMasterDetailEditorBody<TRow = Record<string, unknown>>({
       onCancelDelete={body.editor.cancelRemove}
       onConfirmDelete={body.editor.confirmRemove}
       campaignAccessDialog={campaignAccessDialog}
+      facing={facing}
+      detailFieldSections={body.detailFieldSections}
     />
   )
 }
@@ -205,6 +229,7 @@ function EmbeddedMasterDetailLayout({
   onCancelDelete,
   onConfirmDelete,
   listItems,
+  listGroups,
   selectedItemId,
   listTitle,
   ariaLabel,
@@ -227,6 +252,8 @@ function EmbeddedMasterDetailLayout({
   availabilityDialogRef,
   onDuplicate,
   onListMove,
+  facing,
+  detailFieldSections,
 }: {
   leadingContent?: ReactNode
   campaignAccessDialog: ReactNode
@@ -236,8 +263,9 @@ function EmbeddedMasterDetailLayout({
   onCancelDelete: () => void
   onConfirmDelete: () => void
   listItems: MasterDetailListItem[]
+  listGroups?: MasterDetailListGroup[]
   selectedItemId: string | null
-  listTitle: ReactNode
+  listTitle?: ReactNode
   ariaLabel: string
   addLabel: string
   countSupplement?: ReactNode
@@ -258,13 +286,16 @@ function EmbeddedMasterDetailLayout({
   availabilityDialogRef?: RefObject<HTMLDivElement | null>
   onDuplicate?: () => void
   onListMove?: (from: number, to: number) => void
+  facing?: FacingHostConfig
+  detailFieldSections?: MasterDetailItemFieldSections
 }) {
   const grid = (
     <MasterDetailGrid>
       <MasterDetailListPanel
-        items={listItems}
+        items={listGroups ? undefined : listItems}
+        groups={listGroups}
         selectedItemId={selectedItemId}
-        listTitle={listTitle}
+        listTitle={listGroups ? undefined : listTitle}
         ariaLabel={ariaLabel}
         addLabel={addLabel}
         itemNoun={itemNoun}
@@ -288,6 +319,8 @@ function EmbeddedMasterDetailLayout({
         availabilityNamePrefix={availabilityNamePrefix}
         availabilityDialogRef={availabilityDialogRef}
         onDuplicate={onDuplicate}
+        facing={facing}
+        fieldSections={detailFieldSections}
       />
     </MasterDetailGrid>
   )

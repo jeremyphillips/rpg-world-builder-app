@@ -8,7 +8,6 @@ import type { FieldGroupDisclosure } from '../../components/ui/field-group-discl
 import type { SemanticSurfaceTone } from '../../components/ui/field-dependent.variants'
 
 /** Legacy scope split — ignored; the default nest always wraps dependents. */
-export type FieldDependentsScope = 'wrapper' | 'arrayItems'
 import type { SurfaceConfig } from '../../components/ui/visual-vocabulary.types'
 import type { FieldSeparator, FormHeadingScale } from '../../components/ui/field.variants'
 import type { ArrayResolveFieldsFn } from '../config/array/array-resolve-fields.lib'
@@ -107,12 +106,6 @@ export type GroupFieldItem =
 /** Decorative boundary for the dependents region. Legacy `'panel'` maps to the default nest. */
 export type DependentChrome = 'none' | 'rail' | 'panel'
 
-/**
- * Default controller-relative positioning for dependent regions.
- * @deprecated Nest geometry is owned by the default recipe — use `chrome: 'none'` to opt out.
- */
-export const DEFAULT_DEPENDENT_INSET = true
-
 /** Default decorative boundary for dependent regions. */
 export const DEFAULT_DEPENDENT_CHROME: DependentChrome = 'rail'
 
@@ -123,25 +116,10 @@ export interface DependentDependentsConfig {
    * When omitted and the controller is a switch, defaults to "switch is true".
    */
   visibility?: FieldVisibility
-  /**
-   * Legacy flush opt-out — maps to `chrome: 'none'` at render time.
-   * @deprecated Use `chrome: 'none'` instead.
-   */
-  inset?: boolean
   /** Default dependent nest when omitted or `'rail'` / legacy `'panel'`. @default {@link DEFAULT_DEPENDENT_CHROME} */
   chrome?: DependentChrome
   /** Default leaf/row container treatment for nested fields. */
   fieldChrome?: FieldChrome
-  /**
-   * Legacy panel wash — ignored; `'panel'` maps to the default nest.
-   * @deprecated
-   */
-  panel?: { surface?: SurfaceConfig; tone?: SemanticSurfaceTone }
-  /**
-   * Legacy scope split — ignored; the default nest always wraps dependents.
-   * @deprecated
-   */
-  scope?: FieldDependentsScope
 }
 
 /**
@@ -581,6 +559,8 @@ export type ArrayConfig = AnonymousArrayConfig | NamedArrayConfig
 export interface SlotConfig {
   kind: 'slot'
   name: string
+  /** Relative RHF paths this slot owns, including paths managed through setValue. */
+  boundNames?: readonly string[]
   /** Leaf-tier heading for the slot composite surface. */
   heading?: FormHeading
   /**

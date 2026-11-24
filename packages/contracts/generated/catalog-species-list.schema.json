@@ -878,7 +878,7 @@
             "nameOverride": {
               "$ref": "#/definitions/__schema106"
             },
-            "descriptionOverride": {
+            "details": {
               "$ref": "#/definitions/__schema107"
             }
           },
@@ -906,11 +906,7 @@
               "minLength": 1
             },
             "config": {},
-            "nameOverride": {
-              "type": "string",
-              "minLength": 1
-            },
-            "descriptionOverride": {
+            "details": {
               "type": "string"
             }
           },
@@ -1604,24 +1600,6 @@
             "kind",
             "ability",
             "spellIds"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "id": {
-              "$ref": "#/definitions/__schema29"
-            },
-            "kind": {
-              "type": "string",
-              "const": "spellcasting",
-              "description": "spellcasting"
-            }
-          },
-          "required": [
-            "id",
-            "kind"
           ],
           "additionalProperties": false
         },

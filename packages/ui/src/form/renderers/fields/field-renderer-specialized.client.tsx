@@ -1,19 +1,48 @@
 'use client'
 
+import { useWatch } from 'react-hook-form'
+
 import {
   chooseFromChipsToInlineSentence,
   inlineChooseCountToInlineSentence,
+  inputUnitToInlineSentence,
 } from '../../config/inline-sentence-legacy-config.lib'
+import { resolveValueDigitsFromConfig } from '../../config/input-field-value-digits.lib'
+import type { InputUnitFieldConfig } from '../../field-config'
 import type { MultiControllerFieldConfig } from '../field-renderer-families.lib'
 import type { ResolvedFieldRender } from '../field-resolved-render.types'
 import { InlineSentenceFieldRenderer } from './inline-sentence/inline-sentence-field-renderer.client'
 import { InputSelectFieldRenderer } from './input-select-field-renderer.client'
-import { InputUnitFieldRenderer } from './input-unit-field-renderer.client'
 import { LevelRangeFieldRenderer } from './level-range-field-renderer.client'
 import { JoinedPairFieldRenderer } from './joined-pair/joined-pair-field-renderer.client'
 import { OptionalDisclosureJoinedPairFieldRenderer } from './joined-pair/optional-disclosure-joined-pair-field-renderer.client'
 import { OptionalDisclosureRollValueFieldRenderer } from './optional-disclosure/optional-disclosure-roll-value-field-renderer.client'
 import { RollValueFieldRenderer } from './roll-value-field-renderer.client'
+
+function InputUnitInlineSentenceField({
+  config,
+  id,
+  namePrefix,
+}: {
+  config: InputUnitFieldConfig
+  id: string
+  namePrefix?: string
+}) {
+  const dependsOn = config.valueDigitsDependsOn
+  const prefixedDependsOn = dependsOn
+    ? namePrefix
+      ? `${namePrefix}.${dependsOn}`
+      : dependsOn
+    : undefined
+  const watchedKind = useWatch({ name: prefixedDependsOn ?? '', disabled: !prefixedDependsOn })
+  const valueDigits = resolveValueDigitsFromConfig(config, watchedKind)
+  const inlineConfig = inputUnitToInlineSentence({
+    ...config,
+    valueDigits: valueDigits ?? config.valueDigits,
+  })
+
+  return <InlineSentenceFieldRenderer config={inlineConfig} id={id} namePrefix={namePrefix} />
+}
 
 /** Renders field types that register more than one controller. */
 export function renderSpecializedField({
@@ -35,7 +64,7 @@ export function renderSpecializedField({
         />
       )
     case 'inputUnit':
-      return <InputUnitFieldRenderer config={renderConfig} id={id} namePrefix={namePrefix} />
+      return <InputUnitInlineSentenceField config={renderConfig} id={id} namePrefix={namePrefix} />
     case 'levelRange':
       return (
         <LevelRangeFieldRenderer

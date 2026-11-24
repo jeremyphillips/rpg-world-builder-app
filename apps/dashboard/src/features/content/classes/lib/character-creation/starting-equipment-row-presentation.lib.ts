@@ -10,19 +10,20 @@ import {
 import { GRANT_ROW_TYPE_LABELS } from '../../../lib/forms/grants/grant-form-schema'
 import {
   formatGrantRowToolbarAriaLabel,
+  type GrantEquipmentReferencePresentation,
   type GrantRowPresentation,
 } from '../../../lib/forms/grants/grant-row-presentation.lib'
 
 export function resolveStartingEquipmentRowPresentation(
   row: EquipmentGrantItemForm | undefined,
-  equipmentOptions: FieldOption[] = [],
+  equipmentReferences: GrantEquipmentReferencePresentation,
   proficiencyChoiceOptions: FieldOption[] = [],
 ): GrantRowPresentation | undefined {
   if (!row?.itemKind) return undefined
 
   const heading = GRANT_ROW_TYPE_LABELS.equipment
-  const detail = equipmentGrantDetail(row, equipmentOptions, proficiencyChoiceOptions)
-  const description = equipmentGrantSummary(row, equipmentOptions)
+  const detail = equipmentGrantDetail(row, equipmentReferences, proficiencyChoiceOptions)
+  const description = equipmentGrantSummary(row, equipmentReferences)
 
   return {
     heading,
@@ -32,13 +33,13 @@ export function resolveStartingEquipmentRowPresentation(
 }
 
 export function createStartingEquipmentItemShell(
-  equipmentOptions: FieldOption[],
+  equipmentReferences: GrantEquipmentReferencePresentation,
   proficiencyChoiceOptions: FieldOption[],
 ) {
   return function renderStartingEquipmentItemShell(props: ArrayItemShellRenderProps) {
     const presentation = resolveStartingEquipmentRowPresentation(
       props.itemValues as EquipmentGrantItemForm,
-      equipmentOptions,
+      equipmentReferences,
       proficiencyChoiceOptions,
     )
     const heading = presentation?.heading ?? props.header.fallback

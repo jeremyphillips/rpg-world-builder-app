@@ -10,7 +10,11 @@ import { ActionButton } from './action-button.client'
 import { Button } from './button.client'
 import { ComboboxSearchField } from './combobox-field-parts.client'
 import { comboboxContentVariants } from './combobox-field.variants'
-import { InteractiveListEmpty, InteractiveList } from './interactive-list.client'
+import {
+  InteractiveListEmpty,
+  InteractiveList,
+  type InteractiveListProps,
+} from './interactive-list.client'
 import { ListGroupHeading } from './list-group-heading.client'
 import { InteractiveListRow } from './interactive-list-row.client'
 import { InteractiveListViewport } from './interactive-list-viewport.client'
@@ -62,6 +66,7 @@ function groupHeadingsForItems(
 }
 
 function resolveButtonDropdownMetadata(item: ButtonDropdownItem): string | undefined {
+  if (item.disabled && item.disabledReason) return item.disabledReason
   const parts = [item.metadata, item.note].filter((part) => part && part.length > 0)
   return parts.length > 0 ? joinInlineMetadata(parts) : undefined
 }
@@ -70,12 +75,14 @@ function ButtonDropdownItemRow({
   item,
   optionId,
   isHighlighted,
+  supportingWrap,
   onHighlight,
   onSelect,
 }: {
   item: ButtonDropdownItem
   optionId: string
   isHighlighted: boolean
+  supportingWrap?: boolean
   onHighlight: () => void
   onSelect: () => void
 }) {
@@ -83,17 +90,30 @@ function ButtonDropdownItemRow({
     return (
       <InteractiveListRow
         name={item.label}
+        classification={item.classification}
         metadata={resolveButtonDropdownMetadata(item)}
+        supportingWrap={supportingWrap}
+        highlighted={isHighlighted}
         disabled
-        interactive={false}
-      />
+        asChild
+      >
+        <div
+          id={optionId}
+          role="menuitem"
+          aria-disabled="true"
+          onMouseEnter={onHighlight}
+          onClick={(event) => event.preventDefault()}
+        />
+      </InteractiveListRow>
     )
   }
 
   return (
     <InteractiveListRow
       name={item.label}
+      classification={item.classification}
       metadata={resolveButtonDropdownMetadata(item)}
+      supportingWrap={supportingWrap}
       highlighted={isHighlighted}
       asChild
     >
@@ -106,6 +126,110 @@ function ButtonDropdownItemRow({
       />
     </InteractiveListRow>
   )
+}
+
+function ButtonDropdownItemRows({
+  items,
+  generatedId,
+  supportingWrap,
+  highlightedIndex,
+  highlightIndexForItem,
+  setActiveIndex,
+  selectItem,
+  listProps,
+}: {
+  items: readonly ButtonDropdownItem[]
+  generatedId: string
+  supportingWrap?: boolean
+  highlightedIndex: number
+  highlightIndexForItem: (item: ButtonDropdownItem) => number
+  setActiveIndex: (index: number) => void
+  selectItem: (id: string) => void
+  listProps?: Omit<InteractiveListProps, 'children' | 'density'>
+}) {
+  return (
+    <InteractiveList density={POPOVER_INTERACTIVE_LIST_DENSITY} {...listProps}>
+      {items.map((item) => (
+        <ButtonDropdownItemRow
+          key={item.id}
+          item={item}
+          optionId={`${generatedId}-option-${item.id}`}
+          supportingWrap={supportingWrap}
+          isHighlighted={highlightIndexForItem(item) === highlightedIndex}
+          onHighlight={() => {
+            const index = highlightIndexForItem(item)
+            if (index >= 0) setActiveIndex(index)
+          }}
+          onSelect={() => selectItem(item.id)}
+        />
+      ))}
+    </InteractiveList>
+  )
+}
+
+function ButtonDropdownMenuItems({
+  displayItems,
+  searchActive,
+  groupedSections,
+  emptyMessage,
+  generatedId,
+  supportingWrap,
+  highlightedIndex,
+  highlightIndexForItem,
+  setActiveIndex,
+  selectItem,
+}: {
+  displayItems: readonly ButtonDropdownItem[]
+  searchActive: boolean
+  groupedSections: ReturnType<typeof groupHeadingsForItems>
+  emptyMessage: string
+  generatedId: string
+  supportingWrap?: boolean
+  highlightedIndex: number
+  highlightIndexForItem: (item: ButtonDropdownItem) => number
+  setActiveIndex: (index: number) => void
+  selectItem: (id: string) => void
+}) {
+  if (displayItems.length === 0) {
+    return (
+      <InteractiveList density={POPOVER_INTERACTIVE_LIST_DENSITY}>
+        <InteractiveListEmpty>{emptyMessage}</InteractiveListEmpty>
+      </InteractiveList>
+    )
+  }
+  if (searchActive) {
+    return (
+      <ButtonDropdownItemRows
+        items={displayItems}
+        generatedId={generatedId}
+        supportingWrap={supportingWrap}
+        highlightedIndex={highlightedIndex}
+        highlightIndexForItem={highlightIndexForItem}
+        setActiveIndex={setActiveIndex}
+        selectItem={selectItem}
+      />
+    )
+  }
+  return groupedSections.map(({ group, items: sectionItems }) => {
+    const groupLabel = group?.label.trim() ?? ''
+    const groupHeadingId =
+      group && groupLabel.length > 0 ? `${generatedId}-group-${group.id}` : undefined
+    return (
+      <React.Fragment key={group?.id ?? '__ungrouped'}>
+        {groupHeadingId ? <ListGroupHeading id={groupHeadingId} label={groupLabel} /> : null}
+        <ButtonDropdownItemRows
+          items={sectionItems}
+          generatedId={generatedId}
+          supportingWrap={supportingWrap}
+          highlightedIndex={highlightedIndex}
+          highlightIndexForItem={highlightIndexForItem}
+          setActiveIndex={setActiveIndex}
+          selectItem={selectItem}
+          listProps={{ role: 'group', 'aria-labelledby': groupHeadingId }}
+        />
+      </React.Fragment>
+    )
+  })
 }
 
 /** Outline button that opens a searchable, grouped menu of interactive list rows. */
@@ -123,6 +247,7 @@ export function ButtonDropdown({
   className,
   searchPlaceholder: searchPlaceholderProp,
   triggerPresentation = 'labeled',
+  supportingWrap,
 }: ButtonDropdownProps) {
   const searchPlaceholder = resolveFieldSearchPlaceholder({ label }, searchPlaceholderProp)
   const addIconTrigger = triggerPresentation === 'addIcon'
@@ -134,7 +259,6 @@ export function ButtonDropdown({
     generatedId,
     query,
     displayItems,
-    selectableItems,
     highlightedIndex,
     activeOptionId,
     searchInputRef,
@@ -152,9 +276,8 @@ export function ButtonDropdown({
   )
 
   const highlightIndexForItem = React.useCallback(
-    (item: ButtonDropdownItem) =>
-      selectableItems.findIndex((candidate) => candidate.id === item.id),
-    [selectableItems],
+    (item: ButtonDropdownItem) => displayItems.findIndex((candidate) => candidate.id === item.id),
+    [displayItems],
   )
 
   return (
@@ -225,59 +348,18 @@ export function ButtonDropdown({
               aria-activedescendant={enableSearch ? undefined : activeOptionId}
               onKeyDown={enableSearch ? undefined : handleNavigationKeyDown}
             >
-              {displayItems.length === 0 ? (
-                <InteractiveList density={POPOVER_INTERACTIVE_LIST_DENSITY}>
-                  <InteractiveListEmpty>{emptyMessage}</InteractiveListEmpty>
-                </InteractiveList>
-              ) : searchActive ? (
-                <InteractiveList density={POPOVER_INTERACTIVE_LIST_DENSITY}>
-                  {displayItems.map((item) => (
-                    <ButtonDropdownItemRow
-                      key={item.id}
-                      item={item}
-                      optionId={`${generatedId}-option-${item.id}`}
-                      isHighlighted={highlightIndexForItem(item) === highlightedIndex}
-                      onHighlight={() => {
-                        const index = highlightIndexForItem(item)
-                        if (index >= 0) setActiveIndex(index)
-                      }}
-                      onSelect={() => selectItem(item.id)}
-                    />
-                  ))}
-                </InteractiveList>
-              ) : (
-                groupedSections.map(({ group, items: sectionItems }) => {
-                  const groupLabel = group?.label.trim() ?? ''
-                  const groupHeadingId =
-                    group && groupLabel.length > 0 ? `${generatedId}-group-${group.id}` : undefined
-                  return (
-                    <React.Fragment key={group?.id ?? '__ungrouped'}>
-                      {groupHeadingId ? (
-                        <ListGroupHeading id={groupHeadingId} label={groupLabel} />
-                      ) : null}
-                      <InteractiveList
-                        density={POPOVER_INTERACTIVE_LIST_DENSITY}
-                        role="group"
-                        aria-labelledby={groupHeadingId}
-                      >
-                        {sectionItems.map((item) => (
-                          <ButtonDropdownItemRow
-                            key={item.id}
-                            item={item}
-                            optionId={`${generatedId}-option-${item.id}`}
-                            isHighlighted={highlightIndexForItem(item) === highlightedIndex}
-                            onHighlight={() => {
-                              const index = highlightIndexForItem(item)
-                              if (index >= 0) setActiveIndex(index)
-                            }}
-                            onSelect={() => selectItem(item.id)}
-                          />
-                        ))}
-                      </InteractiveList>
-                    </React.Fragment>
-                  )
-                })
-              )}
+              <ButtonDropdownMenuItems
+                displayItems={displayItems}
+                searchActive={searchActive}
+                groupedSections={groupedSections}
+                emptyMessage={emptyMessage}
+                generatedId={generatedId}
+                supportingWrap={supportingWrap}
+                highlightedIndex={highlightedIndex}
+                highlightIndexForItem={highlightIndexForItem}
+                setActiveIndex={setActiveIndex}
+                selectItem={selectItem}
+              />
             </div>
           </InteractiveListViewport>
         </PopoverPrimitive.Content>

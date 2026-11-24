@@ -28,7 +28,7 @@ Campaign ruleset test conventions (fixtures, matrices, naming) →
 [docs/testing.md](docs/testing.md).
 
 Validation message architecture (tiers, `defineMessage`, naming, copy style) →
-[docs/validation-messages.md](docs/validation-messages.md).
+[docs/validation-messages.md](docs/validation-messages.md) and [domain-message-inventory.md](docs/domain-message-inventory.md).
 
 ## Subpath exports
 

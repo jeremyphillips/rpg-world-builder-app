@@ -8,6 +8,8 @@ import {
 
 import { CREATURE_TYPE_SET_ID } from '@rpg/contracts'
 
+import { DEFAULT_SYSTEM_RULESET_ID } from '@rpg/contracts'
+
 import {
   buildActiveLanguageFieldOptions,
   buildVocabularyEntrySheetDefaultValues,
@@ -57,6 +59,7 @@ export function useVocabularyEntrySheet({
 
   const { vocabulary: languageVocabulary } = useLanguageVocabulary(
     setId === CREATURE_TYPE_SET_ID ? campaignId : undefined,
+    setId !== CREATURE_TYPE_SET_ID ? { seedRulesetId: DEFAULT_SYSTEM_RULESET_ID } : undefined,
   )
   const languageOptions = buildActiveLanguageFieldOptions(languageVocabulary)
 

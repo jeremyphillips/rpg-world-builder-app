@@ -1,6 +1,5 @@
 import { z } from 'zod'
 import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
-
 import { abilitySchema } from '../../vocab/ability'
 import { hitDieSchema } from '../../primitives/dice'
 import { absoluteLevelSchema } from '../../primitives/level'
@@ -30,11 +29,13 @@ import {
   classCharacterCreationSchema,
 } from '../starting-equipment'
 import { spellcastingDraftSchema, spellcastingSchema } from './spellcasting'
-import { isClassSpellcastingGrantingFeature } from './spellcasting/class-spellcasting-ownership'
+import { isSpellcastingClassFeature } from './spellcasting/class-spellcasting-ownership'
 import { classValidationMessages } from './class-messages'
 import { contentSummaryRefSchema } from '../lib/content-summary-ref'
 import { contentTableSchema } from '../tables'
 import { refineFeatureTablesOnFeature } from './class-feature-table'
+import { keysFromEntries } from '../../vocab/enum-schema'
+import type { GameTermEntry } from '../../vocab/types'
 
 // ---------------------------------------------------------------------------
 // Class — SRD-faithful prose lives in rich-text HTML on `description` and
@@ -44,9 +45,39 @@ import { refineFeatureTablesOnFeature } from './class-feature-table'
 
 // --- Class features + proficiencies ----------------------------------------
 
-export const CLASS_FEATURE_KINDS = ['custom', 'subclass-choice'] as const
+export const CLASS_FEATURE_KIND_ENTRIES = {
+  custom: {
+    label: 'Custom feature',
+    description: 'A named class feature described in prose with optional structured grants.',
+  },
+  asi: {
+    label: 'Ability Score Improvement',
+    description: 'Grants an ability score increase or an optional feat at a class level.',
+  },
+  spellcasting: {
+    label: 'Spellcasting',
+    description: 'Pairs the class spell list and progression with spellcasting configuration.',
+  },
+  'subclass-choice': {
+    label: 'Subclass',
+    description: 'A level where the character chooses a subclass for this class.',
+  },
+} as const satisfies Record<string, GameTermEntry>
 
-export type ClassFeatureKind = (typeof CLASS_FEATURE_KINDS)[number]
+export type ClassFeatureKind = keyof typeof CLASS_FEATURE_KIND_ENTRIES
+
+export const CLASS_FEATURE_KINDS = keysFromEntries(CLASS_FEATURE_KIND_ENTRIES)
+
+export const classFeatureKindSchema = z.enum(CLASS_FEATURE_KINDS)
+
+export function isClassFeatureKind(value: unknown): value is ClassFeatureKind {
+  return typeof value === 'string' && (CLASS_FEATURE_KINDS as readonly string[]).includes(value)
+}
+
+const classFeatureIdentitySchema = {
+  id: z.string().min(1),
+  level: absoluteLevelSchema,
+} as const
 
 function refineClassFeatureGrantUnlockLevels(
   feature: { level: number; grantGroups?: GrantGroup[] },
@@ -71,18 +102,38 @@ const classFeatureTablesField = {
 } as const
 
 export const customClassFeatureSchema = customContentTraitSchema
-  .extend({ level: absoluteLevelSchema, ...classFeatureTablesField })
+  .extend({ ...classFeatureIdentitySchema, ...classFeatureTablesField })
   .superRefine(refineClassFeatureGrantUnlockLevels)
   .superRefine(refineFeatureTablesOnFeature)
 
-export const subclassChoiceClassFeatureSchema = customContentTraitSchema
-  .extend({ kind: z.literal('subclass-choice'), level: absoluteLevelSchema })
-  .superRefine(refineClassFeatureGrantUnlockLevels)
+export const asiClassFeatureSchema = z.object({
+  kind: z.literal('asi'),
+  ...classFeatureIdentitySchema,
+  name: z.string().min(1),
+  description: z.string().optional(),
+})
 
-export const classFeatureSchema = z.preprocess(
-  normalizeContentTrait,
-  z.discriminatedUnion('kind', [customClassFeatureSchema, subclassChoiceClassFeatureSchema]),
-)
+export const spellcastingClassFeatureSchema = z.object({
+  kind: z.literal('spellcasting'),
+  ...classFeatureIdentitySchema,
+  name: z.string().min(1),
+  intro: z.string().optional(),
+})
+
+export const subclassChoiceClassFeatureSchema = z.object({
+  kind: z.literal('subclass-choice'),
+  ...classFeatureIdentitySchema,
+  name: z.string().min(1).optional(),
+})
+
+const classFeatureUnionSchema = z.discriminatedUnion('kind', [
+  customClassFeatureSchema,
+  asiClassFeatureSchema,
+  spellcastingClassFeatureSchema,
+  subclassChoiceClassFeatureSchema,
+])
+
+export const classFeatureSchema = z.preprocess(normalizeContentTrait, classFeatureUnionSchema)
 
 export type ClassFeature = z.infer<typeof classFeatureSchema>
 
@@ -91,6 +142,12 @@ const classBodyFeatureAvailabilityFields = {
 } as const
 
 const classBodyCustomFeatureSchema = customClassFeatureSchema.extend(
+  classBodyFeatureAvailabilityFields,
+)
+
+const classBodyAsiFeatureSchema = asiClassFeatureSchema.extend(classBodyFeatureAvailabilityFields)
+
+const classBodySpellcastingFeatureSchema = spellcastingClassFeatureSchema.extend(
   classBodyFeatureAvailabilityFields,
 )
 
@@ -103,14 +160,16 @@ export const classBodyFeatureSchema = z.preprocess(
   normalizeContentTrait,
   z.discriminatedUnion('kind', [
     classBodyCustomFeatureSchema,
+    classBodyAsiFeatureSchema,
+    classBodySpellcastingFeatureSchema,
     classBodySubclassChoiceFeatureSchema,
   ]),
 )
 
 export type ClassBodyFeature = z.infer<typeof classBodyFeatureSchema>
 
-/** Subclass features share the class feature shape (level + optional grants). */
-export const subclassFeatureSchema = classFeatureSchema
+/** Subclass features are custom-only class feature rows. */
+export const subclassFeatureSchema = z.preprocess(normalizeContentTrait, customClassFeatureSchema)
 
 export type SubclassFeature = z.infer<typeof subclassFeatureSchema>
 
@@ -139,8 +198,7 @@ export type ClassProficienciesDraft = z.infer<typeof classProficienciesDraftSche
 // Class — editable body + stored shape
 // ---------------------------------------------------------------------------
 
-/** Persisted body — seed, homebrew Mongo, and overlay patches. */
-export const classStoredBodySchema = mediaBearingAuthoredContentBodySchema.extend({
+const classStoredBodyBaseSchema = mediaBearingAuthoredContentBodySchema.extend({
   primaryAbilities: z.array(abilitySchema).min(1),
   hitDie: hitDieSchema,
   spellcasting: spellcastingSchema.optional(),
@@ -148,6 +206,11 @@ export const classStoredBodySchema = mediaBearingAuthoredContentBodySchema.exten
   features: z.array(classBodyFeatureSchema),
   characterCreation: classCharacterCreationSchema.optional(),
 })
+
+/** Persisted body — seed, homebrew Mongo, and overlay patches. */
+export const classStoredBodySchema = classStoredBodyBaseSchema.superRefine(
+  refineClassBodyFeaturesAggregate,
+)
 
 export type ClassStoredBody = z.infer<typeof classStoredBodySchema>
 
@@ -205,9 +268,22 @@ type ClassSubclassChoiceFeatureSource = {
 
 /** Finds the explicit feature row that marks when a class chooses a subclass. */
 export function subclassChoiceFeature(characterClass: ClassSubclassChoiceFeatureSource) {
-  return characterClass.features.find(
-    (feature) => feature.id === subclassChoiceFeatureId(characterClass.slug),
-  )
+  return characterClass.features.find((feature) => feature.kind === 'subclass-choice')
+}
+
+/** Display name for a class feature row (subclass milestone title derivation only). */
+export function resolveClassFeatureName(
+  feature: Pick<ClassBodyFeature, 'kind' | 'name'>,
+  className: string,
+): string {
+  switch (feature.kind) {
+    case 'subclass-choice':
+      return feature.name ?? subclassChoiceFeatureLabel(className)
+    case 'custom':
+    case 'asi':
+    case 'spellcasting':
+      return feature.name as string
+  }
 }
 
 /** Level at which a class chooses a subclass, derived from its feature rows. */
@@ -217,51 +293,83 @@ export function subclassChoiceFeatureLevel(
   return subclassChoiceFeature(characterClass)?.level
 }
 
-function refineClassSpellcastingOwnership(
+function refineUniqueClassFeatureIds(features: ClassBodyFeature[], ctx: z.RefinementCtx): void {
+  const seen = new Set<string>()
+  for (const feature of features) {
+    if (seen.has(feature.id)) {
+      addCustomRefinementIssue(ctx, classValidationMessages.duplicateClassFeatureId(), ['features'])
+      return
+    }
+    seen.add(feature.id)
+  }
+}
+
+export function classSubclassChoiceAtOccurrenceLimit(
+  features: readonly { kind?: ClassBodyFeature['kind'] }[],
+): boolean {
+  return features.filter((feature) => (feature.kind ?? 'custom') === 'subclass-choice').length >= 1
+}
+
+function refineSubclassChoiceCardinality(features: ClassBodyFeature[], ctx: z.RefinementCtx): void {
+  const count = features.filter((feature) => feature.kind === 'subclass-choice').length
+  if (count <= 1) return
+  addCustomRefinementIssue(ctx, classValidationMessages.subclassChoiceFeatureDuplicate(), [
+    'features',
+  ])
+}
+
+function refineSpellcastingConfigFeaturePairing(
   value: Pick<ClassStoredBody, 'spellcasting' | 'features'>,
   ctx: z.RefinementCtx,
 ): void {
-  const grantingFeatures = value.features.filter(isClassSpellcastingGrantingFeature)
+  const spellcastingFeatures = value.features.filter(isSpellcastingClassFeature)
   const hasConfig = value.spellcasting !== undefined
-  const hasGrant = grantingFeatures.length > 0
+  const hasFeature = spellcastingFeatures.length > 0
 
-  if (!hasConfig && !hasGrant) return
+  if (!hasConfig && !hasFeature) return
+  if (hasConfig && spellcastingFeatures.length === 1) return
 
-  if (hasConfig && grantingFeatures.length === 1) return
-
-  if (hasConfig && !hasGrant) {
+  if (hasConfig && !hasFeature) {
     addCustomRefinementIssue(ctx, classValidationMessages.spellcastingConfigRequiresGrant(), [
       'spellcasting',
     ])
     return
   }
 
-  if (!hasConfig && hasGrant) {
+  if (!hasConfig && hasFeature) {
     addCustomRefinementIssue(ctx, classValidationMessages.spellcastingGrantRequiresConfig(), [
       'features',
     ])
     return
   }
 
-  if (grantingFeatures.length > 1) {
+  if (spellcastingFeatures.length > 1) {
     addCustomRefinementIssue(ctx, classValidationMessages.spellcastingGrantingFeatureDuplicate(), [
       'features',
     ])
   }
 }
 
+function refineClassBodyFeaturesAggregate(
+  value: Pick<ClassStoredBody, 'spellcasting' | 'features'>,
+  ctx: z.RefinementCtx,
+): void {
+  refineUniqueClassFeatureIds(value.features, ctx)
+  refineSubclassChoiceCardinality(value.features, ctx)
+  refineSpellcastingConfigFeaturePairing(value, ctx)
+}
+
 // Homebrew authoring DTOs (forms). Server sets id/source/campaignId/timestamps.
-const createClassInputBaseSchema = classStoredBodySchema.extend({ slug: slugSchema })
+const createClassInputBaseSchema = classStoredBodyBaseSchema.extend({ slug: slugSchema })
 
 export const createClassInputSchema = createClassInputBaseSchema.superRefine((value, ctx) => {
+  refineClassBodyFeaturesAggregate(value, ctx)
   if (value.characterCreation && value.characterCreation.abilityScoreOrder === undefined) {
     addCustomRefinementIssue(ctx, 'characterCreation requires abilityScoreOrder on publish', [
       'characterCreation',
       'abilityScoreOrder',
     ])
   }
-
-  refineClassSpellcastingOwnership(value, ctx)
 })
 export type CreateClassInput = z.infer<typeof createClassInputBaseSchema>
 
@@ -281,7 +389,7 @@ export type UpdateClassDraftInput = z.infer<typeof updateClassDraftInputSchema>
  * Deferred block).
  */
 export const classPatchSchema = contentPatchBaseSchema.extend({
-  patch: classStoredBodySchema.partial(),
+  patch: classStoredBodyBaseSchema.partial(),
 })
 export type ClassPatch = z.infer<typeof classPatchSchema>
 

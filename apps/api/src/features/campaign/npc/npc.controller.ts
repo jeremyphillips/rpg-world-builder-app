@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express'
 
 import type {
-  CampaignNpcStatusPatch,
+  CampaignParticipatingCharacterStatusPatch,
   CharacterMediaPatchInput,
   CreateNpcRequestInput,
 } from '@rpg/contracts'
@@ -74,7 +74,11 @@ export async function patchMedia(req: Request, res: Response): Promise<void> {
 
 export async function patch(req: Request, res: Response): Promise<void> {
   const { campaignId, npcId } = req.params as { campaignId: string; npcId: string }
-  const npc = await patchCampaignNpcStatus(campaignId, npcId, req.body as CampaignNpcStatusPatch)
+  const npc = await patchCampaignNpcStatus(
+    campaignId,
+    npcId,
+    req.body as CampaignParticipatingCharacterStatusPatch,
+  )
   if (!npc) {
     throw new HttpError(404, 'not_found', 'NPC not found.')
   }

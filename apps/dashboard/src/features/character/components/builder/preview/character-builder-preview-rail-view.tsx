@@ -6,7 +6,7 @@ import type {
 } from '@rpg/contracts'
 import { ActionIcon, PreviewRail, type PreviewRailLayout } from '@rpg/ui'
 import { ContentPreviewRailMedia } from '@/features/content'
-import { resolveCharacterPrimaryDisplayImage } from '../../../lib/display/resolve-character-display-image'
+import { resolveCharacterDisplayImageForSurface } from '../../../lib/display/resolve-character-display-image'
 
 import { getBuilderDraftNarrative } from '../../../lib/builder-preview/character-builder-preview-panel.lib'
 import type { BuilderPreviewRailProjection } from '../../../lib/builder-preview/builder-preview-projection.lib'
@@ -117,7 +117,7 @@ export function CharacterBuilderPreviewRailView({
       <PreviewRail.Identity
         media={
           <ContentPreviewRailMedia
-            displayImage={resolveCharacterPrimaryDisplayImage(draft.identity)}
+            displayImage={resolveCharacterDisplayImageForSurface(draft.identity)}
             fallback="character"
           />
         }

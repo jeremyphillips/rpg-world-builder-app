@@ -8,8 +8,22 @@ import {
   type CreatureRollAdjustment,
   type CreatureSaveOutcomeOverride,
 } from '../effects'
+import type { Sense } from '../../../vocab/sense'
+import {
+  SENSE_CREATURE_TRAIT_TEMPLATE_ENTRIES,
+  type CreatureTraitTemplateSourcePolicy,
+} from './sense-templates'
 import { LEGENDARY_RESISTANCE_LABEL } from './legendary-resistance.constants'
 import { legendaryResistanceLimitedUse } from './legendary-resistance-limited-use'
+import {
+  traitHasForVoice,
+  traitLegendaryResistanceRulesProse,
+  traitPossessiveForVoice,
+  traitSubjectCap,
+  type TraitRulesVoice,
+} from './trait-rules-voice'
+
+export type CreatureTraitTemplateHost = 'species' | 'monster'
 
 // ---------------------------------------------------------------------------
 // Versioned creature trait templates. Assignments store `templateId` plus
@@ -32,18 +46,29 @@ export const CREATURE_TRAIT_TEMPLATE_TERM = {
 export type CreatureTraitGrantBody =
   | ({ kind: 'rollAdjustment' } & CreatureRollAdjustment)
   | ({ kind: 'saveOutcomeOverride' } & CreatureSaveOutcomeOverride)
+  | ({ kind: 'sense' } & Sense)
 
 export type CreatureTraitTemplate = {
   label: string
   description: string
   rulesetIds: readonly string[]
+  hosts: readonly CreatureTraitTemplateHost[]
+  occurrence?: 'one'
+  sourcePolicy?: CreatureTraitTemplateSourcePolicy
+  acquisitionGroup?: string
+  senseId?: string
   configSchema: z.ZodTypeAny
   formatName?: (config: unknown) => string
-  formatDescription: (config: unknown) => string
+  formatRules: (config: unknown, voice: TraitRulesVoice) => string
   resolveGrants: (config: unknown) => CreatureTraitGrantBody[]
 }
 
 const NO_CONFIG = z.object({}).strict()
+
+const SPECIES_AND_MONSTER_HOSTS = [
+  'species',
+  'monster',
+] as const satisfies readonly CreatureTraitTemplateHost[]
 
 const legendaryResistanceConfigSchema = z.object({
   uses: z.object({
@@ -66,9 +91,11 @@ export const CREATURE_TRAIT_TEMPLATE_ENTRIES = {
     label: 'Magic Resistance',
     description: 'Advantage on saving throws against spells and other magical effects.',
     rulesetIds: [DEFAULT_SYSTEM_RULESET_ID],
+    hosts: SPECIES_AND_MONSTER_HOSTS,
+    occurrence: 'one',
     configSchema: NO_CONFIG,
-    formatDescription: () =>
-      'This creature has Advantage on saving throws against spells and other magical effects.',
+    formatRules: (_config, voice) =>
+      `${traitSubjectCap(voice)} ${traitHasForVoice(voice)} Advantage on saving throws against spells and other magical effects.`,
     resolveGrants: () => [
       rollGrant({
         mode: 'advantage',
@@ -82,9 +109,11 @@ export const CREATURE_TRAIT_TEMPLATE_ENTRIES = {
     description:
       'Advantage on an attack roll when an ally is adjacent to the target and is not incapacitated.',
     rulesetIds: [DEFAULT_SYSTEM_RULESET_ID],
+    hosts: SPECIES_AND_MONSTER_HOSTS,
+    occurrence: 'one',
     configSchema: NO_CONFIG,
-    formatDescription: () =>
-      "This creature has Advantage on an attack roll against a creature if at least one of its allies is within 5 feet of the creature and the ally doesn't have the Incapacitated condition.",
+    formatRules: (_config, voice) =>
+      `${traitSubjectCap(voice)} ${traitHasForVoice(voice)} Advantage on an attack roll against a creature if at least one of ${traitPossessiveForVoice(voice)} allies is within 5 feet of the creature and the ally doesn't have the Incapacitated condition.`,
     resolveGrants: () => [
       rollGrant({
         mode: 'advantage',
@@ -97,9 +126,11 @@ export const CREATURE_TRAIT_TEMPLATE_ENTRIES = {
     label: 'Sunlight Sensitivity',
     description: 'Disadvantage on attack rolls and Wisdom (Perception) checks while in sunlight.',
     rulesetIds: [DEFAULT_SYSTEM_RULESET_ID],
+    hosts: SPECIES_AND_MONSTER_HOSTS,
+    occurrence: 'one',
     configSchema: NO_CONFIG,
-    formatDescription: () =>
-      'While in sunlight, this creature has Disadvantage on attack rolls and Wisdom (Perception) checks.',
+    formatRules: (_config, voice) =>
+      `While in sunlight, ${traitSubjectCap(voice)} ${traitHasForVoice(voice)} Disadvantage on attack rolls and Wisdom (Perception) checks.`,
     resolveGrants: () => [
       rollGrant({
         mode: 'disadvantage',
@@ -115,10 +146,11 @@ export const CREATURE_TRAIT_TEMPLATE_ENTRIES = {
     label: LEGENDARY_RESISTANCE_LABEL,
     description: 'Choose to succeed on a failed saving throw a limited number of times per day.',
     rulesetIds: [DEFAULT_SYSTEM_RULESET_ID],
+    hosts: SPECIES_AND_MONSTER_HOSTS,
+    occurrence: 'one',
     configSchema: legendaryResistanceConfigSchema,
     formatName: () => LEGENDARY_RESISTANCE_LABEL,
-    formatDescription: () =>
-      'If this creature fails a saving throw, it can choose to succeed instead.',
+    formatRules: (_config, voice) => traitLegendaryResistanceRulesProse(voice),
     resolveGrants: (config) => {
       const parsed = legendaryResistanceConfigSchema.parse(config)
       const override = creatureSaveOutcomeOverrideSchema.parse({
@@ -128,6 +160,7 @@ export const CREATURE_TRAIT_TEMPLATE_ENTRIES = {
       return [{ kind: 'saveOutcomeOverride', ...override }]
     },
   },
+  ...SENSE_CREATURE_TRAIT_TEMPLATE_ENTRIES,
 } as const satisfies Record<string, CreatureTraitTemplate>
 
 export type CreatureTraitTemplateId = keyof typeof CREATURE_TRAIT_TEMPLATE_ENTRIES
@@ -138,15 +171,30 @@ export const CREATURE_TRAIT_TEMPLATE_IDS = Object.keys(CREATURE_TRAIT_TEMPLATE_E
 ]
 
 export function getCreatureTraitTemplate(templateId: string): CreatureTraitTemplate | undefined {
-  return CREATURE_TRAIT_TEMPLATE_ENTRIES[templateId as CreatureTraitTemplateId]
+  return Object.hasOwn(CREATURE_TRAIT_TEMPLATE_ENTRIES, templateId)
+    ? CREATURE_TRAIT_TEMPLATE_ENTRIES[templateId as CreatureTraitTemplateId]
+    : undefined
 }
 
-export function listCreatureTraitTemplatesForRuleset(rulesetId: string): CreatureTraitTemplateId[] {
-  return CREATURE_TRAIT_TEMPLATE_IDS.filter((templateId) =>
-    (CREATURE_TRAIT_TEMPLATE_ENTRIES[templateId].rulesetIds as readonly string[]).includes(
-      rulesetId,
-    ),
-  )
+/** Whether a registry template may be assigned on the given authoring host. */
+export function isCreatureTraitTemplateEligibleForHost(
+  templateId: string,
+  host: CreatureTraitTemplateHost,
+): boolean {
+  const entry = getCreatureTraitTemplate(templateId)
+  if (!entry) return false
+  return entry.hosts.includes(host)
+}
+
+export function listCreatureTraitTemplatesForRuleset(
+  rulesetId: string,
+  host: CreatureTraitTemplateHost,
+): CreatureTraitTemplateId[] {
+  return CREATURE_TRAIT_TEMPLATE_IDS.filter((templateId) => {
+    const entry = CREATURE_TRAIT_TEMPLATE_ENTRIES[templateId]
+    if (!(entry.rulesetIds as readonly string[]).includes(rulesetId)) return false
+    return isCreatureTraitTemplateEligibleForHost(templateId, host)
+  })
 }
 
 export function readCreatureTraitTemplateConfig(
@@ -164,5 +212,6 @@ export function defaultCreatureTraitTemplateConfig(
   templateId: string,
 ): Record<string, unknown> | undefined {
   if (templateId === 'legendary-resistance') return { uses: { normal: 3 } }
+  if (templateId in SENSE_CREATURE_TRAIT_TEMPLATE_ENTRIES) return { range: 60 }
   return undefined
 }

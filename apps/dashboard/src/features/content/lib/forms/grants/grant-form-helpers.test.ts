@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { isOpaqueGrantRowId, type GrantGroups } from '@rpg/contracts'
+import { isOpaqueGrantRowId, type GrantGroups, type Spell } from '@rpg/contracts'
 import {
   isContainer,
   resolveColumnsCollapseSequence,
@@ -23,6 +23,10 @@ import {
   GRANT_TYPE_MISSING_PRIMARY,
   type GrantRowHeaderContext,
 } from './grant-form-fields'
+import {
+  buildGrantEquipmentReferencePresentationFromAuthoring,
+  buildGrantSpellReferencePresentationFromAuthoring,
+} from './grant-row-presentation.lib'
 import {
   GRANT_ROW_TYPE_LABELS,
   GRANT_ROW_TYPES,
@@ -99,6 +103,7 @@ function walkDuplicateFormItemKeys(
       )
       continue
     }
+    if (!('fields' in item) || !item.fields) continue
     walkDuplicateFormItemKeys(item.fields, namePrefix, duplicates)
   }
 
@@ -153,6 +158,25 @@ describe('buildGrantUnlockLevelOptions', () => {
 })
 
 describe('grantGroupsToFormRows / formRowsToGrantGroups (atomic model)', () => {
+  it('projects editable grants alongside campaign-only language choices', () => {
+    const groups: GrantGroups = [
+      {
+        grants: [
+          { id: 'choice', kind: 'languageChoice', choose: 1, categories: ['standard'] },
+          { id: 'sense', kind: 'sense', type: 'darkvision', range: 90 },
+        ],
+      },
+    ]
+    const rows = grantGroupsToFormRows(groups)
+    expect(rows).toHaveLength(1)
+    expect(rows[0]).toMatchObject({
+      id: 'sense',
+      grantType: 'senses',
+      senseType: 'darkvision',
+      senseRange: 90,
+    })
+  })
+
   it('round-trips a casting-only spells grant through grantGroups', () => {
     const groups: GrantGroups = [
       {
@@ -456,12 +480,28 @@ describe('grant row summaries', () => {
         },
         {
           rowLabels: GRANT_ROW_TYPE_LABELS,
-          equipmentOptions: [],
+          equipmentReferences: buildGrantEquipmentReferencePresentationFromAuthoring({
+            status: 'ready',
+            scope: { rulesetId: 'srd-cc-5.2.1', campaignId: 'campaign-1' },
+            equipmentById: new Map(),
+          }),
           weaponOptions: [],
           toolOptions: [],
           armorOptions: [],
           skillOptions: [],
-          spellOptions: [{ value: 'dancing-lights', label: 'Dancing Lights' }],
+          spellReferences: buildGrantSpellReferencePresentationFromAuthoring({
+            status: 'ready',
+            spellsById: new Map([
+              [
+                'dancing-lights',
+                {
+                  id: 'dancing-lights',
+                  name: 'Dancing Lights',
+                  level: 0,
+                } as Spell,
+              ],
+            ]),
+          }),
         },
       ),
     ).toBe('Character can cast Dancing Lights at will.')
@@ -470,15 +510,24 @@ describe('grant row summaries', () => {
 
 const grantRowHeaderContext = {
   rowLabels: GRANT_ROW_TYPE_LABELS,
-  equipmentOptions: [],
+  equipmentReferences: buildGrantEquipmentReferencePresentationFromAuthoring({
+    status: 'ready',
+    scope: { rulesetId: 'srd-cc-5.2.1', campaignId: 'campaign-1' },
+    equipmentById: new Map(),
+  }),
   weaponOptions: [],
   toolOptions: [],
   armorOptions: [],
   skillOptions: [],
-  spellOptions: [
-    { value: 'power-word-heal', label: 'Power Word Heal' },
-    { value: 'power-word-kill', label: 'Power Word Kill' },
-  ],
+  spellReferences: buildGrantSpellReferencePresentationFromAuthoring({
+    status: 'ready',
+    spellsById: new Map(
+      [
+        { id: 'power-word-heal', name: 'Power Word Heal', level: 9 },
+        { id: 'power-word-kill', name: 'Power Word Kill', level: 9 },
+      ].map((spell) => [spell.id, spell as Spell]),
+    ),
+  }),
 } satisfies GrantRowHeaderContext
 
 describe('formatGrantRowSummary', () => {

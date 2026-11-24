@@ -1,5 +1,6 @@
 import type {
   CharacterContentReferenceDescriptor,
+  CharacterType,
   PaginatedItems,
   ReferencingCharacterSummary,
 } from '@rpg/contracts'
@@ -13,7 +14,7 @@ import { CharacterModel } from '../../../character'
 type CharacterReferenceHit = {
   _id: unknown
   name: string
-  characterType: 'pc' | 'npc'
+  characterType: CharacterType
   classes: Array<{ classId: string; level: number; subclassId?: string }>
   species: { id: string }
 }

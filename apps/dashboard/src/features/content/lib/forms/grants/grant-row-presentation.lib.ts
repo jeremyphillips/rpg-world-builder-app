@@ -1,4 +1,6 @@
 import {
+  createEquipmentCatalogContext,
+  createSpellCatalogContext,
   formatDamageTypeGrantSentence,
   formatFeatChoiceGrantSentence,
   formatLanguageGrantSentence,
@@ -6,13 +8,30 @@ import {
   formatMovementGrantMetadataDetail,
   formatResistanceGrantSentence,
   formatSenseGrantSentence,
-  formatSpellsGrantSentence,
+  formatSpellsGrantSentenceFromResolutions,
   getFeatCategorySentenceForm,
+  presentEquipmentReferenceDisplayName,
+  presentSpellReferenceDisplayName,
+  resolveEquipmentSlugReference,
+  resolveEquipmentSlugReferenceOutcomes,
+  resolveSpellReferenceOutcome,
+  resolveSpellReferenceOutcomes,
+  type AuthoringEquipmentCatalogStatus,
+  type AuthoringSpellCatalogStatus,
+  type Equipment,
+  type EquipmentCatalogContext,
+  type EquipmentCatalogScope,
+  type EquipmentReferenceResolution,
+  type EquipmentSlugReference,
   type FeatCategory,
   type MovementGrantPayload,
   type MovementMode,
   type MovementOperation,
   type SenseId,
+  type Spell,
+  type SpellCatalogContext,
+  type SpellReference,
+  type SpellReferenceResolution,
 } from '@rpg/contracts'
 import { INLINE_METADATA_SEPARATOR } from '@rpg/contracts/primitives'
 
@@ -44,17 +63,88 @@ import type {
 
 export type GrantRowValues = Record<string, unknown>
 
+export type GrantSpellReferencePresentation = {
+  catalog: SpellCatalogContext
+  displayName(spellId: SpellReference): string
+  outcomes(spellIds: readonly SpellReference[]): SpellReferenceResolution[]
+}
+
+export type GrantEquipmentReferencePresentation = {
+  catalog: EquipmentCatalogContext
+  scope: EquipmentCatalogScope
+  displayName(slug: EquipmentSlugReference): string
+  outcomes(slugs: readonly EquipmentSlugReference[]): EquipmentReferenceResolution[]
+}
+
 export type GrantRowHeaderContext = {
   rowLabels: Record<string, string>
-  equipmentOptions: FieldOption[]
+  equipmentReferences: GrantEquipmentReferencePresentation
   weaponOptions: FieldOption[]
   toolOptions: FieldOption[]
   armorOptions: FieldOption[]
   skillOptions: FieldOption[]
-  spellOptions: FieldOption[]
+  spellReferences: GrantSpellReferencePresentation
   resolveDamageTypeLabel?: (id: string) => string
   resolveLanguageLabel?: (id: string) => string
   resolveSenseLabel?: (id: string) => string
+}
+
+export function buildGrantSpellReferencePresentation(
+  catalog: SpellCatalogContext,
+): GrantSpellReferencePresentation {
+  return {
+    catalog,
+    displayName(spellId) {
+      return presentSpellReferenceDisplayName(resolveSpellReferenceOutcome(spellId, catalog))
+    },
+    outcomes(spellIds) {
+      return resolveSpellReferenceOutcomes(spellIds, catalog)
+    },
+  }
+}
+
+export function buildGrantSpellReferencePresentationFromAuthoring(args: {
+  status?: AuthoringSpellCatalogStatus
+  spellsById?: ReadonlyMap<string, Spell>
+}): GrantSpellReferencePresentation {
+  return buildGrantSpellReferencePresentation(
+    createSpellCatalogContext({
+      status: args.status ?? 'pending',
+      spellsById: args.spellsById,
+    }),
+  )
+}
+
+export function buildGrantEquipmentReferencePresentation(
+  catalog: EquipmentCatalogContext,
+): GrantEquipmentReferencePresentation {
+  const { scope } = catalog
+  return {
+    catalog,
+    scope,
+    displayName(slug) {
+      return presentEquipmentReferenceDisplayName(
+        resolveEquipmentSlugReference(slug, catalog, scope),
+      )
+    },
+    outcomes(slugs) {
+      return resolveEquipmentSlugReferenceOutcomes(slugs, catalog, scope)
+    },
+  }
+}
+
+export function buildGrantEquipmentReferencePresentationFromAuthoring(args: {
+  status?: AuthoringEquipmentCatalogStatus
+  scope: EquipmentCatalogScope
+  equipmentById?: ReadonlyMap<string, Equipment>
+}): GrantEquipmentReferencePresentation {
+  return buildGrantEquipmentReferencePresentation(
+    createEquipmentCatalogContext({
+      status: args.status ?? 'pending',
+      scope: args.scope,
+      equipmentById: args.equipmentById,
+    }),
+  )
 }
 
 /** Semantic row copy — renderer decides header band vs body description placement. */
@@ -65,10 +155,6 @@ export type GrantRowPresentation = {
 }
 
 export { formatCompactMetadataList } from './grant-compact-metadata.lib'
-
-export function resolveSpellGrantName(spellId: string, spellOptions: FieldOption[]): string {
-  return spellOptions.find((option) => option.value === spellId)?.label ?? spellId
-}
 
 function normalizePresentationPart(value: string): string {
   return value.trim().toLowerCase().replace(/\s+/g, ' ')
@@ -166,9 +252,8 @@ function resolveSpellGrantDetail(
   ctx: GrantRowHeaderContext,
 ): string | undefined {
   if (!spellIds?.length) return undefined
-  return formatCompactMetadataList(
-    spellIds.map((id) => resolveSpellGrantName(id, ctx.spellOptions)),
-  )
+  const outcomes = ctx.spellReferences.outcomes(spellIds)
+  return formatCompactMetadataList(outcomes.map(presentSpellReferenceDisplayName))
 }
 
 function resolveMovementDetail(values: GrantRowValues): string | undefined {
@@ -194,7 +279,8 @@ function resolveSpellGrantDescription(values: GrantRowValues, ctx: GrantRowHeade
       })
     : undefined
 
-  return formatSpellsGrantSentence(
+  const outcomes = ctx.spellReferences.outcomes(spellIds)
+  return formatSpellsGrantSentenceFromResolutions(
     {
       id: 'spells',
       kind: 'spells',
@@ -211,7 +297,7 @@ function resolveSpellGrantDescription(values: GrantRowValues, ctx: GrantRowHeade
           }
         : {}),
     },
-    (id) => resolveSpellGrantName(id, ctx.spellOptions),
+    outcomes,
   )
 }
 
@@ -258,7 +344,7 @@ const GRANT_ROW_DESCRIPTION_BY_TYPE: Partial<Record<string, GrantRowDescriptionF
     })
   },
   equipment: (values, ctx) =>
-    equipmentGrantSummary(values as EquipmentGrantItemForm, ctx.equipmentOptions),
+    equipmentGrantSummary(values as EquipmentGrantItemForm, ctx.equipmentReferences),
   weaponProficiency: (values, ctx) =>
     weaponProficiencyGrantSummary(values as WeaponProficiencyItemForm, ctx.weaponOptions),
   toolProficiency: (values, ctx) =>

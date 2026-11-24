@@ -6,8 +6,9 @@ import { pickEquipment } from '@/features/content'
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
+  standaloneEquipmentReferenceScope,
 } from '../../../lib/fixtures/character-builder-fixtures'
-import { SAMPLE_PC } from '../../../lib/fixtures/character-fixtures'
+import { makePcCharacter } from '../../../lib/fixtures/character-fixtures'
 import { buildCharacterSheetEquipmentCards } from '../../../lib/detail/character-sheet-catalog'
 import { CharacterDetailEquipmentTab } from './character-detail-equipment-tab'
 
@@ -17,9 +18,9 @@ const dagger = pickEquipment('dagger')
 const chainMail = pickEquipment('chain-mail')
 const cards = buildCharacterSheetEquipmentCards(
   {
-    ...SAMPLE_PC,
+    ...makePcCharacter(),
     equipment: {
-      ...SAMPLE_PC.equipment,
+      ...makePcCharacter().equipment,
       weapons: [
         {
           entryId: 'weapon-1',
@@ -44,6 +45,7 @@ const cards = buildCharacterSheetEquipmentCards(
     equipment: new Map([...catalogIndex.equipment, [dagger.id, dagger], [chainMail.id, chainMail]]),
   },
   systemDefaultArmorClassRules(),
+  standaloneEquipmentReferenceScope,
 )
 
 const meta = {
@@ -67,9 +69,9 @@ export const MissingReference: Story = {
   args: {
     cards: buildCharacterSheetEquipmentCards(
       {
-        ...SAMPLE_PC,
+        ...makePcCharacter(),
         equipment: {
-          ...SAMPLE_PC.equipment,
+          ...makePcCharacter().equipment,
           gear: [
             {
               entryId: 'missing-gear',
@@ -82,6 +84,7 @@ export const MissingReference: Story = {
       },
       catalogIndex,
       systemDefaultArmorClassRules(),
+      standaloneEquipmentReferenceScope,
     ),
     armorClassRules: systemDefaultArmorClassRules(),
     wealth: { label: 'Wealth', value: '0 gp' },

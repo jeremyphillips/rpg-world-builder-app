@@ -20,6 +20,10 @@ pnpm lint-staged
 → pnpm gate:fallow-dupes
 ```
 
+**CI** also runs [`fallow-dead-code-gate.sh`](fallow-dead-code-gate.sh) after affected
+typecheck/lint (`pnpm gate:fallow-dead-code`) — new production dead exports only
+(see [tools/fallow/README.md](../fallow/README.md)).
+
 **Commit-msg:** `commitlint` (Conventional Commits).
 
 **Pre-push** (`pnpm gate:pre-push`):

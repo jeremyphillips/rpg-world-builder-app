@@ -1,4 +1,6 @@
-const EXECUTABLE_ATTACK_KINDS = ['weapon', 'natural-weapon', 'attack'] as const
+import { MONSTER_ACTION_ATTACK_KINDS } from './attack-roll-kinds'
+
+const EXECUTABLE_ATTACK_KINDS = MONSTER_ACTION_ATTACK_KINDS
 
 const EXECUTABLE_USE_KINDS = ['save', 'special', 'spell'] as const
 

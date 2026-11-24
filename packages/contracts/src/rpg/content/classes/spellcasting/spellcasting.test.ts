@@ -17,11 +17,10 @@ const wizardSelection = {
 }
 
 const spellcastingGrantFeature = {
-  kind: 'custom' as const,
+  kind: 'spellcasting' as const,
   id: 'spellcasting',
   name: 'Spellcasting',
   level: 1,
-  grantGroups: [{ grants: [{ id: 'spellcasting-1', kind: 'spellcasting' as const }] }],
 }
 
 describe('spellcastingSchema', () => {
@@ -64,6 +63,66 @@ describe('spellcastingSchema', () => {
       recommendations: [{ target: 'cantrips', classLevel: 1, spellIds: ['dancing-lights'] }],
     })
     expect(parsed.recommendations?.[0]?.target).toBe('cantrips')
+  })
+
+  it('parses bard musical instrument focus and cantrip change', () => {
+    const parsed = spellcastingSchema.parse({
+      slotProgressionId: 'full-caster',
+      ability: 'cha',
+      focusKinds: ['musical_instrument'],
+      cantripSelection: {
+        change: { kind: 'replace', trigger: 'levelUp', limit: 1 },
+      },
+      spellSelection: {
+        model: 'limitedRepertoire',
+        change: { kind: 'replace', trigger: 'levelUp', limit: 1 },
+      },
+      progression: {
+        cantrips: { curve: { rows: [{ level: 1, count: 2 }] } },
+        repertoire: { curve: { rows: [{ level: 1, count: 4 }] } },
+      },
+    })
+    expect(parsed.focusKinds).toEqual(['musical_instrument'])
+    const cantripChange = parsed.cantripSelection?.change
+    expect(cantripChange?.kind === 'replace' ? cantripChange.trigger : undefined).toBe('levelUp')
+  })
+
+  it('parses wizard spellbook focus and long-rest cantrip replacement', () => {
+    const parsed = spellcastingSchema.parse({
+      slotProgressionId: 'full-caster',
+      ability: 'int',
+      focusKinds: ['arcane_focus', 'spellbook'],
+      cantripSelection: {
+        change: { kind: 'replace', trigger: 'longRest', limit: 1 },
+      },
+      spellSelection: wizardSelection,
+      progression: {
+        cantrips: { curve: { rows: [{ level: 1, count: 3 }] } },
+        preparedSpells: { curve: { rows: [{ level: 1, count: 4 }] } },
+      },
+    })
+    expect(parsed.focusKinds).toEqual(['arcane_focus', 'spellbook'])
+    const cantripChange = parsed.cantripSelection?.change
+    expect(cantripChange?.kind === 'replace' ? cantripChange.trigger : undefined).toBe('longRest')
+  })
+
+  it('rejects cantrip change without cantrip progression', () => {
+    expect(
+      spellcastingSchema.safeParse({
+        slotProgressionId: 'full-caster',
+        ability: 'wis',
+        cantripSelection: {
+          change: { kind: 'replace', trigger: 'levelUp', limit: 1 },
+        },
+        spellSelection: {
+          model: 'prepareFromClassList',
+          change: { kind: 'replace', trigger: 'longRest', limit: 1 },
+        },
+        progression: {
+          preparedSpells: { curve: { rows: [{ level: 1, count: 2 }] } },
+        },
+      }).success,
+    ).toBe(false)
   })
 
   it('rejects limited repertoire with prepared spells progression', () => {

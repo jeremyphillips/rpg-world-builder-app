@@ -10,6 +10,10 @@ import { describe, expect, it } from 'vitest'
 import { expectRichTextHtml } from '../lib/expect-rich-text-html'
 import { resolveIndexedCampaignSpellcastingProgressionConfig } from '../spellcasting-progressions'
 import { loadSeedSpells, loadSeedSpellsByLevel, seedSpellSlugs, SPELL_LEVEL_FILES } from './index'
+import {
+  SRD_521_SPELL_MODELING_MANIFEST,
+  type Srd521SpellModelingManifestSlug,
+} from './spell-modeling-manifest'
 
 const RULESET = 'srd-cc-5.2.1' as const
 const SPELLCASTING_PROGRESSION = resolveIndexedCampaignSpellcastingProgressionConfig(
@@ -19,11 +23,24 @@ const SPELLCASTING_PROGRESSION = resolveIndexedCampaignSpellcastingProgressionCo
 const SRD_CLASS_SLUGS = seedClassSlugs(RULESET)
 const SPELL_OPTION_HEADROOM = 2
 
+const DELIVERABLE_B_SPELL_SLUGS = [
+  'animal-friendship',
+  'ensnaring-strike',
+  'guiding-bolt',
+  'heroism',
+  'produce-flame',
+  'ray-of-frost',
+  'searing-smite',
+  'shocking-grasp',
+  'sorcerous-burst',
+  'starry-wisp',
+] as const satisfies readonly Srd521SpellModelingManifestSlug[]
+
 describe('SRD 5.2.1 spell seed', () => {
   const spells = loadSeedSpells(RULESET)
 
   it('ships 100 curated spells (validated against the schema at load)', () => {
-    expect(spells).toHaveLength(109)
+    expect(spells).toHaveLength(119)
   })
 
   it('uses deterministic system ids and null campaignId', () => {
@@ -35,10 +52,18 @@ describe('SRD 5.2.1 spell seed', () => {
     }
   })
 
+  it('ships deliverable B SRD spells with reviewed modeling metadata', () => {
+    for (const slug of DELIVERABLE_B_SPELL_SLUGS) {
+      const spell = spells.find((entry) => entry.slug === slug)
+      expect(spell, slug).toBeDefined()
+      expect(spell?.modeling).toEqual(SRD_521_SPELL_MODELING_MANIFEST[slug])
+    }
+  })
+
   it('has globally unique slugs', () => {
     const slugs = spells.map((s) => s.slug)
     expect(new Set(slugs).size).toBe(slugs.length)
-    expect(seedSpellSlugs(RULESET).size).toBe(109)
+    expect(seedSpellSlugs(RULESET).size).toBe(119)
   })
 
   it('stores each spell in the level file matching its level field', () => {

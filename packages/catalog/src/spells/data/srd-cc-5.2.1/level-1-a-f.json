@@ -1,5 +1,66 @@
 [
   {
+    "id": "srd-cc-5.2.1:animal-friendship",
+    "slug": "animal-friendship",
+    "rulesetId": "srd-cc-5.2.1",
+    "catalogLayer": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Animal Friendship",
+    "description": "<p>Target a Beast that you can see within range. The target must succeed on a Wisdom saving throw or have the Charmed condition for the duration. If you or one of your allies deals damage to the target, the spell ends.</p>",
+    "school": "enchantment",
+    "level": 1,
+    "classIds": ["bard", "druid", "ranger"],
+    "tags": {
+      "conditions": ["charmed"],
+      "roles": ["control"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "distance",
+      "value": {
+        "value": 30,
+        "unit": "ft"
+      }
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 24,
+      "unit": "hour"
+    },
+    "components": {
+      "verbal": true,
+      "somatic": true,
+      "material": {
+        "description": "a morsel of food"
+      }
+    },
+    "higherLevelSlotEffect": "<p>You can target one additional Beast for each spell slot level above 1.</p>",
+    "modeling": {
+      "blocker": {
+        "code": "effect-schema-missing",
+        "capabilityId": "condition"
+      },
+      "gaps": [
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Charm ends when target takes damage"
+        },
+        {
+          "code": "object-state-awareness",
+          "note": "Target must be a Beast"
+        }
+      ]
+    }
+  },
+  {
     "id": "srd-cc-5.2.1:bless",
     "slug": "bless",
     "rulesetId": "srd-cc-5.2.1",
@@ -593,6 +654,60 @@
         {
           "code": "progression-schema-missing",
           "note": "Slot +1d6 damage scaling stays prose"
+        }
+      ]
+    }
+  },
+  {
+    "id": "srd-cc-5.2.1:ensnaring-strike",
+    "slug": "ensnaring-strike",
+    "rulesetId": "srd-cc-5.2.1",
+    "catalogLayer": "system",
+    "campaignId": null,
+    "createdAt": "2024-05-21T00:00:00.000Z",
+    "updatedAt": "2024-05-21T00:00:00.000Z",
+    "name": "Ensnaring Strike",
+    "description": "<p>As you hit the target, grasping vines appear on it, and it makes a Strength saving throw. A Large or larger creature has Advantage on this save. On a failed save, the target has the Restrained condition until the spell ends. On a successful save, the vines shrivel away, and the spell ends. While Restrained, the target takes 1d6 Piercing damage at the start of each of its turns. The target or a creature within reach of it can take an action to make a Strength (Athletics) check against your spell save DC. On a success, the spell ends.</p>",
+    "school": "conjuration",
+    "level": 1,
+    "classIds": ["ranger"],
+    "tags": {
+      "conditions": ["restrained"],
+      "damageTypes": ["piercing"],
+      "roles": ["control", "damage"]
+    },
+    "castingTime": {
+      "normal": {
+        "value": 1,
+        "unit": "bonus-action"
+      },
+      "canBeCastAsRitual": false
+    },
+    "range": {
+      "kind": "self"
+    },
+    "duration": {
+      "kind": "timed",
+      "value": 1,
+      "unit": "minute",
+      "concentration": true
+    },
+    "components": {
+      "verbal": true
+    },
+    "higherLevelSlotEffect": "<p>The damage increases by 1d6 for each spell slot level above 1.</p>",
+    "modeling": {
+      "blocker": {
+        "code": "weapon-attack-modification-model-missing"
+      },
+      "gaps": [
+        {
+          "code": "conditional-effect-model-missing",
+          "note": "Restrained, ongoing damage, and Athletics escape stay prose"
+        },
+        {
+          "code": "object-state-awareness",
+          "note": "Large or larger creatures have Advantage on the initial save"
         }
       ]
     }

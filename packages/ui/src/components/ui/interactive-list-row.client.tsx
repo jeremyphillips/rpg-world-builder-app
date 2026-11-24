@@ -23,6 +23,7 @@ export type InteractiveListRowProps = {
   disabled?: boolean
   /** When false, suppresses the default row-hover wash (e.g. static summaries). */
   interactive?: boolean
+  supportingWrap?: boolean
   startSlot?: React.ReactNode
   /** Decorative trailing chrome only — must not contain interactive controls. */
   endSlot?: React.ReactNode
@@ -43,6 +44,7 @@ export function InteractiveListRow({
   selected = false,
   disabled = false,
   interactive = true,
+  supportingWrap,
   startSlot,
   endSlot,
   trailingAction,
@@ -51,7 +53,12 @@ export function InteractiveListRow({
   children,
 }: InteractiveListRowProps) {
   const identityCore = content ?? (
-    <IdentityRow heading={name} classification={classification} supporting={metadata} />
+    <IdentityRow
+      heading={name}
+      classification={classification}
+      supporting={metadata}
+      supportingWrap={supportingWrap}
+    />
   )
 
   const identity = (

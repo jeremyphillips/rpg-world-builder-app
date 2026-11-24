@@ -17,9 +17,6 @@ import {
 
 import type { BuilderOptionDetailsSection } from '@rpg/ui'
 
-const creatureTypeVocabulary = buildSeedCreatureTypeVocabulary()
-const senseVocabulary = buildSeedSenseVocabulary()
-
 export const BUILDER_SPECIES_EYEBROW = getContentTypeItemLabel('species')
 
 function resolveLanguageLabel(
@@ -33,6 +30,8 @@ function buildBuilderSpeciesVocabulary(
   languages: readonly CharacterBuildLanguageOption[],
   spells: readonly Spell[],
 ) {
+  const creatureTypeVocabulary = buildSeedCreatureTypeVocabulary()
+  const senseVocabulary = buildSeedSenseVocabulary()
   const resolveSpell = buildSpellGrantVocabulary(spells)
 
   return {

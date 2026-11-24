@@ -2,8 +2,16 @@ import { describe, expect, it } from 'vitest'
 
 import type { Spell } from './body'
 import {
+  createSpellCatalogContext,
+  SPELL_REFERENCE_DISPLAY_MESSAGES,
+} from './spell-catalog-context'
+import {
   collectSpellReferenceIssues,
+  presentSpellReferenceDisplayName,
   resolveSpellReference,
+  resolveSpellReferenceOutcome,
+  resolveSpellReferenceOutcomeForCatalogStatus,
+  resolveSpellReferenceOutcomes,
   spellReferenceSchema,
 } from './spell-reference'
 
@@ -39,6 +47,97 @@ describe('resolveSpellReference', () => {
     expect(resolveSpellReference('counterspell', spellsById)).toBeUndefined()
     expect(resolveSpellReference('missing', spellsById)).toBeUndefined()
     expect(spellReferenceSchema.parse(systemSpell.id)).toBe(systemSpell.id)
+  })
+})
+
+const spellA = {
+  id: 'srd-cc-5.2.1:fire-bolt',
+  name: 'Fire Bolt',
+  level: 0,
+} as Spell
+
+const spellB = {
+  id: 'homebrew:fire-bolt',
+  name: 'Homebrew Fire Bolt',
+  level: 0,
+} as Spell
+
+const collisionCatalog = createSpellCatalogContext({
+  status: 'ready',
+  spellsById: new Map([
+    [spellA.id, spellA],
+    [spellB.id, spellB],
+  ]),
+})
+
+describe('resolveSpellReferenceOutcome', () => {
+  it('scenario A: colliding local slugs resolve only by exact canonical id', () => {
+    expect(resolveSpellReferenceOutcome(spellA.id, collisionCatalog)).toEqual({
+      status: 'resolved',
+      spellId: spellA.id,
+      spell: spellA,
+    })
+    expect(resolveSpellReferenceOutcome(spellB.id, collisionCatalog)).toEqual({
+      status: 'resolved',
+      spellId: spellB.id,
+      spell: spellB,
+    })
+    expect(resolveSpellReferenceOutcome('fire-bolt', collisionCatalog)).toEqual({
+      status: 'unresolved',
+      spellId: 'fire-bolt',
+      reason: 'unknown-spell',
+    })
+  })
+
+  it('scenario C: loading catalog yields catalog-loading, not unknown-spell', () => {
+    const loading = createSpellCatalogContext({ status: 'pending', spellsById })
+    expect(resolveSpellReferenceOutcome(systemSpell.id, loading)).toEqual({
+      status: 'unresolved',
+      spellId: systemSpell.id,
+      reason: 'catalog-loading',
+    })
+    expect(
+      presentSpellReferenceDisplayName(resolveSpellReferenceOutcome(systemSpell.id, loading)),
+    ).toBe(SPELL_REFERENCE_DISPLAY_MESSAGES.catalogLoading)
+  })
+
+  it('scenario D: error catalog yields catalog-error', () => {
+    const errored = createSpellCatalogContext({ status: 'error', spellsById })
+    const erroredOutcome = resolveSpellReferenceOutcome(systemSpell.id, errored)
+    expect(erroredOutcome.status === 'unresolved' && erroredOutcome.reason).toBe('catalog-error')
+  })
+
+  it('scenario E: ready catalog with absent id yields unknown-spell', () => {
+    const ready = createSpellCatalogContext({ status: 'ready', spellsById })
+    const outcome = resolveSpellReferenceOutcome('missing-id', ready)
+    expect(outcome).toEqual({
+      status: 'unresolved',
+      spellId: 'missing-id',
+      reason: 'unknown-spell',
+    })
+    expect(presentSpellReferenceDisplayName(outcome)).toBe(
+      SPELL_REFERENCE_DISPLAY_MESSAGES.unknownSpell,
+    )
+  })
+
+  it('scenario F: binary catalog status maps unavailable without unknown-spell', () => {
+    const unavailable = resolveSpellReferenceOutcomeForCatalogStatus(systemSpell.id, {
+      catalogStatus: 'unavailable',
+      spellsById,
+    })
+    expect(unavailable).toEqual({
+      status: 'unresolved',
+      spellId: systemSpell.id,
+      reason: 'catalog-unavailable',
+    })
+  })
+
+  it('resolveSpellReferenceOutcomes preserves order', () => {
+    const ready = createSpellCatalogContext({ status: 'ready', spellsById })
+    const outcomes = resolveSpellReferenceOutcomes([systemSpell.id, 'missing-id'], ready)
+    expect(outcomes).toHaveLength(2)
+    expect(outcomes[0]?.status).toBe('resolved')
+    expect(outcomes[1]?.status === 'unresolved' && outcomes[1].reason).toBe('unknown-spell')
   })
 })
 

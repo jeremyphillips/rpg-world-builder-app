@@ -1,4 +1,4 @@
-import type { ContentUsageBlocker } from '@rpg/contracts'
+import type { CharacterType, ContentUsageBlocker } from '@rpg/contracts'
 import { USAGE_BLOCKER_SOURCE_KEYS } from '@rpg/contracts'
 import type { CharacterRelationship, CharacterRelationshipKind } from '@rpg/contracts'
 import {
@@ -10,7 +10,7 @@ import {
 export type CharacterContentUsageHit = {
   _id: unknown
   name: string
-  characterType: 'pc' | 'npc'
+  characterType: CharacterType
   classes?: Array<{ classId?: string; subclassId?: string }>
   species?: { id?: string }
   spells?: Array<{

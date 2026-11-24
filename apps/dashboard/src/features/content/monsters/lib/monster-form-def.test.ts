@@ -14,7 +14,7 @@ describe('monsterFormDef.extractEmbeddedSeedRowIds', () => {
         uses: { normal: 3 },
         actions: [{ id: 'deathly-teleport' }, { id: 'disrupt-life' }],
       },
-    } as Monster
+    } as unknown as Monster
 
     expect(monsterFormDef.extractEmbeddedSeedRowIds?.(entity)).toMatchObject({
       'legendaryActions.actions': ['deathly-teleport', 'disrupt-life'],

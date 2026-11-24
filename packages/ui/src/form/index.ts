@@ -254,7 +254,6 @@ export {
   type FormNavigationAnchor,
   type DependentChrome,
   DEFAULT_DEPENDENT_CHROME,
-  DEFAULT_DEPENDENT_INSET,
   type DependentConfig,
   type DependentDependentsConfig,
   type ArrayAddActionConfig,
@@ -525,3 +524,5 @@ export {
   FieldRowAnatomyProvider,
   useFieldRowParticipation,
 } from '../components/ui/field-row-anatomy.context'
+
+export { collectActiveFormItemBindings } from './config/form-item-visibility.lib'

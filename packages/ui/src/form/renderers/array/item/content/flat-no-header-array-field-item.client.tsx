@@ -158,7 +158,7 @@ export function FlatNoHeaderArrayFieldItem({
     <ArrayItemShell
       titleId={titleId}
       itemPrefix={itemPrefix}
-      showDragHandle={reserveDragHandleSlot}
+      reserveDragHandleSlot={reserveDragHandleSlot}
       collapsible={collapsible}
       dragging={dragging}
       layout="compactRow"

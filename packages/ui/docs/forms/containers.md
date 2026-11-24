@@ -272,17 +272,15 @@ controller field gates indented dependents:
 | Concept            | Meaning                                                                                                                                                                                                                                                                                       |
 | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Dependent nest** | Default when `dependents.chrome` is omitted or `'rail'` / legacy `'panel'` — `ui-field-dependent-nest` with alignment, rhythm (`--compact` / `--comfortable` inset), flush-left rail (`::before`), and host fill (`--host-field-container` / `--host-array-item`). No border or extra radius. |
-| **Opt out**        | `dependents.chrome: 'none'` — no rail, fill, or nest inset. Pair with `inset: false` when the dependent body is the section itself.                                                                                                                                                           |
+| **Opt out**        | `dependents.chrome: 'none'` — no rail, fill, or nest inset.                                                                                                                                                                                                                                   |
 
 - Field `[0]` (controller) — switch, select, etc. — always visible.
 - Fields `[1..]` (dependents) render inside the nest when chrome is not `'none'`.
 - **`dependents.chrome`**: `'none'` | `'rail'` | `'panel'` (legacy `'panel'` maps to the nest). Default `'rail'`.
-- **`dependents.inset`**: deprecated — use `chrome: 'none'`. Legacy `inset: false` maps to flush layout at render time.
 - A top-level `kind: 'dependent'` stack gets one shared field container (`chrome?: FieldChrome` on `DependentConfig`). Nested dependents keep nest decoration but do **not** get additional field containers.
 - Controller → dependents gap is **4px compact / 8px comfortable** (`resolveDependentSectionStackClasses`) on `data-field-dependent` only — not padding on the nest wrapper. Sibling fields inside the nest keep `fieldStackRhythmVariants`.
 - Dependents hidden when the gate predicate is false — no empty nest.
 - `dependentsVisibility` gates fields `[1..]`. When omitted and `[0]` is a switch, defaults to "switch is true".
-- **`dependents.panel`** / **`dependents.scope`** — deprecated; legacy `'panel'` maps to the nest.
 - Dependents inherit parent `density` — no `density` knob on `DependentConfig`.
 - Optional `confirmBeforeClear` on `DependentConfig` — when the controller is a **switch**, turning it off prompts before clearing populated dependent values. Absent by default.
 

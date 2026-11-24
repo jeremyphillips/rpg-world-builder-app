@@ -1,7 +1,11 @@
 import type { RefinementCtx } from 'zod'
 
 import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
-import { getCreatureTraitTemplate } from './templates'
+import {
+  getCreatureTraitTemplate,
+  isCreatureTraitTemplateEligibleForHost,
+  type CreatureTraitTemplateHost,
+} from './templates'
 
 export type CreatureTraitTemplateIssue = {
   path: (string | number)[]
@@ -10,28 +14,17 @@ export type CreatureTraitTemplateIssue = {
 
 const UNKNOWN_TEMPLATE_MESSAGE = 'Unknown creature trait template.'
 const INVALID_CONFIG_MESSAGE = 'Creature trait template config is invalid.'
-
+const HOST_INELIGIBLE_MESSAGE = 'This creature trait template cannot be assigned on this host.'
 function templateRecord(value: unknown): Record<string, unknown> | undefined {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) return undefined
   return value as Record<string, unknown>
 }
 
-function issuesForTemplateTrait(
+function configIssuesForTemplate(
+  template: NonNullable<ReturnType<typeof getCreatureTraitTemplate>>,
   trait: Record<string, unknown>,
   index: number,
 ): CreatureTraitTemplateIssue[] {
-  if (trait.kind !== 'template') return []
-
-  const templateId = trait.templateId
-  if (typeof templateId !== 'string' || templateId.length === 0) {
-    return [{ path: [index, 'templateId'], message: UNKNOWN_TEMPLATE_MESSAGE }]
-  }
-
-  const template = getCreatureTraitTemplate(templateId)
-  if (!template) {
-    return [{ path: [index, 'templateId'], message: UNKNOWN_TEMPLATE_MESSAGE }]
-  }
-
   const parsed = template.configSchema.safeParse(trait.config ?? {})
   if (parsed.success) return []
 
@@ -45,21 +38,65 @@ function issuesForTemplateTrait(
   ]
 }
 
+function eligibilityIssuesForTemplate(
+  templateId: string,
+  _trait: Record<string, unknown>,
+  index: number,
+  host?: CreatureTraitTemplateHost,
+): CreatureTraitTemplateIssue[] {
+  const issues: CreatureTraitTemplateIssue[] = []
+  if (host && !isCreatureTraitTemplateEligibleForHost(templateId, host)) {
+    issues.push({ path: [index, 'templateId'], message: HOST_INELIGIBLE_MESSAGE })
+  }
+  return issues
+}
+
+function issuesForTemplateTrait(
+  trait: Record<string, unknown>,
+  index: number,
+  host?: CreatureTraitTemplateHost,
+): CreatureTraitTemplateIssue[] {
+  if (trait.kind !== 'template') return []
+
+  const templateId = trait.templateId
+  if (typeof templateId !== 'string' || templateId.length === 0) {
+    return [{ path: [index, 'templateId'], message: UNKNOWN_TEMPLATE_MESSAGE }]
+  }
+
+  const template = getCreatureTraitTemplate(templateId)
+  if (!template) {
+    return [{ path: [index, 'templateId'], message: UNKNOWN_TEMPLATE_MESSAGE }]
+  }
+
+  return [
+    ...eligibilityIssuesForTemplate(templateId, trait, index, host),
+    ...configIssuesForTemplate(template, trait, index),
+  ]
+}
+
 /** Rejects unknown template ids and configs that do not match the registry schema. */
-export function collectCreatureTraitTemplateIssues(traits: unknown): CreatureTraitTemplateIssue[] {
+export function collectCreatureTraitTemplateIssues(
+  traits: unknown,
+  options?: { host?: CreatureTraitTemplateHost },
+): CreatureTraitTemplateIssue[] {
   if (!Array.isArray(traits)) return []
   return traits.flatMap((trait, index) => {
     const record = templateRecord(trait)
     if (!record) return []
-    return issuesForTemplateTrait(record, index)
+    return issuesForTemplateTrait(record, index, options?.host)
   })
 }
 
 export function refineCreatureTraitTemplate(
-  trait: { kind?: string; templateId?: unknown; config?: unknown },
+  trait: {
+    kind?: string
+    templateId?: unknown
+    config?: unknown
+  },
   ctx: RefinementCtx,
+  options?: { host?: CreatureTraitTemplateHost },
 ): void {
-  for (const issue of collectCreatureTraitTemplateIssues([trait])) {
+  for (const issue of collectCreatureTraitTemplateIssues([trait], options)) {
     addCustomRefinementIssue(ctx, issue.message, issue.path.slice(1))
   }
 }

@@ -6,7 +6,7 @@ import type {
 import {
   formatCharacterSummary,
   resolveCharacterSummaryParts,
-  resolveTraitDisplay,
+  resolveTraitName,
   type CharacterSummaryLabelLookup,
 } from '@rpg/contracts'
 
@@ -24,7 +24,7 @@ function createDashboardSummaryLabelLookup(
       const species = catalogIndex.species.get(speciesId)
       const heritageOption = species?.heritage?.options.find((option) => option.id === heritageId)
       return heritageOption
-        ? resolveTraitDisplay(heritageOption).name
+        ? resolveTraitName(heritageOption)
         : formatContentReferenceLabel(heritageId)
     },
     className: (classId) =>

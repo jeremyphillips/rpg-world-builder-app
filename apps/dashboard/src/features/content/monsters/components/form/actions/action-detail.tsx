@@ -1,15 +1,15 @@
 import { useEffect, useMemo } from 'react'
 import { isWeaponEquipment, resolveEquipmentInstanceReferenceLabel } from '@rpg/contracts'
 import { SemanticText, Text } from '@rpg/ui'
-import { FormItems, FormRhythmStack } from '@rpg/ui/form'
 import { useWatch } from 'react-hook-form'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import { MasterDetailEditorPanel } from '../../../../components/master-detail/master-detail-editor-panel'
 import { masterDetailItemTitle } from '../../../../lib/master-detail/master-detail-constants'
 import type { useEmbeddedMasterDetailRows } from '../../../../lib/master-detail/use-embedded-master-detail-rows'
+import { useMonsterActionFacingHost } from '../../../../facing/use-monster-action-facing-host'
 import { sharedCastingOptions } from '../../../lib/actions/spell/monster-action-casting-summary'
-import { isLegendaryReferenceTarget } from '../../../lib/actions/legendary/legendary-action-category'
+import { isActionReferenceAcquisitionTarget } from '../../../lib/actions/reference/action-reference-acquisition'
 import { legendarySourceSpellOptions } from '../../../lib/actions/acquisition/monster-legendary-action-acquisition'
 import { monsterActionDetailFields } from '../../../lib/actions/detail-fields/monster-action-detail-fields'
 import { monsterActionSectionMoveAllowed } from '../../../lib/actions/monster-action-kind'
@@ -19,7 +19,6 @@ import {
   type MonsterActionSection,
 } from '../../../lib/actions/references/monster-action-equipment-references'
 import { MONSTER_MOVE_TO_LABEL } from '../../../lib/monster-form-labels'
-import { MonsterSpellPickerHost } from '../spells/spell-picker-host'
 import type { MonsterActionDraftRow } from '../../../lib/actions/monster-action-presets'
 import { monsterActionSectionHeading } from '../../../lib/actions/monster-action-presets'
 import { MONSTER_ACTION_ITEM_NOUN } from '../../../lib/monster-form-labels'
@@ -40,7 +39,7 @@ function referenceOptionLabels(values: MonsterFormValues, ctx: ContentFormCtx) {
   const actionRows = (values.actions ?? []) as MonsterActionDraftRow[]
   const titles = monsterActionEditorTitles(actionRows, values, ctx, 'actions')
   const unnamed = masterDetailItemTitle(undefined, MONSTER_ACTION_ITEM_NOUN)
-  return actionRows.filter(isLegendaryReferenceTarget).map((row) => ({
+  return actionRows.filter(isActionReferenceAcquisitionTarget).map((row) => ({
     value: row.id,
     label: titles.get(row.id) ?? unnamed,
   }))
@@ -176,10 +175,35 @@ export function MonsterActionDetail({
     weapons,
   ])
 
+  const facing = useMonsterActionFacingHost({
+    ctx,
+    values,
+    action: liveAction ?? action,
+    section: located?.section,
+  })
+
   useEffect(() => {
     if (sections.focusToken === 0 || !action) return
     document.getElementById(`monster-action-focus-${action.id}`)?.focus()
   }, [action, sections.focusToken])
+
+  const contextualChrome = sections.notice ? (
+    <div id={action ? `monster-action-focus-${action.id}` : undefined} tabIndex={-1}>
+      <Text as="p" variant="supporting">
+        <SemanticText>{sections.notice}</SemanticText>
+      </Text>
+    </div>
+  ) : action ? (
+    <div id={`monster-action-focus-${action.id}`} tabIndex={-1} />
+  ) : null
+
+  const spellPicker =
+    located && action
+      ? {
+          enabled: action.kind === 'spell' && located.section !== 'legendaryActions',
+          catalog: ctx.spellCatalogById,
+        }
+      : undefined
 
   return (
     <MasterDetailEditorPanel
@@ -205,36 +229,9 @@ export function MonsterActionDetail({
       onDelete={located ? () => sections.requestDelete(located.action.id) : undefined}
       onDuplicate={located ? sections.duplicateSelected : undefined}
       overflowActions={moveOverflowActions(located, sections.requestMove)}
-      detailLeading={
-        sections.notice ? (
-          <div id={action ? `monster-action-focus-${action.id}` : undefined} tabIndex={-1}>
-            <Text as="p" variant="supporting">
-              <SemanticText>{sections.notice}</SemanticText>
-            </Text>
-          </div>
-        ) : action ? (
-          <div id={`monster-action-focus-${action.id}`} tabIndex={-1} />
-        ) : null
-      }
-      renderBody={
-        located && action
-          ? () => (
-              <MonsterSpellPickerHost
-                enabled={action.kind === 'spell' && located.section !== 'legendaryActions'}
-                arrayName={`${namePrefix}.spells`}
-                catalog={ctx.spellCatalogById}
-              >
-                <FormRhythmStack>
-                  <FormItems
-                    items={fields}
-                    idPrefix={`monster-action-${action.id}`}
-                    namePrefix={namePrefix}
-                  />
-                </FormRhythmStack>
-              </MonsterSpellPickerHost>
-            )
-          : undefined
-      }
+      contextualChrome={contextualChrome}
+      facing={facing}
+      spellPicker={spellPicker}
     />
   )
 }

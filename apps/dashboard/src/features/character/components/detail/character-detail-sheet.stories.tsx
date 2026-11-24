@@ -3,12 +3,13 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
+  standaloneEquipmentReferenceScope,
 } from '../../lib/fixtures/character-builder-fixtures'
 import {
   buildCharacterDetailViewModel,
   toCharacterDetailSource,
 } from '../../lib/display/character-display'
-import { SAMPLE_PC } from '../../lib/fixtures/character-fixtures'
+import { makePcCharacter } from '../../lib/fixtures/character-fixtures'
 import { CharacterDetailSheet } from './character-detail-sheet'
 
 const context = createPopulatedStandaloneBuilderContextFixture()
@@ -26,9 +27,10 @@ type Story = StoryObj<typeof CharacterDetailSheet>
 export const Default: Story = {
   args: {
     viewModel: buildCharacterDetailViewModel({
-      source: toCharacterDetailSource(SAMPLE_PC),
+      source: toCharacterDetailSource(makePcCharacter()),
       catalogIndex,
       rules: context.characterCreationRules,
+      equipmentReferenceScope: standaloneEquipmentReferenceScope,
       xpProgression: { entries: [{ level: 1, xpRequired: 0 }] },
     }),
   },

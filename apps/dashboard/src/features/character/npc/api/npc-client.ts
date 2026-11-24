@@ -5,7 +5,7 @@ import {
   getCharacterBuilderChromeMessages,
   type CampaignNpcDetail,
   type CampaignNpcListItem,
-  type CampaignNpcStatusPatch,
+  type CampaignParticipatingCharacterStatusPatch,
   type CharacterMediaPatchInput,
   type ContentDeletionResult,
   type CreateNpcRequestInput,
@@ -115,7 +115,7 @@ export async function patchNpcMedia(
 export async function patchNpcStatus(
   campaignId: string,
   npcId: string,
-  patch: CampaignNpcStatusPatch,
+  patch: CampaignParticipatingCharacterStatusPatch,
 ): Promise<CampaignNpcDetail> {
   const { npc } = await patchJson<{ npc: CampaignNpcDetail }>(
     `${npcCollectionPath(campaignId)}/${npcId}`,
@@ -128,6 +128,6 @@ export async function patchNpcStatus(
 export type {
   CampaignNpcDetail,
   CampaignNpcListItem,
-  CampaignNpcStatusPatch,
+  CampaignParticipatingCharacterStatusPatch,
   CreateNpcRequestInput,
 }

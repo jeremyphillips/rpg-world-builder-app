@@ -4,7 +4,7 @@ import type { ClassFormValues } from './class-form-fields'
 import { featureToFormRow } from './class-feature-form-fields'
 import { createSpellcastingFeature } from './class-spellcasting-features'
 import {
-  findSpellcastingGrantingFeatureIndex,
+  findSpellcastingFeatureIndex,
   reconcileSpellcastingOnEnable,
   removeSpellcastingFromFormValues,
 } from './class-spellcasting-lifecycle'
@@ -32,7 +32,7 @@ describe('class spellcasting lifecycle', () => {
     const next = reconcileSpellcastingOnEnable(baseFormValues({ hasSpellcasting: true }))
     expect(next.hasSpellcasting).toBe(true)
     expect(next.spellcasting?.slotProgressionId).toBe('full-caster')
-    expect(findSpellcastingGrantingFeatureIndex(next.features ?? [])).toBe(0)
+    expect(findSpellcastingFeatureIndex(next.features ?? [])).toBe(0)
   })
 
   it('preserves existing config when grant feature is missing', () => {
@@ -50,12 +50,12 @@ describe('class spellcasting lifecycle', () => {
       }),
     )
     expect(next.spellcasting).toEqual(existingConfig)
-    expect(findSpellcastingGrantingFeatureIndex(next.features ?? [])).toBe(0)
+    expect(findSpellcastingFeatureIndex(next.features ?? [])).toBe(0)
   })
 
   it('preserves existing granting feature when config is missing', () => {
     const featureRow = featureToFormRow(
-      createSpellcastingFeature({ level: 3, usesPactMagic: true }),
+      createSpellcastingFeature({ level: 3, slotProgressionId: 'pact-magic' }),
     )
     const next = reconcileSpellcastingOnEnable(
       baseFormValues({
@@ -69,7 +69,9 @@ describe('class spellcasting lifecycle', () => {
   })
 
   it('does not duplicate the granting feature on repeated enable', () => {
-    const featureRow = featureToFormRow(createSpellcastingFeature({ usesPactMagic: false }))
+    const featureRow = featureToFormRow(
+      createSpellcastingFeature({ slotProgressionId: 'full-caster' }),
+    )
     const values = baseFormValues({
       hasSpellcasting: true,
       features: [featureRow],
@@ -80,7 +82,9 @@ describe('class spellcasting lifecycle', () => {
   })
 
   it('remove helper clears config and the dedicated granting feature', () => {
-    const featureRow = featureToFormRow(createSpellcastingFeature({ usesPactMagic: false }))
+    const featureRow = featureToFormRow(
+      createSpellcastingFeature({ slotProgressionId: 'full-caster' }),
+    )
     const next = removeSpellcastingFromFormValues(
       baseFormValues({
         hasSpellcasting: true,

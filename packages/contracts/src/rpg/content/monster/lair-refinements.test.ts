@@ -8,7 +8,7 @@ import {
   resolveMonsterBaseExperiencePoints,
 } from '../monster'
 import { CHALLENGE_RATING_IDS, CHALLENGE_RATING_MECHANICS } from '../../vocab/challenge-rating'
-import { suggestInLairExperience } from '../../runtime/monster/suggest-in-lair-experience'
+import { suggestInLairExperience } from '../../vocab/challenge-rating'
 import { MONSTER_TEST_BODY } from './test-fixtures'
 
 function parsePublish(input: Record<string, unknown>) {

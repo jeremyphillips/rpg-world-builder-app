@@ -31,7 +31,7 @@ import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-f
 import { resolveCatalogPickerResultSummary } from '../../picker/catalog-picker-filter-state.lib'
 import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action'
 import { OrganizationMembershipTitleField } from '../organization-membership-title-field'
-import { titleFromMembershipRadioValue } from '../../../lib/organization-membership/organization-membership-title.lib'
+import { membershipTitleIdFromRadioValue } from '../../../lib/organization-membership/organization-membership-title.lib'
 import {
   scoreAndSortOrganizationPickerItems,
   formatOrganizationPickerDescription,
@@ -138,7 +138,7 @@ export function OrganizationPickerDrawer({
 
       const { membershipTitleId } = resolveOrganizationMembershipMetadata({
         titles: organization.members.titles ?? [],
-        selectedMembershipTitleId: titleFromMembershipRadioValue(selectedTitle),
+        selectedMembershipTitleId: membershipTitleIdFromRadioValue(selectedTitle),
       })
       const membership: OrganizationMembershipSelection = {
         organizationId: organization.id,

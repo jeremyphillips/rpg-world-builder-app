@@ -11,7 +11,7 @@ import {
   parseLocationCreateSoftParent,
 } from '../../lib/create/location-create-shortcuts'
 import { resolveLocationCreatePageModel } from '../../lib/create/session/location-create-page.lib'
-import '../../lib/forms/location-form-def'
+import { locationFormDef } from '../../lib/forms/location-form-def'
 
 export type LocationCreatePageProps = {
   campaignId: string
@@ -37,7 +37,7 @@ export function LocationCreatePage({ campaignId }: LocationCreatePageProps) {
 
   return (
     <ContentCreateShell
-      contentType="locations"
+      def={locationFormDef}
       campaignId={campaignId}
       heading={formatContentCreateHeading('locations')}
       backHref={ROUTES.content.locations.overview(campaignId)}

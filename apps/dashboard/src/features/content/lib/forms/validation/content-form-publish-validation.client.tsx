@@ -44,7 +44,11 @@ function routedPublishIssues(
 }
 
 function routingFailedIssue(): FormIssue {
-  return { path: '', message: CONTENT_PUBLISH_VALIDATION_ROUTING_FAILED_MESSAGE }
+  return {
+    path: '',
+    message: CONTENT_PUBLISH_VALIDATION_ROUTING_FAILED_MESSAGE,
+    severity: 'crossRow',
+  }
 }
 
 /** Bridges live publish validation into {@link FormUiProvider} presentation props. */

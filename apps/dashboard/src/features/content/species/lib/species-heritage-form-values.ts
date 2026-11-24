@@ -1,6 +1,7 @@
 import {
   resolveContentCampaignAccess,
-  resolveTraitDisplay,
+  renderTraitFacingBodyHtml,
+  resolveTraitFacingParts,
   type GrantContentTrait,
   type SpeciesHeritage,
   type SpeciesHeritageOption,
@@ -35,13 +36,13 @@ import {
 export function heritageGrantOptionToCustomFormRow(
   option: GrantContentTrait,
 ): HeritageOptionRowForm {
-  const display = resolveTraitDisplay(option)
+  const parts = resolveTraitFacingParts(option, { host: 'species' })
   return {
     id: option.id,
     kind: 'custom',
     overrideDisplay: false,
-    name: display.name,
-    description: display.descriptionHtml,
+    name: parts.title,
+    description: renderTraitFacingBodyHtml(parts),
     grants: grantGroupsToFormRows(option.grantGroups),
     campaignAccess: heritageCampaignAccessToForm(option),
   }

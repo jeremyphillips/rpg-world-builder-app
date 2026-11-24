@@ -64,6 +64,78 @@ describe('ButtonDropdown', () => {
     expect(screen.getByText('Other actions')).toBeInTheDocument()
   })
 
+  it('prefers disabledReason over joined metadata for disabled rows', async () => {
+    const user = userEvent.setup()
+    render(
+      <ButtonDropdown
+        label="Add grant"
+        groups={[]}
+        items={[
+          {
+            id: 'blocked',
+            label: 'Spellcasting',
+            metadata: 'Casts referenced spells.',
+            disabled: true,
+            disabledReason: 'Only one Spellcasting profile is allowed.',
+          },
+        ]}
+        onSelectItem={vi.fn()}
+      />,
+    )
+    await user.click(screen.getByRole('button', { name: 'Add grant' }))
+    expect(screen.getByText('Only one Spellcasting profile is allowed.')).toBeInTheDocument()
+    expect(screen.queryByText('Casts referenced spells.')).not.toBeInTheDocument()
+  })
+
+  it('keeps metadata and note joined for enabled warn rows', async () => {
+    const user = userEvent.setup()
+    render(
+      <ButtonDropdown
+        label="Add grant"
+        groups={[]}
+        items={[
+          {
+            id: 'warn',
+            label: 'Movement bonus',
+            metadata: 'Increase a movement mode speed.',
+            note: 'Already added',
+          },
+        ]}
+        onSelectItem={vi.fn()}
+      />,
+    )
+    await user.click(screen.getByRole('button', { name: 'Add grant' }))
+    expect(screen.getByText(/Increase a movement mode speed/i)).toBeInTheDocument()
+    expect(screen.getByText(/Already added/i)).toBeInTheDocument()
+  })
+
+  it('does not select a disabled row with Enter from the search field', async () => {
+    const user = userEvent.setup()
+    const onSelectItem = vi.fn()
+    render(
+      <ButtonDropdown
+        label="Add grant"
+        enableSearch={false}
+        groups={[]}
+        items={[
+          { id: 'open', label: 'Open option' },
+          {
+            id: 'blocked',
+            label: 'Blocked option',
+            disabled: true,
+            disabledReason: 'Only one is allowed.',
+          },
+        ]}
+        onSelectItem={onSelectItem}
+      />,
+    )
+    await user.click(screen.getByRole('button', { name: 'Add grant' }))
+    await user.keyboard('{ArrowDown}{Enter}')
+    expect(onSelectItem).not.toHaveBeenCalled()
+    await user.keyboard('{ArrowUp}{Enter}')
+    expect(onSelectItem).toHaveBeenCalledWith('open')
+  })
+
   it('renders grouped sections when closed and opens a searchable menu', async () => {
     const user = userEvent.setup()
     render(

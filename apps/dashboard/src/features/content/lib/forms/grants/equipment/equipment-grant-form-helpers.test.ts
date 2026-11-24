@@ -1,4 +1,7 @@
 import { describe, expect, it } from 'vitest'
+import type { Equipment } from '@rpg/contracts'
+
+import { buildGrantEquipmentReferencePresentationFromAuthoring } from '../grant-row-presentation.lib'
 import { buildContentPurposeSelectors } from '@rpg/contracts'
 import { resolveFieldConfigPrimaryName } from '@rpg/ui/form'
 
@@ -116,12 +119,20 @@ describe('applyEquipmentGrantKindSync', () => {
 })
 
 describe('equipmentGrantTitle', () => {
-  const equipmentOptions = [
-    { value: 'javelin', label: 'Javelin' },
-    { value: 'greataxe', label: 'Greataxe' },
-    { value: 'longsword', label: 'Longsword' },
-    { value: 'rapier', label: 'Rapier' },
-  ]
+  const equipmentReferences = buildGrantEquipmentReferencePresentationFromAuthoring({
+    status: 'ready',
+    scope: { rulesetId: 'srd-cc-5.2.1', campaignId: 'campaign-1' },
+    equipmentById: new Map(
+      (
+        [
+          { id: 'srd-cc-5.2.1:javelin', slug: 'javelin', name: 'Javelin' },
+          { id: 'srd-cc-5.2.1:greataxe', slug: 'greataxe', name: 'Greataxe' },
+          { id: 'srd-cc-5.2.1:longsword', slug: 'longsword', name: 'Longsword' },
+          { id: 'srd-cc-5.2.1:rapier', slug: 'rapier', name: 'Rapier' },
+        ] as Equipment[]
+      ).map((item) => [item.id, item]),
+    ),
+  })
 
   it('includes quantity when granted equipment count is greater than one', () => {
     expect(
@@ -133,18 +144,21 @@ describe('equipmentGrantTitle', () => {
           quantity: 4,
         },
         0,
-        equipmentOptions,
+        equipmentReferences,
       ),
     ).toBe('4 × Javelin')
   })
 
   it('returns empty summary for incomplete choice rows', () => {
     expect(
-      equipmentGrantSummary({
-        itemKind: 'choice',
-        choose: 1,
-        poolSource: 'filtered',
-      } as EquipmentGrantItemForm),
+      equipmentGrantSummary(
+        {
+          itemKind: 'choice',
+          choose: 1,
+          poolSource: 'filtered',
+        } as EquipmentGrantItemForm,
+        equipmentReferences,
+      ),
     ).toBe('')
   })
 
@@ -159,6 +173,7 @@ describe('equipmentGrantTitle', () => {
           poolToolCategory: 'musical_instrument',
         },
         0,
+        equipmentReferences,
       ),
     ).toBe('Musical Instrument — choose 1')
   })
@@ -173,13 +188,19 @@ describe('equipmentGrantTitle', () => {
           poolEquipmentSlugs: ['longsword', 'rapier', 'greataxe'],
         },
         0,
-        equipmentOptions,
+        equipmentReferences,
       ),
     ).toBe('3 items — choose 1')
   })
 })
 
 describe('equipmentGrantSummary', () => {
+  const equipmentReferences = buildGrantEquipmentReferencePresentationFromAuthoring({
+    status: 'ready',
+    scope: { rulesetId: 'srd-cc-5.2.1', campaignId: 'campaign-1' },
+    equipmentById: new Map(),
+  })
+
   it('wraps formatEquipmentGrantSentence for form rows', () => {
     expect(
       equipmentGrantSummary(
@@ -190,13 +211,15 @@ describe('equipmentGrantSummary', () => {
           poolEquipmentKind: 'tool',
           poolToolCategory: 'musical_instrument',
         },
-        [],
+        equipmentReferences,
       ),
     ).toBe('Character chooses 1 musical instrument.')
   })
 
   it('returns an empty string for incomplete granted rows', () => {
-    expect(equipmentGrantSummary({ itemKind: 'grant' } as EquipmentGrantItemForm, [])).toBe('')
+    expect(
+      equipmentGrantSummary({ itemKind: 'grant' } as EquipmentGrantItemForm, equipmentReferences),
+    ).toBe('')
   })
 })
 

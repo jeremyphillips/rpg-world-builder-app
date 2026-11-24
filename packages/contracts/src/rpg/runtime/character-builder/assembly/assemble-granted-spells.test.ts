@@ -223,8 +223,8 @@ describe('mergeCharacterSpellEntries', () => {
     const classSpells: CharacterSpellEntry[] = [
       {
         spellId: 'bless',
-        access: { classKnown: true },
-        selection: { prepared: true },
+        access: {},
+        collections: [{ kind: 'prepared' }],
         sources: [{ kind: 'classSpellcasting', sourceId: 'cleric', grantId: 'spells' }],
       },
     ]
@@ -239,8 +239,8 @@ describe('mergeCharacterSpellEntries', () => {
 
     const merged = mergeCharacterSpellEntries(classSpells, grantedSpells)
     expect(merged).toHaveLength(1)
-    expect(merged[0]?.access).toEqual({ classKnown: true, alwaysPrepared: true })
-    expect(merged[0]?.selection).toEqual({ prepared: true })
+    expect(merged[0]?.access).toEqual({ alwaysPrepared: true })
+    expect(merged[0]?.collections).toEqual([{ kind: 'prepared' }])
     expect(merged[0]?.sources).toHaveLength(2)
   })
 })

@@ -221,7 +221,10 @@ const dashboardDragHandleGuard = {
 
 /** Form heading hierarchy — ban deprecated label and legend APIs in form field modules. */
 const dashboardFormSlotGuards = {
-  files: ['src/features/**/components/form/slots/**/*.{ts,tsx}'],
+  files: [
+    'src/features/**/components/form/slots/**/*.{ts,tsx}',
+    'src/features/content/monsters/components/form/actions/**/*.slot.{ts,tsx}',
+  ],
   ignores: ['**/*.{test,integration.test,stories}.{ts,tsx}'],
   rules: {
     'no-restricted-syntax': [
@@ -475,6 +478,141 @@ const dashboardSourceExcerptImportGuard = {
   },
 }
 
+const dashboardFacingPresentationImportGuard = {
+  files: ['src/**/*.{ts,tsx}'],
+  ignores: [
+    '**/*.{test,integration.test,stories}.{ts,tsx}',
+    'src/features/content/facing/structured-facing-host-panel.tsx',
+    'src/features/content/facing/facing-detail-body.tsx',
+  ],
+  rules: {
+    '@typescript-eslint/no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: '@rpg/ui',
+            importNames: ['FacingHostPanel'],
+            message: 'Mount structured previews through StructuredFacingHostPanel.',
+          },
+        ],
+      },
+    ],
+  },
+}
+
+const dashboardTraitPipelineImportGuard = {
+  files: ['src/**/*.{ts,tsx}'],
+  ignores: [
+    '**/*.{test,integration.test,stories}.{ts,tsx}',
+    'src/features/content/facing/domains/trait/**',
+  ],
+  rules: {
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: '@rpg/contracts',
+            importNames: ['formatLegendaryResistanceStatBlockTitle'],
+            message:
+              'Legendary Resistance headings are composed in trait facing adapters — do not call the heading helper directly.',
+          },
+        ],
+        patterns: [
+          {
+            group: ['**/format-legendary-resistance*'],
+            message:
+              'Do not deep-import formatLegendaryResistanceStatBlockTitle in dashboard feature code.',
+          },
+        ],
+      },
+    ],
+  },
+}
+
+const dashboardTraitComposerFormFieldImportGuard = {
+  files: [
+    'src/**/*-form-fields.ts',
+    'src/**/lib/**/*-form-fields.ts',
+    'src/features/content/lib/creature-traits/**/*.{ts,tsx}',
+  ],
+  ignores: ['**/*.{test,integration.test,stories}.{ts,tsx}', 'src/features/content/facing/**'],
+  rules: {
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: '@rpg/contracts',
+            importNames: [
+              'formatLegendaryResistanceStatBlockTitle',
+              'resolveTraitFacingParts',
+              'renderTraitFacingBodyHtml',
+            ],
+            message:
+              'Trait form modules use the field assembler and facing host — not the composer or heading helper.',
+          },
+        ],
+        patterns: [
+          {
+            group: ['**/format-legendary-resistance*', '**/trait-facing*'],
+            message:
+              'Trait form modules must not deep-import trait facing composers or heading helpers.',
+          },
+        ],
+      },
+    ],
+  },
+}
+
+const dashboardMonsterAcquisitionSectionKindsGuard = {
+  files: ['src/features/content/monsters/lib/actions/acquisition/**/*.{ts,tsx}'],
+  ignores: ['**/*.{test,integration.test,stories}.{ts,tsx}'],
+  rules: {
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: '@rpg/contracts',
+            importNames: ['MONSTER_SECTION_KINDS'],
+            message:
+              'Use monsterSectionAllowsKind for menu and placement eligibility. MONSTER_SECTION_KINDS is schema-derived tuple metadata.',
+          },
+        ],
+        patterns: [
+          {
+            group: ['**/section-tuples', '**/section-tuples.ts', '**/action/section-tuples*'],
+            message:
+              'Acquisition modules must use monsterSectionAllowsKind and eligibility helpers, not section schema tuples.',
+          },
+        ],
+      },
+    ],
+  },
+}
+
+const dashboardSystemRulesetLiteralGuard = {
+  files: ['src/**/*.{ts,tsx}'],
+  ignores: [
+    '**/*.{test,integration.test,stories}.{ts,tsx}',
+    '**/fixtures/**',
+    '**/*.fixtures.ts',
+    '**/*.fixtures.tsx',
+  ],
+  rules: {
+    'no-restricted-syntax': [
+      'error',
+      {
+        selector: "Literal[value='srd-cc-5.2.1']",
+        message:
+          'Import DEFAULT_SYSTEM_RULESET_ID from @rpg/contracts for the system default identity — do not inline the ruleset literal in production code.',
+      },
+    ],
+  },
+}
+
 const dashboardAuthApiContractsImportGuard = {
   files: ['src/features/auth/api/**/*.{ts,tsx}'],
   rules: {
@@ -520,11 +658,24 @@ export default [
   dashboardSemanticStyleLayerGuards,
   dashboardDragHandleGuard,
   dashboardFormFieldGuards,
-  dashboardFormSlotGuards,
   dashboardContentPickerPolicyGuards,
   dashboardContentCharacterPickerChromeGuard,
   dashboardCharacterBuilderPlayActorGuard,
   dashboardFastRefreshGuard,
   dashboardShellContractsImportGuard,
   dashboardAuthApiContractsImportGuard,
+  dashboardSystemRulesetLiteralGuard,
+  {
+    ...dashboardFormSlotGuards,
+    rules: {
+      'no-restricted-syntax': [
+        ...dashboardSystemRulesetLiteralGuard.rules['no-restricted-syntax'],
+        ...dashboardFormSlotGuards.rules['no-restricted-syntax'].slice(1),
+      ],
+    },
+  },
+  dashboardMonsterAcquisitionSectionKindsGuard,
+  dashboardFacingPresentationImportGuard,
+  dashboardTraitPipelineImportGuard,
+  dashboardTraitComposerFormFieldImportGuard,
 ]

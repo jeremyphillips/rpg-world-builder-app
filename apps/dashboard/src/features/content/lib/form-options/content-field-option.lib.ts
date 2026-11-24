@@ -134,6 +134,10 @@ function toSpellReferenceFieldOption(spell: Spell): FieldOption {
   }
 }
 
+/**
+ * Combobox options for new spell selection (`forReference()` — excludes draft).
+ * Persisted grant ids resolve via `ContentFormCtx.spellCatalogById`, not these labels.
+ */
 export function referenceSpellFieldOptions(
   selectors: ContentPurposeSelectors<Spell> | undefined,
 ): FieldOption[] {

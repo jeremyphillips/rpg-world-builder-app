@@ -15,6 +15,7 @@ import {
 } from '@rpg/contracts'
 
 import { useCampaignRules } from '@/features/campaign'
+import { useCampaignRulesetLookup } from '@/lib/use-campaign-ruleset-lookup'
 import { useRulesetPatch } from '@/features/homebrew'
 import { resolveCampaignSpellcastingProgression } from '@/lib/campaign-spellcasting-progression.lib'
 import {
@@ -104,7 +105,7 @@ function catalogQueryStatus(query: QueryState): 'error' | 'pending' | 'ready' {
 
 function buildContentFormCtx(input: {
   campaignId: string | undefined
-  rulesetId: string
+  rulesetId: string | undefined
   campaignRules: ContentFormCtx['campaignRules']
   spellcastingProgression: ContentFormCtx['spellcastingProgression']
   vocabulary: Pick<
@@ -305,17 +306,21 @@ export function useContentFormOptions(campaignId: string | undefined): {
   const catalog = useContentCatalogLists(campaignId)
   const vocabulary = useContentFormVocabulary(campaignId)
   const campaignRules = useCampaignRules(campaignId)
+  const {
+    rulesetId,
+    isPending: campaignRulesetPending,
+    isError: campaignRulesetError,
+  } = useCampaignRulesetLookup(campaignId)
   const rulesetQuery = useRulesetPatch(campaignId)
   const rulesetPatch = rulesetQuery.data
-  const rulesetId = catalog.classes?.[0]?.rulesetId ?? 'srd-cc-5.2.1'
 
+  const spellcastingProgressionPatch = rulesetPatch?.characterCreation.progression.spellcasting
   const spellcastingProgression = useMemo(
     () =>
-      resolveCampaignSpellcastingProgression(
-        rulesetId,
-        rulesetPatch?.characterCreation.progression.spellcasting,
-      ),
-    [rulesetId, rulesetPatch?.characterCreation.progression.spellcasting],
+      rulesetId
+        ? resolveCampaignSpellcastingProgression(rulesetId, spellcastingProgressionPatch)
+        : undefined,
+    [rulesetId, spellcastingProgressionPatch],
   )
 
   const options = useMemo(
@@ -409,8 +414,15 @@ export function useContentFormOptions(campaignId: string | undefined): {
   return {
     ctx,
     isPending:
-      catalog.isPending || vocabulary.isPending || (Boolean(campaignId) && rulesetQuery.isPending),
-    isError: catalog.isError || vocabulary.isError || (Boolean(campaignId) && rulesetQuery.isError),
+      catalog.isPending ||
+      vocabulary.isPending ||
+      campaignRulesetPending ||
+      (Boolean(campaignId) && rulesetQuery.isPending),
+    isError:
+      catalog.isError ||
+      vocabulary.isError ||
+      campaignRulesetError ||
+      (Boolean(campaignId) && rulesetQuery.isError),
     isRetrying,
     retryFailedQueries,
   }

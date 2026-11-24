@@ -638,18 +638,6 @@ export function npcStartingChoiceManualConstraints(
   })
 }
 
-/** @deprecated Prefer {@link resolveNpcStartingChoiceIssues}. */
-export function npcStartingChoiceIncompleteOverride(
-  choices: NpcStartingChoices,
-): StartingChoiceContribution | undefined {
-  return choices.contributions.find(
-    (contribution) =>
-      contribution.mechanic === 'choice-allowance' &&
-      contribution.overridden &&
-      contribution.selectedIds.length < contribution.allowance.min,
-  )
-}
-
 export function npcStartingChoicePinnedChoiceSetIds(
   choices: NpcStartingChoices,
 ): readonly string[] {

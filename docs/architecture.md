@@ -168,6 +168,7 @@ Package layout → [apps/api/src/realtime/README.md](../apps/api/src/realtime/RE
   and `rpg/campaign/` (campaign + ruleset patches). The API validates against
   them; apps reuse the same schemas with `@hookform/resolvers/zod`.
   Package layout → [packages/contracts/docs/structure.md](../packages/contracts/docs/structure.md).
+  Cross-cutting SSOT / drift-prevention policy → [architecture-ssot.md](./architecture-ssot.md).
   Reusable content media (phased rollout) → [content-media.md](./content-media.md).
   Campaign **rules vocabulary** (creature types, …) is documented in
   [vocabulary.md](./vocabulary.md).

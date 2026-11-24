@@ -1,10 +1,9 @@
 import { z } from 'zod'
 
 import { abilitySchema } from '../../../vocab/ability'
-import {
-  spellcastingFocusGearKindSchema,
-  spellcastingGearKindSchema,
-} from '../../../vocab/equipment/spellcasting-gear-kind'
+import { classSpellcastingFocusKindSchema } from '../../../vocab/spell/class-spellcasting-focus-kind'
+import { spellcastingGearKindSchema } from '../../../vocab/equipment/spellcasting-gear-kind'
+import { spellMutationPolicySchema } from '../../../vocab/spell/spell-mutation-policy'
 
 import { classSpellSelectionSchema } from './class-spell-selection'
 import {
@@ -52,7 +51,12 @@ export const spellcastingSchema = z
      * symbol). Drives equipment picker recommendations; when absent, focus kinds
      * are inferred from starting-equipment package contents.
      */
-    focusKinds: z.array(spellcastingFocusGearKindSchema).min(1).optional(),
+    focusKinds: z.array(classSpellcastingFocusKindSchema).min(1).optional(),
+    cantripSelection: z
+      .object({
+        change: spellMutationPolicySchema,
+      })
+      .optional(),
     /** Strong-tier spellcasting gear suggestions beyond required gear and foci. */
     recommendedGear: z.array(spellcastingGearKindSchema).min(1).optional(),
     /** Advisory starting spell suggestions keyed by semantic target, not selection model. */
@@ -71,7 +75,12 @@ export const spellcastingDraftSchema = z.object({
   progression: classSpellcastingProgressionDraftSchema.optional(),
   ability: abilitySchema,
   requiredGear: z.array(spellcastingGearKindSchema).min(1).optional(),
-  focusKinds: z.array(spellcastingFocusGearKindSchema).min(1).optional(),
+  focusKinds: z.array(classSpellcastingFocusKindSchema).min(1).optional(),
+  cantripSelection: z
+    .object({
+      change: spellMutationPolicySchema,
+    })
+    .optional(),
   recommendedGear: z.array(spellcastingGearKindSchema).min(1).optional(),
   recommendations: z.array(spellRecommendationSchema).optional(),
 })

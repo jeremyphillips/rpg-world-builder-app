@@ -33,7 +33,9 @@ function createBuilderSummaryLabelLookup(
 
       if (!heritageOption) return heritageId
       if (heritageOption.kind === 'custom') return heritageOption.name
-      return heritageOption.nameOverride ?? heritageId
+      return (
+        ('nameOverride' in heritageOption ? heritageOption.nameOverride : undefined) ?? heritageId
+      )
     },
     className: (classId) => resolveCatalogEntryName(catalogEntries(catalogIndex.classes), classId),
     subclassName: (subclassId) => subclassId,

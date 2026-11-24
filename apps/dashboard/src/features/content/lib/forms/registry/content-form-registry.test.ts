@@ -20,13 +20,9 @@ import { describe, expect, it } from 'vitest'
 import { contentTypeKeysWithFormDefinition } from '@rpg/content-types'
 import { flattenFields } from '@rpg/ui/form'
 
-import {
-  contentFormRegistry,
-  contentFormFields,
-  type ContentFormDef,
-} from './content-form-registry'
+import { contentFormFields, type ContentFormDef } from './content-form-registry'
 import { resolveContentFormSchema } from '../shells/edit/content-edit-load'
-import './content-form-test-registry'
+import { contentFormRegistry } from './content-form-test-registry'
 
 type AnyDef = ContentFormDef<{ id: string; name: string }, Record<string, unknown>, unknown>
 

@@ -119,8 +119,7 @@ export function createProficienciesStepRogueContextFixture(
     channel: 'build',
     surface: 'dashboard',
     characterKind: 'pc',
-    mode: 'dashboard',
-    scope: { type: 'standalone', rulesetId },
+
     rulesScope: { type: 'ruleset', rulesetId },
     ownershipTarget: { type: 'user' },
     rulesetId,

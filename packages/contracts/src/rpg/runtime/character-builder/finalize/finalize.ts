@@ -349,8 +349,3 @@ export function finalizePcCharacterBuild(
     ...sheet,
   })
 }
-
-/**
- * @deprecated Use {@link finalizePcCharacterBuild} for PC builds.
- */
-export const finalizeCharacterBuild = finalizePcCharacterBuild

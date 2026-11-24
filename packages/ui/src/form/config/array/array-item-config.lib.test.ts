@@ -9,8 +9,8 @@ import {
   resolveArrayAddActionVariant,
   resolveArrayItemHeaderLabels,
   resolveArrayItemVariant,
-  resolveCompactInlineRow,
 } from './array-item-config.lib'
+import { normalizeArrayItemContent } from './array-item-content-normalizer.lib'
 
 describe('array-item-config.lib', () => {
   it('treats nested array sections as compact by default', () => {
@@ -98,8 +98,10 @@ describe('array-item-config.lib', () => {
       ],
     }
 
-    expect(resolveCompactInlineRow([row])).toBe(row)
-    expect(resolveCompactInlineRow([{ type: 'text', name: 'name', label: 'Name' }])).toBeUndefined()
+    expect(normalizeArrayItemContent([row]).inlineRow).toBe(row)
+    expect(
+      normalizeArrayItemContent([{ type: 'text', name: 'name', label: 'Name' }]).inlineRow,
+    ).toBeUndefined()
   })
 
   it('auto-selects detailed for multi-field items', () => {

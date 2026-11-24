@@ -10,7 +10,6 @@ import { Heading, Text } from '@rpg/ui'
 import { useRef, useState, type ReactNode } from 'react'
 import type { FieldValues, UseFormReturn } from 'react-hook-form'
 
-import { PageShell } from '@/components/layout/page/page-shell'
 import { ContentFormPageShell } from '../layout/content-form-page-shell'
 import {
   ArmorClassAuthoringNotice,
@@ -31,16 +30,8 @@ import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { formatContentCreateActionLabel } from '../../../content-type-labels'
 import { useContentWriteMutation } from '../../../list/use-content-mutations'
 import { ContentAuthoringGate } from '../layout/content-authoring-gate'
-import {
-  ContentFormComingSoon,
-  ContentFormOptionsGate,
-  ContentFormLayout,
-} from '../layout/content-form-shell-layout'
-import {
-  contentFormRegistry,
-  type AnyContentFormDef,
-  type ContentFormCtx,
-} from '../../registry/content-form-registry'
+import { ContentFormOptionsGate, ContentFormLayout } from '../layout/content-form-shell-layout'
+import { type AnyContentFormDef, type ContentFormCtx } from '../../registry/content-form-registry'
 import { resolveContentPostCreateEditHref } from '../layout/content-form-navigation'
 
 import { serializeContentFormInput } from '../../registry/content-form-serialize-input.lib'
@@ -53,8 +44,7 @@ import { resolveContentFormNavigationFields } from '../host/content-form-host-pr
 import { resolveContentFormCreateDefaultValues } from '../../registry/content-form-registry'
 
 export interface ContentCreateShellProps {
-  /** Route key identifying the content type (e.g. `'species'`). */
-  contentType: string
+  def: AnyContentFormDef
   campaignId: string
   /** Page heading (e.g. `"New Species"`). */
   heading: string
@@ -311,16 +301,9 @@ function ContentCreateForm({
   )
 }
 
-/**
- * Generic shell for creating a new content item. Looks up the `ContentFormDef`
- * for `contentType` in the registry, renders the schema-driven `<Form>`, and
- * calls the content API on submit.
- *
- * If no form is registered for the type yet, it renders a "coming soon" notice
- * so the route is still navigable.
- */
+/** Renders and submits the owning route's schema-driven create form. */
 export function ContentCreateShell({
-  contentType,
+  def,
   campaignId,
   heading,
   backHref,
@@ -329,38 +312,23 @@ export function ContentCreateShell({
   prepareSubmitValues,
   formHeaderPrefix,
 }: ContentCreateShellProps) {
-  const def = contentFormRegistry[contentType]
-  const layout = def != null ? resolveContentFormLayout(def) : null
-
-  const formContent = def ? (
+  const layout = resolveContentFormLayout(def)
+  const formContent = (
     <ContentAuthoringGate campaignId={campaignId}>
       <ContentCreateForm
         def={def}
-        contentTypeKey={contentType as ContentTypeKey}
+        contentTypeKey={def.routeKey}
         campaignId={campaignId}
         backHref={backHref}
         heading={heading}
-        layout={layout!}
+        layout={layout}
         initialValues={initialValues}
         formCtx={formCtx}
         prepareSubmitValues={prepareSubmitValues}
         formHeaderPrefix={formHeaderPrefix}
       />
     </ContentAuthoringGate>
-  ) : (
-    <ContentFormComingSoon />
   )
-
-  if (!layout) {
-    return (
-      <PageShell width="narrow">
-        <Heading variant="page" as="h1">
-          {heading}
-        </Heading>
-        {formContent}
-      </PageShell>
-    )
-  }
 
   return (
     <ContentFormPageShell scrollMode={layout.scrollMode} pageWidth={layout.pageWidth}>

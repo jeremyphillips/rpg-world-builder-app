@@ -23,7 +23,13 @@ import {
   type RecommendationSourceIdentity,
   type RecommendationSourceRef,
 } from '../recommendation'
+import { resolveClassSpellcastingActivationLevel } from '../../../content/classes/spellcasting/class-spellcasting-ownership'
+import {
+  resolveClassSpellcasting,
+  resolveMaxSelectableSpellLevelFromClass,
+} from '../../creature/resolve-class-spellcasting'
 import { resolveRecommendedSpellIdsForChoiceSet } from '../resolvers/spellcasting/resolve-spell-recommendations'
+import type { ResolvedSpellcastingProgressionConfig } from '../../../campaign/rules/spellcasting-progression'
 import type { AutomaticNpcBuildConstraints } from './automatic-npc-build-constraints'
 import type { AutomaticNpcBuildPreferences } from './automatic-npc-build-seed'
 import {
@@ -56,15 +62,28 @@ function classRecommendedSpellOptionIds(args: {
   characterClass: CharacterClass | undefined
   catalogIndex: CharacterBuildCatalogIndex
   classLevel: number
+  spellcastingProgression: ResolvedSpellcastingProgressionConfig
 }): string[] {
   if (!args.characterClass) return []
   if (args.choiceSet.choiceType !== 'spell' && args.choiceSet.choiceType !== 'cantrip') return []
+  const resolvedClassSpellcasting = resolveClassSpellcasting(
+    args.characterClass,
+    args.spellcastingProgression,
+  )
+  const activationClassLevel =
+    resolveClassSpellcastingActivationLevel(args.characterClass) ?? args.classLevel
+  const maxSelectableSpellLevel = resolvedClassSpellcasting
+    ? resolveMaxSelectableSpellLevelFromClass(resolvedClassSpellcasting, args.classLevel)
+    : 0
+
   return [
     ...resolveRecommendedSpellIdsForChoiceSet({
       spellcasting: args.characterClass.spellcasting,
       choiceSetId: args.choiceSet.id,
       classId: args.characterClass.id,
       classLevel: args.classLevel,
+      activationClassLevel,
+      maxSelectableSpellLevel,
       choiceSetOptionIds: args.choiceSet.options.map((option) => option.id),
       catalogSpellsById: args.catalogIndex.spells,
     }),
@@ -762,6 +781,7 @@ export function fillChoiceSetWithConstraintAwareSelection(args: {
       characterClass,
       catalogIndex,
       classLevel: draft.class.level,
+      spellcastingProgression: context.spellcastingProgression,
     }),
     ...(characterClass ? { classSource: { kind: 'class', id: characterClass.id } } : {}),
     recommendationIdentity: identity,
@@ -967,21 +987,6 @@ export type ManualEquipmentGrantCompletion =
  * Grants explicit equipment ids still missing from assembled inventory.
  * Callers must enforce campaign availability before invoking.
  */
-/** @deprecated Prefer {@link applyStartingEquipmentGrants} with explicit quantities. */
-export function applyManualEquipmentGrants(args: {
-  draft: CharacterBuilderDraft
-  equipmentIds: readonly string[]
-  context: CharacterBuildContext
-  catalogIndex: CharacterBuildCatalogIndex
-}): ManualEquipmentGrantCompletion {
-  return applyStartingEquipmentGrants({
-    draft: args.draft,
-    grants: args.equipmentIds.map((equipmentId) => ({ equipmentId, quantity: 1 })),
-    context: args.context,
-    catalogIndex: args.catalogIndex,
-  })
-}
-
 // fallow-ignore-next-line complexity
 export function applyStartingEquipmentGrants(args: {
   draft: CharacterBuilderDraft

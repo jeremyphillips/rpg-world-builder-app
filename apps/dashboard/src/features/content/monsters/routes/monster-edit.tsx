@@ -7,7 +7,7 @@ import {
 } from '@/features/content/lib/content-type-labels'
 import { ContentEditShell } from '../../lib/forms/shells/edit/content-edit-shell'
 import { useMonsters } from '../hooks/use-monsters'
-import '../lib/monster-form-def'
+import { monsterFormDef } from '../lib/monster-form-def'
 
 export function MonsterEdit() {
   const { campaignId = '', monsterId = '' } = useParams<{
@@ -18,7 +18,7 @@ export function MonsterEdit() {
 
   return (
     <ContentEditShell
-      contentType="monsters"
+      def={monsterFormDef}
       campaignId={campaignId}
       entityId={monsterId}
       isPending={isPending}
@@ -27,7 +27,6 @@ export function MonsterEdit() {
       notFoundLabel={formatContentNotFoundMessage('monsters')}
       backHref={ROUTES.content.monsters.detail(campaignId, monsterId)}
       overviewHref={ROUTES.content.monsters.overview(campaignId)}
-      contentTypeKey="monsters"
     />
   )
 }

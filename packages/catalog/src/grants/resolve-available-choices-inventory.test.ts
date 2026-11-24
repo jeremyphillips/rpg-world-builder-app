@@ -22,8 +22,7 @@ function seedBuildContext(): CharacterBuildContext {
     channel: 'build',
     surface: 'dashboard',
     characterKind: 'pc',
-    mode: 'dashboard',
-    scope: { type: 'standalone', rulesetId: RULESET },
+
     rulesScope: { type: 'ruleset', rulesetId: RULESET },
     playActor: { kind: 'new_pc' },
     ownershipTarget: { type: 'user' },

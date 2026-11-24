@@ -50,18 +50,6 @@ export function isCampaignMembershipInvalid(state: CampaignRecoveryState): boole
   return state.kind === 'membership_invalid'
 }
 
-/** @deprecated Use {@link isCampaignReconnectRequired} or {@link isCampaignMembershipInvalid}. */
-export function isCampaignParticipationInvalid(state: CampaignRecoveryState): boolean {
-  return isCampaignReconnectRequired(state) || isCampaignMembershipInvalid(state)
-}
-
-/** @deprecated Use {@link resolveCampaignRecoveryState} and {@link isCampaignOnboardingIncomplete}. */
-export function isCampaignMembershipOnboardingIncomplete(
-  campaign: Pick<CampaignListItem, 'viewerState'>,
-): boolean {
-  return isCampaignOnboardingIncomplete(resolveCampaignRecoveryState(campaign))
-}
-
 export function resolveRecoveryCharacterId(state: CampaignRecoveryState): string | undefined {
   if (state.kind === 'control_stale' || state.kind === 'participation_missing') {
     return state.characterId

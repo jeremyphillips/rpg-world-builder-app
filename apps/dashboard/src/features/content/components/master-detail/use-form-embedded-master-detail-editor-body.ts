@@ -1,15 +1,14 @@
 import { useCallback, useMemo } from 'react'
 import type { FormItem } from '@rpg/ui/form'
 
-import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { duplicateMasterDetailRow } from '../../lib/master-detail/duplicate-master-detail-row'
-import type { FormEmbeddedMasterDetailAccessConfig } from '../../lib/master-detail/master-detail-access.types'
-import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
 import type { EmbeddedMasterDetailRow } from '../../lib/master-detail/build-embedded-master-detail-rows'
 import { useEmbeddedMasterDetailRows } from '../../lib/master-detail/use-embedded-master-detail-rows'
 import { useMasterDetailCollectionAvailability } from '../../lib/master-detail/use-master-detail-collection-availability'
 import type { UseMasterDetailArrayResult } from '../../lib/master-detail/use-master-detail-array'
+import type { MasterDetailListGroup } from './master-detail-list-panel'
 import type { MasterDetailEditorIdentity } from './master-detail-editor-shell'
+import type { MasterDetailItemFieldSections } from './master-detail-detail-body'
 import type { FormEmbeddedMasterDetailEditorProps } from './form-embedded-master-detail-editor'
 
 type EditorBodyInput<TRow> = Omit<
@@ -86,10 +85,12 @@ export function useFormEmbeddedMasterDetailEditorBody<TRow = Record<string, unkn
     itemNoun,
     addControl: addControlProp,
     resolveItemFields,
+    resolveFieldSections,
     idPrefix,
     editor,
     access,
     listReorder = false,
+    resolveListGroups,
   } = input
 
   const rows = useEmbeddedMasterDetailRows<TRow>(
@@ -162,11 +163,40 @@ export function useFormEmbeddedMasterDetailEditorBody<TRow = Record<string, unkn
     rows.rowAt,
   )
 
+  const detailFieldSections = useMemo((): MasterDetailItemFieldSections | undefined => {
+    if (!resolveFieldSections || !rows.selectedRow) return undefined
+    const row = rows.rowAt(rows.selectedRow.formIndex)
+    const sections = resolveFieldSections(row)
+    const titleField = rows.selectedIdentity?.inlineTitle?.field
+    if (titleField) {
+      const omitTitle = (items: FormItem[]) =>
+        items.filter((item) => !('name' in item) || item.name !== titleField)
+      return {
+        leading: sections.leading?.length ? omitTitle([...sections.leading]) : sections.leading,
+        primary: omitTitle([...sections.primary]),
+      }
+    }
+    return sections
+  }, [resolveFieldSections, rows])
+
   const addControl = addControlProp
+
+  const listGroups = useMemo((): MasterDetailListGroup[] | undefined => {
+    if (!resolveListGroups) return undefined
+    return resolveListGroups({
+      visibleRows: visibleRows.map((row) => ({
+        item: row.item,
+        row: rows.rowAt(row.formIndex),
+        formIndex: row.formIndex,
+      })),
+      addControl,
+    })
+  }, [addControl, resolveListGroups, rows, visibleRows])
 
   return {
     rows,
     listItems,
+    listGroups,
     invalidItemCount,
     isSelectedRowVisible,
     handleSelectItem,
@@ -174,6 +204,7 @@ export function useFormEmbeddedMasterDetailEditorBody<TRow = Record<string, unkn
     handleDuplicate,
     selectedIdentity,
     detailFields,
+    detailFieldSections,
     addControl,
     formCtx,
     fieldName,

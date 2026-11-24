@@ -6,6 +6,7 @@ import type {
   OrganizationReferenceResolution,
   ResolvedCharacterCreationRules,
   Species,
+  EquipmentCatalogScope,
   XpProgressionBody,
 } from '@rpg/contracts'
 import {
@@ -23,7 +24,7 @@ import {
   resolveCreatureMovement,
   createDefaultCharacterVitalState,
   resolveEquippedArmorFromInventory,
-  resolveTraitDisplay,
+  resolveTraitName,
   resolveEquipmentInstanceSummary,
   getWeaponCategoryLabel,
   getArmorCategoryLabel,
@@ -75,6 +76,7 @@ export type CharacterDisplayInput = {
   catalogIndex: CharacterBuildCatalogIndex
   rules: ResolvedCharacterCreationRules
   xpProgression: Pick<XpProgressionBody, 'entries'>
+  equipmentReferenceScope: EquipmentCatalogScope
   organizationReferences?: readonly OrganizationReferenceResolution[]
   locationReferences?: readonly CharacterLocationReferenceResolution[]
 }
@@ -347,11 +349,11 @@ function buildSpeciesTraitsSection(
   if (heritageOption) traits.push(heritageOption)
 
   const items = traits.map((trait) => {
-    const display = resolveTraitDisplay(trait)
+    const label = resolveTraitName(trait)
     return {
       id: trait.id,
-      label: display.name,
-      detail: display.descriptionHtml ? undefined : display.name,
+      label,
+      detail: label,
     }
   })
 
@@ -534,6 +536,7 @@ export function buildCharacterDetailViewModel({
   catalogIndex,
   rules,
   xpProgression,
+  equipmentReferenceScope,
   organizationReferences = [],
   locationReferences = [],
 }: CharacterDisplayInput): CharacterDetailViewModel {
@@ -580,7 +583,12 @@ export function buildCharacterDetailViewModel({
     savingThrows: buildSavingThrowSection(source, catalogIndex, rules),
     proficiencies: buildProficienciesSection(source, catalogIndex, rules),
     spells: buildCharacterSheetSpellCards({ spells: [...source.spells] }, catalogIndex),
-    equipment: buildCharacterSheetEquipmentCards(source, catalogIndex, rules.armorClass),
+    equipment: buildCharacterSheetEquipmentCards(
+      source,
+      catalogIndex,
+      rules.armorClass,
+      equipmentReferenceScope,
+    ),
     armorClassRules: rules.armorClass,
     wealth: {
       label: CHARACTER_SECTION_LABELS.wealth,

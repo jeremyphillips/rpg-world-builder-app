@@ -16,6 +16,7 @@ import {
   creatureSkillProficiencyEntrySchema,
   creatureWeaponProficienciesSchema,
   creatureWeaponProficiencyTargetSchema,
+  CREATURE_DAMAGE_DEFENSE_LISTS,
   resolveDamageDefenseOptionState,
 } from './creature'
 
@@ -244,6 +245,12 @@ describe('character schema creature reuse', () => {
       cha: 8,
     })
     expect(parsed.hitPoints).toEqual({ base: 12, current: 12, temporary: 0 })
+  })
+})
+
+describe('creature damage-defense list vocabulary', () => {
+  it('preserves cross-list iteration order', () => {
+    expect(CREATURE_DAMAGE_DEFENSE_LISTS).toEqual(['vulnerabilities', 'resistances', 'immunities'])
   })
 })
 

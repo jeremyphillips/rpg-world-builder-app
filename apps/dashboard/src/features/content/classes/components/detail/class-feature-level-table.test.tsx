@@ -1,9 +1,6 @@
+import { reincarnateSpeciesTableFixture } from '@rpg/contracts'
 import { render, screen, waitFor } from '@testing-library/react'
-import { beforeAll, describe, expect, it, vi } from 'vitest'
-
-beforeAll(() => {
-  vi.spyOn(window, 'scrollTo').mockImplementation(() => undefined)
-})
+import { describe, expect, it, vi } from 'vitest'
 
 import { ContentDetailBody } from '../../../lib/detail/page/content-detail-body'
 import { ContentDetailSection } from '../../../lib/detail/page/content-detail-section'
@@ -19,24 +16,46 @@ const items: ClassFeatureDetailItem[] = [
     id: 'fighting-style',
     level: 1,
     title: 'Fighting Style',
-    bodyHtml: '<p>Choose a style.</p>',
+    facing: {
+      status: 'ready',
+      document: {
+        title: 'Fighting Style',
+        blocks: [
+          { kind: 'richText', html: '<p>Choose a style.</p>' },
+          { kind: 'table', table: reincarnateSpeciesTableFixture },
+        ],
+      },
+    },
   },
   {
     id: 'second-wind',
     level: 1,
     title: 'Second Wind',
-    bodyHtml: '<p>Regain hit points.</p>',
+    facing: {
+      status: 'ready',
+      document: {
+        title: 'Second Wind',
+        blocks: [{ kind: 'richText', html: '<p>Regain hit points.</p>' }],
+      },
+    },
   },
   {
     id: 'action-surge',
     level: 2,
     title: 'Action Surge',
-    bodyHtml: '<p>Take an extra action.</p>',
+    facing: {
+      status: 'ready',
+      document: {
+        title: 'Action Surge',
+        blocks: [{ kind: 'richText', html: '<p>Take an extra action.</p>' }],
+      },
+    },
   },
 ]
 
 describe('ClassFeatureLevelTable', () => {
   it('groups features by level and exposes level group anchors for nav', async () => {
+    vi.spyOn(window, 'scrollTo').mockImplementation(() => undefined)
     render(
       <ContentDetailBody>
         <ContentDetailSection
@@ -54,6 +73,8 @@ describe('ClassFeatureLevelTable', () => {
 
     expect(screen.getByRole('heading', { name: 'Fighting Style', level: 4 })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Action Surge', level: 4 })).toBeInTheDocument()
+
+    expect(screen.getByRole('columnheader', { name: 'Species' })).toBeInTheDocument()
 
     const levelOneAnchor = contentDetailNavItemId('feature-level', '1')
     expect(document.getElementById(levelOneAnchor)).toBeInTheDocument()

@@ -7,12 +7,13 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
+  standaloneEquipmentReferenceScope,
 } from '../../lib/fixtures/character-builder-fixtures'
 import {
   buildCharacterDetailViewModel,
   toCharacterDetailSource,
 } from '../../lib/display/character-display'
-import { SAMPLE_PC } from '../../lib/fixtures/character-fixtures'
+import { makePcCharacter } from '../../lib/fixtures/character-fixtures'
 import { CharacterDetailContent } from './character-detail-content'
 
 vi.mock('@/components/layout/breadcrumb/use-breadcrumb-label', () => ({
@@ -30,15 +31,17 @@ vi.mock('../../hooks/use-delete-character', () => ({
 const context = createPopulatedStandaloneBuilderContextFixture()
 const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
 const viewModel = buildCharacterDetailViewModel({
-  source: toCharacterDetailSource(SAMPLE_PC),
+  source: toCharacterDetailSource(makePcCharacter()),
   catalogIndex,
   rules: context.characterCreationRules,
+  equipmentReferenceScope: standaloneEquipmentReferenceScope,
   xpProgression: { entries: [{ level: 1, xpRequired: 0 }] },
 })
 const connectedViewModel = buildCharacterDetailViewModel({
-  source: toCharacterDetailSource(SAMPLE_PC),
+  source: toCharacterDetailSource(makePcCharacter()),
   catalogIndex,
   rules: context.characterCreationRules,
+  equipmentReferenceScope: standaloneEquipmentReferenceScope,
   xpProgression: { entries: [{ level: 1, xpRequired: 0 }] },
   organizationReferences: [
     {

@@ -83,8 +83,7 @@ describe('useBuildContext', () => {
       channel: 'build',
       surface: 'dashboard',
       characterKind: 'pc',
-      mode: 'dashboard',
-      scope: { type: 'standalone', rulesetId: 'srd-cc-5.2.1' },
+
       rulesScope: { type: 'ruleset', rulesetId: 'srd-cc-5.2.1' },
       ownershipTarget: { type: 'user' },
       rulesetId: 'srd-cc-5.2.1',

@@ -2,7 +2,7 @@ import { monsterFormRestrictionEligibleIds, sortMonsterFormRestrictionIds } from
 import { monsterFormRestrictionLabelMap } from '@rpg/contracts'
 import { ChipsField, RadioGroupField, type FieldHintPosition } from '@rpg/ui'
 import { useSlotIssues } from '@rpg/ui/form'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useFormContext, useWatch, type UseFormReturn } from 'react-hook-form'
 
 import {
@@ -158,15 +158,8 @@ export function MonsterFormAvailabilityControl({ namePrefix }: { namePrefix?: st
   const authorable = forms ? monsterFormRestrictionEligibleIds(forms).length > 1 : false
   const visible = shouldShowFormAvailability(namePrefix, authorable, restrictionKeyPresent)
 
-  const [availabilityEngaged, setAvailabilityEngaged] = useState(restrictionKeyPresent)
-
-  useEffect(() => {
-    setAvailabilityEngaged(restrictionKeyPresent)
-  }, [namePrefix])
-
-  useEffect(() => {
-    if (restrictionKeyPresent) setAvailabilityEngaged(true)
-  }, [restrictionKeyPresent])
+  const [userAvailabilityEngaged, setUserAvailabilityEngaged] = useState(false)
+  const availabilityEngaged = restrictionKeyPresent || userAvailabilityEngaged
 
   if (!visible) return null
 
@@ -189,7 +182,7 @@ export function MonsterFormAvailabilityControl({ namePrefix }: { namePrefix?: st
       hint={hint}
       hintPosition={hintPosition}
       onAvailabilityModeChange={(value) => {
-        if (value === 'selected' || value === 'all') setAvailabilityEngaged(true)
+        if (value === 'selected' || value === 'all') setUserAvailabilityEngaged(true)
         applyAvailabilityMode(form, namePrefix, restrictionPath, restrictionKeyPresent, value)
       }}
     />

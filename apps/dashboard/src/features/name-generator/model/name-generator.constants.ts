@@ -1,7 +1,5 @@
 import type { NameSubjectKind } from '@rpg/contracts/name-generator'
 
-export const DEFAULT_RULESET_ID = 'srd-cc-5.2.1'
-
 export const GENERATE_COUNT = 10
 
 export const DEFAULT_FILTERS = {

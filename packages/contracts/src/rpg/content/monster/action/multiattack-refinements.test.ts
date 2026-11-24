@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { z } from 'zod'
+import { type z } from 'zod'
 
 import { multiattackValidationMessages } from './multiattack-validation-messages'
 import { refinePublishedMultiattack } from './multiattack-refinements'
@@ -10,8 +10,8 @@ function collectIssues(
 ) {
   const issues: z.ZodIssue[] = []
   refinePublishedMultiattack(action, 'actions', ['actions', 0], actionsById, new Map(), {
-    addIssue: (issue) => issues.push(issue),
-  } as z.RefinementCtx)
+    addIssue: (issue: z.ZodIssue) => issues.push(issue),
+  } as unknown as z.RefinementCtx)
   return issues
 }
 

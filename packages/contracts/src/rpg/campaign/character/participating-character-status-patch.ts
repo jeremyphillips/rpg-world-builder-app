@@ -12,9 +12,3 @@ export const campaignParticipatingCharacterStatusPatchSchema = z.object({
 export type CampaignParticipatingCharacterStatusPatch = z.infer<
   typeof campaignParticipatingCharacterStatusPatchSchema
 >
-
-/** @deprecated Use `campaignParticipatingCharacterStatusPatchSchema`. */
-export const campaignNpcStatusPatchSchema = campaignParticipatingCharacterStatusPatchSchema
-
-/** @deprecated Use `CampaignParticipatingCharacterStatusPatch`. */
-export type CampaignNpcStatusPatch = CampaignParticipatingCharacterStatusPatch

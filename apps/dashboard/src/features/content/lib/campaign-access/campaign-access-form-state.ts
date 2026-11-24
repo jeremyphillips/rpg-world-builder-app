@@ -99,8 +99,3 @@ export function useCampaignAccessAvailabilityContext(): CampaignAccessAvailabili
   }
   return context
 }
-
-/** @deprecated Use useCampaignAccessAvailabilityContext */
-export function useCampaignAccessFormContext(): CampaignAccessAvailabilityContextValue {
-  return useCampaignAccessAvailabilityContext()
-}

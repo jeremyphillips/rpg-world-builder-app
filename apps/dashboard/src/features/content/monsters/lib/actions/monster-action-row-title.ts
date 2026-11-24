@@ -28,35 +28,79 @@ function withBlankName(action: MonsterActionDraftRow): MonsterActionDraftRow {
   return next
 }
 
-export function resolveMonsterActionRowTitleStrategy(input: {
+type MonsterActionRowTitleInput = {
   action: MonsterActionDraftRow
   sectionRows: readonly MonsterActionDraftRow[]
   values: MonsterFormValues | undefined
   ctx: ContentFormCtx
   section?: MonsterActionSection
-}): MasterDetailRowTitleStrategy<MonsterActionDraftRow> {
+}
+
+function resolveInvalidMonsterActionRowTitle(): MasterDetailRowTitleStrategy<MonsterActionDraftRow> {
+  return {
+    strategy: 'readonly',
+    resolveTitle: () => masterDetailItemTitle(undefined, MONSTER_ACTION_ITEM_NOUN),
+  }
+}
+
+function resolveMultiattackRowTitleStrategy(
+  action: MonsterActionDraftRow,
+): MasterDetailRowTitleStrategy<MonsterActionDraftRow> {
+  const canonical = getMonsterActionKindLabel('multiattack')
+  const stored = action.name?.trim()
+  if (stored && stored !== canonical) {
+    return {
+      strategy: 'override',
+      field: 'name',
+      resolveDerived: () => canonical,
+      resetLabel: MONSTER_MULTIATTACK_USE_LABEL,
+    }
+  }
+  return {
+    strategy: 'readonly',
+    resolveTitle: () => canonical,
+  }
+}
+
+function resolveAuthoredMonsterActionRowTitleStrategy(
+  input: MonsterActionRowTitleInput,
+  listFallback: string,
+): MasterDetailRowTitleStrategy<MonsterActionDraftRow> {
+  const storedReferenceName =
+    input.action.kind === 'action-reference' ? input.action.name?.trim() : undefined
+  return {
+    strategy: 'authored',
+    field: 'name',
+    allowInitialEditOnAdd: input.action.kind !== 'action-reference',
+    ...(storedReferenceName ? { resetLabel: MONSTER_USE_DEFAULT_NAME_LABEL } : {}),
+    resolveFallback: (rowCtx) => {
+      const clearedRows = rowCtx.rows.flatMap((row) => {
+        if (!row?.id) return []
+        return [row.id === input.action.id ? withBlankName(row) : row]
+      })
+      return (
+        monsterActionEditorTitles(clearedRows, input.values, input.ctx, input.section).get(
+          input.action.id,
+        ) ?? listFallback
+      )
+    },
+  }
+}
+
+export function resolveMonsterActionRowTitleStrategy(
+  input: MonsterActionRowTitleInput,
+): MasterDetailRowTitleStrategy<MonsterActionDraftRow> {
+  if (!input.action?.id || typeof input.action.kind !== 'string') {
+    return resolveInvalidMonsterActionRowTitle()
+  }
   if (isPrimarySpellcastingAction(input.action)) {
     return {
       strategy: 'readonly',
       resolveTitle: () => MONSTER_SPELLCASTING_ACTION_NAME,
     }
   }
-
   if (input.action.kind === 'multiattack') {
-    const canonical = getMonsterActionKindLabel('multiattack')
-    const stored = input.action.name?.trim()
-    if (stored && stored !== canonical) {
-      return {
-        strategy: 'override',
-        field: 'name',
-        resolveDerived: () => canonical,
-        resetLabel: MONSTER_MULTIATTACK_USE_LABEL,
-      }
-    }
-    return {
-      strategy: 'readonly',
-      resolveTitle: () => canonical,
-    }
+    return resolveMultiattackRowTitleStrategy(input.action)
   }
 
   const identity = resolveMonsterFormActionIdentity(input.action, input.values, input.ctx)
@@ -70,24 +114,7 @@ export function resolveMonsterActionRowTitleStrategy(input: {
     titles.get(input.action.id) ?? masterDetailItemTitle(undefined, MONSTER_ACTION_ITEM_NOUN)
 
   if (monsterActionAuthoring(input.action).name === 'authored') {
-    const storedReferenceName =
-      input.action.kind === 'action-reference' ? input.action.name?.trim() : undefined
-    return {
-      strategy: 'authored',
-      field: 'name',
-      allowInitialEditOnAdd: input.action.kind !== 'action-reference',
-      ...(storedReferenceName ? { resetLabel: MONSTER_USE_DEFAULT_NAME_LABEL } : {}),
-      resolveFallback: (rowCtx) => {
-        const clearedRows = rowCtx.rows.map((row) =>
-          row.id === input.action.id ? withBlankName(row) : row,
-        )
-        return (
-          monsterActionEditorTitles(clearedRows, input.values, input.ctx, input.section).get(
-            input.action.id,
-          ) ?? listFallback
-        )
-      },
-    }
+    return resolveAuthoredMonsterActionRowTitleStrategy(input, listFallback)
   }
 
   return {

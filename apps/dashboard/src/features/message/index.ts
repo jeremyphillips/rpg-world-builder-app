@@ -14,10 +14,5 @@ export { useConversations, CONVERSATION_LIST_LIMIT } from './hooks/use-conversat
 export { useConversationMessages } from './hooks/use-conversation-messages'
 export { useConversationRecipients } from './hooks/use-conversation-recipients'
 export { useConversationActions } from './hooks/use-conversation-actions'
-export {
-  MessagesCampaignEntryLinks,
-  MessagesEntryLinks,
-  MessagesGlobalEntryLink,
-  MessagesOverviewEntryActions,
-} from './components/messages-entry-links'
+export { MessagesEntryLinks } from './components/messages-entry-links'
 export { MESSAGES_ACTION_COPY } from './lib/messages-copy'

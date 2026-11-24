@@ -208,28 +208,14 @@
       "kind": "subclass-choice",
       "id": "rogue-subclass",
       "name": "Rogue Subclass",
-      "level": 3,
-      "description": ""
+      "level": 3
     },
     {
       "id": "ability-score-improvement-4",
       "name": "Ability Score Improvement",
       "level": 4,
       "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-      "grantGroups": [
-        {
-          "grants": [
-            {
-              "id": "general-feat",
-              "kind": "featChoice",
-              "category": "general",
-              "choose": 1,
-              "allowAnyQualifying": true,
-              "recommendedFeatIds": ["ability-score-improvement"]
-            }
-          ]
-        }
-      ]
+      "kind": "asi"
     },
     {
       "id": "cunning-strike",
@@ -260,40 +246,14 @@
       "name": "Ability Score Improvement",
       "level": 8,
       "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-      "grantGroups": [
-        {
-          "grants": [
-            {
-              "id": "general-feat",
-              "kind": "featChoice",
-              "category": "general",
-              "choose": 1,
-              "allowAnyQualifying": true,
-              "recommendedFeatIds": ["ability-score-improvement"]
-            }
-          ]
-        }
-      ]
+      "kind": "asi"
     },
     {
       "id": "ability-score-improvement-10",
       "name": "Ability Score Improvement",
       "level": 10,
       "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-      "grantGroups": [
-        {
-          "grants": [
-            {
-              "id": "general-feat",
-              "kind": "featChoice",
-              "category": "general",
-              "choose": 1,
-              "allowAnyQualifying": true,
-              "recommendedFeatIds": ["ability-score-improvement"]
-            }
-          ]
-        }
-      ]
+      "kind": "asi"
     },
     {
       "id": "improved-cunning-strike",
@@ -306,20 +266,7 @@
       "name": "Ability Score Improvement",
       "level": 12,
       "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-      "grantGroups": [
-        {
-          "grants": [
-            {
-              "id": "general-feat",
-              "kind": "featChoice",
-              "category": "general",
-              "choose": 1,
-              "allowAnyQualifying": true,
-              "recommendedFeatIds": ["ability-score-improvement"]
-            }
-          ]
-        }
-      ]
+      "kind": "asi"
     },
     {
       "id": "devious-strikes",
@@ -338,20 +285,7 @@
       "name": "Ability Score Improvement",
       "level": 16,
       "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-      "grantGroups": [
-        {
-          "grants": [
-            {
-              "id": "general-feat",
-              "kind": "featChoice",
-              "category": "general",
-              "choose": 1,
-              "allowAnyQualifying": true,
-              "recommendedFeatIds": ["ability-score-improvement"]
-            }
-          ]
-        }
-      ]
+      "kind": "asi"
     },
     {
       "id": "elusive",

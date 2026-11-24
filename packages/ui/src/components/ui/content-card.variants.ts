@@ -122,8 +122,6 @@ export function resolveContentCardDensityInsetClasses(density: ContentCardDensit
   return cn(cardDensityClassName(density), UI_CONTENT_CARD_INSET_CLASS)
 }
 
-/** @deprecated Use {@link ContentCardChrome} — `outline` maps to `standalone`, `ghost` to `embedded`. */
-export type ContentCardSurface = 'outline' | 'card' | 'ghost'
 export type ContentCardHeadingRowRhythm = NonNullable<
   VariantProps<typeof contentCardHeadingRowVariants>['rhythm']
 >

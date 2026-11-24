@@ -292,9 +292,21 @@ type GrantChoiceSetConverter<K extends ContentGrant['kind']> = (
   catalogIndex: CharacterBuildCatalogIndex,
 ) => ChoiceSet[]
 
-const GRANT_CHOICE_SET_CONVERTERS: {
-  [K in ContentGrant['kind']]?: GrantChoiceSetConverter<K>
-} = {
+/** Every persisted grant kind declares how it participates in builder choices. */
+export type GrantChoiceSetConverters = {
+  [K in ContentGrant['kind']]: GrantChoiceSetConverter<K> | null
+}
+
+// Null entries do not create a character builder choice set.
+const GRANT_CHOICE_SET_CONVERTERS: GrantChoiceSetConverters = {
+  sense: null,
+  resistances: null,
+  damageType: null,
+  movement: null,
+  languages: null,
+  spells: null,
+  rollAdjustment: null,
+  saveOutcomeOverride: null,
   featChoice: (grant, ctx, catalogIndex) => [featChoiceSet(grant, ctx, catalogIndex)],
   languageChoice: (grant, ctx, catalogIndex) => [languageChoiceSet(grant, ctx, catalogIndex)],
   skillProficiency: (grant, ctx, catalogIndex) =>
@@ -315,8 +327,8 @@ export function contentGrantToChoiceSets(
   ctx: GrantChoiceSetContext,
   catalogIndex: CharacterBuildCatalogIndex,
 ): ChoiceSet[] {
-  const converter = GRANT_CHOICE_SET_CONVERTERS[grant.kind] as
-    | GrantChoiceSetConverter<typeof grant.kind>
-    | undefined
-  return converter ? converter(grant as never, ctx, catalogIndex) : []
+  const converter = GRANT_CHOICE_SET_CONVERTERS[grant.kind] as GrantChoiceSetConverter<
+    typeof grant.kind
+  > | null
+  return converter ? converter(grant, ctx, catalogIndex) : []
 }

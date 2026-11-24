@@ -19,7 +19,11 @@ import {
 import { getSenseSentenceForm, senseSchema } from '../../../vocab/sense'
 import { formatLimitedUseSentence } from '../../../primitives/limited-use'
 import { featCategorySchema, getFeatCategorySentenceForm } from '../../../vocab/feat'
-import { spellReferenceSchema } from '../../spell/spell-reference'
+import {
+  presentSpellReferenceDisplayName,
+  type SpellReferenceResolution,
+  spellReferenceSchema,
+} from '../../spell/spell-reference'
 import { spellGrantAvailabilitySchema } from '../../../vocab/spell/grant-availability'
 import { spellGrantCastingSchema } from '../../../vocab/spell/grant-casting'
 import { getSpellGrantAvailabilityEntry } from '../../../vocab/spell/grant-availability'
@@ -276,12 +280,6 @@ const equipmentContentGrantSchema = z.object({
   grant: equipmentGrantSchema,
 })
 
-/** Class spellcasting activation — payload-less; authored only on the managed Spellcasting feature. */
-const spellcastingContentGrantSchema = z.object({
-  id: grantRowIdSchema,
-  kind: z.literal('spellcasting'),
-})
-
 /** Advantage or disadvantage on a closed set of rolls, optionally limited by circumstance. */
 const rollAdjustmentContentGrantSchema = creatureRollAdjustmentSchema.extend({
   id: grantRowIdSchema,
@@ -330,13 +328,17 @@ const spellsContentGrantSchema = z
 
 export type SpellsContentGrant = z.infer<typeof spellsContentGrantSchema>
 
-/** Human-readable summary for spell grants in trait and feature summaries. */
-export function formatSpellsGrantSentence(
+function spellNamesFromGrantResolutions(
+  resolutions: readonly SpellReferenceResolution[],
+): string[] {
+  return resolutions.map(presentSpellReferenceDisplayName)
+}
+
+function formatSpellsGrantSentenceWithNames(
   grant: SpellsContentGrant,
-  resolveSpellName?: (id: string) => string | undefined,
+  names: readonly string[],
 ): string {
-  const names = grant.spellIds.map((id) => resolveSpellName?.(id) ?? id)
-  const spellList = joinNaturalList(names)
+  const spellList = joinNaturalList([...names])
   const hasAvailability = grant.availability === 'always_prepared'
   const cadence = grant.casting ? formatLimitedUseSentence(grant.casting.limitedUse) : undefined
 
@@ -357,6 +359,23 @@ export function formatSpellsGrantSentence(
   return `Character gains ${spellList}.`
 }
 
+/** Human-readable summary for spell grants in trait and feature summaries. */
+export function formatSpellsGrantSentence(
+  grant: SpellsContentGrant,
+  resolveSpellName?: (id: string) => string | undefined,
+): string {
+  const names = grant.spellIds.map((id) => resolveSpellName?.(id) ?? id)
+  return formatSpellsGrantSentenceWithNames(grant, names)
+}
+
+/** Spell grant summary from pre-resolved catalog outcomes — preferred for dashboard UI. */
+export function formatSpellsGrantSentenceFromResolutions(
+  grant: SpellsContentGrant,
+  resolutions: readonly SpellReferenceResolution[],
+): string {
+  return formatSpellsGrantSentenceWithNames(grant, spellNamesFromGrantResolutions(resolutions))
+}
+
 /**
  * Atomic, level-less content grant discriminated by `kind`.
  * Place grants inside `GrantGroup.grants`; the group's `unlock` carries timing.
@@ -375,7 +394,6 @@ export const contentGrantSchema = z.discriminatedUnion('kind', [
   featChoiceContentGrantSchema,
   equipmentContentGrantSchema,
   spellsContentGrantSchema,
-  spellcastingContentGrantSchema,
   rollAdjustmentContentGrantSchema,
   saveOutcomeOverrideContentGrantSchema,
 ])
@@ -557,7 +575,7 @@ export function getGrantGroupEffectiveUnlock(
  * (feature level for class features; `1` for species traits).
  */
 export function getUnlockedGrantsAtLevel(
-  groups: GrantGroup[],
+  groups: readonly GrantGroup[],
   level: number,
   parentLevel = 1,
 ): ContentGrant[] {
@@ -640,7 +658,7 @@ export const grantContentTraitSchema = z
     /** Atomic grant groups — the single source of truth for grant traits. */
     grantGroups: grantGroupsSchema,
     nameOverride: z.string().min(1).optional(),
-    descriptionOverride: z.string().optional(),
+    details: z.string().optional(),
   })
   .superRefine((val, ctx) => {
     if (!isGrantGroupsEligible(val.grantGroups)) {
@@ -661,8 +679,8 @@ export const templateContentTraitSchema = z.object({
   id: z.string().min(1),
   templateId: z.string().min(1),
   config: z.unknown().optional(),
-  nameOverride: z.string().min(1).optional(),
-  descriptionOverride: z.string().optional(),
+  /** Optional rich-text prose after generated template rules. */
+  details: z.string().optional(),
 })
 
 export type TemplateContentTrait = z.infer<typeof templateContentTraitSchema>

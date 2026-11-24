@@ -12,7 +12,7 @@ import {
   type RecommendationSourceKind,
 } from '@rpg/contracts'
 
-import { titleFromMembershipRadioValue } from '../../../lib/organization-membership/organization-membership-title.lib'
+import { membershipTitleIdFromRadioValue } from '../../../lib/organization-membership/organization-membership-title.lib'
 
 import { resolveQuickNpcSelectedTitleRecommendation } from './quick-npc-class-recommendation.lib'
 import {
@@ -92,7 +92,7 @@ export function resolveQuickNpcSelectedTitleLabel(args: {
   if (!isQuickNpcMembershipTitleSetupComplete(args.membershipTitle)) {
     return undefined
   }
-  const membershipTitleId = titleFromMembershipRadioValue(args.membershipTitle ?? '')
+  const membershipTitleId = membershipTitleIdFromRadioValue(args.membershipTitle ?? '')
   if (membershipTitleId === undefined) {
     return undefined
   }
@@ -232,7 +232,7 @@ function resolveQuickNpcRoleDisplaySources(args: {
       titles: args.titles,
     })
     if (titleRecommendation?.templateId) {
-      const membershipTitleId = titleFromMembershipRadioValue(args.membershipTitle ?? '')
+      const membershipTitleId = membershipTitleIdFromRadioValue(args.membershipTitle ?? '')
       if (membershipTitleId !== undefined) {
         const projection = resolveOrganizationMembershipTitleProjection({
           catalog: args.titles,

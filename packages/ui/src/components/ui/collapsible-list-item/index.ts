@@ -19,7 +19,7 @@ export {
   collapsibleListItemMainClasses,
   collapsibleListItemShellClasses,
   collapsibleListItemShellInsetClasses,
-  collapsibleListItemShellPaddingClasses,
+  collapsibleListItemFlatShellPaddingClasses,
   collapsibleListItemShellVariants,
   collapsibleListItemToolbarContentClasses,
   collapsibleListItemToolbarRowClasses,

@@ -1,3 +1,4 @@
+import type { ContentTypeKey } from '@rpg/contracts'
 import { lazy, type ComponentType } from 'react'
 
 import type { EquipmentFamilyPath } from '@/features/content/equipment/lib/shared/equipment-family-paths'
@@ -14,6 +15,119 @@ function lazyNamed<P = Record<string, never>>(
     })),
   )
 }
+
+type ContentFormLoaderProps<K extends ContentTypeKey> = K extends 'equipment'
+  ? { family: EquipmentFamilyPath }
+  : Record<string, never>
+
+type ContentFormRouteLoaders = {
+  [K in ContentTypeKey]: Record<
+    'create' | 'edit',
+    () => Promise<{
+      default: ComponentType<ContentFormLoaderProps<K>>
+    }>
+  >
+}
+
+function loadContentFormRoute<Module, Export extends keyof Module>(
+  importRoute: () => Promise<Module>,
+  component: Export,
+) {
+  return async () => ({ default: (await importRoute())[component] })
+}
+
+export const contentFormRouteLoaders = {
+  classes: {
+    create: loadContentFormRoute(
+      () => import('@/features/content/classes/routes/class-create'),
+      'ClassCreate',
+    ),
+    edit: loadContentFormRoute(
+      () => import('@/features/content/classes/routes/class-edit'),
+      'ClassEdit',
+    ),
+  },
+  species: {
+    create: loadContentFormRoute(
+      () => import('@/features/content/species/routes/species-create'),
+      'SpeciesCreate',
+    ),
+    edit: loadContentFormRoute(
+      () => import('@/features/content/species/routes/species-edit'),
+      'SpeciesEdit',
+    ),
+  },
+  monsters: {
+    create: loadContentFormRoute(
+      () => import('@/features/content/monsters/routes/monster-create'),
+      'MonsterCreate',
+    ),
+    edit: loadContentFormRoute(
+      () => import('@/features/content/monsters/routes/monster-edit'),
+      'MonsterEdit',
+    ),
+  },
+  feats: {
+    create: loadContentFormRoute(
+      () => import('@/features/content/feats/routes/feat-create'),
+      'FeatCreate',
+    ),
+    edit: loadContentFormRoute(
+      () => import('@/features/content/feats/routes/feat-edit'),
+      'FeatEdit',
+    ),
+  },
+  organizations: {
+    create: loadContentFormRoute(
+      () => import('@/features/content/organizations/routes/organization-create'),
+      'OrganizationCreate',
+    ),
+    edit: loadContentFormRoute(
+      () => import('@/features/content/organizations/routes/organization-edit'),
+      'OrganizationEdit',
+    ),
+  },
+  locations: {
+    create: loadContentFormRoute(
+      () => import('@/features/content/locations/routes/location-create'),
+      'LocationCreate',
+    ),
+    edit: loadContentFormRoute(
+      () => import('@/features/content/locations/routes/location-edit'),
+      'LocationEdit',
+    ),
+  },
+  spells: {
+    create: loadContentFormRoute(
+      () => import('@/features/content/spells/routes/spell-create'),
+      'SpellCreate',
+    ),
+    edit: loadContentFormRoute(
+      () => import('@/features/content/spells/routes/spell-edit'),
+      'SpellEdit',
+    ),
+  },
+  equipment: {
+    create: loadContentFormRoute(
+      () => import('@/features/content/equipment/routes/equipment-family-create'),
+      'EquipmentFamilyCreate',
+    ),
+    edit: loadContentFormRoute(
+      () => import('@/features/content/equipment/routes/equipment-edit'),
+      'EquipmentEdit',
+    ),
+  },
+  'skill-proficiencies': {
+    create: loadContentFormRoute(
+      () => import('@/features/content/skill-proficiencies/routes/skill-proficiency-create'),
+      'SkillProficiencyCreate',
+    ),
+    edit: loadContentFormRoute(
+      () => import('@/features/content/skill-proficiencies/routes/skill-proficiency-edit'),
+      'SkillProficiencyEdit',
+    ),
+  },
+} satisfies ContentFormRouteLoaders
 
 export const CharactersOverviewRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/character/routes/characters-overview'), 'CharactersOverview'),
@@ -126,12 +240,8 @@ export const ClassesOverviewRoute = withRouteSuspense(
 export const ClassDetailRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/content/classes/routes/class-detail'), 'ClassDetail'),
 )
-export const ClassCreateRoute = withRouteSuspense(
-  lazyNamed(() => import('@/features/content/classes/routes/class-create'), 'ClassCreate'),
-)
-export const ClassEditRoute = withRouteSuspense(
-  lazyNamed(() => import('@/features/content/classes/routes/class-edit'), 'ClassEdit'),
-)
+export const ClassCreateRoute = withRouteSuspense(lazy(contentFormRouteLoaders['classes'].create))
+export const ClassEditRoute = withRouteSuspense(lazy(contentFormRouteLoaders['classes'].edit))
 
 export const SpeciesOverviewRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/content/species/routes/species-overview'), 'SpeciesOverview'),
@@ -139,12 +249,8 @@ export const SpeciesOverviewRoute = withRouteSuspense(
 export const SpeciesDetailRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/content/species/routes/species-detail'), 'SpeciesDetail'),
 )
-export const SpeciesCreateRoute = withRouteSuspense(
-  lazyNamed(() => import('@/features/content/species/routes/species-create'), 'SpeciesCreate'),
-)
-export const SpeciesEditRoute = withRouteSuspense(
-  lazyNamed(() => import('@/features/content/species/routes/species-edit'), 'SpeciesEdit'),
-)
+export const SpeciesCreateRoute = withRouteSuspense(lazy(contentFormRouteLoaders['species'].create))
+export const SpeciesEditRoute = withRouteSuspense(lazy(contentFormRouteLoaders['species'].edit))
 
 export const MonstersOverviewRoute = withRouteSuspense(
   lazyNamed(
@@ -156,11 +262,9 @@ export const MonsterDetailRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/content/monsters/routes/monster-detail'), 'MonsterDetail'),
 )
 export const MonsterCreateRoute = withRouteSuspense(
-  lazyNamed(() => import('@/features/content/monsters/routes/monster-create'), 'MonsterCreate'),
+  lazy(contentFormRouteLoaders['monsters'].create),
 )
-export const MonsterEditRoute = withRouteSuspense(
-  lazyNamed(() => import('@/features/content/monsters/routes/monster-edit'), 'MonsterEdit'),
-)
+export const MonsterEditRoute = withRouteSuspense(lazy(contentFormRouteLoaders['monsters'].edit))
 
 export const FeatsOverviewRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/content/feats/routes/feats-overview'), 'FeatsOverview'),
@@ -168,12 +272,8 @@ export const FeatsOverviewRoute = withRouteSuspense(
 export const FeatDetailRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/content/feats/routes/feat-detail'), 'FeatDetail'),
 )
-export const FeatCreateRoute = withRouteSuspense(
-  lazyNamed(() => import('@/features/content/feats/routes/feat-create'), 'FeatCreate'),
-)
-export const FeatEditRoute = withRouteSuspense(
-  lazyNamed(() => import('@/features/content/feats/routes/feat-edit'), 'FeatEdit'),
-)
+export const FeatCreateRoute = withRouteSuspense(lazy(contentFormRouteLoaders['feats'].create))
+export const FeatEditRoute = withRouteSuspense(lazy(contentFormRouteLoaders['feats'].edit))
 
 export const OrganizationsOverviewRoute = withRouteSuspense(
   lazyNamed(
@@ -188,16 +288,10 @@ export const OrganizationDetailRoute = withRouteSuspense(
   ),
 )
 export const OrganizationCreateRoute = withRouteSuspense(
-  lazyNamed(
-    () => import('@/features/content/organizations/routes/organization-create'),
-    'OrganizationCreate',
-  ),
+  lazy(contentFormRouteLoaders['organizations'].create),
 )
 export const OrganizationEditRoute = withRouteSuspense(
-  lazyNamed(
-    () => import('@/features/content/organizations/routes/organization-edit'),
-    'OrganizationEdit',
-  ),
+  lazy(contentFormRouteLoaders['organizations'].edit),
 )
 
 export const LocationsOverviewRoute = withRouteSuspense(
@@ -210,11 +304,9 @@ export const LocationDetailRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/content/locations/routes/location-detail'), 'LocationDetail'),
 )
 export const LocationCreateRoute = withRouteSuspense(
-  lazyNamed(() => import('@/features/content/locations/routes/location-create'), 'LocationCreate'),
+  lazy(contentFormRouteLoaders['locations'].create),
 )
-export const LocationEditRoute = withRouteSuspense(
-  lazyNamed(() => import('@/features/content/locations/routes/location-edit'), 'LocationEdit'),
-)
+export const LocationEditRoute = withRouteSuspense(lazy(contentFormRouteLoaders['locations'].edit))
 
 export const SpellsOverviewRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/content/spells/routes/spells-overview'), 'SpellsOverview'),
@@ -222,12 +314,8 @@ export const SpellsOverviewRoute = withRouteSuspense(
 export const SpellDetailRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/content/spells/routes/spells-detail'), 'SpellDetail'),
 )
-export const SpellCreateRoute = withRouteSuspense(
-  lazyNamed(() => import('@/features/content/spells/routes/spell-create'), 'SpellCreate'),
-)
-export const SpellEditRoute = withRouteSuspense(
-  lazyNamed(() => import('@/features/content/spells/routes/spell-edit'), 'SpellEdit'),
-)
+export const SpellCreateRoute = withRouteSuspense(lazy(contentFormRouteLoaders['spells'].create))
+export const SpellEditRoute = withRouteSuspense(lazy(contentFormRouteLoaders['spells'].edit))
 
 export const EquipmentHubRoute = withRouteSuspense(
   lazyNamed(() => import('@/features/content/equipment/routes/equipment-hub'), 'EquipmentHub'),
@@ -239,10 +327,7 @@ export const EquipmentFamilyOverviewRoute = withRouteSuspense(
   ),
 )
 export const EquipmentFamilyCreateRoute = withRouteSuspense(
-  lazyNamed<{ family: EquipmentFamilyPath }>(
-    () => import('@/features/content/equipment/routes/equipment-family-create'),
-    'EquipmentFamilyCreate',
-  ),
+  lazy(contentFormRouteLoaders['equipment'].create),
 )
 export const EquipmentDetailRoute = withRouteSuspense(
   lazyNamed<{ family: EquipmentFamilyPath }>(
@@ -250,12 +335,7 @@ export const EquipmentDetailRoute = withRouteSuspense(
     'EquipmentDetail',
   ),
 )
-export const EquipmentEditRoute = withRouteSuspense(
-  lazyNamed<{ family: EquipmentFamilyPath }>(
-    () => import('@/features/content/equipment/routes/equipment-edit'),
-    'EquipmentEdit',
-  ),
-)
+export const EquipmentEditRoute = withRouteSuspense(lazy(contentFormRouteLoaders['equipment'].edit))
 
 export const SkillProficienciesOverviewRoute = withRouteSuspense(
   lazyNamed(
@@ -270,16 +350,10 @@ export const SkillProficiencyDetailRoute = withRouteSuspense(
   ),
 )
 export const SkillProficiencyCreateRoute = withRouteSuspense(
-  lazyNamed(
-    () => import('@/features/content/skill-proficiencies/routes/skill-proficiency-create'),
-    'SkillProficiencyCreate',
-  ),
+  lazy(contentFormRouteLoaders['skill-proficiencies'].create),
 )
 export const SkillProficiencyEditRoute = withRouteSuspense(
-  lazyNamed(
-    () => import('@/features/content/skill-proficiencies/routes/skill-proficiency-edit'),
-    'SkillProficiencyEdit',
-  ),
+  lazy(contentFormRouteLoaders['skill-proficiencies'].edit),
 )
 
 export const HomebrewHubRoute = withRouteSuspense(

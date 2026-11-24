@@ -1,9 +1,9 @@
-import type { MediaScope } from '@rpg/contracts'
+import type { CharacterType, MediaScope } from '@rpg/contracts'
 
 export type PcMediaScopeKind = 'user-pc' | 'campaign-pc'
 
 export type ResolveCharacterMediaScopeInput = {
-  characterType: 'pc' | 'npc'
+  characterType: CharacterType
   userId?: string
   campaignId?: string
   pcScopeKind?: PcMediaScopeKind

@@ -7,7 +7,7 @@ import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
 } from '../lib/fixtures/character-builder-fixtures'
-import { SAMPLE_PC } from '../lib/fixtures/character-fixtures'
+import { makePcCharacter } from '../lib/fixtures/character-fixtures'
 import {
   CHARACTER_LIST_CARD_HEADER_COPY_CLASS,
   CHARACTER_LIST_CARD_HEADER_COPY_TEST_ID,
@@ -29,7 +29,7 @@ type Story = StoryObj<typeof CharacterListCard>
 
 export const Default: Story = {
   args: {
-    card: buildCharacterCardViewModel(SAMPLE_PC, catalogIndex),
+    card: buildCharacterCardViewModel(makePcCharacter(), catalogIndex),
     detailHref: '/characters/char-sample-1',
   },
 }
@@ -37,7 +37,7 @@ export const Default: Story = {
 export const WithCampaign: Story = {
   args: {
     card: {
-      ...buildCharacterCardViewModel(SAMPLE_PC, catalogIndex),
+      ...buildCharacterCardViewModel(makePcCharacter(), catalogIndex),
       campaign: { id: 'camp-1', name: 'The Argent Road' },
     },
     detailHref: '/campaigns/camp-1/characters/char-sample-1',
@@ -47,7 +47,7 @@ export const WithCampaign: Story = {
 export const CampaignRoster: Story = {
   args: {
     card: {
-      ...buildCharacterCardViewModel(SAMPLE_PC, catalogIndex),
+      ...buildCharacterCardViewModel(makePcCharacter(), catalogIndex),
       campaign: { id: 'camp-1', name: 'The Argent Road' },
     },
     detailHref: '/campaigns/camp-1/characters/char-sample-1',
@@ -59,7 +59,7 @@ export const CampaignRoster: Story = {
 
 export const Unassigned: Story = {
   args: {
-    card: buildCharacterCardViewModel(SAMPLE_PC, catalogIndex),
+    card: buildCharacterCardViewModel(makePcCharacter(), catalogIndex),
     detailHref: '/campaigns/camp-1/characters/char-sample-1',
     showCampaign: false,
     controllerLine: CHARACTER_CONTROLLER_DISPLAY.noPlayerAssigned,
@@ -69,7 +69,7 @@ export const Unassigned: Story = {
 
 export const PlayedByYou: Story = {
   args: {
-    card: buildCharacterCardViewModel(SAMPLE_PC, catalogIndex),
+    card: buildCharacterCardViewModel(makePcCharacter(), catalogIndex),
     detailHref: '/campaigns/camp-1/characters/char-sample-1',
     showCampaign: false,
     controllerLine: CHARACTER_CONTROLLER_DISPLAY.playedByYou,
@@ -78,7 +78,7 @@ export const PlayedByYou: Story = {
 }
 
 const densityComparisonCard = {
-  ...buildCharacterCardViewModel(SAMPLE_PC, catalogIndex),
+  ...buildCharacterCardViewModel(makePcCharacter(), catalogIndex),
   campaign: { id: 'camp-1', name: 'The Argent Road' },
 }
 

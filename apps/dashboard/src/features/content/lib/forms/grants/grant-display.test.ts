@@ -103,7 +103,7 @@ describe('buildGrantSummaryModel', () => {
       kind: 'sense',
       supported: true,
       sourceGrantKind: 'sense',
-      label: 'Darkvision 120 ft',
+      label: 'Darkvision 120 ft.',
     })
     expect(model.flatItems[1]).toMatchObject({
       kind: 'cantrip',
@@ -321,19 +321,37 @@ describe('buildGrantSummaryModel', () => {
     ])
   })
 
-  it('marks unrecognized grant kinds separately from notRenderedYet', () => {
-    const model = buildGrantSummaryModel(
-      [{ grants: [{ kind: 'futureGrant' } as never] }],
-      vocabulary,
-    )
+  it('counts an explicitly hidden language choice without rendering a benefit row', () => {
+    const groups: GrantGroup[] = [
+      {
+        grants: [
+          { id: 'language-choice', kind: 'languageChoice', choose: 1, categories: ['standard'] },
+        ],
+      },
+    ]
+    const model = buildGrantSummaryModel(groups, vocabulary)
 
     expect(model.flatItems[0]).toMatchObject({
-      kind: 'unrecognized',
+      kind: 'notRenderedYet',
       supported: false,
-      sourceGrantKind: 'futureGrant',
-      label: '',
+      sourceGrantKind: 'languageChoice',
     })
+    expect(formatGrantSummaryInline(model)).toBe('1 benefit')
   })
+
+  it.each(['futureGrant', 'toString'])(
+    'marks unrecognized kind %s separately from hidden grants',
+    (kind) => {
+      const model = buildGrantSummaryModel([{ grants: [{ kind } as never] }], vocabulary)
+
+      expect(model.flatItems[0]).toMatchObject({
+        kind: 'unrecognized',
+        supported: false,
+        sourceGrantKind: kind,
+        label: '',
+      })
+    },
+  )
 })
 
 describe('formatGrantSummaryInline', () => {
@@ -341,7 +359,7 @@ describe('formatGrantSummaryInline', () => {
     const model = buildGrantSummaryModel(getCatalogDrowHeritageGrantGroups(), vocabulary)
 
     expect(formatGrantSummaryInline(model)).toBe(
-      ['Darkvision 120 ft', 'Dancing Lights', 'Faerie Fire', 'Darkness'].join(GRANT_SUMMARY_JOIN),
+      ['Darkvision 120 ft.', 'Dancing Lights', 'Faerie Fire', 'Darkness'].join(GRANT_SUMMARY_JOIN),
     )
   })
 
@@ -349,7 +367,7 @@ describe('formatGrantSummaryInline', () => {
     const model = buildGrantSummaryModel(getCatalogDrowHeritageGrantGroups(), vocabulary)
 
     expect(formatGrantSummaryInline(model, { includeTypeSuffix: true })).toBe(
-      ['Darkvision 120 ft', 'Dancing Lights cantrip', 'Faerie Fire spell', 'Darkness spell'].join(
+      ['Darkvision 120 ft.', 'Dancing Lights cantrip', 'Faerie Fire spell', 'Darkness spell'].join(
         GRANT_SUMMARY_JOIN,
       ),
     )
@@ -359,7 +377,7 @@ describe('formatGrantSummaryInline', () => {
     const model = buildGrantSummaryModel(getCatalogDrowHeritageGrantGroups(), vocabulary)
 
     expect(formatGrantSummaryInline(model, { maxItems: 2 })).toBe(
-      `Darkvision 120 ft${GRANT_SUMMARY_JOIN}Dancing Lights${GRANT_SUMMARY_JOIN}+2 more`,
+      `Darkvision 120 ft.${GRANT_SUMMARY_JOIN}Dancing Lights${GRANT_SUMMARY_JOIN}+2 more`,
     )
   })
 
@@ -377,7 +395,7 @@ describe('formatGrantSummaryInline', () => {
     )
 
     expect(formatGrantSummaryInline(model)).toBe(
-      `Darkvision 120 ft${GRANT_SUMMARY_JOIN}1 more benefit`,
+      `Darkvision 120 ft.${GRANT_SUMMARY_JOIN}1 more benefit`,
     )
   })
 })
@@ -431,7 +449,7 @@ describe('formatGrantSummaryByLevel', () => {
     expect(formatGrantSummaryByLevel(model)).toEqual([
       {
         label: 'L1',
-        text: `Darkvision 120 ft${GRANT_SUMMARY_JOIN}Walk speed +5 ft${GRANT_SUMMARY_JOIN}Acid resistance${GRANT_SUMMARY_JOIN}Elvish language${GRANT_SUMMARY_JOIN}1 more benefit`,
+        text: `Darkvision 120 ft.${GRANT_SUMMARY_JOIN}Walk speed +5 ft${GRANT_SUMMARY_JOIN}Acid resistance${GRANT_SUMMARY_JOIN}Elvish language${GRANT_SUMMARY_JOIN}1 more benefit`,
       },
     ])
   })
@@ -463,7 +481,7 @@ describe('formatGrantSummaryByLevel', () => {
     expect(formatGrantSummaryByLevel(model)).toEqual([
       {
         label: 'L1',
-        text: `Darkvision 120 ft${GRANT_SUMMARY_JOIN}Walk speed +5 ft`,
+        text: `Darkvision 120 ft.${GRANT_SUMMARY_JOIN}Walk speed +5 ft`,
       },
     ])
   })
@@ -484,7 +502,7 @@ describe('formatGrantSummaryByLevel', () => {
     expect(formatGrantSummaryByLevel(model, { exposeUnsupportedGrants: true })).toEqual([
       {
         label: 'L1',
-        text: `Darkvision 120 ft${GRANT_SUMMARY_JOIN}Unsupported grant: featChoice`,
+        text: `Darkvision 120 ft.${GRANT_SUMMARY_JOIN}Unsupported grant: featChoice`,
       },
     ])
   })
@@ -502,6 +520,8 @@ describe('buildSpellGrantVocabulary', () => {
     ])
 
     expect(resolveSpell('ruleset:dancing-lights')).toEqual({ name: 'Dancing Lights', level: 0 })
-    expect(resolveSpell('missing')).toBeUndefined()
+    expect(resolveSpell('missing')).toEqual({
+      name: 'Spell reference unavailable',
+    })
   })
 })

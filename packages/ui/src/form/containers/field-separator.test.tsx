@@ -26,7 +26,6 @@ const fields: FormItem[] = [
     },
     dependents: {
       chrome: 'panel',
-      panel: { surface: { emphasis: 'subtle' } },
       fields: [
         {
           type: 'select',

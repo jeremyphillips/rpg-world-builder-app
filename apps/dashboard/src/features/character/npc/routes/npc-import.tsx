@@ -4,7 +4,7 @@ import { ButtonLink, Heading } from '@rpg/ui'
 import { ROUTES } from '@/app/routes'
 import { PageShell } from '@/components/layout/page/page-shell'
 import { PageLoadState } from '@/components/layout/page/page-load-state'
-import { useCampaignBuildContext } from '@/features/character'
+import { useCampaignNpcBuildContext } from '@/features/character'
 import { NpcAuthoringGate } from '@/features/character'
 
 import { CharacterImportForm } from '@/features/character-import'
@@ -17,7 +17,8 @@ import {
 export function NpcImportRoute() {
   const navigate = useNavigate()
   const { campaignId = '' } = useParams<{ campaignId: string }>()
-  const { catalogIndex, context, isPending, isError, error } = useCampaignBuildContext(campaignId)
+  const { catalogIndex, context, isPending, isError, error } =
+    useCampaignNpcBuildContext(campaignId)
 
   const saveTarget: CharacterImportSaveTarget | null =
     catalogIndex && context

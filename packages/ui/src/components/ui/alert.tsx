@@ -41,6 +41,7 @@ function resolveAnnouncementRole(
  * Non-blocking status surface for contextual guidance. Variants map to global
  * status tokens (`info`, `success`, `warning`, `destructive`, or `default`).
  */
+// fallow-ignore-next-line complexity — optional title/description/children slots are intentional anatomy
 export function Alert({
   variant = 'default',
   density = 'comfortable',
@@ -76,7 +77,11 @@ export function Alert({
                 {description}
               </p>
             ) : null}
-            {children}
+            {children && title == null && description == null ? (
+              <p className="ui-alert__description ui-copy-supporting">{children}</p>
+            ) : children != null ? (
+              children
+            ) : null}
           </div>
         ) : null}
         {actions ? (

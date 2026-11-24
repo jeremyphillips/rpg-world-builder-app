@@ -7,8 +7,8 @@ import { npcCharacterSchema } from '../character/sheet'
 import { campaignCharacterParticipationSchema } from '../../campaign/character/participation'
 import { characterRosterStateSchema } from '../../campaign/character/roster-state'
 import {
-  campaignNpcStatusPatchSchema,
-  type CampaignNpcStatusPatch,
+  campaignParticipatingCharacterStatusPatchSchema,
+  type CampaignParticipatingCharacterStatusPatch,
 } from '../../campaign/character/participating-character-status-patch'
 
 // ---------------------------------------------------------------------------
@@ -44,4 +44,7 @@ export const campaignNpcDetailSchema = z.object({
 
 export type CampaignNpcDetail = z.infer<typeof campaignNpcDetailSchema>
 
-export { campaignNpcStatusPatchSchema, type CampaignNpcStatusPatch }
+export {
+  campaignParticipatingCharacterStatusPatchSchema,
+  type CampaignParticipatingCharacterStatusPatch,
+}

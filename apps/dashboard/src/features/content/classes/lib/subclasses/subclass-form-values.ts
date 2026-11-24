@@ -6,7 +6,14 @@ import {
 } from '../../../lib/forms/registry/content-form-key-helpers'
 import type { ContentFormInputCtx } from '../../../lib/forms/registry/content-form-registry'
 import { featureToFormRow, subclassFeaturesFromFormValues } from '../class-feature-form-fields'
-import { subclassFormSchema, type SubclassFormValues } from './subclass-form-fields'
+import { createSubclassFormSchema, type SubclassFormValues } from './subclass-form-fields'
+
+let cachedSubclassFormSchema: ReturnType<typeof createSubclassFormSchema> | undefined
+
+function subclassFormSchema() {
+  cachedSubclassFormSchema ??= createSubclassFormSchema()
+  return cachedSubclassFormSchema
+}
 
 export function subclassCreateDefaultValues(defaultFeatureLevel?: number): SubclassFormValues {
   return {
@@ -19,7 +26,9 @@ export function subclassCreateDefaultValues(defaultFeatureLevel?: number): Subcl
 }
 
 export const subclassFormDef = {
-  schema: subclassFormSchema,
+  get schema() {
+    return subclassFormSchema()
+  },
 
   toFormValues: (entity: Subclass): SubclassFormValues => ({
     name: entity.name,

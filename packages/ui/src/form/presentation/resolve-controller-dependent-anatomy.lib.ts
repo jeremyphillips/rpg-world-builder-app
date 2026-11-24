@@ -6,7 +6,6 @@ import {
 import { mapFormLabelPositionToLayout } from '../../components/ui/field-row-presentation.lib'
 import type { FieldLabelLayout } from '../../components/ui/field-row-presentation.lib'
 import type { FieldConfig } from '../field-config'
-import type { FieldLabelPosition } from '../../components/ui/field.variants'
 import type { SwitchFieldConfig } from '../field-config'
 
 /** Internal classification for dependent nest horizontal alignment. */
@@ -21,29 +20,25 @@ function resolveSwitchLabelLayout(controller: SwitchFieldConfig): FieldLabelLayo
   return mapFormLabelPositionToLayout(labelPosition)
 }
 
-function resolveStackedLabelLayout(labelPosition?: FieldLabelPosition): FieldLabelLayout {
-  return mapFormLabelPositionToLayout(labelPosition ?? 'above')
-}
+const CONTROLLER_TYPES_WITH_OPTIONAL_LABEL_POSITION = new Set<FieldConfig['type']>([
+  'select',
+  'text',
+  'number',
+  'textarea',
+  'richtext',
+  'markdown',
+  'json',
+])
 
 function resolveControllerLabelLayout(controller: FieldConfig): FieldLabelLayout {
-  switch (controller.type) {
-    case 'switch':
-      return resolveSwitchLabelLayout(controller)
-    case 'checkbox':
-    case 'boolean':
-      return 'inline'
-    case 'select':
-      return resolveStackedLabelLayout(controller.labelPosition)
-    case 'text':
-    case 'number':
-    case 'textarea':
-    case 'richtext':
-    case 'markdown':
-    case 'json':
-      return resolveStackedLabelLayout(controller.labelPosition)
-    default:
-      return 'stacked'
+  if (controller.type === 'switch') return resolveSwitchLabelLayout(controller)
+  if (controller.type === 'checkbox' || controller.type === 'boolean') return 'inline'
+  if (CONTROLLER_TYPES_WITH_OPTIONAL_LABEL_POSITION.has(controller.type)) {
+    return mapFormLabelPositionToLayout(
+      'labelPosition' in controller ? controller.labelPosition : undefined,
+    )
   }
+  return 'stacked'
 }
 
 /**

@@ -1,7 +1,6 @@
 import type { CharacterClass } from '../../../../content/classes/class'
 import { isSpellcastingActiveAtLevel } from '../../../../content/classes/spellcasting/class-spellcasting-ownership'
 import { getEquipmentSpellcastingGearKind } from '../../../../content/equipment/adventuring-gear-variant'
-import type { SpellcastingFocusGearKind } from '../../../../content/equipment/instance/modifier'
 import {
   isWealthOnlyStartingEquipmentOption,
   startingEquipmentGrantEquipmentSlug,
@@ -11,6 +10,11 @@ import {
   isSpellcastingFocusGearKind,
   type SpellcastingGearKind,
 } from '../../../../vocab/equipment/spellcasting-gear-kind'
+import {
+  isClassSpellcastingFocusKind,
+  isSpellcastingGearFocusKind,
+  type ClassSpellcastingFocusKind,
+} from '../../../../vocab/spell/class-spellcasting-focus-kind'
 import {
   NEUTRAL_EQUIPMENT_RECOMMENDATION,
   type EquipmentRecommendationRule,
@@ -114,24 +118,60 @@ function resolveFocusInferenceIds(
 }
 
 /** Authored `spellcasting.focusKinds` wins; otherwise infer from focus gear in starting packages. */
-function resolveFocusKinds(
+export function resolveFocusKinds(
   characterClass: CharacterClass,
   catalogIndex: CharacterBuildCatalogIndex,
   startingEquipmentIds: readonly string[],
-): SpellcastingFocusGearKind[] {
+): ClassSpellcastingFocusKind[] {
   const authored = characterClass.spellcasting?.focusKinds
   if (authored !== undefined) return [...authored]
 
-  const inferred = new Set<SpellcastingFocusGearKind>()
+  const inferred = new Set<ClassSpellcastingFocusKind>()
   for (const equipmentId of startingEquipmentIds) {
     const equipment = catalogIndex.equipment.get(equipmentId)
     if (equipment?.kind !== 'adventuring_gear') continue
     const spellcastingGearKind = getEquipmentSpellcastingGearKind(equipment)
-    if (spellcastingGearKind !== undefined && isSpellcastingFocusGearKind(spellcastingGearKind)) {
+    if (
+      spellcastingGearKind !== undefined &&
+      isSpellcastingFocusGearKind(spellcastingGearKind) &&
+      isClassSpellcastingFocusKind(spellcastingGearKind)
+    ) {
       inferred.add(spellcastingGearKind)
     }
   }
   return [...inferred]
+}
+
+function equipmentMatchesClassFocusKind(
+  catalogIndex: CharacterBuildCatalogIndex,
+  focusKind: ClassSpellcastingFocusKind,
+): string[] {
+  if (focusKind === 'musical_instrument') {
+    return [...catalogIndex.equipment.values()]
+      .filter(
+        (equipment) => equipment.kind === 'tool' && equipment.toolCategory === 'musical_instrument',
+      )
+      .map((equipment) => equipment.id)
+  }
+
+  if (focusKind === 'spellbook') {
+    return [...catalogIndex.equipment.values()]
+      .filter((equipment) => {
+        if (equipment.kind !== 'adventuring_gear') return false
+        return getEquipmentSpellcastingGearKind(equipment) === 'spellbook'
+      })
+      .map((equipment) => equipment.id)
+  }
+
+  if (!isSpellcastingGearFocusKind(focusKind)) return []
+
+  return [...catalogIndex.equipment.values()]
+    .filter((equipment) => {
+      if (equipment.kind !== 'adventuring_gear') return false
+      const spellcastingGearKind = getEquipmentSpellcastingGearKind(equipment)
+      return spellcastingGearKind === focusKind
+    })
+    .map((equipment) => equipment.id)
 }
 
 function applyAuthoredRules(args: {
@@ -257,14 +297,15 @@ function applySpellcastingFocusContributions(args: {
     ? 'essential'
     : 'strong'
 
-  const matches = [...catalogIndex.equipment.values()].filter((equipment) => {
-    if (equipment.kind !== 'adventuring_gear') return false
-    const spellcastingGearKind = getEquipmentSpellcastingGearKind(equipment)
-    return (
-      spellcastingGearKind !== undefined &&
-      (focusKinds as readonly string[]).includes(spellcastingGearKind)
-    )
-  })
+  const matchIds = new Set<string>()
+  for (const focusKind of focusKinds) {
+    for (const equipmentId of equipmentMatchesClassFocusKind(catalogIndex, focusKind)) {
+      matchIds.add(equipmentId)
+    }
+  }
+  const matches = [...matchIds]
+    .map((equipmentId) => catalogIndex.equipment.get(equipmentId))
+    .filter((equipment): equipment is NonNullable<typeof equipment> => equipment !== undefined)
   const specificity = specificityForMatchCount(matches.length)
   const satisfied = matches.some((equipment) => ownedIds.has(equipment.id))
 

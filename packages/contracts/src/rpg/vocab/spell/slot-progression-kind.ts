@@ -1,3 +1,4 @@
+import { keysFromEntries } from '../enum-schema'
 import type { GameTermEntry, VocabularyTerm } from '../types'
 
 // ---------------------------------------------------------------------------
@@ -27,18 +28,17 @@ export const SLOT_PROGRESSION_KIND_ENTRIES = {
   },
   'pact-magic': {
     label: 'Pact Magic',
-    description:
-      'Uses a small number of same-level spell slots that refresh after a Short or Long Rest.',
+    description: 'Uses a small number of spell slots that are always the same level.',
   },
 } as const satisfies Record<string, GameTermEntry>
 
 export type SlotProgressionKindId = keyof typeof SLOT_PROGRESSION_KIND_ENTRIES
 
-export const SLOT_PROGRESSION_KIND_IDS = [
-  'full-caster',
-  'half-caster',
-  'pact-magic',
-] as const satisfies readonly SlotProgressionKindId[]
+/** Standard ruleset id for Pact Magic slot progression (and the class granting feature id). */
+export const PACT_MAGIC_SLOT_PROGRESSION_KIND_ID =
+  'pact-magic' as const satisfies SlotProgressionKindId
+
+export const SLOT_PROGRESSION_KIND_IDS = keysFromEntries(SLOT_PROGRESSION_KIND_ENTRIES)
 
 export function isSlotProgressionKindId(id: string): id is SlotProgressionKindId {
   return (SLOT_PROGRESSION_KIND_IDS as readonly string[]).includes(id)
@@ -51,4 +51,18 @@ export function getSlotProgressionKindEntry(id: string): GameTermEntry | undefin
 
 export function getSlotProgressionKindLabel(id: string): string {
   return getSlotProgressionKindEntry(id)?.label ?? id
+}
+
+/** Class feature label for the standard leveled spellcasting progression row. */
+export const SPELLCASTING_CLASS_FEATURE_LABEL = 'Spellcasting' as const
+
+export type SpellcastingFeatureLabelProgression = { kind: 'leveled' | 'pact' }
+
+/** Feature-table label derived from slot progression kind. */
+export function spellcastingFeatureLabelForSlotProgression(
+  progression: SpellcastingFeatureLabelProgression,
+): string {
+  return progression.kind === 'pact'
+    ? getSlotProgressionKindLabel(PACT_MAGIC_SLOT_PROGRESSION_KIND_ID)
+    : SPELLCASTING_CLASS_FEATURE_LABEL
 }

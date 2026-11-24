@@ -60,7 +60,7 @@ export const spellsStepWizardClass = makeClassStored({
       id: 'spellcasting',
       name: 'Spellcasting',
       level: 1,
-      grantGroups: [{ grants: [{ id: 'spellcasting-1', kind: 'spellcasting' }] }],
+      grantGroups: [],
     },
   ],
   spellcasting: {
@@ -122,8 +122,7 @@ export function createSpellsStepContextFixture(
     channel: 'build',
     surface: 'dashboard',
     characterKind: 'pc',
-    mode: 'dashboard',
-    scope: { type: 'standalone', rulesetId },
+
     rulesScope: { type: 'ruleset', rulesetId },
     ownershipTarget: { type: 'user' },
     rulesetId,

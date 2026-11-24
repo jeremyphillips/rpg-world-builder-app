@@ -11,15 +11,30 @@ Species, class, and feat traits: [content-types.md](../../../../../../../docs/co
 
 ## What is here
 
-| Module                                                                     | Role                                                             |
-| -------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| [`creature-trait-template-fields.ts`](./creature-trait-template-fields.ts) | Config and display-override fields for a `kind: 'template'` row  |
-| [`creature-trait-add-menu.tsx`](./creature-trait-add-menu.tsx)             | Add menu for template and custom trait rows                      |
-| [`outside-water-breath-toggle.tsx`](./outside-water-breath-toggle.tsx)     | Controlled hold-breath-outside-water checkbox (preset parameter) |
-| [`outside-water-breath.lib.ts`](./outside-water-breath.lib.ts)             | Duration-present predicate for those optional fields             |
+| Module                                                                                       | Role                                                             |
+| -------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| [`creature-trait-template-field-assembler.ts`](./creature-trait-template-field-assembler.ts) | Registry contributions + host-specific config fields + `details` |
+| [`creature-trait-template-fields.ts`](./creature-trait-template-fields.ts)                   | Species template field groups wired through the assembler        |
+| [`creature-trait-add-menu.tsx`](./creature-trait-add-menu.tsx)                               | Add menu for template and custom trait rows                      |
+| [`outside-water-breath-toggle.tsx`](./outside-water-breath-toggle.tsx)                       | Controlled hold-breath-outside-water checkbox (preset parameter) |
+| [`outside-water-breath.lib.ts`](./outside-water-breath.lib.ts)                               | Duration-present predicate for those optional fields             |
 
-Monster and species template rows both use the template fields. The add menu
-lists template ids from the contract registry.
+Monster and species template rows both use the assembler. Form modules must not
+import `resolveTraitFacingParts` or `formatLegendaryResistanceStatBlockTitle` (ESLint
+guards + `src/test/trait-eslint-guard.test.ts`). A module outside the form-field glob
+can still hand-build `FormItem[]` literals — that bypass is residual.
+
+Each host’s add menu calls `listCreatureTraitTemplatesForRuleset(rulesetId, host)`.
+Registry entries declare eligible hosts. The dashboard field matrix requires a
+configurable, fieldless, or unsupported policy for every registered template
+and host. Configurable entries supply at least one field. The assembler checks
+bound control paths against the registered config schema and appends Details
+once for eligible hosts.
+
+Species sense templates use a fixed feet label and store the range in
+`config.range`. Monsters author their senses under Creature Details. Legendary
+Resistance exposes normal uses on both hosts and adds in-lair uses when the
+monster’s lair is enabled.
 
 ## What is not here
 

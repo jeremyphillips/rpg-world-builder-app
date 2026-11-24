@@ -6,7 +6,6 @@ import {
   MONSTER_CLASSIFICATION_DISABLED,
   MONSTER_CLASSIFICATION_DRAFT,
   type Monster,
-  type SystemRulesetId,
 } from '@rpg/contracts'
 
 import { useRulesetPatch } from '@/features/homebrew'
@@ -77,14 +76,19 @@ export function MonsterDetailContent({
   const spellsQuery = useSpells(campaignId)
   const rulesetQuery = useRulesetPatch(campaignId)
   const rulesetPatch = rulesetQuery.data
-  const rulesetId = (monster.rulesetId ?? 'srd-cc-5.2.1') as SystemRulesetId
   const magicPropertyProvider = useMemo(
-    () => createMagicPropertyDefinitionProvider(rulesetId),
-    [rulesetId],
+    () => createMagicPropertyDefinitionProvider(monster.rulesetId),
+    [monster.rulesetId],
   )
   const armorClassRules = rulesetPatch?.mechanics.armorClass
   const equipment = equipmentQuery.data
   const skillProficiencies = skillsQuery.data
+
+  const equipmentCatalogState = equipmentQuery.isPending
+    ? 'pending'
+    : equipmentQuery.isLoadingError
+      ? 'error'
+      : 'ready'
 
   const catalogState: MonsterCatalogLoadState = useMemo(() => {
     if (equipmentQuery.isPending || skillsQuery.isPending || rulesetQuery.isPending)
@@ -140,6 +144,7 @@ export function MonsterDetailContent({
         },
         equipmentById,
         catalogState: derived === null && catalogState === 'ready' ? 'error' : catalogState,
+        equipmentCatalogState,
         derived,
         spellsById: new Map((spellsQuery.data ?? []).map((spell) => [spell.id, spell])),
         spellCatalogStatus: spellsQuery.isError
@@ -156,6 +161,7 @@ export function MonsterDetailContent({
       classesQuery.data,
       derived,
       equipmentById,
+      equipmentCatalogState,
       monster,
       spellsQuery.data,
       magicPropertyProvider,

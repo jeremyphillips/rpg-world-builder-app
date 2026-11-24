@@ -9,7 +9,6 @@ export const MONSTER_SPELLCASTING_ACTION_NAME = 'Spellcasting'
 export const PRIMARY_SPELLCASTING_PROFILE = 'primary' as const
 
 export const PRIMARY_SPELLCASTING_SECTION_MESSAGE = 'Spellcasting belongs in Actions.'
-export const PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE = 'Only one Spellcasting profile is allowed.'
 export const PRIMARY_SPELLCASTING_NAME_MESSAGE = 'Spellcasting is the name of the primary profile.'
 
 export function isPrimarySpellcastingAction(

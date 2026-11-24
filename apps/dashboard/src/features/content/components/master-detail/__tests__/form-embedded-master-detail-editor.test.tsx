@@ -196,6 +196,9 @@ describe('FormEmbeddedMasterDetailEditor', () => {
           addLabel="Add trait"
           idPrefix="species-trait"
           rowTitle={{ strategy: 'authored', field: 'name' }}
+          resolveFieldSections={() => ({
+            primary: [{ type: 'text', name: 'name', label: 'Name' }],
+          })}
         />
       </TestFormShell>,
     )
@@ -203,9 +206,10 @@ describe('FormEmbeddedMasterDetailEditor', () => {
     await user.click(screen.getByRole('button', { name: /Add trait/i }))
 
     await waitFor(() => {
-      expect(screen.getByTestId('detail-traits-0')).toBeInTheDocument()
+      expect(screen.getByRole('textbox', { name: 'Name' })).toBeInTheDocument()
     })
     expect(screen.getAllByLabelText('Name')).toHaveLength(1)
+    expect(screen.queryByTestId('detail-traits-0')).not.toBeInTheDocument()
     expect(screen.getAllByText('Unnamed Trait').length).toBeGreaterThan(0)
   })
 })

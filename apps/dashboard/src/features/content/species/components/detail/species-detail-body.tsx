@@ -81,7 +81,7 @@ export type SpeciesDetailBodyProps = {
   displayFallback?: ContentDisplayFallback
   imageName: string
   viewModel: SpeciesDetailViewModel
-  campaignId: string
+  campaignId?: string
   editHref?: string
   children?: ReactNode
 }

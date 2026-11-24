@@ -38,7 +38,8 @@ function expectBardSpellcastingRoundTrip(): void {
   const fromInput = input.spellcasting!
   const spellcastingFeature = formValues.features.find((row) => row.id === 'spellcasting')
 
-  expect(spellcastingFeature?.description).toContain('cast spells through your bardic arts')
+  expect(spellcastingFeature?.intro).toContain('cast spells through your bardic arts')
+  expect(spellcastingFeature?.description).toBeUndefined()
   expect(spellcastingFeature?.level).toBe(1)
   expect(formValues.spellSelectionModel).toBe(expected.spellSelection?.model)
   expect(fromInput.recommendations).toEqual(expected.recommendations)
@@ -143,7 +144,8 @@ describe('classFormDef round-trips', () => {
     const formValues = classFormDef.toFormValues(bard) as ClassFormValues
     const input = classFormDef.toInput(formValues)
     const wordsOfCreation = input.features.find((f) => f.id === 'words-of-creation')
-    const spellGrant = wordsOfCreation?.grantGroups?.[0]?.grants?.[0]
+    const spellGrant =
+      wordsOfCreation?.kind === 'custom' ? wordsOfCreation.grantGroups?.[0]?.grants?.[0] : undefined
     expect(spellGrant?.kind).toBe('spells')
     if (spellGrant?.kind === 'spells') {
       expect(spellGrant.spellIds).toEqual([
@@ -459,9 +461,7 @@ describe('classFormDef round-trips', () => {
     expect(input).not.toHaveProperty('asiLevels')
 
     // Fighter has ASI at 4, 8, 12, 16 (and 6, 14 extra fighter ASIs)
-    const asiInInput = input.features.filter((f) =>
-      f.grantGroups?.[0]?.grants.some((g) => g.kind === 'featChoice'),
-    )
+    const asiInInput = input.features.filter((f) => f.kind === 'asi')
     expect(asiInInput.length).toBeGreaterThanOrEqual(4)
     expect(input.features.map((feature) => feature.id)).toContain('fighter-subclass')
   })

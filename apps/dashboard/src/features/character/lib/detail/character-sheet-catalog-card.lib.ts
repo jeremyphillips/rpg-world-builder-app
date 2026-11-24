@@ -49,11 +49,13 @@ export type CatalogHeaderModelBase<TTone extends string = string> = {
   unavailableMessage?: string
 }
 
+import { SPELL_REFERENCE_DISPLAY_MESSAGES } from '@rpg/contracts'
+
 import { EQUIPMENT_CATALOG_REFERENCE_UNAVAILABLE_MESSAGE } from '@/lib/equipment/equipment-catalog-reference-status.lib'
 
 export const CHARACTER_SHEET_CATALOG_UNAVAILABLE_MESSAGES = {
   equipment: EQUIPMENT_CATALOG_REFERENCE_UNAVAILABLE_MESSAGE,
-  spell: 'Spell reference unavailable',
+  spell: SPELL_REFERENCE_DISPLAY_MESSAGES.unknownSpell,
 } as const
 
 export type CharacterSheetCatalogContentKind =

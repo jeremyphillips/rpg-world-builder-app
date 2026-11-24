@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { createClassInputSchema } from '../class'
 import {
-  isClassSpellcastingGrantingFeature,
+  isSpellcastingClassFeature,
   resolveClassSpellcastingFeature,
 } from './class-spellcasting-ownership'
 
@@ -18,87 +18,66 @@ const minimalClassBody = {
   },
   features: [
     {
-      kind: 'custom' as const,
+      kind: 'spellcasting' as const,
       id: 'spellcasting',
       name: 'Spellcasting',
       level: 1,
-      grantGroups: [{ grants: [{ id: 'spellcasting-1', kind: 'spellcasting' as const }] }],
     },
   ],
 }
 
+const fullCasterSpellcasting = {
+  slotProgressionId: 'full-caster',
+  ability: 'int',
+  spellSelection: {
+    model: 'limitedRepertoire' as const,
+    change: { kind: 'replace' as const, trigger: 'levelUp' as const, limit: 1 },
+  },
+  progression: {
+    repertoire: { curve: { rows: [{ level: 1, count: 4 }] } },
+  },
+}
+
 describe('class spellcasting publish invariants', () => {
-  it('accepts config with exactly one dedicated granting feature', () => {
+  it('accepts config with exactly one spellcasting feature', () => {
     expect(
       createClassInputSchema.safeParse({
         slug: 'test-caster',
         ...minimalClassBody,
-        spellcasting: {
-          slotProgressionId: 'full-caster',
-          ability: 'int',
-          spellSelection: {
-            model: 'limitedRepertoire',
-            change: { kind: 'replace', trigger: 'levelUp', limit: 1 },
-          },
-          progression: {
-            repertoire: { curve: { rows: [{ level: 1, count: 4 }] } },
-          },
-        },
+        spellcasting: fullCasterSpellcasting,
       }).success,
     ).toBe(true)
   })
 
-  it('rejects config without a granting feature', () => {
+  it('rejects config without a spellcasting feature', () => {
     expect(
       createClassInputSchema.safeParse({
         slug: 'test-caster',
         ...minimalClassBody,
         features: [],
-        spellcasting: {
-          slotProgressionId: 'full-caster',
-          ability: 'int',
-          spellSelection: {
-            model: 'limitedRepertoire',
-            change: { kind: 'replace', trigger: 'levelUp', limit: 1 },
-          },
-          progression: {
-            repertoire: { curve: { rows: [{ level: 1, count: 4 }] } },
-          },
-        },
+        spellcasting: fullCasterSpellcasting,
+      }).success,
+    ).toBe(false)
+  })
+
+  it('rejects a spellcasting feature without config', () => {
+    expect(
+      createClassInputSchema.safeParse({
+        slug: 'test-caster',
+        ...minimalClassBody,
       }).success,
     ).toBe(false)
   })
 })
 
-describe('isClassSpellcastingGrantingFeature', () => {
-  it('recognizes dedicated managed features', () => {
-    expect(isClassSpellcastingGrantingFeature(minimalClassBody.features[0]!)).toBe(true)
-  })
-
-  it('rejects sibling grants', () => {
-    expect(
-      isClassSpellcastingGrantingFeature({
-        grantGroups: [
-          {
-            grants: [
-              { id: 'spellcasting-2', kind: 'spellcasting' },
-              { id: 'languages-3', kind: 'languages', languageIds: ['common'] },
-            ],
-          },
-        ],
-      }),
-    ).toBe(false)
+describe('isSpellcastingClassFeature', () => {
+  it('recognizes spellcasting kind', () => {
+    expect(isSpellcastingClassFeature(minimalClassBody.features[0]!)).toBe(true)
   })
 })
 
 describe('resolveClassSpellcastingFeature', () => {
-  it('filters unavailable features at runtime', () => {
-    const feature = resolveClassSpellcastingFeature(
-      {
-        features: [{ ...minimalClassBody.features[0]!, available: false }],
-      },
-      { runtime: true },
-    )
-    expect(feature).toBeUndefined()
+  it('returns the spellcasting feature row', () => {
+    expect(resolveClassSpellcastingFeature(minimalClassBody)?.id).toBe('spellcasting')
   })
 })

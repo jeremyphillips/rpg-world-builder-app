@@ -73,6 +73,3 @@ export function quickNpcMemberSetupWithChosenTitle(
     ...overrides,
   })
 }
-
-/** @deprecated Use {@link quickNpcMemberSetupWithChosenTitle}. */
-export const quickNpcMemberSetupWithNoTitle = quickNpcMemberSetupWithChosenTitle

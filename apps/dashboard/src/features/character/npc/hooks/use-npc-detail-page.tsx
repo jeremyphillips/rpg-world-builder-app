@@ -20,6 +20,7 @@ import { useNpc } from './use-npcs'
 const REFERENCE_CATALOG_SCOPE = { scope: 'reference' } as const
 
 function buildNpcDetailViewModel(input: {
+  campaignId: string
   character: NonNullable<ReturnType<typeof useNpc>['data']>['character'] | undefined
   foundation: ReturnType<typeof useCampaignBuildFoundation>
   unavailable: ReturnType<typeof resolveCampaignDetailUnavailable>
@@ -36,6 +37,10 @@ function buildNpcDetailViewModel(input: {
     source: toCharacterDetailSource(character),
     catalogIndex: foundation.catalogIndex,
     rules: foundation.rules.characterCreationRules,
+    equipmentReferenceScope: {
+      rulesetId: foundation.rulesetId,
+      campaignId: input.campaignId,
+    },
     xpProgression: resolveCampaignXpProgressionForRules(
       foundation.rulesetId,
       foundation.rules.characterCreationRules.progression,
@@ -87,6 +92,7 @@ export function useNpcDetailPage() {
   const viewModel = useMemo(
     () =>
       buildNpcDetailViewModel({
+        campaignId,
         character,
         foundation,
         unavailable,
@@ -94,6 +100,7 @@ export function useNpcDetailPage() {
         locationReferences: locationReferencesQuery.data,
       }),
     [
+      campaignId,
       character,
       foundation,
       locationReferencesQuery.data,

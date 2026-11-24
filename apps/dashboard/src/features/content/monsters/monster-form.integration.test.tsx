@@ -1,12 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { contentFormRegistry } from '../lib/forms/registry/content-form-registry'
-import './lib/monster-form-def'
+import { monsterFormDef } from './lib/monster-form-def'
 import { buildMonsterInput, resolveMonsterCreateDefaultValues } from './lib/monster-form-values'
 
 describe('private monster form', () => {
   it('registers and round-trips traits and actions', () => {
-    expect(contentFormRegistry.monsters?.routeKey).toBe('monsters')
+    expect(monsterFormDef.routeKey).toBe('monsters')
     const values = resolveMonsterCreateDefaultValues()
     values.name = 'Scout'
     values.traits = [

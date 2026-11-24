@@ -21,7 +21,7 @@ const PROFICIENCIES_HEADING_ID = 'proficiencies-heading'
 
 type ClassProficienciesSectionProps = {
   section: ClassProficienciesViewModel
-  campaignId: string
+  campaignId?: string
   skillProficiencies: SkillProficiency[]
   skillsPending: boolean
   skillsLoadingError?: boolean
@@ -45,7 +45,7 @@ function SkillChoiceLinks({
   isPending,
   isLoadingError,
 }: {
-  campaignId: string
+  campaignId: string | undefined
   optionSlugs: string[]
   skillProficiencies: readonly SkillProficiency[]
   isPending: boolean
@@ -68,10 +68,12 @@ function SkillChoiceLinks({
 
         return (
           <li key={slug}>
-            {skill ? (
+            {skill && campaignId ? (
               <LinkBadge to={ROUTES.content.skillProficiencies.detail(campaignId, skill.id)}>
                 {skill.name}
               </LinkBadge>
+            ) : skill ? (
+              <StaticBadge>{skill.name}</StaticBadge>
             ) : (
               <StaticBadge>{slug}</StaticBadge>
             )}
@@ -98,7 +100,7 @@ function ToolChoiceLabels({
 
 function proficiencyChoiceRowData(
   row: ClassProficienciesViewModel['choices'][number],
-  campaignId: string,
+  campaignId: string | undefined,
   skillProficiencies: SkillProficiency[],
   skillsPending: boolean,
   skillsLoadingError: boolean,
@@ -177,7 +179,7 @@ function ProficiencyChoicesGroup({
   vocabulary,
 }: {
   choices: ClassProficienciesViewModel['choices']
-  campaignId: string
+  campaignId?: string
   skillProficiencies: SkillProficiency[]
   skillsPending: boolean
   skillsLoadingError: boolean

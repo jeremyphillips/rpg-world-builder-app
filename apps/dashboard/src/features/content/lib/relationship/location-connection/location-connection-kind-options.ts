@@ -39,9 +39,6 @@ export type LocationConnectionKindOption = {
 
 export const LOCATION_CONNECTION_KIND_FIELD_LABEL = 'Connection type'
 
-/** @deprecated Use LOCATION_CONNECTION_KIND_ALREADY_LINKED_REASON from drawer-intent module. */
-export const LOCATION_CONNECTION_ALREADY_LINKED_REASON = 'Already linked with this connection type.'
-
 export function buildOrganizationLocationConnectionDisabledKinds(input: {
   locationId: string
   kinds: readonly OrganizationLocationConnectionKind[]

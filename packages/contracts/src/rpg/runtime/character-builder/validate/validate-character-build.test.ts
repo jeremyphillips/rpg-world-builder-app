@@ -182,8 +182,7 @@ describe('validateCharacterBuild', () => {
     const campaignNpcContext = {
       ...builderTestContext,
       characterKind: 'npc',
-      mode: 'dashboard',
-      scope: { type: 'campaign', campaignId: 'campaign-1', rulesetId: 'srd-cc-5.2.1' },
+
       rulesScope: { type: 'campaign', campaignId: 'campaign-1', rulesetId: 'srd-cc-5.2.1' },
       ownershipTarget: { type: 'campaign', campaignId: 'campaign-1' },
       acquisition: { kind: 'campaign_npc', campaignId: 'campaign-1' },

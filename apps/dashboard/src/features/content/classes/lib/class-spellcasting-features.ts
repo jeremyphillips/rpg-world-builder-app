@@ -1,26 +1,27 @@
 import {
-  createGrantRowId,
-  getSlotProgressionKindLabel,
+  spellcastingGrantingFeatureDefaultName,
+  spellcastingGrantingFeatureId,
   type ClassBodyFeature,
+  type SlotProgression,
 } from '@rpg/contracts'
 
 export function createSpellcastingFeature(input: {
   level?: number
-  usesPactMagic: boolean
-  description?: string
+  slotProgressionId?: string
+  slotProgression?: Pick<SlotProgression, 'kind'>
+  name?: string
+  intro?: string
 }): ClassBodyFeature {
   const level = input.level ?? 1
-
-  return {
-    kind: 'custom',
-    id: input.usesPactMagic ? 'pact-magic' : 'spellcasting',
-    name: input.usesPactMagic ? getSlotProgressionKindLabel('pact-magic') : 'Spellcasting',
-    level,
-    ...(input.description ? { description: input.description } : {}),
-    grantGroups: [{ grants: [{ id: createGrantRowId(), kind: 'spellcasting' }] }],
+  const pactProgression = {
+    slotProgression: input.slotProgression,
+    slotProgressionId: input.slotProgressionId,
   }
-}
-
-export function usesPactMagicFromSlotProgression(slotProgressionId: string | undefined): boolean {
-  return slotProgressionId === 'pact-magic'
+  return {
+    kind: 'spellcasting',
+    id: spellcastingGrantingFeatureId(pactProgression),
+    name: input.name ?? spellcastingGrantingFeatureDefaultName(pactProgression),
+    level,
+    ...(input.intro ? { intro: input.intro } : {}),
+  }
 }

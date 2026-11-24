@@ -7,8 +7,7 @@ import {
 } from '@/features/content/lib/content-type-labels'
 import { ContentEditShell } from '../../lib/forms/shells/edit/content-edit-shell'
 import { useClasses } from '../hooks/use-classes'
-// Registers the class form def into the content form registry on module load.
-import '../lib/class-form-def'
+import { classFormDef } from '../lib/class-form-def'
 
 export function ClassEdit() {
   const { campaignId = '', classId = '' } = useParams<{
@@ -19,7 +18,7 @@ export function ClassEdit() {
 
   return (
     <ContentEditShell
-      contentType="classes"
+      def={classFormDef}
       campaignId={campaignId}
       entityId={classId}
       isPending={isPending}
@@ -28,7 +27,6 @@ export function ClassEdit() {
       notFoundLabel={formatContentNotFoundMessage('classes')}
       backHref={ROUTES.content.classes.detail(campaignId, classId)}
       overviewHref={ROUTES.content.classes.overview(campaignId)}
-      contentTypeKey="classes"
     />
   )
 }

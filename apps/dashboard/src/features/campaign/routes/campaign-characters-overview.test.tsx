@@ -13,20 +13,20 @@ vi.mock('../../character/hooks/use-campaign-build-context')
 import { useCampaignCharacterNavigationContext as useCampaignCharacterNavigationContextFn } from '../hooks/use-campaign-character-navigation-context'
 import { useCampaignCharacters as useCampaignCharactersFn } from '../hooks/use-campaign-characters'
 import { useCampaigns as useCampaignsFn } from '../hooks/use-campaigns'
-import { useCampaignBuildContext as useCampaignBuildContextFn } from '@/features/character'
+import { useCampaignNpcBuildContext as useCampaignNpcBuildContextFn } from '@/features/character'
 import { CampaignCharactersOverview } from './campaign-characters-overview'
 
 const useCampaignCharacterNavigationContext = vi.mocked(useCampaignCharacterNavigationContextFn)
 const useCampaignCharacters = vi.mocked(useCampaignCharactersFn)
 const useCampaigns = vi.mocked(useCampaignsFn)
-const useCampaignBuildContext = vi.mocked(useCampaignBuildContextFn)
+const useCampaignNpcBuildContext = vi.mocked(useCampaignNpcBuildContextFn)
 
 describe('CampaignCharactersOverview', () => {
   beforeEach(() => {
     useCampaignCharacterNavigationContext.mockReset()
     useCampaignCharacters.mockReset()
     useCampaigns.mockReset()
-    useCampaignBuildContext.mockReset()
+    useCampaignNpcBuildContext.mockReset()
 
     useCampaigns.mockReturnValue({
       data: [
@@ -37,12 +37,12 @@ describe('CampaignCharactersOverview', () => {
       ],
     } as unknown as ReturnType<typeof useCampaigns>)
 
-    useCampaignBuildContext.mockReturnValue({
+    useCampaignNpcBuildContext.mockReturnValue({
       catalogIndex: {},
       isPending: false,
       isError: false,
       error: undefined,
-    } as unknown as ReturnType<typeof useCampaignBuildContext>)
+    } as unknown as ReturnType<typeof useCampaignNpcBuildContext>)
 
     useCampaignCharacters.mockReturnValue({
       data: [],

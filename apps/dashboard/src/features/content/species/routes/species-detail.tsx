@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom'
-import type { Species } from '@rpg/contracts'
+import { createSpellCatalogContext, type Species } from '@rpg/contracts'
 
 import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
 import {
@@ -25,6 +25,8 @@ import {
 } from '../../lib/detail/page/content-display-image'
 import { buildSpeciesContentDisplayImageInput } from '../../lib/detail/page/content-display-image-input'
 import { ContentUsageReferencesSection } from '../../lib/usage/content-usage-references-section'
+import { useSpells } from '../../spells/hooks/use-spells'
+import { buildSpellGrantVocabularyFromCatalog } from '../../lib/forms/grants/grant-display'
 import { SpeciesDetailBody } from '../components/detail/species-detail-body'
 
 type SpeciesDetailContentProps = { species: Species; campaignId: string }
@@ -36,11 +38,17 @@ export function SpeciesDetailContent({ species, campaignId }: SpeciesDetailConte
   const { vocabulary: senseVocabulary } = useSenseVocabulary(campaignId)
   const { vocabulary: languageVocabulary } = useLanguageVocabulary(campaignId)
 
+  const spells = useSpells(campaignId)
+  const spellCatalog = createSpellCatalogContext({
+    status: spells.isError ? 'error' : spells.isPending ? 'pending' : 'ready',
+    spellsById: new Map(spells.data?.map((spell) => [spell.id, spell])),
+  })
+
   const viewModel = buildSpeciesDetailViewModel(species, {
     resolveCreatureTypeLabel: (id) => getCreatureTypeLabel(id, { creatureTypeVocabulary }),
     resolveLanguageLabel: (id) => getLanguageLabelFromVocabulary(languageVocabulary, id),
     resolveSenseLabel: (type) => getSenseLabelFromVocabulary(senseVocabulary, type),
-    resolveSpell: () => undefined,
+    resolveSpell: buildSpellGrantVocabularyFromCatalog(spellCatalog),
   })
 
   return (

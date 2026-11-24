@@ -1,11 +1,11 @@
 import {
   CHALLENGE_RATING_MECHANICS,
-  appendMonsterActionSupplementalHtml,
   appendMonsterActionSupplementalText,
   availableBodyRows,
+  deriveSpellcastingLines,
+  findSpellCastingSource,
   formatMonsterActionReference,
   formatMonsterAttackAction,
-  formatMonsterForms,
   formatMonsterLeap,
   formatMonsterParryResponse,
   formatMonsterSaveAction,
@@ -14,15 +14,15 @@ import {
   formatMonsterTakeActions,
   formatMonsterTeleport,
   formatOnceUntilNextTurnSentence,
-  formatSavingThrowClauses,
   getAbilityLabel,
   isMonsterActionAttackKind,
   monsterActionSectionRows,
   monsterHasFormRestrictions,
+  monsterReferencedActionIds,
   monsterRichTextIsEmpty,
   resolveMonsterActionIdentity,
+  resolveMonsterDraftAttackEntry,
   resolveProseSavingThrowDc,
-  shapeShiftRows,
   type CastingAbility,
   type DerivedMonsterAttackLine,
   type DerivedMonsterStatBlock,
@@ -35,10 +35,19 @@ import {
   type MonsterLegendaryAction,
   type MonsterReaction,
   type MonsterReferencedSpell,
+  formatMonsterMultiattackResult,
+  formatOnceUntilNextTurnProse,
+  formatSavingThrowClausesProse,
+  joinStatBlockProsePlainText,
+  monsterAttackActionPartsToProse,
+  monsterAttackActionSentenceParts,
+  statBlockProseSpacing,
+  type MonsterActionKind,
+  type StatBlockProse,
+  type StatBlockProseDocument,
   type SavingThrowEffect,
 } from '@rpg/contracts'
 
-import { buildMonsterMultiattackSentence } from '../actions/previews/monster-action-multiattack-summary'
 import {
   nextDistinctTitle,
   presentActionReference,
@@ -55,11 +64,13 @@ export type MonsterActionRulesFacing = {
   name: string
   attackLine?: string
   descriptionHtml?: string
+  /** Mechanical rules text with typed colon lead-ins — preferred over plain `descriptionHtml`. */
+  rulesProse?: StatBlockProseDocument
 }
 
 export type SpellDisplayContext = {
   monster: Monster
-  equipmentById: Map<string, Equipment>
+  equipmentById: ReadonlyMap<string, Equipment>
   monsterName: string
   spellsById?: ReadonlyMap<string, MonsterReferencedSpell>
   catalogStatus: 'ready' | 'unavailable'
@@ -70,7 +81,7 @@ export type SpellDisplayContext = {
 
 export function buildSpellDisplayContext(input: {
   monster: Monster
-  equipmentById: Map<string, Equipment>
+  equipmentById: ReadonlyMap<string, Equipment>
   catalogState: MonsterCatalogLoadState
   spellsById?: ReadonlyMap<string, MonsterReferencedSpell>
   spellCatalogStatus?: 'ready' | 'unavailable'
@@ -97,8 +108,13 @@ export function buildSpellDisplayContext(input: {
   }
 }
 
+type ActionFacingStats = Pick<
+  DerivedMonsterStatBlock,
+  'attacks' | 'proficiencyBonus' | 'spellcasting'
+>
+
 function findAttackLine(
-  derived: DerivedMonsterStatBlock | null | undefined,
+  derived: ActionFacingStats | null | undefined,
   section: DerivedMonsterAttackLine['section'],
   actionId: string,
 ): DerivedMonsterAttackLine | undefined {
@@ -108,7 +124,7 @@ function findAttackLine(
 function actionDisplayIdentity(
   action: MonsterActionIdentitySubject,
   monster: Monster,
-  equipmentById: Map<string, Equipment>,
+  equipmentById: ReadonlyMap<string, Equipment>,
   catalogState: MonsterCatalogLoadState,
   magicPropertyProvider: MagicPropertyDefinitionProvider,
 ) {
@@ -123,10 +139,10 @@ function actionDisplayIdentity(
 
 function proficiencyBonusForDisplay(
   monster: Monster,
-  derived: DerivedMonsterStatBlock | null | undefined,
+  derived: ActionFacingStats | null | undefined,
 ): number {
   if (derived) return derived.proficiencyBonus
-  return CHALLENGE_RATING_MECHANICS[monster.challengeRating].proficiencyBonus
+  return CHALLENGE_RATING_MECHANICS[monster.challengeRating]?.proficiencyBonus ?? 0
 }
 
 function spellcastingAbilityScore(
@@ -137,16 +153,8 @@ function spellcastingAbilityScore(
   if (source.kind === 'ability') {
     return monster.abilityScores[source.ability]
   }
-  const sections = [monster.actions, monster.bonusActions, monster.reactions] as const
-  for (const section of sections) {
-    for (const entry of section) {
-      if (entry.kind !== 'spell' || entry.id !== source.entryId || !entry.castingAbility) continue
-      if (entry.castingAbility.kind === 'ability') {
-        return monster.abilityScores[entry.castingAbility.ability]
-      }
-    }
-  }
-  return undefined
+  const shared = findSpellCastingSource(monster, source.entryId)
+  return shared ? monster.abilityScores[shared.ability] : undefined
 }
 
 function spellcastingAbilityScoreForSave(
@@ -168,8 +176,18 @@ function escapeStatBlockText(value: string): string {
 export function proseSavingThrowParagraph(
   monster: Monster,
   effect: SavingThrowEffect | undefined,
-  derived: DerivedMonsterStatBlock | null | undefined,
+  derived: ActionFacingStats | null | undefined,
 ): string | undefined {
+  const prose = proseSavingThrowProse(monster, effect, derived)
+  if (!prose) return undefined
+  return joinStatBlockProsePlainText(prose)
+}
+
+export function proseSavingThrowProse(
+  monster: Monster,
+  effect: SavingThrowEffect | undefined,
+  derived: ActionFacingStats | null | undefined,
+): StatBlockProse | undefined {
   if (!effect?.ability || !effect.targets.trim() || !effect.failure.trim()) return undefined
   const dc = resolveProseSavingThrowDc({
     source: effect.dcSource,
@@ -179,13 +197,31 @@ export function proseSavingThrowParagraph(
         ? spellcastingAbilityScore(monster, effect.dcSource.castingAbility)
         : undefined,
   })
-  return formatSavingThrowClauses({
+  return formatSavingThrowClausesProse({
     abilityLabel: getAbilityLabel(effect.ability),
     dc,
     targets: effect.targets,
     failure: effect.failure,
     success: effect.success,
   })
+}
+
+function appendTurnLimitToDocument(
+  document: StatBlockProseDocument | undefined,
+  action: { kind: string; onceUntilNextTurn?: boolean },
+  monsterName: string,
+  hasSavingThrow: boolean,
+): StatBlockProseDocument | undefined {
+  if (action.kind === 'multiattack' || action.onceUntilNextTurn !== true) return document
+  const tail = formatOnceUntilNextTurnProse({
+    monsterName,
+    kind: action.kind,
+    hasSavingThrow,
+  })
+  if (!document || document.length === 0) return [tail]
+  const last = document[document.length - 1]
+  if (!last || last.length === 0) return [...document, tail]
+  return [...document.slice(0, -1), [...last, statBlockProseSpacing(), ...tail]]
 }
 
 function joinRulesAndSavingThrow(
@@ -215,17 +251,13 @@ function withTurnLimit(
   return html ? `${body}<p>${sentence}</p>` : `${body} ${sentence}`
 }
 
-function formatSaveActionBody(
+function formatSaveActionContent(
   monster: Monster,
   action: Extract<MonsterAction | MonsterReaction, { kind: 'save' }>,
-  derived: DerivedMonsterStatBlock | null | undefined,
-  catalogState: MonsterCatalogLoadState,
+  derived: ActionFacingStats | null | undefined,
   displayName: string,
-): string | undefined {
-  if (catalogState !== 'ready' || !action.resolution || !action.dcSource) {
-    if (catalogState === 'error') return MONSTER_UNRESOLVED_CATALOG_REFERENCE
-    return undefined
-  }
+): { rulesProse?: StatBlockProseDocument; fallbackBody?: string } {
+  if (!action.resolution || !action.dcSource) return {}
   const formatted = formatMonsterSaveAction({
     action: { ...action, resolution: action.resolution, dcSource: action.dcSource },
     name: displayName,
@@ -233,32 +265,43 @@ function formatSaveActionBody(
     proficiencyBonus: proficiencyBonusForDisplay(monster, derived),
     spellcastingAbilityScore: spellcastingAbilityScoreForSave(monster, action.dcSource),
   })
-  return appendMonsterActionSupplementalText(formatted.body, action.description) || undefined
+  return {
+    rulesProse: [formatted.bodyProse],
+    fallbackBody:
+      appendMonsterActionSupplementalText(formatted.body, action.description) || undefined,
+  }
 }
 
 function formatMultiattackActionBody(
   monster: Monster,
   action: Extract<MonsterAction, { kind: 'multiattack' }>,
-  equipmentById: Map<string, Equipment>,
+  equipmentById: ReadonlyMap<string, Equipment>,
   catalogState: MonsterCatalogLoadState,
   magicPropertyProvider: MagicPropertyDefinitionProvider,
   spells: Pick<SpellDisplayContext, 'spellsById' | 'catalogStatus'>,
 ): string | undefined {
   if (catalogState !== 'ready') {
-    return catalogState === 'error' ? MONSTER_UNRESOLVED_CATALOG_REFERENCE : undefined
+    const references = monsterReferencedActionIds(action)
+    const needsEquipment = monster.actions.some(
+      (target) => target.kind === 'weapon' && references.includes(target.id),
+    )
+    if (needsEquipment) {
+      return catalogState === 'error' ? MONSTER_UNRESOLVED_CATALOG_REFERENCE : undefined
+    }
   }
-  const generated = buildMonsterMultiattackSentence({
+  const generated = formatMonsterMultiattackResult({
     monsterName: monster.name,
     action,
     actions: monster.actions,
-    bonusActions: monster.bonusActions,
+    bonusActions: monster.bonusActions as MonsterAction[],
     equipment: monster.equipment,
     equipmentCatalog: equipmentById,
     magicPropertyProvider,
     spellsById: spells.spellsById,
     spellCatalogStatus: spells.catalogStatus,
   })
-  return appendMonsterActionSupplementalText(generated, action.description) || undefined
+  const sentence = generated.status === 'ready' ? generated.sentence : ''
+  return appendMonsterActionSupplementalText(sentence, action.description) || undefined
 }
 
 function resolveActionAttackLine(
@@ -281,26 +324,44 @@ function parryFollowUpName(
   if (!action.followUpActionId) return undefined
   const target = spells.monster.actions.find((row) => row.id === action.followUpActionId)
   if (!target || !isMonsterActionAttackKind(target.kind)) return undefined
-  const name = actionDisplayIdentity(
+  const identity = actionDisplayIdentity(
     target,
     spells.monster,
     spells.equipmentById,
     spells.catalogState,
     spells.magicPropertyProvider,
-  ).displayName.trim()
+  )
+  if (target.kind === 'weapon' && identity.sourceState !== 'resolved') return undefined
+  const name = identity.displayName.trim()
   return name.length > 0 ? name : undefined
+}
+
+function hasMissingInvocationSource(
+  action: Extract<MonsterAction | MonsterReaction | MonsterLegendaryAction, { kind: 'spell' }>,
+  monster: Monster,
+): boolean {
+  return (
+    action.spellInvocation === 'use-entry' &&
+    action.castingAbility?.kind === 'shared' &&
+    !findSpellCastingSource(monster, action.castingAbility.entryId)
+  )
 }
 
 function mapSpellActionFacing(
   action: Extract<MonsterAction | MonsterReaction | MonsterLegendaryAction, { kind: 'spell' }>,
   section: DerivedMonsterAttackLine['section'],
-  derived: DerivedMonsterStatBlock | null | undefined,
+  derived: ActionFacingStats | null | undefined,
   spells: SpellDisplayContext,
   identityName: string,
 ): MonsterActionRulesFacing {
-  const spellLine = derived?.spellcasting.find(
-    (line) => line.id === action.id && line.section === section,
-  )
+  const proficiencyBonus =
+    CHALLENGE_RATING_MECHANICS[spells.monster.challengeRating]?.proficiencyBonus
+  const lines =
+    derived?.spellcasting ??
+    (proficiencyBonus === undefined
+      ? []
+      : deriveSpellcastingLines(spells.monster, proficiencyBonus))
+  const spellLine = lines.find((line) => line.id === action.id && line.section === section)
   const rendered = formatMonsterSpellEntry({
     entry: { ...action, name: identityName },
     monsterName: spells.monsterName,
@@ -310,34 +371,52 @@ function mapSpellActionFacing(
     spellsInBody: spells.spellsInBody,
     saveDc: spellLine?.saveDc,
   })
-  const descriptionHtml = withTurnLimit(
-    appendMonsterActionSupplementalHtml(rendered.bodyHtml, action.description),
-    action,
-    spells.monsterName,
-    true,
-  )
+  const rulesProse = hasMissingInvocationSource(action, spells.monster)
+    ? undefined
+    : appendTurnLimitToDocument(rendered.bodyProse, action, spells.monsterName, false)
+  const supplemental =
+    action.description && !monsterRichTextIsEmpty(action.description)
+      ? action.description
+      : undefined
   return {
     id: action.id,
     name: rendered.heading,
-    descriptionHtml: descriptionHtml || undefined,
+    rulesProse,
+    descriptionHtml: supplemental,
   }
 }
 
 function mapSaveActionFacing(
   action: Extract<MonsterAction | MonsterReaction, { kind: 'save' }>,
   name: string,
-  derived: DerivedMonsterStatBlock | null | undefined,
-  catalogState: MonsterCatalogLoadState,
+  derived: ActionFacingStats | null | undefined,
   spells: SpellDisplayContext,
   identityName: string,
 ): MonsterActionRulesFacing {
-  const body = formatSaveActionBody(spells.monster, action, derived, catalogState, identityName)
+  const { rulesProse, fallbackBody } = formatSaveActionContent(
+    spells.monster,
+    action,
+    derived,
+    identityName,
+  )
+  const rulesWithTurn = appendTurnLimitToDocument(rulesProse, action, spells.monsterName, false)
+  const mechanical = fallbackBody
+    ? withTurnLimit(fallbackBody, action, spells.monsterName, false)
+    : undefined
+  const supplemental =
+    action.description && !monsterRichTextIsEmpty(action.description)
+      ? action.description
+      : undefined
+  const hasStructuredRules = Boolean(rulesWithTurn && rulesWithTurn.length > 0)
   return {
     id: action.id,
     name,
-    descriptionHtml: body
-      ? `<p>${withTurnLimit(body, action, spells.monsterName, false)}</p>`
-      : withTurnLimit(action.description, action, spells.monsterName, true),
+    rulesProse: hasStructuredRules ? rulesWithTurn : undefined,
+    descriptionHtml: hasStructuredRules
+      ? supplemental
+      : mechanical
+        ? `<p>${escapeStatBlockText(mechanical)}</p>`
+        : withTurnLimit(action.description, action, spells.monsterName, true),
   }
 }
 
@@ -352,18 +431,21 @@ function mapActionReferenceFacing(
     actions: spells.monster.actions,
     equipment: spells.monster.equipment,
     equipmentCatalog: spells.equipmentById,
+    equipmentCatalogStatus: spells.catalogState,
     magicPropertyProvider: spells.magicPropertyProvider,
   })
   const text = generated ? withTurnLimit(generated, action, spells.monsterName, false) : ''
-  const rules = 'description' in action && action.description ? action.description : ''
-  const descriptionHtml = text ? `<p>${escapeStatBlockText(text)}</p>${rules}` : undefined
+  const supplemental = 'description' in action ? action.description : undefined
+  const descriptionHtml = text
+    ? `<p>${escapeStatBlockText(text)}</p>${supplemental ?? ''}`
+    : supplemental
   return { id: action.id, name, descriptionHtml }
 }
 
 function mapMultiattackActionFacing(
   action: Extract<MonsterAction, { kind: 'multiattack' }>,
   name: string,
-  _derived: DerivedMonsterStatBlock | null | undefined,
+  _derived: ActionFacingStats | null | undefined,
   catalogState: MonsterCatalogLoadState,
   spells: SpellDisplayContext,
 ): MonsterActionRulesFacing {
@@ -474,36 +556,46 @@ function mapGeneratedBonusActionFacing(
             combination: action.combination,
             restriction: action.restriction,
           })
+  const descriptionHtml = body ? `<p>${escapeStatBlockText(body)}</p>` : undefined
   return {
     id: action.id,
     name,
-    descriptionHtml: body ? `<p>${escapeStatBlockText(body)}</p>` : undefined,
+    descriptionHtml,
   }
-}
-
-function isGeneratedBonusAction(
-  action: MonsterAction | MonsterBonusAction | MonsterReaction | MonsterLegendaryAction,
-): action is Extract<MonsterBonusAction, { kind: 'leap' | 'teleport' | 'take-actions' }> {
-  return action.kind === 'leap' || action.kind === 'teleport' || action.kind === 'take-actions'
 }
 
 function mapSpecialActionFacing(
   action: Extract<MonsterAction | MonsterReaction, { kind: 'special' }>,
   name: string,
-  derived: DerivedMonsterStatBlock | null | undefined,
+  derived: ActionFacingStats | null | undefined,
   spells: SpellDisplayContext,
 ): MonsterActionRulesFacing {
+  const saveProse = proseSavingThrowProse(spells.monster, action.savingThrow, derived)
+  const rulesProse = appendTurnLimitToDocument(
+    saveProse ? [saveProse] : undefined,
+    action,
+    spells.monsterName,
+    Boolean(saveProse),
+  )
   const paragraph = proseSavingThrowParagraph(spells.monster, action.savingThrow, derived)
+  const hasRules = Boolean(rulesProse && rulesProse.length > 0)
+  const supplemental =
+    action.description && !monsterRichTextIsEmpty(action.description)
+      ? action.description
+      : undefined
   return {
     id: action.id,
     name,
-    descriptionHtml: withTurnLimit(
-      joinRulesAndSavingThrow(action.description, paragraph),
-      action,
-      spells.monsterName,
-      true,
-      Boolean(paragraph),
-    ),
+    rulesProse: hasRules ? rulesProse : undefined,
+    descriptionHtml: hasRules
+      ? supplemental
+      : withTurnLimit(
+          joinRulesAndSavingThrow(action.description, paragraph),
+          action,
+          spells.monsterName,
+          true,
+          Boolean(paragraph),
+        ),
   }
 }
 
@@ -517,26 +609,55 @@ function mapParryActionFacing(
     acBonus: action.acBonus,
     followUpAttackName: parryFollowUpName(action, spells),
   })
+  const descriptionHtml = response ? `<p>${escapeStatBlockText(response)}</p>` : undefined
   return {
     id: action.id,
     name,
-    descriptionHtml: response ? `<p>${escapeStatBlockText(response)}</p>` : undefined,
+    descriptionHtml,
   }
+}
+
+function deriveActionAttackLine(
+  action: Parameters<typeof resolveMonsterDraftAttackEntry>[0]['action'],
+  section: DerivedMonsterAttackLine['section'],
+  spells: SpellDisplayContext,
+): DerivedMonsterAttackLine | undefined {
+  const { result } = resolveMonsterDraftAttackEntry({
+    action,
+    monster: spells.monster,
+    section,
+    equipmentCatalog: spells.equipmentById,
+    proficiencyBonus: CHALLENGE_RATING_MECHANICS[spells.monster.challengeRating]?.proficiencyBonus,
+    magicPropertyProvider: spells.magicPropertyProvider,
+  })
+  return result.status === 'resolved' ? result.value : undefined
 }
 
 function mapAttackActionFacing(
   action: MonsterAction | MonsterBonusAction | MonsterReaction | MonsterLegendaryAction,
   section: DerivedMonsterAttackLine['section'],
   name: string,
-  derived: DerivedMonsterStatBlock | null | undefined,
+  derived: ActionFacingStats | null | undefined,
   catalogState: MonsterCatalogLoadState,
   spells: SpellDisplayContext,
 ): MonsterActionRulesFacing {
-  const attack = findAttackLine(derived, section, action.id)
+  const attackCatalogState = action.kind === 'weapon' ? catalogState : 'ready'
+  const attack =
+    derived || attackCatalogState !== 'ready'
+      ? findAttackLine(derived, section, action.id)
+      : deriveActionAttackLine(action, section, spells)
+  const attackLine = resolveActionAttackLine(attackCatalogState, attack)
+  const parts =
+    attack && attackCatalogState === 'ready' ? monsterAttackActionSentenceParts(attack) : undefined
+  const rulesProse =
+    parts && attackLine !== MONSTER_UNRESOLVED_CATALOG_REFERENCE
+      ? [monsterAttackActionPartsToProse(parts)]
+      : undefined
   return {
     id: action.id,
     name,
-    attackLine: resolveActionAttackLine(catalogState, attack),
+    attackLine: rulesProse ? undefined : attackLine,
+    rulesProse,
     descriptionHtml:
       'description' in action
         ? withTurnLimit(action.description, action, spells.monsterName, true)
@@ -569,57 +690,100 @@ function mapShapeShiftActionFacing(
   return { id: action.id, name, descriptionHtml: `<p>${escapeStatBlockText(description)}</p>` }
 }
 
-function resolveStructuredActionFacing(
-  action: MonsterAction | MonsterBonusAction | MonsterReaction | MonsterLegendaryAction,
-  name: string,
-  identityName: string,
-  derived: DerivedMonsterStatBlock | null | undefined,
-  catalogState: MonsterCatalogLoadState,
-  spells: SpellDisplayContext,
-): MonsterActionRulesFacing | undefined {
-  if (action.kind === 'shape-shift') return mapShapeShiftActionFacing(action, name, spells)
-  if (action.kind === 'special') return mapSpecialActionFacing(action, name, derived, spells)
-  if (action.kind === 'save') {
-    return mapSaveActionFacing(action, name, derived, catalogState, spells, identityName)
-  }
-  if (action.kind === 'action-reference') return mapActionReferenceFacing(action, name, spells)
-  if (isGeneratedBonusAction(action))
-    return mapGeneratedBonusActionFacing(action, name, spells.monsterName)
-  if (action.kind === 'parry') return mapParryActionFacing(action, name, spells)
-  if (action.kind === 'multiattack') {
-    return mapMultiattackActionFacing(action, name, derived, catalogState, spells)
-  }
-  return undefined
-}
-
+// fallow-ignore-next-line complexity
 function resolveActionFacingBody(
   action: MonsterAction | MonsterBonusAction | MonsterReaction | MonsterLegendaryAction,
   section: DerivedMonsterAttackLine['section'],
   name: string,
   identityName: string,
-  derived: DerivedMonsterStatBlock | null | undefined,
+  derived: ActionFacingStats | null | undefined,
   catalogState: MonsterCatalogLoadState,
   spells: SpellDisplayContext,
 ): MonsterActionRulesFacing {
-  if (action.kind === 'spell') {
-    return mapSpellActionFacing(action, section, derived, spells, identityName)
+  const kind = action.kind as MonsterActionKind
+  switch (kind) {
+    case 'spell':
+      return mapSpellActionFacing(
+        action as Extract<MonsterAction | MonsterLegendaryAction, { kind: 'spell' }>,
+        section,
+        derived,
+        spells,
+        identityName,
+      )
+    case 'shape-shift':
+      return mapShapeShiftActionFacing(
+        action as Extract<MonsterBonusAction, { kind: 'shape-shift' }>,
+        name,
+        spells,
+      )
+    case 'special':
+      return mapSpecialActionFacing(
+        action as Extract<MonsterAction | MonsterReaction, { kind: 'special' }>,
+        name,
+        derived,
+        spells,
+      )
+    case 'save':
+      return mapSaveActionFacing(
+        action as Extract<MonsterAction | MonsterLegendaryAction, { kind: 'save' }>,
+        name,
+        derived,
+        spells,
+        identityName,
+      )
+    case 'action-reference':
+      return mapActionReferenceFacing(
+        action as Extract<
+          MonsterAction | MonsterBonusAction | MonsterReaction,
+          { kind: 'action-reference' }
+        >,
+        name,
+        spells,
+      )
+    case 'leap':
+    case 'teleport':
+    case 'take-actions':
+      return mapGeneratedBonusActionFacing(
+        action as Extract<MonsterBonusAction, { kind: 'leap' | 'teleport' | 'take-actions' }>,
+        name,
+        spells.monsterName,
+      )
+    case 'parry':
+      return mapParryActionFacing(
+        action as Extract<MonsterReaction, { kind: 'parry' }>,
+        name,
+        spells,
+      )
+    case 'multiattack':
+      return mapMultiattackActionFacing(
+        action as Extract<MonsterAction, { kind: 'multiattack' }>,
+        name,
+        derived,
+        catalogState,
+        spells,
+      )
+    case 'weapon':
+    case 'natural-weapon':
+    case 'attack':
+      return mapAttackActionFacing(
+        action as Extract<MonsterAction, { kind: 'weapon' | 'natural-weapon' | 'attack' }>,
+        section,
+        name,
+        derived,
+        catalogState,
+        spells,
+      )
+    default: {
+      const unsupported: never = kind
+      throw new Error('Unsupported monster action kind', { cause: unsupported })
+    }
   }
-  const structured = resolveStructuredActionFacing(
-    action,
-    name,
-    identityName,
-    derived,
-    catalogState,
-    spells,
-  )
-  if (structured) return structured
-  return mapAttackActionFacing(action, section, name, derived, catalogState, spells)
 }
 
 export function resolveActionStatBlockRulesFacing(
   action: MonsterAction | MonsterBonusAction | MonsterReaction | MonsterLegendaryAction,
   section: DerivedMonsterAttackLine['section'],
-  derived: DerivedMonsterStatBlock | null | undefined,
+  derived: ActionFacingStats | null | undefined,
   catalogState: MonsterCatalogLoadState,
   spells: SpellDisplayContext,
   referenceHeadings: ReadonlyMap<string, string>,
@@ -655,7 +819,7 @@ export function resolveActionStatBlockRulesFacingList(
     | MonsterLegendaryAction
   )[],
   section: DerivedMonsterAttackLine['section'],
-  derived: DerivedMonsterStatBlock | null | undefined,
+  derived: ActionFacingStats | null | undefined,
   catalogState: MonsterCatalogLoadState,
   spells: SpellDisplayContext,
 ): MonsterActionRulesFacing[] {
@@ -663,25 +827,4 @@ export function resolveActionStatBlockRulesFacingList(
   return actions.map((action) =>
     resolveActionStatBlockRulesFacing(action, section, derived, catalogState, spells, headings),
   )
-}
-
-export function formatMonsterFormsTraitFacing(monster: Monster): MonsterActionRulesFacing[] {
-  if (!monster.forms || monster.forms.definedForms.length === 0) return []
-  if (shapeShiftRows(monster).length > 0) return []
-  const text = formatMonsterForms({
-    monsterName: monster.name,
-    baseSizes: monster.sizes,
-    baseMovement: monster.movement,
-    baseHover: monster.hover,
-    forms: monster.forms,
-    hasFormRestrictions: monsterHasFormRestrictions(monster),
-  })
-  if (!text) return []
-  return [
-    {
-      id: 'forms',
-      name: 'Forms',
-      descriptionHtml: `<p>${escapeStatBlockText(text)}</p>`,
-    },
-  ]
 }

@@ -6,7 +6,6 @@ import {
 } from '@rpg/contracts'
 
 import {
-  contentFormRegistry,
   contentFormFields,
   type ContentFormDef,
 } from '../../lib/forms/registry/content-form-registry'
@@ -34,6 +33,7 @@ import {
   spellbookAcquisitionToFormValues,
   spellcastingToFormValues,
   spellSelectionChangePackageToFormValues,
+  cantripChangePackageToFormValues,
   spellSelectionModelToFormValues,
 } from './class-form-values'
 import { featureToFormRow } from './class-feature-form-fields'
@@ -100,6 +100,7 @@ const classFormDef: ContentFormDef<
     grantsCantrips: entity.spellcasting?.progression?.cantrips !== undefined,
     spellSelectionModel: spellSelectionModelToFormValues(entity.spellcasting),
     spellSelectionChangePackage: spellSelectionChangePackageToFormValues(entity.spellcasting),
+    cantripChangePackage: cantripChangePackageToFormValues(entity.spellcasting),
     ...(() => {
       const acquisition = spellbookAcquisitionToFormValues(entity.spellcasting)
       return {
@@ -156,8 +157,6 @@ const classFormDef: ContentFormDef<
     renderPlayerPreview: ClassPreviewPlayerHost,
   },
 }
-
-contentFormRegistry['classes'] = classFormDef
 
 export { classFormDef, createClassFormSchema, createClassDraftFormSchema, classDraftFormSchema }
 export type { ClassFormValues }

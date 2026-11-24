@@ -8,7 +8,6 @@ import {
   nextHighlightedIndex,
   rankButtonDropdownItems,
   resolveSearchKeyAction,
-  selectableButtonDropdownItems,
 } from './button-dropdown.lib'
 import type { ButtonDropdownGroup, ButtonDropdownItem } from './button-dropdown.types'
 
@@ -38,12 +37,8 @@ export function useButtonDropdownControl({
     () => rankButtonDropdownItems(items, groups, query),
     [groups, items, query],
   )
-  const selectableItems = React.useMemo(
-    () => selectableButtonDropdownItems(displayItems),
-    [displayItems],
-  )
-  const highlightedIndex = clampHighlightedIndex(activeIndex, selectableItems.length)
-  const highlightedItem = selectableItems[highlightedIndex]
+  const highlightedIndex = clampHighlightedIndex(activeIndex, displayItems.length)
+  const highlightedItem = displayItems[highlightedIndex]
   const activeOptionId = highlightedItem ? `${generatedId}-option-${highlightedItem.id}` : undefined
 
   const handleOpenChange = React.useCallback((nextOpen: boolean) => {
@@ -63,10 +58,10 @@ export function useButtonDropdownControl({
   )
 
   const selectHighlightedItem = React.useCallback(() => {
-    const item = selectableItems[highlightedIndex]
-    if (!item) return
+    const item = displayItems[highlightedIndex]
+    if (!item || item.disabled) return
     selectItem(item.id)
-  }, [highlightedIndex, selectItem, selectableItems])
+  }, [displayItems, highlightedIndex, selectItem])
 
   const handleNavigationKeyDown = React.useCallback(
     (event: React.KeyboardEvent) => {
@@ -75,7 +70,7 @@ export function useButtonDropdownControl({
 
       event.preventDefault()
       if (action === 'next' || action === 'previous') {
-        setActiveIndex((index) => nextHighlightedIndex(action, index, selectableItems.length))
+        setActiveIndex((index) => nextHighlightedIndex(action, index, displayItems.length))
         return
       }
       if (action === 'select') {
@@ -84,7 +79,7 @@ export function useButtonDropdownControl({
       }
       handleOpenChange(false)
     },
-    [handleOpenChange, selectableItems.length, selectHighlightedItem],
+    [displayItems.length, handleOpenChange, selectHighlightedItem],
   )
 
   const handleQueryChange = React.useCallback((value: string) => {
@@ -117,7 +112,6 @@ export function useButtonDropdownControl({
     generatedId,
     query,
     displayItems,
-    selectableItems,
     highlightedIndex,
     highlightedItem,
     activeOptionId,

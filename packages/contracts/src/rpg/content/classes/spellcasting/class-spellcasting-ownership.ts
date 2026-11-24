@@ -1,54 +1,29 @@
 import { availableClassFeatures } from '../class-feature-availability'
 import type { ClassBodyFeature } from '../class'
-import type { ContentGrant, GrantGroup } from '../../lib/grants'
-
 import type { Spellcasting } from './spellcasting'
-
-export const SPELLCASTING_GRANTING_FEATURE_IDS = ['spellcasting', 'pact-magic'] as const
 
 export type ClassSpellcastingActivationSource = {
   spellcasting?: Spellcasting
   features: readonly ClassBodyFeature[]
 }
 
-export function isSpellcastingContentGrant(grant: ContentGrant): boolean {
-  return grant.kind === 'spellcasting'
+export function isSpellcastingClassFeature(feature: ClassBodyFeature): boolean {
+  return feature.kind === 'spellcasting'
 }
 
-/** Dedicated managed feature: default group only, exactly one spellcasting grant. */
-export function isClassSpellcastingGrantingFeature(feature: {
-  grantGroups?: GrantGroup[]
-}): boolean {
-  const groups = feature.grantGroups ?? []
-  if (groups.length !== 1) return false
-  const group = groups[0]!
-  if (group.unlock !== undefined) return false
-  if (group.grants.length !== 1) return false
-  return isSpellcastingContentGrant(group.grants[0]!)
-}
-
-export function findClassSpellcastingGrantingFeatures(
+export function findSpellcastingClassFeatures(
   source: ClassSpellcastingActivationSource,
   options?: { runtime?: boolean },
 ): ClassBodyFeature[] {
   const features = options?.runtime ? availableClassFeatures(source.features) : [...source.features]
-  return features.filter(isClassSpellcastingGrantingFeature)
+  return features.filter(isSpellcastingClassFeature)
 }
 
 export function resolveClassSpellcastingFeature(
   source: ClassSpellcastingActivationSource,
   options?: { runtime?: boolean },
 ): ClassBodyFeature | undefined {
-  return findClassSpellcastingGrantingFeatures(source, options)[0]
-}
-
-export function resolveClassSpellcastingGrant(
-  source: ClassSpellcastingActivationSource,
-  options?: { runtime?: boolean },
-): ContentGrant | undefined {
-  const feature = resolveClassSpellcastingFeature(source, options)
-  const grant = feature?.grantGroups?.[0]?.grants[0]
-  return grant && isSpellcastingContentGrant(grant) ? grant : undefined
+  return findSpellcastingClassFeatures(source, options)[0]
 }
 
 export function resolveClassSpellcastingActivationLevel(

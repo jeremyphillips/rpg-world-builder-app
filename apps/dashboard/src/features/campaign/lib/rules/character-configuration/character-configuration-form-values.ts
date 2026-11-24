@@ -1,9 +1,9 @@
 import type {
   ResolvedCampaignCharacterCreationPatch,
-  SystemRulesetId,
   UpdateCampaignCharacterCreationInput,
 } from '@rpg/contracts'
 import {
+  DEFAULT_SYSTEM_RULESET_ID,
   DEFAULT_CHARACTER_ALLOWED_CREATURE_TYPES,
   DEFAULT_MULTICLASSING_ENABLED,
   DEFAULT_PRIMARY_ABILITY_MINIMUM,
@@ -44,8 +44,6 @@ import {
   buildXpThresholdsProgressionPatchInput,
   mapXpThresholdOverridesToFormValues,
 } from './xp-thresholds-form-values'
-
-const DEFAULT_RULESET_ID = 'srd-cc-5.2.1' as const satisfies SystemRulesetId
 
 type BuildCharacterCreationPatchInputOptions = {
   includeDefaultMulticlassing?: boolean
@@ -115,7 +113,7 @@ function assignOptionalCharacterCreationPatchFields(
     patch.subclasses = subclassing
   }
 
-  const startingWealthSeed = getStandardStartingWealthRules(DEFAULT_RULESET_ID)
+  const startingWealthSeed = getStandardStartingWealthRules(DEFAULT_SYSTEM_RULESET_ID)
   const startingWealthPatch = buildStartingWealthPatchInput(
     values.startingWealth,
     startingWealthSeed,
@@ -246,18 +244,25 @@ function mergeCreateRulesWithDefaults(createRules: CreateRulesValues): RulesValu
     speciesLevelLimitsEnabled: DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED,
     subclassChoicesEnabled: DEFAULT_SUBCLASS_CHOICES_ENABLED,
     startingWealth: mapStartingWealthToFormValues(
-      getStandardStartingWealthRules(DEFAULT_RULESET_ID),
+      getStandardStartingWealthRules(DEFAULT_SYSTEM_RULESET_ID),
     ),
     ...mapLanguageProficiencyRulesToFormValues(
-      resolveCharacterCreationPatch(undefined, getStandardStartingWealthRules(DEFAULT_RULESET_ID)),
+      resolveCharacterCreationPatch(
+        undefined,
+        getStandardStartingWealthRules(DEFAULT_SYSTEM_RULESET_ID),
+      ),
     ),
     ...mapLevelZeroNpcsToFormValues(
-      resolveCharacterCreationPatch(undefined, getStandardStartingWealthRules(DEFAULT_RULESET_ID))
-        .levelZeroNpcs,
+      resolveCharacterCreationPatch(
+        undefined,
+        getStandardStartingWealthRules(DEFAULT_SYSTEM_RULESET_ID),
+      ).levelZeroNpcs,
     ),
     standardArray: mapStandardArrayToFormValues(
-      resolveCharacterCreationPatch(undefined, getStandardStartingWealthRules(DEFAULT_RULESET_ID))
-        .standardArray,
+      resolveCharacterCreationPatch(
+        undefined,
+        getStandardStartingWealthRules(DEFAULT_SYSTEM_RULESET_ID),
+      ).standardArray,
     ),
     xpThresholdOverrides: [],
     ...resolveSpellcastingProgressionFormState(undefined),

@@ -204,8 +204,6 @@ export function ArrayItemHeaderContent({ header }: ArrayItemHeaderContentProps) 
 
 export interface ArrayItemHeaderSummaryProps {
   summary?: string
-  /** @deprecated Prefer {@link issueSummaries}. */
-  issueSummary?: ArrayItemIssueSummaryProps
   issueSummaries?: readonly ArrayItemIssueSummaryProps[]
   collapsed: boolean
   leadingChrome: ArrayItemLeadingChromeOptions
@@ -215,15 +213,12 @@ export interface ArrayItemHeaderSummaryProps {
 
 export function ArrayItemHeaderSummary({
   summary,
-  issueSummary,
-  issueSummaries,
+  issueSummaries = [],
   collapsed: _collapsed,
   leadingChrome,
   indentSummary = false,
 }: ArrayItemHeaderSummaryProps) {
-  const resolvedIssueSummaries = issueSummaries ?? (issueSummary ? [issueSummary] : [])
-
-  if (!summary && resolvedIssueSummaries.length === 0) return null
+  if (!summary && issueSummaries.length === 0) return null
 
   const summaryIndent = indentSummary
     ? arrayItemHeaderSummaryIndentClasses(leadingChrome)
@@ -231,7 +226,7 @@ export function ArrayItemHeaderSummary({
 
   return (
     <>
-      <ArrayItemIssueSummaries summaries={resolvedIssueSummaries} className={summaryIndent} />
+      <ArrayItemIssueSummaries summaries={issueSummaries} className={summaryIndent} />
       {summary ? (
         <p className={cn(arrayItemHeaderSummaryClasses, summaryIndent)}>{summary}</p>
       ) : null}
@@ -241,21 +236,21 @@ export function ArrayItemHeaderSummary({
 
 interface ArrayItemHeaderExtrasProps {
   summary?: string
-  issueSummary?: ArrayItemIssueSummaryProps
+  issueSummaries?: readonly ArrayItemIssueSummaryProps[]
   collapsed: boolean
   leadingChrome: ArrayItemLeadingChromeOptions
 }
 
 function ArrayItemHeaderExtras({
   summary,
-  issueSummary,
+  issueSummaries,
   collapsed,
   leadingChrome,
 }: ArrayItemHeaderExtrasProps) {
   return (
     <ArrayItemHeaderSummary
       summary={summary}
-      issueSummary={issueSummary}
+      issueSummaries={issueSummaries}
       collapsed={collapsed}
       leadingChrome={leadingChrome}
       indentSummary
@@ -270,7 +265,7 @@ export interface ArrayItemToolbarProps {
   itemValues: Record<string, unknown>
   watchedPrimary: unknown
   watchedSummaryContext?: Record<string, unknown>
-  showDragHandle: boolean
+  reserveDragHandleSlot: boolean
   dragHandleProps?: ArrayItemDragHandleProps
   collapsible: boolean
   collapsed: boolean
@@ -279,7 +274,7 @@ export interface ArrayItemToolbarProps {
   titleId: string
   /** When true, only drag + title/fields render (compact inline row). */
   compact?: boolean
-  issueSummary?: ArrayItemIssueSummaryProps
+  issueSummaries?: readonly ArrayItemIssueSummaryProps[]
   children?: React.ReactNode
 }
 
@@ -291,7 +286,7 @@ export function ArrayItemToolbar({
   itemValues,
   watchedPrimary,
   watchedSummaryContext,
-  showDragHandle,
+  reserveDragHandleSlot,
   dragHandleProps,
   collapsible,
   collapsed,
@@ -299,7 +294,7 @@ export function ArrayItemToolbar({
   bodyId,
   titleId,
   compact = false,
-  issueSummary,
+  issueSummaries = [],
   children,
 }: ArrayItemToolbarProps) {
   const header = resolveArrayItemHeaderLabels(
@@ -314,8 +309,11 @@ export function ArrayItemToolbar({
       ? headerConfig.summary(itemValues, index, watchedSummaryContext)
       : undefined
 
-  const gripVisible = showDragHandle && Boolean(dragHandleProps)
-  const leadingChrome: ArrayItemLeadingChromeOptions = { showDragHandle: gripVisible, collapsible }
+  const gripVisible = reserveDragHandleSlot && Boolean(dragHandleProps)
+  const leadingChrome: ArrayItemLeadingChromeOptions = {
+    reserveDragHandleSlot: gripVisible,
+    collapsible,
+  }
 
   const headerContentClasses = cn(
     arrayItemHeaderContentClasses,
@@ -341,14 +339,14 @@ export function ArrayItemToolbar({
     </ArrayItemTitleRow>
   )
 
-  if (!summary && !issueSummary) return titleRow
+  if (!summary && issueSummaries.length === 0) return titleRow
 
   return (
     <div className={arrayItemHeaderShellClasses}>
       {titleRow}
       <ArrayItemHeaderExtras
         summary={summary}
-        issueSummary={issueSummary}
+        issueSummaries={issueSummaries}
         collapsed={collapsed}
         leadingChrome={leadingChrome}
       />

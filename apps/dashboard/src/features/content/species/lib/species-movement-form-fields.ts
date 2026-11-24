@@ -11,7 +11,6 @@ export {
   movementValidationMessages,
   movementWithHoverGroup,
   refineMovementRows,
-  refineSpeciesMovementRows,
   type MovementRowDraftFormValues,
   type MovementRowFormValues,
 } from '../../lib/forms/fields/content-movement-form-fields'

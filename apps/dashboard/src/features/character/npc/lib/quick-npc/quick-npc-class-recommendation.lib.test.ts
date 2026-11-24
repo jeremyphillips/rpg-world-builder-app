@@ -12,7 +12,7 @@ import {
 } from './quick-npc-class-recommendation.lib'
 import {
   quickNpcMemberSetupValues,
-  quickNpcMemberSetupWithNoTitle,
+  quickNpcMemberSetupWithChosenTitle,
 } from './quick-npc-test-fixtures'
 
 describe('resolveQuickNpcClassIdFromRecommendationCardinality', () => {
@@ -82,7 +82,7 @@ describe('resolveQuickNpcClassRecommendationIds', () => {
   it('falls back to organization affinities when the title has no template recommendation', () => {
     expect(
       resolveQuickNpcClassRecommendationIds({
-        values: quickNpcMemberSetupWithNoTitle({
+        values: quickNpcMemberSetupWithChosenTitle({
           speciesId: 'srd-cc-5.2.1:dwarf',
           classId: '',
           level: 1,
@@ -125,7 +125,7 @@ describe('applyQuickNpcRecommendedClassSeeding', () => {
   it('auto-seeds a single eligible recommendation', () => {
     expect(
       applyQuickNpcRecommendedClassSeeding({
-        values: quickNpcMemberSetupWithNoTitle({
+        values: quickNpcMemberSetupWithChosenTitle({
           speciesId: 'srd-cc-5.2.1:dwarf',
           classId: '',
           level: 1,

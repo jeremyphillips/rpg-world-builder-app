@@ -181,26 +181,6 @@ export function vocabularySetIdsWithBrowse(
   return VOCABULARY_OPTION_SET_IDS.filter((setId) => capabilities[setId].browse)
 }
 
-/** @deprecated Use {@link vocabularySetIdsWithBrowse}. */
-export function vocabularySetIdsWithHubCard(
-  capabilities: Record<
-    VocabularyOptionSetId,
-    VocabularySetCapability
-  > = VOCABULARY_SET_CAPABILITIES,
-): VocabularyOptionSetId[] {
-  return vocabularySetIdsWithBrowse(capabilities)
-}
-
-/** @deprecated Use {@link vocabularySetIdsWithBrowse}. */
-export function vocabularySetIdsWithOverview(
-  capabilities: Record<
-    VocabularyOptionSetId,
-    VocabularySetCapability
-  > = VOCABULARY_SET_CAPABILITIES,
-): VocabularyOptionSetId[] {
-  return vocabularySetIdsWithBrowse(capabilities)
-}
-
 /** Set ids that require a registered API usage/blocker resolver. */
 export function vocabularySetIdsRequiringUsageResolver(
   capabilities: Record<

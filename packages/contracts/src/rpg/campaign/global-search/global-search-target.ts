@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { characterTypeSchema } from '../../runtime/character/pc-npc-identity'
 import { equipmentFamilyPathSchema } from '../../vocab/equipment/family-path'
 
 // ---------------------------------------------------------------------------
@@ -55,7 +56,7 @@ export const globalSearchMonsterTargetSchema = z.object({
 export const globalSearchCharacterTargetSchema = z.object({
   kind: z.literal('character'),
   id: z.string().min(1),
-  characterType: z.enum(['pc', 'npc']),
+  characterType: characterTypeSchema,
 })
 
 export const globalSearchGameTermTargetSchema = z.object({

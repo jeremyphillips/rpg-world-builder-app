@@ -118,24 +118,16 @@ describe('speciesFormDef round-trips', () => {
     expect(input.languageAffinities).toBeUndefined()
   })
 
-  it('elf: darkvision sense grant is preserved (grantGroups)', () => {
+  it('elf: darkvision sense template is preserved', () => {
     const elf = SRD_SPECIES.find((s) => s.slug === 'elf')!
     const formValues = speciesFormDef.toFormValues(elf) as SpeciesFormValues
     const input = speciesFormDef.toInput(formValues)
-    // Find the grant trait with a darkvision sense grant
-    const darkvisionTrait = input.traits.find(
-      (t) =>
-        t.kind === 'grant' &&
-        t.grantGroups[0]?.grants.some((g) => g.kind === 'sense' && g.type === 'darkvision'),
-    )
-    expect(darkvisionTrait).toBeDefined()
-    expect(darkvisionTrait?.kind).toBe('grant')
-    const senseGrant =
-      darkvisionTrait?.kind === 'grant'
-        ? darkvisionTrait.grantGroups[0]?.grants.find((g) => g.kind === 'sense')
-        : undefined
-    expect(senseGrant?.kind === 'sense' && senseGrant.type).toBe('darkvision')
-    expect(senseGrant?.kind === 'sense' && senseGrant.range).toBe(60)
+    const darkvisionTrait = input.traits.find((t) => t.id === 'darkvision')
+    expect(darkvisionTrait).toMatchObject({
+      kind: 'template',
+      templateId: 'sense-darkvision',
+      config: { range: 60 },
+    })
   })
 })
 
@@ -180,28 +172,41 @@ describe('speciesFormDef create vs update modes', () => {
     expect(input.heritage?.options[0]?.id).toBe(optionId)
   })
 
-  it('grant trait with overrides sets overrideDisplay on load', () => {
+  it('maps elf darkvision to the sense template trait row', () => {
     const elf = SRD_SPECIES.find((s) => s.slug === 'elf')!
     const formValues = speciesFormDef.toFormValues(elf) as SpeciesFormValues
     const darkvision = formValues.traits.find((t) => t.id === 'darkvision')
-    expect(darkvision?.kind).toBe('grant')
+    expect(darkvision?.kind).toBe('template')
+    expect(darkvision?.templateId).toBe('sense-darkvision')
     expect(darkvision?.overrideDisplay).toBe(false)
   })
 
   it('round-trips grant trait display overrides when overrideDisplay is enabled', () => {
-    const elf = SRD_SPECIES.find((s) => s.slug === 'elf')!
-    const formValues = speciesFormDef.toFormValues(elf) as SpeciesFormValues
-    const darkvision = formValues.traits.find((t) => t.id === 'darkvision')!
-    darkvision.overrideDisplay = true
-    darkvision.nameOverride = 'Superior Darkvision'
-    darkvision.descriptionOverride = '<p>Custom homebrew wording.</p>'
-    const input = speciesFormDef.toInput(formValues, { entity: elf })
-    const trait = input.traits.find((t) => t.id === 'darkvision')
+    const human = SRD_SPECIES.find((s) => s.slug === 'human')!
+    const formValues = speciesFormDef.toFormValues(human) as SpeciesFormValues
+    formValues.traits = [
+      {
+        ...createTraitRowDefaultValues(),
+        id: 'superior-darkvision',
+        kind: 'grant',
+        grants: [
+          {
+            grantType: 'resistances',
+            id: 'resist-1',
+            resistances: ['poison'],
+          },
+        ],
+        overrideDisplay: true,
+        nameOverride: 'Poison Resilience',
+        details: '<p>Custom homebrew wording.</p>',
+        available: true,
+      },
+    ]
+    const input = speciesFormDef.toInput(formValues, { entity: human })
+    const trait = input.traits.find((t) => t.kind === 'grant')
     expect(trait?.kind).toBe('grant')
-    expect(trait?.kind === 'grant' && trait.nameOverride).toBe('Superior Darkvision')
-    expect(trait?.kind === 'grant' && trait.descriptionOverride).toBe(
-      '<p>Custom homebrew wording.</p>',
-    )
+    expect(trait?.kind === 'grant' && trait.nameOverride).toBe('Poison Resilience')
+    expect(trait?.kind === 'grant' && trait.details).toBe('<p>Custom homebrew wording.</p>')
   })
 
   it('new authored trait defaults to custom and remains custom after save/reload', () => {
@@ -220,27 +225,42 @@ describe('speciesFormDef create vs update modes', () => {
   })
 
   it('existing grant trait remains grant after grant edit and reload', () => {
-    const elf = SRD_SPECIES.find((s) => s.slug === 'elf')!
-    const formValues = speciesFormDef.toFormValues(elf) as SpeciesFormValues
-    const darkvision = formValues.traits.find((t) => t.id === 'darkvision')!
-    expect(darkvision.kind).toBe('grant')
-    const senseRow = darkvision.grants.find((grant) => grant.grantType === 'senses')
-    expect(senseRow).toBeDefined()
-    senseRow!.senseRange = 120
+    const human = SRD_SPECIES.find((s) => s.slug === 'human')!
+    const formValues = speciesFormDef.toFormValues(human) as SpeciesFormValues
+    formValues.traits = [
+      {
+        ...createTraitRowDefaultValues(),
+        id: 'darkvision-grant',
+        kind: 'grant',
+        grants: [
+          {
+            grantType: 'movement',
+            id: 'move-1',
+            movementMode: 'walk',
+            movementOperation: 'increase',
+            movementFeet: 5,
+          },
+        ],
+        available: true,
+      },
+    ]
+    const movementTrait = formValues.traits[0]!
+    const movementRow = movementTrait.grants.find((grant) => grant.grantType === 'movement')
+    expect(movementRow).toBeDefined()
+    movementRow!.movementFeet = 10
 
-    const input = speciesFormDef.toInput(formValues, { entity: elf })
-    const saved = input.traits.find((t) => t.id === 'darkvision')
+    const input = speciesFormDef.toInput(formValues, { entity: human })
+    const saved = input.traits.find((t) => t.kind === 'grant')
     expect(saved?.kind).toBe('grant')
 
     const reloaded = speciesFormDef.toFormValues({
-      ...elf,
+      ...human,
       traits: input.traits,
     }) as SpeciesFormValues
-    expect(reloaded.traits.find((t) => t.id === 'darkvision')?.kind).toBe('grant')
-    const reloadedSense = reloaded.traits
-      .find((t) => t.id === 'darkvision')
-      ?.grants.find((grant) => grant.grantType === 'senses')
-    expect(reloadedSense?.senseRange).toBe(120)
+    const reloadedGrant = reloaded.traits.find((t) => t.kind === 'grant')
+    expect(reloadedGrant?.kind).toBe('grant')
+    const reloadedMovement = reloadedGrant?.grants.find((grant) => grant.grantType === 'movement')
+    expect(reloadedMovement?.movementFeet).toBe(10)
   })
 
   it('heritage option create/save/reload stays custom', () => {

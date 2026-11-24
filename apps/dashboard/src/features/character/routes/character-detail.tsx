@@ -42,6 +42,10 @@ function CharacterDetailBody() {
       source: toCharacterDetailSource(character),
       catalogIndex,
       rules: context.characterCreationRules,
+      equipmentReferenceScope: {
+        rulesetId: character.rulesetId as SystemRulesetId,
+        campaignId: '',
+      },
       xpProgression: resolveCampaignXpProgressionForRules(
         character.rulesetId as SystemRulesetId,
         context.characterCreationRules.progression,

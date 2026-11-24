@@ -24,7 +24,6 @@ export {
 } from './lib/display/character-list-row.lib'
 export { useBuildContext, type BuildContextResult } from './hooks/use-build-context'
 export {
-  useCampaignBuildContext,
   useCampaignBuildFoundation,
   useCampaignCharacterBuildContext,
   useCampaignNpcBuildContext,
@@ -85,8 +84,8 @@ export {
 export { OrganizationMembershipTitleField } from './components/connections/organization-membership-title-field'
 export {
   buildOrganizationMembershipTitleRadioOptions,
-  membershipRadioValueFromTitle,
-  titleFromMembershipRadioValue,
+  membershipRadioValueFromMembershipTitleId,
+  membershipTitleIdFromRadioValue,
 } from './lib/organization-membership/organization-membership-title.lib'
 export {
   createCharacterRelationship,
@@ -105,7 +104,6 @@ export {
   invalidateCharacterRelationshipQueries,
   type CharacterRelationshipInvalidationTarget,
   type CharacterRelationshipSubjectKind,
-  type CharacterOrganizationMembershipSubjectKind,
 } from './lib/invalidate-character-relationship-queries'
 export {
   characterLocationReferencesQueryKey,
@@ -191,7 +189,7 @@ export {
 } from './components/picker/catalog-picker-filter-state.lib'
 export { CatalogToolbarResetSlot } from './components/picker/catalog-toolbar-reset-action'
 export {
-  SAMPLE_PC,
+  makePcCharacter,
   makeCampaignNpcListItem,
   makeCampaignNpcDetail,
 } from './lib/fixtures/character-fixtures'
@@ -200,6 +198,7 @@ export {
   createStandaloneBuilderContextFixture,
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
+  standaloneEquipmentReferenceScope,
   createCampaignNpcBuilderContextFixture,
   createCampaignPcBuilderContextFixture,
 } from './lib/fixtures/character-builder-fixtures'

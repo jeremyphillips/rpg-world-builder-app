@@ -95,20 +95,16 @@ export type ResolvedDependentPresentation = {
 
 /** Resolves default dependent nest vs flush opt-out. */
 export function resolveDependentPresentation(
-  dependents: Pick<DependentDependentsConfig, 'chrome' | 'inset'>,
+  dependents: Pick<DependentDependentsConfig, 'chrome'>,
   rhythm: FieldRhythm,
   options?: { surfaceHost?: FormSurfaceHost; controller?: FieldConfig },
 ): ResolvedDependentPresentation {
-  let { chrome = DEFAULT_DEPENDENT_CHROME } = dependents
+  const { chrome = DEFAULT_DEPENDENT_CHROME } = dependents
   const surfaceHost = options?.surfaceHost ?? 'field-container'
   const controller = options?.controller
   const alignmentClassName = controller
     ? resolveDependentNestAlignmentClass(resolveControllerDependentAnatomy(controller))
     : DEPENDENT_NEST_ALIGN_FIELD_EDGE_CLASS
-
-  if (dependents.inset === false) {
-    chrome = 'none'
-  }
 
   if (chrome === 'none') {
     return { chrome, showNest: false }

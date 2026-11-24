@@ -51,7 +51,7 @@ const ctx = {
 
 const bite = {
   id: 'bite',
-  kind: 'natural-weapon',
+  kind: 'natural-weapon' as const,
   name: 'Bite',
   mode: 'melee',
   damageType: 'piercing',
@@ -60,20 +60,20 @@ const bite = {
 
 const multiattackFinished = {
   id: 'multiattack',
-  kind: 'multiattack',
+  kind: 'multiattack' as const,
   name: 'Multiattack',
   steps: [{ count: 1, actionIds: ['bite'] }],
 }
 
 const fireBreath = {
   id: 'fire-breath',
-  kind: 'save',
+  kind: 'save' as const,
   name: 'Fire Breath',
 }
 
 const multiattackEmpty = {
   id: 'multiattack',
-  kind: 'multiattack',
+  kind: 'multiattack' as const,
   name: 'Multiattack',
   steps: [],
 }
@@ -316,8 +316,8 @@ describe('multiattack editor UI cleanup', () => {
     let form: { getValues: () => MonsterFormValues } | undefined
     const seeded = {
       ...multiattackEmpty,
-      steps: [{ kind: 'use', mode: 'single', actionId: 'fire-breath' }],
-    }
+      steps: [{ kind: 'use' as const, mode: 'single' as const, actionId: 'fire-breath' }],
+    } as MonsterActionDraftRow
     const rows = [seeded, bite, fireBreath] as MonsterActionDraftRow[]
     render(
       <Harness

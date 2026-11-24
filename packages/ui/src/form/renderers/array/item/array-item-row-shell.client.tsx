@@ -7,7 +7,7 @@ import { ArrayItemShell, type ArrayItemShellProps } from './array-item-shell.cli
 
 export type ArrayItemRowShellProps = Omit<
   ArrayItemShellProps,
-  'showDragHandle' | 'collapsible' | 'layout' | 'main'
+  'reserveDragHandleSlot' | 'collapsible' | 'layout' | 'main'
 > & {
   children: React.ReactNode
 }
@@ -17,7 +17,7 @@ export function ArrayItemRowShell({ children, className, ...props }: ArrayItemRo
   return (
     <ArrayItemShell
       {...props}
-      showDragHandle={false}
+      reserveDragHandleSlot={false}
       collapsible={false}
       layout="compactRow"
       className={cn(className)}

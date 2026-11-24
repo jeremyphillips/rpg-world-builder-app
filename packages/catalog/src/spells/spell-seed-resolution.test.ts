@@ -54,12 +54,12 @@ describe('SRD 5.2.1 spell seed resolution manifest', () => {
     }
   })
 
-  it('covers exactly 15 Tier A slugs', () => {
-    expect(SRD_521_SPELL_SEED_RESOLUTION_TIER_A_SLUGS).toHaveLength(15)
+  it('covers exactly 19 Tier A slugs', () => {
+    expect(SRD_521_SPELL_SEED_RESOLUTION_TIER_A_SLUGS).toHaveLength(19)
   })
 
-  it('applies resolution to 23 slugs (15 Tier A + Eldritch Blast + Magic Missile + 4 Tier D + 2 Tier C)', () => {
-    expect(SRD_521_SPELL_SEED_RESOLUTION_SLUGS).toHaveLength(23)
+  it('applies resolution to 27 slugs (19 Tier A + Eldritch Blast + Magic Missile + 4 Tier D + 2 Tier C)', () => {
+    expect(SRD_521_SPELL_SEED_RESOLUTION_SLUGS).toHaveLength(27)
     expect(SRD_521_SPELL_SEED_RESOLUTION_SLUGS).toContain('eldritch-blast')
     expect(SRD_521_SPELL_SEED_RESOLUTION_SLUGS).toContain('magic-missile')
     expect(SRD_521_SPELL_SEED_RESOLUTION_SLUGS).toContain('cure-wounds')
@@ -72,7 +72,7 @@ describe('SRD 5.2.1 spell seed resolution manifest', () => {
     expect(SRD_521_SPELL_SEED_RESOLUTION_DEFERRED_SLUGS.sort()).toEqual(
       ['hex', 'hunters-mark', 'true-strike'].sort(),
     )
-    expect(SRD_521_SPELL_SEED_RESOLUTION_MANIFEST_SLUGS).toHaveLength(26)
+    expect(SRD_521_SPELL_SEED_RESOLUTION_MANIFEST_SLUGS).toHaveLength(30)
   })
 
   it('returns undefined for deferred manifest slugs', () => {

@@ -141,4 +141,16 @@ describe('formatCantripAcquisitionCopy', () => {
       'Choose up to 3 cantrips to learn from the Druid spell list.',
     )
   })
+
+  it('appends level-up cantrip replacement copy from compiled mutation', () => {
+    const copy = formatCantripAcquisitionCopy('Bard', 2, true, {
+      kind: 'replace',
+      trigger: 'levelUp',
+      limit: 1,
+    })
+    expect(spellAcquisitionCopyLines(copy)).toEqual([
+      'Choose 2 cantrips to learn from the Bard spell list.',
+      'Whenever you gain a Bard level, you can replace one of your cantrips from this feature with another Bard cantrip of your choice.',
+    ])
+  })
 })

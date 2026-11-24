@@ -9,13 +9,3 @@ export function listStaticConventions(): readonly NamingConvention[] {
 export function getStaticConvention(conventionId: string): NamingConvention | undefined {
   return STATIC_CONVENTION_BY_ID.get(conventionId)
 }
-
-/** @deprecated Use listStaticConventions */
-export function listConventions(): readonly NamingConvention[] {
-  return listStaticConventions()
-}
-
-/** @deprecated Use getStaticConvention or a composed convention lookup */
-export function getConvention(conventionId: string): NamingConvention | undefined {
-  return getStaticConvention(conventionId)
-}

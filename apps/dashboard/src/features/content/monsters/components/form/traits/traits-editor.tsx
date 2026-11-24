@@ -1,10 +1,6 @@
 import { useCallback, useMemo } from 'react'
 import { useWatch } from 'react-hook-form'
-import {
-  DEFAULT_SYSTEM_RULESET_ID,
-  getCreatureTraitTemplate,
-  listCreatureTraitTemplatesForRuleset,
-} from '@rpg/contracts'
+import { listCreatureTraitTemplatesForRuleset } from '@rpg/contracts'
 import { ButtonDropdown } from '@rpg/ui'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
@@ -14,7 +10,7 @@ import { useMasterDetailArray } from '../../../../lib/master-detail/use-master-d
 import { createMonsterRowId } from '../../../lib/monster-row-id'
 import {
   MONSTER_TRAIT_ACQUISITION_GROUPS,
-  monsterTraitAcquisitionItems,
+  monsterTraitAcquisitionDropdownItems,
   parseMonsterTraitAcquisitionId,
 } from '../../../lib/traits/monster-trait-acquisition'
 import { sharedCastingOptions } from '../../../lib/actions/spell/monster-action-casting-summary'
@@ -26,10 +22,9 @@ import {
 } from '../../../lib/traits/monster-trait-form-fields'
 import { monsterTraitRowResolveFields } from '../../../lib/monster-master-detail-validation-fields'
 import { resolveMonsterTraitRowTitleConfig } from '../../../lib/traits/monster-trait-row-title'
+import { useMonsterTraitFacingHost } from '../../../../facing/use-monster-trait-facing-host'
 import { monsterTraitPresetDefaults } from '../../../lib/traits/monster-trait-preset-fields'
 import type { MonsterFormValues } from '../../../lib/monster-form-values'
-
-const TEMPLATE_GROUP_ID = 'templates'
 
 export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
   const values = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
@@ -45,24 +40,21 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
   const traits = values?.traits
   const monsterName = values?.name
   const templateIds = useMemo(
-    () => listCreatureTraitTemplatesForRuleset(ctx.rulesetId ?? DEFAULT_SYSTEM_RULESET_ID),
+    () => (ctx.rulesetId ? listCreatureTraitTemplatesForRuleset(ctx.rulesetId, 'monster') : []),
     [ctx.rulesetId],
   )
   const templateIdSet = useMemo(() => new Set<string>(templateIds), [templateIds])
-  const items = useMemo(() => {
-    const presetItems = monsterTraitAcquisitionItems({ traits: traits ?? [] }).filter((item) => {
-      if (!item.id.startsWith('preset:')) return true
-      return !templateIdSet.has(item.id.slice('preset:'.length))
-    })
-    return [
-      ...templateIds.map((templateId) => ({
-        id: `template:${templateId}`,
-        label: getCreatureTraitTemplate(templateId)?.label ?? templateId,
-        groupId: TEMPLATE_GROUP_ID,
-      })),
-      ...presetItems,
-    ]
-  }, [templateIdSet, templateIds, traits])
+  const items = useMemo(
+    () =>
+      monsterTraitAcquisitionDropdownItems({
+        traits: traits ?? [],
+        templateIds,
+      }).filter((item) => {
+        if (!item.id.startsWith('preset:')) return true
+        return !templateIdSet.has(item.id.slice('preset:'.length))
+      }),
+    [templateIdSet, templateIds, traits],
+  )
   const advisories = useMemo(
     () => (values ? collectMonsterFormAdvisories(values, new Map()) : []),
     [values],
@@ -73,32 +65,52 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
     [monsterName],
   )
 
-  const resolveItemFields = useCallback(
-    (row: unknown) => {
-      const rowIndex =
-        row && traits
-          ? traits.findIndex(
-              (trait) =>
-                trait === row ||
-                (typeof row === 'object' &&
-                  row !== null &&
-                  'id' in row &&
-                  typeof trait?.id === 'string' &&
-                  trait.id === (row as { id: string }).id),
-            )
-          : -1
-      const index = rowIndex >= 0 ? rowIndex : (editor.selectedIndex ?? 0)
-      return monsterTraitDetailFields({
+  const traitDetailFieldsForRow = useCallback(
+    (row: unknown, index: number) =>
+      monsterTraitDetailFields({
         row,
         advisories,
         rowPath: `traits.${index}`,
         monsterName: monsterName ?? '',
         ctx,
         sharedCastingOptions: values ? sharedCastingOptions(values, '') : [],
-      })
-    },
-    [advisories, ctx, editor.selectedIndex, monsterName, traits, values],
+      }),
+    [advisories, ctx, monsterName, values],
   )
+
+  const resolveTraitRowIndex = useCallback(
+    (row: unknown) => {
+      if (!row || !traits) return editor.selectedIndex ?? 0
+      const rowIndex = traits.findIndex(
+        (trait) =>
+          trait === row ||
+          (typeof row === 'object' &&
+            row !== null &&
+            'id' in row &&
+            typeof trait?.id === 'string' &&
+            trait.id === (row as { id: string }).id),
+      )
+      return rowIndex >= 0 ? rowIndex : (editor.selectedIndex ?? 0)
+    },
+    [editor.selectedIndex, traits],
+  )
+
+  const resolveItemFields = useCallback(
+    (row: unknown) => traitDetailFieldsForRow(row, resolveTraitRowIndex(row)),
+    [resolveTraitRowIndex, traitDetailFieldsForRow],
+  )
+
+  const resolveFieldSections = useCallback(
+    (row: unknown) => ({
+      primary: traitDetailFieldsForRow(row, resolveTraitRowIndex(row)),
+    }),
+    [resolveTraitRowIndex, traitDetailFieldsForRow],
+  )
+
+  const facing = useMonsterTraitFacingHost({
+    fieldName: 'traits',
+    selectedIndex: editor.selectedIndex,
+  })
 
   return (
     <FormEmbeddedMasterDetailEditor
@@ -107,6 +119,8 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
       fieldName="traits"
       itemFields={traitResolver}
       resolveItemFields={resolveItemFields}
+      resolveFieldSections={resolveFieldSections}
+      facing={facing}
       itemNoun={MONSTER_TRAIT_ITEM_NOUN}
       listTitle={MONSTER_TRAITS_HEADING}
       ariaLabel={MONSTER_TRAITS_HEADING}
@@ -116,25 +130,17 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
           label={MONSTER_ADD_LABEL}
           searchPlaceholder="Search traits…"
           triggerPresentation="addIcon"
-          groups={[
-            { id: TEMPLATE_GROUP_ID, label: 'Templates' },
-            ...MONSTER_TRAIT_ACQUISITION_GROUPS,
-          ]}
+          groups={MONSTER_TRAIT_ACQUISITION_GROUPS}
+          supportingWrap
           items={items}
           onSelectItem={(id) => {
             if (id.startsWith('template:')) {
-              editor.appendRow(
-                creatureTraitTemplateRow(id.slice('template:'.length), createMonsterRowId()),
-              )
+              const templateId = id.slice('template:'.length)
+              editor.appendRow(creatureTraitTemplateRow(templateId, createMonsterRowId()))
               return
             }
             const choice = parseMonsterTraitAcquisitionId(id)
             if (!choice) return
-            if (choice.type === 'focus') {
-              const index = (traits ?? []).findIndex((trait) => trait.id === choice.traitId)
-              if (index >= 0) editor.select(index)
-              return
-            }
             if (choice.type === 'custom') {
               editor.appendRow(makeItemDefaults())
               return

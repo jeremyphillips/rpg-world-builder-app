@@ -2,7 +2,11 @@ import { classSchema, type ClassStored } from '../../content/classes/class'
 import type { Spell } from '../../content/spell'
 import { resolveCharacterCreationPatch } from '../../campaign/patches/campaign-character-creation-patch'
 import { spellcastingProgressionTestConfig } from '../../campaign/rules/spellcasting-progression/fixtures'
-import { getSlotProgressionKindLabel } from '../../vocab/spell/slot-progression-kind'
+import {
+  PACT_MAGIC_SLOT_PROGRESSION_ID,
+  spellcastingGrantingFeatureDefaultName,
+  SPELLCASTING_GRANTING_FEATURE_ID,
+} from '../../content/classes/spellcasting/spellcasting-granting-feature'
 import { defaultCampaignMechanicsPatch } from '../../campaign/patches/campaign-mechanics-patch'
 import type { Species } from '../../content/species'
 import type { SkillProficiency } from '../../content/skill-proficiency'
@@ -32,11 +36,12 @@ const defaultSkillChoices = {
 
 function spellcastingGrantFeature(usesPactMagic = false) {
   return {
-    kind: 'custom' as const,
-    id: usesPactMagic ? 'pact-magic' : 'spellcasting',
-    name: usesPactMagic ? getSlotProgressionKindLabel('pact-magic') : 'Spellcasting',
+    kind: 'spellcasting' as const,
+    id: usesPactMagic ? PACT_MAGIC_SLOT_PROGRESSION_ID : SPELLCASTING_GRANTING_FEATURE_ID,
+    name: spellcastingGrantingFeatureDefaultName({
+      slotProgressionId: usesPactMagic ? 'pact-magic' : 'full-caster',
+    }),
     level: 1,
-    grantGroups: [{ grants: [{ id: 'spellcasting-1', kind: 'spellcasting' as const }] }],
   }
 }
 
@@ -74,6 +79,9 @@ export const wizardStored: ClassStored = {
         extension: 'zero',
       },
       change: { kind: 'replace', trigger: 'longRest', limit: 'all' },
+    },
+    cantripSelection: {
+      change: { kind: 'replace', trigger: 'longRest', limit: 1 },
     },
     progression: {
       cantrips: {
@@ -123,6 +131,47 @@ export const paladinStored: ClassStored = {
 }
 
 export const paladinClass = classSchema.parse(paladinStored)
+
+export const rangerStored: ClassStored = {
+  ...baseMeta,
+  id: `${RULESET}:fixture-ranger`,
+  slug: 'fixture-ranger',
+  name: 'Ranger',
+  description: '<p>Wilderness hunter.</p>',
+  primaryAbilities: ['dex', 'wis'],
+  hitDie: 10,
+  proficiencies: {
+    savingThrows: ['str', 'dex'],
+    armor: { categories: ['light', 'medium', 'shields'], items: [] },
+    weapons: { categories: ['simple', 'martial'], items: [] },
+    skills: { categories: [], items: [] },
+  },
+  characterCreation: defaultSkillChoices,
+  features: [spellcastingGrantFeature()],
+  spellcasting: {
+    slotProgressionId: 'half-caster',
+    ability: 'wis',
+    focusKinds: ['druidic_focus'],
+    spellSelection: {
+      model: 'prepareFromClassList',
+      change: { kind: 'replace', trigger: 'longRest', limit: 1 },
+    },
+    progression: {
+      preparedSpells: {
+        curve: {
+          rows: [
+            { level: 1, count: 2 },
+            { level: 5, count: 6 },
+            { level: 20, count: 15 },
+          ],
+        },
+        extension: 'carryForward',
+      },
+    },
+  },
+}
+
+export const rangerClass = classSchema.parse(rangerStored)
 
 export const warlockStored: ClassStored = {
   ...baseMeta,
@@ -240,7 +289,7 @@ export const athleticsSkill = {
 
 export const spellcastingTestCatalog: CharacterBuildCatalog = {
   species: [testSpecies],
-  classes: [nonCasterClass, wizardClass, paladinClass, warlockClass],
+  classes: [nonCasterClass, wizardClass, paladinClass, rangerClass, warlockClass],
   spells: [
     ...wizardCantrips,
     ...wizardLevelOneSpells,
@@ -260,8 +309,7 @@ export const spellcastingTestContext: CharacterBuildContext = {
   channel: 'build',
   surface: 'dashboard',
   characterKind: 'pc',
-  mode: 'dashboard',
-  scope: { type: 'standalone', rulesetId: RULESET },
+
   rulesScope: { type: 'ruleset', rulesetId: RULESET },
   ownershipTarget: resolveCharacterOwnershipTarget('pc', { type: 'ruleset', rulesetId: RULESET }),
   rulesetId: RULESET,

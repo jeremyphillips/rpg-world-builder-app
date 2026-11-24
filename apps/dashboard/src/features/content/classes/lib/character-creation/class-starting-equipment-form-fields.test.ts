@@ -4,6 +4,8 @@ import { type ArrayConfig, isContainer } from '@rpg/ui/form'
 
 import { pickClass, pickEquipment } from '../../../lib/fixtures/pick'
 import { equipmentGrantSummary } from '../../../lib/forms/grants/equipment/equipment-grant-form-values'
+import { buildGrantEquipmentReferencePresentationFromAuthoring } from '../../../lib/forms/grants/grant-row-presentation.lib'
+import type { Equipment } from '@rpg/contracts'
 import {
   startingEquipmentChoiceItemFormSchema,
   startingEquipmentDraftFormSchema,
@@ -129,10 +131,18 @@ describe('startingEquipmentOptionCompactSummary', () => {
 })
 
 describe('startingEquipmentItemTitle', () => {
-  const equipmentOptions = [
-    { value: 'javelin', label: 'Javelin' },
-    { value: 'greataxe', label: 'Greataxe' },
-  ]
+  const equipmentReferences = buildGrantEquipmentReferencePresentationFromAuthoring({
+    status: 'ready',
+    scope: { rulesetId: 'srd-cc-5.2.1', campaignId: 'campaign-1' },
+    equipmentById: new Map(
+      (
+        [
+          { id: 'srd-cc-5.2.1:javelin', slug: 'javelin', name: 'Javelin' },
+          { id: 'srd-cc-5.2.1:greataxe', slug: 'greataxe', name: 'Greataxe' },
+        ] as Equipment[]
+      ).map((item) => [item.id, item]),
+    ),
+  })
   const proficiencyChoiceOptions = [
     {
       value: 'class-tools',
@@ -152,7 +162,7 @@ describe('startingEquipmentItemTitle', () => {
           quantity: 4,
         },
         0,
-        equipmentOptions,
+        equipmentReferences,
       ),
     ).toBe('Javelin')
   })
@@ -168,7 +178,7 @@ describe('startingEquipmentItemTitle', () => {
           quantity: 1,
         },
         0,
-        equipmentOptions,
+        equipmentReferences,
       ),
     ).toBe('Greataxe')
   })
@@ -184,7 +194,7 @@ describe('startingEquipmentItemTitle', () => {
           quantity: 1,
         },
         0,
-        equipmentOptions,
+        equipmentReferences,
         proficiencyChoiceOptions,
       ),
     ).toBe(`Tool from "Artisan's Tools or Musical Instrument"`)
@@ -199,7 +209,7 @@ describe('startingEquipmentItemTitle', () => {
           proficiencyChoiceId: 'class-tools',
           quantity: 1,
         },
-        equipmentOptions,
+        equipmentReferences,
       ),
     ).toBe('Linked to Tool Proficiencies')
   })

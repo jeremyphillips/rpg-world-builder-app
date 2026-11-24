@@ -20,10 +20,10 @@ export function resolveCharacterBuilderStorageKey(
 }
 
 export function getCharacterBuilderStorageKey(
-  context: Pick<CharacterBuildContext, 'mode' | 'characterKind' | 'rulesScope'>,
+  context: Pick<CharacterBuildContext, 'surface' | 'characterKind' | 'rulesScope'>,
   userId?: string,
 ): string | null {
   const scope = resolveCharacterBuilderDraftScope(context, userId)
   if (!scope) return null
-  return resolveCharacterBuilderDraftKey(scope, { mode: context.mode })
+  return resolveCharacterBuilderDraftKey(scope, { surface: context.surface })
 }

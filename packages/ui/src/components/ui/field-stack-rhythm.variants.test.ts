@@ -14,7 +14,7 @@ import {
   resolveFieldGroupBodyGap,
   fieldStackRhythmVariants,
   resolveFieldAnatomyHeaderBodyStackClassName,
-  resolveFieldGroupInsetPaddingClasses,
+  resolveFormInsetPaddingClasses,
   resolveFieldGroupLegendClassName,
 } from './field.variants'
 
@@ -146,8 +146,8 @@ describe('field group legend helpers', () => {
   })
 })
 
-describe('resolveFieldGroupInsetPaddingClasses', () => {
+describe('resolveFormInsetPaddingClasses', () => {
   it('returns compact inset padding from shared form inset policy', () => {
-    expect(resolveFieldGroupInsetPaddingClasses('compact')).toBe('pl-8')
+    expect(resolveFormInsetPaddingClasses('compact')).toBe('pl-8')
   })
 })

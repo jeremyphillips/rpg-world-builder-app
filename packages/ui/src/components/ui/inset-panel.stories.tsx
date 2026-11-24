@@ -125,12 +125,6 @@ export const OnFieldContainer: Story = {
   ],
 }
 
-/** @deprecated Story alias — use InstructionalGate */
-export const DashedGate = InstructionalGate
-
-/** @deprecated Story alias — use PassiveMessageEmpty */
-export const DashedEmpty = PassiveMessageEmpty
-
 export const ClassReference: Story = {
   tags: ['control-parity'],
   parameters: { semanticClasses: true },

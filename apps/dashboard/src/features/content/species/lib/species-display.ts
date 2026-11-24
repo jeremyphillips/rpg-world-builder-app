@@ -1,13 +1,15 @@
 import {
+  formatCreatureSensesCompactList,
   formatMovementDisplay,
   CREATURE_SIZE_TERM,
   CREATURE_TYPE_TERM,
   formatCreatureSizeList,
   getVocabularyTermLabel,
+  renderTraitFacingBodyHtml,
   resolveCreatureMovement,
   resolveCreatureSenses,
   resolveCreatureTraitGrants,
-  resolveTraitDisplay,
+  resolveTraitFacingParts,
   type Species,
   type SpeciesBodyTrait,
 } from '@rpg/contracts'
@@ -45,7 +47,7 @@ export type SpeciesDetailItem = {
   id: string
   title: string
   bodyHtml?: string
-  /** Grouped grant summary lines, e.g. `L1: Darkvision 120 ft · Dancing Lights cantrip`. */
+  /** Grouped grant summary lines, e.g. `L1: Darkvision 120 ft. · Dancing Lights cantrip`. */
   summaryLines?: string[]
   /** Flat grant summary for compact surfaces. */
   summaryInline?: string
@@ -82,17 +84,14 @@ export type SpeciesDetailViewModel = {
   >
 }
 
-function collectSenses(
-  traits: SpeciesBodyTrait[],
-  resolveSenseLabel: (type: string) => string,
-): string {
+function collectSenses(traits: SpeciesBodyTrait[]): string {
   const senses = resolveCreatureSenses({
     grants: resolveCreatureTraitGrants(traits.map((trait) => ({ trait, source: trait.id }))).map(
       (resolved) => resolved.grant,
     ),
   })
   if (senses.length === 0) return 'None'
-  return senses.map((sense) => `${resolveSenseLabel(sense.type)} ${sense.range} ft.`).join(', ')
+  return formatCreatureSensesCompactList(senses)
 }
 
 function buildSpeciesStatRows(
@@ -114,7 +113,7 @@ function buildSpeciesStatRows(
     },
     {
       label: SPECIES_STAT_LABELS.senses,
-      value: collectSenses(species.traits, vocabulary.resolveSenseLabel),
+      value: collectSenses(species.traits),
     },
   ]
 
@@ -128,12 +127,21 @@ function buildSpeciesStatRows(
   return rows
 }
 
+function facingTitleAndBody(trait: SpeciesBodyTrait): { title: string; bodyHtml?: string } {
+  const parts = resolveTraitFacingParts(trait, { host: 'species' })
+  const bodyHtml = renderTraitFacingBodyHtml(parts)
+  if (bodyHtml || parts.title) {
+    return { title: parts.title, bodyHtml }
+  }
+  return { title: trait.kind === 'custom' ? trait.name : trait.id }
+}
+
 function mapTraitToDetailItem(trait: SpeciesBodyTrait): SpeciesDetailItem {
-  const display = resolveTraitDisplay(trait)
+  const { title, bodyHtml } = facingTitleAndBody(trait)
   return {
     id: trait.id,
-    title: display.name,
-    bodyHtml: display.descriptionHtml,
+    title,
+    bodyHtml,
   }
 }
 
@@ -148,7 +156,7 @@ function mapHeritageOptionToDetailItem(
   trait: SpeciesBodyTrait,
   vocabulary: SpeciesDisplayVocabulary,
 ): SpeciesDetailItem {
-  const display = resolveTraitDisplay(trait)
+  const { title, bodyHtml } = facingTitleAndBody(trait)
   const grantVocabulary = toGrantDisplayVocabulary(vocabulary)
   const summaryModel = buildGrantSummaryModel(
     trait.kind === 'template' ? undefined : trait.grantGroups,
@@ -165,8 +173,8 @@ function mapHeritageOptionToDetailItem(
 
   return {
     id: trait.id,
-    title: display.name,
-    bodyHtml: display.descriptionHtml,
+    title,
+    bodyHtml,
     summaryLines: groupedSummary.map(({ label, text }) => `${label}: ${text}`),
     summaryInline: formatGrantSummaryInline(summaryModel),
   }
@@ -176,7 +184,7 @@ export function buildSpeciesCardViewModel(species: Species): SpeciesCardViewMode
   return {
     label: species.name,
     summaryItems: truncateSpeciesCardSummaryItems(
-      species.traits.map((trait) => resolveTraitDisplay(trait).name),
+      species.traits.map((trait) => facingTitleAndBody(trait).title),
     ),
   }
 }

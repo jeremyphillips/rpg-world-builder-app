@@ -103,7 +103,7 @@ function mergeSpellEntry(
     spellId,
     sources: mergeSources(existing?.sources, sources),
     access: buildSpellAccess(existing?.access, grant),
-    selection: existing?.selection,
+    collections: existing?.collections,
     castingEntitlements: castingEntitlement
       ? mergeCastingEntitlements(existing?.castingEntitlements, castingEntitlement)
       : existing?.castingEntitlements,
@@ -178,7 +178,6 @@ export function mergeCharacterSpellEntries(
       sources: mergeSources(existing.sources, granted.sources ?? []),
       access: { ...existing.access, ...granted.access },
       collections: mergeCharacterSpellCollections(existing.collections, granted.collections ?? []),
-      selection: existing.selection ?? granted.selection,
       castingEntitlements: granted.castingEntitlements?.length
         ? granted.castingEntitlements.reduce(
             (acc, entitlement) => mergeCastingEntitlements(acc, entitlement),

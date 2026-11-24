@@ -10,11 +10,10 @@ import { monsterFormAdvisoryDisplay } from '../monster-form-advisory-presentatio
 import { defineMasterDetailItemNoun } from '../../../lib/master-detail/master-detail-item-noun'
 import { insertMonsterFormAvailabilityField } from '../forms/monster-form-availability-fields'
 import { OutsideWaterBreathSlot } from '../../components/form/slots/traits/outside-water-breath.slot'
-import { MonsterTraitRulesPreview } from '../../components/form/slots/traits/trait-preview.slot'
 import type { MonsterFormAdvisory } from '../monster-form-advisories'
 import {
-  MONSTER_CUSTOM_DESCRIPTION_HINT,
   MONSTER_CUSTOM_DESCRIPTION_LABEL,
+  MONSTER_CUSTOM_DESCRIPTION_HINT,
   MONSTER_RULES_TEXT_LABEL,
 } from '../monster-form-labels'
 
@@ -23,7 +22,7 @@ import {
   type OutsideWaterBreathDurationFields,
 } from '@/features/content/lib/creature-traits/outside-water-breath.lib'
 
-import { legendaryResistanceTemplateUseFields } from '@/features/content/lib/creature-traits/legendary-resistance-trait-fields'
+import { assembleCreatureTraitTemplateFields } from '@/features/content/lib/creature-traits/creature-trait-template-field-assembler'
 
 import { monsterTraitPresetFields } from './monster-trait-preset-fields'
 
@@ -68,43 +67,32 @@ export function monsterTraitItemFields(input?: {
   ]
 }
 
-/** Config and optional display overrides for a monster `kind: 'template'` row. */
-const legendaryResistanceTemplateVisibility = {
-  dependsOn: ['templateId'],
-  visibleWhen: (watched: Record<string, unknown>) =>
-    watched['templateId'] === 'legendary-resistance',
-}
-
-function withLegendaryResistanceTemplateVisibility(field: FormItem): FormItem {
-  if (field.visibility === undefined) {
-    return { ...field, visibility: legendaryResistanceTemplateVisibility }
+/** Config fields for a monster `kind: 'template'` row. */
+export function monsterTraitTemplateFields(templateId?: string): FormItem[] {
+  if (!templateId) {
+    return [
+      {
+        type: 'richtext',
+        name: 'details',
+        label: MONSTER_CUSTOM_DESCRIPTION_LABEL,
+        hint: MONSTER_CUSTOM_DESCRIPTION_HINT,
+        optionalDisclosure: { intent: 'add', actionSubject: 'details' },
+      },
+    ]
   }
-  const prior = field.visibility
-  return {
-    ...field,
-    visibility: {
-      dependsOn: [
-        ...new Set([...prior.dependsOn, ...legendaryResistanceTemplateVisibility.dependsOn]),
-      ],
-      visibleWhen: (watched: Record<string, unknown>) =>
-        prior.visibleWhen(watched) && legendaryResistanceTemplateVisibility.visibleWhen(watched),
-    },
-  }
-}
-
-export function monsterTraitTemplateFields(): FormItem[] {
-  return [
-    ...legendaryResistanceTemplateUseFields({ includeInLair: true }).map(
-      withLegendaryResistanceTemplateVisibility,
-    ),
-    {
-      type: 'richtext',
-      name: 'descriptionOverride',
-      label: MONSTER_CUSTOM_DESCRIPTION_LABEL,
-      hint: MONSTER_CUSTOM_DESCRIPTION_HINT,
-      optionalDisclosure: { intent: 'add', actionSubject: 'details' },
-    },
-  ]
+  return assembleCreatureTraitTemplateFields({
+    templateId,
+    host: 'monster',
+  }).map((field) => {
+    if ('name' in field && field.name === 'details') {
+      return {
+        ...field,
+        label: MONSTER_CUSTOM_DESCRIPTION_LABEL,
+        hint: MONSTER_CUSTOM_DESCRIPTION_HINT,
+      }
+    }
+    return field
+  })
 }
 
 function isPresetRow(row: unknown): row is { preset: string } & Record<string, unknown> {
@@ -126,14 +114,6 @@ function isTemplateRow(row: unknown): row is { templateId: string; config?: unkn
   )
 }
 
-function traitPreviewSlot(): FormItem {
-  return {
-    kind: 'slot',
-    name: 'traitPreview',
-    render: () => <MonsterTraitRulesPreview />,
-  }
-}
-
 function presetParameterFields(
   row: { preset: string } & Record<string, unknown>,
   ctx: Pick<ContentFormCtx, 'damageTypeVocabulary'>,
@@ -152,7 +132,7 @@ function presetParameterFields(
 }
 
 /**
- * Trait detail order: preview, advisory, mechanics, then supplemental prose.
+ * Trait detail order: advisory, mechanics, then supplemental prose.
  * Custom description is primary content and stays immediately after the advisory.
  */
 export function monsterTraitDetailFields(input: {
@@ -166,9 +146,8 @@ export function monsterTraitDetailFields(input: {
   const advisoryItem = monsterFormAdvisoryDisplay(input.advisories, input.rowPath)
   if (isTemplateRow(input.row)) {
     return insertMonsterFormAvailabilityField([
-      traitPreviewSlot(),
       advisoryItem,
-      ...monsterTraitTemplateFields(),
+      ...monsterTraitTemplateFields(input.row.templateId),
     ])
   }
   if (!isPresetRow(input.row)) {
@@ -179,5 +158,5 @@ export function monsterTraitDetailFields(input: {
       }),
     ])
   }
-  return [traitPreviewSlot(), advisoryItem, ...presetParameterFields(input.row, input.ctx)]
+  return [advisoryItem, ...presetParameterFields(input.row, input.ctx)]
 }

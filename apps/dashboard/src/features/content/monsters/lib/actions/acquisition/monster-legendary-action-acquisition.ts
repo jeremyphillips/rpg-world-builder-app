@@ -2,10 +2,12 @@ import {
   formatSpellCastAtLevelName,
   getMonsterActionKindLabel,
   listDirectSpellCastingSources,
+  MONSTER_ACTION_KIND_ENTRIES,
   type ResolvedSpellCastingSource,
   type SpellCastingSections,
 } from '@rpg/contracts'
 
+import type { ButtonDropdownItem } from '@rpg/ui'
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import {
   LEGENDARY_CAST_SPELL_DEFAULT_NAME,
@@ -16,18 +18,25 @@ import {
   LEGENDARY_CUSTOM_LABEL,
   LEGENDARY_ACTION_CATEGORY_LABELS,
   MONSTER_ACTION_REFERENCE_ACQUISITION_LABEL,
-  LEGENDARY_REFERENCE_DESCRIPTION,
   LEGENDARY_REFERENCE_DISABLED_NOTE,
   LEGENDARY_SPELLCASTING_DEFAULT_NAME,
   LEGENDARY_SPELLCASTING_DESCRIPTION,
   LEGENDARY_SPELLCASTING_DISABLED_NOTE,
-  MONSTER_ACQUISITION_SAVE_DESCRIPTION,
 } from '../../monster-form-labels'
 import type { MonsterFormValues } from '../../monster-form-values'
 import { createSpellActionDraft } from './monster-action-acquisition'
 import { createMonsterRowId } from '../../monster-row-id'
-import { isLegendaryReferenceTarget } from '../legendary/legendary-action-category'
+import {
+  LEGENDARY_ACQUISITION_OPTION_ID,
+  type LegendaryAcquisitionCategory,
+} from '../legendary/legendary-action-category'
+import { listActionReferenceAcquisitionTargets } from '../reference/action-reference-acquisition'
 import type { MonsterActionDraftRow } from '../monster-action-presets'
+import {
+  type AcquisitionOption,
+  resolveAcquisitionAvailability,
+  toAcquisitionDropdownItem,
+} from '../../../../lib/acquisition'
 
 export const LEGENDARY_ACTION_ACQUISITION_GROUPS = [
   { id: 'existing', label: 'Use existing' },
@@ -36,15 +45,6 @@ export const LEGENDARY_ACTION_ACQUISITION_GROUPS = [
 
 export type LegendaryActionAcquisitionGroupId =
   (typeof LEGENDARY_ACTION_ACQUISITION_GROUPS)[number]['id']
-
-type LegendaryAcquisitionItem = {
-  id: string
-  label: string
-  groupId: LegendaryActionAcquisitionGroupId
-  metadata?: string
-  disabled?: boolean
-  note?: string
-}
 
 function spellRows(values: MonsterFormValues): MonsterActionDraftRow[] {
   return [
@@ -80,85 +80,108 @@ export function legendarySpellcastingSources(
 }
 
 export function legendaryReferenceTargets(values: MonsterFormValues): MonsterActionDraftRow[] {
-  return ((values.actions ?? []) as MonsterActionDraftRow[]).filter(isLegendaryReferenceTarget)
+  return listActionReferenceAcquisitionTargets((values.actions ?? []) as MonsterActionDraftRow[])
 }
 
 export function legendaryActionAcquisitionItems(
   values: MonsterFormValues,
   ctx: Pick<ContentFormCtx, 'spellCatalogStatus'>,
-): LegendaryAcquisitionItem[] {
+): ButtonDropdownItem[] {
   const targets = legendaryReferenceTargets(values)
   const sources = legendarySpellcastingSources(values)
   const catalogReady = ctx.spellCatalogStatus === 'ready'
-  return [
+  const items: AcquisitionOption[] = [
     {
-      id: 'legendary:reference',
+      id: LEGENDARY_ACQUISITION_OPTION_ID.reference,
       label: MONSTER_ACTION_REFERENCE_ACQUISITION_LABEL,
       groupId: 'existing',
-      metadata: LEGENDARY_REFERENCE_DESCRIPTION,
-      disabled: targets.length === 0,
-      note: targets.length === 0 ? LEGENDARY_REFERENCE_DISABLED_NOTE : undefined,
+      description: {
+        status: 'ready',
+        text: MONSTER_ACTION_KIND_ENTRIES['action-reference'].description,
+      },
+      availability: resolveAcquisitionAvailability({
+        prerequisite:
+          targets.length === 0 ? { message: LEGENDARY_REFERENCE_DISABLED_NOTE } : undefined,
+      }),
     },
     {
-      id: 'legendary:spellcasting',
+      id: LEGENDARY_ACQUISITION_OPTION_ID.spellcasting,
       label: LEGENDARY_ACTION_CATEGORY_LABELS.spellcasting,
       groupId: 'existing',
-      metadata: LEGENDARY_SPELLCASTING_DESCRIPTION,
-      disabled: sources.length === 0,
-      note: sources.length === 0 ? LEGENDARY_SPELLCASTING_DISABLED_NOTE : undefined,
+      description: { status: 'ready', text: LEGENDARY_SPELLCASTING_DESCRIPTION },
+      availability: resolveAcquisitionAvailability({
+        prerequisite:
+          sources.length === 0 ? { message: LEGENDARY_SPELLCASTING_DISABLED_NOTE } : undefined,
+      }),
     },
     {
-      id: 'legendary:cast-spell',
+      id: LEGENDARY_ACQUISITION_OPTION_ID['cast-spell'],
       label: LEGENDARY_CAST_SPELL_LABEL,
       groupId: 'new',
-      metadata: LEGENDARY_CAST_SPELL_DESCRIPTION,
-      disabled: !catalogReady,
-      note: catalogReady ? undefined : LEGENDARY_CAST_SPELL_DISABLED_NOTE,
+      description: { status: 'ready', text: LEGENDARY_CAST_SPELL_DESCRIPTION },
+      availability: resolveAcquisitionAvailability({
+        readiness: !catalogReady ? { message: LEGENDARY_CAST_SPELL_DISABLED_NOTE } : undefined,
+      }),
     },
     {
       id: 'create:save',
       label: getMonsterActionKindLabel('save'),
       groupId: 'new',
-      metadata: MONSTER_ACQUISITION_SAVE_DESCRIPTION,
+      description: { status: 'ready', text: MONSTER_ACTION_KIND_ENTRIES.save.description },
+      availability: { status: 'available' },
     },
     {
       id: 'create:special',
       label: LEGENDARY_CUSTOM_LABEL,
       groupId: 'new',
-      metadata: LEGENDARY_CUSTOM_DESCRIPTION,
+      description: { status: 'ready', text: LEGENDARY_CUSTOM_DESCRIPTION },
+      availability: { status: 'available' },
     },
   ]
+  return items.map(toAcquisitionDropdownItem)
 }
 
 export function createLegendaryActionDraft(
-  category: 'reference' | 'spellcasting' | 'cast-spell',
+  category: LegendaryAcquisitionCategory,
   values: MonsterFormValues,
 ): MonsterActionDraftRow {
   const id = createMonsterRowId()
-  if (category === 'reference') {
-    const targets = legendaryReferenceTargets(values)
-    return {
-      id,
-      kind: 'action-reference',
-      actionIds: targets.length === 1 && targets[0] ? [targets[0].id] : [],
+  switch (category) {
+    case 'reference': {
+      const targets = legendaryReferenceTargets(values)
+      return {
+        id,
+        kind: 'action-reference',
+        actionIds: targets.length === 1 && targets[0] ? [targets[0].id] : [],
+      }
+    }
+    case 'spellcasting': {
+      const sources = legendarySpellcastingSources(values)
+      return {
+        id,
+        kind: 'spell',
+        name: LEGENDARY_SPELLCASTING_DEFAULT_NAME,
+        spellInvocation: 'use-entry',
+        spells: [{ spellId: undefined }],
+        ...(sources.length === 1 && sources[0]
+          ? { castingAbility: { kind: 'shared' as const, entryId: sources[0].id } }
+          : {}),
+      }
+    }
+    case 'cast-spell': {
+      const cast = createSpellActionDraft('legendaryActions', values, 'standalone')
+      if (cast.kind !== 'spell') return cast
+      return {
+        ...cast,
+        name: LEGENDARY_CAST_SPELL_DEFAULT_NAME,
+        spells: [{ spellId: undefined }],
+      }
+    }
+    default: {
+      const unreachable: never = category
+      throw new Error(`Unknown legendary acquisition category: ${unreachable}`)
     }
   }
-  if (category === 'spellcasting') {
-    const sources = legendarySpellcastingSources(values)
-    return {
-      id,
-      kind: 'spell',
-      name: LEGENDARY_SPELLCASTING_DEFAULT_NAME,
-      spellInvocation: 'use-entry',
-      spells: [{ spellId: undefined }],
-      ...(sources.length === 1 && sources[0]
-        ? { castingAbility: { kind: 'shared' as const, entryId: sources[0].id } }
-        : {}),
-    }
-  }
-  const cast = createSpellActionDraft('legendaryActions', values, 'standalone')
-  if (cast.kind !== 'spell') return cast
-  return { ...cast, name: LEGENDARY_CAST_SPELL_DEFAULT_NAME, spells: [{ spellId: undefined }] }
 }
 
 /** Spells on the selected Spellcasting action, labeled with that action's cast level. */

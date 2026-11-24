@@ -5,6 +5,7 @@ import type { FormItem, FormValueSync, TabbedFormTab } from '@rpg/ui/form'
 import type {
   ArmorClassRules,
   ContentMediaDomain,
+  ContentTypeKey,
   CatalogLayer,
   ContentValidationIntent,
   Equipment,
@@ -50,8 +51,10 @@ export type ContentFormCtx = {
   entityCatalogLayer?: CatalogLayer
   /** Immutable catalog slug on edit — omitted from RHF because slug is envelope-only. */
   entitySlug?: string
-  /** Ruleset for system artwork resolution in media fields. */
+  /** Campaign catalog ruleset from the campaign record (authoring catalogs, equipment scope, monster provider). */
   rulesetId?: string
+  /** Entity ruleset on edit — artwork and entity-facing identity; does not override campaign catalog ruleset. */
+  entityRulesetId?: string
   /** Resolved campaign rule overrides (defaults when absent). */
   campaignRules?: ResolvedCampaignRules
   /** Resolved spellcasting progression records (seed + campaign patch). */
@@ -75,7 +78,10 @@ export type ContentFormCtx = {
   /** Campaign-resolved weapon property labels and active ids. */
   weaponPropertyVocabulary?: WeaponPropertyVocabulary
   options?: Partial<ContentFormOptionSets>
-  /** Full effective equipment catalog for monster catalog rules and derived AC. */
+  /**
+   * Equipment keyed by canonical `equipment.id` from the campaign list query.
+   * Authoritative for reference **resolution** — includes drafts not shown in `forReference()` pickers.
+   */
   equipmentCatalogById?: ReadonlyMap<string, Equipment>
   /** Effective skill proficiencies keyed by slug for monster catalog rules. */
   skillCatalogBySlug?: ReadonlyMap<string, SkillProficiency>
@@ -83,9 +89,16 @@ export type ContentFormCtx = {
   equipmentCatalogStatus?: 'pending' | 'ready' | 'error'
   /** `ready` once `skillCatalogBySlug` is the campaign's effective catalog. */
   skillCatalogStatus?: 'pending' | 'ready' | 'error'
-  /** Spells keyed by canonical content id for monster spell actions. */
+  /**
+   * Spells keyed by canonical `spell.id` from the campaign list query (system + homebrew).
+   * Authoritative for reference **resolution** — includes drafts not shown in `forReference()` pickers.
+   * See `packages/contracts/docs/spell-reference-resolution.md`.
+   */
   spellCatalogById?: ReadonlyMap<string, Spell>
-  /** `ready` once `spellCatalogById` is the campaign's effective catalog. */
+  /**
+   * Spells query lifecycle. Maps to `SpellCatalogLoadState` via `mapAuthoringSpellCatalogLoadState`.
+   * Do not report `unknown-spell` while `pending` or `error`.
+   */
   spellCatalogStatus?: 'pending' | 'ready' | 'error'
   /** Campaign armor-class scale captured for this authoring session. */
   armorClassRules?: ArmorClassRules
@@ -136,8 +149,7 @@ export type ContentFormInputCtx<TEntity> = {
 }
 
 /**
- * The per-type definition that the content form registry holds. Each entry
- * describes how to:
+ * Each content type owns a form definition that describes how to:
  * - Render fields (`buildFields`)
  * - Seed the edit form from a stored entity (`toFormValues`)
  * - Map validated form values to the create API input (`toInput`)
@@ -152,7 +164,7 @@ export interface ContentFormDef<
   TPreviewResources = unknown,
 > {
   /** Kebab-case route key used in URLs and API paths (e.g. `'species'`). */
-  routeKey: string
+  routeKey: ContentTypeKey
   /** When true, {@link serializeContentFormInput} may attach validated form `media`. */
   supportsManagedMedia?: boolean
   /** Content media policy domain; set when `supportsManagedMedia` is true. */
@@ -239,16 +251,8 @@ export type ContentFormValuesCtx = {
   armorClassRules?: ArmorClassRules
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- all params are erased at the registry boundary; each def is strongly typed internally
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- all params are erased at the shared form boundary; each def is strongly typed internally
 export type AnyContentFormDef = ContentFormDef<any, any, any, any>
-
-/**
- * The global content form registry. Each content type that supports create/edit
- * registers one entry here. The key is the `routeKey`.
- *
- * Phase 3 registers `species`; subsequent phases register the remaining types.
- */
-export const contentFormRegistry: Record<string, AnyContentFormDef> = {}
 
 /** Create-shell default values — prefers `resolveCreateDefaultValues` when the def provides it. */
 export function resolveContentFormCreateDefaultValues(

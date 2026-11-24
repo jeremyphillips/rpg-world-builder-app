@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
-import { resolveXpThresholdsSummary, type SystemRulesetId } from '@rpg/contracts'
+import { DEFAULT_SYSTEM_RULESET_ID, resolveXpThresholdsSummary } from '@rpg/contracts'
 import { InlineMetadata, SemanticText, Text } from '@rpg/ui'
 
 import { FeatureTableRow } from '@/lib/content-table-surface'
@@ -14,8 +14,6 @@ import {
   resolveSystemXpEntries,
   type XpThresholdOverrideFormEntry,
 } from '../lib/rules/character-configuration/xp-thresholds-field.lib'
-
-const DEFAULT_RULESET_ID = 'srd-cc-5.2.1' as const satisfies SystemRulesetId
 
 type XpThresholdsFormSlice = {
   maxCharacterLevel: number
@@ -42,7 +40,7 @@ export function XpThresholdsField() {
     extendedProgressionEnabled,
     extendedMaxLevel,
   })
-  const systemEntries = useMemo(() => resolveSystemXpEntries(DEFAULT_RULESET_ID), [])
+  const systemEntries = useMemo(() => resolveSystemXpEntries(DEFAULT_SYSTEM_RULESET_ID), [])
 
   const summary = useMemo(
     () =>

@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  EQUIPMENT_REFERENCE_DISPLAY_MESSAGES,
+  SPELL_REFERENCE_DISPLAY_MESSAGES,
+  type Equipment,
+  type Spell,
+} from '@rpg/contracts'
+
+import {
   buildSeedDamageTypeVocabulary,
   buildSeedLanguageVocabulary,
   buildSeedSenseVocabulary,
@@ -11,35 +18,87 @@ import {
 
 import { GRANT_ROW_TYPE_LABELS } from './grant-form-schema'
 import {
+  buildGrantEquipmentReferencePresentationFromAuthoring,
+  buildGrantSpellReferencePresentationFromAuthoring,
   formatCompactMetadataList,
   formatGrantRowDisclosureAriaLabel,
   formatGrantRowToolbarAriaLabel,
   omitRedundantGrantDetail,
   resolveGrantRowPresentation,
-  resolveSpellGrantName,
   type GrantRowHeaderContext,
   type GrantRowPresentation,
 } from './grant-row-presentation.lib'
 
+function spellCatalog(entries: Array<{ id: string; name: string; status?: string }>) {
+  return new Map(
+    entries.map(
+      (entry) =>
+        [
+          entry.id,
+          {
+            id: entry.id,
+            name: entry.name,
+            level: 1,
+            status: entry.status ?? 'published',
+          } as Spell,
+        ] as const,
+    ),
+  )
+}
+
 const seedDamageTypes = buildSeedDamageTypeVocabulary()
 const seedLanguages = buildSeedLanguageVocabulary()
 const seedSenses = buildSeedSenseVocabulary()
+
+const testEquipmentScope = { rulesetId: 'srd-cc-5.2.1', campaignId: 'campaign-1' }
+
+function equipmentCatalog(
+  entries: Array<{ id: string; slug: string; name: string; status?: string }>,
+): ReadonlyMap<string, Equipment> {
+  return new Map(
+    entries.map(
+      (entry) =>
+        [
+          entry.id,
+          {
+            id: entry.id,
+            slug: entry.slug,
+            name: entry.name,
+            rulesetId: testEquipmentScope.rulesetId,
+            catalogLayer: 'system',
+            campaignId: null,
+            status: entry.status ?? 'published',
+          } as Equipment,
+        ] as const,
+    ),
+  )
+}
 
 const headerContext = {
   rowLabels: GRANT_ROW_TYPE_LABELS,
   resolveDamageTypeLabel: (id: string) => getDamageTypeLabelFromVocabulary(seedDamageTypes, id),
   resolveLanguageLabel: (id: string) => getLanguageLabelFromVocabulary(seedLanguages, id),
   resolveSenseLabel: (id: string) => getSenseLabelFromVocabulary(seedSenses, id),
-  equipmentOptions: [],
+  equipmentReferences: buildGrantEquipmentReferencePresentationFromAuthoring({
+    status: 'ready',
+    scope: testEquipmentScope,
+    equipmentById: equipmentCatalog([
+      { id: 'srd-cc-5.2.1:longsword', slug: 'longsword', name: 'Longsword' },
+      { id: 'srd-cc-5.2.1:dagger', slug: 'dagger', name: 'Dagger', status: 'draft' },
+    ]),
+  }),
   weaponOptions: [{ value: 'longsword', label: 'Longsword' }],
   toolOptions: [{ value: 'thieves-tools', label: "Thieves' Tools" }],
   armorOptions: [],
   skillOptions: [{ value: 'athletics', label: 'Athletics' }],
-  spellOptions: [
-    { value: 'srd-cc-5.2.1:aid', label: 'Aid' },
-    { value: 'srd-cc-5.2.1:animate-dead', label: 'Animate Dead' },
-    { value: 'srd-cc-5.2.1:dancing-lights', label: 'Dancing Lights' },
-  ],
+  spellReferences: buildGrantSpellReferencePresentationFromAuthoring({
+    status: 'ready',
+    spellsById: spellCatalog([
+      { id: 'srd-cc-5.2.1:aid', name: 'Aid' },
+      { id: 'srd-cc-5.2.1:animate-dead', name: 'Animate Dead' },
+      { id: 'srd-cc-5.2.1:dancing-lights', name: 'Dancing Lights' },
+    ]),
+  }),
 } satisfies GrantRowHeaderContext
 
 function assertGrantRowPresentation(presentation: GrantRowPresentation | undefined) {
@@ -66,13 +125,60 @@ describe('formatCompactMetadataList', () => {
   })
 })
 
-describe('resolveSpellGrantName', () => {
-  it('returns catalog proper names and title-case slug fallback', () => {
-    expect(resolveSpellGrantName('srd-cc-5.2.1:animate-dead', headerContext.spellOptions)).toBe(
-      'Animate Dead',
+describe('grant spell reference presentation', () => {
+  it('scenario F: removed option-based spell grant name resolver', async () => {
+    const exports = await import('./grant-form-fields')
+    expect('resolveSpellGrantName' in exports).toBe(false)
+  })
+  it('resolves display names from the authoritative catalog, not pickers', () => {
+    const presentation = buildGrantSpellReferencePresentationFromAuthoring({
+      status: 'ready',
+      spellsById: spellCatalog([
+        { id: 'srd-cc-5.2.1:draft-only', name: 'Draft Spell', status: 'draft' },
+      ]),
+    })
+    expect(presentation.displayName('srd-cc-5.2.1:draft-only')).toBe('Draft Spell')
+    expect(presentation.displayName('srd-cc-5.2.1:missing')).toBe(
+      SPELL_REFERENCE_DISPLAY_MESSAGES.unknownSpell,
     )
-    expect(resolveSpellGrantName('srd-cc-5.2.1:unknown-spell', [])).toBe(
-      'srd-cc-5.2.1:unknown-spell',
+  })
+
+  it('does not fabricate names while the catalog is loading', () => {
+    const presentation = buildGrantSpellReferencePresentationFromAuthoring({
+      status: 'pending',
+      spellsById: spellCatalog([{ id: 'srd-cc-5.2.1:aid', name: 'Aid' }]),
+    })
+    expect(presentation.displayName('srd-cc-5.2.1:aid')).toBe(
+      SPELL_REFERENCE_DISPLAY_MESSAGES.catalogLoading,
+    )
+  })
+})
+
+describe('grant equipment reference presentation', () => {
+  it('resolves display names from the authoritative catalog, not pickers', () => {
+    const presentation = buildGrantEquipmentReferencePresentationFromAuthoring({
+      status: 'ready',
+      scope: testEquipmentScope,
+      equipmentById: equipmentCatalog([
+        { id: 'srd-cc-5.2.1:dagger', slug: 'dagger', name: 'Dagger', status: 'draft' },
+      ]),
+    })
+    expect(presentation.displayName('dagger')).toBe('Dagger')
+    expect(presentation.displayName('missing-slug')).toBe(
+      EQUIPMENT_REFERENCE_DISPLAY_MESSAGES.unknownEquipment,
+    )
+  })
+
+  it('does not fabricate names while the catalog is loading', () => {
+    const presentation = buildGrantEquipmentReferencePresentationFromAuthoring({
+      status: 'pending',
+      scope: testEquipmentScope,
+      equipmentById: equipmentCatalog([
+        { id: 'srd-cc-5.2.1:longsword', slug: 'longsword', name: 'Longsword' },
+      ]),
+    })
+    expect(presentation.displayName('longsword')).toBe(
+      EQUIPMENT_REFERENCE_DISPLAY_MESSAGES.catalogLoading,
     )
   })
 })
@@ -165,6 +271,20 @@ describe('resolveGrantRowPresentation', () => {
       expected: {
         heading: 'Damage resistance',
         detail: 'Cold',
+      },
+    },
+    {
+      name: 'equipment grant',
+      values: {
+        grantType: 'equipment',
+        itemKind: 'grant',
+        grantTargetSource: 'equipment',
+        equipmentSlug: 'dagger',
+        quantity: 1,
+      },
+      expected: {
+        heading: 'Equipment',
+        descriptionIncludes: 'dagger',
       },
     },
   ])('$name', ({ values, expected }) => {

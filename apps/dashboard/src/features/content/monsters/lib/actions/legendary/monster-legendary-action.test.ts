@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { formatSpellCastAtLevelName, getMonsterActionKindLabel } from '@rpg/contracts'
+import {
+  formatSpellCastAtLevelName,
+  getMonsterActionKindLabel,
+  MONSTER_ACTION_KIND_ENTRIES,
+} from '@rpg/contracts'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import {
@@ -41,23 +45,27 @@ describe('legendary action acquisition', () => {
     const values = resolveMonsterCreateDefaultValues()
     const items = legendaryActionAcquisitionItems(values, ctx)
     expect(items.map((item) => [item.groupId, item.label, item.metadata])).toEqual([
-      ['existing', 'Use existing action', 'Use an action already defined for this creature.'],
+      [
+        'existing',
+        'Use existing action',
+        MONSTER_ACTION_KIND_ENTRIES['action-reference'].description,
+      ],
       [
         'existing',
         'Use Spellcasting',
         'Cast a spell from an existing action that already lists spells.',
       ],
       ['new', 'Cast a spell', 'Choose a spell from the catalog.'],
-      ['new', 'Saving throw', 'Saving throw effect'],
+      ['new', 'Saving throw', MONSTER_ACTION_KIND_ENTRIES.save.description],
       ['new', 'Custom ability', 'Write a standalone legendary ability.'],
     ])
-    expect(items.find((item) => item.id === 'legendary:reference')?.note).toBe(
+    expect(items.find((item) => item.id === 'legendary:reference')?.disabledReason).toBe(
       LEGENDARY_REFERENCE_DISABLED_NOTE,
     )
-    expect(items.find((item) => item.id === 'legendary:spellcasting')?.note).toBe(
+    expect(items.find((item) => item.id === 'legendary:spellcasting')?.disabledReason).toBe(
       LEGENDARY_SPELLCASTING_DISABLED_NOTE,
     )
-    expect(items.find((item) => item.id === 'legendary:cast-spell')?.note).toBe(
+    expect(items.find((item) => item.id === 'legendary:cast-spell')?.disabledReason).toBe(
       LEGENDARY_CAST_SPELL_DISABLED_NOTE,
     )
     expect(parseMonsterActionAcquisitionId('legendary:reference')).toEqual({

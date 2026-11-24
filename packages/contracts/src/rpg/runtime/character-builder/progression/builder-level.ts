@@ -53,17 +53,6 @@ export type BuilderLevelConstraints = {
   allowedLevels?: number[]
 }
 
-/** @deprecated Use {@link resolveCharacterLevelConstraints} — kept for existing imports. */
-export function resolveBuilderLevelConstraints(
-  context: CharacterBuildContext,
-): BuilderLevelConstraints {
-  return resolveCharacterLevelConstraints({
-    characterKind: context.characterKind,
-    rulesScope: context.rulesScope,
-    characterCreationRules: context.characterCreationRules,
-  })
-}
-
 export type ValidateBuilderCharacterLevelInput = {
   level: number
   characterKind: CharacterKind

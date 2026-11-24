@@ -177,14 +177,14 @@ describe('multiattack replacement form values', () => {
     const user = userEvent.setup()
     let read: (() => MonsterFormValues) | undefined
 
-    function SpellChoiceHarness() {
+    function SpellChoiceHarness({ onReady }: { onReady: (read: () => MonsterFormValues) => void }) {
       const defaultValues = monsterFormTestValues({
         name: 'Lich',
         actions: [multiattack, bite, spellcasting] as MonsterFormValues['actions'],
       })
       primeMultiattackReplacementActionsSnapshot(defaultValues.actions as MonsterActionDraftRow[])
       const form = useForm<MonsterFormValues>({ defaultValues, shouldUnregister: true })
-      read = () => form.getValues()
+      onReady(() => form.getValues())
       return (
         <FormProvider {...form}>
           <FormItems
@@ -206,7 +206,7 @@ describe('multiattack replacement form values', () => {
       )
     }
 
-    render(<SpellChoiceHarness />)
+    render(<SpellChoiceHarness onReady={(getValues) => (read = getValues)} />)
 
     await user.click(screen.getByRole('button', { name: 'Add action replacement' }))
     await user.click(screen.getByRole('button', { name: 'Add choice' }))

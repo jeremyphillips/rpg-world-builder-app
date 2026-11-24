@@ -3,9 +3,11 @@ import {
   resolveDependentsVisibility,
   resolveFieldConfigBoundNames,
   type FieldConfig,
+  type FieldVisibility,
   type FormItem,
   type RowConfig,
 } from '../field-config'
+import { resolveDependsOnRelativeValues } from './form-depends-on.lib'
 import { resolveColumnsCollapseSequence } from './form-columns-collapse.lib'
 
 export type FormContainerItem = Extract<
@@ -171,4 +173,58 @@ export function formItemsHaveVisibleRenderableFields(
   values: Record<string, unknown>,
 ): boolean {
   return items.some((item) => formItemHasVisibleRenderableField(item, values))
+}
+
+type ActiveFormItemBinding = { path: string; kind: 'field' | 'array' }
+
+/** Lists mounted field paths in a form scope, retaining duplicates for ownership checks. */
+export function collectActiveFormItemBindings(
+  items: readonly FormItem[],
+  formValues: Record<string, unknown>,
+  namePrefix: string,
+): ActiveFormItemBinding[] {
+  const isVisible = (visibility?: FieldVisibility | null) =>
+    !visibility ||
+    visibility.visibleWhen(
+      resolveDependsOnRelativeValues(visibility.dependsOn, formValues, namePrefix),
+    )
+  const qualify = (name: string) => (namePrefix ? `${namePrefix}.${name}` : name)
+
+  const fieldBinding = (name: string): ActiveFormItemBinding => ({
+    path: qualify(name),
+    kind: 'field',
+  })
+
+  function collectDependentBindings(
+    item: Extract<FormItem, { kind: 'dependent' }>,
+  ): ActiveFormItemBinding[] {
+    if (!isVisible(item.controller.visibility)) return []
+    const controllerPaths = resolveFieldConfigBoundNames(item.controller).map(fieldBinding)
+    const visibility = resolveDependentsVisibility(item, item.controller)
+    if (!isVisible(visibility)) return controllerPaths
+    return [
+      ...controllerPaths,
+      ...collectActiveFormItemBindings(item.dependents.fields, formValues, namePrefix),
+    ]
+  }
+
+  return items.flatMap((item): ActiveFormItemBinding[] => {
+    if (!isVisible(item.visibility)) return []
+    if (!('kind' in item)) return resolveFieldConfigBoundNames(item).map(fieldBinding)
+
+    switch (item.kind) {
+      case 'group':
+      case 'row':
+      case 'columns':
+        return collectActiveFormItemBindings(formContainerChildItems(item), formValues, namePrefix)
+      case 'dependent':
+        return collectDependentBindings(item)
+      case 'slot':
+        return item.boundNames?.map(fieldBinding) ?? []
+      case 'array':
+        return [{ path: qualify(item.name), kind: 'array' }]
+      default:
+        return []
+    }
+  })
 }

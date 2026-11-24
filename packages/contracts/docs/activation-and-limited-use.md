@@ -21,7 +21,7 @@ An absent `limitedUse` means the ability has no limit of its own (at will). Rech
 
 `describeLimitedUse` is the only interpreter. Notation and sentences are exhaustive tables. Adding a count kind, rest kind, or notation style is a compile error until every cell is filled. Recharge cannot be passed to `formatLimitedUseSentence`.
 
-Spell grants store only the `uses` variant (`restLimitedUseSchema`). A grant sentence reads `formatLimitedUseSentence`.
+Spell grants store only the `uses` variant (`restLimitedUseSchema`). A grant sentence reads `formatLimitedUseSentence`. Trait and monster limited-use controls use `formatLimitedUseAuthoringHint` for recovery copy on form hints — not notation or facing prose.
 
 ## Character entitlements
 
@@ -48,6 +48,14 @@ Spell prose is generated from that structure. Weapon attack lines stay derived. 
 Persisted spell references are canonical content ids: `<rulesetId>:<slug>` for system spells and the Mongo id for homebrew. `spellReferenceSchema` is that string. `resolveSpellReference` is `spellsById.get(ref)` and nothing else. There is no slug match and no shape test that treats a colon as proof of an id.
 
 Grants, class recommendations, monster `spells`, and character sheet rows all use that schema. `collectSpellReferenceIssues` reports `unknown_spell` whenever the catalog is ready, and `spell_not_referenceable` or `spell_catalog_unavailable` on publish. Campaign availability does not invalidate a reference. Deleting a spell that one of those records names is blocked. Rich-text `data-content-id` links are presentation only and are not part of this reference.
+
+### Catalog scope and presentation (authoring)
+
+Dashboard **`spellCatalogById`** is built from the full campaign spells list (system + homebrew), keyed by `spell.id`. Combobox options use `forReference()` and may omit draft spells from **new** selection; persisted ids still resolve from the map when present. **`unknown-spell`** not-found is allowed only after the catalog load state is `ready` — not while loading or on load error.
+
+Lifecycle mapping, display copy, consumer matrix, and migration phases: [spell-reference-resolution.md](./spell-reference-resolution.md). Types and messages: `spell-catalog-context.ts`.
+
+**Resolution** (definition exists?) is separate from **referenceability** (may newly reference?) and **validation** (legal on publish?). Resolved drafts display `spell.name`; eligibility problems use validation messages, not missing-reference labels.
 
 ## Grant rows
 

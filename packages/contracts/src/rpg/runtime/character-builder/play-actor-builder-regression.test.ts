@@ -69,8 +69,7 @@ function makeContext(input: {
     channel: 'build',
     surface: 'dashboard',
     characterKind: 'pc',
-    mode: 'dashboard',
-    scope: { type: 'campaign', campaignId: 'camp-1', rulesetId: 'srd-cc-5.2.1' },
+
     rulesScope: { type: 'campaign', campaignId: 'camp-1', rulesetId: 'srd-cc-5.2.1' },
     ownershipTarget: resolveCharacterOwnershipTarget('pc', {
       type: 'campaign',

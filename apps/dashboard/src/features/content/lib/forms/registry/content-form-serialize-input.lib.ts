@@ -37,14 +37,6 @@ export function isManagedContentMediaDirty(
   return false
 }
 
-/** @deprecated Use hasAuthoredContentMediaForCatalogWrite from @rpg/contracts at call sites with context. */
-export function hasAuthoredContentMedia(
-  media: ContentMedia | undefined | null,
-  ctx?: CatalogContentMediaWriteContext,
-): boolean {
-  return hasAuthoredContentMediaForCatalogWrite(media, ctx)
-}
-
 function resolveCatalogMediaWriteContext(
   def: Pick<AnyContentFormDef, 'routeKey' | 'mediaDomain'>,
   values: FieldValues,

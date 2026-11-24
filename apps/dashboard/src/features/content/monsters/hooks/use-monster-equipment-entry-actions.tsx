@@ -3,6 +3,7 @@ import { useFormContext, useWatch } from 'react-hook-form'
 import { createMagicPropertyDefinitionProvider } from '@rpg/catalog/magic-properties'
 import {
   buildEquipmentInventoryUnmodifiedContext,
+  DEFAULT_SYSTEM_RULESET_ID,
   resolveEquipmentInstanceSummary,
   type SystemRulesetId,
 } from '@rpg/contracts'
@@ -75,7 +76,7 @@ export function useMonsterEquipmentEntryActions(ctx: ContentFormCtx): MonsterEqu
   const [pendingRemove, setPendingRemove] = useState<PendingRemove | null>(null)
 
   const catalog = monsterEquipmentCatalog(ctx)
-  const rulesetId = (ctx.rulesetId ?? 'srd-cc-5.2.1') as SystemRulesetId
+  const rulesetId = (ctx.rulesetId ?? DEFAULT_SYSTEM_RULESET_ID) as SystemRulesetId
   const magicProvider = useMemo(() => createMagicPropertyDefinitionProvider(rulesetId), [rulesetId])
   const equipmentSource = values?.equipment
   const equipment = useMemo(() => equipmentSource ?? [], [equipmentSource])
@@ -106,7 +107,7 @@ export function useMonsterEquipmentEntryActions(ctx: ContentFormCtx): MonsterEqu
   )
 
   const pendingRemoveCopy = useMemo(() => {
-    if (!pendingRemove || !values) return null
+    if (!pendingRemove || !values || !magicProvider) return null
     return buildPendingRemovalCopy(pendingRemove, values, equipment, catalog, magicProvider)
   }, [catalog, equipment, magicProvider, pendingRemove, values])
 

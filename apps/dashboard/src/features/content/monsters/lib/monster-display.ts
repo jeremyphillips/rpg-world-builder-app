@@ -8,6 +8,7 @@ import {
   getDamageTypeLabel,
   getEffectConditionLabel,
   getLanguageLabel,
+  formatCreatureSenseCompactLine,
   getSenseLabel,
   joinInlineMetadata,
   formatMovementDisplay,
@@ -44,6 +45,10 @@ import {
   type DerivedFieldReason,
   type DerivedMonsterStatBlock,
   type MagicPropertyDefinitionProvider,
+  statBlockReactionLead,
+  type StatBlockProse,
+  type StatBlockProseDocument,
+  type StatBlockProseSegment,
 } from '@rpg/contracts'
 
 import {
@@ -86,10 +91,14 @@ export type MonsterActionItemViewModel = {
   id: string
   name: string
   attackLine?: string
-  /** `Trigger: …` when the reaction has authored eligibility prose. */
-  triggerLine?: string
-  /** `Response:` when that authored trigger has a description or attack line. */
-  responseLabel?: string
+  derivedAttackLine?: DerivedMonsterAttackLine
+  rulesProse?: StatBlockProseDocument
+  /** Emphasized `Trigger:` lead when the reaction has authored eligibility prose. */
+  triggerProse?: StatBlockProse
+  /** Emphasized `Response:` lead before structured attack or supplemental rules copy. */
+  responseLeadProse?: StatBlockProse
+  /** Plain attack line folded into `Response:` when there is no derived attack sentence. */
+  responseAttackProse?: StatBlockProse
   descriptionHtml?: string
 }
 
@@ -132,6 +141,7 @@ export type BuildMonsterDetailViewModelInput = {
   classLabel?: (id: string) => string
   equipmentById: Map<string, Equipment>
   catalogState: MonsterCatalogLoadState
+  equipmentCatalogState?: MonsterCatalogLoadState
   derived?: DerivedMonsterStatBlock | null
   spellsById?: ReadonlyMap<string, MonsterReferencedSpell>
   spellCatalogStatus?: 'ready' | 'unavailable'
@@ -264,7 +274,18 @@ function mapActionItems(
   catalogState: MonsterCatalogLoadState,
   spells: Parameters<typeof resolveActionStatBlockRulesFacingList>[4],
 ): MonsterActionItemViewModel[] {
-  return resolveActionStatBlockRulesFacingList(actions, section, derived, catalogState, spells)
+  return resolveActionStatBlockRulesFacingList(actions, section, derived, catalogState, spells).map(
+    (facing) => ({
+      id: facing.id,
+      name: facing.name,
+      attackLine: facing.attackLine,
+      descriptionHtml: facing.descriptionHtml,
+      derivedAttackLine: derived?.attacks.find(
+        (line) => line.id === facing.id && line.section === section,
+      ),
+      rulesProse: facing.rulesProse,
+    }),
+  )
 }
 
 function formsTrait(monster: Monster): MonsterTraitItemViewModel[] {
@@ -302,43 +323,57 @@ function mapReactionItems(
   return reactions.map((action) => {
     const triggerText =
       action.kind === 'parry' ? formatMonsterParryTrigger(spells.monsterName) : action.trigger?.text
+    const facing = resolveActionStatBlockRulesFacing(
+      action,
+      'reactions',
+      derived,
+      catalogState,
+      spells,
+      headings,
+    )
     return reactionItemView(
-      resolveActionStatBlockRulesFacing(
-        action,
-        'reactions',
-        derived,
-        catalogState,
-        spells,
-        headings,
-      ),
+      {
+        id: facing.id,
+        name: facing.name,
+        attackLine: facing.attackLine,
+        descriptionHtml: facing.descriptionHtml,
+        derivedAttackLine: derived?.attacks.find(
+          (line) => line.id === facing.id && line.section === 'reactions',
+        ),
+        rulesProse: facing.rulesProse,
+      },
       triggerText,
     )
   })
 }
 
+const responseLeadOnly: StatBlockProse = [
+  { kind: 'lead', treatment: 'inline', label: 'Response' } satisfies StatBlockProseSegment,
+]
+
+// fallow-ignore-next-line complexity
 function reactionItemView(
-  base: MonsterActionItemViewModel | undefined,
+  base: MonsterActionItemViewModel,
   triggerText: string | undefined,
 ): MonsterActionItemViewModel {
-  const hasBody = Boolean(base?.attackLine || base?.descriptionHtml)
+  const hasBody = Boolean(
+    base.attackLine ||
+    base.derivedAttackLine ||
+    base.descriptionHtml ||
+    (base.rulesProse && base.rulesProse.length > 0),
+  )
+  const showResponse = Boolean(triggerText && hasBody)
+  const responseAttackProse =
+    showResponse && base.attackLine && !base.derivedAttackLine
+      ? statBlockReactionLead('Response', base.attackLine)
+      : undefined
   return {
-    id: base?.id ?? '',
-    name: base?.name ?? '',
-    attackLine: base?.attackLine,
-    descriptionHtml: base?.descriptionHtml,
-    triggerLine: triggerLine(triggerText),
-    responseLabel: responseLabel(triggerText, hasBody),
+    ...base,
+    attackLine: responseAttackProse ? undefined : base.attackLine,
+    triggerProse: triggerText ? statBlockReactionLead('Trigger', triggerText) : undefined,
+    responseLeadProse: showResponse && !responseAttackProse ? responseLeadOnly : undefined,
+    responseAttackProse,
   }
-}
-
-function triggerLine(text: string | undefined): string | undefined {
-  if (!text) return undefined
-  return `Trigger: ${text}`
-}
-
-function responseLabel(text: string | undefined, hasBody: boolean): string | undefined {
-  if (!text || !hasBody) return undefined
-  return 'Response:'
 }
 
 function formatSenseLines(monster: Monster, passivePerception?: number): string {
@@ -348,10 +383,9 @@ function formatSenseLines(monster: Monster, passivePerception?: number): string 
       monster.traits.flatMap((trait) => ('kind' in trait ? [{ trait, source: trait.id }] : [])),
     ).map((resolved) => resolved.grant),
   })
-  const senseParts = senses.map((sense) => {
-    const label = getSenseLabel(sense.type)
-    return sense.range != null ? `${label} ${sense.range} ft.` : label
-  })
+  const senseParts = senses.map((sense) =>
+    sense.range != null ? formatCreatureSenseCompactLine(sense) : getSenseLabel(sense.type),
+  )
   if (passivePerception != null) {
     senseParts.push(formatPassivePerceptionStatPhrase(passivePerception))
   }
@@ -519,7 +553,7 @@ function mapPresetMonsterTrait(
     id: trait.id,
     preset: record.preset,
     monsterName,
-    trait: trait as Monster['traits'][number],
+    trait: trait as never,
   })
   return {
     id: trait.id,
@@ -534,15 +568,12 @@ function mapTemplateMonsterTrait(
   monster: Monster,
 ): MonsterTraitItemViewModel | undefined {
   if (record.kind !== 'template' || typeof record.templateId !== 'string') return undefined
-  const nameOverride = typeof record.nameOverride === 'string' ? record.nameOverride : undefined
-  const descriptionOverride =
-    typeof record.descriptionOverride === 'string' ? record.descriptionOverride : undefined
+  const details = typeof record.details === 'string' ? record.details : undefined
   const facing = resolveTemplateTraitStatBlockRulesFacing({
     id: trait.id,
     templateId: record.templateId,
     config: record.config,
-    nameOverride,
-    descriptionOverride,
+    details,
     monster,
   })
   return {
@@ -613,6 +644,7 @@ export function buildMonsterDetailViewModel({
   classLabel,
   equipmentById,
   catalogState,
+  equipmentCatalogState = catalogState,
   derived,
   spellsById,
   spellCatalogStatus = 'unavailable',
@@ -621,7 +653,7 @@ export function buildMonsterDetailViewModel({
   const spellContext = buildSpellDisplayContext({
     monster,
     equipmentById,
-    catalogState,
+    catalogState: equipmentCatalogState,
     spellsById,
     spellCatalogStatus,
     magicPropertyProvider,
@@ -669,20 +701,20 @@ export function buildMonsterDetailViewModel({
       availableBodyRows(monster.actions),
       'actions',
       derived,
-      catalogState,
+      equipmentCatalogState,
       spellContext,
     ),
     bonusActions: mapActionItems(
       availableBodyRows(monster.bonusActions),
       'bonusActions',
       derived,
-      catalogState,
+      equipmentCatalogState,
       spellContext,
     ),
     reactions: mapReactionItems(
       availableBodyRows(monster.reactions),
       derived,
-      catalogState,
+      equipmentCatalogState,
       spellContext,
     ),
     legendaryActions: mapActionItems(
@@ -691,7 +723,7 @@ export function buildMonsterDetailViewModel({
       ),
       'legendaryActions',
       derived,
-      catalogState,
+      equipmentCatalogState,
       spellContext,
     ),
     legendaryActionsIntro: formatLegendaryActionsIntro(monster),

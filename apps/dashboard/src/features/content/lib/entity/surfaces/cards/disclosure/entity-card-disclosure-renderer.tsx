@@ -45,9 +45,9 @@ export function EntityCardDisclosureRenderer({
   disabled = false,
   dragHandleProps,
 }: EntityCardDisclosureRendererProps) {
-  const showDragHandle = Boolean(dragHandleProps)
+  const reserveDragHandleSlot = Boolean(dragHandleProps)
   const leadingUtilityCount = resolveEntityLeadingUtilityCount({
-    dragHandle: showDragHandle,
+    dragHandle: reserveDragHandleSlot,
     disclosure: true,
   })
 
@@ -65,7 +65,7 @@ export function EntityCardDisclosureRenderer({
         collapsed={collapsed}
         onToggleCollapse={onToggleCollapse}
         defaultCollapsed={defaultCollapsed}
-        showDragHandle={showDragHandle}
+        reserveDragHandleSlot={reserveDragHandleSlot}
         dragHandleProps={dragHandleProps}
         rowLayout="entity-card"
         density={density}

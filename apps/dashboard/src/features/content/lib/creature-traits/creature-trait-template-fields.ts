@@ -1,18 +1,7 @@
-import {
-  CREATURE_TRAIT_TEMPLATE_IDS,
-  defaultCreatureTraitTemplateConfig,
-  getCreatureTraitTemplate,
-} from '@rpg/contracts'
+import { CREATURE_TRAIT_TEMPLATE_IDS, getCreatureTraitTemplate } from '@rpg/contracts'
 import type { FieldVisibility, FormItem } from '@rpg/ui/form'
 
-import { legendaryResistanceTemplateUseFields } from './legendary-resistance-trait-fields'
-
-function visibleForTemplate(): FieldVisibility {
-  return {
-    dependsOn: ['kind'],
-    visibleWhen: (watched) => watched['kind'] === 'template',
-  }
-}
+import { assembleCreatureTraitTemplateFields } from './creature-trait-template-field-assembler'
 
 function visibleForTemplateId(templateId: string): FieldVisibility {
   return {
@@ -22,64 +11,25 @@ function visibleForTemplateId(templateId: string): FieldVisibility {
   }
 }
 
-function visibleForTemplateOverrides(): FieldVisibility {
-  return {
-    dependsOn: ['kind', 'overrideDisplay'],
-    visibleWhen: (watched) => watched['kind'] === 'template' && watched['overrideDisplay'] === true,
-  }
-}
-
-/** Config and display-override fields for a `kind: 'template'` trait row. */
+/** Config fields for a `kind: 'template'` species trait row. */
 export function creatureTraitTemplateFields(): FormItem[] {
-  const descriptions = CREATURE_TRAIT_TEMPLATE_IDS.flatMap((templateId) => {
+  return CREATURE_TRAIT_TEMPLATE_IDS.flatMap((templateId) => {
     const template = getCreatureTraitTemplate(templateId)
-    if (!template) return []
-    const config = defaultCreatureTraitTemplateConfig(templateId) ?? {}
+    if (!template?.hosts.includes('species')) return []
     return [
       {
         kind: 'group' as const,
         heading: {
           label: template.label,
-          hint: template.formatDescription(config),
           labelVisibility: 'srOnly' as const,
         },
         visibility: visibleForTemplateId(templateId),
-        fields: [
-          ...(templateId === 'legendary-resistance'
-            ? legendaryResistanceTemplateUseFields({ includeInLair: false })
-            : []),
-        ],
+        fields: assembleCreatureTraitTemplateFields({
+          templateId,
+          host: 'species',
+          visibility: visibleForTemplateId(templateId),
+        }),
       },
     ]
   })
-
-  return [
-    ...descriptions,
-    {
-      type: 'switch',
-      name: 'overrideDisplay',
-      label: 'Override generated name and description',
-      visibility: visibleForTemplate(),
-    },
-    {
-      type: 'text',
-      name: 'nameOverride',
-      label: 'Name',
-      placeholder: 'Leave blank to use the default',
-      visibility: {
-        dependsOn: ['kind', 'overrideDisplay', 'templateId'],
-        visibleWhen: (watched) =>
-          watched['kind'] === 'template' &&
-          watched['overrideDisplay'] === true &&
-          watched['templateId'] !== 'legendary-resistance',
-      },
-    },
-    {
-      type: 'richtext',
-      name: 'descriptionOverride',
-      label: 'Description',
-      hint: 'Leave blank to use the default',
-      visibility: visibleForTemplateOverrides(),
-    },
-  ]
 }

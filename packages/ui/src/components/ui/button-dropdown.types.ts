@@ -15,10 +15,12 @@ export type ButtonDropdownItem = {
   label: string
   metadata?: string
   groupId?: string
+  classification?: string
   searchTerms?: readonly string[]
   aliases?: readonly string[]
   search?: PickerSearchOptions
   disabled?: boolean
+  disabledReason?: string
   note?: string
 }
 
@@ -46,4 +48,6 @@ export type ButtonDropdownProps = {
   className?: string
   /** Trigger chrome — `addIcon` matches master-detail default add control. */
   triggerPresentation?: ButtonDropdownTriggerPresentation
+  /** When true, supporting metadata may wrap instead of truncating. */
+  supportingWrap?: boolean
 }

@@ -2103,11 +2103,7 @@
               "minLength": 1
             },
             "config": {},
-            "nameOverride": {
-              "type": "string",
-              "minLength": 1
-            },
-            "descriptionOverride": {
+            "details": {
               "type": "string"
             },
             "available": {
@@ -2821,24 +2817,6 @@
             "kind",
             "ability",
             "spellIds"
-          ],
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "properties": {
-            "id": {
-              "$ref": "#/definitions/__schema87"
-            },
-            "kind": {
-              "type": "string",
-              "const": "spellcasting",
-              "description": "spellcasting"
-            }
-          },
-          "required": [
-            "id",
-            "kind"
           ],
           "additionalProperties": false
         },

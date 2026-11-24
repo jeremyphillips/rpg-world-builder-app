@@ -42,14 +42,6 @@ export function fitsStartingEquipmentBudget(
   return moneyToCopper(equipment.cost) <= wealthToCopper(budget.starting)
 }
 
-/** @deprecated Use {@link fitsStartingEquipmentBudget}. */
-export function isEquipmentAffordableAtStartingBudget(
-  equipment: Equipment,
-  budget: EquipmentBudgetSummary,
-): boolean {
-  return fitsStartingEquipmentBudget(equipment, budget)
-}
-
 /** Returns true when the item cost fits in the remaining budget after purchases. */
 export function isEquipmentWithinRemainingBudget(
   equipment: Equipment,

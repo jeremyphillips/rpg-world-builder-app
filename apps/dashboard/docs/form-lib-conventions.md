@@ -8,14 +8,14 @@ campaign settings, homebrew rules). UI layer detail lives in
 
 ## File suffixes
 
-| Suffix             | Responsibility                                                                                                 |
-| ------------------ | -------------------------------------------------------------------------------------------------------------- |
-| `*-form-def.ts`    | **`ContentFormDef` + registry side-effect only** — one per content type (`class-form-def`, `species-form-def`) |
-| `*-form-fields.ts` | Zod schemas, `FormItem[]`, field/section builders, list-row display helpers tied to form config                |
-| `*-form-values.ts` | Entity ↔ form mapping, API input fragments, create/edit defaults                                               |
-| `*-form-labels.ts` | Enum/display labels and UI copy strings (when not from `@rpg/contracts`)                                       |
-| `*-form.ts`        | Thin compose layer (optional; re-exports + wiring)                                                             |
-| `*-constants.ts`   | Field names, sentinels, mode tuples — not display text                                                         |
+| Suffix             | Responsibility                                                                                  |
+| ------------------ | ----------------------------------------------------------------------------------------------- |
+| `*-form-def.ts`    | **`ContentFormDef` only** — one per content type (`class-form-def`, `species-form-def`)         |
+| `*-form-fields.ts` | Zod schemas, `FormItem[]`, field/section builders, list-row display helpers tied to form config |
+| `*-form-values.ts` | Entity ↔ form mapping, API input fragments, create/edit defaults                                |
+| `*-form-labels.ts` | Enum/display labels and UI copy strings (when not from `@rpg/contracts`)                        |
+| `*-form.ts`        | Thin compose layer (optional; re-exports + wiring)                                              |
+| `*-constants.ts`   | Field names, sentinels, mode tuples — not display text                                          |
 
 Campaign settings follow the same suffixes under `features/campaign/lib/` (e.g.
 `campaign-profile-form-fields.ts`, `mechanics-form-values.ts`).
@@ -35,7 +35,7 @@ Reference: locations Location type projection —
 
 ### ContentFormDef → ContentFormHost projection
 
-When a `ContentFormDef` registry entry is wired directly to
+When a `ContentFormDef` is wired directly to
 [`ContentFormHost`](../src/features/content/lib/forms/shells/host/content-form-host.tsx)
 (modals, drawers, nested create flows), use
 [`resolveContentFormHostConfig`](../src/features/content/lib/forms/shells/host/content-form-host-projection.ts)
@@ -489,6 +489,14 @@ These modules support many content types but are **not** per-type form splits:
 | Create/edit shells        | `content/lib/forms/shells/` — `layout/`, `create/`, `edit/`, `host/`, `submit/`, `session/`                                                                                                                                                                                                                       |
 | Preview rail glue         | `content/lib/forms/preview/` — `ContentFormDef.preview` contract, publish-readiness hook, rail/sheet/player hosts. Per-type projections live next to `*-form-def.ts` (Class: `classes/lib/class-preview-projection.ts`). Types without `preview` keep `PageShell width="narrow"`.                                 |
 | Cross-consumer projection | `content/lib/forms/organization-form-projection.ts` (root seam — sole shared projection today)                                                                                                                                                                                                                    |
+
+### Grant participation
+
+The persisted grant union drives the authoring projection and compact summary
+maps. Each kind has an adapter or an explicit exclusion. The editor excludes
+campaign language choices. Compact summaries count hidden choices as benefits
+and omit their labels. Published grant-trait prose and character builder choice
+sets classify grant kinds at their own boundaries.
 
 ### `ContentFormDef.preview`
 

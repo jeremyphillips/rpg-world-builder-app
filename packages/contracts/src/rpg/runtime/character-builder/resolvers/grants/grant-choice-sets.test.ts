@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, expectTypeOf, it } from 'vitest'
 
 import type { Feat } from '../../../../content/feat'
 import { indexCharacterBuildCatalog } from '../../context'
-import { contentGrantToChoiceSets } from './grant-choice-sets'
+import { contentGrantToChoiceSets, type GrantChoiceSetConverters } from './grant-choice-sets'
 import { athleticsSkill, builderTestCatalog } from '../../test-fixtures'
 import { acrobaticsSkill, luteTool, stealthSkill } from '../../proficiency-test-fixtures'
 
@@ -12,6 +12,12 @@ const catalogWithSkillsAndEquipment = {
   organizations: [],
   equipment: [luteTool],
 }
+
+it('requires a capability entry even for a grant kind with no choice set', () => {
+  type MissingSenseCapability = Omit<GrantChoiceSetConverters, 'sense'>
+  expectTypeOf<MissingSenseCapability>().not.toExtend<GrantChoiceSetConverters>()
+  expectTypeOf<null>().toExtend<GrantChoiceSetConverters['sense']>()
+})
 
 describe('contentGrantToChoiceSets — languageChoice', () => {
   const catalogIndex = indexCharacterBuildCatalog(builderTestCatalog)

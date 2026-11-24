@@ -1,3 +1,5 @@
+import type { CharacterType } from '@rpg/contracts'
+
 import {
   buildCharacterEntitySummarySearchText,
   buildCharacterEntitySummaryVmFromTransport,
@@ -8,7 +10,7 @@ export type CharacterPickerOption = {
   id: string
   name: string
   summary: string
-  characterType: 'pc' | 'npc'
+  characterType: CharacterType
   classIds: readonly string[]
   speciesId?: string
 }

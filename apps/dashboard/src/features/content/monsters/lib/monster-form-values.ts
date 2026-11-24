@@ -6,6 +6,7 @@ import {
   type ContentValidationIntent,
   type CreateMonsterInput,
   type CreatureFormsDraft,
+  type FormDifferencesPresentation,
   type CreatureWeaponProficiencies,
   type Monster,
   type MonsterActionDraft,
@@ -95,7 +96,7 @@ export type MonsterFormValues = FieldValues & {
   defenses: Monster['defenses']
   equipment: MonsterEquipmentFormEntry[]
   traits: Monster['traits']
-  forms?: CreatureFormsDraft
+  forms?: CreatureFormsDraft & { differencesPresentation?: FormDifferencesPresentation }
   /** Action rows mirror Zod draft schemas; save normalization parses to publish shape. */
   actions: MonsterActionDraft[]
   bonusActions: MonsterBonusActionDraft[]

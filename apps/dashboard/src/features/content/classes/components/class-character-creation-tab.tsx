@@ -37,14 +37,16 @@ function StartingEquipmentEditor({ formCtx }: { formCtx: ContentFormCtx }) {
   }) as StartingEquipmentForm | undefined
   const enrichedFormCtx = useMemo((): ContentFormCtx => {
     const equipmentEntities = formCtx.options?.equipment?.visible ?? []
-    const rulesetId = equipmentEntities[0]?.rulesetId ?? 'srd-cc-5.2.1'
-    const proficiencyChoiceTargets = buildProficiencyChoiceTargetOptions({
-      rulesetId,
-      classId: formCtx.entityId ?? 'draft-class',
-      proficiencies,
-      equipment: equipmentEntities,
-      startingEquipment,
-    })
+    const rulesetId = formCtx.rulesetId
+    const proficiencyChoiceTargets = rulesetId
+      ? buildProficiencyChoiceTargetOptions({
+          rulesetId,
+          classId: formCtx.entityId ?? 'draft-class',
+          proficiencies,
+          equipment: equipmentEntities,
+          startingEquipment,
+        })
+      : undefined
 
     return {
       ...formCtx,

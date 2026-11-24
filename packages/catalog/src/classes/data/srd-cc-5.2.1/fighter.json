@@ -260,28 +260,14 @@
       "kind": "subclass-choice",
       "id": "fighter-subclass",
       "name": "Fighter Subclass",
-      "level": 3,
-      "description": ""
+      "level": 3
     },
     {
       "id": "ability-score-improvement-4",
       "name": "Ability Score Improvement",
       "level": 4,
       "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-      "grantGroups": [
-        {
-          "grants": [
-            {
-              "id": "general-feat",
-              "kind": "featChoice",
-              "category": "general",
-              "choose": 1,
-              "allowAnyQualifying": true,
-              "recommendedFeatIds": ["ability-score-improvement"]
-            }
-          ]
-        }
-      ]
+      "kind": "asi"
     },
     {
       "id": "extra-attack",
@@ -300,40 +286,14 @@
       "name": "Ability Score Improvement",
       "level": 6,
       "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-      "grantGroups": [
-        {
-          "grants": [
-            {
-              "id": "general-feat",
-              "kind": "featChoice",
-              "category": "general",
-              "choose": 1,
-              "allowAnyQualifying": true,
-              "recommendedFeatIds": ["ability-score-improvement"]
-            }
-          ]
-        }
-      ]
+      "kind": "asi"
     },
     {
       "id": "ability-score-improvement-8",
       "name": "Ability Score Improvement",
       "level": 8,
       "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-      "grantGroups": [
-        {
-          "grants": [
-            {
-              "id": "general-feat",
-              "kind": "featChoice",
-              "category": "general",
-              "choose": 1,
-              "allowAnyQualifying": true,
-              "recommendedFeatIds": ["ability-score-improvement"]
-            }
-          ]
-        }
-      ]
+      "kind": "asi"
     },
     {
       "id": "indomitable",
@@ -386,20 +346,7 @@
       "name": "Ability Score Improvement",
       "level": 12,
       "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-      "grantGroups": [
-        {
-          "grants": [
-            {
-              "id": "general-feat",
-              "kind": "featChoice",
-              "category": "general",
-              "choose": 1,
-              "allowAnyQualifying": true,
-              "recommendedFeatIds": ["ability-score-improvement"]
-            }
-          ]
-        }
-      ]
+      "kind": "asi"
     },
     {
       "id": "studied-attacks",
@@ -412,40 +359,14 @@
       "name": "Ability Score Improvement",
       "level": 14,
       "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-      "grantGroups": [
-        {
-          "grants": [
-            {
-              "id": "general-feat",
-              "kind": "featChoice",
-              "category": "general",
-              "choose": 1,
-              "allowAnyQualifying": true,
-              "recommendedFeatIds": ["ability-score-improvement"]
-            }
-          ]
-        }
-      ]
+      "kind": "asi"
     },
     {
       "id": "ability-score-improvement-16",
       "name": "Ability Score Improvement",
       "level": 16,
       "description": "<p>You gain the Ability Score Improvement feat or another feat of your choice for which you qualify.</p>",
-      "grantGroups": [
-        {
-          "grants": [
-            {
-              "id": "general-feat",
-              "kind": "featChoice",
-              "category": "general",
-              "choose": 1,
-              "allowAnyQualifying": true,
-              "recommendedFeatIds": ["ability-score-improvement"]
-            }
-          ]
-        }
-      ]
+      "kind": "asi"
     },
     {
       "id": "epic-boon",

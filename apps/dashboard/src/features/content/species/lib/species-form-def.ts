@@ -7,7 +7,6 @@ import {
   type MovementRowDraftFormValues,
 } from '../../lib/forms/fields/content-movement-form-fields'
 import {
-  contentFormRegistry,
   contentFormFields,
   type ContentFormDef,
 } from '../../lib/forms/registry/content-form-registry'
@@ -50,7 +49,9 @@ function buildSpeciesFormValueSyncs(): FormValueSync[] {
   ]
 }
 
-const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesInput> = {
+const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesInput> & {
+  routeKey: 'species'
+} = {
   routeKey: 'species',
   ...managedMediaFormDefFields('species'),
 
@@ -97,8 +98,6 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
     renderPlayerPreview: SpeciesPreviewPlayerHost,
   },
 }
-
-contentFormRegistry['species'] = speciesFormDef
 
 export {
   speciesFormDef,

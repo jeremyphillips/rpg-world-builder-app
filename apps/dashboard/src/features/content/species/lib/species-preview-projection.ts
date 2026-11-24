@@ -1,14 +1,18 @@
 import {
+  DEFAULT_SYSTEM_RULESET_ID,
   SPECIES_CLASS_POLICY_MODES_REQUIRING_IDS,
   SPECIES_CONTENT_TYPE_TERM,
   getSpeciesHeritageLabel,
+  createSpellCatalogContext,
   type ContentMedia,
   type Species,
+  type SystemRulesetId,
 } from '@rpg/contracts'
 import { formatPreviewRailOverflowList, type PreviewRailFact } from '@rpg/ui'
 
 import { getLanguageLabelFromVocabulary, getSenseLabelFromVocabulary } from '@/features/vocabulary'
 
+import { buildSpellGrantVocabularyFromCatalog } from '../../lib/forms/grants/grant-display'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import {
   CONTENT_PREVIEW_DESCRIPTION_PLACEHOLDER,
@@ -46,7 +50,7 @@ import { traitRowNameForIdAssignment, traitsFromFormValues } from './species-tra
 import { speciesCreateDefaultValues } from './species-form-values'
 
 const PREVIEW_SPECIES_ENVELOPE = {
-  rulesetId: 'srd-cc-5.2.1' as const,
+  rulesetId: DEFAULT_SYSTEM_RULESET_ID as SystemRulesetId,
   campaignId: null,
   createdAt: '',
   updatedAt: '',
@@ -97,7 +101,12 @@ function speciesPreviewVocabulary(ctx: ContentFormCtx): SpeciesDisplayVocabulary
       ctx.languageVocabulary ? getLanguageLabelFromVocabulary(ctx.languageVocabulary, id) : id,
     resolveSenseLabel: (type) =>
       ctx.senseVocabulary ? getSenseLabelFromVocabulary(ctx.senseVocabulary, type) : type,
-    resolveSpell: () => undefined,
+    resolveSpell: buildSpellGrantVocabularyFromCatalog(
+      createSpellCatalogContext({
+        status: ctx.spellCatalogStatus ?? 'pending',
+        spellsById: ctx.spellCatalogById,
+      }),
+    ),
   }
 }
 
@@ -311,8 +320,8 @@ export function buildSpeciesPreviewDetailViewModel(
   values: SpeciesFormValues,
   ctx: ContentFormCtx,
 ): SpeciesDetailViewModel {
-  return buildSpeciesDetailViewModel(speciesDetailSourceFromFormValues(values), {
-    ...speciesPreviewVocabulary(ctx),
-    resolveSpell: () => undefined,
-  })
+  return buildSpeciesDetailViewModel(
+    speciesDetailSourceFromFormValues(values),
+    speciesPreviewVocabulary(ctx),
+  )
 }

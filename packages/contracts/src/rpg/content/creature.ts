@@ -11,12 +11,19 @@ import {
   creatureSizesSchema,
 } from '../vocab/creature-size'
 import { creatureTypeSchema } from '../vocab/creature-type'
-import { SENSE_RANGES, senseDraftSchema, senseSchema } from '../vocab/sense'
+import {
+  isStandardSenseRange,
+  senseDraftSchema,
+  senseSchema,
+  standardSenseRangeValidationMessage,
+} from '../vocab/sense'
 import { movementSpeedsSchema } from '../vocab/movement-mode'
 import { skillSchema } from './skill-proficiency'
 import { proficiencyRankSchema } from '../vocab/proficiency'
 import { weaponProficiencyGrantSetSchema } from '../primitives/proficiency/typed-proficiency-grant-set'
 import { weaponCategorySchema } from '../vocab/weapon/category'
+import { keysFromEntries } from '../vocab/enum-schema'
+import type { GameTermEntry } from '../vocab/types'
 import { equipmentInstanceSchema, equipmentInstanceSchemaBase } from './equipment/instance/instance'
 
 /**
@@ -41,8 +48,6 @@ export const creatureMovementSchema = movementSpeedsSchema
 export const creatureSensesSchema = z.array(senseSchema).default([])
 
 export const creatureSensesDraftSchema = z.array(senseDraftSchema).default([])
-
-const SENSE_RANGE_PRESETS: readonly number[] = SENSE_RANGES
 
 export {
   TELEPATHY_MILE_FEET,
@@ -72,8 +77,12 @@ export function refineCreatureSenseRanges(
       ])
       return
     }
-    if (!SENSE_RANGE_PRESETS.includes(sense.range)) {
-      addCustomRefinementIssue(ctx, 'Choose a sense range in feet.', [...path, index, 'range'])
+    if (!isStandardSenseRange(sense.range)) {
+      addCustomRefinementIssue(ctx, standardSenseRangeValidationMessage(), [
+        ...path,
+        index,
+        'range',
+      ])
     }
   })
 }
@@ -179,15 +188,30 @@ export const creatureDefensesSchema = z.object({
 
 export type CreatureDefenses = z.infer<typeof creatureDefensesSchema>
 
-const DAMAGE_DEFENSE_LISTS = ['vulnerabilities', 'resistances', 'immunities'] as const
-
-export type CreatureDamageDefenseList = (typeof DAMAGE_DEFENSE_LISTS)[number]
+type CreatureDamageDefenseListEntry = GameTermEntry & { readonly noun: string }
 
 export const CREATURE_DAMAGE_DEFENSE_LIST_ENTRIES = {
-  vulnerabilities: { label: 'Vulnerabilities', noun: 'vulnerability' },
-  resistances: { label: 'Resistances', noun: 'resistance' },
-  immunities: { label: 'Immunities', noun: 'immunity' },
-} as const satisfies Record<CreatureDamageDefenseList, { label: string; noun: string }>
+  vulnerabilities: {
+    label: 'Vulnerabilities',
+    description: 'Damage types the creature takes extra damage from.',
+    noun: 'vulnerability',
+  },
+  resistances: {
+    label: 'Resistances',
+    description: 'Damage types the creature takes reduced damage from.',
+    noun: 'resistance',
+  },
+  immunities: {
+    label: 'Immunities',
+    description: 'Damage types the creature ignores.',
+    noun: 'immunity',
+  },
+} as const satisfies Record<string, CreatureDamageDefenseListEntry>
+
+export type CreatureDamageDefenseList = keyof typeof CREATURE_DAMAGE_DEFENSE_LIST_ENTRIES
+
+/** Cross-list iteration order (vulnerability → resistance → immunity). */
+export const CREATURE_DAMAGE_DEFENSE_LISTS = keysFromEntries(CREATURE_DAMAGE_DEFENSE_LIST_ENTRIES)
 
 const DAMAGE_DEFENSE_NOUN = {
   vulnerabilities: CREATURE_DAMAGE_DEFENSE_LIST_ENTRIES.vulnerabilities.noun,
@@ -205,7 +229,7 @@ export function resolveDamageDefenseOptionState(
     immunities?: readonly string[]
   },
 ): { disabled: boolean; disabledReason?: string } {
-  for (const list of DAMAGE_DEFENSE_LISTS) {
+  for (const list of CREATURE_DAMAGE_DEFENSE_LISTS) {
     if (list === activeList) continue
     if ((defenses[list] ?? []).includes(damageTypeId)) {
       return {
@@ -227,8 +251,8 @@ export function refineCreatureDamageDefenses(
   ctx: z.RefinementCtx,
   prefix: (string | number)[] = [],
 ): void {
-  const seen = new Map<string, (typeof DAMAGE_DEFENSE_LISTS)[number]>()
-  for (const list of DAMAGE_DEFENSE_LISTS) {
+  const seen = new Map<string, CreatureDamageDefenseList>()
+  for (const list of CREATURE_DAMAGE_DEFENSE_LISTS) {
     for (const [index, damageType] of (defenses[list] ?? []).entries()) {
       const prior = seen.get(damageType)
       if (prior) {

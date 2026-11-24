@@ -7,8 +7,7 @@ import {
 } from '@/features/content/lib/content-type-labels'
 import { ContentEditShell } from '../../lib/forms/shells/edit/content-edit-shell'
 import { useSpells } from '../hooks/use-spells'
-// Registers the spell form def into the content form registry on module load.
-import '../lib/spell-form-def'
+import { spellFormDef } from '../lib/spell-form-def'
 
 export function SpellEdit() {
   const { campaignId = '', spellId = '' } = useParams<{
@@ -19,7 +18,7 @@ export function SpellEdit() {
 
   return (
     <ContentEditShell
-      contentType="spells"
+      def={spellFormDef}
       campaignId={campaignId}
       entityId={spellId}
       isPending={isPending}
@@ -28,7 +27,6 @@ export function SpellEdit() {
       notFoundLabel={formatContentNotFoundMessage('spells')}
       backHref={ROUTES.content.spells.detail(campaignId, spellId)}
       overviewHref={ROUTES.content.spells.overview(campaignId)}
-      contentTypeKey="spells"
     />
   )
 }

@@ -1,8 +1,6 @@
-import {
-  clampEquipmentStepQuantity,
-  EQUIPMENT_PURCHASE_QUANTITY_MAX,
-  EQUIPMENT_STEP_QUANTITY_INPUT_DIGITS,
-} from '../../../../lib/equipment/equipment-quantity.lib'
+import { clampEquipmentPurchaseQuantity, EQUIPMENT_PURCHASE_QUANTITY_MAX } from '@rpg/contracts'
+
+import { EQUIPMENT_STEP_QUANTITY_INPUT_DIGITS } from '../../../../lib/equipment/equipment-quantity.lib'
 import {
   type EquipmentInventoryQuantityTarget,
   type EquipmentInventoryRow,
@@ -53,7 +51,7 @@ export function EquipmentInventoryQuantityControl({
           if (!row.quantityTarget || !onSetPurchaseQuantity) return
           const clamped = allowZeroQuantity
             ? Math.min(Math.max(next, 0), maxQuantity)
-            : clampEquipmentStepQuantity(next, maxQuantity)
+            : clampEquipmentPurchaseQuantity(next, maxQuantity)
           onSetPurchaseQuantity(row.quantityTarget, clamped)
         }}
       />

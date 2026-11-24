@@ -4,7 +4,7 @@ import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
 } from '../fixtures/character-builder-fixtures'
-import { SAMPLE_PC } from '../fixtures/character-fixtures'
+import { makePcCharacter } from '../fixtures/character-fixtures'
 import {
   buildCharacterEntitySummaryVmFromCatalog,
   buildCharacterEntitySummaryVmFromTransport,
@@ -17,7 +17,7 @@ const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
 
 describe('buildCharacterEntitySummaryVmFromCatalog', () => {
   it('includes structured parts and identity summary without type in identity', () => {
-    const vm = buildCharacterEntitySummaryVmFromCatalog(SAMPLE_PC, catalogIndex, {
+    const vm = buildCharacterEntitySummaryVmFromCatalog(makePcCharacter(), catalogIndex, {
       characterType: 'pc',
       href: '/campaigns/camp-1/characters/char-sample-1',
     })
@@ -62,7 +62,7 @@ describe('formatCharacterInlineSummary', () => {
   })
 
   it('uses structured segments when parts are known', () => {
-    const vm = buildCharacterEntitySummaryVmFromCatalog(SAMPLE_PC, catalogIndex, {
+    const vm = buildCharacterEntitySummaryVmFromCatalog(makePcCharacter(), catalogIndex, {
       characterType: 'pc',
     })
 

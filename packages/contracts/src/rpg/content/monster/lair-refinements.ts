@@ -1,9 +1,12 @@
 import type { z } from 'zod'
 
 import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
-import { CHALLENGE_RATING_MECHANICS, type ChallengeRating } from '../../vocab/challenge-rating'
-import { suggestInLairExperience } from '../../runtime/monster/suggest-in-lair-experience'
-import { resolveMonsterBaseExperiencePoints } from '../../runtime/monster/resolve-monster-base-experience'
+import {
+  CHALLENGE_RATING_MECHANICS,
+  resolveMonsterBaseExperiencePoints,
+  suggestInLairExperience,
+  type ChallengeRating,
+} from '../../vocab/challenge-rating'
 import { monsterLairInLairXpMustExceedBaseMessage } from './lair-experience-messages'
 import type { MonsterLair } from './lair-schema'
 

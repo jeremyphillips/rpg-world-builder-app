@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useRef, type ReactNode, type RefObject } from 'react'
-import { FormItems, FormRhythmStack, type FormItem } from '@rpg/ui/form'
+import { FormItems, type FormItem } from '@rpg/ui/form'
 
 import { AvailabilityAlert, type Availability } from '@/lib/availability'
-import { MasterDetailDetailFormScope } from '../../lib/master-detail/master-detail-detail-form-scope'
-import { wrapMasterDetailDetailFields } from '../../lib/master-detail/wrap-master-detail-detail-fields'
+import type { FacingHostConfig } from '../../facing/facing-host-config.types'
 import type { MasterDetailItemNounTerm } from '../../lib/master-detail/master-detail-item-noun'
 import type { UseMasterDetailArrayResult } from '../../lib/master-detail/use-master-detail-array'
 import { MasterDetailRowPrefixProvider } from '../../lib/master-detail/master-detail-row-prefix.context'
@@ -13,6 +12,11 @@ import {
   type MasterDetailEditorIdentity,
   type MasterDetailInlineTitle,
 } from './master-detail-editor-shell'
+import {
+  MasterDetailDetailBody,
+  type MasterDetailItemFieldSections,
+  type MasterDetailSpellPicker,
+} from './master-detail-detail-body'
 
 export type { MasterDetailEditorIdentity, MasterDetailInlineTitle }
 
@@ -55,14 +59,20 @@ export interface MasterDetailEditorPanelProps {
   availabilityDialogRef?: RefObject<HTMLDivElement | null>
   /** Extra overflow entries, such as Move to, rendered after availability and duplicate. */
   overflowActions?: readonly DetailOverflowMenuEntry[]
-  /** Attack summary, notices, and advisories rendered above the row fields. */
-  detailLeading?: ReactNode
-  /** Replaces the default `FormItems` body when the row is not a static field list. */
-  renderBody?: (ctx: {
-    selectedFieldId: string
-    selectedIndex: number
-    namePrefix: string
-  }) => ReactNode
+  /**
+   * Notices, advisories, and focus anchors rendered outside the detail-body rhythm stack.
+   * Do not mount facing previews or ordinary form fields here.
+   */
+  contextualChrome?: ReactNode
+  /** Shell-owned player-facing preview for the selected structured row. */
+  facing?: FacingHostConfig
+  /** Optional leading vs primary field regions (`leading` → facing → `primary`). */
+  fieldSections?: MasterDetailItemFieldSections
+  /**
+   * Wraps shell-owned primary `FormItems` when a domain host must own interactive context (spell picker).
+   * Must not introduce a second outer rhythm stack.
+   */
+  spellPicker?: MasterDetailSpellPicker
   onDuplicate?: () => void
   /** Replaces the default delete-confirm request. */
   onDelete?: () => void
@@ -79,12 +89,11 @@ interface MasterDetailSelectedRowEditorProps {
   availabilityFormItems?: FormItem[]
   availabilityNamePrefix?: string
   availabilityDialogRef?: RefObject<HTMLDivElement | null>
-  detailLeading?: ReactNode
-  renderBody?: (ctx: {
-    selectedFieldId: string
-    selectedIndex: number
-    namePrefix: string
-  }) => ReactNode
+  contextualChrome?: ReactNode
+  facing?: FacingHostConfig
+  inlineTitleField?: MasterDetailInlineTitle['field']
+  fieldSections?: MasterDetailItemFieldSections
+  spellPicker?: MasterDetailSpellPicker
 }
 
 function MasterDetailSelectedRowEditor({
@@ -98,12 +107,18 @@ function MasterDetailSelectedRowEditor({
   availabilityFormItems,
   availabilityNamePrefix,
   availabilityDialogRef,
-  detailLeading,
-  renderBody,
+  contextualChrome,
+  facing,
+  inlineTitleField,
+  fieldSections,
+  spellPicker,
 }: MasterDetailSelectedRowEditorProps) {
   const resolvedAvailabilityNamePrefix = availabilityNamePrefix ?? `${fieldName}.${selectedIndex}`
 
   const rowPrefix = `${fieldName}.${selectedIndex}`
+
+  const leadingItemFields = fieldSections?.leading ?? []
+  const primaryItemFields = fieldSections?.primary ?? itemFields
 
   return (
     <MasterDetailRowPrefixProvider value={rowPrefix}>
@@ -119,21 +134,17 @@ function MasterDetailSelectedRowEditor({
           />
         </div>
       ) : null}
-      {detailLeading}
-      <MasterDetailDetailFormScope>
-        {renderBody ? (
-          renderBody({ selectedFieldId, selectedIndex, namePrefix: rowPrefix })
-        ) : (
-          <FormRhythmStack>
-            <FormItems
-              key={`${selectedFieldId}:${selectedIndex}`}
-              items={wrapMasterDetailDetailFields(itemFields)}
-              idPrefix={`${idPrefix}-${selectedFieldId}`}
-              namePrefix={rowPrefix}
-            />
-          </FormRhythmStack>
-        )}
-      </MasterDetailDetailFormScope>
+      {contextualChrome}
+      <MasterDetailDetailBody
+        leadingItemFields={leadingItemFields}
+        primaryItemFields={primaryItemFields}
+        facing={facing}
+        idPrefix={idPrefix}
+        selectedFieldId={selectedFieldId}
+        namePrefix={rowPrefix}
+        inlineTitleField={inlineTitleField}
+        spellPicker={spellPicker}
+      />
     </MasterDetailRowPrefixProvider>
   )
 }
@@ -157,8 +168,10 @@ export function MasterDetailEditorPanel({
   availabilityNamePrefix,
   availabilityDialogRef,
   overflowActions,
-  detailLeading,
-  renderBody,
+  contextualChrome,
+  facing,
+  fieldSections,
+  spellPicker,
   onDuplicate,
   onDelete,
 }: MasterDetailEditorPanelProps) {
@@ -205,7 +218,7 @@ export function MasterDetailEditorPanel({
       namePrefix={
         hasSelectedRow && selectedIndex !== null ? `${fieldName}.${selectedIndex}` : undefined
       }
-      selectedFieldId={hasSelectedRow ? selectedFieldId : undefined}
+      selectedFieldId={hasSelectedRow ? (selectedFieldId ?? undefined) : undefined}
       onAcquisitionEditApplied={handleAcquisitionEditApplied}
       selectedIdentity={hasSelectedRow ? selectedIdentity : undefined}
       onDelete={
@@ -230,8 +243,11 @@ export function MasterDetailEditorPanel({
           availabilityFormItems={availabilityFormItems}
           availabilityNamePrefix={availabilityNamePrefix}
           availabilityDialogRef={availabilityDialogRef}
-          detailLeading={detailLeading}
-          renderBody={renderBody}
+          contextualChrome={contextualChrome}
+          facing={facing}
+          inlineTitleField={inlineTitle?.field}
+          fieldSections={fieldSections}
+          spellPicker={spellPicker}
         />
       ) : null}
     </MasterDetailEditorShell>

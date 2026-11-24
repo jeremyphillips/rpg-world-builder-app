@@ -30,7 +30,10 @@ const rows = [multiattack, fireBreath, spellcasting] as MonsterActionDraftRow[]
 
 function Harness({ onReady }: { onReady: (form: UseFormReturn<MonsterFormValues>) => void }) {
   const form = useForm<MonsterFormValues>({
-    defaultValues: monsterFormTestValues({ name: 'Transition slot', actions: rows }),
+    defaultValues: monsterFormTestValues({
+      name: 'Transition slot',
+      actions: rows as MonsterFormValues['actions'],
+    }),
   })
   onReady(form)
   return (

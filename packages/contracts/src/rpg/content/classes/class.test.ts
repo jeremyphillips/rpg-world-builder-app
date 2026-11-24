@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import {
+  CLASS_FEATURE_KIND_ENTRIES,
+  CLASS_FEATURE_KINDS,
   classBodySchema,
+  classFeatureKindSchema,
   classFeatureSchema,
   classHasSpellcasting,
   classListItemSchema,
@@ -19,6 +22,18 @@ import {
   subclassSchema,
   updateClassInputSchema,
 } from './class'
+
+describe('class feature kinds', () => {
+  it('derives kind ids and schema from metadata entries', () => {
+    expect(CLASS_FEATURE_KINDS).toEqual(['custom', 'asi', 'spellcasting', 'subclass-choice'])
+    for (const kind of CLASS_FEATURE_KINDS) {
+      expect(CLASS_FEATURE_KIND_ENTRIES[kind].label.length).toBeGreaterThan(0)
+      expect(CLASS_FEATURE_KIND_ENTRIES[kind].description.length).toBeGreaterThan(0)
+    }
+    expect(classFeatureKindSchema.safeParse('custom').success).toBe(true)
+    expect(classFeatureKindSchema.safeParse('not-a-kind').success).toBe(false)
+  })
+})
 
 const fighterStoredBody = {
   name: 'Fighter',

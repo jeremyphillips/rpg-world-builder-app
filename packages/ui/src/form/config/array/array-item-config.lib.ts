@@ -11,7 +11,6 @@ import type {
   ArrayItemReorder,
   ArrayItemVariant,
   FormItem,
-  RowConfig,
 } from '../../field-config'
 import { normalizeArrayItemContent } from './array-item-content-normalizer.lib'
 import {
@@ -28,14 +27,6 @@ export function isNestedArraySection(sectionDepth: number): boolean {
 
 function isCompactEligible(fields: FormItem[]): boolean {
   return normalizeArrayItemContent(fields).contentLayout === 'inline'
-}
-
-/**
- * @deprecated Prefer {@link normalizeArrayItemContent}. Returns the source row when authors
- * wrapped inline fields in `kind: 'row'`.
- */
-export function resolveCompactInlineRow(fields: FormItem[]): RowConfig | undefined {
-  return normalizeArrayItemContent(fields).inlineRow
 }
 
 export function resolveArrayItemConfig(

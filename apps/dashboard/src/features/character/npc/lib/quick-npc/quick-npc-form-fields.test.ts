@@ -17,7 +17,7 @@ import {
   QUICK_NPC_DETAILS_TAB_ID,
 } from './quick-npc-form-fields'
 import {
-  quickNpcMemberSetupWithNoTitle,
+  quickNpcMemberSetupWithChosenTitle,
   quickNpcOrganizationMemberCreateContext,
 } from './quick-npc-test-fixtures'
 
@@ -247,7 +247,7 @@ describe('buildQuickNpcTabs validation wiring', () => {
   it('merges setup and tab values for create/finalize', () => {
     expect(
       mergeQuickNpcAuthoringValues(
-        quickNpcMemberSetupWithNoTitle({
+        quickNpcMemberSetupWithChosenTitle({
           speciesId: 'species-1',
           classId: 'class-1',
           level: 2,

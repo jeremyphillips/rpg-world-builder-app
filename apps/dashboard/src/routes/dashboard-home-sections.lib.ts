@@ -73,6 +73,3 @@ export function resolveDashboardHomeShowAllCampaignsLink(
   const recovery = sections.find((section) => section.kind === 'campaignRecovery')
   return recovery?.kind === 'campaignRecovery' && recovery.recoverableCount > 1
 }
-
-/** @deprecated Use {@link DashboardHomeSection} campaignRecovery kind. */
-export type { CampaignRecoveryPromotion as CampaignSetupPromotion }

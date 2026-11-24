@@ -127,7 +127,7 @@ describe('useContentWriteMutation', () => {
   })
 
   const speciesDef = {
-    routeKey: 'species',
+    routeKey: 'species' as const,
     queryKey: (id: string) => ['campaigns', id, 'content', 'species'] as const,
   }
 
@@ -162,7 +162,7 @@ describe('useContentWriteMutation', () => {
   it('uses def.invalidateQueryKeys on success', async () => {
     const skillsKey = (id: string) => ['campaigns', id, 'content', 'skill-proficiencies'] as const
     const classDef = {
-      routeKey: 'classes',
+      routeKey: 'classes' as const,
       queryKey: (id: string) => ['campaigns', id, 'content', 'classes'] as const,
       invalidateQueryKeys: (id: string) => [skillsKey(id)],
     }

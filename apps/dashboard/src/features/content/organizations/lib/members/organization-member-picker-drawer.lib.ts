@@ -2,6 +2,7 @@ import {
   characterMatchesOrganizationMemberClassRecommendations,
   characterMatchesOrganizationMemberSpeciesRecommendations,
   type CharacterClass,
+  type CharacterType,
   type Species,
 } from '@rpg/contracts'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
@@ -29,7 +30,7 @@ export type OrganizationMemberPickerCandidate = CharacterPickerOption & {
 
 export type OrganizationMemberPickerCommit = {
   characterId: string
-  characterType: 'pc' | 'npc'
+  characterType: CharacterType
   membershipTitleId: string
 }
 

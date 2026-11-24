@@ -1,8 +1,8 @@
 import type { CharacterClass, ContentGrant, Species, SystemRulesetId } from '@rpg/contracts'
 import {
-  getUnlockedGrantsAtLevel,
   normalizeGrantGroups,
-  resolveGrantGroupsFromContent,
+  resolveMechanicalGrantsFromContent,
+  type resolveGrantGroupsFromContent,
 } from '@rpg/contracts'
 
 import { loadSeedClasses } from '../classes'
@@ -100,11 +100,15 @@ function walkGrantGroupsAtLevel1(
   parentLevel: number,
   parentUnlock: { level: number } | undefined,
 ): void {
-  const groups = resolveGrantGroupsFromContent(content, parentUnlock)
   if (content.grantGroups?.length) {
     recordNormalizeFailure(acc, path, content.grantGroups, parentUnlock)
   }
-  const grants = getUnlockedGrantsAtLevel(groups, 1, parentLevel)
+  const grants = resolveMechanicalGrantsFromContent(content, {
+    parentLevel,
+    level: 1,
+    parentUnlock,
+    source: path,
+  })
   collectGrantChoiceShapes(grants, acc.choiceShapes)
 }
 
@@ -152,6 +156,7 @@ function accumulateStartingEquipmentChoices(cls: CharacterClass, acc: InventoryA
 
 function accumulateClassFeatures(cls: CharacterClass, acc: InventoryAccumulator): void {
   for (const feature of cls.features) {
+    if (feature.kind !== 'custom') continue
     if (feature.grantGroups?.length) {
       recordNormalizeFailure(acc, `${cls.slug}/feature/${feature.id}`, feature.grantGroups, {
         level: feature.level,

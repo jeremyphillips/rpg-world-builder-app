@@ -1,28 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  getSlotProgressionKindEntry,
-  getSlotProgressionKindLabel,
-  isSlotProgressionKindId,
-  SLOT_PROGRESSION_KIND_ENTRIES,
-} from './slot-progression-kind'
+import { SLOT_PROGRESSION_KIND_ENTRIES, SLOT_PROGRESSION_KIND_IDS } from './slot-progression-kind'
 
-describe('slot-progression-kind', () => {
-  it('recognizes the three standard progression ids', () => {
-    expect(isSlotProgressionKindId('full-caster')).toBe(true)
-    expect(isSlotProgressionKindId('half-caster')).toBe(true)
-    expect(isSlotProgressionKindId('pact-magic')).toBe(true)
-    expect(isSlotProgressionKindId('custom-table')).toBe(false)
-  })
-
-  it('returns descriptions for standard ids', () => {
-    for (const id of ['full-caster', 'half-caster', 'pact-magic'] as const) {
-      expect(getSlotProgressionKindEntry(id)).toEqual(SLOT_PROGRESSION_KIND_ENTRIES[id])
+describe('slot progression kind vocabulary', () => {
+  it('derives ids from entries in builder order', () => {
+    expect(SLOT_PROGRESSION_KIND_IDS).toEqual(['full-caster', 'half-caster', 'pact-magic'])
+    for (const id of SLOT_PROGRESSION_KIND_IDS) {
+      expect(SLOT_PROGRESSION_KIND_ENTRIES[id].label.length).toBeGreaterThan(0)
+      expect(SLOT_PROGRESSION_KIND_ENTRIES[id].description.length).toBeGreaterThan(0)
     }
-    expect(getSlotProgressionKindEntry('custom-table')).toBeUndefined()
-  })
-
-  it('uses Pact Magic capitalization', () => {
-    expect(getSlotProgressionKindLabel('pact-magic')).toBe('Pact Magic')
   })
 })

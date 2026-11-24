@@ -15,7 +15,7 @@ import {
 } from '../../../../lib/fixtures/character-builder-fixtures'
 import {
   quickNpcMemberSetupValues,
-  quickNpcMemberSetupWithNoTitle,
+  quickNpcMemberSetupWithChosenTitle,
   quickNpcOrganizationMemberCreateContext,
 } from '../../../lib/quick-npc/quick-npc-test-fixtures'
 import { createNpc } from '../../../api/npc-client'
@@ -100,7 +100,7 @@ const quickFighter = {
   },
 }
 
-const setup = quickNpcMemberSetupWithNoTitle({
+const setup = quickNpcMemberSetupWithChosenTitle({
   speciesId: populatedBuilderCatalog.species[0]!.id,
   classId: quickFighter.id,
   level: 1,
@@ -266,7 +266,7 @@ describe('QuickNpcAuthoringForm', () => {
     }
     const { props } = renderForm({
       buildContext: buildContextFixture({ classes: [unsatisfiableFighter] }),
-      setup: quickNpcMemberSetupWithNoTitle({
+      setup: quickNpcMemberSetupWithChosenTitle({
         speciesId: populatedBuilderCatalog.species[0]!.id,
         npcTemplateId: 'criminal',
         classId: unsatisfiableFighter.id,

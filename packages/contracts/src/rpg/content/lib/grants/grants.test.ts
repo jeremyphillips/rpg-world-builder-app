@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import { createSpellCatalogContext } from '../../spell/spell-catalog-context'
+import { resolveSpellReferenceOutcomes } from '../../spell/spell-reference'
 import {
   contentGrantSchema,
   contentTraitSchema,
@@ -16,6 +18,7 @@ import {
   formatResistanceGrantSentence,
   formatSenseGrantSentence,
   formatSpellsGrantSentence,
+  formatSpellsGrantSentenceFromResolutions,
   getGrantGroupEffectiveUnlock,
   getUnlockedGrantsAtLevel,
   grantContentTraitSchema,
@@ -26,7 +29,7 @@ import {
   normalizeGrantGroups,
   resolveGrantGroupsFromContent,
 } from './grants'
-import { resolveTraitDisplay } from './trait-display'
+import { renderTraitFacingBodyHtml, resolveTraitFacingParts } from './trait-display'
 
 describe('featChoiceGrantSchema', () => {
   it('parses a fighting-style feat choice', () => {
@@ -202,6 +205,24 @@ describe('grant sentence formatters', () => {
       ),
     ).toBe('Character has Cure Wounds always prepared.')
   })
+
+  it('formats spell grants from resolution outcomes', () => {
+    const grant = {
+      id: 'spells-res',
+      kind: 'spells' as const,
+      ability: 'cha' as const,
+      casting: { mode: 'free_cast' as const },
+      spellIds: ['known', 'missing'],
+    }
+    const catalog = createSpellCatalogContext({
+      status: 'ready',
+      spellsById: new Map([['known', { id: 'known', name: 'Known Spell', level: 0 } as never]]),
+    })
+    const resolutions = resolveSpellReferenceOutcomes(grant.spellIds, catalog)
+    expect(formatSpellsGrantSentenceFromResolutions(grant, resolutions)).toBe(
+      'Character can cast Known Spell and Spell reference unavailable at will.',
+    )
+  })
 })
 
 describe('customContentTraitSchema', () => {
@@ -338,35 +359,37 @@ describe('normalizeContentTrait', () => {
   })
 })
 
-describe('resolveTraitDisplay', () => {
+describe('trait facing (species host)', () => {
+  const speciesHost = { host: 'species' as const }
+
   it('derives darkvision display from grant traits (grantGroups model)', () => {
-    const display = resolveTraitDisplay(
-      contentTraitSchema.parse({
-        kind: 'grant',
-        id: 'darkvision',
-        grantGroups: [
-          { grants: [{ id: 'sense-12', kind: 'sense', type: 'darkvision', range: 60 }] },
-        ],
-      }),
+    const trait = contentTraitSchema.parse({
+      kind: 'grant',
+      id: 'darkvision',
+      grantGroups: [{ grants: [{ id: 'sense-12', kind: 'sense', type: 'darkvision', range: 60 }] }],
+    })
+    const parts = resolveTraitFacingParts(trait, speciesHost)
+    expect(parts.title).toBe('Darkvision')
+    expect(renderTraitFacingBodyHtml(parts)).toBe(
+      '<p>You have Darkvision with a range of 60 feet.</p>',
     )
-    expect(display.name).toBe('Darkvision')
-    expect(display.descriptionHtml).toBe('<p>You have Darkvision with a range of 60 feet.</p>')
   })
 
   it('uses overrides on grant traits when present', () => {
-    const display = resolveTraitDisplay(
-      grantContentTraitSchema.parse({
-        kind: 'grant',
-        id: 'darkvision',
-        grantGroups: [
-          { grants: [{ id: 'sense-13', kind: 'sense', type: 'darkvision', range: 120 }] },
-        ],
-        nameOverride: 'Superior Darkvision',
-        descriptionOverride: '<p>Custom homebrew wording.</p>',
-      }),
+    const trait = grantContentTraitSchema.parse({
+      kind: 'grant',
+      id: 'darkvision',
+      grantGroups: [
+        { grants: [{ id: 'sense-13', kind: 'sense', type: 'darkvision', range: 120 }] },
+      ],
+      nameOverride: 'Superior Darkvision',
+      details: '<p>Custom homebrew wording.</p>',
+    })
+    const parts = resolveTraitFacingParts(trait, speciesHost)
+    expect(parts.title).toBe('Superior Darkvision')
+    expect(renderTraitFacingBodyHtml(parts)).toBe(
+      '<p>You have Darkvision with a range of 120 feet.</p><p>Custom homebrew wording.</p>',
     )
-    expect(display.name).toBe('Superior Darkvision')
-    expect(display.descriptionHtml).toBe('<p>Custom homebrew wording.</p>')
   })
 })
 

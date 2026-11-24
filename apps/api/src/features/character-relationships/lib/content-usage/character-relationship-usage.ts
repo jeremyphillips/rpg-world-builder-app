@@ -1,4 +1,4 @@
-import type { CharacterRelationship, ContentUsageBlocker } from '@rpg/contracts'
+import type { CharacterRelationship, CharacterType, ContentUsageBlocker } from '@rpg/contracts'
 import { isCampaignManager, USAGE_BLOCKER_SOURCE_KEYS } from '@rpg/contracts'
 
 import { listOpenParticipationsForCampaign } from '../../../campaign'
@@ -14,7 +14,7 @@ type RelationshipUsageRecord = {
   relationshipId: string
   characterId: string
   characterName: string
-  characterType: 'pc' | 'npc'
+  characterType: CharacterType
   organizationId?: string
   locationId?: string
   relatedCharacterId?: string
@@ -22,7 +22,7 @@ type RelationshipUsageRecord = {
 
 async function resolveCharacterSummary(characterId: string): Promise<{
   characterName: string
-  characterType: 'pc' | 'npc'
+  characterType: CharacterType
 } | null> {
   const pc = await findPcById(characterId)
   if (pc) {

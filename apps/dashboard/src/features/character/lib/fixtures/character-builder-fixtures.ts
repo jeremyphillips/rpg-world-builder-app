@@ -7,6 +7,7 @@ import {
   type CampaignNpcBuildContext,
   type CampaignPcBuildContext,
   type CharacterBuildCatalogIndex,
+  type EquipmentCatalogScope,
   type StandaloneBuildContext,
 } from '@rpg/contracts'
 import { resolveIndexedCampaignSpellcastingProgressionConfig } from '@rpg/catalog/spellcasting-progressions'
@@ -47,6 +48,11 @@ export const homebrewSpeciesFixture = makeSpecies({
 
 export { populatedBuilderCatalog }
 
+export const standaloneEquipmentReferenceScope = {
+  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
+  campaignId: '',
+} satisfies EquipmentCatalogScope
+
 function defaultSpellcastingProgression(rulesetId: StandaloneBuildContext['rulesetId']) {
   return resolveIndexedCampaignSpellcastingProgressionConfig(rulesetId, undefined)
 }
@@ -60,8 +66,7 @@ export function createStandaloneBuilderContextFixture(
     channel: 'build',
     surface: 'dashboard',
     characterKind: 'pc',
-    mode: 'dashboard',
-    scope: { type: 'standalone', rulesetId },
+
     rulesScope: { type: 'ruleset', rulesetId },
     ownershipTarget: { type: 'user' },
     rulesetId,
@@ -103,8 +108,6 @@ export function createCampaignNpcBuilderContextFixture(
     channel: 'build',
     surface: 'dashboard',
     characterKind: 'npc',
-    mode: 'dashboard',
-    scope: { type: 'campaign', campaignId, rulesetId },
     rulesScope: { type: 'campaign', campaignId, rulesetId },
     ownershipTarget: { type: 'campaign', campaignId },
     acquisition: { kind: 'campaign_npc', campaignId },
@@ -133,8 +136,6 @@ export function createCampaignPcBuilderContextFixture(
     channel: 'build',
     surface: 'dashboard',
     characterKind: 'pc',
-    mode: 'dashboard',
-    scope: { type: 'campaign', campaignId, rulesetId },
     rulesScope: { type: 'campaign', campaignId, rulesetId },
     ownershipTarget: { type: 'user', userId: 'user-test-1' },
     acquisition: {

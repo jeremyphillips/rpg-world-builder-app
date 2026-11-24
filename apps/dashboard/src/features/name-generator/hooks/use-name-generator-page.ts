@@ -134,7 +134,7 @@ export function useNameGeneratorPage() {
           },
           {
             conventions,
-            getConvention,
+            getStaticConvention: getConvention,
           },
         )
 

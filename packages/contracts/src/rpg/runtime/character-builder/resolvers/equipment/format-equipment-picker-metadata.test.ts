@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { equipmentSchema } from '../../../../content/equipment'
 import { buildEquipmentPickerSearchText } from './format-equipment-picker-metadata'
 import {
-  isEquipmentAffordableAtStartingBudget,
+  fitsStartingEquipmentBudget,
   isEquipmentWithinRemainingBudget,
   wealthToCopper,
 } from './equipment-budget'
@@ -44,13 +44,13 @@ describe('equipment-budget', () => {
     }
 
     expect(wealthToCopper(budget.remaining)).toBe(4000)
-    expect(isEquipmentAffordableAtStartingBudget(rope, budget)).toBe(true)
+    expect(fitsStartingEquipmentBudget(rope, budget)).toBe(true)
     expect(isEquipmentWithinRemainingBudget(rope, budget)).toBe(true)
     const expensive = { ...rope, cost: { amount: 75, currency: 'gp' as const } }
-    expect(isEquipmentAffordableAtStartingBudget(expensive, budget)).toBe(true)
+    expect(fitsStartingEquipmentBudget(expensive, budget)).toBe(true)
     expect(isEquipmentWithinRemainingBudget(expensive, budget)).toBe(false)
     const unaffordableAtStart = { ...rope, cost: { amount: 150, currency: 'gp' as const } }
-    expect(isEquipmentAffordableAtStartingBudget(unaffordableAtStart, budget)).toBe(false)
+    expect(fitsStartingEquipmentBudget(unaffordableAtStart, budget)).toBe(false)
     expect(isEquipmentWithinRemainingBudget(unaffordableAtStart, budget)).toBe(false)
   })
 })

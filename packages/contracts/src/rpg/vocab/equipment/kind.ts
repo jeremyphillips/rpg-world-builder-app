@@ -4,7 +4,7 @@ import {
   type GameTermEntry,
   type VocabularyTerm,
 } from '../types'
-import { vocabEnumFromEntries } from '../enum-schema'
+import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
 
 // ---------------------------------------------------------------------------
 // Equipment kind — discriminant for the unified equipment catalog content type.
@@ -71,18 +71,15 @@ export const EQUIPMENT_KIND_ENTRIES = {
   },
 } as const satisfies Record<string, GameTermEntry>
 
+export type EquipmentKind = keyof typeof EQUIPMENT_KIND_ENTRIES
+
+export const EQUIPMENT_KINDS = keysFromEntries(EQUIPMENT_KIND_ENTRIES)
+
 export const EQUIPMENT_KIND_LABELS = Object.fromEntries(
-  Object.entries(EQUIPMENT_KIND_ENTRIES).map(([kind, entry]) => [kind, entry.label]),
+  EQUIPMENT_KINDS.map((kind) => [kind, EQUIPMENT_KIND_ENTRIES[kind].label]),
 ) as {
-  readonly [Kind in keyof typeof EQUIPMENT_KIND_ENTRIES]: (typeof EQUIPMENT_KIND_ENTRIES)[Kind]['label']
+  readonly [Kind in EquipmentKind]: (typeof EQUIPMENT_KIND_ENTRIES)[Kind]['label']
 }
-
-export type EquipmentKind = keyof typeof EQUIPMENT_KIND_LABELS
-
-export const EQUIPMENT_KINDS = Object.keys(EQUIPMENT_KIND_LABELS) as [
-  EquipmentKind,
-  ...EquipmentKind[],
-]
 
 export const equipmentKindSchema = vocabEnumFromEntries(EQUIPMENT_KIND_ENTRIES)
 

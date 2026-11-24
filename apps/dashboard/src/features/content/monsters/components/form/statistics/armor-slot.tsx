@@ -75,6 +75,7 @@ function armorSlotFlaggedCopy(
   catalog: ReturnType<typeof monsterEquipmentCatalog>,
   provider: ReturnType<typeof monsterMagicPropertyProvider>,
 ) {
+  if (!provider) return []
   return owned.flatMap((entry) => {
     const decision = resolveEquipmentRemovalDecision(values, entry)
     if (decision.outcome !== 'confirm') return []

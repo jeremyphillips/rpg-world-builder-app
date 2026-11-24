@@ -169,7 +169,7 @@ describe('MonsterFormAvailabilityControl', () => {
       name: 'Werebear',
       forms: {
         profileFormId: 'profile',
-        trueForm: { kind: 'defined' },
+        trueForm: { kind: 'defined', formId: undefined },
         definedForms: [
           { id: 'humanoid', name: 'Humanoid' },
           { id: 'bear', name: 'Bear' },

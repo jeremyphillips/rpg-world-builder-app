@@ -202,9 +202,12 @@ const SAMPLE_BODIES = {
 } satisfies Record<EquipmentKind, Record<string, unknown>>
 
 describe('equipment kind taxonomy', () => {
-  it('exposes every kind in EQUIPMENT_KINDS', () => {
-    expect([...EQUIPMENT_KINDS].sort()).toEqual(Object.keys(EQUIPMENT_KIND_LABELS).sort())
+  it('derives equipment kinds and labels from entries', () => {
     expect([...EQUIPMENT_KINDS].sort()).toEqual(Object.keys(EQUIPMENT_KIND_ENTRIES).sort())
+    for (const kind of EQUIPMENT_KINDS) {
+      expect(EQUIPMENT_KIND_LABELS[kind]).toBe(EQUIPMENT_KIND_ENTRIES[kind].label)
+      expect(EQUIPMENT_KIND_ENTRIES[kind].description.length).toBeGreaterThan(0)
+    }
   })
 
   it('has a sample body for every kind (keeps this test exhaustive)', () => {

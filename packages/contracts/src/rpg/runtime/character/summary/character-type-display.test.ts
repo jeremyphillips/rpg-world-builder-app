@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  formatUnknownCharacterTypeLabel,
   getCharacterTypeBulkActionDescriptor,
   getCharacterTypeCollectionLabel,
   getCharacterTypeLabel,
@@ -11,9 +12,16 @@ describe('getCharacterTypeLabel', () => {
     expect(getCharacterTypeLabel('pc')).toBe('PC')
     expect(getCharacterTypeLabel('npc')).toBe('NPC')
   })
+})
 
+describe('formatUnknownCharacterTypeLabel', () => {
   it('falls back to the raw value for unknown ids', () => {
-    expect(getCharacterTypeLabel('companion')).toBe('companion')
+    expect(formatUnknownCharacterTypeLabel('companion')).toBe('companion')
+  })
+
+  it('returns known labels for pc and npc', () => {
+    expect(formatUnknownCharacterTypeLabel('pc')).toBe('PC')
+    expect(formatUnknownCharacterTypeLabel('npc')).toBe('NPC')
   })
 })
 

@@ -42,7 +42,6 @@ function rangedNumber(label: string, min: number, max: number) {
     .max(max, `${label} cannot exceed ${max}.`)
 }
 
-const usesField = rangedNumber('Uses', 1, 12)
 const brightRadiusField = rangedNumber('Bright radius', 5, 120)
 const emanationRadiusField = rangedNumber('Emanation radius', 5, 120)
 const insightDcField = rangedNumber('Insight DC', 1, 30)
@@ -250,8 +249,6 @@ const monsterPresetTraitUnionSchema = z.union([
   elementalRestorationSchema,
   stenchSchema,
 ])
-
-export type MonsterPresetTrait = z.infer<typeof monsterPresetTraitUnionSchema>
 
 export const monsterPresetTraitSchema = z.preprocess(
   normalizePresetTraitInput,

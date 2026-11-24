@@ -3,15 +3,16 @@ import { createElement } from 'react'
 import {
   ABILITY_ENTRIES,
   ABILITY_IDS,
-  SPELLCASTING_FOCUS_GEAR_KINDS,
+  CLASS_SPELLCASTING_FOCUS_KINDS,
+  CLASS_SPELLCASTING_FOCUS_KIND_ENTRIES,
   SPELLCASTING_GEAR_KINDS,
   SPELLCASTING_GEAR_KIND_ENTRIES,
   abilitySchema,
+  classSpellcastingFocusKindSchema,
   classGainProgressionSchema,
   classSpellcastingProgressionDraftSchema,
   classSpellcastingProgressionSchema,
   spellRecommendationSchema,
-  spellcastingFocusGearKindSchema,
   spellcastingGearKindSchema,
   getContentTypeSentenceForm,
   getSpellCollectionKindLabel,
@@ -34,7 +35,7 @@ import { CLASS_SPELLCASTING_REMOVE_CONFIRM } from './class-spellcasting-confirm-
 import { isSpellcastingGrantingFeatureRow } from './class-spellcasting-lifecycle'
 import { draftOptionalSelect } from '../../lib/forms/validation/draft-form-schema-helpers'
 import {
-  SPELL_SELECTION_CHANGE_PACKAGE_OPTIONS,
+  SPELL_CHANGE_PACKAGE_OPTIONS,
   SPELL_SELECTION_MODEL_OPTIONS,
 } from './class-spell-selection-form.lib'
 
@@ -54,10 +55,13 @@ const spellcastingGearKindOptions = toOptions(
 )
 
 const spellcastingFocusKindOptions = toOptions(
-  SPELLCASTING_FOCUS_GEAR_KINDS,
+  CLASS_SPELLCASTING_FOCUS_KINDS,
   Object.fromEntries(
-    SPELLCASTING_FOCUS_GEAR_KINDS.map((kind) => [kind, SPELLCASTING_GEAR_KIND_ENTRIES[kind].label]),
-  ) as Record<(typeof SPELLCASTING_FOCUS_GEAR_KINDS)[number], string>,
+    CLASS_SPELLCASTING_FOCUS_KINDS.map((kind) => [
+      kind,
+      CLASS_SPELLCASTING_FOCUS_KIND_ENTRIES[kind].label,
+    ]),
+  ) as Record<(typeof CLASS_SPELLCASTING_FOCUS_KINDS)[number], string>,
 )
 
 const spellSelectionModelOptions = toOptions(
@@ -67,11 +71,11 @@ const spellSelectionModelOptions = toOptions(
   ) as Record<(typeof SPELL_SELECTION_MODEL_OPTIONS)[number]['value'], string>,
 )
 
-const spellSelectionChangePackageOptions = toOptions(
-  SPELL_SELECTION_CHANGE_PACKAGE_OPTIONS.map((option) => option.value),
+const spellChangePackageOptions = toOptions(
+  SPELL_CHANGE_PACKAGE_OPTIONS.map((option) => option.value),
   Object.fromEntries(
-    SPELL_SELECTION_CHANGE_PACKAGE_OPTIONS.map((option) => [option.value, option.label]),
-  ) as Record<(typeof SPELL_SELECTION_CHANGE_PACKAGE_OPTIONS)[number]['value'], string>,
+    SPELL_CHANGE_PACKAGE_OPTIONS.map((option) => [option.value, option.label]),
+  ) as Record<(typeof SPELL_CHANGE_PACKAGE_OPTIONS)[number]['value'], string>,
 )
 
 export function createSpellcastingFormSchema(_maxLevel: number) {
@@ -80,7 +84,7 @@ export function createSpellcastingFormSchema(_maxLevel: number) {
     progression: classSpellcastingProgressionSchema.optional(),
     ability: abilitySchema,
     requiredGear: z.array(spellcastingGearKindSchema).optional(),
-    focusKinds: z.array(spellcastingFocusGearKindSchema).optional(),
+    focusKinds: z.array(classSpellcastingFocusKindSchema).optional(),
     recommendedGear: z.array(spellcastingGearKindSchema).optional(),
     recommendations: z.array(spellRecommendationSchema).optional(),
   })
@@ -92,7 +96,7 @@ export function createSpellcastingDraftFormSchema(_maxLevel: number) {
     progression: classSpellcastingProgressionDraftSchema.optional(),
     ability: draftOptionalSelect(abilitySchema),
     requiredGear: z.array(spellcastingGearKindSchema).optional(),
-    focusKinds: z.array(spellcastingFocusGearKindSchema).optional(),
+    focusKinds: z.array(classSpellcastingFocusKindSchema).optional(),
     recommendedGear: z.array(spellcastingGearKindSchema).optional(),
     recommendations: z.array(spellRecommendationSchema).optional(),
   })
@@ -190,6 +194,18 @@ export function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
               label: 'Grants cantrips',
               hint: 'When enabled, the Spellcasting progression table includes a Cantrips column.',
             },
+            {
+              type: 'select',
+              name: 'cantripChangePackage',
+              label: 'Replace cantrips',
+              options: spellChangePackageOptions,
+              required: true,
+              visibility: {
+                dependsOn: ['grantsCantrips'],
+                visibleWhen: (watched) => watched['grantsCantrips'] === true,
+              },
+              hint: 'When cantrip selections may change after character creation.',
+            },
           ],
         },
         {
@@ -202,7 +218,7 @@ export function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
               type: 'select',
               name: 'spellSelectionChangePackage',
               label: 'Change prepared spells',
-              options: spellSelectionChangePackageOptions,
+              options: spellChangePackageOptions,
               required: true,
               hint: 'When selections may change after character creation.',
             },

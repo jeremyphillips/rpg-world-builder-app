@@ -1,10 +1,16 @@
 import {
   buildEquipmentCompactSummary,
   CHARACTER_EQUIPMENT_INVENTORY_BUCKETS,
+  createEquipmentCatalogContext,
+  createSpellCatalogContext,
+  presentEquipmentReferenceDisplayName,
+  resolveEquipmentIdReference,
   formatSelectionSourceLabel,
   formatSpellConcentrationMarker,
   formatSpellRitualMarker,
   getSpellSchoolLabel,
+  presentSpellReferenceDisplayName,
+  resolveSpellReferenceOutcome,
   type ArmorClassRules,
   type CharacterBuildCatalogIndex,
   type CharacterEquipmentEntry,
@@ -15,12 +21,12 @@ import {
   type Equipment,
   type Character,
   type Spell,
+  type EquipmentCatalogScope,
   getCantripLevelLabel,
 } from '@rpg/contracts'
 
 import type { CatalogMetadataLine } from '@/features/content'
 
-import { formatContentReferenceLabel } from '../display/format-content-reference-label'
 import {
   buildMissingCatalogCard,
   buildResolvedCatalogCard,
@@ -125,9 +131,23 @@ function normalizeSheetSources(
 function resolveEquipmentDisplayName(
   entry: CharacterEquipmentEntry,
   catalogIndex: CharacterBuildCatalogIndex,
+  equipmentReferenceScope: EquipmentCatalogScope,
 ): string {
+  if (entry.customName) return entry.customName
   const equipment = catalogIndex.equipment.get(entry.equipmentId)
-  return entry.customName ?? equipment?.name ?? formatContentReferenceLabel(entry.equipmentId)
+  if (equipment) return equipment.name
+
+  return presentEquipmentReferenceDisplayName(
+    resolveEquipmentIdReference(
+      entry.equipmentId,
+      createEquipmentCatalogContext({
+        status: 'ready',
+        scope: equipmentReferenceScope,
+        equipmentById: catalogIndex.equipment,
+      }),
+      equipmentReferenceScope,
+    ),
+  )
 }
 
 function resolveEquipmentOccurrenceId(
@@ -144,6 +164,7 @@ function buildEquipmentCards(
   character: Pick<Character, 'equipment'>,
   catalogIndex: CharacterBuildCatalogIndex,
   _armorClassRules: ArmorClassRules,
+  equipmentReferenceScope: EquipmentCatalogScope,
 ): CharacterSheetEquipmentCard[] {
   const occurrenceCounts = new Map<string, number>()
   const cards: CharacterSheetEquipmentCard[] = []
@@ -155,7 +176,7 @@ function buildEquipmentCards(
       occurrenceCounts.set(signature, occurrenceIndex + 1)
 
       const equipment = catalogIndex.equipment.get(entry.equipmentId)
-      const displayName = resolveEquipmentDisplayName(entry, catalogIndex)
+      const displayName = resolveEquipmentDisplayName(entry, catalogIndex, equipmentReferenceScope)
       const sources = normalizeSheetSources(entry.sources, catalogIndex)
       const base = {
         id: resolveEquipmentOccurrenceId(entry, bucket, occurrenceIndex),
@@ -182,9 +203,16 @@ function buildSpellCards(
   character: Pick<Character, 'spells'>,
   catalogIndex: CharacterBuildCatalogIndex,
 ): CharacterSheetSpellCard[] {
+  const spellCatalog = createSpellCatalogContext({
+    status: 'ready',
+    spellsById: catalogIndex.spells,
+  })
+
   return character.spells.map((entry, index) => {
     const spell = catalogIndex.spells.get(entry.spellId)
-    const displayName = spell?.name ?? formatContentReferenceLabel(entry.spellId)
+    const displayName = spell
+      ? spell.name
+      : presentSpellReferenceDisplayName(resolveSpellReferenceOutcome(entry.spellId, spellCatalog))
     const sources = normalizeSheetSources(entry.sources, catalogIndex)
     const base = {
       displayName,
@@ -205,8 +233,9 @@ export function buildCharacterSheetEquipmentCards(
   character: Pick<Character, 'equipment'>,
   catalogIndex: CharacterBuildCatalogIndex,
   armorClassRules: ArmorClassRules,
+  equipmentReferenceScope: EquipmentCatalogScope,
 ): CharacterSheetEquipmentCard[] {
-  return buildEquipmentCards(character, catalogIndex, armorClassRules)
+  return buildEquipmentCards(character, catalogIndex, armorClassRules, equipmentReferenceScope)
 }
 
 export function buildCharacterSheetSpellCards(

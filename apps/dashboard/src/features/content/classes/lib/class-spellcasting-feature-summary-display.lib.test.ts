@@ -8,7 +8,7 @@ import { classSpellcastingFeatureSummaryDisplay } from './class-spellcasting-fea
 describe('classSpellcastingFeatureSummaryDisplay', () => {
   it('emits a feature table row when a granting feature exists', () => {
     const features = [
-      featureToFormRow(createSpellcastingFeature({ level: 2, usesPactMagic: false })),
+      featureToFormRow(createSpellcastingFeature({ level: 2, slotProgressionId: 'full-caster' })),
     ]
     const blocks = resolveDisplayBlocks(classSpellcastingFeatureSummaryDisplay(), { features })
     expect(blocks[0]).toMatchObject({

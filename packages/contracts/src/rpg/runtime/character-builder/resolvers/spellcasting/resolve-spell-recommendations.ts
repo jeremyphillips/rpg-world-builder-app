@@ -2,6 +2,7 @@ import {
   CLASS_SPELLCASTING_CHOICE_SUFFIXES,
   type ClassSpellSelection,
   type SpellRecommendation,
+  type SpellRecommendationTarget,
   type Spellcasting,
 } from '../../../../content/classes/spellcasting'
 import type { Spell } from '../../../../content/spell'
@@ -38,17 +39,23 @@ function recommendationMatchesChoiceSet(args: {
   return choiceSetId === spellcastingChoiceSetId(classId, suffix)
 }
 
-function recommendationMatchesSpellLevel(
+function recommendationScheduleLevel(
   recommendation: SpellRecommendation,
-  spell: Spell,
-  classLevel: number,
-): boolean {
-  if (recommendation.classLevel !== undefined && recommendation.classLevel !== classLevel) {
-    return false
-  }
-  if (recommendation.spellLevel !== undefined && recommendation.spellLevel !== spell.level) {
-    return false
-  }
+  activationClassLevel: number,
+): number {
+  return recommendation.classLevel ?? activationClassLevel
+}
+
+function recommendationMatchesEligibility(args: {
+  recommendation: SpellRecommendation
+  spell: Spell
+  classLevel: number
+  activationClassLevel: number
+  maxSelectableSpellLevel: number
+}): boolean {
+  const scheduleLevel = recommendationScheduleLevel(args.recommendation, args.activationClassLevel)
+  if (args.classLevel !== scheduleLevel) return false
+  if (args.spell.level > args.maxSelectableSpellLevel) return false
   return true
 }
 
@@ -57,12 +64,24 @@ function recommendedOptionIdsForReference(args: {
   optionIds: ReadonlySet<string>
   recommendation: SpellRecommendation
   classLevel: number
+  activationClassLevel: number
+  maxSelectableSpellLevel: number
   catalogSpellsById: ReadonlyMap<string, Spell>
 }): string[] {
   if (!args.optionIds.has(args.spellId)) return []
   const spell = args.catalogSpellsById.get(args.spellId)
   if (!spell) return []
-  if (!recommendationMatchesSpellLevel(args.recommendation, spell, args.classLevel)) return []
+  if (
+    !recommendationMatchesEligibility({
+      recommendation: args.recommendation,
+      spell,
+      classLevel: args.classLevel,
+      activationClassLevel: args.activationClassLevel,
+      maxSelectableSpellLevel: args.maxSelectableSpellLevel,
+    })
+  ) {
+    return []
+  }
   return [args.spellId]
 }
 
@@ -70,6 +89,8 @@ function recommendedOptionIdsForRecommendation(args: {
   recommendation: SpellRecommendation
   optionIds: ReadonlySet<string>
   classLevel: number
+  activationClassLevel: number
+  maxSelectableSpellLevel: number
   catalogSpellsById: ReadonlyMap<string, Spell>
 }): string[] {
   return args.recommendation.spellIds.flatMap((spellId) =>
@@ -78,9 +99,49 @@ function recommendedOptionIdsForRecommendation(args: {
       optionIds: args.optionIds,
       recommendation: args.recommendation,
       classLevel: args.classLevel,
+      activationClassLevel: args.activationClassLevel,
+      maxSelectableSpellLevel: args.maxSelectableSpellLevel,
       catalogSpellsById: args.catalogSpellsById,
     }),
   )
+}
+
+/** Resolves recommendation spell ids for a semantic target at the given class level. */
+export function resolveApplicableRecommendationSpellIds(args: {
+  spellcasting: Spellcasting | undefined
+  target: SpellRecommendationTarget
+  classLevel: number
+  activationClassLevel: number
+  maxSelectableSpellLevel: number
+  catalogSpellsById?: ReadonlyMap<string, Spell>
+}): string[] {
+  const recommendations = args.spellcasting?.recommendations ?? []
+  if (recommendations.length === 0) return []
+
+  const result: string[] = []
+  for (const recommendation of recommendations) {
+    if (recommendation.target !== args.target) continue
+
+    if (!args.catalogSpellsById) {
+      const scheduleLevel = recommendationScheduleLevel(recommendation, args.activationClassLevel)
+      if (args.classLevel !== scheduleLevel) continue
+      result.push(...recommendation.spellIds)
+      continue
+    }
+
+    for (const spellId of recommendedOptionIdsForRecommendation({
+      recommendation,
+      optionIds: new Set(recommendation.spellIds),
+      classLevel: args.classLevel,
+      activationClassLevel: args.activationClassLevel,
+      maxSelectableSpellLevel: args.maxSelectableSpellLevel,
+      catalogSpellsById: args.catalogSpellsById,
+    })) {
+      result.push(spellId)
+    }
+  }
+
+  return result
 }
 
 /** Resolves recommended spell ids for the opened ChoiceSet; advisory only. */
@@ -89,6 +150,8 @@ export function resolveRecommendedSpellIdsForChoiceSet(args: {
   choiceSetId: string
   classId: string
   classLevel: number
+  activationClassLevel: number
+  maxSelectableSpellLevel: number
   choiceSetOptionIds: readonly string[]
   catalogSpellsById: ReadonlyMap<string, Spell>
 }): Set<string> {
@@ -115,6 +178,8 @@ export function resolveRecommendedSpellIdsForChoiceSet(args: {
       recommendation,
       optionIds,
       classLevel: args.classLevel,
+      activationClassLevel: args.activationClassLevel,
+      maxSelectableSpellLevel: args.maxSelectableSpellLevel,
       catalogSpellsById: args.catalogSpellsById,
     })) {
       recommended.add(optionId)

@@ -14,10 +14,12 @@ vi.mock('@rpg/ui/form', async (importOriginal) => {
 
 type Trait = {
   id?: string
-  kind: 'custom' | 'grant'
+  kind: 'custom' | 'grant' | 'template'
   name?: string
   description?: string
   overrideDisplay?: boolean
+  templateId?: string
+  config?: { range?: number }
   grants: never[]
 }
 
@@ -75,10 +77,43 @@ async function deleteViaOverflow(user: ReturnType<typeof userEvent.setup>, title
 }
 
 describe('SpeciesTraitsTab', () => {
-  it('shows the empty state when there are no traits', () => {
+  it('shows the flat-list empty state when there are no traits', () => {
     render(<TabShell />)
     expect(screen.getByText(/No traits added\./i)).toBeInTheDocument()
     expect(screen.getByText(/Select a trait to edit/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Add trait/i })).toBeInTheDocument()
+    expect(screen.queryByText(/Other traits/i)).not.toBeInTheDocument()
+  })
+
+  it('renders all traits in one flat list without navigation group headings', () => {
+    render(
+      <TabShell
+        traits={[
+          {
+            id: 'dv',
+            kind: 'template',
+            templateId: 'sense-darkvision',
+            config: { range: 60 },
+            grants: [],
+          },
+          feyAncestry,
+        ]}
+      />,
+    )
+    const nav = screen.getByRole('navigation', { name: 'Traits' })
+    expect(within(nav).getByRole('button', { name: /Darkvision/i })).toBeInTheDocument()
+    expect(within(nav).getByRole('button', { name: /Fey Ancestry/i })).toBeInTheDocument()
+    expect(within(nav).queryByText(/^Senses$/)).not.toBeInTheDocument()
+    expect(within(nav).queryByText(/Other traits/i)).not.toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: /Add trait/i })).toHaveLength(1)
+  })
+
+  it('opens grouped acquisition choices from the header add control', async () => {
+    const user = userEvent.setup()
+    render(<TabShell />)
+    await user.click(screen.getByRole('button', { name: /Add trait/i }))
+    expect(await screen.findByRole('menuitem', { name: /Darkvision/i })).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: /Custom trait/i })).toBeInTheDocument()
   })
 
   it('adds a trait and selects it in the detail panel', async () => {
@@ -180,6 +215,22 @@ describe('SpeciesTraitsTab', () => {
     await waitFor(() => {
       expect(screen.getByText(/No traits added\./i)).toBeInTheDocument()
     })
+  })
+
+  it('adds a sense template from the acquisition menu and selects the new row', async () => {
+    const user = userEvent.setup()
+    render(<TabShell />)
+    await user.click(screen.getByRole('button', { name: /Add trait/i }))
+    await user.click(await screen.findByRole('menuitem', { name: /^Darkvision$/i }))
+    const traits = JSON.parse(screen.getByTestId('traits-values').textContent ?? '[]') as Trait[]
+    expect(traits[0]).toMatchObject({
+      kind: 'template',
+      templateId: 'sense-darkvision',
+      id: 'darkvision',
+    })
+    expect(
+      screen.getAllByTestId('trait-detail').some((element) => element.textContent === 'traits.0'),
+    ).toBe(true)
   })
 
   it('locks system traits on a system species (no overflow delete, System meta)', async () => {

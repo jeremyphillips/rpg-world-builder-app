@@ -1,5 +1,7 @@
 import * as React from 'react'
 
+import { DEFAULT_SYSTEM_RULESET_ID, type SystemRulesetId } from '@rpg/contracts'
+
 import {
   Button,
   ConfirmDialog,
@@ -120,7 +122,7 @@ export function EditOrganizationMembershipDrawer({
     organizationDomain: organization.organizationDomain,
     slug: organization.id,
     catalogLayer: 'homebrew',
-    rulesetId: 'srd-cc-5.2.1',
+    rulesetId: (organization.rulesetId ?? DEFAULT_SYSTEM_RULESET_ID) as SystemRulesetId,
     media: undefined,
   })
   return (

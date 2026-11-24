@@ -7,6 +7,7 @@ import { resolveUnresolvedChoiceSetSummaries } from '../readiness/resolve-unreso
 import type { ChoiceSet } from '../choice-set'
 import { characterBuilderPreviewMessages } from '../messages/character-builder-preview-messages'
 import type { ResolvedSpellcastingProgressionConfig } from '../../../campaign/rules/spellcasting-progression'
+import { resolveClassFeatureName } from '../../../content/classes/class'
 import type { CharacterBuildCatalogIndex, ResolvedCharacterCreationRules } from '../context'
 import type { SystemRulesetId } from '../../../primitives/ruleset'
 import type { CharacterBuilderDraft } from '../draft/draft'
@@ -95,11 +96,15 @@ function resolveBuilderAdvisoryWarnings(
     (feature) => feature.id === 'unarmored-defense',
   )
 
-  if (unarmoredDefense && !hasEquippedBodyArmor(catalogIndex, draft, rules, rulesetId)) {
+  if (
+    unarmoredDefense &&
+    characterClass &&
+    !hasEquippedBodyArmor(catalogIndex, draft, rules, rulesetId)
+  ) {
     warnings.push(
       formatFieldMessage(
         characterBuilderPreviewMessages.unarmoredDefenseNotModeled({
-          featureName: unarmoredDefense.name,
+          featureName: resolveClassFeatureName(unarmoredDefense, characterClass.name),
         }),
       ),
     )

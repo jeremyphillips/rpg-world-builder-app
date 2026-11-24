@@ -7,7 +7,7 @@ import {
   populatedBuilderCatalog,
 } from '../../../../lib/fixtures/character-builder-fixtures'
 import {
-  quickNpcMemberSetupWithNoTitle,
+  quickNpcMemberSetupWithChosenTitle,
   quickNpcOrganizationMemberCreateContext,
   quickNpcTestOrganization,
 } from '../../../lib/quick-npc/quick-npc-test-fixtures'
@@ -104,7 +104,7 @@ const buildContext = createCampaignNpcBuilderContextFixture({
   },
 })
 
-const setup = quickNpcMemberSetupWithNoTitle({
+const setup = quickNpcMemberSetupWithChosenTitle({
   speciesId: 'srd-cc-5.2.1:dwarf',
   classId: quickFighter.id,
   level: 1,
@@ -214,7 +214,7 @@ describe('QuickNpcAuthoringForm', () => {
     const onChangeSetup = vi.fn()
     renderAuthoringForm({
       onChangeSetup,
-      setup: quickNpcMemberSetupWithNoTitle({
+      setup: quickNpcMemberSetupWithChosenTitle({
         speciesId: 'srd-cc-5.2.1:not-a-species',
         classId: quickFighter.id,
         level: 1,

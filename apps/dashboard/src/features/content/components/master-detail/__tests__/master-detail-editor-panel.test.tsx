@@ -33,7 +33,6 @@ function makeEditor(
     replaceRows: vi.fn(),
     lastAddedFieldId: null,
     acknowledgeAcquisition: vi.fn(),
-    clearLastAddedFieldId: vi.fn(),
     deleteIndex: null,
     requestRemove: vi.fn(),
     cancelRemove: vi.fn(),
@@ -175,28 +174,6 @@ describe('MasterDetailEditorPanel', () => {
     expect(screen.queryByRole('button', { name: /Actions for Rage/i })).not.toBeInTheDocument()
   })
 
-  it('focuses the first visible detail control and skips the checkbox bubble', () => {
-    render(
-      <PanelShell
-        editor={makeEditor({ lastAddedFieldId: 'field-a' })}
-        itemFields={itemFields}
-        fieldName="traits"
-        idPrefix="species-trait"
-        itemNoun={TRAIT_MASTER_DETAIL_ITEM_NOUN}
-        selectedIdentity={selectedIdentity}
-        renderBody={() => (
-          <>
-            <input type="checkbox" aria-hidden="true" tabIndex={-1} data-testid="bubble" />
-            <input aria-label="Notes" />
-          </>
-        )}
-      />,
-    )
-
-    expect(screen.getByRole('textbox', { name: 'Notes' })).toHaveFocus()
-    expect(screen.getByTestId('bubble')).not.toHaveFocus()
-  })
-
   it('leaves focus in the inline title when a new row opens its name', async () => {
     render(
       <PanelShell
@@ -215,14 +192,40 @@ describe('MasterDetailEditorPanel', () => {
             initialEdit: true,
           },
         }}
-        renderBody={() => (
+        contextualChrome={
           <input type="checkbox" aria-hidden="true" tabIndex={-1} data-testid="bubble" />
-        )}
+        }
       />,
     )
 
     expect(await screen.findByRole('textbox', { name: 'Name' })).toHaveFocus()
     expect(screen.getByTestId('bubble')).not.toHaveFocus()
+  })
+
+  it('rejects an explicit field section that binds the shell-owned inline title', () => {
+    expect(() =>
+      render(
+        <PanelShell
+          editor={makeEditor()}
+          itemFields={itemFields}
+          fieldName="traits"
+          idPrefix="species-trait"
+          itemNoun={TRAIT_MASTER_DETAIL_ITEM_NOUN}
+          selectedIdentity={{
+            ...selectedIdentity,
+            inlineTitle: {
+              field: 'name',
+              mode: 'authored',
+              fallback: 'Unnamed Trait',
+              placeholder: 'Unnamed Trait',
+            },
+          }}
+          fieldSections={{
+            primary: [{ type: 'text', name: 'name', label: 'Name' }],
+          }}
+        />,
+      ),
+    ).toThrow('Duplicate master–detail field binding "traits.0.name" (inline title, primary)')
   })
 
   it('renders the empty-selection state when nothing is selected', () => {

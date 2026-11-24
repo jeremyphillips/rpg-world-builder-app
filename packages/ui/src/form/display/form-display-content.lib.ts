@@ -27,6 +27,14 @@ function rulesPreviewBlockHasContent(content: FormDisplayRulesContent): boolean 
       return content.rows.length > 0
     case 'guidance':
       return Boolean(content.message.trim())
+    case 'rules':
+      return content.document.length > 0
+    case 'introAndRules': {
+      const intro = Boolean(content.introHtml?.trim())
+      const rules = Boolean(content.rulesDocument?.length)
+      const guidance = Boolean(content.guidance?.trim()) && !rules
+      return intro || rules || guidance
+    }
   }
 }
 

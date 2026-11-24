@@ -6,7 +6,7 @@ import type { ArmorClassRules } from '@rpg/contracts'
 
 import { renderWithDataRouter } from '@/lib/test-router'
 
-import '../../../../equipment/lib/equipment-form-def'
+import { equipmentFormDef } from '../../../../equipment/lib/equipment-form-def'
 import { ContentCreateShell } from './content-create-shell'
 
 const harness = vi.hoisted(() => ({
@@ -106,7 +106,7 @@ function CreatePage() {
         Change rules
       </button>
       <ContentCreateShell
-        contentType="equipment"
+        def={equipmentFormDef}
         campaignId="camp-1"
         heading="New equipment"
         backHref="/overview"

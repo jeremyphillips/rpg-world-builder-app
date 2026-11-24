@@ -5,6 +5,7 @@ import {
   type ContentDisplayImagesByRole,
 } from '../../../primitives/media/content-display-image-dto'
 import { characterRouteContextSchema } from '../../campaign/character-route-context'
+import { characterTypeSchema } from '../pc-npc-identity'
 
 // ---------------------------------------------------------------------------
 // Character list card — reusable transport DTOs for player-facing pickers.
@@ -44,7 +45,7 @@ export const personalCharacterCardSchema = characterCardSummarySchema.extend({
 export type PersonalCharacterCardDto = z.infer<typeof personalCharacterCardSchema>
 
 export const organizationCharacterCardSchema = characterCardSummarySchema.extend({
-  characterType: z.enum(['pc', 'npc']),
+  characterType: characterTypeSchema,
 })
 
 export type OrganizationCharacterCardDto = z.infer<typeof organizationCharacterCardSchema>

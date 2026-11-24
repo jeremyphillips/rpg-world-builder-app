@@ -320,7 +320,7 @@ describe('monster action detail fields', () => {
       { id: 'parry', kind: 'parry', name: 'Parry', acBonus: 2 },
       'reactions',
     )
-    expect(parry[0]).toBe('parryPreview')
+    expect(parry[0]).toBe('monster-row-advisories-reactions-0')
     expect(parry).toContain('acBonus')
     expect(parry).toContain('followUpActionId')
     expect(parry).not.toContain('trigger.text')
@@ -410,13 +410,11 @@ describe('monster action detail fields', () => {
         : false,
     ).toBe(true)
     expect(attack).not.toContain('moveSection')
-    expect(natural[0]).toBe('attackPreview')
-    expect(natural[1]).toBe('monster-row-advisories-actions-0')
+    expect(natural[0]).toBe('monster-row-advisories-actions-0')
     expect(natural.indexOf('onHit.effects')).toBeLessThan(natural.indexOf('limitedUse'))
     expect(natural.indexOf('limitedUse')).toBeLessThan(natural.lastIndexOf('description'))
     expect(natural.at(-1)).toBe('description')
-    expect(attack[0]).toBe('attackPreview')
-    expect(attack[1]).toBe('monster-row-advisories-actions-0')
+    expect(attack[0]).toBe('monster-row-advisories-actions-0')
     expect(attack.indexOf('onHit.effects')).toBeLessThan(attack.indexOf('limitedUse'))
     const attackBonusSection = attackItems.find(
       (item) => 'kind' in item && item.kind === 'group' && item.heading?.label === 'Attack bonus',
@@ -512,9 +510,8 @@ describe('monster action detail fields', () => {
     expect(weapon).not.toContain('limitedUse.kind')
     expect(weapon).not.toContain('name')
     expect(weapon).not.toContain('moveSection')
-    expect(weapon.indexOf('attackPreview')).toBe(weapon.indexOf('equipmentEntryId') + 1)
     expect(weapon.indexOf('monster-row-advisories-actions-0')).toBe(
-      weapon.indexOf('attackPreview') + 1,
+      weapon.indexOf('equipmentEntryId') + 1,
     )
     expect(weapon.indexOf('formAvailability')).toBe(
       weapon.indexOf('monster-row-advisories-actions-0') + 1,
@@ -524,8 +521,7 @@ describe('monster action detail fields', () => {
     expect(weapon.at(-1)).toBe('description')
     const spellNames = detailFields({ id: 'cast', kind: 'spell' })
     expect(spellNames).not.toContain('attackPreview')
-    expect(spellNames[0]).toBe('spellPreview')
-    expect(spellNames[1]).toBe('monster-row-advisories-actions-0')
+    expect(spellNames[0]).toBe('monster-row-advisories-actions-0')
 
     const spell = detailFields({ id: 'cast', kind: 'spell', name: 'Spellcasting', spells: [] })
     expect(spell).not.toContain('name')
@@ -555,8 +551,7 @@ describe('monster action detail fields', () => {
       kind: 'multiattack',
       steps: [],
     })
-    expect(multiattack[0]).toBe('multiattackPreview')
-    expect(multiattack[1]).toBe('monster-row-advisories-actions-0')
+    expect(multiattack[0]).toBe('monster-row-advisories-actions-0')
     expect(multiattack.indexOf('steps')).toBeLessThan(multiattack.indexOf('description'))
     expect(multiattack.at(-1)).toBe('description')
     expect(multiattack).not.toContain('trigger.text')
@@ -767,7 +762,6 @@ describe('monster action section moves', () => {
       { id: 'leap', kind: 'leap', name: 'Leap', distanceFeet: 30, movementFeet: 10 },
       'bonusActions',
     )
-    expect(leap).toContain('bonusPreview')
     expect(leap).toContain('distanceFeet')
     expect(leap).toContain('movementFeet')
     expect(leap).toContain('limitedUse.kind')

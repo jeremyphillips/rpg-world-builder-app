@@ -29,10 +29,10 @@ import { ClassCharacterCreationTab } from '../components/class-character-creatio
 import { ClassSubclassesTab } from '../components/class-subclasses-tab'
 import { coreAttributesFields } from './class-basics-form-fields'
 import {
-  classFeatureItemFields,
   createFeatureRowDraftFormSchema,
   createFeatureRowFormSchema,
-} from './class-feature-form-fields'
+} from './class-feature-row-form-schema'
+import { classFeatureItemFields, classFeatureRowResolveFields } from './class-feature-form-fields'
 import { ARMOR_PROFICIENCY_MODES, WEAPON_PROFICIENCY_MODES } from './class-form-constants'
 import {
   proficienciesDraftFormSchema,
@@ -86,6 +86,7 @@ export function createClassFormSchema(
       spellSelectionChangePackage: z
         .enum(['levelUp:1', 'longRest:1', 'longRest:all', 'none'])
         .optional(),
+      cantripChangePackage: z.enum(['levelUp:1', 'longRest:1', 'longRest:all', 'none']).optional(),
       spellbookAcquisitionStarting: z.coerce.number().int().min(0).optional(),
       spellbookAcquisitionPerLevel: z.coerce.number().int().min(0).optional(),
       spellbookAcquisitionThroughLevel: z.coerce.number().int().min(2).optional(),
@@ -165,6 +166,7 @@ export function createClassDraftFormSchema(
       spellSelectionChangePackage: z
         .enum(['levelUp:1', 'longRest:1', 'longRest:all', 'none'])
         .optional(),
+      cantripChangePackage: z.enum(['levelUp:1', 'longRest:1', 'longRest:all', 'none']).optional(),
       spellbookAcquisitionStarting: z.coerce.number().int().min(0).optional(),
       spellbookAcquisitionPerLevel: z.coerce.number().int().min(0).optional(),
       spellbookAcquisitionThroughLevel: z.coerce.number().int().min(2).optional(),
@@ -220,6 +222,7 @@ export function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
         'grantsCantrips',
         'spellSelectionModel',
         'spellSelectionChangePackage',
+        'cantripChangePackage',
         'spellbookAcquisitionStarting',
         'spellbookAcquisitionPerLevel',
         'spellbookAcquisitionThroughLevel',
@@ -236,6 +239,7 @@ export function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       ...embeddedMasterDetailTabValidation({
         path: 'features',
         itemLabel: 'Features',
+        resolveItemFields: classFeatureRowResolveFields(ctx),
         fields: classFeatureItemFields(ctx),
       }),
       header: createElement(ClassFeaturesTab, { formCtx: ctx }),

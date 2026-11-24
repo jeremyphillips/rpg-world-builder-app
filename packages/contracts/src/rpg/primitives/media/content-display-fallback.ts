@@ -1,3 +1,4 @@
+import type { CharacterType } from '../../runtime/character/pc-npc-identity'
 import type { ContentTypeKey } from '../content/content-type-keys'
 import type { ContentDisplaySurface } from '../media/content-display-surface'
 import type { ContentMediaDomain } from '../media/media-policy'
@@ -35,7 +36,7 @@ export type ContentDisplayFallbackSurface = ContentDisplaySurface | 'search'
 export type ResolveContentDisplayFallbackInput = {
   domain: ContentDisplayFallbackSubject
   surface: ContentDisplayFallbackSurface
-  characterType?: 'pc' | 'npc'
+  characterType?: CharacterType
 }
 
 function isCompactIdentitySurface(surface: ContentDisplayFallbackSurface): boolean {

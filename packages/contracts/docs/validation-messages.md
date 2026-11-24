@@ -62,6 +62,76 @@ Tests assert through the definition, never a literal:
 expect(result.error.issues[0]?.message).toBe(levelValidationMessages.rangeGap({ level: 5 }))
 ```
 
+## Display boundaries
+
+`defineMessage()` catalog invocations return **transport** strings (structured encoding with a
+leading null prefix). UI surfaces must decode to plain English once per pipeline via
+`formatFieldMessage` — never render raw transport in labels, hints, or supporting lines.
+
+| Consumer                                 | Decode at                                                |
+| ---------------------------------------- | -------------------------------------------------------- |
+| Form field errors                        | `resolveFieldErrorMessage` (`@rpg/ui/form`)              |
+| Character builder alerts and step frames | `formatFieldMessage` at render or init                   |
+| Content acquisition add menus            | `formatFieldMessage` in `toAcquisitionDropdownItem` only |
+
+Acquisition policy layers (`resolveAcquisitionAvailability`, domain eligibility helpers) may carry
+transport on `AcquisitionOption` message fields. Producers pass catalog output or plain constants;
+only the acquisition→dropdown adapter decodes before `ButtonDropdownItem` / `InteractiveListRow`.
+
+Malformed transport (invalid prefix payload) follows `formatFieldMessage` passthrough: the raw
+string is returned unchanged.
+
+### Acquisition display regression helpers
+
+Content acquisition tests import `expectPlainDisplayCopy` and
+`expectAcquisitionDropdownItemDisplayCopy` from
+[`apps/dashboard/src/test/expect-plain-display-copy.ts`](../../../apps/dashboard/src/test/expect-plain-display-copy.ts).
+Use them when asserting `ButtonDropdownItem.disabledReason` / `metadata` or rendered menu copy so
+encoded transport (`\x00` prefix, `{"f":…}` payloads, validation ids) cannot reach UI undetected.
+
+## Domain-rule messages — new vs legacy
+
+**Default for new work:** reusable **domain-rule** messages (validation failures, occurrence
+limits, prerequisite failures, eligibility shared across apps) **must** use `defineMessage` in the
+appropriate tier-2 catalog (`packages/contracts`) or tier-3 form module (dashboard `lib/`).
+
+**Stays outside catalogs:** labels, hints, placeholders (`form-copy`), acquisition ready
+descriptions (`*_ENTRIES.description`), rules-facing generated prose, generic empty states,
+host workflow filler, operational/API errors — unless they encode a **reusable cross-pipeline rule**.
+
+### Legacy disposition (five classes)
+
+| Class                        | Meaning                                       | New code allowed?                            | When to migrate                          |
+| ---------------------------- | --------------------------------------------- | -------------------------------------------- | ---------------------------------------- |
+| **1 — Canonical catalog**    | Already `defineMessage`                       | Extend catalog only                          | —                                        |
+| **2 — Legacy shared plain**  | One `*_MESSAGE` for refine + acquisition      | **No new plain rule constants** in contracts | Phase 10 pilot / Phase 12 when scheduled |
+| **3 — Duplicated or ad hoc** | Inline literal or second export for same rule | **Forbidden** — fix or catalog               | Immediate                                |
+| **4 — Presentation copy**    | Readiness / host UX                           | Plain in dashboard or `@rpg/ui`              | Do not catalog                           |
+| **5 — External/API text**    | Wire compares raw issue strings               | Review before transport change               | Compatibility audit with migration       |
+
+Shared plain SSOT is **not** permission to add more plain rule constants. Convention migration
+(moving class-2 plain to catalogs) is for **stable ids and transport**, not because plain shared
+copy is automatically duplicate authority.
+
+**Inventory:** actionable families, policy owners, and phase disposition →
+[domain-message-inventory.md](./domain-message-inventory.md).
+
+## Agent checklist — new domain-rule message
+
+1. Locate **policy owner** (existing function — do not duplicate policy).
+2. Locate or create **domain `*-messages.ts` catalog** (contracts tier 2; dashboard tier 3 if form-only).
+3. Classify message: **domain rule** vs **presentation** (class 4).
+4. Add `defineMessage` with `validation.<scope>.<rule>` id; parameterize when wording varies.
+5. Wire **validation**: `addCustomRefinementIssue(ctx, catalog.rule(…), path)` or equivalent refine.
+6. Wire **acquisition** (if applicable): `availability.message: catalog.rule(…)` — transport allowed.
+7. Confirm **display boundary**: `resolveFieldErrorMessage`, `toAcquisitionDropdownItem`, or alert `formatFieldMessage`.
+8. **Tests:** refine asserts **transport** (`expect(issue.message).toBe(catalog.rule())`); UI/acquisition asserts **display** (`formatFieldMessage` or rendered copy).
+9. Remove superseded plain export when replacing legacy (same PR as consumer updates).
+10. Update [export-surface.snapshot.json](../src/export-surface.snapshot.json) when public API changes.
+
+Reviewers: classify message drift as SSOT problem **D** per
+[architecture-ssot.md](../../../docs/architecture-ssot.md#four-prevention-problems).
+
 ## Draft vs publish contract families
 
 Catalog content types expose parallel Zod schema families keyed by
@@ -118,6 +188,7 @@ Contract/API draft schemas do not need this — they never see the UI sentinel.
 | `characterBuilderValidationMessages`             | `validation.characterBuilder.*`                 | Builder workflow copy (incomplete steps, pending draft choices)      |
 | `characterBuilderDependentChoiceMessages`        | `validation.characterBuilder.dependentChoice.*` | Inline dependent-choice workflow copy (heritage, subclass)           |
 | `featValidationMessages`                         | `validation.feat.*`                             | Feat persisted business rules                                        |
+| `monsterActionOccurrenceMessages`                | `validation.monsterActionOccurrence.*`          | Monster action singleton / duplicate occurrence rules                |
 | `requirementEditorValidationMessages`            | `validation.requirementEditor.*`                | Prerequisite builder UI state (dashboard)                            |
 | `speciesCharacterCreationValidationMessages`     | `validation.speciesCharacterCreation.*`         | Persisted species creation domain                                    |
 | `speciesCharacterCreationFormValidationMessages` | `validation.speciesCharacterCreationForm.*`     | Species creation form-only rules (dashboard)                         |
@@ -341,12 +412,15 @@ register their `legend` with `itemLabel` derived from `itemHeader` when present)
 
 ## Adding a new domain catalog
 
+Follow the [agent checklist](#agent-checklist-new-domain-rule-message). In short:
+
 1. Create `<domain>-messages.ts` beside the schema module (tier 2) or a catalog
    const in the form's `lib/` module (tier 3).
 2. Define messages with `defineMessage` using `validation.<scope>.<rule>` ids.
-3. Reference the catalog in `.refine` / `superRefine` — never inline literals.
-4. Assert messages in tests through the catalog.
+3. Reference the catalog in `.refine` / `superRefine` — never inline literals for reusable rules.
+4. Assert messages in tests through the catalog (transport); decode at display adapters when asserting UI.
 5. Re-export from the layer barrel (contracts) so apps share the copy.
+6. Record disposition in [domain-message-inventory.md](./domain-message-inventory.md) when introducing a new cross-pipeline family.
 
 ## Verification
 

@@ -7,13 +7,10 @@ import type { EmbeddedArrayResolverFieldInput } from '../forms/validation/tabbed
 import type { Availability, AvailabilityReason } from '@/lib/availability'
 import { openCampaignAvailabilityDialog } from '../campaign-access/open-campaign-availability-dialog.lib'
 import type { ContentFormCtx } from '../forms/registry/content-form-registry'
-import { buildEmbeddedMasterDetailListItem } from './build-embedded-master-detail-list-item'
 import {
   buildEmbeddedMasterDetailRows,
   findEmbeddedMasterDetailRowByFieldId,
-  type EmbeddedMasterDetailRow,
 } from './build-embedded-master-detail-rows'
-import { resolveMasterDetailRowKey } from './content-campaign-availability'
 import { buildSelectedMasterDetailIdentity } from './build-selected-master-detail-identity'
 import {
   buildEmbeddedFieldArrayRowSnapshot,
@@ -143,9 +140,9 @@ export function useEmbeddedMasterDetailRows<TRow = Record<string, unknown>>({
     [editor.lastAddedFieldId, itemNoun, mapListItem, resolveListMeta, rowTitle, rowsSnapshot],
   )
 
-  const allRows = useMemo((): EmbeddedMasterDetailRow[] => {
-    if (access) {
-      return buildEmbeddedMasterDetailRows({
+  const allRows = useMemo(
+    () =>
+      buildEmbeddedMasterDetailRows({
         fields: editor.fields,
         rowsSnapshot,
         formCtx,
@@ -158,64 +155,22 @@ export function useEmbeddedMasterDetailRows<TRow = Record<string, unknown>>({
         systemOriginRowIds,
         sectionLabel,
         resolveRowReasons,
-      })
-    }
-
-    return editor.fields.map((field, formIndex) => {
-      const row = rowsSnapshot[formIndex]
-      const listDisplay = resolveListDisplay({
-        field,
-        index: formIndex,
-        row,
-        entityCatalogLayer: formCtx.entityCatalogLayer,
-        getRowIssueCount,
-      })
-      const item = buildEmbeddedMasterDetailListItem({
-        field,
-        index: formIndex,
-        row: row as { id?: string } | undefined,
-        entityCatalogLayer: formCtx.entityCatalogLayer,
-        persistedRowIds,
-        systemOriginRowIds,
-        getRowIssueCount,
-        title: embeddedListItemTitle(listDisplay, itemNoun),
-        eyebrow: listDisplay.eyebrow,
-        kindLabel: listDisplay.kindLabel,
-        summary: listDisplay.summary,
-        sectionLabel,
-        showDelete,
-        extraReasons:
-          resolveRowReasons?.({
-            row,
-            rowKey: resolveMasterDetailRowKey(field.id, row as { id?: string } | undefined),
-            index: formIndex,
-          }) ?? [],
-      })
-      return {
-        fieldId: field.id,
-        formIndex,
-        item,
-        availability: {
-          rowId: item.id,
-          isAvailable: true,
-          statusLabel: 'Available' as const,
-        },
-      }
-    })
-  }, [
-    access,
-    editor.fields,
-    formCtx,
-    getRowIssueCount,
-    itemNoun,
-    resolveListDisplay,
-    resolveRowReasons,
-    persistedRowIds,
-    systemOriginRowIds,
-    sectionLabel,
-    showDelete,
-    rowsSnapshot,
-  ])
+      }),
+    [
+      access,
+      editor.fields,
+      formCtx,
+      getRowIssueCount,
+      itemNoun,
+      resolveListDisplay,
+      resolveRowReasons,
+      persistedRowIds,
+      systemOriginRowIds,
+      sectionLabel,
+      showDelete,
+      rowsSnapshot,
+    ],
+  )
 
   const selectedRow = useMemo(
     () => findEmbeddedMasterDetailRowByFieldId(allRows, editor.selectedFieldId),
@@ -237,11 +192,15 @@ export function useEmbeddedMasterDetailRows<TRow = Record<string, unknown>>({
     return { status: 'inactive', reasons: [...extraReasons] }
   }, [resolveRowReasons, rowsSnapshot, selectedRow])
 
-  const openAvailabilityDialog = useCallback(() => {
-    openCampaignAvailabilityDialog(availabilityDialogRef.current)
+  const openAvailabilityDialogForSelectedRow = useCallback(() => {
+    const dialog = availabilityDialogRef.current
+    if (dialog) openCampaignAvailabilityDialog(dialog)
   }, [])
 
-  const selectedIdentity = useMemo((): MasterDetailEditorIdentity | undefined => {
+  const availabilityDialogOpener = openAvailabilityDialogForSelectedRow
+  const lastAddedFieldId = editor.lastAddedFieldId
+
+  const selectedIdentity = ((): MasterDetailEditorIdentity | undefined => {
     if (!selectedRow) return undefined
     const row = rowsSnapshot[selectedRow.formIndex]
     const listDisplay = resolveListDisplay({
@@ -251,6 +210,7 @@ export function useEmbeddedMasterDetailRows<TRow = Record<string, unknown>>({
       entityCatalogLayer: formCtx.entityCatalogLayer,
       getRowIssueCount,
     })
+    // eslint-disable-next-line react-hooks/refs -- availability opens from a user gesture, not during render.
     return buildSelectedMasterDetailIdentity({
       selectedRow,
       row,
@@ -258,21 +218,10 @@ export function useEmbeddedMasterDetailRows<TRow = Record<string, unknown>>({
       issueCount: showRowBadges ? (selectedRow.item.issueCount ?? 0) : 0,
       headerIssues: getRowHeaderIssues(selectedRow.formIndex),
       availability: access ? selectedRow.availability : undefined,
-      onAvailabilityChange: access ? openAvailabilityDialog : undefined,
-      lastAddedFieldId: editor.lastAddedFieldId,
+      onAvailabilityChange: access ? availabilityDialogOpener : undefined,
+      lastAddedFieldId,
     })
-  }, [
-    access,
-    editor.lastAddedFieldId,
-    formCtx.entityCatalogLayer,
-    getRowHeaderIssues,
-    getRowIssueCount,
-    openAvailabilityDialog,
-    resolveListDisplay,
-    rowsSnapshot,
-    selectedRow,
-    showRowBadges,
-  ])
+  })()
 
   const availabilityFormItems = useMemo((): FormItem[] | undefined => {
     if (!access || !selectedRow || access.kind !== 'availability') return undefined

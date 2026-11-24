@@ -1,31 +1,37 @@
 import {
+  formatFieldMessage,
   getMonsterActionKindLabel,
+  MONSTER_ACTION_KIND_ENTRIES,
   MONSTER_SPELLCASTING_ACTION_NAME,
-  monsterSingletonKindMessage,
-  PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE,
+  monsterActionOccurrenceMessages,
   PRIMARY_SPELLCASTING_PROFILE,
 } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
+import { expectAcquisitionDropdownItemDisplayCopy } from '@/test/expect-plain-display-copy'
+
 import {
-  MONSTER_ACQUISITION_ATTACK_DESCRIPTION,
-  MONSTER_ACQUISITION_MULTIATTACK_DESCRIPTION,
   MONSTER_ACQUISITION_SPELL_PRIMARY_DESCRIPTION,
   MONSTER_ACQUISITION_SPELL_STANDALONE_DESCRIPTION,
-  MONSTER_ACQUISITION_SAVE_DESCRIPTION,
-  MONSTER_ACQUISITION_SPECIAL_DESCRIPTION,
 } from '../../monster-form-labels'
 import type { MonsterActionDraftRow } from '../monster-action-presets'
 import type { FormCastingSections } from '../../casting/spellcasting-sources.lib'
+import type { ActionPresetId } from '@rpg/contracts'
+
 import {
   MONSTER_ACTION_ACQUISITION_GROUPS,
-  MONSTER_ACTION_ALREADY_ADDED_NOTE,
   createActionDraft,
+  createMonsterActionFromAcquisition,
   createReactionActionDraft,
   createSpellActionDraft,
   monsterActionAcquisitionItems,
   parseMonsterActionAcquisitionId,
 } from './monster-action-acquisition'
+
+type GeneralMonsterActionAcquisitionChoice = Exclude<
+  Parameters<typeof createMonsterActionFromAcquisition>[0],
+  never
+>
 
 const weapons = [
   { entryId: 'sword-1', label: 'Longsword', equipped: true },
@@ -36,20 +42,18 @@ const weapons = [
 describe('monsterActionAcquisitionItems', () => {
   it('adds an unused equipped weapon and disables an unequipped one', () => {
     const items = monsterActionAcquisitionItems({ weapons, allowAddWeapon: true })
-    expect(items.find((item) => item.id === 'weapon-entry:sword-1')).toMatchObject({
-      disabled: false,
-    })
+    expect(items.find((item) => item.id === 'weapon-entry:sword-1')?.disabled).toBeUndefined()
     expect(parseMonsterActionAcquisitionId('weapon-entry:sword-1')).toEqual({
       type: 'weapon-entry',
       entryId: 'sword-1',
     })
     expect(items.find((item) => item.id === 'weapon-entry:bow')).toMatchObject({
       disabled: true,
-      note: 'Not equipped',
+      disabledReason: 'Not equipped',
     })
   })
 
-  it('opens the first weapon action across economies and ignores multiattack references', () => {
+  it('disables an equipped weapon row that already has an action', () => {
     const items = monsterActionAcquisitionItems({
       weapons,
       allowAddWeapon: true,
@@ -58,15 +62,19 @@ describe('monsterActionAcquisitionItems', () => {
         { id: 'action-slash', equipmentEntryId: 'sword-1' },
       ],
     })
-    const sword = items.find((item) => item.label === 'Longsword' && item.note)
+    const sword = items.find((item) => item.id === 'weapon-entry:sword-1')
+    const weaponDuplicateTransport = monsterActionOccurrenceMessages.weaponEquipmentDuplicate()
     expect(sword).toMatchObject({
-      id: 'focus-action:bonus-slash',
-      note: MONSTER_ACTION_ALREADY_ADDED_NOTE,
+      disabled: true,
+      disabledReason: formatFieldMessage(weaponDuplicateTransport),
+      metadata: MONSTER_ACTION_KIND_ENTRIES.weapon.description,
     })
-    expect(sword?.disabled).toBeUndefined()
+    expectAcquisitionDropdownItemDisplayCopy(sword!, {
+      disabledReasonTransport: weaponDuplicateTransport,
+    })
     expect(parseMonsterActionAcquisitionId(sword!.id)).toEqual({
-      type: 'focus-existing',
-      actionId: 'bonus-slash',
+      type: 'weapon-entry',
+      entryId: 'sword-1',
     })
     expect(items.find((item) => item.id === 'weapon-entry:sword-2')).toBeDefined()
   })
@@ -88,7 +96,7 @@ describe('monster action acquisition presentation', () => {
     )
     expect(items.find((item) => item.id === 'create:attack')).toMatchObject({
       label: 'Attack roll',
-      metadata: MONSTER_ACQUISITION_ATTACK_DESCRIPTION,
+      metadata: MONSTER_ACTION_KIND_ENTRIES.attack.description,
     })
     expect(items.find((item) => item.id === 'create:attack')?.label).not.toBe(
       getMonsterActionKindLabel('attack'),
@@ -108,7 +116,7 @@ describe('monster action acquisition presentation', () => {
     })
     expect(items.find((item) => item.id === 'create:special')).toMatchObject({
       label: 'Custom ability',
-      metadata: MONSTER_ACQUISITION_SPECIAL_DESCRIPTION,
+      metadata: MONSTER_ACTION_KIND_ENTRIES.special.description,
     })
     expect(items.find((item) => item.id === 'create:special')?.label).not.toBe(
       getMonsterActionKindLabel('special'),
@@ -124,7 +132,7 @@ describe('monster action acquisition presentation', () => {
     expect(bonus.find((item) => item.id === 'preset:constrict')).toBeUndefined()
     expect(bonus.find((item) => item.id === 'weapon-entry:sword-1')).toBeUndefined()
     expect(bonus.find((item) => item.id === 'create:save')).toMatchObject({
-      metadata: MONSTER_ACQUISITION_SAVE_DESCRIPTION,
+      metadata: MONSTER_ACTION_KIND_ENTRIES.save.description,
     })
     expect(bonus.map((item) => item.id)).toEqual([
       'create:teleport',
@@ -174,26 +182,33 @@ describe('monster action acquisition presentation', () => {
     ])
     expect(reactions.find((item) => item.id === 'reaction:reference')).toMatchObject({
       label: 'Use existing action',
-      metadata: 'Use an action already defined for this creature.',
+      metadata: MONSTER_ACTION_KIND_ENTRIES['action-reference'].description,
     })
     expect(createReactionActionDraft('reference', {})).toMatchObject({
       kind: 'action-reference',
       actionIds: [],
     })
     expect(createReactionActionDraft('reference', {})).not.toHaveProperty('name')
-    expect(items.find((item) => item.id === 'natural:other')?.metadata).toBeUndefined()
+    expect(items.find((item) => item.id === 'natural:other')?.metadata).toBe(
+      MONSTER_ACTION_KIND_ENTRIES['natural-weapon'].description,
+    )
   })
 
   it('lists Multiattack first and keeps natural-attack damage types', () => {
     const special = items.filter((item) => item.groupId === 'special').map((item) => item.label)
     expect(special.slice(0, 3)).toEqual(['Multiattack', 'Constrict', 'Breath Weapon'])
     expect(items.find((item) => item.id === 'preset:multiattack')).toMatchObject({
-      metadata: MONSTER_ACQUISITION_MULTIATTACK_DESCRIPTION,
+      metadata: MONSTER_ACTION_KIND_ENTRIES.multiattack.description,
     })
-    expect(items.find((item) => item.id === 'preset:constrict')?.metadata).toBeUndefined()
-    expect(items.find((item) => item.id === 'preset:breath-weapon')?.metadata).toBeUndefined()
-    expect(items.find((item) => item.id === 'natural:bite')).toMatchObject({ metadata: 'Piercing' })
-    expect(items.find((item) => item.id === 'natural:claw')).toMatchObject({ metadata: 'Slashing' })
+    expect(items.find((item) => item.id === 'preset:constrict')?.metadata).toBeTruthy()
+    expect(items.find((item) => item.id === 'preset:breath-weapon')?.metadata).toBeTruthy()
+    expect(items.find((item) => item.id === 'natural:bite')).toMatchObject({
+      classification: 'Piercing',
+      metadata: expect.stringContaining('teeth'),
+    })
+    expect(items.find((item) => item.id === 'natural:claw')).toMatchObject({
+      classification: 'Slashing',
+    })
     expect(items.find((item) => item.id === 'natural:bite')).toMatchObject({
       search: { includeSupporting: false },
       searchTerms: expect.arrayContaining(['teeth']),
@@ -298,9 +313,14 @@ describe('primary Spellcasting acquisition', () => {
       section: 'actions',
       sectionRows: { actions: [spellcasting] },
     })
-    expect(taken.find((item) => item.id === 'create:spell')).toMatchObject({
+    const spellItem = taken.find((item) => item.id === 'create:spell')
+    const spellDuplicateTransport = monsterActionOccurrenceMessages.primarySpellcastingDuplicate()
+    expect(spellItem).toMatchObject({
       disabled: true,
-      note: PRIMARY_SPELLCASTING_DUPLICATE_MESSAGE,
+      disabledReason: formatFieldMessage(spellDuplicateTransport),
+    })
+    expectAcquisitionDropdownItemDisplayCopy(spellItem!, {
+      disabledReasonTransport: spellDuplicateTransport,
     })
 
     const bonus = monsterActionAcquisitionItems({
@@ -321,9 +341,16 @@ describe('repeatability acquisition', () => {
       section: 'actions',
       sectionRows: { actions: [{ id: 'ma', kind: 'multiattack' }] },
     })
-    expect(occupied.find((item) => item.id === 'preset:multiattack')).toMatchObject({
+    const multiattackItem = occupied.find((item) => item.id === 'preset:multiattack')
+    const multiattackTransport = monsterActionOccurrenceMessages.singletonKind({
+      kind: 'multiattack',
+    })
+    expect(multiattackItem).toMatchObject({
       disabled: true,
-      note: monsterSingletonKindMessage('multiattack'),
+      disabledReason: formatFieldMessage(multiattackTransport),
+    })
+    expectAcquisitionDropdownItemDisplayCopy(multiattackItem!, {
+      disabledReasonTransport: multiattackTransport,
     })
 
     const open = monsterActionAcquisitionItems({
@@ -340,8 +367,38 @@ describe('repeatability acquisition', () => {
       section: 'actions',
       sectionRows: { actions: [{ id: 'bite', kind: 'natural-weapon', form: 'bite' }] },
     })
-    expect(natural.find((item) => item.id === 'focus-action:bite')).toMatchObject({
-      note: MONSTER_ACTION_ALREADY_ADDED_NOTE,
+    const naturalItem = natural.find((item) => item.id === 'natural:bite')
+    const naturalTransport = monsterActionOccurrenceMessages.naturalFormDuplicate()
+    expect(naturalItem).toMatchObject({
+      disabled: true,
+      disabledReason: formatFieldMessage(naturalTransport),
     })
+    expectAcquisitionDropdownItemDisplayCopy(naturalItem!, {
+      disabledReasonTransport: naturalTransport,
+    })
+  })
+})
+
+describe('acquisition identity hardening', () => {
+  it('does not parse unknown legendary acquisition ids', () => {
+    expect(parseMonsterActionAcquisitionId('legendary:custom')).toBeUndefined()
+    expect(parseMonsterActionAcquisitionId('legendary:bogus')).toBeUndefined()
+  })
+
+  it('throws for unknown preset ids instead of creating a special action', () => {
+    expect(() =>
+      createMonsterActionFromAcquisition({
+        type: 'preset',
+        presetId: 'not-a-preset' as ActionPresetId,
+      }),
+    ).toThrow(/Unknown action preset/)
+  })
+
+  it('throws for unsupported acquisition choices instead of creating special', () => {
+    expect(() =>
+      createMonsterActionFromAcquisition({
+        type: 'bogus',
+      } as unknown as GeneralMonsterActionAcquisitionChoice),
+    ).toThrow(/Unsupported monster action acquisition choice/)
   })
 })

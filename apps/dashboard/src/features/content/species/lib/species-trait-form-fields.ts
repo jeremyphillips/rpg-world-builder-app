@@ -62,11 +62,20 @@ function traitRowObjectSchema<Kind extends z.ZodType>(kindSchema: Kind) {
     name: z.string().optional(),
     description: z.string().optional(),
     nameOverride: z.string().optional(),
-    descriptionOverride: z.string().optional(),
+    details: z.string().optional(),
     templateId: z.string().min(1).optional(),
     config: z
       .object({
-        uses: z.coerce.number().int().min(1).optional(),
+        uses: z
+          .union([
+            z.coerce.number().int().min(1),
+            z.object({
+              normal: z.coerce.number().int().min(1),
+              inLair: z.coerce.number().int().min(1).optional(),
+            }),
+          ])
+          .optional(),
+        range: z.coerce.number().int().min(0).optional(),
       })
       .optional(),
     grants: z.array(grantRowFormSchema),
@@ -78,7 +87,10 @@ export function refinePublishedTraitRow(
     kind?: string
     name?: string
     templateId?: string
-    config?: { uses?: number }
+    config?: {
+      uses?: number | { normal: number; inLair?: number }
+      range?: number
+    }
     grants: z.infer<typeof grantRowFormSchema>[]
   },
   ctx: z.RefinementCtx,
@@ -87,9 +99,10 @@ export function refinePublishedTraitRow(
     addCustomRefinementIssue(ctx, fieldValidationMessages.requiredText({ label: 'Name' }), ['name'])
   }
   if (row.kind === 'template') {
-    for (const issue of collectCreatureTraitTemplateIssues([
-      { kind: 'template', templateId: row.templateId, config: row.config },
-    ])) {
+    for (const issue of collectCreatureTraitTemplateIssues(
+      [{ kind: 'template', templateId: row.templateId, config: row.config }],
+      { host: 'species' },
+    )) {
       addCustomRefinementIssue(ctx, issue.message, issue.path.slice(1))
     }
   }
@@ -140,13 +153,6 @@ export type TraitRowForm = z.infer<typeof traitRowFormSchema>
 export function traitItemFields(ctx: ContentFormCtx): FormItem[] {
   return [
     {
-      type: 'text',
-      name: 'name',
-      label: 'Name',
-      required: true,
-      visibility: visibleForTraitKind('custom'),
-    },
-    {
       type: 'richtext',
       name: 'description',
       label: 'Description',
@@ -170,20 +176,13 @@ export function traitItemFields(ctx: ContentFormCtx): FormItem[] {
           label: TRAIT_OVERRIDE_DISPLAY_LABEL,
         },
         {
-          type: 'text',
-          name: 'nameOverride',
-          label: 'Name',
-          placeholder: 'Leave blank to use the default',
-          visibility: visibleForGrantOverrides(),
-        },
-        {
           type: 'richtext',
-          name: 'descriptionOverride',
-          label: 'Description',
+          name: 'details',
+          label: 'Details',
           linkable: true,
           internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
           contentTypeOptions: ctx.options?.richTextContentTypeOptions,
-          hint: 'Leave blank to use the default',
+          optionalDisclosure: { intent: 'add', actionSubject: 'details' },
           visibility: visibleForGrantOverrides(),
         },
       ],
@@ -212,8 +211,6 @@ export function traitItemTitle(values: Record<string, unknown>, index: number): 
       id: row.id ?? `trait-${index}`,
       templateId: row.templateId,
       config: row.config,
-      nameOverride: row.nameOverride,
-      descriptionOverride: row.descriptionOverride,
     })
   }
   if (row.kind === 'grant') {
@@ -224,7 +221,6 @@ export function traitItemTitle(values: Record<string, unknown>, index: number): 
         id: row.id ?? `trait-${index}`,
         grantGroups,
         nameOverride: row.nameOverride,
-        descriptionOverride: row.descriptionOverride,
       })
     }
   }

@@ -37,4 +37,17 @@ describe('buildSpellcastingProgressionPatchInput', () => {
     expect(patch?.slotProgressions).toHaveLength(1)
     expect(patch?.slotProgressions?.[0]?.label).toBe('Custom full caster label')
   })
+
+  it('round-trips slot recovery edits in sparse patch input', () => {
+    const state = resolveSpellcastingProgressionFormState(undefined)
+    const updated = state.slotProgressions.map((entry) =>
+      entry.id === 'pact-magic' ? { ...entry, recovery: { minimumRest: 'long' as const } } : entry,
+    )
+
+    const patch = buildSpellcastingProgressionPatchInput({ slotProgressions: updated })
+
+    expect(patch?.slotProgressions).toHaveLength(1)
+    expect(patch?.slotProgressions?.[0]?.id).toBe('pact-magic')
+    expect(patch?.slotProgressions?.[0]?.recovery).toEqual({ minimumRest: 'long' })
+  })
 })

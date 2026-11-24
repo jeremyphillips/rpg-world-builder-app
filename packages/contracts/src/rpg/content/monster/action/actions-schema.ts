@@ -2,7 +2,7 @@ import type { z } from 'zod'
 
 export { monsterActionSchema, monsterActionDraftSchema } from './section-tuples'
 
-import { monsterActionDraftSchema, monsterActionSchema } from './section-tuples'
+import { type monsterActionDraftSchema, type monsterActionSchema } from './section-tuples'
 
 export type MonsterAction = z.infer<typeof monsterActionSchema>
 export type MonsterActionDraft = z.infer<typeof monsterActionDraftSchema>

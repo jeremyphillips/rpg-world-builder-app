@@ -11,7 +11,7 @@ import {
 import { RESOLUTION_OUTCOME_AMOUNT_OPTIONS } from './resolution-form-labels'
 import type {
   ResolutionEffectFormItem,
-  ResolutionOutcomeApplicationFormItem,
+  ResolutionOutcomeEffectReferenceFormItem,
 } from './resolution-form-schema'
 import { RESOLUTION_FIELD_NAME } from './resolution-form-values'
 
@@ -44,7 +44,7 @@ export function outcomeApplicationsResolverItemFields(): FormItem[] {
 
 export function formatOutcomeApplicationRowLabel(
   effects: readonly ResolutionEffectFormItem[],
-  application: ResolutionOutcomeApplicationFormItem,
+  application: ResolutionOutcomeEffectReferenceFormItem,
 ): string {
   return formatEffectReferenceTitle(resolveEffectReferenceById(effects, application.effectId))
 }
@@ -53,7 +53,7 @@ export function createOutcomeApplicationAppendValue(
   effectId: string,
   outcomeResult: ResolutionOutcomeResult,
   effects: readonly ResolutionEffectFormItem[],
-): ResolutionOutcomeApplicationFormItem {
+): ResolutionOutcomeEffectReferenceFormItem {
   const effect = findResolutionEffectById(effects, effectId)
   const amount = effect ? defaultApplicationAmountForOutcome(effect, outcomeResult) : 'full'
 
@@ -101,7 +101,7 @@ export function outcomeApplicationAmountOptions({
 }): FieldOption[] {
   if (fieldName !== 'amount') return [...options]
 
-  const row = arrayItems[rowIndex] as ResolutionOutcomeApplicationFormItem | undefined
+  const row = arrayItems[rowIndex] as ResolutionOutcomeEffectReferenceFormItem | undefined
   if (!row?.effectId) return [...options]
 
   const effects = (watchedValues[RESOLUTION_EFFECTS_FIELD] as ResolutionEffectFormItem[]) ?? []

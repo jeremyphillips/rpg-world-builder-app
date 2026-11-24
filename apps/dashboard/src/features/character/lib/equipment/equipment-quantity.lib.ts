@@ -1,5 +1,4 @@
 import {
-  clampEquipmentPurchaseQuantity,
   EQUIPMENT_PURCHASE_QUANTITY_MAX,
   isEquipmentStackable,
   maxAffordablePurchaseQuantity,
@@ -13,11 +12,6 @@ export { EQUIPMENT_PURCHASE_QUANTITY_MAX }
 
 /** NumberInput digit slots sized for {@link EQUIPMENT_PURCHASE_QUANTITY_MAX}. */
 export const EQUIPMENT_STEP_QUANTITY_INPUT_DIGITS = 2 as const
-
-/** @deprecated Prefer `clampEquipmentPurchaseQuantity` from `@rpg/contracts`. */
-export function clampEquipmentStepQuantity(quantity: number, maxQuantity: number): number {
-  return clampEquipmentPurchaseQuantity(quantity, maxQuantity)
-}
 
 /** Resolves the effective max for equipment-step quantity inputs (budget + hard cap). */
 export function resolveEquipmentStepPurchaseMaxQuantity(args: {

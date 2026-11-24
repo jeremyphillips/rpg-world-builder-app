@@ -1,5 +1,6 @@
-/** Canonical display name for the legendary-resistance template (not a VocabularyTerm). */
-export const LEGENDARY_RESISTANCE_LABEL = 'Legendary Resistance' as const
+import { LEGENDARY_RESISTANCE_LABEL } from '../../../vocab/creature/legendary-resistance-label'
+
+export { LEGENDARY_RESISTANCE_LABEL }
 
 /** Master-detail reset control when a stored name override must be removed. */
 export const LEGENDARY_RESISTANCE_CLEAR_NAME_CONTROL_LABEL = 'Clear custom name' as const

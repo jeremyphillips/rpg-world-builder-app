@@ -1,5 +1,6 @@
 import {
   monsterActionAuthoring,
+  type MonsterActionKind,
   getContentTypeTerm,
   getActionVocabularyEntry,
   BONUS_STANDARD_ACTION_IDS,
@@ -16,12 +17,6 @@ import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form
 import { distanceJoinedPairField } from '../../../../lib/forms/fields/content-distance-form-fields'
 import { resolutionOccupantRequirementsFields } from '../../../../lib/forms/fields/resolution-target-authoring-fields'
 import { monsterActionTurnLimitField } from '../monster-action-turn-limit-fields'
-import { MonsterActionAttackSummary } from '../../../components/form/actions/attack/attack-preview.slot'
-import { MonsterActionBonusSummary } from '../../../components/form/actions/sections/bonus-preview.slot'
-import { MonsterActionParrySummary } from '../../../components/form/actions/parry/parry-preview.slot'
-import { MonsterActionMultiattackSummary } from '../../../components/form/actions/multiattack/multiattack-preview.slot'
-import { MonsterActionSpellSummary } from '../../../components/form/actions/spell/spell-preview.slot'
-import { MonsterActionShapeShiftSummary } from '../../../components/form/actions/shape-shift/shape-shift-summary.slot'
 import {
   MONSTER_RULES_TEXT_LABEL,
   MONSTER_CUSTOM_DESCRIPTION_HINT,
@@ -65,6 +60,7 @@ import {
   monsterActionUsageEditor,
   monsterReactionConditionField,
 } from './shared-mechanics'
+import { monsterActionDetailComposerRoute } from './monster-action-kind-detail-composers'
 
 const monsterActionOptionalDescriptionField = {
   type: 'richtext',
@@ -83,67 +79,6 @@ function monsterActionDescriptionField(action: MonsterActionDraftRow): FormItem 
     }
   }
   return monsterActionOptionalDescriptionField
-}
-
-function monsterActionAttackPreviewSlot(
-  ctx: ContentFormCtx,
-  action: MonsterActionDraftRow,
-): FormItem {
-  return {
-    kind: 'slot',
-    name: 'attackPreview',
-    render: () => <MonsterActionAttackSummary ctx={ctx} action={action} />,
-  }
-}
-
-function monsterActionSpellPreviewSlot(
-  ctx: ContentFormCtx,
-  action: MonsterActionDraftRow,
-  section: MonsterActionSection,
-): FormItem {
-  return {
-    kind: 'slot',
-    name: 'spellPreview',
-    render: () => <MonsterActionSpellSummary ctx={ctx} action={action} section={section} />,
-  }
-}
-
-function monsterActionMultiattackPreviewSlot(
-  ctx: ContentFormCtx,
-  action: MonsterActionDraftRow,
-): FormItem {
-  return {
-    kind: 'slot',
-    name: 'multiattackPreview',
-    render: () => <MonsterActionMultiattackSummary ctx={ctx} action={action} />,
-  }
-}
-
-function monsterActionAuthoringPreviewSlots(
-  ctx: ContentFormCtx,
-  action: MonsterActionDraftRow,
-  section: MonsterActionSection,
-): FormItem[] {
-  switch (action.kind) {
-    case 'weapon':
-    case 'natural-weapon':
-    case 'attack':
-      return [monsterActionAttackPreviewSlot(ctx, action)]
-    case 'spell':
-      return [monsterActionSpellPreviewSlot(ctx, action, section)]
-    case 'multiattack':
-      return [monsterActionMultiattackPreviewSlot(ctx, action)]
-    case 'shape-shift':
-      return [
-        {
-          kind: 'slot',
-          name: 'shapeShiftSummary',
-          render: () => <MonsterActionShapeShiftSummary ctx={ctx} action={action} />,
-        },
-      ]
-    default:
-      return []
-  }
 }
 
 function spellOptions(ctx: ContentFormCtx) {
@@ -169,38 +104,24 @@ function monsterActionEquipmentField(
 
 const turnLimitField = monsterActionTurnLimitField
 
-function monsterActionParryPreviewSlot(
-  ctx: ContentFormCtx,
-  action: MonsterActionDraftRow,
-): FormItem {
-  return {
-    kind: 'slot',
-    name: 'parryPreview',
-    render: () => <MonsterActionParrySummary ctx={ctx} action={action} />,
-  }
-}
-
 function portableKindAuthoringFields(input: {
   ctx: ContentFormCtx
   action: MonsterActionDraftRow
   section: MonsterActionSection
   namePrefix: string
 }): FormItem[] | undefined {
-  const preview: FormItem = {
-    kind: 'slot',
-    name: 'bonusPreview',
-    render: () => <MonsterActionBonusSummary ctx={input.ctx} action={input.action} />,
+  if (monsterActionDetailComposerRoute(input.action.kind as MonsterActionKind) !== 'portable') {
+    return undefined
   }
   const usage = monsterActionUsageEditor(input.action, input.namePrefix)
   if (input.action.kind === 'leap') {
-    return [preview, ...leapDistanceFields(), ...usage]
+    return [...leapDistanceFields(), ...usage]
   }
   if (input.action.kind === 'teleport') {
     const creatureTypeOptions = buildActiveCreatureTypeFieldOptions(
       input.ctx.creatureTypeVocabulary,
     )
     return [
-      preview,
       distanceJoinedPairField({
         amountName: 'distanceFeet',
         label: MONSTER_TELEPORT_DISTANCE_LABEL,
@@ -242,7 +163,6 @@ function portableKindAuthoringFields(input: {
   }
   if (input.action.kind === 'take-actions') {
     return [
-      preview,
       {
         type: 'segmentedControl',
         name: 'combination',
@@ -312,7 +232,6 @@ function reactionAuthoringFields(input: {
   const referenceOptions = input.referenceOptions ?? []
   if (input.action.kind === 'parry') {
     return [
-      monsterActionParryPreviewSlot(input.ctx, input.action),
       monsterFormAdvisoryDisplay(input.advisories ?? [], input.namePrefix),
       {
         type: 'number',
@@ -398,7 +317,7 @@ function legendaryAuthoringFields(input: {
   ]
 }
 
-function sharedAuthoringFields(input: {
+export type MonsterActionDetailFieldsInput = {
   ctx: ContentFormCtx
   action: MonsterActionDraftRow
   section: MonsterActionSection
@@ -407,18 +326,49 @@ function sharedAuthoringFields(input: {
   equipment?: MonsterFormValues['equipment']
   sharedCastingOptions: { value: string; label: string }[]
   attackOptions?: { value: string; label: string }[]
+  actionRows?: MonsterActionDraftRow[]
+  bonusActionRows?: MonsterActionDraftRow[]
+  weapons?: readonly { entryId: string; label: string; equipped: boolean }[]
+  weaponActions?: readonly { id: string; equipmentEntryId?: string }[]
+  allowAddWeapon?: boolean
+  onAcquireAttack?: (
+    section: MonsterActionSection,
+    choice: Exclude<MonsterActionAcquisitionChoice, { type: 'add-weapon' }>,
+  ) => void
+  referenceOptions?: { value: string; label: string }[]
+  sourceSpellOptions?: { value: string; label: string }[]
   onCastingSourceBlocked?: (message: string) => void
   advisories?: readonly MonsterFormAdvisory[]
-}): FormItem[] {
+}
+
+function sharedAuthoringFields(
+  input: Pick<
+    MonsterActionDetailFieldsInput,
+    | 'ctx'
+    | 'action'
+    | 'section'
+    | 'namePrefix'
+    | 'equipmentOptions'
+    | 'equipment'
+    | 'sharedCastingOptions'
+    | 'attackOptions'
+    | 'actionRows'
+    | 'bonusActionRows'
+    | 'weapons'
+    | 'weaponActions'
+    | 'allowAddWeapon'
+    | 'onAcquireAttack'
+    | 'onCastingSourceBlocked'
+    | 'advisories'
+  >,
+): FormItem[] {
   const { ctx, action, section, namePrefix } = input
   const source =
     action.kind === 'weapon' ? [monsterActionEquipmentField(input.equipmentOptions)] : []
-  const preview = monsterActionAuthoringPreviewSlots(ctx, action, section)
   const primaryProse = action.kind === 'special' ? [monsterActionDescriptionField(action)] : []
   const supplemental = action.kind === 'special' ? [] : [monsterActionDescriptionField(action)]
   return [
     ...source,
-    ...preview,
     monsterFormAdvisoryDisplay(input.advisories ?? [], namePrefix),
     ...primaryProse,
     ...monsterActionMechanicFields({
@@ -442,30 +392,6 @@ function sharedAuthoringFields(input: {
       : []),
     ...supplemental,
   ]
-}
-
-export type MonsterActionDetailFieldsInput = {
-  ctx: ContentFormCtx
-  action: MonsterActionDraftRow
-  section: MonsterActionSection
-  namePrefix: string
-  equipmentOptions: { value: string; label: string }[]
-  equipment?: MonsterFormValues['equipment']
-  sharedCastingOptions: { value: string; label: string }[]
-  attackOptions?: { value: string; label: string }[]
-  actionRows?: MonsterActionDraftRow[]
-  bonusActionRows?: MonsterActionDraftRow[]
-  weapons?: readonly { entryId: string; label: string; equipped: boolean }[]
-  weaponActions?: readonly { id: string; equipmentEntryId?: string }[]
-  allowAddWeapon?: boolean
-  onAcquireAttack?: (
-    section: MonsterActionSection,
-    choice: Exclude<MonsterActionAcquisitionChoice, { type: 'add-weapon' }>,
-  ) => void
-  referenceOptions?: { value: string; label: string }[]
-  sourceSpellOptions?: { value: string; label: string }[]
-  onCastingSourceBlocked?: (message: string) => void
-  advisories?: readonly MonsterFormAdvisory[]
 }
 
 export function resolveMonsterActionSectionFields(

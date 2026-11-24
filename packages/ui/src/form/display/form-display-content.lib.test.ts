@@ -34,6 +34,27 @@ describe('form-display-content.lib', () => {
     ])
   })
 
+  it('keeps intro-and-rules preview blocks when only the introduction is present', () => {
+    const config: DisplayConfig = {
+      kind: 'display',
+      id: 'spellcasting-preview',
+      resolve: {
+        dependsOn: ['intro'],
+        contentWhen: () => ({
+          variant: 'rulesPreview',
+          preview: {
+            content: {
+              kind: 'introAndRules',
+              introHtml: '<p>Introduction</p>',
+              guidance: 'Incomplete spellcasting',
+            },
+          },
+        }),
+      },
+    }
+    expect(resolveDisplayBlocks(config, {})).toHaveLength(1)
+  })
+
   it('normalizes block arrays', () => {
     const blocks = normalizeDisplayBlocks([
       { variant: 'text', text: 'a' },

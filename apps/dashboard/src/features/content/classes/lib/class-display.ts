@@ -12,11 +12,18 @@ import {
   type CharacterClass,
   type ClassBodyFeature,
   type ClassFeature,
-  type ContentTable,
+  type FacingResolution,
   type ProficiencyChoice,
+  type ResolvedSpellcastingProgressionConfig,
+  resolveClassFeatureName,
+  type Spell,
 } from '@rpg/contracts'
 
 import { isSubclassChoiceFeatureRow } from './class-subclass-choice-features'
+import {
+  classFeatureDetailTitle,
+  resolveClassFeatureDetailFacing,
+} from './class-display-facing.lib'
 
 import type { ContentStatRowData } from '../../lib/detail/metadata/content-stat-rows'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
@@ -87,8 +94,7 @@ export type ClassFeatureDetailItem = {
   id: string
   level: number
   title: string
-  bodyHtml?: string
-  tables?: ContentTable[]
+  facing: FacingResolution
 }
 
 export type ClassCardViewModel = {
@@ -107,6 +113,9 @@ export type ClassDetailViewModel = {
 export type BuildClassDetailViewModelOptions = {
   surface?: ClassDisplaySurface
   features?: CharacterClass['features']
+  spellcastingProgression?: ResolvedSpellcastingProgressionConfig
+  characterClass?: CharacterClass
+  spellsById?: ReadonlyMap<string, Spell>
 }
 
 function formatSlugLabel(slug: string): string {
@@ -346,28 +355,48 @@ function buildClassStatRows(
   ]
 }
 
-function mapFeatureToDetailItem(feature: ClassFeature): ClassFeatureDetailItem {
+function mapFeatureToDetailItem(
+  feature: ClassFeature,
+  options?: {
+    characterClass?: CharacterClass
+    spellcastingProgression?: ResolvedSpellcastingProgressionConfig
+    spellsById?: ReadonlyMap<string, Spell>
+  },
+): ClassFeatureDetailItem {
+  const facing = resolveClassFeatureDetailFacing(feature, options)
+  const title = classFeatureDetailTitle(feature, facing)
+
   return {
     id: feature.id,
     level: feature.level,
-    title: feature.name,
-    bodyHtml: feature.description,
-    tables: feature.kind === 'custom' ? feature.tables : undefined,
+    title,
+    facing,
   }
 }
 
-function sortFeatures(features: readonly ClassFeature[]): ClassFeature[] {
-  return [...features].sort((a, b) => a.level - b.level || a.name.localeCompare(b.name))
+function sortFeatures(features: readonly ClassFeature[], className: string): ClassFeature[] {
+  return [...features].sort(
+    (a, b) =>
+      a.level - b.level ||
+      resolveClassFeatureName(a, className).localeCompare(resolveClassFeatureName(b, className)),
+  )
 }
 
 function buildFeaturesSection(
   characterClass: ClassDetailViewModelSource,
   features: readonly ClassFeature[],
+  options?: BuildClassDetailViewModelOptions,
 ): Extract<ClassDetailViewModel['sections'][number], { id: 'features' }> {
   return {
     id: 'features',
     title: `${characterClass.name} Class Features`,
-    items: sortFeatures(features).map(mapFeatureToDetailItem),
+    items: sortFeatures(features, characterClass.name).map((feature) =>
+      mapFeatureToDetailItem(feature, {
+        characterClass: options?.characterClass,
+        spellcastingProgression: options?.spellcastingProgression,
+        spellsById: options?.spellsById,
+      }),
+    ),
   }
 }
 
@@ -408,6 +437,9 @@ export function buildClassDetailViewModel(
   const surface = options.surface ?? 'content-detail'
   const features = options.features ?? characterClass.features
   const visibleFeatures = projectVisibleClassFeatures(features, { surface })
+  const characterClassForRules =
+    options.characterClass ??
+    ('spellcasting' in characterClass ? (characterClass as CharacterClass) : undefined)
 
   const sections: ClassDetailViewModel['sections'] = [
     {
@@ -419,7 +451,12 @@ export function buildClassDetailViewModel(
   ]
 
   if (visibleFeatures.length > 0) {
-    sections.push(buildFeaturesSection(characterClass, visibleFeatures))
+    sections.push(
+      buildFeaturesSection(characterClass, visibleFeatures, {
+        ...options,
+        characterClass: characterClassForRules,
+      }),
+    )
   }
 
   return {

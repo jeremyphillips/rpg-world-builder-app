@@ -14,10 +14,10 @@ import {
   type NameGeneratorFilterContext,
 } from './derive-filter-options'
 import type { FilterOption, NameGeneratorFilters } from './name-generator-filters'
-import { DEFAULT_RULESET_ID } from './name-generator.constants'
+import { DEFAULT_SYSTEM_RULESET_ID } from '@rpg/contracts'
 import { recommendNameGeneratorMatches } from './recommend-name-generator-matches'
 
-const SRD_SPECIES = loadSeedSpecies(DEFAULT_RULESET_ID)
+const SRD_SPECIES = loadSeedSpecies(DEFAULT_SYSTEM_RULESET_ID)
 
 function withOptional(
   filters: NameGeneratorFilters,

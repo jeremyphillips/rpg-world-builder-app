@@ -1,6 +1,6 @@
 # SRD mechanical coverage
 
-Shared-model gaps that monster authoring runs into. This is not a monster-only ruleset and not a modeling schema. Spell effects stay in the spell-resolution docs. Stat-block math stays in [monster-stat-blocks.md](./monster-stat-blocks.md).
+Shared-model gaps that monster and class-feature authoring runs into. Class spellcasting ownership and generated rules text → [docs/content-types.md](../../../docs/content-types.md#class-spellcasting-reference). This is not a monster-only ruleset and not a modeling schema. Spell effects stay in the spell-resolution docs. Stat-block math stays in [monster-stat-blocks.md](./monster-stat-blocks.md).
 
 Agents assess and review monsters without editing this file. An approved authoring or implementation pass updates a gap and appends the capability log. Approving a prose fallback does not close the gap.
 
@@ -87,6 +87,33 @@ Keep the evidence when a gap is verified. Deficiency types are not interchangeab
 - Importance: essential when the SRD sentence includes the number.
 - Owner: `formatMonsterSpellEntry` and monster display. The math stays in `runtime/creature/spell-dc.ts`. Characters already use the same DC and attack functions.
 - Approval: open. Implementation: save-DC clause verified for Mage. Attack-bonus clause not started.
+
+### `learned-collection-acquisition`
+
+- Concept: Wizard spellbook acquisition beyond level gains — copying found spells, copying a book, rebuilding from prepared spells, backup books, and the spellbook item's physical properties (Tiny, readable only by you or _Identify_, chosen appearance).
+- Deficiency: missing structured capability. Only level-based acquisition exists (`spellSelection.acquisition`).
+- Related fields: `spellSelection.model: 'prepareFromLearnedCollection'`, `collection: 'spellbook'`, `acquisition`, `requiredGear: ['spellbook']`, and the `spellbook` equipment item.
+- Owner: the learned-collection model.
+- Approval: deferred. Implementation: not started.
+- Runtime impact: characters cannot add found spells to a spellbook today, and generated Wizard rules omit the sidebar.
+
+### `spell-slot-tracking`
+
+- Concept: expended spell slots and rest restoration.
+- Deficiency: missing runtime resolution.
+- Data: `SlotProgression.recovery`.
+- Owner: a future character resource-state pass.
+- Approval: open. Implementation: not started.
+- Resolve when: a rest workflow restores pools using `restMeetsRecovery`.
+
+### `spell-replacement-execution`
+
+- Concept: level-up and Long Rest replacement for cantrips, repertoire, and prepared spells.
+- Deficiency: missing runtime resolution.
+- Data: compiled `mutation` and the `mutable` membership flag.
+- Owner: a future level-up wizard and a sheet prepared-spells editor.
+- Approval: open. Implementation: not started.
+- Resolve when: both workflows enforce `trigger` and `limit`.
 
 ### `weapon-alternate-modes`
 

@@ -1,3 +1,4 @@
+import type { CharacterKind } from '@rpg/contracts'
 import type { QueryClient } from '@tanstack/react-query'
 
 import { campaignCharacterQueryKey } from '@/features/campaign'
@@ -6,10 +7,7 @@ import { organizationMembersQueryKey } from '@/features/content'
 import { characterRelationshipsQueryKey } from '../hooks/use-character-relationships'
 import { npcQueryKey } from '../npc/hooks/use-npcs'
 
-export type CharacterRelationshipSubjectKind = 'pc' | 'npc'
-
-/** @deprecated Use CharacterRelationshipSubjectKind */
-export type CharacterOrganizationMembershipSubjectKind = CharacterRelationshipSubjectKind
+export type CharacterRelationshipSubjectKind = CharacterKind
 
 export type CharacterRelationshipInvalidationTarget = {
   characterId: string

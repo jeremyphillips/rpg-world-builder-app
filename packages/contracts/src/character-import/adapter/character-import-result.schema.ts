@@ -90,6 +90,3 @@ export const characterImportResultSchema = z.object({
 })
 
 export type CharacterImportResult = z.infer<typeof characterImportResultSchema>
-
-/** @deprecated Use CharacterImportResult — kept for transitional naming in docs. */
-export type CharacterImportPreview = CharacterImportResult

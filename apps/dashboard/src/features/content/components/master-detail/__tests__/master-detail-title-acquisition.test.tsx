@@ -33,6 +33,9 @@ function AcquisitionEditor() {
         idPrefix="creature-form"
         makeItemDefaults={() => ({ id: DOMAIN_ROW_ID, name: '' })}
         rowTitle={{ strategy: 'authored', field: 'name' }}
+        resolveFieldSections={() => ({
+          primary: [{ type: 'text', name: 'description', label: 'Description' }],
+        })}
       />
     </TestFormShell>
   )

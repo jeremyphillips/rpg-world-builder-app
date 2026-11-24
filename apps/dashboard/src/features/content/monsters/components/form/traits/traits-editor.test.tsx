@@ -39,6 +39,17 @@ function Host({
 }
 
 describe('MonsterTraitsEditor', () => {
+  it('does not offer species-only sense templates in the add menu', async () => {
+    const user = userEvent.setup()
+    render(<Host />)
+    await user.click(screen.getByRole('button', { name: 'Add' }))
+    expect(screen.getByRole('menuitem', { name: /Magic Resistance/i })).toBeInTheDocument()
+    expect(screen.queryByRole('menuitem', { name: /^Darkvision$/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('menuitem', { name: /^Blindsight$/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('menuitem', { name: /^Tremorsense$/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('menuitem', { name: /^Truesight$/i })).not.toBeInTheDocument()
+  })
+
   it('finds Flyby from its discovery description', async () => {
     const user = userEvent.setup()
     render(<Host />)
@@ -53,14 +64,14 @@ describe('MonsterTraitsEditor', () => {
     render(<Host />)
     await user.click(screen.getByRole('button', { name: 'Add' }))
     await user.click(screen.getByRole('menuitem', { name: /Flyby/ }))
-    const preview = screen.getByText('Trait preview').closest('.ui-panel')
+    const preview = screen.getByText('Preview').closest('.ui-panel')
     expect(preview).toHaveTextContent('Flyby')
     expect(preview).toHaveTextContent(/The owl doesn't provoke an Opportunity Attack/)
 
     await user.click(screen.getByRole('button', { name: 'Add' }))
     await user.click(screen.getByRole('menuitem', { name: /Custom trait/ }))
     expect(screen.getByRole('textbox', { name: 'Name' })).toBeInTheDocument()
-    expect(screen.queryByText('Trait preview')).not.toBeInTheDocument()
+    expect(screen.queryByText('Preview')).not.toBeInTheDocument()
   })
 
   it('shows guidance when trait preview is not ready', () => {
@@ -74,10 +85,8 @@ describe('MonsterTraitsEditor', () => {
       },
     ]
     render(<Host values={values} />)
-    const preview = screen.getByText('Trait preview').closest('.ui-panel')
-    expect(preview).toHaveTextContent(
-      'Complete required trait fields to show the stat-block preview.',
-    )
+    const preview = screen.getByText('Preview').closest('.ui-panel')
+    expect(preview).toHaveTextContent('Complete trait configuration to preview rules text.')
   })
 
   it('previews legendary resistance with the stat-block heading when lair is enabled', () => {
@@ -93,15 +102,14 @@ describe('MonsterTraitsEditor', () => {
       },
     ]
     render(<Host values={values} />)
-    const preview = screen.getByText('Trait preview').closest('.ui-panel')
+    const preview = screen.getByText('Preview').closest('.ui-panel')
     expect(preview).toHaveTextContent('Legendary Resistance (4/Day, or 5/Day in Lair)')
     expect(preview).toHaveTextContent('fails a saving throw')
     const listRow = screen.getByRole('button', { current: true })
-    expect(listRow).toHaveTextContent('Legendary Resistance')
-    expect(listRow).not.toHaveTextContent('/Day')
+    expect(listRow).toHaveTextContent('Legendary Resistance (4/Day)')
   })
 
-  it('previews a template trait and discloses name and description overrides', () => {
+  it('previews a template trait and offers supplemental details only', () => {
     const values = resolveMonsterCreateDefaultValues()
     values.name = 'Kobold Warrior'
     values.traits = [
@@ -114,7 +122,7 @@ describe('MonsterTraitsEditor', () => {
     render(<Host values={values} />)
 
     expect(screen.getByRole('button', { current: true, name: /Pack Tactics/ })).toBeInTheDocument()
-    const preview = screen.getByText('Trait preview').closest('.ui-panel')
+    const preview = screen.getByText('Preview').closest('.ui-panel')
     expect(preview).toHaveTextContent('The kobold warrior')
     expect(preview).toHaveTextContent('its allies')
     expect(preview).not.toHaveTextContent('This creature')
@@ -122,7 +130,7 @@ describe('MonsterTraitsEditor', () => {
       screen.queryByRole('switch', { name: 'Override generated name and description' }),
     ).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Add custom name' })).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Edit name' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Edit name' })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add details' })).toBeInTheDocument()
   })
 
@@ -140,7 +148,7 @@ describe('MonsterTraitsEditor', () => {
       screen.queryByText(/Tunneler uses half the creature's Burrow Speed/),
     ).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: /Tunneler/ }))
-    const preview = screen.getByText('Trait preview')
+    const preview = screen.getByText('Preview')
     const alert = screen.getByText(/Tunneler uses half the creature's Burrow Speed/)
     expect(preview.compareDocumentPosition(alert) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(alert.closest('.ui-alert')).toHaveClass('ui-alert--warning')
@@ -156,7 +164,7 @@ describe('MonsterTraitsEditor', () => {
     expect(formRef.current?.getValues('traits.1')).toEqual({ id: 'tunnel', preset: 'tunneler' })
 
     await user.click(screen.getByRole('button', { name: /Note/ }))
-    expect(screen.queryByText('Trait preview')).not.toBeInTheDocument()
+    expect(screen.queryByText('Preview')).not.toBeInTheDocument()
   })
 
   it('keeps water breathing duration behind a checkbox and out of the stored row when off', async () => {
@@ -165,10 +173,8 @@ describe('MonsterTraitsEditor', () => {
     render(<Host formRef={formRef} />)
     await user.click(screen.getByRole('button', { name: 'Add' }))
     await user.click(screen.getByRole('menuitem', { name: /Water Breathing/ }))
-    expect(screen.getByText(/can breathe only underwater/)).toBeInTheDocument()
-    expect(screen.getByText('Trait preview').closest('.ui-panel')).not.toHaveTextContent(
-      'outside water',
-    )
+    expect(screen.getAllByText(/can breathe only underwater/).length).toBeGreaterThan(0)
+    expect(screen.getByText('Preview').closest('.ui-panel')).not.toHaveTextContent('outside water')
     expect(screen.queryByRole('group', { name: 'Duration' })).not.toBeInTheDocument()
     const checkbox = screen.getByRole('checkbox', { name: 'Hold breath outside water' })
     expect(checkbox).not.toBeChecked()
@@ -176,7 +182,9 @@ describe('MonsterTraitsEditor', () => {
 
     await user.click(checkbox)
     await waitFor(() => {
-      expect(screen.getByText(/hold its breath for 1 hour outside water/)).toBeInTheDocument()
+      expect(
+        screen.getAllByText(/hold its breath for 1 hour outside water/).length,
+      ).toBeGreaterThan(0)
     })
     expect(formRef.current?.getValues('traits.0')).toMatchObject({
       preset: 'water-breathing',
@@ -186,7 +194,7 @@ describe('MonsterTraitsEditor', () => {
 
     await user.click(screen.getByRole('checkbox', { name: 'Hold breath outside water' }))
     await waitFor(() => {
-      expect(screen.getByText('Trait preview').closest('.ui-panel')).not.toHaveTextContent(
+      expect(screen.getByText('Preview').closest('.ui-panel')).not.toHaveTextContent(
         'outside water',
       )
     })
@@ -203,7 +211,7 @@ describe('MonsterTraitsEditor', () => {
     await user.click(screen.getByRole('button', { name: 'Add' }))
     await user.click(screen.getByRole('menuitem', { name: /Regeneration/ }))
 
-    const preview = () => screen.getByText('Trait preview').closest('.ui-panel')
+    const preview = () => screen.getByText('Preview').closest('.ui-panel')
     expect(preview()).toHaveTextContent(
       'The owl regains 10 Hit Points at the start of each of its turns if it has at least 1 Hit Point.',
     )

@@ -30,7 +30,12 @@ import {
   monsterPresetTraitDraftSchema,
   monsterPresetTraitSchema,
 } from './creature/trait-preset-schema'
-import { LEGENDARY_RESISTANCE_NAME_OVERRIDE_MESSAGE } from './creature/traits/legendary-resistance.constants'
+import {
+  creatureTraitTemplateAtOccurrenceLimit,
+  creatureTraitTemplateOccurrenceMessage,
+} from './creature/traits/creature-trait-template-occurrence'
+import { refineMonsterSenseOccurrence } from './creature/traits/sense-occurrence'
+import { getCreatureTraitVocabularyEntry } from '../vocab/creature/trait-vocabulary'
 import { refineCreatureTraitTemplate } from './creature/traits/validate'
 import {
   customContentTraitSchema,
@@ -196,7 +201,7 @@ function refineMonsterTemplateTrait(
   trait: { kind?: string; templateId?: unknown; config?: unknown },
   ctx: z.RefinementCtx,
 ): void {
-  if (trait.kind === 'template') refineCreatureTraitTemplate(trait, ctx)
+  if (trait.kind === 'template') refineCreatureTraitTemplate(trait, ctx, { host: 'monster' })
 }
 
 const monsterAuthoredTraitSchema = z
@@ -288,15 +293,14 @@ const monsterAuthoredTraitDraftSchema = z
         id: z.string().min(1),
         templateId: z.string().min(1).optional(),
         config: z.unknown().optional(),
-        nameOverride: z.string().min(1).optional(),
-        descriptionOverride: z.string().optional(),
+        details: z.string().optional(),
         ...monsterTraitAvailabilityFields,
       }),
     ]),
   )
   .superRefine((trait, ctx) => {
     if (trait.kind !== 'template' || trait.templateId === undefined) return
-    refineCreatureTraitTemplate(trait, ctx)
+    refineCreatureTraitTemplate(trait, ctx, { host: 'monster' })
   })
 
 export const monsterTraitDraftSchema = z.union([
@@ -443,21 +447,30 @@ function refineUniqueTraitPresets(
   ctx: z.RefinementCtx,
   path: (string | number)[],
 ): void {
-  const seen = new Set<string>()
+  const seenTemplates = new Set<string>()
+  const seenPresets = new Set<string>()
   traits.forEach((trait, index) => {
     const preset = 'preset' in trait && typeof trait.preset === 'string' ? trait.preset : undefined
     const templateId =
       'templateId' in trait && typeof trait.templateId === 'string' ? trait.templateId : undefined
-    const key = preset ?? templateId
-    if (!key) return
-    if (seen.has(key)) {
-      addCustomRefinementIssue(ctx, 'Trait presets must be unique.', [
+    if (templateId) {
+      const limit = creatureTraitTemplateAtOccurrenceLimit(templateId, seenTemplates)
+      if (limit.atLimit) {
+        addCustomRefinementIssue(ctx, limit.message, [...path, index, 'templateId'])
+      }
+      seenTemplates.add(templateId)
+      return
+    }
+    if (!preset) return
+    if (seenPresets.has(preset)) {
+      const label = getCreatureTraitVocabularyEntry(preset)?.label ?? preset
+      addCustomRefinementIssue(ctx, creatureTraitTemplateOccurrenceMessage(label), [
         ...path,
         index,
-        preset ? 'preset' : 'templateId',
+        'preset',
       ])
     }
-    seen.add(key)
+    seenPresets.add(preset)
   })
 }
 
@@ -908,6 +921,7 @@ export function refineMonsterBody(
   refineMultiattackReferences(body, ctx, prefix, { published: true })
   refineLegendaryActionPool(body, ctx, prefix)
   refineCreatureDamageDefenses(body.defenses, ctx, [...prefix, 'defenses'])
+  refineMonsterSenseOccurrence(body.senses, ctx, [...prefix, 'senses'])
   refineCreatureSenseRanges(body.senses, ctx, [...prefix, 'senses'])
   refineCreatureTelepathyRange(body.communication.telepathy, ctx, [
     ...prefix,
@@ -934,14 +948,9 @@ function refineMonsterLegendaryResistanceTraits(
   prefix: (string | number)[],
 ): void {
   traits.forEach((trait, index) => {
+    if (typeof trait !== 'object' || trait === null || !('kind' in trait)) return
     if (trait.kind !== 'template' || trait.templateId !== 'legendary-resistance') return
     const traitPath = [...prefix, 'traits', index]
-    if (trait.nameOverride !== undefined) {
-      addCustomRefinementIssue(ctx, LEGENDARY_RESISTANCE_NAME_OVERRIDE_MESSAGE, [
-        ...traitPath,
-        'nameOverride',
-      ])
-    }
     const config = trait.config
     if (!config || typeof config !== 'object' || Array.isArray(config)) return
     const uses = (config as { uses?: { normal?: number; inLair?: number } }).uses
@@ -1007,6 +1016,7 @@ function refineMonsterDraftBody(
 ): void {
   const sections = draftActionSections(body)
   refineMonsterDraftIds(body, ctx, prefix)
+  refineMonsterSenseOccurrence(body.senses ?? [], ctx, [...prefix, 'senses'])
   refineMonsterSpellEntries(sections, ctx, prefix)
   refineWeaponEntryReferences({ equipment: body.equipment ?? [], ...sections }, ctx, prefix, {
     requirePresent: false,
@@ -1077,8 +1087,10 @@ export {
   monsterLairCustomXpMinimumHint,
   monsterLairInLairXpMustExceedBaseMessage,
 } from './monster/lair-experience-messages'
-export { resolveMonsterBaseExperiencePoints } from '../runtime/monster/resolve-monster-base-experience'
-export type { MonsterBaseExperienceInput } from '../runtime/monster/resolve-monster-base-experience'
+export {
+  resolveMonsterBaseExperiencePoints,
+  type MonsterBaseExperienceInput,
+} from '../vocab/challenge-rating'
 export {
   collectMonsterCatalogIssues,
   MONSTER_CATALOG_ISSUE_CODE,

@@ -7,8 +7,7 @@ import {
 } from '@/features/content/lib/content-type-labels'
 import { ContentEditShell } from '../../lib/forms/shells/edit/content-edit-shell'
 import { useSpecies } from '../hooks/use-species'
-// Registers the species form def into the content form registry on module load.
-import '../lib/species-form-def'
+import { speciesFormDef } from '../lib/species-form-def'
 
 export function SpeciesEdit() {
   const { campaignId = '', speciesId = '' } = useParams<{
@@ -19,7 +18,7 @@ export function SpeciesEdit() {
 
   return (
     <ContentEditShell
-      contentType="species"
+      def={speciesFormDef}
       campaignId={campaignId}
       entityId={speciesId}
       isPending={isPending}
@@ -28,7 +27,6 @@ export function SpeciesEdit() {
       notFoundLabel={formatContentNotFoundMessage('species')}
       backHref={ROUTES.content.species.detail(campaignId, speciesId)}
       overviewHref={ROUTES.content.species.overview(campaignId)}
-      contentTypeKey="species"
     />
   )
 }

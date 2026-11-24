@@ -30,22 +30,29 @@ When sub-choices are small, fixed sets owned by one catalog record (lineages, an
 
 Species traits and heritage options share `contentTraitSchema` — a discriminated union on `kind`:
 
-| Kind     | Stored fields                                                             | Rendering                                                      |
-| -------- | ------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| `custom` | `name`, optional `description`, optional `grantGroups`                    | Use stored prose; grant groups supplement mechanics            |
-| `grant`  | `grantGroups` (required), optional `nameOverride` / `descriptionOverride` | Derive display via `resolveTraitDisplay()` in `@rpg/contracts` |
+| Kind       | Stored fields                                                         | Rendering                                                                                                    |
+| ---------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `custom`   | `name`, optional `description`, optional `grantGroups`                | Use stored prose; grant groups supplement mechanics                                                          |
+| `grant`    | `grantGroups` (required), optional `nameOverride`, optional `details` | Facing via `resolveTraitFacingParts(trait, host)` and `renderTraitFacingBodyHtml()` in `@rpg/contracts`      |
+| `template` | `templateId`, optional `config`, optional `details`                   | Registry-backed mechanics via `resolveCreatureTraitGrants()`; passive species senses use `sense-*` templates |
 
-**Class and subclass features are always `custom`** (`classFeatureSchema` extends the custom variant + `level`). Progression UI requires a stored feature name.
+**Class features** are a discriminated union on `kind`: `custom`, `asi`, `spellcasting`, and
+`subclass-choice`. Subclass `features[]` rows are **`custom` only**. Progression UI requires a
+stored feature name on kinds that carry `name`; subclass milestones may omit `name` when it matches
+the derived `<Class> Subclass` title.
 
-**Subclass choice milestones** are modeled as explicit class features (`{classSlug}-subclass`,
-named `<Class> Subclass`). The feature level is the source of truth for when subclass authoring
+**Subclass choice milestones** use `kind: 'subclass-choice'` (stable id such as `{slug}-subclass`).
+The feature level is the source of truth for when subclass authoring
 and default subclass feature levels unlock; there is no top-level `subclassChoiceLevel` field on
 the class body.
 
-Grant-only traits must pass `isGrantGroupsEligible()` — exactly one default group containing exactly one sense, resistance, walk speed override, or language grant. Hybrids (Drow: senses + spells), named heritage options (Dragonborn ancestry), and supplemental rules stay `custom`.
+Grant-only traits must pass `isGrantGroupsEligible()` — exactly one default group containing exactly one sense, resistance, walk speed override, or language grant. On **publish**, species traits must not be a stored-only sense grant; passive senses use `sense-*` templates (`sense-darkvision`, etc.). Hybrids (Drow: senses + spells), named heritage options (Dragonborn ancestry), and supplemental rules stay `custom`.
 
-- **Render** trait lists with `resolveTraitDisplay(trait)` (name + description HTML).
-- **Aggregate** mechanics (e.g. species stat-row senses) with `flattenGrantGroups(resolveGrantGroupsFromContent(trait))` — read atomic grants, not derived prose.
+- **Render** trait lists with `resolveTraitFacingParts(trait, host)` and `renderTraitFacingBodyHtml()` (rules prose once, then optional `details`).
+- **Preview** player-facing trait copy with dashboard `resolveTraitPersistedFacing()` / draft adapters — never duplicate `details` outside the composer.
+- Legacy `descriptionOverride` on parsed records is stripped (not migrated to `details`).
+- **Compact sense stat rows** (species traits tab and monster Creature Details) use `formatCreatureSensesCompactList()` / `formatCreatureSenseCompactLine()` from `@rpg/contracts`.
+- **Aggregate** mechanics (e.g. species stat-row senses) with `resolveCreatureTraitGrants()` and `resolveCreatureSenses()` — not derived prose alone.
 - **Vocab** (`SENSE_ENTRIES`, `DAMAGE_TYPE_ENTRIES`, etc.) holds reference definitions; grant traits omit redundant catalog copy when SRD player-facing wording is derivable.
 
 Legacy records without `kind` normalize to `custom` on parse (`normalizeContentTrait`). The species authoring form keeps `kind` as hidden form state: new traits and heritage options default to `custom`; existing `grant` traits keep a derived editor. The dashboard does not expose a kind selector.
@@ -54,7 +61,8 @@ Legacy records without `kind` normalize to `custom` on parse (`normalizeContentT
 
 Class features, subclass features, and species traits that grant a feat choice store a
 `{ kind: "featChoice", ... }` grant inside `grantGroups` on the **source** record
-(Fighting Style, Epic Boon, Human Versatile, Ability Score Improvement milestones).
+(Fighting Style, Epic Boon, Human Versatile). **ASI milestones** use `kind: 'asi'`; the builder
+reads a projected feat choice via `resolveClassFeatureGrantGroups` (grant id `general-feat`).
 The character builder filters feats by `category`; granted feats do not need a matching
 `prerequisite` on the feat record.
 
@@ -381,7 +389,9 @@ apps/dashboard/src/
 ### Integration manifest (`@rpg/content-types`)
 
 Semantic registries live in `@rpg/contracts` (`CONTENT_TYPE_KEYS`,
-`CONTENT_TYPE_TERMS`, `CONTENT_TYPE_CAPABILITIES`). Repository wiring metadata
+`CONTENT_TYPE_TERMS`, `CONTENT_TYPE_CAPABILITIES`). Domain admission and vocabulary
+patterns: [packages/contracts/docs/vocab-ssot.md](../packages/contracts/docs/vocab-ssot.md)
+(catalog content types use **domain-first** keys). Repository wiring metadata
 lives in **`tools/content-types/`** as `CONTENT_TYPE_INTEGRATION_MANIFEST` —
 path strings and flags only. Runtime registries remain authoritative; the
 manifest supports drift tests and future scaffolding.
@@ -390,8 +400,9 @@ The manifest covers **top-level** `ContentTypeKey` values only. Nested resources
 (e.g. subclasses) are excluded until a separate nested-resource manifest exists.
 See [`tools/content-types/README.md`](../tools/content-types/README.md).
 
-When adding a type: extend `CONTENT_TYPE_KEYS` and terms in contracts, add a
-manifest entry (`satisfies Record<ContentTypeKey, …>` enforces completeness),
+When adding a type: **admit** the key in `CONTENT_TYPE_KEYS` first (domain SSOT),
+then add matching `CONTENT_TYPE_TERMS` and `CONTENT_TYPE_CAPABILITIES` entries,
+add a manifest entry (`satisfies Record<ContentTypeKey, …>` enforces completeness),
 then wire catalog, API, and dashboard layers. API and dashboard metadata are
 declared when those integrations exist, so contracts-first phases do not need
 placeholder files. Per-layer drift tests remain strict for every declared
@@ -936,23 +947,12 @@ route-manifest drift test only verifies the `CONTENT_ROUTES` entry itself.
 
 ### 16. Lazy routes (`apps/dashboard/src/app/lazy-routes.ts`)
 
-Register four lazy exports — import **route module paths directly**, never from
-`@/features/content`:
-
-```typescript
-export const <TypeName>sOverviewRoute = withRouteSuspense(
-  lazyNamed(() => import('@/features/content/<folder>/routes/<kebab-plural>-overview'), '<TypeName>sOverview'),
-)
-export const <TypeName>DetailRoute = withRouteSuspense(
-  lazyNamed(() => import('@/features/content/<folder>/routes/<kebab-singular>-detail'), '<TypeName>Detail'),
-)
-export const <TypeName>CreateRoute = withRouteSuspense(
-  lazyNamed(() => import('@/features/content/<folder>/routes/<kebab-singular>-create'), '<TypeName>Create'),
-)
-export const <TypeName>EditRoute = withRouteSuspense(
-  lazyNamed(() => import('@/features/content/<folder>/routes/<kebab-singular>-edit'), '<TypeName>Edit'),
-)
-```
+Import route modules directly. Use `lazyNamed` and `withRouteSuspense` for overview
+and detail. Add both create and edit to the typed `contentFormRouteLoaders` map
+and use those loaders to build the suspended route wrappers. Each create and
+edit route passes its owning definition directly to the shared shell. The route
+contract tests verify that both shells receive the definition for the mapped
+content type.
 
 ### 17. React Router (`apps/dashboard/src/app/router.tsx`)
 
@@ -1072,27 +1072,41 @@ Delete is blocked with `409` when campaign characters reference the subclass (`c
 Class spellcasting splits **activation**, **configuration**, and **starting recommendations**:
 
 ```text
-features[] → managed Spellcasting / Pact Magic feature (level, name, description, available)
+features[] → managed Spellcasting / Pact Magic feature (level, name, optional intro, available)
            → grantGroups: [{ grants: [{ kind: 'spellcasting' }] }]
-spellcasting → slot reference, selection semantics, capacity curves, gear, recommendations[]
+spellcasting → slot reference, selection semantics, capacity curves, gear, recommendations[], focusKinds, cantripSelection
 ```
+
+The granting feature owns **unlock level** and optional narrative **`intro`** only. Publish rejects non-empty **`description`** on that row (`spellcastingGrantingFeatureDescriptionForbidden` in `class.ts`). **Authoring order:** Introduction → generated rules (`RulesPreview`). Player-facing mechanics (quotas, recovery, change policy, ability, focus kinds, recommendations) come from **`formatClassSpellcastingFeatureRules`** → `StatBlockProseDocument`, shown in authoring via `RulesPreview` and on class detail via `StatBlockProseView` (intro HTML renders before the generated document). The preview uses the same `spellcastingFromFormValues` adapter as save. Progression **curves stay absolute class levels**; moving the feature does not rebase them.
+
+| Field                                     | Rules text role                                                                                                                                                                                                                           |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `SlotProgression.recovery` (Rules Config) | Slot restoration sentence in generated rules (`formatRestRecoveryClause`). Runtime restoration is not implemented — see gap `spell-slot-tracking` in [srd-mechanical-coverage.md](../packages/contracts/docs/srd-mechanical-coverage.md). |
+| `spellcasting.cantripSelection.change`    | Cantrip replacement clause from compiled cantrip `mutation`. Execution is not implemented — gap `spell-replacement-execution`.                                                                                                            |
+| `spellcasting.focusKinds`                 | Spellcasting Focus noun phrases (`class-spellcasting-focus-kind` vocabulary, including `musical_instrument` and `spellbook`). Authoring is SSOT; equipment inference does not backfill missing kinds for rules text.                      |
+| `recommendations[]`                       | Optional spell names in generated rules when catalog ids resolve; still picker hints only and never changes quotas.                                                                                                                       |
+
+**Wizard spellbook sidebar** (copying found spells, physical book details) is **not** generated — gap `learned-collection-acquisition` in [srd-mechanical-coverage.md](../packages/contracts/docs/srd-mechanical-coverage.md). Do not describe the Wizard document as full SRD parity.
+
+**Future:** feature-level `provenance.excerpt` (monster pattern) for SRD reference text — not `description` and not in scope until class entry provenance is registered.
 
 The optional `spellcasting` block (`content/classes/spellcasting/spellcasting.ts`) owns **how** casting works. The dedicated granting feature in `features[]` owns **when** it unlocks. Rules Config owns **slot tables only**.
 
-Publish requires config and exactly one spellcasting grant to coexist (see `refineClassSpellcastingOwnership` in `class.ts`).
+Publish requires `Class.spellcasting` and exactly one `kind: 'spellcasting'` feature row together
+(see `refineClassBodyFeaturesAggregate` on `classStoredBodySchema`).
 
 ### Class record shape
 
-| Field               | Role                                                                                                                                                         |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `slotProgressionId` | Ruleset slot progression id (Full / Half / Pact / custom). Drives spell-slot columns only.                                                                   |
-| `spellSelection`    | L1+ selection semantics (`limitedRepertoire`, `prepareFromClassList`, `prepareFromLearnedCollection`) plus change policy and optional spellbook acquisition. |
-| `progression`       | Independent sparse capacity curves: `cantrips`, `repertoire`, `preparedSpells`. Absolute class levels — not rebased when the granting feature level changes. |
-| `ability`           | Spellcasting ability for this class.                                                                                                                         |
-| `requiredGear`      | Optional class-critical spellcasting gear (e.g. Wizard spellbook).                                                                                           |
-| `focusKinds`        | Optional spellcasting focus kinds this class can use.                                                                                                        |
-| `recommendedGear`   | Optional strong-tier spellcasting gear suggestions.                                                                                                          |
-| `recommendations`   | Optional advisory starting spell lists keyed by semantic target (`cantrips` \| `level1Plus`). Never grants spells or changes quotas.                         |
+| Field               | Role                                                                                                                                                                                                                                                                                       |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `slotProgressionId` | Ruleset slot progression id (Full / Half / Pact / custom). Drives spell-slot columns only.                                                                                                                                                                                                 |
+| `spellSelection`    | L1+ selection semantics (`limitedRepertoire`, `prepareFromClassList`, `prepareFromLearnedCollection`) plus change policy and optional spellbook acquisition.                                                                                                                               |
+| `progression`       | Independent sparse capacity curves: `cantrips`, `repertoire`, `preparedSpells`. Absolute class levels — not rebased when the granting feature level changes.                                                                                                                               |
+| `ability`           | Spellcasting ability for this class.                                                                                                                                                                                                                                                       |
+| `requiredGear`      | Optional class-critical spellcasting gear (e.g. Wizard spellbook).                                                                                                                                                                                                                         |
+| `focusKinds`        | Optional spellcasting focus kinds this class can use.                                                                                                                                                                                                                                      |
+| `recommendedGear`   | Optional strong-tier spellcasting gear suggestions.                                                                                                                                                                                                                                        |
+| `recommendations`   | Optional advisory starting spell lists keyed by semantic target (`cantrips` \| `level1Plus`). Omitted `classLevel` means the granting feature’s activation level. Eligibility uses `maxSelectableSpellLevel` at that level (no `spellLevel` field). Never grants spells or changes quotas. |
 
 SRD rules prose lives on the managed granting feature (`id: spellcasting` or `pact-magic`), not on `Class.spellcasting`. Do **not** persist `spellcasting.level` or `spellcasting.featureId`.
 
@@ -1102,7 +1116,7 @@ SRD rules prose lives on the managed granting feature (`id: spellcasting` or `pa
 
 Authoring lives under **Character Configuration → Progression → Spellcasting**:
 
-- **Slot progressions** — shared spell slot tables (`full-caster`, `half-caster`, `pact-magic`, or custom). Leveled hosts use 1st–9th columns; pact hosts use slot count + slot level.
+- **Slot progressions** — shared spell slot tables (`full-caster`, `half-caster`, `pact-magic`, or custom). Each row includes required **`recovery`** (`long` vs `short` for Pact). Leveled hosts use 1st–9th columns; pact hosts use slot count + slot level.
 
 Contracts: `packages/contracts/src/rpg/campaign/rules/spellcasting-progression/`. Catalog seed: `packages/catalog/src/spellcasting-progressions/data/<ruleset>/slot-progressions.json`.
 
@@ -1111,10 +1125,10 @@ Contracts: `packages/contracts/src/rpg/campaign/rules/spellcasting-progression/`
 The class form Spellcasting tab (`class-spellcasting-form-fields.ts`) exposes:
 
 - **Has spellcasting** — form-only toggle; turning on reconciles config + managed granting feature; turning off confirms before removing both.
-- **Spellcasting feature summary** — links authors to the Features tab for level, name, description, and campaign availability.
+- **Spellcasting feature summary** — links authors to the Features tab for level, name, introduction, generated rules preview, and campaign availability.
 - **Slot progression** — combobox of resolved ruleset slot progressions.
 - **Spell selection model** — semantic L1+ selection (`limitedRepertoire`, prepare-from-list, prepare-from-learned-collection) plus change policy.
-- **Grants cantrips** — toggles the Cantrips column in the spellcasting progression table.
+- **Grants cantrips** — toggles the Cantrips column; optional **cantrip change** package (`spellcasting.cantripSelection.change`) when cantrips are enabled.
 - **Spellcasting progression table** — merged cantrip / repertoire / prepared capacity curves (TableBuilder).
 - **Recommended starting spells** — cantrip and level-1 comboboxes authoring `recommendations[]`.
 - **Spellbook acquisition shorthand** — for learned-collection classes, regular mode uses Starting / per-level / through-level numbers that materialize to a gain curve on save; irregular curves use the table editor escape hatch.

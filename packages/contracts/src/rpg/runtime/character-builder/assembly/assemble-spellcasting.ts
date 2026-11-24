@@ -41,7 +41,7 @@ function membershipForProgression(
   progression: CompiledSpellcastingChoiceProgression,
 ): CharacterSpellCollectionMembership {
   const membership: CharacterSpellCollectionMembership = { kind: progression.destination }
-  if (progression.destination === 'prepared' && progression.mutation.kind === 'replace') {
+  if (spellcastingProgressionIsMutable(progression.mutation)) {
     membership.mutable = true
   }
   return membership
@@ -52,7 +52,11 @@ function membershipForChoiceSet(
   progression: CompiledSpellcastingChoiceProgression | undefined,
 ): CharacterSpellCollectionMembership | undefined {
   if (suffix === CLASS_SPELLCASTING_CHOICE_SUFFIXES.cantrips) {
-    return { kind: 'cantrips' }
+    const membership: CharacterSpellCollectionMembership = { kind: 'cantrips' }
+    if (progression && spellcastingProgressionIsMutable(progression.mutation)) {
+      membership.mutable = true
+    }
+    return membership
   }
   return progression ? membershipForProgression(progression) : undefined
 }

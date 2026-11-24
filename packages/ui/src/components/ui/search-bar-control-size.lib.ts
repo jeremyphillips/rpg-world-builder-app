@@ -1,5 +1,5 @@
 import type { FieldSize } from './field.client'
-import { fieldGroupedControlHeightClasses } from './field-sizing.variants'
+import { resolveFieldGroupActionSegmentClasses } from './field-group.styles'
 import { DEFAULT_FORM_DENSITY, type FormDensity } from '../../form/form-density'
 import { resolveFieldControlSize } from '../../form/resolve-field-control-size.lib'
 import { resolveFilterControlSize } from '../../filters/filter-presentation.lib'
@@ -33,5 +33,5 @@ export function resolveSearchBarControlSize(
 
 /** Maps resolved field size to height utility for class-contract tests. */
 export function searchBarControlHeightClass(size: FieldSize): string {
-  return fieldGroupedControlHeightClasses[size]
+  return resolveFieldGroupActionSegmentClasses(size)
 }

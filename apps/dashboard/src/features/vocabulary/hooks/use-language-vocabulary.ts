@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
-import { DEFAULT_SYSTEM_RULESET_ID, LANGUAGE_SET_ID } from '@rpg/contracts'
+import { LANGUAGE_SET_ID, type SystemRulesetId } from '@rpg/contracts'
 
-import { useCampaigns } from '@/lib/campaign/campaigns-query'
+import { useCampaignRulesetLookup } from '@/lib/use-campaign-ruleset-lookup'
 
 import {
   buildActiveLanguageCategoryFieldOptions,
@@ -9,21 +9,26 @@ import {
 } from '../lib/sets/languages'
 import { useVocabularySet } from './use-vocabulary-set'
 
+type UseLanguageVocabularyOptions = {
+  /** Explicit system seed ruleset when no campaign is in scope (game-terms sheet). */
+  seedRulesetId?: SystemRulesetId
+}
+
 /** Campaign-resolved language labels, categories, and active ids for forms and tables. */
-export function useLanguageVocabulary(campaignId: string | undefined) {
+export function useLanguageVocabulary(
+  campaignId: string | undefined,
+  options?: UseLanguageVocabularyOptions,
+) {
   const query = useVocabularySet(campaignId, LANGUAGE_SET_ID)
-  const { data: campaigns } = useCampaigns()
+  const { rulesetId: campaignRulesetId, isPending, isError } = useCampaignRulesetLookup(campaignId)
 
   const rulesetId = useMemo(() => {
-    if (!campaignId) return DEFAULT_SYSTEM_RULESET_ID
-    return (
-      campaigns?.find((campaign) => campaign.id === campaignId)?.rulesetId ??
-      DEFAULT_SYSTEM_RULESET_ID
-    )
-  }, [campaignId, campaigns])
+    if (campaignId) return campaignRulesetId
+    return options?.seedRulesetId
+  }, [campaignId, campaignRulesetId, options?.seedRulesetId])
 
   const vocabulary = useMemo(
-    () => (query.data ? buildLanguageVocabulary(query.data, rulesetId) : undefined),
+    () => (query.data && rulesetId ? buildLanguageVocabulary(query.data, rulesetId) : undefined),
     [query.data, rulesetId],
   )
 
@@ -36,5 +41,7 @@ export function useLanguageVocabulary(campaignId: string | undefined) {
     ...query,
     vocabulary,
     categoryOptions,
+    rulesetLookupPending: Boolean(campaignId) && isPending,
+    rulesetLookupError: Boolean(campaignId) && isError,
   }
 }

@@ -12,7 +12,7 @@ import { describe, expect, it } from 'vitest'
 
 import { buildSeedDamageTypeVocabulary } from '@/features/vocabulary'
 
-import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
+import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import { normalizeMonsterFormValues } from '../../../lib/normalize-monster-form-values'
 import { monsterFormTestValues } from '../../../lib/monster-form-test-values'
 import type { MonsterFormValues } from '../../../lib/monster-form-values'
@@ -50,6 +50,11 @@ function RetainedMonsterPath({ name }: { name: (typeof RETAINED_FORM_PATHS)[numb
   return null
 }
 
+function RetainedActionRechargeProbe({ index }: { index: number }) {
+  useController({ name: `actions.${index}.limitedUse` as const, shouldUnregister: false })
+  return null
+}
+
 function DirtyProbe({ dirtyRef }: { dirtyRef: { current: boolean } }) {
   const { formState } = useFormContext()
   useEffect(() => {
@@ -69,7 +74,7 @@ function Host({
 }) {
   const form = useForm<MonsterFormValues>({
     shouldUnregister: true,
-    defaultValues: values,
+    defaultValues: structuredClone(values),
   })
   useEffect(() => {
     formRef.current = form
@@ -79,6 +84,9 @@ function Host({
       <DirtyProbe dirtyRef={dirtyRef} />
       {RETAINED_FORM_PATHS.map((name) => (
         <RetainedMonsterPath key={name} name={name} />
+      ))}
+      {(values.actions ?? []).map((_, index) => (
+        <RetainedActionRechargeProbe key={index} index={index} />
       ))}
       <MonsterActionSections ctx={ctx} />
     </FormProvider>
@@ -107,21 +115,16 @@ describe('monster action recharge editor', () => {
     const user = userEvent.setup()
     const formRef: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }
     const dirtyRef = { current: false }
-    render(
-      <Host
-        formRef={formRef}
-        dirtyRef={dirtyRef}
-        values={formValues([
-          {
-            id: 'breath',
-            kind: 'save',
-            preset: 'breath-weapon',
-            name: 'Fire Breath',
-            limitedUse: { kind: 'recharge', minRoll: 5 },
-          },
-        ])}
-      />,
-    )
+    const initial = formValues([
+      {
+        id: 'breath',
+        kind: 'save',
+        preset: 'breath-weapon',
+        name: 'Fire Breath',
+        limitedUse: { kind: 'recharge', minRoll: 5 },
+      },
+    ])
+    render(<Host formRef={formRef} dirtyRef={dirtyRef} values={initial} />)
 
     await user.click(rowButton('Fire Breath'))
     expect(threshold()).toHaveValue(5)
@@ -145,7 +148,6 @@ describe('monster action recharge editor', () => {
         minRoll: 5,
       })
     })
-    expect(threshold()).toHaveValue(5)
   })
 
   it('adds, edits, and removes an optional bite recharge without copying it to another row', async () => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatSpellLevel, spellLevelSchema, SPELL_LEVELS } from './levels'
+import { formatSpellLevel, formatSpellLevelRange, spellLevelSchema, SPELL_LEVELS } from './levels'
 
 describe('SPELL_LEVELS', () => {
   it('covers spell levels 1 through 9', () => {
@@ -14,6 +14,15 @@ describe('spellLevelSchema', () => {
     expect(spellLevelSchema.safeParse(9).success).toBe(true)
     expect(spellLevelSchema.safeParse(0).success).toBe(false)
     expect(spellLevelSchema.safeParse(10).success).toBe(false)
+  })
+})
+
+describe('formatSpellLevelRange', () => {
+  it('formats single and multi-level ranges for rules copy', () => {
+    expect(formatSpellLevelRange([1])).toBe('level 1')
+    expect(formatSpellLevelRange([1, 2])).toBe('levels 1 and 2')
+    expect(formatSpellLevelRange([1, 2, 3])).toBe('levels 1–3')
+    expect(formatSpellLevelRange([])).toBeUndefined()
   })
 })
 

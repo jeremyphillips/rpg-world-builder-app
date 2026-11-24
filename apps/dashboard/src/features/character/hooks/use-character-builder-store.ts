@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useStore } from 'zustand'
 
-import type { CharacterBuildContext } from '@rpg/contracts'
+import { DEFAULT_SYSTEM_RULESET_ID, type CharacterBuildContext } from '@rpg/contracts'
 import {
   resolveCharacterBuilderDraftKey,
   resolveCharacterBuilderDraftScope,
@@ -17,7 +17,7 @@ import {
 
 type CharacterBuilderContextSlice = Pick<
   CharacterBuildContext,
-  'mode' | 'characterKind' | 'rulesScope'
+  'surface' | 'characterKind' | 'rulesScope'
 > | null
 
 function useCharacterBuilderDraftScope(
@@ -27,7 +27,7 @@ function useCharacterBuilderDraftScope(
 
   return useMemo(
     () => (context ? resolveCharacterBuilderDraftScope(context, session?.user.id) : null),
-    [context?.characterKind, context?.mode, context?.rulesScope, session?.user.id],
+    [context?.characterKind, context?.surface, context?.rulesScope, session?.user.id],
   )
 }
 
@@ -36,7 +36,9 @@ export function useCharacterBuilderStore<T>(
   selector: (state: CharacterBuilderStoreState) => T,
 ): T {
   const scope = useCharacterBuilderDraftScope(context)
-  const storageKey = scope ? resolveCharacterBuilderDraftKey(scope, { mode: context?.mode }) : null
+  const storageKey = scope
+    ? resolveCharacterBuilderDraftKey(scope, { surface: context?.surface })
+    : null
   const store = storageKey && scope ? getCharacterBuilderStore(storageKey, scope) : null
 
   return useStore(store ?? getDisabledCharacterBuilderStore(), selector)
@@ -45,7 +47,7 @@ export function useCharacterBuilderStore<T>(
 const disabledStore = getCharacterBuilderStore('character-builder:disabled', {
   kind: 'standalone',
   userId: 'disabled',
-  rulesetId: 'srd-cc-5.2.1',
+  rulesetId: DEFAULT_SYSTEM_RULESET_ID,
   characterKind: 'pc',
 })
 
@@ -57,7 +59,7 @@ export function useCharacterBuilderStorageKey(
   context: CharacterBuilderContextSlice,
 ): string | null {
   const scope = useCharacterBuilderDraftScope(context)
-  return scope ? resolveCharacterBuilderDraftKey(scope, { mode: context?.mode }) : null
+  return scope ? resolveCharacterBuilderDraftKey(scope, { surface: context?.surface }) : null
 }
 
 export function useCharacterBuilderDraftScopeFromContext(

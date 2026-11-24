@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { addCustomRefinementIssue } from '../lib/add-custom-refinement-issue'
 import { characterAlignmentSchema } from '../rpg/vocab/alignment'
-import { characterTypeSchema } from '../rpg/runtime/character/sheet/core'
+import { characterKindSchema } from '../rpg/runtime/character/pc-npc-identity'
 import { characterNarrativeSchema } from '../rpg/runtime/character/sheet/narrative'
 import { organizationSchema } from '../rpg/content/organization/organization'
 import { characterOrganizationConnectionSchema } from '../rpg/runtime/character/connections/connections'
@@ -31,7 +31,7 @@ export const narrativeResidenceSchema = narrativeResidenceFactSchema
 
 export const narrativeGenerationContextSchema = z.object({
   alignment: characterAlignmentSchema.optional(),
-  characterKind: characterTypeSchema,
+  characterKind: characterKindSchema,
   level: z.number().int().nonnegative(),
   affinities: z.array(z.string()).default([]),
   tokens: z.partialRecord(narrativeTokenSchema, z.string().min(1)).default({}),

@@ -1,7 +1,6 @@
 import { cn } from '../../lib/utils'
 import type { FieldDigits } from './field-digit-metrics'
 import type { FieldSize } from './field-root.lib'
-import type { FieldSizeToken } from './field-sizing.variants'
 import { fieldSizeTypographyClasses } from './field-sizing.variants'
 import {
   fieldControlTriggerCursorClasses,
@@ -19,14 +18,6 @@ import {
   type GroupedValueSlotTrailing,
 } from './grouped-segment.variants'
 
-/** @deprecated Prefer {@link resolveFieldGroupCaretSlotClass} — caret width lives in field-group.css. */
-export const selectCaretSlotWidthClasses = {
-  xs: resolveFieldGroupCaretSlotClass(),
-  sm: resolveFieldGroupCaretSlotClass(),
-  md: resolveFieldGroupCaretSlotClass(),
-  lg: resolveFieldGroupCaretSlotClass(),
-} as const satisfies Record<FieldSizeToken, string>
-
 export const selectDigitValueMinWidthVariants = {
   1: 'min-w-[calc(1*1ch)]',
   2: 'min-w-[calc(2*1ch)]',
@@ -43,9 +34,6 @@ const SELECT_VALUE_SLOT_GHOST =
 const SELECT_VALUE_SLOT_OVERLAY = 'col-start-1 row-start-1 min-w-0 truncate text-left'
 
 export type { GroupedValueSlotPosition, GroupedValueSlotTrailing }
-
-/** @deprecated Prefer `GroupedValueSlotPosition`. */
-export type GroupedValueSlotEdge = GroupedValueSlotPosition
 
 /** Grouped select segment shell — height, corners, wash; no padding. */
 export function groupedSelectSegmentShellClasses(
@@ -117,46 +105,6 @@ export function groupedValueSlotClasses(
     padding,
     options.prose && 'flex-1',
   )
-}
-
-/** @deprecated Use `groupedValueSlotClasses` — alias for select ValueSlot padding. */
-export function selectValueSlotClasses(
-  size: FieldSize,
-  options: {
-    digits?: FieldDigits
-    sizingLabel?: string
-    sizingLabels?: readonly string[]
-    prose?: boolean
-    grouped?: boolean
-    groupedPosition?: 'start' | 'end'
-    trailing?: GroupedValueSlotTrailing
-  },
-): string {
-  const position: GroupedValueSlotPosition = options.grouped
-    ? options.groupedPosition === 'end'
-      ? 'end'
-      : 'start'
-    : 'standalone'
-
-  const textSizing =
-    (options.sizingLabel != null && options.sizingLabel.length > 0) ||
-    (options.sizingLabels != null && options.sizingLabels.length > 0)
-
-  const trailing =
-    options.trailing ??
-    (options.grouped && options.groupedPosition === 'end'
-      ? 'slot'
-      : !options.grouped
-        ? 'slot'
-        : 'content')
-
-  return groupedValueSlotClasses(size, {
-    position,
-    trailing,
-    digits: options.digits,
-    textSizing,
-    prose: options.prose,
-  })
 }
 
 export function selectValueSlotGhostClasses(size: FieldSize): string {

@@ -65,7 +65,17 @@ function Detail({ ctx, actionId }: { ctx: ContentFormCtx; actionId: string }) {
       title: (row as { name?: string } | undefined)?.name?.trim() || `Action ${index + 1}`,
     }),
   })
-  return <MonsterActionDetail ctx={ctx} sections={sections} located={located} rows={rows} />
+  return (
+    <MonsterActionDetail
+      ctx={ctx}
+      sections={sections}
+      located={located}
+      rows={rows}
+      weapons={[]}
+      weaponActions={[]}
+      allowAddWeapon={false}
+    />
+  )
 }
 
 const shot: MonsterActionDraftRow = {
@@ -78,10 +88,12 @@ describe('MonsterActionDetail advisories', () => {
   it('shows the attack panel and then the unequipped note', () => {
     render(<Host action={shot} equipped={false} catalogReady />)
 
-    const preview = screen.getByText('Attack preview')
+    const previewPanel = document.querySelector('.ui-panel--subtle')
     const alert = screen.getByText(`${shortbow.name} is not equipped.`)
-    expect(preview.closest('.ui-panel')).toBeTruthy()
-    expect(preview.compareDocumentPosition(alert) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(previewPanel).toBeTruthy()
+    expect(
+      previewPanel!.compareDocumentPosition(alert) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
     expect(alert.closest('.ui-alert')).toHaveClass('ui-alert--warning')
   })
 

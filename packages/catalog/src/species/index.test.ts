@@ -2,7 +2,13 @@ import { describe, expect, it } from 'vitest'
 
 import { expectRichTextHtml } from '../lib/expect-rich-text-html'
 import type { ContentTrait, GrantGroups } from '@rpg/contracts'
-import { normalizeGrantGroups, resolveTraitDisplay } from '@rpg/contracts'
+import {
+  normalizeGrantGroups,
+  renderTraitFacingBodyHtml,
+  resolveCreatureSenses,
+  resolveCreatureTraitGrants,
+  resolveTraitFacingParts,
+} from '@rpg/contracts'
 import { listLanguageSeedOptions } from '../vocabulary'
 import { loadSeedSpecies, seedSpeciesSlugs } from './index'
 
@@ -17,8 +23,10 @@ function grantGroupsOf(trait: {
   return trait.kind === 'template' ? undefined : trait.grantGroups
 }
 
+const speciesTraitHost = { host: 'species' as const }
+
 function traitDescriptionHtml(trait: ContentTrait): string | undefined {
-  return resolveTraitDisplay(trait).descriptionHtml
+  return renderTraitFacingBodyHtml(resolveTraitFacingParts(trait, speciesTraitHost))
 }
 
 function expectSpeciesRichTextDescriptions(entry: SeedSpecies): void {
@@ -95,6 +103,17 @@ describe('SRD 5.2.1 species seed', () => {
     expect(elf!.heritage!.options).toHaveLength(3)
   })
 
+  it('projects elf template darkvision and merges with drow heritage grants', () => {
+    const elf = species.find((s) => s.slug === 'elf')!
+    const drow = elf.heritage!.options.find((option) => option.id === 'drow')!
+    const grants = [
+      ...resolveCreatureTraitGrants(elf.traits.map((trait) => ({ trait, source: trait.id }))),
+      ...resolveCreatureTraitGrants([{ trait: drow, source: drow.id }]),
+    ].map((row) => row.grant)
+    expect(resolveCreatureSenses({ grants })).toEqual([{ type: 'darkvision', range: 120 }])
+    expect(grants.some((grant) => grant.kind === 'sense' && grant.range === 60)).toBe(true)
+  })
+
   it('Drow lineage grants darkvision 120 and level-gated spells', () => {
     const elf = species.find((s) => s.slug === 'elf')!
     const drow = elf.heritage!.options.find((o) => o.id === 'drow')!
@@ -106,13 +125,19 @@ describe('SRD 5.2.1 species seed', () => {
     expect(grantGroupsOf(drow)?.length).toBeGreaterThanOrEqual(3)
   })
 
-  it('grant darkvision traits derive display name and description', () => {
+  it('template darkvision traits derive display name and description', () => {
     const elf = species.find((s) => s.slug === 'elf')!
     const darkvision = elf.traits.find((t) => t.id === 'darkvision')!
-    expect(darkvision.kind).toBe('grant')
-    const display = resolveTraitDisplay(darkvision)
-    expect(display.name).toBe('Darkvision')
-    expect(display.descriptionHtml).toBe('<p>You have Darkvision with a range of 60 feet.</p>')
+    expect(darkvision.kind).toBe('template')
+    expect(darkvision).toMatchObject({
+      templateId: 'sense-darkvision',
+      config: { range: 60 },
+    })
+    const parts = resolveTraitFacingParts(darkvision, speciesTraitHost)
+    expect(parts.title).toBe('Darkvision')
+    expect(renderTraitFacingBodyHtml(parts)).toBe(
+      '<p>You have Darkvision with a range of 60 feet.</p>',
+    )
   })
 
   it('Wood Elf grants +5 ft walking speed', () => {

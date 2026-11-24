@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
   Text,
-  fieldArrayItemClasses,
+  fieldArrayItemVariants,
   fieldInlineSentenceClasses,
   fieldLabelVariants,
   fieldWidthVariants,
@@ -442,7 +442,7 @@ function ConditionSetEditor({
   return (
     <fieldset
       aria-label={conditionSetAriaLabel(setIndex)}
-      className={cn(fieldArrayItemClasses, 'space-y-4')}
+      className={cn(fieldArrayItemVariants({ variant: 'detailed' }), 'space-y-4')}
     >
       <div className="flex items-start gap-3">
         <div className="min-w-0 flex-1">

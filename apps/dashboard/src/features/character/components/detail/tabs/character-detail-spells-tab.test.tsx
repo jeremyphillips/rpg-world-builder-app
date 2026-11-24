@@ -9,7 +9,7 @@ import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
 } from '../../../lib/fixtures/character-builder-fixtures'
-import { SAMPLE_PC } from '../../../lib/fixtures/character-fixtures'
+import { makePcCharacter } from '../../../lib/fixtures/character-fixtures'
 import { buildCharacterSheetSpellCards } from '../../../lib/detail/character-sheet-catalog'
 import { CharacterDetailSpellsTab } from './character-detail-spells-tab'
 
@@ -37,7 +37,7 @@ function buildSpellCards() {
 
   return buildCharacterSheetSpellCards(
     {
-      ...SAMPLE_PC,
+      ...makePcCharacter(),
       spells: [
         {
           spellId: cantrip.id,
@@ -48,8 +48,8 @@ function buildSpellCards() {
               grantId: 'cantrips',
             },
           ],
-          access: { classKnown: true },
-          selection: { prepared: true },
+          access: {},
+          collections: [{ kind: 'prepared' }],
         },
         {
           spellId: firstLevel.id,
@@ -60,8 +60,8 @@ function buildSpellCards() {
               grantId: 'prepared',
             },
           ],
-          access: { classKnown: true },
-          selection: { prepared: true },
+          access: {},
+          collections: [{ kind: 'prepared' }],
         },
       ],
     },

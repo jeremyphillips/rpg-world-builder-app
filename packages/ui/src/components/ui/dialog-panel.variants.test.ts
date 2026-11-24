@@ -15,10 +15,8 @@ import {
   dialogPanelSectionInsetXClasses,
   dialogPanelSectionPaddingClasses,
   dialogPanelScrollRegionBottomInsetClasses,
-  dialogPanelScrollRegionClasses,
   dialogPanelScrollRegionFocusClearanceClasses,
   dialogPanelScrollRegionTopInsetClasses,
-  dialogPanelScrollRegionViewportClasses,
 } from './dialog-panel.variants'
 import { sheetFooterDockClasses } from './sheet.variants'
 import { modalContentVariants, modalOverlayClasses } from './modal.variants'
@@ -90,18 +88,6 @@ describe('dialog-panel variants', () => {
     expect(dialogPanelInnerLeadingScrollViewportClasses).toContain(
       dialogPanelScrollRegionTopInsetClasses,
     )
-  })
-
-  it('aliases deprecated viewport token to section preset', () => {
-    expect(dialogPanelScrollRegionViewportClasses).toBe(dialogPanelSectionScrollViewportClasses)
-  })
-
-  it('applies inner preset on deprecated inner scroll region alias', () => {
-    expect(dialogPanelScrollRegionClasses).toContain('min-h-0')
-    expect(dialogPanelScrollRegionClasses).toContain('flex-1')
-    expect(dialogPanelScrollRegionClasses).toContain(dialogPanelInnerScrollViewportClasses)
-    expect(dialogPanelScrollRegionClasses).not.toContain(dialogPanelSectionInsetXClasses)
-    expect(dialogPanelScrollRegionBottomInsetClasses).toBe('pb-6')
   })
 
   it('suppresses visible outlines on programmatic panel focus', () => {

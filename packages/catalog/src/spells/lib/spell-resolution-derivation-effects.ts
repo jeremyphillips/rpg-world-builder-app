@@ -81,12 +81,44 @@ export const SRD_521_SPELL_RESOLUTION_DERIVATION_EFFECTS = {
       damageType: 'lightning',
     },
   ],
+  'guiding-bolt': [
+    {
+      id: derivationEffectId('guiding-bolt', 'damage'),
+      kind: 'damage',
+      roll: { dice: { count: 4, faces: 6 } },
+      damageType: 'radiant',
+    },
+  ],
   'hellish-rebuke': [
     {
       id: derivationEffectId('hellish-rebuke', 'damage'),
       kind: 'damage',
       roll: { dice: { count: 2, faces: 10 } },
       damageType: 'fire',
+    },
+  ],
+  'ray-of-frost': [
+    {
+      id: derivationEffectId('ray-of-frost', 'damage'),
+      kind: 'damage',
+      roll: { dice: { count: 1, faces: 8 } },
+      damageType: 'cold',
+    },
+  ],
+  'shocking-grasp': [
+    {
+      id: derivationEffectId('shocking-grasp', 'damage'),
+      kind: 'damage',
+      roll: { dice: { count: 1, faces: 8 } },
+      damageType: 'lightning',
+    },
+  ],
+  'starry-wisp': [
+    {
+      id: derivationEffectId('starry-wisp', 'damage'),
+      kind: 'damage',
+      roll: { dice: { count: 1, faces: 8 } },
+      damageType: 'radiant',
     },
   ],
   'mass-cure-wounds': [

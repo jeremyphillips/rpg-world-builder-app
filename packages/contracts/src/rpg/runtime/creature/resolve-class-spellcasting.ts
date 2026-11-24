@@ -1,6 +1,5 @@
 import type { CharacterClass } from '../../content/classes/class'
 import {
-  CLASS_CANTRIP_CHOICE_SET_PROGRESSION_ID,
   CLASS_SPELLCASTING_CHOICE_SUFFIXES,
   type ClassSpellcastingChoiceSuffix,
   type Spellcasting,
@@ -75,6 +74,7 @@ function capacityCurve(progression: ClassCapacityProgression | undefined): Progr
 }
 
 function compileCantripProgression(
+  spellcasting: Spellcasting,
   progression: ClassSpellcastingProgression | undefined,
 ): CompiledSpellcastingChoiceProgression | null {
   if (!progression?.cantrips) return null
@@ -85,7 +85,7 @@ function compileCantripProgression(
     extension: progression.cantrips.extension,
     source: { kind: 'classList' },
     destination: 'cantrips',
-    mutation: IMMUTABLE_SPELL_MUTATION,
+    mutation: spellcasting.cantripSelection?.change ?? IMMUTABLE_SPELL_MUTATION,
     label: getSpellCollectionKindLabel('cantrips'),
     curve: capacityCurve(progression.cantrips),
     showInTable: true,
@@ -174,7 +174,7 @@ function compileChoiceProgressions(
   spellcasting: Spellcasting,
 ): CompiledSpellcastingChoiceProgression[] {
   const progressions: CompiledSpellcastingChoiceProgression[] = []
-  const cantrip = compileCantripProgression(spellcasting.progression)
+  const cantrip = compileCantripProgression(spellcasting, spellcasting.progression)
   if (cantrip) progressions.push(cantrip)
   progressions.push(
     ...compileSelectionProgressions(spellcasting.spellSelection, spellcasting.progression),
@@ -302,9 +302,6 @@ export function resolveClassDisplayChoiceColumns(
 ): ResolvedClassSpellcastingDisplayColumn[] {
   return resolved.displayColumns
 }
-
-/** @deprecated Use CLASS_SPELLCASTING_CHOICE_SUFFIXES.cantrips */
-export { CLASS_CANTRIP_CHOICE_SET_PROGRESSION_ID }
 
 /** Default L1+ column label when spellSelection omits columnLabel. */
 export { DEFAULT_SPELL_SELECTION_COLUMN_LABEL }

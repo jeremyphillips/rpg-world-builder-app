@@ -1,6 +1,11 @@
 import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
-import { type CharacterClass, type SkillProficiency, type Subclass } from '@rpg/contracts'
+import {
+  CLASS_PROGRESSION_TABLE_LABEL,
+  type CharacterClass,
+  type SkillProficiency,
+  type Subclass,
+} from '@rpg/contracts'
 
 import {
   formatContentNotFoundMessage,
@@ -26,6 +31,7 @@ import { ClassProgressionTable } from '../components/detail/class-progression-ta
 import { ClassDetailBody } from '../components/detail/class-detail-body'
 import { ContentDetailSection } from '../../lib/detail/page/content-detail-section'
 import { buildClassDetailViewModel, projectVisibleClassFeatures } from '../lib/class-display'
+import { useSpells } from '../../spells/hooks/use-spells'
 
 type ClassDetailContentProps = {
   characterClass: CharacterClass
@@ -64,6 +70,11 @@ export function ClassDetailContent({
     [characterClass.rulesetId, rulesetPatch?.characterCreation.progression.spellcasting],
   )
   const subclassingEnabled = campaignRules.subclassing.enabled
+  const spellsQuery = useSpells(campaignId)
+  const spellsById = useMemo(
+    () => new Map(spellsQuery.data?.map((spell) => [spell.id, spell]) ?? []),
+    [spellsQuery.data],
+  )
   const visibleFeatures = projectVisibleClassFeatures(characterClass.features, {
     subclassingEnabled,
   })
@@ -79,6 +90,9 @@ export function ClassDetailContent({
   const viewModel = buildClassDetailViewModel(characterClass, vocabulary, {
     surface: 'content-detail',
     features: visibleFeatures,
+    characterClass,
+    spellcastingProgression,
+    spellsById,
   })
 
   return (
@@ -104,7 +118,7 @@ export function ClassDetailContent({
       progressionTable={
         showProgressionTable ? (
           <ContentDetailSection
-            heading="Class Progression"
+            heading={CLASS_PROGRESSION_TABLE_LABEL}
             headingId="progression-heading"
             bodyLayout="flush"
           >

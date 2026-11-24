@@ -37,6 +37,18 @@ describe('species trait field configuration', () => {
     expect(JSON.stringify(fields)).not.toContain('Trait kind')
   })
 
+  it('omits a body name field for custom traits', () => {
+    const names = flattenFields(traitItemFields({} as Parameters<typeof traitItemFields>[0]))
+      .filter((field) => field.type === 'text')
+      .map((field) => resolveFieldConfigPrimaryName(field))
+    expect(names).not.toContain('name')
+  })
+
+  it('omits grant name override from the field list', () => {
+    const serialized = JSON.stringify(traitItemFields({} as Parameters<typeof traitItemFields>[0]))
+    expect(serialized).not.toContain('"nameOverride"')
+  })
+
   it('defaults omitted kind to custom on the draft schema', () => {
     const parsed = traitRowDraftFormSchema.parse({
       name: 'Keen Senses',

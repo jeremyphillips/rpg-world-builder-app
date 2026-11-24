@@ -1,10 +1,8 @@
 import type { LanguageSeedOption } from '../../../vocab/language'
 import { classFeaturesUnlockedAtLevel } from '../../../content/classes/class-feature-availability'
 import type { CharacterClass } from '../../../content/classes/class'
-import {
-  getUnlockedGrantsAtLevel,
-  resolveGrantGroupsFromContent,
-} from '../../../content/lib/grants'
+import { getUnlockedGrantsAtLevel } from '../../../content/lib/grants'
+import { resolveClassFeatureGrantGroups } from '../../../content/classes/resolve-class-feature-grant-groups'
 import { resolveLanguageIdsFromGrantSet } from '../../creature/languages'
 import {
   assembleLanguageProficiencyIds,
@@ -83,7 +81,7 @@ function classFeatureLanguageProficiencies(
   const entries: CharacterProficiencies['languages'] = []
 
   for (const feature of classFeaturesUnlockedAtLevel(characterClass.features, characterLevel)) {
-    const groups = resolveGrantGroupsFromContent(feature, { level: feature.level })
+    const groups = resolveClassFeatureGrantGroups(feature)
     const grants = getUnlockedGrantsAtLevel(groups, characterLevel, feature.level)
 
     for (const grant of grants) {

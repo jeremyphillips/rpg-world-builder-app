@@ -26,6 +26,8 @@ import {
   resolveChoiceAggregateCount,
 } from '../../format-choice-step-copy'
 import { resolveChoiceSetAvailability } from '../../resolve-choice-set-availability'
+import { CLASS_SPELLCASTING_CHOICE_SUFFIXES } from '../../../../content/classes/spellcasting'
+import { findCompiledChoiceProgressionBySuffix } from '../../../creature/resolve-class-spellcasting'
 import type { BuilderSpellcastingProfile } from './builder-spellcasting'
 import {
   resolveSpellAcquisitionDestination,
@@ -200,11 +202,16 @@ function buildClassCantripAcquisitionCopy(
   choiceSet: ChoiceSet,
   profile: BuilderSpellcastingProfile,
 ): string[] {
+  const cantripProgression = findCompiledChoiceProgressionBySuffix(
+    profile.resolved,
+    CLASS_SPELLCASTING_CHOICE_SUFFIXES.cantrips,
+  )
   return spellAcquisitionCopyLines(
     formatCantripAcquisitionCopy(
       profile.className,
       choiceSet.max,
       resolveChoiceSetRequiredToComplete(choiceSet),
+      cantripProgression?.mutation,
     ),
   )
 }

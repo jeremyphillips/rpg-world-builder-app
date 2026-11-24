@@ -11,17 +11,22 @@ import { CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN } from '../lib/class-feature-form
 import {
   classFeatureItemFields,
   featureItemEyebrow,
-  featureItemTitle,
+  resolveClassFeatureFieldSections,
+  resolveClassFeatureItemFields,
   type FeatureRowForm,
 } from '../lib/class-feature-form-fields'
+import { createClassFeatureRowTitleConfig } from '../lib/class-feature-row-title'
 import { isSubclassChoiceFeatureRow } from '../lib/class-subclass-choice-features'
 import type { ClassFormValues } from '../lib/class-form-fields'
 import { CLASS_SPELLCASTING_REMOVE_CONFIRM } from '../lib/class-spellcasting-confirm-copy'
+import { classFeatureKindLabel } from '../lib/class-feature-authoring'
 import {
   isSpellcastingGrantingFeatureRow,
   removeSpellcastingFromFormValues,
 } from '../lib/class-spellcasting-lifecycle'
 import { buildSpellcastingFeatureAvailabilityFormFields } from '../lib/class-spellcasting-feature-availability-form-fields'
+import { ClassFeatureAddMenu } from './class-feature-add-menu'
+import { useClassFeatureFacingHost } from '../../facing/use-class-feature-facing-host'
 
 const FEATURES_FIELD_NAME = 'features'
 
@@ -51,6 +56,8 @@ export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
   const [spellcastingRemoveOpen, setSpellcastingRemoveOpen] = useState(false)
 
   const features = useWatch({ name: FEATURES_FIELD_NAME }) as FeatureRowForm[] | undefined
+  const className = useWatch({ name: 'name' }) as string | undefined
+  const classSlug = useWatch({ name: 'slug' }) as string | undefined
 
   const handleRequestRemove = useCallback(
     (index: number) => {
@@ -70,6 +77,15 @@ export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
       requestRemove: handleRequestRemove,
     }),
     [baseEditor, handleRequestRemove],
+  )
+
+  const handleAddFeatureRows = useCallback(
+    (rows: FeatureRowForm[]) => {
+      for (const row of rows) {
+        editor.appendRow(row)
+      }
+    },
+    [editor],
   )
 
   const previousFieldsLengthRef = useRef(editor.fields.length)
@@ -131,6 +147,24 @@ export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
     [],
   )
 
+  const rowTitle = useMemo(() => createClassFeatureRowTitleConfig(className ?? ''), [className])
+
+  const resolveItemFields = useCallback(
+    (row: unknown) => resolveClassFeatureItemFields(row as FeatureRowForm | undefined, formCtx),
+    [formCtx],
+  )
+
+  const resolveFieldSections = useCallback(
+    (row: unknown) => resolveClassFeatureFieldSections(row as FeatureRowForm | undefined, formCtx),
+    [formCtx],
+  )
+
+  const facing = useClassFeatureFacingHost({
+    formCtx,
+    fieldName: FEATURES_FIELD_NAME,
+    selectedIndex: editor.selectedIndex,
+  })
+
   const handleConfirmSpellcastingRemove = useCallback(() => {
     const patch = removeSpellcastingFromFormValues(getValues())
     for (const [key, value] of Object.entries(patch)) {
@@ -148,19 +182,34 @@ export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
         formCtx={formCtx}
         fieldName={FEATURES_FIELD_NAME}
         itemFields={fields}
+        resolveItemFields={resolveItemFields}
+        resolveFieldSections={resolveFieldSections}
         itemNoun={CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN}
         listTitle="Features"
         ariaLabel="Features"
         addLabel="Add feature"
         idPrefix="class-feature"
         editor={editor}
-        mapListItem={({ row }) => ({
-          title: featureItemTitle(row as FeatureRowForm | undefined),
-          eyebrow: featureItemEyebrow(row as FeatureRowForm | undefined),
-        })}
+        addControl={
+          <ClassFeatureAddMenu
+            features={features}
+            className={className ?? ''}
+            classSlug={classSlug ?? ''}
+            onAddRows={handleAddFeatureRows}
+          />
+        }
+        rowTitle={rowTitle}
+        resolveListMeta={({ row }) => {
+          const featureRow = row as FeatureRowForm | undefined
+          return {
+            eyebrow: featureItemEyebrow(featureRow),
+            kindLabel: classFeatureKindLabel(featureRow?.kind),
+          }
+        }}
         resolveRowReasons={resolveRowReasons}
         resolveAvailabilityFormItems={resolveAvailabilityFormItems}
         access={{ kind: 'availability', fieldName: 'available' }}
+        facing={facing}
       />
       <ConfirmDialog
         open={spellcastingRemoveOpen}

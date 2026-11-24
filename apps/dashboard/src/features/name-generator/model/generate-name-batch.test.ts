@@ -62,12 +62,12 @@ describe('generateNameBatch', () => {
     const first = await generateNameBatch(
       filters,
       { seed: 'batch-seed', count: 3 },
-      { loadCollection, conventions, getConvention },
+      { loadCollection, conventions, getStaticConvention: getConvention },
     )
     const second = await generateNameBatch(
       filters,
       { seed: 'batch-seed', count: 3 },
-      { loadCollection, conventions, getConvention },
+      { loadCollection, conventions, getStaticConvention: getConvention },
     )
 
     expect(first.results).toEqual(second.results)
@@ -126,7 +126,7 @@ describe('generateNameBatch', () => {
       {
         loadCollection,
         conventions: orcConventions,
-        getConvention: (conventionId) =>
+        getStaticConvention: (conventionId) =>
           conventionId === 'orc-personal' ? givenOnlyOrcPersonal : getOrcConvention(conventionId),
       },
     )

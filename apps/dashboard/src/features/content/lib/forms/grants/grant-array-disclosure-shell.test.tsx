@@ -5,9 +5,15 @@ import { z } from 'zod'
 
 import { Form, type FormItem } from '@rpg/ui/form'
 
+import type { Spell } from '@rpg/contracts'
+
 import { createGrantArrayItemShell } from './grant-array-item-shell.lib'
 import { GRANT_ROW_TYPE_LABELS } from './grant-form-schema'
-import { resolveGrantRowPresentation } from './grant-row-presentation.lib'
+import {
+  buildGrantEquipmentReferencePresentationFromAuthoring,
+  buildGrantSpellReferencePresentationFromAuthoring,
+  resolveGrantRowPresentation,
+} from './grant-row-presentation.lib'
 
 const grantRowSchema = z.object({
   grantType: z.literal('spells'),
@@ -24,15 +30,24 @@ const formSchema = z.object({
 
 const grantHeaderContext = {
   rowLabels: GRANT_ROW_TYPE_LABELS,
-  equipmentOptions: [],
+  equipmentReferences: buildGrantEquipmentReferencePresentationFromAuthoring({
+    status: 'ready',
+    scope: { rulesetId: 'srd-cc-5.2.1', campaignId: 'campaign-1' },
+    equipmentById: new Map(),
+  }),
   weaponOptions: [],
   toolOptions: [],
   armorOptions: [],
   skillOptions: [],
-  spellOptions: [
-    { value: 'speak-with-animals', label: 'Speak with Animals' },
-    { value: 'light', label: 'Light' },
-  ],
+  spellReferences: buildGrantSpellReferencePresentationFromAuthoring({
+    status: 'ready',
+    spellsById: new Map(
+      [
+        { id: 'speak-with-animals', name: 'Speak with Animals', level: 1 },
+        { id: 'light', name: 'Light', level: 0 },
+      ].map((spell) => [spell.id, spell as Spell]),
+    ),
+  }),
 }
 
 const grantFields: FormItem[] = [

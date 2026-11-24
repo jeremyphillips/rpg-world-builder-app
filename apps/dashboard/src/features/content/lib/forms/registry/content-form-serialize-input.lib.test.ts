@@ -2,17 +2,17 @@ import {
   contentMediaSchema,
   createUploadRoleAssignment,
   emptyContentMediaSchema,
+  hasAuthoredContentMediaForCatalogWrite,
 } from '@rpg/contracts'
 import { describe, expect, it, vi } from 'vitest'
 
 import {
-  hasAuthoredContentMedia,
   isManagedContentMediaDirty,
   serializeContentFormInput,
 } from './content-form-serialize-input.lib'
 
 const mediaEnabledDef = {
-  routeKey: 'classes',
+  routeKey: 'classes' as const,
   supportsManagedMedia: true as const,
   mediaDomain: 'class' as const,
   toInput: vi.fn(() => ({ name: 'Test Class' })),
@@ -39,13 +39,13 @@ describe('isManagedContentMediaDirty', () => {
   })
 })
 
-describe('hasAuthoredContentMedia', () => {
+describe('hasAuthoredContentMediaForCatalogWrite', () => {
   it('returns false for canonical empty media', () => {
-    expect(hasAuthoredContentMedia(emptyContentMediaSchema)).toBe(false)
+    expect(hasAuthoredContentMediaForCatalogWrite(emptyContentMediaSchema)).toBe(false)
   })
 
   it('returns true when gallery images exist', () => {
-    expect(hasAuthoredContentMedia(authoredMedia)).toBe(true)
+    expect(hasAuthoredContentMediaForCatalogWrite(authoredMedia)).toBe(true)
   })
 })
 
@@ -131,7 +131,7 @@ describe('serializeContentFormInput', () => {
 
   it('skips media merge when def does not support managed media', () => {
     const def = {
-      routeKey: 'spells',
+      routeKey: 'spells' as const,
       supportsManagedMedia: false,
       toInput: vi.fn(() => ({ name: 'Spell' })),
     }

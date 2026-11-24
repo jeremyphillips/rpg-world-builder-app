@@ -1,5 +1,5 @@
 import { loadSeedSpells } from '@rpg/catalog/spells'
-import type { GrantGroup, SpeciesTrait } from '@rpg/contracts'
+import type { GrantGroup, SpeciesBodyTrait } from '@rpg/contracts'
 
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
@@ -16,7 +16,7 @@ export function getCatalogWoodElfHeritageGrantGroups(): GrantGroup[] {
 }
 
 /** Catalog Wood Elf heritage option from the Elf species seed. */
-export function getCatalogWoodElfHeritageOption(): SpeciesTrait {
+export function getCatalogWoodElfHeritageOption(): SpeciesBodyTrait {
   const elf = pickSpecies('elf')
   const woodElf = elf.heritage?.options.find((option) => option.id === 'wood-elf')
   if (!woodElf) {
@@ -28,7 +28,7 @@ export function getCatalogWoodElfHeritageOption(): SpeciesTrait {
 /** Catalog Druidic feature grant groups from the Druid class seed. */
 export function getCatalogDruidDruidicGrantGroups(): GrantGroup[] {
   const druidic = getCatalogDruidDruidicFeature()
-  return druidic.grantGroups ?? []
+  return druidic.kind === 'custom' ? (druidic.grantGroups ?? []) : []
 }
 
 /** Catalog Druidic class feature from the Druid class seed. */
@@ -56,7 +56,7 @@ export function getCatalogBlackDragonHeritageGrantGroups(): GrantGroup[] {
 }
 
 /** Catalog Black Dragon heritage option from the Dragonborn species seed. */
-export function getCatalogBlackDragonHeritageOption(): SpeciesTrait {
+export function getCatalogBlackDragonHeritageOption(): SpeciesBodyTrait {
   const dragonborn = pickSpecies('dragonborn')
   const blackDragon = dragonborn.heritage?.options.find((option) => option.id === 'black')
   if (!blackDragon) {
@@ -66,7 +66,7 @@ export function getCatalogBlackDragonHeritageOption(): SpeciesTrait {
 }
 
 /** Catalog Drow heritage option from the Elf species seed. */
-export function getCatalogDrowHeritageOption(): SpeciesTrait {
+export function getCatalogDrowHeritageOption(): SpeciesBodyTrait {
   const elf = pickSpecies('elf')
   const drow = elf.heritage?.options.find((option) => option.id === 'drow')
   if (!drow) {
@@ -110,7 +110,7 @@ export function getDrowHeritageSpellCatalog() {
 export const DROW_HERITAGE_GROUPED_SUMMARY_WITH_SUFFIX = [
   {
     label: 'L1',
-    text: joinInlineMetadata(['Darkvision 120 ft', 'Dancing Lights cantrip']),
+    text: joinInlineMetadata(['Darkvision 120 ft.', 'Dancing Lights cantrip']),
   },
   {
     label: 'L3',
