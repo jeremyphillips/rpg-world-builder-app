@@ -1,4 +1,8 @@
-import { joinStatBlockProseDocument, systemDefaultArmorClassRules } from '@rpg/contracts'
+import {
+  joinStatBlockProseDocument,
+  monsterActionSectionRows,
+  systemDefaultArmorClassRules,
+} from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import { pickEquipment, pickMonster, pickSpell } from '@/test/fixtures/pick'
@@ -8,6 +12,11 @@ import type { MonsterFormValues } from '../monster-form-values'
 import { normalizeMonsterFormValues } from '../normalize-monster-form-values'
 
 import { resolveActionStatBlockRulesFacingForForm } from './resolve-action-stat-block-rules-facing-for-form'
+
+import {
+  buildSpellDisplayContext,
+  resolveActionStatBlockRulesFacing,
+} from './resolve-action-stat-block-rules-facing'
 
 function baseCtx(overrides: Partial<ContentFormCtx> = {}): ContentFormCtx {
   return {
@@ -238,6 +247,132 @@ describe('resolveActionStatBlockRulesFacingForForm', () => {
       status: 'ready',
       facing: { descriptionHtml: expect.stringContaining('Fireball') },
     })
+  })
+
+  it('resolves a saving throw from a shared casting ability without either catalog', () => {
+    const breath = pickMonster('hell-hound').actions.find((row) => row.kind === 'save')
+    if (!breath) throw new Error('Missing saving throw fixture')
+    const action = {
+      ...breath,
+      dcSource: {
+        kind: 'spellcasting' as const,
+        castingAbility: { kind: 'shared' as const, entryId: 'casting' },
+      },
+    }
+    const values = baseValues({
+      actions: [
+        action,
+        {
+          id: 'casting',
+          kind: 'spell',
+          name: 'Spellcasting',
+          castingAbility: { kind: 'ability', ability: 'dex' },
+          spells: [],
+        },
+      ],
+    })
+    const request = {
+      actionId: action.id,
+      section: 'actions',
+      ctx: baseCtx({ equipmentCatalogStatus: 'error', spellCatalogStatus: 'error' }),
+    } as const
+
+    const ready = resolveActionStatBlockRulesFacingForForm({ ...request, values })
+    expect(ready.status).toBe('ready')
+    if (ready.status === 'ready') {
+      expect(joinStatBlockProseDocument(ready.facing.rulesProse ?? [])).toContain('DC 12')
+    }
+
+    expect(
+      resolveActionStatBlockRulesFacingForForm({
+        ...request,
+        values: { ...values, actions: [action] },
+      }),
+    ).toEqual({ status: 'unavailable', reason: { code: 'missing-action-reference' } })
+  })
+
+  it('shows authored saving-throw prose with a fixed DC during catalog failures', () => {
+    const outcome = resolveActionStatBlockRulesFacingForForm({
+      values: baseValues({
+        actions: [
+          {
+            id: 'roar',
+            kind: 'special',
+            name: 'Roar',
+            savingThrow: {
+              ability: 'wis',
+              dcSource: { kind: 'fixed', dc: 14 },
+              targets: 'each creature nearby',
+              failure: 'The target is Frightened.',
+            },
+          },
+        ],
+      }),
+      ctx: baseCtx({ equipmentCatalogStatus: 'error', spellCatalogStatus: 'error' }),
+      actionId: 'roar',
+      section: 'actions',
+    })
+    expect(outcome.status).toBe('ready')
+    if (outcome.status === 'ready') {
+      expect(joinStatBlockProseDocument(outcome.facing.rulesProse ?? [])).toContain('DC 14')
+    }
+  })
+
+  it.each([
+    ['hell-hound', 'actions', 'fire-breath'],
+    ['hell-hound', 'bonusActions', 'test-teleport'],
+    ['knight', 'reactions', 'parry'],
+    ['lich', 'legendaryActions', 'disrupt-life'],
+  ] as const)(
+    'keeps %s %s draft and published rules aligned during catalog failures',
+    (slug, section, id) => {
+      const monster = pickMonster(slug)
+      const body =
+        section === 'bonusActions'
+          ? {
+              ...monster,
+              bonusActions: [{ kind: 'teleport' as const, id, name: 'Teleport', distanceFeet: 40 }],
+            }
+          : monster
+      const action = monsterActionSectionRows<
+        Parameters<typeof resolveActionStatBlockRulesFacing>[0]
+      >(body, section).find((row) => row.id === id)
+      if (!action) throw new Error('Missing section parity fixture')
+      const published = resolveActionStatBlockRulesFacing(
+        action,
+        section,
+        null,
+        'error',
+        buildSpellDisplayContext({
+          monster: body,
+          catalogState: 'error',
+          equipmentById: new Map(),
+          magicPropertyProvider: () => undefined,
+        }),
+        new Map(),
+      )
+      const preview = resolveActionStatBlockRulesFacingForForm({
+        values: body as unknown as MonsterFormValues,
+        ctx: baseCtx({ equipmentCatalogStatus: 'error', spellCatalogStatus: 'error' }),
+        actionId: id,
+        section,
+      })
+      expect(preview).toMatchObject({ status: 'ready', facing: published })
+    },
+  )
+
+  it('reports unsupported action kinds as invalid draft data', () => {
+    const values = baseValues({
+      actions: [{ id: 'unknown', kind: 'unsupported-kind' } as never],
+    })
+    expect(
+      resolveActionStatBlockRulesFacingForForm({
+        values,
+        ctx: baseCtx(),
+        actionId: 'unknown',
+        section: 'actions',
+      }),
+    ).toEqual({ status: 'invalid', reason: { code: 'unsupported-kind' } })
   })
 
   it('distinguishes weapon selection, equipment lifecycle, and missing references', () => {

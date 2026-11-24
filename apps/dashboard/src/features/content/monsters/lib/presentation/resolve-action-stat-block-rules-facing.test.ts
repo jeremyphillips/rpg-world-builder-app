@@ -15,7 +15,6 @@ import { buildMonsterDetailViewModel, tryDeriveMonsterStatBlock } from '../monst
 
 import {
   buildSpellDisplayContext,
-  MONSTER_UNRESOLVED_CATALOG_REFERENCE,
   resolveActionStatBlockRulesFacing,
   resolveActionStatBlockRulesFacingList,
 } from './resolve-action-stat-block-rules-facing'
@@ -229,24 +228,30 @@ describe('mapSaveActionFacing', () => {
     expect(plain).not.toContain(supplemental)
   })
 
-  it('preserves fallback descriptionHtml when structured rules are unavailable', () => {
+  it('preserves published saving throw rules when equipment is unavailable', () => {
     const monster = pickMonster('hell-hound')
-    const derived = lichDerived(monster)
-    const spellContext = lichSpellContext(monster)
     const breath = availableBodyRows(monster.actions).find((row) => row.id === 'fire-breath')
-    expect(breath?.kind).toBe('save')
+    if (!breath) throw new Error('Missing Fire Breath fixture')
 
-    const facing = resolveActionStatBlockRulesFacing(
-      breath!,
+    const ready = resolveActionStatBlockRulesFacing(
+      breath,
       'actions',
-      derived,
+      lichDerived(monster),
+      'ready',
+      lichSpellContext(monster),
+      new Map(),
+    )
+    const unavailable = resolveActionStatBlockRulesFacing(
+      breath,
+      'actions',
+      null,
       'error',
-      spellContext,
+      lichSpellContext(monster),
       new Map(),
     )
 
-    expect(facing.rulesProse).toBeUndefined()
-    expect(facing.descriptionHtml).toContain(MONSTER_UNRESOLVED_CATALOG_REFERENCE)
+    expect(joinStatBlockProseDocument(unavailable.rulesProse ?? [])).toContain('Saving Throw')
+    expect(unavailable.rulesProse).toEqual(ready.rulesProse)
   })
 
   it('includes the turn-limit sentence once in structured rules for save actions', () => {

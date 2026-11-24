@@ -3,6 +3,7 @@ import {
   appendMonsterActionSupplementalText,
   availableBodyRows,
   deriveSpellcastingLines,
+  findSpellCastingSource,
   formatMonsterActionReference,
   formatMonsterAttackAction,
   formatMonsterForms,
@@ -136,7 +137,7 @@ function proficiencyBonusForDisplay(
   derived: DerivedMonsterStatBlock | null | undefined,
 ): number {
   if (derived) return derived.proficiencyBonus
-  return CHALLENGE_RATING_MECHANICS[monster.challengeRating].proficiencyBonus
+  return CHALLENGE_RATING_MECHANICS[monster.challengeRating]?.proficiencyBonus ?? 0
 }
 
 function spellcastingAbilityScore(
@@ -147,16 +148,8 @@ function spellcastingAbilityScore(
   if (source.kind === 'ability') {
     return monster.abilityScores[source.ability]
   }
-  const sections = [monster.actions, monster.bonusActions, monster.reactions] as const
-  for (const section of sections) {
-    for (const entry of section) {
-      if (entry.kind !== 'spell' || entry.id !== source.entryId || !entry.castingAbility) continue
-      if (entry.castingAbility.kind === 'ability') {
-        return monster.abilityScores[entry.castingAbility.ability]
-      }
-    }
-  }
-  return undefined
+  const shared = findSpellCastingSource(monster, source.entryId)
+  return shared ? monster.abilityScores[shared.ability] : undefined
 }
 
 function spellcastingAbilityScoreForSave(
@@ -257,15 +250,9 @@ function formatSaveActionContent(
   monster: Monster,
   action: Extract<MonsterAction | MonsterReaction, { kind: 'save' }>,
   derived: DerivedMonsterStatBlock | null | undefined,
-  catalogState: MonsterCatalogLoadState,
   displayName: string,
 ): { rulesProse?: StatBlockProseDocument; fallbackBody?: string } {
-  if (catalogState !== 'ready' || !action.resolution || !action.dcSource) {
-    if (catalogState === 'error') {
-      return { fallbackBody: MONSTER_UNRESOLVED_CATALOG_REFERENCE }
-    }
-    return {}
-  }
+  if (!action.resolution || !action.dcSource) return {}
   const formatted = formatMonsterSaveAction({
     action: { ...action, resolution: action.resolution, dcSource: action.dcSource },
     name: displayName,
@@ -382,7 +369,6 @@ function mapSaveActionFacing(
   action: Extract<MonsterAction | MonsterReaction, { kind: 'save' }>,
   name: string,
   derived: DerivedMonsterStatBlock | null | undefined,
-  catalogState: MonsterCatalogLoadState,
   spells: SpellDisplayContext,
   identityName: string,
 ): MonsterActionRulesFacing {
@@ -390,7 +376,6 @@ function mapSaveActionFacing(
     spells.monster,
     action,
     derived,
-    catalogState,
     identityName,
   )
   const rulesWithTurn = appendTurnLimitToDocument(rulesProse, action, spells.monsterName, false)
@@ -699,7 +684,6 @@ function resolveActionFacingBody(
         action as Extract<MonsterAction | MonsterLegendaryAction, { kind: 'save' }>,
         name,
         derived,
-        catalogState,
         spells,
         identityName,
       )
@@ -746,8 +730,8 @@ function resolveActionFacingBody(
         spells,
       )
     default: {
-      const _exhaustive: never = kind
-      return _exhaustive
+      const unsupported: never = kind
+      throw new Error('Unsupported monster action kind', { cause: unsupported })
     }
   }
 }

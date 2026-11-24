@@ -1,7 +1,9 @@
 import {
   availableBodyRows,
   CHALLENGE_RATING_MECHANICS,
+  MONSTER_ACTION_KINDS,
   deriveSpellcastingLines,
+  findSpellCastingSource,
   createSpellCatalogContext,
   resolveSpellReferenceOutcome,
   isMonsterActionAttackKind,
@@ -48,6 +50,7 @@ type PublishedAction = MonsterAction | MonsterBonusAction | MonsterReaction | Mo
 export type MonsterActionRulesPreviewOutcome =
   | { status: 'unavailable'; reason: FacingReason }
   | { status: 'incomplete'; reason: FacingReason }
+  | { status: 'invalid'; reason: FacingReason }
   | { status: 'failed'; reason: FacingReason }
   | {
       status: 'ready'
@@ -85,20 +88,10 @@ function spellCatalogReason(ctx: ContentFormCtx): FacingReason {
   return { code: 'catalog-pending', catalog: 'spells' }
 }
 
-function unavailableActionCatalog(ctx: ContentFormCtx): FacingReason | undefined {
-  if (ctx.equipmentCatalogStatus === 'pending' || ctx.equipmentCatalogStatus === 'error') {
-    return equipmentCatalogReason(ctx)
-  }
-  if (ctx.spellCatalogStatus === 'pending' || ctx.spellCatalogStatus === 'error') {
-    return spellCatalogReason(ctx)
-  }
-  return undefined
-}
-
 function canResolveWithoutDerivedStats(action: PublishedAction): boolean {
   switch (action.kind) {
     case 'special':
-      return !action.savingThrow
+    case 'save':
     case 'leap':
     case 'teleport':
     case 'take-actions':
@@ -175,6 +168,18 @@ function spellCatalogReferenceReason(
   return undefined
 }
 
+function savingThrowSourceReason(
+  action: Extract<PublishedAction, { kind: 'save' | 'special' }>,
+  monster: Monster,
+): FacingReason | undefined {
+  const source = action.kind === 'save' ? action.dcSource : action.savingThrow?.dcSource
+  if (source?.kind !== 'spellcasting' || source.castingAbility?.kind !== 'shared') return undefined
+  if (!findSpellCastingSource(monster, source.castingAbility.entryId)) {
+    return { code: 'missing-action-reference' }
+  }
+  return undefined
+}
+
 function selectedActionCatalogReason(
   action: PublishedAction,
   monster: Monster,
@@ -191,10 +196,12 @@ function selectedActionCatalogReason(
   if (action.kind === 'action-reference' || action.kind === 'parry') {
     return referencedActionReason(action, monster, ctx)
   }
-  if (canResolveWithoutDerivedStats(action)) return undefined
+  if (action.kind === 'save' || action.kind === 'special') {
+    return savingThrowSourceReason(action, monster)
+  }
   if (isMonsterActionAttackKind(action.kind)) return attackCatalogReason(action, monster, ctx)
   if (action.kind === 'spell') return spellCatalogReferenceReason(action.spells, ctx)
-  return unavailableActionCatalog(ctx)
+  return undefined
 }
 
 function derivedAttackReason(
@@ -342,6 +349,10 @@ export function resolveActionStatBlockRulesFacingForForm(input: {
     })
     const selected = sectionRows(normalized, input.section).find((row) => row.id === input.actionId)
     if (!selected) return { status: 'incomplete', reason: { code: 'missing-rules-text' } }
+
+    if (!MONSTER_ACTION_KINDS.includes(selected.kind)) {
+      return { status: 'invalid', reason: { code: 'unsupported-kind' } }
+    }
 
     action = selected
     if (action.kind === 'weapon' && !action.equipmentEntryId) {
