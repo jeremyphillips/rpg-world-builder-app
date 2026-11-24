@@ -1,4 +1,5 @@
 import {
+  DEFAULT_SYSTEM_RULESET_ID,
   SPELL_CONTENT_TYPE_TERM,
   formatAreaGeometry,
   formatSlugAsLabel,
@@ -12,6 +13,7 @@ import {
   spellDeliveryMethodSchema,
   type ContentMedia,
   type Spell,
+  type SystemRulesetId,
 } from '@rpg/contracts'
 import { formatPreviewRailOverflowList, type PreviewRailFact } from '@rpg/ui'
 
@@ -70,7 +72,7 @@ import {
 import { SPELL_DELIVERY_METHOD_NONE } from './spell-form-labels'
 
 const PREVIEW_SPELL_ENVELOPE = {
-  rulesetId: 'srd-cc-5.2.1' as const,
+  rulesetId: DEFAULT_SYSTEM_RULESET_ID as SystemRulesetId,
   campaignId: null,
   createdAt: '',
   updatedAt: '',

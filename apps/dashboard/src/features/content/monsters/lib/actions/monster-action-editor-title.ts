@@ -124,10 +124,10 @@ export function monsterActionEditorTitles(
   section?: MonsterActionSection,
 ): Map<string, string> {
   const sourceTitles = referenceSourceTitles(values, ctx, section)
-  const resolved = rows.map((action) => ({
-    action,
-    identity: resolveMonsterFormActionIdentity(action, values, ctx),
-  }))
+  const resolved = rows.flatMap((action) => {
+    if (!action || typeof action.kind !== 'string') return []
+    return [{ action, identity: resolveMonsterFormActionIdentity(action, values, ctx) }]
+  })
   const titles = new Map<string, string>()
   const taken = new Set<string>()
   const pendingByKind = new Map<string, string[]>()

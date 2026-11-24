@@ -41,7 +41,7 @@ describe('monster lair XP publish resolver', () => {
     values.challengeRating = '10'
     values.lair = { enabled: true, experience: { mode: 'custom', value: 1 } }
 
-    const result = await resolver(values, undefined, {
+    const result = await resolver(values as never, undefined, {
       fields: {},
       shouldUseNativeValidation: false,
     })
@@ -68,7 +68,7 @@ describe('monster lair XP publish resolver', () => {
     values.challengeRating = '10'
     values.lair = { enabled: true, experience: { mode: 'custom', value: 1 } }
 
-    const result = await resolver(values, undefined, {
+    const result = await resolver(values as never, undefined, {
       fields: {},
       shouldUseNativeValidation: false,
     })
@@ -86,7 +86,7 @@ describe('monster lair XP publish resolver', () => {
     values.alignment = 'n'
     values.challengeRating = '21'
     values.lair = { enabled: true, experience: { mode: 'custom', value: 1 } }
-    const issues = evaluateContentPublishValidation(publishSchema, values, fields)
+    const issues = evaluateContentPublishValidation(publishSchema, values as never, fields)
     expect(issues?.some((issue) => issue.path === 'lair.experience.value')).toBe(true)
   })
 
@@ -112,7 +112,7 @@ describe('monster lair XP publish resolver', () => {
       lair: { enabled: true, experience: { mode: 'custom', value: 1 } },
     }
     const resolver = makeResolver(loaded.schema, fields)
-    const result = await resolver(values, undefined, {
+    const result = await resolver(values as never, undefined, {
       fields: {},
       shouldUseNativeValidation: false,
     })
@@ -146,7 +146,7 @@ describe('monster lair XP publish resolver', () => {
       lair: { enabled: true, experience: { mode: 'custom', value: 1 } },
     }
     const resolver = makeResolver(loaded.schema, fields)
-    const result = await resolver(values, undefined, {
+    const result = await resolver(values as never, undefined, {
       fields: {},
       shouldUseNativeValidation: false,
     })
@@ -157,11 +157,11 @@ describe('monster lair XP publish resolver', () => {
   it('returns lair error when forms is only a partial definedForms array', async () => {
     const lich = getMonsterBySlug('srd-cc-5.2.1', 'lich')
     const values = monsterToFormValues(lich)
-    values.forms = { definedForms: [] } as MonsterFormValues['forms']
+    values.forms = { definedForms: [] } as unknown as MonsterFormValues['forms']
     values.lair = { enabled: true, experience: { mode: 'custom', value: 1 } }
     const fields = collectTabbedFormResolverItems(buildMonsterTabs(ctx))
     const resolver = makeResolver(resolveMonsterFormSchema(ctx, 'publish'), fields)
-    const result = await resolver(values, undefined, {
+    const result = await resolver(values as never, undefined, {
       fields: {},
       shouldUseNativeValidation: false,
     })
@@ -195,7 +195,7 @@ describe('monster lair XP publish resolver', () => {
       lair: { enabled: true, experience: { mode: 'custom', value: 1 } },
     }
     const resolver = makeResolver(loaded.schema, fields)
-    const result = await resolver(values, undefined, {
+    const result = await resolver(values as never, undefined, {
       fields: {},
       shouldUseNativeValidation: false,
     })
@@ -221,7 +221,7 @@ describe('monster lair XP publish resolver', () => {
 
     const publishSchema = resolveMonsterFormSchema(ctx, 'publish')
     const fields = collectTabbedFormResolverItems(buildMonsterTabs(ctx))
-    const issues = evaluateContentPublishValidation(publishSchema, values, fields)
+    const issues = evaluateContentPublishValidation(publishSchema, values as never, fields)
 
     act(() => {
       result.current.reset(values)

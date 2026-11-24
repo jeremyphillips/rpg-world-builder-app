@@ -1,5 +1,5 @@
 import { monsterAttackActionPartsToProse } from '@rpg/contracts'
-import { render, screen } from '@testing-library/react'
+import { render } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
 import { StatBlockProseView } from './stat-block-prose'

@@ -28,7 +28,7 @@ export function getCatalogWoodElfHeritageOption(): SpeciesTrait {
 /** Catalog Druidic feature grant groups from the Druid class seed. */
 export function getCatalogDruidDruidicGrantGroups(): GrantGroup[] {
   const druidic = getCatalogDruidDruidicFeature()
-  return druidic.grantGroups ?? []
+  return druidic.kind === 'custom' ? (druidic.grantGroups ?? []) : []
 }
 
 /** Catalog Druidic class feature from the Druid class seed. */

@@ -1,9 +1,10 @@
-import type {
-  CharacterClass,
-  ClassFeature,
-  FacingResolution,
-  ResolvedSpellcastingProgressionConfig,
-  Spell,
+import {
+  resolveClassFeatureName,
+  type CharacterClass,
+  type ClassFeature,
+  type FacingResolution,
+  type ResolvedSpellcastingProgressionConfig,
+  type Spell,
 } from '@rpg/contracts'
 
 import { resolveFacing } from '../../facing/resolve-facing'
@@ -34,9 +35,14 @@ export function resolveClassFeatureDetailFacing(
   })
 }
 
-export function classFeatureDetailTitle(feature: ClassFeature, facing: FacingResolution): string {
+export function classFeatureDetailTitle(
+  feature: ClassFeature,
+  facing: FacingResolution,
+  className = '',
+): string {
+  const fallbackTitle = resolveClassFeatureName(feature, className)
   if (facing.status === 'ready' || facing.status === 'incomplete') {
-    return facing.document?.title ?? feature.name
+    return facing.document?.title ?? fallbackTitle
   }
-  return feature.name
+  return fallbackTitle
 }

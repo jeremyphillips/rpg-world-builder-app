@@ -1,5 +1,6 @@
 import { createMagicPropertyDefinitionProvider } from '@rpg/catalog/magic-properties'
 import {
+  DEFAULT_SYSTEM_RULESET_ID,
   deriveMonsterDraftStatBlock,
   type ArmorClassRules,
   type DerivedMonsterDraftStatBlock,
@@ -17,11 +18,9 @@ export function monsterArmorClassRules(ctx: ContentFormCtx): ArmorClassRules | u
   return ctx.armorClassRules
 }
 
-export function monsterMagicPropertyProvider(
-  ctx: ContentFormCtx,
-): MagicPropertyDefinitionProvider | undefined {
-  if (!ctx.rulesetId) return undefined
-  return createMagicPropertyDefinitionProvider(ctx.rulesetId as SystemRulesetId)
+export function monsterMagicPropertyProvider(ctx: ContentFormCtx): MagicPropertyDefinitionProvider {
+  const rulesetId = (ctx.rulesetId ?? DEFAULT_SYSTEM_RULESET_ID) as SystemRulesetId
+  return createMagicPropertyDefinitionProvider(rulesetId)
 }
 
 export function monsterSkillCatalog(ctx: ContentFormCtx): Map<string, SkillProficiency> {

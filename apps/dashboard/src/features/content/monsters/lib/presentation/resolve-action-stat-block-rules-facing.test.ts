@@ -43,6 +43,7 @@ describe('resolveActionStatBlockRulesFacing', () => {
       equipmentById: new Map(),
       spellsById: new Map([[spell.id, spell]]),
       spellCatalogStatus: 'ready',
+      magicPropertyProvider: () => undefined,
     })
 
     const result = resolveActionStatBlockRulesFacing(

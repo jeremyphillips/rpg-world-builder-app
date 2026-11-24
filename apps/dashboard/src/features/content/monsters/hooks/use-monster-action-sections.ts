@@ -120,7 +120,7 @@ function seedLegendaryUsesIfFirst(
   const block = getValues().legendaryActions
   setValue(
     'legendaryActions',
-    mergeLegendaryActionsBlock({ ...block, uses: 3 }, block?.actions ?? []),
+    mergeLegendaryActionsBlock({ ...block, uses: { normal: 3 } }, block?.actions ?? []),
     { shouldDirty: true },
   )
 }
@@ -306,7 +306,7 @@ export function useMonsterActionSections(
         const block = getValues().legendaryActions
         setValue(
           'legendaryActions',
-          mergeLegendaryActionsBlock({ ...block, uses: 3 }, block?.actions ?? []),
+          mergeLegendaryActionsBlock({ ...block, uses: { normal: 3 } }, block?.actions ?? []),
           { shouldDirty: true },
         )
       }

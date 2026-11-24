@@ -60,7 +60,8 @@ describe('resolveActionStatBlockRulesFacingForForm', () => {
             name: 'Bite',
             mode: 'melee',
             reach: 5,
-            damage: { dice: { count: 1, faces: 6 }, damageTypeId: 'piercing' },
+            damageType: 'piercing',
+            damage: { dice: { count: 1, faces: 6 } },
           },
         ],
       }),
@@ -87,7 +88,7 @@ describe('resolveActionStatBlockRulesFacingForForm', () => {
             reach: 5,
           },
         ],
-      } as MonsterFormValues,
+      } as unknown as MonsterFormValues,
       { intent: 'draft', mode: 'create', armorClassRules: systemDefaultArmorClassRules() },
     ) as MonsterFormValues
     const bite = (values.actions ?? []).find((row) => row.id === 'bite')

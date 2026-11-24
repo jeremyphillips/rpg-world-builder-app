@@ -6,5 +6,8 @@ import { resolveMonsterCreateDefaultValues, type MonsterFormValues } from './mon
 export function monsterFormTestValues(
   overrides: Partial<MonsterFormValues> & Pick<MonsterFormValues, 'name'>,
 ): MonsterFormValues {
-  return { ...resolveMonsterCreateDefaultValues(), ...overrides } as MonsterFormValues
+  return structuredClone({
+    ...resolveMonsterCreateDefaultValues(),
+    ...overrides,
+  }) as MonsterFormValues
 }

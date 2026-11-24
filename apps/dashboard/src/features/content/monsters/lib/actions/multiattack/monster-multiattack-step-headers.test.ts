@@ -31,7 +31,7 @@ const headerInput = {
   ctx: {
     ...ctx,
     spellCatalogById: new Map([['mage-hand', { id: 'mage-hand', name: 'Mage Hand', level: 0 }]]),
-  },
+  } as unknown as ContentFormCtx,
 }
 const watched = { '../../../../actions': rows }
 

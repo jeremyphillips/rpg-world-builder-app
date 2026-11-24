@@ -3,7 +3,7 @@ import {
   getContentTypeTerm,
 } from '../../content/lib/content-type-terms'
 import { resolveTraitName } from '../../content/lib/grants/trait-display'
-import type { CharacterClass } from '../../content/classes/class'
+import { resolveClassFeatureName, type CharacterClass } from '../../content/classes/class'
 import type { Species } from '../../content/species'
 import {
   DEFAULT_LANGUAGE_PROFICIENCY_CHOICES,
@@ -112,10 +112,12 @@ function classNameForSource(
 }
 
 function findClassFeature(
-  characterClass: { features?: CharacterClass['features'] },
+  characterClass: SelectionSourceClassCatalogEntry,
   grantId: string,
 ): { name: string } | undefined {
-  return characterClass.features?.find((feature) => feature.id === grantId)
+  const feature = characterClass.features?.find((row) => row.id === grantId)
+  if (!feature) return undefined
+  return { name: resolveClassFeatureName(feature, characterClass.name) }
 }
 
 function findSpeciesTrait(species: Species, grantId: string) {

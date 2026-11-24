@@ -27,7 +27,6 @@ export function legendaryResistanceTemplateUseFields(options: {
       digits: 2,
       control: 'stepper',
       required: true,
-      shouldUnregister: false,
     },
   ]
   if (options.includeInLair) {
@@ -40,7 +39,6 @@ export function legendaryResistanceTemplateUseFields(options: {
       digits: 2,
       control: 'stepper',
       width: 'auto',
-      shouldUnregister: false,
       visibility: monsterLairEnabledVisibility,
     })
   }

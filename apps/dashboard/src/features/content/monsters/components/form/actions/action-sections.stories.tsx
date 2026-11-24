@@ -73,7 +73,7 @@ export const LegendaryActions: Story = {
       { id: 'rend', kind: 'natural-weapon', name: 'Rend', mode: 'melee', damageType: 'slashing' },
     ]
     values.legendaryActions = {
-      uses: 3,
+      uses: { normal: 3 },
       actions: [
         {
           id: 'pounce',

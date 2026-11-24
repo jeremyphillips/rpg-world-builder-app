@@ -13,7 +13,6 @@ import {
   formatMonsterTakeActions,
   formatMonsterTeleport,
   formatOnceUntilNextTurnSentence,
-  formatSavingThrowClauses,
   getAbilityLabel,
   isMonsterActionAttackKind,
   monsterActionSectionRows,
@@ -295,7 +294,7 @@ function formatMultiattackActionBody(
     monsterName: monster.name,
     action,
     actions: monster.actions,
-    bonusActions: monster.bonusActions,
+    bonusActions: monster.bonusActions as MonsterAction[],
     equipment: monster.equipment,
     equipmentCatalog: equipmentById,
     magicPropertyProvider,
@@ -542,12 +541,7 @@ function mapGeneratedBonusActionFacing(
             combination: action.combination,
             restriction: action.restriction,
           })
-  const generated = body ? `<p>${escapeStatBlockText(body)}</p>` : ''
-  const supplemental =
-    action.description && !monsterRichTextIsEmpty(action.description)
-      ? action.description
-      : undefined
-  const descriptionHtml = supplemental ? `${generated}${supplemental}` : generated || undefined
+  const descriptionHtml = body ? `<p>${escapeStatBlockText(body)}</p>` : undefined
   return {
     id: action.id,
     name,
@@ -600,12 +594,7 @@ function mapParryActionFacing(
     acBonus: action.acBonus,
     followUpAttackName: parryFollowUpName(action, spells),
   })
-  const generated = response ? `<p>${escapeStatBlockText(response)}</p>` : ''
-  const supplemental =
-    action.description && !monsterRichTextIsEmpty(action.description)
-      ? action.description
-      : undefined
-  const descriptionHtml = supplemental ? `${generated}${supplemental}` : generated || undefined
+  const descriptionHtml = response ? `<p>${escapeStatBlockText(response)}</p>` : undefined
   return {
     id: action.id,
     name,
@@ -679,27 +668,77 @@ function resolveActionFacingBody(
   const kind = action.kind as MonsterActionKind
   switch (kind) {
     case 'spell':
-      return mapSpellActionFacing(action, section, derived, spells, identityName)
+      return mapSpellActionFacing(
+        action as Extract<MonsterAction | MonsterLegendaryAction, { kind: 'spell' }>,
+        section,
+        derived,
+        spells,
+        identityName,
+      )
     case 'shape-shift':
-      return mapShapeShiftActionFacing(action, name, spells)
+      return mapShapeShiftActionFacing(
+        action as Extract<MonsterBonusAction, { kind: 'shape-shift' }>,
+        name,
+        spells,
+      )
     case 'special':
-      return mapSpecialActionFacing(action, name, derived, spells)
+      return mapSpecialActionFacing(
+        action as Extract<MonsterAction | MonsterReaction, { kind: 'special' }>,
+        name,
+        derived,
+        spells,
+      )
     case 'save':
-      return mapSaveActionFacing(action, name, derived, catalogState, spells, identityName)
+      return mapSaveActionFacing(
+        action as Extract<MonsterAction | MonsterLegendaryAction, { kind: 'save' }>,
+        name,
+        derived,
+        catalogState,
+        spells,
+        identityName,
+      )
     case 'action-reference':
-      return mapActionReferenceFacing(action, name, spells)
+      return mapActionReferenceFacing(
+        action as Extract<
+          MonsterAction | MonsterBonusAction | MonsterReaction,
+          { kind: 'action-reference' }
+        >,
+        name,
+        spells,
+      )
     case 'leap':
     case 'teleport':
     case 'take-actions':
-      return mapGeneratedBonusActionFacing(action, name, spells.monsterName)
+      return mapGeneratedBonusActionFacing(
+        action as Extract<MonsterBonusAction, { kind: 'leap' | 'teleport' | 'take-actions' }>,
+        name,
+        spells.monsterName,
+      )
     case 'parry':
-      return mapParryActionFacing(action, name, spells)
+      return mapParryActionFacing(
+        action as Extract<MonsterReaction, { kind: 'parry' }>,
+        name,
+        spells,
+      )
     case 'multiattack':
-      return mapMultiattackActionFacing(action, name, derived, catalogState, spells)
+      return mapMultiattackActionFacing(
+        action as Extract<MonsterAction, { kind: 'multiattack' }>,
+        name,
+        derived,
+        catalogState,
+        spells,
+      )
     case 'weapon':
     case 'natural-weapon':
     case 'attack':
-      return mapAttackActionFacing(action, section, name, derived, catalogState, spells)
+      return mapAttackActionFacing(
+        action as Extract<MonsterAction, { kind: 'weapon' | 'natural-weapon' | 'attack' }>,
+        section,
+        name,
+        derived,
+        catalogState,
+        spells,
+      )
     default: {
       const _exhaustive: never = kind
       return _exhaustive

@@ -1,10 +1,12 @@
 import {
+  DEFAULT_SYSTEM_RULESET_ID,
   SPECIES_CLASS_POLICY_MODES_REQUIRING_IDS,
   SPECIES_CONTENT_TYPE_TERM,
   getSpeciesHeritageLabel,
   createSpellCatalogContext,
   type ContentMedia,
   type Species,
+  type SystemRulesetId,
 } from '@rpg/contracts'
 import { formatPreviewRailOverflowList, type PreviewRailFact } from '@rpg/ui'
 
@@ -48,7 +50,7 @@ import { traitRowNameForIdAssignment, traitsFromFormValues } from './species-tra
 import { speciesCreateDefaultValues } from './species-form-values'
 
 const PREVIEW_SPECIES_ENVELOPE = {
-  rulesetId: 'srd-cc-5.2.1' as const,
+  rulesetId: DEFAULT_SYSTEM_RULESET_ID as SystemRulesetId,
   campaignId: null,
   createdAt: '',
   updatedAt: '',

@@ -1,8 +1,8 @@
-import { spellcastingFeatureLabelForSlotProgression } from '../../../campaign/rules/spellcasting-progression/resolve-slots'
-import type { SlotProgression } from '../../../campaign/rules/spellcasting-progression/slot-progression'
 import {
   getSlotProgressionKindLabel,
   PACT_MAGIC_SLOT_PROGRESSION_KIND_ID,
+  spellcastingFeatureLabelForSlotProgression,
+  type SpellcastingFeatureLabelProgression,
 } from '../../../vocab/spell/slot-progression-kind'
 
 import { CLASS_FEATURE_KIND_ENTRIES } from '../class'
@@ -17,7 +17,7 @@ export type SpellcastingGrantingFeatureId =
   | typeof PACT_MAGIC_SLOT_PROGRESSION_ID
 
 export function usesPactMagicSlotProgression(input: {
-  slotProgression?: Pick<SlotProgression, 'kind'>
+  slotProgression?: SpellcastingFeatureLabelProgression
   slotProgressionId?: string
 }): boolean {
   return (
@@ -27,7 +27,7 @@ export function usesPactMagicSlotProgression(input: {
 }
 
 export function spellcastingGrantingFeatureId(input: {
-  slotProgression?: Pick<SlotProgression, 'kind'>
+  slotProgression?: SpellcastingFeatureLabelProgression
   slotProgressionId?: string
 }): SpellcastingGrantingFeatureId {
   return usesPactMagicSlotProgression(input)
@@ -36,11 +36,11 @@ export function spellcastingGrantingFeatureId(input: {
 }
 
 export function spellcastingGrantingFeatureDefaultName(input: {
-  slotProgression?: Pick<SlotProgression, 'kind'>
+  slotProgression?: SpellcastingFeatureLabelProgression
   slotProgressionId?: string
 }): string {
   if (input.slotProgression) {
-    return spellcastingFeatureLabelForSlotProgression(input.slotProgression as SlotProgression)
+    return spellcastingFeatureLabelForSlotProgression(input.slotProgression)
   }
   if (usesPactMagicSlotProgression(input)) {
     return getSlotProgressionKindLabel(PACT_MAGIC_SLOT_PROGRESSION_ID)
@@ -52,7 +52,7 @@ export function spellcastingGrantingFeatureDisplayName(input: {
   name?: string | null
   featureId?: string
   slotProgressionId?: string
-  slotProgression?: Pick<SlotProgression, 'kind'>
+  slotProgression?: SpellcastingFeatureLabelProgression
 }): string {
   const trimmed = String(input.name ?? '').trim()
   if (trimmed) return trimmed

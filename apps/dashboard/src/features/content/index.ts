@@ -1,5 +1,10 @@
 // Lightweight cross-feature surface — keep before route/form exports to avoid barrel init cycles.
 export {
+  resolveAcquisitionAvailability,
+  toAcquisitionDropdownItem,
+  type AcquisitionOption,
+} from './lib/acquisition'
+export {
   outsideWaterBreathDurationEnabled,
   type OutsideWaterBreathDurationFields,
 } from './lib/creature-traits/outside-water-breath.lib'

@@ -67,7 +67,6 @@ import type { ContentFormCtx } from '../registry/content-form-registry'
 import { senseRangeJoinedPairField } from '../fields/content-sense-range-form-fields'
 import { getLevelFieldOptions, withLevelOptionLabels } from '../../form-options/level-field-options'
 import {
-  referenceEquipmentFieldOptions,
   referenceSpellFieldOptions,
   toSortedContentFieldOptions,
 } from '../../form-options/content-field-option.lib'

@@ -575,7 +575,7 @@ export function getGrantGroupEffectiveUnlock(
  * (feature level for class features; `1` for species traits).
  */
 export function getUnlockedGrantsAtLevel(
-  groups: GrantGroup[],
+  groups: readonly GrantGroup[],
   level: number,
   parentLevel = 1,
 ): ContentGrant[] {

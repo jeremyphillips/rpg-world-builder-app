@@ -9,7 +9,14 @@ describe('createClassFeatureRowTitleConfig', () => {
 
   it('uses authored titles for custom features', () => {
     const resolution = resolveMasterDetailRowTitle(config, {
-      row: { kind: 'custom', name: 'Second Wind' },
+      row: {
+        kind: 'custom',
+        name: 'Second Wind',
+        level: 1,
+        grants: [],
+        available: true,
+        tables: [],
+      },
       index: 0,
       fieldId: 'f0',
       rows: [],
@@ -23,7 +30,14 @@ describe('createClassFeatureRowTitleConfig', () => {
 
   it('uses override titles for subclass-choice rows', () => {
     const resolution = resolveMasterDetailRowTitle(config, {
-      row: { kind: 'subclass-choice', name: '' },
+      row: {
+        kind: 'subclass-choice',
+        name: '',
+        level: 3,
+        grants: [],
+        available: true,
+        tables: [],
+      },
       index: 0,
       fieldId: 'f0',
       rows: [],

@@ -6,7 +6,7 @@ export { monsterBonusActionSchema, monsterBonusActionDraftSchema } from './secti
 export { bonusTeleportPassengerSchema }
 export type { BonusTeleportPassenger } from './shared-fragments'
 
-import { monsterBonusActionDraftSchema, monsterBonusActionSchema } from './section-tuples'
+import { type monsterBonusActionDraftSchema, type monsterBonusActionSchema } from './section-tuples'
 
 export type MonsterBonusAction = z.infer<typeof monsterBonusActionSchema>
 export type MonsterBonusActionDraft = z.infer<typeof monsterBonusActionDraftSchema>

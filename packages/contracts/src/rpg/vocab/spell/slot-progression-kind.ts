@@ -52,3 +52,17 @@ export function getSlotProgressionKindEntry(id: string): GameTermEntry | undefin
 export function getSlotProgressionKindLabel(id: string): string {
   return getSlotProgressionKindEntry(id)?.label ?? id
 }
+
+/** Class feature label for the standard leveled spellcasting progression row. */
+export const SPELLCASTING_CLASS_FEATURE_LABEL = 'Spellcasting' as const
+
+export type SpellcastingFeatureLabelProgression = { kind: 'leveled' | 'pact' }
+
+/** Feature-table label derived from slot progression kind. */
+export function spellcastingFeatureLabelForSlotProgression(
+  progression: SpellcastingFeatureLabelProgression,
+): string {
+  return progression.kind === 'pact'
+    ? getSlotProgressionKindLabel(PACT_MAGIC_SLOT_PROGRESSION_KIND_ID)
+    : SPELLCASTING_CLASS_FEATURE_LABEL
+}

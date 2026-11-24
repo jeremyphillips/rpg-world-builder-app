@@ -34,7 +34,7 @@ describe('resolveTraitPersistedFacing', () => {
           grants: [{ kind: 'sense', type: 'darkvision', range: 60 }],
         },
       ],
-    })
+    } as never)
     expect(resolution.status).toBe('ready')
     if (resolution.status !== 'ready') return
     expect(resolution.document.title).toMatch(/Darkvision/i)
@@ -112,7 +112,11 @@ describe('legendary resistance heading parity', () => {
     })
     const monster = resolveMonsterTraitDraftFacing({
       row,
-      monster: { name: 'Lich', lair: { enabled: false }, forms: [] },
+      monster: {
+        name: 'Lich',
+        lair: { enabled: false },
+        forms: { profileFormId: 'true', trueForm: { kind: 'profile' }, definedForms: [] },
+      },
     })
     expect(species?.status).toBe('ready')
     expect(monster?.status).toBe('ready')

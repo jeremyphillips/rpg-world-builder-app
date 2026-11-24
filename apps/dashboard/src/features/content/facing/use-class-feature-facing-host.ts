@@ -1,17 +1,16 @@
+import { DEFAULT_SYSTEM_RULESET_ID, type SystemRulesetId } from '@rpg/contracts'
 import { useMemo } from 'react'
 import { useWatch } from 'react-hook-form'
 
-import {
-  CLASS_SPELLCASTING_PREVIEW_PARENT_FIELD_KEYS,
-  spellcastingFromFormValues,
-} from '../classes/lib/class-form-values'
+import { CLASS_SPELLCASTING_PREVIEW_PARENT_FIELD_KEYS } from '../classes/lib/class-spellcasting-preview-parent-field-keys'
+import { spellcastingFromFormValues } from '../classes/lib/class-form-values'
 import type { ClassFormValues } from '../classes/lib/class-form-fields'
 import type { FeatureRowForm } from '../classes/lib/class-feature-form-fields'
 import type { ContentFormCtx } from '../lib/forms/registry/content-form-registry'
 import type { FacingHostConfig } from './facing-host-config.types'
 import type { ClassFacingHostContext } from './domains/class-feature/class-facing-host'
 import { resolveClassFeatureRowFacing } from './resolve-facing'
-import { toFacingPanelModel } from './structured-facing-host-panel'
+import { toFacingPanelModel } from './structured-facing-panel-model.lib'
 
 const CLASS_FEATURE_FACING_PARENT_WATCH = [
   'name',
@@ -42,7 +41,7 @@ export function useClassFeatureFacingHost(input: {
 
     return {
       className: String(formSlice.name ?? ''),
-      rulesetId: input.formCtx.rulesetId,
+      rulesetId: (input.formCtx.rulesetId ?? DEFAULT_SYSTEM_RULESET_ID) as SystemRulesetId,
       spellcasting: spellcastingFromFormValues(formSlice as ClassFormValues),
       spellcastingProgression: input.formCtx.spellcastingProgression,
       spellsById: input.formCtx.spellCatalogById,

@@ -2,6 +2,7 @@ import {
   averageScaledDiceRoll,
   computeStartingWealthSparsePatch,
   CURRENCY_IDS,
+  DEFAULT_SYSTEM_RULESET_ID,
   formatGroupedNumber,
   formatLevelRangeLabel,
   moneyToCp,
@@ -25,7 +26,7 @@ import {
 export const STARTING_WEALTH_FORM_PREFIX = 'startingWealth' as const
 
 export const STARTING_WEALTH_TIER_COUNT =
-  getStandardStartingWealthRules('srd-cc-5.2.1').tiers.length
+  getStandardStartingWealthRules(DEFAULT_SYSTEM_RULESET_ID).tiers.length
 
 export type StartingWealthMagicItemGrantFormValues = {
   rarity: MagicItemRarity

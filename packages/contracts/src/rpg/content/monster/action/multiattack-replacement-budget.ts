@@ -1,8 +1,4 @@
-import {
-  isMultiattackAttackGroup,
-  type MultiattackDraftStep,
-  type MultiattackReplacement,
-} from './multiattack-schemas'
+import { isMultiattackAttackGroup, type MultiattackDraftStep } from './multiattack-schemas'
 
 function attackGroupCount(step: { count?: number }): number | undefined {
   return typeof step.count === 'number' && Number.isInteger(step.count) ? step.count : undefined
@@ -74,7 +70,13 @@ export function meaningfulMultiattackTargetActionIds(
   })
 }
 
-type ReplacementLike = Pick<MultiattackReplacement, 'replacesActionId'> | undefined
+/** Draft/form slice — counts and target ids may be partially filled. */
+export type MultiattackReplacementBudgetSlice = {
+  count?: number
+  replacesActionId?: string
+}
+
+type ReplacementLike = MultiattackReplacementBudgetSlice | undefined
 
 /** Upper bound for `replacement.count` given primary steps and optional named target. */
 export function replacementCountMax(
@@ -96,7 +98,7 @@ export function replacementCountMax(
 }
 
 export function multiattackReplacementShowsStaticCount(
-  replacement: { count?: number } | undefined,
+  replacement: ReplacementLike,
   steps: readonly MultiattackDraftStep[],
 ): boolean {
   if (replacement?.count !== 1) return false

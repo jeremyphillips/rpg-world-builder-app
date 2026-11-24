@@ -13,7 +13,7 @@ import {
 import { subclassFeatureItemFields } from '@/features/content/classes/lib/class-feature-form-fields'
 import {
   buildSubclassFields,
-  subclassFormSchema,
+  createSubclassFormSchema,
 } from '@/features/content/classes/lib/subclasses/subclass-form-fields'
 import { makeContentFormCtx } from '@/features/content/lib/fixtures/content-form-ctx'
 import { heritageOptionItemFields } from '@/features/content/species/lib/species-trait-form-fields'
@@ -285,9 +285,9 @@ describe('nested grant validation integration', () => {
 
     render(
       <Form
-        schema={subclassFormSchema}
+        schema={createSubclassFormSchema()}
         fields={buildSubclassFields(ctx)}
-        defaultValues={subclassFormSchema.parse({ name: 'Berserker', features: [] })}
+        defaultValues={createSubclassFormSchema().parse({ name: 'Berserker', features: [] })}
         onSubmit={vi.fn()}
         footer={
           <>

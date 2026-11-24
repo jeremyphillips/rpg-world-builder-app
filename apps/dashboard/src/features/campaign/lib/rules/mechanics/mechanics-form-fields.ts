@@ -39,7 +39,7 @@ export const MECHANICS_CONFIGURATION_SECTIONS = [
 export type MechanicsConfigurationSectionId =
   (typeof MECHANICS_CONFIGURATION_SECTIONS)[number]['id']
 
-type MechanicsFieldOptions = {
+export type MechanicsFieldOptions = {
   editionPresetOptions: FieldOption[]
   attackResolutionModeOptions: FieldOption[]
 }

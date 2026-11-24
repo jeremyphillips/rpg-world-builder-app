@@ -2,7 +2,6 @@ import {
   createEquipmentCatalogContext,
   createSpellCatalogContext,
   formatDamageTypeGrantSentence,
-  formatEquipmentGrantSentenceFromResolutions,
   formatFeatChoiceGrantSentence,
   formatLanguageGrantSentence,
   formatMovementGrantAuthoringSummary,

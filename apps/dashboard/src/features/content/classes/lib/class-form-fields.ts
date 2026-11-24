@@ -29,11 +29,10 @@ import { ClassCharacterCreationTab } from '../components/class-character-creatio
 import { ClassSubclassesTab } from '../components/class-subclasses-tab'
 import { coreAttributesFields } from './class-basics-form-fields'
 import {
-  classFeatureItemFields,
-  classFeatureRowResolveFields,
   createFeatureRowDraftFormSchema,
   createFeatureRowFormSchema,
-} from './class-feature-form-fields'
+} from './class-feature-row-form-schema'
+import { classFeatureItemFields, classFeatureRowResolveFields } from './class-feature-form-fields'
 import { ARMOR_PROFICIENCY_MODES, WEAPON_PROFICIENCY_MODES } from './class-form-constants'
 import {
   proficienciesDraftFormSchema,

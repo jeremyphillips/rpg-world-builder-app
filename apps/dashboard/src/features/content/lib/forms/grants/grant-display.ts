@@ -323,7 +323,7 @@ type GrantItemMapper = (
 ) => GrantSummaryItem[]
 
 const GRANT_ITEM_MAPPERS: Partial<Record<ContentGrant['kind'], GrantItemMapper>> = {
-  sense: (grant, vocabulary, idPrefix, level) =>
+  sense: (grant, _vocabulary, idPrefix, level) =>
     createSupportedGrantItems(
       idPrefix,
       'sense',

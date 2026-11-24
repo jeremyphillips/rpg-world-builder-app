@@ -211,7 +211,6 @@ const CONTENT_GRANT_TO_FORM_ROWS = {
       spellIds: grant.spellIds,
     }),
   languageChoice: () => [],
-  spellcasting: (grant, unlockLevel) => grantRows('spellcasting', unlockLevel, { id: grant.id }),
   rollAdjustment: (grant, unlockLevel) => {
     const abilityCheck = grant.rolls.find((roll) => roll.kind === 'ability-check')
     return grantRows('rollAdjustment', unlockLevel, {
@@ -389,10 +388,6 @@ function spellsToGrant(row: GrantRowForm): GrantWithoutRowId | undefined {
 
 type GrantRowContentConverter = (row: GrantRowForm) => GrantWithoutRowId | undefined
 
-function spellcastingToGrant(_row: GrantRowForm): GrantWithoutRowId {
-  return { kind: 'spellcasting' }
-}
-
 function rollTargetsFromForm(row: GrantRowForm): CreatureRollTarget[] {
   const rolls: CreatureRollTarget[] = []
   for (const kind of row.rollTargets ?? []) {
@@ -459,7 +454,6 @@ const FORM_ROW_TO_CONTENT_GRANT: Partial<Record<GrantRowType, GrantRowContentCon
   featChoice: featChoiceToGrant,
   equipment: equipmentToGrant,
   spells: spellsToGrant,
-  spellcasting: spellcastingToGrant,
   rollAdjustment: rollAdjustmentToGrant,
   saveOutcomeOverride: saveOutcomeOverrideToGrant,
 }

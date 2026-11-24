@@ -36,7 +36,7 @@ function previewCharacterClass(
     },
     features: [feature],
     spellcasting: host.spellcasting,
-  } as CharacterClass
+  } as unknown as CharacterClass
 }
 
 function spellcastingRulesDocument(

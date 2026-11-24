@@ -14,6 +14,7 @@ type FormAvailabilityRow = {
   steps?: readonly {
     actionIds?: readonly string[]
     kind?: string
+    mode?: string
     actionId?: string
     choices?: readonly { actionId?: string }[]
   }[]

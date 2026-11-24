@@ -21,7 +21,6 @@ import {
   distanceJoinedPairField,
 } from '../../../lib/forms/fields/content-distance-form-fields'
 
-const LEGENDARY_RESISTANCE_USES = standardFeet(1, 6, 1)
 const HOLD_BREATH_MINUTES = [1, 5, 10, 15, 30] as const
 const HOLD_BREATH_HOURS = [1, 2, 4, 8, 12, 24] as const
 const STANDING_LEAP_FEET = standardFeet(10, 60, 10)

@@ -83,7 +83,7 @@ describe('buildContentFormOptionSets', () => {
           id: 'spellcasting',
           name: 'Spellcasting',
           level: 1,
-          grantGroups: [{ grants: [{ id: 'spellcasting-1', kind: 'spellcasting' as const }] }],
+          grantGroups: [],
         },
       ],
       spellcasting: {
@@ -100,7 +100,7 @@ describe('buildContentFormOptionSets', () => {
           },
         },
       },
-    } satisfies typeof fighter
+    } as typeof fighter
 
     const options = buildContentFormOptionSets({
       classes: [fighter, wizard, patchedBarbarian],

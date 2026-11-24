@@ -10,6 +10,7 @@ import { ClassCharacterCreationTab } from './class-character-creation-tab'
 import { characterCreationProficienciesToFormValues } from '../lib/character-creation/class-character-creation-proficiencies-form-values'
 import { startingEquipmentToFormValues } from '../lib/character-creation/class-starting-equipment-form-values'
 import { startingEquipmentItemTitle } from '../lib/character-creation/class-starting-equipment-form-fields'
+import { buildGrantEquipmentReferencePresentationFromAuthoring } from '../../lib/forms/grants/grant-row-presentation.lib'
 import { buildProficiencyChoiceTargetOptions } from '../lib/character-creation/class-starting-equipment-proficiency-targets.lib'
 
 const monk = pickClass('monk')
@@ -48,7 +49,18 @@ function LiveLabelSyncHarness() {
           options: { equipment: buildContentPurposeSelectors(equipment) },
         }}
       />
-      <div data-testid="linked-title">{startingEquipmentItemTitle(linkedItem, 0, [], options)}</div>
+      <div data-testid="linked-title">
+        {startingEquipmentItemTitle(
+          linkedItem,
+          0,
+          buildGrantEquipmentReferencePresentationFromAuthoring({
+            status: 'ready',
+            equipmentById: new Map(equipment.map((item) => [item.id, item])),
+            scope: { rulesetId: monk.rulesetId, campaignId: '' },
+          }),
+          options,
+        )}
+      </div>
       <div data-testid="linked-option-label">{options[0]?.label}</div>
       <button
         type="button"

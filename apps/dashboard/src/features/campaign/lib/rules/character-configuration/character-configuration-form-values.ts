@@ -1,6 +1,5 @@
 import type {
   ResolvedCampaignCharacterCreationPatch,
-  SystemRulesetId,
   UpdateCampaignCharacterCreationInput,
 } from '@rpg/contracts'
 import {

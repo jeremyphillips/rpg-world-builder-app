@@ -104,7 +104,7 @@ export function resolveTraitPersistedFacing(
 export function resolveSpeciesTraitDraftFacing(row: TraitRowForm): FacingResolution | undefined {
   if (row.kind === 'custom') return undefined
   try {
-    const trait = traitFromFormRow(row)
+    const trait = traitFromFormRow(row as never)
     return resolveTraitPersistedFacing(trait, speciesTraitFacingHost())
   } catch {
     return { status: 'invalid', reason: { code: 'unresolvable-record' } }

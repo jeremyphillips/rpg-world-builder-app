@@ -273,7 +273,7 @@ describe('ArrayFieldRenderer', () => {
     const itemShell = screen.getByRole('group', { name: /Item #1/ })
     expect(itemShell).toHaveClass('bg-surface-faint')
     const nest = addButton.closest('[data-field-dependent-nest]')
-    expect(nest).toHaveClass('bg-background')
+    expect(nest).toHaveClass('ui-field-dependent-nest')
     expect(nest).toContainElement(itemShell)
   })
 

@@ -11,14 +11,9 @@ const ITEM_NOUN = defineMasterDetailItemNoun({
 
 type SampleRow = { id?: string; name?: string; nameOverride?: string }
 
-function ctx(input: Partial<MasterDetailRowTitleContext<SampleRow>> & { row: SampleRow }): {
-  row: SampleRow
-  index: number
-  fieldId: string
-  rows: readonly SampleRow[]
-  itemNoun: typeof ITEM_NOUN
-  lastAddedFieldId: string | null
-} {
+function ctx(
+  input: Partial<MasterDetailRowTitleContext<SampleRow>> & { row: SampleRow },
+): MasterDetailRowTitleContext<SampleRow> {
   return {
     index: 0,
     fieldId: 'field-1',

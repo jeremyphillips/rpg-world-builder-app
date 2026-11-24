@@ -83,7 +83,8 @@ describe('spellcastingSchema', () => {
       },
     })
     expect(parsed.focusKinds).toEqual(['musical_instrument'])
-    expect(parsed.cantripSelection?.change.trigger).toBe('levelUp')
+    const cantripChange = parsed.cantripSelection?.change
+    expect(cantripChange?.kind === 'replace' ? cantripChange.trigger : undefined).toBe('levelUp')
   })
 
   it('parses wizard spellbook focus and long-rest cantrip replacement', () => {
@@ -101,7 +102,8 @@ describe('spellcastingSchema', () => {
       },
     })
     expect(parsed.focusKinds).toEqual(['arcane_focus', 'spellbook'])
-    expect(parsed.cantripSelection?.change.trigger).toBe('longRest')
+    const cantripChange = parsed.cantripSelection?.change
+    expect(cantripChange?.kind === 'replace' ? cantripChange.trigger : undefined).toBe('longRest')
   })
 
   it('rejects cantrip change without cantrip progression', () => {

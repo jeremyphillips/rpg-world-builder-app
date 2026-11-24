@@ -68,7 +68,7 @@ function bardClass(): CharacterClass {
     },
     features: [spellcastingGrantFeature(1)],
     spellcasting: bardSpellcasting,
-  } as CharacterClass
+  } as unknown as CharacterClass
 }
 
 describe('formatClassSpellcastingFeatureRules', () => {

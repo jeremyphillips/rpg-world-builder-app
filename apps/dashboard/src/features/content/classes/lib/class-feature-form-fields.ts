@@ -1,15 +1,8 @@
 import { createElement } from 'react'
-import { z } from 'zod'
 import type { ArrayResolveFieldsFn } from '@rpg/ui/form'
 import {
-  CLASS_FEATURE_KINDS,
-  classFeatureKindSchema,
-  MAX_CHARACTER_LEVEL,
-  addCustomRefinementIssue,
-  campaignLevelSchema,
-  classValidationMessages,
-  contentTableSchema,
   resolveGrantGroupsFromContent,
+  resolveClassFeatureName,
   subclassChoiceFeatureLabel,
   type ClassBodyFeature,
   type ClassFeature,
@@ -18,18 +11,21 @@ import {
 import { normalizeRichTextHtml } from '@rpg/ui'
 import { type FormItem } from '@rpg/ui/form'
 
-import { grantArrayFields } from '../../lib/forms/grants/grant-form-fields'
 import {
   appendGrantCountSummaryPart,
   formatCharacterLevelSummaryPart,
   joinFormArrayItemSummaryParts,
 } from '../../../../lib/forms/array-item-summary'
-import {
-  GRANT_TYPES,
-  GRANT_TYPE_LABELS,
-  GRANT_DEFAULT_UNLOCK_LEVEL,
-  createGrantRowFormSchema,
-} from '../../lib/forms/grants/grant-form-schema'
+import { GRANT_TYPES, GRANT_TYPE_LABELS } from '../../lib/forms/grants/grant-form-schema'
+import { grantArrayFields } from '../../lib/forms/grants/grant-form-fields'
+export {
+  createFeatureRowDraftFormSchema,
+  createFeatureRowFormSchema,
+  createSubclassFeatureRowFormSchema,
+  type FeatureRowForm,
+  type SubclassFeatureRowForm,
+} from './class-feature-row-form-schema'
+import type { FeatureRowForm, SubclassFeatureRowForm } from './class-feature-row-form-schema'
 import {
   grantGroupsToFormRows,
   formRowsToGrantGroups,
@@ -38,82 +34,8 @@ import { applyStableIdsForUpdate } from '../../lib/forms/registry/content-form-k
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import type { MasterDetailItemFieldSections } from '../../components/master-detail/master-detail-detail-body'
 import { FeatureTablesField } from '../components/features/feature-tables-field'
-import { isSpellcastingFeatureRow } from './class-feature-authoring'
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
 import { getLevelFieldOptions, levelSelectDigits } from '../../lib/form-options/level-field-options'
-
-function refineFeatureRowGrantUnlockLevels(
-  row: { level: number; grants?: { unlockLevel?: number | string }[] },
-  ctx: z.RefinementCtx,
-): void {
-  for (const [index, grant] of (row.grants ?? []).entries()) {
-    const unlockLevel = grant.unlockLevel
-    if (unlockLevel === undefined || unlockLevel === GRANT_DEFAULT_UNLOCK_LEVEL) continue
-
-    const numericUnlock = typeof unlockLevel === 'number' ? unlockLevel : Number(unlockLevel)
-    if (!Number.isFinite(numericUnlock)) continue
-
-    if (numericUnlock <= row.level) {
-      addCustomRefinementIssue(
-        ctx,
-        classValidationMessages.grantGroupUnlockAfterFeatureLevel({
-          unlockLevel: numericUnlock,
-          featureLevel: row.level,
-        }),
-        ['grants', index, 'unlockLevel'],
-      )
-    }
-  }
-}
-
-function createFeatureRowBaseFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
-  const levelField = z.coerce.number().pipe(campaignLevelSchema(maxLevel))
-  return z
-    .object({
-      id: z.string().min(1).optional(),
-      kind: classFeatureKindSchema.optional(),
-      name: z.string().min(1),
-      intro: z.string().optional(),
-      description: z.string().optional(),
-      level: levelField,
-      grants: z.array(createGrantRowFormSchema(maxLevel)),
-    })
-    .superRefine(refineFeatureRowGrantUnlockLevels)
-}
-
-/** Class feature row schema — includes campaign availability. */
-export function createFeatureRowFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
-  return createFeatureRowBaseFormSchema(maxLevel).extend({
-    available: z.boolean().default(true),
-    tables: z.array(contentTableSchema).default([]),
-  })
-}
-
-/** Subclass feature rows omit campaign availability. */
-export function createSubclassFeatureRowFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
-  return createFeatureRowBaseFormSchema(maxLevel)
-}
-
-/** Draft feature row — name may be empty while authoring. */
-export function createFeatureRowDraftFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
-  const levelField = z.coerce.number().pipe(campaignLevelSchema(maxLevel))
-  return z.object({
-    id: z.string().min(1).optional(),
-    kind: classFeatureKindSchema.optional(),
-    name: z.string(),
-    description: z.string().optional(),
-    level: levelField,
-    grants: z.array(createGrantRowFormSchema(maxLevel)),
-    available: z.boolean().default(true),
-    tables: z.array(contentTableSchema).default([]),
-  })
-}
-
-export const featureRowFormSchema = createFeatureRowFormSchema()
-export const subclassFeatureRowFormSchema = createSubclassFeatureRowFormSchema()
-
-export type FeatureRowForm = z.infer<typeof featureRowFormSchema>
-export type SubclassFeatureRowForm = z.infer<typeof subclassFeatureRowFormSchema>
 
 export function featureItemTitle(
   row: Pick<FeatureRowForm, 'name' | 'kind'> | undefined,
@@ -353,7 +275,7 @@ export function featureToFormRow(feature: ClassFeature | ClassBodyFeature): Feat
   return {
     id: feature.id,
     kind: feature.kind,
-    name: 'name' in feature ? feature.name : '',
+    name: resolveClassFeatureName(feature, ''),
     intro: feature.kind === 'spellcasting' ? feature.intro : undefined,
     description:
       feature.kind === 'custom' || feature.kind === 'asi' ? feature.description : undefined,
@@ -363,8 +285,6 @@ export function featureToFormRow(feature: ClassFeature | ClassBodyFeature): Feat
     available,
   }
 }
-
-const DEFAULT_CLASS_FEATURE_KIND = CLASS_FEATURE_KINDS[0] satisfies ClassFeatureKind
 
 function subclassChoiceFeatureFromFormRow(
   row: FeatureRowForm & { id: string },

@@ -276,10 +276,14 @@ export function resolveClassFeatureName(
   feature: Pick<ClassBodyFeature, 'kind' | 'name'>,
   className: string,
 ): string {
-  if (feature.kind === 'subclass-choice') {
-    return feature.name ?? subclassChoiceFeatureLabel(className)
+  switch (feature.kind) {
+    case 'subclass-choice':
+      return feature.name ?? subclassChoiceFeatureLabel(className)
+    case 'custom':
+    case 'asi':
+    case 'spellcasting':
+      return feature.name as string
   }
-  return feature.name
 }
 
 /** Level at which a class chooses a subclass, derived from its feature rows. */
@@ -301,9 +305,9 @@ function refineUniqueClassFeatureIds(features: ClassBodyFeature[], ctx: z.Refine
 }
 
 export function classSubclassChoiceAtOccurrenceLimit(
-  features: readonly Pick<ClassBodyFeature, 'kind'>[],
+  features: readonly { kind?: ClassBodyFeature['kind'] }[],
 ): boolean {
-  return features.filter((feature) => feature.kind === 'subclass-choice').length >= 1
+  return features.filter((feature) => (feature.kind ?? 'custom') === 'subclass-choice').length >= 1
 }
 
 function refineSubclassChoiceCardinality(features: ClassBodyFeature[], ctx: z.RefinementCtx): void {

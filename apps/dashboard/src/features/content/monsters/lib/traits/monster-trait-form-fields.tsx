@@ -91,7 +91,7 @@ export function monsterTraitTemplateFields(templateId?: string): FormItem[] {
     host: 'monster',
     visibility: legendaryResistanceTemplateVisibility,
   }).map((field) => {
-    if (field.name === 'details') {
+    if ('name' in field && field.name === 'details') {
       return {
         ...field,
         label: MONSTER_CUSTOM_DESCRIPTION_LABEL,

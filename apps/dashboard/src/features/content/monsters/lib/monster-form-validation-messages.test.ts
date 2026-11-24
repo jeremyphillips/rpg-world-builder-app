@@ -323,11 +323,16 @@ describe('monster publish validation messages', () => {
   it('shows legendary uses when legendaryActions.actions is non-empty', () => {
     const actionsTab = buildMonsterTabs(ctx).find((tab) => tab.id === 'actions')
     const group = actionsTab?.fields.find(
-      (field) =>
-        'visibility' in field &&
-        field.heading &&
-        'label' in field.heading &&
-        field.heading.label === 'Legendary Actions',
+      (field): field is Extract<typeof field, { kind: 'group' }> => {
+        return (
+          'kind' in field &&
+          field.kind === 'group' &&
+          'heading' in field &&
+          field.heading != null &&
+          'label' in field.heading &&
+          field.heading.label === 'Legendary Actions'
+        )
+      },
     )
     expect(group && 'visibility' in group ? group.visibility : undefined).toEqual(
       expect.objectContaining({

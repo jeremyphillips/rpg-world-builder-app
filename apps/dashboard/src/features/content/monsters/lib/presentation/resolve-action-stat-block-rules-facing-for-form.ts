@@ -146,9 +146,9 @@ function derivedForFacing(
           ].proficiencyBonus
         : 0
 
-  const attacks = draft.attacks
-    .filter((entry) => entry.result.status === 'resolved')
-    .map((entry) => entry.result.value)
+  const attacks = draft.attacks.flatMap((entry) =>
+    entry.result.status === 'resolved' ? [entry.result.value] : [],
+  )
 
   const savingThrows = draft.savingThrows.status === 'resolved' ? draft.savingThrows.value : {}
 

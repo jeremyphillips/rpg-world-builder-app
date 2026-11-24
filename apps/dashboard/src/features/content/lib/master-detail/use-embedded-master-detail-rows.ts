@@ -237,11 +237,15 @@ export function useEmbeddedMasterDetailRows<TRow = Record<string, unknown>>({
     return { status: 'inactive', reasons: [...extraReasons] }
   }, [resolveRowReasons, rowsSnapshot, selectedRow])
 
-  const openAvailabilityDialog = useCallback(() => {
-    openCampaignAvailabilityDialog(availabilityDialogRef.current)
+  const openAvailabilityDialogForSelectedRow = useCallback(() => {
+    const dialog = availabilityDialogRef.current
+    if (dialog) openCampaignAvailabilityDialog(dialog)
   }, [])
 
-  const selectedIdentity = useMemo((): MasterDetailEditorIdentity | undefined => {
+  const availabilityDialogOpener = openAvailabilityDialogForSelectedRow
+  const lastAddedFieldId = editor.lastAddedFieldId
+
+  const selectedIdentity = ((): MasterDetailEditorIdentity | undefined => {
     if (!selectedRow) return undefined
     const row = rowsSnapshot[selectedRow.formIndex]
     const listDisplay = resolveListDisplay({
@@ -251,6 +255,7 @@ export function useEmbeddedMasterDetailRows<TRow = Record<string, unknown>>({
       entityCatalogLayer: formCtx.entityCatalogLayer,
       getRowIssueCount,
     })
+    // eslint-disable-next-line react-hooks/refs -- availability opens from a user gesture, not during render.
     return buildSelectedMasterDetailIdentity({
       selectedRow,
       row,
@@ -258,21 +263,10 @@ export function useEmbeddedMasterDetailRows<TRow = Record<string, unknown>>({
       issueCount: showRowBadges ? (selectedRow.item.issueCount ?? 0) : 0,
       headerIssues: getRowHeaderIssues(selectedRow.formIndex),
       availability: access ? selectedRow.availability : undefined,
-      onAvailabilityChange: access ? openAvailabilityDialog : undefined,
-      lastAddedFieldId: editor.lastAddedFieldId,
+      onAvailabilityChange: access ? availabilityDialogOpener : undefined,
+      lastAddedFieldId,
     })
-  }, [
-    access,
-    editor.lastAddedFieldId,
-    formCtx.entityCatalogLayer,
-    getRowHeaderIssues,
-    getRowIssueCount,
-    openAvailabilityDialog,
-    resolveListDisplay,
-    rowsSnapshot,
-    selectedRow,
-    showRowBadges,
-  ])
+  })()
 
   const availabilityFormItems = useMemo((): FormItem[] | undefined => {
     if (!access || !selectedRow || access.kind !== 'availability') return undefined

@@ -39,7 +39,7 @@ export function OptionalDisclosureRowMessage({
 
   return (
     <FieldHintText id={hintId} size={size} className="min-w-0 max-w-full break-words">
-      {hint}
+      {hint ?? ''}
     </FieldHintText>
   )
 }

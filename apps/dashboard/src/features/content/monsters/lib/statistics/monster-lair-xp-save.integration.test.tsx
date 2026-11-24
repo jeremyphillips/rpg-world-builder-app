@@ -124,7 +124,11 @@ function MonsterEditShellHarness({
             schema={schema as ZodType<MonsterFormValues>}
             tabs={tabs}
             defaultValues={defaultValues as MonsterFormValues}
-            valueSyncs={monsterFormDef.valueSyncs?.()}
+            valueSyncs={
+              typeof monsterFormDef.valueSyncs === 'function'
+                ? monsterFormDef.valueSyncs(makeContentFormCtx())
+                : (monsterFormDef.valueSyncs ?? [])
+            }
             publishPresentationEnabled
             hasAttemptedPublish={hasAttemptedPublish}
             onMarkPublishAttempted={markPublishAttempted}

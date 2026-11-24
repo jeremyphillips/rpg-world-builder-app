@@ -208,7 +208,6 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
               digits: 2,
               width: 'auto',
               control: 'stepper',
-              shouldUnregister: false,
             },
             {
               type: 'number',
@@ -219,7 +218,6 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
               digits: 2,
               width: 'auto',
               control: 'stepper',
-              shouldUnregister: false,
               visibility: monsterLairEnabledVisibility,
             },
           ],

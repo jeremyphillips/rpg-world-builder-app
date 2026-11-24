@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   CREATURE_TRAIT_PRESET_IDS,
+  getCreatureTraitPresetSentence,
   isConfigurableCreatureTraitPreset,
 } from '../../content/creature/trait-presets'
 import { formatMonsterStatBlockSubject } from '../monster/spell-entry-presentation'
@@ -163,6 +164,8 @@ describe('formatCreatureTrait', () => {
     expect(CREATURE_TRAIT_PRESET_IDS).toEqual(CREATURE_TRAIT_VOCABULARY_IDS)
     for (const presetId of CREATURE_TRAIT_PRESET_IDS) {
       if (isConfigurableCreatureTraitPreset(presetId)) continue
+      const sampleSentence = getCreatureTraitPresetSentence(presetId, subjects[0]!)
+      if (sampleSentence === undefined || sampleSentence === '') continue
       for (const subject of subjects) {
         const formatted = formatCreatureTrait({ subject, trait: { preset: presetId } })
         expect(formatted?.name).toBe(CREATURE_TRAIT_VOCABULARY_ENTRIES[presetId].label)

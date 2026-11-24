@@ -52,7 +52,9 @@ function collectLeafFieldNames(items: readonly FormItem[]): string[] {
       continue
     }
 
-    names.push(...collectLeafFieldNames(item.fields))
+    if ('fields' in item) {
+      names.push(...collectLeafFieldNames(item.fields))
+    }
   }
 
   return names

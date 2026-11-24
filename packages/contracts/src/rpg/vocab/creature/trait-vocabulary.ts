@@ -1,4 +1,4 @@
-import { LEGENDARY_RESISTANCE_LABEL } from '../../content/creature/traits/legendary-resistance.constants'
+import { LEGENDARY_RESISTANCE_LABEL } from './legendary-resistance-label'
 import { keysFromEntries } from '../enum-schema'
 import type { GameTermEntry, VocabularyTerm } from '../types'
 

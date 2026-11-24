@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest'
 
 import { buildSeedDamageTypeVocabulary } from '@/features/vocabulary'
 
-import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
+import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import { monsterFormTestValues } from '../../../lib/monster-form-test-values'
 import {
   buildMonsterInput,

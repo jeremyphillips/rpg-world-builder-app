@@ -144,7 +144,8 @@ describe('classFormDef round-trips', () => {
     const formValues = classFormDef.toFormValues(bard) as ClassFormValues
     const input = classFormDef.toInput(formValues)
     const wordsOfCreation = input.features.find((f) => f.id === 'words-of-creation')
-    const spellGrant = wordsOfCreation?.grantGroups?.[0]?.grants?.[0]
+    const spellGrant =
+      wordsOfCreation?.kind === 'custom' ? wordsOfCreation.grantGroups?.[0]?.grants?.[0] : undefined
     expect(spellGrant?.kind).toBe('spells')
     if (spellGrant?.kind === 'spells') {
       expect(spellGrant.spellIds).toEqual([

@@ -15,6 +15,7 @@ import {
   type FacingResolution,
   type ProficiencyChoice,
   type ResolvedSpellcastingProgressionConfig,
+  resolveClassFeatureName,
   type Spell,
 } from '@rpg/contracts'
 
@@ -373,8 +374,12 @@ function mapFeatureToDetailItem(
   }
 }
 
-function sortFeatures(features: readonly ClassFeature[]): ClassFeature[] {
-  return [...features].sort((a, b) => a.level - b.level || a.name.localeCompare(b.name))
+function sortFeatures(features: readonly ClassFeature[], className: string): ClassFeature[] {
+  return [...features].sort(
+    (a, b) =>
+      a.level - b.level ||
+      resolveClassFeatureName(a, className).localeCompare(resolveClassFeatureName(b, className)),
+  )
 }
 
 function buildFeaturesSection(
@@ -385,7 +390,7 @@ function buildFeaturesSection(
   return {
     id: 'features',
     title: `${characterClass.name} Class Features`,
-    items: sortFeatures(features).map((feature) =>
+    items: sortFeatures(features, characterClass.name).map((feature) =>
       mapFeatureToDetailItem(feature, {
         characterClass: options?.characterClass,
         spellcastingProgression: options?.spellcastingProgression,

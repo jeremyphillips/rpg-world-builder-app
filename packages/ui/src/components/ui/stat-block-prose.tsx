@@ -1,5 +1,4 @@
 import {
-  statBlockLeadSeparator,
   type StatBlockProse,
   type StatBlockProseDocument,
   type StatBlockProseSegment,

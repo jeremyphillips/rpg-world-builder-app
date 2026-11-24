@@ -192,7 +192,7 @@ describe('speciesFormDef create vs update modes', () => {
         grants: [
           {
             grantType: 'resistances',
-            grantId: 'resist-1',
+            id: 'resist-1',
             resistances: ['poison'],
           },
         ],
@@ -235,7 +235,7 @@ describe('speciesFormDef create vs update modes', () => {
         grants: [
           {
             grantType: 'movement',
-            grantId: 'move-1',
+            id: 'move-1',
             movementMode: 'walk',
             movementOperation: 'increase',
             movementFeet: 5,

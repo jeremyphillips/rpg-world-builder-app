@@ -25,25 +25,27 @@ function resolveStackedLabelLayout(labelPosition?: FieldLabelPosition): FieldLab
   return mapFormLabelPositionToLayout(labelPosition ?? 'above')
 }
 
+const CONTROLLER_TYPES_WITH_OPTIONAL_LABEL_POSITION = new Set<FieldConfig['type']>([
+  'select',
+  'text',
+  'number',
+  'textarea',
+  'richtext',
+  'markdown',
+  'json',
+])
+
+function optionalControllerLabelPosition(controller: FieldConfig): FieldLabelPosition | undefined {
+  return 'labelPosition' in controller ? controller.labelPosition : undefined
+}
+
 function resolveControllerLabelLayout(controller: FieldConfig): FieldLabelLayout {
-  switch (controller.type) {
-    case 'switch':
-      return resolveSwitchLabelLayout(controller)
-    case 'checkbox':
-    case 'boolean':
-      return 'inline'
-    case 'select':
-      return resolveStackedLabelLayout(controller.labelPosition)
-    case 'text':
-    case 'number':
-    case 'textarea':
-    case 'richtext':
-    case 'markdown':
-    case 'json':
-      return resolveStackedLabelLayout(controller.labelPosition)
-    default:
-      return 'stacked'
+  if (controller.type === 'switch') return resolveSwitchLabelLayout(controller)
+  if (controller.type === 'checkbox' || controller.type === 'boolean') return 'inline'
+  if (CONTROLLER_TYPES_WITH_OPTIONAL_LABEL_POSITION.has(controller.type)) {
+    return resolveStackedLabelLayout(optionalControllerLabelPosition(controller))
   }
+  return 'stacked'
 }
 
 /**

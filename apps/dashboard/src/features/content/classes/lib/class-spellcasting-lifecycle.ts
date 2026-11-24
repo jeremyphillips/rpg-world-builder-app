@@ -5,11 +5,7 @@ import {
 } from '@rpg/contracts'
 
 import type { ClassFormValues } from './class-form-fields'
-import {
-  featureFromFormRow,
-  featureToFormRow,
-  type FeatureRowForm,
-} from './class-feature-form-fields'
+import { featureToFormRow, type FeatureRowForm } from './class-feature-form-fields'
 import { isSpellcastingFeatureRow } from './class-feature-authoring'
 import {
   createSpellcastingFeature,

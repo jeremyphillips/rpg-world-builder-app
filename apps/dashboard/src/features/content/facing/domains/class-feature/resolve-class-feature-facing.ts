@@ -19,24 +19,23 @@ import {
 } from './resolvers/subclass-choice-class-feature-facing'
 import type { ClassFacingHostContext } from './class-facing-host'
 
-const CLASS_FEATURE_FACING_RESOLVERS = {
-  custom: resolveCustomClassFeatureFacing,
-  asi: resolveAsiClassFeatureFacing,
-  spellcasting: resolveSpellcastingClassFeatureFacing,
-  'subclass-choice': resolveSubclassChoiceClassFeatureFacing,
-} as const satisfies Record<
-  ClassFeatureKind,
-  (
-    row: FeatureRowForm & { kind: ClassFeatureKind },
-    host: ClassFacingHostContext,
-  ) => FacingResolution
->
-
 export function resolveClassFeatureDraftFacing(
   row: FeatureRowForm & { kind: ClassFeatureKind },
   host: ClassFacingHostContext,
 ): FacingResolution {
-  return CLASS_FEATURE_FACING_RESOLVERS[row.kind](row, host)
+  switch (row.kind) {
+    case 'custom':
+      return resolveCustomClassFeatureFacing(row as unknown as FeatureRowForm & { kind: 'custom' })
+    case 'asi':
+      return resolveAsiClassFeatureFacing(row as never)
+    case 'spellcasting':
+      return resolveSpellcastingClassFeatureFacing(
+        row as FeatureRowForm & { kind: 'spellcasting' },
+        host,
+      )
+    case 'subclass-choice':
+      return resolveSubclassChoiceClassFeatureFacing(row as FeatureRowForm & { id: string }, host)
+  }
 }
 
 export function resolveClassFeaturePersistedFacing(

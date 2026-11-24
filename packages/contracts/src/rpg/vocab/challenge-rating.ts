@@ -118,3 +118,35 @@ export function compareChallengeRatings(left: ChallengeRating, right: ChallengeR
 export function formatChallengeRating(id: ChallengeRating): string {
   return id.includes('/') ? id : String(id)
 }
+
+export type SuggestInLairExperienceResult =
+  | { status: 'available'; experiencePoints: number }
+  | { status: 'unavailable' }
+
+const TABLE_ORDER: ChallengeRating[] = [...CHALLENGE_RATING_IDS].sort(compareChallengeRatings)
+
+export function suggestInLairExperience(
+  rating: ChallengeRating,
+  mechanics: Record<ChallengeRating, ChallengeRatingMechanics> = CHALLENGE_RATING_MECHANICS,
+): SuggestInLairExperienceResult {
+  const index = TABLE_ORDER.indexOf(rating)
+  if (index < 0 || index >= TABLE_ORDER.length - 1) {
+    return { status: 'unavailable' }
+  }
+  const successor = TABLE_ORDER[index + 1]!
+  return { status: 'available', experiencePoints: mechanics[successor].xp }
+}
+
+export type MonsterBaseExperienceInput = {
+  challengeRating: ChallengeRating
+  experiencePointsOverride?: number
+}
+
+/** Normal XP reward for a monster — table XP unless `experiencePointsOverride` is set. */
+export function resolveMonsterBaseExperiencePoints(input: MonsterBaseExperienceInput): number {
+  const derived = CHALLENGE_RATING_MECHANICS[input.challengeRating].xp
+  if (input.experiencePointsOverride !== undefined) {
+    return input.experiencePointsOverride
+  }
+  return derived
+}

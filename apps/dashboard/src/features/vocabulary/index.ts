@@ -21,7 +21,11 @@ export { useWeaponPropertyVocabulary } from './hooks/use-weapon-property-vocabul
 export { useEquipmentCategoryVocabulary } from './hooks/use-equipment-category-vocabulary'
 export { useVocabularySetMaps } from './hooks/use-vocabulary-set-maps'
 
-export { buildLabelDescriptionActiveVocabulary } from './lib/build-vocabulary-maps'
+export {
+  buildLabelDescriptionActiveVocabulary,
+  buildVocabularyFromSeedSet,
+  type LabelDescriptionActiveVocabulary,
+} from './lib/build-vocabulary-maps'
 export {
   VOCABULARY_SOURCE_BADGE,
   VOCABULARY_SOURCE_LABELS,

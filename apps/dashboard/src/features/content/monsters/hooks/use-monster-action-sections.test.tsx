@@ -167,7 +167,7 @@ describe('useMonsterActionSections', () => {
       wrapper: wrapper({
         actions: [{ id: 'bite', kind: 'special', name: 'Bite', description: '<p>Bites.</p>' }],
         legendaryActions: {
-          uses: 3,
+          uses: { normal: 3 },
           actions: [
             { id: 'pounce', kind: 'action-reference', name: 'Pounce', actionIds: ['bite'] },
           ],
@@ -190,7 +190,7 @@ describe('useMonsterActionSections', () => {
       wrapper: wrapper({
         actions: [{ id: 'bite', kind: 'special', name: 'Bite', description: '<p>Bites.</p>' }],
         legendaryActions: {
-          uses: 3,
+          uses: { normal: 3 },
           actions: [
             { id: 'pounce', kind: 'action-reference', name: 'Pounce', actionIds: ['bite'] },
           ],

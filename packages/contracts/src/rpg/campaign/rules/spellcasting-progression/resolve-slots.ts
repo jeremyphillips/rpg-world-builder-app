@@ -1,9 +1,5 @@
-import { CLASS_FEATURE_KIND_ENTRIES } from '../../../content/classes/class'
 import type { ProgressionExtension } from '../../../vocab/spell/progression-extension'
-import {
-  getSlotProgressionKindLabel,
-  PACT_MAGIC_SLOT_PROGRESSION_KIND_ID,
-} from '../../../vocab/spell/slot-progression-kind'
+import { spellcastingFeatureLabelForSlotProgression } from '../../../vocab/spell/slot-progression-kind'
 
 import { expandSlotCountsForDisplay, normalizeSlotCounts } from './lookup'
 import type { LeveledSlotRow, PactSlotRow, SlotProgression } from './slot-progression'
@@ -163,11 +159,6 @@ export function resolveDisplaySlotRowAtLevel(
   return expandSlotCountsForDisplay(slots, width)
 }
 
-/** Feature-table label derived from slot progression kind. */
-export function spellcastingFeatureLabelForSlotProgression(progression: SlotProgression): string {
-  return progression.kind === 'pact'
-    ? getSlotProgressionKindLabel(PACT_MAGIC_SLOT_PROGRESSION_KIND_ID)
-    : CLASS_FEATURE_KIND_ENTRIES.spellcasting.label
-}
+export { spellcastingFeatureLabelForSlotProgression }
 
 export type { ProgressionExtension }

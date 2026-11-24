@@ -64,7 +64,7 @@ function resolveSpellcastingGrantingFeatureRulesDocumentFromInput(
     },
     features: [feature],
     spellcasting: input.spellcasting,
-  } as CharacterClass
+  } as unknown as CharacterClass
 
   return formatClassSpellcastingFeatureRules({
     characterClass,

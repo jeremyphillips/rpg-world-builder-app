@@ -6,6 +6,7 @@ import {
   type Monster,
 } from '@rpg/contracts'
 
+import type { MonsterFormValues } from '../monster-form-values'
 import { applyMonsterEntryHeadingQualifiers } from './monster-entry-heading'
 
 export type TraitStatBlockRulesFacing = {

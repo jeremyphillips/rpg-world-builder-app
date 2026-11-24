@@ -65,7 +65,17 @@ function Detail({ ctx, actionId }: { ctx: ContentFormCtx; actionId: string }) {
       title: (row as { name?: string } | undefined)?.name?.trim() || `Action ${index + 1}`,
     }),
   })
-  return <MonsterActionDetail ctx={ctx} sections={sections} located={located} rows={rows} />
+  return (
+    <MonsterActionDetail
+      ctx={ctx}
+      sections={sections}
+      located={located}
+      rows={rows}
+      weapons={[]}
+      weaponActions={[]}
+      allowAddWeapon={false}
+    />
+  )
 }
 
 const shot: MonsterActionDraftRow = {
