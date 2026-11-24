@@ -12,7 +12,11 @@ function joinFieldPath(prefix: string, name: string): string {
 
 function prefixRowFieldItem(field: RowFieldItem, prefix: string): RowFieldItem {
   if (isRowSlotItem(field)) {
-    return { ...field, name: joinFieldPath(prefix, field.name) }
+    return {
+      ...field,
+      name: joinFieldPath(prefix, field.name),
+      boundNames: field.boundNames?.map((name) => joinFieldPath(prefix, name)),
+    }
   }
   return prefixFieldConfig(field, prefix)
 }
@@ -34,6 +38,7 @@ function prefixFormItem(item: FormItem, prefix: string): FormItem {
     return {
       ...item,
       name: joinFieldPath(prefix, item.name),
+      boundNames: item.boundNames?.map((name) => joinFieldPath(prefix, name)),
       issuePaths: item.issuePaths?.map((issuePath) => joinFieldPath(prefix, issuePath)),
     }
   }

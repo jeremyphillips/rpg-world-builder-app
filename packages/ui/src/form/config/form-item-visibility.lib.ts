@@ -175,12 +175,14 @@ export function formItemsHaveVisibleRenderableFields(
   return items.some((item) => formItemHasVisibleRenderableField(item, values))
 }
 
+type ActiveFormItemBinding = { path: string; kind: 'field' | 'array' }
+
 /** Lists mounted field paths in a form scope, retaining duplicates for ownership checks. */
-export function collectActiveFormItemBoundPaths(
+export function collectActiveFormItemBindings(
   items: readonly FormItem[],
   formValues: Record<string, unknown>,
   namePrefix: string,
-): string[] {
+): ActiveFormItemBinding[] {
   const isVisible = (visibility?: FieldVisibility | null) =>
     !visibility ||
     visibility.visibleWhen(
@@ -188,31 +190,39 @@ export function collectActiveFormItemBoundPaths(
     )
   const qualify = (name: string) => (namePrefix ? `${namePrefix}.${name}` : name)
 
-  return items.flatMap((item): string[] => {
+  const fieldBinding = (name: string): ActiveFormItemBinding => ({
+    path: qualify(name),
+    kind: 'field',
+  })
+
+  function collectDependentBindings(
+    item: Extract<FormItem, { kind: 'dependent' }>,
+  ): ActiveFormItemBinding[] {
+    if (!isVisible(item.controller.visibility)) return []
+    const controllerPaths = resolveFieldConfigBoundNames(item.controller).map(fieldBinding)
+    const visibility = resolveDependentsVisibility(item, item.controller)
+    if (!isVisible(visibility)) return controllerPaths
+    return [
+      ...controllerPaths,
+      ...collectActiveFormItemBindings(item.dependents.fields, formValues, namePrefix),
+    ]
+  }
+
+  return items.flatMap((item): ActiveFormItemBinding[] => {
     if (!isVisible(item.visibility)) return []
-    if (!('kind' in item)) return resolveFieldConfigBoundNames(item).map(qualify)
+    if (!('kind' in item)) return resolveFieldConfigBoundNames(item).map(fieldBinding)
 
     switch (item.kind) {
       case 'group':
       case 'row':
       case 'columns':
-        return collectActiveFormItemBoundPaths(
-          formContainerChildItems(item),
-          formValues,
-          namePrefix,
-        )
-      case 'dependent': {
-        if (!isVisible(item.controller.visibility)) return []
-        const controllerPaths = resolveFieldConfigBoundNames(item.controller).map(qualify)
-        const visibility = resolveDependentsVisibility(item, item.controller)
-        if (!isVisible(visibility)) return controllerPaths
-        return [
-          ...controllerPaths,
-          ...collectActiveFormItemBoundPaths(item.dependents.fields, formValues, namePrefix),
-        ]
-      }
+        return collectActiveFormItemBindings(formContainerChildItems(item), formValues, namePrefix)
+      case 'dependent':
+        return collectDependentBindings(item)
+      case 'slot':
+        return item.boundNames?.map(fieldBinding) ?? []
       case 'array':
-        return [qualify(item.name)]
+        return [{ path: qualify(item.name), kind: 'array' }]
       default:
         return []
     }

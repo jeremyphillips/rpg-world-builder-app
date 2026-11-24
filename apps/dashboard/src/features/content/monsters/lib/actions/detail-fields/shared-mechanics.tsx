@@ -186,6 +186,7 @@ function monsterActionBonusSourceDependent(namePrefix: string, currentActionId: 
       {
         kind: 'slot',
         name: 'bonusSource.ability',
+        boundNames: ['bonusSource.ability'],
         render: () => (
           <MonsterActionAttackAbilityField
             name={`${namePrefix}.bonusSource.ability`}

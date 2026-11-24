@@ -42,7 +42,7 @@ MasterDetailEditorPanel
 
 ## Field binding ownership
 
-The detail body rejects duplicate effective RHF paths across its leading and primary field regions before rendering a conflicting configuration. Visibility is evaluated against the same scoped form values as the field renderer, including parent-relative dependencies. An array owns its collection path and manages its item bindings. Custom slot ownership requires a separate declaration before it can participate in this check.
+The detail body rejects duplicate effective RHF paths across its leading and primary field regions before rendering a conflicting configuration. Visibility is evaluated against the same scoped form values as the field renderer, including parent-relative dependencies. The inline title path belongs to the editor shell. Legacy field lists omit the redundant title field, and explicit sections that claim that path are rejected. An array owns its collection and descendant paths. Other detail fields cannot bind paths inside that collection. Custom slots can declare the relative paths they own with `boundNames`. A slot’s display name alone does not reserve a field path.
 
 ## Prohibitions
 

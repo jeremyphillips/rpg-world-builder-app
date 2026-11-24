@@ -1,6 +1,6 @@
 import type { Spell } from '@rpg/contracts'
 import {
-  collectActiveFormItemBoundPaths,
+  collectActiveFormItemBindings,
   FormItems,
   FormRhythmStack,
   type FormItem,
@@ -11,6 +11,7 @@ import type { FacingHostConfig } from '../../facing/facing-host-config.types'
 import { StructuredFacingHostPanel } from '../../facing/structured-facing-host-panel'
 import { MonsterSpellPickerHost } from '../../monsters/components/form/spells/spell-picker-host'
 import { MasterDetailDetailFormScope } from '../../lib/master-detail/master-detail-detail-form-scope'
+import type { MasterDetailInlineTitle } from '../../lib/master-detail/master-detail-inline-title.types'
 import { wrapMasterDetailDetailFields } from '../../lib/master-detail/wrap-master-detail-detail-fields'
 
 export type MasterDetailItemFieldSections = {
@@ -30,6 +31,7 @@ export type MasterDetailDetailBodyProps = {
   idPrefix: string
   selectedFieldId: string
   namePrefix: string
+  inlineTitleField?: MasterDetailInlineTitle['field']
   spellPicker?: MasterDetailSpellPicker
 }
 
@@ -102,22 +104,39 @@ function MasterDetailFieldBindingGuard({
   leading,
   primary,
   namePrefix,
+  inlineTitleField,
 }: {
   leading: readonly FormItem[]
   primary: readonly FormItem[]
   namePrefix: string
+  inlineTitleField?: MasterDetailInlineTitle['field']
 }) {
   const values = useWatch()
-  const owners = new Map<string, string>()
+  const owners = new Map<string, { region: string; kind: 'field' | 'array' }>()
+  if (inlineTitleField)
+    owners.set(`${namePrefix}.${inlineTitleField}`, { region: 'inline title', kind: 'field' })
   for (const [region, fields] of [
     ['leading', leading],
     ['primary', primary],
   ] as const) {
-    for (const path of collectActiveFormItemBoundPaths(fields, values, namePrefix)) {
+    for (const { path, kind } of collectActiveFormItemBindings(fields, values, namePrefix)) {
       const owner = owners.get(path)
       if (owner)
-        throw new Error(`Duplicate master–detail field binding "${path}" (${owner}, ${region})`)
-      owners.set(path, region)
+        throw new Error(
+          `Duplicate master–detail field binding "${path}" (${owner.region}, ${region})`,
+        )
+
+      for (const [ownedPath, owned] of owners) {
+        const overlaps =
+          (owned.kind === 'array' && path.startsWith(`${ownedPath}.`)) ||
+          (kind === 'array' && ownedPath.startsWith(`${path}.`))
+        if (overlaps) {
+          throw new Error(
+            `Overlapping master–detail field bindings "${ownedPath}" and "${path}" (${owned.region}, ${region})`,
+          )
+        }
+      }
+      owners.set(path, { region, kind })
     }
   }
   return null
@@ -134,6 +153,7 @@ export function MasterDetailDetailBody({
   idPrefix,
   selectedFieldId,
   namePrefix,
+  inlineTitleField,
   spellPicker,
 }: MasterDetailDetailBodyProps) {
   const hasLeading = Boolean(leadingItemFields?.length)
@@ -148,6 +168,7 @@ export function MasterDetailDetailBody({
       <MasterDetailFieldBindingGuard
         leading={leadingItemFields ?? []}
         primary={primaryItemFields}
+        inlineTitleField={inlineTitleField}
         namePrefix={namePrefix}
       />
       {hasLeading ? (

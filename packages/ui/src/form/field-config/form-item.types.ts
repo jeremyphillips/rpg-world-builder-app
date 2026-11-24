@@ -581,6 +581,8 @@ export type ArrayConfig = AnonymousArrayConfig | NamedArrayConfig
 export interface SlotConfig {
   kind: 'slot'
   name: string
+  /** Relative RHF paths this slot owns, including paths managed through setValue. */
+  boundNames?: readonly string[]
   /** Leaf-tier heading for the slot composite surface. */
   heading?: FormHeading
   /**

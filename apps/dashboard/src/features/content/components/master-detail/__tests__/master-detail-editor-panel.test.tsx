@@ -203,6 +203,32 @@ describe('MasterDetailEditorPanel', () => {
     expect(screen.getByTestId('bubble')).not.toHaveFocus()
   })
 
+  it('rejects an explicit field section that binds the shell-owned inline title', () => {
+    expect(() =>
+      render(
+        <PanelShell
+          editor={makeEditor()}
+          itemFields={itemFields}
+          fieldName="traits"
+          idPrefix="species-trait"
+          itemNoun={TRAIT_MASTER_DETAIL_ITEM_NOUN}
+          selectedIdentity={{
+            ...selectedIdentity,
+            inlineTitle: {
+              field: 'name',
+              mode: 'authored',
+              fallback: 'Unnamed Trait',
+              placeholder: 'Unnamed Trait',
+            },
+          }}
+          fieldSections={{
+            primary: [{ type: 'text', name: 'name', label: 'Name' }],
+          }}
+        />,
+      ),
+    ).toThrow('Duplicate master–detail field binding "traits.0.name" (inline title, primary)')
+  })
+
   it('renders the empty-selection state when nothing is selected', () => {
     render(
       <PanelShell

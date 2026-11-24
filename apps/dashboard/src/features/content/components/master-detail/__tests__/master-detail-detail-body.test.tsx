@@ -107,6 +107,45 @@ describe('MasterDetailDetailBody', () => {
     ).toThrow('Duplicate master–detail field binding "features.0.intro" (leading, primary)')
   })
 
+  it.each([true, false])(
+    'rejects an external array child binding (array first: %s)',
+    (arrayFirst) => {
+      const collection = { kind: 'array' as const, name: 'spells', fields: [] }
+      const child = { type: 'text' as const, name: 'spells.0.name', label: 'Spell name' }
+      expect(() =>
+        render(
+          <Shell>
+            <MasterDetailDetailBody
+              leadingItemFields={[arrayFirst ? collection : child]}
+              primaryItemFields={[arrayFirst ? child : collection]}
+              idPrefix="feature"
+              selectedFieldId="row-1"
+              namePrefix="features.0"
+            />
+          </Shell>,
+        ),
+      ).toThrow(/Overlapping master–detail field bindings/)
+    },
+  )
+
+  it('rejects a second binding to a path owned by a custom slot', () => {
+    expect(() =>
+      render(
+        <Shell>
+          <MasterDetailDetailBody
+            leadingItemFields={[
+              { kind: 'slot', name: 'controls', boundNames: ['intro'], render: () => null },
+            ]}
+            primaryItemFields={[{ type: 'text', name: 'intro', label: 'Introduction' }]}
+            idPrefix="feature"
+            selectedFieldId="row-1"
+            namePrefix="features.0"
+          />
+        </Shell>,
+      ),
+    ).toThrow('Duplicate master–detail field binding "features.0.intro" (leading, primary)')
+  })
+
   it('permits mutually exclusive fields that share an effective path', () => {
     render(
       <Shell>

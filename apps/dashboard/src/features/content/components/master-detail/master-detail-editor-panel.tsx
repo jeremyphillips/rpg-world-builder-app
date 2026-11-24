@@ -68,7 +68,6 @@ export interface MasterDetailEditorPanelProps {
   facing?: FacingHostConfig
   /** Optional leading vs primary field regions (`leading` → facing → `primary`). */
   fieldSections?: MasterDetailItemFieldSections
-  /** Domain composites after primary fields inside the outer rhythm stack. */
   /**
    * Wraps shell-owned primary `FormItems` when a domain host must own interactive context (spell picker).
    * Must not introduce a second outer rhythm stack.
@@ -92,6 +91,7 @@ interface MasterDetailSelectedRowEditorProps {
   availabilityDialogRef?: RefObject<HTMLDivElement | null>
   contextualChrome?: ReactNode
   facing?: FacingHostConfig
+  inlineTitleField?: MasterDetailInlineTitle['field']
   fieldSections?: MasterDetailItemFieldSections
   spellPicker?: MasterDetailSpellPicker
 }
@@ -109,6 +109,7 @@ function MasterDetailSelectedRowEditor({
   availabilityDialogRef,
   contextualChrome,
   facing,
+  inlineTitleField,
   fieldSections,
   spellPicker,
 }: MasterDetailSelectedRowEditorProps) {
@@ -141,6 +142,7 @@ function MasterDetailSelectedRowEditor({
         idPrefix={idPrefix}
         selectedFieldId={selectedFieldId}
         namePrefix={rowPrefix}
+        inlineTitleField={inlineTitleField}
         spellPicker={spellPicker}
       />
     </MasterDetailRowPrefixProvider>
@@ -243,6 +245,7 @@ export function MasterDetailEditorPanel({
           availabilityDialogRef={availabilityDialogRef}
           contextualChrome={contextualChrome}
           facing={facing}
+          inlineTitleField={inlineTitle?.field}
           fieldSections={fieldSections}
           spellPicker={spellPicker}
         />
