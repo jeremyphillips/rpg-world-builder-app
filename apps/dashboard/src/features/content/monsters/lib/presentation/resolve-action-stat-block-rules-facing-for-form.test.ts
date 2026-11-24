@@ -152,6 +152,94 @@ describe('resolveActionStatBlockRulesFacingForForm', () => {
     expect(outcome.status).toBe('unavailable')
   })
 
+  it('resolves a natural-attack multiattack during unrelated catalog failures', () => {
+    const monster = pickMonster('hell-hound')
+    const values = baseValues({ actions: monster.actions })
+    const ctx = baseCtx({ equipmentCatalogStatus: 'error', spellCatalogStatus: 'error' })
+    const request = { actionId: 'multiattack', section: 'actions', ctx } as const
+
+    expect(resolveActionStatBlockRulesFacingForForm({ ...request, values })).toMatchObject({
+      status: 'ready',
+      facing: { descriptionHtml: expect.stringContaining('Bite') },
+    })
+
+    expect(
+      resolveActionStatBlockRulesFacingForForm({
+        ...request,
+        values: { ...values, actions: values.actions?.filter((row) => row.kind === 'multiattack') },
+      }),
+    ).toEqual({ status: 'unavailable', reason: { code: 'missing-action-reference' } })
+  })
+
+  it('checks equipment only when a multiattack references a weapon', () => {
+    const monster = pickMonster('kobold-warrior')
+    const action = monster.actions.find((row) => row.kind === 'weapon')
+    if (!action) throw new Error('Missing weapon fixture')
+
+    const values = baseValues({
+      equipment: monster.equipment,
+      actions: [
+        action,
+        {
+          id: 'combo',
+          kind: 'multiattack',
+          name: 'Multiattack',
+          steps: [{ actionIds: [action.id], count: 2 }],
+        },
+      ],
+    })
+    expect(
+      resolveActionStatBlockRulesFacingForForm({
+        values,
+        ctx: baseCtx({ equipmentCatalogStatus: 'pending', spellCatalogStatus: 'error' }),
+        actionId: 'combo',
+        section: 'actions',
+      }),
+    ).toEqual({ status: 'unavailable', reason: { code: 'catalog-pending', catalog: 'equipment' } })
+  })
+
+  it('uses the spell catalog for an explicit multiattack spell choice', () => {
+    const spell = pickSpell('fireball')
+    const values = baseValues({
+      actions: [
+        {
+          id: 'cast',
+          kind: 'spell',
+          name: 'Spellcasting',
+          castingAbility: { kind: 'ability', ability: 'int' },
+          spells: [{ spellId: spell.id }],
+        },
+        {
+          id: 'combo',
+          kind: 'multiattack',
+          name: 'Multiattack',
+          steps: [{ kind: 'use', mode: 'single', actionId: 'cast', spellId: spell.id }],
+        },
+      ],
+    })
+    const request = { values, actionId: 'combo', section: 'actions' } as const
+
+    expect(
+      resolveActionStatBlockRulesFacingForForm({
+        ...request,
+        ctx: baseCtx({ equipmentCatalogStatus: 'error', spellCatalogStatus: 'pending' }),
+      }),
+    ).toEqual({ status: 'unavailable', reason: { code: 'catalog-pending', catalog: 'spells' } })
+
+    expect(
+      resolveActionStatBlockRulesFacingForForm({
+        ...request,
+        ctx: baseCtx({
+          equipmentCatalogStatus: 'error',
+          spellCatalogById: new Map([[spell.id, spell]]),
+        }),
+      }),
+    ).toMatchObject({
+      status: 'ready',
+      facing: { descriptionHtml: expect.stringContaining('Fireball') },
+    })
+  })
+
   it('distinguishes weapon selection, equipment lifecycle, and missing references', () => {
     const monster = pickMonster('kobold-warrior')
     const action = monster.actions.find((row) => row.kind === 'weapon')

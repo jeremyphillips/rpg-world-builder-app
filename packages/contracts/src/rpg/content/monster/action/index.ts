@@ -104,7 +104,11 @@ export {
   type MultiattackUseChoice,
   type MultiattackUseSingle,
 } from './multiattack-schemas'
-export { actionsReferencingAction, stripReferencedActionId } from './action-references'
+export {
+  actionsReferencingAction,
+  monsterReferencedActionIds,
+  stripReferencedActionId,
+} from './action-references'
 export type { ReferencedActionRow } from './action-references'
 export { planMonsterActionRemoval, shapeShiftRows } from './action-removal-plan'
 export type { MonsterActionPlanBody, MonsterActionRemovalPlan } from './action-removal-plan'

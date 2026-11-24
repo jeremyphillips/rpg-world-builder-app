@@ -34,6 +34,7 @@ export const MISSING_SPELL_CONFIGURATION_MESSAGE =
   'Configure spellcasting details to preview this action.' as const
 
 export const FACING_REASON_STATIC_MESSAGES = {
+  'missing-action-reference': 'Referenced action unavailable.',
   'missing-rules-text': MISSING_RULES_TEXT_MESSAGE,
   'missing-kind': MISSING_KIND_MESSAGE,
   'missing-spell-configuration': MISSING_SPELL_CONFIGURATION_MESSAGE,

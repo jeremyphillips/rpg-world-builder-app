@@ -33,7 +33,7 @@ function multiattackStepReferences(steps: ReferencedActionRow['steps']): string[
 }
 
 // fallow-ignore-next-line complexity
-function referencedIds(action: ReferencedActionRow): string[] {
+export function monsterReferencedActionIds(action: ReferencedActionRow): string[] {
   if (action.kind === 'multiattack') {
     const fromSteps = multiattackStepReferences(action.steps)
     const fromReplacement = [
@@ -59,7 +59,7 @@ export function actionsReferencingAction<T extends ReferencedActionRow>(
   actionId: string,
 ): T[] {
   return actions.filter(
-    (action) => action.id !== actionId && referencedIds(action).includes(actionId),
+    (action) => action.id !== actionId && monsterReferencedActionIds(action).includes(actionId),
   )
 }
 

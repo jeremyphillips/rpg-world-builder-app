@@ -5,8 +5,10 @@ import {
   createSpellCatalogContext,
   resolveSpellReferenceOutcome,
   isMonsterActionAttackKind,
+  isMultiattackUseClause,
   monsterActionSectionRows,
   monsterRichTextIsEmpty,
+  monsterReferencedActionIds,
   type DerivedFieldReason,
   type DerivedMonsterAttackLine,
   type DerivedMonsterStatBlock,
@@ -101,6 +103,9 @@ function canResolveWithoutDerivedStats(action: PublishedAction): boolean {
     case 'teleport':
     case 'take-actions':
     case 'shape-shift':
+    case 'multiattack':
+    case 'action-reference':
+    case 'parry':
       return true
     default:
       return false
@@ -121,22 +126,45 @@ function attackCatalogReason(
   return undefined
 }
 
-function selectedActionCatalogReason(
+function referencedActionReason(
   action: PublishedAction,
   monster: Monster,
   ctx: ContentFormCtx,
 ): FacingReason | undefined {
-  if (canResolveWithoutDerivedStats(action)) return undefined
-  if (isMonsterActionAttackKind(action.kind)) return attackCatalogReason(action, monster, ctx)
-  if (action.kind !== 'spell') return unavailableActionCatalog(ctx)
-  if (ctx.spellCatalogStatus !== 'ready') return spellCatalogReason(ctx)
+  const targets =
+    action.kind === 'multiattack' ? [...monster.actions, ...monster.bonusActions] : monster.actions
+  for (const id of monsterReferencedActionIds(action)) {
+    const target = targets.find((candidate) => candidate.id === id)
+    if (!target) return { code: 'missing-action-reference' }
+    if (target.kind !== 'weapon') continue
+    const reason = attackCatalogReason(target, monster, ctx)
+    if (reason) return reason
+  }
+  return undefined
+}
 
+function multiattackSpellChoices(action: Extract<PublishedAction, { kind: 'multiattack' }>) {
+  const steps = [...action.steps, ...(action.alternative?.steps ?? [])]
+  return [
+    ...steps.flatMap<{ spellId?: string }>((step) => {
+      if (!isMultiattackUseClause(step)) return []
+      return step.mode === 'choice' ? (step.choices ?? []) : [step]
+    }),
+    ...(action.replacement?.choices ?? []),
+  ]
+}
+
+function spellCatalogReferenceReason(
+  spells: readonly { spellId?: string }[],
+  ctx: ContentFormCtx,
+): FacingReason | undefined {
+  if (ctx.spellCatalogStatus !== 'ready') return spellCatalogReason(ctx)
   const catalog = createSpellCatalogContext({
     status: ctx.spellCatalogStatus,
     spellsById: ctx.spellCatalogById,
   })
   if (
-    action.spells.some(
+    spells.some(
       ({ spellId }) =>
         spellId !== undefined &&
         resolveSpellReferenceOutcome(spellId, catalog).status === 'unresolved',
@@ -145,6 +173,28 @@ function selectedActionCatalogReason(
     return { code: 'missing-spell-reference' }
   }
   return undefined
+}
+
+function selectedActionCatalogReason(
+  action: PublishedAction,
+  monster: Monster,
+  ctx: ContentFormCtx,
+): FacingReason | undefined {
+  if (action.kind === 'multiattack') {
+    const reason = referencedActionReason(action, monster, ctx)
+    if (reason) return reason
+    const spells = multiattackSpellChoices(action)
+    return spells.some(({ spellId }) => spellId !== undefined)
+      ? spellCatalogReferenceReason(spells, ctx)
+      : undefined
+  }
+  if (action.kind === 'action-reference' || action.kind === 'parry') {
+    return referencedActionReason(action, monster, ctx)
+  }
+  if (canResolveWithoutDerivedStats(action)) return undefined
+  if (isMonsterActionAttackKind(action.kind)) return attackCatalogReason(action, monster, ctx)
+  if (action.kind === 'spell') return spellCatalogReferenceReason(action.spells, ctx)
+  return unavailableActionCatalog(ctx)
 }
 
 function derivedAttackReason(

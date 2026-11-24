@@ -19,6 +19,7 @@ export type FacingReason =
   | { code: 'missing-spell-configuration' }
   | { code: 'missing-spell-reference' }
   | { code: 'missing-equipment-reference' }
+  | { code: 'missing-action-reference' }
   | { code: 'incomplete-spellcasting' }
   | { code: 'spellcasting-progression-unavailable' }
   | { code: 'incomplete-trait' }
