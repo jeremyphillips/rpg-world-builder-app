@@ -9,13 +9,9 @@ import { systemRulesetIdSchema } from '../../primitives/ruleset'
 // for new cross-feature flows.
 // ---------------------------------------------------------------------------
 
-/** @deprecated Legacy builder mode. Do not promote to `rpg/character-builder/`. */
-export const CHARACTER_BUILDER_MODES = ['public', 'dashboard', 'npc', 'import'] as const
+const characterBuilderModes = ['public', 'dashboard', 'npc', 'import'] as const
 
-/** @deprecated Legacy builder mode. Do not promote to `rpg/character-builder/`. */
-export const characterBuilderModeSchema = z.enum(CHARACTER_BUILDER_MODES)
-
-export type CharacterBuilderMode = z.infer<typeof characterBuilderModeSchema>
+export type CharacterBuilderMode = (typeof characterBuilderModes)[number]
 
 /** Modes that can run without a campaign context. */
 export const STANDALONE_CHARACTER_BUILDER_MODES = [
