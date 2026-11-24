@@ -21,11 +21,6 @@ export const resolutionFormValidationMessages = {
     'validation.spellResolutionForm.originDistanceRequired',
     () => 'Enter an origin distance in feet.',
   ),
-  /** @deprecated Use proximityDistanceRequired */
-  rangeDistanceRequired: defineMessage(
-    'validation.spellResolutionForm.rangeDistanceRequired',
-    () => 'Enter a distance in feet.',
-  ),
   damageRollRequired: defineMessage(
     'validation.spellResolutionForm.damageRollRequired',
     () => 'Enter a damage roll.',

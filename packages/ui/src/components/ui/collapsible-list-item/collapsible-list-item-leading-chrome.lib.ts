@@ -23,15 +23,13 @@ export interface CollapsibleListItemLeadingChromeOptions {
    * Mixed lists keep every title on the same inset.
    */
   reserveCaretSlot?: boolean
-  /** @deprecated Prefer {@link reserveDragHandleSlot}. */
-  showDragHandle: boolean
   collapsible: boolean
 }
 
 export function resolveCollapsibleListItemReserveDragHandleSlot(
   options: CollapsibleListItemLeadingChromeOptions,
 ): boolean {
-  return options.reserveDragHandleSlot ?? options.showDragHandle
+  return Boolean(options.reserveDragHandleSlot)
 }
 
 /** Caret column is list chrome. A row without a button still keeps the column when the list reserves it. */

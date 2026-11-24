@@ -73,9 +73,6 @@ export const resolutionOutcomeEffectFormSchema = z.discriminatedUnion('kind', [
 
 export type ResolutionOutcomeEffectFormItem = z.infer<typeof resolutionOutcomeEffectFormSchema>
 
-/** @deprecated Reference rows live in `effects`. */
-export type ResolutionOutcomeApplicationFormItem = ResolutionOutcomeEffectReferenceFormItem
-
 export const resolutionOutcomeFormItemSchema = z.object({
   result: z.enum(RESOLUTION_OUTCOME_RESULTS),
   effects: z.array(resolutionOutcomeEffectFormSchema).default([]),

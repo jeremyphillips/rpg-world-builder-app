@@ -60,9 +60,6 @@ export const diceFormulaModifierGroupVariants = cva(diceFormulaGroupShellClasses
   },
 })
 
-/** @deprecated Use `InlineSentenceRow` — kept for grouped segment imports. */
-export const diceFormulaRowVariants = 'flex flex-wrap items-center gap-x-2 gap-y-2'
-
 export { diceFormulaSeparatorVariants } from './inline-sentence-row.variants'
 
 export const diceFormulaControlCellVariants = 'flex shrink-0 items-center'

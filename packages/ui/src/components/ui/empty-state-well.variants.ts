@@ -18,9 +18,6 @@ export const emptyStateWellPassiveMessageClasses = 'text-style-caption italic'
  */
 export const emptyStateWellPassiveMessageEmphasisClasses = 'italic'
 
-/** @deprecated Use `emptyStateWellPassiveMessageClasses`. */
-export const emptyStateWellBodyClasses = emptyStateWellPassiveMessageClasses
-
 /** Instructional or explanatory copy under a structured title — roman. */
 export const emptyStateWellSupportingClasses = 'text-style-supporting'
 

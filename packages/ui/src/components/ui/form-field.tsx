@@ -15,6 +15,7 @@ import type { FieldLabelVisibility } from '../../form/form-heading.lib'
 import { FormFieldLabel } from '../../form/presentation/form-field-label.client'
 import {
   mapFormLabelPositionToLayout,
+  resolveFieldLabelAlignClassName,
   resolveFieldPresentation,
 } from './field-row-presentation.lib'
 import {
@@ -94,7 +95,10 @@ function FormFieldSettingsRoot({
   const ownedLabel = labelNode(label, info, required)
   const hintBelowControl = Boolean(hint) && (hintPosition ?? 'below-label') === 'below-control'
   const settingsRow = headerHasVisibleContent ? (
-    <div data-field-align="" className={cn(presentation.alignmentAnchorClassName)}>
+    <div
+      data-field-align=""
+      className={cn(resolveFieldLabelAlignClassName('settings', size ?? 'md'))}
+    >
       <div className={presentation.groupClassName}>
         <div className={fieldLabelHintStackClasses}>
           {ownedLabel}

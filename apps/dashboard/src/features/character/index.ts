@@ -189,7 +189,7 @@ export {
 } from './components/picker/catalog-picker-filter-state.lib'
 export { CatalogToolbarResetSlot } from './components/picker/catalog-toolbar-reset-action'
 export {
-  SAMPLE_PC,
+  makePcCharacter,
   makeCampaignNpcListItem,
   makeCampaignNpcDetail,
 } from './lib/fixtures/character-fixtures'

@@ -5,13 +5,12 @@ import { ActionIcon } from './action-icon.client'
 import {
   dialogPanelHeaderGlyphSizeClasses,
   dialogPanelHeaderIconControlClasses,
-  dialogPanelHeaderNavGlyphSizeClasses,
 } from './dialog-panel-header-icon-control.lib'
 
 export const UI_DIALOG_PANEL_HEADER_NAV_BUTTON_BLOCK_CLASS =
   'ui-dialog-panel-header-nav-button' as const
 
-export { dialogPanelHeaderGlyphSizeClasses, dialogPanelHeaderNavGlyphSizeClasses }
+export { dialogPanelHeaderGlyphSizeClasses }
 
 /** Header back affordance — default icon hit target, not list-row compact ghost. */
 export const dialogPanelHeaderNavButtonClasses = cn(

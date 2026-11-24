@@ -56,7 +56,7 @@ describe('collapsibleListItemBodyClasses', () => {
   it('returns structural-only classes for entity-card row layout', () => {
     const classes = collapsibleListItemBodyClasses({
       rowLayout: 'entity-card',
-      showDragHandle: true,
+      reserveDragHandleSlot: true,
       collapsible: true,
       preset: 'default',
     })
@@ -72,7 +72,7 @@ describe('collapsibleListItemBodyClasses', () => {
   it('bleeds default row bodies to the shell edge with inline-start content inset', () => {
     const classes = collapsibleListItemBodyClasses({
       rowLayout: 'default',
-      showDragHandle: true,
+      reserveDragHandleSlot: true,
       collapsible: true,
     })
 
@@ -102,7 +102,7 @@ describe('collapsibleListItemBodyClasses', () => {
     const classes = collapsibleListItemBodyClasses({
       rowLayout: 'entity-card',
       preset: 'catalog',
-      showDragHandle: true,
+      reserveDragHandleSlot: true,
       collapsible: true,
     })
 

@@ -15,7 +15,7 @@ import {
 } from './quick-npc-form-fields'
 import {
   quickNpcMemberSetupValues,
-  quickNpcMemberSetupWithNoTitle,
+  quickNpcMemberSetupWithChosenTitle,
   quickNpcStandaloneSetupValues,
 } from './quick-npc-test-fixtures'
 
@@ -255,7 +255,7 @@ describe('applyQuickNpcSetupValueChange', () => {
   it('preserves species when title changes and reseeds level and class', () => {
     expect(
       applySetupChange({
-        values: quickNpcMemberSetupWithNoTitle({
+        values: quickNpcMemberSetupWithChosenTitle({
           speciesId: 'srd-cc-5.2.1:elf',
         }),
         setId: 'membershipTitle',
@@ -358,7 +358,7 @@ describe('applyQuickNpcSetupValueChange', () => {
   it('recomputes and auto-seeds Class when level rises from 0 to a class-applicable level', () => {
     expect(
       applySetupChange({
-        values: quickNpcMemberSetupWithNoTitle({
+        values: quickNpcMemberSetupWithChosenTitle({
           speciesId: 'srd-cc-5.2.1:dwarf',
           level: 0,
           classId: '',
@@ -378,7 +378,7 @@ describe('applyQuickNpcSetupValueChange', () => {
   it('defers Class seeding when level rises from 0 before Species is complete', () => {
     expect(
       applySetupChange({
-        values: quickNpcMemberSetupWithNoTitle({
+        values: quickNpcMemberSetupWithChosenTitle({
           speciesId: '',
           level: 0,
           classId: '',
@@ -388,7 +388,7 @@ describe('applyQuickNpcSetupValueChange', () => {
         ...changeArgs,
       }),
     ).toEqual(
-      quickNpcMemberSetupWithNoTitle({
+      quickNpcMemberSetupWithChosenTitle({
         speciesId: '',
         level: 1,
         classId: '',

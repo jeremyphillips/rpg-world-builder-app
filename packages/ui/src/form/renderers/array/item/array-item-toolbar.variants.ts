@@ -2,7 +2,6 @@ import { cn } from '../../../../lib/utils'
 import { iconGhostControlVariants } from '../../../../components/ui/icon-ghost-control.variants'
 import {
   collapsibleListItemActionsRailClasses,
-  collapsibleListItemBodyClasses,
   collapsibleListItemChromeButtonClasses,
   collapsibleListItemCollapseButtonClasses,
   collapsibleListItemDraggingClasses,
@@ -91,11 +90,6 @@ export function arrayItemHeaderSummaryIndentClasses(
   options: CollapsibleListItemLeadingChromeOptions,
 ): string {
   return resolveCollapsibleListItemLeadingChrome(options).contentColumnIndentClasses
-}
-
-/** @deprecated Detailed items compose `CollapsibleListItem` — use `collapsibleListItemBodyClasses`. */
-export function arrayItemBodyClasses(options: CollapsibleListItemLeadingChromeOptions): string {
-  return collapsibleListItemBodyClasses(options)
 }
 
 /** Inline field region for compact items (same row as toolbar). */

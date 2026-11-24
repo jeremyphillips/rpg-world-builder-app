@@ -35,13 +35,10 @@ export type FieldContainerChrome = {
 
 type FieldComposableChrome = FieldPanelChrome | FieldOutlineChrome | FieldContainerChrome
 
-/** @deprecated Use `{ variant: 'none' }`. */
-export type FieldPlainChrome = { variant: 'plain' }
-
 export type FieldNoneChrome = { variant: 'none' }
 
 /** Visual shell around a single field's full anatomy (label + control + messages). */
-export type FieldChrome = FieldNoneChrome | FieldPlainChrome | FieldComposableChrome
+export type FieldChrome = FieldNoneChrome | FieldComposableChrome | { variant: 'plain' }
 
 export interface FieldChromeProps {
   chrome?: FieldChrome

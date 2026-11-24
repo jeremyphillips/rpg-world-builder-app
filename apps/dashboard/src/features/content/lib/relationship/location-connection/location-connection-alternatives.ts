@@ -534,9 +534,6 @@ export function hasResolvedRelationshipMutationAlternative(
   return Boolean(operation?.supported && operation.availability === 'available')
 }
 
-/** @deprecated Use {@link hasResolvedRelationshipMutationAlternative} or {@link isRelationshipMutationActionVisible}. */
-export const isRelationshipMutationActionAvailable = hasResolvedRelationshipMutationAlternative
-
 export function assertRelationshipAlternativesMatchCapabilities(
   capabilities: RelationshipMutationCapabilities,
   alternatives: RelationshipAlternatives['alternatives'],

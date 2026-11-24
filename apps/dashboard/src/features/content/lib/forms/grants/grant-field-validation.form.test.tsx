@@ -6,11 +6,33 @@ import { z } from 'zod'
 
 import type { FormItem } from '@rpg/ui/form'
 
-import { renderGrantArrayItemShell } from './grant-array-item-shell.lib'
+import { createGrantArrayItemShell } from './grant-array-item-shell.lib'
+import {
+  buildGrantEquipmentReferencePresentationFromAuthoring,
+  buildGrantSpellReferencePresentationFromAuthoring,
+} from './grant-row-presentation.lib'
+import { GRANT_ROW_TYPE_LABELS } from './grant-form-schema'
 import { grantItemFields } from './grant-form-fields'
 import { GRANT_TYPE_LABELS, GRANT_TYPES, grantRowFormSchema } from './grant-form-schema'
 
 const grantFields = grantItemFields(GRANT_TYPES, GRANT_TYPE_LABELS, { options: {} })
+
+const grantHeaderContext = {
+  rowLabels: GRANT_ROW_TYPE_LABELS,
+  equipmentReferences: buildGrantEquipmentReferencePresentationFromAuthoring({
+    status: 'ready',
+    scope: { rulesetId: 'srd-cc-5.2.1', campaignId: 'campaign-1' },
+    equipmentById: new Map(),
+  }),
+  weaponOptions: [],
+  toolOptions: [],
+  armorOptions: [],
+  skillOptions: [],
+  spellReferences: buildGrantSpellReferencePresentationFromAuthoring({
+    status: 'ready',
+    spellsById: new Map(),
+  }),
+}
 
 const grantsOnlySchema = z.object({
   grants: z.array(grantRowFormSchema),
@@ -33,7 +55,9 @@ function buildGrantArrayFields(options?: {
     name: 'grants',
     item: {
       collapsible: true,
-      ...(options?.renderShell ? { renderShell: renderGrantArrayItemShell } : {}),
+      ...(options?.renderShell
+        ? { renderShell: createGrantArrayItemShell(grantHeaderContext) }
+        : {}),
     },
     fields: grantFields,
   }

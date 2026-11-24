@@ -5,9 +5,6 @@ import { interactiveFocusVariants, interactivePointerClasses } from './interacti
 /** Responsive glyph sizing for dialog panel header icon controls (18px → 20px from md). */
 export const dialogPanelHeaderGlyphSizeClasses = 'size-dialog-panel-header-glyph' as const
 
-/** @deprecated Use {@link dialogPanelHeaderGlyphSizeClasses}. */
-export const dialogPanelHeaderNavGlyphSizeClasses = dialogPanelHeaderGlyphSizeClasses
-
 /**
  * Shared chrome for header back and panel dismiss — `icon-default` hit target, embedded focus.
  */

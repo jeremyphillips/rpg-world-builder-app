@@ -10,14 +10,6 @@ export const formSectionHeaderActionLayoutAlignWithHintClasses = 'items-start'
 /** Single-line label row — action vertically centers with the heading line. */
 export const formSectionHeaderActionLayoutAlignSingleLineClasses = 'items-center'
 
-/**
- * @deprecated Use {@link resolveFormSectionHeaderActionLayoutClasses} — alignment depends on hint stack.
- */
-export const formSectionHeaderActionLayoutClasses = cn(
-  formSectionHeaderActionLayoutGridClasses,
-  formSectionHeaderActionLayoutAlignWithHintClasses,
-)
-
 export function resolveFormSectionHeaderActionLayoutClasses(options: {
   hasStackedHint: boolean
 }): string {

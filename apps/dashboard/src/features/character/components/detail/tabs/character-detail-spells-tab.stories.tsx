@@ -6,7 +6,7 @@ import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
 } from '../../../lib/fixtures/character-builder-fixtures'
-import { SAMPLE_PC } from '../../../lib/fixtures/character-fixtures'
+import { makePcCharacter } from '../../../lib/fixtures/character-fixtures'
 import { buildCharacterSheetSpellCards } from '../../../lib/detail/character-sheet-catalog'
 import { CharacterDetailSpellsTab } from './character-detail-spells-tab'
 
@@ -20,7 +20,7 @@ const catalogIndex = {
 }
 const cards = buildCharacterSheetSpellCards(
   {
-    ...SAMPLE_PC,
+    ...makePcCharacter(),
     spells: [
       {
         spellId: cantrip.id,

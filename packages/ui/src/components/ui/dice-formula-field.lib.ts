@@ -3,9 +3,6 @@ export const DICE_FORMULA_TAIL_OPERATORS = ['+', '-', '×', '÷'] as const
 
 export type DiceFormulaTailOperator = (typeof DICE_FORMULA_TAIL_OPERATORS)[number]
 
-/** @deprecated Prefer `DiceFormulaTailOperator` — kept for existing imports. */
-export type DiceFormulaOperator = DiceFormulaTailOperator
-
 export interface DiceFormulaModifier {
   operator: DiceFormulaTailOperator
   amount: number

@@ -2,7 +2,6 @@ import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
 import { borderStrength } from './border-strength'
-import { UI_FIELD_CONTROL_BLOCK_CLASS } from './field-control.styles'
 import {
   UI_FIELD_GROUP_BLOCK_CLASS,
   UI_FIELD_GROUP_DIVIDER_PRIMARY_CLASS,
@@ -15,9 +14,6 @@ import {
   UI_FIELD_GROUP_SEGMENT_START_CLASS,
   UI_FIELD_GROUP_STRETCH_LAYOUT_CLASS,
 } from './field-group.styles'
-
-/** @deprecated Prefer {@link UI_FIELD_CONTROL_BLOCK_CLASS} — presentation lives in field-control.css. */
-export const fieldInputShellClasses = UI_FIELD_CONTROL_BLOCK_CLASS
 
 /** Grouped-control invalid shell — pairs with {@link UI_FIELD_GROUP_BLOCK_CLASS}. */
 export const fieldInputInvalidClasses = UI_FIELD_GROUP_INVALID_CLASS
@@ -53,9 +49,6 @@ export const groupedDividerVariants = cva(fieldGroupedDividerBaseClasses, {
     strength: 'primary',
   },
 })
-
-/** @deprecated Prefer `groupedDividerVariants({ strength: 'primary' })`. */
-export const fieldGroupedDividerClasses = groupedDividerVariants({ strength: 'primary' })
 
 export type GroupedDividerVariantProps = VariantProps<typeof groupedDividerVariants>
 

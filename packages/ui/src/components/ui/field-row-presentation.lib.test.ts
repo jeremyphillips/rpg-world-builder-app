@@ -4,6 +4,7 @@ import { fieldSettingsRowClasses } from './field.variants'
 import {
   mapFormLabelPositionToLayout,
   resolveFieldActionBandClassName,
+  resolveFieldLabelAlignClassName,
   resolveFieldPresentation,
   resolveFieldRowClasses,
 } from './field-row-presentation.lib'
@@ -59,7 +60,7 @@ describe('resolveFieldPresentation', () => {
 
     if (labelLayout === 'stacked') {
       expect(presentation.groupClassName).toContain('flex-col')
-      expect(presentation.alignmentAnchorClassName).toContain(
+      expect(resolveFieldLabelAlignClassName(labelLayout, size)).toContain(
         size === 'sm' || size === 'xs' ? 'gap-y-1' : 'gap-y-1.5',
       )
     }

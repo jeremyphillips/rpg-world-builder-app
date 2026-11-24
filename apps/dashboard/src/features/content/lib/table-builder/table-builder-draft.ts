@@ -23,12 +23,6 @@ import type { TableBuilderKind } from './table-builder-kind'
 // derived from the label once when first saved; general ids are opaque UUIDs.
 // ---------------------------------------------------------------------------
 
-/** @deprecated Use `tableBuilderCapabilities.levelProgression` from `table-builder-kind`. */
-export const progressionTableBuilderCapabilities = {
-  axis: 'level',
-  rowReorder: false,
-} as const
-
 export type TableBuilderDiceCellDraft = {
   /** May be absent while RHF registers count/faces independently mid-edit. */
   count?: string

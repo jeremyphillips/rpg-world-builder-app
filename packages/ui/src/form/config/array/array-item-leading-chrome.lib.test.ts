@@ -8,7 +8,7 @@ import {
 describe('resolveArrayItemLeadingChrome', () => {
   it('uses shell inset only when no leading chrome is visible', () => {
     const resolved = resolveArrayItemLeadingChrome({
-      showDragHandle: false,
+      reserveDragHandleSlot: false,
       collapsible: false,
     })
 
@@ -19,7 +19,7 @@ describe('resolveArrayItemLeadingChrome', () => {
 
   it('keeps the caret column when the list reserves it and this row has no button', () => {
     const resolved = resolveArrayItemLeadingChrome({
-      showDragHandle: false,
+      reserveDragHandleSlot: false,
       collapsible: false,
       reserveCaretSlot: true,
     })
@@ -30,11 +30,11 @@ describe('resolveArrayItemLeadingChrome', () => {
 
   it('reserves one chrome column and a content gap for caret-only or grip-only rows', () => {
     const caretOnly = resolveArrayItemLeadingChrome({
-      showDragHandle: false,
+      reserveDragHandleSlot: false,
       collapsible: true,
     })
     const gripOnly = resolveArrayItemLeadingChrome({
-      showDragHandle: true,
+      reserveDragHandleSlot: true,
       collapsible: false,
     })
 
@@ -49,7 +49,7 @@ describe('resolveArrayItemLeadingChrome', () => {
 
   it('reserves two chrome columns when grip and caret are both visible', () => {
     const resolved = resolveArrayItemLeadingChrome({
-      showDragHandle: true,
+      reserveDragHandleSlot: true,
       collapsible: true,
     })
 

@@ -2,11 +2,11 @@ import {
   contentMediaSchema,
   createUploadRoleAssignment,
   emptyContentMediaSchema,
+  hasAuthoredContentMediaForCatalogWrite,
 } from '@rpg/contracts'
 import { describe, expect, it, vi } from 'vitest'
 
 import {
-  hasAuthoredContentMedia,
   isManagedContentMediaDirty,
   serializeContentFormInput,
 } from './content-form-serialize-input.lib'
@@ -39,13 +39,13 @@ describe('isManagedContentMediaDirty', () => {
   })
 })
 
-describe('hasAuthoredContentMedia', () => {
+describe('hasAuthoredContentMediaForCatalogWrite', () => {
   it('returns false for canonical empty media', () => {
-    expect(hasAuthoredContentMedia(emptyContentMediaSchema)).toBe(false)
+    expect(hasAuthoredContentMediaForCatalogWrite(emptyContentMediaSchema)).toBe(false)
   })
 
   it('returns true when gallery images exist', () => {
-    expect(hasAuthoredContentMedia(authoredMedia)).toBe(true)
+    expect(hasAuthoredContentMediaForCatalogWrite(authoredMedia)).toBe(true)
   })
 })
 

@@ -25,7 +25,7 @@ import {
 } from '../../../lib/quick-npc/quick-npc-form-fields'
 import {
   quickNpcMemberSetupValues,
-  quickNpcMemberSetupWithNoTitle,
+  quickNpcMemberSetupWithChosenTitle,
   quickNpcOrganizationMemberCreateContext,
   quickNpcTestOrganization,
 } from '../../../lib/quick-npc/quick-npc-test-fixtures'
@@ -147,7 +147,7 @@ describe('QuickNpcBuildCard', () => {
     const model = resolveQuickNpcBuildCardModel({
       createContext,
       context,
-      values: quickNpcMemberSetupWithNoTitle({
+      values: quickNpcMemberSetupWithChosenTitle({
         speciesId: 'srd-cc-5.2.1:dwarf',
         classId: '',
         level: 0,

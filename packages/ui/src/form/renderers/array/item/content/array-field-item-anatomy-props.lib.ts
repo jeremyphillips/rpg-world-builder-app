@@ -48,7 +48,6 @@ export function buildArrayFieldItemAnatomyProps(options: {
   leadingChrome: {
     reserveDragHandleSlot: boolean
     reserveCaretSlot: boolean
-    showDragHandle: boolean
     collapsible: boolean
   }
   suppressFieldErrorText: boolean

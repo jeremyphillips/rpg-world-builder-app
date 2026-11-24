@@ -75,9 +75,6 @@ export const ORGANIZATION_FORWARD_FAMILY_PRESENTATION = {
 export const ORGANIZATION_LOCATION_CONNECTION_FAMILY_ORDER: OrganizationLocationConnectionFamily[] =
   ['territorial_authority', 'geographic_presence', 'site']
 
-/** @deprecated Use ORGANIZATION_FORWARD_FAMILY_PRESENTATION or resolveOrganizationForwardFamilyPresentation. */
-export const ORGANIZATION_FORWARD_FAMILY_SURFACE_COPY = ORGANIZATION_FORWARD_FAMILY_PRESENTATION
-
 export const ORGANIZATION_FORWARD_SURFACE_COPY = {
   headquarters: {
     empty: 'No headquarters linked.',
@@ -183,9 +180,6 @@ export const ORGANIZATION_FORWARD_OVERFLOW_BY_FAMILY = {
   },
 } as const satisfies Record<OrganizationLocationConnectionFamily, OrganizationForwardOverflowLabels>
 
-/** @deprecated Use resolveOrganizationForwardOverflowLabels(family) for family-aware copy. */
-export const ORGANIZATION_FORWARD_OVERFLOW = ORGANIZATION_FORWARD_OVERFLOW_BY_FAMILY.site
-
 export function resolveOrganizationForwardOverflowLabels(
   family: OrganizationLocationConnectionFamily,
 ): OrganizationForwardOverflowLabels {
@@ -271,6 +265,6 @@ export function resolveOrganizationForwardFamilyAddDrawerHelper(
   family: OrganizationLocationConnectionFamily,
 ): string | undefined {
   const copy: OrganizationForwardFamilySurfaceCopy =
-    ORGANIZATION_FORWARD_FAMILY_SURFACE_COPY[family]
+    ORGANIZATION_FORWARD_FAMILY_PRESENTATION[family]
   return copy.addDrawerHelper
 }

@@ -44,7 +44,7 @@ export interface CollapsibleListItemProps {
   onToggleCollapse?: () => void
   /** Uncontrolled initial state when `collapsed` is omitted. Defaults to collapsed. */
   defaultCollapsed?: boolean
-  showDragHandle?: boolean
+  reserveDragHandleSlot?: boolean
   /** Keep the caret column when this row does not render a collapse button. */
   reserveCaretSlot?: boolean
   dragHandleProps?: CollapsibleListItemDragHandleConfig
@@ -129,7 +129,7 @@ function CollapsibleListItemRoot({
   collapsed: collapsedProp,
   onToggleCollapse,
   defaultCollapsed = true,
-  showDragHandle = false,
+  reserveDragHandleSlot = false,
   reserveCaretSlot = false,
   dragHandleProps,
   preset = 'default',
@@ -158,7 +158,6 @@ function CollapsibleListItemRoot({
     onToggleCollapse,
     defaultCollapsed,
   )
-  const reserveDragHandleSlot = showDragHandle
   const gripVisible = Boolean(dragHandleProps)
   const headerActionsPlacement = resolveCollapsibleListItemHeaderActionsPlacement(layout, rowLayout)
   const leadingChrome = buildCollapsibleListItemLeadingChrome(
@@ -220,7 +219,7 @@ function CollapsibleListItemRoot({
       <CollapsibleListItemShell
         titleId={titleId}
         itemPrefix={itemPrefix}
-        showDragHandle={reserveDragHandleSlot}
+        reserveDragHandleSlot={reserveDragHandleSlot}
         reserveCaretSlot={reserveCaretSlot}
         collapsible={collapsible}
         dragging={contextValue.dragging}
@@ -280,7 +279,7 @@ function CollapsibleListItemCompoundRoot({
   const domIds = resolveCollapsibleListItemDomIds(props.itemId)
   const titleId = props.titleId ?? domIds.titleId
   const resolvedBodyId = props.bodyId ?? domIds.bodyId
-  const reserveDragHandleSlot = props.showDragHandle ?? false
+  const reserveDragHandleSlot = props.reserveDragHandleSlot ?? false
   const gripVisible = Boolean(props.dragHandleProps)
   const collapsible = props.collapsible ?? false
   const layout = props.layout ?? 'default'
@@ -337,7 +336,7 @@ function CollapsibleListItemCompoundRoot({
       <CollapsibleListItemShell
         titleId={titleId}
         itemPrefix={props.itemPrefix}
-        showDragHandle={reserveDragHandleSlot}
+        reserveDragHandleSlot={reserveDragHandleSlot}
         reserveCaretSlot={props.reserveCaretSlot}
         collapsible={collapsible}
         dragging={contextValue.dragging}

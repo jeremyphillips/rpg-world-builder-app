@@ -6,7 +6,7 @@ import {
 } from '../../../lib/fixtures/character-builder-fixtures'
 import {
   quickNpcMemberSetupValues,
-  quickNpcMemberSetupWithNoTitle,
+  quickNpcMemberSetupWithChosenTitle,
   quickNpcStandaloneSetupValues,
 } from './quick-npc-test-fixtures'
 import { isQuickNpcSetupStillValid } from './quick-npc-authoring-validation.lib'
@@ -45,7 +45,7 @@ describe('isQuickNpcSetupStillValid', () => {
   it('accepts organization-member setup that still matches campaign availability', () => {
     expect(
       isQuickNpcSetupStillValid(
-        quickNpcMemberSetupWithNoTitle({
+        quickNpcMemberSetupWithChosenTitle({
           speciesId: 'srd-cc-5.2.1:dwarf',
           npcTemplateId: 'criminal',
           classId: 'srd-cc-5.2.1:fighter',
@@ -59,7 +59,7 @@ describe('isQuickNpcSetupStillValid', () => {
   it('rejects organization-member setup when the species is no longer campaign-available', () => {
     expect(
       isQuickNpcSetupStillValid(
-        quickNpcMemberSetupWithNoTitle({
+        quickNpcMemberSetupWithChosenTitle({
           speciesId: 'srd-cc-5.2.1:not-a-species',
           classId: 'srd-cc-5.2.1:fighter',
           level: 1,
@@ -72,7 +72,7 @@ describe('isQuickNpcSetupStillValid', () => {
   it('rejects organization-member setup when the class is no longer campaign-available', () => {
     expect(
       isQuickNpcSetupStillValid(
-        quickNpcMemberSetupWithNoTitle({
+        quickNpcMemberSetupWithChosenTitle({
           speciesId: 'srd-cc-5.2.1:dwarf',
           classId: 'srd-cc-5.2.1:not-a-class',
           level: 1,
@@ -85,7 +85,7 @@ describe('isQuickNpcSetupStillValid', () => {
   it('accepts organization-member level 0 setup without a class', () => {
     expect(
       isQuickNpcSetupStillValid(
-        quickNpcMemberSetupWithNoTitle({
+        quickNpcMemberSetupWithChosenTitle({
           speciesId: 'srd-cc-5.2.1:dwarf',
           npcTemplateId: 'commoner',
           classId: '',

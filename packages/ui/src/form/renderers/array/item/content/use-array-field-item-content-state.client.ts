@@ -112,7 +112,6 @@ export function useArrayFieldItemContentState({
   const leadingChrome = {
     reserveDragHandleSlot,
     reserveCaretSlot,
-    showDragHandle: reserveDragHandleSlot,
     collapsible,
   }
   const rowLabel = header.ariaLabel
@@ -148,7 +147,6 @@ export function useArrayFieldItemContentState({
     leadingChrome,
     rowLabel,
     focusIssue: rowState.focusIssue,
-    issueSummary: rowState.issueSummary,
     issueSummaries: rowState.issueSummaries,
     validationPresentation: rowState.validationPresentation,
     fieldJoinSummaryId: rowState.fieldJoinSummaryId,

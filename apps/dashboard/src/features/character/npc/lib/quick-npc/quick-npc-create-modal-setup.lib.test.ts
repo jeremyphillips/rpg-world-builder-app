@@ -33,7 +33,7 @@ import { QUICK_NPC_ROLE_ALL_GROUP_EYEBROW } from './quick-npc-npc-template-optio
 import { resolveCreateSetupActiveSetId, resolveCreateSetupVisibleSetIds } from '@/lib/create-setup'
 import {
   quickNpcMemberSetupValues,
-  quickNpcMemberSetupWithNoTitle,
+  quickNpcMemberSetupWithChosenTitle,
   quickNpcOrganizationMemberCreateContext,
   quickNpcStandaloneCreateContext,
   quickNpcStandaloneSetupValues,
@@ -152,7 +152,7 @@ describe('buildQuickNpcCreateSetupSets', () => {
   })
 
   it('reveals species after membership title is chosen without downstream setup sets', () => {
-    const values = quickNpcMemberSetupWithNoTitle()
+    const values = quickNpcMemberSetupWithChosenTitle()
     const sets = buildQuickNpcCreateSetupSets({
       createContext: memberCreateContext,
       context,
@@ -282,7 +282,7 @@ describe('resolveQuickNpcBuildCardModel', () => {
     const model = resolveQuickNpcBuildCardModel({
       createContext: memberCreateContext,
       context,
-      values: quickNpcMemberSetupWithNoTitle({
+      values: quickNpcMemberSetupWithChosenTitle({
         speciesId: 'srd-cc-5.2.1:dwarf',
         classId: '',
         level: 0,
@@ -458,7 +458,7 @@ describe('resolveQuickNpcSetupSummaryRows', () => {
     })
     const rows = resolveQuickNpcSetupSummaryRows({
       createContext: memberCreateContext,
-      values: quickNpcMemberSetupWithNoTitle({
+      values: quickNpcMemberSetupWithChosenTitle({
         speciesId: elf.id,
         classId: populatedBuilderCatalog.classes[0]!.id,
         level: 0,
@@ -525,7 +525,7 @@ describe('isQuickNpcBuildResolved', () => {
     expect(
       isQuickNpcBuildResolved({
         context,
-        values: quickNpcMemberSetupWithNoTitle({
+        values: quickNpcMemberSetupWithChosenTitle({
           speciesId: 'srd-cc-5.2.1:dwarf',
           classId: '',
           level: 1,

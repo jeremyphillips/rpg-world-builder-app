@@ -42,7 +42,6 @@ export type FieldRowPresentation = {
   controlBandClassName: string
   labelClassName: string
   controlSize: FieldSizeToken
-  alignmentAnchorClassName: string
 }
 
 function resolveGroupClassName(labelLayout: FieldLabelLayout): string {
@@ -59,7 +58,8 @@ function resolveGroupClassName(labelLayout: FieldLabelLayout): string {
   }
 }
 
-function resolveAlignmentAnchorClassName(
+/** Settings-row label stack alignment anchor — stacked labels only. */
+export function resolveFieldLabelAlignClassName(
   labelLayout: FieldLabelLayout,
   size: FieldSizeToken,
 ): string {
@@ -92,8 +92,6 @@ export function resolveFieldPresentation(config: FieldPresentationConfig): Field
     controlBandClassName: fieldControlBandVariants({ size: controlSize, band: controlBand }),
     labelClassName: fieldLabelVariants({ size }),
     controlSize,
-    /** @deprecated Prefer three-region anatomy; retained for settings / legacy anchors. */
-    alignmentAnchorClassName: resolveAlignmentAnchorClassName(labelLayout, size),
   }
 }
 

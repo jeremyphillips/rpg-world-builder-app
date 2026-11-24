@@ -102,7 +102,7 @@ function CatalogPickerCollapsibleItemRow<TItem>({
         surface={{ elevation: 'flat' }}
         toolbarCompact={false}
         collapsible={hasDetails}
-        showDragHandle={false}
+        reserveDragHandleSlot={false}
         collapsed={!isExpanded}
         onToggleCollapse={onToggleCollapse}
         header={renderItemHeader!(item)}

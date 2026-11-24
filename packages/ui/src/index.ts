@@ -223,7 +223,6 @@ export {
   type CollectionAddControlProps,
 } from './components/ui/collection-add-control.client'
 export {
-  emptyStateWellBodyClasses,
   emptyStateWellIconInkClasses,
   emptyStateWellIconLgClasses,
   emptyStateWellIconMdClasses,
@@ -523,7 +522,6 @@ export {
   type DiceFormulaLabelPosition,
   type DiceFormulaModifier,
   type DiceFormulaModifierMode,
-  type DiceFormulaOperator,
   type DiceFormulaValue,
 } from './components/ui/dice-formula-field.lib'
 export { joinArrayItemSummaryParts } from './form/config/array/array-item-config.lib'
@@ -726,7 +724,6 @@ export {
   fieldLabelVariants,
   fieldMessageRegionVariants,
   fieldControlRegionClasses,
-  fieldRowLayoutClasses,
   fieldSeparatorVariants,
   fieldStackRhythmVariants,
   fieldSettingsRowClasses,
@@ -927,7 +924,6 @@ export {
   CONTENT_CARD_DENSITIES,
   type ContentCardDensity,
   type ContentCardChrome,
-  type ContentCardSurface,
 } from './components/ui/content-card.variants'
 export { resolveContentCardHeadingRowRhythm } from './components/ui/content-card.lib'
 export {
@@ -1134,9 +1130,7 @@ export {
 export {
   dialogPanelActionRowClasses,
   dialogPanelScrollRegionBottomInsetClasses,
-  dialogPanelScrollRegionClasses,
   dialogPanelScrollRegionTopInsetClasses,
-  dialogPanelScrollRegionViewportClasses,
   dialogPanelSectionScrollViewportClasses,
   dialogPanelInnerScrollViewportClasses,
   dialogPanelInnerLeadingScrollViewportClasses,

@@ -15,9 +15,9 @@ import {
   resolveQuickNpcRequirementValidIds,
   resolveQuickNpcWeaponRequirementOptions,
 } from './quick-npc-requirement-options.lib'
-import { quickNpcMemberSetupWithNoTitle } from './quick-npc-test-fixtures'
+import { quickNpcMemberSetupWithChosenTitle } from './quick-npc-test-fixtures'
 
-const setup = quickNpcMemberSetupWithNoTitle({
+const setup = quickNpcMemberSetupWithChosenTitle({
   speciesId: 'species-1',
   classId: equipmentStepBardClassFixture.id,
   level: 1,

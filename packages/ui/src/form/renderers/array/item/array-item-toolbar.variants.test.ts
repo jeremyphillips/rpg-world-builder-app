@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
+import { collapsibleListItemBodyClasses } from '../../../../components/ui/collapsible-list-item/collapsible-list-item.variants'
 import {
   arrayItemActionsRailClasses,
-  arrayItemBodyClasses,
   arrayItemCompactRowClasses,
   arrayItemCompactActionsClasses,
   arrayItemCompactGripClasses,
@@ -45,12 +45,12 @@ describe('array item shell variants', () => {
   })
 
   it('does not place trailing actions in the leading toolbar row', () => {
-    expect(arrayItemToolbarRowClasses({ showDragHandle: false, collapsible: false })).not.toContain(
-      'ml-auto',
-    )
-    expect(arrayItemToolbarRowClasses({ showDragHandle: false, collapsible: false })).not.toContain(
-      'pr-2',
-    )
+    expect(
+      arrayItemToolbarRowClasses({ reserveDragHandleSlot: false, collapsible: false }),
+    ).not.toContain('ml-auto')
+    expect(
+      arrayItemToolbarRowClasses({ reserveDragHandleSlot: false, collapsible: false }),
+    ).not.toContain('pr-2')
   })
 
   it('does not use negative margin hacks on the drag handle', () => {
@@ -59,11 +59,11 @@ describe('array item shell variants', () => {
 
   it('aligns grip-only and caret-only toolbar content with the same leading chrome inset', () => {
     const gripOnly = arrayItemToolbarContentClasses({
-      showDragHandle: true,
+      reserveDragHandleSlot: true,
       collapsible: false,
     })
     const caretOnly = arrayItemToolbarContentClasses({
-      showDragHandle: false,
+      reserveDragHandleSlot: false,
       collapsible: true,
     })
 
@@ -72,31 +72,34 @@ describe('array item shell variants', () => {
   })
 
   it('uses flex for the leading toolbar row so chrome aligns with title copy', () => {
-    expect(arrayItemToolbarRowClasses({ showDragHandle: true, collapsible: false })).toContain(
-      'flex',
-    )
-    expect(arrayItemToolbarRowClasses({ showDragHandle: true, collapsible: false })).toContain(
-      'items-center',
-    )
+    expect(
+      arrayItemToolbarRowClasses({ reserveDragHandleSlot: true, collapsible: false }),
+    ).toContain('flex')
+    expect(
+      arrayItemToolbarRowClasses({ reserveDragHandleSlot: true, collapsible: false }),
+    ).toContain('items-center')
   })
 
   it('bleeds detailed bodies to the shell edge with inline-start content inset', () => {
-    expect(arrayItemBodyClasses({ showDragHandle: true, collapsible: false })).toContain(
+    expect(
+      collapsibleListItemBodyClasses({ reserveDragHandleSlot: true, collapsible: false }),
+    ).toContain('ui-collapsible-list-item__body')
+    expect(
+      collapsibleListItemBodyClasses({ reserveDragHandleSlot: true, collapsible: true }),
+    ).toContain('ui-collapsible-list-item__body')
+    expect(collapsibleListItemBodyClasses({ reserveDragHandleSlot: true, collapsible: true })).toBe(
       'ui-collapsible-list-item__body',
     )
-    expect(arrayItemBodyClasses({ showDragHandle: true, collapsible: true })).toContain(
-      'ui-collapsible-list-item__body',
-    )
-    expect(arrayItemBodyClasses({ showDragHandle: true, collapsible: true })).toBe(
-      'ui-collapsible-list-item__body',
-    )
-    expect(arrayItemBodyClasses({ showDragHandle: true, collapsible: true })).not.toContain(
-      'ui-collapsible-list-item__summary',
-    )
+    expect(
+      collapsibleListItemBodyClasses({ reserveDragHandleSlot: true, collapsible: true }),
+    ).not.toContain('ui-collapsible-list-item__summary')
   })
 
   it('paints the collapsible body on the canvas content plane', () => {
-    const classes = arrayItemBodyClasses({ showDragHandle: true, collapsible: true })
+    const classes = collapsibleListItemBodyClasses({
+      reserveDragHandleSlot: true,
+      collapsible: true,
+    })
     expect(classes).toBe('ui-collapsible-list-item__body')
   })
 

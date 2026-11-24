@@ -180,7 +180,7 @@ export function useArrayFieldRendererState({
         itemBodyStackClasses,
         canRemove: rowRemovable && !itemConfig.removeSlot,
         showDefaultItemRemove: rowRemovable && !itemConfig.removeSlot,
-        showDragHandle: reorderConfigured,
+        reserveDragHandleSlot: reorderConfigured,
         fieldsLength: fields.length,
         collapsible: rowCollapsible,
         reserveCaretSlot: collapsible,

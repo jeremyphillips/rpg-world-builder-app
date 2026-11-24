@@ -55,8 +55,6 @@ export type SpellModelingAudit = {
   unreviewed: string[]
   /** Prose-only spells with no documented `modeling.blocker`. */
   proseOnlyWithoutDocumentedBlocker: string[]
-  /** @deprecated Use `proseOnlyWithoutDocumentedBlocker`. */
-  proseOnlyWithoutDocumentedGaps: string[]
   violationCount: number
 }
 
@@ -112,9 +110,6 @@ export function proseOnlyWithoutDocumentedBlocker(
     .map((entry) => entry.slug)
     .sort()
 }
-
-/** @deprecated Use `proseOnlyWithoutDocumentedBlocker`. */
-export const proseOnlyWithoutDocumentedGaps = proseOnlyWithoutDocumentedBlocker
 
 export function countCodeFrequency(
   entries: readonly SpellModelingAuditEntry[],
@@ -183,7 +178,6 @@ export function buildSpellModelingAudit(rulesetId: SystemRulesetId): SpellModeli
       .map((entry) => entry.slug)
       .sort(),
     proseOnlyWithoutDocumentedBlocker: proseOnlyWithoutBlocker,
-    proseOnlyWithoutDocumentedGaps: proseOnlyWithoutBlocker,
     violationCount,
   }
 }

@@ -10,10 +10,10 @@ export function resolveEntityDisclosureLeadingUtilities({
 }: {
   dragHandleProps?: CollapsibleListItemDragHandleConfig
 }): ReactNode[] {
-  const showDragHandle = Boolean(dragHandleProps)
+  const reserveDragHandleSlot = Boolean(dragHandleProps)
 
   return [
-    showDragHandle ? <CollapsibleListItemDragHandleTrigger /> : null,
+    reserveDragHandleSlot ? <CollapsibleListItemDragHandleTrigger /> : null,
     <CollapsibleListItemDisclosureTrigger key="disclosure-trigger" />,
   ].filter((utility) => utility != null) as ReactNode[]
 }

@@ -13,7 +13,7 @@ import {
   buildCharacterDetailViewModel,
   toCharacterDetailSource,
 } from '../lib/display/character-display'
-import { SAMPLE_PC } from '../lib/fixtures/character-fixtures'
+import { makePcCharacter } from '../lib/fixtures/character-fixtures'
 import { CharacterDetail } from './character-detail'
 
 vi.mock('../hooks/use-character')
@@ -35,7 +35,7 @@ const useBuildContext = vi.mocked(useBuildContextFn)
 const context = createPopulatedStandaloneBuilderContextFixture()
 const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
 const viewModel = buildCharacterDetailViewModel({
-  source: toCharacterDetailSource(SAMPLE_PC),
+  source: toCharacterDetailSource(makePcCharacter()),
   catalogIndex,
   rules: context.characterCreationRules,
   equipmentReferenceScope: standaloneEquipmentReferenceScope,
@@ -43,7 +43,9 @@ const viewModel = buildCharacterDetailViewModel({
 })
 
 function mockCharacterQuery(
-  overrides: Partial<ReturnType<typeof useCharacterFn>> & { data?: typeof SAMPLE_PC },
+  overrides: Partial<ReturnType<typeof useCharacterFn>> & {
+    data?: ReturnType<typeof makePcCharacter>
+  },
 ) {
   useCharacter.mockReturnValue({
     data: overrides.data,
@@ -80,7 +82,7 @@ describe('CharacterDetail', () => {
   })
 
   it('renders the loaded character', () => {
-    mockCharacterQuery({ data: SAMPLE_PC })
+    mockCharacterQuery({ data: makePcCharacter() })
 
     renderWithProviders(
       <Routes>

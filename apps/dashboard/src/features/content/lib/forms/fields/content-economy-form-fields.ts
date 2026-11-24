@@ -144,11 +144,6 @@ export function weightToFormDefaults(): { unit: 'lb' } {
   return { unit: 'lb' }
 }
 
-/** @deprecated Use equipmentEconomyFormDefaults from equipment-economy-form-values for create defaults. */
-export function costToFormDefaults(): { currency: Currency } {
-  return { currency: 'gp' }
-}
-
 export {
   wealthGrantFields,
   wealthGrantFromForm,

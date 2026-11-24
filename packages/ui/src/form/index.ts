@@ -254,7 +254,6 @@ export {
   type FormNavigationAnchor,
   type DependentChrome,
   DEFAULT_DEPENDENT_CHROME,
-  DEFAULT_DEPENDENT_INSET,
   type DependentConfig,
   type DependentDependentsConfig,
   type ArrayAddActionConfig,

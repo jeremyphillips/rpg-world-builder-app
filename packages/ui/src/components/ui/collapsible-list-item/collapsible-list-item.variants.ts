@@ -26,7 +26,7 @@ export {
  * Collapsible list item chrome geometry — shell padding and action hit targets.
  *
  * Layout contract:
- * - Shell owns fixed box insets via `collapsibleListItemShellPaddingClasses`.
+ * - Shell owns fixed box insets via `collapsibleListItemFlatShellPaddingClasses`.
  * - Leading inset for summary/body aligns with toolbar content via
  *   `resolveCollapsibleListItemLeadingChrome`.
  * - Array items use a two-column grid so the actions rail shares row 1 only;
@@ -36,9 +36,6 @@ export const collapsibleListItemShellInsetClasses = 'calc(var(--spacing) * 2)'
 
 /** Flat array item shell — block padding. Inline inset stays on the block. */
 export const collapsibleListItemFlatShellPaddingClasses = 'ui-collapsible-list-item--flat'
-
-/** @deprecated Use {@link collapsibleListItemFlatShellPaddingClasses}. */
-export const collapsibleListItemShellPaddingClasses = collapsibleListItemFlatShellPaddingClasses
 
 /**
  * Disclosure shell padding — inline inset only; bottom pad is owned by the body wash
@@ -59,9 +56,6 @@ export const collapsibleListItemCatalogShellExtraClasses = 'pb-0'
 /** Entity-card host — structural reset; perimeter lives on EntityCardFrame. */
 export const collapsibleListItemEntityCardShellClasses =
   'ui-collapsible-list-item ui-collapsible-list-item--entity-card'
-
-/** @deprecated Padding reset is owned by `ui-collapsible-list-item--entity-card`. */
-export const collapsibleListItemEntityCardShellPaddingClasses = 'p-0'
 
 /** Entity-card host header row — no duplicate vertical padding; entity card owns rhythm. */
 export const collapsibleListItemEntityCardHeaderRowClasses = 'ui-collapsible-list-item__header'

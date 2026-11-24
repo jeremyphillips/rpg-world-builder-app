@@ -25,7 +25,6 @@ import { type FieldSizeToken } from './field-sizing.variants'
  * - `fieldSetChromeContainClasses` — column stack for borderless leaf fieldset anatomy
  * - `fieldSetInFlowLegendClasses` — structural contents legends (not leaf field labels)
  * - `formSectionStackClasses` — vertical gap between top-level form sections
- * - `fieldRowLayoutClasses` — deprecated alias (`gap-6`); prefer `resolveFieldRowClasses`
  * - `fieldChipWrapGapClasses` — chip pill row gap only (no vertical pad) inside `ChipsField`
  * - structural section hints use `text-style-field-section-description*` / `text-style-field-subsection-description*`
  * - `fieldGroupLegendHeaderStackClasses` — vertical gap between a group legend and its hint
@@ -450,14 +449,6 @@ export const fieldSeparatorVariants = cva('border-b', {
 })
 
 export type FieldSeparatorVariantProps = VariantProps<typeof fieldSeparatorVariants>
-
-/**
- * Side-by-side fields in a wrapping flex row — compose widths via leaf `width` tokens.
- *
- * @deprecated Prefer `resolveFieldRowClasses({ layout: 'flow', align: 'control-edge', gap: 'form' })`
- * from `field-row-presentation.lib.ts`. Kept as a sync’d alias (`items-end` control-edge).
- */
-export const fieldRowLayoutClasses = cn('flex flex-wrap items-end', 'gap-6')
 
 /** Where helper text renders relative to the label and control. */
 export type FieldHintPosition = 'below-label' | 'below-control'

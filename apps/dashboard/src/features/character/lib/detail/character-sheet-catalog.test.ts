@@ -8,7 +8,7 @@ import {
   createStandaloneBuilderCatalogIndexFixture,
   standaloneEquipmentReferenceScope,
 } from '../fixtures/character-builder-fixtures'
-import { SAMPLE_PC } from '../fixtures/character-fixtures'
+import { makePcCharacter } from '../fixtures/character-fixtures'
 import {
   buildCharacterSheetEquipmentCards,
   buildCharacterSheetSpellCards,
@@ -28,9 +28,9 @@ describe('character-sheet-catalog', () => {
       equipment: new Map([...catalogIndex.equipment, [dagger.id, dagger]]),
     }
     const character = {
-      ...SAMPLE_PC,
+      ...makePcCharacter(),
       equipment: {
-        ...SAMPLE_PC.equipment,
+        ...makePcCharacter().equipment,
         weapons: [
           {
             entryId: 'weapon-row-1',
@@ -56,9 +56,9 @@ describe('character-sheet-catalog', () => {
     const sourceA = [{ kind: 'manual' as const }]
     const sourceB = [{ kind: 'startingGold' as const, sourceId: 'srd-cc-5.2.1:fighter' }]
     const character = {
-      ...SAMPLE_PC,
+      ...makePcCharacter(),
       equipment: {
-        ...SAMPLE_PC.equipment,
+        ...makePcCharacter().equipment,
         weapons: [
           {
             equipmentId: 'srd-cc-5.2.1:dagger',
@@ -91,9 +91,9 @@ describe('character-sheet-catalog', () => {
       equipment: new Map(),
     }
     const character = {
-      ...SAMPLE_PC,
+      ...makePcCharacter(),
       equipment: {
-        ...SAMPLE_PC.equipment,
+        ...makePcCharacter().equipment,
         gear: [
           {
             equipmentId: 'missing:gear',
@@ -118,9 +118,9 @@ describe('character-sheet-catalog', () => {
 
   it('marks missing equipment references as unavailable', () => {
     const character = {
-      ...SAMPLE_PC,
+      ...makePcCharacter(),
       equipment: {
-        ...SAMPLE_PC.equipment,
+        ...makePcCharacter().equipment,
         gear: [
           {
             equipmentId: 'missing:gear',
@@ -153,7 +153,7 @@ describe('character-sheet-catalog', () => {
       spells: new Map([...catalogIndex.spells, [spell.id, spell]]),
     }
     const character = {
-      ...SAMPLE_PC,
+      ...makePcCharacter(),
       spells: [
         {
           spellId: spell.id,

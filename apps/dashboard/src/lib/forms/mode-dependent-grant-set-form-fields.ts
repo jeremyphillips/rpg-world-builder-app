@@ -21,8 +21,6 @@ const XOR_GRANT_SET_MODE_LABELS: Record<XorGrantSetMode, string> = {
 }
 
 export type DependentPresentationOptions = {
-  /** @deprecated Use `chrome: 'none'` for flush dependents. */
-  inset?: boolean
   chrome?: DependentChrome
 }
 
@@ -167,9 +165,6 @@ export function modeDependentGrantSetField(options: ModeDependentGrantSetFieldOp
     },
     dependents: {
       ...(visibility ? { visibility } : {}),
-      ...(dependentsPresentation?.inset !== undefined
-        ? { inset: dependentsPresentation.inset }
-        : {}),
       ...(dependentsPresentation?.chrome !== undefined
         ? { chrome: dependentsPresentation.chrome }
         : {}),
