@@ -139,27 +139,49 @@ describe('resolveActionStatBlockRulesFacingForForm', () => {
     ).toEqual({ status: 'unavailable', reason: { code: 'missing-spell-reference' } })
   })
 
-  it('returns unavailable when equipment catalog is pending', () => {
-    const outcome = resolveActionStatBlockRulesFacingForForm({
-      values: baseValues({
-        actions: [
-          {
-            id: 'bite',
-            kind: 'natural-weapon',
-            name: 'Bite',
-            mode: 'melee',
-            reach: 5,
-            damageType: 'piercing',
-            damage: { dice: { count: 1, faces: 6 } },
-          },
-        ],
-      }),
-      ctx: baseCtx({ equipmentCatalogStatus: 'pending' }),
-      actionId: 'bite',
-      section: 'actions',
-    })
-    expect(outcome.status).toBe('unavailable')
-  })
+  it.each(['natural-weapon', 'attack'] as const)(
+    'preserves %s preview rules and metadata during catalog failures',
+    (kind) => {
+      const attack = {
+        id: 'claw',
+        name: 'Claw',
+        mode: 'melee',
+        reach: 5,
+        damageType: 'piercing',
+        damage: { dice: { count: 1, faces: 6 } },
+      } as const
+      const action =
+        kind === 'attack'
+          ? {
+              ...attack,
+              kind,
+              modes: ['melee' as const],
+              bonusSource: { kind: 'ability', ability: 'str', proficient: true } as const,
+            }
+          : { ...attack, kind }
+      const request = {
+        values: baseValues({ actions: [action] }),
+        actionId: attack.id,
+        section: 'actions',
+      } as const
+      const ready = resolveActionStatBlockRulesFacingForForm({ ...request, ctx: baseCtx() })
+
+      expect(ready).toMatchObject({
+        status: 'ready',
+        facing: { rulesProse: expect.any(Array) },
+        attackProfile: expect.any(Object),
+        attackLine: expect.any(Object),
+      })
+      for (const equipmentCatalogStatus of ['pending', 'error'] as const) {
+        expect(
+          resolveActionStatBlockRulesFacingForForm({
+            ...request,
+            ctx: baseCtx({ equipmentCatalogStatus, spellCatalogStatus: 'error' }),
+          }),
+        ).toEqual(ready)
+      }
+    },
+  )
 
   it('resolves a natural-attack multiattack during unrelated catalog failures', () => {
     const monster = pickMonster('hell-hound')
@@ -429,7 +451,7 @@ describe('resolveActionStatBlockRulesFacingForForm', () => {
             kind: 'attack',
             name: 'Scratch',
             bonusSource: { kind: 'ability', ability: 'str', proficient: true },
-            mode: 'melee',
+            modes: ['melee'],
             reach: 5,
           },
         ],
@@ -443,6 +465,17 @@ describe('resolveActionStatBlockRulesFacingForForm', () => {
       ctx: baseCtx(),
       actionId: bite!.id,
       section: 'actions',
+    })
+    expect(
+      resolveActionStatBlockRulesFacingForForm({
+        values,
+        ctx: baseCtx({ equipmentCatalogStatus: 'error', spellCatalogStatus: 'error' }),
+        actionId: 'unfinished',
+        section: 'actions',
+      }),
+    ).toEqual({
+      status: 'incomplete',
+      reason: { code: 'missing-attack-input', field: 'damage' },
     })
     expect(outcome.status).toBe('ready')
     if (outcome.status === 'ready') {
