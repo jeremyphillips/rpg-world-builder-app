@@ -105,6 +105,48 @@ describe('assembleGrantSkillProficiencyEntries', () => {
     expect(assembleGrantSkillProficiencyEntries(draft, catalogIndex)).toEqual([])
   })
 
+  it('assembles an unlocked fixed grant with provenance and no player choice', () => {
+    const grantRowId = 'fixed-skill'
+    const fixedTrait: Species['traits'][number] = {
+      kind: 'custom',
+      id: 'fixed-perception',
+      name: 'Keen Eyes',
+      grantGroups: [
+        {
+          unlock: { level: 3 },
+          grants: [
+            {
+              id: grantRowId,
+              kind: 'skillProficiency',
+              grant: { kind: 'fixed', skillIds: ['perception'] },
+            },
+          ],
+        },
+      ],
+    }
+    const fixedSpecies = { ...speciesWithSkillGrant, traits: [fixedTrait] }
+    const fixedCatalog = indexCharacterBuildCatalog({ ...catalog, species: [fixedSpecies] })
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      species: { speciesId: fixedSpecies.id },
+    }
+    const unlocked = { ...draft, class: { ...draft.class, level: 3 } }
+
+    expect(assembleGrantSkillProficiencyEntries(draft, fixedCatalog)).toEqual([])
+    expect(
+      resolveSpeciesTraitGrantChoiceSets(unlocked, fixedCatalog, createCharacterBuildContext()),
+    ).toEqual([])
+    expect(assembleSkillProficiencyEntries(unlocked, fixedCatalog, [], undefined)).toEqual([
+      {
+        skill: 'perception',
+        rank: 'proficient',
+        sources: [
+          { kind: 'speciesTrait', sourceId: fixedSpecies.id, grantId: fixedTrait.id, grantRowId },
+        ],
+      },
+    ])
+  })
+
   it('finalizes species trait ChoiceSet selections with species provenance', () => {
     const draft = {
       ...createEmptyCharacterBuilderDraft(),

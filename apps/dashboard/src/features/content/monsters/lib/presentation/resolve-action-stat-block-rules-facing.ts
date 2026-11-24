@@ -6,7 +6,6 @@ import {
   findSpellCastingSource,
   formatMonsterActionReference,
   formatMonsterAttackAction,
-  formatMonsterForms,
   formatMonsterLeap,
   formatMonsterParryResponse,
   formatMonsterSaveAction,
@@ -24,7 +23,6 @@ import {
   resolveMonsterActionIdentity,
   resolveMonsterDraftAttackEntry,
   resolveProseSavingThrowDc,
-  shapeShiftRows,
   type CastingAbility,
   type DerivedMonsterAttackLine,
   type DerivedMonsterStatBlock,
@@ -829,25 +827,4 @@ export function resolveActionStatBlockRulesFacingList(
   return actions.map((action) =>
     resolveActionStatBlockRulesFacing(action, section, derived, catalogState, spells, headings),
   )
-}
-
-export function formatMonsterFormsTraitFacing(monster: Monster): MonsterActionRulesFacing[] {
-  if (!monster.forms || monster.forms.definedForms.length === 0) return []
-  if (shapeShiftRows(monster).length > 0) return []
-  const text = formatMonsterForms({
-    monsterName: monster.name,
-    baseSizes: monster.sizes,
-    baseMovement: monster.movement,
-    baseHover: monster.hover,
-    forms: monster.forms,
-    hasFormRestrictions: monsterHasFormRestrictions(monster),
-  })
-  if (!text) return []
-  return [
-    {
-      id: 'forms',
-      name: 'Forms',
-      descriptionHtml: `<p>${escapeStatBlockText(text)}</p>`,
-    },
-  ]
 }

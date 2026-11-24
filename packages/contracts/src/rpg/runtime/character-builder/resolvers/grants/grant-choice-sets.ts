@@ -292,10 +292,13 @@ type GrantChoiceSetConverter<K extends ContentGrant['kind']> = (
   catalogIndex: CharacterBuildCatalogIndex,
 ) => ChoiceSet[]
 
-// Null entries do not create a character builder choice set.
-const GRANT_CHOICE_SET_CONVERTERS: {
+/** Every persisted grant kind declares how it participates in builder choices. */
+export type GrantChoiceSetConverters = {
   [K in ContentGrant['kind']]: GrantChoiceSetConverter<K> | null
-} = {
+}
+
+// Null entries do not create a character builder choice set.
+const GRANT_CHOICE_SET_CONVERTERS: GrantChoiceSetConverters = {
   sense: null,
   resistances: null,
   damageType: null,

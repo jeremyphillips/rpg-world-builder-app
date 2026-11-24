@@ -1,5 +1,11 @@
 # Monster action previews
 
-`MonsterActionDetail` mounts `MonsterActionRulesPreviewShell` above action composer fields for every section/kind pair. Rules text comes from `resolveActionStatBlockRulesFacingForForm` → `resolveActionStatBlockRulesFacing`; attack metadata uses the draft profile retained on `DerivedDraftAttack`.
+`MonsterActionDetail` supplies a draft action request to the master–detail
+editor. `StructuredFacingHostPanel` renders the selected action above the
+composer fields. Rules text comes from `resolveActionStatBlockRulesFacingForForm`
+and the published rules composer. Attack metadata uses the selected draft
+attack profile.
 
-Summary builders here (`buildMonsterAction*Preview`, `resolveMonsterAction*PreviewGuidance`) are production entry points for `MonsterActionRulesPreviewShell` and stat-block facing. Per-kind preview **slots** under `components/form/actions/**` remain registered form escape hatches; do not delete them when trimming label/constants debt in `monster-form-labels.ts` (see `tools/fallow/phase7-monster-form-labels.json`).
+The summary builders in this directory serve action authoring and stat-block
+facing. Registered per-kind form slots live under
+`components/form/actions/`.
