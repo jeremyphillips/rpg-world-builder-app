@@ -47,7 +47,7 @@ export type SpeciesDetailItem = {
   id: string
   title: string
   bodyHtml?: string
-  /** Grouped grant summary lines, e.g. `L1: Darkvision 120 ft · Dancing Lights cantrip`. */
+  /** Grouped grant summary lines, e.g. `L1: Darkvision 120 ft. · Dancing Lights cantrip`. */
   summaryLines?: string[]
   /** Flat grant summary for compact surfaces. */
   summaryInline?: string

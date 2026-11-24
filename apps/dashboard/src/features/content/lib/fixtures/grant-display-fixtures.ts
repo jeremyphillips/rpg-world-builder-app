@@ -110,7 +110,7 @@ export function getDrowHeritageSpellCatalog() {
 export const DROW_HERITAGE_GROUPED_SUMMARY_WITH_SUFFIX = [
   {
     label: 'L1',
-    text: joinInlineMetadata(['Darkvision 120 ft', 'Dancing Lights cantrip']),
+    text: joinInlineMetadata(['Darkvision 120 ft.', 'Dancing Lights cantrip']),
   },
   {
     label: 'L3',

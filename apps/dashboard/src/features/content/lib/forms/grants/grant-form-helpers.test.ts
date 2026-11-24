@@ -158,6 +158,25 @@ describe('buildGrantUnlockLevelOptions', () => {
 })
 
 describe('grantGroupsToFormRows / formRowsToGrantGroups (atomic model)', () => {
+  it('projects editable grants alongside campaign-only language choices', () => {
+    const groups: GrantGroups = [
+      {
+        grants: [
+          { id: 'choice', kind: 'languageChoice', choose: 1, categories: ['standard'] },
+          { id: 'sense', kind: 'sense', type: 'darkvision', range: 90 },
+        ],
+      },
+    ]
+    const rows = grantGroupsToFormRows(groups)
+    expect(rows).toHaveLength(1)
+    expect(rows[0]).toMatchObject({
+      id: 'sense',
+      grantType: 'senses',
+      senseType: 'darkvision',
+      senseRange: 90,
+    })
+  })
+
   it('round-trips a casting-only spells grant through grantGroups', () => {
     const groups: GrantGroups = [
       {

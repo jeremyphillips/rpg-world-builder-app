@@ -490,6 +490,14 @@ These modules support many content types but are **not** per-type form splits:
 | Preview rail glue         | `content/lib/forms/preview/` — `ContentFormDef.preview` contract, publish-readiness hook, rail/sheet/player hosts. Per-type projections live next to `*-form-def.ts` (Class: `classes/lib/class-preview-projection.ts`). Types without `preview` keep `PageShell width="narrow"`.                                 |
 | Cross-consumer projection | `content/lib/forms/organization-form-projection.ts` (root seam — sole shared projection today)                                                                                                                                                                                                                    |
 
+### Grant participation
+
+The persisted grant union drives the authoring projection and compact summary
+maps. Each kind has an adapter or an explicit exclusion. The editor excludes
+campaign language choices. Compact summaries count hidden choices as benefits
+and omit their labels. Published grant-trait prose and character builder choice
+sets classify grant kinds at their own boundaries.
+
 ### `ContentFormDef.preview`
 
 Optional. When present, create/edit shells switch to `PageShell width="wide"` and an `xl` persistent PreviewRail (sheet + compact **Preview** trigger below that). Register `buildIdentity` and `buildSections` keyed so `buildSections` keys **exactly equal** `buildTabs` ids (`null` = explicit opt-out). Optional `PreviewResources` resolves async/domain data for `buildSections` (class: `ClassPreviewResourcesProvider` in `class-preview-resources.tsx`). Optional `renderPlayerPreview` supplies the player-facing modal — omit until the type has a player surface. Shared copy comes from `CONTENT_TYPE_TERMS`. Publish readiness uses `resolveContentPublishSchema` (the same helper as the Publish action). Class is the reference implementation (`class-preview-projection.ts`); types without `preview` keep `PageShell width="narrow"`.

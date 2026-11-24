@@ -203,7 +203,7 @@ describe('species-display', () => {
       id: 'drow',
       title: 'Drow',
       summaryLines: [...DROW_HERITAGE_SHEET_SUMMARY_LINES],
-      summaryInline: 'Darkvision 120 ft · Dancing Lights · Faerie Fire · Darkness',
+      summaryInline: 'Darkvision 120 ft. · Dancing Lights · Faerie Fire · Darkness',
     })
   })
 })

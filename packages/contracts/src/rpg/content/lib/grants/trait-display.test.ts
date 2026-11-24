@@ -56,6 +56,23 @@ describe('resolveTraitFacingParts (species host)', () => {
     expect(renderTraitFacingBodyHtml(parts)).toBe('<p>You have Resistance to poison damage.</p>')
   })
 
+  it('preserves authored detail in place of generated prose for a published grant trait', () => {
+    const details = '<p>Move farther on foot.</p>'
+    const trait = grantContentTraitSchema.parse({
+      kind: 'grant',
+      id: 'speed-bonus',
+      details,
+      grantGroups: [
+        {
+          grants: [{ id: 'move', kind: 'movement', mode: 'walk', operation: 'increase', feet: 5 }],
+        },
+      ],
+    })
+    const parts = resolveTraitFacingParts(trait, speciesHost)
+    expect(parts.title).toBe('Movement')
+    expect(renderTraitFacingBodyHtml(parts)).toBe(details)
+  })
+
   it('derives movement bonus display from grantGroups', () => {
     const parts = resolveTraitFacingParts(
       grantContentTraitSchema.parse({

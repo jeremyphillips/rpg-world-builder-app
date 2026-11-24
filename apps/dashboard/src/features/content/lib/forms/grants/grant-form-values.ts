@@ -115,6 +115,7 @@ type ContentGrantRowsConverter<K extends ContentGrant['kind']> = (
   unlockLevel?: number,
 ) => GrantRowForm[]
 
+// Null entries are outside this editor, such as campaign language choices.
 const CONTENT_GRANT_TO_FORM_ROWS = {
   sense: (grant, unlockLevel) =>
     grantRows('senses', unlockLevel, {
@@ -210,7 +211,7 @@ const CONTENT_GRANT_TO_FORM_ROWS = {
       spellAllowsSlotCasting: grant.casting?.allowsSlotCasting ?? false,
       spellIds: grant.spellIds,
     }),
-  languageChoice: () => [],
+  languageChoice: null,
   rollAdjustment: (grant, unlockLevel) => {
     const abilityCheck = grant.rolls.find((roll) => roll.kind === 'ability-check')
     return grantRows('rollAdjustment', unlockLevel, {
@@ -231,7 +232,7 @@ const CONTENT_GRANT_TO_FORM_ROWS = {
         grant.limitedUse.count.kind === 'fixed' ? grant.limitedUse.count.value : undefined,
       saveOutcomeRest: grant.limitedUse.recovery.minimumRest,
     }),
-} satisfies { [K in ContentGrant['kind']]: ContentGrantRowsConverter<K> }
+} satisfies { [K in ContentGrant['kind']]: ContentGrantRowsConverter<K> | null }
 
 /**
  * Converts a single atomic `ContentGrant` into one or more flat grant row form
@@ -241,11 +242,10 @@ const CONTENT_GRANT_TO_FORM_ROWS = {
  * single-language-per-row authoring UX.
  */
 function contentGrantToFormRows(grant: ContentGrant, unlockLevel?: number): GrantRowForm[] {
-  const convert = CONTENT_GRANT_TO_FORM_ROWS[grant.kind] as (
-    grant: ContentGrant,
-    unlockLevel?: number,
-  ) => GrantRowForm[]
-  return convert(grant, unlockLevel)
+  const convert = CONTENT_GRANT_TO_FORM_ROWS[grant.kind] as ContentGrantRowsConverter<
+    ContentGrant['kind']
+  > | null
+  return convert ? convert(grant, unlockLevel) : []
 }
 
 // ---------------------------------------------------------------------------

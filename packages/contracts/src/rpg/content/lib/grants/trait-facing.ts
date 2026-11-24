@@ -8,6 +8,7 @@ import { contextualCountSchema } from '../../../primitives/contextual-count'
 import { readCreatureTraitTemplateConfig } from '../../creature/traits/templates'
 import { monsterRichTextIsEmpty } from '../../monster/action/save-refinements'
 import type {
+  ContentGrant,
   ContentTrait,
   CustomContentTrait,
   GrantContentTrait,
@@ -38,38 +39,58 @@ function htmlParagraph(text: string): string {
   return `<p>${text}</p>`
 }
 
-function deriveGrantGroupDisplay(groups: GrantGroups): { name: string; descriptionHtml?: string } {
-  const grant = groups[0]?.grants[0]
-  if (!grant) return { name: 'Grant' }
+type PublishedGrantDisplay = { name: string; descriptionHtml?: string }
+type PublishedGrantMapper<K extends ContentGrant['kind']> = (
+  grant: Extract<ContentGrant, { kind: K }>,
+) => PublishedGrantDisplay
 
-  switch (grant.kind) {
-    case 'sense':
-      return {
-        name: getSenseLabel(grant.type),
-        descriptionHtml: htmlParagraph(
-          `You have ${getSenseSentenceForm(grant.type)} with a range of ${grant.range} feet.`,
-        ),
-      }
-    case 'resistances':
-      return {
-        name: 'Damage Resistance',
-        descriptionHtml: `<p>You have Resistance to ${getDamageTypeSentenceForm(
-          grant.damageTypes[0]!,
-        )}.</p>`,
-      }
-    case 'movement':
-      return {
-        name: 'Movement',
-        descriptionHtml: `<p>${formatMovementGrantSentence(grant)}</p>`,
-      }
-    case 'languages':
-      return {
-        name: 'Language',
-        descriptionHtml: `<p>You know ${getLanguageSentenceForm(grant.languageIds[0]!)}.</p>`,
-      }
-    default:
-      return { name: 'Grant' }
+const GENERIC_GRANT_DISPLAY: PublishedGrantDisplay = { name: 'Grant' }
+
+// Null entries are ineligible for standalone grant trait prose.
+const PUBLISHED_GRANT_MAPPERS = {
+  sense: (grant) => ({
+    name: getSenseLabel(grant.type),
+    descriptionHtml: htmlParagraph(
+      `You have ${getSenseSentenceForm(grant.type)} with a range of ${grant.range} feet.`,
+    ),
+  }),
+  resistances: (grant) => ({
+    name: 'Damage Resistance',
+    descriptionHtml: htmlParagraph(
+      `You have Resistance to ${getDamageTypeSentenceForm(grant.damageTypes[0]!)}.`,
+    ),
+  }),
+  movement: (grant) => ({
+    name: 'Movement',
+    descriptionHtml: htmlParagraph(formatMovementGrantSentence(grant)),
+  }),
+  languages: (grant) => ({
+    name: 'Language',
+    descriptionHtml: htmlParagraph(`You know ${getLanguageSentenceForm(grant.languageIds[0]!)}.`),
+  }),
+  damageType: null,
+  weaponProficiency: null,
+  toolProficiency: null,
+  skillProficiency: null,
+  armorTraining: null,
+  languageChoice: null,
+  featChoice: null,
+  equipment: null,
+  spells: null,
+  rollAdjustment: null,
+  saveOutcomeOverride: null,
+} satisfies { [K in ContentGrant['kind']]: PublishedGrantMapper<K> | null }
+
+function deriveGrantGroupDisplay(groups: GrantGroups): PublishedGrantDisplay {
+  const grant = groups[0]?.grants[0]
+  if (!grant) return GENERIC_GRANT_DISPLAY
+  if (!Object.hasOwn(PUBLISHED_GRANT_MAPPERS, grant.kind)) {
+    throw new Error('Unsupported published trait grant', { cause: grant })
   }
+  const mapper = PUBLISHED_GRANT_MAPPERS[grant.kind] as PublishedGrantMapper<
+    ContentGrant['kind']
+  > | null
+  return mapper ? mapper(grant) : GENERIC_GRANT_DISPLAY
 }
 
 function templateTitle(
