@@ -1,4 +1,8 @@
-import { spellReferenceDisplayMessageForUnresolvedReason, type FacingReason } from '@rpg/contracts'
+import {
+  equipmentReferenceDisplayMessageForUnresolvedReason,
+  spellReferenceDisplayMessageForUnresolvedReason,
+  type FacingReason,
+} from '@rpg/contracts'
 
 import {
   formatMonsterActionAttackPreviewConfigureHint,
@@ -31,6 +35,8 @@ export function facingReasonMessage(reason: FacingReason): string {
       return formatMonsterActionMultiattackPreviewConfigureHint(MONSTER_MULTIATTACK_STEPS_LABEL)
     case 'catalog-pending':
       return facingCatalogPendingMessage(reason.catalog)
+    case 'missing-equipment-reference':
+      return equipmentReferenceDisplayMessageForUnresolvedReason('unknown-equipment')
     case 'missing-spell-reference':
       return spellReferenceDisplayMessageForUnresolvedReason('unknown-spell')
     case 'catalog-error':

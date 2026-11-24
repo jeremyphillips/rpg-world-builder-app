@@ -18,6 +18,7 @@ export type FacingReason =
   | { code: 'missing-multiattack-steps' }
   | { code: 'missing-spell-configuration' }
   | { code: 'missing-spell-reference' }
+  | { code: 'missing-equipment-reference' }
   | { code: 'incomplete-spellcasting' }
   | { code: 'spellcasting-progression-unavailable' }
   | { code: 'incomplete-trait' }

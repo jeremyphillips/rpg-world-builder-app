@@ -2,6 +2,7 @@ import {
   CHALLENGE_RATING_MECHANICS,
   appendMonsterActionSupplementalText,
   availableBodyRows,
+  deriveSpellcastingLines,
   formatMonsterActionReference,
   formatMonsterAttackAction,
   formatMonsterForms,
@@ -342,9 +343,14 @@ function mapSpellActionFacing(
   spells: SpellDisplayContext,
   identityName: string,
 ): MonsterActionRulesFacing {
-  const spellLine = derived?.spellcasting.find(
-    (line) => line.id === action.id && line.section === section,
-  )
+  const proficiencyBonus =
+    CHALLENGE_RATING_MECHANICS[spells.monster.challengeRating]?.proficiencyBonus
+  const lines =
+    derived?.spellcasting ??
+    (proficiencyBonus === undefined
+      ? []
+      : deriveSpellcastingLines(spells.monster, proficiencyBonus))
+  const spellLine = lines.find((line) => line.id === action.id && line.section === section)
   const rendered = formatMonsterSpellEntry({
     entry: { ...action, name: identityName },
     monsterName: spells.monsterName,

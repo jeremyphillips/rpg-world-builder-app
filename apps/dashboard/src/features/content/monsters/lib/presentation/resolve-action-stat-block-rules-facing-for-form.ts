@@ -107,11 +107,27 @@ function canResolveWithoutDerivedStats(action: PublishedAction): boolean {
   }
 }
 
+function attackCatalogReason(
+  action: PublishedAction,
+  monster: Monster,
+  ctx: ContentFormCtx,
+): FacingReason | undefined {
+  if (ctx.equipmentCatalogStatus !== 'ready') return equipmentCatalogReason(ctx)
+  if (action.kind !== 'weapon') return undefined
+
+  const entry = monster.equipment?.find((row) => row.entryId === action.equipmentEntryId)
+  const equipment = entry && monsterEquipmentCatalog(ctx).get(entry.equipmentId)
+  if (equipment?.kind !== 'weapon') return { code: 'missing-equipment-reference' }
+  return undefined
+}
+
 function selectedActionCatalogReason(
   action: PublishedAction,
+  monster: Monster,
   ctx: ContentFormCtx,
 ): FacingReason | undefined {
   if (canResolveWithoutDerivedStats(action)) return undefined
+  if (isMonsterActionAttackKind(action.kind)) return attackCatalogReason(action, monster, ctx)
   if (action.kind !== 'spell') return unavailableActionCatalog(ctx)
   if (ctx.spellCatalogStatus !== 'ready') return spellCatalogReason(ctx)
 
@@ -131,10 +147,6 @@ function selectedActionCatalogReason(
   return undefined
 }
 
-function catalogReferenceReason(ctx: ContentFormCtx): FacingReason {
-  return unavailableActionCatalog(ctx) ?? { code: 'catalog-pending', catalog: 'armor-class-rules' }
-}
-
 function derivedAttackReason(
   reason: DerivedFieldReason,
   values: MonsterFormValues,
@@ -148,7 +160,7 @@ function derivedAttackReason(
     }
     return { code: 'missing-rules-text' }
   }
-  if (reason === 'missing-reference') return catalogReferenceReason(ctx)
+  if (reason === 'missing-reference') return { code: 'unresolvable-record' }
   if (reason === 'conflict') return { code: 'derived-conflict' }
   return { code: 'unexpected' }
 }
@@ -282,7 +294,10 @@ export function resolveActionStatBlockRulesFacingForForm(input: {
     if (!selected) return { status: 'incomplete', reason: { code: 'missing-rules-text' } }
 
     action = selected
-    const reason = selectedActionCatalogReason(action, input.ctx)
+    if (action.kind === 'weapon' && !action.equipmentEntryId) {
+      return { status: 'incomplete', reason: { code: 'missing-attack-input', field: 'equipment' } }
+    }
+    const reason = selectedActionCatalogReason(action, normalized, input.ctx)
     if (reason) return { status: 'unavailable', reason }
 
     derived = canResolveWithoutDerivedStats(action)

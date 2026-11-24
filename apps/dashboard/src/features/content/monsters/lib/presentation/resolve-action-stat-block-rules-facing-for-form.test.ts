@@ -1,7 +1,7 @@
 import { joinStatBlockProseDocument, systemDefaultArmorClassRules } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
-import { pickMonster, pickSpell } from '@/test/fixtures/pick'
+import { pickEquipment, pickMonster, pickSpell } from '@/test/fixtures/pick'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import type { MonsterFormValues } from '../monster-form-values'
@@ -103,7 +103,9 @@ describe('resolveActionStatBlockRulesFacingForForm', () => {
     })
     expect(ready.status).toBe('ready')
     if (ready.status === 'ready') {
-      expect(joinStatBlockProseDocument(ready.facing.rulesProse ?? [])).toMatch(/fireball/i)
+      const rules = joinStatBlockProseDocument(ready.facing.rulesProse ?? [])
+      expect(rules).toMatch(/fireball/i)
+      expect(rules).toContain('DC 10')
     }
 
     expect(
@@ -148,6 +150,48 @@ describe('resolveActionStatBlockRulesFacingForForm', () => {
       section: 'actions',
     })
     expect(outcome.status).toBe('unavailable')
+  })
+
+  it('distinguishes weapon selection, equipment lifecycle, and missing references', () => {
+    const monster = pickMonster('kobold-warrior')
+    const action = monster.actions.find((row) => row.kind === 'weapon')
+    if (!action) throw new Error('Missing weapon fixture')
+
+    const request = {
+      values: baseValues({ equipment: monster.equipment, actions: [action] }),
+      actionId: action.id,
+      section: 'actions',
+    } as const
+    const resolve = (overrides?: Partial<ContentFormCtx>) =>
+      resolveActionStatBlockRulesFacingForForm({ ...request, ctx: baseCtx(overrides) })
+
+    expect(resolve({ equipmentCatalogStatus: 'pending' })).toEqual({
+      status: 'unavailable',
+      reason: { code: 'catalog-pending', catalog: 'equipment' },
+    })
+    expect(resolve({ equipmentCatalogStatus: 'error' })).toEqual({
+      status: 'unavailable',
+      reason: { code: 'catalog-error', catalog: 'equipment' },
+    })
+    expect(resolve({ spellCatalogStatus: 'error' })).toEqual({
+      status: 'unavailable',
+      reason: { code: 'missing-equipment-reference' },
+    })
+
+    const dagger = pickEquipment('dagger')
+    const ready = resolve({
+      equipmentCatalogById: new Map([[dagger.id, dagger]]),
+      spellCatalogStatus: 'error',
+    })
+    expect(ready).toMatchObject({ status: 'ready', facing: { rulesProse: expect.any(Array) } })
+
+    const values = baseValues({ actions: [{ ...action, equipmentEntryId: undefined }] })
+    expect(
+      resolveActionStatBlockRulesFacingForForm({ ...request, values, ctx: baseCtx() }),
+    ).toEqual({
+      status: 'incomplete',
+      reason: { code: 'missing-attack-input', field: 'equipment' },
+    })
   })
 
   it('keeps a finished attack ready when a sibling attack has no damage', () => {
