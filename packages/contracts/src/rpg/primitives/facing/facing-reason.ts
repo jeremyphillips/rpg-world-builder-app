@@ -1,5 +1,5 @@
 /** Closed catalog codes for unavailable facing reasons. */
-export type FacingCatalogCode = 'equipment' | 'spells' | 'armor-class-rules'
+export type FacingCatalogCode = 'equipment' | 'spells'
 
 /** Attack preview configure hints — maps to label text in the dashboard adapter. */
 export type FacingAttackInputField =

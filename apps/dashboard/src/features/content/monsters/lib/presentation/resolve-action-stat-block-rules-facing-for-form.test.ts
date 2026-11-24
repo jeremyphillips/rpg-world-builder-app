@@ -45,28 +45,18 @@ function baseValues(overrides: Partial<MonsterFormValues> = {}): MonsterFormValu
 }
 
 describe('resolveActionStatBlockRulesFacingForForm', () => {
-  it('returns unavailable when campaign ruleset is not on context', () => {
-    const outcome = resolveActionStatBlockRulesFacingForForm({
-      values: baseValues({
-        actions: [{ id: 'act', kind: 'special', name: 'Roar', description: '<p>Roar</p>' }],
-      }),
-      ctx: baseCtx({ rulesetId: undefined }),
-      actionId: 'act',
-      section: 'actions',
-    })
-    expect(outcome).toEqual({
-      status: 'unavailable',
-      reason: { code: 'catalog-pending', catalog: 'armor-class-rules' },
-    })
-  })
-
-  it('keeps authored Special Ability prose visible when unrelated catalogs fail', () => {
+  it('keeps authored Special Ability prose visible without campaign rules or catalogs', () => {
     const description = '<p>The creature roars.</p>'
     const outcome = resolveActionStatBlockRulesFacingForForm({
       values: baseValues({
         actions: [{ id: 'roar', kind: 'special', name: 'Roar', description }],
       }),
-      ctx: baseCtx({ equipmentCatalogStatus: 'error', spellCatalogStatus: 'error' }),
+      ctx: baseCtx({
+        armorClassRules: undefined,
+        rulesetId: undefined,
+        equipmentCatalogStatus: 'error',
+        spellCatalogStatus: 'error',
+      }),
       actionId: 'roar',
       section: 'actions',
     })
@@ -88,7 +78,7 @@ describe('resolveActionStatBlockRulesFacingForForm', () => {
     })
   })
 
-  it('resolves spell previews from the spell catalog even when equipment fails', () => {
+  it('resolves spell previews from the spell catalog while campaign rules and equipment are unavailable', () => {
     const spell = pickSpell('fireball')
     const values = baseValues({
       actions: [
@@ -106,6 +96,8 @@ describe('resolveActionStatBlockRulesFacingForForm', () => {
     const ready = resolveActionStatBlockRulesFacingForForm({
       ...request,
       ctx: baseCtx({
+        armorClassRules: undefined,
+        rulesetId: undefined,
         equipmentCatalogStatus: 'error',
         spellCatalogById: new Map([[spell.id, spell]]),
       }),
@@ -429,6 +421,14 @@ describe('resolveActionStatBlockRulesFacingForForm', () => {
       spellCatalogStatus: 'error',
     })
     expect(ready).toMatchObject({ status: 'ready', facing: { rulesProse: expect.any(Array) } })
+    expect(
+      resolve({
+        armorClassRules: undefined,
+        rulesetId: undefined,
+        equipmentCatalogById: new Map([[dagger.id, dagger]]),
+        spellCatalogStatus: 'error',
+      }),
+    ).toEqual(ready)
 
     const values = baseValues({ actions: [{ ...action, equipmentEntryId: undefined }] })
     expect(

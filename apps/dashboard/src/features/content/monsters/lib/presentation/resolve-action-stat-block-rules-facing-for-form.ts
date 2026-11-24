@@ -233,22 +233,6 @@ export function resolveActionStatBlockRulesFacingForForm(input: {
   actionId: string
   section: MonsterActionSection
 }): MonsterActionRulesPreviewOutcome {
-  const armorClassRules = monsterArmorClassRules(input.ctx)
-  if (!armorClassRules) {
-    return {
-      status: 'unavailable',
-      reason: { code: 'catalog-pending', catalog: 'armor-class-rules' },
-    }
-  }
-
-  const magicPropertyProvider = monsterMagicPropertyProvider(input.ctx)
-  if (!input.ctx.rulesetId || !magicPropertyProvider) {
-    return {
-      status: 'unavailable',
-      reason: { code: 'catalog-pending', catalog: 'armor-class-rules' },
-    }
-  }
-
   let normalized: Monster
   let action: PublishedAction
   let attackDraft: ReturnType<typeof resolveMonsterDraftAttackEntry> | undefined
@@ -258,7 +242,7 @@ export function resolveActionStatBlockRulesFacingForForm(input: {
     normalized = normalizeMonsterDraftForPreview(input.values, {
       intent: 'draft',
       mode: 'create',
-      armorClassRules,
+      armorClassRules: monsterArmorClassRules(input.ctx),
     })
     const selected = sectionRows(normalized, input.section).find((row) => row.id === input.actionId)
     if (!selected) return { status: 'incomplete', reason: { code: 'missing-rules-text' } }
@@ -274,6 +258,7 @@ export function resolveActionStatBlockRulesFacingForForm(input: {
     const reason = selectedActionCatalogReason(action, normalized, input.ctx)
     if (reason) return { status: 'unavailable', reason }
 
+    const magicPropertyProvider = monsterMagicPropertyProvider(input.ctx)
     if (isMonsterActionAttackKind(action.kind)) {
       attackDraft = resolveMonsterDraftAttackEntry({
         action,
