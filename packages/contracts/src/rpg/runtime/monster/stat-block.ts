@@ -352,7 +352,7 @@ type DraftMonsterSource = {
   legendaryActions?: MonsterBody['legendaryActions']
 }
 
-function resolveDraftAttackEntry(args: {
+export function resolveMonsterDraftAttackEntry(args: {
   action: MonsterAction | MonsterBonusAction | MonsterReaction | MonsterLegendaryAction
   monster: MonsterBody
   equipmentCatalog: CreatureEquipmentCatalog
@@ -399,7 +399,7 @@ function draftAttacks(
       attacks.push({
         id: action.id,
         section,
-        ...resolveDraftAttackEntry({
+        ...resolveMonsterDraftAttackEntry({
           action,
           monster: asBody,
           equipmentCatalog,

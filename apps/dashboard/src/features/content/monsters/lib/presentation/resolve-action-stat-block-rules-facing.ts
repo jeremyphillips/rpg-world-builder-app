@@ -108,8 +108,13 @@ export function buildSpellDisplayContext(input: {
   }
 }
 
+type ActionFacingStats = Pick<
+  DerivedMonsterStatBlock,
+  'attacks' | 'proficiencyBonus' | 'spellcasting'
+>
+
 function findAttackLine(
-  derived: DerivedMonsterStatBlock | null | undefined,
+  derived: ActionFacingStats | null | undefined,
   section: DerivedMonsterAttackLine['section'],
   actionId: string,
 ): DerivedMonsterAttackLine | undefined {
@@ -134,7 +139,7 @@ function actionDisplayIdentity(
 
 function proficiencyBonusForDisplay(
   monster: Monster,
-  derived: DerivedMonsterStatBlock | null | undefined,
+  derived: ActionFacingStats | null | undefined,
 ): number {
   if (derived) return derived.proficiencyBonus
   return CHALLENGE_RATING_MECHANICS[monster.challengeRating]?.proficiencyBonus ?? 0
@@ -171,7 +176,7 @@ function escapeStatBlockText(value: string): string {
 export function proseSavingThrowParagraph(
   monster: Monster,
   effect: SavingThrowEffect | undefined,
-  derived: DerivedMonsterStatBlock | null | undefined,
+  derived: ActionFacingStats | null | undefined,
 ): string | undefined {
   const prose = proseSavingThrowProse(monster, effect, derived)
   if (!prose) return undefined
@@ -181,7 +186,7 @@ export function proseSavingThrowParagraph(
 export function proseSavingThrowProse(
   monster: Monster,
   effect: SavingThrowEffect | undefined,
-  derived: DerivedMonsterStatBlock | null | undefined,
+  derived: ActionFacingStats | null | undefined,
 ): StatBlockProse | undefined {
   if (!effect?.ability || !effect.targets.trim() || !effect.failure.trim()) return undefined
   const dc = resolveProseSavingThrowDc({
@@ -249,7 +254,7 @@ function withTurnLimit(
 function formatSaveActionContent(
   monster: Monster,
   action: Extract<MonsterAction | MonsterReaction, { kind: 'save' }>,
-  derived: DerivedMonsterStatBlock | null | undefined,
+  derived: ActionFacingStats | null | undefined,
   displayName: string,
 ): { rulesProse?: StatBlockProseDocument; fallbackBody?: string } {
   if (!action.resolution || !action.dcSource) return {}
@@ -326,7 +331,7 @@ function parryFollowUpName(
 function mapSpellActionFacing(
   action: Extract<MonsterAction | MonsterReaction | MonsterLegendaryAction, { kind: 'spell' }>,
   section: DerivedMonsterAttackLine['section'],
-  derived: DerivedMonsterStatBlock | null | undefined,
+  derived: ActionFacingStats | null | undefined,
   spells: SpellDisplayContext,
   identityName: string,
 ): MonsterActionRulesFacing {
@@ -368,7 +373,7 @@ function mapSpellActionFacing(
 function mapSaveActionFacing(
   action: Extract<MonsterAction | MonsterReaction, { kind: 'save' }>,
   name: string,
-  derived: DerivedMonsterStatBlock | null | undefined,
+  derived: ActionFacingStats | null | undefined,
   spells: SpellDisplayContext,
   identityName: string,
 ): MonsterActionRulesFacing {
@@ -421,7 +426,7 @@ function mapActionReferenceFacing(
 function mapMultiattackActionFacing(
   action: Extract<MonsterAction, { kind: 'multiattack' }>,
   name: string,
-  _derived: DerivedMonsterStatBlock | null | undefined,
+  _derived: ActionFacingStats | null | undefined,
   catalogState: MonsterCatalogLoadState,
   spells: SpellDisplayContext,
 ): MonsterActionRulesFacing {
@@ -543,7 +548,7 @@ function mapGeneratedBonusActionFacing(
 function mapSpecialActionFacing(
   action: Extract<MonsterAction | MonsterReaction, { kind: 'special' }>,
   name: string,
-  derived: DerivedMonsterStatBlock | null | undefined,
+  derived: ActionFacingStats | null | undefined,
   spells: SpellDisplayContext,
 ): MonsterActionRulesFacing {
   const saveProse = proseSavingThrowProse(spells.monster, action.savingThrow, derived)
@@ -597,7 +602,7 @@ function mapAttackActionFacing(
   action: MonsterAction | MonsterBonusAction | MonsterReaction | MonsterLegendaryAction,
   section: DerivedMonsterAttackLine['section'],
   name: string,
-  derived: DerivedMonsterStatBlock | null | undefined,
+  derived: ActionFacingStats | null | undefined,
   catalogState: MonsterCatalogLoadState,
   spells: SpellDisplayContext,
 ): MonsterActionRulesFacing {
@@ -652,7 +657,7 @@ function resolveActionFacingBody(
   section: DerivedMonsterAttackLine['section'],
   name: string,
   identityName: string,
-  derived: DerivedMonsterStatBlock | null | undefined,
+  derived: ActionFacingStats | null | undefined,
   catalogState: MonsterCatalogLoadState,
   spells: SpellDisplayContext,
 ): MonsterActionRulesFacing {
@@ -739,7 +744,7 @@ function resolveActionFacingBody(
 export function resolveActionStatBlockRulesFacing(
   action: MonsterAction | MonsterBonusAction | MonsterReaction | MonsterLegendaryAction,
   section: DerivedMonsterAttackLine['section'],
-  derived: DerivedMonsterStatBlock | null | undefined,
+  derived: ActionFacingStats | null | undefined,
   catalogState: MonsterCatalogLoadState,
   spells: SpellDisplayContext,
   referenceHeadings: ReadonlyMap<string, string>,
@@ -775,7 +780,7 @@ export function resolveActionStatBlockRulesFacingList(
     | MonsterLegendaryAction
   )[],
   section: DerivedMonsterAttackLine['section'],
-  derived: DerivedMonsterStatBlock | null | undefined,
+  derived: ActionFacingStats | null | undefined,
   catalogState: MonsterCatalogLoadState,
   spells: SpellDisplayContext,
 ): MonsterActionRulesFacing[] {

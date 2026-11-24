@@ -2,7 +2,7 @@ import {
   availableBodyRows,
   CHALLENGE_RATING_MECHANICS,
   MONSTER_ACTION_KINDS,
-  deriveSpellcastingLines,
+  resolveMonsterDraftAttackEntry,
   findSpellCastingSource,
   createSpellCatalogContext,
   resolveSpellReferenceOutcome,
@@ -13,7 +13,6 @@ import {
   monsterReferencedActionIds,
   type DerivedFieldReason,
   type DerivedMonsterAttackLine,
-  type DerivedMonsterStatBlock,
   type FacingReason,
   type Monster,
   type MonsterAction,
@@ -28,7 +27,6 @@ import { resolveMonsterActionAttackPreviewReason } from '../actions/previews/mon
 import { findMonsterFormActionDraft } from '../actions/previews/monster-action-draft-lookup'
 import type { MonsterActionSection } from '../actions/references/monster-action-equipment-references'
 import {
-  deriveMonsterFormDraft,
   monsterArmorClassRules,
   monsterEquipmentCatalog,
   monsterMagicPropertyProvider,
@@ -88,30 +86,13 @@ function spellCatalogReason(ctx: ContentFormCtx): FacingReason {
   return { code: 'catalog-pending', catalog: 'spells' }
 }
 
-function canResolveWithoutDerivedStats(action: PublishedAction): boolean {
-  switch (action.kind) {
-    case 'special':
-    case 'save':
-    case 'leap':
-    case 'teleport':
-    case 'take-actions':
-    case 'shape-shift':
-    case 'multiattack':
-    case 'action-reference':
-    case 'parry':
-      return true
-    default:
-      return false
-  }
-}
-
 function attackCatalogReason(
   action: PublishedAction,
   monster: Monster,
   ctx: ContentFormCtx,
 ): FacingReason | undefined {
-  if (ctx.equipmentCatalogStatus !== 'ready') return equipmentCatalogReason(ctx)
   if (action.kind !== 'weapon') return undefined
+  if (ctx.equipmentCatalogStatus !== 'ready') return equipmentCatalogReason(ctx)
 
   const entry = monster.equipment?.find((row) => row.entryId === action.equipmentEntryId)
   const equipment = entry && monsterEquipmentCatalog(ctx).get(entry.equipmentId)
@@ -236,56 +217,6 @@ function incompleteReasonForAction(
   return { code: 'missing-rules-text' }
 }
 
-// fallow-ignore-next-line complexity
-function derivedForFacing(
-  values: MonsterFormValues,
-  ctx: ContentFormCtx,
-): DerivedMonsterStatBlock | null {
-  const draft = deriveMonsterFormDraft(values, ctx)
-  if (!draft) return null
-
-  const normalized = normalizeMonsterDraftForPreview(values, {
-    intent: 'draft',
-    mode: 'create',
-    armorClassRules: monsterArmorClassRules(ctx)!,
-  })
-
-  const proficiencyBonus =
-    draft.challenge.status === 'resolved'
-      ? draft.challenge.value.proficiencyBonus
-      : normalized.challengeRating && normalized.challengeRating in CHALLENGE_RATING_MECHANICS
-        ? CHALLENGE_RATING_MECHANICS[
-            normalized.challengeRating as keyof typeof CHALLENGE_RATING_MECHANICS
-          ].proficiencyBonus
-        : 0
-
-  const attacks = draft.attacks.flatMap((entry) =>
-    entry.result.status === 'resolved' ? [entry.result.value] : [],
-  )
-
-  const savingThrows = draft.savingThrows.status === 'resolved' ? draft.savingThrows.value : {}
-
-  return {
-    ac: draft.ac,
-    hp: draft.hp.status === 'resolved' ? draft.hp.value.hp : 0,
-    hpFormula: draft.hp.status === 'resolved' ? draft.hp.value.formula : '',
-    hpClampedToMinimum: draft.hp.status === 'resolved' ? draft.hp.value.clampedToMinimum : false,
-    initiativeModifier:
-      draft.initiative.status === 'resolved' ? draft.initiative.value.modifier : 0,
-    initiativeLabel: draft.initiative.status === 'resolved' ? draft.initiative.value.label : '',
-    proficiencyBonus,
-    experiencePoints:
-      draft.challenge.status === 'resolved' ? draft.challenge.value.experiencePoints : 0,
-    passivePerception:
-      draft.passivePerception.status === 'resolved' ? draft.passivePerception.value : 10,
-    savingThrows,
-    skills: draft.skills.status === 'resolved' ? draft.skills.value : [],
-    attacks,
-    spellcasting: deriveSpellcastingLines(normalized, proficiencyBonus),
-    senses: [],
-  }
-}
-
 function facingHasRulesBody(facing: MonsterActionRulesFacing): boolean {
   if (facing.rulesProse && facing.rulesProse.length > 0) return true
   if (facing.attackLine && facing.attackLine !== MONSTER_UNRESOLVED_CATALOG_REFERENCE) {
@@ -293,24 +224,6 @@ function facingHasRulesBody(facing: MonsterActionRulesFacing): boolean {
   }
   if (facing.descriptionHtml && !monsterRichTextIsEmpty(facing.descriptionHtml)) return true
   return false
-}
-
-function attackDraftState(
-  values: MonsterFormValues,
-  ctx: ContentFormCtx,
-  actionId: string,
-  section: MonsterActionSection,
-): {
-  reason?: DerivedFieldReason
-  profile?: MonsterActionAttackProfile
-  line?: DerivedMonsterAttackLine
-} {
-  const draft = deriveMonsterFormDraft(values, ctx)
-  if (!draft) return { reason: 'missing-reference' }
-  const entry = draft.attacks.find((row) => row.id === actionId && row.section === section)
-  if (!entry) return {}
-  if (entry.result.status === 'unavailable') return { reason: entry.result.reason }
-  return { profile: entry.profile, line: entry.result.value }
 }
 
 // fallow-ignore-next-line complexity
@@ -338,7 +251,7 @@ export function resolveActionStatBlockRulesFacingForForm(input: {
 
   let normalized: Monster
   let action: PublishedAction
-  let derived: DerivedMonsterStatBlock | null
+  let attackDraft: ReturnType<typeof resolveMonsterDraftAttackEntry> | undefined
   let spellContext: SpellDisplayContext
 
   try {
@@ -361,9 +274,16 @@ export function resolveActionStatBlockRulesFacingForForm(input: {
     const reason = selectedActionCatalogReason(action, normalized, input.ctx)
     if (reason) return { status: 'unavailable', reason }
 
-    derived = canResolveWithoutDerivedStats(action)
-      ? null
-      : derivedForFacing(input.values, input.ctx)
+    if (isMonsterActionAttackKind(action.kind)) {
+      attackDraft = resolveMonsterDraftAttackEntry({
+        action,
+        monster: normalized,
+        section: derivedSection(input.section),
+        equipmentCatalog: monsterEquipmentCatalog(input.ctx),
+        proficiencyBonus: CHALLENGE_RATING_MECHANICS[normalized.challengeRating]?.proficiencyBonus,
+        magicPropertyProvider,
+      })
+    }
     const catalogState = 'ready' as const
     spellContext = buildSpellDisplayContext({
       monster: normalized,
@@ -382,31 +302,23 @@ export function resolveActionStatBlockRulesFacingForForm(input: {
     return { status: 'failed', reason: { code: 'unexpected' } }
   }
 
-  const attackDraft = isMonsterActionAttackKind(action.kind)
-    ? attackDraftState(input.values, input.ctx, input.actionId, derivedSection(input.section))
-    : undefined
-
-  if (attackDraft) {
-    if (attackDraft.reason === 'conflict') {
-      return {
-        status: 'unavailable',
-        reason: derivedAttackReason('conflict', input.values, input.ctx, input.actionId),
-      }
-    }
-    if (attackDraft.reason === 'missing-reference') {
-      return {
-        status: 'unavailable',
-        reason: derivedAttackReason('missing-reference', input.values, input.ctx, input.actionId),
-      }
-    }
-    if (attackDraft.reason === 'missing-input') {
-      return {
-        status: 'incomplete',
-        reason: derivedAttackReason('missing-input', input.values, input.ctx, input.actionId),
-      }
+  if (attackDraft?.result.status === 'unavailable') {
+    const { reason } = attackDraft.result
+    return {
+      status: reason === 'missing-input' ? 'incomplete' : 'unavailable',
+      reason: derivedAttackReason(reason, input.values, input.ctx, input.actionId),
     }
   }
 
+  const attackLine = attackDraft?.result.value
+  const derived = attackLine
+    ? {
+        attacks: [attackLine],
+        proficiencyBonus:
+          CHALLENGE_RATING_MECHANICS[normalized.challengeRating]?.proficiencyBonus ?? 0,
+        spellcasting: [],
+      }
+    : null
   const headings = actionReferenceHeadings(sectionRows(normalized, input.section), spellContext)
 
   const facing = resolveActionStatBlockRulesFacing(
@@ -430,7 +342,7 @@ export function resolveActionStatBlockRulesFacingForForm(input: {
     status: 'ready',
     facing,
     ...(attackDraft?.profile ? { attackProfile: attackDraft.profile } : {}),
-    ...(attackDraft?.line ? { attackLine: attackDraft.line } : {}),
+    ...(attackLine ? { attackLine } : {}),
   }
 }
 

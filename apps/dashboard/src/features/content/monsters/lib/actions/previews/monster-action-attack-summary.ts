@@ -227,10 +227,10 @@ export function resolveMonsterActionAttackPreviewReason({
   values,
   action,
 }: MonsterActionAttackPreviewGuidanceContext): FacingReason {
-  if (ctx.equipmentCatalogStatus === 'error') {
+  if (action.kind === 'weapon' && ctx.equipmentCatalogStatus === 'error') {
     return { code: 'catalog-error', catalog: 'equipment' }
   }
-  if (ctx.equipmentCatalogStatus !== 'ready') {
+  if (action.kind === 'weapon' && ctx.equipmentCatalogStatus !== 'ready') {
     return { code: 'catalog-pending', catalog: 'equipment' }
   }
 

@@ -3631,6 +3631,7 @@
     "resolveMonsterArmorClass",
     "resolveMonsterArmorProficiencyCategories",
     "resolveMonsterBaseExperiencePoints",
+    "resolveMonsterDraftAttackEntry",
     "resolveMonsterEntryHeading",
     "resolveMonsterHitPoints",
     "resolveMonsterInLairExperiencePoints",
