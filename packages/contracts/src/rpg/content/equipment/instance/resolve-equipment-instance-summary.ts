@@ -100,6 +100,7 @@ function resolveDisplayName(args: {
   return `${item.name} ${formatSignedModifier(enhancementBonus)}`
 }
 
+// fallow-ignore-next-line complexity — single orchestration point for instance display metadata
 export function resolveEquipmentInstanceSummary(
   entry: EquipmentInstance,
   item: Equipment | undefined,

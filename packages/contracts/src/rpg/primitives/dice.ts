@@ -22,9 +22,6 @@ export const CLASS_HIT_DICE = [6, 8, 10, 12] as const satisfies readonly DieFace
 
 export type HitDie = (typeof CLASS_HIT_DICE)[number]
 
-/** @deprecated Prefer {@link HitDie} — kept as a class-content alias. */
-export type ClassHitDie = HitDie
-
 export const hitDieSchema = z.union(
   CLASS_HIT_DICE.map((f) => z.literal(f)) as [z.ZodLiteral<HitDie>, ...z.ZodLiteral<HitDie>[]],
 )

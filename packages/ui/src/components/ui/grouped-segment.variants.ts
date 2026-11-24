@@ -84,14 +84,6 @@ export function resolveGroupedValueSlotPadding(
   }
 }
 
-/** @deprecated Prefer `resolveGroupedValueSlotPadding`. */
-export function groupedValueSlotPaddingClasses(
-  size: FieldSizeToken,
-  position: GroupedSegmentPosition,
-): string {
-  return resolveGroupedValueSlotPadding(size, position)
-}
-
 /** Segment shell — geometry (height, corners) + explicit surface; position does not imply wash. */
 export function groupedSegmentShellClasses(
   size: FieldSize,

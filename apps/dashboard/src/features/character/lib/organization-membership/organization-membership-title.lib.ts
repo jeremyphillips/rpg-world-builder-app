@@ -39,15 +39,3 @@ export function membershipRadioValueFromMembershipTitleId(
   }
   return membershipTitleId
 }
-
-/** @deprecated Use membershipTitleIdFromRadioValue — label-based mapping removed. */
-export function titleFromMembershipRadioValue(value: string): string {
-  return membershipTitleIdFromRadioValue(value)
-}
-
-/** @deprecated Use membershipRadioValueFromMembershipTitleId. */
-export function membershipRadioValueFromTitle(
-  title: string | undefined | null,
-): string | undefined {
-  return membershipRadioValueFromMembershipTitleId(title)
-}

@@ -220,10 +220,6 @@ export function createOrganizationCreateDefaultValues(): Partial<OrganizationFor
   }
 }
 
-/** @deprecated Prefer `createOrganizationCreateDefaultValues()` for a fresh `omt_*` per create session. */
-export const organizationCreateDefaultValues: Partial<OrganizationFormValues> =
-  createOrganizationCreateDefaultValues()
-
 export { nameField as organizationNameField }
 
 function buildOrganizationProfileFields(options: {

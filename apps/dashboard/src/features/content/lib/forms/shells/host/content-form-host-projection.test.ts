@@ -9,7 +9,7 @@ import { spellFormDef } from '../../../../spells/lib/spell-form-def'
 import { weaponFormValueSyncs } from '../../../../equipment/weapons'
 import { resolutionFormValueSyncs } from '../../../../spells/resolution/lib/form/resolution-form-sync'
 import {
-  organizationCreateDefaultValues,
+  createOrganizationCreateDefaultValues,
   organizationDraftFormSchema,
   organizationFormSchema,
 } from '../../organization-form-projection'
@@ -82,7 +82,7 @@ describe('resolveContentFormHostConfig', () => {
     })
 
     expect(config.defaultValues).toEqual({
-      ...organizationCreateDefaultValues,
+      ...createOrganizationCreateDefaultValues(),
       members: { classAffinityIds: ['class-rogue'] },
     })
     expect(config.defaultValues?.members).not.toHaveProperty('speciesAffinityIds')

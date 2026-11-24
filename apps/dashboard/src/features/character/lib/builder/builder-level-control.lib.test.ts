@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   createEmptyCharacterBuilderDraft,
-  resolveBuilderLevelConstraints,
+  resolveCharacterLevelConstraints,
   sanitizeClassForLevel,
 } from '@rpg/contracts'
 
@@ -17,7 +17,11 @@ import {
 
 describe('builder-level-control.lib', () => {
   const context = createStandaloneBuilderContextFixture()
-  const constraints = resolveBuilderLevelConstraints(context)
+  const constraints = resolveCharacterLevelConstraints({
+    characterKind: context.characterKind,
+    rulesScope: context.rulesScope,
+    characterCreationRules: context.characterCreationRules,
+  })
 
   it('builds level options within campaign maximum', () => {
     const options = buildBuilderLevelSelectOptions(constraints)

@@ -148,27 +148,3 @@ export function resolveCampaignRecoveryPromotions(
     recoverableCount: recoverable.length,
   }
 }
-
-/** @deprecated Use {@link CampaignRecoveryPromotion}. */
-export type CampaignSetupPromotion = CampaignRecoveryPromotion
-
-/** @deprecated Use {@link toRecoveryPromotion}. */
-export const toFinishJoiningPromotion = toRecoveryPromotion
-
-/** @deprecated Use {@link resolveCampaignRecoveryPromotions}. */
-export function resolvePromotedFinishJoining(
-  campaigns: readonly CampaignListItem[],
-  user: CampaignRecoveryPreferences | null | undefined,
-  storedId: string | null,
-): { promotion: CampaignRecoveryPromotion | null; incompleteCount: number } {
-  const { promotion, recoverableCount } = resolveCampaignRecoveryPromotions(campaigns, {
-    storedCampaignId: storedId,
-    lastSelectedCampaignId: user?.lastSelectedCampaignId,
-  })
-  return { promotion, incompleteCount: recoverableCount }
-}
-
-/** @deprecated Use {@link listRecoverableCampaigns}. */
-export function countIncompleteCampaigns(campaigns: readonly CampaignListItem[]): number {
-  return listRecoverableCampaigns(campaigns).length
-}

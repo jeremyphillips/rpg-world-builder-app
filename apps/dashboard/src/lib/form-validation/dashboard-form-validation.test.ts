@@ -27,10 +27,10 @@ import {
   mechanicsValuesSchema,
 } from '@/features/campaign/lib/rules/mechanics/mechanics-form-fields'
 import {
+  createIdentityFields,
+  createIdentitySchema,
   flavorFields,
   flavorSchema,
-  identityFields,
-  identitySchema,
   settingsIdentityFields,
 } from '@/features/campaign/lib/settings/campaign-profile-form-fields'
 import { campaignSettingsSchema } from '@/features/campaign/lib/settings/campaign-settings-form-values'
@@ -41,11 +41,21 @@ import {
   changePasswordFormSchema,
 } from '@/features/user/lib/change-password-fields'
 import {
-  vocabularyEntryCreateFields,
-  vocabularyEntryCreateFormSchema,
-  vocabularyEntryEditFields,
-  vocabularyEntryEditFormSchema,
+  buildVocabularyEntrySheetFields,
+  vocabularyEntrySheetFormSchema,
 } from '@/features/vocabulary/lib/vocabulary-entry-form-fields'
+
+const vocabularyEntryCreateFields = buildVocabularyEntrySheetFields({
+  groupId: 'vocabulary-entry-create-registry',
+  pending: false,
+  available: true,
+})
+
+const vocabularyEntryEditFields = buildVocabularyEntrySheetFields({
+  groupId: 'vocabulary-entry-edit-registry',
+  pending: false,
+  available: true,
+})
 
 const creatureTypeOptions = buildActiveCreatureTypeFieldOptions(buildSeedCreatureTypeVocabulary())
 const editionPresetOptions = buildEditionPresetFieldOptions(buildSeedEditionPresetVocabulary())
@@ -82,9 +92,9 @@ describe('dashboard form validation', () => {
   })
 
   it('campaign create identity step', () => {
-    assertFieldPathsRegistered(identityFields)
-    assertRegistryCoverage(identitySchema, identityFields)
-    assertInvalidSubmitUsesRefinedMessages(identitySchema, identityFields)
+    assertFieldPathsRegistered(createIdentityFields)
+    assertRegistryCoverage(createIdentitySchema, createIdentityFields)
+    assertInvalidSubmitUsesRefinedMessages(createIdentitySchema, createIdentityFields)
   })
 
   it('campaign create rules step', () => {
@@ -141,22 +151,22 @@ describe('dashboard form validation', () => {
 
   it('vocabulary entry create sheet', () => {
     assertFieldPathsRegistered(vocabularyEntryCreateFields)
-    assertRegistryCoverage(vocabularyEntryCreateFormSchema, vocabularyEntryCreateFields, {
+    assertRegistryCoverage(vocabularyEntrySheetFormSchema, vocabularyEntryCreateFields, {
       ignorePaths: VOCABULARY_ENTRY_DYNAMIC_FIELD_IGNORE,
     })
     assertInvalidSubmitUsesRefinedMessages(
-      vocabularyEntryCreateFormSchema,
+      vocabularyEntrySheetFormSchema,
       vocabularyEntryCreateFields,
     )
   })
 
   it('vocabulary entry edit sheet', () => {
     assertFieldPathsRegistered(vocabularyEntryEditFields)
-    assertRegistryCoverage(vocabularyEntryEditFormSchema, vocabularyEntryEditFields, {
+    assertRegistryCoverage(vocabularyEntrySheetFormSchema, vocabularyEntryEditFields, {
       ignorePaths: VOCABULARY_ENTRY_DYNAMIC_FIELD_IGNORE,
     })
     assertInvalidSubmitUsesRefinedMessages(
-      vocabularyEntryEditFormSchema,
+      vocabularyEntrySheetFormSchema,
       vocabularyEntryEditFields,
       {
         invalidValue: { id: 'fey', label: '', description: '', status: 'active' },

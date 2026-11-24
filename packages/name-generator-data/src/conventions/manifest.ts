@@ -12,9 +12,3 @@ export const STATIC_CONVENTIONS: readonly NamingConvention[] = RAW_STATIC_CONVEN
 export const STATIC_CONVENTION_BY_ID = new Map(
   STATIC_CONVENTIONS.map((convention) => [convention.id, convention]),
 )
-
-/** @deprecated Use STATIC_CONVENTIONS — unmigrated conventions only. */
-export const CONVENTIONS = STATIC_CONVENTIONS
-
-/** @deprecated Use STATIC_CONVENTION_BY_ID */
-export const CONVENTION_BY_ID = STATIC_CONVENTION_BY_ID

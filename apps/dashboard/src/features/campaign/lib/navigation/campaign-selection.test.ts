@@ -8,7 +8,6 @@ import {
   getCampaignSwitcherTriggerLabel,
   resolveCampaignSwitcherTriggerState,
   resolveContinueCampaign,
-  resolveResumeSetupCampaign,
   resolveTargetPathOnSwitch,
 } from './campaign-selection'
 import { resolvePreferredCampaignId } from './resolve-preferred-campaign-id'
@@ -80,20 +79,6 @@ describe('resolveContinueCampaign', () => {
         null,
       ),
     ).toMatchObject({ id: 'solo' })
-  })
-})
-
-describe('resolveResumeSetupCampaign', () => {
-  it('returns the preferred campaign when onboarding is incomplete', () => {
-    expect(
-      resolveResumeSetupCampaign(campaignListItems, { lastSelectedCampaignId: 'c' }, null),
-    ).toMatchObject({ id: 'c' })
-  })
-
-  it('returns null when onboarding is complete', () => {
-    expect(
-      resolveResumeSetupCampaign(campaignListItems, { lastSelectedCampaignId: 'a' }, 'b'),
-    ).toBeNull()
   })
 })
 

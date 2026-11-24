@@ -24,7 +24,6 @@ export {
 } from './lib/display/character-list-row.lib'
 export { useBuildContext, type BuildContextResult } from './hooks/use-build-context'
 export {
-  useCampaignBuildContext,
   useCampaignBuildFoundation,
   useCampaignCharacterBuildContext,
   useCampaignNpcBuildContext,
@@ -85,8 +84,8 @@ export {
 export { OrganizationMembershipTitleField } from './components/connections/organization-membership-title-field'
 export {
   buildOrganizationMembershipTitleRadioOptions,
-  membershipRadioValueFromTitle,
-  titleFromMembershipRadioValue,
+  membershipRadioValueFromMembershipTitleId,
+  membershipTitleIdFromRadioValue,
 } from './lib/organization-membership/organization-membership-title.lib'
 export {
   createCharacterRelationship,
@@ -105,7 +104,6 @@ export {
   invalidateCharacterRelationshipQueries,
   type CharacterRelationshipInvalidationTarget,
   type CharacterRelationshipSubjectKind,
-  type CharacterOrganizationMembershipSubjectKind,
 } from './lib/invalidate-character-relationship-queries'
 export {
   characterLocationReferencesQueryKey,

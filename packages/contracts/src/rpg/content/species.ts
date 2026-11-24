@@ -47,9 +47,6 @@ export const speciesBodyTraitSchema = contentTraitSchema.and(
 
 export type SpeciesBodyTrait = z.infer<typeof speciesBodyTraitSchema>
 
-/** @deprecated Prefer {@link SpeciesBodyTrait} — alias retained for existing imports. */
-export type SpeciesTrait = SpeciesBodyTrait
-
 export const speciesHeritageOptionSchema = contentTraitSchema.and(
   z.object({ campaignAccess: contentCampaignAccessSchema.partial().optional() }),
 )

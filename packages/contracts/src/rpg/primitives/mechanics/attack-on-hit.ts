@@ -10,9 +10,6 @@ import { orderedEffectSchema, orderedEffectsSchema } from './ordered-effect'
  */
 export const attackOnHitEffectSchema = orderedEffectSchema
 
-/** @deprecated Use {@link orderedEffectSchema} — retained for one release slice. */
-export type AttackOnHitEffect = z.infer<typeof attackOnHitEffectSchema>
-
 export const attackOnHitSchema = z
   .object({
     effects: orderedEffectsSchema.min(1),

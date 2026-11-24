@@ -56,21 +56,6 @@ export const CAMPAIGN_ONBOARDING_RECONNECT_HEADING = 'Restore your campaign conn
 export const CAMPAIGN_ONBOARDING_RECONNECT_BODY =
   'Choose a character to reconnect your membership with this campaign.' as const
 
-/** @deprecated Use {@link CAMPAIGN_CONNECTION_RESTORE_BADGE}. */
-export const CAMPAIGN_PARTICIPATION_INVALID_BADGE = CAMPAIGN_CONNECTION_RESTORE_BADGE
-
-/** @deprecated Use {@link CAMPAIGN_CONNECTION_RESTORE_BODY}. */
-export const CAMPAIGN_PARTICIPATION_INVALID_BODY = CAMPAIGN_CONNECTION_RESTORE_BODY
-
-/** @deprecated Use {@link CAMPAIGN_CONNECTION_RESTORE_INDEX_ROW_BODY}. */
-export const CAMPAIGN_PARTICIPATION_INVALID_INDEX_ROW_BODY =
-  CAMPAIGN_CONNECTION_RESTORE_INDEX_ROW_BODY
-
-/** @deprecated Use {@link campaignConnectionRestoreTitle}. */
-export function campaignParticipationInvalidTitle(campaignName: string): string {
-  return campaignConnectionRestoreTitle(campaignName)
-}
-
 export const CAMPAIGN_ONBOARDING_INCOMPLETE_COPY = {
   badge: CAMPAIGN_ONBOARDING_INCOMPLETE_BADGE,
   message: FINISH_JOINING_CAMPAIGN_BODY,

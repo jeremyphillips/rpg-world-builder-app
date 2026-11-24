@@ -1,10 +1,8 @@
 import { useId, useMemo } from 'react'
 
+import { clampEquipmentPurchaseQuantity } from '@rpg/contracts'
 import { Badge, Button, cn, DividedStack, Heading, NumberStepper, Text } from '@rpg/ui'
-import {
-  clampEquipmentStepQuantity,
-  EQUIPMENT_STEP_QUANTITY_INPUT_DIGITS,
-} from '../../../lib/equipment/equipment-quantity.lib'
+import { EQUIPMENT_STEP_QUANTITY_INPUT_DIGITS } from '../../../lib/equipment/equipment-quantity.lib'
 import {
   buildEquipmentAcquisitionPanelViewModel,
   formatAcquisitionCommitSuccessAnnouncement,
@@ -132,7 +130,7 @@ function AcquisitionNextActionQuantityRow({
         value={quantity}
         disabled={isPending || nextAction.quantityDisabled}
         onChange={(next) =>
-          onQuantityChange(clampEquipmentStepQuantity(next, nextAction.maxQuantity))
+          onQuantityChange(clampEquipmentPurchaseQuantity(next, nextAction.maxQuantity))
         }
       />
     </div>

@@ -5,15 +5,11 @@ import { ROUTES } from '@/app/routes'
 import { renderWithProviders } from '@/test/render'
 import { MESSAGES_ACTION_COPY } from '../../lib/messages-copy'
 
-import {
-  MessagesCampaignEntryLinks,
-  MessagesGlobalEntryLink,
-  MessagesOverviewEntryActions,
-} from '../messages-entry-links'
+import { MessagesEntryLinks } from '../messages-entry-links'
 
 describe('messages entry links', () => {
   it('links campaign surfaces to scoped and global message routes', () => {
-    renderWithProviders(<MessagesCampaignEntryLinks campaignId="camp-1" />)
+    renderWithProviders(<MessagesEntryLinks campaignId="camp-1" />)
 
     expect(
       screen.getByRole('link', { name: MESSAGES_ACTION_COPY.viewForCampaign }),
@@ -25,7 +21,7 @@ describe('messages entry links', () => {
   })
 
   it('links overview actions to scoped and global message routes', () => {
-    renderWithProviders(<MessagesOverviewEntryActions campaignId="camp-2" />)
+    renderWithProviders(<MessagesEntryLinks campaignId="camp-2" tone="overview" />)
 
     expect(
       screen.getByRole('link', { name: MESSAGES_ACTION_COPY.viewForCampaign }),
@@ -33,7 +29,7 @@ describe('messages entry links', () => {
   })
 
   it('links global surfaces to the unscoped message list', () => {
-    renderWithProviders(<MessagesGlobalEntryLink />)
+    renderWithProviders(<MessagesEntryLinks />)
 
     expect(screen.getByRole('link', { name: MESSAGES_ACTION_COPY.viewAll })).toHaveAttribute(
       'href',

@@ -9,7 +9,6 @@ import { ROUTES } from '@/app/routes'
 
 import { CAMPAIGNS_QUERY_ERROR_MESSAGE, CAMPAIGN_UNKNOWN_NAME } from '../campaign-display'
 import {
-  isCampaignOnboardingIncomplete,
   isCampaignRecoveryRequired,
   resolveCampaignRecoveryState,
 } from '../recovery/campaign-recovery-state'
@@ -39,27 +38,6 @@ export function resolveContinueCampaign(
 
   const campaign = campaigns.find((item) => item.id === id)
   if (!campaign || isCampaignRecoveryRequired(resolveCampaignRecoveryState(campaign))) {
-    return null
-  }
-
-  return campaign
-}
-
-/**
- * Resolve a campaign the Dashboard should prompt to finish onboarding.
- * The candidate must exist and have incomplete viewer onboarding.
- * @deprecated Prefer {@link resolveCampaignRecoveryPromotions} for home promotion.
- */
-export function resolveResumeSetupCampaign(
-  campaigns: readonly CampaignListItem[],
-  user: CampaignPreference | null | undefined,
-  storedId: string | null,
-): CampaignListItem | null {
-  const id = resolvePreferredCampaignId(campaigns, user, storedId)
-  if (!id) return null
-
-  const campaign = campaigns.find((item) => item.id === id)
-  if (!campaign || !isCampaignOnboardingIncomplete(resolveCampaignRecoveryState(campaign))) {
     return null
   }
 

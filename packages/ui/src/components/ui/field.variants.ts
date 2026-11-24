@@ -185,9 +185,6 @@ export const fieldRecommendationFieldGroupClasses =
 export const fieldRecommendationCollectionGroupClasses =
   'mb-2 flex w-fit max-w-full flex-col items-start gap-1'
 
-/** @deprecated Use {@link fieldRecommendationFieldGroupClasses} or {@link fieldRecommendationCollectionGroupClasses}. */
-export const fieldRecommendationGroupClasses = fieldRecommendationCollectionGroupClasses
-
 /** Source label + optional bulk action — wraps together with token gap. */
 export const fieldRecommendationGroupHeaderClasses =
   'flex max-w-full flex-wrap items-center gap-x-1 gap-y-0.5'
@@ -274,8 +271,6 @@ export const fieldArrayItemVariants = cva('relative rounded-md border border-bor
 
 export type FieldArrayItemVariantProps = VariantProps<typeof fieldArrayItemVariants>
 
-/** @deprecated Use `fieldArrayItemVariants` — retained for legacy class assertions. */
-export const fieldArrayItemClasses = fieldArrayItemVariants({ variant: 'detailed' })
 export const fieldSetResetClasses = 'min-w-0 border-0 p-0 m-0'
 /** Column stack for a reset leaf `<fieldset>` whose chrome lives on a wrapping shell. */
 export const fieldSetChromeContainClasses = 'flex flex-col'
@@ -347,12 +342,6 @@ export const formDependentContentOffsetSpacing = {
   comfortable: 7,
 } as const satisfies Record<FieldRhythm, number>
 
-/** @deprecated Use {@link formDependentInsetSpacing}. */
-export const formRailInnerSpacing = formDependentInsetSpacing
-
-/** @deprecated Use {@link formDependentInsetSpacing}. */
-export const formInsetSpacing = formDependentInsetSpacing
-
 export const fieldDependentInsetVariants = cva('', {
   variants: {
     rhythm: {
@@ -364,12 +353,6 @@ export const fieldDependentInsetVariants = cva('', {
     rhythm: 'comfortable',
   },
 })
-
-/** @deprecated Use {@link fieldDependentInsetVariants}. */
-export const fieldRailInnerPaddingVariants = fieldDependentInsetVariants
-
-/** @deprecated Use {@link fieldDependentInsetVariants}. */
-export const fieldInsetLeftPaddingVariants = fieldDependentInsetVariants
 
 export const fieldInsetPaddingVariants = cva('', {
   variants: {
@@ -393,19 +376,6 @@ export function resolveFormInsetPaddingClasses(
   return axis === 'left'
     ? fieldDependentInsetVariants({ rhythm })
     : fieldInsetPaddingVariants({ rhythm })
-}
-
-/** @deprecated Use {@link fieldDependentInsetVariants}. */
-export const fieldGroupInsetPaddingVariants = fieldDependentInsetVariants
-
-/** @deprecated Use {@link resolveFormInsetPaddingClasses}. */
-export function resolveFieldGroupInsetPaddingClasses(rhythm: FieldRhythm = 'comfortable'): string {
-  return resolveFormInsetPaddingClasses(rhythm, 'left')
-}
-
-/** @deprecated Use {@link resolveDependentInsetClasses}. */
-export function resolveFieldRailInnerPaddingClasses(rhythm: FieldRhythm = 'comfortable'): string {
-  return resolveFormInsetPaddingClasses(rhythm, 'left')
 }
 
 /** Horizontal offset of dependent content from its controller — `pl-8` / `pl-9` (8px rail gutter + content offset). */

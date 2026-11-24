@@ -246,6 +246,3 @@ export function refineMovementRows(
     seen.add(mode)
   }
 }
-
-/** @deprecated Use {@link refineMovementRows}. */
-export const refineSpeciesMovementRows = refineMovementRows

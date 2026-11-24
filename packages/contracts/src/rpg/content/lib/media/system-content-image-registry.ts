@@ -276,19 +276,3 @@ export function resolveSystemContentImageSourceDimensionsFromPath(
 ): SourceDimensions | undefined {
   return SYSTEM_CONTENT_IMAGE_ENTRIES.find((entry) => entry.path === path)?.sourceDimensions
 }
-
-/** @deprecated Use {@link buildSystemContentImagePath} with a {@link SystemImageSubject}. */
-export function buildLegacySystemContentImagePath(input: {
-  imageSetId: string
-  contentType: string
-  assetRole: string
-  slug: string
-}): string {
-  return buildSystemContentImagePath({
-    imageSetId: input.imageSetId,
-    subject: contentTypeSubject(input.contentType as ContentTypeKey),
-    assetRole: input.assetRole,
-    slug: input.slug,
-    extension: 'jpeg',
-  })
-}

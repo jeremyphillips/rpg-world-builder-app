@@ -7,7 +7,7 @@ import {
 import { scoreSearchDocument } from '@rpg/search'
 import { Button, Modal, SelectField, Text } from '@rpg/ui'
 
-import { titleFromMembershipRadioValue } from '../../../lib/organization-membership/organization-membership-title.lib'
+import { membershipTitleIdFromRadioValue } from '../../../lib/organization-membership/organization-membership-title.lib'
 import { buildCharacterEntityCardModel } from '../../../lib/display/character-entity-summary.lib'
 import {
   buildCharacterPickerOptionEntitySummary,
@@ -167,7 +167,7 @@ export function CharacterConnectionAddModal({
         }
         const metadata = resolveOrganizationMembershipMetadata({
           titles: organization?.members?.titles ?? [],
-          selectedMembershipTitleId: titleFromMembershipRadioValue(detailsState.membershipTitle),
+          selectedMembershipTitleId: membershipTitleIdFromRadioValue(detailsState.membershipTitle),
         })
         await onAddOrganization(selectedEntityId, metadata.membershipTitleId)
       } else if (sectionId === 'places' && selectedPlaceRole) {

@@ -1,6 +1,5 @@
 import type { CharacterClass } from '../../content/classes/class'
 import {
-  CLASS_CANTRIP_CHOICE_SET_PROGRESSION_ID,
   CLASS_SPELLCASTING_CHOICE_SUFFIXES,
   type ClassSpellcastingChoiceSuffix,
   type Spellcasting,
@@ -303,9 +302,6 @@ export function resolveClassDisplayChoiceColumns(
 ): ResolvedClassSpellcastingDisplayColumn[] {
   return resolved.displayColumns
 }
-
-/** @deprecated Use CLASS_SPELLCASTING_CHOICE_SUFFIXES.cantrips */
-export { CLASS_CANTRIP_CHOICE_SET_PROGRESSION_ID }
 
 /** Default L1+ column label when spellSelection omits columnLabel. */
 export { DEFAULT_SPELL_SELECTION_COLUMN_LABEL }

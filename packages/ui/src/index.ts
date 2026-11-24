@@ -424,8 +424,6 @@ export {
   fieldDigitSizeClasses,
   fieldDigitTrailingColumnClasses,
   fieldDigitTrailingPaddingClasses,
-  fieldGroupedControlHeightClasses,
-  fieldGroupedControlSizeClasses,
   buttonTextSizeToComboboxFieldSize,
   COMBOBOX_SEARCH_FIELD_SIZE_FOR_ICON_BUTTON,
   resolveComboboxSearchFieldSizeForButtonSize,
@@ -712,7 +710,6 @@ export type {
 export type { FieldChrome } from './components/ui/field-chrome.variants'
 export {
   fieldAnatomyStackVariants,
-  fieldArrayItemClasses,
   fieldArrayItemListClasses,
   fieldArrayItemVariants,
   fieldGroupBottomMarginClasses,
@@ -1027,11 +1024,6 @@ export {
   type CheckboxOptionScale,
   type ResolvedCheckboxOptionScale,
 } from './components/ui/checkbox-option.lib'
-/** @deprecated Use {@link CheckboxOption} with `shell="outlined"` where a pill is needed. */
-export {
-  CheckboxOption as BooleanField,
-  type CheckboxOptionProps as BooleanFieldProps,
-} from './components/ui/checkbox-option.client'
 export type { ChoiceTone } from './components/ui/choice-control.styles'
 export { RadioGroup, RadioGroupItem } from './components/ui/radio-group.client'
 export { Switch } from './components/ui/switch.client'

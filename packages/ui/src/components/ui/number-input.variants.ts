@@ -7,8 +7,8 @@ import { fieldDigitWidthVariants } from './field-digit-metrics'
 import {
   fieldDigitTrailingColumnClasses,
   fieldDigitTrailingPaddingClasses,
-  fieldGroupedControlSizeClasses,
 } from './field-sizing.variants'
+import { resolveFieldGroupInputSegmentClasses } from './field-group.styles'
 
 export const numberInputRootVariants = 'group relative inline-flex'
 
@@ -20,10 +20,10 @@ export const numberInputCompositeShellRootClasses =
 export const numberInputCompositeShellFieldClasses = 'rounded-l-md rounded-r-none'
 
 const groupedNumberInputFieldSizeClasses = {
-  xs: cn(fieldGroupedControlSizeClasses.xs, fieldDigitTrailingPaddingClasses.xs),
-  sm: cn(fieldGroupedControlSizeClasses.sm, fieldDigitTrailingPaddingClasses.sm),
-  md: cn(fieldGroupedControlSizeClasses.md, fieldDigitTrailingPaddingClasses.md),
-  lg: cn(fieldGroupedControlSizeClasses.lg, fieldDigitTrailingPaddingClasses.lg),
+  xs: cn(resolveFieldGroupInputSegmentClasses('xs'), fieldDigitTrailingPaddingClasses.xs),
+  sm: cn(resolveFieldGroupInputSegmentClasses('sm'), fieldDigitTrailingPaddingClasses.sm),
+  md: cn(resolveFieldGroupInputSegmentClasses('md'), fieldDigitTrailingPaddingClasses.md),
+  lg: cn(resolveFieldGroupInputSegmentClasses('lg'), fieldDigitTrailingPaddingClasses.lg),
 } as const
 
 export const numberInputFieldVariants = cva(

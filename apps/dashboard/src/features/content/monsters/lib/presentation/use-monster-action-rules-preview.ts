@@ -7,7 +7,7 @@ import type { MonsterActionSection } from '../actions/references/monster-action-
 import { useMonsterActionPreviewTitle } from '../monster-qualified-preview-title'
 import type { MonsterFormValues } from '../monster-form-values'
 
-import { tryResolveActionStatBlockRulesFacingForForm } from './resolve-action-stat-block-rules-facing-for-form'
+import { resolveActionStatBlockRulesFacingForForm } from './resolve-action-stat-block-rules-facing-for-form'
 import type { MonsterActionRulesFacing } from './resolve-action-stat-block-rules-facing'
 
 export function useMonsterActionRulesPreviewPresentation(
@@ -18,12 +18,13 @@ export function useMonsterActionRulesPreviewPresentation(
   const values = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
   return useMemo(() => {
     if (!values) return null
-    return tryResolveActionStatBlockRulesFacingForForm({
+    const outcome = resolveActionStatBlockRulesFacingForForm({
       values,
       ctx,
       actionId,
       section,
     })
+    return outcome.status === 'ready' ? outcome.facing : null
   }, [actionId, ctx, section, values])
 }
 

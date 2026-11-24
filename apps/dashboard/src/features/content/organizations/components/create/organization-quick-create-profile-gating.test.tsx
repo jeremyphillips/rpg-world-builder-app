@@ -8,7 +8,7 @@ import {
   buildOrganizationFields,
   buildOrganizationFormValueSyncs,
 } from '../../../lib/forms/organization-form-projection'
-import { organizationCreateDefaultValues } from '../../../lib/forms/organization-form-projection'
+import { createOrganizationCreateDefaultValues } from '../../../lib/forms/organization-form-projection'
 import { makeContentFormCtx } from '../../../lib/fixtures/content-form-ctx'
 import { OrganizationAuthoringProvider } from '../authoring/organization-authoring-context'
 import { OrganizationAuthoringPresetBridge } from './organization-authoring-preset-bridge'
@@ -34,7 +34,7 @@ function renderQuickCreateForm(options?: { uiStateKey?: string }) {
       <Form
         schema={schema}
         fields={buildOrganizationFields(ctx, { presentation: 'quick' })}
-        defaultValues={organizationCreateDefaultValues}
+        defaultValues={createOrganizationCreateDefaultValues()}
         valueSyncs={buildOrganizationFormValueSyncs()}
         onSubmit={() => undefined}
         uiStateKey={options?.uiStateKey}

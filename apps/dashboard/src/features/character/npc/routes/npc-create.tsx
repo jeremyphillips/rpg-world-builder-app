@@ -7,7 +7,7 @@ import { PageLoadState } from '@/components/layout/page/page-load-state'
 
 import { CharacterBuilderPageShell } from '../../components/builder/character-builder-page-shell'
 import { CharacterBuilderShell } from '../../components/builder/character-builder-shell'
-import { useCampaignBuildContext } from '../../hooks/use-campaign-build-context'
+import { useCampaignNpcBuildContext } from '../../hooks/use-campaign-build-context'
 import { NpcAuthoringGate } from '../components/npc-authoring-gate'
 
 export type NpcCreateLocationState = {
@@ -20,7 +20,8 @@ export function NpcCreate() {
   const navigate = useNavigate()
   const locationState = location.state as NpcCreateLocationState | null
   const builderSeed = locationState?.builderSeed
-  const { context, catalogIndex, isPending, isError, error } = useCampaignBuildContext(campaignId)
+  const { context, catalogIndex, isPending, isError, error } =
+    useCampaignNpcBuildContext(campaignId)
 
   const handleBuilderSeedApplied = useCallback(() => {
     if (!locationState?.builderSeed) return

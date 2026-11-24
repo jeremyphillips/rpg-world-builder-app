@@ -6,7 +6,7 @@ import {
   formatCharacterBuilderDraftRestoreRejectionMessage,
   formatFieldMessage,
   isCampaignBuildContext,
-  resolveBuilderLevelConstraints,
+  resolveCharacterLevelConstraints,
   resolveEffectiveBuilderSteps,
   type CharacterBuildCatalogIndex,
   type CharacterBuildContext,
@@ -179,7 +179,15 @@ export function CharacterBuilderShell({
   const currentStepId = effectiveSteps.some(({ id }) => id === requestedStepId)
     ? requestedStepId
     : effectiveSteps[0]!.id
-  const levelConstraints = useMemo(() => resolveBuilderLevelConstraints(context), [context])
+  const levelConstraints = useMemo(
+    () =>
+      resolveCharacterLevelConstraints({
+        characterKind: context.characterKind,
+        rulesScope: context.rulesScope,
+        characterCreationRules: context.characterCreationRules,
+      }),
+    [context],
+  )
 
   useEffect(() => {
     if (levelConstraints.mode !== 'fixed' || levelConstraints.fixedLevel === undefined) {

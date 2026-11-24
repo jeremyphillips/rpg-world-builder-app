@@ -2,10 +2,10 @@ import { describe, expect, it } from 'vitest'
 
 import { builderTestContext } from '../test-fixtures'
 import { createEmptyCharacterBuilderDraft } from '../draft/draft'
+import { resolveCharacterLevelConstraints } from './character-level-policy'
 import {
   getBuilderSelectedStartingLevel,
   getCharacterBuilderTotalLevel,
-  resolveBuilderLevelConstraints,
   validateBuilderCharacterLevel,
 } from './builder-level'
 
@@ -21,7 +21,11 @@ describe('builder level helpers', () => {
   })
 
   it('allows selectable levels for standalone PC', () => {
-    const constraints = resolveBuilderLevelConstraints(builderTestContext)
+    const constraints = resolveCharacterLevelConstraints({
+      characterKind: builderTestContext.characterKind,
+      rulesScope: builderTestContext.rulesScope,
+      characterCreationRules: builderTestContext.characterCreationRules,
+    })
     expect(constraints).toMatchObject({
       mode: 'selectable',
       minLevel: 1,

@@ -33,9 +33,6 @@ export const OnFieldContainer: Story = {
   ],
 }
 
-/** @deprecated Story alias — use PassiveMessage */
-export const Default = PassiveMessage
-
 export const ClassReference: Story = {
   tags: ['control-parity'],
   parameters: { semanticClasses: true },

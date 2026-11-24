@@ -1,7 +1,7 @@
 export {
-  isCampaignMembershipOnboardingIncomplete,
+  isCampaignMembershipInvalid,
   isCampaignOnboardingIncomplete,
-  isCampaignParticipationInvalid,
+  isCampaignReconnectRequired,
   isCampaignRecoveryRequired,
   resolveCampaignRecoveryState,
   type CampaignRecoveryState,

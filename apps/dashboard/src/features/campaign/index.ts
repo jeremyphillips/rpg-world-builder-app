@@ -87,9 +87,9 @@ export { useActiveCampaignId } from './hooks/use-active-campaign-id'
 export { hasCampaignRows } from './lib/overview/campaign-list-view.lib'
 export { filterPendingInvitesForMembership } from './lib/onboarding/filter-pending-invites-for-membership'
 export {
-  isCampaignMembershipOnboardingIncomplete,
+  isCampaignMembershipInvalid,
   isCampaignOnboardingIncomplete,
-  isCampaignParticipationInvalid,
+  isCampaignReconnectRequired,
   isCampaignRecoveryRequired,
   resolveCampaignRecoveryState,
   type CampaignRecoveryState,
@@ -101,13 +101,8 @@ export {
   toPendingInvitePromotion,
   toRecoveryPromotion,
   type CampaignRecoveryPromotion,
-  type CampaignSetupPromotion,
-  toFinishJoiningPromotion,
-  resolvePromotedFinishJoining,
-  countIncompleteCampaigns,
 } from './lib/recovery/campaign-recovery-promotions.lib'
 export {
-  resolveCampaignDestination,
   resolveCampaignEntryDestination,
   resolveCampaignRecoveryDestination,
   resolveSwitchCampaignPath,
@@ -128,7 +123,6 @@ export {
   resolveActiveCampaignSummary,
   resolveLandingCampaignId,
   resolveContinueCampaign,
-  resolveResumeSetupCampaign,
   resolvePreferredCampaignId,
   resolveTargetPathOnSwitch,
   resolveCampaignSwitcherTriggerState,
@@ -138,7 +132,6 @@ export {
 export { resolveActiveCampaignId } from './lib/navigation/resolve-active-campaign-id'
 export {
   buildCampaignDisplay,
-  CAMPAIGN_DISPLAY_FALLBACK_NAME,
   CAMPAIGN_UNKNOWN_NAME,
   CAMPAIGNS_QUERY_ERROR_MESSAGE,
   normalizeCampaignDisplayName,

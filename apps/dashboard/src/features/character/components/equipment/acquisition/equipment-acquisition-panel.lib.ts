@@ -466,8 +466,3 @@ export function formatAcquisitionCommitSuccessButtonLabel(quantity: number): str
 export function formatAcquisitionCommitSuccessAnnouncement(quantity: number): string {
   return `Added ${quantity} to inventory`
 }
-
-/** @deprecated Use {@link formatAcquisitionCommitSuccessAnnouncement}. */
-export function formatAcquisitionSuccessMessage(quantity: number): string {
-  return formatAcquisitionCommitSuccessAnnouncement(quantity)
-}

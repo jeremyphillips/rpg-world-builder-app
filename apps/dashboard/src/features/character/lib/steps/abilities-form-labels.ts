@@ -1,8 +1,5 @@
 export const FIXED_SCORES_EMPTY_SCORE_VALUE = '__empty__'
 
-/** @deprecated Use FIXED_SCORES_EMPTY_SCORE_VALUE */
-export const STANDARD_ARRAY_EMPTY_SCORE_VALUE = FIXED_SCORES_EMPTY_SCORE_VALUE
-
 export const abilitiesFormCopy = {
   availableScores: 'Available scores',
   dropScoreHere: 'Drop score here',

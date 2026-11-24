@@ -28,8 +28,8 @@ import { useCampaigns } from '@/features/campaign'
 import { useRulesetPatch } from '@/features/homebrew'
 import { fetchCampaignBuilderCatalog } from '../api/campaign-content-client'
 import {
-  useCampaignBuildContext,
   useCampaignBuildFoundation,
+  useCampaignNpcBuildContext,
   useCampaignPcOnboardingBuildContext,
 } from './use-campaign-build-context'
 
@@ -56,7 +56,7 @@ const rulesPatch = {
   mechanics: defaultCampaignMechanicsPatch(),
 }
 
-describe('useCampaignBuildContext', () => {
+describe('useCampaignNpcBuildContext', () => {
   beforeEach(() => {
     mockUseCampaigns.mockReset()
     mockUseRulesetPatch.mockReset()
@@ -75,7 +75,7 @@ describe('useCampaignBuildContext', () => {
   })
 
   it('does not fetch catalog when campaignId is undefined', () => {
-    const { result } = renderHook(() => useCampaignBuildContext(undefined), {
+    const { result } = renderHook(() => useCampaignNpcBuildContext(undefined), {
       wrapper: makeQueryWrapper(),
     })
 
@@ -84,7 +84,7 @@ describe('useCampaignBuildContext', () => {
   })
 
   it('assembles a campaign NPC CharacterBuildContext and catalog index', async () => {
-    const { result } = renderHook(() => useCampaignBuildContext('camp-1'), {
+    const { result } = renderHook(() => useCampaignNpcBuildContext('camp-1'), {
       wrapper: makeQueryWrapper(),
     })
 
@@ -125,7 +125,7 @@ describe('useCampaignBuildContext', () => {
   })
 
   it('distinguishes loading from invalid acquisition combos', async () => {
-    const { result } = renderHook(() => useCampaignBuildContext('camp-1'), {
+    const { result } = renderHook(() => useCampaignNpcBuildContext('camp-1'), {
       wrapper: makeQueryWrapper(),
     })
 

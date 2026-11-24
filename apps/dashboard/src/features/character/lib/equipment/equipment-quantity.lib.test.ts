@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { EQUIPMENT_PURCHASE_QUANTITY_MAX } from '@rpg/contracts'
+import { clampEquipmentPurchaseQuantity, EQUIPMENT_PURCHASE_QUANTITY_MAX } from '@rpg/contracts'
 
 import {
   equipmentPickerBudgetFixture,
@@ -8,7 +8,6 @@ import {
   equipmentPickerRopeFixture,
 } from '../../components/equipment/picker/drawer/equipment-picker-drawer.fixtures'
 import {
-  clampEquipmentStepQuantity,
   EQUIPMENT_STEP_QUANTITY_INPUT_DIGITS,
   resolveEquipmentStepPurchaseMaxQuantity,
 } from './equipment-quantity.lib'
@@ -20,9 +19,9 @@ describe('equipment-quantity.lib', () => {
   })
 
   it('clamps quantities to the shared hard cap', () => {
-    expect(clampEquipmentStepQuantity(120, 200)).toBe(99)
-    expect(clampEquipmentStepQuantity(0, 40)).toBe(1)
-    expect(clampEquipmentStepQuantity(12, 40)).toBe(12)
+    expect(clampEquipmentPurchaseQuantity(120, 200)).toBe(99)
+    expect(clampEquipmentPurchaseQuantity(0, 40)).toBe(1)
+    expect(clampEquipmentPurchaseQuantity(12, 40)).toBe(12)
   })
 
   it('resolves budget-limited max quantities for picker and inventory inputs', () => {

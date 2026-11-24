@@ -434,6 +434,3 @@ export function ComboboxSelectedItems({
     </div>
   )
 }
-
-/** @deprecated Use {@link ComboboxSelectedItems}. */
-export const ComboboxSelectedChips = ComboboxSelectedItems

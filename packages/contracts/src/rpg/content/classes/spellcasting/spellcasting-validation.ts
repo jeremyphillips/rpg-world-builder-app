@@ -145,6 +145,7 @@ function refineSelectionAgainstProgression(
   }
 }
 
+// fallow-ignore-next-line complexity — grant/progression/cantrip change matrix is clearer inline
 function refineCantripsAgainstGrant(
   spellcasting: Spellcasting,
   progression: ClassSpellcastingProgression | undefined,

@@ -4,7 +4,7 @@ import type { ClassFormValues } from './class-form-fields'
 import { featureToFormRow } from './class-feature-form-fields'
 import { createSpellcastingFeature } from './class-spellcasting-features'
 import {
-  findSpellcastingGrantingFeatureIndex,
+  findSpellcastingFeatureIndex,
   reconcileSpellcastingOnEnable,
   removeSpellcastingFromFormValues,
 } from './class-spellcasting-lifecycle'
@@ -32,7 +32,7 @@ describe('class spellcasting lifecycle', () => {
     const next = reconcileSpellcastingOnEnable(baseFormValues({ hasSpellcasting: true }))
     expect(next.hasSpellcasting).toBe(true)
     expect(next.spellcasting?.slotProgressionId).toBe('full-caster')
-    expect(findSpellcastingGrantingFeatureIndex(next.features ?? [])).toBe(0)
+    expect(findSpellcastingFeatureIndex(next.features ?? [])).toBe(0)
   })
 
   it('preserves existing config when grant feature is missing', () => {
@@ -50,7 +50,7 @@ describe('class spellcasting lifecycle', () => {
       }),
     )
     expect(next.spellcasting).toEqual(existingConfig)
-    expect(findSpellcastingGrantingFeatureIndex(next.features ?? [])).toBe(0)
+    expect(findSpellcastingFeatureIndex(next.features ?? [])).toBe(0)
   })
 
   it('preserves existing granting feature when config is missing', () => {

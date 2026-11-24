@@ -987,21 +987,6 @@ export type ManualEquipmentGrantCompletion =
  * Grants explicit equipment ids still missing from assembled inventory.
  * Callers must enforce campaign availability before invoking.
  */
-/** @deprecated Prefer {@link applyStartingEquipmentGrants} with explicit quantities. */
-export function applyManualEquipmentGrants(args: {
-  draft: CharacterBuilderDraft
-  equipmentIds: readonly string[]
-  context: CharacterBuildContext
-  catalogIndex: CharacterBuildCatalogIndex
-}): ManualEquipmentGrantCompletion {
-  return applyStartingEquipmentGrants({
-    draft: args.draft,
-    grants: args.equipmentIds.map((equipmentId) => ({ equipmentId, quantity: 1 })),
-    context: args.context,
-    catalogIndex: args.catalogIndex,
-  })
-}
-
 // fallow-ignore-next-line complexity
 export function applyStartingEquipmentGrants(args: {
   draft: CharacterBuilderDraft

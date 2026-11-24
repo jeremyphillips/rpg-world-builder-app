@@ -292,16 +292,6 @@ export function formatBulkCampaignAccessSelectedCount(selectedCount: number): st
   return `${selectedCount} item${selectedCount === 1 ? '' : 's'} selected.`
 }
 
-/** @deprecated Use formatBulkCampaignAccessConfigureSummary. */
-export function formatBulkCampaignAccessChangePreview(
-  wouldChangeCount: number,
-  unchangedCount: number,
-): string {
-  const changedLabel = `${wouldChangeCount} item${wouldChangeCount === 1 ? '' : 's'} will change.`
-  const unchangedLabel = `${unchangedCount} item${unchangedCount === 1 ? '' : 's'} unchanged.`
-  return `${changedLabel} ${unchangedLabel}`
-}
-
 /** Reminder that bulk access edits do not publish drafts. */
 export const BULK_CAMPAIGN_ACCESS_DRAFT_NOTE = 'Draft items remain draft.'
 

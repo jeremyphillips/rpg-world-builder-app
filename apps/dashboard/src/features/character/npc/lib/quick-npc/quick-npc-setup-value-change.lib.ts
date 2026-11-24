@@ -6,7 +6,7 @@ import {
   type OrganizationMembershipTitleDefinition,
 } from '@rpg/contracts'
 
-import { titleFromMembershipRadioValue } from '../../../lib/organization-membership/organization-membership-title.lib'
+import { membershipTitleIdFromRadioValue } from '../../../lib/organization-membership/organization-membership-title.lib'
 
 import {
   isQuickNpcOrganizationMemberSetup,
@@ -52,7 +52,7 @@ export function resolveQuickNpcLevelForMembershipTitle(args: {
 
   let membershipTitleId: string
   try {
-    membershipTitleId = titleFromMembershipRadioValue(args.membershipTitle)
+    membershipTitleId = membershipTitleIdFromRadioValue(args.membershipTitle)
   } catch {
     return defaultLevel
   }

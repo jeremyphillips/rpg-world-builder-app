@@ -55,9 +55,3 @@ export type ContentVisibilityMode = z.infer<typeof contentVisibilityModeSchema>
 export const CONTENT_VISIBILITY_MODE_OPTIONS = termOptionsFromEntries(
   CONTENT_VISIBILITY_MODE_ENTRIES,
 )
-
-/**
- * @deprecated Prefer dashboard `CAMPAIGN_ACCESS_PLAYER_ACCESS_HINT` or
- * `resolveCampaignAccessPlayerAccessHint` — kept for legacy imports.
- */
-export const CONTENT_VISIBILITY_SELECT_HINT = CONTENT_VISIBILITY_MODE_TERM.description

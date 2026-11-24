@@ -32,7 +32,7 @@ import {
 import {
   buildOrganizationFields,
   buildOrganizationFormValueSyncs,
-  organizationCreateDefaultValues,
+  createOrganizationCreateDefaultValues,
   organizationFormSchema,
 } from '../../../lib/forms/organization-form-projection'
 import { resolveDiscoverableOrganizationMemberClasses } from '../../../organizations/lib/members/organization-member-class-discoverable.lib'
@@ -247,7 +247,7 @@ function BuildingOrganizationNewOrganizationForm({
         presentation: 'quick',
         recommendedPracticeIds: practiceRecommendations,
       })}
-      defaultValues={organizationCreateDefaultValues}
+      defaultValues={createOrganizationCreateDefaultValues()}
       valueSyncs={buildOrganizationFormValueSyncs(
         undefined,
         resolveDiscoverableOrganizationMemberClasses(context),

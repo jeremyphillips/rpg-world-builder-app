@@ -1,14 +1,14 @@
-import type { ClassHitDie } from '../../../primitives/dice'
+import type { HitDie } from '../../../primitives/dice'
 
 export type HitPointDerivationMethod = 'average' | 'max'
 
 /** PHB average hit die gain per level after the first: floor(die / 2) + 1. */
-export function averageHitDieGain(hitDie: ClassHitDie): number {
+export function averageHitDieGain(hitDie: HitDie): number {
   return Math.floor(hitDie / 2) + 1
 }
 
 export type ResolveMaxHpAtLevelInput = {
-  hitDie: ClassHitDie
+  hitDie: HitDie
   constitutionModifier: number
   level: number
   method: HitPointDerivationMethod

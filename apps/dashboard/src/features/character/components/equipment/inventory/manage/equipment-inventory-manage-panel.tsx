@@ -14,7 +14,7 @@ import type { AddedEquipmentEntryViewModel } from '../../../../lib/equipment/equ
 import type { EquipmentOwnedSourceAction } from '../../acquisition/equipment-acquisition-panel.lib'
 import { EquipmentAcquisitionPanelBody } from '../../acquisition/equipment-acquisition-panel-body'
 import { buildEquipmentInventoryRowEntity } from '../equipment-inventory-entity.lib'
-import { useEquipmentAcquisitionQuantityCommit } from '../../../../hooks/use-equipment-acquisition-quantity-commit'
+import { useEquipmentAcquisitionCommitConfirmation } from '../../acquisition/use-equipment-acquisition-commit-confirmation'
 
 export type EquipmentInventoryManagePanelBodyProps = {
   equipment: Equipment
@@ -45,8 +45,8 @@ export function EquipmentInventoryManagePanelBody({
     [equipment.id, onApplyMagicItemAcquisition],
   )
 
-  const { quantity, setQuantity, isPending, successQuantity, commitQuantity } =
-    useEquipmentAcquisitionQuantityCommit({ commit: commitAcquisition })
+  const { quantity, setQuantity, isPending, successQuantity, confirm } =
+    useEquipmentAcquisitionCommitConfirmation({ commit: commitAcquisition })
 
   const handleSourceAction = useCallback(
     (action: EquipmentOwnedSourceAction) => {
@@ -80,7 +80,7 @@ export function EquipmentInventoryManagePanelBody({
       isPending={isPending}
       successQuantity={successQuantity}
       onSourceAction={handleSourceAction}
-      onCommit={commitQuantity}
+      onCommit={confirm}
       layout="disclosure"
     />
   )
