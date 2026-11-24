@@ -21,7 +21,7 @@ Structured facing copy uses typed `FacingReason` codes in `@rpg/contracts` and
 | `incomplete`, `invalid`, `unavailable` | Neutral info guidance (no `role="alert"`)                     |
 | `failed`                               | Failure copy with `role="status"` on the guidance line        |
 
-Incomplete with a partial document shows both document and guidance.
+Incomplete with a partial document shows both document and guidance. Rules Preview, published class detail, and the builder class details sheet share the dashboard table adapter for structured facing blocks. The adapter requires a table renderer, and the shared block dispatcher rejects unsupported block kinds.
 
 ## Applicability
 

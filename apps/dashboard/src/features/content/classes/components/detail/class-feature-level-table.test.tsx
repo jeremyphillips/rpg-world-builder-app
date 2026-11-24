@@ -1,9 +1,6 @@
+import { reincarnateSpeciesTableFixture } from '@rpg/contracts'
 import { render, screen, waitFor } from '@testing-library/react'
-import { beforeAll, describe, expect, it, vi } from 'vitest'
-
-beforeAll(() => {
-  vi.spyOn(window, 'scrollTo').mockImplementation(() => undefined)
-})
+import { describe, expect, it, vi } from 'vitest'
 
 import { ContentDetailBody } from '../../../lib/detail/page/content-detail-body'
 import { ContentDetailSection } from '../../../lib/detail/page/content-detail-section'
@@ -23,7 +20,10 @@ const items: ClassFeatureDetailItem[] = [
       status: 'ready',
       document: {
         title: 'Fighting Style',
-        blocks: [{ kind: 'richText', html: '<p>Choose a style.</p>' }],
+        blocks: [
+          { kind: 'richText', html: '<p>Choose a style.</p>' },
+          { kind: 'table', table: reincarnateSpeciesTableFixture },
+        ],
       },
     },
   },
@@ -55,6 +55,7 @@ const items: ClassFeatureDetailItem[] = [
 
 describe('ClassFeatureLevelTable', () => {
   it('groups features by level and exposes level group anchors for nav', async () => {
+    vi.spyOn(window, 'scrollTo').mockImplementation(() => undefined)
     render(
       <ContentDetailBody>
         <ContentDetailSection
@@ -72,6 +73,8 @@ describe('ClassFeatureLevelTable', () => {
 
     expect(screen.getByRole('heading', { name: 'Fighting Style', level: 4 })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Action Surge', level: 4 })).toBeInTheDocument()
+
+    expect(screen.getByRole('columnheader', { name: 'Species' })).toBeInTheDocument()
 
     const levelOneAnchor = contentDetailNavItemId('feature-level', '1')
     expect(document.getElementById(levelOneAnchor)).toBeInTheDocument()

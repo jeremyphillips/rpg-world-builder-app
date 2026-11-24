@@ -1,4 +1,9 @@
-import { getSlotProgressionKindEntry, getSlotProgressionKindLabel } from '@rpg/contracts'
+import {
+  getSlotProgressionKindEntry,
+  getSlotProgressionKindLabel,
+  reincarnateSpeciesTableFixture,
+} from '@rpg/contracts'
+import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 
 import { CLASS_SECTION_LABELS, CLASS_STAT_LABELS } from '@/features/content'
@@ -79,6 +84,31 @@ describe('builder-class-option-display.lib', () => {
       label: getSlotProgressionKindLabel('full-caster'),
       tooltip: getSlotProgressionKindEntry('full-caster')!.description,
     })
+  })
+
+  it('renders authored feature tables in the class details sheet', () => {
+    const content = buildClassDetailsSheetContent(
+      {
+        ...fighter,
+        features: [
+          {
+            kind: 'custom',
+            id: 'return-to-life',
+            name: 'Return to Life',
+            level: 1,
+            tables: [reincarnateSpeciesTableFixture],
+          },
+        ],
+      },
+      catalog,
+    )
+    const feature = content.sections
+      .find((section) => section.title === 'Fighter Class Features')
+      ?.items?.find((item) => item.title === 'Return to Life')
+    const markup = renderToStaticMarkup(feature?.body)
+
+    expect(markup).toContain('<table')
+    expect(markup).toContain('Species')
   })
 
   it('includes level-1 features only', () => {

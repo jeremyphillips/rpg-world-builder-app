@@ -1,7 +1,7 @@
 import { FacingHostPanel } from '@rpg/ui'
 
-import { ContentTableView } from '../components/tables/content-table-view'
 import { buildMonsterActionAttackPreview } from '../monsters/lib/actions/previews/monster-action-attack-summary'
+import { facingBlockRenderers } from './facing-block-renderers'
 import { resolveMonsterActionDraftFacing } from './domains/monster-action/resolve-monster-action-draft-facing'
 import type { FacingHostConfig } from './facing-host-config.types'
 import { resolveFacing } from './resolve-facing'
@@ -31,10 +31,5 @@ function resolvePanelModel(request: FacingHostConfig) {
 export function StructuredFacingHostPanel({ facing }: { facing: FacingHostConfig | undefined }) {
   if (!facing) return null
 
-  return (
-    <FacingHostPanel
-      model={resolvePanelModel(facing)}
-      renderTable={(table) => <ContentTableView table={table} />}
-    />
-  )
+  return <FacingHostPanel model={resolvePanelModel(facing)} {...facingBlockRenderers} />
 }

@@ -1,7 +1,7 @@
 import type { FacingResolution } from '@rpg/contracts'
 import { FacingBody, Icon, SemanticText, Text } from '@rpg/ui'
 
-import { ContentTableView } from '../components/tables/content-table-view'
+import { facingBlockRenderers } from './facing-block-renderers'
 import { facingReasonMessage } from './facing-reason-message'
 
 function FacingDetailGuidance({ message }: { message: string }) {
@@ -21,7 +21,7 @@ export function FacingDetailBody({ resolution }: { resolution: FacingResolution 
       <FacingBody
         blocks={resolution.document.blocks}
         proseTone="default"
-        renderTable={(table) => <ContentTableView table={table} />}
+        {...facingBlockRenderers}
       />
     )
   }
@@ -35,7 +35,7 @@ export function FacingDetailBody({ resolution }: { resolution: FacingResolution 
           <FacingBody
             blocks={resolution.document.blocks}
             proseTone="default"
-            renderTable={(table) => <ContentTableView table={table} />}
+            {...facingBlockRenderers}
           />
         ) : null}
         <FacingDetailGuidance message={message} />
