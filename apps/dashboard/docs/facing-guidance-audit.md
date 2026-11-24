@@ -3,7 +3,7 @@
 Structured facing copy uses typed `FacingReason` codes in `@rpg/contracts` and
 `facingReasonMessage` in `apps/dashboard/src/features/content/facing/facing-reason-message.ts`.
 `@rpg/ui` `FacingHostPanel` accepts only `FacingHostPanelModel` (`status`, `document`,
-`message`, optional preview metadata). Features never pass guidance strings or React chrome.
+`message`, optional preview metadata). Editor hooks pass a draft domain request through `FacingHostConfig`. The structured host resolves that request and owns the conversion to the UI display model. Monster attack resolution supplies an attack profile, which the host formats once for the preview.
 
 ## Ownership
 
@@ -26,8 +26,7 @@ Incomplete with a partial document shows both document and guidance.
 ## Applicability
 
 Resolver `undefined` (not applicable) is separate from `FacingResolution` statuses.
-Custom species / monster traits and custom class features without catalog structure are
-`undefined` from the host hook — no Rules Preview panel.
+Custom species and monster traits resolve to an inapplicable result through the facing facade. An empty selection supplies no request. Custom class features with authored content can resolve to a rules document.
 
 ## Spellbook Alert gap
 

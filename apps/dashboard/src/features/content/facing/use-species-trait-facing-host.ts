@@ -1,10 +1,7 @@
-import { useMemo } from 'react'
 import { useWatch } from 'react-hook-form'
 
 import type { TraitRowForm } from '../species/lib/species-trait-form-fields'
 import type { FacingHostConfig } from './facing-host-config.types'
-import { resolveFacing } from './resolve-facing'
-import { toFacingPanelModel } from './structured-facing-panel-model.lib'
 
 export function useSpeciesTraitFacingHost(input: {
   fieldName: string
@@ -19,20 +16,7 @@ export function useSpeciesTraitFacingHost(input: {
     disabled: !rowPrefix,
   }) as TraitRowForm | undefined
 
-  const resolution = useMemo(() => {
-    if (!selectedRow) return undefined
-    return resolveFacing({
-      domain: 'trait',
-      source: 'draft',
-      hostId: input.hostId,
-      row: selectedRow,
-    })
-  }, [input.hostId, selectedRow])
+  if (input.selectedIndex === null || !selectedRow) return undefined
 
-  if (input.selectedIndex === null || resolution === undefined) return undefined
-
-  return {
-    hostId: input.hostId,
-    resolvePanelModel: () => toFacingPanelModel(resolution),
-  }
+  return { domain: 'trait', source: 'draft', hostId: input.hostId, row: selectedRow }
 }

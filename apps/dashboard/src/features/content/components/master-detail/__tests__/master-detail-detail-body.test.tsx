@@ -26,6 +26,12 @@ function Shell({ children }: { children: ReactNode }) {
   return <FormProvider {...methods}>{children}</FormProvider>
 }
 
+vi.mock('../../../monsters/components/form/spells/spell-picker-host', () => ({
+  MonsterSpellPickerHost: ({ children }: { children: ReactNode }) => (
+    <div data-testid="spell-scope">{children}</div>
+  ),
+}))
+
 describe('MasterDetailDetailBody', () => {
   it('uses one outer FormRhythmStack for leading fields, facing, and primary fields', () => {
     render(
@@ -41,11 +47,10 @@ describe('MasterDetailDetailBody', () => {
           ]}
           primaryItemFields={[{ type: 'richtext', name: 'intro', label: 'Introduction' }]}
           facing={{
-            hostId: 'class-features',
-            resolvePanelModel: () => ({
-              status: 'ready',
-              document: { title: 'Feature', blocks: [] },
-            }),
+            domain: 'classFeature',
+            source: 'draft',
+            row: { kind: 'custom', name: 'Feature' },
+            host: { className: 'Example', rulesetId: 'srd-cc-5.2.1' },
           }}
           idPrefix="class-feature"
           selectedFieldId="row-1"
@@ -67,7 +72,7 @@ describe('MasterDetailDetailBody', () => {
     expect(facing.compareDocumentPosition(primary) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
-  it('renders shell-owned primary FormItems inside primaryScope', () => {
+  it('renders shell-owned primary FormItems inside the spell picker provider', () => {
     render(
       <Shell>
         <MasterDetailDetailBody
@@ -75,7 +80,7 @@ describe('MasterDetailDetailBody', () => {
           idPrefix="monster-action"
           selectedFieldId="row-1"
           namePrefix="actions.0"
-          primaryScope={({ children }) => <div data-testid="spell-scope">{children}</div>}
+          spellPicker={{ enabled: true, catalog: undefined }}
         />
       </Shell>,
     )

@@ -15,7 +15,7 @@ import {
 import {
   MasterDetailDetailBody,
   type MasterDetailItemFieldSections,
-  type MasterDetailPrimaryScopeProps,
+  type MasterDetailSpellPicker,
 } from './master-detail-detail-body'
 
 export type { MasterDetailEditorIdentity, MasterDetailInlineTitle }
@@ -69,12 +69,11 @@ export interface MasterDetailEditorPanelProps {
   /** Optional leading vs primary field regions (`leading` → facing → `primary`). */
   fieldSections?: MasterDetailItemFieldSections
   /** Domain composites after primary fields inside the outer rhythm stack. */
-  additionalDetails?: ReactNode
   /**
    * Wraps shell-owned primary `FormItems` when a domain host must own interactive context (spell picker).
    * Must not introduce a second outer rhythm stack.
    */
-  primaryScope?: (ctx: MasterDetailPrimaryScopeProps) => ReactNode
+  spellPicker?: MasterDetailSpellPicker
   onDuplicate?: () => void
   /** Replaces the default delete-confirm request. */
   onDelete?: () => void
@@ -94,8 +93,7 @@ interface MasterDetailSelectedRowEditorProps {
   contextualChrome?: ReactNode
   facing?: FacingHostConfig
   fieldSections?: MasterDetailItemFieldSections
-  additionalDetails?: ReactNode
-  primaryScope?: (ctx: MasterDetailPrimaryScopeProps) => ReactNode
+  spellPicker?: MasterDetailSpellPicker
 }
 
 function MasterDetailSelectedRowEditor({
@@ -112,8 +110,7 @@ function MasterDetailSelectedRowEditor({
   contextualChrome,
   facing,
   fieldSections,
-  additionalDetails,
-  primaryScope,
+  spellPicker,
 }: MasterDetailSelectedRowEditorProps) {
   const resolvedAvailabilityNamePrefix = availabilityNamePrefix ?? `${fieldName}.${selectedIndex}`
 
@@ -144,8 +141,7 @@ function MasterDetailSelectedRowEditor({
         idPrefix={idPrefix}
         selectedFieldId={selectedFieldId}
         namePrefix={rowPrefix}
-        additionalDetails={additionalDetails}
-        primaryScope={primaryScope}
+        spellPicker={spellPicker}
       />
     </MasterDetailRowPrefixProvider>
   )
@@ -173,8 +169,7 @@ export function MasterDetailEditorPanel({
   contextualChrome,
   facing,
   fieldSections,
-  additionalDetails,
-  primaryScope,
+  spellPicker,
   onDuplicate,
   onDelete,
 }: MasterDetailEditorPanelProps) {
@@ -249,8 +244,7 @@ export function MasterDetailEditorPanel({
           contextualChrome={contextualChrome}
           facing={facing}
           fieldSections={fieldSections}
-          additionalDetails={additionalDetails}
-          primaryScope={primaryScope}
+          spellPicker={spellPicker}
         />
       ) : null}
     </MasterDetailEditorShell>

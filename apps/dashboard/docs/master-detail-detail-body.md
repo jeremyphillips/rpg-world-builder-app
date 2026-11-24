@@ -13,8 +13,7 @@ actions, monster traits) share one detail-body composition path.
 | Leading fields                       | Domain `resolveFieldSections` / `fieldSections`  | Optional; rendered before facing                                  |
 | Facing                               | `facing` + `StructuredFacingHostPanel`           | Shell-mounted only                                                |
 | Primary fields                       | `FormItems` inside `MasterDetailDetailFormScope` | Kind field lists                                                  |
-| Additional details                   | `additionalDetails`                              | After primary fields inside the same stack                        |
-| Primary host                         | `primaryScope`                                   | Spell picker and similar — wraps shell `FormItems` only           |
+| Primary host                         | `spellPicker`                                    | Spell picker and similar — wraps shell `FormItems` only           |
 
 ## Component map
 
@@ -27,8 +26,7 @@ MasterDetailEditorPanel
         └── FormRhythmStack
             ├── leading FormItems
             ├── StructuredFacingHostPanel
-            ├── primaryScope → primary FormItems
-            └── additionalDetails
+            └── spellPicker provider → primary FormItems
 ```
 
 ## Consumers

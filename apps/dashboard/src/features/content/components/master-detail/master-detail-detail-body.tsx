@@ -1,20 +1,20 @@
-import type { ReactNode } from 'react'
+import type { Spell } from '@rpg/contracts'
 import { FormItems, FormRhythmStack, type FormItem } from '@rpg/ui/form'
 
 import type { FacingHostConfig } from '../../facing/facing-host-config.types'
 import { StructuredFacingHostPanel } from '../../facing/structured-facing-host-panel'
+import { MonsterSpellPickerHost } from '../../monsters/components/form/spells/spell-picker-host'
 import { MasterDetailDetailFormScope } from '../../lib/master-detail/master-detail-detail-form-scope'
 import { wrapMasterDetailDetailFields } from '../../lib/master-detail/wrap-master-detail-detail-fields'
 
 export type MasterDetailItemFieldSections = {
-  /** Rendered above the facing preview when both are present. */
   leading?: readonly FormItem[]
   primary: readonly FormItem[]
 }
 
-export type MasterDetailPrimaryScopeProps = {
-  namePrefix: string
-  children: ReactNode
+export type MasterDetailSpellPicker = {
+  enabled: boolean
+  catalog: ReadonlyMap<string, Spell> | undefined
 }
 
 export type MasterDetailDetailBodyProps = {
@@ -24,12 +24,7 @@ export type MasterDetailDetailBodyProps = {
   idPrefix: string
   selectedFieldId: string
   namePrefix: string
-  /** Domain composites that must sit inside the outer rhythm stack after primary fields. */
-  additionalDetails?: ReactNode
-  /**
-   * Wraps shell-owned primary `FormItems` (context + drawer only — must render `children` unchanged).
-   */
-  primaryScope?: (ctx: MasterDetailPrimaryScopeProps) => ReactNode
+  spellPicker?: MasterDetailSpellPicker
 }
 
 function DetailBodyFormItemsContent({
@@ -66,10 +61,10 @@ function DetailBodyPrimaryRegion({
   idPrefix,
   selectedFieldId,
   namePrefix,
-  primaryScope,
+  spellPicker,
 }: Pick<
   MasterDetailDetailBodyProps,
-  'primaryItemFields' | 'idPrefix' | 'selectedFieldId' | 'namePrefix' | 'primaryScope'
+  'primaryItemFields' | 'idPrefix' | 'selectedFieldId' | 'namePrefix' | 'spellPicker'
 >) {
   const primaryFormItems = DetailBodyFormItemsContent({
     items: primaryItemFields,
@@ -80,10 +75,21 @@ function DetailBodyPrimaryRegion({
   })
   if (!primaryFormItems) return null
 
-  const scoped = primaryScope
-    ? primaryScope({ namePrefix, children: primaryFormItems })
-    : primaryFormItems
-  return <MasterDetailDetailFormScope>{scoped}</MasterDetailDetailFormScope>
+  return (
+    <MasterDetailDetailFormScope>
+      {spellPicker ? (
+        <MonsterSpellPickerHost
+          enabled={spellPicker.enabled}
+          arrayName={`${namePrefix}.spells`}
+          catalog={spellPicker.catalog}
+        >
+          {primaryFormItems}
+        </MonsterSpellPickerHost>
+      ) : (
+        primaryFormItems
+      )}
+    </MasterDetailDetailFormScope>
+  )
 }
 
 /**
@@ -97,13 +103,12 @@ export function MasterDetailDetailBody({
   idPrefix,
   selectedFieldId,
   namePrefix,
-  additionalDetails,
-  primaryScope,
+  spellPicker,
 }: MasterDetailDetailBodyProps) {
   const hasLeading = Boolean(leadingItemFields?.length)
   const hasPrimary = primaryItemFields.length > 0
 
-  if (!hasLeading && !facing && !hasPrimary && !additionalDetails) {
+  if (!hasLeading && !facing && !hasPrimary) {
     return null
   }
 
@@ -125,10 +130,9 @@ export function MasterDetailDetailBody({
           idPrefix={idPrefix}
           selectedFieldId={selectedFieldId}
           namePrefix={namePrefix}
-          primaryScope={primaryScope}
+          spellPicker={spellPicker}
         />
       ) : null}
-      {additionalDetails ?? null}
     </FormRhythmStack>
   )
 }

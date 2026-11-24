@@ -9,8 +9,6 @@ import type { FeatureRowForm } from '../classes/lib/class-feature-form-fields'
 import type { ContentFormCtx } from '../lib/forms/registry/content-form-registry'
 import type { FacingHostConfig } from './facing-host-config.types'
 import type { ClassFacingHostContext } from './domains/class-feature/class-facing-host'
-import { resolveClassFeatureRowFacing } from './resolve-facing'
-import { toFacingPanelModel } from './structured-facing-panel-model.lib'
 
 const CLASS_FEATURE_FACING_PARENT_WATCH = [
   'name',
@@ -48,15 +46,7 @@ export function useClassFeatureFacingHost(input: {
     }
   }, [input.formCtx, parentValues])
 
-  const resolution = useMemo(
-    () => resolveClassFeatureRowFacing(selectedRow, host),
-    [host, selectedRow],
-  )
+  if (input.selectedIndex === null || !selectedRow) return undefined
 
-  if (input.selectedIndex === null) return undefined
-
-  return {
-    hostId: 'class-features',
-    resolvePanelModel: () => toFacingPanelModel(resolution),
-  }
+  return { domain: 'classFeature', source: 'draft', row: selectedRow, host }
 }

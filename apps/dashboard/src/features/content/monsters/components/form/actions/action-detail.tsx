@@ -1,4 +1,4 @@
-import { useEffect, useMemo, type ReactNode } from 'react'
+import { useEffect, useMemo } from 'react'
 import { isWeaponEquipment, resolveEquipmentInstanceReferenceLabel } from '@rpg/contracts'
 import { SemanticText, Text } from '@rpg/ui'
 import { useWatch } from 'react-hook-form'
@@ -19,7 +19,6 @@ import {
   type MonsterActionSection,
 } from '../../../lib/actions/references/monster-action-equipment-references'
 import { MONSTER_MOVE_TO_LABEL } from '../../../lib/monster-form-labels'
-import { MonsterSpellPickerHost } from '../spells/spell-picker-host'
 import type { MonsterActionDraftRow } from '../../../lib/actions/monster-action-presets'
 import { monsterActionSectionHeading } from '../../../lib/actions/monster-action-presets'
 import { MONSTER_ACTION_ITEM_NOUN } from '../../../lib/monster-form-labels'
@@ -198,17 +197,12 @@ export function MonsterActionDetail({
     <div id={`monster-action-focus-${action.id}`} tabIndex={-1} />
   ) : null
 
-  const primaryScope =
+  const spellPicker =
     located && action
-      ? ({ namePrefix: rowPrefix, children }: { namePrefix: string; children: ReactNode }) => (
-          <MonsterSpellPickerHost
-            enabled={action.kind === 'spell' && located.section !== 'legendaryActions'}
-            arrayName={`${rowPrefix}.spells`}
-            catalog={ctx.spellCatalogById}
-          >
-            {children}
-          </MonsterSpellPickerHost>
-        )
+      ? {
+          enabled: action.kind === 'spell' && located.section !== 'legendaryActions',
+          catalog: ctx.spellCatalogById,
+        }
       : undefined
 
   return (
@@ -237,7 +231,7 @@ export function MonsterActionDetail({
       overflowActions={moveOverflowActions(located, sections.requestMove)}
       contextualChrome={contextualChrome}
       facing={facing}
-      primaryScope={primaryScope}
+      spellPicker={spellPicker}
     />
   )
 }

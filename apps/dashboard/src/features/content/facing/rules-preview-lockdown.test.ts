@@ -1,14 +1,22 @@
 import { systemDefaultArmorClassRules } from '@rpg/contracts'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, expectTypeOf, it, vi } from 'vitest'
 
 import '../classes/lib/class-form-def'
 import { adaptClassFeatureDraftRow } from './adapters/class-feature-draft.adapter'
 import { resolveCustomClassFeatureFacing } from './domains/class-feature/resolvers/custom-class-feature-facing'
 import { facingReasonMessage } from './facing-reason-message'
+import type { FacingHostConfig } from './facing-host-config.types'
 import { resolveFacing } from './resolve-facing'
 import { resolveSpeciesTraitDraftFacing } from './domains/trait/resolve-trait-facing'
 
 describe('rules preview lockdown', () => {
+  it('accepts a semantic draft request with no presentation overrides', () => {
+    expectTypeOf<FacingHostConfig['source']>().toEqualTypeOf<'draft'>()
+    expectTypeOf<
+      Extract<keyof FacingHostConfig, 'resolvePanelModel' | 'message' | 'tone' | 'renderTable'>
+    >().toEqualTypeOf<never>()
+  })
+
   it('treats new custom class features without id as ready when description exists', () => {
     const adapted = adaptClassFeatureDraftRow({
       kind: 'custom',
@@ -56,6 +64,9 @@ describe('rules preview lockdown', () => {
       kind: 'custom' as const,
       name: 'Notes',
       description: '<p>Freeform</p>',
+      grants: [],
+      overrideDisplay: false,
+      available: true,
     }
     expect(
       resolveFacing({

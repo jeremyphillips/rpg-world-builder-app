@@ -1,7 +1,6 @@
 import type { ClassBodyFeature, ContentTrait, FacingResolution } from '@rpg/contracts'
 
 import { adaptClassFeatureDraftRow } from './adapters/class-feature-draft.adapter'
-import type { FeatureRowForm } from '../classes/lib/class-feature-form-fields'
 import type { ContentFormCtx } from '../lib/forms/registry/content-form-registry'
 import type { MonsterActionSection } from '../monsters/lib/actions/references/monster-action-equipment-references'
 import type { MonsterFormValues } from '../monsters/lib/monster-form-values'
@@ -107,12 +106,4 @@ function resolveTraitFacing(
   }
   const resolution = resolveSpeciesTraitDraftFacing(request.row)
   return resolution ?? { status: 'invalid', reason: { code: 'unresolvable-record' } }
-}
-
-export function resolveClassFeatureRowFacing(
-  row: FeatureRowForm | undefined,
-  host: ClassFacingHostContext,
-): FacingResolution | undefined {
-  if (!row) return undefined
-  return resolveFacing({ domain: 'classFeature', source: 'draft', row, host })
 }
