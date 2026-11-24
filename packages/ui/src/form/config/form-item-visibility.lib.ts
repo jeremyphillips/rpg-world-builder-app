@@ -3,9 +3,11 @@ import {
   resolveDependentsVisibility,
   resolveFieldConfigBoundNames,
   type FieldConfig,
+  type FieldVisibility,
   type FormItem,
   type RowConfig,
 } from '../field-config'
+import { resolveDependsOnRelativeValues } from './form-depends-on.lib'
 import { resolveColumnsCollapseSequence } from './form-columns-collapse.lib'
 
 export type FormContainerItem = Extract<
@@ -171,4 +173,48 @@ export function formItemsHaveVisibleRenderableFields(
   values: Record<string, unknown>,
 ): boolean {
   return items.some((item) => formItemHasVisibleRenderableField(item, values))
+}
+
+/** Lists mounted field paths in a form scope, retaining duplicates for ownership checks. */
+export function collectActiveFormItemBoundPaths(
+  items: readonly FormItem[],
+  formValues: Record<string, unknown>,
+  namePrefix: string,
+): string[] {
+  const isVisible = (visibility?: FieldVisibility | null) =>
+    !visibility ||
+    visibility.visibleWhen(
+      resolveDependsOnRelativeValues(visibility.dependsOn, formValues, namePrefix),
+    )
+  const qualify = (name: string) => (namePrefix ? `${namePrefix}.${name}` : name)
+
+  return items.flatMap((item): string[] => {
+    if (!isVisible(item.visibility)) return []
+    if (!('kind' in item)) return resolveFieldConfigBoundNames(item).map(qualify)
+
+    switch (item.kind) {
+      case 'group':
+      case 'row':
+      case 'columns':
+        return collectActiveFormItemBoundPaths(
+          formContainerChildItems(item),
+          formValues,
+          namePrefix,
+        )
+      case 'dependent': {
+        if (!isVisible(item.controller.visibility)) return []
+        const controllerPaths = resolveFieldConfigBoundNames(item.controller).map(qualify)
+        const visibility = resolveDependentsVisibility(item, item.controller)
+        if (!isVisible(visibility)) return controllerPaths
+        return [
+          ...controllerPaths,
+          ...collectActiveFormItemBoundPaths(item.dependents.fields, formValues, namePrefix),
+        ]
+      }
+      case 'array':
+        return [qualify(item.name)]
+      default:
+        return []
+    }
+  })
 }

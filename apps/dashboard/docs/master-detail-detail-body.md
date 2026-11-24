@@ -40,6 +40,10 @@ MasterDetailEditorPanel
 | Heritage options                 | none (custom rows only)      | `resolveFieldSections`             |
 | Monster traits                   | `useMonsterTraitFacingHost`  | `resolveFieldSections`             |
 
+## Field binding ownership
+
+The detail body rejects duplicate effective RHF paths across its leading and primary field regions before rendering a conflicting configuration. Visibility is evaluated against the same scoped form values as the field renderer, including parent-relative dependencies. An array owns its collection path and manages its item bindings. Custom slot ownership requires a separate declaration before it can participate in this check.
+
 ## Prohibitions
 
 - Do not mount `StructuredFacingHostPanel` from feature components.

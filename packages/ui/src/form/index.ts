@@ -525,3 +525,5 @@ export {
   FieldRowAnatomyProvider,
   useFieldRowParticipation,
 } from '../components/ui/field-row-anatomy.context'
+
+export { collectActiveFormItemBoundPaths } from './config/form-item-visibility.lib'

@@ -1,5 +1,11 @@
 import type { Spell } from '@rpg/contracts'
-import { FormItems, FormRhythmStack, type FormItem } from '@rpg/ui/form'
+import {
+  collectActiveFormItemBoundPaths,
+  FormItems,
+  FormRhythmStack,
+  type FormItem,
+} from '@rpg/ui/form'
+import { useWatch } from 'react-hook-form'
 
 import type { FacingHostConfig } from '../../facing/facing-host-config.types'
 import { StructuredFacingHostPanel } from '../../facing/structured-facing-host-panel'
@@ -92,6 +98,31 @@ function DetailBodyPrimaryRegion({
   )
 }
 
+function MasterDetailFieldBindingGuard({
+  leading,
+  primary,
+  namePrefix,
+}: {
+  leading: readonly FormItem[]
+  primary: readonly FormItem[]
+  namePrefix: string
+}) {
+  const values = useWatch()
+  const owners = new Map<string, string>()
+  for (const [region, fields] of [
+    ['leading', leading],
+    ['primary', primary],
+  ] as const) {
+    for (const path of collectActiveFormItemBoundPaths(fields, values, namePrefix)) {
+      const owner = owners.get(path)
+      if (owner)
+        throw new Error(`Duplicate master–detail field binding "${path}" (${owner}, ${region})`)
+      owners.set(path, region)
+    }
+  }
+  return null
+}
+
 /**
  * Canonical structured-row detail body: one outer `FormRhythmStack` for leading fields,
  * facing preview, and primary fields. The shell owns spacing; domains supply slot content.
@@ -114,6 +145,11 @@ export function MasterDetailDetailBody({
 
   return (
     <FormRhythmStack>
+      <MasterDetailFieldBindingGuard
+        leading={leadingItemFields ?? []}
+        primary={primaryItemFields}
+        namePrefix={namePrefix}
+      />
       {hasLeading ? (
         <DetailBodyFormItems
           items={leadingItemFields!}

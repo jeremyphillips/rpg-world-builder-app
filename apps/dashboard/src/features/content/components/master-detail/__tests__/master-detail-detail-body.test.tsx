@@ -89,6 +89,53 @@ describe('MasterDetailDetailBody', () => {
     expect(scope).toContainElement(screen.getByTestId('form-monster-action-row-1-primary'))
   })
 
+  it('rejects a duplicate effective field path across regions', () => {
+    expect(() =>
+      render(
+        <Shell>
+          <MasterDetailDetailBody
+            leadingItemFields={[{ type: 'text', name: 'intro', label: 'Introduction' }]}
+            primaryItemFields={[
+              { kind: 'group', fields: [{ type: 'text', name: 'intro', label: 'Introduction' }] },
+            ]}
+            idPrefix="feature"
+            selectedFieldId="row-1"
+            namePrefix="features.0"
+          />
+        </Shell>,
+      ),
+    ).toThrow('Duplicate master–detail field binding "features.0.intro" (leading, primary)')
+  })
+
+  it('permits mutually exclusive fields that share an effective path', () => {
+    render(
+      <Shell>
+        <MasterDetailDetailBody
+          leadingItemFields={[
+            {
+              type: 'text',
+              name: 'intro',
+              label: 'Introduction',
+              visibility: { dependsOn: ['level'], visibleWhen: ({ level }) => level === 1 },
+            },
+          ]}
+          primaryItemFields={[
+            {
+              type: 'text',
+              name: 'intro',
+              label: 'Detailed introduction',
+              visibility: { dependsOn: ['level'], visibleWhen: ({ level }) => level === 2 },
+            },
+          ]}
+          idPrefix="feature"
+          selectedFieldId="row-1"
+          namePrefix="features.0"
+        />
+      </Shell>,
+    )
+    expect(screen.getByTestId('form-feature-row-1-leading')).toBeInTheDocument()
+  })
+
   it('omits empty leading sections without extra rhythm nodes', () => {
     const { container } = render(
       <Shell>
