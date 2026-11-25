@@ -50,7 +50,7 @@ import {
 } from '@/features/vocabulary'
 import { languageSingleComboboxField } from '@/lib/forms/language-combobox-form-fields.lib'
 
-import { GrantTypePersistField } from './grant-type-persist-field'
+import { GRANT_TYPE_FIELD_NAME, GrantTypePersistField } from './grant-type-persist-field'
 import {
   nounFromContentType,
   getContentTypeCollectionLabel,
@@ -345,6 +345,7 @@ function grantTypePersistFields(): FormItem[] {
     {
       kind: 'slot',
       name: '_grantTypePersist',
+      boundNames: [GRANT_TYPE_FIELD_NAME],
       render: () => createElement(GrantTypePersistField),
     },
   ]
