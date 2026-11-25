@@ -40,4 +40,4 @@ Density tokens on `.ui-alert__*` apply to unwrapped alert anatomy only.
 1. Add a `FacingReason` code in contracts when a new unfinished state needs a shared sentence.
 2. Map it in `facingReasonMessage` (exhaustive switch).
 3. Return the reason from the domain resolver — never put sentences on `FacingResolution`.
-4. Mount preview only via `StructuredFacingHostPanel` / `FacingDetailBody`.
+4. Mount preview through `StructuredFacingHostPanel` and use `FacingDetailBody` for published documents. The structured host owns the raw `FacingHostPanel` import. The dashboard import guard covers package and workspace paths.

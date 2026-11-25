@@ -17,6 +17,16 @@ describe('facing presentation import guard', () => {
     ["import { FacingHostPanel } from '@rpg/ui'", true],
     ["import * as UI from '@rpg/ui'; export const Panel = UI.FacingHostPanel", true],
     ["export { FacingHostPanel } from '@rpg/ui'", true],
+    ["export * from '@rpg/ui'", true],
+    ["import { FacingHostPanel } from '@rpg/ui/components/ui/facing-host-panel'", true],
+    [
+      "import { FacingHostPanel } from '../../../../../../../../../packages/ui/src/components/ui/facing-host-panel'",
+      true,
+    ],
+    [
+      "export { FacingHostPanel as Panel } from '../../../../../../../../../packages/ui/src/index.ts'",
+      true,
+    ],
     ["import { Button } from '@rpg/ui'", false],
   ])('checks a feature consumer after flat config merging: %s', async (source, restricted) => {
     const [result] = await eslint.lintText(source, {

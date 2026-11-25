@@ -478,12 +478,13 @@ const dashboardSourceExcerptImportGuard = {
   },
 }
 
+const structuredFacingMountMessage = 'Mount structured previews through StructuredFacingHostPanel.'
+
 const dashboardFacingPresentationImportGuard = {
   files: ['src/**/*.{ts,tsx}'],
   ignores: [
     '**/*.{test,integration.test,stories}.{ts,tsx}',
     'src/features/content/facing/structured-facing-host-panel.tsx',
-    'src/features/content/facing/facing-detail-body.tsx',
   ],
   rules: {
     '@typescript-eslint/no-restricted-imports': [
@@ -493,7 +494,27 @@ const dashboardFacingPresentationImportGuard = {
           {
             name: '@rpg/ui',
             importNames: ['FacingHostPanel'],
-            message: 'Mount structured previews through StructuredFacingHostPanel.',
+            message: structuredFacingMountMessage,
+          },
+        ],
+        patterns: [
+          {
+            group: [
+              '@rpg/ui/**/facing-host-panel',
+              '@rpg/ui/**/facing-host-panel.*',
+              '**/packages/ui/src/**/facing-host-panel',
+              '**/packages/ui/src/**/facing-host-panel.*',
+            ],
+            message: structuredFacingMountMessage,
+          },
+          {
+            group: [
+              '**/packages/ui/src',
+              '**/packages/ui/src/index',
+              '**/packages/ui/src/index.ts',
+            ],
+            importNames: ['FacingHostPanel'],
+            message: structuredFacingMountMessage,
           },
         ],
       },
