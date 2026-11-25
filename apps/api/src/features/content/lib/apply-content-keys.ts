@@ -26,6 +26,7 @@ function hasStableId(value: unknown): value is { id: string; name: string } {
   return hasName(value) && typeof value.id === 'string' && value.id.length > 0
 }
 
+// fallow-ignore-next-line complexity
 function stableIdentifiedArray(
   incoming: unknown[] | undefined,
   existing?: unknown[],

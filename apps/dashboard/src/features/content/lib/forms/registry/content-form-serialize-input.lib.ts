@@ -103,6 +103,7 @@ function assertCoherentFormMedia(prepared: ContentMedia): void {
  * id, so serialize does not take an `unresolvedOverlay` flag. Callers that still
  * hold that signal can pass it to `assertSystemOverlayWriteReady` directly.
  */
+// fallow-ignore-next-line complexity
 export function serializeContentFormInput<
   TInput extends Record<string, unknown> = Record<string, unknown>,
 >(

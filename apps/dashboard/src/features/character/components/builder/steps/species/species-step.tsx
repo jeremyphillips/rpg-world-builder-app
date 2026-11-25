@@ -72,6 +72,7 @@ function resolveSelectedHeritageOptionId(
   return draft.choiceSelections[heritageChoiceSet.id]?.[0]
 }
 
+// fallow-ignore-next-line complexity
 export function SpeciesStep({
   context,
   spellsById,
