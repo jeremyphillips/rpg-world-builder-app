@@ -8,7 +8,7 @@ import {
   type GrantGroup,
 } from '@rpg/contracts'
 
-import { pickEquipment } from '../../fixtures/pick'
+import { pickEquipment, pickSkillProficiency } from '../../fixtures/pick'
 import { makeSpell } from '@/test/fixtures/factories/spell'
 
 import {
@@ -54,6 +54,7 @@ const hiddenFeatChoiceGrant = {
 const proficiencyVocabulary = {
   ...vocabulary,
   ...buildCatalogEquipmentGrantVocabulary(['thieves-tools']),
+  resolveSkillName: (slug: string) => pickSkillProficiency(slug).name,
 }
 
 const equipmentVocabulary = {
@@ -308,6 +309,28 @@ describe('buildGrantSummaryModel', () => {
       supported: false,
       sourceGrantKind: 'skillProficiency',
     })
+  })
+
+  it('shows unavailable references for skills and senses missing from their vocabulary', () => {
+    const model = buildGrantSummaryModel(
+      [
+        {
+          grants: [
+            { id: 'sense', kind: 'sense', type: 'darkvision', range: 60 },
+            {
+              id: 'skill',
+              kind: 'skillProficiency',
+              grant: { kind: 'fixed', skillIds: ['athletics'] },
+            },
+          ],
+        },
+      ],
+      { ...vocabulary, resolveSenseLabel: () => undefined },
+    )
+    expect(model.flatItems.map((item) => item.label)).toEqual([
+      'Sense reference unavailable',
+      'Skill proficiency reference unavailable',
+    ])
   })
 
   it('uses scoped equipment records for saved grants and proficiencies', () => {

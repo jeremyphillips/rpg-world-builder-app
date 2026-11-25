@@ -9,7 +9,6 @@ import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadc
 import {
   formatContentNotFoundMessage,
   formatContentListLoadErrorMessage,
-  formatContentReferenceUnavailable,
 } from '@/features/content/lib/content-type-labels'
 import {
   useCreatureTypeVocabulary,
@@ -17,7 +16,6 @@ import {
   useSenseVocabulary,
   findVocabularyLabel,
   useDamageTypeVocabulary,
-  getSenseLabelFromVocabulary,
 } from '@/features/vocabulary'
 import { getCreatureTypeLabel } from '../lib/creature-type-field-options'
 import { buildSpeciesDetailViewModel } from '../lib/species-display'
@@ -58,16 +56,14 @@ export function SpeciesDetailContent({ species, campaignId }: SpeciesDetailConte
     resolveCreatureTypeLabel: (id) => getCreatureTypeLabel(id, { creatureTypeVocabulary }),
     resolveDamageTypeLabel: (id) => findVocabularyLabel(damageTypeVocabulary, id),
     resolveLanguageLabel: (id) => findVocabularyLabel(languageVocabulary, id),
-    resolveSenseLabel: (type) => getSenseLabelFromVocabulary(senseVocabulary, type),
+    resolveSenseLabel: (type) => findVocabularyLabel(senseVocabulary, type),
     spellCatalog,
     equipmentCatalog: createEquipmentCatalogContext({
       status: equipment.isError ? 'error' : equipment.isPending ? 'pending' : 'ready',
       scope: { rulesetId: species.rulesetId, campaignId },
       equipmentById: new Map(equipment.data?.map((item) => [item.id, item])),
     }),
-    resolveSkillName: (slug) =>
-      skills.data?.find((skill) => skill.slug === slug)?.name ??
-      formatContentReferenceUnavailable('skill-proficiencies'),
+    resolveSkillName: (slug) => skills.data?.find((skill) => skill.slug === slug)?.name,
   })
 
   return (

@@ -11,7 +11,6 @@ import {
   findVocabularyLabel,
   buildSeedSenseVocabulary,
   getCreatureTypeLabel,
-  getSenseLabelFromVocabulary,
 } from '@/features/vocabulary'
 import {
   buildSpeciesCardViewModel,
@@ -25,9 +24,11 @@ import type { BuilderOptionDetailsSection } from '@rpg/ui'
 
 export const BUILDER_SPECIES_EYEBROW = getContentTypeItemLabel('species')
 
-export type BuilderSpeciesGrantReferences = Pick<
-  SpeciesDisplayVocabulary,
-  'equipmentCatalog' | 'resolveDamageTypeLabel' | 'resolveSkillName'
+export type BuilderSpeciesGrantReferences = Partial<
+  Pick<
+    SpeciesDisplayVocabulary,
+    'equipmentCatalog' | 'resolveDamageTypeLabel' | 'resolveSenseLabel' | 'resolveSkillName'
+  >
 >
 
 export function buildBuilderSpeciesVocabulary(
@@ -36,7 +37,7 @@ export function buildBuilderSpeciesVocabulary(
   references?: BuilderSpeciesGrantReferences,
 ) {
   const creatureTypeVocabulary = buildSeedCreatureTypeVocabulary()
-  const senseVocabulary = buildSeedSenseVocabulary()
+  const senseVocabulary = references?.resolveSenseLabel ? undefined : buildSeedSenseVocabulary()
   const seedDamageTypes = references?.resolveDamageTypeLabel
     ? undefined
     : buildSeedDamageTypeVocabulary()
@@ -48,7 +49,9 @@ export function buildBuilderSpeciesVocabulary(
       ((id: string) => findVocabularyLabel(seedDamageTypes, id)),
     resolveCreatureTypeLabel: (id: string) => getCreatureTypeLabel(creatureTypeVocabulary, id),
     resolveLanguageLabel: (id: string) => languages.find((entry) => entry.id === id)?.label,
-    resolveSenseLabel: (type: string) => getSenseLabelFromVocabulary(senseVocabulary, type),
+    resolveSenseLabel:
+      references?.resolveSenseLabel ??
+      ((type: string) => findVocabularyLabel(senseVocabulary, type)),
     spellCatalog,
   }
 }

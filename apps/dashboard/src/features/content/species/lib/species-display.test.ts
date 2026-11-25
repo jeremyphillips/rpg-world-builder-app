@@ -114,6 +114,17 @@ describe('species-display', () => {
     expect(sensesRow?.value).toBe('None')
   })
 
+  it.each([
+    ['Moon Sight', 'Moon Sight 120 ft.'],
+    [undefined, 'Sense reference unavailable'],
+  ])('uses the scoped sense label in species stats', (label, value) => {
+    const display = buildSpeciesDetailViewModel(dwarfWithTraits, {
+      ...vocabulary,
+      resolveSenseLabel: () => label,
+    })
+    expect(display.statRows).toContainEqual({ label: SPECIES_STAT_LABELS.senses, value })
+  })
+
   it('omits language affinities stat row when absent', () => {
     const speciesWithoutLanguages = makeSpecies({
       ...dwarfWithTraits,

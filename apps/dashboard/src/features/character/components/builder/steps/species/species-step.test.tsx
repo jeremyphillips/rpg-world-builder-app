@@ -31,6 +31,7 @@ import { SpeciesStep } from './species-step'
 vi.mock('@/features/vocabulary', async (importOriginal) => ({
   ...(await importOriginal()),
   useDamageTypeVocabulary: vi.fn(() => ({ vocabulary: undefined })),
+  useSenseVocabulary: vi.fn(() => ({ vocabulary: undefined })),
 }))
 
 const dwarfWithTraits = makeSpecies({

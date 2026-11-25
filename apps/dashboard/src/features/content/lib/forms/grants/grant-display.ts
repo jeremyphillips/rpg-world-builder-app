@@ -63,6 +63,8 @@
  */
 import {
   formatCreatureSenseCompactLine,
+  SENSE_TERM,
+  type Sense,
   formatCreatureRollAdjustmentSentence,
   formatCreatureSaveOutcomeOverrideNotation,
   formatDamageTypeGrantCompact,
@@ -90,8 +92,10 @@ import {
 } from '@rpg/contracts'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
+import { formatContentReferenceUnavailable } from '../../content-type-labels'
+
 export type GrantDisplayVocabulary = {
-  resolveSenseLabel: (type: string) => string
+  resolveSenseLabel: (type: string) => string | undefined
   resolveDamageTypeLabel?: (id: string) => string | undefined
   resolveLanguageLabel?: (id: string) => string | undefined
   spellCatalog: SpellCatalogContext
@@ -315,6 +319,38 @@ function equipmentKindResolver(
   }
 }
 
+export function formatScopedSenseSummary(
+  sense: Sense,
+  resolveLabel: GrantDisplayVocabulary['resolveSenseLabel'],
+): string {
+  const label = resolveLabel(sense.type)
+  return label
+    ? formatCreatureSenseCompactLine(sense, label)
+    : `${SENSE_TERM.label} reference unavailable`
+}
+
+function formatScopedSkillSummary(
+  grant: Extract<ContentGrant, { kind: 'skillProficiency' }>['grant'],
+  resolveLabel: GrantDisplayVocabulary['resolveSkillName'],
+): string | undefined {
+  if (grant.kind !== 'fixed') return undefined
+  const names = new Map<string, string>()
+  let hasUnavailable = false
+  for (const id of grant.skillIds) {
+    const label = resolveLabel?.(id)
+    if (label) names.set(id, label)
+    else hasUnavailable = true
+  }
+  const resolved = formatSkillProficiencyGrantCompact(
+    { ...grant, skillIds: grant.skillIds.filter((id) => names.has(id)) },
+    (id) => names.get(id),
+  )
+  const unavailable = hasUnavailable
+    ? formatContentReferenceUnavailable('skill-proficiencies')
+    : undefined
+  return [resolved, unavailable].filter(Boolean).join(', ') || undefined
+}
+
 // Null entries participate in compact benefit counts without a visible label.
 const GRANT_ITEM_MAPPERS = {
   languageChoice: null,
@@ -323,7 +359,7 @@ const GRANT_ITEM_MAPPERS = {
     createSupportedGrantItems(
       idPrefix,
       'sense',
-      formatCreatureSenseCompactLine(grant, vocabulary.resolveSenseLabel(grant.type)),
+      formatScopedSenseSummary(grant, vocabulary.resolveSenseLabel),
       'sense',
       grant.kind,
       level,
@@ -368,7 +404,7 @@ const GRANT_ITEM_MAPPERS = {
     ),
   skillProficiency: (grant, vocabulary, idPrefix, level) =>
     mapCompactProficiencyGrantToItems(
-      formatSkillProficiencyGrantCompact(grant.grant, vocabulary.resolveSkillName),
+      formatScopedSkillSummary(grant.grant, vocabulary.resolveSkillName),
       `${idPrefix}:skillProficiency`,
       grant.kind,
       'proficiency',

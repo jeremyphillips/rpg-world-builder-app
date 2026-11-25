@@ -11,10 +11,9 @@ import {
 } from '@rpg/contracts'
 import { formatPreviewRailOverflowList, type PreviewRailFact } from '@rpg/ui'
 
-import { findVocabularyLabel, getSenseLabelFromVocabulary } from '@/features/vocabulary'
+import { findVocabularyLabel } from '@/features/vocabulary'
 
 import { equipmentReferenceScopeFromContentFormCtx } from '@/lib/content-form-equipment-reference-scope.lib'
-import { formatContentReferenceUnavailable } from '../../lib/content-type-labels'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import {
   CONTENT_PREVIEW_DESCRIPTION_PLACEHOLDER,
@@ -98,14 +97,11 @@ function speciesPreviewVocabulary(ctx: ContentFormCtx): SpeciesDisplayVocabulary
       scope: scope ?? { rulesetId: '', campaignId: '' },
       equipmentById: ctx.equipmentCatalogById,
     }),
-    resolveSkillName: (slug) =>
-      ctx.skillCatalogBySlug?.get(slug)?.name ??
-      formatContentReferenceUnavailable('skill-proficiencies'),
+    resolveSkillName: (slug) => ctx.skillCatalogBySlug?.get(slug)?.name,
     resolveCreatureTypeLabel: (id) => getCreatureTypeLabel(id, ctx),
     resolveDamageTypeLabel: (id) => findVocabularyLabel(ctx.damageTypeVocabulary, id),
     resolveLanguageLabel: (id) => findVocabularyLabel(ctx.languageVocabulary, id),
-    resolveSenseLabel: (type) =>
-      ctx.senseVocabulary ? getSenseLabelFromVocabulary(ctx.senseVocabulary, type) : type,
+    resolveSenseLabel: (type) => findVocabularyLabel(ctx.senseVocabulary, type),
     spellCatalog: createSpellCatalogContext({
       status: ctx.spellCatalogStatus ?? 'pending',
       spellsById: ctx.spellCatalogById,

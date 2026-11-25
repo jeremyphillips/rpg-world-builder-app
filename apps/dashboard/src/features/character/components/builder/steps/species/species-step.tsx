@@ -14,12 +14,12 @@ import {
 import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
 import { Badge, BuilderOptionDetailsSheet, Button, RadioCard, Text } from '@rpg/ui'
 
+import { buildSpeciesContentDisplayImageInput, getContentDisplayImage } from '@/features/content'
 import {
-  buildSpeciesContentDisplayImageInput,
-  formatContentReferenceUnavailable,
-  getContentDisplayImage,
-} from '@/features/content'
-import { findVocabularyLabel, useDamageTypeVocabulary } from '@/features/vocabulary'
+  findVocabularyLabel,
+  useDamageTypeVocabulary,
+  useSenseVocabulary,
+} from '@/features/vocabulary'
 
 import {
   findSpeciesHeritageChoiceSet,
@@ -86,6 +86,7 @@ export function SpeciesStep({
   const campaignId =
     context.rulesScope.type === 'campaign' ? context.rulesScope.campaignId : undefined
   const { vocabulary: campaignDamageTypes } = useDamageTypeVocabulary(campaignId)
+  const { vocabulary: campaignSenses } = useSenseVocabulary(campaignId)
   const resolveCampaignDamageTypeLabel = useCallback(
     (id: string) => findVocabularyLabel(campaignDamageTypes, id),
     [campaignDamageTypes],
@@ -93,17 +94,20 @@ export function SpeciesStep({
   const grantReferences = useMemo(
     () => ({
       resolveDamageTypeLabel: campaignId ? resolveCampaignDamageTypeLabel : undefined,
+      resolveSenseLabel: campaignId
+        ? (type: string) => findVocabularyLabel(campaignSenses, type)
+        : undefined,
       equipmentCatalog: createEquipmentCatalogContext({
         status: 'ready',
         scope: { rulesetId: context.rulesetId, campaignId: campaignId ?? '' },
         equipmentById: new Map(context.catalog.equipment.map((item) => [item.id, item])),
       }),
       resolveSkillName: (slug: string) =>
-        context.catalog.skillProficiencies.find((skill) => skill.slug === slug)?.name ??
-        formatContentReferenceUnavailable('skill-proficiencies'),
+        context.catalog.skillProficiencies.find((skill) => skill.slug === slug)?.name,
     }),
     [
       campaignId,
+      campaignSenses,
       context.rulesetId,
       context.catalog.equipment,
       context.catalog.skillProficiencies,
