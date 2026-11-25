@@ -466,6 +466,9 @@ describe('grant row summaries', () => {
     )
     expect(formatLanguageRowSummary('common')).toBe('Character knows Common.')
     expect(formatFeatChoiceRowSummary('general', 2)).toBe('Character chooses 2 general feats.')
+    expect(formatFeatChoiceRowSummary('general', '')).toBe('Character chooses 1 general feat.')
+    expect(formatFeatChoiceRowSummary('general', 0)).toBe('')
+    expect(formatFeatChoiceRowSummary('not-a-category', '2')).toBe('')
   })
 
   it('formats spell grant summaries from availability and casting toggles', () => {

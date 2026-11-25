@@ -80,7 +80,6 @@ const useStepFieldItems = (actionRows: MonsterActionDraftRow[]) => [
     ctx,
     sectionRowsDependsOn: '../../../../actions',
     actionRows,
-    spellCatalogById: ctx.spellCatalogById,
   }),
   {
     kind: 'slot' as const,

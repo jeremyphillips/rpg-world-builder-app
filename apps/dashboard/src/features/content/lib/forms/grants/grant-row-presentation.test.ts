@@ -232,7 +232,7 @@ describe('resolveGrantRowPresentation', () => {
     },
     {
       name: 'feat choice',
-      values: { grantType: 'featChoice', featCategory: 'fighting-style', featChoose: 1 },
+      values: { grantType: 'featChoice', featCategory: 'fighting-style', featChoose: '1' },
       expected: {
         heading: 'Feat choice',
         detail: '1 fighting style feat',

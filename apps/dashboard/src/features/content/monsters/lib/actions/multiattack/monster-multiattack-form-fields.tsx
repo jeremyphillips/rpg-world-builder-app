@@ -1,4 +1,4 @@
-import { isMultiattackUseClause, type Spell } from '@rpg/contracts'
+import { isMultiattackUseClause } from '@rpg/contracts'
 import type { FieldVisibility, FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
@@ -100,7 +100,6 @@ function monsterMultiattackUseClauseFields(input: {
   action: MultiattackDraft
   ctx: ContentFormCtx
   actionRows: readonly MonsterActionDraftRow[]
-  spellCatalogById?: ReadonlyMap<string, Spell>
   stepSectionRowsDependsOn: string
   useChoiceSectionRowsDependsOn: string
 }): FormItem[] {
@@ -121,7 +120,6 @@ function monsterMultiattackUseClauseFields(input: {
           ctx: input.ctx,
           sectionRowsDependsOn: input.stepSectionRowsDependsOn,
           actionRows: input.actionRows,
-          spellCatalogById: input.spellCatalogById,
         }),
         {
           kind: 'slot',
@@ -179,7 +177,6 @@ function monsterMultiattackUseClauseFields(input: {
         section: input.section,
         sectionRowsDependsOn: input.useChoiceSectionRowsDependsOn,
         actionRows: input.actionRows,
-        spellCatalogById: input.spellCatalogById,
         actionPicker: { mode: 'use', multiattackId: input.action.id, ctx: input.ctx },
       }),
     },
@@ -191,7 +188,6 @@ function monsterMultiattackStepsArray(input: {
   action: MultiattackDraft
   ctx: ContentFormCtx
   actionRows: readonly MonsterActionDraftRow[]
-  spellCatalogById?: ReadonlyMap<string, Spell>
   scope?: MultiattackSequenceScope
   headingHint?: string
 }): FormItem {
@@ -300,7 +296,6 @@ function monsterMultiattackStepsArray(input: {
         action: input.action,
         ctx: input.ctx,
         actionRows: input.actionRows,
-        spellCatalogById: input.spellCatalogById,
         stepSectionRowsDependsOn,
         useChoiceSectionRowsDependsOn,
       }),
@@ -314,7 +309,6 @@ function monsterMultiattackReplacementGroup(input: {
   action: MultiattackDraft
   ctx: ContentFormCtx
   actionRows: readonly MonsterActionDraftRow[]
-  spellCatalogById?: ReadonlyMap<string, Spell>
   canConfigureReplacement: boolean
   replacementCountMax?: number
 }): FormItem {
@@ -427,7 +421,6 @@ function monsterMultiattackReplacementGroup(input: {
           section: input.section,
           sectionRowsDependsOn: multiattackReplacementChoiceRowSectionRowsDependsOn(input.section),
           actionRows: input.actionRows,
-          spellCatalogById: input.spellCatalogById,
           actionPicker: { mode: 'replacement', multiattackId: input.action.id, ctx: input.ctx },
         }),
       },
@@ -440,7 +433,6 @@ function monsterMultiattackAlternativeGroup(input: {
   action: MultiattackDraft
   ctx: ContentFormCtx
   actionRows: readonly MonsterActionDraftRow[]
-  spellCatalogById?: ReadonlyMap<string, Spell>
 }): FormItem {
   const hasReplacement = input.action.replacement !== undefined
   const group = {
@@ -485,7 +477,6 @@ function monsterMultiattackAlternativeGroup(input: {
           action: input.action,
           ctx: input.ctx,
           actionRows: input.actionRows,
-          spellCatalogById: input.spellCatalogById,
           scope: 'alternative',
         }),
         name: 'alternative.steps',
@@ -561,7 +552,6 @@ export function monsterMultiattackFormFields(input: {
       action: input.action,
       ctx: input.ctx,
       actionRows: input.actionRows,
-      spellCatalogById: input.ctx.spellCatalogById,
       headingHint: MONSTER_MULTIATTACK_ATTACKS_HINT,
     }),
     monsterMultiattackAlternativeGroup({
@@ -569,14 +559,12 @@ export function monsterMultiattackFormFields(input: {
       action: input.action,
       ctx: input.ctx,
       actionRows: input.actionRows,
-      spellCatalogById: input.ctx.spellCatalogById,
     }),
     monsterMultiattackReplacementGroup({
       section: input.section,
       action: input.action,
       ctx: input.ctx,
       actionRows: input.actionRows,
-      spellCatalogById: input.ctx.spellCatalogById,
       canConfigureReplacement: input.canConfigureReplacement,
       replacementCountMax: input.replacementCountMax,
     }),

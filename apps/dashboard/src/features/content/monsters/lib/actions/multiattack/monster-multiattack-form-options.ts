@@ -1,6 +1,9 @@
 import {
   classifyMultiattackReplacementChoice,
   formatSpellCastAtLevelName,
+  MONSTER_ACTION_UNRESOLVED_REFERENCE,
+  presentSpellReferenceDisplayName,
+  resolveSpellReferenceOutcome,
   isMultiattackAttackGroup,
   meaningfulMultiattackTargetActionIds,
   multiattackReplacementChoiceKey,
@@ -11,7 +14,7 @@ import {
   type MultiattackDraftStep,
   type MultiattackReplacement,
   type MultiattackReplacementChoiceRef,
-  type Spell,
+  type SpellCatalogContext,
 } from '@rpg/contracts'
 
 import {
@@ -263,7 +266,10 @@ export function multiattackExecutableAttackOptions(
   const titles = monsterActionEditorTitles(rows, values, ctx, 'actions')
   return rows
     .filter((row) => multiattackRowEligibleForPurpose(row, 'executable-attack', { multiattackId }))
-    .map((row) => ({ value: row.id, label: titles.get(row.id) ?? row.id }))
+    .map((row) => ({
+      value: row.id,
+      label: titles.get(row.id) ?? MONSTER_ACTION_UNRESOLVED_REFERENCE,
+    }))
 }
 
 export function multiattackSequenceMenuContextDependsOn(
@@ -335,7 +341,10 @@ export function multiattackExecutableUseOptions(
   const titles = monsterActionEditorTitles(rows, values, ctx, 'actions')
   return rows
     .filter((row) => multiattackRowEligibleForPurpose(row, 'executable-use', { multiattackId }))
-    .map((row) => ({ value: row.id, label: titles.get(row.id) ?? row.id }))
+    .map((row) => ({
+      value: row.id,
+      label: titles.get(row.id) ?? MONSTER_ACTION_UNRESOLVED_REFERENCE,
+    }))
 }
 
 function parseReplacementChoiceRows(value: unknown): MultiattackReplacementChoiceRef[] {
@@ -385,7 +394,7 @@ export function multiattackReplacementChoiceSelectOptions(input: {
     })
     if (redundancy !== 'ok') return []
 
-    return [{ value: row.id, label: titles.get(row.id) ?? row.id }]
+    return [{ value: row.id, label: titles.get(row.id) ?? MONSTER_ACTION_UNRESOLVED_REFERENCE }]
   })
 
   const storedActionId = input.storedChoice?.actionId
@@ -393,7 +402,7 @@ export function multiattackReplacementChoiceSelectOptions(input: {
 
   const authorizedDisplay = new Map<string, { label: string }>()
   for (const row of input.rows) {
-    const label = titles.get(row.id) ?? row.id
+    const label = titles.get(row.id) ?? MONSTER_ACTION_UNRESOLVED_REFERENCE
     authorizedDisplay.set(row.id, { label })
   }
 
@@ -477,7 +486,10 @@ export function multiattackPrerequisiteOptions(
   ])
   return combined
     .filter((row) => multiattackRowEligibleForPurpose(row, 'prerequisite', { multiattackId }))
-    .map((row) => ({ value: row.id, label: titles.get(row.id) ?? row.id }))
+    .map((row) => ({
+      value: row.id,
+      label: titles.get(row.id) ?? MONSTER_ACTION_UNRESOLVED_REFERENCE,
+    }))
 }
 
 type MultiattackDraft = Extract<MonsterActionDraftRow, { kind: 'multiattack' }>
@@ -496,7 +508,10 @@ export function multiattackTargetAttackOptions(
       ids.add(step.actionIds[0]!)
     }
   }
-  return [...ids].map((id) => ({ value: id, label: titles.get(id) ?? id }))
+  return [...ids].map((id) => ({
+    value: id,
+    label: titles.get(id) ?? MONSTER_ACTION_UNRESOLVED_REFERENCE,
+  }))
 }
 
 export function multiattackTargetAttackOptionsForReplacement(
@@ -517,30 +532,29 @@ export function multiattackTargetAttackOptionsForReplacement(
   }
   return multiattackSequenceAttackIds(steps ?? []).map((id) => ({
     value: id,
-    label: titles.get(id) ?? id,
+    label: titles.get(id) ?? MONSTER_ACTION_UNRESOLVED_REFERENCE,
   }))
 }
 
 export function multiattackSpellOptionsForAction(
   actionId: string,
   actionRows: readonly MonsterActionDraftRow[],
-  spellCatalogById: ReadonlyMap<string, Spell> | undefined,
+  spellCatalog: SpellCatalogContext,
 ): Option[] {
   const source = actionRows.find((row) => row.id === actionId && row.kind === 'spell')
   if (!source || source.kind !== 'spell') return []
   return (source.spells ?? []).flatMap((spell) => {
     if (!spell.spellId) return []
-    const catalogSpell = spellCatalogById?.get(spell.spellId)
-    return [
-      {
-        value: spell.spellId,
-        label: formatSpellCastAtLevelName({
-          name: catalogSpell?.name ?? spell.spellId,
-          castAtLevel: spell.castAtLevel,
-          spellLevel: catalogSpell?.level,
-        }),
-      },
-    ]
+    const outcome = resolveSpellReferenceOutcome(spell.spellId, spellCatalog)
+    const label =
+      outcome.status === 'resolved'
+        ? formatSpellCastAtLevelName({
+            name: outcome.spell.name,
+            castAtLevel: spell.castAtLevel,
+            spellLevel: outcome.spell.level,
+          })
+        : presentSpellReferenceDisplayName(outcome)
+    return [{ value: spell.spellId, label }]
   })
 }
 

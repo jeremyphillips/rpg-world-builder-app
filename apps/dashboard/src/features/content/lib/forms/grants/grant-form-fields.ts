@@ -88,6 +88,7 @@ import {
   type GrantRowHeaderContext,
   type GrantRowValues,
 } from './grant-row-presentation.lib'
+import { readFeatChoiceFromDraft } from './grant-form-values'
 import {
   formatGrantUnlockLevelLabel,
   GRANT_DEFAULT_UNLOCK_LABEL,
@@ -262,13 +263,8 @@ export function formatFeatChoiceRowSummary(
   category: string | undefined,
   choose: number | string | undefined,
 ): string {
-  if (!category) return ''
-  const numericChoose = choose === undefined || choose === '' ? 1 : Number(choose)
-  if (!Number.isFinite(numericChoose)) return ''
-  return formatFeatChoiceGrantSentence({
-    category: category as FeatCategory,
-    choose: numericChoose,
-  })
+  const choice = readFeatChoiceFromDraft(category, choose)
+  return choice ? formatFeatChoiceGrantSentence(choice) : ''
 }
 
 export function formatSpellRowSummary(values: GrantRowValues, ctx: GrantRowHeaderContext): string {

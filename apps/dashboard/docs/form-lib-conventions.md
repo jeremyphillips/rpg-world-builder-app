@@ -496,7 +496,8 @@ The persisted grant union drives the authoring projection and compact summary
 maps. Each kind has an adapter or an explicit exclusion. The editor excludes
 campaign language choices. Compact summaries count hidden choices as benefits
 and omit their labels. Published grant-trait prose and character builder choice
-sets classify grant kinds at their own boundaries.
+sets classify grant kinds at their own boundaries. Feat-choice rows share one
+draft category and count parser across write conversion, row details, and prose.
 
 ### `ContentFormDef.preview`
 

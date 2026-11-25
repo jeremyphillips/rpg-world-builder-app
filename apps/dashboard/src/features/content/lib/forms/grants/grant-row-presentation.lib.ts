@@ -23,7 +23,6 @@ import {
   type EquipmentCatalogScope,
   type EquipmentReferenceResolution,
   type EquipmentSlugReference,
-  type FeatCategory,
   type MovementGrantPayload,
   type MovementMode,
   type MovementOperation,
@@ -51,6 +50,7 @@ import {
   weaponProficiencyGrantSummary,
 } from './proficiency/proficiency-grant-form-values'
 import { GRANT_TYPE_LABELS, type GrantType } from './grant-form-schema'
+import { readFeatChoiceFromDraft } from './grant-form-values'
 
 export const GRANT_TYPE_MISSING_PRIMARY = 'Grant type missing'
 import type { EquipmentGrantItemForm } from './equipment/equipment-grant-form-fields'
@@ -237,14 +237,10 @@ function resolveSenseDetail(
   return `${label} ${numericRange} ft`
 }
 
-function resolveFeatChoiceDetail(
-  category: string | undefined,
-  choose: number | string | undefined,
-): string | undefined {
-  if (!category) return undefined
-  const numericChoose = choose === undefined || choose === '' ? 1 : Number(choose)
-  if (!Number.isFinite(numericChoose)) return undefined
-  return `${numericChoose} ${getFeatCategorySentenceForm(category, numericChoose)}`
+function resolveFeatChoiceDetail(values: GrantRowValues): string | undefined {
+  const choice = readFeatChoiceFromDraft(values['featCategory'], values['featChoose'])
+  if (!choice) return undefined
+  return `${choice.choose} ${getFeatCategorySentenceForm(choice.category, choice.choose)}`
 }
 
 function resolveSpellGrantDetail(
@@ -333,15 +329,8 @@ const GRANT_ROW_DESCRIPTION_BY_TYPE: Partial<Record<string, GrantRowDescriptionF
     return formatLanguageGrantSentence([languageId])
   },
   featChoice: (values) => {
-    const category = values['featCategory'] as string | undefined
-    const choose = values['featChoose'] as number | string | undefined
-    if (!category) return ''
-    const numericChoose = choose === undefined || choose === '' ? 1 : Number(choose)
-    if (!Number.isFinite(numericChoose)) return ''
-    return formatFeatChoiceGrantSentence({
-      category: category as FeatCategory,
-      choose: numericChoose,
-    })
+    const choice = readFeatChoiceFromDraft(values['featCategory'], values['featChoose'])
+    return choice ? formatFeatChoiceGrantSentence(choice) : ''
   },
   equipment: (values, ctx) =>
     equipmentGrantSummary(values as EquipmentGrantItemForm, ctx.equipmentReferences),
@@ -374,11 +363,7 @@ const GRANT_ROW_DETAIL_BY_TYPE: Partial<Record<string, GrantRowDetailFormatter>>
     ),
   movement: (values) => resolveMovementDetail(values),
   languages: (values, ctx) => resolveLanguageDetail(values['language'] as string | undefined, ctx),
-  featChoice: (values) =>
-    resolveFeatChoiceDetail(
-      values['featCategory'] as string | undefined,
-      values['featChoose'] as number | string | undefined,
-    ),
+  featChoice: resolveFeatChoiceDetail,
   weaponProficiency: (values, ctx) =>
     weaponProficiencyGrantDetail(values as WeaponProficiencyItemForm, ctx.weaponOptions),
   toolProficiency: (values, ctx) =>

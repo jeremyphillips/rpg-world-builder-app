@@ -4,7 +4,6 @@ import type {
   CreatureEffectCircumstance,
   CreatureRollTarget,
   DamageTypeId,
-  FeatCategory,
   GrantGroup,
   GrantGroups,
   GrantUnlock,
@@ -14,6 +13,7 @@ import type {
 } from '@rpg/contracts'
 import {
   createGrantRowId,
+  featChoiceGrantSchema,
   flattenGrantGroups,
   grantRowIdSchema,
   normalizeGrantGroups,
@@ -344,12 +344,22 @@ function languagesToGrant(row: GrantRowForm): GrantWithoutRowId | undefined {
   return { kind: 'languages', languageIds: [row.language] }
 }
 
+/** Reads the shared category and count from an incomplete grant row. */
+export function readFeatChoiceFromDraft(category: unknown, choose: unknown) {
+  const count = typeof choose === 'string' && choose.trim() !== '' ? Number(choose) : choose
+  const parsed = featChoiceGrantSchema.safeParse({
+    category,
+    choose: count === '' ? undefined : count,
+  })
+  return parsed.success ? parsed.data : undefined
+}
+
 function featChoiceToGrant(row: GrantRowForm): GrantWithoutRowId | undefined {
-  if (!row.featCategory) return undefined
+  const choice = readFeatChoiceFromDraft(row.featCategory, row.featChoose)
+  if (!choice) return undefined
   return {
     kind: 'featChoice',
-    category: row.featCategory as FeatCategory,
-    choose: row.featChoose ?? 1,
+    ...choice,
     ...(row.featAllowAnyQualifying ? { allowAnyQualifying: true } : {}),
     ...(row.featReplaceable ? { replaceable: true } : {}),
     ...(row.featRecommendedIds?.length ? { recommendedFeatIds: row.featRecommendedIds } : {}),
