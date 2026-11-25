@@ -24,7 +24,6 @@ export {
   buildSeedLanguageVocabulary,
   buildActiveLanguageFieldOptions,
   buildActiveLanguageCategoryFieldOptions,
-  findLanguageLabelInVocabulary,
   getLanguageLabelFromVocabulary,
   type LanguageVocabulary,
 } from './lib/sets/languages'

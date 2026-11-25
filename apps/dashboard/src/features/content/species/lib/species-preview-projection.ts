@@ -10,7 +10,7 @@ import {
 } from '@rpg/contracts'
 import { formatPreviewRailOverflowList, type PreviewRailFact } from '@rpg/ui'
 
-import { findLanguageLabelInVocabulary, getSenseLabelFromVocabulary } from '@/features/vocabulary'
+import { findVocabularyLabel, getSenseLabelFromVocabulary } from '@/features/vocabulary'
 
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import {
@@ -90,7 +90,8 @@ function speciesPreviewName(values: SpeciesFormValues): string {
 function speciesPreviewVocabulary(ctx: ContentFormCtx): SpeciesDisplayVocabulary {
   return {
     resolveCreatureTypeLabel: (id) => getCreatureTypeLabel(id, ctx),
-    resolveLanguageLabel: (id) => findLanguageLabelInVocabulary(ctx.languageVocabulary, id),
+    resolveDamageTypeLabel: (id) => findVocabularyLabel(ctx.damageTypeVocabulary, id),
+    resolveLanguageLabel: (id) => findVocabularyLabel(ctx.languageVocabulary, id),
     resolveSenseLabel: (type) =>
       ctx.senseVocabulary ? getSenseLabelFromVocabulary(ctx.senseVocabulary, type) : type,
     spellCatalog: createSpellCatalogContext({

@@ -88,6 +88,7 @@ import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 export type GrantDisplayVocabulary = {
   resolveSenseLabel: (type: string) => string
+  resolveDamageTypeLabel?: (id: string) => string | undefined
   resolveLanguageLabel?: (id: string) => string | undefined
   spellCatalog: SpellCatalogContext
   resolveSkillName?: (id: string) => string | undefined
@@ -317,20 +318,20 @@ const GRANT_ITEM_MAPPERS = {
       grant.kind,
       level,
     ),
-  damageType: (grant, _vocabulary, idPrefix, level) =>
+  damageType: (grant, vocabulary, idPrefix, level) =>
     createSupportedGrantItems(
       idPrefix,
       'damageType',
-      formatDamageTypeGrantCompact(grant.damageTypes),
+      formatDamageTypeGrantCompact(grant.damageTypes, vocabulary.resolveDamageTypeLabel),
       'damageType',
       grant.kind,
       level,
     ),
-  resistances: (grant, _vocabulary, idPrefix, level) =>
+  resistances: (grant, vocabulary, idPrefix, level) =>
     createSupportedGrantItems(
       idPrefix,
       'resistances',
-      formatResistanceGrantCompact(grant.damageTypes),
+      formatResistanceGrantCompact(grant.damageTypes, vocabulary.resolveDamageTypeLabel),
       'resistance',
       grant.kind,
       level,

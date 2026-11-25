@@ -10,7 +10,8 @@ import {
   useCreatureTypeVocabulary,
   useLanguageVocabulary,
   useSenseVocabulary,
-  findLanguageLabelInVocabulary,
+  findVocabularyLabel,
+  useDamageTypeVocabulary,
   getSenseLabelFromVocabulary,
 } from '@/features/vocabulary'
 import { getCreatureTypeLabel } from '../lib/creature-type-field-options'
@@ -35,6 +36,7 @@ export function SpeciesDetailContent({ species, campaignId }: SpeciesDetailConte
 
   const { vocabulary: creatureTypeVocabulary } = useCreatureTypeVocabulary(campaignId)
   const { vocabulary: senseVocabulary } = useSenseVocabulary(campaignId)
+  const { vocabulary: damageTypeVocabulary } = useDamageTypeVocabulary(campaignId)
   const { vocabulary: languageVocabulary } = useLanguageVocabulary(campaignId)
 
   const spells = useSpells(campaignId)
@@ -45,7 +47,8 @@ export function SpeciesDetailContent({ species, campaignId }: SpeciesDetailConte
 
   const viewModel = buildSpeciesDetailViewModel(species, {
     resolveCreatureTypeLabel: (id) => getCreatureTypeLabel(id, { creatureTypeVocabulary }),
-    resolveLanguageLabel: (id) => findLanguageLabelInVocabulary(languageVocabulary, id),
+    resolveDamageTypeLabel: (id) => findVocabularyLabel(damageTypeVocabulary, id),
+    resolveLanguageLabel: (id) => findVocabularyLabel(languageVocabulary, id),
     resolveSenseLabel: (type) => getSenseLabelFromVocabulary(senseVocabulary, type),
     spellCatalog,
   })

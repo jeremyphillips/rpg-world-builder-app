@@ -9,7 +9,7 @@ import {
   damageTypeIdSchema,
   DAMAGE_TYPE_TERM,
 } from '../../../vocab/damage/vocabulary'
-import { getTermSentenceForm } from '../../../vocab/types'
+import { getTermSentenceForm, type VocabularyTerm } from '../../../vocab/types'
 import { absoluteLevelSchema } from '../../../primitives/level'
 import {
   movementGrantIncreaseSchema,
@@ -87,20 +87,30 @@ export function formatLanguageGrantSentence(
   return `Character knows ${joinNaturalList(languageIds.map(resolveLabel))}.`
 }
 
+function formatCompactVocabularyGrant(
+  ids: readonly string[],
+  resolveLabel: (id: string) => string | undefined,
+  term: VocabularyTerm,
+  formatResolved: (labels: string[]) => string,
+): string {
+  const labels = ids.map(resolveLabel).filter((label) => label !== undefined)
+  const parts = []
+  if (labels.length > 0) parts.push(formatResolved(labels))
+  if (labels.length < ids.length) parts.push(`${term.label} reference unavailable`)
+  return parts.join(', ')
+}
+
 /** Compact summary label: "Common language", "Common, Elvish languages", etc. */
 export function formatLanguageGrantCompact(
   languageIds: readonly string[],
   resolveLabel: (id: string) => string | undefined = getLanguageLabel,
 ): string {
-  const labels = languageIds.map(resolveLabel).filter((label) => label !== undefined)
-  const parts = []
-  if (labels.length > 0) {
-    parts.push(`${labels.join(', ')} ${getLanguageProficiencySentenceForm(labels.length)}`)
-  }
-  if (labels.length < languageIds.length) {
-    parts.push(`${LANGUAGE_TERM.label} reference unavailable`)
-  }
-  return parts.join(', ')
+  return formatCompactVocabularyGrant(
+    languageIds,
+    resolveLabel,
+    LANGUAGE_TERM,
+    (labels) => `${labels.join(', ')} ${getLanguageProficiencySentenceForm(labels.length)}`,
+  )
 }
 
 export function formatLanguageChoiceGrantSentence(grant: LanguageChoiceGrant): string {
@@ -179,10 +189,17 @@ export function formatDamageTypeGrantSentence(
 }
 
 /** Compact summary label: "Acid damage type", "Fire and Cold damage types", etc. */
-export function formatDamageTypeGrantCompact(damageTypes: readonly string[]): string {
-  const labels = joinNaturalList(damageTypes.map((id) => getDamageTypeLabel(id)))
-  const concept = getTermSentenceForm(DAMAGE_TYPE_TERM, damageTypes.length)
-  return `${labels} ${concept}`
+export function formatDamageTypeGrantCompact(
+  damageTypes: readonly string[],
+  resolveLabel: (id: string) => string | undefined = getDamageTypeLabel,
+): string {
+  return formatCompactVocabularyGrant(
+    damageTypes,
+    resolveLabel,
+    DAMAGE_TYPE_TERM,
+    (labels) =>
+      `${joinNaturalList(labels)} ${getTermSentenceForm(DAMAGE_TYPE_TERM, labels.length)}`,
+  )
 }
 
 export function formatResistanceGrantSentence(
@@ -194,9 +211,16 @@ export function formatResistanceGrantSentence(
 }
 
 /** Compact summary label: "Acid resistance", "Fire and Cold resistance", etc. */
-export function formatResistanceGrantCompact(damageTypes: readonly string[]): string {
-  const labels = joinNaturalList(damageTypes.map((id) => getDamageTypeLabel(id)))
-  return `${labels} resistance`
+export function formatResistanceGrantCompact(
+  damageTypes: readonly string[],
+  resolveLabel: (id: string) => string | undefined = getDamageTypeLabel,
+): string {
+  return formatCompactVocabularyGrant(
+    damageTypes,
+    resolveLabel,
+    DAMAGE_TYPE_TERM,
+    (labels) => `${joinNaturalList(labels)} resistance`,
+  )
 }
 
 // ---------------------------------------------------------------------------

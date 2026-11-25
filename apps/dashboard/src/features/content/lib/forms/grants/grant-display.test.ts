@@ -185,6 +185,28 @@ describe('buildGrantSummaryModel', () => {
     ])
   })
 
+  it('uses scoped damage labels and preserves missing references in saved summaries', () => {
+    const damageTypes = ['acid', 'removed-damage']
+    const model = buildGrantSummaryModel(
+      [
+        {
+          grants: [
+            { id: 'damage', kind: 'damageType', damageTypes },
+            { id: 'resistance', kind: 'resistances', damageTypes },
+          ],
+        },
+      ],
+      {
+        ...vocabulary,
+        resolveDamageTypeLabel: (id) => (id === 'acid' ? 'Grave Frost' : undefined),
+      },
+    )
+    expect(model.flatItems.map((item) => item.label)).toEqual([
+      'Grave Frost damage type, Damage Type reference unavailable',
+      'Grave Frost resistance, Damage Type reference unavailable',
+    ])
+  })
+
   it('renders language grants with compact labels', () => {
     const single = buildGrantSummaryModel(
       [{ grants: [{ id: 'languages-10', kind: 'languages', languageIds: ['druidic'] }] }],

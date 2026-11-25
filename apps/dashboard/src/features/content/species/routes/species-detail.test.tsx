@@ -6,6 +6,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import {
   buildSeedCreatureTypeVocabulary,
+  buildSeedDamageTypeVocabulary,
   buildSeedLanguageVocabulary,
   buildSeedSenseVocabulary,
 } from '@/features/vocabulary'
@@ -34,12 +35,14 @@ vi.mock('@/features/vocabulary', async (importOriginal) => {
     useCreatureTypeVocabulary: vi.fn(),
     useSenseVocabulary: vi.fn(),
     useLanguageVocabulary: vi.fn(),
+    useDamageTypeVocabulary: vi.fn(),
   }
 })
 
 import {
   useCreatureTypeVocabulary,
   useLanguageVocabulary,
+  useDamageTypeVocabulary,
   useSenseVocabulary,
 } from '@/features/vocabulary'
 import { getDrowHeritageSpellCatalog } from '../../lib/fixtures/grant-display-fixtures'
@@ -78,6 +81,11 @@ describe('SpeciesDetailContent language affinities', () => {
       isPending: false,
       isError: false,
     } as ReturnType<typeof useSenseVocabulary>)
+    vi.mocked(useDamageTypeVocabulary).mockReturnValue({
+      vocabulary: buildSeedDamageTypeVocabulary(),
+      isPending: false,
+      isError: false,
+    } as ReturnType<typeof useDamageTypeVocabulary>)
     useLanguageVocabularyMock.mockReturnValue({
       vocabulary: buildSeedLanguageVocabulary(),
       isPending: false,

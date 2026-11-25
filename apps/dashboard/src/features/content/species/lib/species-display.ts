@@ -42,7 +42,7 @@ export const SPECIES_SECTION_LABELS = { traits: 'Traits' } as const
 export type SpeciesDisplayVocabulary = {
   resolveCreatureTypeLabel: (id: string) => string
   resolveLanguageLabel: (id: string) => string | undefined
-} & Pick<GrantDisplayVocabulary, 'resolveSenseLabel' | 'spellCatalog'>
+} & Pick<GrantDisplayVocabulary, 'resolveDamageTypeLabel' | 'resolveSenseLabel' | 'spellCatalog'>
 
 export type SpeciesDetailItem = {
   id: string
@@ -155,6 +155,7 @@ function toGrantDisplayVocabulary(vocabulary: SpeciesDisplayVocabulary): GrantDi
   return {
     resolveSenseLabel: vocabulary.resolveSenseLabel,
     resolveLanguageLabel: vocabulary.resolveLanguageLabel,
+    resolveDamageTypeLabel: vocabulary.resolveDamageTypeLabel,
     spellCatalog: vocabulary.spellCatalog,
   }
 }
