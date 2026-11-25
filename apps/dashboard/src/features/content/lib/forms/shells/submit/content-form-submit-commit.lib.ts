@@ -32,7 +32,7 @@ export type ContentFormCommitRunInput<TValues extends FieldValues> = {
   producerSlot: FormValidationProducerSlot
   commitValidationIntent: ContentValidationIntent
   prepareCommitValues?: (values: TValues) => TValues
-  prepareWrite?: (values: TValues) => ContentPreparedWrite<unknown>
+  prepareWrite?: (values: TValues, form: UseFormReturn<TValues>) => ContentPreparedWrite<unknown>
   attemptStamp?: number
   invalidPresentation?: ContentFormInvalidPresentation
   ui: Pick<

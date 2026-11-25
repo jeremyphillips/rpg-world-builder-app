@@ -356,6 +356,8 @@ export {
   projectIssuesToFieldErrors,
   projectInvalidEvaluationToForm,
   FORM_RHF_INTEGRATION_STRATEGY,
+  FORM_OWNERSHIP_COMPILE_BUDGET_MS,
+  FORM_VALIDATION_PILOT_REVEAL_BUDGET_MS,
   FORM_VALIDATION_PRODUCER_SLOT_ORDER,
   collectFormValidationSessionIssues,
   createEmptyFormValidationProducerSession,
@@ -384,6 +386,7 @@ export {
   type ResolvedOptionalDisclosureActions,
 } from './config/optional-disclosure-actions.lib'
 export { navigateInvalidSubmit } from './config/navigate-invalid-submit.client'
+export { waitForInvalidSubmitTarget } from './config/wait-for-invalid-submit-target.lib'
 export { navigateTabbedFormInvalidSubmit } from './shells/navigate-tabbed-form-invalid-submit.client'
 export { performInvalidSubmitFocus } from './config/navigate-invalid-submit-focus.lib'
 export {

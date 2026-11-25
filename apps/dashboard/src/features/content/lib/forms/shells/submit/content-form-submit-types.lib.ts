@@ -1,5 +1,5 @@
 import type { ContentValidationIntent } from '@rpg/contracts'
-import type { FieldValues } from 'react-hook-form'
+import type { FieldValues, UseFormReturn } from 'react-hook-form'
 import type { FormItem, FormSubmitHandler, MapFormError } from '@rpg/ui/form'
 
 import type { AnyContentFormDef, ContentFormCtx } from '../../registry/content-form-registry'
@@ -29,7 +29,7 @@ export type UseContentFormSubmitOptions<TValues extends FieldValues> = {
   invalidPresentation?: ContentFormInvalidPresentation
   prepareCommitValues?: (values: TValues) => TValues
   writeSchema?: import('zod').ZodType<unknown>
-  prepareWrite?: (values: TValues) => ContentPreparedWrite<unknown>
+  prepareWrite?: (values: TValues, form: UseFormReturn<TValues>) => ContentPreparedWrite<unknown>
   attemptStamp?: number
   persist: FormSubmitHandler<TValues>
 }

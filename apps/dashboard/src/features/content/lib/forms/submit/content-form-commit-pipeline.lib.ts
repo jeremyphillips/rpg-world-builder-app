@@ -35,7 +35,7 @@ export type ContentFormCommitPipelineOptions<TValues extends FieldValues> = {
   resolverFields: FormItem[]
   producerSlot: FormValidationProducerSlot
   prepareCommitValues?: (values: TValues) => TValues
-  prepareWrite?: (values: TValues) => ContentPreparedWrite<unknown>
+  prepareWrite?: (values: TValues, form: UseFormReturn<TValues>) => ContentPreparedWrite<unknown>
 }
 
 export type ContentFormCommitPipelineSuccess<TValues extends FieldValues> = {
@@ -58,29 +58,32 @@ export type ContentFormCommitPipelineResult<TValues extends FieldValues> =
 function createFormEvaluateStage<TValues extends FieldValues>(
   formSchema: ZodType<TValues>,
   resolverFields: FormItem[],
-): FormActionStage<ContentFormCommitPipelineInput<TValues>, TValues> {
+): FormActionStage<
+  ContentFormCommitPipelineInput<TValues>,
+  ContentFormCommitPipelineInput<TValues>
+> {
   return {
     id: CONTENT_FORM_COMMIT_STAGE_FORM,
     intent: 'form-evaluate',
-    run: ({ values }) => {
-      const issues = normalizeContentFormIssues(formSchema, values, resolverFields)
+    run: (input) => {
+      const issues = normalizeContentFormIssues(formSchema, input.values, resolverFields)
       if (issues) return { kind: 'invalid', issues }
-      return { kind: 'parsed', data: values }
+      return { kind: 'parsed', data: input }
     },
   }
 }
 
 function createPrepareStage<TValues extends FieldValues>(
   prepareCommitValues?: (values: TValues) => TValues,
-  prepareWrite?: (values: TValues) => ContentPreparedWrite<unknown>,
-): FormActionStage<TValues, ContentPreparedWrite<TValues>> {
+  prepareWrite?: (values: TValues, form: UseFormReturn<TValues>) => ContentPreparedWrite<unknown>,
+): FormActionStage<ContentFormCommitPipelineInput<TValues>, ContentPreparedWrite<TValues>> {
   return {
     id: CONTENT_FORM_COMMIT_STAGE_PREPARE,
     intent: 'prepare',
-    run: (values) => {
+    run: ({ values, form }) => {
       const preparedValues = prepareCommitValues?.(values) ?? values
       if (prepareWrite) {
-        const prepared = prepareWrite(preparedValues)
+        const prepared = prepareWrite(preparedValues, form)
         return { kind: 'parsed', data: prepared as ContentPreparedWrite<TValues> }
       }
       return { kind: 'parsed', data: buildIdentityPreparedWrite(preparedValues) }

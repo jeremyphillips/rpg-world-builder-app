@@ -35,6 +35,7 @@ import { type AnyContentFormDef, type ContentFormCtx } from '../../registry/cont
 import { resolveContentPostCreateEditHref } from '../layout/content-form-navigation'
 
 import { serializeContentFormInput } from '../../registry/content-form-serialize-input.lib'
+import { prepareSerializedContentFormWrite } from '../../submit/prepare-serialized-content-form-write.lib'
 import { resolveContentFormSchema } from '../edit/content-edit-load'
 import { intentToStatus } from './content-create-intent'
 import { createWithDeferredCampaignAccess } from '../../../campaign-access/create-with-deferred-campaign-access'
@@ -108,10 +109,16 @@ function ContentCreateFormBody({
     | ((values: Record<string, unknown>) => Record<string, unknown>)
     | undefined
 
-  const createEntity = async (
-    values: Record<string, unknown>,
+  const serializeInputCtx = {
+    weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
+    campaignRules: ctx.campaignRules,
+    equipmentKind: ctx.equipmentKind,
+    armorClassRules: authoringCtx.armorClassRules,
+  }
+
+  const persistCreatedEntity = async (
+    createBody: Record<string, unknown>,
     status: 'draft' | 'published',
-    validationIntent: ContentValidationIntent,
     form?: UseFormReturn<FieldValues>,
   ) => {
     if (
@@ -125,22 +132,11 @@ function ContentCreateFormBody({
       return
     }
 
-    const preparedValues = prepareSubmitValues?.(values) ?? values
-    const inputCtx = {
-      weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
-      campaignRules: ctx.campaignRules,
-      equipmentKind: ctx.equipmentKind,
-      armorClassRules: authoringCtx.armorClassRules,
-    }
     const { entity: created, deferredAccessFailed } = await createWithDeferredCampaignAccess({
       campaignId,
       routeKey: def.routeKey,
       createInput: {
-        ...(serializeContentFormInput(def, preparedValues, inputCtx, validationIntent, {
-          operation: 'create',
-          dirtyFields: form?.formState.dirtyFields as Record<string, unknown> | undefined,
-          rulesetId: ctx.rulesetId,
-        }) as Record<string, unknown>),
+        ...createBody,
         status,
       },
       mutateAsync: (input) => mutation.mutateAsync(input) as Promise<{ id: string }>,
@@ -159,6 +155,27 @@ function ContentCreateFormBody({
     }
   }
 
+  const createEntity = async (
+    values: Record<string, unknown>,
+    status: 'draft' | 'published',
+    validationIntent: ContentValidationIntent,
+    form?: UseFormReturn<FieldValues>,
+  ) => {
+    const preparedValues = prepareSubmitValues?.(values) ?? values
+    const createBody = serializeContentFormInput(
+      def,
+      preparedValues,
+      serializeInputCtx,
+      validationIntent,
+      {
+        operation: 'create',
+        dirtyFields: form?.formState.dirtyFields as Record<string, unknown> | undefined,
+        rulesetId: ctx.rulesetId,
+      },
+    ) as Record<string, unknown>
+    await persistCreatedEntity(createBody, status, form)
+  }
+
   const invalidPresentation = {
     resolverFields: resolveContentFormNavigationFields(def, ctx),
     formId: formKey,
@@ -174,8 +191,19 @@ function ContentCreateFormBody({
     fallbackMessage: `Could not create ${def.routeKey}.`,
     prepareCommitValues,
     invalidPresentation,
-    persist: async (values, form) => {
-      await createEntity(values, intentToStatus('publish'), 'publish', form)
+    prepareWrite: (values, form) =>
+      prepareSerializedContentFormWrite({
+        def,
+        values,
+        form,
+        inputCtx: serializeInputCtx,
+        validationIntent: 'publish',
+        operation: 'create',
+        rulesetId: ctx.rulesetId,
+        prepareFormValues: prepareSubmitValues,
+      }),
+    persist: async (wireInput, form) => {
+      await persistCreatedEntity(wireInput as Record<string, unknown>, 'published', form)
     },
   })
 
