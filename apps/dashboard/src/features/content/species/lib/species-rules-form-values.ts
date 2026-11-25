@@ -11,9 +11,16 @@ import {
   type SpeciesCharacterCreation,
 } from '@rpg/contracts'
 
+import { formatContentReferenceUnavailable } from '../../lib/content-type-labels'
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import type { SpeciesCharacterCreationForm } from './species-rules-form-fields'
+
+/** Species class policies persist class slugs. The visible slice can still label saved drafts. */
+export function resolveSpeciesClassLabel(slug: string, ctx: ContentFormCtx): string {
+  const characterClass = ctx.options?.classes?.visible.find((entry) => entry.slug === slug)
+  return characterClass?.name ?? formatContentReferenceUnavailable('classes')
+}
 
 /** Species character-creation form validation messages (tier 3 form overrides). */
 export const speciesCharacterCreationFormValidationMessages = {

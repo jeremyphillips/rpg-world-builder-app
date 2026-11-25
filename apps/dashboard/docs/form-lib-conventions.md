@@ -499,6 +499,13 @@ and omit their labels. Published grant-trait prose and character builder choice
 sets classify grant kinds at their own boundaries. Feat-choice rows share one
 draft category and count parser across write conversion, row details, and prose.
 
+### Catalog reference labels
+
+Class skill facts and species class policies resolve persisted slugs against the
+scoped catalog. The species display can label an existing draft from the
+visible catalog even when the picker excludes it. Missing references use
+explicit unavailable copy.
+
 ### `ContentFormDef.preview`
 
 Optional. When present, create/edit shells switch to `PageShell width="wide"` and an `xl` persistent PreviewRail (sheet + compact **Preview** trigger below that). Register `buildIdentity` and `buildSections` keyed so `buildSections` keys **exactly equal** `buildTabs` ids (`null` = explicit opt-out). Optional `PreviewResources` resolves async/domain data for `buildSections` (class: `ClassPreviewResourcesProvider` in `class-preview-resources.tsx`). Optional `renderPlayerPreview` supplies the player-facing modal — omit until the type has a player surface. Shared copy comes from `CONTENT_TYPE_TERMS`. Publish readiness uses `resolveContentPublishSchema` (the same helper as the Publish action). Class is the reference implementation (`class-preview-projection.ts`); types without `preview` keep `PageShell width="narrow"`.

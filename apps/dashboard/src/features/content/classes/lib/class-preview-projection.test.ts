@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import { pickSkillProficiency } from '../../lib/fixtures/pick'
+
 import { classCreateDefaultValues } from './class-form-values'
 import { classFormDef, type ClassFormValues } from './class-form-def'
 import {
@@ -101,6 +103,28 @@ describe('class preview projection', () => {
     const sections = buildClassPreviewSections(createValues(), emptyCtx)
     expect(resolveContentPreviewSectionPresentation(sections.basics!, false, false)).toEqual({
       marker: 'incomplete',
+    })
+  })
+
+  it.each([
+    ['ready', 'Athletics for This Campaign, Skill proficiency reference unavailable'],
+    ['pending', 'Loading skill proficiencies…'],
+    ['error', 'Could not load skill proficiencies.'],
+  ] as const)('uses scoped skill labels and %s catalog state', (skillCatalogStatus, value) => {
+    const athletics = { ...pickSkillProficiency('athletics'), name: 'Athletics for This Campaign' }
+    const sections = buildClassPreviewSections(
+      createValues({
+        proficiencies: {
+          ...classCreateDefaultValues.proficiencies!,
+          skills: { items: [athletics.slug, 'missing-skill'] },
+        },
+      }),
+      { skillCatalogStatus, skillCatalogBySlug: new Map([[athletics.slug, athletics]]) },
+    )
+
+    expect(sections.proficiencies?.facts).toContainEqual({
+      label: CLASS_PREVIEW_FACT_LABELS.skills,
+      value,
     })
   })
 

@@ -16,6 +16,7 @@ export {
 export { monsterArmorClassUnavailableCopy } from './monsters/lib/statistics/monster-armor-class-presentation'
 export {
   formatAddContentTypeLabel,
+  formatContentReferenceUnavailable,
   formatContentCollectionAvailabilityCaption,
   formatContentCreateHeading,
   formatContentListLoadErrorMessage,

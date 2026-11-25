@@ -1,6 +1,5 @@
 import { createElement } from 'react'
 import {
-  getSkillName,
   getSlotProgressionKindEntry,
   resolveSlotProgressionForClass,
   type CharacterBuildCatalog,
@@ -12,6 +11,7 @@ import {
   buildClassCardViewModel,
   buildClassDetailViewModel,
   CLASS_SECTION_LABELS,
+  formatContentReferenceUnavailable,
   FacingDetailBody,
 } from '@/features/content'
 import { getContentTypeItemLabel } from '@/features/content'
@@ -39,7 +39,8 @@ function buildBuilderClassVocabulary(
 
   return {
     resolveSkillLabel: (slug) =>
-      catalog.skillProficiencies.find((skill) => skill.slug === slug)?.name ?? getSkillName(slug),
+      catalog.skillProficiencies.find((skill) => skill.slug === slug)?.name ??
+      formatContentReferenceUnavailable('skill-proficiencies'),
     resolveToolLabel: (slug) => equipmentBySlug.get(slug) ?? formatSlugLabel(slug),
   }
 }

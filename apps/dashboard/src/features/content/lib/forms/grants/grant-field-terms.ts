@@ -9,10 +9,9 @@ import {
   MOVEMENT_MODE_TERM,
   MOVEMENT_OPERATION_TERM,
   SENSE_TERM,
+  vocabularyTermFieldCopy,
   type VocabularyTerm,
 } from '@rpg/contracts'
-
-import { vocabularyFieldLabel } from '@/features/vocabulary'
 
 /** Plain skill noun for grant selection validation (not "skill proficiency"). */
 export const GRANT_SKILL_SELECTION_TERM = {
@@ -52,7 +51,7 @@ export function grantFieldLabel(key: GrantFieldTermKey, options?: { plural?: boo
   if (key === 'armorTrainingSlugs') {
     return 'Armor'
   }
-  return vocabularyFieldLabel(term, options)
+  return vocabularyTermFieldCopy(term, { multiple: options?.plural }).label
 }
 
 /** Tier-1 required single-select message from a grant term. */

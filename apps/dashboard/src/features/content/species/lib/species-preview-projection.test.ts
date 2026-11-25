@@ -1,8 +1,8 @@
-import { SPELL_REFERENCE_DISPLAY_MESSAGES } from '@rpg/contracts'
+import { buildContentPurposeSelectors, SPELL_REFERENCE_DISPLAY_MESSAGES } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import { buildCatalogDrowGrantDisplayVocabulary } from '../../lib/fixtures/grant-display-fixtures'
-import { pickSpecies } from '../../lib/fixtures/pick'
+import { pickClass, pickSpecies } from '../../lib/fixtures/pick'
 
 import { speciesFormDef } from './species-form-def'
 import type { SpeciesFormValues } from './species-form-fields'
@@ -120,6 +120,26 @@ describe('species preview projection', () => {
       status: '1',
     })
     expect(sections.traits?.facts?.[0]?.value).toBe('Darkvision')
+  })
+
+  it('resolves class policy slugs from the visible catalog, including saved drafts', () => {
+    const wizard = { ...pickClass('wizard'), name: 'Campaign Wizard', status: 'draft' as const }
+    const sections = buildSpeciesPreviewSections(
+      createValues({
+        characterCreation: {
+          multiclassing: {
+            policy: 'restricted',
+            classPolicy: { mode: 'only', classIds: [wizard.slug, 'missing-class'] },
+          },
+        },
+      }),
+      { options: { classes: buildContentPurposeSelectors([wizard]) } },
+    )
+
+    expect(sections.rules?.facts).toContainEqual({
+      label: SPECIES_PREVIEW_FACT_LABELS.classPolicyClasses,
+      value: 'Campaign Wizard, Class reference unavailable',
+    })
   })
 
   it('uses the authoring spell catalog lifecycle in the Drow detail preview', () => {

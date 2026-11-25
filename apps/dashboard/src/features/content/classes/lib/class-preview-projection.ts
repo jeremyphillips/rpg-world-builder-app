@@ -9,6 +9,11 @@ import {
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import { formatPreviewRailOverflowList, type PreviewRailFact } from '@rpg/ui'
 
+import {
+  formatContentListLoadErrorMessage,
+  formatContentReferenceUnavailable,
+  getContentTypeMidSentenceLabel,
+} from '../../lib/content-type-labels'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { isMeaningfulCharacterCreationToolChoice } from './character-creation/class-character-creation-proficiencies-form-values'
 import {
@@ -113,11 +118,20 @@ function formatSlugLabel(slug: string): string {
     .join(' ')
 }
 
-function skillLabel(slug: string, ctx: ContentFormCtx): string {
-  const match = ctx.options?.skills?.visible.find(
-    (skill) => skill.id === slug || skill.slug === slug,
-  )
-  return match?.name ?? formatSlugLabel(slug)
+function classPreviewSkillLabels(slugs: readonly string[], ctx: ContentFormCtx): string[] {
+  if (!slugs.length) return []
+  if (ctx.skillCatalogStatus === 'pending') {
+    return [`Loading ${getContentTypeMidSentenceLabel('skill-proficiencies', { plural: true })}…`]
+  }
+  if (ctx.skillCatalogStatus === 'error') {
+    return [formatContentListLoadErrorMessage('skill-proficiencies')]
+  }
+  return slugs.map((slug) => {
+    const skill = ctx.skillCatalogBySlug
+      ? ctx.skillCatalogBySlug.get(slug)
+      : ctx.options?.skills?.visible.find((entry) => entry.slug === slug)
+    return skill?.name ?? formatContentReferenceUnavailable('skill-proficiencies')
+  })
 }
 
 function appendFact(facts: PreviewRailFact[], label: string, items: readonly string[]): void {
@@ -201,7 +215,7 @@ function buildProficienciesSection(
   appendFact(
     facts,
     CLASS_PREVIEW_FACT_LABELS.skills,
-    (proficiencies?.skills.items ?? []).map((slug) => skillLabel(slug, ctx)),
+    classPreviewSkillLabels(proficiencies?.skills.items ?? [], ctx),
   )
 
   return {
@@ -333,7 +347,7 @@ function buildCharacterCreationFacts(
       skillFrom.length > 0
         ? joinInlineMetadata([
             `Choose ${skillChoose}`,
-            formatPreviewRailOverflowList(skillFrom.map((slug) => skillLabel(slug, ctx))),
+            formatPreviewRailOverflowList(classPreviewSkillLabels(skillFrom, ctx)),
           ])
         : CONTENT_PREVIEW_NOT_SET,
   })

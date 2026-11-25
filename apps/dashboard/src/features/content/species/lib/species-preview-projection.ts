@@ -44,6 +44,7 @@ import {
 import {
   mergeLevelLimitsFormDefaults,
   mergeMulticlassingFormDefaults,
+  resolveSpeciesClassLabel,
 } from './species-rules-form-values'
 import { traitRowNameForIdAssignment, traitsFromFormValues } from './species-trait-form-values'
 import { speciesCreateDefaultValues } from './species-form-values'
@@ -84,13 +85,6 @@ function htmlToPreviewSnippet(html: string | undefined): string | undefined {
 function speciesPreviewName(values: SpeciesFormValues): string {
   const trimmed = values.name?.trim()
   return trimmed ? trimmed : contentPreviewUnnamedName(SPECIES_CONTENT_TYPE_TERM)
-}
-
-function formatClassLabel(classId: string, ctx: ContentFormCtx): string {
-  const match = ctx.options?.classes?.visible.find(
-    (cls) => cls.id === classId || cls.slug === classId,
-  )
-  return match?.name ?? classId
 }
 
 function speciesPreviewVocabulary(ctx: ContentFormCtx): SpeciesDisplayVocabulary {
@@ -239,7 +233,7 @@ function buildRulesFacts(values: SpeciesFormValues, ctx: ContentFormCtx): Previe
   })
 
   if (SPECIES_CLASS_POLICY_MODES_REQUIRING_IDS.includes(classPolicy.mode)) {
-    const classLabels = (classPolicy.classIds ?? []).map((id) => formatClassLabel(id, ctx))
+    const classLabels = (classPolicy.classIds ?? []).map((id) => resolveSpeciesClassLabel(id, ctx))
     facts.push({
       label: SPECIES_PREVIEW_FACT_LABELS.classPolicyClasses,
       value:
