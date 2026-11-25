@@ -1,10 +1,16 @@
-import { reincarnateSpeciesTableFixture, type FacingBlock } from '@rpg/contracts'
+import {
+  reincarnateSpeciesTableFixture,
+  DEFAULT_SYSTEM_RULESET_ID,
+  systemDefaultArmorClassRules,
+  type FacingBlock,
+} from '@rpg/contracts'
 import { render, screen } from '@testing-library/react'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { describe, expect, expectTypeOf, it } from 'vitest'
+import { describe, expect, expectTypeOf, it, vi } from 'vitest'
 
 import { srdSpellcastingProgressionFixture } from '../classes/lib/fixtures/spellcasting-progression-fixture'
 import type { facingBlockRenderers } from './facing-block-renderers'
+import { facingReasonMessage } from './facing-reason-message'
 import { FacingDetailBody } from './facing-detail-body'
 import { StructuredFacingHostPanel } from './structured-facing-host-panel'
 
@@ -69,5 +75,72 @@ describe('dashboard facing tables', () => {
         />,
       ),
     ).toThrow('Unsupported facing block')
+  })
+})
+
+describe('structured preview guidance', () => {
+  it('announces a resolver failure once with sanitized guidance', async () => {
+    const normalization = await import('../monsters/lib/normalize-monster-form-values')
+    const internalMessage = 'private preview normalization failure'
+    using normalize = vi
+      .spyOn(normalization, 'normalizeMonsterDraftForPreview')
+      .mockImplementationOnce(() => {
+        throw new Error(internalMessage)
+      })
+    using logger = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    render(
+      <StructuredFacingHostPanel
+        facing={{
+          domain: 'monsterAction',
+          source: 'draft',
+          values: {} as never,
+          ctx: {
+            rulesetId: DEFAULT_SYSTEM_RULESET_ID,
+            armorClassRules: systemDefaultArmorClassRules(),
+            equipmentCatalogStatus: 'ready',
+            spellCatalogStatus: 'ready',
+          },
+          actionId: 'bite',
+          section: 'actions',
+        }}
+      />,
+    )
+
+    expect(normalize).toHaveBeenCalledOnce()
+    expect(logger).toHaveBeenCalledOnce()
+    const [announcement] = screen.getAllByRole('status')
+    expect(screen.getAllByRole('status')).toHaveLength(1)
+    expect(announcement).toHaveTextContent(facingReasonMessage({ code: 'unexpected' }))
+    expect(screen.queryByText(internalMessage)).not.toBeInTheDocument()
+  })
+
+  it('keeps authored draft prose visible alongside incomplete guidance', () => {
+    render(
+      <StructuredFacingHostPanel
+        facing={{
+          domain: 'classFeature',
+          source: 'draft',
+          row: {
+            kind: 'spellcasting',
+            id: 'spellcasting',
+            name: 'Spellcasting',
+            level: 1,
+            intro: '<p>Authored spellcasting introduction.</p>',
+          },
+          host: {
+            className: 'Example',
+            rulesetId: DEFAULT_SYSTEM_RULESET_ID,
+            spellcastingProgression: srdSpellcastingProgressionFixture(),
+          },
+        }}
+      />,
+    )
+
+    expect(screen.getByText('Authored spellcasting introduction.')).toBeInTheDocument()
+    expect(
+      screen.getByText(facingReasonMessage({ code: 'incomplete-spellcasting' })),
+    ).toBeInTheDocument()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
 })
