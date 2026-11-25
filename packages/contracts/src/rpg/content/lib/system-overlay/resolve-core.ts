@@ -71,7 +71,8 @@ function policyForUnionRow(
   return undefined
 }
 
-function rowPolicyForRecord(
+/** Resolve policy for a concrete row when the schema root (or row) is a discriminated union. */
+export function overlayPolicyForRow(
   row: Record<string, unknown>,
   policy: OverlayPolicyNode,
 ): OverlayPolicyNode | undefined {
@@ -147,7 +148,7 @@ function mergeSeedOverrideRow(
   if (!collections) {
     return { ok: true, result: { value: row, diagnostics: EMPTY_DIAGNOSTICS } }
   }
-  const activePolicy = rowPolicyForRecord(row, rowPolicy)
+  const activePolicy = overlayPolicyForRow(row, rowPolicy)
   if (!activePolicy || activePolicy.kind !== 'deep') {
     return {
       ok: false,
@@ -429,10 +430,18 @@ export function resolveWithPolicy(
   overlay: StoredOverlay | null,
   policy: OverlayPolicyNode,
 ): ResolveResult {
-  if (policy.kind !== 'deep') {
+  const activePolicy = overlayPolicyForRow(seed, policy)
+  if (!activePolicy || activePolicy.kind !== 'deep') {
     return {
       ok: false,
-      failure: { code: 'overlay-validation', issues: ['Root overlay policy must be deep'] },
+      failure: {
+        code: 'overlay-validation',
+        issues: [
+          activePolicy
+            ? 'Root overlay policy must be deep'
+            : 'No overlay union branch matches seed row',
+        ],
+      },
     }
   }
   const slice: ObjectOverlaySlice | undefined = overlay
@@ -443,7 +452,7 @@ export function resolveWithPolicy(
         collections: overlay.collections,
       }
     : undefined
-  return resolveDeepObject(seed, slice, policy, '')
+  return resolveDeepObject(seed, slice, activePolicy, '')
 }
 
 export function resolveSeedOverrideIntent(
@@ -566,11 +575,12 @@ export function normalizeScalarSet(
   overlay: StoredOverlay,
   policy: OverlayPolicyNode,
 ): StoredOverlay {
-  if (policy.kind !== 'deep' || !overlay.set) return overlay
+  const activePolicy = overlayPolicyForRow(seed, policy) ?? policy
+  if (activePolicy.kind !== 'deep' || !overlay.set) return overlay
   const nextSet: Record<string, unknown> = { ...overlay.set }
   const restore = new Set(overlay.restore ?? [])
   for (const key of Object.keys(nextSet)) {
-    const node = policy.fields[key]
+    const node = activePolicy.fields[key]
     if (!node) continue
     if (node.kind !== 'scalar' && node.kind !== 'atomic' && node.kind !== 'value-list') continue
     if (overlayValueEqual(nextSet[key], seed[key])) {

@@ -6,15 +6,12 @@ import {
   overlayRestoreIdRows,
   overlaySlugList,
 } from '../lib/system-overlay/overlay-presets'
+import { mergeSystemOverlayUpdateEnvelope } from '../lib/system-overlay/system-overlay-update'
 import { abilitySchema } from '../../vocab/ability'
 import { hitDieSchema } from '../../primitives/dice'
 import { absoluteLevelSchema } from '../../primitives/level'
-import {
-  contentBodyBaseSchema,
-  contentMetaSchema,
-  contentPatchBaseSchema,
-  slugSchema,
-} from '../lib/envelope'
+import { contentBodyBaseSchema, contentMetaSchema, slugSchema } from '../lib/envelope'
+import { contentStoredOverlayPatchSchema } from '../lib/system-overlay/patch-document'
 import {
   mediaBearingAuthoredContentBodySchema,
   mediaBearingDraftAuthoredContentBodySchema,
@@ -382,21 +379,21 @@ export type CreateClassInput = z.infer<typeof createClassInputBaseSchema>
 export const createClassDraftInputSchema = createDraftInputSchema(classBodyDraftSchema)
 export type CreateClassDraftInput = z.infer<typeof createClassDraftInputSchema>
 
-export const updateClassInputSchema = createClassInputBaseSchema.partial()
+export const updateClassInputSchema = mergeSystemOverlayUpdateEnvelope(
+  createClassInputBaseSchema.partial(),
+)
 export type UpdateClassInput = z.infer<typeof updateClassInputSchema>
 
-export const updateClassDraftInputSchema = createClassDraftInputSchema.partial()
+export const updateClassDraftInputSchema = mergeSystemOverlayUpdateEnvelope(
+  createClassDraftInputSchema.partial(),
+)
 export type UpdateClassDraftInput = z.infer<typeof updateClassDraftInputSchema>
 
 /**
  * System-patch overlay. Reuses the generic envelope; only the type-specific
- * `patch` body differs. `.partial()` is shallow (Zod v4 has no `deepPartial`);
- * the read-time merge does the deep-merge, replacing arrays wholesale (see the
- * Deferred block).
+ * Versioned stored overlay (`StoredOverlay`) reconciled at write and applied at read.
  */
-export const classPatchSchema = contentPatchBaseSchema.extend({
-  patch: classStoredBodyBaseSchema.partial(),
-})
+export const classPatchSchema = contentStoredOverlayPatchSchema
 export type ClassPatch = z.infer<typeof classPatchSchema>
 
 // ---------------------------------------------------------------------------
@@ -432,18 +429,12 @@ export type ResolvedSubclass = z.infer<typeof resolvedSubclassSchema>
 export const createSubclassInputSchema = subclassBodySchema.extend({ slug: slugSchema })
 export type CreateSubclassInput = z.infer<typeof createSubclassInputSchema>
 
-export const updateSubclassInputSchema = subclassPatchableBodySchema
-  .extend({ slug: slugSchema })
-  .partial()
+export const updateSubclassInputSchema = mergeSystemOverlayUpdateEnvelope(
+  subclassPatchableBodySchema.extend({ slug: slugSchema }).partial(),
+)
 export type UpdateSubclassInput = z.infer<typeof updateSubclassInputSchema>
 
-/**
- * System-patch overlay for subclass body fields. Deep-merge semantics match
- * `classPatchSchema` — arrays replace wholesale at read time.
- */
-export const subclassPatchSchema = contentPatchBaseSchema.extend({
-  patch: subclassPatchableBodySchema.partial(),
-})
+export const subclassPatchSchema = contentStoredOverlayPatchSchema
 export type SubclassPatch = z.infer<typeof subclassPatchSchema>
 
 /** Opaque class slug — resolve display names from resolved catalog `name` at read/UI time. */

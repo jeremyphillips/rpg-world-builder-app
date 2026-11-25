@@ -54,4 +54,24 @@ export const subclassFormDef = {
       },
       ctx,
     ) as CreateSubclassInput,
+
+  normalizeOverlayBody: (
+    values: SubclassFormValues,
+    classId: string,
+    ctx?: ContentFormInputCtx<Subclass>,
+  ) => {
+    const input = finalizeContentInput(
+      {
+        ...envelopeSlugFields(values.name, ctx),
+        classId,
+        name: values.name,
+        tagline: values.tagline || undefined,
+        description: values.description || undefined,
+        features: subclassFeaturesFromFormValues(values.features, ctx?.entity?.features),
+      },
+      ctx,
+    ) as Record<string, unknown>
+    const { slug: _slug, classId: _classId, ...body } = input
+    return body
+  },
 }

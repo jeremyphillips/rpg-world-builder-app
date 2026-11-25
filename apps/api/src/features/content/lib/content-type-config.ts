@@ -1,4 +1,4 @@
-import type { SystemRulesetId } from '@rpg/contracts'
+import type { SystemOverlayParticipantId, SystemRulesetId } from '@rpg/contracts'
 
 import type { OverlayPatch } from './resolve-catalog'
 
@@ -25,11 +25,8 @@ export interface ContentTypeConfig<T extends { id: string } = { id: string }> {
   loadHomebrew: (campaignId: string, rulesetId: SystemRulesetId) => Promise<T[]>
   /** Patch keys replaced at the top level during overlay merge (not deep-merged). */
   patchReplaceKeys?: readonly string[]
-  /**
-   * Id-keyed arrays whose seed-origin rows are restored on read and on an
-   * explicit system-patch replacement. Omitted for every type except monsters.
-   */
-  patchStickyArrayKeys?: readonly string[]
+  /** Mandatory when `system.loadPatches` is set — drives versioned overlay apply/reconcile. */
+  overlayParticipantId?: SystemOverlayParticipantId
 }
 
 /** System records for a type, or an empty catalog when the type has no bundled content. */

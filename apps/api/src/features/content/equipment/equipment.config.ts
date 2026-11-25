@@ -58,6 +58,7 @@ function bodyFromCreateInput(input: Record<string, unknown>): Record<string, unk
 export const equipmentContentConfig: ContentTypeConfig<Equipment> = {
   type: 'equipment',
   patchReplaceKeys: [CONTENT_MEDIA_REPLACE_KEY],
+  overlayParticipantId: 'equipment',
   system: {
     load: loadSeedEquipment,
     slugs: seedEquipmentSlugs,

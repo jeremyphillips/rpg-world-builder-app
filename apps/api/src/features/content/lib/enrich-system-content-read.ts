@@ -13,6 +13,7 @@ const RESPONSE_TYPE_TO_PARTICIPANT: Partial<Record<string, PatchModelParticipant
   monsters: 'monsters',
   species: 'species',
   classes: 'classes',
+  subclasses: 'subclasses',
   spells: 'spells',
   equipment: 'equipment',
   feats: 'feats',

@@ -34,6 +34,13 @@ const spellFormDef: ContentFormDef<Spell, SpellFormValues, CreateSpellInput> & {
   toFormValues: spellToFormValues,
   toInput: (values, ctx, validationIntent = 'publish') =>
     buildSpellCreateInput(values, ctx, validationIntent),
+  normalizeOverlayBody: (values, ctx, validationIntent = 'publish') => {
+    const { slug: _slug, ...body } = buildSpellCreateInput(values, ctx, validationIntent) as Record<
+      string,
+      unknown
+    >
+    return body
+  },
   useListQuery: useSpells,
   queryKey: spellsQueryKey,
 

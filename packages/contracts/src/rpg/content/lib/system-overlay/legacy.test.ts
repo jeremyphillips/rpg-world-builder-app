@@ -97,6 +97,45 @@ describe('overlay legacy gates', () => {
     expect(parsed.failure.code).toBe('overlay-validation')
   })
 
+  it('strips nested null leaves on identity overrides', () => {
+    const parsed = parseStoredOverlayInput({
+      version: 1,
+      revision: 1,
+      collections: {
+        traits: {
+          kind: 'identity',
+          overrides: [
+            {
+              origin: 'seed',
+              id: 'a',
+              set: { name: 'x' },
+              clear: null,
+              restore: null,
+              collections: null,
+            },
+          ],
+          additions: [],
+          removedIds: [],
+        },
+      },
+    })
+    expect(parsed.ok).toBe(true)
+  })
+
+  it('treats null optional envelope fields as absent (mongoose wire shape)', () => {
+    const parsed = parseStoredOverlayInput({
+      version: 1,
+      revision: 1,
+      set: { name: 'Patched' },
+      restore: null,
+      collections: null,
+    })
+    expect(parsed).toEqual({
+      ok: true,
+      overlay: { version: 1, revision: 1, set: { name: 'Patched' } },
+    })
+  })
+
   it('delete and restore policies diverge on removed seed ids', () => {
     const restorePolicy = policyFor(restoreFixtureSchema)
     const deletePolicy = policyFor(deleteFixtureSchema)

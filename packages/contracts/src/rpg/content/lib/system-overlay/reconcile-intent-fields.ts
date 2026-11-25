@@ -1,6 +1,6 @@
 import type { ObjectDelta } from './intent'
 import type { OverlayPolicyNode } from './policy'
-import type { ResolveFailure } from './resolve-core'
+import { overlayPolicyForRow, type ResolveFailure } from './resolve-core'
 import type { StoredCollection, StoredOverlay } from './stored'
 import { overlayValueEqual } from './value-equal'
 
@@ -86,10 +86,11 @@ export function applyIntentSetFields(
   intent: ObjectDelta,
   policy: OverlayPolicyNode,
 ): OverlayDraft {
-  if (policy.kind !== 'deep') return draft
+  const activePolicy = overlayPolicyForRow(seed, policy) ?? policy
+  if (activePolicy.kind !== 'deep') return draft
   let current = draft
   for (const [key, value] of Object.entries(intent.set ?? {})) {
-    const node = policy.fields[key]
+    const node = activePolicy.fields[key]
     if (!node) continue
     if (node.kind === 'scalar' || node.kind === 'atomic' || node.kind === 'value-list') {
       current = applyIntentScalarSet(current, seed, key, value, node)
@@ -122,11 +123,11 @@ export function applyIntentClearFields(
   intent: ObjectDelta,
   policy: OverlayPolicyNode,
 ): { draft: OverlayDraft; failure?: ResolveFailure } {
-  void seed
-  if (policy.kind !== 'deep') return { draft }
+  const activePolicy = overlayPolicyForRow(seed, policy) ?? policy
+  if (activePolicy.kind !== 'deep') return { draft }
   let { overlay, set } = draft
   for (const key of intent.clear ?? []) {
-    const node = policy.fields[key]
+    const node = activePolicy.fields[key]
     if (node?.presence === 'required') {
       return {
         draft,

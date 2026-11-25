@@ -68,6 +68,7 @@ function prepareHomebrewUpdate(
 export const classContentConfig: ContentTypeConfig<CharacterClass> = {
   type: 'classes',
   patchReplaceKeys: [CONTENT_MEDIA_REPLACE_KEY],
+  overlayParticipantId: 'classes',
   system: {
     load: (rulesetId) => loadSeedClassesStored(rulesetId) as CharacterClass[],
     slugs: seedClassSlugs,

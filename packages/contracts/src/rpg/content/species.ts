@@ -1,7 +1,9 @@
 import { z } from 'zod'
 
 import { overlayRestoreIdRows, overlaySlugList } from './lib/system-overlay/overlay-presets'
-import { contentMetaSchema, contentPatchBaseSchema, slugSchema } from './lib/envelope'
+import { mergeSystemOverlayUpdateEnvelope } from './lib/system-overlay/system-overlay-update'
+import { contentMetaSchema, slugSchema } from './lib/envelope'
+import { contentStoredOverlayPatchSchema } from './lib/system-overlay/patch-document'
 import {
   mediaBearingAuthoredContentBodySchema,
   mediaBearingDraftAuthoredContentBodySchema,
@@ -143,23 +145,20 @@ export type CreateSpeciesInput = z.infer<typeof createSpeciesInputSchema>
 export const createSpeciesDraftInputSchema = createDraftInputSchema(speciesBodyDraftSchema)
 export type CreateSpeciesDraftInput = z.infer<typeof createSpeciesDraftInputSchema>
 
-export const updateSpeciesInputSchema = speciesBodySchema
-  .partial()
-  .extend({ slug: slugSchema.optional() })
-  .superRefine((input, ctx) => {
-    if (input.traits) refineSpeciesTraits(input.traits, ctx)
-  })
+export const updateSpeciesInputSchema = mergeSystemOverlayUpdateEnvelope(
+  speciesBodySchema
+    .partial()
+    .extend({ slug: slugSchema.optional() })
+    .superRefine((input, ctx) => {
+      if (input.traits) refineSpeciesTraits(input.traits, ctx)
+    }),
+)
 export type UpdateSpeciesInput = z.infer<typeof updateSpeciesInputSchema>
 
-export const updateSpeciesDraftInputSchema = createSpeciesDraftInputSchema.partial()
+export const updateSpeciesDraftInputSchema = mergeSystemOverlayUpdateEnvelope(
+  createSpeciesDraftInputSchema.partial(),
+)
 export type UpdateSpeciesDraftInput = z.infer<typeof updateSpeciesDraftInputSchema>
 
-/**
- * System-patch overlay. Reuses the generic envelope; only the type-specific
- * `patch` body differs. `.partial()` is shallow; the read-time merge handles
- * deep-merging (arrays replaced wholesale).
- */
-export const speciesPatchSchema = contentPatchBaseSchema.extend({
-  patch: speciesBodySchema.partial(),
-})
+export const speciesPatchSchema = contentStoredOverlayPatchSchema
 export type SpeciesPatch = z.infer<typeof speciesPatchSchema>

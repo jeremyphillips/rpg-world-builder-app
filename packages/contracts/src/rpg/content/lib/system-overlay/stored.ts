@@ -150,3 +150,46 @@ export const storedOverlaySchema = z
 export function parseStoredOverlay(input: unknown): StoredOverlay {
   return storedOverlaySchema.parse(input)
 }
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+/** Remove null leaves after BSON/Mongoose round-trips (top-level and nested). */
+export function stripOverlayNullLeaves(value: unknown): unknown {
+  if (value === null) return undefined
+  if (Array.isArray(value)) return value.map((entry) => stripOverlayNullLeaves(entry))
+  if (!isPlainObject(value)) return value
+  const result: Record<string, unknown> = {}
+  for (const [key, entry] of Object.entries(value)) {
+    const stripped = stripOverlayNullLeaves(entry)
+    if (stripped !== undefined) result[key] = stripped
+  }
+  return result
+}
+
+/** Drop empty optional envelope fields so Mongoose/BSON does not persist null leaves. */
+export function pruneStoredOverlayForWire(overlay: StoredOverlay): StoredOverlay {
+  const cleaned = stripOverlayNullLeaves(overlay) as StoredOverlay
+  const next: StoredOverlay = { version: cleaned.version, revision: cleaned.revision }
+  if (cleaned.set && Object.keys(cleaned.set).length > 0) {
+    next.set = cleaned.set
+  }
+  if ((cleaned.clear?.length ?? 0) > 0) {
+    next.clear = cleaned.clear
+  }
+  if ((cleaned.restore?.length ?? 0) > 0) {
+    next.restore = cleaned.restore
+  }
+  if (cleaned.collections && Object.keys(cleaned.collections).length > 0) {
+    next.collections = cleaned.collections
+  }
+  return next
+}
+
+/** Coerce null optional overlay envelope fields to absent before schema validation. */
+export function normalizeStoredOverlayWireInput(input: unknown): unknown {
+  if (input === null || input === undefined) return input
+  if (typeof input !== 'object' || Array.isArray(input)) return input
+  return stripOverlayNullLeaves(input)
+}

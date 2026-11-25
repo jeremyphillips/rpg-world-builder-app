@@ -96,6 +96,7 @@ function ClassSubclassesTabBody({
     campaignId,
     classId,
     editor,
+    rulesetId: formCtx.rulesetId,
   })
   const [switchTargetId, setSwitchTargetId] = useState<string | null>(null)
   const [accessOverrides, setAccessOverrides] = useState<Record<string, boolean>>({})

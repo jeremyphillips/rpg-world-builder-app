@@ -56,8 +56,12 @@ export {
   overlaySlugList,
 } from './overlay-presets'
 export { collectSchemaCollections, describeOverlaySchema, type SchemaFact } from './schema-tree'
+export { contentStoredOverlayPatchSchema, type ContentStoredOverlayPatch } from './patch-document'
 export {
+  normalizeStoredOverlayWireInput,
   parseStoredOverlay,
+  pruneStoredOverlayForWire,
+  stripOverlayNullLeaves,
   storedOverlaySchema,
   type HomebrewAddition,
   type LegacyHold,

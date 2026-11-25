@@ -2,12 +2,14 @@ import { z } from 'zod'
 import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
 
 import { overlayDeleteIdRows } from './lib/system-overlay/overlay-presets'
+import { mergeSystemOverlayUpdateEnvelope } from './lib/system-overlay/system-overlay-update'
 
 import { featCategorySchema } from '../vocab/feat'
 import { FEAT_CONTENT_TYPE_TERM } from './lib/content-type-terms'
 import { createDraftInputSchema, createPublishInputSchema } from './lib/content-input-schemas'
 import { draftAuthoredContentBodySchema } from './lib/draft-authored-content'
-import { contentBodyBaseSchema, contentMetaSchema, contentPatchBaseSchema } from './lib/envelope'
+import { contentBodyBaseSchema, contentMetaSchema } from './lib/envelope'
+import { contentStoredOverlayPatchSchema } from './lib/system-overlay/patch-document'
 import { requirementExpressionSchema } from './lib/requirement-expression'
 import { featValidationMessages } from './feat-messages'
 
@@ -83,13 +85,15 @@ export type CreateFeatInput = z.infer<typeof createFeatInputSchema>
 export const createFeatDraftInputSchema = createDraftInputSchema(featBodyDraftSchema)
 export type CreateFeatDraftInput = z.infer<typeof createFeatDraftInputSchema>
 
-export const updateFeatInputSchema = createFeatInputSchema.partial()
+export const updateFeatInputSchema = mergeSystemOverlayUpdateEnvelope(
+  createFeatInputSchema.partial(),
+)
 export type UpdateFeatInput = z.infer<typeof updateFeatInputSchema>
 
-export const updateFeatDraftInputSchema = createFeatDraftInputSchema.partial()
+export const updateFeatDraftInputSchema = mergeSystemOverlayUpdateEnvelope(
+  createFeatDraftInputSchema.partial(),
+)
 export type UpdateFeatDraftInput = z.infer<typeof updateFeatDraftInputSchema>
 
-export const featPatchSchema = contentPatchBaseSchema.extend({
-  patch: featBodySchema.partial(),
-})
+export const featPatchSchema = contentStoredOverlayPatchSchema
 export type FeatPatch = z.infer<typeof featPatchSchema>

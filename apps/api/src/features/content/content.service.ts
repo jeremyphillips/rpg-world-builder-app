@@ -30,9 +30,8 @@ export async function resolveCatalogForCampaign<T extends { id: string }>(
 
   const contentTypeKey = contentTypeKeySchema.safeParse(config.type).data
   const resolved = resolveCatalog(systemSeed, patches, homebrew, {
-    replaceKeys: config.patchReplaceKeys,
     ...(contentTypeKey ? { contentTypeKey } : {}),
-    ...(config.patchStickyArrayKeys ? { stickyArrayKeys: config.patchStickyArrayKeys } : {}),
+    overlayParticipantId: config.overlayParticipantId,
   })
   const seedById = new Map(
     systemSeed.map((record) => [record.id, record as unknown as Record<string, unknown>]),

@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import { loadSeedFeats } from '@rpg/catalog/feats'
+
 import { resolveCatalog } from './resolve-catalog'
 
 interface Record_ {
@@ -21,11 +23,42 @@ describe('resolveCatalog', () => {
     expect(resolveCatalog(system, [], [])).toEqual(publishedSystem)
   })
 
-  it('deep-merges an overlay patch onto its target by id', () => {
-    const result = resolveCatalog(system, [{ targetId: 'sys:b', patch: { hitDie: 12 } }], [])
-    expect(result.find((r) => r.id === 'sys:b')?.hitDie).toBe(12)
-    expect(result.find((r) => r.id === 'sys:a')?.hitDie).toBe(8)
-    expect(result.every((record) => record.status === 'published')).toBe(true)
+  it('throws when a patch exists without overlay participant wiring', () => {
+    expect(() =>
+      resolveCatalog(
+        system,
+        [{ targetId: 'sys:b', patch: { version: 1, revision: 0, set: { hitDie: 12 } } }],
+        [],
+      ),
+    ).toThrow('overlayParticipantId is not configured')
+  })
+
+  it('rejects unversioned patch documents when overlay wiring is present', () => {
+    const alert = loadSeedFeats('srd-cc-5.2.1').find((feat) => feat.slug === 'alert')
+    expect(alert).toBeDefined()
+    expect(() =>
+      resolveCatalog([alert!], [{ targetId: alert!.id, patch: { name: 'Patched Alert' } }], [], {
+        overlayParticipantId: 'feats',
+      }),
+    ).toThrow(/supported version/i)
+  })
+
+  it('applies a versioned overlay scalar onto its target by id', () => {
+    const alert = loadSeedFeats('srd-cc-5.2.1').find((feat) => feat.slug === 'alert')
+    expect(alert).toBeDefined()
+    const result = resolveCatalog(
+      [alert!],
+      [
+        {
+          targetId: alert!.id,
+          patch: { version: 1, revision: 1, set: { name: 'Watchful Alert' } },
+        },
+      ],
+      [],
+      { overlayParticipantId: 'feats' },
+    )
+    expect(result[0]?.name).toBe('Watchful Alert')
+    expect(result[0]?.status).toBe('published')
   })
 
   it('appends homebrew records after the resolved system records', () => {
@@ -36,79 +69,29 @@ describe('resolveCatalog', () => {
   })
 
   it('ignores patches whose target is not in the system catalog', () => {
-    const result = resolveCatalog(system, [{ targetId: 'sys:gone', patch: { hitDie: 4 } }], [])
+    const result = resolveCatalog(
+      system,
+      [{ targetId: 'sys:gone', patch: { version: 1, revision: 0, set: { hitDie: 4 } } }],
+      [],
+      { overlayParticipantId: 'classes' },
+    )
     expect(result).toEqual(publishedSystem)
   })
 
-  it('forces published status even when a patch carries draft', () => {
-    const result = resolveCatalog(
-      system,
-      [{ targetId: 'sys:a', patch: { status: 'draft', hitDie: 99 } }],
-      [],
-    )
-    expect(result.find((r) => r.id === 'sys:a')).toEqual({
-      id: 'sys:a',
-      name: 'A',
-      hitDie: 99,
-      status: 'published',
-    })
-  })
-
-  it('restores seed-origin rows in memory and leaves a poisoned patch document untouched', () => {
-    const seedTraits = [
-      { id: 'swarm', preset: 'swarm' },
-      { id: 'spider-climb', preset: 'spider-climb' },
-    ]
-    const seeded = [
-      { id: 'sys:swarm', name: 'Swarm', traits: seedTraits, actions: [] as unknown[] },
-    ]
-    const result = resolveCatalog(seeded, [{ targetId: 'sys:swarm', patch: { traits: [] } }], [], {
-      stickyArrayKeys: ['traits', 'actions'],
-    })
-    expect(result[0]?.traits).toEqual(seedTraits)
-    expect(result[0]?.actions).toEqual([])
-    expect(seeded[0]?.traits).toEqual(seedTraits)
-  })
-
-  it('does not restore sticky rows for a catalog that did not opt in', () => {
-    const seeded = [{ id: 'sys:a', name: 'A', traits: [{ id: 'kept' }] }]
-    const result = resolveCatalog(seeded, [{ targetId: 'sys:a', patch: { traits: [] } }], [])
-    expect(result[0]?.traits).toEqual([])
-  })
-
   it('does not mutate the system seed', () => {
-    resolveCatalog(system, [{ targetId: 'sys:a', patch: { hitDie: 99 } }], [])
-    expect(system[0]?.hitDie).toBe(8)
-  })
-
-  it('reattaches record provenance without a content type and entry provenance with one', () => {
-    const provenance = { citation: { documentId: 'srd-5.2.1' } }
-    const entryProvenance = {
-      excerpt: { documentId: 'srd-5.2.1', excerptId: 'monsters/knight/parry' },
-    }
-    const seeded = [
-      {
-        id: 'sys:a',
-        name: 'Knight',
-        rulesetId: 'srd-cc-5.2.1' as const,
-        provenance,
-        reactions: [{ id: 'parry', name: 'Parry', provenance: entryProvenance }],
-      },
-    ]
-    const patch = [
-      {
-        targetId: 'sys:a',
-        patch: { reactions: [{ id: 'parry', name: 'Parry' }] },
-      },
-    ]
-
-    const withoutType = resolveCatalog(seeded, patch, [])
-    expect(withoutType[0]?.provenance).toEqual(provenance)
-    expect(withoutType[0]?.reactions).toEqual([{ id: 'parry', name: 'Parry' }])
-
-    const withType = resolveCatalog(seeded, patch, [], { contentTypeKey: 'monsters' })
-    expect(withType[0]?.reactions).toEqual([
-      { id: 'parry', name: 'Parry', provenance: entryProvenance },
-    ])
+    const alert = loadSeedFeats('srd-cc-5.2.1').find((feat) => feat.slug === 'alert')
+    expect(alert).toBeDefined()
+    resolveCatalog(
+      [alert!],
+      [
+        {
+          targetId: alert!.id,
+          patch: { version: 1, revision: 0, set: { name: 'Other Name' } },
+        },
+      ],
+      [],
+      { overlayParticipantId: 'feats' },
+    )
+    expect(alert!.name).not.toBe('Other Name')
   })
 })

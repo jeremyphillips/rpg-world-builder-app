@@ -71,16 +71,6 @@ export const contentMetaSchema = z.object({
 export type ContentMeta = z.infer<typeof contentMetaSchema>
 
 /**
- * Generic system-patch overlay envelope, shared by every content type. A
- * campaign never mutates a shipped system record; it stores an overlay patch
- * keyed by the base record's `targetId`, deep-merged onto the base at read time.
- *
- * Type modules add the type-specific body via
- * `.extend({ patch: <body>.partial() })`, so the patch/homebrew rules never live
- * in a single content feature. A `(campaignId, targetId)` uniqueness rule (one
- * patch per record per campaign) is enforced at the Mongo/service layer.
- */
-/**
  * Catalog-facing alias for the neutral authored-content primitive. Catalog
  * content types retain this name while campaign-owned world content and seed
  * contracts can consume `authoredContentBodySchema` directly without adopting

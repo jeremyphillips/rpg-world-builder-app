@@ -3,7 +3,6 @@ import {
   contentStatusToValidationIntent,
   ContentProvenanceWriteError,
   reconcileContentProvenance,
-  stripContentProvenanceForPatch,
   type ContentMedia,
   type CatalogLayer,
   type ContentProvenanceWriteAuthority,
@@ -20,12 +19,24 @@ import { resolveCatalogForCampaign } from '../content.service'
 import { loadSystemContentSlugs } from './content-type-config'
 import { normalizeHomebrewWriteInput } from './apply-content-keys'
 import { assertSlugAvailable } from './assert-slug-available'
-import { deepMerge } from './deep-merge'
-import { composeMonsterSystemPatch } from './system-patch-sticky-arrays'
+import {
+  contentEntityBody,
+  extractSystemOverlayWriteEnvelope,
+  overlayPolicyForValidationIntent,
+  readOverlayRevision,
+  reconcileSystemOverlayWrite,
+  throwOverlayFailure,
+} from './resolve-system-overlay.lib'
 import type { ContentWriteConfig, ContentWriteContext, HomebrewDoc } from './content-write-config'
 import { resolveStoredSchema, resolveWriteInputSchema } from './content-write-config'
 import { stripNullDeep, stripNullDeepFields } from './strip-null-deep'
-import type { ApiContentTypeKey } from '@rpg/contracts'
+import {
+  EXPECTED_OVERLAY_REVISION_FIELD,
+  parseStoredOverlayInput,
+  SYSTEM_OVERLAY_INTENT_FIELD,
+  type ApiContentTypeKey,
+  type SystemOverlayParticipantId,
+} from '@rpg/contracts'
 import type {
   ContentSlugCollisionPolicy,
   ResolvedContentSlug,
@@ -170,27 +181,6 @@ function normalizeWriteInput(
   }
 }
 
-function patchMergeKeys<T extends StoredEntity>(config: ContentWriteConfig<T>) {
-  return {
-    replaceKeys: config.patchReplaceKeys ?? config.readConfig.patchReplaceKeys,
-    tombstoneKeys: config.patchTombstoneKeys,
-  }
-}
-
-/** Accumulates a system patch, preserving declared top-level null tombstones. */
-export function accumulateSystemPatch(args: {
-  existingPatch: Record<string, unknown> | undefined
-  update: Record<string, unknown>
-  replaceKeys?: readonly string[]
-  tombstoneKeys?: readonly string[]
-}): Record<string, unknown> {
-  const merged = deepMerge(args.existingPatch ?? {}, stripUndefined(args.update), {
-    replaceKeys: args.replaceKeys,
-    tombstoneKeys: args.tombstoneKeys,
-  })
-  return stripNullDeep(merged, { preserveTopLevelNullKeys: args.tombstoneKeys })
-}
-
 function mergeHomebrewEffectiveBody(
   existingBody: Record<string, unknown>,
   input: Record<string, unknown>,
@@ -214,45 +204,104 @@ function seedBodyForSystemEntity<T extends StoredEntity>(
   return entityBody(seed as unknown as Record<string, unknown>)
 }
 
-function prepareSystemPatchMerge<T extends StoredEntity>(
+function overlayParticipantForConfig<T extends StoredEntity>(
+  config: ContentWriteConfig<T>,
+): SystemOverlayParticipantId {
+  const participantId = config.readConfig.overlayParticipantId
+  if (!participantId) {
+    throw new HttpError(
+      500,
+      'internal_error',
+      'Patchable content type is missing overlay participant wiring.',
+    )
+  }
+  return participantId
+}
+
+function applyAtomicMediaToStoredOverlay(
+  stored: Record<string, unknown>,
+  media: unknown,
+): Record<string, unknown> {
+  const base = stored as {
+    set?: Record<string, unknown>
+    version: 1
+    revision: number
+  }
+  return {
+    ...base,
+    set: { ...(base.set ?? {}), media },
+  }
+}
+
+function reconcileSystemWriteFromUpdate<T extends StoredEntity>(
   config: ContentWriteConfig<T>,
   existing: T,
-  existingPatch: Record<string, unknown> | undefined,
+  existingPatch: unknown,
   update: Record<string, unknown>,
-): { mergedBody: Record<string, unknown>; cumulativePatch: Record<string, unknown> } {
-  const { replaceKeys, tombstoneKeys } = patchMergeKeys(config)
-  const patchBody = stripUndefined(update)
-  const existingPatchStripped = existingPatch ?? {}
-  const stickyArrayKeys = config.readConfig.patchStickyArrayKeys
-  if (stickyArrayKeys && stickyArrayKeys.length > 0) {
-    const seedBody = seedBodyForSystemEntity(config, existing)
-    if (seedBody) {
-      return composeMonsterSystemPatch({
-        seedBody,
-        existingPatch: existingPatchStripped,
-        update: patchBody,
-        replaceKeys,
-        tombstoneKeys,
-        stickyArrayKeys,
-      })
+  rawNormalized: Record<string, unknown>,
+  validationIntent: ContentValidationIntent,
+): {
+  mergedBody: Record<string, unknown>
+  stored: Record<string, unknown>
+  unchanged: boolean
+  expectedRevision: number
+} {
+  const participantId = overlayParticipantForConfig(config)
+  const policy = overlayPolicyForValidationIntent(participantId, validationIntent)
+  const seedBody =
+    seedBodyForSystemEntity(config, existing) ??
+    contentEntityBody(existing as unknown as Record<string, unknown>)
+  const { intent, expectedRevision } = extractSystemOverlayWriteEnvelope(update)
+
+  const currentRevision = readOverlayRevision(existingPatch ?? null)
+  if (currentRevision !== expectedRevision) {
+    throw new HttpError(409, 'stale_revision', 'Content overlay revision is stale.', {
+      overlayRevision: currentRevision,
+    })
+  }
+
+  const legacyBodyKeys = Object.keys(stripUndefined(rawNormalized)).filter(
+    (key) =>
+      key !== SYSTEM_OVERLAY_INTENT_FIELD &&
+      key !== EXPECTED_OVERLAY_REVISION_FIELD &&
+      key !== 'provenance' &&
+      key !== 'media' &&
+      key !== 'slug',
+  )
+  if (legacyBodyKeys.length > 0) {
+    throw new HttpError(
+      400,
+      'bad_request',
+      'System content updates must use overlay intent instead of partial body fields.',
+    )
+  }
+
+  const reconciled = reconcileSystemOverlayWrite({
+    seedBody,
+    baselineBody: contentEntityBody(existing as unknown as Record<string, unknown>),
+    storedInput: existingPatch ?? null,
+    intent,
+    policy,
+    currentRevision,
+  })
+
+  const mediaChanged = Object.prototype.hasOwnProperty.call(rawNormalized, 'media')
+  let stored: Record<string, unknown> = reconciled.stored
+  if (mediaChanged) {
+    stored = applyAtomicMediaToStoredOverlay(stored, rawNormalized.media)
+    if (reconciled.unchanged) {
+      stored = { ...stored, revision: currentRevision + 1 }
     }
   }
-  const mergedBodyRaw = deepMerge(
-    deepMerge(entityBody(existing as unknown as Record<string, unknown>), existingPatchStripped, {
-      replaceKeys,
-    }),
-    patchBody,
-    { replaceKeys },
-  )
-  return {
-    mergedBody: mergedBodyRaw,
-    cumulativePatch: accumulateSystemPatch({
-      existingPatch: existingPatchStripped,
-      update: patchBody,
-      replaceKeys,
-      tombstoneKeys,
-    }),
+
+  const mergedBody = { ...reconciled.body }
+  if (mediaChanged) {
+    mergedBody.media = rawNormalized.media
   }
+
+  const unchanged = reconciled.unchanged && !mediaChanged
+
+  return { mergedBody, stored, unchanged, expectedRevision }
 }
 
 function parsePersistedWriteInput<T extends StoredEntity>(
@@ -263,13 +312,6 @@ function parsePersistedWriteInput<T extends StoredEntity>(
 ): Record<string, unknown> {
   const schema = resolveWriteInputSchema(config, mode, validationIntent)
   const parsed = schema.parse(normalized) as Record<string, unknown>
-  // Monster body defaults turn an omitted list into `[]`. On a sticky system
-  // update, a key the caller did not send stays omitted so it is not a clear.
-  if (mode === 'update' && config.readConfig.patchStickyArrayKeys?.length) {
-    for (const key of Object.keys(parsed)) {
-      if (!Object.prototype.hasOwnProperty.call(normalized, key)) delete parsed[key]
-    }
-  }
   return parsed
 }
 
@@ -406,8 +448,6 @@ function parseSystemPatchedStoredEntity<T extends StoredEntity>(
     normalized: mergedBodyForParse,
     existing: existingRecord,
   })
-  config.bodySchema.parse(reconciledBody)
-
   const entityForParse = {
     ...reconciledBody,
     id: existing.id,
@@ -430,34 +470,53 @@ async function updateSystemPatch<T extends StoredEntity>(
   entityId: string,
   existing: T,
   update: Record<string, unknown>,
+  rawNormalized: Record<string, unknown>,
   session?: ClientSession,
 ): Promise<T> {
   if (!config.patchModel) {
     throw new HttpError(400, 'not_patchable', 'This content type does not support system patches.')
   }
 
+  const validationIntent = contentStatusToValidationIntent(existing.status)
+
   const existingPatchDoc = await config.patchModel
     .findOne({ campaignId, targetId: entityId })
     .session(session ?? null)
     .lean<{ patch: Record<string, unknown> }>()
 
-  const { mergedBody, cumulativePatch } = prepareSystemPatchMerge(
+  const existingPatch = existingPatchDoc?.patch
+  const parsedExisting = parseStoredOverlayInput(existingPatch ?? null)
+  if (existingPatch !== undefined && !parsedExisting.ok) {
+    throwOverlayFailure(parsedExisting.failure)
+  }
+
+  const { mergedBody, stored, unchanged, expectedRevision } = reconcileSystemWriteFromUpdate(
     config,
     existing,
-    existingPatchDoc?.patch,
+    existingPatch,
     update,
+    rawNormalized,
+    validationIntent,
   )
 
-  const sanitizedPatch = stripContentProvenanceForPatch(
-    cumulativePatch,
-    config.typeName as ApiContentTypeKey,
-  )
+  if (!unchanged) {
+    const filter =
+      existingPatchDoc === null
+        ? { campaignId, targetId: entityId, patch: { $exists: false } }
+        : { campaignId, targetId: entityId, 'patch.revision': expectedRevision }
 
-  await config.patchModel.findOneAndUpdate(
-    { campaignId, targetId: entityId },
-    { $set: { patch: sanitizedPatch } },
-    { upsert: true, returnDocument: 'after', session },
-  )
+    const updated = await config.patchModel
+      .findOneAndUpdate(
+        filter,
+        { $set: { patch: stored } },
+        { upsert: true, returnDocument: 'after', session },
+      )
+      .lean<{ patch: Record<string, unknown> }>()
+
+    if (!updated) {
+      throw new HttpError(409, 'stale_revision', 'Content overlay revision is stale.')
+    }
+  }
 
   return parseSystemPatchedStoredEntity(config, existing, mergedBody)
 }
@@ -873,6 +932,7 @@ async function resolveUpdateEffectiveBody<T extends StoredEntity>(
   existing: T,
   existingBody: Record<string, unknown>,
   update: Record<string, unknown>,
+  rawNormalized: Record<string, unknown>,
 ): Promise<Record<string, unknown>> {
   if (existing.catalogLayer === 'homebrew') {
     return mergeHomebrewEffectiveBody(existingBody, update)
@@ -880,10 +940,18 @@ async function resolveUpdateEffectiveBody<T extends StoredEntity>(
   if (!config.patchModel) {
     return mergeHomebrewEffectiveBody(existingBody, update)
   }
+  const validationIntent = contentStatusToValidationIntent(existing.status)
   const existingPatchDoc = await config.patchModel
     .findOne({ campaignId, targetId: existing.id })
     .lean<{ patch: Record<string, unknown> }>()
-  return prepareSystemPatchMerge(config, existing, existingPatchDoc?.patch, update).mergedBody
+  return reconcileSystemWriteFromUpdate(
+    config,
+    existing,
+    existingPatchDoc?.patch,
+    update,
+    rawNormalized,
+    validationIntent,
+  ).mergedBody
 }
 
 /** Update a homebrew record or upsert a system overlay patch. */
@@ -932,6 +1000,7 @@ export async function updateContentEntity<T extends StoredEntity>(
     existing,
     existingBody,
     update,
+    normalizedRaw,
   )
   const writeCtx = buildWriteContext(
     campaignId,
@@ -964,6 +1033,7 @@ export async function updateContentEntity<T extends StoredEntity>(
       entityId,
       existing,
       payload,
+      normalizedRaw,
       session,
     )
   }

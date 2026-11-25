@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { overlayDeleteIdRows, overlaySlugList } from '../lib/system-overlay/overlay-presets'
+import { mergeSystemOverlayUpdateEnvelope } from '../lib/system-overlay/system-overlay-update'
 
 import { coercedSelectNumberSchema } from '../../primitives/level'
 import { areaGeometrySchema } from '../../primitives/area-geometry'
@@ -14,12 +15,8 @@ import {
   spellSchoolIdSchema,
   spellTagsSchema,
 } from '../../vocab/spell'
-import {
-  contentBodyBaseSchema,
-  contentMetaSchema,
-  contentPatchBaseSchema,
-  slugSchema,
-} from '../lib/envelope'
+import { contentBodyBaseSchema, contentMetaSchema, slugSchema } from '../lib/envelope'
+import { contentStoredOverlayPatchSchema } from '../lib/system-overlay/patch-document'
 import { classSlugSchema } from '../classes/class'
 import { contentModelingSchema } from '../../primitives/modeling/schema'
 import { SPELL_CONTENT_TYPE_TERM } from '../lib/content-type-terms'
@@ -135,17 +132,19 @@ export type CreateSpellDraftInput = z.infer<typeof createSpellDraftInputSchema>
  * - `null` → remove stored resolution
  * - object → replace stored resolution entirely
  */
-export const updateSpellInputSchema = createSpellInputSchema.partial().extend({
-  resolution: spellResolutionSchema.nullable().optional(),
-})
+export const updateSpellInputSchema = mergeSystemOverlayUpdateEnvelope(
+  createSpellInputSchema.partial().extend({
+    resolution: spellResolutionSchema.nullable().optional(),
+  }),
+)
 export type UpdateSpellInput = z.infer<typeof updateSpellInputSchema>
 
-export const updateSpellDraftInputSchema = createSpellDraftInputSchema.partial().extend({
-  resolution: spellResolutionSchema.nullable().optional(),
-})
+export const updateSpellDraftInputSchema = mergeSystemOverlayUpdateEnvelope(
+  createSpellDraftInputSchema.partial().extend({
+    resolution: spellResolutionSchema.nullable().optional(),
+  }),
+)
 export type UpdateSpellDraftInput = z.infer<typeof updateSpellDraftInputSchema>
 
-export const spellPatchSchema = contentPatchBaseSchema.extend({
-  patch: spellBodySchema.partial(),
-})
+export const spellPatchSchema = contentStoredOverlayPatchSchema
 export type SpellPatch = z.infer<typeof spellPatchSchema>

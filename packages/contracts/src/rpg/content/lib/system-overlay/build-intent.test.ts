@@ -37,7 +37,39 @@ const seed = {
   traits: [{ id: 'keen-sight', name: 'Keen Sight', grants: [{ id: 'grt_default' }] }],
 }
 
+const armorSeed = { kind: 'armor' as const, name: 'Leather', baseAcOffset: 2 }
+const rootUnionSchema = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('armor'), name: z.string(), baseAcOffset: z.number() }),
+  z.object({ kind: z.literal('weapon'), name: z.string(), damage: z.string() }),
+])
+const rootUnionPolicy = (() => {
+  const compiled = compileOverlayPolicy(rootUnionSchema)
+  if (!compiled.ok) throw new Error(compiled.issues.join('\n'))
+  return compiled.policy
+})()
+
 describe('buildSystemOverlayIntent', () => {
+  it('builds scalar deltas for a root discriminated-union body', () => {
+    const intent = buildSystemOverlayIntent({
+      policy: rootUnionPolicy,
+      catalogSeed: armorSeed,
+      baseline: armorSeed,
+      draft: { ...armorSeed, name: 'Patched Leather' },
+    })
+    expect(intent).toEqual({ set: { name: 'Patched Leather' } })
+    const reconciled = reconcileOverlayUpdate(
+      armorSeed,
+      { version: 1, revision: 0 },
+      intent,
+      rootUnionPolicy,
+    )
+    expect(reconciled.ok).toBe(true)
+    if (!reconciled.ok) return
+    const applied = applyStoredOverlay(armorSeed, reconciled.result.stored, rootUnionPolicy)
+    expect(applied.ok).toBe(true)
+    if (!applied.ok) return
+    expect(applied.result.body.name).toBe('Patched Leather')
+  })
   it('omits unchanged scalars when another collection is still mounted', () => {
     const baseline = { ...seed, traits: seed.traits }
     const draft = { ...seed, name: 'Custom Owlbear', traits: seed.traits }

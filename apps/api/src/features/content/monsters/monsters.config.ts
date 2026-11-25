@@ -76,18 +76,10 @@ const MONSTER_PATCH_REPLACE_KEYS = [
   'communication',
 ] as const
 
-/** Seed-origin rows in these lists cannot be removed by a system patch. */
-export const MONSTER_PATCH_STICKY_ARRAY_KEYS = [
-  'traits',
-  'actions',
-  'bonusActions',
-  'reactions',
-] as const
-
 export const monstersContentConfig: ContentTypeConfig<Monster> = {
   type: 'monsters',
   patchReplaceKeys: [...MONSTER_PATCH_REPLACE_KEYS],
-  patchStickyArrayKeys: [...MONSTER_PATCH_STICKY_ARRAY_KEYS],
+  overlayParticipantId: 'monsters',
   system: {
     load: loadSeedMonsters,
     slugs: seedMonsterSlugs,

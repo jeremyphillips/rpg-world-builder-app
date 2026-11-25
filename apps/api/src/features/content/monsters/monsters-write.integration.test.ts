@@ -18,8 +18,6 @@ import { speciesWriteConfig } from '../species/species.config'
 import { spellWriteConfig } from '../spells/spells.config'
 import { subclassWriteConfig } from '../subclasses/subclasses.config'
 import { ELDRITCH_BLAST_RESOLUTION } from '@rpg/contracts'
-import { loadSeedMonsters } from '@rpg/catalog/monsters'
-import { MonsterPatchModel } from './monster-patch.model'
 import { monstersWriteConfig } from './monsters.config'
 import { monstersValidateBeforeWrite } from './monsters-write-hooks'
 
@@ -416,7 +414,7 @@ describe('monster write validation', () => {
     ).resolves.toBeUndefined()
   })
 
-  it('clears homebrew nulls and stores system-patch tombstones', async () => {
+  it('clears homebrew nulls on optional monster fields', async () => {
     const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(monstersWriteConfig, campaign.id, {
       ...minimalHomebrewMonsterInput,
@@ -432,44 +430,6 @@ describe('monster write validation', () => {
     })
     expect(cleared.hover).toBeUndefined()
     expect(cleared.experiencePointsOverride).toBeUndefined()
-
-    const catalog = await resolveCatalogForCampaign(monstersWriteConfig.readConfig, campaign.id)
-    const kobold = catalog.find(
-      (row) => row.slug === 'kobold-warrior' && row.catalogLayer === 'system',
-    )
-    expect(kobold).toBeDefined()
-    if (!kobold) return
-
-    await updateContentEntity(monstersWriteConfig, campaign.id, kobold.id, {
-      challengeRating: '0',
-      experiencePointsOverride: 0,
-    })
-    await updateContentEntity(monstersWriteConfig, campaign.id, kobold.id, {
-      challengeRating: '1/8',
-      experiencePointsOverride: null,
-    })
-
-    const stored = await MonsterPatchModel.findOne({
-      campaignId: campaign.id,
-      targetId: kobold.id,
-    }).lean()
-    expect(stored?.patch.experiencePointsOverride).toBeUndefined()
-
-    const afterOmit = await updateContentEntity(monstersWriteConfig, campaign.id, kobold.id, {
-      name: kobold.name,
-    })
-    expect(afterOmit.experiencePointsOverride).toBeUndefined()
-    const stillTombstoned = await MonsterPatchModel.findOne({
-      campaignId: campaign.id,
-      targetId: kobold.id,
-    }).lean()
-    expect(stillTombstoned?.patch.experiencePointsOverride).toBeUndefined()
-
-    const restored = await updateContentEntity(monstersWriteConfig, campaign.id, kobold.id, {
-      challengeRating: '0',
-      experiencePointsOverride: 0,
-    })
-    expect(restored.experiencePointsOverride).toBe(0)
   })
 
   it('publishes a weapon action that references unequipped equipment', async () => {
@@ -493,46 +453,6 @@ describe('monster write validation', () => {
     )
     const published = await promoteContentToPublished(monstersWriteConfig, campaign.id, created.id)
     expect(published.status).toBe('published')
-  })
-
-  it('preserves untouched action rows on a system patch and a no-op resave', async () => {
-    const campaign = await makeTestCampaign()
-    const catalog = await resolveCatalogForCampaign(monstersWriteConfig.readConfig, campaign.id)
-    const kobold = catalog.find(
-      (row) => row.slug === 'kobold-warrior' && row.catalogLayer === 'system',
-    )
-    expect(kobold).toBeDefined()
-    if (!kobold) return
-
-    const actions = kobold.actions.map((action, index) =>
-      index === 0 ? { ...action, name: 'Renamed strike' } : action,
-    )
-    const patch = {
-      senses: kobold.senses,
-      equipment: kobold.equipment,
-      traits: kobold.traits,
-      actions,
-      bonusActions: kobold.bonusActions,
-      reactions: kobold.reactions,
-    }
-    const saved = await updateContentEntity(monstersWriteConfig, campaign.id, kobold.id, patch)
-    expect(saved.actions[0]?.name).toBe('Renamed strike')
-    expect(saved.actions.slice(1)).toEqual(kobold.actions.slice(1))
-    expect(saved.bonusActions).toEqual(kobold.bonusActions)
-    expect(saved.reactions).toEqual(kobold.reactions)
-
-    const stored = await MonsterPatchModel.findOne({
-      campaignId: campaign.id,
-      targetId: kobold.id,
-    }).lean()
-    await updateContentEntity(monstersWriteConfig, campaign.id, kobold.id, patch)
-    const again = await MonsterPatchModel.findOne({
-      campaignId: campaign.id,
-      targetId: kobold.id,
-    }).lean()
-    expect(again?.patch.actions).toEqual(stored?.patch.actions)
-    expect(again?.patch.bonusActions).toEqual(stored?.patch.bonusActions)
-    expect(again?.patch.reactions).toEqual(stored?.patch.reactions)
   })
 })
 
@@ -802,14 +722,6 @@ describe('monster classification persistence', () => {
     expect(cleared.creatureFamilyIds).toBeUndefined()
     expect(cleared.classIds).toBeUndefined()
   })
-  it('clears a seeded class classification with a system patch tombstone', async () => {
-    const campaign = await makeTestCampaign()
-    const id = 'srd-cc-5.2.1:mage'
-    await updateContentEntity(monstersWriteConfig, campaign.id, id, { classIds: null })
-    const catalog = await resolveCatalogForCampaign(monstersWriteConfig.readConfig, campaign.id)
-    expect(catalog.find((row) => row.id === id)?.classIds).toBeUndefined()
-  })
-
   it('round-trips defined forms', async () => {
     const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(monstersWriteConfig, campaign.id, {
@@ -843,175 +755,5 @@ describe('monster classification persistence', () => {
         issues: expect.arrayContaining([expect.objectContaining({ path: 'creatureFamilyIds.0' })]),
       },
     })
-  })
-})
-
-describe('monster system patch seed rows', () => {
-  const swarmId = 'srd-cc-5.2.1:swarm-of-insects'
-
-  function swarmSeed() {
-    const swarm = loadSeedMonsters('srd-cc-5.2.1').find((row) => row.id === swarmId)
-    expect(swarm).toBeDefined()
-    return swarm!
-  }
-
-  it('keeps seeded traits when a movement-only save does not send traits', async () => {
-    const campaign = await makeTestCampaign()
-    const seed = swarmSeed()
-    const saved = await updateContentEntity(monstersWriteConfig, campaign.id, swarmId, {
-      movement: { walk: 30 },
-    })
-    expect(saved.traits.map((trait) => trait.id)).toEqual(['swarm', 'spider-climb'])
-    expect(saved.actions).toEqual([])
-    const stored = await MonsterPatchModel.findOne({
-      campaignId: campaign.id,
-      targetId: swarmId,
-    }).lean()
-    expect(stored?.patch.traits).toBeUndefined()
-    expect(stored?.patch.movement).toEqual({ walk: 30 })
-
-    const restored = await updateContentEntity(monstersWriteConfig, campaign.id, swarmId, {
-      movement: seed.movement,
-    })
-    expect(restored.movement).toEqual(seed.movement)
-    const cleared = await MonsterPatchModel.findOne({
-      campaignId: campaign.id,
-      targetId: swarmId,
-    }).lean()
-    expect(cleared?.patch.movement).toBeUndefined()
-    expect(cleared?.patch.traits).toBeUndefined()
-  })
-
-  it('keeps an omitted homebrew trait and drops it on an explicit empty replacement', async () => {
-    const campaign = await makeTestCampaign()
-    const seed = swarmSeed()
-    const homebrew = {
-      id: 'homebrew-stinger',
-      kind: 'custom' as const,
-      name: 'Stinger',
-      description: 'The swarm stings.',
-    }
-    const withHomebrew = await updateContentEntity(monstersWriteConfig, campaign.id, swarmId, {
-      traits: [...seed.traits, homebrew],
-    })
-    expect(withHomebrew.traits.map((trait) => trait.id)).toEqual([
-      'swarm',
-      'spider-climb',
-      'stinger',
-    ])
-
-    const movementOnly = await updateContentEntity(monstersWriteConfig, campaign.id, swarmId, {
-      movement: { walk: 25 },
-    })
-    expect(movementOnly.traits.map((trait) => trait.id)).toEqual([
-      'swarm',
-      'spider-climb',
-      'stinger',
-    ])
-
-    const cleared = await updateContentEntity(monstersWriteConfig, campaign.id, swarmId, {
-      traits: [],
-    })
-    expect(cleared.traits.map((trait) => trait.id)).toEqual(['swarm', 'spider-climb'])
-    const stored = await MonsterPatchModel.findOne({
-      campaignId: campaign.id,
-      targetId: swarmId,
-    }).lean()
-    expect(stored?.patch.traits).toBeUndefined()
-    expect(stored?.patch.movement).toEqual({ walk: 25 })
-  })
-
-  it('pins the whole traits array when one seed row is edited, then drops it when restored', async () => {
-    const campaign = await makeTestCampaign()
-    const seed = swarmSeed()
-    const edited = seed.traits.map((trait) =>
-      trait.id === 'swarm' && trait.preset === 'swarm' ? { ...trait, noun: 'beetle' } : trait,
-    )
-    const saved = await updateContentEntity(monstersWriteConfig, campaign.id, swarmId, {
-      traits: edited,
-    })
-    expect(saved.traits.find((trait) => trait.id === 'swarm')).toMatchObject({ noun: 'beetle' })
-    expect(saved.traits.map((trait) => trait.id)).toEqual(['swarm', 'spider-climb'])
-    const stored = await MonsterPatchModel.findOne({
-      campaignId: campaign.id,
-      targetId: swarmId,
-    }).lean()
-    const patchedTraits = stored?.patch.traits as { id: string; noun?: string }[]
-    expect(patchedTraits.map((trait) => trait.id)).toEqual(['swarm', 'spider-climb'])
-    expect(patchedTraits[0]).toMatchObject({ noun: 'beetle' })
-    expect(patchedTraits[1]).toMatchObject({ id: 'spider-climb', preset: 'spider-climb' })
-
-    await updateContentEntity(monstersWriteConfig, campaign.id, swarmId, { traits: seed.traits })
-    const restored = await MonsterPatchModel.findOne({
-      campaignId: campaign.id,
-      targetId: swarmId,
-    }).lean()
-    expect(restored?.patch.traits).toBeUndefined()
-  })
-
-  it('resolves a poisoned traits patch without writing, then a save removes the override', async () => {
-    const campaign = await makeTestCampaign()
-    await MonsterPatchModel.create({
-      campaignId: campaign.id,
-      targetId: swarmId,
-      patch: { traits: [] },
-    })
-    const catalog = await resolveCatalogForCampaign(monstersWriteConfig.readConfig, campaign.id)
-    expect(catalog.find((row) => row.id === swarmId)?.traits.map((trait) => trait.id)).toEqual([
-      'swarm',
-      'spider-climb',
-    ])
-    const untouched = await MonsterPatchModel.findOne({
-      campaignId: campaign.id,
-      targetId: swarmId,
-    }).lean()
-    expect(untouched?.patch.traits).toEqual([])
-
-    await updateContentEntity(monstersWriteConfig, campaign.id, swarmId, { traits: [] })
-    const cleaned = await MonsterPatchModel.findOne({
-      campaignId: campaign.id,
-      targetId: swarmId,
-    }).lean()
-    expect(cleaned?.patch.traits).toBeUndefined()
-    const reread = await resolveCatalogForCampaign(monstersWriteConfig.readConfig, campaign.id)
-    expect(reread.find((row) => row.id === swarmId)?.traits.map((trait) => trait.id)).toEqual([
-      'swarm',
-      'spider-climb',
-    ])
-  })
-
-  it('keeps a cleared seeded movement alternative across an unrelated save', async () => {
-    const campaign = await makeTestCampaign()
-    const seed = swarmSeed()
-    const cleared = await updateContentEntity(monstersWriteConfig, campaign.id, swarmId, {
-      movementAlternative: null,
-    })
-    expect(cleared.movementAlternative).toBeUndefined()
-    const stored = await MonsterPatchModel.findOne({
-      campaignId: campaign.id,
-      targetId: swarmId,
-    }).lean()
-    expect(stored?.patch.movementAlternative).toBeNull()
-
-    await updateContentEntity(monstersWriteConfig, campaign.id, swarmId, {
-      movement: { walk: 30 },
-    })
-    const kept = await MonsterPatchModel.findOne({
-      campaignId: campaign.id,
-      targetId: swarmId,
-    }).lean()
-    expect(kept?.patch.movementAlternative).toBeNull()
-    const catalog = await resolveCatalogForCampaign(monstersWriteConfig.readConfig, campaign.id)
-    expect(catalog.find((row) => row.id === swarmId)?.movementAlternative).toBeUndefined()
-
-    const restored = await updateContentEntity(monstersWriteConfig, campaign.id, swarmId, {
-      movementAlternative: seed.movementAlternative,
-    })
-    expect(restored.movementAlternative).toEqual(seed.movementAlternative)
-    const after = await MonsterPatchModel.findOne({
-      campaignId: campaign.id,
-      targetId: swarmId,
-    }).lean()
-    expect(after?.patch.movementAlternative).toBeUndefined()
   })
 })

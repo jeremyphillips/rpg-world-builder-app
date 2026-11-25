@@ -1,4 +1,4 @@
-import { storedOverlaySchema, type StoredOverlay } from './stored'
+import { normalizeStoredOverlayWireInput, storedOverlaySchema, type StoredOverlay } from './stored'
 import type { OverlayUnsupportedVersionFailure, OverlayValidationFailure } from './overlay-failures'
 
 export type ParsedStoredOverlayInput =
@@ -25,7 +25,7 @@ export function parseStoredOverlayInput(input: unknown): ParsedStoredOverlayInpu
   if (version !== 1) {
     return { ok: false, failure: { code: 'unsupported-overlay-version', version } }
   }
-  const parsed = storedOverlaySchema.safeParse(input)
+  const parsed = storedOverlaySchema.safeParse(normalizeStoredOverlayWireInput(input))
   if (!parsed.success) {
     return {
       ok: false,

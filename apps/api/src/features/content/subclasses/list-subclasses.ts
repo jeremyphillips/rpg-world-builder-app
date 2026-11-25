@@ -4,6 +4,7 @@ import type { ResolvedSubclass } from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
 import { findCampaignById } from '../../campaign'
+import { enrichResolvedSystemRecords } from '../lib/enrich-system-content-read'
 import { resolveCatalog } from '../lib/resolve-catalog'
 import { loadSystemContent, loadSystemContentPatches } from '../lib/content-type-config'
 import { attachCampaignAccessForTargetType } from '../lib/content-campaign-access.service'
@@ -24,18 +25,24 @@ export async function resolveSubclassesForCampaign(
   }
 
   const { rulesetId } = campaign
+  const systemSeed = loadSystemContent(subclassContentConfig, rulesetId)
   const [patches, homebrew] = await Promise.all([
     loadSystemContentPatches(subclassContentConfig, campaignId),
     subclassContentConfig.loadHomebrew(campaignId, rulesetId),
   ])
 
-  const resolved = resolveCatalog(
-    loadSystemContent(subclassContentConfig, rulesetId),
+  const seedById = new Map(
+    systemSeed.map((record) => [record.id, record as unknown as Record<string, unknown>]),
+  )
+  const resolved = enrichResolvedSystemRecords(
+    resolveCatalog(systemSeed, patches, homebrew, {
+      contentTypeKey: 'classes',
+      overlayParticipantId: subclassContentConfig.overlayParticipantId,
+    }).filter((subclass) => subclass.classId === classId),
+    seedById,
     patches,
-    homebrew,
-    // Subclasses are not a ContentTypeKey. They share the classes capability entry.
-    { contentTypeKey: 'classes' },
-  ).filter((subclass) => subclass.classId === classId)
+    subclassContentConfig.type,
+  )
 
   return attachCampaignAccessForTargetType(campaignId, 'subclasses', resolved)
 }

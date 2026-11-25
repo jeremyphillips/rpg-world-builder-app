@@ -27,6 +27,13 @@ const featFormDef: ContentFormDef<Feat, FeatFormValues, CreateFeatInput> = {
   buildFields: buildFeatFields,
   toFormValues: featToFormValues,
   toInput: buildFeatCreateInput,
+  normalizeOverlayBody: (values, ctx, validationIntent = 'publish') => {
+    const { slug: _slug, ...body } = buildFeatCreateInput(values, ctx, validationIntent) as Record<
+      string,
+      unknown
+    >
+    return body
+  },
   useListQuery: useFeats,
   queryKey: featsQueryKey,
 }

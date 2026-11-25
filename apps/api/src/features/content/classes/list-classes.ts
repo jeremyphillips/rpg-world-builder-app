@@ -35,8 +35,10 @@ export async function resolveSubclassSummariesByClassId(
     loadSystemContent(subclassContentConfig, rulesetId),
     patches,
     homebrew,
-    // Subclasses are not a ContentTypeKey. They share the classes capability entry.
-    { contentTypeKey: 'classes' },
+    {
+      contentTypeKey: 'classes',
+      overlayParticipantId: subclassContentConfig.overlayParticipantId,
+    },
   )
   const withCampaignAccess = await attachCampaignAccessForTargetType(
     campaignId,

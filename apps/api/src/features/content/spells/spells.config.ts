@@ -63,15 +63,13 @@ function bodyFromCreateInput(input: Record<string, unknown>): Record<string, unk
 export const spellContentConfig: ContentTypeConfig<Spell> = {
   type: 'spells',
   patchReplaceKeys: ['resolution'],
+  overlayParticipantId: 'spells',
   system: {
     load: loadSeedSpells,
     slugs: seedSpellSlugs,
     loadPatches: async (campaignId) => {
       const docs = await SpellPatchModel.find({ campaignId }).lean<SpellPatchRecord[]>()
-      return docs.map<OverlayPatch>((d) => ({
-        targetId: d.targetId,
-        patch: stripNullDeep(d.patch),
-      }))
+      return docs.map<OverlayPatch>((d) => ({ targetId: d.targetId, patch: d.patch }))
     },
   },
   loadHomebrew: async (campaignId, rulesetId) => {

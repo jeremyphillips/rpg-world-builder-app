@@ -58,7 +58,8 @@ import {
   draftStoredSchema,
   publishStoredSchema,
 } from './lib/content-input-schemas'
-import { contentPatchBaseSchema, type ContentMeta, type Slug } from './lib/envelope'
+import { type ContentMeta, type Slug } from './lib/envelope'
+import { contentStoredOverlayPatchSchema } from './lib/system-overlay/patch-document'
 import {
   mediaBearingAuthoredContentBodySchema,
   mediaBearingDraftAuthoredContentBodySchema,
@@ -1080,15 +1081,17 @@ export const updateMonsterInputSchema = mergeSystemOverlayUpdateEnvelope(
 
 export type UpdateMonsterInput = z.infer<typeof updateMonsterInputSchema>
 
-export const updateMonsterDraftInputSchema = monsterDraftInputSchema
-  .partial()
-  .extend({
-    creatureFamilyIds: monsterBodyFields.creatureFamilyIds.nullable(),
-    classIds: monsterBodyFields.classIds.nullable(),
-    movementAlternative: movementAlternativeSchema.nullable().optional(),
-    lair: monsterLairDraftSchema.nullable().optional(),
-  })
-  .superRefine((input, ctx) => refineMonsterDraftBody(input as MonsterBodyDraft, ctx))
+export const updateMonsterDraftInputSchema = mergeSystemOverlayUpdateEnvelope(
+  monsterDraftInputSchema
+    .partial()
+    .extend({
+      creatureFamilyIds: monsterBodyFields.creatureFamilyIds.nullable(),
+      classIds: monsterBodyFields.classIds.nullable(),
+      movementAlternative: movementAlternativeSchema.nullable().optional(),
+      lair: monsterLairDraftSchema.nullable().optional(),
+    })
+    .superRefine((input, ctx) => refineMonsterDraftBody(input as MonsterBodyDraft, ctx)),
+)
 
 export {
   monsterLairDraftSchema,
@@ -1126,9 +1129,7 @@ export type {
 
 export type UpdateMonsterDraftInput = z.infer<typeof updateMonsterDraftInputSchema>
 
-export const monsterPatchSchema = contentPatchBaseSchema.extend({
-  patch: monsterBodySchema.partial(),
-})
+export const monsterPatchSchema = contentStoredOverlayPatchSchema
 
 export type MonsterPatch = z.infer<typeof monsterPatchSchema>
 

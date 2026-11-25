@@ -1,4 +1,9 @@
-import type { ContentCampaignAccessPatch, CreateSubclassInput, Subclass } from '@rpg/contracts'
+import type {
+  ContentCampaignAccessPatch,
+  CreateSubclassInput,
+  Subclass,
+  UpdateSubclassInput,
+} from '@rpg/contracts'
 import { getErrorMessage } from '@rpg/contracts'
 
 import { notifyCoordinatedContentSaveSuccess } from '@/lib/notify'
@@ -10,6 +15,7 @@ import {
   runCoordinatedContentSave,
   type CoordinatedContentSaveResult,
 } from '../../../lib/forms/shells/session/content-save-session.lib'
+import { buildSystemOverlayUpdatePayload } from '../../../lib/forms/registry/build-system-overlay-intent'
 import type { SubclassFormValues } from './subclass-form-fields'
 import { subclassFormDef } from './subclass-form-values'
 
@@ -36,8 +42,12 @@ export type SubclassExistingSaveInput = {
   readPendingAvailable?: () => boolean | undefined
   readAccessAvailabilityChanged?: () => boolean | undefined
   saveAccess: () => Promise<CampaignAccessSaveResult>
-  updateBody: (args: { subclassId: string; input: CreateSubclassInput }) => Promise<Subclass>
+  updateBody: (args: { subclassId: string; input: UpdateSubclassInput }) => Promise<Subclass>
   onBodySaved: (subclassId: string) => void
+  overlayBaseline?: Record<string, unknown>
+  catalogSeed?: Record<string, unknown>
+  expectedOverlayRevision?: number
+  rulesetId?: string
 }
 
 export async function persistSubclassCampaignAccess(args: {
@@ -89,11 +99,28 @@ export async function saveExistingSubclass(
     },
     body: {
       save: async () => {
-        const entityInput = subclassFormDef.toInput(
-          input.values,
-          input.classId,
-          input.existingEntity ? { entity: input.existingEntity } : undefined,
-        )
+        const entityCtx = input.existingEntity ? { entity: input.existingEntity } : undefined
+        const entityInput =
+          input.existingEntity?.catalogLayer === 'system' &&
+          input.overlayBaseline &&
+          input.catalogSeed
+            ? (buildSystemOverlayUpdatePayload({
+                participantId: 'subclasses',
+                catalogSeed: input.catalogSeed,
+                baseline: input.overlayBaseline,
+                draft: subclassFormDef.normalizeOverlayBody!(
+                  input.values,
+                  input.classId,
+                  entityCtx,
+                ),
+                validationIntent: 'publish',
+                expectedOverlayRevision: input.expectedOverlayRevision,
+              }) as UpdateSubclassInput)
+            : (subclassFormDef.toInput(
+                input.values,
+                input.classId,
+                entityCtx,
+              ) as UpdateSubclassInput)
         await input.updateBody({ subclassId: input.subclassId, input: entityInput })
         input.onBodySaved(input.subclassId)
         return { status: 'saved' as const }

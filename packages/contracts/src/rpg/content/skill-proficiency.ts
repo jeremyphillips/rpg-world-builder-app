@@ -2,17 +2,14 @@ import { z } from 'zod'
 import { abilitySchema } from '../vocab/ability'
 
 import { overlayOrderedList } from './lib/system-overlay/overlay-presets'
+import { mergeSystemOverlayUpdateEnvelope } from './lib/system-overlay/system-overlay-update'
 import { formatVocabularySlugLabel } from '../vocab/format-slug-label'
 import { getTermSentenceForm } from '../vocab/types'
 import { SKILL_PROFICIENCY_CONTENT_TYPE_TERM } from './lib/content-type-terms'
 import { createDraftInputSchema, createPublishInputSchema } from './lib/content-input-schemas'
 import { draftAuthoredContentBodySchema } from './lib/draft-authored-content'
-import {
-  contentBodyBaseSchema,
-  contentMetaSchema,
-  contentPatchBaseSchema,
-  slugSchema,
-} from './lib/envelope'
+import { contentBodyBaseSchema, contentMetaSchema, slugSchema } from './lib/envelope'
+import { contentStoredOverlayPatchSchema } from './lib/system-overlay/patch-document'
 
 // ---------------------------------------------------------------------------
 // Skill references — skill proficiencies are a content type. Stored grants and
@@ -88,21 +85,17 @@ export type CreateSkillProficiencyDraftInput = z.infer<
   typeof createSkillProficiencyDraftInputSchema
 >
 
-export const updateSkillProficiencyInputSchema = createSkillProficiencyInputSchema.partial()
+export const updateSkillProficiencyInputSchema = mergeSystemOverlayUpdateEnvelope(
+  createSkillProficiencyInputSchema.partial(),
+)
 export type UpdateSkillProficiencyInput = z.infer<typeof updateSkillProficiencyInputSchema>
 
-export const updateSkillProficiencyDraftInputSchema =
-  createSkillProficiencyDraftInputSchema.partial()
+export const updateSkillProficiencyDraftInputSchema = mergeSystemOverlayUpdateEnvelope(
+  createSkillProficiencyDraftInputSchema.partial(),
+)
 export type UpdateSkillProficiencyDraftInput = z.infer<
   typeof updateSkillProficiencyDraftInputSchema
 >
 
-/**
- * System-patch overlay. Reuses the generic envelope; only the type-specific
- * `patch` body differs. `.partial()` is shallow; the read-time merge handles
- * deep-merging (arrays replaced wholesale).
- */
-export const skillProficiencyPatchSchema = contentPatchBaseSchema.extend({
-  patch: skillProficiencyBodySchema.partial(),
-})
+export const skillProficiencyPatchSchema = contentStoredOverlayPatchSchema
 export type SkillProficiencyPatch = z.infer<typeof skillProficiencyPatchSchema>

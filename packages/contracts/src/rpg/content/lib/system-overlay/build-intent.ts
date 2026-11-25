@@ -1,6 +1,7 @@
 import type { CollectionDelta, ObjectDelta, SeedFieldDelta, SeedRowReplace } from './intent'
 import type { OverlayPolicyNode } from './policy'
 import { canonicalIdentityOrder, readIdentityId, seedIdentityIds } from './order'
+import { overlayPolicyForRow } from './resolve-core'
 import { overlayValueEqual } from './value-equal'
 
 export type BuildSystemOverlayIntentInput = {
@@ -22,17 +23,6 @@ function asArray(value: unknown): unknown[] {
 
 function hasOwn(record: Record<string, unknown>, key: string): boolean {
   return Object.prototype.hasOwnProperty.call(record, key)
-}
-
-function rowPolicyForRecord(
-  row: Record<string, unknown>,
-  policy: OverlayPolicyNode,
-): OverlayPolicyNode | undefined {
-  if (policy.kind !== 'union') return policy
-  for (const branch of policy.branches) {
-    if (row[branch.discriminator] === branch.value) return branch.node
-  }
-  return undefined
 }
 
 function unionDiscriminator(policy: OverlayPolicyNode): string | undefined {
@@ -263,7 +253,7 @@ function diffSeedRow(
   rowPolicy: OverlayPolicyNode,
   path: string,
 ): Omit<SeedFieldDelta, 'origin' | 'id'> | undefined {
-  const activePolicy = rowPolicyForRecord(draftRow, rowPolicy) ?? rowPolicy
+  const activePolicy = overlayPolicyForRow(draftRow, rowPolicy) ?? rowPolicy
   if (activePolicy.kind === 'deep') {
     const nested = diffObjectLevel(seedRow, draftRow, seedRow, activePolicy, path)
     if (Object.keys(nested).length === 0) return undefined
@@ -304,9 +294,23 @@ function diffObjectLevel(
   return pruneObjectDelta(scalarDelta)
 }
 
+function resolveRootOverlayPolicy(
+  catalogSeed: Record<string, unknown>,
+  baseline: Record<string, unknown>,
+  draft: Record<string, unknown>,
+  policy: OverlayPolicyNode,
+): OverlayPolicyNode {
+  return (
+    overlayPolicyForRow(draft, policy) ??
+    overlayPolicyForRow(baseline, policy) ??
+    overlayPolicyForRow(catalogSeed, policy) ??
+    policy
+  )
+}
+
 /** Build overlay update intent by diffing normalized baseline and draft form bodies. */
 export function buildSystemOverlayIntent(input: BuildSystemOverlayIntentInput): ObjectDelta {
   const { policy, catalogSeed, baseline, draft } = input
-  if (policy.kind !== 'deep') return {}
-  return diffObjectLevel(baseline, draft, catalogSeed, policy, '')
+  const activePolicy = resolveRootOverlayPolicy(catalogSeed, baseline, draft, policy)
+  return diffObjectLevel(baseline, draft, catalogSeed, activePolicy, '')
 }

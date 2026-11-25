@@ -1,4 +1,4 @@
-import { loadSeedClasses } from '@rpg/catalog/classes'
+import { loadSeedClasses, loadSeedSubclasses } from '@rpg/catalog/classes'
 import { loadSeedEquipment } from '@rpg/catalog/equipment'
 import { loadSeedFeats } from '@rpg/catalog/feats'
 import { loadSeedMonsters } from '@rpg/catalog/monsters'
@@ -29,5 +29,13 @@ export function resolveCatalogSeedBody(
   const load = LOADERS[routeKey]
   if (!load) return undefined
   const seed = load(rulesetId).find((row) => row.id === entityId)
+  return seed ? (seed as unknown as Record<string, unknown>) : undefined
+}
+
+export function resolveSubclassCatalogSeedBody(
+  rulesetId: SystemRulesetId,
+  entityId: string,
+): Record<string, unknown> | undefined {
+  const seed = loadSeedSubclasses(rulesetId).find((row) => row.id === entityId)
   return seed ? (seed as unknown as Record<string, unknown>) : undefined
 }

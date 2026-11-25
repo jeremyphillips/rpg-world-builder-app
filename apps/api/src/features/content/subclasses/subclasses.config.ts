@@ -62,6 +62,7 @@ async function validateSubclassBeforeWrite(ctx: ContentWriteContext): Promise<vo
 
 export const subclassContentConfig: ContentTypeConfig<Subclass> = {
   type: 'subclasses',
+  overlayParticipantId: 'subclasses',
   system: {
     load: loadSeedSubclasses,
     slugs: seedSubclassSlugs,

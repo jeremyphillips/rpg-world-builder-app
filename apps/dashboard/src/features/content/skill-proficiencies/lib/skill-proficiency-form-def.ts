@@ -29,6 +29,14 @@ const skillProficiencyFormDef: ContentFormDef<
   buildFields: buildSkillProficiencyFields,
   toFormValues: skillProficiencyToFormValues,
   toInput: buildSkillProficiencyCreateInput,
+  normalizeOverlayBody: (values, ctx, validationIntent = 'publish') => {
+    const { slug: _slug, ...body } = buildSkillProficiencyCreateInput(
+      values,
+      ctx,
+      validationIntent,
+    ) as Record<string, unknown>
+    return body
+  },
   useListQuery: useSkillProficiencies,
   queryKey: skillProficienciesQueryKey,
 }

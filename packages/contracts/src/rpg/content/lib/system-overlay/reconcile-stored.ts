@@ -9,6 +9,7 @@ import {
 import {
   intentCollectionToStoredIdentity,
   normalizeScalarSet,
+  overlayPolicyForRow,
   type ResolveFailure,
 } from './resolve-core'
 import type { StoredCollection, StoredIdentityCollection, StoredOverlay } from './stored'
@@ -21,10 +22,15 @@ function asArray(value: unknown): unknown[] {
 function nodeAtPath(
   policy: OverlayPolicyNode,
   collectionPath: string,
+  seed?: Record<string, unknown>,
 ): OverlayPolicyNode | undefined {
-  if (!collectionPath || collectionPath === '<root>') return policy
-  const segments = collectionPath.split('.').filter(Boolean)
   let current: OverlayPolicyNode = policy
+  if (seed) {
+    const branch = overlayPolicyForRow(seed, current)
+    if (branch) current = branch
+  }
+  if (!collectionPath || collectionPath === '<root>') return current
+  const segments = collectionPath.split('.').filter(Boolean)
   for (const segment of segments) {
     if (current.kind !== 'deep') return undefined
     const next = current.fields[segment]
@@ -62,13 +68,14 @@ function reconcileIdentityCollection(
 }
 
 function reconcileCollection(
+  seed: Record<string, unknown>,
   seedValue: unknown,
   current: StoredCollection | undefined,
   delta: CollectionDelta,
   policy: OverlayPolicyNode,
   path: string,
 ): { stored?: StoredCollection; failure?: ResolveFailure } {
-  const node = nodeAtPath(policy, path)
+  const node = nodeAtPath(policy, path, seed)
   if (!node) {
     return { failure: { code: 'overlay-validation', issues: [`Unknown collection path ${path}`] } }
   }
@@ -135,7 +142,7 @@ export function reconcileStoredOverlay(
   const collections = { ...(next.collections ?? {}) }
   for (const [path, delta] of Object.entries(intent.collections ?? {})) {
     const seedRows = asArray(seedValueAt(seed, path))
-    const reconciled = reconcileCollection(seedRows, collections[path], delta, policy, path)
+    const reconciled = reconcileCollection(seed, seedRows, collections[path], delta, policy, path)
     if (reconciled.failure) return { overlay: base, failure: reconciled.failure }
     if (reconciled.stored === undefined) delete collections[path]
     else collections[path] = reconciled.stored
