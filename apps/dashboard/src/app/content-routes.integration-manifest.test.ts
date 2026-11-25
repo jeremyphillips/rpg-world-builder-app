@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import {
   contentTypeKeysWithFormDefinition,
   contentTypeKeysWithRouteSection,
@@ -19,4 +19,18 @@ describe('production content form route loaders', () => {
   it('covers every form-capable content type', () => {
     expect(Object.keys(contentFormRouteLoaders).sort()).toEqual(contentTypeKeysWithFormDefinition())
   })
+
+  it.each([{}, { ClassCreate: 'invalid component' }])(
+    'rejects a malformed class create chunk: %j',
+    async (exports) => {
+      vi.doMock('@/features/content/classes/routes/class-create', () => exports)
+      try {
+        await expect(contentFormRouteLoaders.classes.create()).rejects.toThrow(
+          'Content form route export "ClassCreate" must be a component.',
+        )
+      } finally {
+        vi.doUnmock('@/features/content/classes/routes/class-create')
+      }
+    },
+  )
 })

@@ -952,7 +952,8 @@ and detail. Add both create and edit to the typed `contentFormRouteLoaders` map
 and use those loaders to build the suspended route wrappers. Each create and
 edit route passes its owning definition directly to the shared shell. The route
 contract tests verify that both shells receive the definition for the mapped
-content type.
+content type. Create and edit loaders reject a missing or non-component route
+export and identify the expected export in the error.
 
 ### 17. React Router (`apps/dashboard/src/app/router.tsx`)
 

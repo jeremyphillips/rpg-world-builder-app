@@ -29,11 +29,18 @@ type ContentFormRouteLoaders = {
   >
 }
 
-function loadContentFormRoute<Module, Export extends keyof Module>(
+function loadContentFormRoute<Module extends object, Export extends keyof Module>(
   importRoute: () => Promise<Module>,
   component: Export,
 ) {
-  return async () => ({ default: (await importRoute())[component] })
+  return async () => {
+    const module = await importRoute()
+    const route = Object.hasOwn(module, component) ? module[component] : undefined
+    if (typeof route !== 'function') {
+      throw new Error(`Content form route export "${String(component)}" must be a component.`)
+    }
+    return { default: route }
+  }
 }
 
 export const contentFormRouteLoaders = {
