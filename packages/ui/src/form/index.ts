@@ -352,6 +352,7 @@ export {
 } from './config/form-resolver'
 export {
   evaluateFormSchema,
+  evaluateRoutedFormSchema,
   runFormAction,
   projectIssuesToFieldErrors,
   projectInvalidEvaluationToForm,
@@ -366,6 +367,7 @@ export {
   readFormValidationProducerSlotIssues,
   replaceFormValidationProducerSlot,
   type EvaluateFormSchemaOptions,
+  type EvaluateRoutedFormSchemaResult,
   type FormActionStage,
   type FormActionStageResult,
   type FormRhfIntegrationStrategy,

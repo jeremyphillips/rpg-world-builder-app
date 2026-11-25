@@ -6,7 +6,10 @@ import {
   type FormValidationProducerSlot,
 } from '@rpg/ui/form'
 
-import { paintValidationIssuesOnForm } from './content-publish-validation.lib'
+import {
+  formIssuesToPathMessages,
+  paintValidationIssuesOnForm,
+} from './content-publish-validation.lib'
 
 export function ingestContentFormValidationIssues(
   session: FormValidationProducerSession,
@@ -22,11 +25,5 @@ export function applyCanonicalFormIssuesToRhf<TFieldValues extends FieldValues>(
   issues: readonly FormIssue[],
 ): void {
   form.clearErrors()
-  paintValidationIssuesOnForm(
-    form,
-    issues.map((issue) => ({
-      path: issue.path,
-      message: issue.message,
-    })),
-  )
+  paintValidationIssuesOnForm(form, formIssuesToPathMessages(issues))
 }

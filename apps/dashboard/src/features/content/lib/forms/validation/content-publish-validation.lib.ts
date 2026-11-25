@@ -10,6 +10,36 @@ import { normalizeContentFormIssues } from './normalize-content-form-issues.lib'
 export const CONTENT_PUBLISH_VALIDATION_ROUTING_FAILED_MESSAGE =
   'Publish validation could not run. Refresh and try again.'
 
+export function createContentPublishRoutingFailedIssues(): FormIssue[] {
+  return [
+    {
+      path: '',
+      message: CONTENT_PUBLISH_VALIDATION_ROUTING_FAILED_MESSAGE,
+      severity: 'crossRow',
+    },
+  ]
+}
+
+export function tryEvaluateContentPublishFormIssues<TFieldValues extends FieldValues>(
+  publishSchema: ZodType<TFieldValues>,
+  values: TFieldValues,
+  items: FormItem[] = [],
+): { issues: FormIssue[]; routingFailed: boolean } {
+  try {
+    const issues = evaluateContentPublishFormIssues(publishSchema, values, items)
+    if (issues === null) return { issues: [], routingFailed: false }
+    return { issues, routingFailed: false }
+  } catch {
+    return { issues: createContentPublishRoutingFailedIssues(), routingFailed: true }
+  }
+}
+
+export function formIssuesToPathMessages(
+  issues: readonly Pick<FormIssue, 'path' | 'message'>[],
+): Pick<ApiValidationIssue, 'path' | 'message'>[] {
+  return issues.map((issue) => ({ path: issue.path, message: issue.message }))
+}
+
 export function applyValidationIssuesToForm<TFieldValues extends FieldValues>(
   form: UseFormReturn<TFieldValues>,
   issues: readonly Pick<ApiValidationIssue, 'path' | 'message'>[],

@@ -17,6 +17,10 @@ export {
   FORM_VALIDATION_PILOT_REVEAL_BUDGET_MS,
 } from './form-validation-pilot-budgets.lib'
 export { evaluateFormSchema, type EvaluateFormSchemaOptions } from './form-schema-evaluator'
+export {
+  evaluateRoutedFormSchema,
+  type EvaluateRoutedFormSchemaResult,
+} from './evaluate-routed-form-schema.lib'
 export { projectIssuesToFieldErrors } from './project-issues-to-field-errors.lib'
 export { runFormAction, type RunFormActionOptions } from './run-form-action'
 export { projectInvalidEvaluationToForm } from './passive-rhf-projection.client'

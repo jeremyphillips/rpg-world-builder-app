@@ -1,6 +1,6 @@
 import type { ApiValidationIssue } from '@rpg/contracts'
 import type { ZodType } from 'zod'
-import { evaluateFormSchema, routeFormIssues, type FormIssue, type FormItem } from '@rpg/ui/form'
+import { evaluateRoutedFormSchema, type FormIssue, type FormItem } from '@rpg/ui/form'
 
 export const CONTENT_FORM_VALIDATION_OPERATION_MESSAGE =
   'Validation could not complete. Refresh and try again.'
@@ -19,14 +19,14 @@ export function normalizeContentFormIssues(
 ): FormIssue[] | null {
   const formValues =
     typeof values === 'object' && values !== null ? (values as Record<string, unknown>) : {}
-  const evaluation = evaluateFormSchema(schema, values, { items: fields, formValues })
-  if (evaluation.kind === 'parsed') return null
-  if (evaluation.kind === 'operation-failure') {
-    throw new ContentFormValidationOperationFailure(evaluation.message)
+  const result = evaluateRoutedFormSchema(schema, values, { items: fields, formValues })
+
+  if (result.kind === 'valid') return null
+  if (result.kind === 'operation-failure') {
+    throw new ContentFormValidationOperationFailure(result.message)
   }
 
-  const combined = [...evaluation.issues, ...evaluation.rootIssues]
-  return routeFormIssues(combined, fields, formValues)
+  return result.issues
 }
 
 export function apiValidationIssuesToFormIssues(

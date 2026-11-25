@@ -19,9 +19,9 @@ import {
   type DraftPublishValidationSurface,
 } from './content-draft-publish-validation-surface.ref'
 import {
-  CONTENT_PUBLISH_VALIDATION_ROUTING_FAILED_MESSAGE,
-  evaluateContentPublishFormIssues,
+  formIssuesToPathMessages,
   paintValidationIssuesOnForm,
+  tryEvaluateContentPublishFormIssues,
 } from './content-publish-validation.lib'
 import { ingestContentFormValidationIssues } from './ingest-content-form-validation.lib'
 
@@ -62,34 +62,23 @@ export function ContentDraftPublishValidationSurfaceBridge({
     const surface: DraftPublishValidationSurface = (values) => {
       const publishSchema = resolveContentPublishSchema(def, ctx)
       const currentUi = uiRef.current
-      let issues: ReturnType<typeof evaluateContentPublishFormIssues>
-      try {
-        issues = evaluateContentPublishFormIssues(publishSchema, values, publishFields)
-      } catch {
-        paintValidationIssuesOnForm(form, [
-          { path: '', message: CONTENT_PUBLISH_VALIDATION_ROUTING_FAILED_MESSAGE },
-        ])
+      const { issues, routingFailed } = tryEvaluateContentPublishFormIssues(
+        publishSchema,
+        values,
+        publishFields,
+      )
+      if (routingFailed) {
+        paintValidationIssuesOnForm(form, formIssuesToPathMessages(issues))
         currentUi.markSubmitAttempted()
         if (currentUi.publishPresentationEnabled) {
           currentUi.markPublishAttempted()
-          onPublishIssuesChangeRef.current({
-            issues: [
-              {
-                path: '',
-                message: CONTENT_PUBLISH_VALIDATION_ROUTING_FAILED_MESSAGE,
-                severity: 'crossRow',
-              },
-            ],
-          })
+          onPublishIssuesChangeRef.current({ issues })
         }
         return null
       }
-      if (!issues) return null
+      if (issues.length === 0) return null
 
-      paintValidationIssuesOnForm(
-        form,
-        issues.map((issue) => ({ path: issue.path, message: issue.message })),
-      )
+      paintValidationIssuesOnForm(form, formIssuesToPathMessages(issues))
       currentUi.markSubmitAttempted()
 
       if (currentUi.publishPresentationEnabled) {
