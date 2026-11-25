@@ -10,13 +10,13 @@ Open5e API v2, `GET /v2/creatures/?document__key=srd-2024&fields=name,key,traits
 
 Parenthetical titles such as `(3/Day, or 4/Day in Lair)` are part of the printed name. Counts below use the name with that parenthetical removed, then split a name again when the body is mechanically different.
 
-Catalog cross-check: [monsters.json](../../catalog/src/monsters/data/srd-cc-5.2.1/monsters.json) has three trait rows, all in the phase 1 set.
+Catalog cross-check: [monsters.json](../../catalog/src/monsters/data/srd-cc-5.2.1/monsters.json) seeds seven creatures. Trait rows:
 
-- Kobold Warrior, Pack Tactics. Open5e matches the stored sentence, including “the kobold”.
-- Kobold Warrior, Sunlight Sensitivity. Open5e matches, including “the kobold”.
-- Hell Hound, Pack Tactics. Open5e matches, including “the hound”.
+- Kobold Warrior, Pack Tactics and Sunlight Sensitivity (templates). Open5e matches, including “the kobold”.
+- Hell Hound, Pack Tactics (template). Open5e matches, including “the hound”.
+- Swarm of Insects, Swarm (`swarm`, noun `insect`) and Spider Climb (`spider-climb`). Movement uses `movementAlternative` (Climb or Fly 20 ft., GM's choice). Spider Climb prose is generated with a climb-availability lead clause. Actions are empty; Bites and other attacks are not seeded.
 
-Skeleton, Knight, and Mage have no traits. Their other named blocks are actions. No seeded trait is custom, configurable, or deferred. Species traits in the catalog (Breath Weapon, Fey Ancestry, Keen Senses, and the rest) do not reuse these monster trait names.
+Skeleton, Knight, Mage, and Lich have no descriptive trait presets in the seed set (Kobold and Hell Hound use grant templates). Species traits in the catalog (Breath Weapon, Fey Ancestry, Keen Senses, and the rest) do not reuse these monster trait names.
 
 ## Coverage
 
@@ -24,14 +24,14 @@ Skeleton, Knight, and Mage have no traits. Their other named blocks are actions.
 
 | Disposition | Rows | Share | What the number means                                                                  |
 | ----------- | ---: | ----: | -------------------------------------------------------------------------------------- |
-| Shipped     |  274 |   84% | Phase 1: 145 rows. Phase 2: 66 rows. Wave 1: 49 rows. Wave 2: 14 rows                  |
+| Shipped     |  275 |   84% | Phase 1: 146 rows. Phase 2: 66 rows. Wave 1: 49 rows. Wave 2: 14 rows                  |
 | Pending     |   15 |    5% | A fidelity or authoring blocker. Not a build task yet                                  |
-| Custom      |   37 |   11% | Signature prose, Spirit Naga’s Fiendish Restoration, and Swarm of Insects Spider Climb |
+| Custom      |   36 |   11% | Signature prose and Spirit Naga’s Fiendish Restoration |
 | Total       |  326 |  100% |                                                                                        |
 
-274 + 15 + 37 = 326. The remaining rows are pending or custom.
+275 + 15 + 36 = 326. The remaining rows are pending or custom.
 
-Phase 1 is 18 preset ids. `spider-climb` stays field-free. The Swarm of Insects row is one of the 37 custom rows. `lightning-absorption` stays the shipped field-free preset. Fire Absorption and Acid Absorption are separate approved ids.
+Phase 1 is 18 preset ids. `spider-climb` stays field-free; Swarm of Insects now uses that preset with a conditional sentence driven by `movementModeAvailability` (see [Movement alternative](#movement-alternative-shipped)). `lightning-absorption` stays the shipped field-free preset. Fire Absorption and Acid Absorption are separate approved ids.
 
 ## Ownership
 
@@ -47,6 +47,38 @@ Preset definitions belong next to the other creature value objects: stable id, l
 `formatMonsterStatBlockSubject` stays a monster adapter. It returns `the ${name.toLowerCase()}` (`the hell hound`). The shared formatter receives that phrase. It does not know monster records, and it does not grow a species voice. Species sentences are second person and often come from grants. Sharing those templates would need a second voice. This phase does not add one.
 
 Monster authoring and the stat block call the shared formatter. They own the combobox, duplicate checks, HTML wrapping, and provenance. Phase 1 does not add a preset field to species, and it does not change grant overrides.
+
+## Movement alternative (shipped)
+
+**Status: implemented** on published monster bodies only (optional `movementAlternative` beside fixed `movement` in [movement-mode.ts](../src/rpg/vocab/movement-mode.ts)).
+
+- Exactly one unresolved pair of modes at one speed; neither mode may also appear in fixed `movement`.
+- `resolveCreatureMovement` still returns only simultaneous fixed speeds. `movementModeAvailability(definition, mode)` returns `guaranteed`, `alternative`, or `absent`.
+- Speed line: [formatMovementDisplay](../src/rpg/vocab/movement-mode.ts) and [formatMonsterSpeedStatRow](../src/rpg/runtime/monster/format-monster-speed-stat-row.ts) print unresolved alternatives, e.g. `20 ft., Fly or Climb 20 ft. (GM's choice)`.
+- **Instance selection at encounter setup is deferred.** The definition does not record which alternative mode is active.
+- Catalog proof: `srd-cc-5.2.1:swarm-of-insects` — walk 20, alternative Climb or Fly 20, Swarm + Spider Climb presets, empty actions.
+
+Spider Climb reads climb availability from the monster movement definition (not a trait field). When Climb is `alternative`, the sentence leads with “If {subject} has a Climb Speed, …”. When Climb is `guaranteed` or `absent`, the sentence stays unconditional (Vampire Spawn remains valid without Climb). A nonblocking `spider-climb-alternative-climb` advisory on the trait row explains that removing the alternative makes the trait unconditional.
+
+Species and defined-form movement overrides do not gain `movementAlternative` in this slice.
+
+## Exposure, roll effects, and deferred mechanics
+
+**Status: documented / blocked** — no roll consumer, no environmental illumination or sunlight-as-state vocabulary beyond the existing `in-sunlight` circumstance on stored grants.
+
+| Concern | Owner (when built) | Status |
+| -------- | ------------------ | ------ |
+| Place illumination + sunlight exposure | Shared environmental state + `creature-effect` circumstances | **Proposed** — not `in-bright-light` yet |
+| Trait roll disadvantage in play | `creatureRollAdjustmentSchema` + shared roll consumer | **Blocked** — grants persist; Sunlight Sensitivity template grant now matches attack + ability-check prose |
+| Spell resolution emitting advantage/disadvantage | Spell `resolution` effects | **Missing** — spells do not store roll adjustments |
+| Damage auras (Heat/Fire Aura pulses) | Shared aura config | **Deferred** |
+| HP at 0, regeneration execution, bloodied | `runtime/creature` state | **Blocked** |
+| Encounter instance picking among definition alternatives | Creature-level instance selection | **Deferred** — movement alternative renders unresolved |
+| Shape-shift full stat-block replacement | Catalog creature reference + picker | **Deferred** — `definedForms` partial overrides only |
+
+Exposure predicates and continuous vs pulse timing must not grow a trait-local roll engine. Mechanical outliers (Fire Elemental ignition, Gibbering d8 table) stay custom or pending — not `details`.
+
+Details on trait rows remains supplemental narrative after generated rules; it does not encode predicates or mechanical clauses moved to presets/templates.
 
 ## Generated sentence policy
 
@@ -94,7 +126,7 @@ Menu groups: Environment, Movement, Combat, Form, and General. Custom trait stay
 - **Flyby** (`flyby`, 7, cosmetic). The {Subject} doesn't provoke an Opportunity Attack when it flies out of an enemy's reach. Flying Snake, Gargoyle, Giant Owl, Giant Wasp, Hippogriff, Owl, Pteranodon.
 - **Incorporeal Movement** (`incorporeal-movement`, 4, cosmetic). The {Subject} can move through other creatures and objects as if they were Difficult Terrain. It takes 5 (1d10) Force damage if it ends its turn inside an object. Ghost, Specter, Will-o'-Wisp, Wraith. The damage roll does not vary.
 - **Running Leap** (`running-leap`, 2, cosmetic). With a 10-foot running start, the {subject} can Long Jump up to 25 feet. Lion, Saber-Toothed Tiger. Both distances match, so they are not fields.
-- **Spider Climb** (`spider-climb`, 13, cosmetic). The {Subject} can climb difficult surfaces, including along ceilings, without needing to make an ability check. Black Pudding, Drider, Ettercap, Giant Lizard, Giant Spider, Giant Wolf Spider, Lizard, Ochre Jelly, Phase Spider, Roper, Spider, Vampire, Vampire Spawn. Swarm of Insects is custom: the trait applies only if the swarm has a Climb Speed.
+- **Spider Climb** (`spider-climb`, 14, cosmetic). The {Subject} can climb difficult surfaces, including along ceilings, without needing to make an ability check. Black Pudding, Drider, Ettercap, Giant Lizard, Giant Spider, Giant Wolf Spider, Lizard, Ochre Jelly, Phase Spider, Roper, Spider, Vampire, Vampire Spawn, Swarm of Insects. On Swarm of Insects the lead clause is conditional when Climb is an alternative movement mode; other rows use the unconditional sentence unless climb is absent from the definition and the caller omits availability (then no sentence).
 - **Tunneler** (`tunneler`, 2, cosmetic). The {Subject} can burrow through solid rock at half its Burrow Speed and leaves a 10-foot-diameter tunnel in its wake. Ankheg, Purple Worm. Half speed and the 10-foot diameter do not vary.
 - **Web Walker** (`web-walker`, 5, cosmetic). The {Subject} ignores movement restrictions caused by webs, and it knows the location of any other creature in contact with the same web. Drider, Ettercap, Giant Spider, Phase Spider, Spider.
 
@@ -255,10 +287,9 @@ Each fixture keeps every trigger, number, exception, and outcome. Later referenc
 
 ## Custom
 
-37 rows. These stay authored prose.
+36 rows. These stay authored prose.
 
 - **Spirit Naga, Fiendish Restoration** (1). If it dies, it returns to life in 1d6 days and regains all its Hit Points. Only a Wish spell prevents that. Not the Rakshasa preset.
-- **Spider Climb on Swarm of Insects** (1). The climb works only when the swarm has a Climb Speed. `spider-climb` stays field-free.
 - **Fire Form** (1, Fire Elemental). The 1-inch passage plus 5 (1d10) Fire on the first entry each turn. Not Air Form.
 
 ### Signature prose
@@ -301,7 +332,7 @@ One creature, or a procedure that is not a reusable sentence.
 
 This audit covers the 18 shipped presets. It does not add preset ids or author fields. Movement facts below are from Open5e `srd-2024` creature detail (`document.key` is `srd-2024`). A speed that shows up on those stat blocks is an association until the trait sentence itself names that statistic.
 
-`resolveCreatureMovement` in [movement-mode.ts](../src/rpg/vocab/movement-mode.ts) is the movement read. Form rows reach it through `movementRowsToRecordForPreview`. The advisory result is derived while authoring. It is not stored on the trait.
+`resolveCreatureMovement` in [movement-mode.ts](../src/rpg/vocab/movement-mode.ts) is the fixed-speed read. `movementModeAvailability` is the movement-mode status read for trait prose. Form rows reach movement through `movementRowsToRecordForPreview`. Advisories are derived while authoring. They are not stored on the trait.
 
 Four labels:
 
@@ -320,7 +351,7 @@ Four labels:
 
 **Running Leap** (2). Granted: a 25-foot Long Jump. Activation: a 10-foot running start. Lion walks 50. Saber-Toothed Tiger walks 40. The 10 feet are what the creature must move before the jump during play. They do not require a base Walk Speed of at least 10. No build advisory.
 
-**Spider Climb** (13 on the preset). Granted: climb difficult surfaces, including ceilings, without a check. Twelve of those creatures have a Climb Speed. Vampire Spawn has the trait and Walk 30 only, so Climb Speed is not required. The Swarm of Insects sentence is the explicit exception (“If the swarm has a Climb Speed”) and stays custom. No hint on the preset.
+**Spider Climb** (14 on the preset, including Swarm of Insects in catalog). Granted: climb difficult surfaces, including ceilings, without a check. Most rows have a Climb Speed. Vampire Spawn has the trait and Walk 30 only — climb `absent`, unconditional sentence. Swarm of Insects has climb `alternative`; the formatter adds the SRD lead clause. No field on the preset.
 
 **Ice Walk** (4). Granted: cross and climb ice without a check, and ice or snow is not difficult terrain. The four white dragons also have walk, fly, burrow, and swim. Those modes are the dragon’s stat block, not this trait. No hint.
 
@@ -353,10 +384,11 @@ A normal activation condition, such as Running Leap’s 10-foot running start, d
 
 Monster authoring advisories are `collectMonsterFormAdvisories` in [monster-form-advisories.ts](../../../apps/dashboard/src/features/content/monsters/lib/monster-form-advisories.ts). Each one is `{ code, message, path }`. There is no severity. They do not block save or publish. The open editor shows the messages whose path matches the selected row. The add menu, the generated sentence, the stat block, and the vocabulary description do not repeat them.
 
-| Preset   | Code                            | When                                                                                                                                           |
-| -------- | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Tunneler | `tunneler-missing-burrow-speed` | No usable Burrow Speed. Message: “Tunneler uses half the creature's Burrow Speed, but no Burrow Speed is configured.” Path: `traits.${index}`. |
-| Flyby    | `flyby-missing-fly-speed`       | No usable Fly Speed. Message: “Flyby only applies while flying, but this creature has no Fly Speed.” Path: `traits.${index}`.                  |
+| Preset        | Code                               | When                                                                                                                                           |
+| ------------- | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tunneler      | `tunneler-missing-burrow-speed`    | No usable Burrow Speed. Message: “Tunneler uses half the creature's Burrow Speed, but no Burrow Speed is configured.” Path: `traits.${index}`. |
+| Flyby         | `flyby-missing-fly-speed`          | No usable Fly Speed. Message: “Flyby only applies while flying, but this creature has no Fly Speed.” Path: `traits.${index}`.                  |
+| Spider Climb  | `spider-climb-alternative-climb`   | Climb is an alternative movement mode. Notes that removing the alternative makes Spider Climb unconditional. Path: `traits.${index}`.          |
 
 Movement is `movementRowsToRecordForPreview`, then `resolveCreatureMovement`. A positive speed is usable. An explicit 0 is not usable, because the creature cannot move in that mode. A row with the mode chosen and feet still blank is unfinished input and stays quiet. A missing mode is absent.
 
@@ -378,4 +410,4 @@ No other fixed preset gets a check. Running Leap, Pack Tactics, Web Walker, Spid
 
 ## Row check
 
-274 shipped + 15 pending + 37 custom = 326. The shipped rows are phase 1, phase 2, and waves 1 and 2. Swarm of Insects Spider Climb is inside the custom 37. Every other name in the Open5e extract is in exactly one section above.
+275 shipped + 15 pending + 36 custom = 326. The shipped rows are phase 1, phase 2, and waves 1 and 2, including Swarm of Insects Spider Climb via the conditional preset formatter. Every other name in the Open5e extract is in exactly one section above.
