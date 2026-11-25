@@ -6,6 +6,7 @@ import {
   performInvalidSubmitFocus,
   type InvalidSubmitFocusFallbacks,
 } from './navigate-invalid-submit-focus.lib'
+import { scheduleInvalidSubmitFocusWithRevealBudget } from './navigate-invalid-submit-reveal.lib'
 import { resolveInvalidSubmitNavigation } from '../errors/resolve-invalid-submit-navigation'
 import type { FormItem } from '../field-config'
 import type { FormUiContextValue } from '../context/form-ui.context'
@@ -17,6 +18,8 @@ export type NavigateInvalidSubmitOptions = {
   onBeforeFocus?: () => void
   /** Waits two animation frames before focusing so layout (tab switch) can commit. */
   waitForLayout?: boolean
+  /** When set with `waitForLayout`, polls for the target within the pilot reveal budget. */
+  usePilotRevealBudget?: boolean
   focusFallbacks?: InvalidSubmitFocusFallbacks
 }
 
@@ -50,6 +53,11 @@ export function navigateInvalidSubmit<TFieldValues extends FieldValues>(
   ui.addValidationSessionExpandKeys(navigation.expandKeys)
 
   const focus = () => performInvalidSubmitFocus(navigation, idPrefix, options?.focusFallbacks)
+
+  if (options?.waitForLayout && options?.usePilotRevealBudget) {
+    scheduleInvalidSubmitFocusWithRevealBudget(navigation, idPrefix, focus, options.focusFallbacks)
+    return
+  }
 
   if (options?.waitForLayout) {
     window.requestAnimationFrame(() => {

@@ -62,7 +62,7 @@ export function presentContentFormInvalidSubmit<TFieldValues extends FieldValues
     ui,
     form.formState.errors,
     {
-      ...(viewId ? { waitForLayout: true } : {}),
+      ...(viewId ? { waitForLayout: true, usePilotRevealBudget: true } : {}),
     },
   )
 }

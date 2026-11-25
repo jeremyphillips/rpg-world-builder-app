@@ -26,7 +26,6 @@ import {
 } from '../layout/content-form-layout.lib'
 import type { UnsavedChangesConfirmController } from '@/lib/form-unsaved-changes-guard'
 import { notifyContentCreated } from '@/lib/notify'
-import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { formatContentCreateActionLabel } from '../../../content-type-labels'
 import { useContentWriteMutation } from '../../../list/use-content-mutations'
 import { ContentAuthoringGate } from '../layout/content-authoring-gate'
@@ -34,7 +33,6 @@ import { ContentFormOptionsGate, ContentFormLayout } from '../layout/content-for
 import { type AnyContentFormDef, type ContentFormCtx } from '../../registry/content-form-registry'
 import { resolveContentPostCreateEditHref } from '../layout/content-form-navigation'
 
-import { serializeContentFormInput } from '../../registry/content-form-serialize-input.lib'
 import { prepareSerializedContentFormWrite } from '../../submit/prepare-serialized-content-form-write.lib'
 import { resolveContentFormSchema } from '../edit/content-edit-load'
 import { intentToStatus } from './content-create-intent'
@@ -155,27 +153,6 @@ function ContentCreateFormBody({
     }
   }
 
-  const createEntity = async (
-    values: Record<string, unknown>,
-    status: 'draft' | 'published',
-    validationIntent: ContentValidationIntent,
-    form?: UseFormReturn<FieldValues>,
-  ) => {
-    const preparedValues = prepareSubmitValues?.(values) ?? values
-    const createBody = serializeContentFormInput(
-      def,
-      preparedValues,
-      serializeInputCtx,
-      validationIntent,
-      {
-        operation: 'create',
-        dirtyFields: form?.formState.dirtyFields as Record<string, unknown> | undefined,
-        rulesetId: ctx.rulesetId,
-      },
-    ) as Record<string, unknown>
-    await persistCreatedEntity(createBody, status, form)
-  }
-
   const invalidPresentation = {
     resolverFields: resolveContentFormNavigationFields(def, ctx),
     formId: formKey,
@@ -207,17 +184,37 @@ function ContentCreateFormBody({
     },
   })
 
-  const { onSubmit: onSaveDraft, formError: saveDraftFormError } = useSubmitHandler(
-    async (values, form) => {
+  const {
+    onSubmit: onSaveDraft,
+    formError: saveDraftFormError,
+    UiBridge: DraftUiBridge,
+  } = useContentFormSubmit<Record<string, unknown>>({
+    def,
+    ctx,
+    commitValidationIntent: 'draft',
+    fallbackMessage: `Could not save ${def.routeKey} draft.`,
+    prepareCommitValues,
+    invalidPresentation,
+    prepareWrite: (values, form) =>
+      prepareSerializedContentFormWrite({
+        def,
+        values,
+        form,
+        inputCtx: serializeInputCtx,
+        validationIntent: 'draft',
+        operation: 'create',
+        rulesetId: ctx.rulesetId,
+        prepareFormValues: prepareSubmitValues,
+      }),
+    persist: async (wireInput, form) => {
       setSaveDraftPending(true)
       try {
-        await createEntity(values, intentToStatus('save_draft'), 'draft', form)
+        await persistCreatedEntity(wireInput as Record<string, unknown>, 'draft', form)
       } finally {
         setSaveDraftPending(false)
       }
     },
-    `Could not save ${def.routeKey} draft.`,
-  )
+  })
 
   return (
     <ArmorClassAuthoringProvider value={authoring}>
@@ -266,6 +263,7 @@ function ContentCreateFormBody({
                 </Heading>
               ) : null}
               <UiBridge />
+              <DraftUiBridge />
               {formHeaderPrefix}
               <ArmorClassAuthoringNotice />
             </>

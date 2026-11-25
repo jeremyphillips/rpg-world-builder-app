@@ -7,4 +7,6 @@ Pilot budgets (Pre-implementation decisions):
 
 ## Create shell
 
-`ContentCreateShell` publish uses `prepareSerializedContentFormWrite` in the commit pipeline so `persist` receives the wire payload without a second `serializeContentFormInput` pass. Draft save still serializes on the legacy `useSubmitHandler` path until the remaining pilot surfaces adopt the same pipeline.
+- **Create shell:** publish and draft saves both use `prepareSerializedContentFormWrite` + `useContentFormSubmit`.
+- **Edit shell:** save uses the same commit pipeline and `persistContentEditUpdate` (overlay + media stale handling unchanged).
+- **Invalid submit:** tab/view activation uses `usePilotRevealBudget` on `navigateInvalidSubmit` (500ms poll via `waitForInvalidSubmitTarget`).

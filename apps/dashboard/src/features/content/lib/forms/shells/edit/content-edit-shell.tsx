@@ -15,19 +15,16 @@ import type { ZodType } from 'zod'
 import { ContentFormPageShell } from '../layout/content-form-page-shell'
 import { resolveContentFormLayout } from '../layout/content-form-layout.lib'
 import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
-import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { SubclassUnsavedEditsProvider } from '@/features/content/classes/hooks/subclass-unsaved-edits-context'
-import { stripEditEnvelopeFromFormDefaults } from '../../registry/content-form-key-helpers'
-import { serializeContentFormInput } from '../../registry/content-form-serialize-input.lib'
+import { prepareSerializedContentFormWrite } from '../../submit/prepare-serialized-content-form-write.lib'
+import { useContentFormSubmit } from '../submit/content-form-submit'
+import { resolveContentFormNavigationFields } from '../host/content-form-host-projection'
+import { persistContentEditUpdate } from './content-edit-persist.lib'
 import { resolveCatalogSeedBody } from '../../registry/resolve-catalog-seed-body.lib'
 import { findContentOverlayListFailure } from '../../../list/create-content-list'
 import { useContentWriteMutation } from '../../../list/use-content-mutations'
 import { type AnyContentFormDef, type ContentFormCtx } from '../../registry/content-form-registry'
-import {
-  findContentEditEntity,
-  loadContentEditFormState,
-  replaceCachedContentListEntity,
-} from './content-edit-load'
+import { findContentEditEntity, loadContentEditFormState } from './content-edit-load'
 import {
   ArmorClassAuthoringNotice,
   ArmorClassAuthoringProvider,
@@ -44,10 +41,6 @@ import { ContentEditLifecycleActions } from './content-edit-lifecycle-actions'
 import { ContentEditPublishProvider } from './content-edit-publish-context'
 import { ContentEditHeadingBadges } from '../../../campaign-access/content-edit-heading-badges'
 import { ContentEditEntityFormDialogs } from './content-edit-entity-form-dialogs'
-import {
-  CONTENT_MEDIA_STALE_FORM_MESSAGE,
-  extractStaleMediaFromError,
-} from './content-edit-stale-media.lib'
 import { draftPublishValidationSurface } from '../../validation/content-draft-publish-validation-surface.ref'
 
 function ContentEditFormHeading({
@@ -145,6 +138,7 @@ interface ContentEditEntityFormProps<
   onSubmit: (values: FieldValues, form: UseFormReturn<FieldValues>) => Promise<void>
   formKey?: string
   formHeaderNotice?: ReactNode
+  submitUiBridge?: ReactNode
 }
 
 function ContentEditEntityForm<
@@ -188,6 +182,7 @@ function ContentEditEntityFormBody<
   onSubmit,
   formKey,
   formHeaderNotice,
+  submitUiBridge,
 }: ContentEditEntityFormProps<TEntity>) {
   useSetBreadcrumbLabel(entity.name)
   const layout = resolveContentFormLayout(def)
@@ -257,6 +252,7 @@ function ContentEditEntityFormBody<
       previewDraftBadge={layout.previewEnabled && entity.status === 'draft'}
       formHeaderPrefix={
         <>
+          {submitUiBridge}
           {layout.previewEnabled ? heading : null}
           {formHeaderNotice}
         </>
@@ -443,9 +439,41 @@ function ContentEditFormBody({
     )
   })
   const { schema, validationIntent, defaultValues } = loaded
-  const { onSubmit, formError } = useSubmitHandler({
-    // fallow-ignore-next-line complexity — edit submit merges overlay intent, media, and cache sync
-    submit: async (values, form) => {
+  const formKey = `${entity.id}:${armorClassRulesSignature(authoring.snapshot)}:${authoring.generation}`
+
+  const serializeInputCtx = {
+    entity,
+    weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
+    campaignRules: layoutCtx.campaignRules,
+    equipmentKind: layoutCtx.equipmentKind,
+    armorClassRules: layoutCtx.armorClassRules,
+  }
+
+  const { onSubmit, formError, UiBridge } = useContentFormSubmit<Record<string, unknown>>({
+    def,
+    ctx: layoutCtx,
+    commitValidationIntent: validationIntent,
+    fallbackMessage: `Could not update ${def.routeKey}.`,
+    invalidPresentation: {
+      resolverFields: resolveContentFormNavigationFields(def, layoutCtx),
+      formId: formKey,
+    },
+    prepareWrite: (values, form) =>
+      prepareSerializedContentFormWrite({
+        def,
+        values,
+        form,
+        inputCtx: serializeInputCtx,
+        validationIntent,
+        operation: 'update',
+        rulesetId: layoutCtx.rulesetId,
+        serializeOptions: {
+          overlayBaseline: overlayBaseline ?? undefined,
+          catalogSeed,
+          expectedOverlayRevision: (entity as { overlayRevision?: number }).overlayRevision ?? 0,
+        },
+      }),
+    persist: async (wireInput, form) => {
       if (
         armorClassAuthoringIsStale({
           sensitive: authoring.sensitive,
@@ -458,72 +486,25 @@ function ContentEditFormBody({
       }
 
       if (validationIntent === 'draft') {
-        draftPublishValidationSurface.current?.(values as FieldValues)
+        draftPublishValidationSurface.current?.(form.getValues())
       }
 
-      let saved: unknown
-      try {
-        saved = await mutation.mutateAsync(
-          serializeContentFormInput(
-            def,
-            values,
-            {
-              entity,
-              weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
-              campaignRules: layoutCtx.campaignRules,
-              equipmentKind: layoutCtx.equipmentKind,
-              armorClassRules: layoutCtx.armorClassRules,
-            },
-            validationIntent,
-            {
-              operation: 'update',
-              dirtyFields: form.formState.dirtyFields as Record<string, unknown>,
-              rulesetId: layoutCtx.rulesetId,
-              overlayBaseline: overlayBaseline ?? undefined,
-              catalogSeed,
-              expectedOverlayRevision:
-                (entity as { overlayRevision?: number }).overlayRevision ?? 0,
-              entityId,
-              seedRowIdsByPath: (entity as { seedRowIdsByPath?: Record<string, readonly string[]> })
-                .seedRowIdsByPath,
-            },
-          ),
-        )
-      } catch (error) {
-        const serverMedia = extractStaleMediaFromError(error)
-        if (serverMedia === undefined) throw error
-
-        form.resetField('media', { defaultValue: serverMedia })
-        throw new Error(CONTENT_MEDIA_STALE_FORM_MESSAGE, { cause: error })
-      }
-      const savedRecord = saved as typeof entity & { media?: ContentMedia }
-      queryClient.setQueryData(def.queryKey(campaignId), (current: unknown) =>
-        replaceCachedContentListEntity(current, savedRecord),
-      )
-      const baseline = stripEditEnvelopeFromFormDefaults(
-        {
-          ...def.toFormValues(saved, { armorClassRules: layoutCtx.armorClassRules }),
-          media: savedRecord.media ?? emptyContentMediaSchema,
-        },
-        {
-          stripKind: layoutCtx.equipmentKind != null,
-        },
-      )
-      form.reset(baseline)
-      if (entity.catalogLayer === 'system' && def.normalizeOverlayBody) {
-        setOverlayBaseline(
-          def.normalizeOverlayBody(
-            baseline as never,
-            { entity: savedRecord, armorClassRules: layoutCtx.armorClassRules },
-            validationIntent,
-          ),
-        )
-      }
+      const baseline = await persistContentEditUpdate({
+        def,
+        entity,
+        campaignId,
+        layoutCtx,
+        wireInput: wireInput as Record<string, unknown>,
+        form,
+        mutation,
+        queryClient,
+        setOverlayBaseline,
+        validationIntent,
+      })
       if (validationIntent === 'draft') {
-        draftPublishValidationSurface.current?.(baseline as FieldValues)
+        draftPublishValidationSurface.current?.(baseline)
       }
     },
-    fallbackMessage: `Could not update ${def.routeKey}.`,
   })
 
   const formDefaults = authoring.keptValues ?? {
@@ -545,7 +526,7 @@ function ContentEditFormBody({
         headingFn={headingFn}
         layoutCtx={layoutCtx}
         schema={schema}
-        formKey={`${entity.id}:${armorClassRulesSignature(authoring.snapshot)}:${authoring.generation}`}
+        formKey={formKey}
         formHeaderNotice={
           <>
             <ArmorClassAuthoringNotice />
@@ -556,6 +537,7 @@ function ContentEditFormBody({
             ) : null}
           </>
         }
+        submitUiBridge={<UiBridge />}
         defaultValues={formDefaults}
         submitPending={mutation.isPending}
         formError={formError ?? null}
