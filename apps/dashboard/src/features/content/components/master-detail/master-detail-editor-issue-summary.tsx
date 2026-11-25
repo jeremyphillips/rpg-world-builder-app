@@ -13,7 +13,7 @@ export function MasterDetailEditorIssueSummary({ count }: MasterDetailEditorIssu
   if (count <= 0) return null
 
   return (
-    <span className="inline-flex min-w-0 items-center gap-1 text-style-label text-destructive-muted">
+    <span className="inline-flex min-w-0 items-center gap-1 text-style-label text-semantic-destructive">
       <Icon name="triangle-alert" size="inline" className="shrink-0" />
       {masterDetailEditorIssueCountLabel(count)}
     </span>

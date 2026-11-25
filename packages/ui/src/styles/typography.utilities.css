@@ -311,7 +311,7 @@
 @utility text-style-field-error {
   font-size: var(--text-xs);
   line-height: var(--text-xs--line-height);
-  color: var(--destructive);
+  color: var(--semantic-destructive);
 }
 
 /* Score numerals. Base owns weight, tabular figures, and foreground. Size modifiers own size and line-height. */

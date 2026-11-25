@@ -31,7 +31,10 @@ export function MasterDetailEditorStatusRow({
       ) : null}
       {showIssues ? <MasterDetailEditorIssueSummary count={issueCount} /> : null}
       {headerIssues.length > 0 ? (
-        <ul role="alert" className="m-0 flex list-none flex-col gap-1 p-0 text-destructive-muted">
+        <ul
+          role="alert"
+          className="m-0 flex list-none flex-col gap-1 p-0 text-semantic-destructive"
+        >
           {headerIssues.map((issue) => (
             <li key={issue.path}>{issue.message}</li>
           ))}

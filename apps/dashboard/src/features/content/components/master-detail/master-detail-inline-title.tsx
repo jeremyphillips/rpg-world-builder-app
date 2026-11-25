@@ -204,7 +204,7 @@ export function MasterDetailInlineTitleEditor({
         />
       </div>
       {validation.error ? (
-        <Text id={errorId} role="alert" variant="caption" className="text-destructive-muted">
+        <Text id={errorId} role="alert" variant="caption" className="text-semantic-destructive">
           {validation.error}
         </Text>
       ) : null}
