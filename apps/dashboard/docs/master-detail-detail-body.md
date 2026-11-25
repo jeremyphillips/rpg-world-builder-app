@@ -10,7 +10,7 @@ availability for editors with and without availability controls.
 | Region                               | Owner                                            | Notes                                                             |
 | ------------------------------------ | ------------------------------------------------ | ----------------------------------------------------------------- |
 | Identity (title, metadata, overflow) | `MasterDetailEditorShell`                        | Unchanged                                                         |
-| Contextual chrome                    | `contextualChrome`                               | Notices, advisories, focus anchors — **outside** the rhythm stack |
+| Contextual chrome                    | `contextNotice`                                  | Notices, advisories, focus anchors — **outside** the rhythm stack |
 | Detail body                          | `MasterDetailDetailBody`                         | One outer `FormRhythmStack`                                       |
 | Leading fields                       | Domain `resolveFieldSections` / `fieldSections`  | Optional; rendered before facing                                  |
 | Facing                               | `facing` + `StructuredFacingHostPanel`           | Shell-mounted only                                                |

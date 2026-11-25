@@ -1,6 +1,5 @@
 import { useEffect, useMemo } from 'react'
 import { isWeaponEquipment, resolveEquipmentInstanceReferenceLabel } from '@rpg/contracts'
-import { SemanticText, Text } from '@rpg/ui'
 import { useWatch } from 'react-hook-form'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
@@ -187,15 +186,13 @@ export function MonsterActionDetail({
     document.getElementById(`monster-action-focus-${action.id}`)?.focus()
   }, [action, sections.focusToken])
 
-  const contextualChrome = sections.notice ? (
-    <div id={action ? `monster-action-focus-${action.id}` : undefined} tabIndex={-1}>
-      <Text as="p" variant="supporting">
-        <SemanticText>{sections.notice}</SemanticText>
-      </Text>
-    </div>
-  ) : action ? (
-    <div id={`monster-action-focus-${action.id}`} tabIndex={-1} />
-  ) : null
+  const contextNotice =
+    action || sections.notice
+      ? {
+          focusAnchorId: action ? `monster-action-focus-${action.id}` : undefined,
+          text: sections.notice,
+        }
+      : undefined
 
   const spellPicker =
     located && action
@@ -229,7 +226,7 @@ export function MonsterActionDetail({
       onDelete={located ? () => sections.requestDelete(located.action.id) : undefined}
       onDuplicate={located ? sections.duplicateSelected : undefined}
       overflowActions={moveOverflowActions(located, sections.requestMove)}
-      contextualChrome={contextualChrome}
+      contextNotice={contextNotice}
       facing={facing}
       spellPicker={spellPicker}
     />

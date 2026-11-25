@@ -192,14 +192,12 @@ describe('MasterDetailEditorPanel', () => {
             initialEdit: true,
           },
         }}
-        contextualChrome={
-          <input type="checkbox" aria-hidden="true" tabIndex={-1} data-testid="bubble" />
-        }
+        contextNotice={{ focusAnchorId: 'notice-anchor', text: 'Action moved.' }}
       />,
     )
 
     expect(await screen.findByRole('textbox', { name: 'Name' })).toHaveFocus()
-    expect(screen.getByTestId('bubble')).not.toHaveFocus()
+    expect(screen.getByText('Action moved.').closest('#notice-anchor')).not.toHaveFocus()
   })
 
   it('rejects an explicit field section that binds the shell-owned inline title', () => {
