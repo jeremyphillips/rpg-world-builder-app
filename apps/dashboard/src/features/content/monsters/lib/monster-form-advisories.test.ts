@@ -132,7 +132,7 @@ describe('collectMonsterFormAdvisories', () => {
     const values = {
       traits: [{ id: 'climb', preset: 'spider-climb' }],
       movement: [{ mode: 'walk', feet: 20 }],
-      movementAlternative: { firstMode: 'climb', secondMode: 'fly', feet: 20 },
+      movementAlternative: { modes: ['climb', 'fly'], feet: 20 },
     } as unknown as MonsterFormValues
 
     expect(collectMonsterFormAdvisories(values, new Map())).toEqual([

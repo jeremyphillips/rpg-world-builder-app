@@ -22,12 +22,12 @@ Skeleton, Knight, Mage, and Lich have no descriptive trait presets in the seed s
 
 326 trait rows on 204 creatures. 127 creatures have none. 106 names after stripping parentheticals.
 
-| Disposition | Rows | Share | What the number means                                                                  |
-| ----------- | ---: | ----: | -------------------------------------------------------------------------------------- |
-| Shipped     |  275 |   84% | Phase 1: 146 rows. Phase 2: 66 rows. Wave 1: 49 rows. Wave 2: 14 rows                  |
-| Pending     |   15 |    5% | A fidelity or authoring blocker. Not a build task yet                                  |
-| Custom      |   36 |   11% | Signature prose and Spirit Naga’s Fiendish Restoration |
-| Total       |  326 |  100% |                                                                                        |
+| Disposition | Rows | Share | What the number means                                                 |
+| ----------- | ---: | ----: | --------------------------------------------------------------------- |
+| Shipped     |  275 |   84% | Phase 1: 146 rows. Phase 2: 66 rows. Wave 1: 49 rows. Wave 2: 14 rows |
+| Pending     |   15 |    5% | A fidelity or authoring blocker. Not a build task yet                 |
+| Custom      |   36 |   11% | Signature prose and Spirit Naga’s Fiendish Restoration                |
+| Total       |  326 |  100% |                                                                       |
 
 275 + 15 + 36 = 326. The remaining rows are pending or custom.
 
@@ -52,7 +52,7 @@ Monster authoring and the stat block call the shared formatter. They own the com
 
 **Status: implemented** on published monster bodies only (optional `movementAlternative` beside fixed `movement` in [movement-mode.ts](../src/rpg/vocab/movement-mode.ts)).
 
-- Exactly one unresolved pair of modes at one speed; neither mode may also appear in fixed `movement`.
+- Two or more unresolved alternative modes at one speed (GM chooses one); none may also appear in fixed `movement`.
 - `resolveCreatureMovement` still returns only simultaneous fixed speeds. `movementModeAvailability(definition, mode)` returns `guaranteed`, `alternative`, or `absent`.
 - Speed line: [formatMovementDisplay](../src/rpg/vocab/movement-mode.ts) and [formatMonsterSpeedStatRow](../src/rpg/runtime/monster/format-monster-speed-stat-row.ts) print unresolved alternatives, e.g. `20 ft., Fly or Climb 20 ft. (GM's choice)`.
 - **Instance selection at encounter setup is deferred.** The definition does not record which alternative mode is active.
@@ -66,15 +66,15 @@ Species and defined-form movement overrides do not gain `movementAlternative` in
 
 **Status: documented / blocked** — no roll consumer, no environmental illumination or sunlight-as-state vocabulary beyond the existing `in-sunlight` circumstance on stored grants.
 
-| Concern | Owner (when built) | Status |
-| -------- | ------------------ | ------ |
-| Place illumination + sunlight exposure | Shared environmental state + `creature-effect` circumstances | **Proposed** — not `in-bright-light` yet |
-| Trait roll disadvantage in play | `creatureRollAdjustmentSchema` + shared roll consumer | **Blocked** — grants persist; Sunlight Sensitivity template grant now matches attack + ability-check prose |
-| Spell resolution emitting advantage/disadvantage | Spell `resolution` effects | **Missing** — spells do not store roll adjustments |
-| Damage auras (Heat/Fire Aura pulses) | Shared aura config | **Deferred** |
-| HP at 0, regeneration execution, bloodied | `runtime/creature` state | **Blocked** |
-| Encounter instance picking among definition alternatives | Creature-level instance selection | **Deferred** — movement alternative renders unresolved |
-| Shape-shift full stat-block replacement | Catalog creature reference + picker | **Deferred** — `definedForms` partial overrides only |
+| Concern                                                  | Owner (when built)                                           | Status                                                                                                     |
+| -------------------------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| Place illumination + sunlight exposure                   | Shared environmental state + `creature-effect` circumstances | **Proposed** — not `in-bright-light` yet                                                                   |
+| Trait roll disadvantage in play                          | `creatureRollAdjustmentSchema` + shared roll consumer        | **Blocked** — grants persist; Sunlight Sensitivity template grant now matches attack + ability-check prose |
+| Spell resolution emitting advantage/disadvantage         | Spell `resolution` effects                                   | **Missing** — spells do not store roll adjustments                                                         |
+| Damage auras (Heat/Fire Aura pulses)                     | Shared aura config                                           | **Deferred**                                                                                               |
+| HP at 0, regeneration execution, bloodied                | `runtime/creature` state                                     | **Blocked**                                                                                                |
+| Encounter instance picking among definition alternatives | Creature-level instance selection                            | **Deferred** — movement alternative renders unresolved                                                     |
+| Shape-shift full stat-block replacement                  | Catalog creature reference + picker                          | **Deferred** — `definedForms` partial overrides only                                                       |
 
 Exposure predicates and continuous vs pulse timing must not grow a trait-local roll engine. Mechanical outliers (Fire Elemental ignition, Gibbering d8 table) stay custom or pending — not `details`.
 
@@ -384,11 +384,11 @@ A normal activation condition, such as Running Leap’s 10-foot running start, d
 
 Monster authoring advisories are `collectMonsterFormAdvisories` in [monster-form-advisories.ts](../../../apps/dashboard/src/features/content/monsters/lib/monster-form-advisories.ts). Each one is `{ code, message, path }`. There is no severity. They do not block save or publish. The open editor shows the messages whose path matches the selected row. The add menu, the generated sentence, the stat block, and the vocabulary description do not repeat them.
 
-| Preset        | Code                               | When                                                                                                                                           |
-| ------------- | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Tunneler      | `tunneler-missing-burrow-speed`    | No usable Burrow Speed. Message: “Tunneler uses half the creature's Burrow Speed, but no Burrow Speed is configured.” Path: `traits.${index}`. |
-| Flyby         | `flyby-missing-fly-speed`          | No usable Fly Speed. Message: “Flyby only applies while flying, but this creature has no Fly Speed.” Path: `traits.${index}`.                  |
-| Spider Climb  | `spider-climb-alternative-climb`   | Climb is an alternative movement mode. Notes that removing the alternative makes Spider Climb unconditional. Path: `traits.${index}`.          |
+| Preset       | Code                             | When                                                                                                                                           |
+| ------------ | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tunneler     | `tunneler-missing-burrow-speed`  | No usable Burrow Speed. Message: “Tunneler uses half the creature's Burrow Speed, but no Burrow Speed is configured.” Path: `traits.${index}`. |
+| Flyby        | `flyby-missing-fly-speed`        | No usable Fly Speed. Message: “Flyby only applies while flying, but this creature has no Fly Speed.” Path: `traits.${index}`.                  |
+| Spider Climb | `spider-climb-alternative-climb` | Climb is an alternative movement mode. Notes that removing the alternative makes Spider Climb unconditional. Path: `traits.${index}`.          |
 
 Movement is `movementRowsToRecordForPreview`, then `resolveCreatureMovement`. A positive speed is usable. An explicit 0 is not usable, because the creature cannot move in that mode. A row with the mode chosen and feet still blank is unfinished input and stays quiet. A missing mode is absent.
 

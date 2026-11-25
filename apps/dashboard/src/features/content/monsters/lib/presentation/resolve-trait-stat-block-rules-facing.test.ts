@@ -81,7 +81,7 @@ describe('resolveTraitStatBlockRulesFacing', () => {
       monster: {
         name: 'Swarm of Insects',
         movement: [{ mode: 'walk', feet: 20 }],
-        movementAlternative: { firstMode: 'climb', secondMode: 'fly', feet: 20 },
+        movementAlternative: { modes: ['climb', 'fly'], feet: 20 },
       },
     })
     const published = resolveTraitStatBlockRulesFacing({

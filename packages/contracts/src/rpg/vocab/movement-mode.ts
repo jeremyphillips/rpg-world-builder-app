@@ -185,7 +185,8 @@ export type CreatureMovementDefinition = CreatureLikeMovement & {
 
 const movementAlternativeModesSchema = z
   .array(extraMovementModeSchema)
-  .length(2, 'Exactly two alternative movement modes are required.')
+  .min(2, 'At least two alternative movement modes are required.')
+  .max(EXTRA_MOVEMENT_MODES.length)
   .superRefine((modes, ctx) => {
     if (new Set(modes).size !== modes.length) {
       addCustomRefinementIssue(ctx, 'Alternative movement modes must be distinct.', ['modes'])

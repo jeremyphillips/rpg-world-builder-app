@@ -2,10 +2,13 @@ import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 
 import { MOVEMENT_MODES } from '@rpg/contracts'
-import { isContainer, type ArrayConfig, type SelectFieldConfig } from '@rpg/ui/form'
+import { isContainer, type ArrayConfig, type ChipsFieldConfig } from '@rpg/ui/form'
 
-import { speciesCreateDefaultValues } from '../../../species/lib/species-form-values'
 import {
+  movementAlternativeChipOptions,
+  movementAlternativeFormToSchema,
+  movementAlternativeGroupField,
+  movementAlternativeRecordToForm,
   movementArrayField,
   movementRowDraftFormSchema,
   movementRowFormSchema,
@@ -13,14 +16,27 @@ import {
   movementRowsToRecord,
   movementRowsToRecordForPreview,
   movementWithHoverGroup,
+  orderMovementAlternativeModes,
+  refineMovementAlternativeForm,
   refineMovementRows,
 } from './content-movement-form-fields'
 
-describe('content movement form fields', () => {
-  it('seeds create forms with Walk 30', () => {
-    expect(speciesCreateDefaultValues.movement).toEqual([{ mode: 'walk', feet: 30 }])
-  })
+function alternativeGroupFromFactory() {
+  const monsterGroup = movementWithHoverGroup({ includeMovementAlternative: true })
+  expect(isContainer(monsterGroup) && monsterGroup.kind === 'group').toBe(true)
+  if (!isContainer(monsterGroup) || monsterGroup.kind !== 'group') {
+    throw new Error('expected movementWithHoverGroup root group')
+  }
+  const alternativeGroup = monsterGroup.fields.find(
+    (field) => isContainer(field) && field.kind === 'group' && field.name === 'movementAlternative',
+  )
+  if (!isContainer(alternativeGroup) || alternativeGroup.kind !== 'group') {
+    throw new Error('expected movementAlternative group')
+  }
+  return alternativeGroup
+}
 
+describe('content movement form fields', () => {
   it('omits alternative movement on species and the default hover group', () => {
     const group = movementWithHoverGroup()
     expect(isContainer(group) && group.kind === 'group').toBe(true)
@@ -33,47 +49,93 @@ describe('content movement form fields', () => {
   })
 
   it('includes alternative movement only when the factory option is on', () => {
-    const monsterGroup = movementWithHoverGroup({ includeMovementAlternative: true })
-    expect(isContainer(monsterGroup) && monsterGroup.kind === 'group').toBe(true)
-    if (!isContainer(monsterGroup) || monsterGroup.kind !== 'group') return
-    const hasAlternative = monsterGroup.fields.some(
-      (field) =>
-        isContainer(field) && field.kind === 'group' && field.name === 'movementAlternative',
-    )
-    expect(hasAlternative).toBe(true)
+    const alternativeGroup = alternativeGroupFromFactory()
+    expect(alternativeGroup.name).toBe('movementAlternative')
   })
 
-  it('resolves alternative mode selects through optionsResolve.optionsWhen', () => {
-    const monsterGroup = movementWithHoverGroup({ includeMovementAlternative: true })
-    expect(isContainer(monsterGroup) && monsterGroup.kind === 'group').toBe(true)
-    if (!isContainer(monsterGroup) || monsterGroup.kind !== 'group') return
-
-    const alternativeGroup = monsterGroup.fields.find(
-      (field) =>
-        isContainer(field) && field.kind === 'group' && field.name === 'movementAlternative',
+  it('configures alternative modes as multi-select chips with min two selections', () => {
+    const alternativeGroup = alternativeGroupFromFactory()
+    const chips = alternativeGroup.fields.find(
+      (field): field is ChipsFieldConfig => 'type' in field && field.type === 'chips',
     )
-    expect(isContainer(alternativeGroup) && alternativeGroup.kind === 'group').toBe(true)
-    if (!isContainer(alternativeGroup) || alternativeGroup.kind !== 'group') return
+    expect(chips).toMatchObject({
+      name: 'modes',
+      min: 2,
+      required: true,
+      optionsResolve: { dependsOn: ['movement', 'movementAlternative'] },
+    })
+    expect(chips?.optionsResolve?.optionsWhen).toBe(movementAlternativeChipOptions)
+  })
 
-    const row = alternativeGroup.fields.find((field) => isContainer(field) && field.kind === 'row')
-    expect(isContainer(row) && row.kind === 'row').toBe(true)
-    if (!isContainer(row) || row.kind !== 'row') return
-
+  it('excludes fixed movement from chip options but keeps conflicting selections visible', () => {
     const watched = {
       movement: [{ mode: 'walk', feet: 20 }],
-      movementAlternative: { firstMode: '', secondMode: '', feet: undefined },
+      movementAlternative: { modes: [], feet: undefined },
     }
+    const baseline = movementAlternativeChipOptions(watched).map((option) => option.value)
+    expect(baseline).not.toContain('walk')
 
-    for (const name of ['firstMode', 'secondMode'] as const) {
-      const select = row.fields.find(
-        (field): field is SelectFieldConfig =>
-          'type' in field && field.type === 'select' && field.name === name,
-      )
-      expect(select).toBeDefined()
-      expect(select!.optionsResolve?.optionsWhen).toBeTypeOf('function')
-      const options = [...select!.optionsResolve!.optionsWhen!(watched)]
-      expect(options.every((option) => 'value' in option && option.value !== 'walk')).toBe(true)
+    const conflicting = {
+      movement: [
+        { mode: 'walk', feet: 20 },
+        { mode: 'climb', feet: 10 },
+      ],
+      movementAlternative: { modes: ['climb', 'fly'], feet: 20 },
     }
+    const options = movementAlternativeChipOptions(conflicting)
+    expect(options.map((option) => option.value)).toContain('climb')
+    expect(options.map((option) => option.value)).not.toContain('walk')
+  })
+
+  it('orders alternative modes in movement vocabulary order', () => {
+    expect(orderMovementAlternativeModes(['fly', 'climb', 'burrow'])).toEqual([
+      'fly',
+      'climb',
+      'burrow',
+    ])
+  })
+
+  it('round-trips published alternatives through form values', () => {
+    const published = { modes: ['fly', 'climb'] as const, feet: 20 as const }
+    const form = movementAlternativeRecordToForm(published)
+    expect(form).toEqual({ modes: ['fly', 'climb'], feet: 20 })
+    expect(movementAlternativeFormToSchema(form)).toEqual(published)
+  })
+
+  it('rejects fewer than two modes on form refine', () => {
+    const schema = z
+      .object({ movementAlternative: z.object({ modes: z.array(z.string()), feet: z.number() }) })
+      .superRefine((values, ctx) => {
+        refineMovementAlternativeForm(values.movementAlternative, [{ mode: 'walk', feet: 20 }], ctx)
+      })
+
+    const result = schema.safeParse({ movementAlternative: { modes: ['fly'], feet: 20 } })
+    expect(result.success).toBe(false)
+    if (result.success) return
+    expect(
+      result.error.issues.some((issue) => issue.path.join('.') === 'movementAlternative.modes'),
+    ).toBe(true)
+  })
+
+  it('flags overlap on movementAlternative.modes regardless of edit direction', () => {
+    const schema = z
+      .object({ movement: z.array(movementRowDraftFormSchema), movementAlternative: z.any() })
+      .superRefine((values, ctx) => {
+        refineMovementAlternativeForm(values.movementAlternative, values.movement, ctx)
+      })
+
+    const result = schema.safeParse({
+      movement: [
+        { mode: 'walk', feet: 20 },
+        { mode: 'climb', feet: 10 },
+      ],
+      movementAlternative: { modes: ['climb', 'fly'], feet: 20 },
+    })
+    expect(result.success).toBe(false)
+    if (result.success) return
+    expect(
+      result.error.issues.some((issue) => issue.path.join('.') === 'movementAlternative.modes'),
+    ).toBe(true)
   })
 
   it('movementWithHoverGroup stacks movement array and hover without a section heading', () => {
@@ -169,5 +231,13 @@ describe('content movement form fields', () => {
     if (result.success) return
 
     expect(result.error.issues.some((issue) => issue.path.join('.') === '1.mode')).toBe(true)
+  })
+
+  it('optional disclosure seeds empty modes array', () => {
+    const group = movementAlternativeGroupField()
+    if (!isContainer(group) || group.kind !== 'group') {
+      throw new Error('expected movementAlternative group field')
+    }
+    expect(group.optionalDisclosure?.seedWhen?.()).toEqual({ modes: [], feet: undefined })
   })
 })

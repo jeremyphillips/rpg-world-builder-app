@@ -211,17 +211,34 @@ describe('formatMovementDisplay', () => {
 })
 
 describe('movementAlternativeSchema', () => {
-  it('accepts two distinct alternative modes', () => {
+  it('accepts two or more distinct alternative modes', () => {
     expect(movementAlternativeSchema.parse({ modes: ['climb', 'fly'], feet: 20 })).toEqual({
       modes: ['climb', 'fly'],
       feet: 20,
     })
+    expect(
+      movementAlternativeSchema.parse({ modes: ['climb', 'fly', 'burrow'], feet: 20 }),
+    ).toEqual({
+      modes: ['climb', 'fly', 'burrow'],
+      feet: 20,
+    })
   })
 
-  it('rejects duplicate modes, empty objects, and bad feet', () => {
+  it('formats three alternatives in movement vocabulary order', () => {
+    const alternative = movementAlternativeSchema.parse({
+      modes: ['burrow', 'fly', 'climb'],
+      feet: 20,
+    })
+    expect(formatMovementDisplay({ walk: 20 }, 'ft.', alternative)).toBe(
+      "20 ft., Fly or Climb or Burrow 20 ft. (GM's choice)",
+    )
+  })
+
+  it('rejects duplicate modes, fewer than two, empty objects, and bad feet', () => {
     expect(movementAlternativeSchema.safeParse({ modes: ['fly', 'fly'], feet: 20 }).success).toBe(
       false,
     )
+    expect(movementAlternativeSchema.safeParse({ modes: ['fly'], feet: 20 }).success).toBe(false)
     expect(movementAlternativeSchema.safeParse({}).success).toBe(false)
     expect(movementAlternativeSchema.safeParse({ modes: ['climb', 'fly'], feet: 3 }).success).toBe(
       false,
