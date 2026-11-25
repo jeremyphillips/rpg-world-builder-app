@@ -47,7 +47,7 @@ export type UseContentFormSubmitOptions<TValues extends FieldValues> = {
   fallbackMessage: string
   mapError?: MapFormError
   invalidPresentation?: ContentFormInvalidPresentation
-  /** Applied immediately before commit schema validation. Persist still receives raw form values. */
+  /** Applied once before commit validation; persist receives this prepared payload. */
   prepareCommitValues?: (values: TValues) => TValues
   /** Feature-owned persistence — called only after commit validation passes. */
   persist: FormSubmitHandler<TValues>
@@ -172,7 +172,7 @@ export function useContentFormSubmit<TValues extends FieldValues>(
       }
 
       try {
-        await persist(values, form)
+        await persist(commitValues, form)
       } catch (err) {
         presentPersistValidationFailure(form, err, invalidPresentation, uiRef.current)
         throw err

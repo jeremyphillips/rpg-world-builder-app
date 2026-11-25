@@ -156,7 +156,33 @@ describe('useContentFormSubmit', () => {
     })
 
     expect(persist).toHaveBeenCalledOnce()
+    expect(persist).toHaveBeenCalledWith({ name: 'A', level: 1 }, form)
     expect(result.current.formError).toBeUndefined()
+  })
+
+  it('persists prepared commit values, not raw handler values', async () => {
+    const persist = vi.fn().mockResolvedValue(undefined)
+
+    const { result } = renderHook(() =>
+      useContentFormSubmit<TestValues>({
+        def: testDef,
+        ctx: testCtx,
+        fallbackMessage: 'Could not save.',
+        prepareCommitValues: (values) => ({ ...values, name: values.name.trim() }),
+        persist,
+      }),
+    )
+
+    const form = renderHook(() =>
+      useForm<TestValues>({ defaultValues: { name: '  A  ', level: 1 } }),
+    ).result.current
+
+    await act(async () => {
+      await result.current.onSubmit({ name: '  A  ', level: 1 }, form)
+    })
+
+    expect(persist).toHaveBeenCalledOnce()
+    expect(persist).toHaveBeenCalledWith({ name: 'A', level: 1 }, form)
   })
 
   it('sets formError and rejects when persist throws', async () => {

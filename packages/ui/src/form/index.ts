@@ -344,6 +344,20 @@ export {
   createValidateSilently,
   type SilentValidationResult,
 } from './config/form-resolver'
+export {
+  evaluateFormSchema,
+  runFormAction,
+  projectIssuesToFieldErrors,
+  projectInvalidEvaluationToForm,
+  FORM_RHF_INTEGRATION_STRATEGY,
+  type EvaluateFormSchemaOptions,
+  type FormActionStage,
+  type FormActionStageResult,
+  type FormRhfIntegrationStrategy,
+  type FormSchemaEvaluationResult,
+  type RunFormActionOptions,
+  type RunFormActionResult,
+} from './lifecycle'
 export { resolveDependsOnWatchName } from './config/form-depends-on.lib'
 export { disableOptionsUsedInSiblingRows } from './config/array-unique-select.lib'
 export {

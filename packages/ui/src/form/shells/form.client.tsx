@@ -150,8 +150,8 @@ export function Form<TFieldValues extends FieldValues>({
 
   const resolver = React.useMemo(() => makeResolver<TFieldValues>(schema, fields), [schema, fields])
   const validateSilently = React.useMemo(
-    () => createValidateSilently(resolver) as ValidateSilently,
-    [resolver],
+    () => createValidateSilently(schema, fields) as ValidateSilently,
+    [schema, fields],
   )
 
   // Capture defaults once at mount. RHF v7.52+ auto-resets when `defaultValues`
