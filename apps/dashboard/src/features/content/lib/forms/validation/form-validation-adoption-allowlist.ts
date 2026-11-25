@@ -21,4 +21,9 @@ export const FORM_VALIDATION_ADOPTION_ALLOWLIST = [
     removesIn: 'phase-6-quick-npc',
     paths: ['apps/dashboard/src/features/character/npc'],
   },
+  {
+    id: 'campaign-settings-submit',
+    removesIn: 'phase-6-campaign-settings',
+    paths: ['apps/dashboard/src/features/campaign/routes/campaign-settings.tsx'],
+  },
 ] as const

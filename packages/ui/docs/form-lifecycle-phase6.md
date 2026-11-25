@@ -17,6 +17,15 @@ Adopt registered content hub forms onto the Phase 4 pilot pipeline one slice at 
 - Row badges: `useMasterDetailRowValidation` → `useContentFormPresentationIssues(resolverFields)`.
 - Inline title editor: `useFieldIssue(path)` (presentation-gated copy; no parallel RHF error merge).
 
+## Campaign
+
+- **Create wizard** — `WizardStepForm` steps with Zod schemas (evaluator-backed resolver); adoption drift in `campaign-form-validation-adoption.test.ts`.
+- **Settings** — tabbed save still on `useSubmitHandler` (allowlist entry `campaign-settings-submit`).
+
+## Public auth
+
+Login and signup use schema-driven `Form` from `@rpg/ui/form`; drift in `apps/public/.../auth-form-adoption.test.ts`.
+
 ## Still deferred
 
-See `form-validation-adoption-allowlist.ts` (character builder, import, Quick NPC).
+See `form-validation-adoption-allowlist.ts` (character builder, import, Quick NPC, campaign settings submit).
