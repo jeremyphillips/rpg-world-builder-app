@@ -12,10 +12,7 @@ import {
 } from '@rpg/ui/form'
 
 import { validateContentPublishValues } from '../../validation/content-publish-validation.lib'
-import {
-  apiValidationIssuesToFormIssues,
-  applyCanonicalFormIssuesToRhf,
-} from '../../validation/ingest-content-form-validation.lib'
+import { applyApiValidationIssuesToCanonicalRhf } from '../../validation/ingest-content-form-validation.lib'
 import { useContentEditPublishRequest } from './use-content-edit-publish-request'
 
 type ContentEditPublishBridgeProps = {
@@ -83,7 +80,7 @@ export function ContentEditPublishBridge({
         const issues = getApiValidationIssues(err)
         if (!issues) throw err
 
-        applyCanonicalFormIssuesToRhf(form, apiValidationIssuesToFormIssues(issues))
+        applyApiValidationIssuesToCanonicalRhf(form, issues)
         ui.markPublishAttempted()
         onPublishValidationFailed?.()
         presentPublishValidationErrors(form, fields, formId, tabbedChrome, ui)

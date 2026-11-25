@@ -1,4 +1,3 @@
-import { getApiValidationIssues } from '@rpg/contracts'
 import type { FieldValues, UseFormReturn } from 'react-hook-form'
 import {
   buildFieldControlId,
@@ -9,9 +8,8 @@ import {
   type FormValidationProducerSession,
 } from '@rpg/ui/form'
 
-import { applyValidationIssuesToForm } from '../../validation/content-publish-validation.lib'
 import {
-  apiValidationIssuesToFormIssues,
+  applyApiErrorValidationToCanonicalRhf,
   ingestContentFormValidationIssues,
 } from '../../validation/ingest-content-form-validation.lib'
 import type { ContentFormInvalidPresentation } from './content-form-submit-types.lib'
@@ -75,15 +73,11 @@ export function presentPersistValidationFailure<TFieldValues extends FieldValues
   session: FormValidationProducerSession,
   stamp: number,
 ): FormValidationProducerSession {
-  const issues = getApiValidationIssues(error)
-  if (!issues || !presentation) return session
-
-  form.clearErrors()
-  applyValidationIssuesToForm(form, issues)
-  const routed = apiValidationIssuesToFormIssues(issues)
+  const routed = applyApiErrorValidationToCanonicalRhf(form, error)
+  if (!routed || !presentation) return session
   const nextSession = ingestContentFormValidationIssues(session, 'api', stamp, routed)
   presentContentFormInvalidSubmit(form, ui, presentation, {
-    firstInvalidPath: issues[0]?.path,
+    firstInvalidPath: routed[0]?.path,
   })
   return nextSession
 }

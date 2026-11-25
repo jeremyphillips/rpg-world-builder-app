@@ -20,6 +20,9 @@ const contentEditShellPath = fileURLToPath(
 const contentFormSubmitCommitPath = fileURLToPath(
   new URL('./content-form-submit-commit.lib.ts', import.meta.url),
 )
+const contentFormSubmitPresentationPath = fileURLToPath(
+  new URL('./content-form-submit-presentation.lib.ts', import.meta.url),
+)
 const previewValidationPath = fileURLToPath(
   new URL('../../validation/use-content-publish-validation.ts', import.meta.url),
 )
@@ -85,6 +88,13 @@ describe('ContentFormDef create submit drift guard', () => {
     expect(source).not.toContain('applyContentPublishValidation')
   })
 
+  it('requires persist validation failure to paint api issues canonically', () => {
+    const source = readFileSync(contentFormSubmitPresentationPath, 'utf8')
+
+    expect(source).toContain('applyApiErrorValidationToCanonicalRhf')
+    expect(source).not.toContain('applyValidationIssuesToForm')
+  })
+
   it('requires publish preview and bridges to share canonical publish evaluation', () => {
     const railSource = readFileSync(previewRailPath, 'utf8')
     const validationSource = readFileSync(previewValidationPath, 'utf8')
@@ -101,7 +111,7 @@ describe('ContentFormDef create submit drift guard', () => {
     const source = readFileSync(editPublishBridgePath, 'utf8')
 
     expect(source).toContain('validateContentPublishValues')
-    expect(source).toContain('applyCanonicalFormIssuesToRhf')
+    expect(source).toContain('applyApiValidationIssuesToCanonicalRhf')
     expect(source).not.toContain('applyValidationIssuesToForm')
     expect(source).not.toContain('applyContentPublishValidation')
   })
