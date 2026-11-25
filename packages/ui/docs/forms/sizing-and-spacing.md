@@ -283,6 +283,16 @@ tracks come from [`resolveFieldRowColumnTracks`](../../components/ui/field-row-c
 (`--row-cols`). The parent slot caps total width; cluster children only partition that space
 (e.g. `auto` + `auto` → intrinsic `max-content` tracks with trailing free space inside the slot).
 
+### Auto row intrinsic sizing (hints)
+
+When a leaf field has `width: 'auto'` inside an anatomy row (`rowParticipation` on
+`Field.Root`), column tracks still resolve from label ∪ control — not from below-label hints,
+recommendations, derived meta, or errors. `FieldLayout` splits those spill regions behind
+`[data-field-intrinsic-spill]`; visible label chrome stays in `[data-field-intrinsic-sizing]`.
+Rules live in [`field-row-anatomy.utilities.css`](../../src/styles/field-row-anatomy.utilities.css)
+for both open-page `.field-row-anatomy-grid` and `.array-item-anatomy-grid`. Geometry fixtures:
+Storybook `Internal/Forms/Layout/FieldRowIntrinsicSizing`.
+
 ## Array inline row spacing (chrome shells)
 
 Compact array inline rows (`ArrayItemAnatomyGrid`) use **two-tier** horizontal spacing —

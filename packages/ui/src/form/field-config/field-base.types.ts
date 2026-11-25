@@ -117,7 +117,9 @@ export interface BaseFieldConfig {
    * Width of the field wrapper within its container — see `FIELD_WIDTHS`.
    *
    * **Intrinsic** (`xs` ~64px, `sm`, `md`, `lg`, `xl`, `auto`): capped width; use
-   * `auto` or fractions inside a `kind: 'row'`. Standalone fields with `digits`
+   * `auto` or fractions inside a `kind: 'row'`. In anatomy rows, `auto` uses
+   * row-scoped intrinsic sizing/spill so column width tracks label∪control and
+   * below-label hints wrap inside that column. Standalone fields with `digits`
    * usually keep `full` so label and hint span the column.
    *
    * **Row fractions** (`full`, `1/2`, `1/3`, `2/3`, `1/4`, `3/4`): meaningful

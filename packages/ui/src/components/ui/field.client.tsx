@@ -11,6 +11,7 @@ import {
   resolveFieldRootClassName,
   type FieldSize,
 } from './field-root.lib'
+import { resolveFieldAutoRowIntrinsicSizing } from './field-intrinsic-row.lib'
 import { FieldDerivedMeta } from './field-derived-meta.client'
 import { useFieldDerivedMetaContext } from './field-derived-meta-context.client'
 import {
@@ -42,6 +43,7 @@ interface FieldContextValue {
   error?: string
   hint?: string
   hintIcon?: 'info'
+  autoRowIntrinsicSizing: boolean
 }
 
 const FieldContext = React.createContext<FieldContextValue | null>(null)
@@ -156,6 +158,10 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
     const anatomyGridPlacement = useFieldAnatomyGridPlacement()
     const effectiveRowParticipation = rowParticipation || inAnatomyRow
     const useAnatomy = anatomy || effectiveRowParticipation
+    const autoRowIntrinsicSizing = resolveFieldAutoRowIntrinsicSizing(
+      width,
+      effectiveRowParticipation,
+    )
 
     const value = React.useMemo<FieldContextValue>(
       () =>
@@ -172,6 +178,7 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
           required,
           hasDerivedMeta,
           labelVisibility,
+          autoRowIntrinsicSizing,
         }),
       [
         controlId,
@@ -186,6 +193,7 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
         required,
         hasDerivedMeta,
         labelVisibility,
+        autoRowIntrinsicSizing,
       ],
     )
 
@@ -194,6 +202,7 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
         <div
           ref={ref}
           data-field={name}
+          data-field-width={width}
           data-field-anatomy={useAnatomy ? '' : undefined}
           data-field-row-participant={effectiveRowParticipation ? '' : undefined}
           className={resolveFieldRootClassName({
