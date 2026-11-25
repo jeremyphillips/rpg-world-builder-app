@@ -1,10 +1,15 @@
+import { SPELL_REFERENCE_DISPLAY_MESSAGES } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
+
+import { buildCatalogDrowGrantDisplayVocabulary } from '../../lib/fixtures/grant-display-fixtures'
+import { pickSpecies } from '../../lib/fixtures/pick'
 
 import { speciesFormDef } from './species-form-def'
 import type { SpeciesFormValues } from './species-form-fields'
 import {
   SPECIES_PREVIEW_FACT_LABELS,
   buildSpeciesPreviewIdentity,
+  buildSpeciesPreviewDetailViewModel,
   buildSpeciesPreviewSections,
 } from './species-preview-projection'
 import { speciesCreateDefaultValues } from './species-form-values'
@@ -115,6 +120,24 @@ describe('species preview projection', () => {
       status: '1',
     })
     expect(sections.traits?.facts?.[0]?.value).toBe('Darkvision')
+  })
+
+  it('uses the authoring spell catalog lifecycle in the Drow detail preview', () => {
+    const values = createValues(speciesFormDef.toFormValues(pickSpecies('elf')))
+    const { spellsById } = buildCatalogDrowGrantDisplayVocabulary().spellCatalog
+
+    function drowSummary(spellCatalogStatus: 'ready' | 'pending') {
+      return buildSpeciesPreviewDetailViewModel(values, {
+        spellCatalogStatus,
+        spellCatalogById: spellsById,
+      })
+        .sections.find((section) => section.id === 'heritage')
+        ?.items.find((item) => item.id === 'drow')?.summaryInline
+    }
+
+    expect(drowSummary('ready')).toContain('Dancing Lights')
+    expect(drowSummary('pending')).toContain(SPELL_REFERENCE_DISPLAY_MESSAGES.catalogLoading)
+    expect(drowSummary('pending')).not.toContain('Dancing Lights')
   })
 
   it('shows heritage when configured', () => {

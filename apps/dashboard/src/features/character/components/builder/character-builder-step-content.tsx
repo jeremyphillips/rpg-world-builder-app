@@ -1,4 +1,5 @@
 import type {
+  CharacterBuildCatalogIndex,
   CharacterBuildContext,
   CharacterBuilderDraft,
   CharacterBuildPreview,
@@ -23,6 +24,7 @@ import type { CharacterBuilderNavigateToStep } from '../../lib/builder/character
 export type CharacterBuilderStepContentProps = {
   stepId: CharacterBuilderStepId
   context: CharacterBuildContext
+  spellsById: CharacterBuildCatalogIndex['spells']
   draft: CharacterBuilderDraft
   preview: CharacterBuildPreview | null
   resolvedChoiceSets: readonly ChoiceSet[]
@@ -39,6 +41,7 @@ export type CharacterBuilderStepContentProps = {
 export function CharacterBuilderStepContent({
   stepId,
   context,
+  spellsById,
   draft,
   preview,
   resolvedChoiceSets,
@@ -76,6 +79,7 @@ export function CharacterBuilderStepContent({
       return (
         <SpeciesStep
           context={context}
+          spellsById={spellsById}
           draft={draft}
           resolvedChoiceSets={resolvedChoiceSets}
           validationIssues={validationIssues}

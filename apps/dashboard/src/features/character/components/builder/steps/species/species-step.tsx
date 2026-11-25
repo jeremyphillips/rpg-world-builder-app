@@ -2,8 +2,10 @@ import { useCallback, useMemo, useState } from 'react'
 
 import {
   characterBuilderStepSelectionMessages,
+  createSpellCatalogContext,
   formatFieldMessage,
   resolvePlayableBuilderContent,
+  type CharacterBuildCatalogIndex,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
   type ChoiceSet,
@@ -48,6 +50,7 @@ const SELECTED_SPECIES_LABEL = formatFieldMessage(
 
 export type SpeciesStepProps = {
   context: CharacterBuildContext
+  spellsById: CharacterBuildCatalogIndex['spells']
   draft: CharacterBuilderDraft
   resolvedChoiceSets: readonly ChoiceSet[]
   validationIssues: CharacterBuildValidationIssue[]
@@ -65,6 +68,7 @@ function resolveSelectedHeritageOptionId(
 
 export function SpeciesStep({
   context,
+  spellsById,
   draft,
   resolvedChoiceSets,
   validationIssues,
@@ -72,6 +76,11 @@ export function SpeciesStep({
 }: SpeciesStepProps) {
   const [detailsSpeciesId, setDetailsSpeciesId] = useState<string | null>(null)
   const [heritagePanelExpanded, setHeritagePanelExpanded] = useState(false)
+
+  const spellCatalog = useMemo(
+    () => createSpellCatalogContext({ status: 'ready', spellsById }),
+    [spellsById],
+  )
 
   const species = useMemo(() => resolvePlayableBuilderContent(context).species, [context])
 
@@ -131,7 +140,7 @@ export function SpeciesStep({
         options={mapHeritageOptionsToDependentCardOptions(
           selectedSpecies,
           context.catalog.languages,
-          context.catalog.spells,
+          spellCatalog,
         )}
         value={selectedHeritageOptionId ?? ''}
         onValueChange={(optionId) => {
@@ -141,7 +150,7 @@ export function SpeciesStep({
     )
   }, [
     context.catalog.languages,
-    context.catalog.spells,
+    spellCatalog,
     draft,
     heritageChoiceSet,
     heritagePanelExpanded,
@@ -183,7 +192,6 @@ export function SpeciesStep({
         }
       }),
     [
-      context,
       heritageEmbeddedContent,
       heritageRequired,
       selectedHeritageOptionLabel,
@@ -199,12 +207,8 @@ export function SpeciesStep({
 
   const detailsContent = useMemo(() => {
     if (!detailsSpecies) return null
-    return buildSpeciesDetailsSheetContent(
-      detailsSpecies,
-      context.catalog.languages,
-      context.catalog.spells,
-    )
-  }, [context.catalog.languages, context.catalog.spells, detailsSpecies])
+    return buildSpeciesDetailsSheetContent(detailsSpecies, context.catalog.languages, spellCatalog)
+  }, [context.catalog.languages, spellCatalog, detailsSpecies])
 
   const isDetailsSpeciesSelected =
     detailsSpeciesId != null && draft.species.speciesId === detailsSpeciesId

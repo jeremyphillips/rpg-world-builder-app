@@ -4,7 +4,10 @@ import { DEFAULT_SYSTEM_RULESET_ID } from '@rpg/contracts'
 import { listLanguageSeedOptions } from '@rpg/catalog/vocabulary'
 
 import { SPECIES_SECTION_LABELS, SPECIES_STAT_LABELS } from '@/features/content'
-import { DROW_HERITAGE_SHEET_SUMMARY_LINES, getDrowHeritageSpellCatalog } from '@/features/content'
+import {
+  DROW_HERITAGE_SHEET_SUMMARY_LINES,
+  buildCatalogDrowGrantDisplayVocabulary,
+} from '@/features/content'
 import { pickSpecies } from '@/features/content'
 import { makeSpecies } from '@/test/fixtures/factories/species'
 
@@ -56,7 +59,11 @@ describe('builder-option-display.lib', () => {
 
   it('builds species detail sheet metadata, traits, language affinities, and senses', () => {
     const languages = listLanguageSeedOptions(DEFAULT_SYSTEM_RULESET_ID)
-    const content = buildSpeciesDetailsSheetContent(dwarfWithTraits, languages)
+    const content = buildSpeciesDetailsSheetContent(
+      dwarfWithTraits,
+      languages,
+      buildCatalogDrowGrantDisplayVocabulary().spellCatalog,
+    )
     const dwarvishLabel =
       languages.find((language) => language.id === 'dwarvish')?.label ?? 'dwarvish'
 
@@ -79,7 +86,11 @@ describe('builder-option-display.lib', () => {
   it('builds catalog Elf heritage grant summary lines without prose body', () => {
     const languages = listLanguageSeedOptions(DEFAULT_SYSTEM_RULESET_ID)
     const elf = pickSpecies('elf')
-    const content = buildSpeciesDetailsSheetContent(elf, languages, getDrowHeritageSpellCatalog())
+    const content = buildSpeciesDetailsSheetContent(
+      elf,
+      languages,
+      buildCatalogDrowGrantDisplayVocabulary().spellCatalog,
+    )
     const heritageSection = content.sections.find((section) => section.title === 'Elven Lineage')
     const drowItem = heritageSection?.items?.find((item) => item.title === 'Drow')
 
@@ -109,7 +120,11 @@ describe('builder-option-display.lib', () => {
         ],
       },
     })
-    const content = buildSpeciesDetailsSheetContent(speciesWithProseOnlyHeritage, languages, [])
+    const content = buildSpeciesDetailsSheetContent(
+      speciesWithProseOnlyHeritage,
+      languages,
+      buildCatalogDrowGrantDisplayVocabulary().spellCatalog,
+    )
     const heritageSection = content.sections.find((section) => section.title === 'Test Heritage')
     const optionItem = heritageSection?.items?.[0]
 

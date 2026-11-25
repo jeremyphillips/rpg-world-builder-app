@@ -1,11 +1,11 @@
 import { loadSeedSpells } from '@rpg/catalog/spells'
-import type { GrantGroup, SpeciesBodyTrait } from '@rpg/contracts'
+import { createSpellCatalogContext, type GrantGroup, type SpeciesBodyTrait } from '@rpg/contracts'
 
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 import { type GrantDisplayVocabulary } from '../forms/grants/grant-display'
 
-import { pickClass, pickEquipment, pickSpecies, pickSpell } from './pick'
+import { pickClass, pickEquipment, pickSpecies } from './pick'
 import { STORY_RULESET_ID } from './constants'
 
 /** Catalog Wood Elf heritage option grant groups from the Elf species seed. */
@@ -86,17 +86,14 @@ export function buildCatalogEquipmentGrantVocabulary(): Pick<
   }
 }
 
-/** Vocabulary resolving catalog spell names for Drow lineage grants. */
+/** Vocabulary for grant summaries using the system spell catalog. */
 export function buildCatalogDrowGrantDisplayVocabulary(): GrantDisplayVocabulary {
   return {
     resolveSenseLabel: (type) => (type === 'darkvision' ? 'Darkvision' : type),
-    resolveSpell: (spellId) => {
-      const slug = spellId.startsWith(`${STORY_RULESET_ID}:`)
-        ? spellId.slice(STORY_RULESET_ID.length + 1)
-        : spellId
-      const spell = pickSpell(slug)
-      return { name: spell.name, level: spell.level }
-    },
+    spellCatalog: createSpellCatalogContext({
+      status: 'ready',
+      spellsById: new Map(loadSeedSpells(STORY_RULESET_ID).map((spell) => [spell.id, spell])),
+    }),
   }
 }
 

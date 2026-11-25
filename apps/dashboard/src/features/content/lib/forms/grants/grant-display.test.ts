@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import type { GrantGroup } from '@rpg/contracts'
+import {
+  createSpellCatalogContext,
+  SPELL_REFERENCE_DISPLAY_MESSAGES,
+  type GrantGroup,
+} from '@rpg/contracts'
 
 import { makeSpell } from '@/test/fixtures/factories/spell'
 
@@ -15,7 +19,6 @@ import {
 } from '../../fixtures/grant-display-fixtures'
 import {
   buildGrantSummaryModel,
-  buildSpellGrantVocabulary,
   formatGrantSummaryByLevel,
   formatGrantSummaryInline,
 } from './grant-display'
@@ -508,20 +511,53 @@ describe('formatGrantSummaryByLevel', () => {
   })
 })
 
-describe('buildSpellGrantVocabulary', () => {
-  it('resolves spell display metadata by canonical id', () => {
-    const resolveSpell = buildSpellGrantVocabulary([
-      makeSpell({
-        id: 'ruleset:dancing-lights',
-        slug: 'dancing-lights',
-        name: 'Dancing Lights',
-        level: 0,
-      }),
-    ])
+describe('spell grant reference outcomes', () => {
+  const spell = makeSpell({
+    id: 'ruleset:dancing-lights',
+    slug: 'dancing-lights',
+    name: 'Dancing Lights',
+    level: 0,
+    status: 'draft',
+  })
+  const groups: GrantGroup[] = [
+    {
+      grants: [
+        {
+          id: 'spells',
+          kind: 'spells',
+          ability: 'int',
+          availability: 'always_prepared',
+          spellIds: [spell.id, 'other-ruleset:dancing-lights'],
+        },
+      ],
+    },
+  ]
+  const spellsById = new Map([[spell.id, spell]])
 
-    expect(resolveSpell('ruleset:dancing-lights')).toEqual({ name: 'Dancing Lights', level: 0 })
-    expect(resolveSpell('missing')).toEqual({
-      name: 'Spell reference unavailable',
+  it('uses the exact catalog id and reserves spell type suffixes for resolved entries', () => {
+    const model = buildGrantSummaryModel(groups, {
+      ...vocabulary,
+      spellCatalog: createSpellCatalogContext({ status: 'ready', spellsById }),
     })
+
+    expect(model.flatItems.map(({ kind }) => kind)).toEqual(['cantrip', 'unresolvedSpell'])
+    expect(formatGrantSummaryInline(model, { includeTypeSuffix: true })).toBe(
+      `Dancing Lights cantrip${GRANT_SUMMARY_JOIN}${SPELL_REFERENCE_DISPLAY_MESSAGES.unknownSpell}`,
+    )
+  })
+
+  it.each([
+    ['pending', SPELL_REFERENCE_DISPLAY_MESSAGES.catalogLoading],
+    ['error', SPELL_REFERENCE_DISPLAY_MESSAGES.catalogError],
+  ] as const)('preserves %s even when the query has a map', (status, label) => {
+    const model = buildGrantSummaryModel(groups, {
+      ...vocabulary,
+      spellCatalog: createSpellCatalogContext({ status, spellsById }),
+    })
+
+    expect(model.flatItems.map((item) => item.label)).toEqual([label, label])
+    expect(formatGrantSummaryInline(model, { includeTypeSuffix: true })).toBe(
+      `${label}${GRANT_SUMMARY_JOIN}${label}`,
+    )
   })
 })

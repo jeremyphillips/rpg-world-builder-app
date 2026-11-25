@@ -77,20 +77,18 @@ import {
   getGrantGroupEffectiveUnlock,
   resolveGrantGroupsFromContent,
   resolveMechanicalGrantsFromContent,
-  createSpellCatalogContext,
   presentSpellReferenceDisplayName,
   resolveSpellReferenceOutcome,
   type SpellCatalogContext,
   type ContentGrant,
   type EquipmentKind,
   type GrantGroup,
-  type Spell,
 } from '@rpg/contracts'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 export type GrantDisplayVocabulary = {
   resolveSenseLabel: (type: string) => string
-  resolveSpell: (spellId: string) => { name: string; level?: number } | undefined
+  spellCatalog: SpellCatalogContext
   resolveSkillName?: (id: string) => string | undefined
   resolveToolName?: (slug: string) => string | undefined
   resolveWeaponName?: (slug: string) => string | undefined
@@ -103,6 +101,7 @@ export type GrantSummaryKind =
   | 'sense'
   | 'spell'
   | 'cantrip'
+  | 'unresolvedSpell'
   | 'proficiency'
   | 'damageType'
   | 'resistance'
@@ -180,19 +179,17 @@ function mapSpellGrantToItems(
   level: number,
 ): GrantSummaryItem[] {
   return grant.spellIds.map((spellId, spellIndex) => {
-    const resolved = vocabulary.resolveSpell(spellId)
-    const name =
-      resolved?.name ??
-      presentSpellReferenceDisplayName({
-        status: 'unresolved',
-        spellId,
-        reason: 'unknown-spell',
-      })
-    const spellKind: GrantSummaryKind = resolved?.level === 0 ? 'cantrip' : 'spell'
+    const outcome = resolveSpellReferenceOutcome(spellId, vocabulary.spellCatalog)
+    const spellKind: GrantSummaryKind =
+      outcome.status === 'unresolved'
+        ? 'unresolvedSpell'
+        : outcome.spell.level === 0
+          ? 'cantrip'
+          : 'spell'
 
     return {
       id: `${idPrefix}:spells:${spellIndex}`,
-      label: name,
+      label: presentSpellReferenceDisplayName(outcome),
       kind: spellKind,
       supported: true,
       sourceGrantKind: grant.kind,
@@ -509,30 +506,6 @@ function applyMaxItems(
   return {
     parts: parts.slice(0, maxItems),
     overflowCount: parts.length - maxItems,
-  }
-}
-
-/** Resolves canonical spell ids from catalog entries. */
-export function buildSpellGrantVocabulary(
-  spells: readonly Spell[],
-): GrantDisplayVocabulary['resolveSpell'] {
-  const catalog = createSpellCatalogContext({
-    status: 'ready',
-    spellsById: new Map(spells.map((spell) => [spell.id, spell])),
-  })
-
-  return buildSpellGrantVocabularyFromCatalog(catalog)
-}
-
-export function buildSpellGrantVocabularyFromCatalog(
-  catalog: SpellCatalogContext,
-): GrantDisplayVocabulary['resolveSpell'] {
-  return (spellId) => {
-    const outcome = resolveSpellReferenceOutcome(spellId, catalog)
-    if (outcome.status === 'resolved') {
-      return { name: outcome.spell.name, level: outcome.spell.level }
-    }
-    return { name: presentSpellReferenceDisplayName(outcome) }
   }
 }
 

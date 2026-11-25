@@ -580,6 +580,7 @@ export function CharacterBuilderShell({
                 <CharacterBuilderStepContent
                   stepId={currentStepId}
                   context={context}
+                  spellsById={catalogIndex.spells}
                   draft={draft}
                   preview={preview}
                   resolvedChoiceSets={resolvedChoiceSets}

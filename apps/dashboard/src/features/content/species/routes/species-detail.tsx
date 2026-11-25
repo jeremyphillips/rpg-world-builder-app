@@ -26,7 +26,6 @@ import {
 import { buildSpeciesContentDisplayImageInput } from '../../lib/detail/page/content-display-image-input'
 import { ContentUsageReferencesSection } from '../../lib/usage/content-usage-references-section'
 import { useSpells } from '../../spells/hooks/use-spells'
-import { buildSpellGrantVocabularyFromCatalog } from '../../lib/forms/grants/grant-display'
 import { SpeciesDetailBody } from '../components/detail/species-detail-body'
 
 type SpeciesDetailContentProps = { species: Species; campaignId: string }
@@ -48,7 +47,7 @@ export function SpeciesDetailContent({ species, campaignId }: SpeciesDetailConte
     resolveCreatureTypeLabel: (id) => getCreatureTypeLabel(id, { creatureTypeVocabulary }),
     resolveLanguageLabel: (id) => getLanguageLabelFromVocabulary(languageVocabulary, id),
     resolveSenseLabel: (type) => getSenseLabelFromVocabulary(senseVocabulary, type),
-    resolveSpell: buildSpellGrantVocabularyFromCatalog(spellCatalog),
+    spellCatalog,
   })
 
   return (

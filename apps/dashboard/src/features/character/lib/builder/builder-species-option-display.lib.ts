@@ -1,4 +1,8 @@
-import { type CharacterBuildLanguageOption, type Species, type Spell } from '@rpg/contracts'
+import {
+  type CharacterBuildLanguageOption,
+  type Species,
+  type SpellCatalogContext,
+} from '@rpg/contracts'
 
 import { getContentTypeItemLabel } from '@/features/content'
 import {
@@ -10,7 +14,6 @@ import {
 import {
   buildSpeciesCardViewModel,
   buildSpeciesDetailViewModel,
-  buildSpellGrantVocabulary,
   SPECIES_SECTION_LABELS,
   type SpeciesDetailItem,
 } from '@/features/content'
@@ -26,19 +29,18 @@ function resolveLanguageLabel(
   return languages.find((entry) => entry.id === languageId)?.label ?? languageId
 }
 
-function buildBuilderSpeciesVocabulary(
+export function buildBuilderSpeciesVocabulary(
   languages: readonly CharacterBuildLanguageOption[],
-  spells: readonly Spell[],
+  spellCatalog: SpellCatalogContext,
 ) {
   const creatureTypeVocabulary = buildSeedCreatureTypeVocabulary()
   const senseVocabulary = buildSeedSenseVocabulary()
-  const resolveSpell = buildSpellGrantVocabulary(spells)
 
   return {
     resolveCreatureTypeLabel: (id: string) => getCreatureTypeLabel(creatureTypeVocabulary, id),
     resolveLanguageLabel: (id: string) => resolveLanguageLabel(languages, id),
     resolveSenseLabel: (type: string) => getSenseLabelFromVocabulary(senseVocabulary, type),
-    resolveSpell,
+    spellCatalog,
   }
 }
 
@@ -71,11 +73,11 @@ export type SpeciesDetailsSheetContent = {
 export function buildSpeciesDetailsSheetContent(
   species: Species,
   languages: readonly CharacterBuildLanguageOption[],
-  spells: readonly Spell[] = [],
+  spellCatalog: SpellCatalogContext,
 ): SpeciesDetailsSheetContent {
   const viewModel = buildSpeciesDetailViewModel(
     species,
-    buildBuilderSpeciesVocabulary(languages, spells),
+    buildBuilderSpeciesVocabulary(languages, spellCatalog),
   )
 
   const sections: BuilderOptionDetailsSection[] = viewModel.sections.map((section) => {

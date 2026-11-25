@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { DEFAULT_SYSTEM_RULESET_ID } from '@rpg/contracts'
+import { createSpellCatalogContext, DEFAULT_SYSTEM_RULESET_ID } from '@rpg/contracts'
 import { listLanguageSeedOptions } from '@rpg/catalog/vocabulary'
 
 import { makeSpecies } from '@/test/fixtures/factories/species'
@@ -15,7 +15,7 @@ import {
 import { pickSpecies } from '../../lib/fixtures/pick'
 import {
   DROW_HERITAGE_SHEET_SUMMARY_LINES,
-  getDrowHeritageSpellCatalog,
+  buildCatalogDrowGrantDisplayVocabulary,
 } from '../../lib/fixtures/grant-display-fixtures'
 
 import {
@@ -55,7 +55,7 @@ function buildVocabulary(languages: ReturnType<typeof listLanguageSeedOptions>) 
     resolveCreatureTypeLabel: (id: string) => getCreatureTypeLabel(creatureTypeVocabulary, id),
     resolveLanguageLabel: (id: string) => languages.find((entry) => entry.id === id)?.label ?? id,
     resolveSenseLabel: (type: string) => getSenseLabelFromVocabulary(senseVocabulary, type),
-    resolveSpell: () => undefined,
+    spellCatalog: createSpellCatalogContext({ status: 'ready' }),
   }
 }
 
@@ -189,10 +189,7 @@ describe('species-display', () => {
     const elf = pickSpecies('elf')
     const vocabularyWithSpells = {
       ...vocabulary,
-      resolveSpell: (spellId: string) => {
-        const spell = getDrowHeritageSpellCatalog().find((entry) => entry.id === spellId)
-        return spell ? { name: spell.name, level: spell.level } : undefined
-      },
+      spellCatalog: buildCatalogDrowGrantDisplayVocabulary().spellCatalog,
     }
 
     const { sections } = buildSpeciesDetailViewModel(elf, vocabularyWithSpells)

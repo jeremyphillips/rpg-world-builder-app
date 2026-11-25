@@ -15,9 +15,9 @@ Rules vocabulary (layer 1): [vocabulary.md](../../../docs/vocabulary.md).
 | **2 — Content / ChoiceSet** | DM-authored rules-facing names              | `Elven Lineage`, `Giant Ancestry`, `Drow`                    | Catalog → `resolve*ChoiceSets()`                              |
 | **3 — Builder UI copy**     | Workflow chrome (status, helpers, change)   | `Heritage required`, `Change heritage`, `Choose one option.` | `characterBuilderDependentChoiceMessages` in `@rpg/contracts` |
 
-**Display vocabulary** (grant summaries, stat rows) is a fourth _resolution_ concern —
-`GrantDisplayVocabulary`, `buildSpellGrantVocabulary`, `getCreatureTypeLabel` — not a
-copy catalog. Keep in display libs; do not conflate with layer 3.
+**Display vocabulary** covers grant summaries and stat rows. The species
+details sheet and heritage cards share the species display vocabulary and
+resolve spell references through the loaded builder catalog index.
 
 Rules vocabulary is **not** builder UI copy. Layer-2 headings may use words like
 "Lineage" when authored in catalog content; layer-3 code uses domain terms

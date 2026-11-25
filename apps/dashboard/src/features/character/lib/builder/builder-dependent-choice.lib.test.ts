@@ -8,7 +8,10 @@ import {
 } from '@rpg/contracts'
 import { listLanguageSeedOptions } from '@rpg/catalog/vocabulary'
 
-import { DROW_HERITAGE_SHEET_SUMMARY_LINES, getDrowHeritageSpellCatalog } from '@/features/content'
+import {
+  DROW_HERITAGE_SHEET_SUMMARY_LINES,
+  buildCatalogDrowGrantDisplayVocabulary,
+} from '@/features/content'
 import { pickSpecies } from '@/features/content'
 
 import {
@@ -60,7 +63,7 @@ describe('builder-dependent-choice.lib', () => {
     const options = mapHeritageOptionsToDependentCardOptions(
       elf,
       languages,
-      getDrowHeritageSpellCatalog(),
+      buildCatalogDrowGrantDisplayVocabulary().spellCatalog,
     )
     const drow = options.find((option) => option.value === 'drow')
 

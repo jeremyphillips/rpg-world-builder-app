@@ -83,6 +83,7 @@ function renderSpeciesStep({
   return render(
     <SpeciesStep
       context={context}
+      spellsById={new Map(context.catalog.spells.map((spell) => [spell.id, spell]))}
       draft={draft}
       resolvedChoiceSets={resolvedChoiceSets}
       validationIssues={[]}
@@ -122,6 +123,7 @@ function StatefulSpeciesStep({
   return (
     <SpeciesStep
       context={context}
+      spellsById={new Map(context.catalog.spells.map((spell) => [spell.id, spell]))}
       draft={draft}
       resolvedChoiceSets={resolvedChoiceSets}
       validationIssues={[]}
@@ -225,6 +227,7 @@ describe('SpeciesStep', () => {
     await user.click(screen.getByRole('button', { name: 'View Elf details' }))
 
     const dialog = screen.getByRole('dialog')
+    expect(within(dialog).getByText('Dancing Lights cantrip', { exact: false })).toBeInTheDocument()
     expect(
       within(dialog).queryByRole('button', { name: CHANGE_HERITAGE_LABEL }),
     ).not.toBeInTheDocument()

@@ -12,7 +12,6 @@ import { formatPreviewRailOverflowList, type PreviewRailFact } from '@rpg/ui'
 
 import { getLanguageLabelFromVocabulary, getSenseLabelFromVocabulary } from '@/features/vocabulary'
 
-import { buildSpellGrantVocabularyFromCatalog } from '../../lib/forms/grants/grant-display'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import {
   CONTENT_PREVIEW_DESCRIPTION_PLACEHOLDER,
@@ -101,12 +100,10 @@ function speciesPreviewVocabulary(ctx: ContentFormCtx): SpeciesDisplayVocabulary
       ctx.languageVocabulary ? getLanguageLabelFromVocabulary(ctx.languageVocabulary, id) : id,
     resolveSenseLabel: (type) =>
       ctx.senseVocabulary ? getSenseLabelFromVocabulary(ctx.senseVocabulary, type) : type,
-    resolveSpell: buildSpellGrantVocabularyFromCatalog(
-      createSpellCatalogContext({
-        status: ctx.spellCatalogStatus ?? 'pending',
-        spellsById: ctx.spellCatalogById,
-      }),
-    ),
+    spellCatalog: createSpellCatalogContext({
+      status: ctx.spellCatalogStatus ?? 'pending',
+      spellsById: ctx.spellCatalogById,
+    }),
   }
 }
 

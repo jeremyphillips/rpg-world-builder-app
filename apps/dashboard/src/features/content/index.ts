@@ -345,7 +345,6 @@ export type {
 export { ContentEditShell } from './lib/forms/shells/edit/content-edit-shell'
 export {
   buildGrantSummaryModel,
-  buildSpellGrantVocabulary,
   formatGrantSummaryByLevel,
   formatGrantSummaryInline,
   type GrantDisplayVocabulary,
