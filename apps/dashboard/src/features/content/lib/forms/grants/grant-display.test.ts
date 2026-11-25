@@ -99,6 +99,14 @@ describe('buildGrantSummaryModel', () => {
     expect(model.flatItems).toHaveLength(4)
   })
 
+  it('uses the scoped sense label in compact grant summaries', () => {
+    const model = buildGrantSummaryModel(getCatalogDrowHeritageGrantGroups(), {
+      ...vocabulary,
+      resolveSenseLabel: () => 'Moon Sight',
+    })
+    expect(model.flatItems[0]?.label).toBe('Moon Sight 120 ft.')
+  })
+
   it('marks supported catalog Drow items with source grant kinds', () => {
     const model = buildGrantSummaryModel(getCatalogDrowHeritageGrantGroups(), vocabulary)
 

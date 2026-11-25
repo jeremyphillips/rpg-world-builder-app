@@ -12,8 +12,6 @@ import {
   buildSeedLanguageVocabulary,
   buildSeedSenseVocabulary,
   getDamageTypeLabelFromVocabulary,
-  getLanguageLabelFromVocabulary,
-  getSenseLabelFromVocabulary,
 } from '@/features/vocabulary'
 
 import { GRANT_ROW_TYPE_LABELS } from './grant-form-schema'
@@ -77,8 +75,8 @@ function equipmentCatalog(
 const headerContext = {
   rowLabels: GRANT_ROW_TYPE_LABELS,
   resolveDamageTypeLabel: (id: string) => getDamageTypeLabelFromVocabulary(seedDamageTypes, id),
-  resolveLanguageLabel: (id: string) => getLanguageLabelFromVocabulary(seedLanguages, id),
-  resolveSenseLabel: (id: string) => getSenseLabelFromVocabulary(seedSenses, id),
+  resolveLanguageLabel: (id: string) => seedLanguages.labelById[id],
+  resolveSenseLabel: (id: string) => seedSenses.labelById[id],
   equipmentReferences: buildGrantEquipmentReferencePresentationFromAuthoring({
     status: 'ready',
     scope: testEquipmentScope,
@@ -309,6 +307,41 @@ describe('resolveGrantRowPresentation', () => {
     expect(presentation?.description).toBe(
       'Character gains proficiency with Dagger and Equipment reference unavailable.',
     )
+  })
+
+  it('uses campaign language and sense labels in details and descriptions', () => {
+    const context = {
+      ...headerContext,
+      resolveLanguageLabel: () => 'River Cant',
+      resolveSenseLabel: () => 'Moon Sight',
+    }
+    expect(
+      resolveGrantRowPresentation({ grantType: 'languages', language: 'river-cant' }, context),
+    ).toMatchObject({ detail: 'River Cant', description: 'Character knows River Cant.' })
+    expect(
+      resolveGrantRowPresentation(
+        { grantType: 'senses', senseType: 'moon-sight', senseRange: '60' },
+        context,
+      ),
+    ).toMatchObject({
+      detail: 'Moon Sight 60 ft.',
+      description: 'Character gains Moon Sight with a range of 60 feet.',
+    })
+  })
+
+  it('displays unavailable copy for missing language and sense references', () => {
+    expect(
+      resolveGrantRowPresentation(
+        { grantType: 'languages', language: 'missing-language' },
+        headerContext,
+      ),
+    ).toEqual({ heading: 'Language', detail: 'Language reference unavailable' })
+    const sense = resolveGrantRowPresentation(
+      { grantType: 'senses', senseType: 'missing-sense', senseRange: 60 },
+      headerContext,
+    )
+    expect(sense?.detail).toBe('Sense reference unavailable')
+    expect(sense?.description).toBeUndefined()
   })
 
   it('omits detail when incomplete', () => {

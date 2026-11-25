@@ -79,8 +79,11 @@ export const languageChoiceGrantSchema = contentPoolChoiceSchema
 
 export type LanguageChoiceGrant = z.infer<typeof languageChoiceGrantSchema>
 
-export function formatLanguageGrantSentence(languageIds: readonly string[]): string {
-  return `Character knows ${joinNaturalList(languageIds.map((id) => getLanguageSentenceForm(id)))}.`
+export function formatLanguageGrantSentence(
+  languageIds: readonly string[],
+  resolveLabel: (id: string) => string = (id) => getLanguageSentenceForm(id),
+): string {
+  return `Character knows ${joinNaturalList(languageIds.map(resolveLabel))}.`
 }
 
 /** Compact summary label: "Common language", "Common, Elvish languages", etc. */
@@ -139,8 +142,11 @@ export function formatFeatChoiceGrantSentence(grant: FeatChoiceGrant): string {
   return `Character chooses ${grant.choose} ${featForm}.`
 }
 
-export function formatSenseGrantSentence(sense: z.infer<typeof senseSchema>): string {
-  return `Character gains ${getSenseSentenceForm(sense.type)} with a range of ${sense.range} feet.`
+export function formatSenseGrantSentence(
+  sense: z.infer<typeof senseSchema>,
+  label = getSenseSentenceForm(sense.type),
+): string {
+  return `Character gains ${label} with a range of ${sense.range} feet.`
 }
 
 export function formatDamageTypeGrantSentence(damageTypes: readonly string[]): string {

@@ -1,6 +1,7 @@
 import {
   createEquipmentCatalogContext,
   createSpellCatalogContext,
+  formatCreatureSenseCompactLine,
   formatDamageTypeGrantSentence,
   formatFeatChoiceGrantSentence,
   formatLanguageGrantSentence,
@@ -10,6 +11,8 @@ import {
   formatSenseGrantSentence,
   formatSpellsGrantSentenceFromResolutions,
   getFeatCategorySentenceForm,
+  LANGUAGE_TERM,
+  SENSE_TERM,
   presentEquipmentReferenceDisplayName,
   presentSpellReferenceDisplayName,
   resolveEquipmentSlugReference,
@@ -81,8 +84,8 @@ export type GrantRowHeaderContext = {
   resolveSkillName?: (slug: string) => string
   spellReferences: GrantSpellReferencePresentation
   resolveDamageTypeLabel?: (id: string) => string
-  resolveLanguageLabel?: (id: string) => string
-  resolveSenseLabel?: (id: string) => string
+  resolveLanguageLabel?: (id: string) => string | undefined
+  resolveSenseLabel?: (id: string) => string | undefined
 }
 
 export function buildGrantSpellReferencePresentation(
@@ -213,24 +216,14 @@ function resolveDamageTypeDetail(
   return formatCompactMetadataList(damageTypes.map((id) => resolveLabel(id)))
 }
 
-function resolveLanguageDetail(
-  languageId: string | undefined,
-  ctx: GrantRowHeaderContext,
-): string | undefined {
-  if (!languageId) return undefined
-  return ctx.resolveLanguageLabel?.(languageId) ?? languageId
-}
-
-function resolveSenseDetail(
+function readSenseGrantFact(
   type: string | undefined,
   range: number | string | undefined,
-  ctx: GrantRowHeaderContext,
-): string | undefined {
+): { type: SenseId; range: number } | undefined {
   if (!type || range === undefined || range === '') return undefined
-  const numericRange = typeof range === 'number' ? range : Number(range)
+  const numericRange = Number(range)
   if (!Number.isFinite(numericRange)) return undefined
-  const label = ctx.resolveSenseLabel?.(type) ?? type
-  return `${label} ${numericRange} ft`
+  return { type, range: numericRange }
 }
 
 function resolveFeatChoiceDetail(values: GrantRowValues): string | undefined {
@@ -306,23 +299,24 @@ const GRANT_ROW_DESCRIPTION_BY_TYPE: Partial<Record<string, GrantRowDescriptionF
     if (!damageTypes?.length) return ''
     return formatDamageTypeGrantSentence(damageTypes)
   },
-  senses: (values) => {
-    const type = values['senseType'] as string | undefined
-    const range = values['senseRange'] as number | string | undefined
-    if (!type || range === undefined || range === '') return ''
-    const numericRange = typeof range === 'number' ? range : Number(range)
-    if (!Number.isFinite(numericRange)) return ''
-    return formatSenseGrantSentence({ type: type as SenseId, range: numericRange })
+  senses: (values, ctx) => {
+    const sense = readSenseGrantFact(
+      values['senseType'] as string | undefined,
+      values['senseRange'] as number | string | undefined,
+    )
+    const label = sense && ctx.resolveSenseLabel?.(sense.type)
+    return sense && label ? formatSenseGrantSentence(sense, label) : ''
   },
   movement: (values) => {
     const grant = movementFormValuesToGrantPayload(values)
     if (!grant) return ''
     return formatMovementGrantAuthoringSummary(grant)
   },
-  languages: (values) => {
+  languages: (values, ctx) => {
     const languageId = values['language'] as string | undefined
     if (!languageId) return ''
-    return formatLanguageGrantSentence([languageId])
+    const label = ctx.resolveLanguageLabel?.(languageId)
+    return label ? formatLanguageGrantSentence([languageId], () => label) : ''
   },
   featChoice: (values) => {
     const choice = readFeatChoiceFromDraft(values['featCategory'], values['featChoose'])
@@ -357,14 +351,23 @@ const GRANT_ROW_DETAIL_BY_TYPE: Partial<Record<string, GrantRowDetailFormatter>>
     resolveDamageTypeDetail(values['resistances'] as string[] | undefined, ctx),
   damageType: (values, ctx) =>
     resolveDamageTypeDetail(values['damageType'] as string[] | undefined, ctx),
-  senses: (values, ctx) =>
-    resolveSenseDetail(
+  senses: (values, ctx) => {
+    const sense = readSenseGrantFact(
       values['senseType'] as string | undefined,
       values['senseRange'] as number | string | undefined,
-      ctx,
-    ),
+    )
+    if (!sense) return undefined
+    const label = ctx.resolveSenseLabel?.(sense.type)
+    return label
+      ? formatCreatureSenseCompactLine(sense, label)
+      : `${SENSE_TERM.label} reference unavailable`
+  },
   movement: (values) => resolveMovementDetail(values),
-  languages: (values, ctx) => resolveLanguageDetail(values['language'] as string | undefined, ctx),
+  languages: (values, ctx) => {
+    const id = values['language'] as string | undefined
+    if (!id) return undefined
+    return ctx.resolveLanguageLabel?.(id) ?? `${LANGUAGE_TERM.label} reference unavailable`
+  },
   featChoice: resolveFeatChoiceDetail,
   weaponProficiency: (values, ctx) =>
     weaponProficiencyGrantDetail(

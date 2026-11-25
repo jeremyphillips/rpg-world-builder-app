@@ -164,10 +164,6 @@ function isHiddenKnownValidGrant(item: GrantSummaryItem): boolean {
   return item.kind === 'notRenderedYet'
 }
 
-function formatSenseCompactLabel(grant: Extract<ContentGrant, { kind: 'sense' }>): string {
-  return formatCreatureSenseCompactLine(grant)
-}
-
 function formatSpellTypeSuffix(kind: 'cantrip' | 'spell'): string {
   return kind === 'cantrip' ? 'cantrip' : 'spell'
 }
@@ -300,11 +296,11 @@ type GrantItemMapper<K extends ContentGrant['kind']> = (
 const GRANT_ITEM_MAPPERS = {
   languageChoice: null,
   featChoice: null,
-  sense: (grant, _vocabulary, idPrefix, level) =>
+  sense: (grant, vocabulary, idPrefix, level) =>
     createSupportedGrantItems(
       idPrefix,
       'sense',
-      formatSenseCompactLabel(grant),
+      formatCreatureSenseCompactLine(grant, vocabulary.resolveSenseLabel(grant.type)),
       'sense',
       grant.kind,
       level,

@@ -47,8 +47,6 @@ import {
   buildActiveLanguageFieldOptions,
   buildActiveSenseFieldOptions,
   getDamageTypeLabelFromVocabulary,
-  getLanguageLabelFromVocabulary,
-  getSenseLabelFromVocabulary,
 } from '@/features/vocabulary'
 import { languageSingleComboboxField } from '@/lib/forms/language-combobox-form-fields.lib'
 
@@ -760,8 +758,14 @@ function buildGrantRowHeaderContext(
   return {
     rowLabels: labels,
     resolveDamageTypeLabel: (id) => getDamageTypeLabelFromVocabulary(damageTypeVocabulary, id),
-    resolveLanguageLabel: (id) => getLanguageLabelFromVocabulary(languageVocabulary, id),
-    resolveSenseLabel: (id) => getSenseLabelFromVocabulary(senseVocabulary, id),
+    resolveLanguageLabel: (id) =>
+      Object.hasOwn(languageVocabulary?.labelById ?? {}, id)
+        ? languageVocabulary?.labelById[id]
+        : undefined,
+    resolveSenseLabel: (id) =>
+      Object.hasOwn(senseVocabulary?.labelById ?? {}, id)
+        ? senseVocabulary?.labelById[id]
+        : undefined,
     equipmentReferences: buildGrantEquipmentReferencePresentationFromAuthoring({
       status: ctx.rulesetId ? ctx.equipmentCatalogStatus : 'pending',
       equipmentById: ctx.equipmentCatalogById,
