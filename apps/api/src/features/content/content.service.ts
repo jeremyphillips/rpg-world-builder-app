@@ -4,6 +4,7 @@ import { HttpError } from '../../lib/http-error'
 import { findCampaignById } from '../campaign'
 import type { ContentTypeConfig } from './lib/content-type-config'
 import { loadSystemContent, loadSystemContentPatches } from './lib/content-type-config'
+import { enrichResolvedSystemRecords } from './lib/enrich-system-content-read'
 import { resolveCatalog } from './lib/resolve-catalog'
 
 /**
@@ -21,15 +22,20 @@ export async function resolveCatalogForCampaign<T extends { id: string }>(
   }
 
   const { rulesetId } = campaign
+  const systemSeed = loadSystemContent(config, rulesetId)
   const [patches, homebrew] = await Promise.all([
     loadSystemContentPatches(config, campaignId),
     config.loadHomebrew(campaignId, rulesetId),
   ])
 
   const contentTypeKey = contentTypeKeySchema.safeParse(config.type).data
-  return resolveCatalog(loadSystemContent(config, rulesetId), patches, homebrew, {
+  const resolved = resolveCatalog(systemSeed, patches, homebrew, {
     replaceKeys: config.patchReplaceKeys,
     ...(contentTypeKey ? { contentTypeKey } : {}),
     ...(config.patchStickyArrayKeys ? { stickyArrayKeys: config.patchStickyArrayKeys } : {}),
   })
+  const seedById = new Map(
+    systemSeed.map((record) => [record.id, record as unknown as Record<string, unknown>]),
+  )
+  return enrichResolvedSystemRecords(resolved, seedById, patches, config.type)
 }

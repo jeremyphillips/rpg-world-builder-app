@@ -307,7 +307,9 @@ function omitAbsentSystemPatchLists(
   return next
 }
 
-function baselineFromEntity(entity: Monster | undefined): MonsterNormalizeBaseline | undefined {
+export function baselineFromEntity(
+  entity: Monster | undefined,
+): MonsterNormalizeBaseline | undefined {
   if (!entity) return undefined
   return {
     hover: entity.hover,

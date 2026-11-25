@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { creatureFamilyIdSchema } from '../vocab/creature-family'
 
 import { overlayAtomic } from './lib/system-overlay/annotate'
+import { mergeSystemOverlayUpdateEnvelope } from './lib/system-overlay/system-overlay-update'
 import {
   overlayDeleteEntryIdRows,
   overlayRestoreIdRows,
@@ -1065,15 +1066,17 @@ export const createMonsterDraftInputSchema = monsterDraftInputSchema.superRefine
   refineMonsterDraftBody(input as MonsterBodyDraft, ctx),
 )
 
-export const updateMonsterInputSchema = monsterPublishInputSchema.partial().extend({
-  creatureFamilyIds: monsterBodyFields.creatureFamilyIds.nullable(),
-  classIds: monsterBodyFields.classIds.nullable(),
-  experiencePointsOverride: z.number().int().min(0).nullable().optional(),
-  hover: z.boolean().nullable().optional(),
-  description: z.string().nullable().optional(),
-  movementAlternative: movementAlternativeSchema.nullable().optional(),
-  lair: monsterLairSchema.nullable().optional(),
-})
+export const updateMonsterInputSchema = mergeSystemOverlayUpdateEnvelope(
+  monsterPublishInputSchema.partial().extend({
+    creatureFamilyIds: monsterBodyFields.creatureFamilyIds.nullable(),
+    classIds: monsterBodyFields.classIds.nullable(),
+    experiencePointsOverride: z.number().int().min(0).nullable().optional(),
+    hover: z.boolean().nullable().optional(),
+    description: z.string().nullable().optional(),
+    movementAlternative: movementAlternativeSchema.nullable().optional(),
+    lair: monsterLairSchema.nullable().optional(),
+  }),
+)
 
 export type UpdateMonsterInput = z.infer<typeof updateMonsterInputSchema>
 

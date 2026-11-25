@@ -7,7 +7,7 @@ import type {
 import { emptyContentMediaSchema, type ContentMedia } from '@rpg/contracts'
 import { Heading, Spinner, Text } from '@rpg/ui'
 import { useQueryClient } from '@tanstack/react-query'
-import { type ReactNode, useState } from 'react'
+import { type ReactNode, useMemo, useState } from 'react'
 import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 
@@ -18,6 +18,7 @@ import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { SubclassUnsavedEditsProvider } from '@/features/content/classes/hooks/subclass-unsaved-edits-context'
 import { stripEditEnvelopeFromFormDefaults } from '../../registry/content-form-key-helpers'
 import { serializeContentFormInput } from '../../registry/content-form-serialize-input.lib'
+import { resolveCatalogSeedBody } from '../../registry/resolve-catalog-seed-body.lib'
 import { useContentWriteMutation } from '../../../list/use-content-mutations'
 import { type AnyContentFormDef, type ContentFormCtx } from '../../registry/content-form-registry'
 import {
@@ -347,24 +348,32 @@ interface ContentEditFormBodyProps {
 
 function useFrozenSystemOriginRowIds(
   def: AnyContentFormDef,
-  entity: { id: string; catalogLayer: CatalogLayer },
+  entity: {
+    id: string
+    catalogLayer: CatalogLayer
+    seedRowIdsByPath?: Readonly<Record<string, readonly string[]>>
+    rulesetId?: string
+  },
+  rulesetId?: string,
 ): ContentFormCtx['embeddedSystemOriginRowIds'] {
+  const resolveSeedLocks = () =>
+    entity.seedRowIdsByPath ?? def.extractEmbeddedSeedRowIds?.(entity as never)
+
   const [systemOrigin, setSystemOrigin] = useState<{
     entityId: string
     ids: ContentFormCtx['embeddedSystemOriginRowIds']
   } | null>(() =>
-    entity.catalogLayer === 'system'
-      ? { entityId: entity.id, ids: def.extractEmbeddedSeedRowIds?.(entity as never) }
-      : null,
+    entity.catalogLayer === 'system' ? { entityId: entity.id, ids: resolveSeedLocks() } : null,
   )
   if (entity.catalogLayer === 'system' && systemOrigin?.entityId !== entity.id) {
     setSystemOrigin({
       entityId: entity.id,
-      ids: def.extractEmbeddedSeedRowIds?.(entity as never),
+      ids: resolveSeedLocks(),
     })
   } else if (entity.catalogLayer !== 'system' && systemOrigin) {
     setSystemOrigin(null)
   }
+  void rulesetId
   return systemOrigin?.entityId === entity.id ? systemOrigin.ids : undefined
 }
 
@@ -380,7 +389,6 @@ function ContentEditFormBody({
   ctx,
 }: ContentEditFormBodyProps) {
   const queryClient = useQueryClient()
-  const systemOriginRowIds = useFrozenSystemOriginRowIds(def, entity)
   const mutation = useContentWriteMutation(def, campaignId, entityId)
   const authoring = useArmorClassAuthoringSession(
     Boolean(def.armorClassRulesSensitive),
@@ -396,12 +404,29 @@ function ContentEditFormBody({
     entityId,
     armorClassRules: authoring.snapshot,
   })
+  const systemOriginRowIds = useFrozenSystemOriginRowIds(def, entity, loaded.layoutCtx.rulesetId)
   const layoutCtx = {
     ...loaded.layoutCtx,
     embeddedSystemOriginRowIds: systemOriginRowIds,
   }
+  const catalogSeed = useMemo(
+    () =>
+      entity.catalogLayer === 'system' && layoutCtx.rulesetId
+        ? resolveCatalogSeedBody(def.routeKey, layoutCtx.rulesetId, entityId)
+        : undefined,
+    [def.routeKey, entity.catalogLayer, entityId, layoutCtx.rulesetId],
+  )
+  const [overlayBaseline, setOverlayBaseline] = useState<Record<string, unknown> | null>(() => {
+    if (entity.catalogLayer !== 'system' || !def.normalizeOverlayBody) return null
+    return def.normalizeOverlayBody(
+      loaded.defaultValues as never,
+      { entity, armorClassRules: layoutCtx.armorClassRules },
+      loaded.validationIntent,
+    )
+  })
   const { schema, validationIntent, defaultValues } = loaded
   const { onSubmit, formError } = useSubmitHandler({
+    // fallow-ignore-next-line complexity — edit submit merges overlay intent, media, and cache sync
     submit: async (values, form) => {
       if (
         armorClassAuthoringIsStale({
@@ -436,6 +461,10 @@ function ContentEditFormBody({
               operation: 'update',
               dirtyFields: form.formState.dirtyFields as Record<string, unknown>,
               rulesetId: layoutCtx.rulesetId,
+              overlayBaseline: overlayBaseline ?? undefined,
+              catalogSeed,
+              expectedOverlayRevision:
+                (entity as { overlayRevision?: number }).overlayRevision ?? 0,
             },
           ),
         )
@@ -460,6 +489,15 @@ function ContentEditFormBody({
         },
       )
       form.reset(baseline)
+      if (entity.catalogLayer === 'system' && def.normalizeOverlayBody) {
+        setOverlayBaseline(
+          def.normalizeOverlayBody(
+            baseline as never,
+            { entity: savedRecord, armorClassRules: layoutCtx.armorClassRules },
+            validationIntent,
+          ),
+        )
+      }
       if (validationIntent === 'draft') {
         draftPublishValidationSurface.current?.(baseline as FieldValues)
       }

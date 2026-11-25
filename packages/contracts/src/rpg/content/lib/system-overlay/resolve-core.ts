@@ -1,4 +1,4 @@
-import type { ObjectDelta, SeedFieldDelta, SeedRowReplace } from './intent'
+import type { SeedFieldDelta, SeedRowReplace } from './intent'
 import type { OverlayReadDiagnostics, OverlayApplyFailure } from './overlay-failures'
 import {
   canonicalIdentityOrder,
@@ -506,16 +506,16 @@ export function intentCollectionToStoredIdentity(
   for (const entry of delta.overrides ?? []) {
     if ('mode' in entry && entry.mode === 'replace') {
       byId.set(entry.id, { origin: 'seed', id: entry.id, mode: 'replace', row: entry.row })
-    } else {
-      byId.set(entry.id, {
-        origin: 'seed',
-        id: entry.id,
-        set: entry.set,
-        clear: entry.clear,
-        restore: entry.restore,
-        collections: entry.collections as Record<string, StoredCollection> | undefined,
-      })
+      continue
     }
+    byId.set(entry.id, {
+      origin: 'seed',
+      id: entry.id,
+      set: entry.set,
+      clear: entry.clear,
+      restore: entry.restore,
+      collections: entry.collections as Record<string, StoredCollection> | undefined,
+    })
   }
   overrides = [...byId.values()]
 

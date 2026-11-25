@@ -83,6 +83,14 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
       buildSpeciesCreateInput(values, ctx, validationIntent),
       ctx,
     ) as CreateSpeciesInput,
+  normalizeOverlayBody: (values, ctx, validationIntent = 'publish') => {
+    const { slug: _slug, ...body } = buildSpeciesCreateInput(
+      values,
+      ctx,
+      validationIntent,
+    ) as Record<string, unknown>
+    return body
+  },
 
   useListQuery: useSpecies,
   queryKey: speciesQueryKey,

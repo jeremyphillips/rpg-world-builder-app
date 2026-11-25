@@ -214,6 +214,15 @@ export interface ContentFormDef<
     ctx?: ContentFormInputCtx<TEntity>,
     validationIntent?: ContentValidationIntent,
   ) => TCreateInput
+  /**
+   * Normalized overlay body for baseline/draft diffs on system updates. Must match
+   * the tree used after load `reset`, without intent-schema defaults.
+   */
+  normalizeOverlayBody?: (
+    formValues: TFormValues,
+    ctx: ContentFormInputCtx<TEntity> | undefined,
+    validationIntent: ContentValidationIntent,
+  ) => Record<string, unknown>
   /** List query hook; the edit shell uses it to seed the form from cache. */
   useListQuery: (campaignId: string | undefined) => ContentListQueryResult<TEntity>
   /** Query key factory; used to invalidate the list after a successful mutation. */

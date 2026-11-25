@@ -1,4 +1,4 @@
-import type { ObjectDelta } from './intent'
+import type { CollectionDelta, ObjectDelta } from './intent'
 import type { OverlayPolicyNode } from './policy'
 import {
   applyIntentClearFields,

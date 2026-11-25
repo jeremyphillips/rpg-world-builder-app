@@ -140,6 +140,13 @@ const classFormDef: ContentFormDef<
       buildClassCreateInput(values, ctx, validationIntent),
       ctx,
     ) as CreateClassInput,
+  normalizeOverlayBody: (values, ctx, validationIntent = 'publish') => {
+    const { slug: _slug, ...body } = buildClassCreateInput(values, ctx, validationIntent) as Record<
+      string,
+      unknown
+    >
+    return body
+  },
 
   useListQuery: useClasses,
   queryKey: classesQueryKey,

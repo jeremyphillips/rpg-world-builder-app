@@ -15,6 +15,8 @@ import type { FieldValues } from 'react-hook-form'
 
 import { hasDirtyFields } from '@/lib/form-dirty-state'
 
+import { buildSystemOverlayUpdatePayload } from './build-system-overlay-intent'
+import { overlayParticipantForContentType } from './content-overlay-participant.lib'
 import type { AnyContentFormDef, ContentFormInputCtx } from './content-form-registry'
 
 export type ContentFormSerializeOperation = 'create' | 'update'
@@ -23,6 +25,11 @@ export type SerializeContentFormInputOptions = {
   operation: ContentFormSerializeOperation
   dirtyFields?: Record<string, unknown>
   rulesetId?: string
+  /** Normalized overlay baseline captured at edit load / post-save reset. */
+  overlayBaseline?: Record<string, unknown>
+  /** Catalog seed body for the system record (overlay diff authority). */
+  catalogSeed?: Record<string, unknown>
+  expectedOverlayRevision?: number
 }
 
 export function isManagedContentMediaDirty(
@@ -89,29 +96,55 @@ function assertCoherentFormMedia(prepared: ContentMedia): void {
 export function serializeContentFormInput<
   TInput extends Record<string, unknown> = Record<string, unknown>,
 >(
-  def: Pick<AnyContentFormDef, 'supportsManagedMedia' | 'mediaDomain' | 'routeKey' | 'toInput'>,
+  def: Pick<
+    AnyContentFormDef,
+    'supportsManagedMedia' | 'mediaDomain' | 'routeKey' | 'toInput' | 'normalizeOverlayBody'
+  >,
   values: FieldValues,
   ctx: ContentFormInputCtx<unknown> | undefined,
   validationIntent: ContentValidationIntent,
   options: SerializeContentFormInputOptions,
 ): TInput {
+  const catalogLayer = (ctx?.entity as { catalogLayer?: CatalogLayer } | undefined)?.catalogLayer
+  const participantId = overlayParticipantForContentType(def.routeKey as ContentTypeKey)
+  const overlayReady =
+    options.operation === 'update' &&
+    catalogLayer === 'system' &&
+    participantId &&
+    options.overlayBaseline &&
+    options.catalogSeed &&
+    def.normalizeOverlayBody
+
   const baseInput = def.toInput(values, ctx, validationIntent) as TInput
 
+  let payload: Record<string, unknown> = overlayReady
+    ? {
+        ...buildSystemOverlayUpdatePayload({
+          participantId,
+          catalogSeed: options.catalogSeed,
+          baseline: options.overlayBaseline,
+          draft: def.normalizeOverlayBody!(values, ctx, validationIntent),
+          validationIntent,
+          expectedOverlayRevision: options.expectedOverlayRevision,
+        }),
+      }
+    : { ...baseInput }
+
   if (!def.supportsManagedMedia) {
-    return baseInput
+    return payload as TInput
   }
 
   const mediaCtx = resolveCatalogMediaWriteContext(def, values, ctx, options.rulesetId)
 
   if (!shouldIncludeMediaInWritePayload(options.operation, values, options.dirtyFields, mediaCtx)) {
-    return baseInput
+    return payload as TInput
   }
 
   const prepared = prepareContentMediaForCatalogWrite(values.media ?? emptyContentMediaSchema)
   assertCoherentFormMedia(prepared)
 
   return {
-    ...baseInput,
+    ...payload,
     media: prepared,
     [catalogContentMediaExpectedRevisionField]: prepared.revision,
   } as TInput

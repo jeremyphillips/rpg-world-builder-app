@@ -20,7 +20,9 @@ import { buildMultiattackUseRepetitionValueSyncs } from './actions/multiattack/m
 import { buildMonsterHitPointsFormValueSyncs } from './statistics/monster-hit-points-form.lib'
 import { buildMonsterLairFormValueSyncs } from './statistics/monster-lair-form-value-sync'
 import { resolveMonsterFormSchema } from './monster-form-schema'
+import { normalizeMonsterFormValues } from './normalize-monster-form-values'
 import {
+  baselineFromEntity,
   buildMonsterInput,
   monsterToFormValues,
   resolveMonsterCreateDefaultValues,
@@ -100,6 +102,13 @@ export const monsterFormDef: ContentFormDef<Monster, MonsterFormValues, CreateMo
   }),
   toInput: (values, ctx, validationIntent = 'publish') =>
     buildMonsterInput(values, ctx, validationIntent),
+  normalizeOverlayBody: (values, ctx, validationIntent = 'publish') =>
+    normalizeMonsterFormValues(values, {
+      baseline: baselineFromEntity(ctx?.entity),
+      intent: validationIntent,
+      mode: 'update',
+      armorClassRules: ctx?.armorClassRules,
+    }) as Record<string, unknown>,
   useListQuery: useMonsters,
   queryKey: monstersQueryKey,
   preview: {

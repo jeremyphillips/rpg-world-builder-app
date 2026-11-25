@@ -60,6 +60,10 @@ export const contentMetaSchema = z.object({
   status: contentStatusSchema.default('published'),
   campaignId: z.string().min(1).nullable(),
   provenance: contentProvenanceSchema.optional(),
+  /** Restore-collection seed ids for system overlay delete locks (read model only). */
+  seedRowIdsByPath: z.record(z.string().min(1), z.array(z.string().min(1))).optional(),
+  /** Latest overlay patch revision for optimistic concurrency (read model only). */
+  overlayRevision: z.number().int().min(0).optional(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
 })

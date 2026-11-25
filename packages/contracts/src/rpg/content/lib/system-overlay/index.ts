@@ -35,6 +35,17 @@ export {
   type CompiledParticipantPolicy,
   type SystemOverlayParticipantId,
 } from './participants'
+export { buildSystemOverlayIntent, type BuildSystemOverlayIntentInput } from './build-intent'
+export { buildSeedRowIdsByPath } from './seed-row-ids-by-path'
+export { overlayPathToFormFieldPath } from './overlay-form-path'
+export { overlayPolicyForParticipant } from './participant-policies'
+export {
+  EXPECTED_OVERLAY_REVISION_FIELD,
+  SYSTEM_OVERLAY_INTENT_FIELD,
+  mergeSystemOverlayUpdateEnvelope,
+  systemOverlayUpdateEnvelopeSchema,
+  type SystemOverlayUpdateEnvelope,
+} from './system-overlay-update'
 export { type OverlayPolicyNode, type OverlayPresence, type OverlayUnionBranch } from './policy'
 export {
   overlayDeleteEntryIdRows,
