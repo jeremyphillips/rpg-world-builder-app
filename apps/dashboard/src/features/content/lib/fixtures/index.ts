@@ -1,5 +1,6 @@
 export {
   buildCatalogDrowGrantDisplayVocabulary,
+  buildScopedHeritageEquipmentFixture,
   DROW_HERITAGE_GROUPED_SUMMARY_WITH_SUFFIX,
   DROW_HERITAGE_SHEET_SUMMARY_LINES,
   getCatalogDrowHeritageGrantGroups,

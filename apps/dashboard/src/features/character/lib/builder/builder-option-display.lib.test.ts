@@ -7,6 +7,7 @@ import { SPECIES_SECTION_LABELS, SPECIES_STAT_LABELS } from '@/features/content'
 import {
   DROW_HERITAGE_SHEET_SUMMARY_LINES,
   buildCatalogDrowGrantDisplayVocabulary,
+  buildScopedHeritageEquipmentFixture,
 } from '@/features/content'
 import { pickSpecies } from '@/features/content'
 import { makeSpecies } from '@/test/fixtures/factories/species'
@@ -99,6 +100,20 @@ describe('builder-option-display.lib', () => {
       summaryLines: [...DROW_HERITAGE_SHEET_SUMMARY_LINES],
     })
     expect(drowItem).not.toHaveProperty('body')
+  })
+
+  it('uses the same scoped equipment summary for saved heritage in the builder', () => {
+    const { species, equipmentCatalog, expectedSummary } = buildScopedHeritageEquipmentFixture()
+    const sheet = buildSpeciesDetailsSheetContent(
+      species,
+      [],
+      buildCatalogDrowGrantDisplayVocabulary().spellCatalog,
+      { equipmentCatalog },
+    )
+    expect(
+      sheet.sections.find((section) => section.title === species.heritage?.name)?.items?.[0]
+        ?.summaryLines,
+    ).toEqual([expectedSummary])
   })
 
   it('keeps prose body for heritage options without grant groups', () => {

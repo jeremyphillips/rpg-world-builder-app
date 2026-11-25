@@ -1,9 +1,13 @@
 import { buildContentPurposeSelectors, SPELL_REFERENCE_DISPLAY_MESSAGES } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
-import { buildCatalogDrowGrantDisplayVocabulary } from '../../lib/fixtures/grant-display-fixtures'
+import {
+  buildCatalogDrowGrantDisplayVocabulary,
+  buildScopedHeritageEquipmentFixture,
+} from '../../lib/fixtures/grant-display-fixtures'
 import { pickClass, pickSpecies } from '../../lib/fixtures/pick'
 
+import { buildSpeciesDetailViewModel } from './species-display'
 import { speciesFormDef } from './species-form-def'
 import type { SpeciesFormValues } from './species-form-fields'
 import {
@@ -158,6 +162,30 @@ describe('species preview projection', () => {
     expect(drowSummary('ready')).toContain('Dancing Lights')
     expect(drowSummary('pending')).toContain(SPELL_REFERENCE_DISPLAY_MESSAGES.catalogLoading)
     expect(drowSummary('pending')).not.toContain('Dancing Lights')
+  })
+
+  it('keeps saved equipment labels identical in published detail and player preview', () => {
+    const { species, equipmentCatalog, expectedSummary } = buildScopedHeritageEquipmentFixture()
+    const published = buildSpeciesDetailViewModel(species, {
+      ...buildCatalogDrowGrantDisplayVocabulary(),
+      equipmentCatalog,
+      resolveCreatureTypeLabel: (id) => id,
+      resolveLanguageLabel: () => undefined,
+    })
+    const preview = buildSpeciesPreviewDetailViewModel(
+      createValues(speciesFormDef.toFormValues(species)),
+      {
+        ...equipmentCatalog.scope,
+        equipmentCatalogStatus: 'ready',
+        equipmentCatalogById: equipmentCatalog.equipmentById,
+      },
+    )
+
+    for (const display of [published, preview]) {
+      expect(
+        display.sections.find((section) => section.id === 'heritage')?.items[0]?.summaryLines,
+      ).toEqual([expectedSummary])
+    }
   })
 
   it('shows heritage when configured', () => {
