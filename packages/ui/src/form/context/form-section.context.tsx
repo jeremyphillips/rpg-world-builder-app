@@ -45,6 +45,7 @@ export interface FormSectionContextValue {
   fieldChromeSuppressed?: boolean
   /** Reserved preview mounts can prohibit rules previews in descendant display fields. */
   reserveRulesPreview?: boolean
+  enforceUniqueFieldBindings?: boolean
   /** Internal nesting plane for dependent nest fill — not author-facing. */
   surfaceHost?: FormSurfaceHost
 }
@@ -103,6 +104,7 @@ function inheritSectionContextFields(
     fieldChromeSuppressed: parent.fieldChromeSuppressed,
     surfaceHost: parent.surfaceHost,
     reserveRulesPreview: parent.reserveRulesPreview,
+    enforceUniqueFieldBindings: parent.enforceUniqueFieldBindings,
   }
 
   return overrides ? { ...inherited, ...filterUndefined(overrides) } : inherited

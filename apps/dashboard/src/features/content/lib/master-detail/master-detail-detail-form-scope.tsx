@@ -22,6 +22,7 @@ export function MasterDetailDetailFormScope({ children }: { children: ReactNode 
       ...parent,
       namedGroupDepth,
       reserveRulesPreview: true,
+      enforceUniqueFieldBindings: true,
     }
   }, [parent])
 
