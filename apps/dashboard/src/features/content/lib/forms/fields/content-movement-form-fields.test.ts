@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 
 import { MOVEMENT_MODES } from '@rpg/contracts'
-import { isContainer, type ArrayConfig } from '@rpg/ui/form'
+import { isContainer, type ArrayConfig, type SelectFieldConfig } from '@rpg/ui/form'
 
 import { speciesCreateDefaultValues } from '../../../species/lib/species-form-values'
 import {
@@ -41,6 +41,39 @@ describe('content movement form fields', () => {
         isContainer(field) && field.kind === 'group' && field.name === 'movementAlternative',
     )
     expect(hasAlternative).toBe(true)
+  })
+
+  it('resolves alternative mode selects through optionsResolve.optionsWhen', () => {
+    const monsterGroup = movementWithHoverGroup({ includeMovementAlternative: true })
+    expect(isContainer(monsterGroup) && monsterGroup.kind === 'group').toBe(true)
+    if (!isContainer(monsterGroup) || monsterGroup.kind !== 'group') return
+
+    const alternativeGroup = monsterGroup.fields.find(
+      (field) =>
+        isContainer(field) && field.kind === 'group' && field.name === 'movementAlternative',
+    )
+    expect(isContainer(alternativeGroup) && alternativeGroup.kind === 'group').toBe(true)
+    if (!isContainer(alternativeGroup) || alternativeGroup.kind !== 'group') return
+
+    const row = alternativeGroup.fields.find((field) => isContainer(field) && field.kind === 'row')
+    expect(isContainer(row) && row.kind === 'row').toBe(true)
+    if (!isContainer(row) || row.kind !== 'row') return
+
+    const watched = {
+      movement: [{ mode: 'walk', feet: 20 }],
+      movementAlternative: { firstMode: '', secondMode: '', feet: undefined },
+    }
+
+    for (const name of ['firstMode', 'secondMode'] as const) {
+      const select = row.fields.find(
+        (field): field is SelectFieldConfig =>
+          'type' in field && field.type === 'select' && field.name === name,
+      )
+      expect(select).toBeDefined()
+      expect(select!.optionsResolve?.optionsWhen).toBeTypeOf('function')
+      const options = [...select!.optionsResolve!.optionsWhen!(watched)]
+      expect(options.every((option) => 'value' in option && option.value !== 'walk')).toBe(true)
+    }
   })
 
   it('movementWithHoverGroup stacks movement array and hover without a section heading', () => {

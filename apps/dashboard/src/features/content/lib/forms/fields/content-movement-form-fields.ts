@@ -166,7 +166,7 @@ export function movementAlternativeGroupField(): FormItem {
             options: extraMovementModeOptions,
             optionsResolve: {
               dependsOn: ['movement', 'movementAlternative'],
-              resolve: (watched) => movementAlternativeModeOptions(watched, 'firstMode'),
+              optionsWhen: (watched) => movementAlternativeModeOptions(watched, 'firstMode'),
             },
           },
           {
@@ -178,7 +178,7 @@ export function movementAlternativeGroupField(): FormItem {
             options: extraMovementModeOptions,
             optionsResolve: {
               dependsOn: ['movement', 'movementAlternative'],
-              resolve: (watched) => movementAlternativeModeOptions(watched, 'secondMode'),
+              optionsWhen: (watched) => movementAlternativeModeOptions(watched, 'secondMode'),
             },
           },
           {
