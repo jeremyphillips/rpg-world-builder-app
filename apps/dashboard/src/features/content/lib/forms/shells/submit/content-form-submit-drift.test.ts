@@ -41,6 +41,9 @@ const monsterStatisticsPanelPath = fileURLToPath(
 const masterDetailRowValidationPath = fileURLToPath(
   new URL('../../../master-detail/master-detail-row-validation.ts', import.meta.url),
 )
+const duplicateContentDialogPath = fileURLToPath(
+  new URL('../../../duplication/duplicate-content-dialog.tsx', import.meta.url),
+)
 const masterDetailInlineTitlePath = fileURLToPath(
   new URL('../../../../components/master-detail/master-detail-inline-title.tsx', import.meta.url),
 )
@@ -122,6 +125,13 @@ describe('ContentFormDef create submit drift guard', () => {
     expect(source).toContain('useContentFormPresentationIssues')
     expect(source).not.toContain('flattenFormIssues')
     expect(source).not.toContain('useFormValidationPresentation')
+  })
+
+  it('requires duplicate content dialog to use adopted submit helper', () => {
+    const source = readFileSync(duplicateContentDialogPath, 'utf8')
+
+    expect(source).toContain('useAdoptedFormSubmit')
+    expect(source).not.toContain('useSubmitHandler')
   })
 
   it('requires content master-detail validation to use adopted presentation hooks', () => {

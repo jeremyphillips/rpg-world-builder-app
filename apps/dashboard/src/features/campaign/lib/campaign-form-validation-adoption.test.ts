@@ -16,10 +16,11 @@ describe('campaign form validation adoption', () => {
     expect(source).not.toContain('paintValidationIssuesOnForm')
   })
 
-  it('documents settings submit on legacy handler until action pipeline cutover', () => {
+  it('uses adopted submit helper on settings', () => {
     const source = readFileSync(campaignSettingsPath, 'utf8')
 
-    expect(source).toContain('useSubmitHandler')
+    expect(source).toContain('useAdoptedFormSubmit')
+    expect(source).not.toContain('useSubmitHandler')
     expect(source).toContain('TabbedForm')
   })
 })

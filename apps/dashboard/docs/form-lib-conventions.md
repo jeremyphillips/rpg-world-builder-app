@@ -539,7 +539,7 @@ Top-level content shells share `ContentFormFooter` (`content-form-footer.tsx`) w
 Create handoff URL: `resolveContentPostCreateEditHref` in `content-form-navigation.ts`.
 Submit/error wiring: **`useContentFormSubmit`** for ContentFormDef create/edit page shells
 (`ContentCreateShell`, `ContentEditShell`), create modals, and `ContentFormHost` adapters.
-Non–ContentFormDef surfaces and deferred workflows stay on `useSubmitHandler` until their adoption
+Adopted tabbed/flat dashboard saves outside `ContentFormDef` use `useAdoptedFormSubmit` (`@/lib/form-validation-adoption.lib`) for canonical API issue paint. Deferred workflows stay on `useSubmitHandler` until Phase 7 adoption
 slice. Nested subclass editor remains separate until aligned in a follow-up.
 
 **Pilot commit pipeline (create/edit shells):** one prepare-once write via

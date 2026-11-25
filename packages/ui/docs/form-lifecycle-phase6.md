@@ -1,31 +1,24 @@
-# Form validation lifecycle — Phase 6 (family adoption)
+# Form validation lifecycle — Phase 6 (family adoption — complete)
 
-Adopt registered content hub forms onto the Phase 4 pilot pipeline one slice at a time. Deferred workflows stay on `FORM_VALIDATION_ADOPTION_ALLOWLIST` until their milestone.
+Initial adoption families are listed in `form-validation-adopted-families.ts`. Exit inventory: `form-validation-phase6-exit.test.ts`.
 
-## Content hub — edit publish (first slice)
+## Adopted patterns
 
-- `validateContentPublishValues` / `applyContentPublishValidation` evaluate with `tryEvaluateContentPublishFormIssues` and paint via `applyCanonicalFormIssuesToRhf`.
-- `ContentEditPublishBridge` uses the same canonical RHF paint for API validation failures.
-- Shared RHF helper: `content-form-validation-rhf.lib.ts` (breaks ingest ↔ publish import cycle).
+| Family                         | Submit / resolver                                    | API failure paint                                          |
+| ------------------------------ | ---------------------------------------------------- | ---------------------------------------------------------- |
+| Content hub (`ContentFormDef`) | `useContentFormSubmit` + commit pipeline             | `applyApiErrorValidationToCanonicalRhf` via persist bridge |
+| Content duplicate dialog       | `useAdoptedFormSubmit`                               | same                                                       |
+| Campaign create                | `WizardStepForm` + `makeResolver`                    | wizard `formError` (operation)                             |
+| Campaign settings              | `useAdoptedFormSubmit`                               | canonical RHF or footer                                    |
+| Public auth                    | `Form` + schema                                      | `formError` (operation)                                    |
+| Master–detail / statistics     | `useContentFormPresentationIssues` / `useFieldIssue` | presentation session                                       |
 
-## Monster statistics tab
+## Shared helpers
 
-`MonsterStatisticsPanel` consumes `useContentFormPresentationIssues` — one presentation snapshot, no parallel `flattenFormIssues` merge.
+- `content-form-validation-rhf.lib.ts` — canonical RHF paint for `FormIssue[]`
+- `ingest-content-form-validation.lib.ts` — producer slots + `applyApiErrorValidationToCanonicalRhf`
+- `useAdoptedFormSubmit` (`apps/dashboard/src/lib/form-validation-adoption.lib.ts`) — tabbed/flat adopted saves outside the content commit pipeline
 
-## Content master–detail
+## Deferred (Phase 7)
 
-- Row badges: `useMasterDetailRowValidation` → `useContentFormPresentationIssues(resolverFields)`.
-- Inline title editor: `useFieldIssue(path)` (presentation-gated copy; no parallel RHF error merge).
-
-## Campaign
-
-- **Create wizard** — `WizardStepForm` steps with Zod schemas (evaluator-backed resolver); adoption drift in `campaign-form-validation-adoption.test.ts`.
-- **Settings** — tabbed save still on `useSubmitHandler` (allowlist entry `campaign-settings-submit`).
-
-## Public auth
-
-Login and signup use schema-driven `Form` from `@rpg/ui/form`; drift in `apps/public/.../auth-form-adoption.test.ts`.
-
-## Still deferred
-
-See `form-validation-adoption-allowlist.ts` (character builder, import, Quick NPC, campaign settings submit).
+`FORM_VALIDATION_ADOPTION_ALLOWLIST`: character builder, character import, Quick NPC (`removesIn: phase-7-*`).
