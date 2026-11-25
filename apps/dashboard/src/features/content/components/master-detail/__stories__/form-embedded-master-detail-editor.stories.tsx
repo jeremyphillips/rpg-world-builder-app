@@ -1,11 +1,20 @@
+import { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { expect } from 'storybook/test'
 import { FormProvider, useForm } from 'react-hook-form'
 import { Button } from '@rpg/ui'
 import type { FormItem } from '@rpg/ui/form'
-import { FormStickyScrollBody, formStickyScrollShellWithDockedFooterClasses } from '@rpg/ui/form'
+import {
+  FormUiProvider,
+  FormStickyScrollBody,
+  formStickyScrollShellWithDockedFooterClasses,
+} from '@rpg/ui/form'
 
 import { CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN } from '../../../classes/lib/class-feature-form-labels'
 import { FormEmbeddedMasterDetailEditor } from '../form-embedded-master-detail-editor'
+
+const NAME_PATH = 'features.0.name'
+const NAME_ERROR = 'Enter a feature name.'
 
 const itemFields: FormItem[] = [{ type: 'text', name: 'name', label: 'Name', required: true }]
 
@@ -22,32 +31,63 @@ function EditorStory({
   features = [] as FeatureRow[],
   entityCatalogLayer,
   fields = itemFields,
+  fieldError,
 }: {
   features?: FeatureRow[]
   entityCatalogLayer?: 'system' | 'homebrew'
   fields?: FormItem[]
+  fieldError?: string
 }) {
+  const [showFieldError, setShowFieldError] = useState(false)
   const form = useForm({ defaultValues: { features } })
   return (
     <FormProvider {...form}>
-      <FormEmbeddedMasterDetailEditor
-        formCtx={{ entityCatalogLayer }}
-        fieldName="features"
-        itemFields={fields}
-        itemNoun={CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN}
-        listTitle="Features"
-        ariaLabel="Features"
-        addLabel="Add feature"
-        idPrefix="class-feature"
-        mapListItem={({ row }) => {
-          const feature = row as FeatureRow | undefined
-          const name = typeof feature?.name === 'string' ? feature.name.trim() : ''
-          return {
-            title: name,
-            eyebrow: feature?.level !== undefined ? `Level ${feature.level}` : undefined,
-          }
-        }}
-      />
+      <FormUiProvider
+        publishPresentationEnabled={Boolean(fieldError)}
+        hasAttemptedPublish={showFieldError}
+        publishPresentationIssues={
+          showFieldError && fieldError
+            ? [
+                {
+                  path: NAME_PATH,
+                  message: fieldError,
+                  severity: 'field',
+                  claim: { kind: 'field', target: NAME_PATH },
+                },
+              ]
+            : []
+        }
+      >
+        <FormEmbeddedMasterDetailEditor
+          formCtx={{ entityCatalogLayer }}
+          fieldName="features"
+          itemFields={fields}
+          itemNoun={CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN}
+          listTitle="Features"
+          ariaLabel="Features"
+          addLabel="Add feature"
+          idPrefix="class-feature"
+          mapListItem={({ row }) => {
+            const feature = row as FeatureRow | undefined
+            const name = typeof feature?.name === 'string' ? feature.name.trim() : ''
+            return {
+              title: name,
+              eyebrow: feature?.level !== undefined ? `Level ${feature.level}` : undefined,
+            }
+          }}
+        />
+        {fieldError ? (
+          <Button
+            type="button"
+            onClick={() => {
+              setShowFieldError(true)
+              form.setFocus(NAME_PATH)
+            }}
+          >
+            Show field error
+          </Button>
+        ) : null}
+      </FormUiProvider>
     </FormProvider>
   )
 }
@@ -79,6 +119,17 @@ export const WithRows: Story = {
       ]}
     />
   ),
+}
+
+export const WithFieldError: Story = {
+  render: () => <EditorStory features={[{ id: 'f1', name: '' }]} fieldError={NAME_ERROR} />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: 'Show field error' }))
+    const field = canvas.getByRole('textbox', { name: 'Name' })
+    await expect(field).toHaveFocus()
+    await expect(field).toHaveAttribute('aria-invalid', 'true')
+    await expect(field).toHaveAccessibleDescription(NAME_ERROR)
+  },
 }
 
 export const LongCollection: Story = {
