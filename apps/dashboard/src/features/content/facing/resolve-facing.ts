@@ -54,7 +54,10 @@ export type ResolveFacingRequest =
       source: 'draft'
       hostId: 'monster-traits'
       row: Record<string, unknown>
-      monster: Pick<MonsterFormValues, 'name' | 'lair' | 'forms'>
+      monster: Pick<
+        MonsterFormValues,
+        'name' | 'lair' | 'forms' | 'movement' | 'movementAlternative'
+      >
     }
 
 type DraftTraitFacingRequest = Extract<ResolveFacingRequest, { domain: 'trait'; source: 'draft' }>

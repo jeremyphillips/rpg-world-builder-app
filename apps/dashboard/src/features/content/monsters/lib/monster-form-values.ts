@@ -31,7 +31,9 @@ import type { MonsterHitPointStash } from './statistics/monster-variant-transiti
 import type { WeaponProficiencyMode } from '../../classes/lib/class-form-constants'
 import type { ContentFormInputCtx } from '../../lib/forms/registry/content-form-registry'
 import {
+  movementAlternativeRecordToForm,
   movementRecordToRows,
+  type MovementAlternativeFormValues,
   type MovementRowDraftFormValues,
 } from '../../lib/forms/fields/content-movement-form-fields'
 import {
@@ -87,6 +89,7 @@ export type MonsterFormValues = FieldValues & {
   }
   hitPoints: Monster['hitPoints'] | { kind: 'fixed'; average?: number; formula?: string }
   movement: MovementRowDraftFormValues[]
+  movementAlternative?: MovementAlternativeFormValues
   hover?: boolean
   senses: Array<{ type: Monster['senses'][number]['type']; range?: number }>
   communication: Monster['communication']
@@ -234,6 +237,9 @@ export function monsterToFormValues(
     hitPoints: entity.hitPoints,
     ...hitPointsAuthoringFromEntity(entity),
     movement: movementRecordToRows(entity.movement),
+    ...(entity.movementAlternative
+      ? { movementAlternative: movementAlternativeRecordToForm(entity.movementAlternative) }
+      : {}),
     hover: entity.hover,
     senses: entity.senses ?? [],
     communication: entity.communication ?? {},
@@ -286,6 +292,7 @@ function baselineFromEntity(entity: Monster | undefined): MonsterNormalizeBaseli
   if (!entity) return undefined
   return {
     hover: entity.hover,
+    movementAlternative: entity.movementAlternative,
     creatureFamilyIds: entity.creatureFamilyIds,
     classIds: entity.classIds,
     description: entity.description,

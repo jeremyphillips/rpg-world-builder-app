@@ -9,6 +9,8 @@ import {
   formatMovementGrantMetadataDetail,
   formatMovementGrantSentence,
   formatMovementDisplay,
+  movementAlternativeSchema,
+  movementModeAvailability,
   getMovementModeEntry,
   getMovementModeGrantLabel,
   getMovementModeLabel,
@@ -188,5 +190,54 @@ describe('formatMovementDisplay', () => {
   it('uses the stat-block abbreviation only when asked', () => {
     expect(formatMovementDisplay({ walk: 20, fly: 40 }, 'ft.')).toBe('Walk 20 ft., Fly 40 ft.')
     expect(formatMovementDisplay({ walk: 0 }, 'ft.')).toBe('Walk 0 ft.')
+  })
+
+  it('appends an unresolved alternative in movement-mode order for stat blocks', () => {
+    const alternative = movementAlternativeSchema.parse({
+      modes: ['fly', 'climb'],
+      feet: 20,
+    })
+    expect(formatMovementDisplay({ walk: 20 }, 'ft.', alternative)).toBe(
+      "20 ft., Fly or Climb 20 ft. (GM's choice)",
+    )
+    expect(formatMovementDisplay({ walk: 20, swim: 10 }, 'ft.', alternative)).toBe(
+      "Walk 20 ft., Swim 10 ft., Fly or Climb 20 ft. (GM's choice)",
+    )
+  })
+
+  it('leaves dashboard formatting unchanged when no alternative is present', () => {
+    expect(formatMovementDisplay({ walk: 20, fly: 40 })).toBe('Walk 20 ft, Fly 40 ft')
+  })
+})
+
+describe('movementAlternativeSchema', () => {
+  it('accepts two distinct alternative modes', () => {
+    expect(movementAlternativeSchema.parse({ modes: ['climb', 'fly'], feet: 20 })).toEqual({
+      modes: ['climb', 'fly'],
+      feet: 20,
+    })
+  })
+
+  it('rejects duplicate modes, empty objects, and bad feet', () => {
+    expect(movementAlternativeSchema.safeParse({ modes: ['fly', 'fly'], feet: 20 }).success).toBe(
+      false,
+    )
+    expect(movementAlternativeSchema.safeParse({}).success).toBe(false)
+    expect(movementAlternativeSchema.safeParse({ modes: ['climb', 'fly'], feet: 3 }).success).toBe(
+      false,
+    )
+  })
+})
+
+describe('movementModeAvailability', () => {
+  it('classifies fixed, alternative, and absent modes', () => {
+    const definition = {
+      movement: { walk: 20 },
+      movementAlternative: movementAlternativeSchema.parse({ modes: ['climb', 'fly'], feet: 20 }),
+    }
+    expect(movementModeAvailability(definition, 'walk')).toBe('guaranteed')
+    expect(movementModeAvailability(definition, 'climb')).toBe('alternative')
+    expect(movementModeAvailability(definition, 'fly')).toBe('alternative')
+    expect(movementModeAvailability(definition, 'swim')).toBe('absent')
   })
 })

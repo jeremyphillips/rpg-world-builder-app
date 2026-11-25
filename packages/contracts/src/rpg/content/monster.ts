@@ -35,6 +35,7 @@ import {
   creatureTraitTemplateOccurrenceMessage,
 } from './creature/traits/creature-trait-template-occurrence'
 import { refineMonsterSenseOccurrence } from './creature/traits/sense-occurrence'
+import { movementAlternativeSchema, refineMovementAlternativeOverlap } from '../vocab/movement-mode'
 import { getCreatureTraitVocabularyEntry } from '../vocab/creature/trait-vocabulary'
 import { refineCreatureTraitTemplate } from './creature/traits/validate'
 import {
@@ -335,6 +336,7 @@ export const monsterBodyFields = {
   armorClass: monsterArmorClassSchema.default({}),
   hitPoints: monsterHitPointsSchema,
   movement: creatureMovementSchema,
+  movementAlternative: movementAlternativeSchema.optional(),
   hover: z.boolean().optional(),
   senses: creatureSensesSchema,
   communication: creatureCommunicationSchema.default(EMPTY_CREATURE_COMMUNICATION),
@@ -372,6 +374,7 @@ const monsterBodyDraftSchemaBase = mediaBearingDraftAuthoredContentBodySchema(
   abilityScores: creatureAbilityScoresSchema.partial().optional(),
   hitPoints: monsterHitPointsSchema.optional(),
   movement: creatureMovementSchema.optional(),
+  movementAlternative: movementAlternativeSchema.optional(),
   senses: creatureSensesDraftSchema.optional(),
   challengeRating: challengeRatingSchema.optional(),
   lair: monsterLairDraftSchema.optional(),
@@ -940,6 +943,7 @@ export function refineMonsterBody(
   refineExperiencePointsOverride(body, ctx, prefix)
   refineMonsterLair(body, ctx, prefix)
   refineMonsterLegendaryResistanceTraits(body.traits, ctx, prefix)
+  refineMovementAlternativeOverlap(body, ctx, prefix)
 }
 
 function refineMonsterLegendaryResistanceTraits(
@@ -1023,6 +1027,7 @@ function refineMonsterDraftBody(
   })
   refineMultiattackReferences(sections, ctx, prefix, { published: false })
   if (body.forms) refineMonsterFormIdentity(body.forms, ctx, prefix, { creatureName: body.name })
+  refineMovementAlternativeOverlap(body, ctx, prefix)
 }
 
 const monsterDraftStoredSchemaBase = draftStoredSchema(monsterBodyDraftSchema).superRefine(

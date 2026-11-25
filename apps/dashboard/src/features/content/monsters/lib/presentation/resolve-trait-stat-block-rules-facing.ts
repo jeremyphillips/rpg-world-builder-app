@@ -1,12 +1,19 @@
 import {
-  formatCreatureTrait,
+  formatMonsterPresetTrait,
   formatMonsterStatBlockSubject,
   monsterRichTextIsEmpty,
+  parseMonsterPresetTraitDraftForFormat,
+  parseMonsterPresetTraitForFormat,
   resolveTraitFacingParts,
   type Monster,
+  type MonsterPresetTraitForFormat,
 } from '@rpg/contracts'
 
 import type { MonsterFormValues } from '../monster-form-values'
+import {
+  monsterMovementDefinitionFromForm,
+  monsterMovementDefinitionFromRecord,
+} from '../monster-movement-definition'
 import { applyMonsterEntryHeadingQualifiers } from './monster-entry-heading'
 
 export type TraitStatBlockRulesFacing = {
@@ -62,12 +69,13 @@ export function resolveTemplateTraitStatBlockRulesFacing(input: {
 
 export function resolvePresetTraitStatBlockRulesFacing(input: {
   id: string
-  preset: string
+  preset: MonsterPresetTraitForFormat['preset']
   monsterName: string
-  trait: Parameters<typeof formatCreatureTrait>[0]['trait']
+  trait: MonsterPresetTraitForFormat
+  movement: Parameters<typeof formatMonsterPresetTrait>[2]
 }): TraitStatBlockRulesFacing {
   const subject = formatMonsterStatBlockSubject(input.monsterName)
-  const formatted = formatCreatureTrait({ subject, trait: input.trait })
+  const formatted = formatMonsterPresetTrait(subject, input.trait, input.movement)
   const sentence = formatted?.sentence ?? ''
   return {
     heading: formatted?.name ?? input.preset,
@@ -78,7 +86,7 @@ export function resolvePresetTraitStatBlockRulesFacing(input: {
 
 export function resolveTraitStatBlockRulesFacing(input: {
   trait: Monster['traits'][number]
-  monster: Pick<Monster, 'name' | 'lair'>
+  monster: Pick<Monster, 'name' | 'lair' | 'movement' | 'movementAlternative'>
   record: Record<string, unknown>
 }): TraitStatBlockRulesFacing | undefined {
   if (input.record.kind === 'template' && typeof input.record.templateId === 'string') {
@@ -92,11 +100,16 @@ export function resolveTraitStatBlockRulesFacing(input: {
     })
   }
   if (typeof input.record.preset === 'string' && input.record.kind !== 'template') {
+    const presetTrait =
+      parseMonsterPresetTraitForFormat(input.trait) ??
+      parseMonsterPresetTraitDraftForFormat(input.trait)
+    if (!presetTrait) return undefined
     return resolvePresetTraitStatBlockRulesFacing({
       id: input.trait.id,
-      preset: input.record.preset,
+      preset: presetTrait.preset,
       monsterName: input.monster.name,
-      trait: input.trait as Parameters<typeof formatCreatureTrait>[0]['trait'],
+      trait: presetTrait,
+      movement: monsterMovementDefinitionFromRecord(input.monster),
     })
   }
   return undefined
@@ -104,13 +117,22 @@ export function resolveTraitStatBlockRulesFacing(input: {
 
 export function resolveTraitStatBlockRulesFacingForFormRow(input: {
   row: Record<string, unknown>
-  monster: Pick<MonsterFormValues, 'name' | 'lair' | 'forms'>
+  monster: Pick<MonsterFormValues, 'name' | 'lair' | 'forms' | 'movement' | 'movementAlternative'>
 }): TraitStatBlockRulesFacing | undefined {
   const id = typeof input.row.id === 'string' ? input.row.id : 'preview'
   const trait = { ...input.row, id } as Monster['traits'][number]
+  const movementDefinition = monsterMovementDefinitionFromForm(
+    input.monster.movement,
+    input.monster.movementAlternative,
+  )
   const facing = resolveTraitStatBlockRulesFacing({
     trait,
-    monster: input.monster,
+    monster: {
+      name: input.monster.name,
+      lair: input.monster.lair,
+      movement: movementDefinition.movement,
+      movementAlternative: movementDefinition.movementAlternative,
+    },
     record: input.row,
   })
   if (!facing) return undefined

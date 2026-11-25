@@ -113,7 +113,7 @@ export function resolveSpeciesTraitDraftFacing(row: TraitRowForm): FacingResolut
 
 function resolveMonsterTemplateTraitDraftFacing(input: {
   row: Record<string, unknown>
-  monster: Pick<MonsterFormValues, 'name' | 'lair' | 'forms'>
+  monster: Pick<MonsterFormValues, 'name' | 'lair' | 'forms' | 'movement' | 'movementAlternative'>
 }): FacingResolution {
   const trait = {
     kind: 'template' as const,
@@ -131,7 +131,7 @@ function resolveMonsterTemplateTraitDraftFacing(input: {
 
 function resolveMonsterPresetTraitDraftFacing(input: {
   row: Record<string, unknown>
-  monster: Pick<MonsterFormValues, 'name' | 'lair' | 'forms'>
+  monster: Pick<MonsterFormValues, 'name' | 'lair' | 'forms' | 'movement' | 'movementAlternative'>
 }): FacingResolution {
   const facing = resolveTraitStatBlockRulesFacingForFormRow({
     row: input.row,
@@ -148,7 +148,7 @@ function resolveMonsterPresetTraitDraftFacing(input: {
 
 export function resolveMonsterTraitDraftFacing(input: {
   row: Record<string, unknown>
-  monster: Pick<MonsterFormValues, 'name' | 'lair' | 'forms'>
+  monster: Pick<MonsterFormValues, 'name' | 'lair' | 'forms' | 'movement' | 'movementAlternative'>
 }): FacingResolution | undefined {
   if (input.row.kind === 'custom') return undefined
   if (input.row.kind === 'template') {

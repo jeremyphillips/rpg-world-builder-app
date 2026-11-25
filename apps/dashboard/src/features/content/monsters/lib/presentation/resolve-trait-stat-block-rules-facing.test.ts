@@ -71,4 +71,25 @@ describe('resolveTraitStatBlockRulesFacing', () => {
     expect(previewOn?.heading).toBe('Legendary Resistance (4/Day, or 5/Day in Lair)')
     expect(previewOff?.heading).toBe('Legendary Resistance (4/Day)')
   })
+
+  it('matches draft and published spider climb when climb is an alternative', () => {
+    const movement = { walk: 20 }
+    const movementAlternative = { modes: ['climb', 'fly'], feet: 20 as const }
+    const row = { id: 'climb', preset: 'spider-climb' }
+    const draft = resolveTraitStatBlockRulesFacingForFormRow({
+      row,
+      monster: {
+        name: 'Swarm of Insects',
+        movement: [{ mode: 'walk', feet: 20 }],
+        movementAlternative: { firstMode: 'climb', secondMode: 'fly', feet: 20 },
+      },
+    })
+    const published = resolveTraitStatBlockRulesFacing({
+      trait: row,
+      monster: { name: 'Swarm of Insects', movement, movementAlternative },
+      record: row,
+    })
+    expect(draft?.proseText).toBe(published?.proseText)
+    expect(draft?.proseText).toMatch(/^If the swarm of insects has a Climb Speed,/)
+  })
 })

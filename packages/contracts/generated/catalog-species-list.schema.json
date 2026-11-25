@@ -242,7 +242,7 @@
             "minItems": 1,
             "type": "array",
             "items": {
-              "$ref": "#/definitions/__schema108"
+              "$ref": "#/definitions/__schema111"
             }
           },
           "id": {
@@ -294,7 +294,7 @@
                     "description": "all | only | all_except"
                   },
                   "classIds": {
-                    "$ref": "#/definitions/__schema110"
+                    "$ref": "#/definitions/__schema113"
                   }
                 },
                 "required": [
@@ -314,10 +314,10 @@
             "type": "object",
             "properties": {
               "maxCharacterLevel": {
-                "$ref": "#/definitions/__schema112"
+                "$ref": "#/definitions/__schema115"
               },
               "classLevelCaps": {
-                "$ref": "#/definitions/__schema113"
+                "$ref": "#/definitions/__schema116"
               }
             },
             "required": [
@@ -870,16 +870,16 @@
               "description": "grant"
             },
             "id": {
-              "$ref": "#/definitions/__schema105"
+              "$ref": "#/definitions/__schema108"
             },
             "grantGroups": {
               "$ref": "#/definitions/__schema24"
             },
             "nameOverride": {
-              "$ref": "#/definitions/__schema106"
+              "$ref": "#/definitions/__schema109"
             },
             "details": {
-              "$ref": "#/definitions/__schema107"
+              "$ref": "#/definitions/__schema110"
             }
           },
           "required": [
@@ -2970,28 +2970,14 @@
               "description": "ability-check"
             },
             "ability": {
-              "type": "string",
-              "enum": [
-                "str",
-                "dex",
-                "con",
-                "int",
-                "wis",
-                "cha"
-              ],
-              "description": "str | dex | con | int | wis | cha"
+              "$ref": "#/definitions/__schema105"
             },
             "skillId": {
-              "allOf": [
-                {
-                  "$ref": "#/definitions/__schema0"
-                }
-              ]
+              "$ref": "#/definitions/__schema106"
             }
           },
           "required": [
-            "kind",
-            "ability"
+            "kind"
           ],
           "additionalProperties": false
         }
@@ -2999,21 +2985,49 @@
     },
     "__schema104": {
       "type": "string",
+      "const": "ability-check",
+      "description": "ability-check"
+    },
+    "__schema105": {
+      "allOf": [
+        {
+          "type": "string",
+          "enum": [
+            "str",
+            "dex",
+            "con",
+            "int",
+            "wis",
+            "cha"
+          ],
+          "description": "str | dex | con | int | wis | cha"
+        }
+      ]
+    },
+    "__schema106": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/__schema0"
+        }
+      ]
+    },
+    "__schema107": {
+      "type": "string",
       "const": "grant",
       "description": "grant"
     },
-    "__schema105": {
+    "__schema108": {
       "type": "string",
       "minLength": 1
     },
-    "__schema106": {
+    "__schema109": {
       "type": "string",
       "minLength": 1
     },
-    "__schema107": {
+    "__schema110": {
       "type": "string"
     },
-    "__schema108": {
+    "__schema111": {
       "allOf": [
         {
           "$ref": "#/definitions/__schema22"
@@ -3050,7 +3064,7 @@
         }
       ]
     },
-    "__schema109": {
+    "__schema112": {
       "type": "string",
       "enum": [
         "all",
@@ -3059,17 +3073,17 @@
       ],
       "description": "all | only | all_except"
     },
-    "__schema110": {
+    "__schema113": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/__schema111"
+        "$ref": "#/definitions/__schema114"
       }
     },
-    "__schema111": {
+    "__schema114": {
       "type": "string",
       "minLength": 1
     },
-    "__schema112": {
+    "__schema115": {
       "anyOf": [
         {
           "$ref": "#/definitions/__schema27"
@@ -3079,13 +3093,13 @@
         }
       ]
     },
-    "__schema113": {
+    "__schema116": {
       "type": "array",
       "items": {
         "type": "object",
         "properties": {
           "classId": {
-            "$ref": "#/definitions/__schema111"
+            "$ref": "#/definitions/__schema114"
           },
           "maxLevel": {
             "$ref": "#/definitions/__schema27"

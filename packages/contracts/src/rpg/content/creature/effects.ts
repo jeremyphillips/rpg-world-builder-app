@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 import { formatLimitedUseNotation } from '../../primitives/limited-use'
 import { restLimitedUseSchema, type RestLimitedUse } from '../../primitives/limited-use'
 import { getAbilityLabel, abilitySchema } from '../../vocab/ability'
@@ -18,14 +19,22 @@ import { joinNaturalList } from '../../primitives/prose'
 // them. Evaluation against a live roll is deferred until a roll consumer exists.
 // ---------------------------------------------------------------------------
 
+const creatureAbilityCheckRollTargetSchema = z
+  .object({
+    kind: z.literal('ability-check'),
+    ability: abilitySchema.optional(),
+    skillId: skillSchema.optional(),
+  })
+  .superRefine((target, ctx) => {
+    if (target.skillId !== undefined && target.ability === undefined) {
+      addCustomRefinementIssue(ctx, 'skillId requires ability.', ['ability'])
+    }
+  })
+
 export const creatureRollTargetSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('attack') }),
   z.object({ kind: z.literal('saving-throw') }),
-  z.object({
-    kind: z.literal('ability-check'),
-    ability: abilitySchema,
-    skillId: skillSchema.optional(),
-  }),
+  creatureAbilityCheckRollTargetSchema,
 ])
 
 export type CreatureRollTarget = z.infer<typeof creatureRollTargetSchema>
@@ -48,6 +57,7 @@ export type CreatureSaveOutcomeOverride = z.infer<typeof creatureSaveOutcomeOver
 function formatRollTargetLabel(target: CreatureRollTarget): string {
   if (target.kind === 'attack') return 'attack rolls'
   if (target.kind === 'saving-throw') return 'saving throws'
+  if (target.ability === undefined) return 'ability checks'
   const ability = getAbilityLabel(target.ability)
   if (target.skillId) return `${ability} (${getSkillName(target.skillId)}) checks`
   return `${ability} checks`
