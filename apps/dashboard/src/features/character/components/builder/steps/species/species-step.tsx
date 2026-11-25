@@ -14,6 +14,7 @@ import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character
 import { Badge, BuilderOptionDetailsSheet, Button, RadioCard, Text } from '@rpg/ui'
 
 import { buildSpeciesContentDisplayImageInput, getContentDisplayImage } from '@/features/content'
+import { findVocabularyLabel, useDamageTypeVocabulary } from '@/features/vocabulary'
 
 import {
   findSpeciesHeritageChoiceSet,
@@ -76,6 +77,15 @@ export function SpeciesStep({
 }: SpeciesStepProps) {
   const [detailsSpeciesId, setDetailsSpeciesId] = useState<string | null>(null)
   const [heritagePanelExpanded, setHeritagePanelExpanded] = useState(false)
+
+  const campaignId =
+    context.rulesScope.type === 'campaign' ? context.rulesScope.campaignId : undefined
+  const { vocabulary: campaignDamageTypes } = useDamageTypeVocabulary(campaignId)
+  const resolveCampaignDamageTypeLabel = useCallback(
+    (id: string) => findVocabularyLabel(campaignDamageTypes, id),
+    [campaignDamageTypes],
+  )
+  const resolveDamageTypeLabel = campaignId ? resolveCampaignDamageTypeLabel : undefined
 
   const spellCatalog = useMemo(
     () => createSpellCatalogContext({ status: 'ready', spellsById }),
@@ -141,6 +151,7 @@ export function SpeciesStep({
           selectedSpecies,
           context.catalog.languages,
           spellCatalog,
+          resolveDamageTypeLabel,
         )}
         value={selectedHeritageOptionId ?? ''}
         onValueChange={(optionId) => {
@@ -151,6 +162,7 @@ export function SpeciesStep({
   }, [
     context.catalog.languages,
     spellCatalog,
+    resolveDamageTypeLabel,
     draft,
     heritageChoiceSet,
     heritagePanelExpanded,
@@ -207,8 +219,13 @@ export function SpeciesStep({
 
   const detailsContent = useMemo(() => {
     if (!detailsSpecies) return null
-    return buildSpeciesDetailsSheetContent(detailsSpecies, context.catalog.languages, spellCatalog)
-  }, [context.catalog.languages, spellCatalog, detailsSpecies])
+    return buildSpeciesDetailsSheetContent(
+      detailsSpecies,
+      context.catalog.languages,
+      spellCatalog,
+      resolveDamageTypeLabel,
+    )
+  }, [context.catalog.languages, spellCatalog, resolveDamageTypeLabel, detailsSpecies])
 
   const isDetailsSpeciesSelected =
     detailsSpeciesId != null && draft.species.speciesId === detailsSpeciesId

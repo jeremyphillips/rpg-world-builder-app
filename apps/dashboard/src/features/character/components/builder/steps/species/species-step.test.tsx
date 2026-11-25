@@ -12,18 +12,26 @@ import {
   formatFieldMessage,
   resolveAvailableChoices,
   type CharacterBuilderDraft,
+  type CharacterBuildContext,
 } from '@rpg/contracts'
 import { listLanguageSeedOptions } from '@rpg/catalog/vocabulary'
 
 import { getDrowHeritageSpellCatalog } from '@/features/content'
 import { pickSpecies } from '@/features/content'
+import { useDamageTypeVocabulary } from '@/features/vocabulary'
 import { makeSpecies } from '@/test/fixtures/factories/species'
 import {
   createStandaloneBuilderContextFixture,
+  createCampaignPcBuilderContextFixture,
   populatedBuilderCatalog,
 } from '../../../../lib/fixtures/character-builder-fixtures'
 import { CHANGE_HERITAGE_LABEL } from '../../../../lib/builder/builder-parent-choice-status.lib'
 import { SpeciesStep } from './species-step'
+
+vi.mock('@/features/vocabulary', async (importOriginal) => ({
+  ...(await importOriginal()),
+  useDamageTypeVocabulary: vi.fn(() => ({ vocabulary: undefined })),
+}))
 
 const dwarfWithTraits = makeSpecies({
   ...populatedBuilderCatalog.species[0]!,
@@ -74,7 +82,7 @@ function renderSpeciesStep({
   draft = createEmptyCharacterBuilderDraft(),
   onDraftChange = vi.fn(),
 }: {
-  context: ReturnType<typeof createDwarfContext>
+  context: CharacterBuildContext
   draft?: CharacterBuilderDraft
   onDraftChange?: (patch: Partial<CharacterBuilderDraft>) => void
 }) {
@@ -176,6 +184,30 @@ describe('SpeciesStep', () => {
     expect(screen.getByRole('heading', { name: 'Dwarf' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Traits' })).toBeInTheDocument()
     expect(onDraftChange).not.toHaveBeenCalled()
+  })
+
+  it('uses the campaign damage vocabulary in saved species heritage details', async () => {
+    const context = createCampaignPcBuilderContextFixture({
+      catalog: { ...populatedBuilderCatalog, species: [pickSpecies('dragonborn')] },
+    })
+    vi.mocked(useDamageTypeVocabulary).mockImplementation(
+      (id) =>
+        ({
+          vocabulary:
+            id === context.rulesScope.campaignId
+              ? { labelById: { acid: 'Grave Frost' }, activeIds: new Set(['acid']) }
+              : undefined,
+        }) as ReturnType<typeof useDamageTypeVocabulary>,
+    )
+    const user = userEvent.setup()
+
+    renderSpeciesStep({ context })
+    await user.click(screen.getByRole('button', { name: 'View Dragonborn details' }))
+
+    expect(useDamageTypeVocabulary).toHaveBeenCalledWith(context.rulesScope.campaignId)
+    const dialog = screen.getByRole('dialog')
+    expect(dialog).toHaveTextContent('Grave Frost damage type')
+    expect(dialog).toHaveTextContent('Grave Frost resistance')
   })
 
   it('selects from the sheet and closes it', async () => {

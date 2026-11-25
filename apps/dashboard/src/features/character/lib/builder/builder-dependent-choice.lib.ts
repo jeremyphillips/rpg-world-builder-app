@@ -10,7 +10,7 @@ import {
 } from '@rpg/contracts'
 import type { RadioCardOption } from '@rpg/ui'
 
-import { buildSpeciesDetailViewModel } from '@/features/content'
+import { buildSpeciesDetailViewModel, type SpeciesDisplayVocabulary } from '@/features/content'
 
 import { buildBuilderSpeciesVocabulary } from './builder-species-option-display.lib'
 
@@ -56,12 +56,13 @@ export function mapHeritageOptionsToDependentCardOptions(
   species: Species,
   languages: readonly CharacterBuildLanguageOption[],
   spellCatalog: SpellCatalogContext,
+  resolveDamageTypeLabel?: SpeciesDisplayVocabulary['resolveDamageTypeLabel'],
 ): RadioCardOption[] {
   if (!species.heritage) return []
 
   const heritageSection = buildSpeciesDetailViewModel(
     species,
-    buildBuilderSpeciesVocabulary(languages, spellCatalog),
+    buildBuilderSpeciesVocabulary(languages, spellCatalog, resolveDamageTypeLabel),
   ).sections.find((section) => section.id === 'heritage')
 
   if (!heritageSection) return []

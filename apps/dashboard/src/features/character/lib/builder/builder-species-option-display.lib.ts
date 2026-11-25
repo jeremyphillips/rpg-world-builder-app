@@ -7,6 +7,8 @@ import {
 import { getContentTypeItemLabel } from '@/features/content'
 import {
   buildSeedCreatureTypeVocabulary,
+  buildSeedDamageTypeVocabulary,
+  findVocabularyLabel,
   buildSeedSenseVocabulary,
   getCreatureTypeLabel,
   getSenseLabelFromVocabulary,
@@ -16,6 +18,7 @@ import {
   buildSpeciesDetailViewModel,
   SPECIES_SECTION_LABELS,
   type SpeciesDetailItem,
+  type SpeciesDisplayVocabulary,
 } from '@/features/content'
 
 import type { BuilderOptionDetailsSection } from '@rpg/ui'
@@ -25,11 +28,15 @@ export const BUILDER_SPECIES_EYEBROW = getContentTypeItemLabel('species')
 export function buildBuilderSpeciesVocabulary(
   languages: readonly CharacterBuildLanguageOption[],
   spellCatalog: SpellCatalogContext,
+  resolveDamageTypeLabel?: SpeciesDisplayVocabulary['resolveDamageTypeLabel'],
 ) {
   const creatureTypeVocabulary = buildSeedCreatureTypeVocabulary()
   const senseVocabulary = buildSeedSenseVocabulary()
+  const seedDamageTypes = resolveDamageTypeLabel ? undefined : buildSeedDamageTypeVocabulary()
 
   return {
+    resolveDamageTypeLabel:
+      resolveDamageTypeLabel ?? ((id: string) => findVocabularyLabel(seedDamageTypes, id)),
     resolveCreatureTypeLabel: (id: string) => getCreatureTypeLabel(creatureTypeVocabulary, id),
     resolveLanguageLabel: (id: string) => languages.find((entry) => entry.id === id)?.label,
     resolveSenseLabel: (type: string) => getSenseLabelFromVocabulary(senseVocabulary, type),
@@ -67,10 +74,11 @@ export function buildSpeciesDetailsSheetContent(
   species: Species,
   languages: readonly CharacterBuildLanguageOption[],
   spellCatalog: SpellCatalogContext,
+  resolveDamageTypeLabel?: SpeciesDisplayVocabulary['resolveDamageTypeLabel'],
 ): SpeciesDetailsSheetContent {
   const viewModel = buildSpeciesDetailViewModel(
     species,
-    buildBuilderSpeciesVocabulary(languages, spellCatalog),
+    buildBuilderSpeciesVocabulary(languages, spellCatalog, resolveDamageTypeLabel),
   )
 
   const sections: BuilderOptionDetailsSection[] = viewModel.sections.map((section) => {
