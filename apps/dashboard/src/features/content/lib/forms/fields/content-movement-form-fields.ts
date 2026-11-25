@@ -47,8 +47,11 @@ export const movementValidationMessages = {
 
 export const MOVEMENT_ALTERNATIVE_HEADING = 'Alternative movement'
 export const MOVEMENT_ALTERNATIVE_HINT =
-  'Select two or more modes. The GM chooses one for the creature, in addition to its regular movement speeds.'
+  "The creature has one of these movement modes (GM's choice), in addition to its regular speeds."
 export const MOVEMENT_ALTERNATIVE_AVAILABLE_MODES_LABEL = 'Available modes'
+/** Optional-disclosure group `name` is the object path only — leaves use fully qualified paths. */
+export const MOVEMENT_ALTERNATIVE_MODES_FIELD = 'movementAlternative.modes'
+export const MOVEMENT_ALTERNATIVE_FEET_FIELD = 'movementAlternative.feet'
 
 export type MovementAlternativeFormValues = {
   modes: ExtraMovementMode[]
@@ -174,22 +177,22 @@ export function movementAlternativeGroupField(): FormItem {
     },
     fields: [
       {
-        type: 'chips',
-        name: 'modes',
-        label: MOVEMENT_ALTERNATIVE_AVAILABLE_MODES_LABEL,
-        required: true,
-        min: 2,
-        max: EXTRA_MOVEMENT_MODES.length,
-        width: 'full',
-        options: extraMovementModeOptions,
-        optionsResolve: {
-          dependsOn: ['movement', 'movementAlternative'],
-          optionsWhen: movementAlternativeChipOptions,
-        },
-      },
-      {
         kind: 'row',
         fields: [
+          {
+            type: 'chips',
+            name: MOVEMENT_ALTERNATIVE_MODES_FIELD,
+            label: MOVEMENT_ALTERNATIVE_AVAILABLE_MODES_LABEL,
+            required: true,
+            min: 2,
+            max: EXTRA_MOVEMENT_MODES.length,
+            width: 'auto',
+            options: extraMovementModeOptions,
+            optionsResolve: {
+              dependsOn: ['movement', 'movementAlternative'],
+              optionsWhen: movementAlternativeChipOptions,
+            },
+          },
           {
             type: 'joinedPair',
             label: MOVEMENT_SPEED_FIELD_LABEL,
@@ -197,7 +200,7 @@ export function movementAlternativeGroupField(): FormItem {
             required: true,
             start: {
               kind: 'select',
-              name: 'feet',
+              name: MOVEMENT_ALTERNATIVE_FEET_FIELD,
               options: movementFeetOptions,
               digits: 3,
               ariaLabel: 'Speed value',

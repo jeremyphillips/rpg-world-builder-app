@@ -9,6 +9,7 @@ import {
   movementAlternativeFormToSchema,
   movementAlternativeGroupField,
   movementAlternativeRecordToForm,
+  MOVEMENT_ALTERNATIVE_MODES_FIELD,
   movementArrayField,
   movementRowDraftFormSchema,
   movementRowFormSchema,
@@ -55,11 +56,15 @@ describe('content movement form fields', () => {
 
   it('configures alternative modes as multi-select chips with min two selections', () => {
     const alternativeGroup = alternativeGroupFromFactory()
-    const chips = alternativeGroup.fields.find(
+    const row = alternativeGroup.fields.find((field) => isContainer(field) && field.kind === 'row')
+    if (!isContainer(row) || row.kind !== 'row') {
+      throw new Error('expected movementAlternative row')
+    }
+    const chips = row.fields.find(
       (field): field is ChipsFieldConfig => 'type' in field && field.type === 'chips',
     )
     expect(chips).toMatchObject({
-      name: 'modes',
+      name: MOVEMENT_ALTERNATIVE_MODES_FIELD,
       min: 2,
       required: true,
       optionsResolve: { dependsOn: ['movement', 'movementAlternative'] },
