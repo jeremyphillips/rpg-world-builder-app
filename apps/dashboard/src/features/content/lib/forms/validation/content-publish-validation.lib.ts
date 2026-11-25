@@ -5,6 +5,7 @@ import { collectTabbedFormResolverItems, type FormIssue, type FormItem } from '@
 
 import { resolveContentPublishSchema } from '../shells/edit/content-edit-load'
 import type { AnyContentFormDef, ContentFormCtx } from '../registry/content-form-registry'
+import { applyCanonicalFormIssuesToRhf } from './content-form-validation-rhf.lib'
 import { normalizeContentFormIssues } from './normalize-content-form-issues.lib'
 
 export const CONTENT_PUBLISH_VALIDATION_ROUTING_FAILED_MESSAGE =
@@ -89,9 +90,19 @@ export function evaluateContentPublishValidation<TFieldValues extends FieldValue
 ): ApiValidationIssue[] | null {
   const issues = evaluateContentPublishFormIssues(publishSchema, values, items)
   if (!issues) return null
-  return issues.map((issue) => ({
-    path: issue.path,
-    message: issue.message,
+  return formIssuesToPathMessages(issues).map((issue) => ({
+    ...issue,
+    code: 'custom',
+  }))
+}
+
+function paintCanonicalPublishIssues<TFieldValues extends FieldValues>(
+  form: UseFormReturn<TFieldValues>,
+  issues: readonly FormIssue[],
+): ApiValidationIssue[] {
+  applyCanonicalFormIssuesToRhf(form, issues)
+  return formIssuesToPathMessages(issues).map((issue) => ({
+    ...issue,
     code: 'custom',
   }))
 }
@@ -102,12 +113,13 @@ export function applyContentPublishValidation<TFieldValues extends FieldValues>(
   values: TFieldValues,
   items: FormItem[] = [],
 ): ApiValidationIssue[] | null {
-  const issues = evaluateContentPublishValidation(publishSchema, values, items)
-  if (!issues) return null
-
-  form.clearErrors()
-  paintValidationIssuesOnForm(form, issues)
-  return issues
+  const { issues, routingFailed } = tryEvaluateContentPublishFormIssues(
+    publishSchema,
+    values,
+    items,
+  )
+  if (!routingFailed && issues.length === 0) return null
+  return paintCanonicalPublishIssues(form, issues)
 }
 
 export function validateContentPublishValues<TFieldValues extends FieldValues>(

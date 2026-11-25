@@ -29,6 +29,9 @@ const previewRailPath = fileURLToPath(
 const publishBridgePath = fileURLToPath(
   new URL('../layout/content-create-publish-validation-bridge.client.tsx', import.meta.url),
 )
+const editPublishBridgePath = fileURLToPath(
+  new URL('../edit/content-edit-publish-bridge.tsx', import.meta.url),
+)
 
 const manualPublishParsePattern = /resolveContentFormSchema\([^)]*,\s*['"]publish['"]\)\.parse\(/
 
@@ -83,5 +86,14 @@ describe('ContentFormDef create submit drift guard', () => {
     expect(validationSource).not.toContain('safeParseWithFieldErrors')
     expect(bridgeSource).toContain('evaluateContentPublishFormIssues')
     expect(bridgeSource).not.toContain('prepareFormIssues')
+  })
+
+  it('requires edit publish bridge to use canonical publish evaluation and rhf paint', () => {
+    const source = readFileSync(editPublishBridgePath, 'utf8')
+
+    expect(source).toContain('validateContentPublishValues')
+    expect(source).toContain('applyCanonicalFormIssuesToRhf')
+    expect(source).not.toContain('applyValidationIssuesToForm')
+    expect(source).not.toContain('applyContentPublishValidation')
   })
 })
