@@ -12,6 +12,14 @@ import {
 } from '@/features/vocabulary'
 import { SPECIES_STAT_LABELS } from '@/features/content'
 
+vi.mock('../../equipment/hooks/use-equipment', async (importOriginal) => ({
+  ...(await importOriginal()),
+  useEquipment: () => ({ data: [], isPending: false, isError: false }),
+}))
+vi.mock('../../skill-proficiencies/hooks/use-skill-proficiencies', async (importOriginal) => ({
+  ...(await importOriginal()),
+  useSkillProficiencies: () => ({ data: [], isPending: false, isError: false }),
+}))
 vi.mock('../../spells/hooks/use-spells', async (importOriginal) => ({
   ...(await importOriginal()),
   useSpells: vi.fn(),

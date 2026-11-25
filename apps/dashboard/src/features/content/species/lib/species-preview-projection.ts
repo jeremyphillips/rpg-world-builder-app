@@ -4,6 +4,7 @@ import {
   SPECIES_CONTENT_TYPE_TERM,
   getSpeciesHeritageLabel,
   createSpellCatalogContext,
+  createEquipmentCatalogContext,
   type ContentMedia,
   type Species,
   type SystemRulesetId,
@@ -12,6 +13,8 @@ import { formatPreviewRailOverflowList, type PreviewRailFact } from '@rpg/ui'
 
 import { findVocabularyLabel, getSenseLabelFromVocabulary } from '@/features/vocabulary'
 
+import { equipmentReferenceScopeFromContentFormCtx } from '@/lib/content-form-equipment-reference-scope.lib'
+import { formatContentReferenceUnavailable } from '../../lib/content-type-labels'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import {
   CONTENT_PREVIEW_DESCRIPTION_PLACEHOLDER,
@@ -88,7 +91,16 @@ function speciesPreviewName(values: SpeciesFormValues): string {
 }
 
 function speciesPreviewVocabulary(ctx: ContentFormCtx): SpeciesDisplayVocabulary {
+  const scope = equipmentReferenceScopeFromContentFormCtx(ctx)
   return {
+    equipmentCatalog: createEquipmentCatalogContext({
+      status: scope ? (ctx.equipmentCatalogStatus ?? 'pending') : 'pending',
+      scope: scope ?? { rulesetId: '', campaignId: '' },
+      equipmentById: ctx.equipmentCatalogById,
+    }),
+    resolveSkillName: (slug) =>
+      ctx.skillCatalogBySlug?.get(slug)?.name ??
+      formatContentReferenceUnavailable('skill-proficiencies'),
     resolveCreatureTypeLabel: (id) => getCreatureTypeLabel(id, ctx),
     resolveDamageTypeLabel: (id) => findVocabularyLabel(ctx.damageTypeVocabulary, id),
     resolveLanguageLabel: (id) => findVocabularyLabel(ctx.languageVocabulary, id),

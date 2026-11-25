@@ -10,9 +10,12 @@ import {
 } from '@rpg/contracts'
 import type { RadioCardOption } from '@rpg/ui'
 
-import { buildSpeciesDetailViewModel, type SpeciesDisplayVocabulary } from '@/features/content'
+import { buildSpeciesDetailViewModel } from '@/features/content'
 
-import { buildBuilderSpeciesVocabulary } from './builder-species-option-display.lib'
+import {
+  buildBuilderSpeciesVocabulary,
+  type BuilderSpeciesGrantReferences,
+} from './builder-species-option-display.lib'
 
 export type DependentChoiceSectionCopy = {
   statusText: string
@@ -56,13 +59,13 @@ export function mapHeritageOptionsToDependentCardOptions(
   species: Species,
   languages: readonly CharacterBuildLanguageOption[],
   spellCatalog: SpellCatalogContext,
-  resolveDamageTypeLabel?: SpeciesDisplayVocabulary['resolveDamageTypeLabel'],
+  references?: BuilderSpeciesGrantReferences,
 ): RadioCardOption[] {
   if (!species.heritage) return []
 
   const heritageSection = buildSpeciesDetailViewModel(
     species,
-    buildBuilderSpeciesVocabulary(languages, spellCatalog, resolveDamageTypeLabel),
+    buildBuilderSpeciesVocabulary(languages, spellCatalog, references),
   ).sections.find((section) => section.id === 'heritage')
 
   if (!heritageSection) return []

@@ -25,18 +25,27 @@ import type { BuilderOptionDetailsSection } from '@rpg/ui'
 
 export const BUILDER_SPECIES_EYEBROW = getContentTypeItemLabel('species')
 
+export type BuilderSpeciesGrantReferences = Pick<
+  SpeciesDisplayVocabulary,
+  'equipmentCatalog' | 'resolveDamageTypeLabel' | 'resolveSkillName'
+>
+
 export function buildBuilderSpeciesVocabulary(
   languages: readonly CharacterBuildLanguageOption[],
   spellCatalog: SpellCatalogContext,
-  resolveDamageTypeLabel?: SpeciesDisplayVocabulary['resolveDamageTypeLabel'],
+  references?: BuilderSpeciesGrantReferences,
 ) {
   const creatureTypeVocabulary = buildSeedCreatureTypeVocabulary()
   const senseVocabulary = buildSeedSenseVocabulary()
-  const seedDamageTypes = resolveDamageTypeLabel ? undefined : buildSeedDamageTypeVocabulary()
+  const seedDamageTypes = references?.resolveDamageTypeLabel
+    ? undefined
+    : buildSeedDamageTypeVocabulary()
 
   return {
+    ...references,
     resolveDamageTypeLabel:
-      resolveDamageTypeLabel ?? ((id: string) => findVocabularyLabel(seedDamageTypes, id)),
+      references?.resolveDamageTypeLabel ??
+      ((id: string) => findVocabularyLabel(seedDamageTypes, id)),
     resolveCreatureTypeLabel: (id: string) => getCreatureTypeLabel(creatureTypeVocabulary, id),
     resolveLanguageLabel: (id: string) => languages.find((entry) => entry.id === id)?.label,
     resolveSenseLabel: (type: string) => getSenseLabelFromVocabulary(senseVocabulary, type),
@@ -74,11 +83,11 @@ export function buildSpeciesDetailsSheetContent(
   species: Species,
   languages: readonly CharacterBuildLanguageOption[],
   spellCatalog: SpellCatalogContext,
-  resolveDamageTypeLabel?: SpeciesDisplayVocabulary['resolveDamageTypeLabel'],
+  references?: BuilderSpeciesGrantReferences,
 ): SpeciesDetailsSheetContent {
   const viewModel = buildSpeciesDetailViewModel(
     species,
-    buildBuilderSpeciesVocabulary(languages, spellCatalog, resolveDamageTypeLabel),
+    buildBuilderSpeciesVocabulary(languages, spellCatalog, references),
   )
 
   const sections: BuilderOptionDetailsSection[] = viewModel.sections.map((section) => {

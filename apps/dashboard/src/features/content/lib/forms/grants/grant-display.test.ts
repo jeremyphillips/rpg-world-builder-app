@@ -2,10 +2,13 @@ import { describe, expect, it } from 'vitest'
 
 import {
   createSpellCatalogContext,
+  createEquipmentCatalogContext,
+  EQUIPMENT_REFERENCE_DISPLAY_MESSAGES,
   SPELL_REFERENCE_DISPLAY_MESSAGES,
   type GrantGroup,
 } from '@rpg/contracts'
 
+import { pickEquipment } from '../../fixtures/pick'
 import { makeSpell } from '@/test/fixtures/factories/spell'
 
 import {
@@ -299,6 +302,47 @@ describe('buildGrantSummaryModel', () => {
       supported: false,
       sourceGrantKind: 'skillProficiency',
     })
+  })
+
+  it('uses scoped equipment records for saved grants and proficiencies', () => {
+    const dagger = { ...pickEquipment('dagger'), name: 'River Blade', status: 'draft' as const }
+    const model = buildGrantSummaryModel(
+      [
+        {
+          grants: [
+            {
+              id: 'gear',
+              kind: 'equipment',
+              grant: { kind: 'grant', equipmentSlug: dagger.slug, quantity: 1 },
+            },
+            {
+              id: 'weapon',
+              kind: 'weaponProficiency',
+              grant: { kind: 'fixed', weaponSlugs: [dagger.slug] },
+            },
+            {
+              id: 'missing',
+              kind: 'equipment',
+              grant: { kind: 'grant', equipmentSlug: 'stale-gear', quantity: 1 },
+            },
+          ],
+        },
+      ],
+      {
+        ...vocabulary,
+        equipmentCatalog: createEquipmentCatalogContext({
+          status: 'ready',
+          scope: { rulesetId: dagger.rulesetId, campaignId: '' },
+          equipmentById: new Map([[dagger.id, dagger]]),
+        }),
+      },
+    )
+
+    expect(model.flatItems.map((item) => item.label)).toEqual([
+      'River Blade',
+      'River Blade proficiency',
+      EQUIPMENT_REFERENCE_DISPLAY_MESSAGES.unknownEquipment,
+    ])
   })
 
   it('renders equipment grants with names and service suffixes', () => {

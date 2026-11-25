@@ -1,10 +1,15 @@
 import { useParams } from 'react-router-dom'
-import { createSpellCatalogContext, type Species } from '@rpg/contracts'
+import {
+  createEquipmentCatalogContext,
+  createSpellCatalogContext,
+  type Species,
+} from '@rpg/contracts'
 
 import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
 import {
   formatContentNotFoundMessage,
   formatContentListLoadErrorMessage,
+  formatContentReferenceUnavailable,
 } from '@/features/content/lib/content-type-labels'
 import {
   useCreatureTypeVocabulary,
@@ -26,6 +31,8 @@ import {
 } from '../../lib/detail/page/content-display-image'
 import { buildSpeciesContentDisplayImageInput } from '../../lib/detail/page/content-display-image-input'
 import { ContentUsageReferencesSection } from '../../lib/usage/content-usage-references-section'
+import { useEquipment } from '../../equipment/hooks/use-equipment'
+import { useSkillProficiencies } from '../../skill-proficiencies/hooks/use-skill-proficiencies'
 import { useSpells } from '../../spells/hooks/use-spells'
 import { SpeciesDetailBody } from '../components/detail/species-detail-body'
 
@@ -40,6 +47,8 @@ export function SpeciesDetailContent({ species, campaignId }: SpeciesDetailConte
   const { vocabulary: languageVocabulary } = useLanguageVocabulary(campaignId)
 
   const spells = useSpells(campaignId)
+  const equipment = useEquipment(campaignId)
+  const skills = useSkillProficiencies(campaignId)
   const spellCatalog = createSpellCatalogContext({
     status: spells.isError ? 'error' : spells.isPending ? 'pending' : 'ready',
     spellsById: new Map(spells.data?.map((spell) => [spell.id, spell])),
@@ -51,6 +60,14 @@ export function SpeciesDetailContent({ species, campaignId }: SpeciesDetailConte
     resolveLanguageLabel: (id) => findVocabularyLabel(languageVocabulary, id),
     resolveSenseLabel: (type) => getSenseLabelFromVocabulary(senseVocabulary, type),
     spellCatalog,
+    equipmentCatalog: createEquipmentCatalogContext({
+      status: equipment.isError ? 'error' : equipment.isPending ? 'pending' : 'ready',
+      scope: { rulesetId: species.rulesetId, campaignId },
+      equipmentById: new Map(equipment.data?.map((item) => [item.id, item])),
+    }),
+    resolveSkillName: (slug) =>
+      skills.data?.find((skill) => skill.slug === slug)?.name ??
+      formatContentReferenceUnavailable('skill-proficiencies'),
   })
 
   return (

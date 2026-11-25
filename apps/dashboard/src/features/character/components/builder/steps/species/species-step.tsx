@@ -3,6 +3,7 @@ import { useCallback, useMemo, useState } from 'react'
 import {
   characterBuilderStepSelectionMessages,
   createSpellCatalogContext,
+  createEquipmentCatalogContext,
   formatFieldMessage,
   resolvePlayableBuilderContent,
   type CharacterBuildCatalogIndex,
@@ -13,7 +14,11 @@ import {
 import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
 import { Badge, BuilderOptionDetailsSheet, Button, RadioCard, Text } from '@rpg/ui'
 
-import { buildSpeciesContentDisplayImageInput, getContentDisplayImage } from '@/features/content'
+import {
+  buildSpeciesContentDisplayImageInput,
+  formatContentReferenceUnavailable,
+  getContentDisplayImage,
+} from '@/features/content'
 import { findVocabularyLabel, useDamageTypeVocabulary } from '@/features/vocabulary'
 
 import {
@@ -85,7 +90,26 @@ export function SpeciesStep({
     (id: string) => findVocabularyLabel(campaignDamageTypes, id),
     [campaignDamageTypes],
   )
-  const resolveDamageTypeLabel = campaignId ? resolveCampaignDamageTypeLabel : undefined
+  const grantReferences = useMemo(
+    () => ({
+      resolveDamageTypeLabel: campaignId ? resolveCampaignDamageTypeLabel : undefined,
+      equipmentCatalog: createEquipmentCatalogContext({
+        status: 'ready',
+        scope: { rulesetId: context.rulesetId, campaignId: campaignId ?? '' },
+        equipmentById: new Map(context.catalog.equipment.map((item) => [item.id, item])),
+      }),
+      resolveSkillName: (slug: string) =>
+        context.catalog.skillProficiencies.find((skill) => skill.slug === slug)?.name ??
+        formatContentReferenceUnavailable('skill-proficiencies'),
+    }),
+    [
+      campaignId,
+      context.rulesetId,
+      context.catalog.equipment,
+      context.catalog.skillProficiencies,
+      resolveCampaignDamageTypeLabel,
+    ],
+  )
 
   const spellCatalog = useMemo(
     () => createSpellCatalogContext({ status: 'ready', spellsById }),
@@ -151,7 +175,7 @@ export function SpeciesStep({
           selectedSpecies,
           context.catalog.languages,
           spellCatalog,
-          resolveDamageTypeLabel,
+          grantReferences,
         )}
         value={selectedHeritageOptionId ?? ''}
         onValueChange={(optionId) => {
@@ -162,7 +186,7 @@ export function SpeciesStep({
   }, [
     context.catalog.languages,
     spellCatalog,
-    resolveDamageTypeLabel,
+    grantReferences,
     draft,
     heritageChoiceSet,
     heritagePanelExpanded,
@@ -223,9 +247,9 @@ export function SpeciesStep({
       detailsSpecies,
       context.catalog.languages,
       spellCatalog,
-      resolveDamageTypeLabel,
+      grantReferences,
     )
-  }, [context.catalog.languages, spellCatalog, resolveDamageTypeLabel, detailsSpecies])
+  }, [context.catalog.languages, spellCatalog, grantReferences, detailsSpecies])
 
   const isDetailsSpeciesSelected =
     detailsSpeciesId != null && draft.species.speciesId === detailsSpeciesId

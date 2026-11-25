@@ -78,10 +78,13 @@ import {
   resolveGrantGroupsFromContent,
   resolveMechanicalGrantsFromContent,
   presentSpellReferenceDisplayName,
+  presentEquipmentReferenceDisplayName,
+  resolveEquipmentSlugReference,
   resolveSpellReferenceOutcome,
   type SpellCatalogContext,
   type ContentGrant,
   type EquipmentKind,
+  type EquipmentCatalogContext,
   type GrantGroup,
 } from '@rpg/contracts'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
@@ -91,6 +94,7 @@ export type GrantDisplayVocabulary = {
   resolveDamageTypeLabel?: (id: string) => string | undefined
   resolveLanguageLabel?: (id: string) => string | undefined
   spellCatalog: SpellCatalogContext
+  equipmentCatalog?: EquipmentCatalogContext
   resolveSkillName?: (id: string) => string | undefined
   resolveToolName?: (slug: string) => string | undefined
   resolveWeaponName?: (slug: string) => string | undefined
@@ -294,6 +298,28 @@ type GrantItemMapper<K extends ContentGrant['kind']> = (
   level: number,
 ) => GrantSummaryItem[]
 
+function equipmentNameResolver(
+  catalog: EquipmentCatalogContext | undefined,
+  fallback: GrantDisplayVocabulary['resolveEquipmentName'],
+): GrantDisplayVocabulary['resolveEquipmentName'] {
+  if (!catalog) return fallback
+  return (slug) =>
+    presentEquipmentReferenceDisplayName(
+      resolveEquipmentSlugReference(slug, catalog, catalog.scope),
+    )
+}
+
+function equipmentKindResolver(
+  catalog: EquipmentCatalogContext | undefined,
+  fallback: GrantDisplayVocabulary['resolveEquipmentKind'],
+): GrantDisplayVocabulary['resolveEquipmentKind'] {
+  if (!catalog) return fallback
+  return (slug) => {
+    const outcome = resolveEquipmentSlugReference(slug, catalog, catalog.scope)
+    return outcome.status === 'resolved' ? outcome.equipment.kind : undefined
+  }
+}
+
 // Null entries participate in compact benefit counts without a visible label.
 const GRANT_ITEM_MAPPERS = {
   languageChoice: null,
@@ -355,7 +381,10 @@ const GRANT_ITEM_MAPPERS = {
     ),
   toolProficiency: (grant, vocabulary, idPrefix, level) =>
     mapCompactProficiencyGrantToItems(
-      formatToolProficiencyGrantCompact(grant.grant, vocabulary.resolveToolName),
+      formatToolProficiencyGrantCompact(
+        grant.grant,
+        equipmentNameResolver(vocabulary.equipmentCatalog, vocabulary.resolveToolName),
+      ),
       `${idPrefix}:toolProficiency`,
       grant.kind,
       'proficiency',
@@ -363,7 +392,10 @@ const GRANT_ITEM_MAPPERS = {
     ),
   weaponProficiency: (grant, vocabulary, idPrefix, level) =>
     mapCompactProficiencyGrantToItems(
-      formatWeaponProficiencyGrantCompact(grant.grant, vocabulary.resolveWeaponName),
+      formatWeaponProficiencyGrantCompact(
+        grant.grant,
+        equipmentNameResolver(vocabulary.equipmentCatalog, vocabulary.resolveWeaponName),
+      ),
       `${idPrefix}:weaponProficiency`,
       grant.kind,
       'proficiency',
@@ -371,7 +403,10 @@ const GRANT_ITEM_MAPPERS = {
     ),
   armorTraining: (grant, vocabulary, idPrefix, level) =>
     mapCompactProficiencyGrantToItems(
-      formatArmorTrainingGrantCompact(grant.grant, vocabulary.resolveArmorName),
+      formatArmorTrainingGrantCompact(
+        grant.grant,
+        equipmentNameResolver(vocabulary.equipmentCatalog, vocabulary.resolveArmorName),
+      ),
       `${idPrefix}:armorTraining`,
       grant.kind,
       'training',
@@ -380,8 +415,14 @@ const GRANT_ITEM_MAPPERS = {
   equipment: (grant, vocabulary, idPrefix, level) =>
     mapCompactProficiencyGrantToItems(
       formatEquipmentGrantCompact(grant.grant, {
-        resolveEquipmentName: vocabulary.resolveEquipmentName,
-        resolveEquipmentKind: vocabulary.resolveEquipmentKind,
+        resolveEquipmentName: equipmentNameResolver(
+          vocabulary.equipmentCatalog,
+          vocabulary.resolveEquipmentName,
+        ),
+        resolveEquipmentKind: equipmentKindResolver(
+          vocabulary.equipmentCatalog,
+          vocabulary.resolveEquipmentKind,
+        ),
       }),
       `${idPrefix}:equipment`,
       grant.kind,

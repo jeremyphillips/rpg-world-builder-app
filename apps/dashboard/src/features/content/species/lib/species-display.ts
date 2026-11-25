@@ -42,7 +42,7 @@ export const SPECIES_SECTION_LABELS = { traits: 'Traits' } as const
 export type SpeciesDisplayVocabulary = {
   resolveCreatureTypeLabel: (id: string) => string
   resolveLanguageLabel: (id: string) => string | undefined
-} & Pick<GrantDisplayVocabulary, 'resolveDamageTypeLabel' | 'resolveSenseLabel' | 'spellCatalog'>
+} & GrantDisplayVocabulary
 
 export type SpeciesDetailItem = {
   id: string
@@ -151,24 +151,14 @@ function mapTraitToDetailItem(trait: SpeciesBodyTrait): SpeciesDetailItem {
   }
 }
 
-function toGrantDisplayVocabulary(vocabulary: SpeciesDisplayVocabulary): GrantDisplayVocabulary {
-  return {
-    resolveSenseLabel: vocabulary.resolveSenseLabel,
-    resolveLanguageLabel: vocabulary.resolveLanguageLabel,
-    resolveDamageTypeLabel: vocabulary.resolveDamageTypeLabel,
-    spellCatalog: vocabulary.spellCatalog,
-  }
-}
-
 function mapHeritageOptionToDetailItem(
   trait: SpeciesBodyTrait,
   vocabulary: SpeciesDisplayVocabulary,
 ): SpeciesDetailItem {
   const { title, bodyHtml } = facingTitleAndBody(trait)
-  const grantVocabulary = toGrantDisplayVocabulary(vocabulary)
   const summaryModel = buildGrantSummaryModel(
     trait.kind === 'template' ? undefined : trait.grantGroups,
-    grantVocabulary,
+    vocabulary,
     {
       parentLevel: 1,
     },
