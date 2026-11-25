@@ -1,4 +1,4 @@
-import type { MovementSpeeds } from '../../vocab/movement-mode'
+import type { MovementAlternative, MovementSpeeds } from '../../vocab/movement-mode'
 import {
   MOVEMENT_MODES,
   formatMovementDisplay,
@@ -15,6 +15,7 @@ import { resolveFormDifferencesPresentation } from './form-differences-presentat
 
 export type MonsterSpeedStatRowInput = CreatureFormDifferenceInput & {
   hasShapeShift: boolean
+  movementAlternative?: MovementAlternative
 }
 
 function formatFormOnlyQualifier(formNames: readonly string[]): string {
@@ -84,7 +85,7 @@ export function formatMonsterSpeedStatRow(
   input: MonsterSpeedStatRowInput,
   unit: 'ft' | 'ft.' = 'ft.',
 ): string | undefined {
-  const movement = formatMovementDisplay(input.movement, unit)
+  const movement = formatMovementDisplay(input.movement, unit, input.movementAlternative)
   if (!input.forms.definedForms.length) {
     return input.hover && movement ? `${movement} (hover)` : movement || undefined
   }

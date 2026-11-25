@@ -1,12 +1,17 @@
 import {
+  EXTRA_MOVEMENT_MODES,
   MOVEMENT_MODES,
   MOVEMENT_SPEED_FEET,
   addCustomRefinementIssue,
   defineMessage,
+  extraMovementModeSchema,
   fieldValidationMessages,
   getMovementModeLabel,
+  movementAlternativeSchema,
   movementModeSchema,
   movementSpeedFeetSchema,
+  type ExtraMovementMode,
+  type MovementAlternative,
   type MovementMode,
   type MovementSpeedFeet,
   type MovementSpeeds,
@@ -26,10 +31,188 @@ export const movementValidationMessages = {
     'validation.content.movement.duplicateMode',
     () => 'Each movement mode can only appear once.',
   ),
+  alternativeOverlap: defineMessage(
+    'validation.content.movement.alternativeOverlap',
+    () => 'This mode cannot appear in both fixed movement and the alternative pair.',
+  ),
+  alternativeDuplicateMode: defineMessage(
+    'validation.content.movement.alternativeDuplicateMode',
+    () => 'Alternative movement modes must be distinct.',
+  ),
+}
+
+export const MOVEMENT_ALTERNATIVE_HEADING = 'Alternative movement'
+export const MOVEMENT_ALTERNATIVE_HINT =
+  "The creature has its regular movement speeds, plus one of the alternative modes below (GM's choice). It does not have both alternative modes."
+export const MOVEMENT_ALTERNATIVE_FIRST_MODE_LABEL = 'First mode'
+export const MOVEMENT_ALTERNATIVE_SECOND_MODE_LABEL = 'Second mode'
+
+export type MovementAlternativeFormValues = {
+  firstMode: ExtraMovementMode | ''
+  secondMode: ExtraMovementMode | ''
+  feet: MovementSpeedFeet | '' | undefined
+}
+
+const extraMovementModeOptions = EXTRA_MOVEMENT_MODES.map((mode) => ({
+  value: mode,
+  label: getMovementModeLabel(mode),
+}))
+
+function movementModesUsedInFixedRows(
+  rows: MovementRowDraftFormValues[] | undefined,
+): Set<MovementMode> {
+  const used = new Set<MovementMode>()
+  for (const row of rows ?? []) {
+    if (row.mode && movementModeSchema.safeParse(row.mode).success) {
+      used.add(row.mode as MovementMode)
+    }
+  }
+  return used
+}
+
+function movementAlternativeModeOptions(
+  watched: Record<string, unknown>,
+  field: 'firstMode' | 'secondMode',
+) {
+  const fixedUsed = movementModesUsedInFixedRows(
+    watched.movement as MovementRowDraftFormValues[] | undefined,
+  )
+  const alternative = watched.movementAlternative as MovementAlternativeFormValues | undefined
+  const sibling = field === 'firstMode' ? alternative?.secondMode : alternative?.firstMode
+  return extraMovementModeOptions.filter(
+    (option) => !fixedUsed.has(option.value) && option.value !== sibling,
+  )
+}
+
+export function movementAlternativeRecordToForm(
+  alternative?: MovementAlternative,
+): MovementAlternativeFormValues | undefined {
+  if (!alternative) return undefined
+  return {
+    firstMode: alternative.modes[0],
+    secondMode: alternative.modes[1],
+    feet: alternative.feet,
+  }
+}
+
+export function movementAlternativeFormToSchema(
+  values: MovementAlternativeFormValues | undefined,
+): MovementAlternative | undefined {
+  if (!values) return undefined
+  if (!values.firstMode || !values.secondMode) return undefined
+  if (values.feet === undefined || values.feet === '') return undefined
+  if (values.firstMode === values.secondMode) return undefined
+  const parsed = movementAlternativeSchema.safeParse({
+    modes: [values.firstMode, values.secondMode],
+    feet: values.feet,
+  })
+  return parsed.success ? parsed.data : undefined
+}
+
+export function refineMovementAlternativeForm(
+  alternative: MovementAlternativeFormValues | undefined,
+  movementRows: MovementRowDraftFormValues[],
+  ctx: z.RefinementCtx,
+  pathPrefix: (string | number)[] = ['movementAlternative'],
+): void {
+  if (!alternative) return
+  const { firstMode, secondMode } = alternative
+  if (firstMode && secondMode && firstMode === secondMode) {
+    addCustomRefinementIssue(ctx, movementValidationMessages.alternativeDuplicateMode(), [
+      ...pathPrefix,
+      'secondMode',
+    ])
+  }
+  const fixedModes = movementModesUsedInFixedRows(movementRows)
+  for (const mode of [firstMode, secondMode]) {
+    if (!mode) continue
+    if (fixedModes.has(mode)) {
+      addCustomRefinementIssue(ctx, movementValidationMessages.alternativeOverlap(), [
+        ...pathPrefix,
+        mode === firstMode ? 'firstMode' : 'secondMode',
+      ])
+    }
+  }
+}
+
+export function movementAlternativeGroupField(): FormItem {
+  return {
+    kind: 'group',
+    name: 'movementAlternative',
+    heading: {
+      label: MOVEMENT_ALTERNATIVE_HEADING,
+      hint: MOVEMENT_ALTERNATIVE_HINT,
+    },
+    headingScale: 'field',
+    optionalDisclosure: {
+      intent: 'add',
+      addLabel: 'Add alternative movement',
+      removeLabel: 'Remove alternative movement',
+      expandWhenPopulated: true,
+      watchPaths: ['movementAlternative'],
+      clearPaths: ['movementAlternative'],
+      seedWhen: () => ({ firstMode: '', secondMode: '', feet: undefined }),
+    },
+    fields: [
+      {
+        kind: 'row',
+        fields: [
+          {
+            type: 'select',
+            name: 'firstMode',
+            label: MOVEMENT_ALTERNATIVE_FIRST_MODE_LABEL,
+            required: true,
+            width: 'md',
+            options: extraMovementModeOptions,
+            optionsResolve: {
+              dependsOn: ['movement', 'movementAlternative'],
+              resolve: (watched) => movementAlternativeModeOptions(watched, 'firstMode'),
+            },
+          },
+          {
+            type: 'select',
+            name: 'secondMode',
+            label: MOVEMENT_ALTERNATIVE_SECOND_MODE_LABEL,
+            required: true,
+            width: 'md',
+            options: extraMovementModeOptions,
+            optionsResolve: {
+              dependsOn: ['movement', 'movementAlternative'],
+              resolve: (watched) => movementAlternativeModeOptions(watched, 'secondMode'),
+            },
+          },
+          {
+            type: 'joinedPair',
+            label: MOVEMENT_SPEED_FIELD_LABEL,
+            width: 'auto',
+            required: true,
+            start: {
+              kind: 'select',
+              name: 'feet',
+              options: movementFeetOptions,
+              digits: 3,
+              ariaLabel: 'Speed value',
+            },
+            end: {
+              kind: 'label',
+              text: 'ft.',
+              ariaLabel: 'Speed unit',
+            },
+          },
+        ],
+      },
+    ],
+  }
 }
 
 const movementModeDraftSchema = z.union([movementModeSchema, z.literal('')])
 const movementFeetDraftSchema = z.union([movementSpeedFeetSchema, z.literal(''), z.undefined()])
+
+export const movementAlternativeFormSchema = z.object({
+  firstMode: z.union([extraMovementModeSchema, z.literal('')]),
+  secondMode: z.union([extraMovementModeSchema, z.literal('')]),
+  feet: movementFeetDraftSchema,
+})
 
 export const movementRowDraftFormSchema = z.object({
   mode: movementModeDraftSchema,
@@ -178,11 +361,19 @@ export function creatureFlyHoverSwitchField(): FormItem {
   }
 }
 
-export function movementWithHoverGroup(): FormItem {
+export type MovementWithHoverGroupOptions = {
+  includeMovementAlternative?: boolean
+}
+
+export function movementWithHoverGroup(options?: MovementWithHoverGroupOptions): FormItem {
+  const fields: FormItem[] = [movementArrayField(), creatureFlyHoverSwitchField()]
+  if (options?.includeMovementAlternative) {
+    fields.push(movementAlternativeGroupField())
+  }
   return {
     kind: 'group',
     density: 'comfortable',
-    fields: [movementArrayField(), creatureFlyHoverSwitchField()],
+    fields,
   }
 }
 

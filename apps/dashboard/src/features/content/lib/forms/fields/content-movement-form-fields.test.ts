@@ -21,6 +21,28 @@ describe('content movement form fields', () => {
     expect(speciesCreateDefaultValues.movement).toEqual([{ mode: 'walk', feet: 30 }])
   })
 
+  it('omits alternative movement on species and the default hover group', () => {
+    const group = movementWithHoverGroup()
+    expect(isContainer(group) && group.kind === 'group').toBe(true)
+    if (!isContainer(group) || group.kind !== 'group') return
+    const hasAlternative = group.fields.some(
+      (field) =>
+        isContainer(field) && field.kind === 'group' && field.name === 'movementAlternative',
+    )
+    expect(hasAlternative).toBe(false)
+  })
+
+  it('includes alternative movement only when the factory option is on', () => {
+    const monsterGroup = movementWithHoverGroup({ includeMovementAlternative: true })
+    expect(isContainer(monsterGroup) && monsterGroup.kind === 'group').toBe(true)
+    if (!isContainer(monsterGroup) || monsterGroup.kind !== 'group') return
+    const hasAlternative = monsterGroup.fields.some(
+      (field) =>
+        isContainer(field) && field.kind === 'group' && field.name === 'movementAlternative',
+    )
+    expect(hasAlternative).toBe(true)
+  })
+
   it('movementWithHoverGroup stacks movement array and hover without a section heading', () => {
     const group = movementWithHoverGroup()
     expect(isContainer(group) && group.kind === 'group').toBe(true)

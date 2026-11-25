@@ -211,6 +211,23 @@ describe('qualified stat rows', () => {
     ).toBe('Walk 30 ft., Climb 30 ft.')
   })
 
+  it('prints an unresolved movement alternative on the speed row', () => {
+    expect(
+      formatMonsterSpeedStatRow({
+        monsterName: 'Swarm of Insects',
+        sizes: ['medium'],
+        movement: { walk: 20 },
+        movementAlternative: { modes: ['climb', 'fly'], feet: 20 },
+        forms: {
+          profileFormId: 'profile',
+          trueForm: { kind: 'profile' },
+          definedForms: [],
+        },
+        hasShapeShift: false,
+      }),
+    ).toBe("20 ft., Fly or Climb 20 ft. (GM's choice)")
+  })
+
   it('falls back to stat rows when Shape-Shift is missing', () => {
     expect(
       formatMonsterSpeedStatRow({

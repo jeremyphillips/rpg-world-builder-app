@@ -6,6 +6,7 @@ import {
   LEAP_MISSING_WALK_SPEED_MESSAGE,
   LEAP_MOVEMENT_EXCEEDS_WALK_SPEED_MESSAGE,
   LEAP_ZERO_WALK_SPEED_MESSAGE,
+  SPIDER_CLIMB_ALTERNATIVE_CLIMB_MESSAGE,
 } from './monster-form-advisories'
 
 describe('collectMonsterFormAdvisories', () => {
@@ -124,6 +125,25 @@ describe('collectMonsterFormAdvisories', () => {
     expect(collectMonsterFormAdvisories(values, new Map())).toEqual([])
 
     values.bonusActions = [{ id: 'step', kind: 'teleport', name: 'Teleport', distanceFeet: 40 }]
+    expect(collectMonsterFormAdvisories(values, new Map())).toEqual([])
+  })
+
+  it('warns on spider climb only while climb is an alternative mode', () => {
+    const values = {
+      traits: [{ id: 'climb', preset: 'spider-climb' }],
+      movement: [{ mode: 'walk', feet: 20 }],
+      movementAlternative: { firstMode: 'climb', secondMode: 'fly', feet: 20 },
+    } as unknown as MonsterFormValues
+
+    expect(collectMonsterFormAdvisories(values, new Map())).toEqual([
+      {
+        code: 'spider-climb-alternative-climb',
+        message: SPIDER_CLIMB_ALTERNATIVE_CLIMB_MESSAGE,
+        path: 'traits.0',
+      },
+    ])
+
+    values.movementAlternative = undefined
     expect(collectMonsterFormAdvisories(values, new Map())).toEqual([])
   })
 })

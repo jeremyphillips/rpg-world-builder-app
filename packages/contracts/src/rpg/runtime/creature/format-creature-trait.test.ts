@@ -143,13 +143,9 @@ describe('formatCreatureTrait', () => {
     ).toContain("this creature's Vile Appearance for 24 hours")
   })
 
-  it('formats spider climb for any subject, including a swarm', () => {
-    expect(
-      formatCreatureTrait({
-        subject: formatMonsterStatBlockSubject('Swarm of Insects'),
-        trait: { preset: 'spider-climb' },
-      })?.sentence,
-    ).toBe(
+  it('formats spider climb unconditionally without movement context', () => {
+    const subject = formatMonsterStatBlockSubject('Swarm of Insects')
+    expect(formatCreatureTrait({ subject, trait: { preset: 'spider-climb' } })?.sentence).toBe(
       'The swarm of insects can climb difficult surfaces, including along ceilings, without needing to make an ability check.',
     )
   })

@@ -2049,30 +2049,44 @@
               "description": "ability-check"
             },
             "ability": {
-              "type": "string",
-              "enum": [
-                "str",
-                "dex",
-                "con",
-                "int",
-                "wis",
-                "cha"
-              ],
-              "description": "str | dex | con | int | wis | cha"
+              "$ref": "#/definitions/__schema80"
             },
             "skillId": {
-              "allOf": [
-                {
-                  "$ref": "#/definitions/__schema31"
-                }
-              ]
+              "$ref": "#/definitions/__schema81"
             }
           },
           "required": [
-            "kind",
-            "ability"
+            "kind"
           ],
           "additionalProperties": false
+        }
+      ]
+    },
+    "__schema79": {
+      "type": "string",
+      "const": "ability-check",
+      "description": "ability-check"
+    },
+    "__schema80": {
+      "allOf": [
+        {
+          "type": "string",
+          "enum": [
+            "str",
+            "dex",
+            "con",
+            "int",
+            "wis",
+            "cha"
+          ],
+          "description": "str | dex | con | int | wis | cha"
+        }
+      ]
+    },
+    "__schema81": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/__schema31"
         }
       ]
     }

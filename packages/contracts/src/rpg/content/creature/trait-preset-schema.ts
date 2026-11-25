@@ -368,3 +368,19 @@ export const monsterPresetTraitDraftSchema = z.union([
   elementalRestorationDraftSchema,
   stenchDraftSchema,
 ])
+
+export type MonsterPresetTrait = z.output<typeof monsterPresetTraitSchema>
+export type MonsterPresetTraitDraft = z.infer<typeof monsterPresetTraitDraftSchema>
+export type MonsterPresetTraitForFormat = MonsterPresetTrait | MonsterPresetTraitDraft
+
+export function parseMonsterPresetTraitForFormat(value: unknown): MonsterPresetTrait | undefined {
+  const result = monsterPresetTraitSchema.safeParse(value)
+  return result.success ? result.data : undefined
+}
+
+export function parseMonsterPresetTraitDraftForFormat(
+  value: unknown,
+): MonsterPresetTraitDraft | undefined {
+  const result = monsterPresetTraitDraftSchema.safeParse(value)
+  return result.success ? result.data : undefined
+}

@@ -104,7 +104,12 @@ describe('rules preview lockdown', () => {
         source: 'draft',
         hostId: 'monster-traits',
         row,
-        monster: { name: 'Example', lair: undefined, forms: undefined },
+        monster: {
+          name: 'Example',
+          lair: undefined,
+          forms: undefined,
+          movement: [{ mode: 'walk', feet: 30 }],
+        },
       }),
     ).toBeUndefined()
     expect(
@@ -113,7 +118,12 @@ describe('rules preview lockdown', () => {
         source: 'draft',
         hostId: 'monster-traits',
         row: { ...row, kind: 'unsupported' },
-        monster: { name: 'Example', lair: undefined, forms: undefined },
+        monster: {
+          name: 'Example',
+          lair: undefined,
+          forms: undefined,
+          movement: [{ mode: 'walk', feet: 30 }],
+        },
       }),
     ).toEqual({ status: 'invalid', reason: { code: 'unsupported-kind' } })
   })
