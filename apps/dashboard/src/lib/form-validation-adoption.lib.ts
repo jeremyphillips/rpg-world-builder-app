@@ -8,6 +8,7 @@ import { applyApiErrorValidationToCanonicalRhf } from '@/features/content/lib/fo
 export function useAdoptedFormSubmit<TValues extends FieldValues>(
   submit: (values: TValues, form: UseFormReturn<TValues>) => Promise<void>,
   fallbackMessage: string,
+  mapFooterError?: (error: unknown) => string | undefined,
 ) {
   const [formError, setFormError] = useState<string | null>(null)
 
@@ -18,11 +19,11 @@ export function useAdoptedFormSubmit<TValues extends FieldValues>(
         await submit(values, form)
       } catch (error) {
         if (!applyApiErrorValidationToCanonicalRhf(form, error)) {
-          setFormError(getErrorMessage(error, fallbackMessage))
+          setFormError(mapFooterError?.(error) ?? getErrorMessage(error, fallbackMessage))
         }
       }
     },
-    [fallbackMessage, submit],
+    [fallbackMessage, mapFooterError, submit],
   )
 
   return { onSubmit, formError }

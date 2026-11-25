@@ -49,4 +49,23 @@ describe('useAdoptedFormSubmit', () => {
 
     expect(result.current.formError).toBe('Could not save.')
   })
+
+  it('prefers mapFooterError when structured api paint does not apply', async () => {
+    const { result } = renderHook(() =>
+      useAdoptedFormSubmit<{ name: string }>(
+        vi.fn().mockRejectedValue(new ApiError(429, 'cooldown', 'Cooldown')),
+        'Could not save.',
+        () => 'Try again soon.',
+      ),
+    )
+
+    const form = renderHook(() => useForm<{ name: string }>({ defaultValues: { name: 'x' } }))
+      .result.current
+
+    await act(async () => {
+      await result.current.onSubmit({ name: 'x' }, form)
+    })
+
+    expect(result.current.formError).toBe('Try again soon.')
+  })
 })

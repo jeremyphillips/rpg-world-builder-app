@@ -6,6 +6,9 @@ const campaignCreatePath = fileURLToPath(new URL('../routes/campaign-create.tsx'
 const campaignSettingsPath = fileURLToPath(
   new URL('../routes/campaign-settings.tsx', import.meta.url),
 )
+const inviteMemberDialogPath = fileURLToPath(
+  new URL('../components/overview/invite-member-dialog.tsx', import.meta.url),
+)
 
 describe('campaign form validation adoption', () => {
   it('uses evaluator-backed wizard steps on create', () => {
@@ -22,5 +25,12 @@ describe('campaign form validation adoption', () => {
     expect(source).toContain('useAdoptedFormSubmit')
     expect(source).not.toContain('useSubmitHandler')
     expect(source).toContain('TabbedForm')
+  })
+
+  it('uses adopted submit helper on invite member dialog', () => {
+    const source = readFileSync(inviteMemberDialogPath, 'utf8')
+
+    expect(source).toContain('useAdoptedFormSubmit')
+    expect(source).not.toContain('useSubmitHandler')
   })
 })

@@ -19,6 +19,6 @@ Initial adoption families are listed in `form-validation-adopted-families.ts`. E
 - `ingest-content-form-validation.lib.ts` — producer slots + `applyApiErrorValidationToCanonicalRhf`
 - `useAdoptedFormSubmit` (`apps/dashboard/src/lib/form-validation-adoption.lib.ts`) — tabbed/flat adopted saves outside the content commit pipeline
 
-## Deferred (Phase 7)
+## Deferred (until allowlist milestones)
 
-`FORM_VALIDATION_ADOPTION_ALLOWLIST`: character builder, character import, Quick NPC (`removesIn: phase-7-*`).
+`FORM_VALIDATION_ADOPTION_ALLOWLIST`: character builder, character import, Quick NPC (`removesIn: phase-7-*`). Repository-wide enforcement: [form-lifecycle-phase7.md](./form-lifecycle-phase7.md).

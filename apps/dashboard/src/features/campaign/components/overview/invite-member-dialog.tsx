@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { ActionButton, Button, Modal } from '@rpg/ui'
 import { Form, FormFooterActions } from '@rpg/ui/form'
 
-import { useSubmitHandler } from '@/lib/use-submit-handler'
+import { useAdoptedFormSubmit } from '@/lib/form-validation-adoption.lib'
 
 import {
   INVITE_MEMBER_DIALOG_COPY,
@@ -46,8 +46,8 @@ export function InviteMemberDialog({
     }
   }
 
-  const { onSubmit, formError } = useSubmitHandler<InviteMemberValues>({
-    submit: async (values, form) => {
+  const { onSubmit, formError } = useAdoptedFormSubmit<InviteMemberValues>(
+    async (values, form) => {
       const result = await mutateAsync(values.email.trim())
       if (result.invite.deliveryStatus === 'failed') {
         setDeliveryFailed(true)
@@ -58,9 +58,9 @@ export function InviteMemberDialog({
       setDeliveryFailed(false)
       handleOpenChange(false)
     },
-    fallbackMessage: INVITE_MEMBER_DIALOG_COPY.fallbackError,
-    mapError: mapInviteSendError,
-  })
+    INVITE_MEMBER_DIALOG_COPY.fallbackError,
+    mapInviteSendError,
+  )
 
   return (
     <Modal.Root open={open} onOpenChange={handleOpenChange}>

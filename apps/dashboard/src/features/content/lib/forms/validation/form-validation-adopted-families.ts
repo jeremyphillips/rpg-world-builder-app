@@ -16,6 +16,7 @@ export const FORM_VALIDATION_ADOPTED_FAMILIES = [
     surfaces: [
       'campaign create wizard (WizardStepForm)',
       'campaign settings (useAdoptedFormSubmit)',
+      'invite member dialog (useAdoptedFormSubmit)',
     ],
   },
   {
