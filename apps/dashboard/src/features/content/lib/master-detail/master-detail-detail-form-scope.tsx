@@ -21,6 +21,7 @@ export function MasterDetailDetailFormScope({ children }: { children: ReactNode 
     return {
       ...parent,
       namedGroupDepth,
+      reserveRulesPreview: true,
     }
   }, [parent])
 

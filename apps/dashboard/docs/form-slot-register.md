@@ -225,7 +225,7 @@ A slot that needs one of these stays a slot.
   dependency changes identity, and write one reaction with
   `shouldValidate: false`.
 - Display `html`, and previews that need whole-form normalization or a title hook.
-  Display is `text`, `notice`, and data-only `rulesPreview`.
+  Display supports `text`, `notice`, and data-only `rulesPreview`. Master–detail row fields reserve the preview for the detail shell and reject both static and resolved `rulesPreview` blocks.
 - Display inside `kind: 'row'`.
 - Root-anchored `dependsOn`, chips for number or boolean presence, and a shared
   hidden-registration kind.

@@ -3,6 +3,7 @@
 import * as React from 'react'
 
 import { useDependsOnValues } from '../../config/form-depends-on.client'
+import { useFormSectionContext } from '../../context/form-section.context'
 import type { DisplayConfig } from '../../field-config'
 import {
   collectDisplayDependsOn,
@@ -17,6 +18,7 @@ export interface DisplayFieldRendererProps {
 }
 
 export function DisplayFieldRenderer({ config, namePrefix }: DisplayFieldRendererProps) {
+  const { reserveRulesPreview } = useFormSectionContext()
   const dependsOn = React.useMemo(() => collectDisplayDependsOn(config), [config])
   const watched = useDependsOnValues(dependsOn, namePrefix)
 
@@ -30,6 +32,10 @@ export function DisplayFieldRenderer({ config, namePrefix }: DisplayFieldRendere
         : Object.fromEntries(config.resolve.dependsOn.map((dep) => [dep, watched[dep]]))
     return resolveDisplayBlocks(config, resolveValues)
   }, [config, watched])
+
+  if (reserveRulesPreview && blocks.some((block) => block.variant === 'rulesPreview')) {
+    throw new Error('Rules preview belongs to the detail shell')
+  }
 
   if (displayContentIsEmpty(blocks)) return null
 

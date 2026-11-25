@@ -43,6 +43,8 @@ export interface FormSectionContextValue {
   fieldChromeCascade?: FieldChrome
   /** When true, leaf fields default to no container unless explicitly configured. */
   fieldChromeSuppressed?: boolean
+  /** Reserved preview mounts can prohibit rules previews in descendant display fields. */
+  reserveRulesPreview?: boolean
   /** Internal nesting plane for dependent nest fill — not author-facing. */
   surfaceHost?: FormSurfaceHost
 }
@@ -100,6 +102,7 @@ function inheritSectionContextFields(
     fieldChromeCascade: parent.fieldChromeCascade,
     fieldChromeSuppressed: parent.fieldChromeSuppressed,
     surfaceHost: parent.surfaceHost,
+    reserveRulesPreview: parent.reserveRulesPreview,
   }
 
   return overrides ? { ...inherited, ...filterUndefined(overrides) } : inherited

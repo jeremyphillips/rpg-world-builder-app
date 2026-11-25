@@ -2,7 +2,15 @@ import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { z } from 'zod'
+import { FormProvider, useForm } from 'react-hook-form'
+import {
+  FormSectionContext,
+  buildFormSectionChildContext,
+} from '../../context/form-section.context'
+import { DisplayFieldRenderer } from './display-field-renderer.client'
+import type { DisplayConfig } from '../../field-config'
 
+import { DEFAULT_FORM_DENSITY } from '../../form-density'
 import { Form } from '../../shells/form.client'
 import type { FormItem, RowConfig } from '../../field-config'
 import { submitAndExpectPayload } from '../../test-utils'
@@ -44,6 +52,46 @@ describe('DisplayFieldRenderer', () => {
     expect(summary).toHaveAttribute('aria-live', 'polite')
     expect(screen.queryByRole('status')).not.toBeInTheDocument()
   })
+
+  it.each(['static', 'resolved'] as const)(
+    'rejects %s rules previews within a reserved detail section',
+    (source) => {
+      const block = {
+        variant: 'rulesPreview',
+        preview: { content: { kind: 'introAndRules', introHtml: '<p>Introduction</p>' } },
+      } as const
+      const config: DisplayConfig = {
+        kind: 'display',
+        id: 'rules',
+        ...(source === 'static'
+          ? { content: block }
+          : { resolve: { dependsOn: [], contentWhen: () => block } }),
+      }
+
+      function Fixture({ reserved }: { reserved: boolean }) {
+        const form = useForm()
+        const parent = {
+          density: DEFAULT_FORM_DENSITY,
+          depth: 0,
+          namedGroupDepth: 0,
+          reserveRulesPreview: reserved,
+        }
+        return (
+          <FormProvider {...form}>
+            <FormSectionContext.Provider value={buildFormSectionChildContext(parent, 0)}>
+              <DisplayFieldRenderer config={config} />
+            </FormSectionContext.Provider>
+          </FormProvider>
+        )
+      }
+
+      const fixture = render(<Fixture reserved={false} />)
+      expect(screen.getByText('Introduction')).toBeInTheDocument()
+      expect(() => fixture.rerender(<Fixture reserved />)).toThrow(
+        'Rules preview belongs to the detail shell',
+      )
+    },
+  )
 
   it('renders advisory notice without aria-live', () => {
     const fields: FormItem[] = [
