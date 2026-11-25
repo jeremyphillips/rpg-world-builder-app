@@ -593,6 +593,54 @@ const dashboardMonsterAcquisitionSectionKindsGuard = {
   },
 }
 
+// Flat config replaces rule options. Preserve earlier restrictions in the
+// acquisition directories, including any form-field modules nested there.
+const monsterAcquisitionImportOptions =
+  dashboardMonsterAcquisitionSectionKindsGuard.rules['no-restricted-imports'][1]
+const traitPipelineImportOptions =
+  dashboardTraitPipelineImportGuard.rules['no-restricted-imports'][1]
+const traitFormFieldImportOptions =
+  dashboardTraitComposerFormFieldImportGuard.rules['no-restricted-imports'][1]
+
+const dashboardMonsterAcquisitionImportGuards = [
+  {
+    ...dashboardMonsterAcquisitionSectionKindsGuard,
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [...traitPipelineImportOptions.paths, ...monsterAcquisitionImportOptions.paths],
+          patterns: [
+            ...traitPipelineImportOptions.patterns,
+            ...monsterAcquisitionImportOptions.patterns,
+          ],
+        },
+      ],
+    },
+  },
+  {
+    ...dashboardMonsterAcquisitionSectionKindsGuard,
+    files: dashboardMonsterAcquisitionSectionKindsGuard.files.flatMap((acquisitionGlob) =>
+      dashboardTraitComposerFormFieldImportGuard.files.map((formFieldGlob) => [
+        acquisitionGlob,
+        formFieldGlob,
+      ]),
+    ),
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [...traitFormFieldImportOptions.paths, ...monsterAcquisitionImportOptions.paths],
+          patterns: [
+            ...traitFormFieldImportOptions.patterns,
+            ...monsterAcquisitionImportOptions.patterns,
+          ],
+        },
+      ],
+    },
+  },
+]
+
 const dashboardSystemRulesetLiteralGuard = {
   files: ['src/**/*.{ts,tsx}'],
   ignores: [
@@ -674,8 +722,8 @@ export default [
       ],
     },
   },
-  dashboardMonsterAcquisitionSectionKindsGuard,
   dashboardFacingPresentationImportGuard,
   dashboardTraitPipelineImportGuard,
   dashboardTraitComposerFormFieldImportGuard,
+  ...dashboardMonsterAcquisitionImportGuards,
 ]

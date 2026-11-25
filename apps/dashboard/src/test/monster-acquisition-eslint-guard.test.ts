@@ -52,4 +52,34 @@ describe('monster acquisition ESLint import guards', () => {
       ),
     ).toBe(true)
   })
+
+  it.each([
+    ['fixture.ts', 'formatLegendaryResistanceStatBlockTitle', true],
+    ['fixture-form-fields.ts', 'resolveTraitFacingParts', true],
+    ['fixture-form-fields.ts', 'MONSTER_SECTION_KINDS', true],
+    ['fixture.ts', 'monsterSectionAllowsKind', false],
+  ])('preserves effective import policy in %s for %s', async (file, name, restricted) => {
+    const eslint = new ESLint({
+      cwd: dashboardRoot,
+      overrideConfigFile: path.join(dashboardRoot, 'eslint.config.js'),
+    })
+
+    const [result] = await eslint.lintText(
+      `import { ${name} } from '@rpg/contracts'
+`,
+      {
+        filePath: path.join(
+          dashboardRoot,
+          'src/features/content/monsters/lib/actions/acquisition',
+          file,
+        ),
+      },
+    )
+
+    expect(
+      result?.messages.some(
+        (message) => message.ruleId === 'no-restricted-imports' && message.severity === 2,
+      ),
+    ).toBe(restricted)
+  })
 })
