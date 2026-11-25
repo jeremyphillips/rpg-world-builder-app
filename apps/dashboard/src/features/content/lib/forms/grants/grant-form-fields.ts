@@ -22,8 +22,6 @@ import {
   type FeatCategory,
   type MovementOperation,
   type SenseId,
-  isArmorEquipment,
-  isWeaponEquipment,
   getSpellGrantAvailabilityLabel,
 } from '@rpg/contracts'
 
@@ -58,6 +56,8 @@ import { GrantTypePersistField } from './grant-type-persist-field'
 import {
   nounFromContentType,
   getContentTypeCollectionLabel,
+  formatContentListLoadErrorMessage,
+  formatContentReferenceUnavailable,
   getContentTypeMidSentenceLabel,
 } from '@/features/content/lib/content-type-labels'
 
@@ -755,7 +755,6 @@ function buildGrantRowHeaderContext(
   labels: Record<string, string>,
   ctx: ContentFormCtx,
 ): GrantRowHeaderContext {
-  const referenceEquipment = ctx.options?.equipment?.forReference() ?? []
   const { damageTypeVocabulary, languageVocabulary, senseVocabulary } = ctx
 
   return {
@@ -771,22 +770,18 @@ function buildGrantRowHeaderContext(
         campaignId: '',
       },
     }),
-    weaponOptions: toSortedContentFieldOptions(
-      referenceEquipment.filter(isWeaponEquipment),
-      'equipment',
-    ),
-    toolOptions: toSortedContentFieldOptions(
-      referenceEquipment.filter((item) => item.kind === 'tool'),
-      'equipment',
-    ),
-    armorOptions: toSortedContentFieldOptions(
-      referenceEquipment.filter(isArmorEquipment),
-      'equipment',
-    ),
-    skillOptions: toSortedContentFieldOptions(
-      ctx.options?.skills?.forReference(),
-      'skill-proficiencies',
-    ),
+    resolveSkillName: (slug) => {
+      if (ctx.skillCatalogStatus === 'pending') {
+        return `Loading ${getContentTypeMidSentenceLabel('skill-proficiencies', { plural: true })}…`
+      }
+      if (ctx.skillCatalogStatus === 'error') {
+        return formatContentListLoadErrorMessage('skill-proficiencies')
+      }
+      return (
+        ctx.skillCatalogBySlug?.get(slug)?.name ??
+        formatContentReferenceUnavailable('skill-proficiencies')
+      )
+    },
     spellReferences: buildGrantSpellReferencePresentationFromAuthoring({
       status: ctx.spellCatalogStatus,
       spellsById: ctx.spellCatalogById,

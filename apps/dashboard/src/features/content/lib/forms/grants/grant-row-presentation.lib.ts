@@ -35,7 +35,6 @@ import {
 import { INLINE_METADATA_SEPARATOR } from '@rpg/contracts/primitives'
 
 import { limitedUseFromForm } from '../limited-use/limited-use-form.lib'
-import type { FieldOption } from '@rpg/ui/form'
 
 import { formatCompactMetadataList } from './grant-compact-metadata.lib'
 import { equipmentGrantSummary } from './equipment/equipment-grant-form-values'
@@ -79,10 +78,7 @@ export type GrantEquipmentReferencePresentation = {
 export type GrantRowHeaderContext = {
   rowLabels: Record<string, string>
   equipmentReferences: GrantEquipmentReferencePresentation
-  weaponOptions: FieldOption[]
-  toolOptions: FieldOption[]
-  armorOptions: FieldOption[]
-  skillOptions: FieldOption[]
+  resolveSkillName?: (slug: string) => string
   spellReferences: GrantSpellReferencePresentation
   resolveDamageTypeLabel?: (id: string) => string
   resolveLanguageLabel?: (id: string) => string
@@ -335,13 +331,19 @@ const GRANT_ROW_DESCRIPTION_BY_TYPE: Partial<Record<string, GrantRowDescriptionF
   equipment: (values, ctx) =>
     equipmentGrantSummary(values as EquipmentGrantItemForm, ctx.equipmentReferences),
   weaponProficiency: (values, ctx) =>
-    weaponProficiencyGrantSummary(values as WeaponProficiencyItemForm, ctx.weaponOptions),
+    weaponProficiencyGrantSummary(
+      values as WeaponProficiencyItemForm,
+      ctx.equipmentReferences.displayName,
+    ),
   toolProficiency: (values, ctx) =>
-    toolProficiencyGrantSummary(values as ToolProficiencyItemForm, ctx.toolOptions),
+    toolProficiencyGrantSummary(
+      values as ToolProficiencyItemForm,
+      ctx.equipmentReferences.displayName,
+    ),
   skillProficiency: (values, ctx) =>
-    skillProficiencyGrantSummary(values as SkillProficiencyItemForm, ctx.skillOptions),
+    skillProficiencyGrantSummary(values as SkillProficiencyItemForm, ctx.resolveSkillName),
   armorTraining: (values, ctx) =>
-    armorTrainingGrantSummary(values as ArmorTrainingItemForm, ctx.armorOptions),
+    armorTrainingGrantSummary(values as ArmorTrainingItemForm, ctx.equipmentReferences.displayName),
   spells: (values, ctx) => resolveSpellGrantDescription(values, ctx),
 }
 
@@ -365,13 +367,19 @@ const GRANT_ROW_DETAIL_BY_TYPE: Partial<Record<string, GrantRowDetailFormatter>>
   languages: (values, ctx) => resolveLanguageDetail(values['language'] as string | undefined, ctx),
   featChoice: resolveFeatChoiceDetail,
   weaponProficiency: (values, ctx) =>
-    weaponProficiencyGrantDetail(values as WeaponProficiencyItemForm, ctx.weaponOptions),
+    weaponProficiencyGrantDetail(
+      values as WeaponProficiencyItemForm,
+      ctx.equipmentReferences.displayName,
+    ),
   toolProficiency: (values, ctx) =>
-    toolProficiencyGrantDetail(values as ToolProficiencyItemForm, ctx.toolOptions),
+    toolProficiencyGrantDetail(
+      values as ToolProficiencyItemForm,
+      ctx.equipmentReferences.displayName,
+    ),
   skillProficiency: (values, ctx) =>
-    skillProficiencyGrantDetail(values as SkillProficiencyItemForm, ctx.skillOptions),
+    skillProficiencyGrantDetail(values as SkillProficiencyItemForm, ctx.resolveSkillName),
   armorTraining: (values, ctx) =>
-    armorTrainingGrantDetail(values as ArmorTrainingItemForm, ctx.armorOptions),
+    armorTrainingGrantDetail(values as ArmorTrainingItemForm, ctx.equipmentReferences.displayName),
   spells: (values, ctx) => resolveSpellGrantDetail(values['spellIds'] as string[] | undefined, ctx),
 }
 

@@ -87,10 +87,8 @@ const headerContext = {
       { id: 'srd-cc-5.2.1:dagger', slug: 'dagger', name: 'Dagger', status: 'draft' },
     ]),
   }),
-  weaponOptions: [{ value: 'longsword', label: 'Longsword' }],
-  toolOptions: [{ value: 'thieves-tools', label: "Thieves' Tools" }],
-  armorOptions: [],
-  skillOptions: [{ value: 'athletics', label: 'Athletics' }],
+  resolveSkillName: (slug: string) =>
+    slug === 'athletics' ? 'Athletics' : 'Skill proficiency reference unavailable',
   spellReferences: buildGrantSpellReferencePresentationFromAuthoring({
     status: 'ready',
     spellsById: spellCatalog([
@@ -296,6 +294,21 @@ describe('resolveGrantRowPresentation', () => {
       expect(presentation?.description).toContain(expected.descriptionIncludes)
       expect(presentation?.description).not.toContain('animate-dead')
     }
+  })
+
+  it('resolves persisted equipment proficiencies independently of picker eligibility', () => {
+    const presentation = resolveGrantRowPresentation(
+      {
+        grantType: 'weaponProficiency',
+        proficiencySource: 'specific',
+        weaponProficiencySlugs: ['dagger', 'missing-weapon'],
+      },
+      headerContext,
+    )
+    expect(presentation?.detail).toBe('Dagger, Equipment reference unavailable')
+    expect(presentation?.description).toBe(
+      'Character gains proficiency with Dagger and Equipment reference unavailable.',
+    )
   })
 
   it('omits detail when incomplete', () => {

@@ -9,19 +9,19 @@ import type {
   WeaponProficiencyPool,
 } from '@rpg/contracts'
 import {
+  EQUIPMENT_REFERENCE_DISPLAY_MESSAGES,
   formatArmorTrainingGrantSentence,
   formatSkillProficiencyGrantSentence,
   formatToolProficiencyGrantSentence,
   formatWeaponProficiencyGrantSentence,
   getArmorCategoryCollectionLabel,
   getArmorCategoryScopeForm,
-  getSkillName,
   getToolCategoryLabel,
   getWeaponCategoryCollectionLabel,
   getWeaponCategorySentenceForm,
   isMeaningfulToolProficiencyPool,
 } from '@rpg/contracts'
-import type { FieldOption } from '@rpg/ui/form'
+import { formatContentReferenceUnavailable } from '../../../content-type-labels'
 
 import {
   formatCompactMetadataList,
@@ -34,6 +34,8 @@ import type {
   ToolProficiencyItemForm,
   WeaponProficiencyItemForm,
 } from './proficiency-grant-form-fields'
+
+const unresolvedEquipmentName = () => EQUIPMENT_REFERENCE_DISPLAY_MESSAGES.unknownEquipment
 
 function categoryFormValueToDomain(value: string | undefined): string | undefined {
   if (!value || value === PROFICIENCY_POOL_CATEGORY_ANY) return undefined
@@ -196,14 +198,12 @@ function weaponPoolMetadataDetail(row: WeaponProficiencyPoolItemForm): string | 
 
 export function weaponProficiencyGrantDetail(
   row: WeaponProficiencyItemForm | undefined,
-  weaponOptions: FieldOption[] = [],
+  resolveWeaponName: (slug: string) => string = unresolvedEquipmentName,
 ): string | undefined {
   if (!row?.proficiencySource) return undefined
 
   if (row.proficiencySource === 'specific') {
-    const labels = (row.weaponProficiencySlugs ?? []).map(
-      (slug) => weaponOptions.find((option) => option.value === slug)?.label ?? slug,
-    )
+    const labels = (row.weaponProficiencySlugs ?? []).map(resolveWeaponName)
     if (!labels.length) return undefined
     return formatCompactMetadataList(labels)
   }
@@ -221,14 +221,11 @@ export function weaponProficiencyGrantDetail(
 
 export function weaponProficiencyGrantSummary(
   row: WeaponProficiencyItemForm | undefined,
-  weaponOptions: FieldOption[] = [],
+  resolveWeaponName: (slug: string) => string = unresolvedEquipmentName,
 ): string {
   if (!row?.proficiencySource) return ''
   if (row.proficiencySource === 'specific' && !row.weaponProficiencySlugs?.length) return ''
   if (row.proficiencySource === 'category' && !row.weaponProficiencyCategories?.length) return ''
-
-  const resolveWeaponName = (slug: string) =>
-    weaponOptions.find((option) => option.value === slug)?.label
 
   return formatWeaponProficiencyGrantSentence(
     weaponProficiencyGrantFromFormRow(row),
@@ -377,14 +374,12 @@ function toolPoolMetadataDetail(row: ToolProficiencyPoolItemForm): string | unde
 
 export function toolProficiencyGrantDetail(
   row: ToolProficiencyItemForm | undefined,
-  toolOptions: FieldOption[] = [],
+  resolveToolName: (slug: string) => string = unresolvedEquipmentName,
 ): string | undefined {
   if (!row?.proficiencySource) return undefined
 
   if (row.proficiencySource === 'specific') {
-    const labels = (row.toolProficiencySlugs ?? []).map(
-      (slug) => toolOptions.find((option) => option.value === slug)?.label ?? slug,
-    )
+    const labels = (row.toolProficiencySlugs ?? []).map(resolveToolName)
     if (!labels.length) return undefined
     return formatCompactMetadataList(labels)
   }
@@ -402,14 +397,11 @@ export function toolProficiencyGrantDetail(
 
 export function toolProficiencyGrantSummary(
   row: ToolProficiencyItemForm | undefined,
-  toolOptions: FieldOption[] = [],
+  resolveToolName: (slug: string) => string = unresolvedEquipmentName,
 ): string {
   if (!row?.proficiencySource) return ''
   if (row.proficiencySource === 'specific' && !row.toolProficiencySlugs?.length) return ''
   if (row.proficiencySource === 'category' && !row.toolProficiencyCategories?.length) return ''
-
-  const resolveToolName = (slug: string) =>
-    toolOptions.find((option) => option.value === slug)?.label
 
   return formatToolProficiencyGrantSentence(toolProficiencyGrantFromFormRow(row), resolveToolName)
 }
@@ -485,46 +477,43 @@ export function skillProficiencyGrantFromFormRow(
   }
 }
 
+const unresolvedSkillName = () => formatContentReferenceUnavailable('skill-proficiencies')
+
 function skillPoolMetadataDetail(
   row: SkillProficiencyPoolItemForm,
-  skillOptions: FieldOption[],
+  resolveSkillName: (slug: string) => string,
 ): string | undefined {
   const choose = row.choose ?? 1
   if (row.poolSource === 'any') return `${choose} from any skill`
   const ids = row.skillProficiencyPoolIds ?? []
   if (!ids.length) return `${choose} from selected skills`
-  const labels = ids.map(
-    (id) => skillOptions.find((option) => option.value === id)?.label ?? getSkillName(id),
-  )
+  const labels = ids.map(resolveSkillName)
   const compact = formatCompactMetadataList(labels)
   return compact ? `${choose} from ${compact}` : undefined
 }
 
 export function skillProficiencyGrantDetail(
   row: SkillProficiencyItemForm | undefined,
-  skillOptions: FieldOption[] = [],
+  resolveSkillName: (slug: string) => string = unresolvedSkillName,
 ): string | undefined {
   if (!row?.proficiencySource) return undefined
 
   if (row.proficiencySource === 'specific') {
     const ids = row.skillProficiencyIds ?? []
     if (!ids.length) return undefined
-    const labels = ids.map(
-      (id) => skillOptions.find((option) => option.value === id)?.label ?? getSkillName(id),
-    )
+    const labels = ids.map(resolveSkillName)
     return formatCompactMetadataList(labels)
   }
 
-  return skillPoolMetadataDetail(row, skillOptions)
+  return skillPoolMetadataDetail(row, resolveSkillName)
 }
 
 export function skillProficiencyGrantSummary(
   row: SkillProficiencyItemForm | undefined,
-  skillOptions: FieldOption[] = [],
+  resolveSkillName: (slug: string) => string = unresolvedSkillName,
 ): string {
   if (!row?.proficiencySource) return ''
   if (row.proficiencySource === 'specific' && !row.skillProficiencyIds?.length) return ''
-  const resolveSkillName = (id: string) => skillOptions.find((option) => option.value === id)?.label
   return formatSkillProficiencyGrantSentence(
     skillProficiencyGrantFromFormRow(row),
     resolveSkillName,
@@ -641,14 +630,12 @@ function armorPoolMetadataDetail(row: ArmorTrainingPoolItemForm): string | undef
 
 export function armorTrainingGrantDetail(
   row: ArmorTrainingItemForm | undefined,
-  armorOptions: FieldOption[] = [],
+  resolveArmorName: (slug: string) => string = unresolvedEquipmentName,
 ): string | undefined {
   if (!row?.proficiencySource) return undefined
 
   if (row.proficiencySource === 'specific') {
-    const labels = (row.armorTrainingSlugs ?? []).map(
-      (slug) => armorOptions.find((option) => option.value === slug)?.label ?? slug,
-    )
+    const labels = (row.armorTrainingSlugs ?? []).map(resolveArmorName)
     if (!labels.length) return undefined
     return formatCompactMetadataList(labels)
   }
@@ -666,14 +653,11 @@ export function armorTrainingGrantDetail(
 
 export function armorTrainingGrantSummary(
   row: ArmorTrainingItemForm | undefined,
-  armorOptions: FieldOption[] = [],
+  resolveArmorName: (slug: string) => string = unresolvedEquipmentName,
 ): string {
   if (!row?.proficiencySource) return ''
   if (row.proficiencySource === 'specific' && !row.armorTrainingSlugs?.length) return ''
   if (row.proficiencySource === 'category' && !row.armorTrainingCategories?.length) return ''
-
-  const resolveArmorName = (slug: string) =>
-    armorOptions.find((option) => option.value === slug)?.label
 
   return formatArmorTrainingGrantSentence(armorTrainingGrantFromFormRow(row), resolveArmorName)
 }

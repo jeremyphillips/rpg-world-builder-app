@@ -26,10 +26,8 @@ const headerContext = {
       ),
     ),
   }),
-  weaponOptions: [{ value: 'longsword', label: 'Longsword' }],
-  toolOptions: [{ value: 'thieves-tools', label: "Thieves' Tools" }],
-  armorOptions: [],
-  skillOptions: [{ value: 'athletics', label: 'Athletics' }],
+  resolveSkillName: (slug: string) =>
+    slug === 'athletics' ? 'Athletics' : 'Skill proficiency reference unavailable',
   spellReferences: buildGrantSpellReferencePresentationFromAuthoring({
     status: 'ready',
     spellsById: new Map(

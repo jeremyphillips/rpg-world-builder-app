@@ -193,19 +193,20 @@ describe('armorTrainingPoolToFormRow / armorTrainingPoolFromFormRow', () => {
 })
 
 describe('proficiency grant details and summaries', () => {
-  const weaponOptions = [
-    { value: 'longsword', label: 'Longsword' },
-    { value: 'shortbow', label: 'Shortbow' },
-    { value: 'rapier', label: 'Rapier' },
-  ]
+  const weaponNames = new Map([
+    ['longsword', 'Longsword'],
+    ['shortbow', 'Shortbow'],
+    ['rapier', 'Rapier'],
+  ])
+  const resolveWeaponName = (slug: string) => weaponNames.get(slug)!
 
   it('formats specific weapon details and summaries from mocks', () => {
     const row: WeaponProficiencyItemForm = {
       proficiencySource: 'specific',
       weaponProficiencySlugs: ['longsword', 'shortbow'],
     }
-    expect(weaponProficiencyGrantDetail(row, weaponOptions)).toBe('Longsword, Shortbow')
-    expect(weaponProficiencyGrantSummary(row, weaponOptions)).toBe(
+    expect(weaponProficiencyGrantDetail(row, resolveWeaponName)).toBe('Longsword, Shortbow')
+    expect(weaponProficiencyGrantSummary(row, resolveWeaponName)).toBe(
       'Character gains proficiency with Longsword and Shortbow.',
     )
   })
@@ -243,17 +244,14 @@ describe('proficiency grant details and summaries', () => {
           poolSource: 'explicit',
           weaponProficiencyPoolSlugs: ['longsword', 'rapier', 'shortbow'],
         },
-        weaponOptions,
+        resolveWeaponName,
       ),
     ).toBe('1 from selected weapons')
   })
 
   it('returns an empty summary for incomplete specific rows', () => {
     expect(
-      weaponProficiencyGrantSummary(
-        { proficiencySource: 'specific' } as WeaponProficiencyItemForm,
-        [],
-      ),
+      weaponProficiencyGrantSummary({ proficiencySource: 'specific' } as WeaponProficiencyItemForm),
     ).toBe('')
   })
 
@@ -267,25 +265,19 @@ describe('proficiency grant details and summaries', () => {
     expect(
       skillProficiencyGrantDetail(
         { proficiencySource: 'specific', skillProficiencyIds: ['athletics', 'stealth'] },
-        [
-          { value: 'athletics', label: 'Athletics' },
-          { value: 'stealth', label: 'Stealth' },
-        ],
+        (slug) => (slug === 'athletics' ? 'Athletics' : 'Stealth'),
       ),
     ).toBe('Athletics, Stealth')
   })
 
   it('formats armor training pool summaries', () => {
     expect(
-      armorTrainingGrantSummary(
-        {
-          proficiencySource: 'pool',
-          choose: 1,
-          poolSource: 'filtered',
-          armorTrainingPoolCategory: 'heavy',
-        },
-        [],
-      ),
+      armorTrainingGrantSummary({
+        proficiencySource: 'pool',
+        choose: 1,
+        poolSource: 'filtered',
+        armorTrainingPoolCategory: 'heavy',
+      }),
     ).toBe('Character chooses 1 armor training from heavy armor.')
   })
 
