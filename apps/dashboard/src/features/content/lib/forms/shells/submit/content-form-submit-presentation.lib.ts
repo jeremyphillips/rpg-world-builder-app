@@ -1,0 +1,116 @@
+import { getApiValidationIssues } from '@rpg/contracts'
+import type { FieldValues, UseFormReturn } from 'react-hook-form'
+import {
+  buildFieldControlId,
+  navigateInvalidSubmit,
+  resolveInvalidSubmitNavigation,
+  type FormItem,
+  type FormUiContextValue,
+  type FormValidationProducerSession,
+} from '@rpg/ui/form'
+
+import { applyValidationIssuesToForm } from '../../validation/content-publish-validation.lib'
+import {
+  apiValidationIssuesToFormIssues,
+  ingestContentFormValidationIssues,
+} from '../../validation/ingest-content-form-validation.lib'
+import type { ContentFormInvalidPresentation } from './content-form-submit-types.lib'
+
+function resolveFirstInvalidPath<TFieldValues extends FieldValues>(
+  form: UseFormReturn<TFieldValues>,
+  fields: FormItem[],
+  formId: string,
+): string | undefined {
+  const navigation = resolveInvalidSubmitNavigation({
+    errors: form.formState.errors,
+    fields,
+    idPrefix: formId,
+    getItemValues: (fullName, index) => {
+      const value = form.getValues(`${fullName}.${index}` as never)
+      return typeof value === 'object' && value !== null
+        ? (value as Record<string, unknown>)
+        : undefined
+    },
+  })
+  return navigation?.firstIssue.path
+}
+
+export function presentContentFormInvalidSubmit<TFieldValues extends FieldValues>(
+  form: UseFormReturn<TFieldValues>,
+  ui: Pick<FormUiContextValue, 'markSubmitAttempted' | 'addValidationSessionExpandKeys'> | null,
+  presentation: ContentFormInvalidPresentation,
+  options?: { firstInvalidPath?: string },
+): void {
+  const firstPath =
+    options?.firstInvalidPath ??
+    resolveFirstInvalidPath(form, presentation.resolverFields, presentation.formId)
+  const viewId =
+    firstPath && presentation.resolveViewForPath
+      ? presentation.resolveViewForPath(firstPath)
+      : undefined
+
+  if (viewId && presentation.activateView) {
+    presentation.activateView(viewId)
+  }
+
+  if (!ui) return
+
+  navigateInvalidSubmit(
+    form,
+    presentation.resolverFields,
+    presentation.formId,
+    ui,
+    form.formState.errors,
+    {
+      ...(viewId ? { waitForLayout: true } : {}),
+    },
+  )
+}
+
+export function presentPersistValidationFailure<TFieldValues extends FieldValues>(
+  form: UseFormReturn<TFieldValues>,
+  error: unknown,
+  presentation: ContentFormInvalidPresentation | undefined,
+  ui: Pick<FormUiContextValue, 'markSubmitAttempted' | 'addValidationSessionExpandKeys'> | null,
+  session: FormValidationProducerSession,
+  stamp: number,
+): FormValidationProducerSession {
+  const issues = getApiValidationIssues(error)
+  if (!issues || !presentation) return session
+
+  form.clearErrors()
+  applyValidationIssuesToForm(form, issues)
+  const routed = apiValidationIssuesToFormIssues(issues)
+  const nextSession = ingestContentFormValidationIssues(session, 'api', stamp, routed)
+  presentContentFormInvalidSubmit(form, ui, presentation, {
+    firstInvalidPath: issues[0]?.path,
+  })
+  return nextSession
+}
+
+/** Activates the view that owns `path`, then focuses that control or `[data-form-focus]`. */
+export function focusFormPath(
+  path: string,
+  presentation: Pick<
+    ContentFormInvalidPresentation,
+    'formId' | 'resolveViewForPath' | 'activateView'
+  >,
+): void {
+  const viewId = presentation.resolveViewForPath?.(path)
+  if (viewId) presentation.activateView?.(viewId)
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      const control = document.getElementById(
+        buildFieldControlId(presentation.formId, undefined, path),
+      )
+      const marked = document.querySelector(`[data-form-focus="${path}"]`)
+      const element = control ?? marked
+      if (!(element instanceof HTMLElement)) return
+      element.scrollIntoView({ block: 'center' })
+      const focusable = element.matches('button, input, select, textarea, [tabindex]')
+        ? element
+        : element.querySelector<HTMLElement>('button, input, select, textarea, [tabindex]')
+      focusable?.focus()
+    })
+  })
+}

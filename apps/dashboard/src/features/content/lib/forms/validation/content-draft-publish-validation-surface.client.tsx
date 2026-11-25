@@ -4,8 +4,8 @@ import { useEffect, useRef } from 'react'
 import type { FieldValues } from 'react-hook-form'
 import { useFormContext } from 'react-hook-form'
 import {
+  createEmptyFormValidationProducerSession,
   navigateInvalidSubmit,
-  prepareFormIssues,
   useFormUiContext,
   type FormIssue,
   type FormItem,
@@ -20,9 +20,10 @@ import {
 } from './content-draft-publish-validation-surface.ref'
 import {
   CONTENT_PUBLISH_VALIDATION_ROUTING_FAILED_MESSAGE,
-  evaluateContentPublishValidation,
+  evaluateContentPublishFormIssues,
   paintValidationIssuesOnForm,
 } from './content-publish-validation.lib'
+import { ingestContentFormValidationIssues } from './ingest-content-form-validation.lib'
 
 export function ContentDraftPublishValidationSurfaceBridge({
   def,
@@ -43,6 +44,7 @@ export function ContentDraftPublishValidationSurfaceBridge({
   const ui = useFormUiContext()
   const uiRef = useRef(ui)
   const onPublishIssuesChangeRef = useRef(onPublishIssuesChange)
+  const publishReadinessSessionRef = useRef(createEmptyFormValidationProducerSession())
 
   useEffect(() => {
     uiRef.current = ui
@@ -60,9 +62,9 @@ export function ContentDraftPublishValidationSurfaceBridge({
     const surface: DraftPublishValidationSurface = (values) => {
       const publishSchema = resolveContentPublishSchema(def, ctx)
       const currentUi = uiRef.current
-      let issues: ReturnType<typeof evaluateContentPublishValidation>
+      let issues: ReturnType<typeof evaluateContentPublishFormIssues>
       try {
-        issues = evaluateContentPublishValidation(publishSchema, values, publishFields)
+        issues = evaluateContentPublishFormIssues(publishSchema, values, publishFields)
       } catch {
         paintValidationIssuesOnForm(form, [
           { path: '', message: CONTENT_PUBLISH_VALIDATION_ROUTING_FAILED_MESSAGE },
@@ -84,20 +86,23 @@ export function ContentDraftPublishValidationSurfaceBridge({
       }
       if (!issues) return null
 
-      paintValidationIssuesOnForm(form, issues)
+      paintValidationIssuesOnForm(
+        form,
+        issues.map((issue) => ({ path: issue.path, message: issue.message })),
+      )
       currentUi.markSubmitAttempted()
 
       if (currentUi.publishPresentationEnabled) {
         currentUi.markPublishAttempted()
+        const stamp = Date.now()
+        publishReadinessSessionRef.current = ingestContentFormValidationIssues(
+          publishReadinessSessionRef.current,
+          'publish-readiness',
+          stamp,
+          issues,
+        )
         onPublishIssuesChangeRef.current({
-          issues: prepareFormIssues(
-            issues.map((issue) => ({
-              path: issue.path.split('.'),
-              message: issue.message,
-            })),
-            publishFields,
-            values as Record<string, unknown>,
-          ),
+          issues: publishReadinessSessionRef.current.slots['publish-readiness']?.issues ?? issues,
         })
       }
 

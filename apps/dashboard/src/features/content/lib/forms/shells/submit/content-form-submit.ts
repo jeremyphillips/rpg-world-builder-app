@@ -1,125 +1,35 @@
 import { useContext, useRef } from 'react'
-import type { ContentValidationIntent } from '@rpg/contracts'
-import { getApiValidationIssues } from '@rpg/contracts'
-import type { FieldValues, UseFormReturn } from 'react-hook-form'
+import type { FieldValues } from 'react-hook-form'
 import {
-  buildFieldControlId,
+  createEmptyFormValidationProducerSession,
   FormUiContext,
-  navigateInvalidSubmit,
-  resolveInvalidSubmitNavigation,
   useSubmitHandler,
-  type FormItem,
-  type FormSubmitHandler,
-  type FormUiContextValue,
-  type MapFormError,
+  type FormValidationProducerSession,
   type UseSubmitHandlerResult,
 } from '@rpg/ui/form'
 
-import {
-  applyContentPublishValidation,
-  applyValidationIssuesToForm,
-} from '../../validation/content-publish-validation.lib'
-import type { AnyContentFormDef, ContentFormCtx } from '../../registry/content-form-registry'
 import { resolveContentFormSchema, resolveContentPublishSchema } from '../edit/content-edit-load'
+import { runContentFormCommitAttempt } from './content-form-submit-commit.lib'
+import {
+  ContentFormSubmitValidationFailed,
+  type ContentFormInvalidPresentation,
+  type UseContentFormSubmitOptions,
+} from './content-form-submit-types.lib'
 
-/** Internal sentinel — commit validation failed after field errors were applied. */
-export class ContentFormSubmitValidationFailed extends Error {
-  constructor() {
-    super('Content form commit validation failed.')
-    this.name = 'ContentFormSubmitValidationFailed'
-  }
-}
-
-export type ContentFormInvalidPresentation = {
-  /** Fields for invalid-submit focus (include hoisted identity/name). */
-  resolverFields: FormItem[]
-  formId: string
-  /** Feature-owned: which view/tab owns a failing path. Shared code never hard-codes tab ids. */
-  resolveViewForPath?: (path: string) => string | undefined
-  activateView?: (viewId: string) => void
-}
-
-export type UseContentFormSubmitOptions<TValues extends FieldValues> = {
-  def: AnyContentFormDef
-  ctx: ContentFormCtx
-  /** Final commit intent — default `'publish'`. */
-  commitValidationIntent?: ContentValidationIntent
-  fallbackMessage: string
-  mapError?: MapFormError
-  invalidPresentation?: ContentFormInvalidPresentation
-  /** Applied once before commit validation; persist receives this prepared payload. */
-  prepareCommitValues?: (values: TValues) => TValues
-  /** Feature-owned persistence — called only after commit validation passes. */
-  persist: FormSubmitHandler<TValues>
-}
+export {
+  ContentFormSubmitValidationFailed,
+  type ContentFormInvalidPresentation,
+  type UseContentFormSubmitOptions,
+} from './content-form-submit-types.lib'
+export {
+  presentContentFormInvalidSubmit,
+  focusFormPath,
+} from './content-form-submit-presentation.lib'
 
 export type UseContentFormSubmitResult<TValues extends FieldValues> =
   UseSubmitHandlerResult<TValues> & {
-    /** Render inside the form header so invalid-submit focus can expand sections. */
     UiBridge: () => null
   }
-
-function resolveFirstInvalidPath<TFieldValues extends FieldValues>(
-  form: UseFormReturn<TFieldValues>,
-  fields: FormItem[],
-  formId: string,
-): string | undefined {
-  const navigation = resolveInvalidSubmitNavigation({
-    errors: form.formState.errors,
-    fields,
-    idPrefix: formId,
-    getItemValues: (fullName, index) => {
-      const value = form.getValues(`${fullName}.${index}` as never)
-      return typeof value === 'object' && value !== null
-        ? (value as Record<string, unknown>)
-        : undefined
-    },
-  })
-  return navigation?.firstIssue.path
-}
-
-export function presentContentFormInvalidSubmit<TFieldValues extends FieldValues>(
-  form: UseFormReturn<TFieldValues>,
-  ui: Pick<FormUiContextValue, 'markSubmitAttempted' | 'addValidationSessionExpandKeys'> | null,
-  presentation: ContentFormInvalidPresentation,
-  options?: { firstInvalidPath?: string },
-): void {
-  const firstPath =
-    options?.firstInvalidPath ??
-    resolveFirstInvalidPath(form, presentation.resolverFields, presentation.formId)
-  const viewId =
-    firstPath && presentation.resolveViewForPath
-      ? presentation.resolveViewForPath(firstPath)
-      : undefined
-
-  if (viewId && presentation.activateView) {
-    presentation.activateView(viewId)
-  }
-
-  if (!ui) return
-
-  const errors = form.formState.errors
-
-  navigateInvalidSubmit(form, presentation.resolverFields, presentation.formId, ui, errors, {
-    ...(viewId ? { waitForLayout: true } : {}),
-  })
-}
-
-function presentPersistValidationFailure<TFieldValues extends FieldValues>(
-  form: UseFormReturn<TFieldValues>,
-  error: unknown,
-  presentation: ContentFormInvalidPresentation | undefined,
-  ui: Pick<FormUiContextValue, 'markSubmitAttempted' | 'addValidationSessionExpandKeys'> | null,
-): void {
-  const issues = getApiValidationIssues(error)
-  if (!issues || !presentation) return
-
-  form.clearErrors()
-  applyValidationIssuesToForm(form, issues)
-  presentContentFormInvalidSubmit(form, ui, presentation, {
-    firstInvalidPath: issues[0]?.path,
-  })
-}
 
 export function useContentFormSubmit<TValues extends FieldValues>(
   options: UseContentFormSubmitOptions<TValues>,
@@ -132,18 +42,28 @@ export function useContentFormSubmit<TValues extends FieldValues>(
     mapError,
     invalidPresentation,
     prepareCommitValues,
+    writeSchema,
+    prepareWrite,
+    attemptStamp,
     persist,
   } = options
 
   const uiRef = useRef<Pick<
-    FormUiContextValue,
+    import('@rpg/ui/form').FormUiContextValue,
     'markSubmitAttempted' | 'markPublishAttempted' | 'addValidationSessionExpandKeys'
   > | null>(null)
+
+  const producerSessionRef = useRef<FormValidationProducerSession>(
+    createEmptyFormValidationProducerSession(),
+  )
 
   const publishSchema =
     commitValidationIntent === 'publish'
       ? resolveContentPublishSchema(def, ctx)
       : resolveContentFormSchema(def, ctx, commitValidationIntent)
+
+  const producerSlot =
+    commitValidationIntent === 'publish' ? ('publish-action' as const) : ('draft-action' as const)
 
   const { onSubmit, formError } = useSubmitHandler<TValues>({
     fallbackMessage,
@@ -152,30 +72,29 @@ export function useContentFormSubmit<TValues extends FieldValues>(
       return mapError?.(error)
     },
     submit: async (values, form) => {
-      const commitValues = prepareCommitValues?.(values) ?? values
-      const issues = applyContentPublishValidation(
+      const result = await runContentFormCommitAttempt({
+        values,
         form,
         publishSchema,
-        commitValues,
-        invalidPresentation?.resolverFields ?? [],
-      )
-      if (issues) {
-        if (commitValidationIntent === 'publish') {
-          uiRef.current?.markPublishAttempted()
-        }
-        if (invalidPresentation) {
-          presentContentFormInvalidSubmit(form, uiRef.current, invalidPresentation, {
-            firstInvalidPath: issues[0]?.path,
-          })
-        }
+        writeSchema,
+        resolverFields: invalidPresentation?.resolverFields ?? [],
+        producerSlot,
+        commitValidationIntent,
+        prepareCommitValues,
+        prepareWrite,
+        attemptStamp,
+        invalidPresentation,
+        ui: uiRef.current,
+        producerSession: producerSessionRef.current,
+        persist,
+      })
+
+      producerSessionRef.current = result.session
+      if (result.kind === 'validation-blocked') {
         throw new ContentFormSubmitValidationFailed()
       }
-
-      try {
-        await persist(commitValues, form)
-      } catch (err) {
-        presentPersistValidationFailure(form, err, invalidPresentation, uiRef.current)
-        throw err
+      if (result.kind === 'persist-failed') {
+        throw result.error
       }
     },
   })
@@ -187,31 +106,4 @@ export function useContentFormSubmit<TValues extends FieldValues>(
   }
 
   return { onSubmit, formError, UiBridge }
-}
-
-/** Activates the view that owns `path`, then focuses that control or `[data-form-focus]`. */
-export function focusFormPath(
-  path: string,
-  presentation: Pick<
-    ContentFormInvalidPresentation,
-    'formId' | 'resolveViewForPath' | 'activateView'
-  >,
-): void {
-  const viewId = presentation.resolveViewForPath?.(path)
-  if (viewId) presentation.activateView?.(viewId)
-  window.requestAnimationFrame(() => {
-    window.requestAnimationFrame(() => {
-      const control = document.getElementById(
-        buildFieldControlId(presentation.formId, undefined, path),
-      )
-      const marked = document.querySelector(`[data-form-focus="${path}"]`)
-      const element = control ?? marked
-      if (!(element instanceof HTMLElement)) return
-      element.scrollIntoView({ block: 'center' })
-      const focusable = element.matches('button, input, select, textarea, [tabindex]')
-        ? element
-        : element.querySelector<HTMLElement>('button, input, select, textarea, [tabindex]')
-      focusable?.focus()
-    })
-  })
 }

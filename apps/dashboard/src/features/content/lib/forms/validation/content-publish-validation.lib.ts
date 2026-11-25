@@ -1,14 +1,11 @@
 import type { ApiValidationIssue } from '@rpg/contracts'
 import type { FieldPath, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodIssue, ZodType } from 'zod'
-import {
-  collectTabbedFormResolverItems,
-  safeParseWithFieldErrors,
-  type FormItem,
-} from '@rpg/ui/form'
+import { collectTabbedFormResolverItems, type FormIssue, type FormItem } from '@rpg/ui/form'
 
 import { resolveContentPublishSchema } from '../shells/edit/content-edit-load'
 import type { AnyContentFormDef, ContentFormCtx } from '../registry/content-form-registry'
+import { normalizeContentFormIssues } from './normalize-content-form-issues.lib'
 
 export const CONTENT_PUBLISH_VALIDATION_ROUTING_FAILED_MESSAGE =
   'Publish validation could not run. Refresh and try again.'
@@ -47,14 +44,26 @@ export function zodIssuesToValidationIssues(issues: ZodIssue[]): ApiValidationIs
   }))
 }
 
+export function evaluateContentPublishFormIssues<TFieldValues extends FieldValues>(
+  publishSchema: ZodType<TFieldValues>,
+  values: TFieldValues,
+  items: FormItem[] = [],
+): FormIssue[] | null {
+  return normalizeContentFormIssues(publishSchema, values, items)
+}
+
 export function evaluateContentPublishValidation<TFieldValues extends FieldValues>(
   publishSchema: ZodType<TFieldValues>,
   values: TFieldValues,
   items: FormItem[] = [],
 ): ApiValidationIssue[] | null {
-  const result = safeParseWithFieldErrors(publishSchema, values, items)
-  if (result.success) return null
-  return zodIssuesToValidationIssues(result.error.issues)
+  const issues = evaluateContentPublishFormIssues(publishSchema, values, items)
+  if (!issues) return null
+  return issues.map((issue) => ({
+    path: issue.path,
+    message: issue.message,
+    code: 'custom',
+  }))
 }
 
 export function applyContentPublishValidation<TFieldValues extends FieldValues>(

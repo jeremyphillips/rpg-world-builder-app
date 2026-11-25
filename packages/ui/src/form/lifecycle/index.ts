@@ -16,3 +16,14 @@ export { evaluateFormSchema, type EvaluateFormSchemaOptions } from './form-schem
 export { projectIssuesToFieldErrors } from './project-issues-to-field-errors.lib'
 export { runFormAction, type RunFormActionOptions } from './run-form-action'
 export { projectInvalidEvaluationToForm } from './passive-rhf-projection.client'
+export {
+  FORM_VALIDATION_PRODUCER_SLOT_ORDER,
+  collectFormValidationSessionIssues,
+  createEmptyFormValidationProducerSession,
+  dedupeFormIssues,
+  isFormValidationProducerSlotStale,
+  readFormValidationProducerSlotIssues,
+  replaceFormValidationProducerSlot,
+  type FormValidationProducerSession,
+  type FormValidationProducerSlotState,
+} from './form-validation-producer-session.lib'
