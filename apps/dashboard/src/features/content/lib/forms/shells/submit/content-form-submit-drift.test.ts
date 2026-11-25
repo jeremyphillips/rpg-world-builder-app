@@ -32,6 +32,9 @@ const publishBridgePath = fileURLToPath(
 const editPublishBridgePath = fileURLToPath(
   new URL('../edit/content-edit-publish-bridge.tsx', import.meta.url),
 )
+const monsterStatisticsPanelPath = fileURLToPath(
+  new URL('../../../../monsters/components/form/statistics/statistics-panel.tsx', import.meta.url),
+)
 
 const manualPublishParsePattern = /resolveContentFormSchema\([^)]*,\s*['"]publish['"]\)\.parse\(/
 
@@ -95,5 +98,13 @@ describe('ContentFormDef create submit drift guard', () => {
     expect(source).toContain('applyCanonicalFormIssuesToRhf')
     expect(source).not.toContain('applyValidationIssuesToForm')
     expect(source).not.toContain('applyContentPublishValidation')
+  })
+
+  it('requires monster statistics panel to use content presentation issues only', () => {
+    const source = readFileSync(monsterStatisticsPanelPath, 'utf8')
+
+    expect(source).toContain('useContentFormPresentationIssues')
+    expect(source).not.toContain('flattenFormIssues')
+    expect(source).not.toContain('useFormValidationPresentation')
   })
 })

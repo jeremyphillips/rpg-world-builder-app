@@ -8,6 +8,10 @@ Adopt registered content hub forms onto the Phase 4 pilot pipeline one slice at 
 - `ContentEditPublishBridge` uses the same canonical RHF paint for API validation failures.
 - Shared RHF helper: `content-form-validation-rhf.lib.ts` (breaks ingest ↔ publish import cycle).
 
+## Monster statistics tab
+
+`MonsterStatisticsPanel` consumes `useContentFormPresentationIssues` — one presentation snapshot, no parallel `flattenFormIssues` merge.
+
 ## Still deferred
 
-See `apps/dashboard/.../form-validation-adoption-allowlist.ts` (character builder/import, Quick NPC, monster statistics presentation hook, master-detail `useFormValidationPresentation`).
+See `form-validation-adoption-allowlist.ts` (character builder/import, Quick NPC, master-detail `useFormValidationPresentation`).

@@ -22,13 +22,6 @@ export const FORM_VALIDATION_ADOPTION_ALLOWLIST = [
     paths: ['apps/dashboard/src/features/character/npc'],
   },
   {
-    id: 'monster-statistics-presentation',
-    removesIn: 'phase-6-monster-statistics',
-    paths: [
-      'apps/dashboard/src/features/content/monsters/components/form/statistics/statistics-panel.tsx',
-    ],
-  },
-  {
     id: 'master-detail-presentation',
     removesIn: 'phase-6-content-master-detail',
     paths: [

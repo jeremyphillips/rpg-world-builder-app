@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react'
-import { useFormContext, useFormState, useWatch } from 'react-hook-form'
+import { useFormContext, useWatch } from 'react-hook-form'
 import {
   ABILITY_IDS,
   ABILITY_SCORE_MAX,
@@ -7,7 +7,7 @@ import {
   NEUTRAL_ABILITY_SCORE,
 } from '@rpg/contracts'
 import { SemanticText, Text } from '@rpg/ui'
-import { flattenFormIssues, useFormValidationPresentation } from '@rpg/ui/form'
+import { useContentFormPresentationIssues } from '../../../../lib/forms/validation/content-form-presentation-issues.client'
 
 import { AbilityScoreNumeric } from '@/components/ability-score'
 
@@ -25,13 +25,10 @@ import { MonsterAbilitySaveProficiencyFooter } from './ability-save-proficiency-
 const StatisticsIssuesContext = createContext<readonly StatisticsFieldIssue[]>([])
 
 function useStatisticsIssues(): readonly StatisticsFieldIssue[] {
-  const { errors } = useFormState()
-  const presentation = useFormValidationPresentation()
-  const rhfIssues = flattenFormIssues(errors)
-  const source = presentation.isPresentationSessionExpanded
-    ? [...presentation.issues, ...rhfIssues]
-    : rhfIssues
-  return statisticsIssuesForDisplay(source)
+  const presentation = useContentFormPresentationIssues()
+  return statisticsIssuesForDisplay(
+    presentation.issues.map((issue) => ({ path: issue.path, message: issue.message })),
+  )
 }
 
 function statisticsInvalid(path: string, issues: readonly StatisticsFieldIssue[]): boolean {
