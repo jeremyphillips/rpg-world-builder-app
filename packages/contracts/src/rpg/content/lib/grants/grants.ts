@@ -149,10 +149,25 @@ export function formatSenseGrantSentence(
   return `Character gains ${label} with a range of ${sense.range} feet.`
 }
 
-export function formatDamageTypeGrantSentence(damageTypes: readonly string[]): string {
-  return `Character chooses from ${joinNaturalList(
-    damageTypes.map((id) => getDamageTypeSentenceForm(id)),
-  )}.`
+function formatDamageTypeGrantChoices(
+  damageTypes: readonly string[],
+  resolveLabel?: (id: string) => string | undefined,
+): string | undefined {
+  const phrases = damageTypes.map((id) => {
+    if (!resolveLabel) return getDamageTypeSentenceForm(id)
+    const label = resolveLabel(id)
+    return label ? getDamageTypeSentenceForm(id, 1, label) : undefined
+  })
+  if (phrases.some((phrase) => phrase === undefined)) return undefined
+  return joinNaturalList(phrases.filter((phrase) => phrase !== undefined))
+}
+
+export function formatDamageTypeGrantSentence(
+  damageTypes: readonly string[],
+  resolveLabel?: (id: string) => string | undefined,
+): string {
+  const choices = formatDamageTypeGrantChoices(damageTypes, resolveLabel)
+  return choices === undefined ? '' : `Character chooses from ${choices}.`
 }
 
 /** Compact summary label: "Acid damage type", "Fire and Cold damage types", etc. */
@@ -162,10 +177,12 @@ export function formatDamageTypeGrantCompact(damageTypes: readonly string[]): st
   return `${labels} ${concept}`
 }
 
-export function formatResistanceGrantSentence(damageTypes: readonly string[]): string {
-  return `Character gains Resistance to ${joinNaturalList(
-    damageTypes.map((id) => getDamageTypeSentenceForm(id)),
-  )}.`
+export function formatResistanceGrantSentence(
+  damageTypes: readonly string[],
+  resolveLabel?: (id: string) => string | undefined,
+): string {
+  const choices = formatDamageTypeGrantChoices(damageTypes, resolveLabel)
+  return choices === undefined ? '' : `Character gains Resistance to ${choices}.`
 }
 
 /** Compact summary label: "Acid resistance", "Fire and Cold resistance", etc. */

@@ -1,6 +1,7 @@
 import {
   createEquipmentCatalogContext,
   createSpellCatalogContext,
+  DAMAGE_TYPE_TERM,
   formatCreatureSenseCompactLine,
   formatDamageTypeGrantSentence,
   formatFeatChoiceGrantSentence,
@@ -83,7 +84,7 @@ export type GrantRowHeaderContext = {
   equipmentReferences: GrantEquipmentReferencePresentation
   resolveSkillName?: (slug: string) => string
   spellReferences: GrantSpellReferencePresentation
-  resolveDamageTypeLabel?: (id: string) => string
+  resolveDamageTypeLabel?: (id: string) => string | undefined
   resolveLanguageLabel?: (id: string) => string | undefined
   resolveSenseLabel?: (id: string) => string | undefined
 }
@@ -212,8 +213,11 @@ function resolveDamageTypeDetail(
   ctx: GrantRowHeaderContext,
 ): string | undefined {
   if (!damageTypes?.length) return undefined
-  const resolveLabel = ctx.resolveDamageTypeLabel ?? ((id: string) => id)
-  return formatCompactMetadataList(damageTypes.map((id) => resolveLabel(id)))
+  return formatCompactMetadataList(
+    damageTypes.map(
+      (id) => ctx.resolveDamageTypeLabel?.(id) ?? `${DAMAGE_TYPE_TERM.label} reference unavailable`,
+    ),
+  )
 }
 
 function readSenseGrantFact(
@@ -289,15 +293,15 @@ function resolveSpellGrantDescription(values: GrantRowValues, ctx: GrantRowHeade
 type GrantRowDescriptionFormatter = (values: GrantRowValues, ctx: GrantRowHeaderContext) => string
 
 const GRANT_ROW_DESCRIPTION_BY_TYPE: Partial<Record<string, GrantRowDescriptionFormatter>> = {
-  resistances: (values) => {
+  resistances: (values, ctx) => {
     const damageTypes = values['resistances'] as string[] | undefined
     if (!damageTypes?.length) return ''
-    return formatResistanceGrantSentence(damageTypes)
+    return formatResistanceGrantSentence(damageTypes, ctx.resolveDamageTypeLabel)
   },
-  damageType: (values) => {
+  damageType: (values, ctx) => {
     const damageTypes = values['damageType'] as string[] | undefined
     if (!damageTypes?.length) return ''
-    return formatDamageTypeGrantSentence(damageTypes)
+    return formatDamageTypeGrantSentence(damageTypes, ctx.resolveDamageTypeLabel)
   },
   senses: (values, ctx) => {
     const sense = readSenseGrantFact(

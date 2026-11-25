@@ -46,7 +46,6 @@ import {
   buildActiveDamageTypeFieldOptions,
   buildActiveLanguageFieldOptions,
   buildActiveSenseFieldOptions,
-  getDamageTypeLabelFromVocabulary,
 } from '@/features/vocabulary'
 import { languageSingleComboboxField } from '@/lib/forms/language-combobox-form-fields.lib'
 
@@ -749,6 +748,15 @@ export function grantItemFields<T extends string>(
   ]
 }
 
+function resolveGrantVocabularyLabel(
+  vocabulary: { labelById: Readonly<Record<string, string>> } | undefined,
+  id: string,
+): string | undefined {
+  return vocabulary && Object.hasOwn(vocabulary.labelById, id)
+    ? vocabulary.labelById[id]
+    : undefined
+}
+
 function buildGrantRowHeaderContext(
   labels: Record<string, string>,
   ctx: ContentFormCtx,
@@ -757,15 +765,9 @@ function buildGrantRowHeaderContext(
 
   return {
     rowLabels: labels,
-    resolveDamageTypeLabel: (id) => getDamageTypeLabelFromVocabulary(damageTypeVocabulary, id),
-    resolveLanguageLabel: (id) =>
-      Object.hasOwn(languageVocabulary?.labelById ?? {}, id)
-        ? languageVocabulary?.labelById[id]
-        : undefined,
-    resolveSenseLabel: (id) =>
-      Object.hasOwn(senseVocabulary?.labelById ?? {}, id)
-        ? senseVocabulary?.labelById[id]
-        : undefined,
+    resolveDamageTypeLabel: (id) => resolveGrantVocabularyLabel(damageTypeVocabulary, id),
+    resolveLanguageLabel: (id) => resolveGrantVocabularyLabel(languageVocabulary, id),
+    resolveSenseLabel: (id) => resolveGrantVocabularyLabel(senseVocabulary, id),
     equipmentReferences: buildGrantEquipmentReferencePresentationFromAuthoring({
       status: ctx.rulesetId ? ctx.equipmentCatalogStatus : 'pending',
       equipmentById: ctx.equipmentCatalogById,

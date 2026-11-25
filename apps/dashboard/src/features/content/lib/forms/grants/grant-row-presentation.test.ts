@@ -11,7 +11,6 @@ import {
   buildSeedDamageTypeVocabulary,
   buildSeedLanguageVocabulary,
   buildSeedSenseVocabulary,
-  getDamageTypeLabelFromVocabulary,
 } from '@/features/vocabulary'
 
 import { GRANT_ROW_TYPE_LABELS } from './grant-form-schema'
@@ -74,7 +73,7 @@ function equipmentCatalog(
 
 const headerContext = {
   rowLabels: GRANT_ROW_TYPE_LABELS,
-  resolveDamageTypeLabel: (id: string) => getDamageTypeLabelFromVocabulary(seedDamageTypes, id),
+  resolveDamageTypeLabel: (id: string) => seedDamageTypes.labelById[id],
   resolveLanguageLabel: (id: string) => seedLanguages.labelById[id],
   resolveSenseLabel: (id: string) => seedSenses.labelById[id],
   equipmentReferences: buildGrantEquipmentReferencePresentationFromAuthoring({
@@ -308,6 +307,28 @@ describe('resolveGrantRowPresentation', () => {
       'Character gains proficiency with Dagger and Equipment reference unavailable.',
     )
   })
+
+  it.each([
+    ['damageType', 'Character chooses from grave frost damage.'],
+    ['resistances', 'Character gains Resistance to grave frost damage.'],
+  ])(
+    'uses campaign damage labels for %s and reports missing references',
+    (grantType, description) => {
+      const context = {
+        ...headerContext,
+        resolveDamageTypeLabel: (id: string) => (id === 'cold' ? 'Grave Frost' : undefined),
+      }
+      expect(
+        resolveGrantRowPresentation({ grantType, [grantType]: ['cold'] }, context),
+      ).toMatchObject({ detail: 'Grave Frost', description })
+      const mixed = resolveGrantRowPresentation(
+        { grantType, [grantType]: ['cold', 'missing-damage'] },
+        context,
+      )
+      expect(mixed?.detail).toBe('Grave Frost, Damage Type reference unavailable')
+      expect(mixed?.description).toBeUndefined()
+    },
+  )
 
   it('uses campaign language and sense labels in details and descriptions', () => {
     const context = {
