@@ -111,6 +111,33 @@ describe('useMasterDetailArray', () => {
     expect(result.current.fields.map((field) => field.id)).toEqual([remainingId])
   })
 
+  it('leaves replacement rows intact when a pending delete loses its field identity', () => {
+    const { result } = setup()
+    act(() => result.current.appendRow({ name: 'Original' }))
+    act(() => result.current.requestRemove(0))
+
+    act(() => result.current.replaceRows([{ name: 'Replacement' }]))
+    const replacementId = result.current.fields[0]?.id
+    expect(result.current.deleteIndex).toBeNull()
+    act(() => result.current.confirmRemove())
+
+    expect(result.current.fields.map((field) => field.id)).toEqual([replacementId])
+  })
+
+  it('leaves the surviving row intact when the pending target is removed elsewhere', () => {
+    const { result } = setup()
+    act(() => result.current.appendRow({ name: 'Target' }))
+    act(() => result.current.appendRow({ name: 'Survivor' }))
+    const survivorId = result.current.fields[1]?.id
+
+    act(() => result.current.requestRemove(0))
+    act(() => result.current.removeAt(0))
+    expect(result.current.deleteIndex).toBeNull()
+    act(() => result.current.confirmRemove())
+
+    expect(result.current.fields.map((field) => field.id)).toEqual([survivorId])
+  })
+
   it('clamps selection when the selected row is confirmed for removal', () => {
     const { result } = setup()
     act(() => result.current.handleAdd())
