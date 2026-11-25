@@ -1,6 +1,7 @@
 /**
  * @vitest-environment jsdom
  */
+import { ApiError } from '@rpg/contracts'
 import { describe, expect, it, vi } from 'vitest'
 import { useForm } from 'react-hook-form'
 import { renderHook, act } from '@testing-library/react'
@@ -251,5 +252,43 @@ describe('useContentFormSubmit', () => {
     expect(uiValue.markSubmitAttempted).toHaveBeenCalled()
     expect(uiValue.markPublishAttempted).toHaveBeenCalled()
     expect(persist).not.toHaveBeenCalled()
+  })
+
+  it('paints structured API validation issues on persist failure', async () => {
+    const persist = vi.fn().mockRejectedValue(
+      new ApiError(400, 'validation_error', 'Validation failed', {
+        issues: [{ path: 'name', message: 'Slug is already taken', code: 'duplicate' }],
+      }),
+    )
+
+    const { result } = renderHook(
+      () =>
+        useContentFormSubmit<TestValues>({
+          def: testDef,
+          ctx: testCtx,
+          fallbackMessage: 'Could not save.',
+          invalidPresentation: {
+            resolverFields: [{ name: 'name', label: 'Name', type: 'text' }],
+            formId: 'pilot-form',
+          },
+          persist,
+        }),
+      { wrapper: FormUiWrapper },
+    )
+
+    renderHook(() => result.current.UiBridge(), { wrapper: FormUiWrapper })
+
+    const form = renderHook(() => useForm<TestValues>({ defaultValues: { name: 'A', level: 1 } }))
+      .result.current
+
+    await act(async () => {
+      try {
+        await result.current.onSubmit({ name: 'A', level: 1 }, form)
+      } catch {
+        /* expected */
+      }
+    })
+
+    expect(form.getFieldState('name').error?.message).toContain('Slug is already taken')
   })
 })

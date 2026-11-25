@@ -1,9 +1,10 @@
 import { useContext, useEffect, useRef } from 'react'
 import { useFormContext, type FieldValues } from 'react-hook-form'
 import type { ZodType } from 'zod'
-import { FormUiContext, prepareFormIssues, type FormIssue, type FormItem } from '@rpg/ui/form'
+import { FormUiContext, type FormIssue, type FormItem } from '@rpg/ui/form'
 
-import { applyContentPublishValidation } from '../../validation/content-publish-validation.lib'
+import { evaluateContentPublishFormIssues } from '../../validation/content-publish-validation.lib'
+import { applyCanonicalFormIssuesToRhf } from '../../validation/ingest-content-form-validation.lib'
 
 type ContentCreatePublishValidationBridgeProps = {
   publishSchema: ZodType<FieldValues>
@@ -33,24 +34,10 @@ export function ContentCreatePublishValidationBridge({
 
     if (Object.keys(form.formState.errors).length === 0) return
 
-    const applied = applyContentPublishValidation(
-      form,
-      publishSchema,
-      form.getValues(),
-      publishFields,
-    )
-    if (!applied) return
+    const issues = evaluateContentPublishFormIssues(publishSchema, form.getValues(), publishFields)
+    if (!issues) return
 
-    const values = form.getValues()
-    const issues = prepareFormIssues(
-      applied.map((issue) => ({
-        path: issue.path.split('.'),
-        message: issue.message,
-      })),
-      publishFields,
-      values as Record<string, unknown>,
-    )
-
+    applyCanonicalFormIssuesToRhf(form, issues)
     ui.markPublishAttempted()
     onPublishAttempted()
     onPublishIssuesChange({ issues })

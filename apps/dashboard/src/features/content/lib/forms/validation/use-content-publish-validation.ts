@@ -3,13 +3,13 @@ import { useFormContext, useWatch, type FieldValues } from 'react-hook-form'
 import type { ZodType } from 'zod'
 import {
   collectTabbedFormResolverItems,
-  prepareFormIssues,
   resolveTabValidationState,
-  safeParseWithFieldErrors,
   type FormIssue,
   type FormItem,
   type TabbedFormTab,
 } from '@rpg/ui/form'
+
+import { evaluateContentPublishFormIssues } from './content-publish-validation.lib'
 
 const DEFAULT_DEBOUNCE_MS = 300
 
@@ -26,12 +26,10 @@ function computePublishValidation<TValues extends FieldValues>(
   tabs: TabbedFormTab[],
   fields: FormItem[],
 ): Pick<ContentPublishValidation, 'isPublishReady' | 'issues' | 'invalidTabIds'> {
-  const parsed = safeParseWithFieldErrors(schema, values, fields)
-  if (parsed.success) {
+  const issues = evaluateContentPublishFormIssues(schema, values, fields)
+  if (!issues) {
     return { isPublishReady: true, issues: [], invalidTabIds: new Set() }
   }
-
-  const issues = prepareFormIssues(parsed.error.issues, fields, values as Record<string, unknown>)
   const tabStates = resolveTabValidationState(issues, tabs, fields)
   return {
     isPublishReady: false,

@@ -537,9 +537,16 @@ Top-level content shells share `ContentFormFooter` (`content-form-footer.tsx`) w
 | **Edit**   | `[Discard changes]` `[Save changes]` | `hasDirtyFields(dirtyFields)` — disabled when clean, `pending`, read-only, or Armor Class rules are stale | Stay on edit route; reset baseline from `def.toFormValues(saved, { armorClassRules })` using the authoring snapshot; one toast from coordinated save session (`onSaved`) — access-only uses availability copy, body or combined uses `notifySaveSuccess` |
 
 Create handoff URL: `resolveContentPostCreateEditHref` in `content-form-navigation.ts`.
-Submit/error wiring: `useContentFormSubmit` for ContentFormDef create modals and hosts;
-`useSubmitHandler` alone for edit shells and non–ContentFormDef surfaces. Nested subclass editor remains
-separate until aligned in a follow-up.
+Submit/error wiring: **`useContentFormSubmit`** for ContentFormDef create/edit page shells
+(`ContentCreateShell`, `ContentEditShell`), create modals, and `ContentFormHost` adapters.
+Non–ContentFormDef surfaces and deferred workflows stay on `useSubmitHandler` until their adoption
+slice. Nested subclass editor remains separate until aligned in a follow-up.
+
+**Pilot commit pipeline (create/edit shells):** one prepare-once write via
+`prepareSerializedContentFormWrite`, then `runContentFormCommitAttempt` (publish/draft commit
+validation → optional write schema → `persist`). Do not call `serializeContentFormInput` or
+`resolveContentFormSchema(..., 'publish').parse()` in feature submit handlers. Edit persistence goes
+through `persistContentEditUpdate` after the pipeline returns the prepared payload.
 
 #### `useContentFormSubmit` (ContentFormDef create)
 
@@ -548,10 +555,12 @@ route publish/create submit through `useContentFormSubmit` in
 [`content-form-submit.ts`](../src/features/content/lib/forms/shells/submit/content-form-submit.ts).
 Do **not** call `resolveContentFormSchema(..., 'publish').parse()` in feature submit handlers.
 
-The hook runs: draft validation (RHF, already done) → commit validation via
-`validateContentPublishValues` → invalid-submit presentation (field errors, optional tab/view reveal)
-→ feature-owned `persist`. Commit-invalid failures reject without `formError`; persist failures set
-`formError` and reject. Success chrome (trusted close, navigate) runs only after a resolved submit.
+The hook runs: RHF resolver (already on the form) → `runContentFormCommitPipeline` (commit schema,
+optional write schema / `prepareWrite`) → canonical issue ingestion + RHF paint on validation block
+→ feature-owned `persist` with the prepared payload. Commit-invalid failures throw
+`ContentFormSubmitValidationFailed` without `formError`; structured API validation failures paint
+field errors and ingest the `api` producer slot; other persist failures set `formError` and reject.
+Success chrome (trusted close, navigate) runs only after a resolved submit.
 
 Render the returned `UiBridge` inside the form header so invalid-submit focus can expand sections.
 Feature-owned tab mapping uses `invalidPresentation.resolveViewForPath` / `activateView` — shared code

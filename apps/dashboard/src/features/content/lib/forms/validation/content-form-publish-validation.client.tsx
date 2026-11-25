@@ -1,15 +1,10 @@
 import { useEffect, useMemo } from 'react'
 import { useFormContext, type FieldValues } from 'react-hook-form'
 import type { ZodType } from 'zod'
-import {
-  collectTabbedFormResolverItems,
-  prepareFormIssues,
-  type FormIssue,
-  type TabbedFormTab,
-} from '@rpg/ui/form'
+import { collectTabbedFormResolverItems, type FormIssue, type TabbedFormTab } from '@rpg/ui/form'
 
 import {
-  evaluateContentPublishValidation,
+  evaluateContentPublishFormIssues,
   CONTENT_PUBLISH_VALIDATION_ROUTING_FAILED_MESSAGE,
 } from './content-publish-validation.lib'
 import {
@@ -25,19 +20,9 @@ function routedPublishIssues(
   fields: ReturnType<typeof collectTabbedFormResolverItems>,
 ): RoutedPublishIssues {
   try {
-    const fresh = evaluateContentPublishValidation(schema, values, fields)
-    if (!fresh) return { status: 'ok', issues: [] }
-    return {
-      status: 'ok',
-      issues: prepareFormIssues(
-        fresh.map((issue) => ({
-          path: issue.path.split('.'),
-          message: issue.message,
-        })),
-        fields,
-        values as Record<string, unknown>,
-      ),
-    }
+    const issues = evaluateContentPublishFormIssues(schema, values, fields)
+    if (issues === null) return { status: 'ok', issues: [] }
+    return { status: 'ok', issues }
   } catch {
     return { status: 'failed' }
   }
