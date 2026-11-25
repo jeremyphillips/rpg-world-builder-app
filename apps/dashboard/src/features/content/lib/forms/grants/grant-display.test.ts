@@ -347,7 +347,10 @@ describe('buildGrantSummaryModel', () => {
             {
               id: 'weapon',
               kind: 'weaponProficiency',
-              grant: { kind: 'fixed', weaponSlugs: [dagger.slug] },
+              grant: {
+                kind: 'fixed',
+                weaponSlugs: [dagger.slug, 'stale-gear', 'another-stale-gear'],
+              },
             },
             {
               id: 'missing',
@@ -369,7 +372,7 @@ describe('buildGrantSummaryModel', () => {
 
     expect(model.flatItems.map((item) => item.label)).toEqual([
       'River Blade',
-      'River Blade proficiency',
+      `River Blade proficiency, ${EQUIPMENT_REFERENCE_DISPLAY_MESSAGES.unknownEquipment}`,
       EQUIPMENT_REFERENCE_DISPLAY_MESSAGES.unknownEquipment,
     ])
   })

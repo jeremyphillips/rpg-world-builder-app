@@ -329,26 +329,61 @@ export function formatScopedSenseSummary(
     : `${SENSE_TERM.label} reference unavailable`
 }
 
+function formatScopedProficiencyReferences(
+  ids: readonly string[],
+  resolve: (id: string) => { label: string } | { unavailable: string },
+  formatResolved: (ids: string[], label: (id: string) => string | undefined) => string | undefined,
+): string | undefined {
+  const names = new Map<string, string>()
+  const unavailable = new Set<string>()
+  for (const id of ids) {
+    const result = resolve(id)
+    if ('label' in result) names.set(id, result.label)
+    else unavailable.add(result.unavailable)
+  }
+  const resolved = formatResolved(
+    ids.filter((id) => names.has(id)),
+    (id) => names.get(id),
+  )
+  return [resolved, ...unavailable].filter(Boolean).join(', ') || undefined
+}
+
 function formatScopedSkillSummary(
   grant: Extract<ContentGrant, { kind: 'skillProficiency' }>['grant'],
   resolveLabel: GrantDisplayVocabulary['resolveSkillName'],
 ): string | undefined {
   if (grant.kind !== 'fixed') return undefined
-  const names = new Map<string, string>()
-  let hasUnavailable = false
-  for (const id of grant.skillIds) {
-    const label = resolveLabel?.(id)
-    if (label) names.set(id, label)
-    else hasUnavailable = true
-  }
-  const resolved = formatSkillProficiencyGrantCompact(
-    { ...grant, skillIds: grant.skillIds.filter((id) => names.has(id)) },
-    (id) => names.get(id),
+  return formatScopedProficiencyReferences(
+    grant.skillIds,
+    (id) => {
+      const label = resolveLabel?.(id)
+      return label
+        ? { label }
+        : { unavailable: formatContentReferenceUnavailable('skill-proficiencies') }
+    },
+    (skillIds, label) => formatSkillProficiencyGrantCompact({ ...grant, skillIds }, label),
   )
-  const unavailable = hasUnavailable
-    ? formatContentReferenceUnavailable('skill-proficiencies')
-    : undefined
-  return [resolved, unavailable].filter(Boolean).join(', ') || undefined
+}
+
+function formatScopedEquipmentProficiency(
+  slugs: readonly string[] | undefined,
+  catalog: EquipmentCatalogContext | undefined,
+  formatResolved: Parameters<typeof formatScopedProficiencyReferences>[2],
+): string | undefined {
+  return formatScopedProficiencyReferences(
+    slugs ?? [],
+    (slug) => {
+      if (!catalog)
+        return {
+          unavailable: equipmentReferenceDisplayMessageForUnresolvedReason('catalog-unavailable'),
+        }
+      const outcome = resolveEquipmentSlugReference(slug, catalog, catalog.scope)
+      return outcome.status === 'resolved'
+        ? { label: outcome.equipment.name }
+        : { unavailable: presentEquipmentReferenceDisplayName(outcome) }
+    },
+    formatResolved,
+  )
 }
 
 // Null entries participate in compact benefit counts without a visible label.
@@ -410,36 +445,46 @@ const GRANT_ITEM_MAPPERS = {
       'proficiency',
       level,
     ),
-  toolProficiency: (grant, vocabulary, idPrefix, level) =>
+  toolProficiency: ({ grant, kind }, vocabulary, idPrefix, level) =>
     mapCompactProficiencyGrantToItems(
-      formatToolProficiencyGrantCompact(
-        grant.grant,
-        equipmentNameResolver(vocabulary.equipmentCatalog),
-      ),
+      grant.kind === 'fixed'
+        ? formatScopedEquipmentProficiency(
+            grant.toolSlugs,
+            vocabulary.equipmentCatalog,
+            (toolSlugs, label) => formatToolProficiencyGrantCompact({ ...grant, toolSlugs }, label),
+          )
+        : undefined,
       `${idPrefix}:toolProficiency`,
-      grant.kind,
+      kind,
       'proficiency',
       level,
     ),
-  weaponProficiency: (grant, vocabulary, idPrefix, level) =>
+  weaponProficiency: ({ grant, kind }, vocabulary, idPrefix, level) =>
     mapCompactProficiencyGrantToItems(
-      formatWeaponProficiencyGrantCompact(
-        grant.grant,
-        equipmentNameResolver(vocabulary.equipmentCatalog),
-      ),
+      grant.kind === 'fixed'
+        ? formatScopedEquipmentProficiency(
+            grant.weaponSlugs,
+            vocabulary.equipmentCatalog,
+            (weaponSlugs, label) =>
+              formatWeaponProficiencyGrantCompact({ ...grant, weaponSlugs }, label),
+          )
+        : undefined,
       `${idPrefix}:weaponProficiency`,
-      grant.kind,
+      kind,
       'proficiency',
       level,
     ),
-  armorTraining: (grant, vocabulary, idPrefix, level) =>
+  armorTraining: ({ grant, kind }, vocabulary, idPrefix, level) =>
     mapCompactProficiencyGrantToItems(
-      formatArmorTrainingGrantCompact(
-        grant.grant,
-        equipmentNameResolver(vocabulary.equipmentCatalog),
-      ),
+      grant.kind === 'fixed'
+        ? formatScopedEquipmentProficiency(
+            grant.armorSlugs,
+            vocabulary.equipmentCatalog,
+            (armorSlugs, label) => formatArmorTrainingGrantCompact({ ...grant, armorSlugs }, label),
+          )
+        : undefined,
       `${idPrefix}:armorTraining`,
-      grant.kind,
+      kind,
       'training',
       level,
     ),
