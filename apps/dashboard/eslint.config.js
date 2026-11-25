@@ -522,6 +522,63 @@ const dashboardFacingPresentationImportGuard = {
   },
 }
 
+const facingImportOptions =
+  dashboardFacingPresentationImportGuard.rules['@typescript-eslint/no-restricted-imports'][1]
+
+const dashboardMasterDetailShellImportGuard = {
+  files: dashboardFacingPresentationImportGuard.files,
+  ignores: [
+    ...dashboardFacingPresentationImportGuard.ignores,
+    'src/features/content/components/master-detail/master-detail-editor-panel.tsx',
+    'src/features/content/components/master-detail/nested-resource-master-detail-editor.tsx',
+  ],
+  rules: {
+    '@typescript-eslint/no-restricted-imports': [
+      'error',
+      {
+        paths: facingImportOptions.paths,
+        patterns: [
+          ...facingImportOptions.patterns,
+          {
+            group: ['**/master-detail-editor-shell', '**/master-detail-editor-shell.*'],
+            message:
+              'Use the structured editor panel or the independently persisted resource adapter.',
+          },
+        ],
+      },
+    ],
+  },
+}
+
+const masterDetailShellImportOptions =
+  dashboardMasterDetailShellImportGuard.rules['@typescript-eslint/no-restricted-imports'][1]
+
+const dashboardNestedResourceEditorImportGuard = {
+  ...dashboardMasterDetailShellImportGuard,
+  ignores: [
+    ...dashboardMasterDetailShellImportGuard.ignores,
+    'src/features/content/classes/components/class-subclasses-tab.tsx',
+  ],
+  rules: {
+    '@typescript-eslint/no-restricted-imports': [
+      'error',
+      {
+        ...masterDetailShellImportOptions,
+        patterns: [
+          ...masterDetailShellImportOptions.patterns,
+          {
+            group: [
+              '**/nested-resource-master-detail-editor',
+              '**/nested-resource-master-detail-editor.*',
+            ],
+            message: 'The subclass route owns independently persisted master–detail editing.',
+          },
+        ],
+      },
+    ],
+  },
+}
+
 const dashboardTraitPipelineImportGuard = {
   files: ['src/**/*.{ts,tsx}'],
   ignores: [
@@ -744,6 +801,8 @@ export default [
     },
   },
   dashboardFacingPresentationImportGuard,
+  dashboardMasterDetailShellImportGuard,
+  dashboardNestedResourceEditorImportGuard,
   dashboardTraitPipelineImportGuard,
   dashboardTraitComposerFormFieldImportGuard,
   ...dashboardMonsterAcquisitionImportGuards,

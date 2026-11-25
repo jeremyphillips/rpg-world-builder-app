@@ -17,6 +17,10 @@ availability for editors with and without availability controls.
 | Primary fields                       | `FormItems` inside `MasterDetailDetailFormScope` | Kind field lists                                                  |
 | Primary host                         | `spellPicker`                                    | Spell picker and similar — wraps shell `FormItems` only           |
 
+The structured editor panel and the independently persisted resource adapter own
+raw shell imports. The subclass tab owns the independent resource adapter. The
+dashboard import guard enforces these entry points.
+
 ## Component map
 
 ```text
