@@ -133,6 +133,7 @@ function classFeatureCustomFieldSections(
       {
         kind: 'slot',
         name: 'tables',
+        boundNames: ['tables'],
         render: () => createElement(FeatureTablesField, { formCtx: ctx }),
       },
     ],

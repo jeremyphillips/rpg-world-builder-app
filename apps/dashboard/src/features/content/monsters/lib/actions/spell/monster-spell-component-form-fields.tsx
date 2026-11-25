@@ -6,6 +6,7 @@ export function monsterSpellComponentRequirementsField(name = 'omittedComponents
   return {
     kind: 'slot',
     name,
+    boundNames: [name],
     render: () => <MonsterSpellComponentRequirementsField name={name} />,
   }
 }

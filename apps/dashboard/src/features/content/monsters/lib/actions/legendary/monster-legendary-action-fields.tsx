@@ -90,6 +90,7 @@ export function legendaryActionDetailFields(input: {
       {
         kind: 'slot',
         name: 'castingAbility',
+        boundNames: ['castingAbility'],
         render: () => (
           <MonsterLegendarySpellcastingActionField name={`${input.namePrefix}.castingAbility`} />
         ),
@@ -109,6 +110,7 @@ export function legendaryActionDetailFields(input: {
     {
       kind: 'slot',
       name: 'castingAbility',
+      boundNames: ['castingAbility'],
       render: () => (
         <MonsterActionCastingAbilityField
           name={`${input.namePrefix}.castingAbility`}
