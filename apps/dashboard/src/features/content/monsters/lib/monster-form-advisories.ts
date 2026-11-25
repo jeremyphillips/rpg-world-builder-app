@@ -1,7 +1,6 @@
 import {
   CHALLENGE_RATING_MECHANICS,
   collectFormAvailabilityAdvisories,
-  movementModeAvailability,
   multiattackStepReferencedActionIds,
   type ChallengeRating,
   isWeaponEquipment,
@@ -13,10 +12,7 @@ import {
   type MovementMode,
 } from '@rpg/contracts'
 
-import {
-  movementAlternativeFormToSchema,
-  movementRowsToRecordForPreview,
-} from '../../lib/forms/fields/content-movement-form-fields'
+import { movementRowsToRecordForPreview } from '../../lib/forms/fields/content-movement-form-fields'
 import type { MovementRowDraftFormValues } from '../../lib/forms/fields/content-movement-form-fields'
 import { equipmentEntryBaseName } from './equipment/monster-equipment-entry-name'
 import { coerceCreatureWeaponProficienciesForForm } from './creature-details/monster-weapon-proficiencies-form.lib'
@@ -37,9 +33,6 @@ export const TUNNELER_MISSING_BURROW_SPEED_MESSAGE =
 
 export const FLYBY_MISSING_FLY_SPEED_MESSAGE =
   'Flyby only applies while flying, but this creature has no Fly Speed.'
-
-export const SPIDER_CLIMB_ALTERNATIVE_CLIMB_MESSAGE =
-  'Spider Climb is conditional because Climb is an alternative movement mode. Removing that alternative makes the trait unconditional.'
 
 export const LEAP_MISSING_WALK_SPEED_MESSAGE =
   'Leap spends movement, but no Walk Speed is configured.'
@@ -77,7 +70,6 @@ export type MonsterFormAdvisory = {
     | 'legendary-action-pool-outside-srd'
     | 'in-lair-use-count-outside-srd'
     | 'legendary-resistance-uses-outside-srd'
-    | 'spider-climb-alternative-climb'
   message: string
   path: string
 }
@@ -100,20 +92,9 @@ function speedSupport(
   return 'absent'
 }
 
-function climbAvailability(values: MonsterFormValues) {
-  return movementModeAvailability(
-    {
-      movement: movementRowsToRecordForPreview(values.movement ?? []),
-      movementAlternative: movementAlternativeFormToSchema(values.movementAlternative),
-    },
-    'climb',
-  )
-}
-
 function collectTraitSpeedAdvisories(values: MonsterFormValues): MonsterFormAdvisory[] {
   const burrow = speedSupport(values.movement, 'burrow')
   const fly = speedSupport(values.movement, 'fly')
-  const climb = climbAvailability(values)
   const advisories: MonsterFormAdvisory[] = []
   ;(values.traits ?? []).forEach((trait, index) => {
     if (!('preset' in trait)) return
@@ -129,13 +110,6 @@ function collectTraitSpeedAdvisories(values: MonsterFormValues): MonsterFormAdvi
       advisories.push({
         code: 'flyby-missing-fly-speed',
         message: FLYBY_MISSING_FLY_SPEED_MESSAGE,
-        path,
-      })
-    }
-    if (trait.preset === 'spider-climb' && climb === 'alternative') {
-      advisories.push({
-        code: 'spider-climb-alternative-climb',
-        message: SPIDER_CLIMB_ALTERNATIVE_CLIMB_MESSAGE,
         path,
       })
     }

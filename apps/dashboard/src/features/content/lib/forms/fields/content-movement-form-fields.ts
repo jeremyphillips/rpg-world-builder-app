@@ -5,9 +5,11 @@ import {
   addCustomRefinementIssue,
   defineMessage,
   extraMovementModeSchema,
+  choiceCountPhrase,
   fieldValidationMessages,
   getMovementModeLabel,
   movementAlternativeSchema,
+  nounFromLabel,
   movementModeSchema,
   movementSpeedFeetSchema,
   type ExtraMovementMode,
@@ -49,6 +51,12 @@ export const MOVEMENT_ALTERNATIVE_HEADING = 'Alternative movement'
 export const MOVEMENT_ALTERNATIVE_HINT =
   "The creature has one of these movement modes (GM's choice), in addition to its regular speeds."
 export const MOVEMENT_ALTERNATIVE_AVAILABLE_MODES_LABEL = 'Available modes'
+export const MOVEMENT_ALTERNATIVE_AVAILABLE_MODES_BASE_HINT = choiceCountPhrase(
+  nounFromLabel(MOVEMENT_ALTERNATIVE_AVAILABLE_MODES_LABEL),
+  { min: 2, max: EXTRA_MOVEMENT_MODES.length },
+)
+export const MOVEMENT_ALTERNATIVE_AVAILABLE_MODES_SPIDER_CLIMB_HINT =
+  'Because Climb is an alternative, Spider Climb applies only when Climb is chosen.'
 /** Optional-disclosure group `name` is the object path only — leaves use fully qualified paths. */
 export const MOVEMENT_ALTERNATIVE_MODES_FIELD = 'movementAlternative.modes'
 export const MOVEMENT_ALTERNATIVE_FEET_FIELD = 'movementAlternative.feet'
@@ -93,6 +101,24 @@ function movementAlternativeSelectedModes(
 }
 
 /** Chip options: hide fixed modes unless already selected (conflicts stay visible and deselectable). */
+function monsterHasSpiderClimbTrait(traits: unknown): boolean {
+  if (!Array.isArray(traits)) return false
+  return traits.some(
+    (row) =>
+      row !== null &&
+      typeof row === 'object' &&
+      'preset' in row &&
+      (row as { preset?: string }).preset === 'spider-climb',
+  )
+}
+
+export function movementAlternativeAvailableModesHint(watched: Record<string, unknown>): string {
+  if (!monsterHasSpiderClimbTrait(watched.traits)) {
+    return MOVEMENT_ALTERNATIVE_AVAILABLE_MODES_BASE_HINT
+  }
+  return `${MOVEMENT_ALTERNATIVE_AVAILABLE_MODES_BASE_HINT} ${MOVEMENT_ALTERNATIVE_AVAILABLE_MODES_SPIDER_CLIMB_HINT}`
+}
+
 export function movementAlternativeChipOptions(watched: Record<string, unknown>) {
   const fixedUsed = movementModesUsedInFixedRows(
     watched.movement as MovementRowDraftFormValues[] | undefined,
@@ -187,6 +213,12 @@ export function movementAlternativeGroupField(): FormItem {
             min: 2,
             max: EXTRA_MOVEMENT_MODES.length,
             width: 'auto',
+            hint: {
+              resolve: {
+                dependsOn: ['traits'],
+                hintWhen: movementAlternativeAvailableModesHint,
+              },
+            },
             options: extraMovementModeOptions,
             optionsResolve: {
               dependsOn: ['movement', 'movementAlternative'],

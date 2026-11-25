@@ -6,6 +6,7 @@ import {
 
 import { deepMerge } from './deep-merge'
 import type { DeepMergeOptions } from './deep-merge'
+import { restoreStickySeedRows } from './system-patch-sticky-arrays'
 
 /** Any stored content record is referenced by its opaque `id`. */
 interface Identified {
@@ -31,13 +32,26 @@ export function resolveCatalog<T extends Identified>(
   system: readonly T[],
   patches: readonly OverlayPatch[],
   homebrew: readonly T[],
-  options?: Pick<DeepMergeOptions, 'replaceKeys'> & { contentTypeKey?: ApiContentTypeKey },
+  options?: Pick<DeepMergeOptions, 'replaceKeys'> & {
+    contentTypeKey?: ApiContentTypeKey
+    /** In-memory seed-row fill. Does not write the patch document. */
+    stickyArrayKeys?: readonly string[]
+  },
 ): T[] {
   const patchByTarget = new Map(patches.map((p) => [p.targetId, p]))
 
   const resolvedSystem = system.map((record) => {
     const overlay = patchByTarget.get(record.id)
-    const merged = overlay ? deepMerge(record, overlay.patch, options) : record
+    const mergedRaw = overlay ? deepMerge(record, overlay.patch, options) : record
+    const stickyArrayKeys = options?.stickyArrayKeys
+    const merged =
+      overlay && stickyArrayKeys && stickyArrayKeys.length > 0
+        ? restoreStickySeedRows(
+            record as unknown as Record<string, unknown>,
+            mergedRaw as unknown as Record<string, unknown>,
+            stickyArrayKeys,
+          )
+        : mergedRaw
     const published = { ...merged, status: 'published' as const }
     const rulesetId = (record as { rulesetId?: SystemRulesetId }).rulesetId
     if (!rulesetId) return published

@@ -288,6 +288,25 @@ export function monsterToFormValues(
   return values
 }
 
+/**
+ * Lists whose absence must survive update schema defaults. `monsterBodySchema`
+ * fills a missing array with `[]`, and a system patch stores that as a clear.
+ */
+const MONSTER_SYSTEM_PATCH_LIST_KEYS = ['traits', 'actions', 'bonusActions', 'reactions'] as const
+
+function omitAbsentSystemPatchLists(
+  parsed: Record<string, unknown>,
+  normalized: Record<string, unknown>,
+  entity: Monster | undefined,
+): Record<string, unknown> {
+  if (entity?.catalogLayer !== 'system') return parsed
+  const next = { ...parsed }
+  for (const key of MONSTER_SYSTEM_PATCH_LIST_KEYS) {
+    if (!Object.prototype.hasOwnProperty.call(normalized, key)) delete next[key]
+  }
+  return next
+}
+
 function baselineFromEntity(entity: Monster | undefined): MonsterNormalizeBaseline | undefined {
   if (!entity) return undefined
   return {
@@ -324,5 +343,9 @@ export function buildMonsterInput(
     : validationIntent === 'draft'
       ? createMonsterDraftInputSchema
       : createMonsterInputSchema
-  return finalizeContentInput(schema.parse(payload), ctx) as CreateMonsterInput
+  const parsed = schema.parse(payload) as Record<string, unknown>
+  return finalizeContentInput(
+    omitAbsentSystemPatchLists(parsed, normalized, ctx?.entity),
+    ctx,
+  ) as CreateMonsterInput
 }

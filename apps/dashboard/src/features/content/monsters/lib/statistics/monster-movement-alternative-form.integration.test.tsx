@@ -16,6 +16,8 @@ import { getMonsterBySlug } from '@rpg/catalog/monsters'
 import { makeContentFormCtx } from '../../../lib/fixtures/content-form-ctx'
 import { augmentTabsWithHoistedName } from '../../../lib/forms/shells/layout/content-schema-form-tabs.lib'
 import {
+  MOVEMENT_ALTERNATIVE_AVAILABLE_MODES_BASE_HINT,
+  MOVEMENT_ALTERNATIVE_AVAILABLE_MODES_SPIDER_CLIMB_HINT,
   MOVEMENT_ALTERNATIVE_MODES_FIELD,
   movementWithHoverGroup,
 } from '../../../lib/forms/fields/content-movement-form-fields'
@@ -75,6 +77,28 @@ describe('monster movement alternative validation', () => {
     )
     expect(input.movementAlternative).toBeNull()
     expect(JSON.stringify(input)).not.toMatch(/Invalid input/i)
+  })
+
+  it('keeps seeded traits on a movement-only save and omits a missing traits key', () => {
+    const swarm = getMonsterBySlug('srd-cc-5.2.1', 'swarm-of-insects')!
+    const values = swarmFormValues()
+    values.movement = [{ mode: 'walk', feet: 25 }]
+    const input = buildMonsterInput(
+      values,
+      { entity: swarm, armorClassRules: ctx.armorClassRules },
+      'draft',
+    )
+    expect(input.traits?.map((trait) => trait.id)).toEqual(['swarm', 'spider-climb'])
+    expect(input.actions).toEqual([])
+
+    const missing = swarmFormValues()
+    delete (missing as { traits?: unknown }).traits
+    const omitted = buildMonsterInput(
+      missing,
+      { entity: swarm, armorClassRules: ctx.armorClassRules },
+      'draft',
+    )
+    expect(omitted).not.toHaveProperty('traits')
   })
 
   it('routes min-mode publish errors to Available modes', async () => {
@@ -214,6 +238,11 @@ describe('movement alternative optional disclosure', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Available modes')).toBeInTheDocument()
+      expect(
+        screen.getByText(
+          `${MOVEMENT_ALTERNATIVE_AVAILABLE_MODES_BASE_HINT} ${MOVEMENT_ALTERNATIVE_AVAILABLE_MODES_SPIDER_CLIMB_HINT}`,
+        ),
+      ).toBeInTheDocument()
     })
   })
 })

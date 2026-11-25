@@ -30,5 +30,6 @@ export async function resolveCatalogForCampaign<T extends { id: string }>(
   return resolveCatalog(loadSystemContent(config, rulesetId), patches, homebrew, {
     replaceKeys: config.patchReplaceKeys,
     ...(contentTypeKey ? { contentTypeKey } : {}),
+    ...(config.patchStickyArrayKeys ? { stickyArrayKeys: config.patchStickyArrayKeys } : {}),
   })
 }

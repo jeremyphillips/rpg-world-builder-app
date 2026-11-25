@@ -5,10 +5,13 @@ import { MOVEMENT_MODES } from '@rpg/contracts'
 import { isContainer, type ArrayConfig, type ChipsFieldConfig } from '@rpg/ui/form'
 
 import {
+  movementAlternativeAvailableModesHint,
   movementAlternativeChipOptions,
   movementAlternativeFormToSchema,
   movementAlternativeGroupField,
   movementAlternativeRecordToForm,
+  MOVEMENT_ALTERNATIVE_AVAILABLE_MODES_BASE_HINT,
+  MOVEMENT_ALTERNATIVE_AVAILABLE_MODES_SPIDER_CLIMB_HINT,
   MOVEMENT_ALTERNATIVE_MODES_FIELD,
   movementArrayField,
   movementRowDraftFormSchema,
@@ -67,9 +70,25 @@ describe('content movement form fields', () => {
       name: MOVEMENT_ALTERNATIVE_MODES_FIELD,
       min: 2,
       required: true,
+      hint: {
+        resolve: { dependsOn: ['traits'], hintWhen: movementAlternativeAvailableModesHint },
+      },
       optionsResolve: { dependsOn: ['movement', 'movementAlternative'] },
     })
     expect(chips?.optionsResolve?.optionsWhen).toBe(movementAlternativeChipOptions)
+  })
+
+  it('appends spider climb copy to available modes hint when that trait is present', () => {
+    expect(movementAlternativeAvailableModesHint({ traits: [] })).toBe(
+      MOVEMENT_ALTERNATIVE_AVAILABLE_MODES_BASE_HINT,
+    )
+    expect(
+      movementAlternativeAvailableModesHint({
+        traits: [{ id: 'climb', preset: 'spider-climb' }],
+      }),
+    ).toBe(
+      `${MOVEMENT_ALTERNATIVE_AVAILABLE_MODES_BASE_HINT} ${MOVEMENT_ALTERNATIVE_AVAILABLE_MODES_SPIDER_CLIMB_HINT}`,
+    )
   })
 
   it('excludes fixed movement from chip options but keeps conflicting selections visible', () => {

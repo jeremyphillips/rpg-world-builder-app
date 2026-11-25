@@ -58,7 +58,7 @@ Monster authoring and the stat block call the shared formatter. They own the com
 - **Instance selection at encounter setup is deferred.** The definition does not record which alternative mode is active.
 - Catalog proof: `srd-cc-5.2.1:swarm-of-insects` — walk 20, alternative Climb or Fly 20, Swarm + Spider Climb presets, empty actions.
 
-Spider Climb reads climb availability from the monster movement definition (not a trait field). When Climb is `alternative`, the sentence leads with “If {subject} has a Climb Speed, …”. When Climb is `guaranteed` or `absent`, the sentence stays unconditional (Vampire Spawn remains valid without Climb). A nonblocking `spider-climb-alternative-climb` advisory on the trait row explains that removing the alternative makes the trait unconditional.
+Spider Climb reads climb availability from the monster movement definition (not a trait field). When Climb is `alternative`, the sentence leads with “If {subject} has a Climb Speed, …”. When Climb is `guaranteed` or `absent`, the sentence stays unconditional (Vampire Spawn remains valid without Climb). Monster edit surfaces append contextual copy on **Available modes** when the creature has Spider Climb so authors know the trait tracks the GM’s climb choice.
 
 Species and defined-form movement overrides do not gain `movementAlternative` in this slice.
 
@@ -384,11 +384,10 @@ A normal activation condition, such as Running Leap’s 10-foot running start, d
 
 Monster authoring advisories are `collectMonsterFormAdvisories` in [monster-form-advisories.ts](../../../apps/dashboard/src/features/content/monsters/lib/monster-form-advisories.ts). Each one is `{ code, message, path }`. There is no severity. They do not block save or publish. The open editor shows the messages whose path matches the selected row. The add menu, the generated sentence, the stat block, and the vocabulary description do not repeat them.
 
-| Preset       | Code                             | When                                                                                                                                           |
-| ------------ | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Tunneler     | `tunneler-missing-burrow-speed`  | No usable Burrow Speed. Message: “Tunneler uses half the creature's Burrow Speed, but no Burrow Speed is configured.” Path: `traits.${index}`. |
-| Flyby        | `flyby-missing-fly-speed`        | No usable Fly Speed. Message: “Flyby only applies while flying, but this creature has no Fly Speed.” Path: `traits.${index}`.                  |
-| Spider Climb | `spider-climb-alternative-climb` | Climb is an alternative movement mode. Notes that removing the alternative makes Spider Climb unconditional. Path: `traits.${index}`.          |
+| Preset   | Code                            | When                                                                                                                                           |
+| -------- | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tunneler | `tunneler-missing-burrow-speed` | No usable Burrow Speed. Message: “Tunneler uses half the creature's Burrow Speed, but no Burrow Speed is configured.” Path: `traits.${index}`. |
+| Flyby    | `flyby-missing-fly-speed`       | No usable Fly Speed. Message: “Flyby only applies while flying, but this creature has no Fly Speed.” Path: `traits.${index}`.                  |
 
 Movement is `movementRowsToRecordForPreview`, then `resolveCreatureMovement`. A positive speed is usable. An explicit 0 is not usable, because the creature cannot move in that mode. A row with the mode chosen and feet still blank is unfinished input and stays quiet. A missing mode is absent.
 

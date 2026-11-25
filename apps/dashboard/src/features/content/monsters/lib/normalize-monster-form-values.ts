@@ -43,6 +43,7 @@ export type MonsterNormalizeBaseline = {
   hover?: boolean
   description?: string
   experiencePointsOverride?: number
+  movementAlternative?: Monster['movementAlternative']
   lair?: Monster['lair']
 }
 

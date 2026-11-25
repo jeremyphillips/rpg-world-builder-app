@@ -21,6 +21,7 @@ import { loadSystemContentSlugs } from './content-type-config'
 import { normalizeHomebrewWriteInput } from './apply-content-keys'
 import { assertSlugAvailable } from './assert-slug-available'
 import { deepMerge } from './deep-merge'
+import { composeMonsterSystemPatch } from './system-patch-sticky-arrays'
 import type { ContentWriteConfig, ContentWriteContext, HomebrewDoc } from './content-write-config'
 import { resolveStoredSchema, resolveWriteInputSchema } from './content-write-config'
 import { stripNullDeep, stripNullDeepFields } from './strip-null-deep'
@@ -201,6 +202,18 @@ function mergeHomebrewEffectiveBody(
   return merged
 }
 
+function seedBodyForSystemEntity<T extends StoredEntity>(
+  config: ContentWriteConfig<T>,
+  existing: T,
+): Record<string, unknown> | undefined {
+  const rulesetId = (existing as { rulesetId?: SystemRulesetId }).rulesetId
+  const load = config.readConfig.system?.load
+  if (!rulesetId || !load) return undefined
+  const seed = load(rulesetId).find((row) => row.id === existing.id)
+  if (!seed) return undefined
+  return entityBody(seed as unknown as Record<string, unknown>)
+}
+
 function prepareSystemPatchMerge<T extends StoredEntity>(
   config: ContentWriteConfig<T>,
   existing: T,
@@ -210,6 +223,20 @@ function prepareSystemPatchMerge<T extends StoredEntity>(
   const { replaceKeys, tombstoneKeys } = patchMergeKeys(config)
   const patchBody = stripUndefined(update)
   const existingPatchStripped = existingPatch ?? {}
+  const stickyArrayKeys = config.readConfig.patchStickyArrayKeys
+  if (stickyArrayKeys && stickyArrayKeys.length > 0) {
+    const seedBody = seedBodyForSystemEntity(config, existing)
+    if (seedBody) {
+      return composeMonsterSystemPatch({
+        seedBody,
+        existingPatch: existingPatchStripped,
+        update: patchBody,
+        replaceKeys,
+        tombstoneKeys,
+        stickyArrayKeys,
+      })
+    }
+  }
   const mergedBodyRaw = deepMerge(
     deepMerge(entityBody(existing as unknown as Record<string, unknown>), existingPatchStripped, {
       replaceKeys,
@@ -235,7 +262,15 @@ function parsePersistedWriteInput<T extends StoredEntity>(
   validationIntent: ContentValidationIntent,
 ): Record<string, unknown> {
   const schema = resolveWriteInputSchema(config, mode, validationIntent)
-  return schema.parse(normalized) as Record<string, unknown>
+  const parsed = schema.parse(normalized) as Record<string, unknown>
+  // Monster body defaults turn an omitted list into `[]`. On a sticky system
+  // update, a key the caller did not send stays omitted so it is not a clear.
+  if (mode === 'update' && config.readConfig.patchStickyArrayKeys?.length) {
+    for (const key of Object.keys(parsed)) {
+      if (!Object.prototype.hasOwnProperty.call(normalized, key)) delete parsed[key]
+    }
+  }
+  return parsed
 }
 
 function buildWriteContext(

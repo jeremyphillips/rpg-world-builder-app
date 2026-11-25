@@ -54,6 +54,28 @@ describe('resolveCatalog', () => {
     })
   })
 
+  it('restores seed-origin rows in memory and leaves a poisoned patch document untouched', () => {
+    const seedTraits = [
+      { id: 'swarm', preset: 'swarm' },
+      { id: 'spider-climb', preset: 'spider-climb' },
+    ]
+    const seeded = [
+      { id: 'sys:swarm', name: 'Swarm', traits: seedTraits, actions: [] as unknown[] },
+    ]
+    const result = resolveCatalog(seeded, [{ targetId: 'sys:swarm', patch: { traits: [] } }], [], {
+      stickyArrayKeys: ['traits', 'actions'],
+    })
+    expect(result[0]?.traits).toEqual(seedTraits)
+    expect(result[0]?.actions).toEqual([])
+    expect(seeded[0]?.traits).toEqual(seedTraits)
+  })
+
+  it('does not restore sticky rows for a catalog that did not opt in', () => {
+    const seeded = [{ id: 'sys:a', name: 'A', traits: [{ id: 'kept' }] }]
+    const result = resolveCatalog(seeded, [{ targetId: 'sys:a', patch: { traits: [] } }], [])
+    expect(result[0]?.traits).toEqual([])
+  })
+
   it('does not mutate the system seed', () => {
     resolveCatalog(system, [{ targetId: 'sys:a', patch: { hitDie: 99 } }], [])
     expect(system[0]?.hitDie).toBe(8)
