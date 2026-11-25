@@ -1,5 +1,10 @@
 import { loadSeedSpells } from '@rpg/catalog/spells'
-import { createSpellCatalogContext, type GrantGroup, type SpeciesBodyTrait } from '@rpg/contracts'
+import {
+  createEquipmentCatalogContext,
+  createSpellCatalogContext,
+  type GrantGroup,
+  type SpeciesBodyTrait,
+} from '@rpg/contracts'
 
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
@@ -75,14 +80,17 @@ export function getCatalogDrowHeritageOption(): SpeciesBodyTrait {
   return drow
 }
 
-/** Vocabulary resolving catalog equipment names and kinds for grant summaries. */
-export function buildCatalogEquipmentGrantVocabulary(): Pick<
-  GrantDisplayVocabulary,
-  'resolveEquipmentName' | 'resolveEquipmentKind'
-> {
+/** Scoped catalog fixture for grants using specific equipment slugs. */
+export function buildCatalogEquipmentGrantVocabulary(
+  slugs: readonly string[],
+): Pick<GrantDisplayVocabulary, 'equipmentCatalog'> {
+  const equipment = slugs.map((slug) => pickEquipment(slug))
   return {
-    resolveEquipmentName: (slug) => pickEquipment(slug).name,
-    resolveEquipmentKind: (slug) => pickEquipment(slug).kind,
+    equipmentCatalog: createEquipmentCatalogContext({
+      status: 'ready',
+      scope: { rulesetId: STORY_RULESET_ID, campaignId: '' },
+      equipmentById: new Map(equipment.map((item) => [item.id, item])),
+    }),
   }
 }
 

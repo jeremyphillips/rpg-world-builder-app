@@ -53,12 +53,18 @@ const hiddenFeatChoiceGrant = {
 
 const proficiencyVocabulary = {
   ...vocabulary,
-  resolveToolName: (slug: string) => (slug === 'thieves-tools' ? "Thieves' Tools" : undefined),
+  ...buildCatalogEquipmentGrantVocabulary(['thieves-tools']),
 }
 
 const equipmentVocabulary = {
   ...vocabulary,
-  ...buildCatalogEquipmentGrantVocabulary(),
+  ...buildCatalogEquipmentGrantVocabulary([
+    'antitoxin',
+    'camel',
+    'wagon',
+    'potion-of-healing',
+    'messenger',
+  ]),
 }
 
 const starterProficiencyGrants = [
@@ -343,6 +349,25 @@ describe('buildGrantSummaryModel', () => {
       'River Blade proficiency',
       EQUIPMENT_REFERENCE_DISPLAY_MESSAGES.unknownEquipment,
     ])
+  })
+
+  it('shows catalog-unavailable copy when a saved equipment grant has no catalog', () => {
+    const model = buildGrantSummaryModel(
+      [
+        {
+          grants: [
+            {
+              id: 'gear',
+              kind: 'equipment',
+              grant: { kind: 'grant', equipmentSlug: 'unverified-slug', quantity: 1 },
+            },
+          ],
+        },
+      ],
+      vocabulary,
+    )
+
+    expect(model.flatItems[0]?.label).toBe(EQUIPMENT_REFERENCE_DISPLAY_MESSAGES.catalogError)
   })
 
   it('renders equipment grants with names and service suffixes', () => {
