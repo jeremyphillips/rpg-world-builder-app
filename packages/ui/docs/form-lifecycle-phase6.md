@@ -12,6 +12,11 @@ Adopt registered content hub forms onto the Phase 4 pilot pipeline one slice at 
 
 `MonsterStatisticsPanel` consumes `useContentFormPresentationIssues` — one presentation snapshot, no parallel `flattenFormIssues` merge.
 
+## Content master–detail
+
+- Row badges: `useMasterDetailRowValidation` → `useContentFormPresentationIssues(resolverFields)`.
+- Inline title editor: `useFieldIssue(path)` (presentation-gated copy; no parallel RHF error merge).
+
 ## Still deferred
 
-See `form-validation-adoption-allowlist.ts` (character builder/import, Quick NPC, master-detail `useFormValidationPresentation`).
+See `form-validation-adoption-allowlist.ts` (character builder, import, Quick NPC).

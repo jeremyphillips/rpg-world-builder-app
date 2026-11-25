@@ -21,12 +21,4 @@ export const FORM_VALIDATION_ADOPTION_ALLOWLIST = [
     removesIn: 'phase-6-quick-npc',
     paths: ['apps/dashboard/src/features/character/npc'],
   },
-  {
-    id: 'master-detail-presentation',
-    removesIn: 'phase-6-content-master-detail',
-    paths: [
-      'apps/dashboard/src/features/content/lib/master-detail/master-detail-row-validation.ts',
-      'apps/dashboard/src/features/content/components/master-detail/master-detail-inline-title.tsx',
-    ],
-  },
 ] as const

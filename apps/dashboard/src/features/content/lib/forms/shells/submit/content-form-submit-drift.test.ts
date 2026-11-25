@@ -35,6 +35,12 @@ const editPublishBridgePath = fileURLToPath(
 const monsterStatisticsPanelPath = fileURLToPath(
   new URL('../../../../monsters/components/form/statistics/statistics-panel.tsx', import.meta.url),
 )
+const masterDetailRowValidationPath = fileURLToPath(
+  new URL('../../../master-detail/master-detail-row-validation.ts', import.meta.url),
+)
+const masterDetailInlineTitlePath = fileURLToPath(
+  new URL('../../../../components/master-detail/master-detail-inline-title.tsx', import.meta.url),
+)
 
 const manualPublishParsePattern = /resolveContentFormSchema\([^)]*,\s*['"]publish['"]\)\.parse\(/
 
@@ -106,5 +112,16 @@ describe('ContentFormDef create submit drift guard', () => {
     expect(source).toContain('useContentFormPresentationIssues')
     expect(source).not.toContain('flattenFormIssues')
     expect(source).not.toContain('useFormValidationPresentation')
+  })
+
+  it('requires content master-detail validation to use adopted presentation hooks', () => {
+    const rowValidation = readFileSync(masterDetailRowValidationPath, 'utf8')
+    const inlineTitle = readFileSync(masterDetailInlineTitlePath, 'utf8')
+
+    expect(rowValidation).toContain('useContentFormPresentationIssues')
+    expect(rowValidation).not.toContain('useFormValidationPresentation')
+    expect(inlineTitle).toContain('useFieldIssue')
+    expect(inlineTitle).not.toContain('useFormValidationPresentation')
+    expect(inlineTitle).not.toContain('useFieldErrorPresentation')
   })
 })

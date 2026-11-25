@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { get, useFormContext, useFormState, useWatch, type FieldErrors } from 'react-hook-form'
+import { useFormContext, useWatch } from 'react-hook-form'
 import { cn, InlineTitleEditActionButton, Input, Text } from '@rpg/ui'
-import { useFieldErrorPresentation, useFormValidationPresentation } from '@rpg/ui/form'
+import { useFieldIssue } from '@rpg/ui/form'
 
 import type { MasterDetailInlineTitle } from '../../lib/master-detail/master-detail-inline-title.types'
 
@@ -66,15 +66,8 @@ export function MasterDetailInlineTitleEditor({
   const path = `${namePrefix}.${title.field}`
   const { getValues, setValue } = useFormContext()
   const watched = useWatch({ name: path })
-  const { errors } = useFormState({ name: path })
-  const fieldError = get(errors as FieldErrors, path) as { message?: string } | undefined
   const valueKey = storedText(watched)
-  const presentation = useFormValidationPresentation()
-  const issueMessage = presentation.issues.find((issue) => {
-    const presentationPath = issue.presentationPath ?? issue.path
-    return presentationPath === path || issue.path === path
-  })?.message
-  const validation = useFieldErrorPresentation(fieldError?.message ?? issueMessage, path)
+  const fieldIssue = useFieldIssue(path)
   const inputRef = useRef<HTMLInputElement>(null)
   const cancelingRef = useRef(false)
   const localWriteRef = useRef(false)
@@ -169,8 +162,8 @@ export function MasterDetailInlineTitleEditor({
             value={draft}
             placeholder={title.placeholder}
             aria-label={label}
-            aria-invalid={validation.invalid}
-            aria-describedby={validation.error ? errorId : undefined}
+            aria-invalid={fieldIssue.invalid}
+            aria-describedby={fieldIssue.message ? errorId : undefined}
             autoComplete="off"
             className={cn(
               MASTER_DETAIL_TITLE_TYPE_CLASS,
@@ -203,9 +196,9 @@ export function MasterDetailInlineTitleEditor({
           }}
         />
       </div>
-      {validation.error ? (
+      {fieldIssue.message ? (
         <Text id={errorId} role="alert" variant="caption" className="text-semantic-destructive">
-          {validation.error}
+          {fieldIssue.message}
         </Text>
       ) : null}
     </div>

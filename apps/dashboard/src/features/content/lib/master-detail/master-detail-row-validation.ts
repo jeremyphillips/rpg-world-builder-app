@@ -4,11 +4,11 @@ import {
   collectArraySections,
   groupIssuesForItemPrefix,
   resolveSectionFieldOrder,
-  useFormValidationPresentation,
   type FormIssue,
   type FormItem,
 } from '@rpg/ui/form'
 
+import { useContentFormPresentationIssues } from '../forms/validation/content-form-presentation-issues.client'
 import {
   embeddedArrayResolverField,
   type EmbeddedArrayResolverFieldInput,
@@ -37,7 +37,7 @@ export function useMasterDetailRowValidation(
   const formValues = useWatch() as Record<string, unknown>
 
   const { issues, hasAttemptedSubmit, hasAttemptedPublish } =
-    useFormValidationPresentation(resolverFields)
+    useContentFormPresentationIssues(resolverFields)
 
   const showRowBadges = hasAttemptedSubmit || hasAttemptedPublish
 
