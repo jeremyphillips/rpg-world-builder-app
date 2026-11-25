@@ -25,7 +25,7 @@ import {
   removeSpellcastingFromFormValues,
 } from '../lib/class-spellcasting-lifecycle'
 import { buildSpellcastingFeatureAvailabilityFormFields } from '../lib/class-spellcasting-feature-availability-form-fields'
-import { buildClassFeatureAcquisition } from './class-feature-add-menu'
+import { buildClassFeatureAcquisition } from '../lib/class-feature-acquisition'
 import { useClassFeatureFacingHost } from '../../facing/use-class-feature-facing-host'
 
 const FEATURES_FIELD_NAME = 'features'

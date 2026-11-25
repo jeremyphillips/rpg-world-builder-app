@@ -319,6 +319,20 @@ function useMonsterActionDetailRows(
   }
 }
 
+function resolveWeaponPickerItems(
+  values: MonsterFormValues,
+  ctx: ContentFormCtx,
+  weaponGrants: ReturnType<typeof resolveMonsterFormWeaponGrants>,
+  section: MonsterActionSection | null,
+) {
+  if (!section) return []
+  return buildMonsterLoadoutPickerItems({
+    referenceOptions: ctx.options?.equipment?.forReference() ?? [],
+    weaponGrants,
+    equipment: values.equipment ?? [],
+  }).filter((item) => isWeaponEquipment(item.equipment))
+}
+
 export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
   const sections = useMonsterActionSections(ctx.entityId, {
     equipmentCatalogStatus: ctx.equipmentCatalogStatus,
@@ -333,18 +347,8 @@ export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
   const weapons = equippedWeaponRows(values, catalog, provider)
   const confirmCopy = pendingConfirmCopy(sections.pending)
 
-  const pickerItems = useMemo(() => {
-    if (!weaponPickerSection) return []
-    const referenceOptions = ctx.options?.equipment?.forReference() ?? []
-    const grants = resolveMonsterFormWeaponGrants(values)
-    return buildMonsterLoadoutPickerItems({
-      referenceOptions,
-      weaponGrants: grants,
-      equipment: values.equipment ?? [],
-    }).filter((item) => isWeaponEquipment(item.equipment))
-  }, [ctx.options?.equipment, values, weaponPickerSection])
-
-  const weaponGrants = useMemo(() => resolveMonsterFormWeaponGrants(values), [values])
+  const weaponGrants = resolveMonsterFormWeaponGrants(values)
+  const pickerItems = resolveWeaponPickerItems(values, ctx, weaponGrants, weaponPickerSection)
 
   const { titlesBySection, rowsBySection, actionRows } = useMonsterActionDetailRows(
     ctx,

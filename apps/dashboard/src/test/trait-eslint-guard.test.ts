@@ -70,6 +70,19 @@ describe('facing presentation import guard', () => {
     expect(result?.messages.some((message) => message.ruleId === ruleId)).toBe(restricted)
   })
 
+  it('allows an embedded editor to reference the shell identity type', async () => {
+    const [result] = await eslint.lintText(
+      "import type { MasterDetailEditorIdentity } from './master-detail-editor-shell'",
+      {
+        filePath: path.join(
+          dashboardRoot,
+          'src/features/content/components/master-detail/form-embedded-master-detail-editor.tsx',
+        ),
+      },
+    )
+    expect(result?.messages.some((message) => message.ruleId === ruleId)).toBe(false)
+  })
+
   it.each([
     ['src/features/content/monsters/components/form/actions/action-detail.tsx', true],
     ['src/features/content/classes/components/class-subclasses-tab.tsx', false],

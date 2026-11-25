@@ -1,4 +1,3 @@
-import { ButtonDropdown } from '@rpg/ui'
 import {
   CLASS_FEATURE_KIND_ENTRIES,
   CLASS_FEATURE_KINDS,
@@ -7,11 +6,11 @@ import {
   isClassFeatureKind,
 } from '@rpg/contracts'
 
-import { type FeatureRowForm } from '../lib/class-feature-form-fields'
-import { createAsiFeature } from '../lib/class-asi-features'
-import { createSubclassChoiceFeature } from '../lib/class-subclass-choice-features'
-import { featureToFormRow } from '../lib/class-feature-form-fields'
-import { featureRowShowsInAddMenu } from '../lib/class-feature-authoring'
+import { type FeatureRowForm } from './class-feature-form-fields'
+import { createAsiFeature } from './class-asi-features'
+import { createSubclassChoiceFeature } from './class-subclass-choice-features'
+import { featureToFormRow } from './class-feature-form-fields'
+import { featureRowShowsInAddMenu } from './class-feature-authoring'
 import type { MasterDetailAcquisition } from '../../components/master-detail/master-detail-list-panel'
 import { toAcquisitionDropdownItem } from '../../lib/acquisition'
 
@@ -75,8 +74,4 @@ export function buildClassFeatureAcquisition({
       }
     },
   }
-}
-
-export function ClassFeatureAddMenu(props: Parameters<typeof buildClassFeatureAcquisition>[0]) {
-  return <ButtonDropdown {...buildClassFeatureAcquisition(props)} triggerPresentation="addIcon" />
 }

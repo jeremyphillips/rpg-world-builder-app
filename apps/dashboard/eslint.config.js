@@ -541,6 +541,7 @@ const dashboardMasterDetailShellImportGuard = {
           ...facingImportOptions.patterns,
           {
             group: ['**/master-detail-editor-shell', '**/master-detail-editor-shell.*'],
+            allowTypeImports: true,
             message:
               'Use the structured editor panel or the independently persisted resource adapter.',
           },

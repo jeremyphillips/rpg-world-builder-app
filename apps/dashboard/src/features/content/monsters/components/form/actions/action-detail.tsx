@@ -127,6 +127,7 @@ export function MonsterActionDetail({
       ? (monsterFormSectionRows(values, located.section)[located.index] ?? action)
       : action
   const editor = located ? sections.editors[located.section] : sections.editors.actions
+  const { addAcquisition, setNotice } = sections
   const fields = useMemo(() => {
     if (!located || !values || !action || !liveAction) return []
     const sectionRows = monsterFormSectionRows(values, located.section)
@@ -139,7 +140,7 @@ export function MonsterActionDetail({
       equipment: values.equipment,
       sharedCastingOptions: sharedCastingOptions(values, action.id),
       advisories: collectMonsterFormAdvisories(values, monsterEquipmentCatalog(ctx)),
-      onCastingSourceBlocked: sections.setNotice,
+      onCastingSourceBlocked: setNotice,
       attackOptions: attackChipOptions(
         (located.section === 'reactions' || located.section === 'legendaryActions'
           ? (values.actions ?? [])
@@ -156,7 +157,7 @@ export function MonsterActionDetail({
       weapons,
       weaponActions,
       allowAddWeapon,
-      onAcquireAttack: (section, choice) => sections.addAcquisition(section, choice),
+      onAcquireAttack: (section, choice) => addAcquisition(section, choice),
       referenceOptions: referenceOptionLabels(values, ctx),
       sourceSpellOptions: legendarySourceSpellOptions(values, liveAction, ctx.spellCatalogById),
     })
@@ -167,8 +168,8 @@ export function MonsterActionDetail({
     liveAction,
     located,
     namePrefix,
-    sections.addAcquisition,
-    sections.setNotice,
+    addAcquisition,
+    setNotice,
     values,
     weaponActions,
     weapons,
