@@ -4,8 +4,9 @@ import {
   type CreatureTraitTemplateHost,
 } from '@rpg/contracts'
 import { resolveDependsOnWatchName, type FormItem } from '@rpg/ui/form'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
+import * as legendaryFields from './legendary-resistance-trait-fields'
 import { monsterTraitTemplateFields } from '../../monsters/lib/traits/monster-trait-form-fields'
 import { senseRangeJoinedPairField } from '../forms/fields/content-sense-range-form-fields'
 import {
@@ -38,6 +39,17 @@ describe('assembleCreatureTraitTemplateFields', () => {
         expect(fields.filter((field) => fieldName(field) === 'details')).toHaveLength(1)
       }
     }
+  })
+
+  it.each(HOSTS)('rejects an empty configurable contribution on %s', (host) => {
+    using fields = vi
+      .spyOn(legendaryFields, 'legendaryResistanceTemplateUseFields')
+      .mockReturnValueOnce([] as never)
+
+    expect(() =>
+      assembleCreatureTraitTemplateFields({ templateId: LEGENDARY_RESISTANCE, host }),
+    ).toThrow(`Configurable trait template ${LEGENDARY_RESISTANCE} has no fields on ${host}.`)
+    expect(fields).toHaveBeenCalledOnce()
   })
 
   it('adds only Details for a fieldless template', () => {
