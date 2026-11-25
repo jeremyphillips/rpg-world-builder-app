@@ -3,6 +3,7 @@ import {
   isRowSlotItem,
   prefixFieldConfig,
   type ArrayResolveFieldsFn,
+  type ArrayRowVariantTopology,
   type ColumnsConfig,
   type FormItem,
   type RowFieldItem,
@@ -85,10 +86,12 @@ export type EmbeddedArrayResolverFieldInput =
       resolveItemFields: ArrayResolveFieldsFn
       /** Optional static template; omit when rows are fully dynamic. */
       itemFields?: readonly FormItem[]
+      rowVariantTopology?: ArrayRowVariantTopology
     }
   | {
       itemFields: readonly FormItem[]
       resolveItemFields?: never
+      rowVariantTopology?: ArrayRowVariantTopology
     }
 
 /** Resolver-only array field config for master-detail tabs. */
@@ -100,13 +103,16 @@ export function embeddedArrayResolverField(
   const resolveFields =
     'resolveItemFields' in input && input.resolveItemFields ? input.resolveItemFields : undefined
   const fields = 'itemFields' in input && input.itemFields ? [...input.itemFields] : []
+  const rowVariantTopology = input.rowVariantTopology
 
   return {
     kind: 'array',
     name,
     heading: { label: sectionLabel },
     fields,
-    ...(resolveFields ? { item: { resolveFields } } : {}),
+    ...(resolveFields || rowVariantTopology
+      ? { item: { ...(resolveFields ? { resolveFields } : {}), rowVariantTopology } }
+      : {}),
   }
 }
 
@@ -116,12 +122,14 @@ export type EmbeddedMasterDetailTabValidationConfig =
       itemLabel?: string
       resolveItemFields: ArrayResolveFieldsFn
       fields?: readonly FormItem[]
+      rowVariantTopology?: ArrayRowVariantTopology
     }
   | {
       path: string
       itemLabel?: string
       fields: readonly FormItem[]
       resolveItemFields?: never
+      rowVariantTopology?: ArrayRowVariantTopology
     }
 
 /**
@@ -138,8 +146,9 @@ export function embeddedMasterDetailTabValidation(
       ? {
           resolveItemFields: config.resolveItemFields,
           itemFields: config.fields,
+          rowVariantTopology: config.rowVariantTopology,
         }
-      : { itemFields: config.fields }
+      : { itemFields: config.fields, rowVariantTopology: config.rowVariantTopology }
 
   return {
     errorPaths: [path],

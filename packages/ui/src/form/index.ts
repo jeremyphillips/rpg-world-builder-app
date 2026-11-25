@@ -261,6 +261,7 @@ export {
   type ArrayAddMenuPresentationMap,
   type ArrayRelationshipAddAction,
   type ArrayItemConfig,
+  type ArrayRowVariantTopology,
   type ArrayItemHeaderVisibility,
   type ArrayFilterSelectConfig,
   type ArrayFilterSelectFn,
@@ -332,6 +333,11 @@ export {
 } from '../components/ui/dice-formula-field.lib'
 export type { FieldSize } from '../components/ui/field.client'
 export type { ArrayResolveFieldsFn } from './config/array/array-resolve-fields.lib'
+export { collectRowVariantTopologyFields } from './config/array/array-row-variant-topology.lib'
+export {
+  compileFormOwnership,
+  type CompiledFormOwnership,
+} from './ownership/compile-form-ownership.lib'
 export {
   makeFieldErrorMap,
   safeParseWithFieldErrors,

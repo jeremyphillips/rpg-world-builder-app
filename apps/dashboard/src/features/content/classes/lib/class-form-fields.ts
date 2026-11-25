@@ -32,7 +32,11 @@ import {
   createFeatureRowDraftFormSchema,
   createFeatureRowFormSchema,
 } from './class-feature-row-form-schema'
-import { classFeatureItemFields, classFeatureRowResolveFields } from './class-feature-form-fields'
+import {
+  buildClassFeatureRowVariantTopology,
+  classFeatureItemFields,
+  classFeatureRowResolveFields,
+} from './class-feature-form-fields'
 import { ARMOR_PROFICIENCY_MODES, WEAPON_PROFICIENCY_MODES } from './class-form-constants'
 import {
   proficienciesDraftFormSchema,
@@ -241,6 +245,7 @@ export function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
         itemLabel: 'Features',
         resolveItemFields: classFeatureRowResolveFields(ctx),
         fields: classFeatureItemFields(ctx),
+        rowVariantTopology: buildClassFeatureRowVariantTopology(ctx),
       }),
       header: createElement(ClassFeaturesTab, { formCtx: ctx }),
     },

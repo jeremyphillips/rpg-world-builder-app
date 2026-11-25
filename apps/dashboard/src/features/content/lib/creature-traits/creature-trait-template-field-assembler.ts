@@ -46,7 +46,7 @@ const FIELD_POLICIES = {
   'legendary-resistance': {
     species: {
       kind: 'configurable',
-      fields: () => legendaryResistanceTemplateUseFields({ includeInLair: false }),
+      fields: () => legendaryResistanceTemplateUseFields({ includeInLair: true }),
     },
     monster: {
       kind: 'configurable',

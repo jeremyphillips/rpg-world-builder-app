@@ -35,6 +35,22 @@ export function visibleForGrantOverrides(): FieldVisibility {
 export function traitItemFields(ctx: ContentFormCtx): FormItem[] {
   return [
     {
+      type: 'text',
+      name: 'name',
+      label: 'Name',
+      required: true,
+      visibility: visibleForTraitKind('custom'),
+    },
+    {
+      type: 'text',
+      name: 'nameOverride',
+      label: 'Name override',
+      visibility: {
+        dependsOn: ['kind'],
+        visibleWhen: (watched) => watched['kind'] === 'grant' || watched['kind'] === 'template',
+      },
+    },
+    {
       type: 'richtext',
       name: 'description',
       label: 'Description',
