@@ -23,12 +23,46 @@ Keep the evidence when a gap is verified. Deficiency types are not interchangeab
 
 - Concept: multiple defined forms on one stat block, including stable profile identity, true-form designation, size overrides, a generated Shape-Shift action, and a derived Forms trait when that action is absent.
 - Implemented: unified defined forms, central identity and destination resolution, size, movement, and speech overrides, the Shape-Shift kind in Actions and Bonus Actions, equipment and prerequisite sentences, `onlyInFormIds` on actions and traits, heading qualifiers, single-level form advisories, and lifecycle-planned removal that keeps an emptied restriction invalid.
-- Not this model: stat-block replacement, mist restrictions, involuntary shifts, and Multiattack replacement. Those stay on `stat-block-replacement` or their own gaps.
+- Not this model: stat-block replacement, mist restrictions, involuntary shifts, and Multiattack replacement. Those stay on `stat-block-replacement` or their own gaps. A **catalog creature id** reference for “become another stat block” is not this model either — see [creature-forms.md](./creature-forms.md#catalog-stat-block-reference-deferred).
 - Evidence: [creature-forms.md](./creature-forms.md).
 - Representative: none seeded.
 - Importance: essential for lycanthropes, the Vampire, and the other Shape-Shift creatures.
 - Owner: creature forms and the monster Shape-Shift action.
 - Approval: open. Implementation: sizes and Shape-Shift started.
+
+### `creature-movement-alternative`
+
+- Concept: one mutually exclusive pair of movement modes at a single speed on the monster definition, chosen later by the GM, while fixed speeds on `movement` remain simultaneous.
+- **Implementation: partial (definition + presentation).** Optional `movementAlternative` on published monster bodies; overlap refine with fixed `movement`; `movementModeAvailability`; Speed line and Spider Climb conditional prose. Species and form overrides omit the field.
+- Not this model: encounter instance selection, multiple alternative groups, per-mode different speeds, or copying the chosen mode into `movement` at publish time.
+- Evidence: [movement-mode.ts](../src/rpg/vocab/movement-mode.ts), [creature-trait-inventory.md](./creature-trait-inventory.md#movement-alternative-shipped).
+- Representative: **Swarm of Insects** (`srd-cc-5.2.1:swarm-of-insects`) — movement + Swarm + Spider Climb presets only; actions empty.
+- Importance: essential when the SRD prints “Climb or Fly (GM's choice)” without fixing both speeds on the block.
+- Owner: movement vocabulary + monster stat presentation.
+- Approval: approved for the first slice. Implementation: verified on catalog seed. Encounter selection: deferred.
+
+### `creature-roll-adjustment-evaluation`
+
+- Concept: applying stored `creatureRollAdjustmentSchema` grants (advantage, disadvantage, circumstances such as `in-sunlight`) during play, including stacking and cancellation with spells and conditions.
+- Deficiency: missing runtime resolution. Grants and template `resolveGrants` paths persist payloads; Sunlight Sensitivity now matches SRD attack + ability-check targets in storage.
+- Spell parity: spell resolution does not emit roll adjustments — see [effect-capability-roadmap.md](./effect-resolution/effect-capability-roadmap.md).
+- Environmental exposure (Bright Light vs sunlight-present) has no shared state vocabulary yet — traits must not grow a private exposure engine.
+- Owner: shared roll consumer in `runtime/creature` (future).
+- Approval: open. Implementation: **blocked**.
+
+### `creature-damage-aura`
+
+- Concept: end-of-turn (or start-of-turn save) emanation damage and fear/condition auras shared across Heat Aura, Fire Aura, Fear Aura, and similar traits.
+- Deficiency: missing structured capability. Heat Aura and similar rows remain preset or custom prose. Fire Elemental ignition is not `details`.
+- Owner: deferred — shared pulse config after a second implementation pass.
+- Approval: deferred. Implementation: not started.
+
+### `creature-hp-state`
+
+- Concept: HP thresholds (bloodied), regeneration at 0 HP, Undead Fortitude saves, vampire sunlight pulse damage at turn start.
+- Deficiency: missing HP state machine on creatures.
+- Owner: deferred `runtime/creature` state shared with any content type that triggers on 0 HP.
+- Approval: deferred. Implementation: not started.
 
 ### `stat-block-replacement`
 
@@ -135,6 +169,7 @@ Recorded 2026-11-09 from Open5e `srd-2024` details and the catalog fixtures. A l
 - **Mage** (`srd-cc-5.2.1:mage`, `srd-2024_mage`). Fidelity not yet verified. Monster fixtures: initiative `+2 (12)`, HP 81, AC 15, Arcane Burst `+6` / `16 (3d8 + 3)`, the multiattack sentence, derived spellcasting `saveDc` 14 and `attackBonus` 6, and the Spellcasting sentence `spell save DC 14`. The attack bonus is not printed. Spell bodies stay on the spell records. Gap: `spell-list-omits-dc-and-attack` for the attack-bonus clause only. `fixedAcOffset` stays, because the excerpt includes Mage Armor in the AC. Disposition: text-supported for the seed. No seed change.
 - **Lich** (`srd-cc-5.2.1:lich`, `srd-2024_lich`). Text-supported for the non-legendary block. Monster fixtures: AC 20, HP 315, Paralyzing Touch `+12` / `15 (3d6 + 5)` cold plus Paralyzed until the lich's next turn, Eldritch Burst `+12` / `31 (4d12 + 5)` force, the multiattack sentence, and spellcasting `saveDc` 20 / `attackBonus` 12. Fireball and Lightning Bolt are stored with `castAtLevel` 5. The spell records stay level 3. Legendary actions are absent. Initiative resolves to Dexterity `+3`; the payload's `+17` is not stored. Languages "All" is not enumerated. Legendary Resistance is 4/day; the lair's fifth use stays in the name. Disposition: text-supported.
 - **Hell Hound** (`srd-cc-5.2.1:hell-hound`, `srd-2024_hell-hound`). Fidelity not yet verified. Monster fixtures: initiative `+1 (11)`, HP 58, AC 15, bite `+5` / `7 (1d8 + 3)` plus `1d6`, the multiattack sentence, and Fire Breath’s heading and DC 12 / `17 (5d6)` body. Pack Tactics is trait prose. Fire immunity, darkvision, and Perception are stored and untested. Disposition: text-supported. No seed change.
+- **Swarm of Insects** (`srd-cc-5.2.1:swarm-of-insects`, `srd-2024_swarm-of-insects`). Partial seed by design: Walk 20, `movementAlternative` Climb or Fly 20 (not Open5e’s simultaneous fly on the speeds record), Blindsight 30, CR 1/2, Swarm + Spider Climb preset traits. Catalog fixtures: Speed line, conditional Spider Climb sentence, empty `actions`. Bites and full stat-block parity are **not** seeded. Disposition: movement-alternative slice verified; combat block unverified.
 
 ## Shared capabilities
 
@@ -152,6 +187,8 @@ A monster SRD fixture is an assertion in `packages/catalog/src/monsters/index.te
 - Spell save DC presentation. Supported and resolved when a listed spell’s resolution method is `saving-throw`. Monster fixture: Mage sentence with DC 14. Prose-only save spells still omit the DC.
 - Spell attack bonus on the Spellcasting sentence. The number is derived (`attackBonus` 6 on Mage). It is not printed. Not a monster fixture for presentation.
 - Thrown melee and ranged modes. Supported on one attack bonus. Monster fixture: Kobold Warrior dagger sentence. Versatile two-hand damage remains `weapon-alternate-modes`.
+- Unresolved movement alternative on Speed. Supported in presentation only. Monster fixture: Swarm of Insects `20 ft., Fly or Climb 20 ft. (GM's choice)`. Encounter selection of the mode is not implemented.
+- Spider Climb conditional lead clause from `movementModeAvailability`. Supported in preset facing. Monster fixture: Swarm of Insects catalog trait row. Roll evaluation and climb mode selection at runtime remain deferred.
 
 ## Capability log
 
@@ -159,3 +196,4 @@ Append after an approved authoring pass.
 
 - **Lich** (`srd-cc-5.2.1:lich`). Verified the non-legendary attack lines, multiattack sentence, and spellcasting save DC. Reused equipped-attack resolution, on-hit conditions, spell references, and Legendary Resistance. Opened no new gap. `legendary-actions`, `save-conditions`, and the lair's fifth resistance use stay open. Fixtures are the attack sentences, AC 20, and HP 315. Other SRD undead with on-hit conditions can reuse the same rider. The on-hit condition model was already in place; this seed did not add one.
 - **Creature forms.** Implemented `creature-forms` for stable identity, true-form designation, size overrides, form restrictions, and Shape-Shift; retained `stat-block-replacement` as deferred. No creature was seeded.
+- **Movement alternative.** Implemented `creature-movement-alternative` definition, validation, Speed formatting, monster authoring disclosure, Spider Climb availability prose, and catalog proof on Swarm of Insects (traits and movement only). Opened `creature-roll-adjustment-evaluation`, `creature-damage-aura`, and `creature-hp-state` as blocked/deferred in docs only.

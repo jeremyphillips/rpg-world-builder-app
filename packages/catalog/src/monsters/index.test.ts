@@ -3,15 +3,20 @@ import {
   CHALLENGE_RATING_MECHANICS,
   deriveMonsterStatBlock,
   formatCrStatRow,
+  formatConfigurableCreatureTrait,
   formatMonsterAttackAction,
   resolveMonsterInLairExperiencePoints,
   formatMonsterMultiattack,
   formatMonsterParryResponse,
   formatMonsterParryTrigger,
+  formatMonsterPresetTrait,
   formatMonsterSaveAction,
+  formatMonsterSpeedStatRow,
+  formatMonsterStatBlockSubject,
   formatLegendaryActionUsesIntro,
   formatMonsterSpellEntry,
   formatOnceUntilNextTurnSentence,
+  formatSpiderClimbRuleClause,
   joinStatBlockProseDocument,
   multiattackStepReferencedActionIds,
   resolveCreatureTraitGrants,
@@ -59,10 +64,83 @@ describe('SRD 5.2.1 monster seed', () => {
   const monsters = loadSeedMonsters(RULESET)
 
   it('loads the system monster seeds validated against monsterSchema', () => {
-    expect(monsters).toHaveLength(6)
+    expect(monsters).toHaveLength(7)
     expect(seedMonsterSlugs(RULESET)).toEqual(
-      new Set(['kobold-warrior', 'skeleton', 'knight', 'mage', 'hell-hound', 'lich']),
+      new Set([
+        'kobold-warrior',
+        'skeleton',
+        'knight',
+        'mage',
+        'hell-hound',
+        'lich',
+        'swarm-of-insects',
+      ]),
     )
+  })
+
+  it('seeds swarm of insects movement alternative and conditional spider climb facing', () => {
+    const swarm = monsters.find((monster) => monster.slug === 'swarm-of-insects')
+    expect(swarm).toBeDefined()
+    expect(swarm?.movement).toEqual({ walk: 20 })
+    expect(swarm?.movementAlternative).toEqual({ modes: ['climb', 'fly'], feet: 20 })
+    expect(swarm?.actions).toEqual([])
+    expect(swarm?.traits).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'swarm', preset: 'swarm', noun: 'insect' }),
+        expect.objectContaining({ id: 'spider-climb', preset: 'spider-climb' }),
+      ]),
+    )
+
+    const subject = formatMonsterStatBlockSubject(swarm!.name)
+    const movementContext = {
+      movement: swarm!.movement,
+      movementAlternative: swarm!.movementAlternative,
+    }
+
+    const speed = formatMonsterSpeedStatRow({
+      monsterName: swarm!.name,
+      sizes: swarm!.sizes,
+      movement: swarm!.movement,
+      movementAlternative: swarm!.movementAlternative,
+      forms: {
+        profileFormId: 'profile',
+        trueForm: { kind: 'profile' },
+        definedForms: [],
+      },
+      hasShapeShift: false,
+    })
+    expect(speed).toBe("20 ft., Fly or Climb 20 ft. (GM's choice)")
+
+    const swarmTrait = swarm!.traits.find((row) => row.id === 'swarm')
+    const spiderClimbTrait = swarm!.traits.find((row) => row.id === 'spider-climb')
+    expect(swarmTrait && 'preset' in swarmTrait && swarmTrait.preset === 'swarm').toBe(true)
+    expect(
+      spiderClimbTrait && 'preset' in spiderClimbTrait && spiderClimbTrait.preset === 'spider-climb',
+    ).toBe(true)
+
+    const swarmSentence = formatConfigurableCreatureTrait(subject, {
+      preset: 'swarm',
+      noun: 'insect',
+    })?.sentence
+    const spiderClimbSentence = formatMonsterPresetTrait(
+      subject,
+      spiderClimbTrait as { id: string; preset: 'spider-climb' },
+      movementContext,
+    )?.sentence
+
+    expect(swarmSentence).toBe(
+      "The swarm of insects can occupy another creature's space and vice versa, and it can move through any opening large enough for a Tiny insect. It can't regain Hit Points or gain Temporary Hit Points.",
+    )
+    expect(spiderClimbSentence).toBe(
+      `If ${subject} has a Climb Speed, ${formatSpiderClimbRuleClause(subject)}`,
+    )
+
+    const spiderClimbReplay = formatMonsterPresetTrait(
+      subject,
+      spiderClimbTrait as { id: string; preset: 'spider-climb' },
+      movementContext,
+    )?.sentence
+    expect(spiderClimbReplay).toBe(spiderClimbSentence)
   })
 
   it('stores the repeated general traits as templates', () => {
