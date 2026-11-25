@@ -244,5 +244,14 @@ describe('movement alternative optional disclosure', () => {
         ),
       ).toBeInTheDocument()
     })
+
+    const modesParticipant = screen
+      .getByText('Available modes')
+      .closest('[data-field-row-participant]')
+    expect(modesParticipant).toHaveAttribute('data-field-width', 'auto')
+    expect(modesParticipant?.querySelector('[data-field-intrinsic-sizing]')).toBeTruthy()
+    expect(modesParticipant?.querySelector('[data-field-intrinsic-spill]')).toBeTruthy()
+    const hintNode = modesParticipant?.querySelector('[id$="-hint"]')
+    expect(hintNode?.textContent).toContain(MOVEMENT_ALTERNATIVE_AVAILABLE_MODES_BASE_HINT)
   })
 })

@@ -120,6 +120,34 @@ export const HintDoesNotExpandColumn: Story = {
   },
 }
 
+/**
+ * Manual baseline — do not apply spill CSS to `[data-field-intrinsic-sizing]`.
+ * Automated guard: `ProductionIntrinsicSizing` play asserts label/hint width &gt; 0.
+ */
+export const ZeroWidthRegressionBaseline: Story = {
+  render: () => (
+    <>
+      <style>
+        {`
+          [data-testid="modes-field"] [data-field-intrinsic-sizing] {
+            width: 0;
+            min-width: 100%;
+          }
+        `}
+      </style>
+      <IntrinsicRowHarness leftHint={LONG_HINT} />
+    </>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Illustrates the prior failure mode when spill constraints target sizing nodes. The production play suite guards non-zero label/hint width.',
+      },
+    },
+  },
+}
+
 export const LongLabelWidensColumn: Story = {
   render: () => (
     <div className="flex flex-col gap-8">

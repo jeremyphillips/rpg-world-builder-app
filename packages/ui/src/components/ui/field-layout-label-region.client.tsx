@@ -43,6 +43,9 @@ export function buildLabelHintStackContent(options: {
     }
     return <Field.Hint />
   }
+  if (autoRowIntrinsicSizing && showVisibleLabel) {
+    return <FieldIntrinsicSizing>{label}</FieldIntrinsicSizing>
+  }
   return showVisibleLabel ? label : null
 }
 

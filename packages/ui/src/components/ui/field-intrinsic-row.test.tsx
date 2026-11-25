@@ -42,6 +42,37 @@ describe('auto row intrinsic layout structure', () => {
     expect(container.querySelector('[data-field-width="auto"]')).toBeTruthy()
   })
 
+  it('wraps label in sizing when hint is below-control on an auto row', () => {
+    const presentation = resolveFieldRowAnatomyPresentation(['auto'])
+    const { container } = render(
+      <FieldRowAnatomyProvider>
+        <div
+          data-field-row-anatomy=""
+          className={presentation.className}
+          style={presentation.style}
+        >
+          <Field.Root
+            id="modes"
+            width="auto"
+            hint="Helper copy."
+            hintPosition="below-control"
+            anatomy
+            rowParticipation
+          >
+            <FieldLayout
+              label={<Field.Label>Modes</Field.Label>}
+              control={<input aria-label="Modes" />}
+            />
+          </Field.Root>
+        </div>
+      </FieldRowAnatomyProvider>,
+    )
+
+    expect(container.querySelector('[data-field-intrinsic-sizing]')).toBeTruthy()
+    expect(container.querySelector('[data-field-intrinsic-spill]')).toBeTruthy()
+    expect(container.querySelector('[data-field-intrinsic-spill] [id$="-hint"]')).toBeTruthy()
+  })
+
   it('keeps stacked label+hint without spill wrappers outside anatomy auto rows', () => {
     const { container } = render(
       <Field.Root id="name" width="full" hint="Helper copy." anatomy>
