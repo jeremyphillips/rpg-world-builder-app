@@ -10,6 +10,7 @@ import {
   isManagedContentMediaDirty,
   serializeContentFormInput,
 } from './content-form-serialize-input.lib'
+import { SystemOverlayWriteNotReadyError } from './system-overlay-write-readiness.lib'
 
 const mediaEnabledDef = {
   routeKey: 'classes' as const,
@@ -127,6 +128,27 @@ describe('serializeContentFormInput', () => {
         { operation: 'update', dirtyFields: { media: true } },
       ),
     ).toThrow(/missing attachment/)
+  })
+
+  it('throws instead of posting partial body for system update without overlay context', () => {
+    const def = {
+      routeKey: 'monsters' as const,
+      supportsManagedMedia: false,
+      toInput: vi.fn(() => ({ name: 'Patched' })),
+      normalizeOverlayBody: vi.fn(() => ({ name: 'Patched' })),
+    }
+
+    expect(() =>
+      serializeContentFormInput(
+        def,
+        { name: 'Patched' },
+        { entity: { catalogLayer: 'system', id: 'srd:owlbear' } },
+        'publish',
+        { operation: 'update', entityId: 'srd:owlbear' },
+      ),
+    ).toThrow(SystemOverlayWriteNotReadyError)
+
+    expect(def.toInput).not.toHaveBeenCalled()
   })
 
   it('skips media merge when def does not support managed media', () => {

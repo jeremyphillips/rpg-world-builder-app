@@ -16,6 +16,10 @@ import {
   type CoordinatedContentSaveResult,
 } from '../../../lib/forms/shells/session/content-save-session.lib'
 import { buildSystemOverlayUpdatePayload } from '../../../lib/forms/registry/build-system-overlay-intent'
+import {
+  assertSystemOverlayWriteReady,
+  assertSystemOverlayWriteSnapshotMatchesEntity,
+} from '../../../lib/forms/registry/system-overlay-write-readiness.lib'
 import type { SubclassFormValues } from './subclass-form-fields'
 import { subclassFormDef } from './subclass-form-values'
 
@@ -48,6 +52,7 @@ export type SubclassExistingSaveInput = {
   catalogSeed?: Record<string, unknown>
   expectedOverlayRevision?: number
   rulesetId?: string
+  seedRowIdsByPath?: Readonly<Record<string, readonly string[]>>
 }
 
 export async function persistSubclassCampaignAccess(args: {
@@ -100,27 +105,41 @@ export async function saveExistingSubclass(
     body: {
       save: async () => {
         const entityCtx = input.existingEntity ? { entity: input.existingEntity } : undefined
-        const entityInput =
-          input.existingEntity?.catalogLayer === 'system' &&
-          input.overlayBaseline &&
-          input.catalogSeed
-            ? (buildSystemOverlayUpdatePayload({
-                participantId: 'subclasses',
-                catalogSeed: input.catalogSeed,
-                baseline: input.overlayBaseline,
-                draft: subclassFormDef.normalizeOverlayBody!(
-                  input.values,
-                  input.classId,
-                  entityCtx,
-                ),
-                validationIntent: 'publish',
-                expectedOverlayRevision: input.expectedOverlayRevision,
-              }) as UpdateSubclassInput)
-            : (subclassFormDef.toInput(
-                input.values,
-                input.classId,
-                entityCtx,
-              ) as UpdateSubclassInput)
+        let entityInput: UpdateSubclassInput
+        if (input.existingEntity?.catalogLayer === 'system') {
+          const snapshot = assertSystemOverlayWriteReady({
+            operation: 'update',
+            catalogLayer: 'system',
+            participantId: 'subclasses',
+            entityId: input.subclassId,
+            rulesetId: input.rulesetId,
+            hasNormalizer: Boolean(subclassFormDef.normalizeOverlayBody),
+            catalogSeed: input.catalogSeed,
+            overlayBaseline: input.overlayBaseline,
+            expectedOverlayRevision: input.expectedOverlayRevision,
+            seedRowIdsByPath: input.seedRowIdsByPath,
+          })
+          assertSystemOverlayWriteSnapshotMatchesEntity({
+            snapshotEntityId: snapshot.entityId,
+            snapshotRevision: snapshot.expectedOverlayRevision,
+            entityId: input.existingEntity.id,
+            entityRevision: (input.existingEntity as { overlayRevision?: number }).overlayRevision,
+          })
+          entityInput = buildSystemOverlayUpdatePayload({
+            participantId: snapshot.participantId,
+            catalogSeed: snapshot.catalogSeed,
+            baseline: snapshot.overlayBaseline,
+            draft: subclassFormDef.normalizeOverlayBody!(input.values, input.classId, entityCtx),
+            validationIntent: 'publish',
+            expectedOverlayRevision: snapshot.expectedOverlayRevision,
+          }) as UpdateSubclassInput
+        } else {
+          entityInput = subclassFormDef.toInput(
+            input.values,
+            input.classId,
+            entityCtx,
+          ) as UpdateSubclassInput
+        }
         await input.updateBody({ subclassId: input.subclassId, input: entityInput })
         input.onBodySaved(input.subclassId)
         return { status: 'saved' as const }

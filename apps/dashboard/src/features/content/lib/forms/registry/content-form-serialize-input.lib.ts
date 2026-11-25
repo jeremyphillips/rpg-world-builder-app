@@ -18,6 +18,10 @@ import { hasDirtyFields } from '@/lib/form-dirty-state'
 import { buildSystemOverlayUpdatePayload } from './build-system-overlay-intent'
 import { overlayParticipantForContentType } from './content-overlay-participant.lib'
 import type { AnyContentFormDef, ContentFormInputCtx } from './content-form-registry'
+import {
+  assertSystemOverlayWriteReady,
+  assertSystemOverlayWriteSnapshotMatchesEntity,
+} from './system-overlay-write-readiness.lib'
 
 export type ContentFormSerializeOperation = 'create' | 'update'
 
@@ -30,6 +34,8 @@ export type SerializeContentFormInputOptions = {
   /** Catalog seed body for the system record (overlay diff authority). */
   catalogSeed?: Record<string, unknown>
   expectedOverlayRevision?: number
+  entityId?: string
+  seedRowIdsByPath?: Readonly<Record<string, readonly string[]>>
 }
 
 export function isManagedContentMediaDirty(
@@ -105,30 +111,52 @@ export function serializeContentFormInput<
   validationIntent: ContentValidationIntent,
   options: SerializeContentFormInputOptions,
 ): TInput {
-  const catalogLayer = (ctx?.entity as { catalogLayer?: CatalogLayer } | undefined)?.catalogLayer
-  const participantId = overlayParticipantForContentType(def.routeKey as ContentTypeKey)
-  const overlayReady =
-    options.operation === 'update' &&
-    catalogLayer === 'system' &&
-    participantId &&
-    options.overlayBaseline &&
-    options.catalogSeed &&
-    def.normalizeOverlayBody
-
-  const baseInput = def.toInput(values, ctx, validationIntent) as TInput
-
-  let payload: Record<string, unknown> = overlayReady
-    ? {
-        ...buildSystemOverlayUpdatePayload({
-          participantId,
-          catalogSeed: options.catalogSeed,
-          baseline: options.overlayBaseline,
-          draft: def.normalizeOverlayBody!(values, ctx, validationIntent),
-          validationIntent,
-          expectedOverlayRevision: options.expectedOverlayRevision,
-        }),
+  const entityRecord = ctx?.entity as
+    | {
+        catalogLayer?: CatalogLayer
+        id?: string
+        overlayRevision?: number
       }
-    : { ...baseInput }
+    | undefined
+  const catalogLayer = entityRecord?.catalogLayer
+  const isSystemUpdate = options.operation === 'update' && catalogLayer === 'system'
+
+  let payload: Record<string, unknown>
+
+  if (isSystemUpdate) {
+    const participantId = overlayParticipantForContentType(def.routeKey as ContentTypeKey)
+    const snapshot = assertSystemOverlayWriteReady({
+      operation: options.operation,
+      catalogLayer,
+      participantId,
+      entityId: options.entityId,
+      rulesetId: options.rulesetId,
+      hasNormalizer: Boolean(def.normalizeOverlayBody),
+      catalogSeed: options.catalogSeed,
+      overlayBaseline: options.overlayBaseline,
+      expectedOverlayRevision: options.expectedOverlayRevision,
+      seedRowIdsByPath: options.seedRowIdsByPath,
+    })
+    assertSystemOverlayWriteSnapshotMatchesEntity({
+      snapshotEntityId: snapshot.entityId,
+      snapshotRevision: snapshot.expectedOverlayRevision,
+      entityId: entityRecord?.id,
+      entityRevision: entityRecord?.overlayRevision,
+    })
+
+    payload = {
+      ...buildSystemOverlayUpdatePayload({
+        participantId: snapshot.participantId,
+        catalogSeed: snapshot.catalogSeed,
+        baseline: snapshot.overlayBaseline,
+        draft: def.normalizeOverlayBody!(values, ctx, validationIntent),
+        validationIntent,
+        expectedOverlayRevision: snapshot.expectedOverlayRevision,
+      }),
+    }
+  } else {
+    payload = { ...(def.toInput(values, ctx, validationIntent) as TInput) }
+  }
 
   if (!def.supportsManagedMedia) {
     return payload as TInput

@@ -182,6 +182,11 @@ export function useSubclassTabSave(args: {
         expectedOverlayRevision:
           (editor.selectedEntity as { overlayRevision?: number } | undefined)?.overlayRevision ?? 0,
         rulesetId,
+        seedRowIdsByPath: (
+          editor.selectedEntity as
+            | { seedRowIdsByPath?: Record<string, readonly string[]> }
+            | undefined
+        )?.seedRowIdsByPath,
       })
       reportSubclassSaveResult(result, editor.selectedEntity?.name ?? 'Subclass', setSaveError)
     } catch (err) {
