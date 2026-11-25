@@ -84,14 +84,18 @@ export function getCatalogDrowHeritageOption(): SpeciesBodyTrait {
 /** Scoped catalog fixture for grants using specific equipment slugs. */
 export function buildCatalogEquipmentGrantVocabulary(
   slugs: readonly string[],
-): Pick<GrantDisplayVocabulary, 'equipmentCatalog'> {
+): Pick<GrantDisplayVocabulary, 'equipmentReferences'> {
   const equipment = slugs.map((slug) => pickEquipment(slug))
+  const scope = { rulesetId: STORY_RULESET_ID, campaignId: '' }
   return {
-    equipmentCatalog: createEquipmentCatalogContext({
-      status: 'ready',
-      scope: { rulesetId: STORY_RULESET_ID, campaignId: '' },
-      equipmentById: new Map(equipment.map((item) => [item.id, item])),
-    }),
+    equipmentReferences: {
+      scope,
+      catalog: createEquipmentCatalogContext({
+        status: 'ready',
+        scope,
+        equipmentById: new Map(equipment.map((item) => [item.id, item])),
+      }),
+    },
   }
 }
 

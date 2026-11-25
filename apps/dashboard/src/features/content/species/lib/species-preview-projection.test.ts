@@ -172,7 +172,7 @@ describe('species preview projection', () => {
     const { species, equipmentCatalog, expectedSummary } = buildScopedHeritageEquipmentFixture()
     const published = buildSpeciesDetailViewModel(species, {
       ...buildCatalogDrowGrantDisplayVocabulary(),
-      equipmentCatalog,
+      equipmentReferences: { catalog: equipmentCatalog, scope: equipmentCatalog.scope },
       resolveCreatureTypeLabel: (id) => id,
       resolveLanguageLabel: () => undefined,
     })

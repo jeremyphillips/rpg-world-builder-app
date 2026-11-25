@@ -362,11 +362,14 @@ describe('buildGrantSummaryModel', () => {
       ],
       {
         ...vocabulary,
-        equipmentCatalog: createEquipmentCatalogContext({
-          status: 'ready',
+        equipmentReferences: {
           scope: { rulesetId: dagger.rulesetId, campaignId: '' },
-          equipmentById: new Map([[dagger.id, dagger]]),
-        }),
+          catalog: createEquipmentCatalogContext({
+            status: 'ready',
+            scope: { rulesetId: dagger.rulesetId, campaignId: '' },
+            equipmentById: new Map([[dagger.id, dagger]]),
+          }),
+        },
       },
     )
 

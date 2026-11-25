@@ -27,7 +27,7 @@ export const BUILDER_SPECIES_EYEBROW = getContentTypeItemLabel('species')
 export type BuilderSpeciesGrantReferences = Partial<
   Pick<
     SpeciesDisplayVocabulary,
-    'equipmentCatalog' | 'resolveDamageTypeLabel' | 'resolveSenseLabel' | 'resolveSkillName'
+    'equipmentReferences' | 'resolveDamageTypeLabel' | 'resolveSenseLabel' | 'resolveSkillName'
   >
 >
 

@@ -85,9 +85,8 @@ import {
   resolveSpellReferenceOutcome,
   type SpellCatalogContext,
   type ContentGrant,
-  type EquipmentKind,
-  equipmentReferenceDisplayMessageForUnresolvedReason,
   type EquipmentCatalogContext,
+  type EquipmentCatalogScope,
   type GrantGroup,
 } from '@rpg/contracts'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
@@ -99,7 +98,7 @@ export type GrantDisplayVocabulary = {
   resolveDamageTypeLabel?: (id: string) => string | undefined
   resolveLanguageLabel?: (id: string) => string | undefined
   spellCatalog: SpellCatalogContext
-  equipmentCatalog?: EquipmentCatalogContext
+  equipmentReferences?: { catalog: EquipmentCatalogContext; scope: EquipmentCatalogScope }
   resolveSkillName?: (id: string) => string | undefined
 }
 
@@ -298,25 +297,14 @@ type GrantItemMapper<K extends ContentGrant['kind']> = (
   level: number,
 ) => GrantSummaryItem[]
 
-function equipmentNameResolver(
-  catalog: EquipmentCatalogContext | undefined,
-): (slug: string) => string {
-  return (slug) =>
-    catalog
-      ? presentEquipmentReferenceDisplayName(
-          resolveEquipmentSlugReference(slug, catalog, catalog.scope),
-        )
-      : equipmentReferenceDisplayMessageForUnresolvedReason('catalog-unavailable')
-}
-
-function equipmentKindResolver(
-  catalog: EquipmentCatalogContext | undefined,
-): (slug: string) => EquipmentKind | undefined {
-  return (slug) => {
-    if (!catalog) return undefined
-    const outcome = resolveEquipmentSlugReference(slug, catalog, catalog.scope)
-    return outcome.status === 'resolved' ? outcome.equipment.kind : undefined
+function resolveSavedEquipment(
+  slug: string,
+  references: GrantDisplayVocabulary['equipmentReferences'],
+) {
+  if (!references) {
+    return { status: 'unresolved', reference: slug, reason: 'catalog-unavailable' } as const
   }
+  return resolveEquipmentSlugReference(slug, references.catalog, references.scope)
 }
 
 export function formatScopedSenseSummary(
@@ -367,17 +355,13 @@ function formatScopedSkillSummary(
 
 function formatScopedEquipmentProficiency(
   slugs: readonly string[] | undefined,
-  catalog: EquipmentCatalogContext | undefined,
+  references: GrantDisplayVocabulary['equipmentReferences'],
   formatResolved: Parameters<typeof formatScopedProficiencyReferences>[2],
 ): string | undefined {
   return formatScopedProficiencyReferences(
     slugs ?? [],
     (slug) => {
-      if (!catalog)
-        return {
-          unavailable: equipmentReferenceDisplayMessageForUnresolvedReason('catalog-unavailable'),
-        }
-      const outcome = resolveEquipmentSlugReference(slug, catalog, catalog.scope)
+      const outcome = resolveSavedEquipment(slug, references)
       return outcome.status === 'resolved'
         ? { label: outcome.equipment.name }
         : { unavailable: presentEquipmentReferenceDisplayName(outcome) }
@@ -450,7 +434,7 @@ const GRANT_ITEM_MAPPERS = {
       grant.kind === 'fixed'
         ? formatScopedEquipmentProficiency(
             grant.toolSlugs,
-            vocabulary.equipmentCatalog,
+            vocabulary.equipmentReferences,
             (toolSlugs, label) => formatToolProficiencyGrantCompact({ ...grant, toolSlugs }, label),
           )
         : undefined,
@@ -464,7 +448,7 @@ const GRANT_ITEM_MAPPERS = {
       grant.kind === 'fixed'
         ? formatScopedEquipmentProficiency(
             grant.weaponSlugs,
-            vocabulary.equipmentCatalog,
+            vocabulary.equipmentReferences,
             (weaponSlugs, label) =>
               formatWeaponProficiencyGrantCompact({ ...grant, weaponSlugs }, label),
           )
@@ -479,7 +463,7 @@ const GRANT_ITEM_MAPPERS = {
       grant.kind === 'fixed'
         ? formatScopedEquipmentProficiency(
             grant.armorSlugs,
-            vocabulary.equipmentCatalog,
+            vocabulary.equipmentReferences,
             (armorSlugs, label) => formatArmorTrainingGrantCompact({ ...grant, armorSlugs }, label),
           )
         : undefined,
@@ -491,8 +475,14 @@ const GRANT_ITEM_MAPPERS = {
   equipment: (grant, vocabulary, idPrefix, level) =>
     mapCompactProficiencyGrantToItems(
       formatEquipmentGrantCompact(grant.grant, {
-        resolveEquipmentName: equipmentNameResolver(vocabulary.equipmentCatalog),
-        resolveEquipmentKind: equipmentKindResolver(vocabulary.equipmentCatalog),
+        resolveEquipmentName: (slug) =>
+          presentEquipmentReferenceDisplayName(
+            resolveSavedEquipment(slug, vocabulary.equipmentReferences),
+          ),
+        resolveEquipmentKind: (slug) => {
+          const outcome = resolveSavedEquipment(slug, vocabulary.equipmentReferences)
+          return outcome.status === 'resolved' ? outcome.equipment.kind : undefined
+        },
       }),
       `${idPrefix}:equipment`,
       grant.kind,

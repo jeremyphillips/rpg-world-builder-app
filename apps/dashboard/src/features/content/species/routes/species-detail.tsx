@@ -52,17 +52,21 @@ export function SpeciesDetailContent({ species, campaignId }: SpeciesDetailConte
     spellsById: new Map(spells.data?.map((spell) => [spell.id, spell])),
   })
 
+  const equipmentScope = { rulesetId: species.rulesetId, campaignId }
   const viewModel = buildSpeciesDetailViewModel(species, {
     resolveCreatureTypeLabel: (id) => getCreatureTypeLabel(id, { creatureTypeVocabulary }),
     resolveDamageTypeLabel: (id) => findVocabularyLabel(damageTypeVocabulary, id),
     resolveLanguageLabel: (id) => findVocabularyLabel(languageVocabulary, id),
     resolveSenseLabel: (type) => findVocabularyLabel(senseVocabulary, type),
     spellCatalog,
-    equipmentCatalog: createEquipmentCatalogContext({
-      status: equipment.isError ? 'error' : equipment.isPending ? 'pending' : 'ready',
-      scope: { rulesetId: species.rulesetId, campaignId },
-      equipmentById: new Map(equipment.data?.map((item) => [item.id, item])),
-    }),
+    equipmentReferences: {
+      scope: equipmentScope,
+      catalog: createEquipmentCatalogContext({
+        status: equipment.isError ? 'error' : equipment.isPending ? 'pending' : 'ready',
+        scope: equipmentScope,
+        equipmentById: new Map(equipment.data?.map((item) => [item.id, item])),
+      }),
+    },
     resolveSkillName: (slug) => skills.data?.find((skill) => skill.slug === slug)?.name,
   })
 

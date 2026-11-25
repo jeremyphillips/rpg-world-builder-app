@@ -91,12 +91,16 @@ function speciesPreviewName(values: SpeciesFormValues): string {
 
 function speciesPreviewVocabulary(ctx: ContentFormCtx): SpeciesDisplayVocabulary {
   const scope = equipmentReferenceScopeFromContentFormCtx(ctx)
+  const equipmentScope = scope ?? { rulesetId: '', campaignId: '' }
   return {
-    equipmentCatalog: createEquipmentCatalogContext({
-      status: scope ? (ctx.equipmentCatalogStatus ?? 'pending') : 'pending',
-      scope: scope ?? { rulesetId: '', campaignId: '' },
-      equipmentById: ctx.equipmentCatalogById,
-    }),
+    equipmentReferences: {
+      scope: equipmentScope,
+      catalog: createEquipmentCatalogContext({
+        status: scope ? (ctx.equipmentCatalogStatus ?? 'pending') : 'pending',
+        scope: equipmentScope,
+        equipmentById: ctx.equipmentCatalogById,
+      }),
+    },
     resolveSkillName: (slug) => ctx.skillCatalogBySlug?.get(slug)?.name,
     resolveCreatureTypeLabel: (id) => getCreatureTypeLabel(id, ctx),
     resolveDamageTypeLabel: (id) => findVocabularyLabel(ctx.damageTypeVocabulary, id),

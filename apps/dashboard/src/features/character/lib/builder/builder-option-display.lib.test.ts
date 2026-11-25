@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { DEFAULT_SYSTEM_RULESET_ID } from '@rpg/contracts'
+import { DEFAULT_SYSTEM_RULESET_ID, EQUIPMENT_REFERENCE_DISPLAY_MESSAGES } from '@rpg/contracts'
 import { listLanguageSeedOptions } from '@rpg/catalog/vocabulary'
 
 import { SPECIES_SECTION_LABELS, SPECIES_STAT_LABELS } from '@/features/content'
@@ -108,12 +108,33 @@ describe('builder-option-display.lib', () => {
       species,
       [],
       buildCatalogDrowGrantDisplayVocabulary().spellCatalog,
-      { equipmentCatalog },
+      { equipmentReferences: { catalog: equipmentCatalog, scope: equipmentCatalog.scope } },
     )
     expect(
       sheet.sections.find((section) => section.title === species.heritage?.name)?.items?.[0]
         ?.summaryLines,
     ).toEqual([expectedSummary])
+  })
+
+  it('does not display saved equipment names from another campaign in the builder', () => {
+    const { species, equipmentCatalog } = buildScopedHeritageEquipmentFixture()
+    const sheet = buildSpeciesDetailsSheetContent(
+      species,
+      [],
+      buildCatalogDrowGrantDisplayVocabulary().spellCatalog,
+      {
+        equipmentReferences: {
+          catalog: equipmentCatalog,
+          scope: { rulesetId: equipmentCatalog.scope.rulesetId, campaignId: 'different-campaign' },
+        },
+      },
+    )
+    const label = EQUIPMENT_REFERENCE_DISPLAY_MESSAGES.catalogError
+
+    expect(
+      sheet.sections.find((section) => section.title === species.heritage?.name)?.items?.[0]
+        ?.summaryLines,
+    ).toEqual([`L1: ${label} · ${label}`])
   })
 
   it('keeps prose body for heritage options without grant groups', () => {

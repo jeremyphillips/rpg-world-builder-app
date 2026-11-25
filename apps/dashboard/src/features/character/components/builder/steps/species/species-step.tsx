@@ -91,29 +91,32 @@ export function SpeciesStep({
     (id: string) => findVocabularyLabel(campaignDamageTypes, id),
     [campaignDamageTypes],
   )
-  const grantReferences = useMemo(
-    () => ({
+  const grantReferences = useMemo(() => {
+    const scope = { rulesetId: context.rulesetId, campaignId: campaignId ?? '' }
+    return {
       resolveDamageTypeLabel: campaignId ? resolveCampaignDamageTypeLabel : undefined,
       resolveSenseLabel: campaignId
         ? (type: string) => findVocabularyLabel(campaignSenses, type)
         : undefined,
-      equipmentCatalog: createEquipmentCatalogContext({
-        status: 'ready',
-        scope: { rulesetId: context.rulesetId, campaignId: campaignId ?? '' },
-        equipmentById: new Map(context.catalog.equipment.map((item) => [item.id, item])),
-      }),
+      equipmentReferences: {
+        scope,
+        catalog: createEquipmentCatalogContext({
+          status: 'ready',
+          scope,
+          equipmentById: new Map(context.catalog.equipment.map((item) => [item.id, item])),
+        }),
+      },
       resolveSkillName: (slug: string) =>
         context.catalog.skillProficiencies.find((skill) => skill.slug === slug)?.name,
-    }),
-    [
-      campaignId,
-      campaignSenses,
-      context.rulesetId,
-      context.catalog.equipment,
-      context.catalog.skillProficiencies,
-      resolveCampaignDamageTypeLabel,
-    ],
-  )
+    }
+  }, [
+    campaignId,
+    campaignSenses,
+    context.rulesetId,
+    context.catalog.equipment,
+    context.catalog.skillProficiencies,
+    resolveCampaignDamageTypeLabel,
+  ])
 
   const spellCatalog = useMemo(
     () => createSpellCatalogContext({ status: 'ready', spellsById }),
