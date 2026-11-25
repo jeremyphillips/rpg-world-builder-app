@@ -34,6 +34,18 @@ Pre-commit is intentionally fast (no full affected package test suites). Broad t
 and collect-all affected tests since `origin/main` live in `pnpm gate:pre-push`
 (`gate:ci:quality`, `test:affected:gate`).
 
+## Verifying CI failure propagation
+
+The [CI workflow](../.github/workflows/ci.yml) runs affected typecheck and lint,
+duplication, and coverage as individual required steps. The repository’s
+`analyze` script is advisory.
+
+When changing these steps, parse the workflow and run each step command with its
+mapped [package script](../package.json) and a controlled failing child process.
+The required commands should preserve the child’s nonzero exit status. The
+advisory script should exit successfully even when its analysis child fails.
+This probe verifies command propagation without running the full check suite.
+
 ## Writing implementation plans
 
 **Avoid** auto-closing every phase with:

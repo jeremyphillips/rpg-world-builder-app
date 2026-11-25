@@ -62,12 +62,8 @@ import {
   movementWithHoverGroup,
   refineMovementRows,
 } from './species-movement-form-fields'
-import {
-  heritageOptionItemFields,
-  traitItemFields,
-  traitRowDraftFormSchema,
-  traitRowFormSchema,
-} from './species-trait-form-fields'
+import { traitRowDraftFormSchema, traitRowFormSchema } from './species-trait-form-schema'
+import { heritageOptionItemFields, traitItemFields } from './species-trait-form-fields'
 
 /** Species form validation messages (tier 3 form overrides). */
 export const speciesValidationMessages = {

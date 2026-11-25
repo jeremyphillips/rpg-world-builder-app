@@ -12,7 +12,7 @@ import {
   SPECIES_SENSE_VOCABULARY_READINESS_MESSAGE,
   speciesTraitAcquisitionDropdownItems,
 } from './species-trait-acquisition'
-import type { TraitRowForm } from './species-trait-form-fields'
+import type { TraitRowForm } from './species-trait-form-schema'
 
 const seedSenseVocabulary = buildVocabularyFromSeedSet(
   SENSE_SET_ID,

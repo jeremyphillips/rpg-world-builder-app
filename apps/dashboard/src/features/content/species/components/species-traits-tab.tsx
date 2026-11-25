@@ -7,12 +7,13 @@ import { creatureTraitTemplateRow } from '../../lib/creature-traits/creature-tra
 import { FormEmbeddedMasterDetailEditor } from '../../components/master-detail/form-embedded-master-detail-editor'
 import { useMasterDetailArray } from '../../lib/master-detail/use-master-detail-array'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
-import { traitItemFields, type TraitRowForm } from '../lib/species-trait-form-fields'
+import { type TraitRowForm } from '../lib/species-trait-form-schema'
+import { traitItemFields } from '../lib/species-trait-form-fields'
 import { TRAIT_MASTER_DETAIL_ITEM_NOUN } from '../lib/species-trait-form-labels'
 import { createSpeciesTraitRowTitleConfig } from '../lib/species-trait-row-title'
 import { traitItemDefaultValues } from '../lib/species-trait-form-values'
 import { useSpeciesTraitFacingHost } from '../../facing/use-species-trait-facing-host'
-import { SpeciesTraitAddMenu } from './species-trait-add-menu'
+import { useSpeciesTraitAcquisition } from './species-trait-add-menu'
 
 const TRAITS_FIELD_NAME = 'traits'
 
@@ -50,25 +51,23 @@ export function SpeciesTraitsTab({ formCtx }: SpeciesTraitsTabProps) {
     hostId: 'species-traits',
   })
 
-  const addControl = (
-    <SpeciesTraitAddMenu
-      label="Add trait"
-      formCtx={formCtx}
-      traits={traits}
-      onAcquire={(choice) => {
-        if (choice.type === 'custom') {
-          editor.appendRow(makeItemDefaults())
-          return
-        }
-        const traitId = defaultTemplateTraitId(choice.templateId)
-        editor.appendRow({
-          ...makeItemDefaults(),
-          ...creatureTraitTemplateRow(choice.templateId, traitId),
-          templateId: choice.templateId,
-        })
-      }}
-    />
-  )
+  const acquisition = useSpeciesTraitAcquisition({
+    label: 'Add trait',
+    formCtx,
+    traits,
+    onAcquire: (choice) => {
+      if (choice.type === 'custom') {
+        editor.appendRow(makeItemDefaults())
+        return
+      }
+      const traitId = defaultTemplateTraitId(choice.templateId)
+      editor.appendRow({
+        ...makeItemDefaults(),
+        ...creatureTraitTemplateRow(choice.templateId, traitId),
+        templateId: choice.templateId,
+      })
+    },
+  })
 
   return (
     <FormEmbeddedMasterDetailEditor
@@ -81,7 +80,7 @@ export function SpeciesTraitsTab({ formCtx }: SpeciesTraitsTabProps) {
       ariaLabel="Traits"
       addLabel="Add trait"
       idPrefix="species-trait"
-      addControl={addControl}
+      acquisition={acquisition}
       rowTitle={rowTitle}
       resolveFieldSections={resolveFieldSections}
       facing={facing}

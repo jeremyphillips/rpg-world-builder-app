@@ -3,7 +3,7 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
+import { createEmptyCharacterBuilderDraft, reincarnateSpeciesTableFixture } from '@rpg/contracts'
 
 import { pickClass, pickSkillProficiency } from '@/features/content'
 import { pickEquipment } from '@/test/fixtures/pick'
@@ -74,6 +74,58 @@ describe('ClassStep', () => {
     expect(screen.getByRole('heading', { name: 'Proficiencies' })).toBeInTheDocument()
     expect(screen.getByText('Choose 2 from 5 options')).toBeInTheDocument()
     expect(onDraftChange).not.toHaveBeenCalled()
+  })
+
+  it('renders authored and generated class features from the details trigger', async () => {
+    const user = userEvent.setup()
+    const wizard = pickClass('wizard')
+    const updatedWizard: typeof wizard = {
+      ...wizard,
+      features: [
+        {
+          kind: 'custom',
+          id: 'planar-study',
+          name: 'Planar Study',
+          level: 1,
+          description: '<p>Study travel between planes.</p>',
+          tables: [reincarnateSpeciesTableFixture],
+        },
+        {
+          kind: 'asi',
+          id: 'focused-study',
+          name: 'Focused Study',
+          level: 1,
+          description: '<p>Improve an ability through practice.</p>',
+        },
+        {
+          kind: 'spellcasting',
+          id: 'spellcasting',
+          name: 'Spellcasting',
+          level: 1,
+          intro: '<p>Record new spells in your spellbook.</p>',
+        },
+      ],
+    }
+    const context = createStandaloneBuilderContextFixture({
+      catalog: { ...populatedBuilderCatalog, classes: [updatedWizard] },
+    })
+    render(
+      <ClassStep
+        context={context}
+        draft={createEmptyCharacterBuilderDraft()}
+        validationIssues={[]}
+        onDraftChange={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'View Wizard details' }))
+
+    const details = within(screen.getByRole('dialog'))
+    expect(details.getByText('Study travel between planes.')).toBeVisible()
+    expect(details.getByRole('table')).toBeVisible()
+    expect(details.getByText('Improve an ability through practice.')).toBeVisible()
+    expect(details.getByText('Record new spells in your spellbook.')).toBeVisible()
+    expect(screen.getByRole('dialog')).toHaveTextContent(/You know three Wizard cantrips/)
   })
 
   it('omits card media for fallback art while keeping the card stretched in the row', () => {

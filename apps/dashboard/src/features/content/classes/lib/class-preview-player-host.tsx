@@ -16,20 +16,13 @@ import {
 } from '../../lib/authoring/content-authoring-scope.lib'
 import type { ContentPreviewPlayerPreviewProps } from '../../lib/forms/preview/content-form-preview.types'
 import { CONTENT_PREVIEW_AS_PLAYER_LABEL } from '../../lib/forms/preview/content-form-preview-copy'
-import { useSkillProficiencies } from '../../skill-proficiencies/hooks/use-skill-proficiencies'
 import { ClassDetailBody } from '../components/detail/class-detail-body'
 import { useSubclasses } from '../hooks/use-subclasses'
-import type { ClassDetailViewModel } from './class-display'
-import { buildClassPreviewDetailViewModel } from './class-preview-projection'
+import {
+  buildClassPreviewDetailViewModel,
+  classPreviewVocabulary,
+} from './class-preview-projection'
 import type { ClassFormValues } from './class-form-fields'
-
-const PREVIEW_TOOL_LABEL_VOCABULARY = {
-  resolveToolLabel: (slug: string) =>
-    slug
-      .split('-')
-      .map((part) => (part.length > 0 ? part.charAt(0).toUpperCase() + part.slice(1) : part))
-      .join(' '),
-}
 
 function classPreviewDisplayImage(
   values: ClassFormValues,
@@ -58,12 +51,11 @@ export function ClassPreviewPlayerHost({
   const queryCampaignId = contentAuthoringCampaignIdForQueries(ctx)
   const campaignRules = useCampaignRules(queryCampaignId)
   const subclassesQuery = useSubclasses(queryCampaignId, ctx.entityId)
-  const skillsQuery = useSkillProficiencies(queryCampaignId)
   const subclassesEnabled = Boolean(queryCampaignId && ctx.entityId)
-  const skillsEnabled = Boolean(queryCampaignId)
 
   const name = values.name?.trim() || 'Unnamed class'
-  const viewModel = buildClassPreviewDetailViewModel(values, ctx)
+  const vocabulary = classPreviewVocabulary(ctx)
+  const viewModel = buildClassPreviewDetailViewModel(values, vocabulary)
 
   return (
     <DetailPreviewModal
@@ -76,16 +68,16 @@ export function ClassPreviewPlayerHost({
         displayImage={classPreviewDisplayImage(values, ctx)}
         displayFallback={resolveDashboardDetailDisplayFallback('class')}
         imageName={name}
-        viewModel={viewModel as ClassDetailViewModel}
+        viewModel={viewModel}
         subclasses={subclassesQuery.data ?? []}
         subclassesPending={subclassesEnabled && subclassesQuery.isPending}
         subclassesLoadingError={subclassesEnabled && subclassesQuery.isLoadingError}
         subclassingEnabled={campaignRules.subclassing.enabled}
         campaignId={queryCampaignId}
-        skillProficiencies={skillsQuery.data ?? []}
-        skillsPending={skillsEnabled && skillsQuery.isPending}
-        skillsLoadingError={skillsEnabled && skillsQuery.isLoadingError}
-        vocabulary={PREVIEW_TOOL_LABEL_VOCABULARY}
+        skillProficiencies={[...(ctx.skillCatalogBySlug?.values() ?? [])]}
+        skillsPending={ctx.skillCatalogStatus === 'pending'}
+        skillsLoadingError={ctx.skillCatalogStatus === 'error'}
+        vocabulary={vocabulary}
         pageShell={false}
       />
     </DetailPreviewModal>

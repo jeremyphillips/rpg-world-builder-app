@@ -1,18 +1,32 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import {
+  EQUIPMENT_REFERENCE_DISPLAY_MESSAGES,
+  type Equipment,
+  SPELL_REFERENCE_DISPLAY_MESSAGES,
+} from '@rpg/contracts'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import {
   buildSeedCreatureTypeVocabulary,
+  buildSeedDamageTypeVocabulary,
   buildSeedLanguageVocabulary,
   buildSeedSenseVocabulary,
 } from '@/features/vocabulary'
 import { SPECIES_STAT_LABELS } from '@/features/content'
 
+vi.mock('../../equipment/hooks/use-equipment', async (importOriginal) => ({
+  ...(await importOriginal()),
+  useEquipment: vi.fn(),
+}))
+vi.mock('../../skill-proficiencies/hooks/use-skill-proficiencies', async (importOriginal) => ({
+  ...(await importOriginal()),
+  useSkillProficiencies: () => ({ data: [], isPending: false, isError: false }),
+}))
 vi.mock('../../spells/hooks/use-spells', async (importOriginal) => ({
   ...(await importOriginal()),
-  useSpells: () => ({ data: [], isPending: false, isError: false }),
+  useSpells: vi.fn(),
 }))
 
 vi.mock('@/components/layout/breadcrumb/use-breadcrumb-label', () => ({
@@ -33,32 +47,52 @@ vi.mock('@/features/vocabulary', async (importOriginal) => {
     useCreatureTypeVocabulary: vi.fn(),
     useSenseVocabulary: vi.fn(),
     useLanguageVocabulary: vi.fn(),
+    useDamageTypeVocabulary: vi.fn(),
   }
 })
 
 import {
   useCreatureTypeVocabulary,
   useLanguageVocabulary,
+  useDamageTypeVocabulary,
   useSenseVocabulary,
 } from '@/features/vocabulary'
+import {
+  buildScopedHeritageEquipmentFixture,
+  getDrowHeritageSpellCatalog,
+} from '../../lib/fixtures/grant-display-fixtures'
+import { useEquipment } from '../../equipment/hooks/use-equipment'
+import { useSpells } from '../../spells/hooks/use-spells'
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { ELF, TIEFLING } from '../fixtures'
 import { SpeciesDetailContent } from './species-detail'
 
+const useSpellsMock = vi.mocked(useSpells)
 const useCreatureTypeVocabularyMock = vi.mocked(useCreatureTypeVocabulary)
 const useSenseVocabularyMock = vi.mocked(useSenseVocabulary)
 const useLanguageVocabularyMock = vi.mocked(useLanguageVocabulary)
 
-function renderSpeciesDetail(species: typeof ELF) {
+function renderSpeciesDetail(species: typeof ELF, campaignId = STORY_CAMPAIGN_ID) {
   return render(
     <MemoryRouter>
-      <SpeciesDetailContent species={species} campaignId={STORY_CAMPAIGN_ID} />
+      <SpeciesDetailContent species={species} campaignId={campaignId} />
     </MemoryRouter>,
   )
 }
 
-describe('SpeciesDetailContent language affinities', () => {
+describe('SpeciesDetailContent', () => {
   beforeEach(() => {
+    const equipment: Equipment[] = []
+    vi.mocked(useEquipment).mockReturnValue({
+      data: equipment,
+      isPending: false,
+      isError: false,
+    } as ReturnType<typeof useEquipment>)
+    useSpellsMock.mockReturnValue({
+      data: getDrowHeritageSpellCatalog(),
+      isPending: false,
+      isError: false,
+    } as ReturnType<typeof useSpells>)
     useCreatureTypeVocabularyMock.mockReturnValue({
       vocabulary: buildSeedCreatureTypeVocabulary(),
       isPending: false,
@@ -69,6 +103,11 @@ describe('SpeciesDetailContent language affinities', () => {
       isPending: false,
       isError: false,
     } as ReturnType<typeof useSenseVocabulary>)
+    vi.mocked(useDamageTypeVocabulary).mockReturnValue({
+      vocabulary: buildSeedDamageTypeVocabulary(),
+      isPending: false,
+      isError: false,
+    } as ReturnType<typeof useDamageTypeVocabulary>)
     useLanguageVocabularyMock.mockReturnValue({
       vocabulary: buildSeedLanguageVocabulary(),
       isPending: false,
@@ -90,6 +129,59 @@ describe('SpeciesDetailContent language affinities', () => {
 
     expect(screen.queryByText(SPECIES_STAT_LABELS.languageAffinities)).not.toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Traits' })).toBeInTheDocument()
+  })
+
+  it('renders Drow cantrip and spell names from the campaign catalog', () => {
+    renderSpeciesDetail(ELF)
+
+    for (const name of [
+      /^L1: .*Dancing Lights cantrip$/,
+      /^L3: Faerie Fire spell$/,
+      /^L5: Darkness spell$/,
+    ]) {
+      expect(screen.getByText(name)).toBeInTheDocument()
+    }
+    expect(useSpellsMock).toHaveBeenCalledWith(STORY_CAMPAIGN_ID)
+  })
+
+  it.each([
+    [true, false, SPELL_REFERENCE_DISPLAY_MESSAGES.catalogLoading],
+    [false, true, SPELL_REFERENCE_DISPLAY_MESSAGES.catalogError],
+    [false, false, SPELL_REFERENCE_DISPLAY_MESSAGES.unknownSpell],
+  ])('renders spell catalog guidance with pending=%s and error=%s', (isPending, isError, label) => {
+    useSpellsMock.mockReturnValue({
+      data: isPending || isError ? undefined : [],
+      isPending,
+      isError,
+    } as ReturnType<typeof useSpells>)
+
+    renderSpeciesDetail(ELF)
+
+    expect(screen.getAllByText(label, { exact: false }).length).toBeGreaterThan(0)
+    expect(screen.queryByText(/^L1: .*Dancing Lights cantrip$/)).not.toBeInTheDocument()
+  })
+
+  it.each([
+    [false, false, undefined],
+    [true, false, EQUIPMENT_REFERENCE_DISPLAY_MESSAGES.catalogLoading],
+    [false, true, EQUIPMENT_REFERENCE_DISPLAY_MESSAGES.catalogError],
+  ])('uses campaign equipment with pending=%s and error=%s', (isPending, isError, guidance) => {
+    const { species, equipmentCatalog, expectedSummary } = buildScopedHeritageEquipmentFixture()
+    vi.mocked(useEquipment).mockReturnValue({
+      data: [...equipmentCatalog.equipmentById.values()],
+      isPending,
+      isError,
+    } as ReturnType<typeof useEquipment>)
+
+    renderSpeciesDetail(species, equipmentCatalog.scope.campaignId)
+
+    expect(useEquipment).toHaveBeenCalledWith(equipmentCatalog.scope.campaignId)
+    if (guidance) {
+      expect(screen.getByText(`L1: ${guidance} · ${guidance}`)).toBeInTheDocument()
+      expect(screen.queryByText(expectedSummary)).not.toBeInTheDocument()
+    } else {
+      expect(screen.getByText(expectedSummary)).toBeInTheDocument()
+    }
   })
 
   itAxe('has no axe accessibility violations', async () => {

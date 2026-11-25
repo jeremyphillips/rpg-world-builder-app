@@ -1,0 +1,77 @@
+import {
+  CLASS_FEATURE_KIND_ENTRIES,
+  CLASS_FEATURE_KINDS,
+  classSubclassChoiceAtOccurrenceLimit,
+  classValidationMessages,
+  isClassFeatureKind,
+} from '@rpg/contracts'
+
+import { type FeatureRowForm } from './class-feature-form-fields'
+import { createAsiFeature } from './class-asi-features'
+import { createSubclassChoiceFeature } from './class-subclass-choice-features'
+import { featureToFormRow } from './class-feature-form-fields'
+import { featureRowShowsInAddMenu } from './class-feature-authoring'
+import type { MasterDetailAcquisition } from '../../components/master-detail/master-detail-list-panel'
+import { toAcquisitionDropdownItem } from '../../lib/acquisition'
+
+const ADD_MENU_KINDS = CLASS_FEATURE_KINDS.filter(featureRowShowsInAddMenu)
+
+export function buildClassFeatureAcquisition({
+  features,
+  className,
+  classSlug,
+  onAddRows,
+}: {
+  features: FeatureRowForm[] | undefined
+  className: string
+  classSlug: string
+  onAddRows: (rows: FeatureRowForm[]) => void
+}): MasterDetailAcquisition {
+  const items = ADD_MENU_KINDS.map((kind) =>
+    toAcquisitionDropdownItem({
+      id: kind,
+      label: CLASS_FEATURE_KIND_ENTRIES[kind].label,
+      description: {
+        status: 'ready',
+        text: CLASS_FEATURE_KIND_ENTRIES[kind].description,
+      },
+      availability:
+        kind === 'subclass-choice' && classSubclassChoiceAtOccurrenceLimit(features ?? [])
+          ? {
+              status: 'unavailable',
+              code: 'occurrence',
+              message: classValidationMessages.subclassChoiceFeatureDuplicate(),
+            }
+          : { status: 'available' },
+    }),
+  )
+
+  return {
+    label: 'Add feature',
+    supportingWrap: true,
+    groups: [],
+    items,
+    onSelectItem: (itemId) => {
+      if (!isClassFeatureKind(itemId) || !featureRowShowsInAddMenu(itemId)) return
+      const kind = itemId
+      if (kind === 'custom') {
+        onAddRows([{ name: '', level: 1, grants: [], tables: [], available: true, kind: 'custom' }])
+        return
+      }
+      if (kind === 'asi') {
+        onAddRows([featureToFormRow(createAsiFeature(1))])
+        return
+      }
+      if (kind === 'subclass-choice' && !classSubclassChoiceAtOccurrenceLimit(features ?? [])) {
+        onAddRows([
+          featureToFormRow(
+            createSubclassChoiceFeature({
+              classSlug: classSlug || 'new-class',
+              className: className || 'New Class',
+            }),
+          ),
+        ])
+      }
+    },
+  }
+}

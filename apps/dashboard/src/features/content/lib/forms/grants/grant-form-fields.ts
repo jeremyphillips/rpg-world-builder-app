@@ -22,8 +22,6 @@ import {
   type FeatCategory,
   type MovementOperation,
   type SenseId,
-  isArmorEquipment,
-  isWeaponEquipment,
   getSpellGrantAvailabilityLabel,
 } from '@rpg/contracts'
 
@@ -48,16 +46,16 @@ import {
   buildActiveDamageTypeFieldOptions,
   buildActiveLanguageFieldOptions,
   buildActiveSenseFieldOptions,
-  getDamageTypeLabelFromVocabulary,
-  getLanguageLabelFromVocabulary,
-  getSenseLabelFromVocabulary,
+  findVocabularyLabel,
 } from '@/features/vocabulary'
 import { languageSingleComboboxField } from '@/lib/forms/language-combobox-form-fields.lib'
 
-import { GrantTypePersistField } from './grant-type-persist-field'
+import { GRANT_TYPE_FIELD_NAME, GrantTypePersistField } from './grant-type-persist-field'
 import {
   nounFromContentType,
   getContentTypeCollectionLabel,
+  formatContentListLoadErrorMessage,
+  formatContentReferenceUnavailable,
   getContentTypeMidSentenceLabel,
 } from '@/features/content/lib/content-type-labels'
 
@@ -88,6 +86,7 @@ import {
   type GrantRowHeaderContext,
   type GrantRowValues,
 } from './grant-row-presentation.lib'
+import { readFeatChoiceFromDraft } from './grant-form-values'
 import {
   formatGrantUnlockLevelLabel,
   GRANT_DEFAULT_UNLOCK_LABEL,
@@ -262,13 +261,8 @@ export function formatFeatChoiceRowSummary(
   category: string | undefined,
   choose: number | string | undefined,
 ): string {
-  if (!category) return ''
-  const numericChoose = choose === undefined || choose === '' ? 1 : Number(choose)
-  if (!Number.isFinite(numericChoose)) return ''
-  return formatFeatChoiceGrantSentence({
-    category: category as FeatCategory,
-    choose: numericChoose,
-  })
+  const choice = readFeatChoiceFromDraft(category, choose)
+  return choice ? formatFeatChoiceGrantSentence(choice) : ''
 }
 
 export function formatSpellRowSummary(values: GrantRowValues, ctx: GrantRowHeaderContext): string {
@@ -351,6 +345,7 @@ function grantTypePersistFields(): FormItem[] {
     {
       kind: 'slot',
       name: '_grantTypePersist',
+      boundNames: [GRANT_TYPE_FIELD_NAME],
       render: () => createElement(GrantTypePersistField),
     },
   ]
@@ -759,14 +754,13 @@ function buildGrantRowHeaderContext(
   labels: Record<string, string>,
   ctx: ContentFormCtx,
 ): GrantRowHeaderContext {
-  const referenceEquipment = ctx.options?.equipment?.forReference() ?? []
   const { damageTypeVocabulary, languageVocabulary, senseVocabulary } = ctx
 
   return {
     rowLabels: labels,
-    resolveDamageTypeLabel: (id) => getDamageTypeLabelFromVocabulary(damageTypeVocabulary, id),
-    resolveLanguageLabel: (id) => getLanguageLabelFromVocabulary(languageVocabulary, id),
-    resolveSenseLabel: (id) => getSenseLabelFromVocabulary(senseVocabulary, id),
+    resolveDamageTypeLabel: (id) => findVocabularyLabel(damageTypeVocabulary, id),
+    resolveLanguageLabel: (id) => findVocabularyLabel(languageVocabulary, id),
+    resolveSenseLabel: (id) => findVocabularyLabel(senseVocabulary, id),
     equipmentReferences: buildGrantEquipmentReferencePresentationFromAuthoring({
       status: ctx.rulesetId ? ctx.equipmentCatalogStatus : 'pending',
       equipmentById: ctx.equipmentCatalogById,
@@ -775,22 +769,18 @@ function buildGrantRowHeaderContext(
         campaignId: '',
       },
     }),
-    weaponOptions: toSortedContentFieldOptions(
-      referenceEquipment.filter(isWeaponEquipment),
-      'equipment',
-    ),
-    toolOptions: toSortedContentFieldOptions(
-      referenceEquipment.filter((item) => item.kind === 'tool'),
-      'equipment',
-    ),
-    armorOptions: toSortedContentFieldOptions(
-      referenceEquipment.filter(isArmorEquipment),
-      'equipment',
-    ),
-    skillOptions: toSortedContentFieldOptions(
-      ctx.options?.skills?.forReference(),
-      'skill-proficiencies',
-    ),
+    resolveSkillName: (slug) => {
+      if (ctx.skillCatalogStatus === 'pending') {
+        return `Loading ${getContentTypeMidSentenceLabel('skill-proficiencies', { plural: true })}…`
+      }
+      if (ctx.skillCatalogStatus === 'error') {
+        return formatContentListLoadErrorMessage('skill-proficiencies')
+      }
+      return (
+        ctx.skillCatalogBySlug?.get(slug)?.name ??
+        formatContentReferenceUnavailable('skill-proficiencies')
+      )
+    },
     spellReferences: buildGrantSpellReferencePresentationFromAuthoring({
       status: ctx.spellCatalogStatus,
       spellsById: ctx.spellCatalogById,

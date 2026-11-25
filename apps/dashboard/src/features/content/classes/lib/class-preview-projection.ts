@@ -1,16 +1,26 @@
 import {
   availableClassFeatures,
+  createEquipmentCatalogContext,
   CLASS_CONTENT_TYPE_TERM,
   type ContentMedia,
   getAbilityCompactLabel,
   getArmorCategoryPreviewLabel,
   getWeaponCategoryPreviewLabel,
 } from '@rpg/contracts'
+import { equipmentReferenceScopeFromContentFormCtx } from '@/lib/content-form-equipment-reference-scope.lib'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import { formatPreviewRailOverflowList, type PreviewRailFact } from '@rpg/ui'
 
+import {
+  formatContentListLoadErrorMessage,
+  formatContentReferenceUnavailable,
+  getContentTypeMidSentenceLabel,
+} from '../../lib/content-type-labels'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
-import { isMeaningfulCharacterCreationToolChoice } from './character-creation/class-character-creation-proficiencies-form-values'
+import {
+  characterCreationProficienciesWithLiveToolLabel,
+  isMeaningfulCharacterCreationToolChoice,
+} from './character-creation/class-character-creation-proficiencies-form-values'
 import {
   CONTENT_PREVIEW_DESCRIPTION_PLACEHOLDER,
   CONTENT_PREVIEW_NOT_SET,
@@ -33,6 +43,7 @@ import { SPELL_SELECTION_MODEL_OPTIONS } from './class-spell-selection-form.lib'
 import { spellcastingFeatureSummaryFromRows } from './class-spellcasting-lifecycle'
 import {
   buildClassDetailViewModel,
+  buildClassEquipmentVocabulary,
   type ClassDetailViewModel,
   type ClassDetailViewModelSource,
   type ClassDisplayVocabulary,
@@ -106,18 +117,18 @@ function identityFacts(values: ClassFormValues): PreviewRailFact[] {
   ]
 }
 
-function formatSlugLabel(slug: string): string {
-  return slug
-    .split('-')
-    .map((part) => (part.length > 0 ? part.charAt(0).toUpperCase() + part.slice(1) : part))
-    .join(' ')
-}
-
-function skillLabel(slug: string, ctx: ContentFormCtx): string {
-  const match = ctx.options?.skills?.visible.find(
-    (skill) => skill.id === slug || skill.slug === slug,
-  )
-  return match?.name ?? formatSlugLabel(slug)
+function classPreviewSkillLabels(slugs: readonly string[], ctx: ContentFormCtx): string[] {
+  if (!slugs.length) return []
+  if (ctx.skillCatalogStatus === 'pending') {
+    return [`Loading ${getContentTypeMidSentenceLabel('skill-proficiencies', { plural: true })}…`]
+  }
+  if (ctx.skillCatalogStatus === 'error') {
+    return [formatContentListLoadErrorMessage('skill-proficiencies')]
+  }
+  return slugs.map((slug) => {
+    const skill = ctx.skillCatalogBySlug?.get(slug)
+    return skill?.name ?? formatContentReferenceUnavailable('skill-proficiencies')
+  })
 }
 
 function appendFact(facts: PreviewRailFact[], label: string, items: readonly string[]): void {
@@ -181,6 +192,7 @@ function buildProficienciesSection(
   ctx: ContentFormCtx,
 ): ContentPreviewSection {
   const proficiencies = values.proficiencies
+  const { resolveEquipmentLabel } = classPreviewVocabulary(ctx)
   const facts: PreviewRailFact[] = []
 
   appendFact(
@@ -190,18 +202,18 @@ function buildProficienciesSection(
   )
   appendFact(facts, CLASS_PREVIEW_FACT_LABELS.armorTraining, [
     ...(proficiencies?.armor?.categories ?? []).map(getArmorCategoryPreviewLabel),
-    ...(proficiencies?.armor?.items ?? []).map(formatSlugLabel),
+    ...(proficiencies?.armor?.items ?? []).map(resolveEquipmentLabel),
   ])
 
   const weapons = [
     ...(proficiencies?.weapons.categories ?? []).map(getWeaponCategoryPreviewLabel),
-    ...(proficiencies?.weapons.items ?? []).map(formatSlugLabel),
+    ...(proficiencies?.weapons.items ?? []).map(resolveEquipmentLabel),
   ]
   appendFact(facts, CLASS_PREVIEW_FACT_LABELS.weapons, weapons)
   appendFact(
     facts,
     CLASS_PREVIEW_FACT_LABELS.skills,
-    (proficiencies?.skills.items ?? []).map((slug) => skillLabel(slug, ctx)),
+    classPreviewSkillLabels(proficiencies?.skills.items ?? [], ctx),
   )
 
   return {
@@ -333,7 +345,7 @@ function buildCharacterCreationFacts(
       skillFrom.length > 0
         ? joinInlineMetadata([
             `Choose ${skillChoose}`,
-            formatPreviewRailOverflowList(skillFrom.map((slug) => skillLabel(slug, ctx))),
+            formatPreviewRailOverflowList(classPreviewSkillLabels(skillFrom, ctx)),
           ])
         : CONTENT_PREVIEW_NOT_SET,
   })
@@ -379,15 +391,17 @@ export function buildClassPreviewSections(
   }
 }
 
-function classPreviewVocabulary(ctx: ContentFormCtx): ClassDisplayVocabulary {
-  return {
-    resolveToolLabel: (slug: string) => {
-      const match = ctx.options?.equipment?.visible.find(
-        (item) => item.slug === slug || item.id === slug,
-      )
-      return match?.name ?? formatSlugLabel(slug)
-    },
-  }
+export function classPreviewVocabulary(ctx: ContentFormCtx): ClassDisplayVocabulary {
+  const scope = equipmentReferenceScopeFromContentFormCtx(ctx)
+  const expectedScope = scope ?? { rulesetId: '', campaignId: '' }
+  return buildClassEquipmentVocabulary(
+    createEquipmentCatalogContext({
+      status: scope ? (ctx.equipmentCatalogStatus ?? 'pending') : 'pending',
+      scope: expectedScope,
+      equipmentById: ctx.equipmentCatalogById,
+    }),
+    expectedScope,
+  )
 }
 
 export function classDetailSourceFromFormValues(
@@ -405,30 +419,18 @@ export function classDetailSourceFromFormValues(
     ),
     features: featuresFromFormValues(values.features ?? []),
     characterCreation: {
-      proficiencies: {
-        skills: {
-          choices: [
-            {
-              id: 'class-skills',
-              choose: values.characterCreation?.proficiencies?.skills.choose ?? 0,
-              from: values.characterCreation?.proficiencies?.skills.from ?? [],
-            },
-          ],
-        },
-      },
+      proficiencies: characterCreationProficienciesWithLiveToolLabel(
+        values.characterCreation?.proficiencies,
+      ),
     },
   }
 }
 
 export function buildClassPreviewDetailViewModel(
   values: ClassFormValues,
-  ctx: ContentFormCtx,
+  vocabulary: ClassDisplayVocabulary,
 ): ClassDetailViewModel {
-  return buildClassDetailViewModel(
-    classDetailSourceFromFormValues(values),
-    classPreviewVocabulary(ctx),
-    {
-      surface: 'content-detail',
-    },
-  )
+  return buildClassDetailViewModel(classDetailSourceFromFormValues(values), vocabulary, {
+    surface: 'content-detail',
+  })
 }

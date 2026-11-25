@@ -52,4 +52,7 @@ export function resolveClassFeaturePersistedFacing(
     case 'subclass-choice':
       return resolvePersistedSubclassChoiceClassFeatureFacing(feature, host)
   }
+  const unsupported: never = feature
+  void unsupported
+  return { status: 'invalid', reason: { code: 'unsupported-kind' } }
 }

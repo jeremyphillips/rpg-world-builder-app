@@ -9,7 +9,11 @@ import {
 import { getSeedLanguageCategory } from '@rpg/catalog/vocabulary'
 import { toOptions, type FieldOption } from '@rpg/ui/form'
 
-import { buildLabelActiveVocabulary, buildVocabularyFromSeedSet } from '../build-vocabulary-maps'
+import {
+  buildLabelActiveVocabulary,
+  buildVocabularyFromSeedSet,
+  findVocabularyLabel,
+} from '../build-vocabulary-maps'
 
 export type LanguageVocabulary = {
   labelById: Record<string, string>
@@ -64,5 +68,5 @@ export function getLanguageLabelFromVocabulary(
   vocabulary: LanguageVocabulary | undefined,
   id: string,
 ): string {
-  return vocabulary?.labelById[id] ?? id
+  return findVocabularyLabel(vocabulary, id) ?? id
 }

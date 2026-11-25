@@ -77,7 +77,12 @@ export const LongCollection: Story = {
     itemNoun: CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN,
     onAdd: () => {},
     onSelectItem: () => {},
-    countSupplement: <span>20 available</span>,
+    countSupplement: {
+      scope: { availableCount: 20, unavailableCount: 0, visibleCount: 20 },
+      showUnavailable: false,
+      onShow: () => {},
+      onHide: () => {},
+    },
   },
 }
 
@@ -100,7 +105,12 @@ export const ConstrainedViewport: Story = {
     itemNoun: CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN,
     onAdd: () => {},
     onSelectItem: () => {},
-    countSupplement: <span>20 available</span>,
+    countSupplement: {
+      scope: { availableCount: 20, unavailableCount: 0, visibleCount: 20 },
+      showUnavailable: false,
+      onShow: () => {},
+      onHide: () => {},
+    },
   },
 }
 
@@ -139,7 +149,12 @@ export const WithStickyFormFooter: Story = {
     itemNoun: CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN,
     onAdd: () => {},
     onSelectItem: () => {},
-    countSupplement: <span>20 available</span>,
+    countSupplement: {
+      scope: { availableCount: 20, unavailableCount: 0, visibleCount: 20 },
+      showUnavailable: false,
+      onShow: () => {},
+      onHide: () => {},
+    },
   },
 }
 
@@ -221,7 +236,12 @@ export const Grouped: Story = {
     itemNoun: CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN,
     selectedItemId: 'bite',
     onSelectItem: () => {},
-    countSupplement: <span>2 available · 1 unavailable</span>,
+    countSupplement: {
+      scope: { availableCount: 2, unavailableCount: 1, visibleCount: 2 },
+      showUnavailable: false,
+      onShow: () => {},
+      onHide: () => {},
+    },
     groups: [
       {
         id: 'actions',

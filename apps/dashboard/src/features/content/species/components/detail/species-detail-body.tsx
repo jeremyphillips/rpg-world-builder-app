@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { RichTextContent } from '@rpg/ui'
+import { RichTextContent, Text } from '@rpg/ui'
 import type { ContentDisplayFallback, ContentDisplayImage } from '@rpg/contracts'
 
 import { DetailNavFlushStack } from '../../../lib/detail/collection/item-stack/detail-nav-flush-stack'
@@ -14,6 +14,11 @@ const TRAITS_HEADING_ID = 'traits-heading'
 function TraitItemBody({ item }: { item: SpeciesDetailItem }) {
   return (
     <>
+      {item.summaryLines?.map((line) => (
+        <Text key={line} variant="supporting">
+          {line}
+        </Text>
+      ))}
       {item.bodyHtml ? <RichTextContent html={item.bodyHtml} {...contentDetailProseProps} /> : null}
     </>
   )

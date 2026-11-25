@@ -16,6 +16,7 @@ export {
 export { monsterArmorClassUnavailableCopy } from './monsters/lib/statistics/monster-armor-class-presentation'
 export {
   formatAddContentTypeLabel,
+  formatContentReferenceUnavailable,
   formatContentCollectionAvailabilityCaption,
   formatContentCreateHeading,
   formatContentListLoadErrorMessage,
@@ -25,6 +26,7 @@ export {
 } from './lib/content-type-labels'
 export {
   buildCatalogDrowGrantDisplayVocabulary,
+  buildScopedHeritageEquipmentFixture,
   DROW_HERITAGE_GROUPED_SUMMARY_WITH_SUFFIX,
   DROW_HERITAGE_SHEET_SUMMARY_LINES,
   getCatalogDrowHeritageGrantGroups,
@@ -259,6 +261,7 @@ export {
 export {
   buildClassCardViewModel,
   buildClassDetailViewModel,
+  buildClassEquipmentVocabulary,
   CLASS_DISPLAY_NONE,
   CLASS_PROFICIENCY_GROUP_LABELS,
   CLASS_PROFICIENCY_ROW_LABELS,
@@ -345,7 +348,6 @@ export type {
 export { ContentEditShell } from './lib/forms/shells/edit/content-edit-shell'
 export {
   buildGrantSummaryModel,
-  buildSpellGrantVocabulary,
   formatGrantSummaryByLevel,
   formatGrantSummaryInline,
   type GrantDisplayVocabulary,

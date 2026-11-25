@@ -42,7 +42,7 @@ export function getDamageTypeEntry(id: string): GameTermEntry {
   if (physicalEntry) return physicalEntry
 
   const label = formatVocabularySlugLabel(id)
-  const phrase = `${label.toLowerCase()} damage`
+  const phrase = damageTypePhrase(label)
   return {
     label,
     description: '',
@@ -53,7 +53,11 @@ export function getDamageTypeEntry(id: string): GameTermEntry {
   }
 }
 
+function damageTypePhrase(label: string): string {
+  return `${label.toLowerCase()} damage`
+}
+
 /** Counted/mass noun phrase for generated damage-type prose. */
-export function getDamageTypeSentenceForm(id: string, count = 1): string {
-  return getTermSentenceForm(getDamageTypeEntry(id), count)
+export function getDamageTypeSentenceForm(id: string, count = 1, label?: string): string {
+  return label ? damageTypePhrase(label) : getTermSentenceForm(getDamageTypeEntry(id), count)
 }

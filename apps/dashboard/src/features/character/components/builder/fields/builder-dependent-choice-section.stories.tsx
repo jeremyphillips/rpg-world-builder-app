@@ -8,7 +8,7 @@ import {
   resolveDependentChoiceSectionCopy,
 } from '../../../lib/builder/builder-dependent-choice.lib'
 import { DEPENDENT_KIND_HERITAGE } from '../../../lib/builder/builder-parent-choice-status.lib'
-import { getDrowHeritageSpellCatalog } from '@/features/content'
+import { buildCatalogDrowGrantDisplayVocabulary } from '@/features/content'
 import { pickSpecies } from '@/features/content'
 import { BuilderDependentChoiceSection } from './builder-dependent-choice-section'
 
@@ -17,7 +17,7 @@ const languages = listLanguageSeedOptions(DEFAULT_SYSTEM_RULESET_ID)
 const heritageOptions = mapHeritageOptionsToDependentCardOptions(
   elf,
   languages,
-  getDrowHeritageSpellCatalog(),
+  buildCatalogDrowGrantDisplayVocabulary().spellCatalog,
 )
 
 const meta = {

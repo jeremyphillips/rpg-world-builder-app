@@ -11,6 +11,7 @@ import {
 } from '@rpg/contracts'
 import {
   combineFieldVisibilityAll,
+  resolveFieldConfigBoundNames,
   type FieldVisibility,
   type FormItem,
   type JoinedPairFieldConfig,
@@ -283,6 +284,7 @@ function monsterAttackDistanceFields(
           {
             kind: 'slot',
             name: 'attackRangeCluster',
+            boundNames: rangeClusterFields.flatMap(resolveFieldConfigBoundNames),
             width: '2/3',
             render: () => (
               <MonsterAttackRangeClusterSlot
@@ -320,6 +322,7 @@ export function monsterActionUsageEditor(
       {
         kind: 'slot',
         name: 'limitedUse',
+        boundNames: ['limitedUse'],
         render: () => (
           <MonsterActionRechargeField
             name={`${namePrefix}.limitedUse`}
@@ -343,6 +346,7 @@ function monsterActionSpellMechanics(input: {
     {
       kind: 'slot',
       name: 'castingAbility',
+      boundNames: ['castingAbility'],
       render: () => (
         <MonsterActionCastingAbilityField
           name={`${input.namePrefix}.castingAbility`}
@@ -383,6 +387,7 @@ function monsterActionSpellMechanics(input: {
             {
               kind: 'slot',
               name: 'frequency',
+              boundNames: ['limitedUse'],
               width: '1/2',
               render: () => <MonsterSpellFrequencySlot />,
             },

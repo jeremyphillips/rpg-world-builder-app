@@ -5,12 +5,8 @@ import {
   TRAIT_DERIVED_DISPLAY_DESCRIPTION,
   TRAIT_OVERRIDE_DISPLAY_LABEL,
 } from './species-trait-form-labels'
-import {
-  heritageOptionItemFields,
-  traitItemFields,
-  traitRowDraftFormSchema,
-  traitRowFormSchema,
-} from './species-trait-form-fields'
+import { traitRowDraftFormSchema, traitRowFormSchema } from './species-trait-form-schema'
+import { heritageOptionItemFields, traitItemFields } from './species-trait-form-fields'
 
 function userFacingKindSelects(fields: ReturnType<typeof flattenFields>) {
   return fields.filter(

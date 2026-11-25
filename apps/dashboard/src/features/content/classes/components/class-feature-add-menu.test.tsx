@@ -1,3 +1,4 @@
+import { ButtonDropdown } from '@rpg/ui'
 import { classValidationMessages, formatFieldMessage } from '@rpg/contracts'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -6,7 +7,7 @@ import { describe, it, vi } from 'vitest'
 import { expectPlainDisplayCopy } from '@/test/expect-plain-display-copy'
 
 import type { FeatureRowForm } from '../lib/class-feature-form-fields'
-import { ClassFeatureAddMenu } from './class-feature-add-menu'
+import { buildClassFeatureAcquisition } from '../lib/class-feature-acquisition'
 
 const subclassChoiceRow: FeatureRowForm = {
   kind: 'subclass-choice',
@@ -28,11 +29,14 @@ describe('ClassFeatureAddMenu', () => {
     const transport = classValidationMessages.subclassChoiceFeatureDuplicate()
 
     render(
-      <ClassFeatureAddMenu
-        className="Fighter"
-        classSlug="fighter"
-        features={[subclassChoiceRow]}
-        onAddRows={vi.fn()}
+      <ButtonDropdown
+        {...buildClassFeatureAcquisition({
+          className: 'Fighter',
+          classSlug: 'fighter',
+          features: [subclassChoiceRow],
+          onAddRows: vi.fn(),
+        })}
+        triggerPresentation="addIcon"
       />,
     )
 

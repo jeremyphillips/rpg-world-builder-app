@@ -5,6 +5,7 @@ import type { SkillProficiency } from '@rpg/contracts'
 import { ROUTES } from '@/app/routes'
 import { LinkBadge, StaticBadge } from '@/lib/link-badge'
 
+import { formatContentReferenceUnavailable } from '../../../lib/content-type-labels'
 import { ContentStatList } from '../../../lib/detail/metadata/content-stat-row'
 import type { ContentStatRowData } from '../../../lib/detail/metadata/content-stat-rows'
 import { ContentDetailQueryStatus } from '../../../lib/detail/page/content-detail-query-status'
@@ -75,7 +76,7 @@ function SkillChoiceLinks({
             ) : skill ? (
               <StaticBadge>{skill.name}</StaticBadge>
             ) : (
-              <StaticBadge>{slug}</StaticBadge>
+              <StaticBadge>{formatContentReferenceUnavailable('skill-proficiencies')}</StaticBadge>
             )}
           </li>
         )
@@ -93,7 +94,7 @@ function ToolChoiceLabels({
 }) {
   return (
     <Text variant="supporting" as="span">
-      {optionSlugs.map((slug) => vocabulary.resolveToolLabel(slug)).join(', ')}
+      {optionSlugs.map((slug) => vocabulary.resolveEquipmentLabel(slug)).join(', ')}
     </Text>
   )
 }

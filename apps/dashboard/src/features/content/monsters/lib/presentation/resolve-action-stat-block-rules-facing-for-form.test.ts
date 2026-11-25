@@ -8,6 +8,7 @@ import { describe, expect, it } from 'vitest'
 
 import { pickEquipment, pickMonster, pickSpell } from '@/test/fixtures/pick'
 
+import { resolveFacingWithFacts } from '../../../facing/resolve-facing'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { buildMonsterDetailViewModel } from '../monster-display'
 import type { MonsterFormValues } from '../monster-form-values'
@@ -319,6 +320,14 @@ describe('resolveActionStatBlockRulesFacingForForm', () => {
         attackProfile: expect.any(Object),
         attackLine: expect.any(Object),
       })
+      expect(
+        resolveFacingWithFacts({
+          domain: 'monsterAction',
+          source: 'draft',
+          ...request,
+          ctx: baseCtx(),
+        }),
+      ).toMatchObject({ resolution: { status: 'ready' }, attackProfile: expect.any(Object) })
       for (const equipmentCatalogStatus of ['pending', 'error'] as const) {
         const ctx = baseCtx({ equipmentCatalogStatus, spellCatalogStatus: 'error' })
         expect(resolveActionStatBlockRulesFacingForForm({ ...request, ctx })).toEqual(ready)

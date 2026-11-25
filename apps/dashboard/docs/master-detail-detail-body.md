@@ -10,12 +10,20 @@ availability for editors with and without availability controls.
 | Region                               | Owner                                            | Notes                                                             |
 | ------------------------------------ | ------------------------------------------------ | ----------------------------------------------------------------- |
 | Identity (title, metadata, overflow) | `MasterDetailEditorShell`                        | Unchanged                                                         |
-| Contextual chrome                    | `contextualChrome`                               | Notices, advisories, focus anchors — **outside** the rhythm stack |
+| Contextual chrome                    | `contextNotice`                                  | Notices, advisories, focus anchors — **outside** the rhythm stack |
 | Detail body                          | `MasterDetailDetailBody`                         | One outer `FormRhythmStack`                                       |
 | Leading fields                       | Domain `resolveFieldSections` / `fieldSections`  | Optional; rendered before facing                                  |
 | Facing                               | `facing` + `StructuredFacingHostPanel`           | Shell-mounted only                                                |
 | Primary fields                       | `FormItems` inside `MasterDetailDetailFormScope` | Kind field lists                                                  |
 | Primary host                         | `spellPicker`                                    | Spell picker and similar — wraps shell `FormItems` only           |
+
+The structured editor panel and the independently persisted resource adapter own
+raw shell imports. The subclass tab owns the independent resource adapter. The
+dashboard import guard enforces these entry points. Heritage group fields render
+in the species tab above the options editor. The shared editors own only their
+list, detail, and dialog regions. The list panel owns its headings, empty copy,
+count supplement and acquisition trigger. Callers pass text labels, availability
+facts and acquisition menu items.
 
 ## Component map
 
@@ -23,7 +31,7 @@ availability for editors with and without availability controls.
 MasterDetailEditorPanel
 └── MasterDetailSelectedRowEditor
     ├── AvailabilityAlert (when inactive)
-    ├── contextualChrome
+    ├── contextNotice
     └── MasterDetailDetailBody
         └── FormRhythmStack
             ├── leading FormItems
@@ -55,3 +63,14 @@ The detail body rejects duplicate effective RHF paths across its leading and pri
 Invalid facing rows and preview guidance copy: [facing-guidance-audit.md](./facing-guidance-audit.md).
 
 See [feature-authoring-architecture.md](../../../docs/feature-authoring-architecture.md).
+
+## Browser regression
+
+The embedded editor [field-error story](../src/features/content/components/master-detail/__stories__/form-embedded-master-detail-editor.stories.tsx)
+exercises a routed validation issue and verifies focus, `aria-invalid`, and the
+field’s accessible description. In Chromium, the populated fixture placed the
+list beside the editor at 1200 pixels and before it at 390 pixels. Enter selected
+a row and Escape restored focus to the overflow trigger. The empty editor and
+failed monster action preview each exposed one status region. The populated,
+field-error, empty, and failed-preview states passed the focused axe scan for
+WCAG 2.2 AA and earlier applicable WCAG A and AA tags.

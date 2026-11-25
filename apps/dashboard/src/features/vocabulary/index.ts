@@ -23,6 +23,7 @@ export { useVocabularySetMaps } from './hooks/use-vocabulary-set-maps'
 
 export {
   buildLabelDescriptionActiveVocabulary,
+  findVocabularyLabel,
   buildVocabularyFromSeedSet,
   type LabelDescriptionActiveVocabulary,
 } from './lib/build-vocabulary-maps'

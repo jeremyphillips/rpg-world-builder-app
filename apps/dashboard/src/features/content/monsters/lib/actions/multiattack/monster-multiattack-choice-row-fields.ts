@@ -1,4 +1,4 @@
-import type { Spell } from '@rpg/contracts'
+import { createSpellCatalogContext, type SpellCatalogContext } from '@rpg/contracts'
 import type { DependentChrome, FieldConfig, FieldVisibility, FormItem } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
@@ -46,11 +46,12 @@ export function multiattackSpellActionOnlyVisibility(input: {
 function spellPickerField(input: {
   sectionRowsDependsOn: string
   fallbackActionRows?: readonly MonsterActionDraftRow[]
-  spellCatalogById?: ReadonlyMap<string, Spell>
+  spellCatalog?: SpellCatalogContext
   /** Parent `kind: 'dependent'` owns spell-on-action visibility when true. */
   dependentsGated?: boolean
   visibility?: FieldVisibility
 }): FormItem {
+  const spellCatalog = input.spellCatalog ?? createSpellCatalogContext({ status: 'pending' })
   const spellContext = {
     sectionRowsDependsOn: input.sectionRowsDependsOn,
     fallbackActionRows: input.fallbackActionRows,
@@ -83,7 +84,7 @@ function spellPickerField(input: {
         return multiattackSpellOptionsForAction(
           typeof watched.actionId === 'string' ? watched.actionId : '',
           rows,
-          input.spellCatalogById,
+          spellCatalog,
         )
       },
     },
@@ -137,7 +138,7 @@ function multiattackRowsFromSpellWatch(
 type MultiattackActionSpellSpellContext = {
   sectionRowsDependsOn: string
   fallbackActionRows?: readonly MonsterActionDraftRow[]
-  spellCatalogById?: ReadonlyMap<string, Spell>
+  spellCatalog?: SpellCatalogContext
 }
 
 /** Action controller + spell dependents with shared spell-on-action visibility. */
@@ -162,7 +163,7 @@ export function monsterMultiattackActionSpellDependent(
       fields: [
         spellPickerField({
           ...spellContext,
-          spellCatalogById: input.spellCatalogById,
+          spellCatalog: input.spellCatalog,
           dependentsGated: true,
         }),
       ],
@@ -240,7 +241,6 @@ export function monsterMultiattackChoiceRowFields(input: {
   section: MonsterActionSection
   sectionRowsDependsOn: string
   actionRows: readonly MonsterActionDraftRow[]
-  spellCatalogById?: ReadonlyMap<string, Spell>
   actionPicker:
     | {
         mode: 'use'
@@ -258,7 +258,10 @@ export function monsterMultiattackChoiceRowFields(input: {
       actionField: buildMultiattackChoiceActionField(input),
       sectionRowsDependsOn: input.sectionRowsDependsOn,
       fallbackActionRows: input.actionRows,
-      spellCatalogById: input.spellCatalogById,
+      spellCatalog: createSpellCatalogContext({
+        status: input.actionPicker.ctx.spellCatalogStatus ?? 'pending',
+        spellsById: input.actionPicker.ctx.spellCatalogById,
+      }),
       chrome: 'none',
     }),
   ]
@@ -270,7 +273,6 @@ export function monsterMultiattackUseStepActionSpellDependent(input: {
   ctx: ContentFormCtx
   sectionRowsDependsOn: string
   actionRows: readonly MonsterActionDraftRow[]
-  spellCatalogById?: ReadonlyMap<string, Spell>
 }): FormItem {
   return monsterMultiattackActionSpellDependent({
     actionField: {
@@ -294,7 +296,10 @@ export function monsterMultiattackUseStepActionSpellDependent(input: {
     },
     sectionRowsDependsOn: input.sectionRowsDependsOn,
     fallbackActionRows: input.actionRows,
-    spellCatalogById: input.spellCatalogById,
+    spellCatalog: createSpellCatalogContext({
+      status: input.ctx.spellCatalogStatus ?? 'pending',
+      spellsById: input.ctx.spellCatalogById,
+    }),
     chrome: 'rail',
   })
 }

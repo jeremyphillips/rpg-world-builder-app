@@ -49,7 +49,20 @@ function EditorStory({
       ariaLabel="Subclasses"
       addLabel="Add subclass"
       itemNoun={CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN}
-      countSupplement={items.length > 5 ? <span>{items.length} available</span> : undefined}
+      countSupplement={
+        items.length > 5
+          ? {
+              scope: {
+                availableCount: items.length,
+                unavailableCount: 0,
+                visibleCount: items.length,
+              },
+              showUnavailable: false,
+              onShow: () => {},
+              onHide: () => {},
+            }
+          : undefined
+      }
       selectedIdentity={
         selectedItem
           ? {

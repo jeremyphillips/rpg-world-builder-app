@@ -17,6 +17,16 @@ describe('facing presentation import guard', () => {
     ["import { FacingHostPanel } from '@rpg/ui'", true],
     ["import * as UI from '@rpg/ui'; export const Panel = UI.FacingHostPanel", true],
     ["export { FacingHostPanel } from '@rpg/ui'", true],
+    ["export * from '@rpg/ui'", true],
+    ["import { FacingHostPanel } from '@rpg/ui/components/ui/facing-host-panel'", true],
+    [
+      "import { FacingHostPanel } from '../../../../../../../../../packages/ui/src/components/ui/facing-host-panel'",
+      true,
+    ],
+    [
+      "export { FacingHostPanel as Panel } from '../../../../../../../../../packages/ui/src/index.ts'",
+      true,
+    ],
     ["import { Button } from '@rpg/ui'", false],
   ])('checks a feature consumer after flat config merging: %s', async (source, restricted) => {
     const [result] = await eslint.lintText(source, {
@@ -43,6 +53,45 @@ describe('facing presentation import guard', () => {
     expect(result?.messages.some((message) => message.ruleId === 'no-restricted-syntax')).toBe(
       restricted,
     )
+  })
+
+  it.each([
+    ['src/features/content/monsters/components/form/actions/action-detail.tsx', true],
+    ['src/features/content/components/master-detail/master-detail-editor-panel.tsx', false],
+    [
+      'src/features/content/components/master-detail/nested-resource-master-detail-editor.tsx',
+      false,
+    ],
+  ])('restricts raw master–detail shell access from %s', async (filePath, restricted) => {
+    const [result] = await eslint.lintText(
+      "import { MasterDetailEditorShell } from '@/features/content/components/master-detail/master-detail-editor-shell'",
+      { filePath: path.join(dashboardRoot, filePath) },
+    )
+    expect(result?.messages.some((message) => message.ruleId === ruleId)).toBe(restricted)
+  })
+
+  it('allows an embedded editor to reference the shell identity type', async () => {
+    const [result] = await eslint.lintText(
+      "import type { MasterDetailEditorIdentity } from './master-detail-editor-shell'",
+      {
+        filePath: path.join(
+          dashboardRoot,
+          'src/features/content/components/master-detail/form-embedded-master-detail-editor.tsx',
+        ),
+      },
+    )
+    expect(result?.messages.some((message) => message.ruleId === ruleId)).toBe(false)
+  })
+
+  it.each([
+    ['src/features/content/monsters/components/form/actions/action-detail.tsx', true],
+    ['src/features/content/classes/components/class-subclasses-tab.tsx', false],
+  ])('scopes the independent resource adapter from %s', async (filePath, restricted) => {
+    const [result] = await eslint.lintText(
+      "import { NestedResourceMasterDetailEditor } from '@/features/content/components/master-detail/nested-resource-master-detail-editor'",
+      { filePath: path.join(dashboardRoot, filePath) },
+    )
+    expect(result?.messages.some((message) => message.ruleId === ruleId)).toBe(restricted)
   })
 
   it('allows the structured facing owner to import the panel', async () => {

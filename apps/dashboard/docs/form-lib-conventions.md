@@ -490,13 +490,23 @@ These modules support many content types but are **not** per-type form splits:
 | Preview rail glue         | `content/lib/forms/preview/` — `ContentFormDef.preview` contract, publish-readiness hook, rail/sheet/player hosts. Per-type projections live next to `*-form-def.ts` (Class: `classes/lib/class-preview-projection.ts`). Types without `preview` keep `PageShell width="narrow"`.                                 |
 | Cross-consumer projection | `content/lib/forms/organization-form-projection.ts` (root seam — sole shared projection today)                                                                                                                                                                                                                    |
 
+Grant row details and summaries resolve saved equipment and skill proficiency slugs from the effective campaign catalogs. Reference picker options govern new selections. Language, sense, damage-type, and resistance grant rows use the effective vocabulary for both detail and prose. Missing vocabulary references show unavailable copy in the row detail. Saved species heritage language grants use the same scoped labels as the species language affinities. Published species detail, authoring preview, and the character builder resolve saved heritage damage-type and resistance labels from the effective damage vocabulary. Standalone builds use the seed vocabulary. Saved heritage equipment and proficiency summaries read the equipment and skill catalogs for their surface. Equipment summaries use catalog outcomes for loading, unavailable, and missing references. They check the viewer’s expected ruleset and campaign scope before using catalog names. Species stat rows and saved heritage sense grants share the scoped sense formatter. Saved skill, weapon, tool, and armor proficiency summaries retain resolved names and report unavailable references separately. Repeated unavailable outcomes display once per summary.
+
 ### Grant participation
 
 The persisted grant union drives the authoring projection and compact summary
 maps. Each kind has an adapter or an explicit exclusion. The editor excludes
 campaign language choices. Compact summaries count hidden choices as benefits
 and omit their labels. Published grant-trait prose and character builder choice
-sets classify grant kinds at their own boundaries.
+sets classify grant kinds at their own boundaries. Feat-choice rows share one
+draft category and count parser across write conversion, row details, and prose.
+
+### Catalog reference labels
+
+Class skill facts and species class policies resolve persisted slugs against the
+scoped catalog. The species display can label an existing draft from the
+visible catalog even when the picker excludes it. Missing references use
+explicit unavailable copy.
 
 ### `ContentFormDef.preview`
 

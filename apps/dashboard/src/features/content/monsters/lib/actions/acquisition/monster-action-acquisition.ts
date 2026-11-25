@@ -182,7 +182,9 @@ function parsePrefixedAcquisitionId(id: string): MonsterActionAcquisitionChoice 
 export function parseMonsterActionAcquisitionId(
   id: string,
 ): MonsterActionAcquisitionChoice | undefined {
-  return EXACT_ACQUISITION_CHOICES[id] ?? parsePrefixedAcquisitionId(id)
+  return Object.hasOwn(EXACT_ACQUISITION_CHOICES, id)
+    ? EXACT_ACQUISITION_CHOICES[id]
+    : parsePrefixedAcquisitionId(id)
 }
 
 function availabilityFactsFromOption(
@@ -570,17 +572,14 @@ function createSaveActionDraft(id: string): MonsterActionDraftRow {
 }
 
 function createActionKindDraft(
-  choice: Extract<
-    MonsterActionAcquisitionChoice,
-    { type: 'create'; kind: 'attack' | 'special' | 'save' | 'shape-shift' | 'spell' }
+  kind: Exclude<
+    Extract<MonsterActionAcquisitionChoice, { type: 'create' }>['kind'],
+    'spell' | 'leap' | 'teleport' | 'take-actions'
   >,
   id: string,
 ): MonsterActionDraftRow {
-  if (choice.kind === 'spell') {
-    return createSpellActionDraft('actions', {}, choice.spellAcquisition ?? 'standalone')
-  }
-  if (choice.kind === 'special') return { id, kind: 'special' } as MonsterActionDraftRow
-  if (choice.kind === 'shape-shift') {
+  if (kind === 'special') return { id, kind: 'special' } as MonsterActionDraftRow
+  if (kind === 'shape-shift') {
     return {
       id,
       kind: 'shape-shift',
@@ -588,8 +587,12 @@ function createActionKindDraft(
       equipment: 'unchanged',
     } as MonsterActionDraftRow
   }
-  if (choice.kind === 'save') return createSaveActionDraft(id)
-  return { id, kind: 'attack', damage: authoredStartingDamage() } as MonsterActionDraftRow
+  if (kind === 'save') return createSaveActionDraft(id)
+  if (kind === 'attack') {
+    return { id, kind: 'attack', damage: authoredStartingDamage() } as MonsterActionDraftRow
+  }
+  const unsupported: never = kind
+  throw new Error(`Unsupported monster action create choice: ${JSON.stringify(unsupported)}`)
 }
 
 export function createMonsterActionFromAcquisition(
@@ -618,13 +621,7 @@ export function createMonsterActionFromAcquisition(
     if (choice.kind === 'spell') {
       return createSpellActionDraft('actions', {}, choice.spellAcquisition)
     }
-    return createActionKindDraft(
-      choice as Extract<
-        MonsterActionAcquisitionChoice,
-        { type: 'create'; kind: 'attack' | 'special' | 'save' | 'shape-shift' }
-      >,
-      id,
-    )
+    return createActionKindDraft(choice.kind, id)
   }
   const unreachable: never = choice
   throw new Error(`Unsupported monster action acquisition choice: ${JSON.stringify(unreachable)}`)

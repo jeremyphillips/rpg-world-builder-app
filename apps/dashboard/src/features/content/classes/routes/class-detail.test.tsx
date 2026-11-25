@@ -21,6 +21,14 @@ vi.mock('../../lib/usage/content-usage-references-section', () => ({
 vi.mock('../../lib/detail/page/content-detail-section-nav', () => ({
   ContentDetailSectionNav: () => null,
 }))
+vi.mock('../../equipment/hooks/use-equipment', async (importOriginal) => ({
+  ...(await importOriginal()),
+  useEquipment: () => ({ data: [], isError: false }),
+}))
+vi.mock('../../spells/hooks/use-spells', async (importOriginal) => ({
+  ...(await importOriginal()),
+  useSpells: () => ({ data: [], isPending: false, isError: false }),
+}))
 vi.mock('@/features/homebrew', () => ({
   useRulesetPatch: vi.fn(() => ({
     data: undefined,
@@ -114,6 +122,25 @@ describe('ClassDetailContent proficiencies', () => {
         ROUTES.content.skillProficiencies.detail(STORY_CAMPAIGN_ID, skill.id),
       )
     }
+  })
+
+  it('uses unavailable copy for stored skill options missing from the catalog', () => {
+    render(
+      <MemoryRouter>
+        <ClassDetailContent
+          characterClass={FIGHTER}
+          campaignId={STORY_CAMPAIGN_ID}
+          classId={FIGHTER.id}
+          subclasses={[]}
+          skillProficiencies={[]}
+          skillsPending={false}
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getAllByText('Skill proficiency reference unavailable')).toHaveLength(
+      skillSlugsFromClassChoices(FIGHTER).length,
+    )
   })
 
   it('shows empty Tools and Languages choice rows as None', () => {

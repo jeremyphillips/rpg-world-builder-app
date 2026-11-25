@@ -4,6 +4,7 @@ export { useClasses, classesQueryKey } from './hooks/use-classes'
 export {
   buildClassCardViewModel,
   buildClassDetailViewModel,
+  buildClassEquipmentVocabulary,
   CLASS_DISPLAY_NONE,
   CLASS_PROFICIENCY_GROUP_LABELS,
   CLASS_PROFICIENCY_ROW_LABELS,

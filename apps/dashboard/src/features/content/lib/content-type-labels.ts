@@ -34,6 +34,11 @@ export function getContentTypeSentenceLabel(
   return capitalizeFirst(phrase)
 }
 
+/** Display label for a persisted catalog reference missing from the scoped list. */
+export function formatContentReferenceUnavailable(key: ContentTypeKey): string {
+  return `${getContentTypeSentenceLabel(key)} reference unavailable`
+}
+
 /** Compact label when the content-type term defines one; otherwise undefined. */
 export function getContentTypeCompactLabel(key: ContentTypeKey): string | undefined {
   return getContentTypeTerm(key).compactLabel

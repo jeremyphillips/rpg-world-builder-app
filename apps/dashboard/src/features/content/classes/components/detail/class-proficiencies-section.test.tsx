@@ -9,7 +9,7 @@ import { buildClassDetailViewModel } from '../../lib/class-display'
 import { ClassProficienciesSection } from './class-proficiencies-section'
 
 const vocabulary = {
-  resolveToolLabel: (slug: string) => slug,
+  resolveEquipmentLabel: (slug: string) => slug,
 }
 
 describe('ClassProficienciesSection', () => {
@@ -95,7 +95,7 @@ describe('ClassProficienciesSection', () => {
     }
   })
 
-  it('keeps links and a static badge from a retained skill snapshot', () => {
+  it('keeps resolved links and labels a missing retained skill reference', () => {
     const viewModel = buildClassDetailViewModel(ROGUE, vocabulary, { surface: 'content-detail' })
     const section = viewModel.sections.find((entry) => entry.id === 'proficiencies')
     if (!section || section.id !== 'proficiencies') {
@@ -122,7 +122,8 @@ describe('ClassProficienciesSection', () => {
 
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
     expect(screen.queryByRole('status')).not.toBeInTheDocument()
-    expect(screen.getByText(missingSlug)).toBeInTheDocument()
+    expect(screen.getByText('Skill proficiency reference unavailable')).toBeInTheDocument()
+    expect(screen.queryByText(missingSlug)).not.toBeInTheDocument()
     expect(screen.getByRole('link', { name: retained[0]!.name })).toBeInTheDocument()
   })
 })

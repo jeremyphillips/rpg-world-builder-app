@@ -63,6 +63,8 @@
  */
 import {
   formatCreatureSenseCompactLine,
+  SENSE_TERM,
+  type Sense,
   formatCreatureRollAdjustmentSentence,
   formatCreatureSaveOutcomeOverrideNotation,
   formatDamageTypeGrantCompact,
@@ -77,32 +79,34 @@ import {
   getGrantGroupEffectiveUnlock,
   resolveGrantGroupsFromContent,
   resolveMechanicalGrantsFromContent,
-  createSpellCatalogContext,
   presentSpellReferenceDisplayName,
+  presentEquipmentReferenceDisplayName,
+  resolveEquipmentSlugReference,
   resolveSpellReferenceOutcome,
   type SpellCatalogContext,
   type ContentGrant,
-  type EquipmentKind,
+  type EquipmentCatalogContext,
+  type EquipmentCatalogScope,
   type GrantGroup,
-  type Spell,
 } from '@rpg/contracts'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
+import { formatContentReferenceUnavailable } from '../../content-type-labels'
+
 export type GrantDisplayVocabulary = {
-  resolveSenseLabel: (type: string) => string
-  resolveSpell: (spellId: string) => { name: string; level?: number } | undefined
+  resolveSenseLabel: (type: string) => string | undefined
+  resolveDamageTypeLabel?: (id: string) => string | undefined
+  resolveLanguageLabel?: (id: string) => string | undefined
+  spellCatalog: SpellCatalogContext
+  equipmentReferences?: { catalog: EquipmentCatalogContext; scope: EquipmentCatalogScope }
   resolveSkillName?: (id: string) => string | undefined
-  resolveToolName?: (slug: string) => string | undefined
-  resolveWeaponName?: (slug: string) => string | undefined
-  resolveArmorName?: (slug: string) => string | undefined
-  resolveEquipmentName?: (slug: string) => string | undefined
-  resolveEquipmentKind?: (slug: string) => EquipmentKind | undefined
 }
 
 export type GrantSummaryKind =
   | 'sense'
   | 'spell'
   | 'cantrip'
+  | 'unresolvedSpell'
   | 'proficiency'
   | 'damageType'
   | 'resistance'
@@ -165,10 +169,6 @@ function isHiddenKnownValidGrant(item: GrantSummaryItem): boolean {
   return item.kind === 'notRenderedYet'
 }
 
-function formatSenseCompactLabel(grant: Extract<ContentGrant, { kind: 'sense' }>): string {
-  return formatCreatureSenseCompactLine(grant)
-}
-
 function formatSpellTypeSuffix(kind: 'cantrip' | 'spell'): string {
   return kind === 'cantrip' ? 'cantrip' : 'spell'
 }
@@ -180,19 +180,17 @@ function mapSpellGrantToItems(
   level: number,
 ): GrantSummaryItem[] {
   return grant.spellIds.map((spellId, spellIndex) => {
-    const resolved = vocabulary.resolveSpell(spellId)
-    const name =
-      resolved?.name ??
-      presentSpellReferenceDisplayName({
-        status: 'unresolved',
-        spellId,
-        reason: 'unknown-spell',
-      })
-    const spellKind: GrantSummaryKind = resolved?.level === 0 ? 'cantrip' : 'spell'
+    const outcome = resolveSpellReferenceOutcome(spellId, vocabulary.spellCatalog)
+    const spellKind: GrantSummaryKind =
+      outcome.status === 'unresolved'
+        ? 'unresolvedSpell'
+        : outcome.spell.level === 0
+          ? 'cantrip'
+          : 'spell'
 
     return {
       id: `${idPrefix}:spells:${spellIndex}`,
-      label: name,
+      label: presentSpellReferenceDisplayName(outcome),
       kind: spellKind,
       supported: true,
       sourceGrantKind: grant.kind,
@@ -299,15 +297,88 @@ type GrantItemMapper<K extends ContentGrant['kind']> = (
   level: number,
 ) => GrantSummaryItem[]
 
+function resolveSavedEquipment(
+  slug: string,
+  references: GrantDisplayVocabulary['equipmentReferences'],
+) {
+  if (!references) {
+    return { status: 'unresolved', reference: slug, reason: 'catalog-unavailable' } as const
+  }
+  return resolveEquipmentSlugReference(slug, references.catalog, references.scope)
+}
+
+export function formatScopedSenseSummary(
+  sense: Sense,
+  resolveLabel: GrantDisplayVocabulary['resolveSenseLabel'],
+): string {
+  const label = resolveLabel(sense.type)
+  return label
+    ? formatCreatureSenseCompactLine(sense, label)
+    : `${SENSE_TERM.label} reference unavailable`
+}
+
+function formatScopedProficiencyReferences(
+  ids: readonly string[],
+  resolve: (id: string) => { label: string } | { unavailable: string },
+  formatResolved: (ids: string[], label: (id: string) => string | undefined) => string | undefined,
+): string | undefined {
+  const names = new Map<string, string>()
+  const unavailable = new Set<string>()
+  for (const id of ids) {
+    const result = resolve(id)
+    if ('label' in result) names.set(id, result.label)
+    else unavailable.add(result.unavailable)
+  }
+  const resolved = formatResolved(
+    ids.filter((id) => names.has(id)),
+    (id) => names.get(id),
+  )
+  return [resolved, ...unavailable].filter(Boolean).join(', ') || undefined
+}
+
+function formatScopedSkillSummary(
+  grant: Extract<ContentGrant, { kind: 'skillProficiency' }>['grant'],
+  resolveLabel: GrantDisplayVocabulary['resolveSkillName'],
+): string | undefined {
+  if (grant.kind !== 'fixed') return undefined
+  return formatScopedProficiencyReferences(
+    grant.skillIds,
+    (id) => {
+      const label = resolveLabel?.(id)
+      return label
+        ? { label }
+        : { unavailable: formatContentReferenceUnavailable('skill-proficiencies') }
+    },
+    (skillIds, label) => formatSkillProficiencyGrantCompact({ ...grant, skillIds }, label),
+  )
+}
+
+function formatScopedEquipmentProficiency(
+  slugs: readonly string[] | undefined,
+  references: GrantDisplayVocabulary['equipmentReferences'],
+  formatResolved: Parameters<typeof formatScopedProficiencyReferences>[2],
+): string | undefined {
+  return formatScopedProficiencyReferences(
+    slugs ?? [],
+    (slug) => {
+      const outcome = resolveSavedEquipment(slug, references)
+      return outcome.status === 'resolved'
+        ? { label: outcome.equipment.name }
+        : { unavailable: presentEquipmentReferenceDisplayName(outcome) }
+    },
+    formatResolved,
+  )
+}
+
 // Null entries participate in compact benefit counts without a visible label.
 const GRANT_ITEM_MAPPERS = {
   languageChoice: null,
   featChoice: null,
-  sense: (grant, _vocabulary, idPrefix, level) =>
+  sense: (grant, vocabulary, idPrefix, level) =>
     createSupportedGrantItems(
       idPrefix,
       'sense',
-      formatSenseCompactLabel(grant),
+      formatScopedSenseSummary(grant, vocabulary.resolveSenseLabel),
       'sense',
       grant.kind,
       level,
@@ -323,70 +394,95 @@ const GRANT_ITEM_MAPPERS = {
       grant.kind,
       level,
     ),
-  damageType: (grant, _vocabulary, idPrefix, level) =>
+  damageType: (grant, vocabulary, idPrefix, level) =>
     createSupportedGrantItems(
       idPrefix,
       'damageType',
-      formatDamageTypeGrantCompact(grant.damageTypes),
+      formatDamageTypeGrantCompact(grant.damageTypes, vocabulary.resolveDamageTypeLabel),
       'damageType',
       grant.kind,
       level,
     ),
-  resistances: (grant, _vocabulary, idPrefix, level) =>
+  resistances: (grant, vocabulary, idPrefix, level) =>
     createSupportedGrantItems(
       idPrefix,
       'resistances',
-      formatResistanceGrantCompact(grant.damageTypes),
+      formatResistanceGrantCompact(grant.damageTypes, vocabulary.resolveDamageTypeLabel),
       'resistance',
       grant.kind,
       level,
     ),
-  languages: (grant, _vocabulary, idPrefix, level) =>
+  languages: (grant, vocabulary, idPrefix, level) =>
     createSupportedGrantItems(
       idPrefix,
       'languages',
-      formatLanguageGrantCompact(grant.languageIds),
+      formatLanguageGrantCompact(grant.languageIds, vocabulary.resolveLanguageLabel),
       'language',
       grant.kind,
       level,
     ),
   skillProficiency: (grant, vocabulary, idPrefix, level) =>
     mapCompactProficiencyGrantToItems(
-      formatSkillProficiencyGrantCompact(grant.grant, vocabulary.resolveSkillName),
+      formatScopedSkillSummary(grant.grant, vocabulary.resolveSkillName),
       `${idPrefix}:skillProficiency`,
       grant.kind,
       'proficiency',
       level,
     ),
-  toolProficiency: (grant, vocabulary, idPrefix, level) =>
+  toolProficiency: ({ grant, kind }, vocabulary, idPrefix, level) =>
     mapCompactProficiencyGrantToItems(
-      formatToolProficiencyGrantCompact(grant.grant, vocabulary.resolveToolName),
+      grant.kind === 'fixed'
+        ? formatScopedEquipmentProficiency(
+            grant.toolSlugs,
+            vocabulary.equipmentReferences,
+            (toolSlugs, label) => formatToolProficiencyGrantCompact({ ...grant, toolSlugs }, label),
+          )
+        : undefined,
       `${idPrefix}:toolProficiency`,
-      grant.kind,
+      kind,
       'proficiency',
       level,
     ),
-  weaponProficiency: (grant, vocabulary, idPrefix, level) =>
+  weaponProficiency: ({ grant, kind }, vocabulary, idPrefix, level) =>
     mapCompactProficiencyGrantToItems(
-      formatWeaponProficiencyGrantCompact(grant.grant, vocabulary.resolveWeaponName),
+      grant.kind === 'fixed'
+        ? formatScopedEquipmentProficiency(
+            grant.weaponSlugs,
+            vocabulary.equipmentReferences,
+            (weaponSlugs, label) =>
+              formatWeaponProficiencyGrantCompact({ ...grant, weaponSlugs }, label),
+          )
+        : undefined,
       `${idPrefix}:weaponProficiency`,
-      grant.kind,
+      kind,
       'proficiency',
       level,
     ),
-  armorTraining: (grant, vocabulary, idPrefix, level) =>
+  armorTraining: ({ grant, kind }, vocabulary, idPrefix, level) =>
     mapCompactProficiencyGrantToItems(
-      formatArmorTrainingGrantCompact(grant.grant, vocabulary.resolveArmorName),
+      grant.kind === 'fixed'
+        ? formatScopedEquipmentProficiency(
+            grant.armorSlugs,
+            vocabulary.equipmentReferences,
+            (armorSlugs, label) => formatArmorTrainingGrantCompact({ ...grant, armorSlugs }, label),
+          )
+        : undefined,
       `${idPrefix}:armorTraining`,
-      grant.kind,
+      kind,
       'training',
       level,
     ),
   equipment: (grant, vocabulary, idPrefix, level) =>
     mapCompactProficiencyGrantToItems(
       formatEquipmentGrantCompact(grant.grant, {
-        resolveEquipmentName: vocabulary.resolveEquipmentName,
-        resolveEquipmentKind: vocabulary.resolveEquipmentKind,
+        resolveEquipmentName: (slug) =>
+          presentEquipmentReferenceDisplayName(
+            resolveSavedEquipment(slug, vocabulary.equipmentReferences),
+          ),
+        resolveEquipmentKind: (slug) => {
+          const outcome = resolveSavedEquipment(slug, vocabulary.equipmentReferences)
+          return outcome.status === 'resolved' ? outcome.equipment.kind : undefined
+        },
       }),
       `${idPrefix}:equipment`,
       grant.kind,
@@ -509,30 +605,6 @@ function applyMaxItems(
   return {
     parts: parts.slice(0, maxItems),
     overflowCount: parts.length - maxItems,
-  }
-}
-
-/** Resolves canonical spell ids from catalog entries. */
-export function buildSpellGrantVocabulary(
-  spells: readonly Spell[],
-): GrantDisplayVocabulary['resolveSpell'] {
-  const catalog = createSpellCatalogContext({
-    status: 'ready',
-    spellsById: new Map(spells.map((spell) => [spell.id, spell])),
-  })
-
-  return buildSpellGrantVocabularyFromCatalog(catalog)
-}
-
-export function buildSpellGrantVocabularyFromCatalog(
-  catalog: SpellCatalogContext,
-): GrantDisplayVocabulary['resolveSpell'] {
-  return (spellId) => {
-    const outcome = resolveSpellReferenceOutcome(spellId, catalog)
-    if (outcome.status === 'resolved') {
-      return { name: outcome.spell.name, level: outcome.spell.level }
-    }
-    return { name: presentSpellReferenceDisplayName(outcome) }
   }
 }
 

@@ -114,7 +114,12 @@ describe('SpeciesHeritageTab', () => {
 
   it('renders heritage scalar fields and options list when pre-filled', () => {
     render(<TabShell heritage={draconicHeritageForm} />)
-    expect(screen.getByTestId('detail-heritage')).toHaveTextContent('heritage')
+    const groupFields = screen.getByTestId('detail-heritage')
+    const options = screen.getByRole('navigation', { name: 'Heritage options' })
+    expect(groupFields).toHaveTextContent('heritage')
+    expect(
+      groupFields.compareDocumentPosition(options) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
     expect(screen.getByRole('button', { name: /Add option/i })).toBeInTheDocument()
     expect(
       within(screen.getByRole('navigation', { name: 'Heritage options' })).getByRole('button', {

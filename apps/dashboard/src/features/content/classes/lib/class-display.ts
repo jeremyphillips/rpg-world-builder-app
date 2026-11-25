@@ -1,5 +1,9 @@
 import {
   availableClassFeatures,
+  type EquipmentCatalogContext,
+  type EquipmentCatalogScope,
+  presentEquipmentReferenceDisplayName,
+  resolveEquipmentSlugReference,
   formatToolProficiencyPoolLabel,
   getAbilityCompactLabel,
   getAbilityLabel,
@@ -65,7 +69,19 @@ export type ClassDetailViewModelSource = Pick<
 }
 
 export type ClassDisplayVocabulary = {
-  resolveToolLabel: (slug: string) => string
+  resolveEquipmentLabel: (slug: string) => string
+}
+
+export function buildClassEquipmentVocabulary(
+  catalog: EquipmentCatalogContext,
+  expectedScope: EquipmentCatalogScope,
+): ClassDisplayVocabulary {
+  return {
+    resolveEquipmentLabel: (slug) =>
+      presentEquipmentReferenceDisplayName(
+        resolveEquipmentSlugReference(slug, catalog, expectedScope),
+      ),
+  }
 }
 
 export type ClassProficiencyGrantRow = {
@@ -118,13 +134,6 @@ export type BuildClassDetailViewModelOptions = {
   spellsById?: ReadonlyMap<string, Spell>
 }
 
-function formatSlugLabel(slug: string): string {
-  return slug
-    .split('-')
-    .map((part) => (part.length > 0 ? part.charAt(0).toUpperCase() + part.slice(1) : part))
-    .join(' ')
-}
-
 function formatArmorCategoryDisplay(category: string): string {
   if (category === 'shields') return 'Shields'
 
@@ -156,20 +165,22 @@ function joinDisplayList(values: string[]): string {
 
 function formatGrantedArmorValue(
   armor: ClassDetailViewModelSource['proficiencies']['armor'],
+  vocabulary: ClassDisplayVocabulary,
 ): string {
   const parts = [
     ...armor.categories.map(formatArmorCategoryDisplay),
-    ...armor.items.map(formatSlugLabel),
+    ...armor.items.map(vocabulary.resolveEquipmentLabel),
   ]
   return joinDisplayList(parts)
 }
 
 function formatGrantedWeaponsValue(
   weapons: ClassDetailViewModelSource['proficiencies']['weapons'],
+  vocabulary: ClassDisplayVocabulary,
 ): string {
   const parts = [
     ...weapons.categories.map(formatWeaponCategoryDisplay),
-    ...weapons.items.map(formatSlugLabel),
+    ...weapons.items.map(vocabulary.resolveEquipmentLabel),
   ]
 
   return joinDisplayList(parts)
@@ -181,7 +192,7 @@ function formatGrantedToolsValue(
 ): string {
   const parts = [
     ...tools.categories.map(formatToolCategoryDisplay),
-    ...tools.items.map((slug) => vocabulary.resolveToolLabel(slug)),
+    ...tools.items.map(vocabulary.resolveEquipmentLabel),
   ]
 
   return joinDisplayList(parts)
@@ -203,12 +214,12 @@ function buildGrantedProficiencyRows(
     {
       id: 'armor-training',
       label: CLASS_PROFICIENCY_ROW_LABELS.armorTraining,
-      value: formatGrantedArmorValue(proficiencies.armor),
+      value: formatGrantedArmorValue(proficiencies.armor, vocabulary),
     },
     {
       id: 'weapons',
       label: CLASS_PROFICIENCY_ROW_LABELS.weapons,
-      value: formatGrantedWeaponsValue(proficiencies.weapons),
+      value: formatGrantedWeaponsValue(proficiencies.weapons, vocabulary),
     },
   ]
 

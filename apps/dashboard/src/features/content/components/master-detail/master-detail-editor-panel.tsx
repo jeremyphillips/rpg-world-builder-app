@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, type ReactNode, type RefObject } from 'react'
+import { useCallback, useEffect, useRef, type RefObject } from 'react'
+import { SemanticText, Text } from '@rpg/ui'
 import { FormItems, type FormItem } from '@rpg/ui/form'
 
 import { AvailabilityAlert, type Availability } from '@/lib/availability'
@@ -59,11 +60,8 @@ export interface MasterDetailEditorPanelProps {
   availabilityDialogRef?: RefObject<HTMLDivElement | null>
   /** Extra overflow entries, such as Move to, rendered after availability and duplicate. */
   overflowActions?: readonly DetailOverflowMenuEntry[]
-  /**
-   * Notices, advisories, and focus anchors rendered outside the detail-body rhythm stack.
-   * Do not mount facing previews or ordinary form fields here.
-   */
-  contextualChrome?: ReactNode
+  /** Shell-rendered notice and focus anchor outside the detail-body rhythm stack. */
+  contextNotice?: MasterDetailContextNotice
   /** Shell-owned player-facing preview for the selected structured row. */
   facing?: FacingHostConfig
   /** Optional leading vs primary field regions (`leading` → facing → `primary`). */
@@ -78,6 +76,24 @@ export interface MasterDetailEditorPanelProps {
   onDelete?: () => void
 }
 
+type MasterDetailContextNotice = {
+  text?: string | null
+  focusAnchorId?: string
+}
+
+function renderContextNotice(notice: MasterDetailContextNotice | undefined) {
+  if (!notice) return null
+  return (
+    <div id={notice.focusAnchorId} tabIndex={-1}>
+      {notice.text ? (
+        <Text as="p" variant="supporting">
+          <SemanticText>{notice.text}</SemanticText>
+        </Text>
+      ) : null}
+    </div>
+  )
+}
+
 interface MasterDetailSelectedRowEditorProps {
   itemFields: FormItem[]
   fieldName: string
@@ -89,7 +105,7 @@ interface MasterDetailSelectedRowEditorProps {
   availabilityFormItems?: FormItem[]
   availabilityNamePrefix?: string
   availabilityDialogRef?: RefObject<HTMLDivElement | null>
-  contextualChrome?: ReactNode
+  contextNotice?: MasterDetailContextNotice
   facing?: FacingHostConfig
   inlineTitleField?: MasterDetailInlineTitle['field']
   fieldSections?: MasterDetailItemFieldSections
@@ -107,7 +123,7 @@ function MasterDetailSelectedRowEditor({
   availabilityFormItems,
   availabilityNamePrefix,
   availabilityDialogRef,
-  contextualChrome,
+  contextNotice,
   facing,
   inlineTitleField,
   fieldSections,
@@ -134,7 +150,7 @@ function MasterDetailSelectedRowEditor({
           />
         </div>
       ) : null}
-      {contextualChrome}
+      {renderContextNotice(contextNotice)}
       <MasterDetailDetailBody
         leadingItemFields={leadingItemFields}
         primaryItemFields={primaryItemFields}
@@ -168,7 +184,7 @@ export function MasterDetailEditorPanel({
   availabilityNamePrefix,
   availabilityDialogRef,
   overflowActions,
-  contextualChrome,
+  contextNotice,
   facing,
   fieldSections,
   spellPicker,
@@ -243,7 +259,7 @@ export function MasterDetailEditorPanel({
           availabilityFormItems={availabilityFormItems}
           availabilityNamePrefix={availabilityNamePrefix}
           availabilityDialogRef={availabilityDialogRef}
-          contextualChrome={contextualChrome}
+          contextNotice={contextNotice}
           facing={facing}
           inlineTitleField={inlineTitle?.field}
           fieldSections={fieldSections}

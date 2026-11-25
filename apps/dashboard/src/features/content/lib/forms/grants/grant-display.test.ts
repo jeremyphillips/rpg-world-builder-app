@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
-import type { GrantGroup } from '@rpg/contracts'
+import {
+  createSpellCatalogContext,
+  createEquipmentCatalogContext,
+  EQUIPMENT_REFERENCE_DISPLAY_MESSAGES,
+  SPELL_REFERENCE_DISPLAY_MESSAGES,
+  type GrantGroup,
+} from '@rpg/contracts'
 
+import { pickEquipment, pickSkillProficiency } from '../../fixtures/pick'
 import { makeSpell } from '@/test/fixtures/factories/spell'
 
 import {
@@ -15,7 +22,6 @@ import {
 } from '../../fixtures/grant-display-fixtures'
 import {
   buildGrantSummaryModel,
-  buildSpellGrantVocabulary,
   formatGrantSummaryByLevel,
   formatGrantSummaryInline,
 } from './grant-display'
@@ -47,12 +53,19 @@ const hiddenFeatChoiceGrant = {
 
 const proficiencyVocabulary = {
   ...vocabulary,
-  resolveToolName: (slug: string) => (slug === 'thieves-tools' ? "Thieves' Tools" : undefined),
+  ...buildCatalogEquipmentGrantVocabulary(['thieves-tools']),
+  resolveSkillName: (slug: string) => pickSkillProficiency(slug).name,
 }
 
 const equipmentVocabulary = {
   ...vocabulary,
-  ...buildCatalogEquipmentGrantVocabulary(),
+  ...buildCatalogEquipmentGrantVocabulary([
+    'antitoxin',
+    'camel',
+    'wagon',
+    'potion-of-healing',
+    'messenger',
+  ]),
 }
 
 const starterProficiencyGrants = [
@@ -94,6 +107,14 @@ describe('buildGrantSummaryModel', () => {
     expect(model.groups[1]?.label).toBe('L3')
     expect(model.groups[2]?.label).toBe('L5')
     expect(model.flatItems).toHaveLength(4)
+  })
+
+  it('uses the scoped sense label in compact grant summaries', () => {
+    const model = buildGrantSummaryModel(getCatalogDrowHeritageGrantGroups(), {
+      ...vocabulary,
+      resolveSenseLabel: () => 'Moon Sight',
+    })
+    expect(model.flatItems[0]?.label).toBe('Moon Sight 120 ft.')
   })
 
   it('marks supported catalog Drow items with source grant kinds', () => {
@@ -171,6 +192,28 @@ describe('buildGrantSummaryModel', () => {
         label: 'L1',
         text: `Acid damage type${GRANT_SUMMARY_JOIN}Acid resistance`,
       },
+    ])
+  })
+
+  it('uses scoped damage labels and preserves missing references in saved summaries', () => {
+    const damageTypes = ['acid', 'removed-damage']
+    const model = buildGrantSummaryModel(
+      [
+        {
+          grants: [
+            { id: 'damage', kind: 'damageType', damageTypes },
+            { id: 'resistance', kind: 'resistances', damageTypes },
+          ],
+        },
+      ],
+      {
+        ...vocabulary,
+        resolveDamageTypeLabel: (id) => (id === 'acid' ? 'Grave Frost' : undefined),
+      },
+    )
+    expect(model.flatItems.map((item) => item.label)).toEqual([
+      'Grave Frost damage type, Damage Type reference unavailable',
+      'Grave Frost resistance, Damage Type reference unavailable',
     ])
   })
 
@@ -266,6 +309,94 @@ describe('buildGrantSummaryModel', () => {
       supported: false,
       sourceGrantKind: 'skillProficiency',
     })
+  })
+
+  it('shows unavailable references for skills and senses missing from their vocabulary', () => {
+    const model = buildGrantSummaryModel(
+      [
+        {
+          grants: [
+            { id: 'sense', kind: 'sense', type: 'darkvision', range: 60 },
+            {
+              id: 'skill',
+              kind: 'skillProficiency',
+              grant: { kind: 'fixed', skillIds: ['athletics'] },
+            },
+          ],
+        },
+      ],
+      { ...vocabulary, resolveSenseLabel: () => undefined },
+    )
+    expect(model.flatItems.map((item) => item.label)).toEqual([
+      'Sense reference unavailable',
+      'Skill proficiency reference unavailable',
+    ])
+  })
+
+  it('uses scoped equipment records for saved grants and proficiencies', () => {
+    const dagger = { ...pickEquipment('dagger'), name: 'River Blade', status: 'draft' as const }
+    const model = buildGrantSummaryModel(
+      [
+        {
+          grants: [
+            {
+              id: 'gear',
+              kind: 'equipment',
+              grant: { kind: 'grant', equipmentSlug: dagger.slug, quantity: 1 },
+            },
+            {
+              id: 'weapon',
+              kind: 'weaponProficiency',
+              grant: {
+                kind: 'fixed',
+                weaponSlugs: [dagger.slug, 'stale-gear', 'another-stale-gear'],
+              },
+            },
+            {
+              id: 'missing',
+              kind: 'equipment',
+              grant: { kind: 'grant', equipmentSlug: 'stale-gear', quantity: 1 },
+            },
+          ],
+        },
+      ],
+      {
+        ...vocabulary,
+        equipmentReferences: {
+          scope: { rulesetId: dagger.rulesetId, campaignId: '' },
+          catalog: createEquipmentCatalogContext({
+            status: 'ready',
+            scope: { rulesetId: dagger.rulesetId, campaignId: '' },
+            equipmentById: new Map([[dagger.id, dagger]]),
+          }),
+        },
+      },
+    )
+
+    expect(model.flatItems.map((item) => item.label)).toEqual([
+      'River Blade',
+      `River Blade proficiency, ${EQUIPMENT_REFERENCE_DISPLAY_MESSAGES.unknownEquipment}`,
+      EQUIPMENT_REFERENCE_DISPLAY_MESSAGES.unknownEquipment,
+    ])
+  })
+
+  it('shows catalog-unavailable copy when a saved equipment grant has no catalog', () => {
+    const model = buildGrantSummaryModel(
+      [
+        {
+          grants: [
+            {
+              id: 'gear',
+              kind: 'equipment',
+              grant: { kind: 'grant', equipmentSlug: 'unverified-slug', quantity: 1 },
+            },
+          ],
+        },
+      ],
+      vocabulary,
+    )
+
+    expect(model.flatItems[0]?.label).toBe(EQUIPMENT_REFERENCE_DISPLAY_MESSAGES.catalogError)
   })
 
   it('renders equipment grants with names and service suffixes', () => {
@@ -508,20 +639,53 @@ describe('formatGrantSummaryByLevel', () => {
   })
 })
 
-describe('buildSpellGrantVocabulary', () => {
-  it('resolves spell display metadata by canonical id', () => {
-    const resolveSpell = buildSpellGrantVocabulary([
-      makeSpell({
-        id: 'ruleset:dancing-lights',
-        slug: 'dancing-lights',
-        name: 'Dancing Lights',
-        level: 0,
-      }),
-    ])
+describe('spell grant reference outcomes', () => {
+  const spell = makeSpell({
+    id: 'ruleset:dancing-lights',
+    slug: 'dancing-lights',
+    name: 'Dancing Lights',
+    level: 0,
+    status: 'draft',
+  })
+  const groups: GrantGroup[] = [
+    {
+      grants: [
+        {
+          id: 'spells',
+          kind: 'spells',
+          ability: 'int',
+          availability: 'always_prepared',
+          spellIds: [spell.id, 'other-ruleset:dancing-lights'],
+        },
+      ],
+    },
+  ]
+  const spellsById = new Map([[spell.id, spell]])
 
-    expect(resolveSpell('ruleset:dancing-lights')).toEqual({ name: 'Dancing Lights', level: 0 })
-    expect(resolveSpell('missing')).toEqual({
-      name: 'Spell reference unavailable',
+  it('uses the exact catalog id and reserves spell type suffixes for resolved entries', () => {
+    const model = buildGrantSummaryModel(groups, {
+      ...vocabulary,
+      spellCatalog: createSpellCatalogContext({ status: 'ready', spellsById }),
     })
+
+    expect(model.flatItems.map(({ kind }) => kind)).toEqual(['cantrip', 'unresolvedSpell'])
+    expect(formatGrantSummaryInline(model, { includeTypeSuffix: true })).toBe(
+      `Dancing Lights cantrip${GRANT_SUMMARY_JOIN}${SPELL_REFERENCE_DISPLAY_MESSAGES.unknownSpell}`,
+    )
+  })
+
+  it.each([
+    ['pending', SPELL_REFERENCE_DISPLAY_MESSAGES.catalogLoading],
+    ['error', SPELL_REFERENCE_DISPLAY_MESSAGES.catalogError],
+  ] as const)('preserves %s even when the query has a map', (status, label) => {
+    const model = buildGrantSummaryModel(groups, {
+      ...vocabulary,
+      spellCatalog: createSpellCatalogContext({ status, spellsById }),
+    })
+
+    expect(model.flatItems.map((item) => item.label)).toEqual([label, label])
+    expect(formatGrantSummaryInline(model, { includeTypeSuffix: true })).toBe(
+      `${label}${GRANT_SUMMARY_JOIN}${label}`,
+    )
   })
 })

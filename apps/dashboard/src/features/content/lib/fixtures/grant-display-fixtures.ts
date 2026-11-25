@@ -1,11 +1,17 @@
 import { loadSeedSpells } from '@rpg/catalog/spells'
-import type { GrantGroup, SpeciesBodyTrait } from '@rpg/contracts'
+import {
+  createEquipmentCatalogContext,
+  createSpellCatalogContext,
+  type GrantGroup,
+  type Species,
+  type SpeciesBodyTrait,
+} from '@rpg/contracts'
 
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 import { type GrantDisplayVocabulary } from '../forms/grants/grant-display'
 
-import { pickClass, pickEquipment, pickSpecies, pickSpell } from './pick'
+import { pickClass, pickEquipment, pickSpecies } from './pick'
 import { STORY_RULESET_ID } from './constants'
 
 /** Catalog Wood Elf heritage option grant groups from the Elf species seed. */
@@ -75,28 +81,32 @@ export function getCatalogDrowHeritageOption(): SpeciesBodyTrait {
   return drow
 }
 
-/** Vocabulary resolving catalog equipment names and kinds for grant summaries. */
-export function buildCatalogEquipmentGrantVocabulary(): Pick<
-  GrantDisplayVocabulary,
-  'resolveEquipmentName' | 'resolveEquipmentKind'
-> {
+/** Scoped catalog fixture for grants using specific equipment slugs. */
+export function buildCatalogEquipmentGrantVocabulary(
+  slugs: readonly string[],
+): Pick<GrantDisplayVocabulary, 'equipmentReferences'> {
+  const equipment = slugs.map((slug) => pickEquipment(slug))
+  const scope = { rulesetId: STORY_RULESET_ID, campaignId: '' }
   return {
-    resolveEquipmentName: (slug) => pickEquipment(slug).name,
-    resolveEquipmentKind: (slug) => pickEquipment(slug).kind,
+    equipmentReferences: {
+      scope,
+      catalog: createEquipmentCatalogContext({
+        status: 'ready',
+        scope,
+        equipmentById: new Map(equipment.map((item) => [item.id, item])),
+      }),
+    },
   }
 }
 
-/** Vocabulary resolving catalog spell names for Drow lineage grants. */
+/** Vocabulary for grant summaries using the system spell catalog. */
 export function buildCatalogDrowGrantDisplayVocabulary(): GrantDisplayVocabulary {
   return {
     resolveSenseLabel: (type) => (type === 'darkvision' ? 'Darkvision' : type),
-    resolveSpell: (spellId) => {
-      const slug = spellId.startsWith(`${STORY_RULESET_ID}:`)
-        ? spellId.slice(STORY_RULESET_ID.length + 1)
-        : spellId
-      const spell = pickSpell(slug)
-      return { name: spell.name, level: spell.level }
-    },
+    spellCatalog: createSpellCatalogContext({
+      status: 'ready',
+      spellsById: new Map(loadSeedSpells(STORY_RULESET_ID).map((spell) => [spell.id, spell])),
+    }),
   }
 }
 
@@ -125,3 +135,50 @@ export const DROW_HERITAGE_GROUPED_SUMMARY_WITH_SUFFIX = [
 export const DROW_HERITAGE_SHEET_SUMMARY_LINES = DROW_HERITAGE_GROUPED_SUMMARY_WITH_SUFFIX.map(
   ({ label, text }) => `${label}: ${text}`,
 )
+
+/** A saved lineage with a renamed draft weapon and a stale proficiency reference. */
+export function buildScopedHeritageEquipmentFixture() {
+  const equipment = { ...pickEquipment('dagger'), name: 'River Blade', status: 'draft' as const }
+  const scope = { rulesetId: STORY_RULESET_ID, campaignId: 'heritage-reference-campaign' }
+  const species: Species = {
+    ...pickSpecies('elf'),
+    heritage: {
+      id: 'river-lineage',
+      name: 'River Lineage',
+      choose: 1,
+      options: [
+        {
+          id: 'river',
+          kind: 'custom',
+          name: 'River',
+          grantGroups: [
+            {
+              grants: [
+                {
+                  id: 'gear',
+                  kind: 'equipment',
+                  grant: { kind: 'grant', equipmentSlug: equipment.slug, quantity: 1 },
+                },
+                {
+                  id: 'weapons',
+                  kind: 'weaponProficiency',
+                  grant: { kind: 'fixed', weaponSlugs: [equipment.slug, 'retired-weapon'] },
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  }
+  const equipmentCatalog = createEquipmentCatalogContext({
+    scope,
+    status: 'ready',
+    equipmentById: new Map([[equipment.id, equipment]]),
+  })
+  return {
+    species,
+    equipmentCatalog,
+    expectedSummary: `L1: ${joinInlineMetadata([equipment.name, `${equipment.name} proficiency, Equipment reference unavailable`])}`,
+  }
+}

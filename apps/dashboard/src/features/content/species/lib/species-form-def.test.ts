@@ -18,7 +18,7 @@ import {
 } from '@rpg/contracts'
 
 import { speciesFormDef, speciesDraftFormSchema, type SpeciesFormValues } from './species-form-def'
-import { createHeritageOptionCampaignAccessDefaults } from './species-trait-form-fields'
+import { createHeritageOptionCampaignAccessDefaults } from './species-trait-form-schema'
 import { createTraitRowDefaultValues } from './species-trait-form-values'
 
 const SRD_SPECIES = loadSeedSpecies('srd-cc-5.2.1')

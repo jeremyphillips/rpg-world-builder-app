@@ -228,3 +228,24 @@ export function collectActiveFormItemBindings(
     }
   })
 }
+
+/** Finds duplicate fields or a second owner under a reserved array path. */
+export function findFormItemBindingConflict<T extends ActiveFormItemBinding>(
+  bindings: readonly T[],
+): { owner: T; binding: T } | undefined {
+  const owners = new Map<string, T>()
+  for (const binding of bindings) {
+    const existing = owners.get(binding.path)
+    if (existing) return { owner: existing, binding }
+    for (const owner of owners.values()) {
+      if (
+        (owner.kind === 'array' && binding.path.startsWith(`${owner.path}.`)) ||
+        (binding.kind === 'array' && owner.path.startsWith(`${binding.path}.`))
+      ) {
+        return { owner, binding }
+      }
+    }
+    owners.set(binding.path, binding)
+  }
+  return undefined
+}

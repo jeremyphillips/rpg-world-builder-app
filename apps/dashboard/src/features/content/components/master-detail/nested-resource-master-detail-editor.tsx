@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react'
-import { fieldGroupFlexStackClasses } from '@rpg/ui'
 
 import type { DetailOverflowMenuEntry } from '../../lib/detail/detail-overflow-actions'
 import { MasterDetailDetailFormScope } from '../../lib/master-detail/master-detail-detail-form-scope'
@@ -9,7 +8,11 @@ import {
   type MasterDetailEditorIdentity,
 } from './master-detail-editor-shell'
 import { MasterDetailGrid } from './master-detail-grid'
-import { MasterDetailListPanel, type MasterDetailListItem } from './master-detail-list-panel'
+import {
+  MasterDetailListPanel,
+  type MasterDetailListItem,
+  type MasterDetailListPanelProps,
+} from './master-detail-list-panel'
 
 export type { MasterDetailEditorIdentity }
 
@@ -18,18 +21,17 @@ export interface NestedResourceMasterDetailEditorProps {
   selectedRowId: string | null
   onSelectRow: (rowId: string) => void
   onAdd: () => void
-  listTitle: ReactNode
+  listTitle: string
   ariaLabel: string
   addLabel: string
   itemNoun: MasterDetailItemNounTerm
-  countSupplement?: ReactNode
+  countSupplement?: MasterDetailListPanelProps['countSupplement']
   selectedIdentity?: MasterDetailEditorIdentity
   onDelete?: () => void
   onDuplicate?: () => void
   overflowActions?: readonly DetailOverflowMenuEntry[]
   invalidItemCount?: number
   renderDetail: (ctx: { rowId: string }) => ReactNode
-  leadingContent?: ReactNode
   deleteDialog?: ReactNode
 }
 
@@ -54,7 +56,6 @@ export function NestedResourceMasterDetailEditor({
   overflowActions,
   invalidItemCount,
   renderDetail,
-  leadingContent,
   deleteDialog,
 }: NestedResourceMasterDetailEditorProps) {
   const detailColumn =
@@ -92,18 +93,9 @@ export function NestedResourceMasterDetailEditor({
     </MasterDetailGrid>
   )
 
-  const content = leadingContent ? (
-    <div className={fieldGroupFlexStackClasses}>
-      {leadingContent}
-      {masterDetailGrid}
-    </div>
-  ) : (
-    masterDetailGrid
-  )
-
   return (
     <>
-      {content}
+      {masterDetailGrid}
       {deleteDialog}
     </>
   )

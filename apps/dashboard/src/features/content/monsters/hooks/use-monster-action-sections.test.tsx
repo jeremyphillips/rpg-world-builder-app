@@ -132,11 +132,11 @@ describe('useMonsterActionSections', () => {
     act(() => {
       result.current.addAcquisition('legendaryActions', { type: 'create', kind: 'special' })
     })
-    expect(result.current.values?.legendaryActions?.uses).toBe(3)
+    expect(result.current.values?.legendaryActions?.uses).toEqual({ normal: 3 })
     act(() => {
       result.current.addAcquisition('legendaryActions', { type: 'create', kind: 'special' })
     })
-    expect(result.current.values?.legendaryActions?.uses).toBe(3)
+    expect(result.current.values?.legendaryActions?.uses).toEqual({ normal: 3 })
     const ids = (result.current.values?.legendaryActions?.actions ?? []).flatMap((action) =>
       action && typeof action === 'object' && 'id' in action && typeof action.id === 'string'
         ? [action.id]

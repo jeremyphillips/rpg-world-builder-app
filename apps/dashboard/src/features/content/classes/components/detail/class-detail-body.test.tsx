@@ -15,7 +15,7 @@ import { buildClassDetailViewModel } from '../../lib/class-display'
 import { ClassDetailBody } from './class-detail-body'
 
 const vocabulary = {
-  resolveToolLabel: (slug: string) => slug,
+  resolveEquipmentLabel: (slug: string) => slug,
 }
 
 describe('ClassDetailBody', () => {

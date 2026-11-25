@@ -27,7 +27,8 @@ import {
   heritageFormSchema,
   heritageScalarFields,
 } from '../../../species/lib/species-heritage-form-fields'
-import { traitItemFields, traitRowFormSchema } from '../../../species/lib/species-trait-form-fields'
+import { traitRowFormSchema } from '../../../species/lib/species-trait-form-schema'
+import { traitItemFields } from '../../../species/lib/species-trait-form-fields'
 import {
   classFeatureItemFields,
   createFeatureRowFormSchema,

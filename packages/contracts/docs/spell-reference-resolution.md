@@ -72,9 +72,14 @@ Consumers must not use `formatContentReferenceLabel`, slug title-case, raw ids, 
 | `resolveMonsterReactionTrigger` | Shared `resolveSpellReferenceOutcomeForCatalogStatus` | Downstream prose                   | Done                  |
 | Grant row presentation          | `GrantSpellReferencePresentation`                     | Catalog-backed display             | Done                  |
 | `formatSpellsGrantSentence`     | `formatSpellsGrantSentenceFromResolutions`            | `?? id` callback (legacy)          | Done for dashboard UI |
-| `grant-display` compact summary | `buildSpellGrantVocabulary`                           | Shared presenter                   | Done                  |
+| `grant-display` compact summary | `resolveSpellReferenceOutcome`                        | Shared presenter                   | Done                  |
 | Character sheet spell cards     | `resolveSpellReferenceOutcome`                        | `presentSpellReferenceDisplayName` | Done                  |
 | Monster `spellPlainName`        | `resolveSpellReferenceOutcomeForCatalogStatus`        | Shared display messages            | Done                  |
+
+Species detail and authoring previews pass their spell catalog lifecycle to the
+grant summary model. The builder uses the spell index from its loaded catalog.
+Compact summaries show a shared catalog status label for unresolved spells and
+add spell type suffixes only to resolved names.
 
 Semantic reason for not-found: **`unknown-spell`** (same as reaction-trigger); do not introduce a parallel `unknown-reference` alias.
 

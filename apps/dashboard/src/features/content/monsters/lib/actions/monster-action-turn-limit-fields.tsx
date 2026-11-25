@@ -6,6 +6,7 @@ export function monsterActionTurnLimitField(name = 'onceUntilNextTurn'): FormIte
   return {
     kind: 'slot',
     name: '_turnLimit',
+    boundNames: [name],
     render: () => <MonsterActionTurnLimitControl name={name} />,
   }
 }

@@ -1,4 +1,9 @@
-import type { ClassBodyFeature, ContentTrait, FacingResolution } from '@rpg/contracts'
+import type {
+  ClassBodyFeature,
+  ContentTrait,
+  FacingResolution,
+  MonsterActionAttackProfile,
+} from '@rpg/contracts'
 
 import { adaptClassFeatureDraftRow } from './adapters/class-feature-draft.adapter'
 import type { ContentFormCtx } from '../lib/forms/registry/content-form-registry'
@@ -15,7 +20,7 @@ import {
   resolveSpeciesTraitDraftFacing,
   resolveTraitPersistedFacing,
 } from './domains/trait/resolve-trait-facing'
-import type { TraitRowForm } from '../species/lib/species-trait-form-fields'
+import type { TraitRowForm } from '../species/lib/species-trait-form-schema'
 
 export type ResolveFacingRequest =
   | {
@@ -64,6 +69,20 @@ export function resolveFacing(
 ): FacingResolution
 export function resolveFacing(request: ResolveFacingRequest): FacingResolution | undefined
 export function resolveFacing(request: ResolveFacingRequest): FacingResolution | undefined {
+  return resolveFacingWithFacts(request).resolution
+}
+
+export function resolveFacingWithFacts(request: ResolveFacingRequest): {
+  resolution: FacingResolution | undefined
+  attackProfile?: MonsterActionAttackProfile
+} {
+  if (request.domain === 'monsterAction') return resolveMonsterActionDraftFacing(request)
+  return { resolution: resolveNonActionFacing(request) }
+}
+
+function resolveNonActionFacing(
+  request: Exclude<ResolveFacingRequest, { domain: 'monsterAction' }>,
+): FacingResolution | undefined {
   switch (request.domain) {
     case 'classFeature': {
       if (request.source === 'persisted') {
@@ -78,13 +97,6 @@ export function resolveFacing(request: ResolveFacingRequest): FacingResolution |
       }
       return resolveClassFeatureDraftFacing(adapted.record, request.host)
     }
-    case 'monsterAction':
-      return resolveMonsterActionDraftFacing({
-        values: request.values,
-        ctx: request.ctx,
-        actionId: request.actionId,
-        section: request.section,
-      }).resolution
     case 'trait':
       return resolveTraitFacing(request)
   }

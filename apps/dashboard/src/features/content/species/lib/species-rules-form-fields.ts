@@ -29,6 +29,8 @@ import {
   speciesMulticlassPolicyOptions,
 } from './species-rules-form-labels'
 
+import { resolveSpeciesClassLabel } from './species-rules-form-values'
+
 export const MULTICLASSING_FIELD_PREFIX = 'characterCreation.multiclassing'
 export const LEVEL_LIMITS_FIELD_PREFIX = 'characterCreation.levelLimits'
 export const CLASS_POLICY_MODE_FIELD = 'classPolicy.mode'
@@ -235,7 +237,10 @@ export function speciesLevelLimitsFields(ctx: ContentFormCtx): FormItem[] {
                   const classId = values['classId'] as string | undefined
                   const maxLevelValue = values['maxLevel'] as string | number | undefined
                   if (classId && maxLevelValue !== undefined) {
-                    return joinInlineMetadata([`${classId}`, `level ${maxLevelValue}`])
+                    return joinInlineMetadata([
+                      resolveSpeciesClassLabel(classId, ctx),
+                      `level ${maxLevelValue}`,
+                    ])
                   }
                   return undefined
                 },

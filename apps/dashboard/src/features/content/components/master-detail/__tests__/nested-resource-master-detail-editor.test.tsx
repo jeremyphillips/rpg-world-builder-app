@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { ComponentProps } from 'react'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
@@ -42,7 +42,7 @@ function EditorHarness({
   onSelectRow?: (rowId: string) => void
   onAdd?: () => void
   onDelete?: () => void
-  countSupplement?: ReactNode
+  countSupplement?: ComponentProps<typeof NestedResourceMasterDetailEditor>['countSupplement']
 }) {
   const selectedIdentity: MasterDetailEditorIdentity | undefined =
     selectedRowId === 'row-a'
@@ -128,7 +128,16 @@ describe('NestedResourceMasterDetailEditor', () => {
   })
 
   it('passes count supplement through to the list panel', () => {
-    render(<EditorHarness countSupplement={<span>2 available</span>} />)
+    render(
+      <EditorHarness
+        countSupplement={{
+          scope: { availableCount: 2, unavailableCount: 0, visibleCount: 2 },
+          showUnavailable: false,
+          onShow: () => {},
+          onHide: () => {},
+        }}
+      />,
+    )
 
     expect(screen.getByText('2 available')).toBeInTheDocument()
   })

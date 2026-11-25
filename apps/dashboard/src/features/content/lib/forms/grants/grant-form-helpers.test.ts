@@ -466,6 +466,9 @@ describe('grant row summaries', () => {
     )
     expect(formatLanguageRowSummary('common')).toBe('Character knows Common.')
     expect(formatFeatChoiceRowSummary('general', 2)).toBe('Character chooses 2 general feats.')
+    expect(formatFeatChoiceRowSummary('general', '')).toBe('Character chooses 1 general feat.')
+    expect(formatFeatChoiceRowSummary('general', 0)).toBe('')
+    expect(formatFeatChoiceRowSummary('not-a-category', '2')).toBe('')
   })
 
   it('formats spell grant summaries from availability and casting toggles', () => {
@@ -485,10 +488,6 @@ describe('grant row summaries', () => {
             scope: { rulesetId: 'srd-cc-5.2.1', campaignId: 'campaign-1' },
             equipmentById: new Map(),
           }),
-          weaponOptions: [],
-          toolOptions: [],
-          armorOptions: [],
-          skillOptions: [],
           spellReferences: buildGrantSpellReferencePresentationFromAuthoring({
             status: 'ready',
             spellsById: new Map([
@@ -515,10 +514,6 @@ const grantRowHeaderContext = {
     scope: { rulesetId: 'srd-cc-5.2.1', campaignId: 'campaign-1' },
     equipmentById: new Map(),
   }),
-  weaponOptions: [],
-  toolOptions: [],
-  armorOptions: [],
-  skillOptions: [],
   spellReferences: buildGrantSpellReferencePresentationFromAuthoring({
     status: 'ready',
     spellsById: new Map(

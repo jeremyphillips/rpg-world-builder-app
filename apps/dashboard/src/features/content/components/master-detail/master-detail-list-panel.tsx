@@ -1,5 +1,7 @@
 import { useEffect, useRef, type ReactNode, type RefObject } from 'react'
 import {
+  ButtonDropdown,
+  type ButtonDropdownProps,
   ActionButton,
   cn,
   Heading,
@@ -10,6 +12,10 @@ import {
   ValidationIssueCountBadge,
 } from '@rpg/ui'
 
+import {
+  buildAvailabilityCountSupplement,
+  type BuildAvailabilityCountSupplementOptions,
+} from '../../lib/campaign-access/availability-count-supplement'
 import { isElementOutsideScrollport } from '../../lib/master-detail/is-element-outside-scrollport'
 import type { MasterDetailListItem } from '../../lib/master-detail/master-detail-list-item.types'
 import type { MasterDetailItemMeta } from '../../lib/master-detail/master-detail-item-meta'
@@ -31,15 +37,20 @@ import {
 
 export type { MasterDetailItemMeta, MasterDetailListItem }
 
+export type MasterDetailAcquisition = Pick<
+  ButtonDropdownProps,
+  'label' | 'groups' | 'items' | 'onSelectItem' | 'searchPlaceholder' | 'supportingWrap'
+>
+
 export type MasterDetailListGroup = {
   id: string
-  title: ReactNode
-  /** Ghost icon add — superseded by `addControl` (for example acquisition menus). */
+  title: string
+  /** Ghost icon add — superseded by `acquisition` (for example acquisition menus). */
   onAdd?: () => void
-  addControl?: ReactNode
+  acquisition?: MasterDetailAcquisition
   items: MasterDetailListItem[]
   /** Section empty copy — defaults to the panel's flat `itemNoun` empty label. */
-  emptyLabel?: ReactNode
+  emptyLabel?: string
 }
 
 export type MasterDetailListPanelProps = {
@@ -47,7 +58,7 @@ export type MasterDetailListPanelProps = {
   selectedItemId: string | null
   onSelectItem: (id: string) => void
   /** Visible collection title. Omit on a grouped rail when each group has its own title. */
-  listTitle?: ReactNode
+  listTitle?: string
   /** Accessible name for the list `<nav>` — independent from `listTitle`. */
   ariaLabel: string
   itemNoun: MasterDetailItemNounTerm
@@ -59,12 +70,12 @@ export type MasterDetailListPanelProps = {
   addLabel?: string
   /**
    * Replaces the default Add button on a flat rail. Grouped rails use each group's
-   * `addControl` instead.
+   * `acquisition` instead.
    */
-  addControl?: ReactNode
+  acquisition?: MasterDetailAcquisition
   onAdd?: () => void
   /** Optional stable availability count row rendered below the list header. */
-  countSupplement?: ReactNode
+  countSupplement?: BuildAvailabilityCountSupplementOptions
   /** Count of visible list rows with validation issues (not total issue count). */
   invalidItemCount?: number
   /** When set on a flat rail with more than one row, enables drag-to-reorder handles. */
@@ -231,7 +242,9 @@ function MasterDetailListScroll({
               <Heading as="div" variant="nav" className="min-w-0">
                 {group.title}
               </Heading>
-              {group.addControl ?? (
+              {group.acquisition ? (
+                <ButtonDropdown {...group.acquisition} triggerPresentation="addIcon" />
+              ) : (
                 <MasterDetailListAddButton addLabel={addLabel} onAdd={group.onAdd} />
               )}
             </div>
@@ -283,14 +296,19 @@ function listPanelItems(props: MasterDetailListPanelProps): MasterDetailListItem
 function MasterDetailCollectionHeader({
   groups,
   listTitle,
-  addControl,
+  acquisition,
   addLabel,
   onAdd,
-}: Pick<MasterDetailListPanelProps, 'groups' | 'listTitle' | 'addControl' | 'addLabel' | 'onAdd'>) {
+}: Pick<
+  MasterDetailListPanelProps,
+  'groups' | 'listTitle' | 'acquisition' | 'addLabel' | 'onAdd'
+>) {
   if (groups && listTitle == null) return null
-  const addButton = groups
-    ? null
-    : (addControl ?? <MasterDetailListAddButton addLabel={addLabel} onAdd={onAdd} />)
+  const addButton = groups ? null : acquisition ? (
+    <ButtonDropdown {...acquisition} triggerPresentation="addIcon" />
+  ) : (
+    <MasterDetailListAddButton addLabel={addLabel} onAdd={onAdd} />
+  )
   return (
     <div className={masterDetailListHeaderClasses}>
       <Heading as="div" variant="nav" className="min-w-0">
@@ -305,18 +323,17 @@ function MasterDetailCountRow({
   countSupplement,
   invalidItemCount,
 }: Pick<MasterDetailListPanelProps, 'countSupplement' | 'invalidItemCount'>) {
-  if (!countSupplement && !invalidItemCount) return null
+  const counts = countSupplement && buildAvailabilityCountSupplement(countSupplement)
+  if (!counts && !invalidItemCount) return null
   return (
     <div
       className={cn(
         masterDetailListSupplementClasses,
         'text-style-caption',
-        countSupplement ? 'justify-between' : 'justify-end',
+        counts ? 'justify-between' : 'justify-end',
       )}
     >
-      {countSupplement ? (
-        <div className="min-w-0 flex flex-wrap items-center gap-x-1">{countSupplement}</div>
-      ) : null}
+      {counts ? <div className="min-w-0 flex flex-wrap items-center gap-x-1">{counts}</div> : null}
       {invalidItemCount && invalidItemCount > 0 ? (
         <ValidationIssueCountBadge count={invalidItemCount} />
       ) : null}
@@ -349,7 +366,7 @@ export function MasterDetailListPanel(props: MasterDetailListPanelProps) {
       <MasterDetailCollectionHeader
         groups={props.groups}
         listTitle={props.listTitle}
-        addControl={props.addControl}
+        acquisition={props.acquisition}
         addLabel={props.addLabel}
         onAdd={props.onAdd}
       />

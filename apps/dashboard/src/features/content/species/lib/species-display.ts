@@ -1,8 +1,8 @@
 import {
-  formatCreatureSensesCompactList,
   formatMovementDisplay,
   CREATURE_SIZE_TERM,
   CREATURE_TYPE_TERM,
+  LANGUAGE_TERM,
   formatCreatureSizeList,
   getVocabularyTermLabel,
   renderTraitFacingBodyHtml,
@@ -16,6 +16,7 @@ import {
 
 import {
   buildGrantSummaryModel,
+  formatScopedSenseSummary,
   formatGrantSummaryByLevel,
   formatGrantSummaryInline,
   type GrantDisplayVocabulary,
@@ -40,8 +41,8 @@ export const SPECIES_SECTION_LABELS = { traits: 'Traits' } as const
 
 export type SpeciesDisplayVocabulary = {
   resolveCreatureTypeLabel: (id: string) => string
-  resolveLanguageLabel: (id: string) => string
-} & Pick<GrantDisplayVocabulary, 'resolveSenseLabel' | 'resolveSpell'>
+  resolveLanguageLabel: (id: string) => string | undefined
+} & GrantDisplayVocabulary
 
 export type SpeciesDetailItem = {
   id: string
@@ -84,14 +85,17 @@ export type SpeciesDetailViewModel = {
   >
 }
 
-function collectSenses(traits: SpeciesBodyTrait[]): string {
+function collectSenses(
+  traits: SpeciesBodyTrait[],
+  resolveLabel: SpeciesDisplayVocabulary['resolveSenseLabel'],
+): string {
   const senses = resolveCreatureSenses({
     grants: resolveCreatureTraitGrants(traits.map((trait) => ({ trait, source: trait.id }))).map(
       (resolved) => resolved.grant,
     ),
   })
   if (senses.length === 0) return 'None'
-  return formatCreatureSensesCompactList(senses)
+  return senses.map((sense) => formatScopedSenseSummary(sense, resolveLabel)).join(', ')
 }
 
 function buildSpeciesStatRows(
@@ -113,14 +117,19 @@ function buildSpeciesStatRows(
     },
     {
       label: SPECIES_STAT_LABELS.senses,
-      value: collectSenses(species.traits),
+      value: collectSenses(species.traits, vocabulary.resolveSenseLabel),
     },
   ]
 
   if (species.languageAffinities?.length) {
     rows.push({
       label: SPECIES_STAT_LABELS.languageAffinities,
-      value: species.languageAffinities.map((id) => vocabulary.resolveLanguageLabel(id)).join(', '),
+      value: species.languageAffinities
+        .map(
+          (id) =>
+            vocabulary.resolveLanguageLabel(id) ?? `${LANGUAGE_TERM.label} reference unavailable`,
+        )
+        .join(', '),
     })
   }
 
@@ -145,22 +154,14 @@ function mapTraitToDetailItem(trait: SpeciesBodyTrait): SpeciesDetailItem {
   }
 }
 
-function toGrantDisplayVocabulary(vocabulary: SpeciesDisplayVocabulary): GrantDisplayVocabulary {
-  return {
-    resolveSenseLabel: vocabulary.resolveSenseLabel,
-    resolveSpell: vocabulary.resolveSpell,
-  }
-}
-
 function mapHeritageOptionToDetailItem(
   trait: SpeciesBodyTrait,
   vocabulary: SpeciesDisplayVocabulary,
 ): SpeciesDetailItem {
   const { title, bodyHtml } = facingTitleAndBody(trait)
-  const grantVocabulary = toGrantDisplayVocabulary(vocabulary)
   const summaryModel = buildGrantSummaryModel(
     trait.kind === 'template' ? undefined : trait.grantGroups,
-    grantVocabulary,
+    vocabulary,
     {
       parentLevel: 1,
     },

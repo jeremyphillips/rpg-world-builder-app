@@ -35,10 +35,6 @@ const grantHeaderContext = {
     scope: { rulesetId: 'srd-cc-5.2.1', campaignId: 'campaign-1' },
     equipmentById: new Map(),
   }),
-  weaponOptions: [],
-  toolOptions: [],
-  armorOptions: [],
-  skillOptions: [],
   spellReferences: buildGrantSpellReferencePresentationFromAuthoring({
     status: 'ready',
     spellsById: new Map(

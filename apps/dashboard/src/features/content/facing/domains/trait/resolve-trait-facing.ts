@@ -14,7 +14,7 @@ import {
   resolveTraitStatBlockRulesFacingForFormRow,
   type TraitStatBlockRulesFacing,
 } from '../../../monsters/lib/presentation/resolve-trait-stat-block-rules-facing'
-import type { TraitRowForm } from '../../../species/lib/species-trait-form-fields'
+import type { TraitRowForm } from '../../../species/lib/species-trait-form-schema'
 import { traitFromFormRow } from '../../../species/lib/species-trait-form-values'
 
 function speciesTraitFacingHost(): TraitFacingHost {

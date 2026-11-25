@@ -1,6 +1,7 @@
 import type { Spell } from '@rpg/contracts'
 import {
   collectActiveFormItemBindings,
+  findFormItemBindingConflict,
   FormItems,
   FormRhythmStack,
   type FormItem,
@@ -112,32 +113,37 @@ function MasterDetailFieldBindingGuard({
   inlineTitleField?: MasterDetailInlineTitle['field']
 }) {
   const values = useWatch()
-  const owners = new Map<string, { region: string; kind: 'field' | 'array' }>()
-  if (inlineTitleField)
-    owners.set(`${namePrefix}.${inlineTitleField}`, { region: 'inline title', kind: 'field' })
-  for (const [region, fields] of [
-    ['leading', leading],
-    ['primary', primary],
-  ] as const) {
-    for (const { path, kind } of collectActiveFormItemBindings(fields, values, namePrefix)) {
-      const owner = owners.get(path)
-      if (owner)
-        throw new Error(
-          `Duplicate master–detail field binding "${path}" (${owner.region}, ${region})`,
-        )
+  const bindings: (ReturnType<typeof collectActiveFormItemBindings>[number] & {
+    region: string
+  })[] = (
+    [
+      ['leading', leading],
+      ['primary', primary],
+    ] as const
+  ).flatMap(([region, fields]) =>
+    collectActiveFormItemBindings(fields, values, namePrefix).map((binding) => ({
+      ...binding,
+      region,
+    })),
+  )
+  if (inlineTitleField) {
+    bindings.unshift({
+      path: `${namePrefix}.${inlineTitleField}`,
+      region: 'inline title',
+      kind: 'field',
+    })
+  }
 
-      for (const [ownedPath, owned] of owners) {
-        const overlaps =
-          (owned.kind === 'array' && path.startsWith(`${ownedPath}.`)) ||
-          (kind === 'array' && ownedPath.startsWith(`${path}.`))
-        if (overlaps) {
-          throw new Error(
-            `Overlapping master–detail field bindings "${ownedPath}" and "${path}" (${owned.region}, ${region})`,
-          )
-        }
-      }
-      owners.set(path, { region, kind })
+  const conflict = findFormItemBindingConflict(bindings)
+  if (conflict) {
+    const { owner, binding } = conflict
+    const regions = `(${owner.region}, ${binding.region})`
+    if (owner.path === binding.path) {
+      throw new Error(`Duplicate master–detail field binding "${binding.path}" ${regions}`)
     }
+    throw new Error(
+      `Overlapping master–detail field bindings "${owner.path}" and "${binding.path}" ${regions}`,
+    )
   }
   return null
 }

@@ -135,6 +135,9 @@ export function assembleCreatureTraitTemplateFields(input: {
   if (policy.kind === 'fieldless') return [supplementalDetailsField()]
 
   const fields = policy.fields()
+  if (fields.length === 0) {
+    throw new Error(`Configurable trait template ${templateId} has no fields on ${input.host}.`)
+  }
   validateTraitTemplateConfigFields(fields, templateId)
   return [
     ...fields.map((field) =>

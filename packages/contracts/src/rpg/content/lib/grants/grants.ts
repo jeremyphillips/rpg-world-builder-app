@@ -9,7 +9,7 @@ import {
   damageTypeIdSchema,
   DAMAGE_TYPE_TERM,
 } from '../../../vocab/damage/vocabulary'
-import { getTermSentenceForm } from '../../../vocab/types'
+import { getTermSentenceForm, type VocabularyTerm } from '../../../vocab/types'
 import { absoluteLevelSchema } from '../../../primitives/level'
 import {
   movementGrantIncreaseSchema,
@@ -34,6 +34,7 @@ import {
   getLanguageSentenceForm,
   languageCategorySchema,
   languageIdSchema,
+  LANGUAGE_TERM,
 } from '../../../vocab/language'
 import { equipmentGrantSchema } from './equipment-grant'
 import { grantRowIdSchema } from './grant-row-id'
@@ -79,17 +80,37 @@ export const languageChoiceGrantSchema = contentPoolChoiceSchema
 
 export type LanguageChoiceGrant = z.infer<typeof languageChoiceGrantSchema>
 
-export function formatLanguageGrantSentence(languageIds: readonly string[]): string {
-  return `Character knows ${joinNaturalList(languageIds.map((id) => getLanguageSentenceForm(id)))}.`
+export function formatLanguageGrantSentence(
+  languageIds: readonly string[],
+  resolveLabel: (id: string) => string = (id) => getLanguageSentenceForm(id),
+): string {
+  return `Character knows ${joinNaturalList(languageIds.map(resolveLabel))}.`
+}
+
+function formatCompactVocabularyGrant(
+  ids: readonly string[],
+  resolveLabel: (id: string) => string | undefined,
+  term: VocabularyTerm,
+  formatResolved: (labels: string[]) => string,
+): string {
+  const labels = ids.map(resolveLabel).filter((label) => label !== undefined)
+  const parts = []
+  if (labels.length > 0) parts.push(formatResolved(labels))
+  if (labels.length < ids.length) parts.push(`${term.label} reference unavailable`)
+  return parts.join(', ')
 }
 
 /** Compact summary label: "Common language", "Common, Elvish languages", etc. */
-export function formatLanguageGrantCompact(languageIds: readonly string[]): string {
-  const labels = languageIds.map((id) => getLanguageLabel(id))
-  if (languageIds.length === 1) {
-    return `${labels[0]} ${getLanguageProficiencySentenceForm(1)}`
-  }
-  return `${labels.join(', ')} ${getLanguageProficiencySentenceForm(2)}`
+export function formatLanguageGrantCompact(
+  languageIds: readonly string[],
+  resolveLabel: (id: string) => string | undefined = getLanguageLabel,
+): string {
+  return formatCompactVocabularyGrant(
+    languageIds,
+    resolveLabel,
+    LANGUAGE_TERM,
+    (labels) => `${labels.join(', ')} ${getLanguageProficiencySentenceForm(labels.length)}`,
+  )
 }
 
 export function formatLanguageChoiceGrantSentence(grant: LanguageChoiceGrant): string {
@@ -139,33 +160,67 @@ export function formatFeatChoiceGrantSentence(grant: FeatChoiceGrant): string {
   return `Character chooses ${grant.choose} ${featForm}.`
 }
 
-export function formatSenseGrantSentence(sense: z.infer<typeof senseSchema>): string {
-  return `Character gains ${getSenseSentenceForm(sense.type)} with a range of ${sense.range} feet.`
+export function formatSenseGrantSentence(
+  sense: z.infer<typeof senseSchema>,
+  label = getSenseSentenceForm(sense.type),
+): string {
+  return `Character gains ${label} with a range of ${sense.range} feet.`
 }
 
-export function formatDamageTypeGrantSentence(damageTypes: readonly string[]): string {
-  return `Character chooses from ${joinNaturalList(
-    damageTypes.map((id) => getDamageTypeSentenceForm(id)),
-  )}.`
+function formatDamageTypeGrantChoices(
+  damageTypes: readonly string[],
+  resolveLabel?: (id: string) => string | undefined,
+): string | undefined {
+  const phrases = damageTypes.map((id) => {
+    if (!resolveLabel) return getDamageTypeSentenceForm(id)
+    const label = resolveLabel(id)
+    return label ? getDamageTypeSentenceForm(id, 1, label) : undefined
+  })
+  if (phrases.some((phrase) => phrase === undefined)) return undefined
+  return joinNaturalList(phrases.filter((phrase) => phrase !== undefined))
+}
+
+export function formatDamageTypeGrantSentence(
+  damageTypes: readonly string[],
+  resolveLabel?: (id: string) => string | undefined,
+): string {
+  const choices = formatDamageTypeGrantChoices(damageTypes, resolveLabel)
+  return choices === undefined ? '' : `Character chooses from ${choices}.`
 }
 
 /** Compact summary label: "Acid damage type", "Fire and Cold damage types", etc. */
-export function formatDamageTypeGrantCompact(damageTypes: readonly string[]): string {
-  const labels = joinNaturalList(damageTypes.map((id) => getDamageTypeLabel(id)))
-  const concept = getTermSentenceForm(DAMAGE_TYPE_TERM, damageTypes.length)
-  return `${labels} ${concept}`
+export function formatDamageTypeGrantCompact(
+  damageTypes: readonly string[],
+  resolveLabel: (id: string) => string | undefined = getDamageTypeLabel,
+): string {
+  return formatCompactVocabularyGrant(
+    damageTypes,
+    resolveLabel,
+    DAMAGE_TYPE_TERM,
+    (labels) =>
+      `${joinNaturalList(labels)} ${getTermSentenceForm(DAMAGE_TYPE_TERM, labels.length)}`,
+  )
 }
 
-export function formatResistanceGrantSentence(damageTypes: readonly string[]): string {
-  return `Character gains Resistance to ${joinNaturalList(
-    damageTypes.map((id) => getDamageTypeSentenceForm(id)),
-  )}.`
+export function formatResistanceGrantSentence(
+  damageTypes: readonly string[],
+  resolveLabel?: (id: string) => string | undefined,
+): string {
+  const choices = formatDamageTypeGrantChoices(damageTypes, resolveLabel)
+  return choices === undefined ? '' : `Character gains Resistance to ${choices}.`
 }
 
 /** Compact summary label: "Acid resistance", "Fire and Cold resistance", etc. */
-export function formatResistanceGrantCompact(damageTypes: readonly string[]): string {
-  const labels = joinNaturalList(damageTypes.map((id) => getDamageTypeLabel(id)))
-  return `${labels} resistance`
+export function formatResistanceGrantCompact(
+  damageTypes: readonly string[],
+  resolveLabel: (id: string) => string | undefined = getDamageTypeLabel,
+): string {
+  return formatCompactVocabularyGrant(
+    damageTypes,
+    resolveLabel,
+    DAMAGE_TYPE_TERM,
+    (labels) => `${joinNaturalList(labels)} resistance`,
+  )
 }
 
 // ---------------------------------------------------------------------------

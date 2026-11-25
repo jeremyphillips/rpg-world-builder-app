@@ -11,7 +11,7 @@ import { ClassDetailBody } from './class-detail-body'
 const SRD_SKILLS = loadSeedSkillProficiencies('srd-cc-5.2.1')
 
 const vocabulary = {
-  resolveToolLabel: (slug: string) => slug,
+  resolveEquipmentLabel: (slug: string) => slug,
 }
 
 const meta = {

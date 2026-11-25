@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import { loadSeedClasses } from '@rpg/catalog/classes'
-import { isSpellcastingClassFeature } from '@rpg/contracts'
+import {
+  createEquipmentCatalogContext,
+  EQUIPMENT_REFERENCE_DISPLAY_MESSAGES,
+  isSpellcastingClassFeature,
+} from '@rpg/contracts'
 
 import { pickClass, pickEquipment } from '../../lib/fixtures/pick'
 import { FIGHTER, ROGUE } from '../fixtures'
@@ -10,6 +14,7 @@ import { srdSpellcastingProgressionFixture } from './fixtures/spellcasting-progr
 import {
   buildClassCardViewModel,
   buildClassDetailViewModel,
+  buildClassEquipmentVocabulary,
   CLASS_DISPLAY_NONE,
   CLASS_PROFICIENCY_ROW_LABELS,
   CLASS_SECTION_LABELS,
@@ -17,7 +22,7 @@ import {
 } from './class-display'
 
 const vocabulary = {
-  resolveToolLabel: (slug: string) => pickEquipment(slug).name,
+  resolveEquipmentLabel: (slug: string) => pickEquipment(slug).name,
 }
 
 function getProficienciesSection(viewModel: ReturnType<typeof buildClassDetailViewModel>) {
@@ -29,6 +34,27 @@ function getProficienciesSection(viewModel: ReturnType<typeof buildClassDetailVi
 }
 
 describe('class-display', () => {
+  it.each([
+    ['ready', 'another-campaign', EQUIPMENT_REFERENCE_DISPLAY_MESSAGES.catalogError],
+    ['pending', 'campaign', EQUIPMENT_REFERENCE_DISPLAY_MESSAGES.catalogLoading],
+    ['error', 'campaign', EQUIPMENT_REFERENCE_DISPLAY_MESSAGES.catalogError],
+    ['ready', 'campaign', 'River Blade'],
+  ] as const)(
+    'resolves class equipment for a %s catalog scoped to %s',
+    (status, campaignId, label) => {
+      const equipment = { ...pickEquipment('dagger'), name: 'River Blade' }
+      const scope = { rulesetId: equipment.rulesetId, campaignId: 'campaign' }
+      const catalog = createEquipmentCatalogContext({
+        status,
+        scope: { ...scope, campaignId },
+        equipmentById: new Map([[equipment.id, equipment]]),
+      })
+      expect(
+        buildClassEquipmentVocabulary(catalog, scope).resolveEquipmentLabel(equipment.slug),
+      ).toBe(label)
+    },
+  )
+
   it('builds class card view model with ability summary and hit die', () => {
     expect(buildClassCardViewModel(FIGHTER)).toEqual({
       label: 'Fighter',

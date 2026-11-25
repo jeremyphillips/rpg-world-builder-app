@@ -1,6 +1,5 @@
 import { useEffect, useMemo } from 'react'
 import { isWeaponEquipment, resolveEquipmentInstanceReferenceLabel } from '@rpg/contracts'
-import { SemanticText, Text } from '@rpg/ui'
 import { useWatch } from 'react-hook-form'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
@@ -128,6 +127,7 @@ export function MonsterActionDetail({
       ? (monsterFormSectionRows(values, located.section)[located.index] ?? action)
       : action
   const editor = located ? sections.editors[located.section] : sections.editors.actions
+  const { addAcquisition, setNotice } = sections
   const fields = useMemo(() => {
     if (!located || !values || !action || !liveAction) return []
     const sectionRows = monsterFormSectionRows(values, located.section)
@@ -140,7 +140,7 @@ export function MonsterActionDetail({
       equipment: values.equipment,
       sharedCastingOptions: sharedCastingOptions(values, action.id),
       advisories: collectMonsterFormAdvisories(values, monsterEquipmentCatalog(ctx)),
-      onCastingSourceBlocked: sections.setNotice,
+      onCastingSourceBlocked: setNotice,
       attackOptions: attackChipOptions(
         (located.section === 'reactions' || located.section === 'legendaryActions'
           ? (values.actions ?? [])
@@ -157,7 +157,7 @@ export function MonsterActionDetail({
       weapons,
       weaponActions,
       allowAddWeapon,
-      onAcquireAttack: (section, choice) => sections.addAcquisition(section, choice),
+      onAcquireAttack: (section, choice) => addAcquisition(section, choice),
       referenceOptions: referenceOptionLabels(values, ctx),
       sourceSpellOptions: legendarySourceSpellOptions(values, liveAction, ctx.spellCatalogById),
     })
@@ -168,8 +168,8 @@ export function MonsterActionDetail({
     liveAction,
     located,
     namePrefix,
-    sections.addAcquisition,
-    sections.setNotice,
+    addAcquisition,
+    setNotice,
     values,
     weaponActions,
     weapons,
@@ -187,15 +187,13 @@ export function MonsterActionDetail({
     document.getElementById(`monster-action-focus-${action.id}`)?.focus()
   }, [action, sections.focusToken])
 
-  const contextualChrome = sections.notice ? (
-    <div id={action ? `monster-action-focus-${action.id}` : undefined} tabIndex={-1}>
-      <Text as="p" variant="supporting">
-        <SemanticText>{sections.notice}</SemanticText>
-      </Text>
-    </div>
-  ) : action ? (
-    <div id={`monster-action-focus-${action.id}`} tabIndex={-1} />
-  ) : null
+  const contextNotice =
+    action || sections.notice
+      ? {
+          focusAnchorId: action ? `monster-action-focus-${action.id}` : undefined,
+          text: sections.notice,
+        }
+      : undefined
 
   const spellPicker =
     located && action
@@ -229,7 +227,7 @@ export function MonsterActionDetail({
       onDelete={located ? () => sections.requestDelete(located.action.id) : undefined}
       onDuplicate={located ? sections.duplicateSelected : undefined}
       overflowActions={moveOverflowActions(located, sections.requestMove)}
-      contextualChrome={contextualChrome}
+      contextNotice={contextNotice}
       facing={facing}
       spellPicker={spellPicker}
     />

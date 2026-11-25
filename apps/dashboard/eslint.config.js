@@ -478,12 +478,13 @@ const dashboardSourceExcerptImportGuard = {
   },
 }
 
+const structuredFacingMountMessage = 'Mount structured previews through StructuredFacingHostPanel.'
+
 const dashboardFacingPresentationImportGuard = {
   files: ['src/**/*.{ts,tsx}'],
   ignores: [
     '**/*.{test,integration.test,stories}.{ts,tsx}',
     'src/features/content/facing/structured-facing-host-panel.tsx',
-    'src/features/content/facing/facing-detail-body.tsx',
   ],
   rules: {
     '@typescript-eslint/no-restricted-imports': [
@@ -493,7 +494,85 @@ const dashboardFacingPresentationImportGuard = {
           {
             name: '@rpg/ui',
             importNames: ['FacingHostPanel'],
-            message: 'Mount structured previews through StructuredFacingHostPanel.',
+            message: structuredFacingMountMessage,
+          },
+        ],
+        patterns: [
+          {
+            group: [
+              '@rpg/ui/**/facing-host-panel',
+              '@rpg/ui/**/facing-host-panel.*',
+              '**/packages/ui/src/**/facing-host-panel',
+              '**/packages/ui/src/**/facing-host-panel.*',
+            ],
+            message: structuredFacingMountMessage,
+          },
+          {
+            group: [
+              '**/packages/ui/src',
+              '**/packages/ui/src/index',
+              '**/packages/ui/src/index.ts',
+            ],
+            importNames: ['FacingHostPanel'],
+            message: structuredFacingMountMessage,
+          },
+        ],
+      },
+    ],
+  },
+}
+
+const facingImportOptions =
+  dashboardFacingPresentationImportGuard.rules['@typescript-eslint/no-restricted-imports'][1]
+
+const dashboardMasterDetailShellImportGuard = {
+  files: dashboardFacingPresentationImportGuard.files,
+  ignores: [
+    ...dashboardFacingPresentationImportGuard.ignores,
+    'src/features/content/components/master-detail/master-detail-editor-panel.tsx',
+    'src/features/content/components/master-detail/nested-resource-master-detail-editor.tsx',
+  ],
+  rules: {
+    '@typescript-eslint/no-restricted-imports': [
+      'error',
+      {
+        paths: facingImportOptions.paths,
+        patterns: [
+          ...facingImportOptions.patterns,
+          {
+            group: ['**/master-detail-editor-shell', '**/master-detail-editor-shell.*'],
+            allowTypeImports: true,
+            message:
+              'Use the structured editor panel or the independently persisted resource adapter.',
+          },
+        ],
+      },
+    ],
+  },
+}
+
+const masterDetailShellImportOptions =
+  dashboardMasterDetailShellImportGuard.rules['@typescript-eslint/no-restricted-imports'][1]
+
+const dashboardNestedResourceEditorImportGuard = {
+  ...dashboardMasterDetailShellImportGuard,
+  ignores: [
+    ...dashboardMasterDetailShellImportGuard.ignores,
+    'src/features/content/classes/components/class-subclasses-tab.tsx',
+  ],
+  rules: {
+    '@typescript-eslint/no-restricted-imports': [
+      'error',
+      {
+        ...masterDetailShellImportOptions,
+        patterns: [
+          ...masterDetailShellImportOptions.patterns,
+          {
+            group: [
+              '**/nested-resource-master-detail-editor',
+              '**/nested-resource-master-detail-editor.*',
+            ],
+            message: 'The subclass route owns independently persisted master–detail editing.',
           },
         ],
       },
@@ -593,6 +672,54 @@ const dashboardMonsterAcquisitionSectionKindsGuard = {
   },
 }
 
+// Flat config replaces rule options. Preserve earlier restrictions in the
+// acquisition directories, including any form-field modules nested there.
+const monsterAcquisitionImportOptions =
+  dashboardMonsterAcquisitionSectionKindsGuard.rules['no-restricted-imports'][1]
+const traitPipelineImportOptions =
+  dashboardTraitPipelineImportGuard.rules['no-restricted-imports'][1]
+const traitFormFieldImportOptions =
+  dashboardTraitComposerFormFieldImportGuard.rules['no-restricted-imports'][1]
+
+const dashboardMonsterAcquisitionImportGuards = [
+  {
+    ...dashboardMonsterAcquisitionSectionKindsGuard,
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [...traitPipelineImportOptions.paths, ...monsterAcquisitionImportOptions.paths],
+          patterns: [
+            ...traitPipelineImportOptions.patterns,
+            ...monsterAcquisitionImportOptions.patterns,
+          ],
+        },
+      ],
+    },
+  },
+  {
+    ...dashboardMonsterAcquisitionSectionKindsGuard,
+    files: dashboardMonsterAcquisitionSectionKindsGuard.files.flatMap((acquisitionGlob) =>
+      dashboardTraitComposerFormFieldImportGuard.files.map((formFieldGlob) => [
+        acquisitionGlob,
+        formFieldGlob,
+      ]),
+    ),
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [...traitFormFieldImportOptions.paths, ...monsterAcquisitionImportOptions.paths],
+          patterns: [
+            ...traitFormFieldImportOptions.patterns,
+            ...monsterAcquisitionImportOptions.patterns,
+          ],
+        },
+      ],
+    },
+  },
+]
+
 const dashboardSystemRulesetLiteralGuard = {
   files: ['src/**/*.{ts,tsx}'],
   ignores: [
@@ -674,8 +801,10 @@ export default [
       ],
     },
   },
-  dashboardMonsterAcquisitionSectionKindsGuard,
   dashboardFacingPresentationImportGuard,
+  dashboardMasterDetailShellImportGuard,
+  dashboardNestedResourceEditorImportGuard,
   dashboardTraitPipelineImportGuard,
   dashboardTraitComposerFormFieldImportGuard,
+  ...dashboardMonsterAcquisitionImportGuards,
 ]

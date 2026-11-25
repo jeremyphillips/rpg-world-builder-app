@@ -39,6 +39,20 @@ const weapons = [
   { entryId: 'bow', label: 'Shortbow', equipped: false },
 ]
 
+describe('monster action acquisition inputs', () => {
+  it.each(['toString', 'constructor', '__proto__', 'create:unsupported'])(
+    'rejects the unregistered acquisition ID %s',
+    (id) => expect(parseMonsterActionAcquisitionId(id)).toBeUndefined(),
+  )
+
+  it('rejects a forged create kind before constructing an action', () => {
+    const forged = { type: 'create', kind: 'unsupported' } as never
+    expect(() => createMonsterActionFromAcquisition(forged)).toThrow(
+      'Unsupported monster action create choice',
+    )
+  })
+})
+
 describe('monsterActionAcquisitionItems', () => {
   it('adds an unused equipped weapon and disables an unequipped one', () => {
     const items = monsterActionAcquisitionItems({ weapons, allowAddWeapon: true })

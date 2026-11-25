@@ -1,5 +1,12 @@
+import {
+  createSpellCatalogContext,
+  MONSTER_ACTION_UNRESOLVED_REFERENCE,
+  SPELL_REFERENCE_DISPLAY_MESSAGES,
+} from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 import { resolveDependsOnWatchName } from '@rpg/ui/form'
+
+import { pickMonster, pickSpell } from '@/test/fixtures/pick'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import {
@@ -7,8 +14,11 @@ import {
   multiattackReplacementChoiceOptionsFromWatched,
   multiattackReplacementChoiceRowSectionRowsDependsOn,
   multiattackSequenceRowsDependsOn,
+  multiattackSpellOptionsForAction,
+  multiattackTargetAttackOptions,
 } from './monster-multiattack-form-options'
 import type { MonsterActionDraftRow } from '../monster-action-presets'
+import type { MonsterFormValues } from '../../monster-form-values'
 
 const ctx = {
   entityCatalogLayer: 'homebrew',
@@ -153,5 +163,46 @@ describe('multiattack live option resolution', () => {
     })
 
     expect(options.map((option) => option.value).sort()).toEqual(['bite'])
+  })
+})
+
+describe('multiattack reference option labels', () => {
+  const fireball = pickSpell('fireball')
+  const wrongScopeId = `other:${fireball.slug}`
+  const spellAction = {
+    id: 'spellcasting',
+    kind: 'spell',
+    spells: [
+      { spellId: fireball.id, castAtLevel: 5 },
+      { spellId: wrongScopeId, castAtLevel: 5 },
+    ],
+  } as MonsterActionDraftRow
+  const spellsById = new Map([[fireball.id, fireball]])
+
+  it('uses exact spell ids and retains an unresolved selection with a shared label', () => {
+    const catalog = createSpellCatalogContext({ status: 'ready', spellsById })
+    expect(multiattackSpellOptionsForAction(spellAction.id, [spellAction], catalog)).toEqual([
+      { value: fireball.id, label: 'Fireball (level 5 version)' },
+      { value: wrongScopeId, label: SPELL_REFERENCE_DISPLAY_MESSAGES.unknownSpell },
+    ])
+  })
+
+  it.each([
+    ['pending', SPELL_REFERENCE_DISPLAY_MESSAGES.catalogLoading],
+    ['error', SPELL_REFERENCE_DISPLAY_MESSAGES.catalogError],
+  ] as const)('uses the %s catalog label without inferring a cast level', (status, label) => {
+    const catalog = createSpellCatalogContext({ status, spellsById })
+    expect(multiattackSpellOptionsForAction(spellAction.id, [spellAction], catalog)).toEqual([
+      { value: fireball.id, label },
+      { value: wrongScopeId, label },
+    ])
+  })
+
+  it('keeps the stale attack id as a value while showing unresolved copy', () => {
+    const staleId = 'missing-attack'
+    const values = pickMonster('hell-hound') as unknown as MonsterFormValues
+    expect(
+      multiattackTargetAttackOptions([{ count: 1, actionIds: [staleId] }], [], values, ctx),
+    ).toEqual([{ value: staleId, label: MONSTER_ACTION_UNRESOLVED_REFERENCE }])
   })
 })

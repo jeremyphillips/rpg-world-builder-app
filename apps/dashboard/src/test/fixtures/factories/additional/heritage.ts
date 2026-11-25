@@ -1,5 +1,5 @@
 import type { HeritageForm } from '@/features/content/species/lib/species-heritage-form-fields'
-import { createHeritageOptionCampaignAccessDefaults } from '@/features/content/species/lib/species-trait-form-fields'
+import { createHeritageOptionCampaignAccessDefaults } from '@/features/content/species/lib/species-trait-form-schema'
 
 const DEFAULT_HERITAGE_OPTION = {
   kind: 'custom' as const,

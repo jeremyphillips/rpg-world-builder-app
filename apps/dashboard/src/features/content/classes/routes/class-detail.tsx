@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import {
   CLASS_PROGRESSION_TABLE_LABEL,
+  createEquipmentCatalogContext,
   type CharacterClass,
   type SkillProficiency,
   type Subclass,
@@ -30,7 +31,12 @@ import { ContentUsageReferencesSection } from '../../lib/usage/content-usage-ref
 import { ClassProgressionTable } from '../components/detail/class-progression-table'
 import { ClassDetailBody } from '../components/detail/class-detail-body'
 import { ContentDetailSection } from '../../lib/detail/page/content-detail-section'
-import { buildClassDetailViewModel, projectVisibleClassFeatures } from '../lib/class-display'
+import {
+  buildClassDetailViewModel,
+  buildClassEquipmentVocabulary,
+  projectVisibleClassFeatures,
+} from '../lib/class-display'
+import { useEquipment } from '../../equipment/hooks/use-equipment'
 import { useSpells } from '../../spells/hooks/use-spells'
 
 type ClassDetailContentProps = {
@@ -79,13 +85,22 @@ export function ClassDetailContent({
     subclassingEnabled,
   })
 
-  const vocabulary = {
-    resolveToolLabel: (slug: string) =>
-      slug
-        .split('-')
-        .map((part) => (part.length > 0 ? part.charAt(0).toUpperCase() + part.slice(1) : part))
-        .join(' '),
-  }
+  const equipmentQuery = useEquipment(campaignId)
+  const vocabulary = useMemo(() => {
+    const scope = { rulesetId: characterClass.rulesetId, campaignId }
+    const catalog = createEquipmentCatalogContext({
+      status: equipmentQuery.isError ? 'error' : equipmentQuery.isPending ? 'pending' : 'ready',
+      scope,
+      equipmentById: new Map(equipmentQuery.data?.map((item) => [item.id, item])),
+    })
+    return buildClassEquipmentVocabulary(catalog, scope)
+  }, [
+    campaignId,
+    characterClass.rulesetId,
+    equipmentQuery.data,
+    equipmentQuery.isError,
+    equipmentQuery.isPending,
+  ])
 
   const viewModel = buildClassDetailViewModel(characterClass, vocabulary, {
     surface: 'content-detail',
@@ -165,7 +180,7 @@ export function ClassDetail() {
           subclassesLoadingError={subclassesQuery.isLoadingError}
           skillProficiencies={skillsQuery.data ?? []}
           skillsPending={skillsQuery.isPending}
-          skillsLoadingError={skillsQuery.isLoadingError}
+          skillsLoadingError={skillsQuery.isError}
         />
       )}
     </ContentDetailResolver>

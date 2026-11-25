@@ -1,6 +1,8 @@
 import {
   createEquipmentCatalogContext,
   createSpellCatalogContext,
+  DAMAGE_TYPE_TERM,
+  formatCreatureSenseCompactLine,
   formatDamageTypeGrantSentence,
   formatFeatChoiceGrantSentence,
   formatLanguageGrantSentence,
@@ -10,6 +12,8 @@ import {
   formatSenseGrantSentence,
   formatSpellsGrantSentenceFromResolutions,
   getFeatCategorySentenceForm,
+  LANGUAGE_TERM,
+  SENSE_TERM,
   presentEquipmentReferenceDisplayName,
   presentSpellReferenceDisplayName,
   resolveEquipmentSlugReference,
@@ -23,7 +27,6 @@ import {
   type EquipmentCatalogScope,
   type EquipmentReferenceResolution,
   type EquipmentSlugReference,
-  type FeatCategory,
   type MovementGrantPayload,
   type MovementMode,
   type MovementOperation,
@@ -36,7 +39,6 @@ import {
 import { INLINE_METADATA_SEPARATOR } from '@rpg/contracts/primitives'
 
 import { limitedUseFromForm } from '../limited-use/limited-use-form.lib'
-import type { FieldOption } from '@rpg/ui/form'
 
 import { formatCompactMetadataList } from './grant-compact-metadata.lib'
 import { equipmentGrantSummary } from './equipment/equipment-grant-form-values'
@@ -51,6 +53,7 @@ import {
   weaponProficiencyGrantSummary,
 } from './proficiency/proficiency-grant-form-values'
 import { GRANT_TYPE_LABELS, type GrantType } from './grant-form-schema'
+import { readFeatChoiceFromDraft } from './grant-form-values'
 
 export const GRANT_TYPE_MISSING_PRIMARY = 'Grant type missing'
 import type { EquipmentGrantItemForm } from './equipment/equipment-grant-form-fields'
@@ -79,14 +82,11 @@ export type GrantEquipmentReferencePresentation = {
 export type GrantRowHeaderContext = {
   rowLabels: Record<string, string>
   equipmentReferences: GrantEquipmentReferencePresentation
-  weaponOptions: FieldOption[]
-  toolOptions: FieldOption[]
-  armorOptions: FieldOption[]
-  skillOptions: FieldOption[]
+  resolveSkillName?: (slug: string) => string
   spellReferences: GrantSpellReferencePresentation
-  resolveDamageTypeLabel?: (id: string) => string
-  resolveLanguageLabel?: (id: string) => string
-  resolveSenseLabel?: (id: string) => string
+  resolveDamageTypeLabel?: (id: string) => string | undefined
+  resolveLanguageLabel?: (id: string) => string | undefined
+  resolveSenseLabel?: (id: string) => string | undefined
 }
 
 export function buildGrantSpellReferencePresentation(
@@ -213,38 +213,27 @@ function resolveDamageTypeDetail(
   ctx: GrantRowHeaderContext,
 ): string | undefined {
   if (!damageTypes?.length) return undefined
-  const resolveLabel = ctx.resolveDamageTypeLabel ?? ((id: string) => id)
-  return formatCompactMetadataList(damageTypes.map((id) => resolveLabel(id)))
+  return formatCompactMetadataList(
+    damageTypes.map(
+      (id) => ctx.resolveDamageTypeLabel?.(id) ?? `${DAMAGE_TYPE_TERM.label} reference unavailable`,
+    ),
+  )
 }
 
-function resolveLanguageDetail(
-  languageId: string | undefined,
-  ctx: GrantRowHeaderContext,
-): string | undefined {
-  if (!languageId) return undefined
-  return ctx.resolveLanguageLabel?.(languageId) ?? languageId
-}
-
-function resolveSenseDetail(
+function readSenseGrantFact(
   type: string | undefined,
   range: number | string | undefined,
-  ctx: GrantRowHeaderContext,
-): string | undefined {
+): { type: SenseId; range: number } | undefined {
   if (!type || range === undefined || range === '') return undefined
-  const numericRange = typeof range === 'number' ? range : Number(range)
+  const numericRange = Number(range)
   if (!Number.isFinite(numericRange)) return undefined
-  const label = ctx.resolveSenseLabel?.(type) ?? type
-  return `${label} ${numericRange} ft`
+  return { type, range: numericRange }
 }
 
-function resolveFeatChoiceDetail(
-  category: string | undefined,
-  choose: number | string | undefined,
-): string | undefined {
-  if (!category) return undefined
-  const numericChoose = choose === undefined || choose === '' ? 1 : Number(choose)
-  if (!Number.isFinite(numericChoose)) return undefined
-  return `${numericChoose} ${getFeatCategorySentenceForm(category, numericChoose)}`
+function resolveFeatChoiceDetail(values: GrantRowValues): string | undefined {
+  const choice = readFeatChoiceFromDraft(values['featCategory'], values['featChoose'])
+  if (!choice) return undefined
+  return `${choice.choose} ${getFeatCategorySentenceForm(choice.category, choice.choose)}`
 }
 
 function resolveSpellGrantDetail(
@@ -304,55 +293,55 @@ function resolveSpellGrantDescription(values: GrantRowValues, ctx: GrantRowHeade
 type GrantRowDescriptionFormatter = (values: GrantRowValues, ctx: GrantRowHeaderContext) => string
 
 const GRANT_ROW_DESCRIPTION_BY_TYPE: Partial<Record<string, GrantRowDescriptionFormatter>> = {
-  resistances: (values) => {
+  resistances: (values, ctx) => {
     const damageTypes = values['resistances'] as string[] | undefined
     if (!damageTypes?.length) return ''
-    return formatResistanceGrantSentence(damageTypes)
+    return formatResistanceGrantSentence(damageTypes, ctx.resolveDamageTypeLabel)
   },
-  damageType: (values) => {
+  damageType: (values, ctx) => {
     const damageTypes = values['damageType'] as string[] | undefined
     if (!damageTypes?.length) return ''
-    return formatDamageTypeGrantSentence(damageTypes)
+    return formatDamageTypeGrantSentence(damageTypes, ctx.resolveDamageTypeLabel)
   },
-  senses: (values) => {
-    const type = values['senseType'] as string | undefined
-    const range = values['senseRange'] as number | string | undefined
-    if (!type || range === undefined || range === '') return ''
-    const numericRange = typeof range === 'number' ? range : Number(range)
-    if (!Number.isFinite(numericRange)) return ''
-    return formatSenseGrantSentence({ type: type as SenseId, range: numericRange })
+  senses: (values, ctx) => {
+    const sense = readSenseGrantFact(
+      values['senseType'] as string | undefined,
+      values['senseRange'] as number | string | undefined,
+    )
+    const label = sense && ctx.resolveSenseLabel?.(sense.type)
+    return sense && label ? formatSenseGrantSentence(sense, label) : ''
   },
   movement: (values) => {
     const grant = movementFormValuesToGrantPayload(values)
     if (!grant) return ''
     return formatMovementGrantAuthoringSummary(grant)
   },
-  languages: (values) => {
+  languages: (values, ctx) => {
     const languageId = values['language'] as string | undefined
     if (!languageId) return ''
-    return formatLanguageGrantSentence([languageId])
+    const label = ctx.resolveLanguageLabel?.(languageId)
+    return label ? formatLanguageGrantSentence([languageId], () => label) : ''
   },
   featChoice: (values) => {
-    const category = values['featCategory'] as string | undefined
-    const choose = values['featChoose'] as number | string | undefined
-    if (!category) return ''
-    const numericChoose = choose === undefined || choose === '' ? 1 : Number(choose)
-    if (!Number.isFinite(numericChoose)) return ''
-    return formatFeatChoiceGrantSentence({
-      category: category as FeatCategory,
-      choose: numericChoose,
-    })
+    const choice = readFeatChoiceFromDraft(values['featCategory'], values['featChoose'])
+    return choice ? formatFeatChoiceGrantSentence(choice) : ''
   },
   equipment: (values, ctx) =>
     equipmentGrantSummary(values as EquipmentGrantItemForm, ctx.equipmentReferences),
   weaponProficiency: (values, ctx) =>
-    weaponProficiencyGrantSummary(values as WeaponProficiencyItemForm, ctx.weaponOptions),
+    weaponProficiencyGrantSummary(
+      values as WeaponProficiencyItemForm,
+      ctx.equipmentReferences.displayName,
+    ),
   toolProficiency: (values, ctx) =>
-    toolProficiencyGrantSummary(values as ToolProficiencyItemForm, ctx.toolOptions),
+    toolProficiencyGrantSummary(
+      values as ToolProficiencyItemForm,
+      ctx.equipmentReferences.displayName,
+    ),
   skillProficiency: (values, ctx) =>
-    skillProficiencyGrantSummary(values as SkillProficiencyItemForm, ctx.skillOptions),
+    skillProficiencyGrantSummary(values as SkillProficiencyItemForm, ctx.resolveSkillName),
   armorTraining: (values, ctx) =>
-    armorTrainingGrantSummary(values as ArmorTrainingItemForm, ctx.armorOptions),
+    armorTrainingGrantSummary(values as ArmorTrainingItemForm, ctx.equipmentReferences.displayName),
   spells: (values, ctx) => resolveSpellGrantDescription(values, ctx),
 }
 
@@ -366,27 +355,38 @@ const GRANT_ROW_DETAIL_BY_TYPE: Partial<Record<string, GrantRowDetailFormatter>>
     resolveDamageTypeDetail(values['resistances'] as string[] | undefined, ctx),
   damageType: (values, ctx) =>
     resolveDamageTypeDetail(values['damageType'] as string[] | undefined, ctx),
-  senses: (values, ctx) =>
-    resolveSenseDetail(
+  senses: (values, ctx) => {
+    const sense = readSenseGrantFact(
       values['senseType'] as string | undefined,
       values['senseRange'] as number | string | undefined,
-      ctx,
-    ),
+    )
+    if (!sense) return undefined
+    const label = ctx.resolveSenseLabel?.(sense.type)
+    return label
+      ? formatCreatureSenseCompactLine(sense, label)
+      : `${SENSE_TERM.label} reference unavailable`
+  },
   movement: (values) => resolveMovementDetail(values),
-  languages: (values, ctx) => resolveLanguageDetail(values['language'] as string | undefined, ctx),
-  featChoice: (values) =>
-    resolveFeatChoiceDetail(
-      values['featCategory'] as string | undefined,
-      values['featChoose'] as number | string | undefined,
-    ),
+  languages: (values, ctx) => {
+    const id = values['language'] as string | undefined
+    if (!id) return undefined
+    return ctx.resolveLanguageLabel?.(id) ?? `${LANGUAGE_TERM.label} reference unavailable`
+  },
+  featChoice: resolveFeatChoiceDetail,
   weaponProficiency: (values, ctx) =>
-    weaponProficiencyGrantDetail(values as WeaponProficiencyItemForm, ctx.weaponOptions),
+    weaponProficiencyGrantDetail(
+      values as WeaponProficiencyItemForm,
+      ctx.equipmentReferences.displayName,
+    ),
   toolProficiency: (values, ctx) =>
-    toolProficiencyGrantDetail(values as ToolProficiencyItemForm, ctx.toolOptions),
+    toolProficiencyGrantDetail(
+      values as ToolProficiencyItemForm,
+      ctx.equipmentReferences.displayName,
+    ),
   skillProficiency: (values, ctx) =>
-    skillProficiencyGrantDetail(values as SkillProficiencyItemForm, ctx.skillOptions),
+    skillProficiencyGrantDetail(values as SkillProficiencyItemForm, ctx.resolveSkillName),
   armorTraining: (values, ctx) =>
-    armorTrainingGrantDetail(values as ArmorTrainingItemForm, ctx.armorOptions),
+    armorTrainingGrantDetail(values as ArmorTrainingItemForm, ctx.equipmentReferences.displayName),
   spells: (values, ctx) => resolveSpellGrantDetail(values['spellIds'] as string[] | undefined, ctx),
 }
 

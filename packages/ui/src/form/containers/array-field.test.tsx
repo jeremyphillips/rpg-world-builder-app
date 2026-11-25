@@ -3,7 +3,7 @@ import { describe, expect, it, vi, afterEach } from 'vitest'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { UseFormReturn } from 'react-hook-form'
-import { useController } from 'react-hook-form'
+import { FormProvider, useController, useForm } from 'react-hook-form'
 import axe from 'axe-core'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { z } from 'zod'
@@ -12,6 +12,8 @@ import { addCustomRefinementIssue } from '@rpg/contracts'
 import { CANVAS_SURFACE } from '../../components/ui/surface.variants'
 import { fieldAnatomyStackVariants } from '../../components/ui/field.variants'
 import { Form } from '../shells/form.client'
+import { DEFAULT_FORM_DENSITY } from '../form-density'
+import { ArrayFormItemSection } from '../renderers/array/array-form-item-section.client'
 import type { FormItem } from '../field-config'
 import { readArrayItemCollapseOverrides } from '../config/array/array-item-collapse-storage.lib'
 import { submitAndExpectPayload } from '../test-utils'
@@ -116,6 +118,59 @@ function renderForm(onSubmit: (values: Values) => void = vi.fn()) {
 describe('ArrayFieldRenderer', () => {
   afterEach(() => {
     localStorage.clear()
+  })
+
+  it('checks bindings separately in each instantiated structured detail array row', () => {
+    function Fixture({ duplicate }: { duplicate: boolean }) {
+      const form = useForm({
+        defaultValues: {
+          traits: [{ name: 'First' }, { name: 'Second' }],
+        },
+      })
+      return (
+        <FormProvider {...form}>
+          <ArrayFormItemSection
+            item={{
+              kind: 'array',
+              name: 'traits',
+              fields: [
+                ...traitFields,
+                ...(duplicate
+                  ? [
+                      {
+                        kind: 'slot' as const,
+                        name: 'duplicate',
+                        boundNames: ['name'],
+                        visibility: {
+                          dependsOn: ['name'],
+                          visibleWhen: (values: Record<string, unknown>) =>
+                            values.name === 'Second',
+                        },
+                        render: () => null,
+                      },
+                    ]
+                  : []),
+              ],
+            }}
+            parentContext={{
+              density: DEFAULT_FORM_DENSITY,
+              depth: 0,
+              namedGroupDepth: 0,
+              enforceUniqueFieldBindings: true,
+            }}
+            idPrefix="traits"
+            depth={0}
+          />
+        </FormProvider>
+      )
+    }
+
+    const fixture = render(<Fixture duplicate={false} />)
+    expect(screen.getByDisplayValue('First')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('Second')).toBeInTheDocument()
+    expect(() => fixture.rerender(<Fixture duplicate />)).toThrow(
+      'Overlapping detail array bindings "traits.1.name" and "traits.1.name"',
+    )
   })
 
   it('wraps a top-level array fieldset in one shared field container', () => {

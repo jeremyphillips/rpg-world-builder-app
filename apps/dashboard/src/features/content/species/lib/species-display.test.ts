@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { DEFAULT_SYSTEM_RULESET_ID } from '@rpg/contracts'
+import { createSpellCatalogContext, DEFAULT_SYSTEM_RULESET_ID } from '@rpg/contracts'
 import { listLanguageSeedOptions } from '@rpg/catalog/vocabulary'
 
 import { makeSpecies } from '@/test/fixtures/factories/species'
@@ -15,7 +15,7 @@ import {
 import { pickSpecies } from '../../lib/fixtures/pick'
 import {
   DROW_HERITAGE_SHEET_SUMMARY_LINES,
-  getDrowHeritageSpellCatalog,
+  buildCatalogDrowGrantDisplayVocabulary,
 } from '../../lib/fixtures/grant-display-fixtures'
 
 import {
@@ -55,7 +55,7 @@ function buildVocabulary(languages: ReturnType<typeof listLanguageSeedOptions>) 
     resolveCreatureTypeLabel: (id: string) => getCreatureTypeLabel(creatureTypeVocabulary, id),
     resolveLanguageLabel: (id: string) => languages.find((entry) => entry.id === id)?.label ?? id,
     resolveSenseLabel: (type: string) => getSenseLabelFromVocabulary(senseVocabulary, type),
-    resolveSpell: () => undefined,
+    spellCatalog: createSpellCatalogContext({ status: 'ready' }),
   }
 }
 
@@ -112,6 +112,17 @@ describe('species-display', () => {
     const sensesRow = statRows.find((row) => row.label === SPECIES_STAT_LABELS.senses)
 
     expect(sensesRow?.value).toBe('None')
+  })
+
+  it.each([
+    ['Moon Sight', 'Moon Sight 120 ft.'],
+    [undefined, 'Sense reference unavailable'],
+  ])('uses the scoped sense label in species stats', (label, value) => {
+    const display = buildSpeciesDetailViewModel(dwarfWithTraits, {
+      ...vocabulary,
+      resolveSenseLabel: () => label,
+    })
+    expect(display.statRows).toContainEqual({ label: SPECIES_STAT_LABELS.senses, value })
   })
 
   it('omits language affinities stat row when absent', () => {
@@ -185,14 +196,52 @@ describe('species-display', () => {
     })
   })
 
+  it('uses scoped language labels for affinities and saved heritage grants', () => {
+    const species = makeSpecies({
+      ...dwarfWithTraits,
+      languageAffinities: ['river-cant', 'removed-language'],
+      heritage: {
+        id: 'river-lineages',
+        name: 'River Lineages',
+        choose: 1,
+        options: [
+          {
+            kind: 'custom',
+            id: 'river',
+            name: 'River',
+            grantGroups: [
+              {
+                grants: [
+                  {
+                    id: 'river-languages',
+                    kind: 'languages',
+                    languageIds: ['river-cant', 'removed-language'],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    })
+    const display = buildSpeciesDetailViewModel(species, {
+      ...vocabulary,
+      resolveLanguageLabel: (id) => (id === 'river-cant' ? 'Waterway Speech' : undefined),
+    })
+    expect(display.statRows).toContainEqual({
+      label: SPECIES_STAT_LABELS.languageAffinities,
+      value: 'Waterway Speech, Language reference unavailable',
+    })
+    expect(
+      display.sections.find((section) => section.id === 'heritage')?.items[0]?.summaryInline,
+    ).toBe('Waterway Speech language, Language reference unavailable')
+  })
+
   it('builds grouped grant summaries for catalog Drow heritage options', () => {
     const elf = pickSpecies('elf')
     const vocabularyWithSpells = {
       ...vocabulary,
-      resolveSpell: (spellId: string) => {
-        const spell = getDrowHeritageSpellCatalog().find((entry) => entry.id === spellId)
-        return spell ? { name: spell.name, level: spell.level } : undefined
-      },
+      spellCatalog: buildCatalogDrowGrantDisplayVocabulary().spellCatalog,
     }
 
     const { sections } = buildSpeciesDetailViewModel(elf, vocabularyWithSpells)

@@ -16,7 +16,7 @@ import {
 } from '@/features/content'
 import { CREATURE_TRAIT_CUSTOM_DESCRIPTION } from '../../lib/creature-traits/creature-trait-custom-description'
 import { CREATURE_TRAIT_CUSTOM_ITEM_ID } from '../../lib/creature-traits/creature-trait-add-menu'
-import type { TraitRowForm } from './species-trait-form-fields'
+import type { TraitRowForm } from './species-trait-form-schema'
 
 const CUSTOM_GROUP_ID = 'custom'
 const SENSES_GROUP_ID = 'senses'

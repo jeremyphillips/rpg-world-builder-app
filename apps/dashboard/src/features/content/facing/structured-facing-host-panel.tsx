@@ -2,16 +2,13 @@ import { FacingHostPanel } from '@rpg/ui'
 
 import { buildMonsterActionAttackPreview } from '../monsters/lib/actions/previews/monster-action-attack-summary'
 import { facingBlockRenderers } from './facing-block-renderers'
-import { resolveMonsterActionDraftFacing } from './domains/monster-action/resolve-monster-action-draft-facing'
 import type { FacingHostConfig } from './facing-host-config.types'
-import { resolveFacing } from './resolve-facing'
+import { resolveFacingWithFacts } from './resolve-facing'
 import { toFacingPanelModel } from './structured-facing-panel-model.lib'
 
 function resolvePanelModel(request: FacingHostConfig) {
-  if (request.domain === 'monsterAction') {
-    const { resolution, attackProfile } = resolveMonsterActionDraftFacing(request)
-    if (!attackProfile) return toFacingPanelModel(resolution)
-
+  const { resolution, attackProfile } = resolveFacingWithFacts(request)
+  if (request.domain === 'monsterAction' && attackProfile) {
     const preview = buildMonsterActionAttackPreview(
       { status: 'resolved', value: attackProfile },
       request.values.abilityScores,
@@ -25,7 +22,7 @@ function resolvePanelModel(request: FacingHostConfig) {
         : undefined,
     )
   }
-  return toFacingPanelModel(resolveFacing(request))
+  return toFacingPanelModel(resolution)
 }
 
 export function StructuredFacingHostPanel({ facing }: { facing: FacingHostConfig | undefined }) {

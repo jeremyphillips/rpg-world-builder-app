@@ -1,4 +1,8 @@
-import { systemDefaultArmorClassRules } from '@rpg/contracts'
+import {
+  DEFAULT_SYSTEM_RULESET_ID,
+  systemDefaultArmorClassRules,
+  type ClassBodyFeature,
+} from '@rpg/contracts'
 import { describe, expect, expectTypeOf, it, vi } from 'vitest'
 
 import '../classes/lib/class-form-def'
@@ -42,6 +46,24 @@ describe('rules preview lockdown', () => {
       status: 'invalid',
       reason: { code: 'unsupported-kind' },
     })
+  })
+
+  it('rejects an unsupported class feature through both facing inputs', () => {
+    const forged = { id: 'forged', kind: 'unsupported', name: 'Unsupported feature' }
+    const host = { className: 'Example', rulesetId: DEFAULT_SYSTEM_RULESET_ID } as const
+    const expected = { status: 'invalid', reason: { code: 'unsupported-kind' } }
+
+    expect(resolveFacing({ domain: 'classFeature', source: 'draft', row: forged, host })).toEqual(
+      expected,
+    )
+    expect(
+      resolveFacing({
+        domain: 'classFeature',
+        source: 'persisted',
+        feature: forged as unknown as ClassBodyFeature,
+        host,
+      }),
+    ).toEqual(expected)
   })
 
   it('returns undefined for custom species trait drafts', () => {

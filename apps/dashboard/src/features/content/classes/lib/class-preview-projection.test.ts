@@ -1,10 +1,16 @@
 import { describe, expect, it } from 'vitest'
 
+import { EQUIPMENT_REFERENCE_DISPLAY_MESSAGES } from '@rpg/contracts'
+
+import { pickEquipment, pickSkillProficiency } from '../../lib/fixtures/pick'
+
 import { classCreateDefaultValues } from './class-form-values'
 import { classFormDef, type ClassFormValues } from './class-form-def'
 import {
   CLASS_PREVIEW_FACT_LABELS,
   buildClassPreviewIdentity,
+  buildClassPreviewDetailViewModel,
+  classPreviewVocabulary,
   buildClassPreviewSections,
 } from './class-preview-projection'
 import {
@@ -102,6 +108,56 @@ describe('class preview projection', () => {
     expect(resolveContentPreviewSectionPresentation(sections.basics!, false, false)).toEqual({
       marker: 'incomplete',
     })
+  })
+
+  it.each([
+    ['ready', 'Athletics for This Campaign, Skill proficiency reference unavailable'],
+    ['pending', 'Loading skill proficiencies…'],
+    ['error', 'Could not load skill proficiencies.'],
+  ] as const)('uses scoped skill labels and %s catalog state', (skillCatalogStatus, value) => {
+    const athletics = { ...pickSkillProficiency('athletics'), name: 'Athletics for This Campaign' }
+    const sections = buildClassPreviewSections(
+      createValues({
+        proficiencies: {
+          ...classCreateDefaultValues.proficiencies!,
+          skills: { items: [athletics.slug, 'missing-skill'] },
+        },
+      }),
+      { skillCatalogStatus, skillCatalogBySlug: new Map([[athletics.slug, athletics]]) },
+    )
+
+    expect(sections.proficiencies?.facts).toContainEqual({
+      label: CLASS_PREVIEW_FACT_LABELS.skills,
+      value,
+    })
+  })
+
+  it('uses scoped equipment names in the rail and player preview', () => {
+    const equipment = { ...pickEquipment('greataxe'), name: 'Campaign Greataxe' }
+    const values = createValues({
+      weaponProficiencyMode: 'specific',
+      proficiencies: {
+        ...classCreateDefaultValues.proficiencies!,
+        weapons: { categories: [], items: [equipment.slug, 'stale-item'] },
+      },
+    })
+    const ctx = {
+      rulesetId: equipment.rulesetId,
+      equipmentCatalogStatus: 'ready' as const,
+      equipmentCatalogById: new Map([[equipment.id, equipment]]),
+    }
+    const expected = `${equipment.name}, ${EQUIPMENT_REFERENCE_DISPLAY_MESSAGES.unknownEquipment}`
+    expect(buildClassPreviewSections(values, ctx).proficiencies?.facts).toContainEqual({
+      label: CLASS_PREVIEW_FACT_LABELS.weapons,
+      value: expected,
+    })
+    const detail = buildClassPreviewDetailViewModel(values, classPreviewVocabulary(ctx))
+    expect(detail.sections).toContainEqual(
+      expect.objectContaining({
+        id: 'proficiencies',
+        granted: expect.arrayContaining([expect.objectContaining({ value: expected })]),
+      }),
+    )
   })
 
   it('uses compact vocabulary labels for preview rail facts', () => {

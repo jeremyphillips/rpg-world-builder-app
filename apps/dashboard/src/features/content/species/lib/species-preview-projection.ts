@@ -4,15 +4,16 @@ import {
   SPECIES_CONTENT_TYPE_TERM,
   getSpeciesHeritageLabel,
   createSpellCatalogContext,
+  createEquipmentCatalogContext,
   type ContentMedia,
   type Species,
   type SystemRulesetId,
 } from '@rpg/contracts'
 import { formatPreviewRailOverflowList, type PreviewRailFact } from '@rpg/ui'
 
-import { getLanguageLabelFromVocabulary, getSenseLabelFromVocabulary } from '@/features/vocabulary'
+import { findVocabularyLabel } from '@/features/vocabulary'
 
-import { buildSpellGrantVocabularyFromCatalog } from '../../lib/forms/grants/grant-display'
+import { equipmentReferenceScopeFromContentFormCtx } from '@/lib/content-form-equipment-reference-scope.lib'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import {
   CONTENT_PREVIEW_DESCRIPTION_PLACEHOLDER,
@@ -45,6 +46,7 @@ import {
 import {
   mergeLevelLimitsFormDefaults,
   mergeMulticlassingFormDefaults,
+  resolveSpeciesClassLabel,
 } from './species-rules-form-values'
 import { traitRowNameForIdAssignment, traitsFromFormValues } from './species-trait-form-values'
 import { speciesCreateDefaultValues } from './species-form-values'
@@ -87,26 +89,27 @@ function speciesPreviewName(values: SpeciesFormValues): string {
   return trimmed ? trimmed : contentPreviewUnnamedName(SPECIES_CONTENT_TYPE_TERM)
 }
 
-function formatClassLabel(classId: string, ctx: ContentFormCtx): string {
-  const match = ctx.options?.classes?.visible.find(
-    (cls) => cls.id === classId || cls.slug === classId,
-  )
-  return match?.name ?? classId
-}
-
 function speciesPreviewVocabulary(ctx: ContentFormCtx): SpeciesDisplayVocabulary {
+  const scope = equipmentReferenceScopeFromContentFormCtx(ctx)
+  const equipmentScope = scope ?? { rulesetId: '', campaignId: '' }
   return {
-    resolveCreatureTypeLabel: (id) => getCreatureTypeLabel(id, ctx),
-    resolveLanguageLabel: (id) =>
-      ctx.languageVocabulary ? getLanguageLabelFromVocabulary(ctx.languageVocabulary, id) : id,
-    resolveSenseLabel: (type) =>
-      ctx.senseVocabulary ? getSenseLabelFromVocabulary(ctx.senseVocabulary, type) : type,
-    resolveSpell: buildSpellGrantVocabularyFromCatalog(
-      createSpellCatalogContext({
-        status: ctx.spellCatalogStatus ?? 'pending',
-        spellsById: ctx.spellCatalogById,
+    equipmentReferences: {
+      scope: equipmentScope,
+      catalog: createEquipmentCatalogContext({
+        status: scope ? (ctx.equipmentCatalogStatus ?? 'pending') : 'pending',
+        scope: equipmentScope,
+        equipmentById: ctx.equipmentCatalogById,
       }),
-    ),
+    },
+    resolveSkillName: (slug) => ctx.skillCatalogBySlug?.get(slug)?.name,
+    resolveCreatureTypeLabel: (id) => getCreatureTypeLabel(id, ctx),
+    resolveDamageTypeLabel: (id) => findVocabularyLabel(ctx.damageTypeVocabulary, id),
+    resolveLanguageLabel: (id) => findVocabularyLabel(ctx.languageVocabulary, id),
+    resolveSenseLabel: (type) => findVocabularyLabel(ctx.senseVocabulary, type),
+    spellCatalog: createSpellCatalogContext({
+      status: ctx.spellCatalogStatus ?? 'pending',
+      spellsById: ctx.spellCatalogById,
+    }),
   }
 }
 
@@ -242,7 +245,7 @@ function buildRulesFacts(values: SpeciesFormValues, ctx: ContentFormCtx): Previe
   })
 
   if (SPECIES_CLASS_POLICY_MODES_REQUIRING_IDS.includes(classPolicy.mode)) {
-    const classLabels = (classPolicy.classIds ?? []).map((id) => formatClassLabel(id, ctx))
+    const classLabels = (classPolicy.classIds ?? []).map((id) => resolveSpeciesClassLabel(id, ctx))
     facts.push({
       label: SPECIES_PREVIEW_FACT_LABELS.classPolicyClasses,
       value:

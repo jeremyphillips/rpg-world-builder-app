@@ -7,6 +7,10 @@ import { ArrayItemPresentationContext } from '../../../../context/array-item-pre
 import { FormSectionContext } from '../../../../context/form-section.context'
 import type { ArrayConfig } from '../../../../field-config'
 import { NestedFormItems } from '../../../../containers/form-item-node.client'
+import {
+  collectActiveFormItemBindings,
+  findFormItemBindingConflict,
+} from '../../../../config/form-item-visibility.lib'
 import { arrayItemHasVisibleBodyFields } from '../../../../config/array/array-item-visible-body.lib'
 
 export function renderArrayFieldItemFieldsNode(options: {
@@ -20,6 +24,15 @@ export function renderArrayFieldItemFieldsNode(options: {
   arrayItemFieldContext: React.ComponentProps<typeof FormSectionContext.Provider>['value']
   itemValues: Record<string, unknown>
 }): { fieldsNode: React.ReactNode; itemBody: React.ReactNode | undefined } {
+  if (options.arrayItemFieldContext.enforceUniqueFieldBindings) {
+    const bindings = collectActiveFormItemBindings(options.config.fields, options.itemValues, '')
+    const conflict = findFormItemBindingConflict(bindings)
+    if (conflict) {
+      throw new Error(
+        `Overlapping detail array bindings "${options.itemPrefix}.${conflict.owner.path}" and "${options.itemPrefix}.${conflict.binding.path}"`,
+      )
+    }
+  }
   const fieldsNode = (
     <ArrayItemPresentationContext.Provider
       value={{

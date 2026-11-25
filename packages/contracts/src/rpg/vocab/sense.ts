@@ -67,8 +67,11 @@ export function formatCreatureSenseTraitRulesSentence(sense: Sense): string {
 }
 
 /** Compact stat line for one sense (e.g. `Darkvision 60 ft.`). */
-export function formatCreatureSenseCompactLine(sense: Sense): string {
-  return `${getSenseLabel(sense.type)} ${sense.range} ft.`
+export function formatCreatureSenseCompactLine(
+  sense: Sense,
+  label = getSenseLabel(sense.type),
+): string {
+  return `${label} ${sense.range} ft.`
 }
 
 /** Joins compact sense lines for species and monster stat rows. */

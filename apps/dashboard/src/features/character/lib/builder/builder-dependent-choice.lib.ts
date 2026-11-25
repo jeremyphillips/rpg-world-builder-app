@@ -6,17 +6,16 @@ import {
   type CharacterBuildLanguageOption,
   type ChoiceSet,
   type Species,
-  type Spell,
+  type SpellCatalogContext,
 } from '@rpg/contracts'
 import type { RadioCardOption } from '@rpg/ui'
 
+import { buildSpeciesDetailViewModel } from '@/features/content'
+
 import {
-  buildSeedCreatureTypeVocabulary,
-  buildSeedSenseVocabulary,
-  getCreatureTypeLabel,
-  getSenseLabelFromVocabulary,
-} from '@/features/vocabulary'
-import { buildSpeciesDetailViewModel, buildSpellGrantVocabulary } from '@/features/content'
+  buildBuilderSpeciesVocabulary,
+  type BuilderSpeciesGrantReferences,
+} from './builder-species-option-display.lib'
 
 export type DependentChoiceSectionCopy = {
   statusText: string
@@ -55,40 +54,18 @@ export function resolveDependentChoiceSectionCopy({
   }
 }
 
-function resolveLanguageLabel(
-  languages: readonly CharacterBuildLanguageOption[],
-  languageId: string,
-): string {
-  return languages.find((entry) => entry.id === languageId)?.label ?? languageId
-}
-
-function buildHeritageDisplayVocabulary(
-  languages: readonly CharacterBuildLanguageOption[],
-  spells: readonly Spell[],
-) {
-  const creatureTypeVocabulary = buildSeedCreatureTypeVocabulary()
-  const senseVocabulary = buildSeedSenseVocabulary()
-  const resolveSpell = buildSpellGrantVocabulary(spells)
-
-  return {
-    resolveCreatureTypeLabel: (id: string) => getCreatureTypeLabel(creatureTypeVocabulary, id),
-    resolveLanguageLabel: (id: string) => resolveLanguageLabel(languages, id),
-    resolveSenseLabel: (type: string) => getSenseLabelFromVocabulary(senseVocabulary, type),
-    resolveSpell,
-  }
-}
-
 /** Maps species heritage options to compact dependent-choice RadioCard options. */
 export function mapHeritageOptionsToDependentCardOptions(
   species: Species,
   languages: readonly CharacterBuildLanguageOption[],
-  spells: readonly Spell[] = [],
+  spellCatalog: SpellCatalogContext,
+  references?: BuilderSpeciesGrantReferences,
 ): RadioCardOption[] {
   if (!species.heritage) return []
 
   const heritageSection = buildSpeciesDetailViewModel(
     species,
-    buildHeritageDisplayVocabulary(languages, spells),
+    buildBuilderSpeciesVocabulary(languages, spellCatalog, references),
   ).sections.find((section) => section.id === 'heritage')
 
   if (!heritageSection) return []

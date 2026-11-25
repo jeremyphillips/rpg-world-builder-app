@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
-import { render, screen } from '@testing-library/react'
-import { FormProvider, useForm } from 'react-hook-form'
+import { fireEvent, render, screen } from '@testing-library/react'
+import { FormProvider, useForm, useFormContext } from 'react-hook-form'
 import { describe, expect, it, vi } from 'vitest'
 import { fieldStackRhythmVariants } from '@rpg/ui'
 
@@ -173,6 +173,42 @@ describe('MasterDetailDetailBody', () => {
       </Shell>,
     )
     expect(screen.getByTestId('form-feature-row-1-leading')).toBeInTheDocument()
+  })
+
+  it('rejects overlapping bindings when a form change activates both regions', () => {
+    function ActivateBoth() {
+      const { setValue } = useFormContext()
+      return (
+        <button type="button" onClick={() => setValue('features.0.level', 2)}>
+          Activate both
+        </button>
+      )
+    }
+
+    render(
+      <Shell>
+        <ActivateBoth />
+        <MasterDetailDetailBody
+          leadingItemFields={[{ type: 'text', name: 'intro', label: 'Introduction' }]}
+          primaryItemFields={[
+            {
+              type: 'text',
+              name: 'intro',
+              label: 'Detailed introduction',
+              visibility: { dependsOn: ['level'], visibleWhen: ({ level }) => level === 2 },
+            },
+          ]}
+          idPrefix="feature"
+          selectedFieldId="row-1"
+          namePrefix="features.0"
+        />
+      </Shell>,
+    )
+
+    expect(screen.getByTestId('form-feature-row-1-leading')).toBeInTheDocument()
+    expect(() => fireEvent.click(screen.getByRole('button', { name: 'Activate both' }))).toThrow(
+      'Duplicate master–detail field binding "features.0.intro" (leading, primary)',
+    )
   })
 
   it('omits empty leading sections without extra rhythm nodes', () => {

@@ -525,4 +525,7 @@ export {
   useFieldRowParticipation,
 } from '../components/ui/field-row-anatomy.context'
 
-export { collectActiveFormItemBindings } from './config/form-item-visibility.lib'
+export {
+  collectActiveFormItemBindings,
+  findFormItemBindingConflict,
+} from './config/form-item-visibility.lib'

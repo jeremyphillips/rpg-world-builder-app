@@ -61,12 +61,22 @@ export function buildVocabularyFromSeedSet<T>(
 /** Alias for seed-only vocabulary map builders. */
 export const buildSeedVocabulary = buildVocabularyFromSeedSet
 
+/** Resolves a saved vocabulary reference without guessing from its ID. */
+export function findVocabularyLabel(
+  vocabulary: Pick<LabelActiveVocabulary, 'labelById'> | undefined,
+  id: string,
+): string | undefined {
+  return vocabulary && Object.hasOwn(vocabulary.labelById, id)
+    ? vocabulary.labelById[id]
+    : undefined
+}
+
 /** Resolves a campaign label with id fallback when vocabulary is absent or unknown. */
 export function getVocabularyLabel(
   vocabulary: LabelActiveVocabulary | undefined,
   id: string,
 ): string {
-  return vocabulary?.labelById[id] ?? id
+  return findVocabularyLabel(vocabulary, id) ?? id
 }
 
 /** Sorted combobox options from active vocabulary entries. */

@@ -11,9 +11,6 @@ import {
   buildSeedDamageTypeVocabulary,
   buildSeedLanguageVocabulary,
   buildSeedSenseVocabulary,
-  getDamageTypeLabelFromVocabulary,
-  getLanguageLabelFromVocabulary,
-  getSenseLabelFromVocabulary,
 } from '@/features/vocabulary'
 
 import { GRANT_ROW_TYPE_LABELS } from './grant-form-schema'
@@ -76,9 +73,9 @@ function equipmentCatalog(
 
 const headerContext = {
   rowLabels: GRANT_ROW_TYPE_LABELS,
-  resolveDamageTypeLabel: (id: string) => getDamageTypeLabelFromVocabulary(seedDamageTypes, id),
-  resolveLanguageLabel: (id: string) => getLanguageLabelFromVocabulary(seedLanguages, id),
-  resolveSenseLabel: (id: string) => getSenseLabelFromVocabulary(seedSenses, id),
+  resolveDamageTypeLabel: (id: string) => seedDamageTypes.labelById[id],
+  resolveLanguageLabel: (id: string) => seedLanguages.labelById[id],
+  resolveSenseLabel: (id: string) => seedSenses.labelById[id],
   equipmentReferences: buildGrantEquipmentReferencePresentationFromAuthoring({
     status: 'ready',
     scope: testEquipmentScope,
@@ -87,10 +84,8 @@ const headerContext = {
       { id: 'srd-cc-5.2.1:dagger', slug: 'dagger', name: 'Dagger', status: 'draft' },
     ]),
   }),
-  weaponOptions: [{ value: 'longsword', label: 'Longsword' }],
-  toolOptions: [{ value: 'thieves-tools', label: "Thieves' Tools" }],
-  armorOptions: [],
-  skillOptions: [{ value: 'athletics', label: 'Athletics' }],
+  resolveSkillName: (slug: string) =>
+    slug === 'athletics' ? 'Athletics' : 'Skill proficiency reference unavailable',
   spellReferences: buildGrantSpellReferencePresentationFromAuthoring({
     status: 'ready',
     spellsById: spellCatalog([
@@ -232,7 +227,7 @@ describe('resolveGrantRowPresentation', () => {
     },
     {
       name: 'feat choice',
-      values: { grantType: 'featChoice', featCategory: 'fighting-style', featChoose: 1 },
+      values: { grantType: 'featChoice', featCategory: 'fighting-style', featChoose: '1' },
       expected: {
         heading: 'Feat choice',
         detail: '1 fighting style feat',
@@ -296,6 +291,78 @@ describe('resolveGrantRowPresentation', () => {
       expect(presentation?.description).toContain(expected.descriptionIncludes)
       expect(presentation?.description).not.toContain('animate-dead')
     }
+  })
+
+  it('resolves persisted equipment proficiencies independently of picker eligibility', () => {
+    const presentation = resolveGrantRowPresentation(
+      {
+        grantType: 'weaponProficiency',
+        proficiencySource: 'specific',
+        weaponProficiencySlugs: ['dagger', 'missing-weapon'],
+      },
+      headerContext,
+    )
+    expect(presentation?.detail).toBe('Dagger, Equipment reference unavailable')
+    expect(presentation?.description).toBe(
+      'Character gains proficiency with Dagger and Equipment reference unavailable.',
+    )
+  })
+
+  it.each([
+    ['damageType', 'Character chooses from grave frost damage.'],
+    ['resistances', 'Character gains Resistance to grave frost damage.'],
+  ])(
+    'uses campaign damage labels for %s and reports missing references',
+    (grantType, description) => {
+      const context = {
+        ...headerContext,
+        resolveDamageTypeLabel: (id: string) => (id === 'cold' ? 'Grave Frost' : undefined),
+      }
+      expect(
+        resolveGrantRowPresentation({ grantType, [grantType]: ['cold'] }, context),
+      ).toMatchObject({ detail: 'Grave Frost', description })
+      const mixed = resolveGrantRowPresentation(
+        { grantType, [grantType]: ['cold', 'missing-damage'] },
+        context,
+      )
+      expect(mixed?.detail).toBe('Grave Frost, Damage Type reference unavailable')
+      expect(mixed?.description).toBeUndefined()
+    },
+  )
+
+  it('uses campaign language and sense labels in details and descriptions', () => {
+    const context = {
+      ...headerContext,
+      resolveLanguageLabel: () => 'River Cant',
+      resolveSenseLabel: () => 'Moon Sight',
+    }
+    expect(
+      resolveGrantRowPresentation({ grantType: 'languages', language: 'river-cant' }, context),
+    ).toMatchObject({ detail: 'River Cant', description: 'Character knows River Cant.' })
+    expect(
+      resolveGrantRowPresentation(
+        { grantType: 'senses', senseType: 'moon-sight', senseRange: '60' },
+        context,
+      ),
+    ).toMatchObject({
+      detail: 'Moon Sight 60 ft.',
+      description: 'Character gains Moon Sight with a range of 60 feet.',
+    })
+  })
+
+  it('displays unavailable copy for missing language and sense references', () => {
+    expect(
+      resolveGrantRowPresentation(
+        { grantType: 'languages', language: 'missing-language' },
+        headerContext,
+      ),
+    ).toEqual({ heading: 'Language', detail: 'Language reference unavailable' })
+    const sense = resolveGrantRowPresentation(
+      { grantType: 'senses', senseType: 'missing-sense', senseRange: 60 },
+      headerContext,
+    )
+    expect(sense?.detail).toBe('Sense reference unavailable')
+    expect(sense?.description).toBeUndefined()
   })
 
   it('omits detail when incomplete', () => {

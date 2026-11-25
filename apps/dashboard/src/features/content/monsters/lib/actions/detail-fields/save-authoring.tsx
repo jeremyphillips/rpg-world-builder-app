@@ -162,6 +162,7 @@ function buildMonsterAbilitySourceDependent(
         {
           kind: 'slot',
           name: `${input.sourcePath}.castingAbility`,
+          boundNames: [`${input.sourcePath}.castingAbility`],
           visibility: spellBranch,
           render: () => (
             <MonsterActionCastingAbilityField

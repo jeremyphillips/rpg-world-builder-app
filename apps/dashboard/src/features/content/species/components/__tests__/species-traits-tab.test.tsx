@@ -1,15 +1,29 @@
+import { DEFAULT_SYSTEM_RULESET_ID, SENSE_SET_ID } from '@rpg/contracts'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useWatch } from 'react-hook-form'
 import { describe, expect, it, vi } from 'vitest'
 
 import { TestFormShell } from '@/test/form-shell'
+import type * as VocabularyFeature from '@/features/vocabulary'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { SpeciesTraitsTab } from '../species-traits-tab'
 
 vi.mock('@rpg/ui/form', async (importOriginal) => {
   const { stubUiFormItems } = await import('@/test/mocks/ui-form')
   return stubUiFormItems(importOriginal, 'trait-detail')
+})
+
+vi.mock('@/features/vocabulary', async (importOriginal) => {
+  const vocabulary = await importOriginal<typeof VocabularyFeature>()
+  return {
+    ...vocabulary,
+    useVocabularySet: () => ({
+      data: vocabulary.buildSeedVocabulary(SENSE_SET_ID, (set) => set),
+      isPending: false,
+      isError: false,
+    }),
+  }
 })
 
 type Trait = {
@@ -42,7 +56,12 @@ function TabShell({
   return (
     <TestFormShell defaultValues={{ traits }}>
       <SpeciesTraitsTab
-        formCtx={{ entityCatalogLayer, embeddedSeedRowIds, embeddedSystemOriginRowIds }}
+        formCtx={{
+          rulesetId: DEFAULT_SYSTEM_RULESET_ID,
+          entityCatalogLayer,
+          embeddedSeedRowIds,
+          embeddedSystemOriginRowIds,
+        }}
       />
       <TraitsValuesProbe />
     </TestFormShell>
@@ -221,7 +240,7 @@ describe('SpeciesTraitsTab', () => {
     const user = userEvent.setup()
     render(<TabShell />)
     await user.click(screen.getByRole('button', { name: /Add trait/i }))
-    await user.click(await screen.findByRole('menuitem', { name: /^Darkvision$/i }))
+    await user.click(await screen.findByRole('menuitem', { name: /^Darkvision\b/i }))
     const traits = JSON.parse(screen.getByTestId('traits-values').textContent ?? '[]') as Trait[]
     expect(traits[0]).toMatchObject({
       kind: 'template',

@@ -6,7 +6,7 @@ import {
   resolveCreatureFormsContext,
   resolveEquipmentInstanceReferenceLabel,
 } from '@rpg/contracts'
-import { ButtonDropdown, ConfirmDialog } from '@rpg/ui'
+import { ConfirmDialog } from '@rpg/ui'
 import { useFormContext } from 'react-hook-form'
 
 import { EquipmentPickerDrawer } from '@/features/character'
@@ -119,7 +119,7 @@ function actionAcquisitionSectionRows(values: MonsterFormValues) {
   }
 }
 
-function MonsterActionAddMenu({
+function buildMonsterActionAcquisition({
   section,
   weapons,
   weaponActions,
@@ -156,19 +156,16 @@ function MonsterActionAddMenu({
       ? [...LEGENDARY_ACTION_ACQUISITION_GROUPS]
       : [...MONSTER_ACTION_ACQUISITION_GROUPS]
   const groups = groupSource.filter((group) => items.some((item) => item.groupId === group.id))
-  return (
-    <ButtonDropdown
-      label={MONSTER_ADD_LABEL}
-      triggerPresentation="addIcon"
-      supportingWrap
-      groups={groups}
-      items={items}
-      onSelectItem={(id) => {
-        const choice = parseMonsterActionAcquisitionId(id)
-        if (choice) onSelect(section, choice)
-      }}
-    />
-  )
+  return {
+    label: MONSTER_ADD_LABEL,
+    supportingWrap: true,
+    groups,
+    items,
+    onSelectItem: (id: string) => {
+      const choice = parseMonsterActionAcquisitionId(id)
+      if (choice) onSelect(section, choice)
+    },
+  }
 }
 
 function pendingConfirmCopy(pending: MonsterActionPending | null): {
@@ -322,6 +319,20 @@ function useMonsterActionDetailRows(
   }
 }
 
+function resolveWeaponPickerItems(
+  values: MonsterFormValues,
+  ctx: ContentFormCtx,
+  weaponGrants: ReturnType<typeof resolveMonsterFormWeaponGrants>,
+  section: MonsterActionSection | null,
+) {
+  if (!section) return []
+  return buildMonsterLoadoutPickerItems({
+    referenceOptions: ctx.options?.equipment?.forReference() ?? [],
+    weaponGrants,
+    equipment: values.equipment ?? [],
+  }).filter((item) => isWeaponEquipment(item.equipment))
+}
+
 export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
   const sections = useMonsterActionSections(ctx.entityId, {
     equipmentCatalogStatus: ctx.equipmentCatalogStatus,
@@ -336,18 +347,8 @@ export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
   const weapons = equippedWeaponRows(values, catalog, provider)
   const confirmCopy = pendingConfirmCopy(sections.pending)
 
-  const pickerItems = useMemo(() => {
-    if (!weaponPickerSection) return []
-    const referenceOptions = ctx.options?.equipment?.forReference() ?? []
-    const grants = resolveMonsterFormWeaponGrants(values)
-    return buildMonsterLoadoutPickerItems({
-      referenceOptions,
-      weaponGrants: grants,
-      equipment: values.equipment ?? [],
-    }).filter((item) => isWeaponEquipment(item.equipment))
-  }, [ctx.options?.equipment, values, weaponPickerSection])
-
-  const weaponGrants = useMemo(() => resolveMonsterFormWeaponGrants(values), [values])
+  const weaponGrants = resolveMonsterFormWeaponGrants(values)
+  const pickerItems = resolveWeaponPickerItems(values, ctx, weaponGrants, weaponPickerSection)
 
   const { titlesBySection, rowsBySection, actionRows } = useMonsterActionDetailRows(
     ctx,
@@ -415,23 +416,21 @@ export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
             id: section,
             title: SECTION_HEADINGS[section],
             emptyLabel: monsterActionSectionEmptyLabel(section),
-            addControl: (
-              <MonsterActionAddMenu
-                section={section}
-                weapons={weapons}
-                weaponActions={weaponActionReferences(values)}
-                allowAddWeapon={allowAddWeapon}
-                values={values}
-                ctx={ctx}
-                onSelect={(target, choice) => {
-                  if (choice.type === 'add-weapon') {
-                    setWeaponPickerSection(target)
-                    return
-                  }
-                  sections.addAcquisition(target, choice)
-                }}
-              />
-            ),
+            acquisition: buildMonsterActionAcquisition({
+              section,
+              weapons,
+              weaponActions: weaponActionReferences(values),
+              allowAddWeapon,
+              values,
+              ctx,
+              onSelect: (target, choice) => {
+                if (choice.type === 'add-weapon') {
+                  setWeaponPickerSection(target)
+                  return
+                }
+                sections.addAcquisition(target, choice)
+              },
+            }),
             items: rowsBySection[section].allRows
               .filter((row) => visibleIds.has(row.item.id))
               .map((row) => row.item),

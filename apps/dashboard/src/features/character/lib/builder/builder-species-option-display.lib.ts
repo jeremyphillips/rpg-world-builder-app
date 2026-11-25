@@ -1,44 +1,58 @@
-import { type CharacterBuildLanguageOption, type Species, type Spell } from '@rpg/contracts'
+import {
+  type CharacterBuildLanguageOption,
+  type Species,
+  type SpellCatalogContext,
+} from '@rpg/contracts'
 
 import { getContentTypeItemLabel } from '@/features/content'
 import {
   buildSeedCreatureTypeVocabulary,
+  buildSeedDamageTypeVocabulary,
+  findVocabularyLabel,
   buildSeedSenseVocabulary,
   getCreatureTypeLabel,
-  getSenseLabelFromVocabulary,
 } from '@/features/vocabulary'
 import {
   buildSpeciesCardViewModel,
   buildSpeciesDetailViewModel,
-  buildSpellGrantVocabulary,
   SPECIES_SECTION_LABELS,
   type SpeciesDetailItem,
+  type SpeciesDisplayVocabulary,
 } from '@/features/content'
 
 import type { BuilderOptionDetailsSection } from '@rpg/ui'
 
 export const BUILDER_SPECIES_EYEBROW = getContentTypeItemLabel('species')
 
-function resolveLanguageLabel(
-  languages: readonly CharacterBuildLanguageOption[],
-  languageId: string,
-): string {
-  return languages.find((entry) => entry.id === languageId)?.label ?? languageId
-}
+export type BuilderSpeciesGrantReferences = Partial<
+  Pick<
+    SpeciesDisplayVocabulary,
+    'equipmentReferences' | 'resolveDamageTypeLabel' | 'resolveSenseLabel' | 'resolveSkillName'
+  >
+>
 
-function buildBuilderSpeciesVocabulary(
+export function buildBuilderSpeciesVocabulary(
   languages: readonly CharacterBuildLanguageOption[],
-  spells: readonly Spell[],
+  spellCatalog: SpellCatalogContext,
+  references?: BuilderSpeciesGrantReferences,
 ) {
   const creatureTypeVocabulary = buildSeedCreatureTypeVocabulary()
-  const senseVocabulary = buildSeedSenseVocabulary()
-  const resolveSpell = buildSpellGrantVocabulary(spells)
+  const senseVocabulary = references?.resolveSenseLabel ? undefined : buildSeedSenseVocabulary()
+  const seedDamageTypes = references?.resolveDamageTypeLabel
+    ? undefined
+    : buildSeedDamageTypeVocabulary()
 
   return {
+    ...references,
+    resolveDamageTypeLabel:
+      references?.resolveDamageTypeLabel ??
+      ((id: string) => findVocabularyLabel(seedDamageTypes, id)),
     resolveCreatureTypeLabel: (id: string) => getCreatureTypeLabel(creatureTypeVocabulary, id),
-    resolveLanguageLabel: (id: string) => resolveLanguageLabel(languages, id),
-    resolveSenseLabel: (type: string) => getSenseLabelFromVocabulary(senseVocabulary, type),
-    resolveSpell,
+    resolveLanguageLabel: (id: string) => languages.find((entry) => entry.id === id)?.label,
+    resolveSenseLabel:
+      references?.resolveSenseLabel ??
+      ((type: string) => findVocabularyLabel(senseVocabulary, type)),
+    spellCatalog,
   }
 }
 
@@ -71,11 +85,12 @@ export type SpeciesDetailsSheetContent = {
 export function buildSpeciesDetailsSheetContent(
   species: Species,
   languages: readonly CharacterBuildLanguageOption[],
-  spells: readonly Spell[] = [],
+  spellCatalog: SpellCatalogContext,
+  references?: BuilderSpeciesGrantReferences,
 ): SpeciesDetailsSheetContent {
   const viewModel = buildSpeciesDetailViewModel(
     species,
-    buildBuilderSpeciesVocabulary(languages, spells),
+    buildBuilderSpeciesVocabulary(languages, spellCatalog, references),
   )
 
   const sections: BuilderOptionDetailsSection[] = viewModel.sections.map((section) => {
