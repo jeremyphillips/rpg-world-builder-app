@@ -16,11 +16,7 @@ describe('form validation phase 7 exit', () => {
     expect(FORM_VALIDATION_RULE_EXEMPT_FILES.size).toBeGreaterThanOrEqual(5)
   })
 
-  it('keeps explicit allowlist milestones until those workflows migrate', () => {
-    expect(FORM_VALIDATION_ADOPTION_ALLOWLIST.map((entry) => entry.id)).toEqual([
-      'character-builder',
-      'character-import',
-      'quick-npc',
-    ])
+  it('expects allowlist clearance in phase 8', () => {
+    expect(FORM_VALIDATION_ADOPTION_ALLOWLIST.length).toBe(0)
   })
 })

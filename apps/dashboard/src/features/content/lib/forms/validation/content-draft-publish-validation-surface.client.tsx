@@ -18,11 +18,8 @@ import {
   draftPublishValidationSurface,
   type DraftPublishValidationSurface,
 } from './content-draft-publish-validation-surface.ref'
-import {
-  formIssuesToPathMessages,
-  paintValidationIssuesOnForm,
-  tryEvaluateContentPublishFormIssues,
-} from './content-publish-validation.lib'
+import { applyCanonicalFormIssuesToRhf } from './content-form-validation-rhf.lib'
+import { tryEvaluateContentPublishFormIssues } from './content-publish-validation.lib'
 import { ingestContentFormValidationIssues } from './ingest-content-form-validation.lib'
 
 export function ContentDraftPublishValidationSurfaceBridge({
@@ -68,7 +65,7 @@ export function ContentDraftPublishValidationSurfaceBridge({
         publishFields,
       )
       if (routingFailed) {
-        paintValidationIssuesOnForm(form, formIssuesToPathMessages(issues))
+        applyCanonicalFormIssuesToRhf(form, issues)
         currentUi.markSubmitAttempted()
         if (currentUi.publishPresentationEnabled) {
           currentUi.markPublishAttempted()
@@ -78,7 +75,7 @@ export function ContentDraftPublishValidationSurfaceBridge({
       }
       if (issues.length === 0) return null
 
-      paintValidationIssuesOnForm(form, formIssuesToPathMessages(issues))
+      applyCanonicalFormIssuesToRhf(form, issues)
       currentUi.markSubmitAttempted()
 
       if (currentUi.publishPresentationEnabled) {

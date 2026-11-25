@@ -28,8 +28,4 @@ Production sources under:
 - `content-form-validation-rhf.lib.ts` — canonical RHF paint bridge
 - `content-draft-publish-validation-surface.client.tsx` — draft global surface
 
-## Deferred workflows
-
-`FORM_VALIDATION_ADOPTION_ALLOWLIST` still skips character builder, character import, and Quick NPC until their named `phase-7-*` migrations land.
-
-Per-file drift tests (`content-form-submit-drift.test.ts`, `campaign-form-validation-adoption.test.ts`, `auth-form-adoption.test.ts`) remain as focused documentation alongside the scanner.
+Per-file drift tests (`content-form-submit-drift.test.ts`, `campaign-form-validation-adoption.test.ts`, `auth-form-adoption.test.ts`) remain as focused documentation alongside the scanner. Phase 8 clears the allowlist — see [form-lifecycle-phase8.md](./form-lifecycle-phase8.md).

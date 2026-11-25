@@ -8,8 +8,8 @@ import { z } from 'zod'
 import { formatFieldMessage } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 
+import { applyCanonicalFormIssuesToRhf } from './content-form-validation-rhf.lib'
 import {
-  applyValidationIssuesToForm,
   validateContentPublishValues,
   zodIssuesToValidationIssues,
 } from './content-publish-validation.lib'
@@ -26,16 +26,16 @@ describe('zodIssuesToValidationIssues', () => {
   })
 })
 
-describe('applyValidationIssuesToForm', () => {
+describe('applyCanonicalFormIssuesToRhf', () => {
   it('sets field errors for dotted paths', () => {
     const { result } = renderHook(() =>
       useForm<{ name: string; level: number }>({ defaultValues: { name: '', level: 0 } }),
     )
 
     act(() => {
-      applyValidationIssuesToForm(result.current, [
-        { path: 'name', message: 'Name is required.' },
-        { path: 'level', message: 'Level is required.' },
+      applyCanonicalFormIssuesToRhf(result.current, [
+        { path: 'name', message: 'Name is required.', severity: 'field' },
+        { path: 'level', message: 'Level is required.', severity: 'field' },
       ])
     })
 

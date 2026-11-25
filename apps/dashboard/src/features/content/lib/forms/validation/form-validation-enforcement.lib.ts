@@ -21,6 +21,7 @@ export const FORM_VALIDATION_LEGACY_RULES: readonly FormValidationLegacyRule[] =
 export const FORM_VALIDATION_ENFORCEMENT_ROOTS = [
   'apps/dashboard/src/features/content',
   'apps/dashboard/src/features/campaign',
+  'apps/dashboard/src/features/character/npc',
   'apps/public/src/features/auth',
 ] as const
 

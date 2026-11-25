@@ -8,9 +8,10 @@ import { collectTabbedFormResolverItems, makeResolver } from '@rpg/ui/form'
 import { getMonsterBySlug } from '@rpg/catalog/monsters'
 
 import { makeContentFormCtx } from '../../../lib/fixtures/content-form-ctx'
+import { applyCanonicalFormIssuesToRhf } from '../../../lib/forms/validation/content-form-validation-rhf.lib'
 import {
+  evaluateContentPublishFormIssues,
   evaluateContentPublishValidation,
-  paintValidationIssuesOnForm,
 } from '../../../lib/forms/validation/content-publish-validation.lib'
 import { monsterFormDef } from '../monster-form-def'
 import { buildMonsterTabs } from '../monster-form-fields'
@@ -221,11 +222,11 @@ describe('monster lair XP publish resolver', () => {
 
     const publishSchema = resolveMonsterFormSchema(ctx, 'publish')
     const fields = collectTabbedFormResolverItems(buildMonsterTabs(ctx))
-    const issues = evaluateContentPublishValidation(publishSchema, values as never, fields)
+    const formIssues = evaluateContentPublishFormIssues(publishSchema, values as never, fields)
 
     act(() => {
       result.current.reset(values)
-      if (issues) paintValidationIssuesOnForm(result.current, issues)
+      if (formIssues) applyCanonicalFormIssuesToRhf(result.current, formIssues)
     })
 
     expect(result.current.getFieldState('lair.experience.value').error?.message).toMatch(

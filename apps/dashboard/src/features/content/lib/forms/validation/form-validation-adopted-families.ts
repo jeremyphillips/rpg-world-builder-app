@@ -31,4 +31,8 @@ export const FORM_VALIDATION_ADOPTED_FAMILIES = [
       'monster statistics panel',
     ],
   },
+  {
+    id: 'quick-npc',
+    surfaces: ['quick npc authoring (useAdoptedFormSubmit)'],
+  },
 ] as const

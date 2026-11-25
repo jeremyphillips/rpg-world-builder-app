@@ -539,7 +539,7 @@ Top-level content shells share `ContentFormFooter` (`content-form-footer.tsx`) w
 Create handoff URL: `resolveContentPostCreateEditHref` in `content-form-navigation.ts`.
 Submit/error wiring: **`useContentFormSubmit`** for ContentFormDef create/edit page shells
 (`ContentCreateShell`, `ContentEditShell`), create modals, and `ContentFormHost` adapters.
-Adopted tabbed/flat dashboard saves outside `ContentFormDef` use `useAdoptedFormSubmit` (`@/lib/form-validation-adoption.lib`) for canonical API issue paint. Allowlisted workflows (`FORM_VALIDATION_ADOPTION_ALLOWLIST`) may still use legacy submit until their `phase-7-*` milestone; adopted scopes are guarded by `form-validation-enforcement.lib.ts`. Nested subclass editor remains separate until aligned in a follow-up.
+Adopted tabbed/flat dashboard saves outside `ContentFormDef` use `useAdoptedFormSubmit` (`@/lib/form-validation-adoption.lib`) for canonical API issue paint. Adopted scopes are guarded by `form-validation-enforcement.lib.ts`; RHF paint for content issues goes through `applyCanonicalFormIssuesToRhf`. Nested subclass editor remains separate until aligned in a follow-up.
 
 **Pilot commit pipeline (create/edit shells):** one prepare-once write via
 `prepareSerializedContentFormWrite`, then `runContentFormCommitAttempt` (publish/draft commit
