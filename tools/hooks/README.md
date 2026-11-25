@@ -38,6 +38,22 @@ pnpm gate:ci:quality
 
 Fallow runs at commit (complexity/dupes) and again at push with CRAP after coverage.
 
+### Fallow complexity
+
+[`fallow-health-gate.sh`](fallow-health-gate.sh) delegates to [`fallow-health-gate.mjs`](fallow-health-gate.mjs)
+(Fallow **2.89** JSON `findings[].exceeded`):
+
+| Mode | Command | Fails on |
+| ---- | ------- | -------- |
+| Pre-commit | `pnpm gate:fallow-health` | `cyclomatic`, `cognitive`, `both` |
+| Coverage | `pnpm gate:fallow-health:coverage` | Any finding, including `crap` (Istanbul) |
+
+Estimated CRAP-only findings do **not** fail pre-commit. Missing `coverage-final.json`
+on the coverage gate exits **2** (fails closed). Fallow exit **2** (parse/config) is
+not treated as success. Policy: [docs/complexity-remediation.md](../../docs/complexity-remediation.md).
+
+Unit tests: `pnpm exec vitest run tools/hooks/fallow-health-gate.lib.test.mjs`
+
 [`regenerate-json-schemas.sh`](regenerate-json-schemas.sh) runs after lint-staged when staged
 files touch `@rpg/contracts` Zod sources that feed catalog JSON Schema generation. It runs
 `pnpm generate:json-schemas`, stages `packages/contracts/generated` and

@@ -128,12 +128,13 @@ only the files that failed. Run repository gates only on **commit/checkpoint** o
 
 ## fallow (code health)
 
-Use the `/fallow` skill for code-health work. Use judgement per finding: fix it
-in code, or — if a fix isn't worth it — propose an inline suppression or a
-`.fallowrc.json` tweak and **consult the user before ignoring**. Production
-complexity thresholds live in `.fallowrc.json` `health`; CRAP uses Istanbul
-coverage from `pnpm coverage` via `--coverage ./coverage/coverage-final.json`
-(pre-push and CI — not pre-commit).
+Use the `/fallow` skill for dead-code and duplication. For **complexity findings**,
+follow [docs/complexity-remediation.md](docs/complexity-remediation.md) — metrics
+signal investigation, not automatic extraction. Enforced numerics live only in
+[`.fallowrc.json`](.fallowrc.json) `health`; pre-commit gates cyclomatic/cognitive
+(`gate:fallow-health`); CRAP gates with Istanbul at pre-push/CI
+(`gate:fallow-health:coverage`). Inline suppressions or `.fallowrc.json` tweaks
+require **user consultation** (see canonical doc).
 
 ## Agent skills
 

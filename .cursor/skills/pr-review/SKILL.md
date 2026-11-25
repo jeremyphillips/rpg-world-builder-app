@@ -55,6 +55,7 @@ non-reusable.
 | 6   | **Behavior or test regressions** | Changed flows, defaults, navigation, permissions, persisted state; deleted/weakened/stale tests                                                                  |
 | 7   | **Wiring gaps**                  | Partial landing across layers — see below                                                                                                                        |
 | 8   | **New form slots**               | A new production `kind: 'slot'` that `display`, `visibility`, `optionsResolve`, `hint.resolve`, `derivedMeta`, `valueSyncs`, `dependent`, or `optionalDisclosure` could express. A new or renamed identity must update the [slot register](../../../apps/dashboard/docs/form-slot-register.md) and `form-slot-literal-baseline.json`. Confirm-gated multi-path writes stay feature controllers plus `ConfirmDialog`. Reject raw `<input>`, `<select>`, or `<textarea>` in `components/form/slots/**` (see [.cursor/rules/form-slots.mdc](../../../.cursor/rules/form-slots.mdc)). |
+| 9   | **Metric-only complexity refactors** | Splits/extracts whose only stated goal is passing Fallow; new single-use `*.lib.ts`, pass-through helpers, or extra files without semantic boundary — see [complexity-remediation.md](../../../docs/complexity-remediation.md). Favor simplify-in-place, meaningful tests, consolidate/remove dubious abstractions. |
 
 ### SSOT rule
 

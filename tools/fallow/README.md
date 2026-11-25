@@ -5,6 +5,20 @@ This repo uses [Fallow](https://docs.fallow.tools) `^2.89` for unused-code analy
 
 Policy hub: [docs/architecture-ssot.md](../../docs/architecture-ssot.md).
 
+**Complexity / abstraction:** [docs/complexity-remediation.md](../../docs/complexity-remediation.md)
+(agent canonical). Investigation: [docs/analysis/complexity-threshold-investigation.md](../../docs/analysis/complexity-threshold-investigation.md).
+Gates: [tools/hooks/README.md](../hooks/README.md#fallow-complexity).
+
+## Complexity gates (summary)
+
+| Script | Enforces |
+| ------ | -------- |
+| `pnpm gate:fallow-health` | Cyclomatic/cognitive (`exceeded` ≠ crap-only) via JSON policy |
+| `pnpm gate:fallow-health:coverage` | Above + CRAP with Istanbul after `pnpm coverage` |
+
+Raw `fallow health --format human` may list estimated CRAP while pre-commit still passes.
+Threshold values: `.fallowrc.json` `health` only.
+
 ## Baseline
 
 | File                                                   | Purpose                                                                                                              |
