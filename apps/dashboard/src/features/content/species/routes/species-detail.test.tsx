@@ -1,7 +1,11 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { SPELL_REFERENCE_DISPLAY_MESSAGES } from '@rpg/contracts'
+import {
+  EQUIPMENT_REFERENCE_DISPLAY_MESSAGES,
+  type Equipment,
+  SPELL_REFERENCE_DISPLAY_MESSAGES,
+} from '@rpg/contracts'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import {
@@ -14,7 +18,7 @@ import { SPECIES_STAT_LABELS } from '@/features/content'
 
 vi.mock('../../equipment/hooks/use-equipment', async (importOriginal) => ({
   ...(await importOriginal()),
-  useEquipment: () => ({ data: [], isPending: false, isError: false }),
+  useEquipment: vi.fn(),
 }))
 vi.mock('../../skill-proficiencies/hooks/use-skill-proficiencies', async (importOriginal) => ({
   ...(await importOriginal()),
@@ -53,7 +57,11 @@ import {
   useDamageTypeVocabulary,
   useSenseVocabulary,
 } from '@/features/vocabulary'
-import { getDrowHeritageSpellCatalog } from '../../lib/fixtures/grant-display-fixtures'
+import {
+  buildScopedHeritageEquipmentFixture,
+  getDrowHeritageSpellCatalog,
+} from '../../lib/fixtures/grant-display-fixtures'
+import { useEquipment } from '../../equipment/hooks/use-equipment'
 import { useSpells } from '../../spells/hooks/use-spells'
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { ELF, TIEFLING } from '../fixtures'
@@ -64,16 +72,22 @@ const useCreatureTypeVocabularyMock = vi.mocked(useCreatureTypeVocabulary)
 const useSenseVocabularyMock = vi.mocked(useSenseVocabulary)
 const useLanguageVocabularyMock = vi.mocked(useLanguageVocabulary)
 
-function renderSpeciesDetail(species: typeof ELF) {
+function renderSpeciesDetail(species: typeof ELF, campaignId = STORY_CAMPAIGN_ID) {
   return render(
     <MemoryRouter>
-      <SpeciesDetailContent species={species} campaignId={STORY_CAMPAIGN_ID} />
+      <SpeciesDetailContent species={species} campaignId={campaignId} />
     </MemoryRouter>,
   )
 }
 
-describe('SpeciesDetailContent language affinities', () => {
+describe('SpeciesDetailContent', () => {
   beforeEach(() => {
+    const equipment: Equipment[] = []
+    vi.mocked(useEquipment).mockReturnValue({
+      data: equipment,
+      isPending: false,
+      isError: false,
+    } as ReturnType<typeof useEquipment>)
     useSpellsMock.mockReturnValue({
       data: getDrowHeritageSpellCatalog(),
       isPending: false,
@@ -145,6 +159,29 @@ describe('SpeciesDetailContent language affinities', () => {
 
     expect(screen.getAllByText(label, { exact: false }).length).toBeGreaterThan(0)
     expect(screen.queryByText(/^L1: .*Dancing Lights cantrip$/)).not.toBeInTheDocument()
+  })
+
+  it.each([
+    [false, false, undefined],
+    [true, false, EQUIPMENT_REFERENCE_DISPLAY_MESSAGES.catalogLoading],
+    [false, true, EQUIPMENT_REFERENCE_DISPLAY_MESSAGES.catalogError],
+  ])('uses campaign equipment with pending=%s and error=%s', (isPending, isError, guidance) => {
+    const { species, equipmentCatalog, expectedSummary } = buildScopedHeritageEquipmentFixture()
+    vi.mocked(useEquipment).mockReturnValue({
+      data: [...equipmentCatalog.equipmentById.values()],
+      isPending,
+      isError,
+    } as ReturnType<typeof useEquipment>)
+
+    renderSpeciesDetail(species, equipmentCatalog.scope.campaignId)
+
+    expect(useEquipment).toHaveBeenCalledWith(equipmentCatalog.scope.campaignId)
+    if (guidance) {
+      expect(screen.getByText(`L1: ${guidance} · ${guidance}`)).toBeInTheDocument()
+      expect(screen.queryByText(expectedSummary)).not.toBeInTheDocument()
+    } else {
+      expect(screen.getByText(expectedSummary)).toBeInTheDocument()
+    }
   })
 
   itAxe('has no axe accessibility violations', async () => {

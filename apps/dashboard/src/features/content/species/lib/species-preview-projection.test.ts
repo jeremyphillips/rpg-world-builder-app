@@ -1,4 +1,8 @@
-import { buildContentPurposeSelectors, SPELL_REFERENCE_DISPLAY_MESSAGES } from '@rpg/contracts'
+import {
+  buildContentPurposeSelectors,
+  EQUIPMENT_REFERENCE_DISPLAY_MESSAGES,
+  SPELL_REFERENCE_DISPLAY_MESSAGES,
+} from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -187,6 +191,28 @@ describe('species preview projection', () => {
       ).toEqual([expectedSummary])
     }
   })
+
+  it.each([
+    ['pending', EQUIPMENT_REFERENCE_DISPLAY_MESSAGES.catalogLoading],
+    ['error', EQUIPMENT_REFERENCE_DISPLAY_MESSAGES.catalogError],
+  ] as const)(
+    'keeps cached equipment names out of a %s player preview',
+    (equipmentCatalogStatus, label) => {
+      const { species, equipmentCatalog } = buildScopedHeritageEquipmentFixture()
+      const preview = buildSpeciesPreviewDetailViewModel(
+        createValues(speciesFormDef.toFormValues(species)),
+        {
+          ...equipmentCatalog.scope,
+          equipmentCatalogStatus,
+          equipmentCatalogById: equipmentCatalog.equipmentById,
+        },
+      )
+
+      expect(
+        preview.sections.find((section) => section.id === 'heritage')?.items[0]?.summaryLines,
+      ).toEqual([`L1: ${label} · ${label}`])
+    },
+  )
 
   it('shows heritage when configured', () => {
     const sections = buildSpeciesPreviewSections(
