@@ -99,6 +99,10 @@
         "type": "array",
         "items": {
           "$ref": "#/definitions/__schema9"
+        },
+        "overlay": {
+          "kind": "value-list",
+          "ordered": true
         }
       }
     },

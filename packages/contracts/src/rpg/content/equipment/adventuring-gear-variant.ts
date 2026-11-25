@@ -1,4 +1,6 @@
 import { z } from 'zod'
+
+import { overlaySlugList } from '../lib/system-overlay/overlay-presets'
 import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 
 import { gearKindSchema } from '../../vocab/equipment/gear-kind'
@@ -24,11 +26,11 @@ export const adventuringGearEquipmentKindFields = {
   /** The container a bundle ships in (e.g. "Quiver", "Case"). */
   storage: z.string().optional(),
   /** Open-ended mechanical notes (e.g. "burst DC 13", "1-hour duration"). */
-  properties: z.array(z.string()).optional(),
+  properties: overlaySlugList(z.string()).optional(),
   /** Storage capacity, free text (e.g. "1 cubic foot / 30 lb of gear"). */
   capacity: z.string().optional(),
   /** Valid ways to carry a holy symbol (required when `spellcastingGearKind` is `holy_symbol`). */
-  holySymbolUsage: z.array(holySymbolUsageSchema).min(1).optional(),
+  holySymbolUsage: overlaySlugList(holySymbolUsageSchema).min(1).optional(),
   /** Weapon slug when this gear item also functions as a weapon (e.g. focus staff as quarterstaff). */
   alsoWeaponSlug: slugSchema.optional(),
 } as const

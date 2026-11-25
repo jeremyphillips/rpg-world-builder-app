@@ -21,13 +21,3 @@ export type OverlayUnionBranch = {
   value: string
   node: OverlayPolicyNode
 }
-
-export type CollectionDecision =
-  | { kind: 'atomic' }
-  | { kind: 'value-list'; ordered: boolean }
-  | {
-      kind: 'identity'
-      idKey: 'id' | 'entryId'
-      missingSeedRow: 'restore' | 'delete'
-      order: 'authored' | 'immaterial'
-    }

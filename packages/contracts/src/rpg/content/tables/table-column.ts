@@ -1,6 +1,8 @@
 import { z } from 'zod'
 import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 
+import { overlayOrderedList } from '../lib/system-overlay/overlay-presets'
+
 import { diceSchema } from '../../primitives/dice'
 import { absoluteLevelSchema } from '../../primitives/level'
 import { slugSchema } from '../lib/envelope'
@@ -163,7 +165,7 @@ const textProgressionTableEntrySchema = z.object({
 
 export const numberProgressionTableColumnSchema = numberTableColumnDefSchema
   .extend({
-    entries: z.array(numberProgressionTableEntrySchema).min(1),
+    entries: overlayOrderedList(numberProgressionTableEntrySchema).min(1),
   })
   .superRefine((column, ctx) => {
     refineAscendingEntryLevels(column.entries, ctx, ['entries'])
@@ -171,7 +173,7 @@ export const numberProgressionTableColumnSchema = numberTableColumnDefSchema
 
 export const diceProgressionTableColumnSchema = diceTableColumnDefSchema
   .extend({
-    entries: z.array(diceProgressionTableEntrySchema).min(1),
+    entries: overlayOrderedList(diceProgressionTableEntrySchema).min(1),
   })
   .superRefine((column, ctx) => {
     refineAscendingEntryLevels(column.entries, ctx, ['entries'])
@@ -179,7 +181,7 @@ export const diceProgressionTableColumnSchema = diceTableColumnDefSchema
 
 export const textProgressionTableColumnSchema = textTableColumnDefSchema
   .extend({
-    entries: z.array(textProgressionTableEntrySchema).min(1),
+    entries: overlayOrderedList(textProgressionTableEntrySchema).min(1),
   })
   .superRefine((column, ctx) => {
     refineAscendingEntryLevels(column.entries, ctx, ['entries'])

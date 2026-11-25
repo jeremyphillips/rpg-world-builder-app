@@ -1,6 +1,13 @@
 import { z } from 'zod'
 import { creatureFamilyIdSchema } from '../vocab/creature-family'
 
+import { overlayAtomic } from './lib/system-overlay/annotate'
+import {
+  overlayDeleteEntryIdRows,
+  overlayRestoreIdRows,
+  overlaySlugList,
+} from './lib/system-overlay/overlay-presets'
+
 import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
 import { refineContextualCountInLairExceedsNormal } from '../primitives/contextual-count'
 import { abilitySchema } from '../vocab/ability'
@@ -163,20 +170,26 @@ import { refineEquipmentInstanceInvariants } from './equipment/instance/instance
 
 import { FIXED_AC_OFFSET_MIN } from '../vocab/mechanics/armor-class-scale'
 
-export const monsterArmorClassSchema = z.object({
-  naturalArmorBonus: z.number().int().min(1).optional(),
-  /** Protection offset for a fixed override. Minimum -10; no maximum. */
-  fixedAcOffset: z.number().int().min(FIXED_AC_OFFSET_MIN).optional(),
-})
+export const monsterArmorClassSchema = overlayAtomic(
+  z.object({
+    naturalArmorBonus: z.number().int().min(1).optional(),
+    /** Protection offset for a fixed override. Minimum -10; no maximum. */
+    fixedAcOffset: z.number().int().min(FIXED_AC_OFFSET_MIN).optional(),
+  }),
+  'armor class options replace wholesale',
+)
 
-export const monsterHitPointsSchema = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('hit-dice'), count: z.number().int().min(1) }),
-  creatureStatBlockHitPointsSchema.extend({ kind: z.literal('fixed') }),
-])
+export const monsterHitPointsSchema = overlayAtomic(
+  z.discriminatedUnion('kind', [
+    z.object({ kind: z.literal('hit-dice'), count: z.number().int().min(1) }),
+    creatureStatBlockHitPointsSchema.extend({ kind: z.literal('fixed') }),
+  ]),
+  'hit point stat block replaces wholesale',
+)
 
 const monsterTraitAvailabilityFields = {
   available: z.boolean().optional(),
-  onlyInFormIds: z.array(z.string().min(1)).optional(),
+  onlyInFormIds: overlaySlugList(z.string().min(1)).optional(),
   ...entryProvenanceField,
 }
 
@@ -323,12 +336,10 @@ export const monsterEquipmentEntrySchema = z.preprocess((value) => {
 export const monsterBodyFields = {
   sizes: creatureSizesSchema,
   creatureType: creatureTypeRefSchema,
-  creatureFamilyIds: z
-    .array(creatureFamilyIdSchema)
+  creatureFamilyIds: overlaySlugList(creatureFamilyIdSchema)
     .refine((ids) => new Set(ids).size === ids.length, 'Creature families must be unique.')
     .optional(),
-  classIds: z
-    .array(z.string().min(1))
+  classIds: overlaySlugList(z.string().min(1))
     .refine((ids) => new Set(ids).size === ids.length, 'Class classifications must be unique.')
     .optional(),
   alignment: creatureAlignmentSchema,
@@ -344,18 +355,18 @@ export const monsterBodyFields = {
   experiencePointsOverride: z.number().int().min(0).optional(),
   lair: monsterLairSchema.optional(),
   proficiencies: z.object({
-    savingThrows: z.array(abilitySchema).default([]),
-    skills: z.array(creatureSkillProficiencyEntrySchema).default([]),
-    languages: z.array(creatureLanguageProficiencyEntrySchema).default([]),
+    savingThrows: overlaySlugList(abilitySchema).default([]),
+    skills: overlaySlugList(creatureSkillProficiencyEntrySchema).default([]),
+    languages: overlaySlugList(creatureLanguageProficiencyEntrySchema).default([]),
     additionalLanguageCount: z.number().int().min(1).optional(),
-    weapons: z.array(creatureWeaponProficiencyTargetSchema).default([]),
+    weapons: overlaySlugList(creatureWeaponProficiencyTargetSchema).default([]),
   }),
   defenses: creatureDefensesSchema,
-  equipment: z.array(monsterEquipmentEntrySchema).default([]),
-  traits: z.array(monsterTraitSchema).default([]),
-  actions: z.array(monsterActionSchema).default([]),
-  bonusActions: z.array(monsterBonusActionSchema).default([]),
-  reactions: z.array(monsterReactionSchema).default([]),
+  equipment: overlayDeleteEntryIdRows(monsterEquipmentEntrySchema).default([]),
+  traits: overlayRestoreIdRows(monsterTraitSchema).default([]),
+  actions: overlayRestoreIdRows(monsterActionSchema).default([]),
+  bonusActions: overlayRestoreIdRows(monsterBonusActionSchema).default([]),
+  reactions: overlayRestoreIdRows(monsterReactionSchema).default([]),
   legendaryActions: monsterLegendaryActionsBlockSchema.optional(),
   forms: monsterFormsSchema.optional(),
 } as const
@@ -378,11 +389,11 @@ const monsterBodyDraftSchemaBase = mediaBearingDraftAuthoredContentBodySchema(
   senses: creatureSensesDraftSchema.optional(),
   challengeRating: challengeRatingSchema.optional(),
   lair: monsterLairDraftSchema.optional(),
-  actions: z.array(monsterActionDraftSchema).default([]),
-  bonusActions: z.array(monsterBonusActionDraftSchema).default([]),
-  reactions: z.array(monsterReactionDraftSchema).default([]),
+  actions: overlayRestoreIdRows(monsterActionDraftSchema).default([]),
+  bonusActions: overlayRestoreIdRows(monsterBonusActionDraftSchema).default([]),
+  reactions: overlayRestoreIdRows(monsterReactionDraftSchema).default([]),
   legendaryActions: monsterLegendaryActionsBlockDraftSchema.optional(),
-  traits: z.array(monsterTraitDraftSchema).default([]),
+  traits: overlayRestoreIdRows(monsterTraitDraftSchema).default([]),
   forms: monsterFormsDraftSchema.optional(),
 })
 

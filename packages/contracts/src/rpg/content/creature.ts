@@ -1,6 +1,8 @@
 import { z } from 'zod'
 import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
 
+import { overlaySlugList } from './lib/system-overlay/overlay-presets'
+
 import { abilityScoreSchema } from '../vocab/ability'
 import { alignmentSchema } from '../vocab/alignment'
 import { damageTypeIdSchema, getDamageTypeLabel } from '../vocab/damage'
@@ -45,9 +47,9 @@ export const creatureSizeRefSchema = creatureSizeSchema
 export { creatureSizesSchema, creatureSizesDraftSchema }
 export const creatureTypeRefSchema = creatureTypeSchema
 export const creatureMovementSchema = movementSpeedsSchema
-export const creatureSensesSchema = z.array(senseSchema).default([])
+export const creatureSensesSchema = overlaySlugList(senseSchema).default([])
 
-export const creatureSensesDraftSchema = z.array(senseDraftSchema).default([])
+export const creatureSensesDraftSchema = overlaySlugList(senseDraftSchema).default([])
 
 export {
   TELEPATHY_MILE_FEET,
@@ -180,10 +182,10 @@ export const EMPTY_CREATURE_WEAPON_PROFICIENCIES: CreatureWeaponProficiencies = 
 }
 
 export const creatureDefensesSchema = z.object({
-  vulnerabilities: z.array(damageTypeIdSchema).default([]),
-  resistances: z.array(damageTypeIdSchema).default([]),
-  immunities: z.array(damageTypeIdSchema).default([]),
-  conditionImmunities: z.array(effectConditionSchema).default([]),
+  vulnerabilities: overlaySlugList(damageTypeIdSchema).default([]),
+  resistances: overlaySlugList(damageTypeIdSchema).default([]),
+  immunities: overlaySlugList(damageTypeIdSchema).default([]),
+  conditionImmunities: overlaySlugList(effectConditionSchema).default([]),
 })
 
 export type CreatureDefenses = z.infer<typeof creatureDefensesSchema>

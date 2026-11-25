@@ -1,5 +1,7 @@
 import { z } from 'zod'
 import { abilitySchema } from '../vocab/ability'
+
+import { overlayOrderedList } from './lib/system-overlay/overlay-presets'
 import { formatVocabularySlugLabel } from '../vocab/format-slug-label'
 import { getTermSentenceForm } from '../vocab/types'
 import { SKILL_PROFICIENCY_CONTENT_TYPE_TERM } from './lib/content-type-terms'
@@ -48,7 +50,7 @@ export const skillProficiencyBodySchema = contentBodyBaseSchema.extend({
   /** The ability score used when making this skill check (e.g. `str` for Athletics). */
   ability: abilitySchema,
   /** Concrete use-case phrases shown as a bulleted list on detail surfaces. */
-  examples: z.array(z.string().min(1)).min(1),
+  examples: overlayOrderedList(z.string().min(1)).min(1),
 })
 
 export type SkillProficiencyBody = z.infer<typeof skillProficiencyBodySchema>
@@ -58,7 +60,7 @@ export const skillProficiencyBodyDraftSchema = draftAuthoredContentBodySchema(
   SKILL_PROFICIENCY_CONTENT_TYPE_TERM.label,
 ).extend({
   ability: abilitySchema.optional(),
-  examples: z.array(z.string().min(1)).default([]),
+  examples: overlayOrderedList(z.string().min(1)).default([]),
 })
 
 export type SkillProficiencyBodyDraft = z.infer<typeof skillProficiencyBodyDraftSchema>

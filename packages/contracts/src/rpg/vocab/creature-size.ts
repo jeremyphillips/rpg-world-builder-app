@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { overlaySlugList } from '../content/lib/system-overlay/overlay-presets'
+
 import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
 import { vocabEnumFromEntries, keysFromEntries } from './enum-schema'
 import { getTermSentenceForm } from './types'
@@ -111,14 +113,12 @@ function refineUniqueCreatureSizes(sizes: readonly string[], ctx: z.RefinementCt
 }
 
 /** Published permitted sizes. At least one, no duplicates. Order is not canonical. */
-export const creatureSizesSchema = z
-  .array(creatureSizeSchema)
+export const creatureSizesSchema = overlaySlugList(creatureSizeSchema)
   .min(1)
   .superRefine(refineUniqueCreatureSizes)
 
 /** Draft permitted sizes. Empty is allowed. Duplicates and unknown ids are not. */
-export const creatureSizesDraftSchema = z
-  .array(creatureSizeSchema)
+export const creatureSizesDraftSchema = overlaySlugList(creatureSizeSchema)
   .default([])
   .superRefine(refineUniqueCreatureSizes)
 

@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { overlaySlugList } from './lib/system-overlay/overlay-presets'
 import { massSchema, speedRateSchema, weightSchema } from '../primitives/units'
 import { diceSchema } from '../primitives/dice'
 import { abilitySchema } from '../vocab/ability'
@@ -338,7 +339,7 @@ const equipmentBaseDraftSchema = draftAuthoredContentBodySchema(
 ).extend({
   cost: equipmentBaseSchema.shape.cost.optional(),
   weight: weightSchema.optional(),
-  tags: z.array(z.string()).optional(),
+  tags: overlaySlugList(z.string()).optional(),
 })
 
 const weaponEquipmentBodyDraftFields = equipmentBaseDraftSchema.extend({
@@ -348,7 +349,7 @@ const weaponEquipmentBodyDraftFields = equipmentBaseDraftSchema.extend({
   damage: weaponDamageSchema.optional(),
   damageType: weaponDamageTypeSchema.optional(),
   versatileDamage: diceSchema.optional(),
-  properties: z.array(weaponPropertySchema).optional(),
+  properties: overlaySlugList(weaponPropertySchema).optional(),
   mastery: weaponMasterySchema.optional(),
   range: weaponRangeSchema.optional(),
   specialRules: z.string().optional(),
@@ -375,9 +376,9 @@ const adventuringGearEquipmentBodyDraftFields = equipmentBaseDraftSchema.extend(
   spellcastingGearKind: spellcastingGearKindSchema.optional(),
   bundleSize: z.number().int().min(1).optional(),
   storage: z.string().optional(),
-  properties: z.array(z.string()).optional(),
+  properties: overlaySlugList(z.string()).optional(),
   capacity: z.string().optional(),
-  holySymbolUsage: z.array(holySymbolUsageSchema).min(1).optional(),
+  holySymbolUsage: overlaySlugList(holySymbolUsageSchema).min(1).optional(),
   alsoWeaponSlug: slugSchema.optional(),
 })
 
@@ -385,8 +386,8 @@ const toolEquipmentBodyDraftFields = equipmentBaseDraftSchema.extend({
   kind: z.literal('tool'),
   toolCategory: toolCategorySchema.optional(),
   ability: abilitySchema.optional(),
-  utilizes: z.array(toolUtilizeActionSchema).optional(),
-  crafts: z.array(z.string().min(1)).optional(),
+  utilizes: overlaySlugList(toolUtilizeActionSchema).optional(),
+  crafts: overlaySlugList(z.string().min(1)).optional(),
 })
 
 const mountEquipmentBodyDraftFields = equipmentBaseDraftSchema.extend({

@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { overlayAtomic } from '../../content/lib/system-overlay/annotate'
 import { standardFeet } from '../../primitives/distance-presets'
 
 /**
@@ -10,10 +11,13 @@ export const REACH_FEET = standardFeet(5, 30, 5) as unknown as readonly [5, 10, 
 
 export type ReachFeet = (typeof REACH_FEET)[number]
 
-export const reachFeetSchema = z.union(
-  REACH_FEET.map((feet) => z.literal(feet)) as [
-    z.ZodLiteral<ReachFeet>,
-    z.ZodLiteral<ReachFeet>,
-    ...z.ZodLiteral<ReachFeet>[],
-  ],
+export const reachFeetSchema = overlayAtomic(
+  z.union(
+    REACH_FEET.map((feet) => z.literal(feet)) as [
+      z.ZodLiteral<ReachFeet>,
+      z.ZodLiteral<ReachFeet>,
+      ...z.ZodLiteral<ReachFeet>[],
+    ],
+  ),
+  'melee reach feet preset literal',
 )

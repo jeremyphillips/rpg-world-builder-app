@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { overlaySlugList } from '../../lib/system-overlay/overlay-presets'
 import { equipmentAdjustmentSchema } from './effect'
 import { equipmentMagicPropertyEntrySchema } from './magic-property'
 import { equipmentModifierSchema } from './modifier'
@@ -20,9 +21,9 @@ export const equipmentInstanceSchemaBase = z.object({
   customName: z.string().min(1).optional(),
   customDescription: z.string().optional(),
   magical: z.boolean().optional(),
-  magicProperties: z.array(equipmentMagicPropertyEntrySchema).optional(),
-  adjustments: z.array(equipmentAdjustmentSchema).optional(),
-  modifiers: z.array(equipmentModifierSchema).optional(),
+  magicProperties: overlaySlugList(equipmentMagicPropertyEntrySchema).optional(),
+  adjustments: overlaySlugList(equipmentAdjustmentSchema).optional(),
+  modifiers: overlaySlugList(equipmentModifierSchema).optional(),
 })
 
 /** Parsed rows always include `quantity`; callers may omit it before schema parse. */

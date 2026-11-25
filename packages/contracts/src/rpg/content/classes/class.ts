@@ -1,5 +1,11 @@
 import { z } from 'zod'
 import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
+
+import {
+  overlayDeleteIdRows,
+  overlayRestoreIdRows,
+  overlaySlugList,
+} from '../lib/system-overlay/overlay-presets'
 import { abilitySchema } from '../../vocab/ability'
 import { hitDieSchema } from '../../primitives/dice'
 import { absoluteLevelSchema } from '../../primitives/level'
@@ -98,7 +104,7 @@ function refineClassFeatureGrantUnlockLevels(
 }
 
 const classFeatureTablesField = {
-  tables: z.array(contentTableSchema).optional(),
+  tables: overlayDeleteIdRows(contentTableSchema).optional(),
 } as const
 
 export const customClassFeatureSchema = customContentTraitSchema
@@ -174,7 +180,7 @@ export const subclassFeatureSchema = z.preprocess(normalizeContentTrait, customC
 export type SubclassFeature = z.infer<typeof subclassFeatureSchema>
 
 export const classProficienciesSchema = z.object({
-  savingThrows: z.array(abilitySchema).min(1).max(3), // relaxed for homebrew (SRD uses 2)
+  savingThrows: overlaySlugList(abilitySchema).min(1).max(3), // relaxed for homebrew (SRD uses 2)
   armor: armorProficiencyGrantSetSchema,
   weapons: weaponProficiencyGrantSetSchema,
   tools: toolProficiencyGrantSetSchema.optional(),
@@ -185,7 +191,7 @@ export type ClassProficiencies = z.infer<typeof classProficienciesSchema>
 
 /** Draft class proficiencies — saving throws and nested buckets may be empty while authoring. */
 export const classProficienciesDraftSchema = z.object({
-  savingThrows: z.array(abilitySchema).max(3).default([]),
+  savingThrows: overlaySlugList(abilitySchema).max(3).default([]),
   armor: armorProficiencyGrantSetSchema,
   weapons: weaponProficiencyGrantSetSchema,
   tools: toolProficiencyGrantSetSchema.optional(),
@@ -199,11 +205,11 @@ export type ClassProficienciesDraft = z.infer<typeof classProficienciesDraftSche
 // ---------------------------------------------------------------------------
 
 const classStoredBodyBaseSchema = mediaBearingAuthoredContentBodySchema.extend({
-  primaryAbilities: z.array(abilitySchema).min(1),
+  primaryAbilities: overlaySlugList(abilitySchema).min(1),
   hitDie: hitDieSchema,
   spellcasting: spellcastingSchema.optional(),
   proficiencies: classProficienciesSchema,
-  features: z.array(classBodyFeatureSchema),
+  features: overlayRestoreIdRows(classBodyFeatureSchema),
   characterCreation: classCharacterCreationSchema.optional(),
 })
 
@@ -218,11 +224,11 @@ export type ClassStoredBody = z.infer<typeof classStoredBodySchema>
 export const classBodyDraftSchema = mediaBearingDraftAuthoredContentBodySchema(
   CLASS_CONTENT_TYPE_TERM.label,
 ).extend({
-  primaryAbilities: z.array(abilitySchema).max(2).optional(),
+  primaryAbilities: overlaySlugList(abilitySchema).max(2).optional(),
   hitDie: hitDieSchema.optional(),
   spellcasting: spellcastingDraftSchema.optional(),
   proficiencies: classProficienciesDraftSchema.optional(),
-  features: z.array(classBodyFeatureSchema).default([]),
+  features: overlayRestoreIdRows(classBodyFeatureSchema).default([]),
   characterCreation: classCharacterCreationDraftSchema.optional(),
 })
 
@@ -404,12 +410,12 @@ export const subclassPatchableBodySchema = contentBodyBaseSchema.extend({
   /** Short italic lead-in matching the SRD's em-formatted tagline (e.g. "Channel Rage into Violent Fury"). */
   tagline: z.string().optional(),
   /** Optional on patch/update payloads; full records default to `[]` via `subclassBodySchema`. */
-  features: z.array(subclassFeatureSchema).optional(),
+  features: overlayDeleteIdRows(subclassFeatureSchema).optional(),
 })
 
 /** The editable shape: what a form authors and what a patch overrides. */
 export const subclassBodySchema = subclassPatchableBodySchema.extend({
-  features: z.array(subclassFeatureSchema).default([]),
+  features: overlayDeleteIdRows(subclassFeatureSchema).default([]),
 })
 
 export type SubclassBody = z.infer<typeof subclassBodySchema>

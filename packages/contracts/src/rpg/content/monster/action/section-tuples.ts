@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { overlaySlugList } from '../../lib/system-overlay/overlay-presets'
 import { activationTriggerSchema } from '../../../primitives/activation-trigger'
 import { entryProvenanceField } from '../../../primitives/provenance'
 import type { MonsterActionSection } from '../action-sections'
@@ -18,8 +19,8 @@ function withReactionTrigger<T extends z.ZodObject>(schema: T) {
 function reactionReferenceSchema(mode: MonsterActionMode) {
   const actionIds =
     mode === 'draft'
-      ? z.array(z.string().min(1)).max(1).default([])
-      : z.array(z.string().min(1)).min(1, ACTION_REFERENCE_CHOOSE_FROM_ACTIONS).max(1)
+      ? overlaySlugList(z.string().min(1)).max(1).default([])
+      : overlaySlugList(z.string().min(1)).min(1, ACTION_REFERENCE_CHOOSE_FROM_ACTIONS).max(1)
   return z.object({
     id: z.string().min(1),
     kind: z.literal('action-reference'),

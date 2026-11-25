@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { overlayRestoreIdRows, overlaySlugList } from './lib/system-overlay/overlay-presets'
 import { contentMetaSchema, contentPatchBaseSchema, slugSchema } from './lib/envelope'
 import {
   mediaBearingAuthoredContentBodySchema,
@@ -59,14 +60,14 @@ export type SpeciesHeritageOption = z.infer<typeof speciesHeritageOptionSchema>
  * Wording like "lineage" vs "ancestry" lives in `name`, not a separate field.
  */
 export const speciesHeritageSchema = contentNamedChoiceSchema.extend({
-  options: z.array(speciesHeritageOptionSchema).min(1),
+  options: overlayRestoreIdRows(speciesHeritageOptionSchema).min(1),
 })
 
 export type SpeciesHeritage = z.infer<typeof speciesHeritageSchema>
 
 /** Draft heritage — options may be empty while authoring. */
 export const speciesHeritageDraftSchema = contentNamedChoiceSchema.omit({ options: true }).extend({
-  options: z.array(speciesHeritageOptionSchema).default([]),
+  options: overlayRestoreIdRows(speciesHeritageOptionSchema).default([]),
 })
 
 export type SpeciesHeritageDraft = z.infer<typeof speciesHeritageDraftSchema>
@@ -89,10 +90,10 @@ export const speciesBodySchema = mediaBearingAuthoredContentBodySchema.extend({
    * selectable pools. On the classless level-0 chassis they are granted when
    * `retainSpeciesLanguages` is enabled. They do not grant languages once a class applies.
    */
-  languageAffinities: z.array(languageIdSchema).optional(),
+  languageAffinities: overlaySlugList(languageIdSchema).optional(),
   /** Cultural affiliation and naming capability for generator integration. */
   culture: speciesCultureConfigSchema.optional(),
-  traits: z.array(speciesBodyTraitSchema),
+  traits: overlayRestoreIdRows(speciesBodyTraitSchema),
   heritage: speciesHeritageSchema.optional(),
   /** Species-authored data consumed only when the campaign enables the matching rule. */
   characterCreation: speciesCharacterCreationSchema.optional(),
@@ -109,9 +110,9 @@ export const speciesBodyDraftSchema = mediaBearingDraftAuthoredContentBodySchema
   movement: movementSpeedsDraftSchema,
   hover: z.boolean().optional(),
   /** See {@link speciesBodySchema} `languageAffinities`. */
-  languageAffinities: z.array(languageIdSchema).optional(),
+  languageAffinities: overlaySlugList(languageIdSchema).optional(),
   culture: speciesCultureConfigSchema.optional(),
-  traits: z.array(speciesBodyTraitSchema).default([]),
+  traits: overlayRestoreIdRows(speciesBodyTraitSchema).default([]),
   heritage: speciesHeritageDraftSchema.optional(),
   characterCreation: speciesCharacterCreationSchema.optional(),
 })

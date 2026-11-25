@@ -1,5 +1,8 @@
 import { z } from 'zod'
 import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
+
+import { overlayAtomic } from '../content/lib/system-overlay/annotate'
+import { overlaySlugList } from '../content/lib/system-overlay/overlay-presets'
 import { standardFeet } from '../primitives/distance-presets'
 
 import { closedSetEnum, keysFromEntries, vocabEnumFromEntries } from './enum-schema'
@@ -146,7 +149,7 @@ export const movementSpeedFeetSchema = z.union(
  */
 export type MovementSpeeds = Partial<Record<MovementMode, number>>
 
-export const movementSpeedsSchema: z.ZodType<MovementSpeeds> = z
+const movementSpeedsCoreSchema = z
   .record(z.string(), speedFeetSchema)
   .superRefine((movement, ctx) => {
     const keys = Object.keys(movement)
@@ -161,8 +164,7 @@ export const movementSpeedsSchema: z.ZodType<MovementSpeeds> = z
     }
   })
 
-/** Draft movement map — allows an empty object; still validates mode keys when present. */
-export const movementSpeedsDraftSchema: z.ZodType<MovementSpeeds> = z
+const movementSpeedsDraftCoreSchema = z
   .record(z.string(), speedFeetSchema)
   .superRefine((movement, ctx) => {
     for (const key of Object.keys(movement)) {
@@ -171,7 +173,17 @@ export const movementSpeedsDraftSchema: z.ZodType<MovementSpeeds> = z
       }
     }
   })
-  .default({})
+
+export const movementSpeedsSchema: z.ZodType<MovementSpeeds> = overlayAtomic(
+  movementSpeedsCoreSchema,
+  'movement speed map replaces wholesale',
+)
+
+/** Draft movement map — allows an empty object; still validates mode keys when present. */
+export const movementSpeedsDraftSchema: z.ZodType<MovementSpeeds> = overlayAtomic(
+  movementSpeedsDraftCoreSchema,
+  'movement speed map replaces wholesale',
+).default({})
 
 export type CreatureLikeMovement = {
   movement: MovementSpeeds
@@ -183,8 +195,7 @@ export type CreatureMovementDefinition = CreatureLikeMovement & {
   movementAlternative?: MovementAlternative
 }
 
-const movementAlternativeModesSchema = z
-  .array(extraMovementModeSchema)
+const movementAlternativeModesSchema = overlaySlugList(extraMovementModeSchema)
   .min(2, 'At least two alternative movement modes are required.')
   .max(EXTRA_MOVEMENT_MODES.length)
   .superRefine((modes, ctx) => {
@@ -197,7 +208,7 @@ const movementAlternativeModesSchema = z
 export const movementAlternativeSchema = z
   .object({
     modes: movementAlternativeModesSchema,
-    feet: movementSpeedFeetSchema,
+    feet: overlayAtomic(movementSpeedFeetSchema, 'preset alternative movement speed feet literal'),
   })
   .strict()
 

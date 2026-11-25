@@ -1,14 +1,23 @@
 import type { z } from 'zod'
 
+import { isOverlayAtomicMeta, readOverlaySchemaMeta, type OverlaySchemaMeta } from './annotate'
+
 /** Structural fact used to check an overlay policy against a body schema. */
 export type SchemaFact =
   | { type: 'scalar' }
-  | { type: 'unsupported'; wrapper: string }
+  | { type: 'unsupported'; wrapper: string; annotation?: OverlaySchemaMeta }
   | {
       type: 'object'
       fields: Readonly<Record<string, SchemaField>>
+      annotation?: OverlaySchemaMeta
     }
-  | { type: 'array'; element: SchemaFact; idKey?: 'id' | 'entryId' }
+  | {
+      type: 'array'
+      element: SchemaFact
+      idKey?: 'id' | 'entryId'
+      annotation?: OverlaySchemaMeta
+      elementSchema?: z.ZodType
+    }
   | { type: 'union'; branches: readonly SchemaUnionBranch[] }
 
 export type SchemaField = {
@@ -222,7 +231,7 @@ function describeIntersection(schema: ZodLike): SchemaFact | undefined {
   )
 }
 
-function describeObject(schema: ZodLike): SchemaFact | undefined {
+function describeObject(schema: ZodLike, annotation?: OverlaySchemaMeta): SchemaFact | undefined {
   const shape = schema.def.type === 'object' ? objectShape(schema) : undefined
   if (!shape) return undefined
   if (schema.def.catchall && schema.def.catchall.def.type !== 'never') {
@@ -233,15 +242,22 @@ function describeObject(schema: ZodLike): SchemaFact | undefined {
     const unwrapped = unwrap(field)
     fields[key] = { presence: unwrapped.presence, fact: describeCore(unwrapped.core) }
   }
-  return { type: 'object', fields }
+  return { type: 'object', fields, ...(annotation ? { annotation } : {}) }
 }
 
-function describeArray(schema: ZodLike): SchemaFact | undefined {
+function describeArray(schema: ZodLike, annotation?: OverlaySchemaMeta): SchemaFact | undefined {
   if (schema.def.type !== 'array' || !schema.def.element) return undefined
-  const element = unwrap(schema.def.element).core
+  const elementWrapped = unwrap(schema.def.element)
+  const element = elementWrapped.core
   const elementFact = describeCore(element)
   const idKey = idKeyForFact(element, elementFact)
-  return { type: 'array', element: elementFact, ...(idKey ? { idKey } : {}) }
+  return {
+    type: 'array',
+    element: elementFact,
+    elementSchema: schema.def.element as unknown as z.ZodType,
+    ...(idKey ? { idKey } : {}),
+    ...(annotation ? { annotation } : {}),
+  }
 }
 
 function describeUnion(schema: ZodLike): SchemaFact | undefined {
@@ -251,14 +267,28 @@ function describeUnion(schema: ZodLike): SchemaFact | undefined {
   return { type: 'union', branches }
 }
 
+function describeAtomicAnnotated(schema: ZodLike, annotation: OverlaySchemaMeta): SchemaFact {
+  const object = describeObject(schema, annotation)
+  if (object) return object
+  return { type: 'unsupported', wrapper: schema.def.type, annotation }
+}
+
+function describeOpaque(schema: ZodLike, type: string, annotation?: OverlaySchemaMeta): SchemaFact {
+  return { type: 'unsupported', wrapper: type, ...(annotation ? { annotation } : {}) }
+}
+
 function describeCore(schema: ZodLike): SchemaFact {
+  const annotation = readOverlaySchemaMeta(schema as unknown as z.ZodType)
   const type = schema.def.type
+  if (annotation && isOverlayAtomicMeta(annotation))
+    return describeAtomicAnnotated(schema, annotation)
+  const intersection = describeIntersection(schema)
+  if (intersection) return intersection
+  if (OPAQUE_TYPES.has(type)) return describeOpaque(schema, type, annotation)
   return (
-    describeIntersection(schema) ??
-    (OPAQUE_TYPES.has(type) ? { type: 'unsupported', wrapper: type } : undefined) ??
     describeUnion(schema) ??
-    describeObject(schema) ??
-    describeArray(schema) ??
+    describeObject(schema, annotation) ??
+    describeArray(schema, annotation) ??
     (SCALAR_TYPES.has(type) ? { type: 'scalar' } : { type: 'unsupported', wrapper: type })
   )
 }

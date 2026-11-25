@@ -1,6 +1,8 @@
 import { z } from 'zod'
 import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
 
+import { overlayDeleteIdRows } from './lib/system-overlay/overlay-presets'
+
 import { featCategorySchema } from '../vocab/feat'
 import { FEAT_CONTENT_TYPE_TERM } from './lib/content-type-terms'
 import { createDraftInputSchema, createPublishInputSchema } from './lib/content-input-schemas'
@@ -39,7 +41,7 @@ export const featBenefitSectionSchema = z.object({
 })
 
 export const featBenefitSchema = z.object({
-  sections: z.array(featBenefitSectionSchema).min(1),
+  sections: overlayDeleteIdRows(featBenefitSectionSchema).min(1),
 })
 
 export type FeatBenefit = z.infer<typeof featBenefitSchema>

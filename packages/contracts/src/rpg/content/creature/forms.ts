@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
+import { overlayDeleteIdRows } from '../lib/system-overlay/overlay-presets'
 import { creatureSizesDraftSchema, creatureSizesSchema } from '../../vocab/creature-size'
 import {
   movementSpeedsDraftSchema,
@@ -65,8 +66,8 @@ export type CreatureFormOverrides = z.infer<ReturnType<typeof formOverrides>>
 export function creatureFormsSchemaFor(mode: CreatureFormMode) {
   const forms =
     mode === 'draft'
-      ? z.array(definedForm(mode)).default([])
-      : z.array(definedForm(mode)).min(1, FORMS_REQUIRED_MESSAGE)
+      ? overlayDeleteIdRows(definedForm(mode)).default([])
+      : overlayDeleteIdRows(definedForm(mode)).min(1, FORMS_REQUIRED_MESSAGE)
   const profileTrueForm = z.strictObject({
     kind: z.literal('profile'),
     name: z.string().trim().min(1).optional(),

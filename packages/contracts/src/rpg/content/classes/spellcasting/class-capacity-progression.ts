@@ -1,4 +1,6 @@
 import { z } from 'zod'
+
+import { overlayOrderedList } from '../../lib/system-overlay/overlay-presets'
 import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
 
 import { defineMessage } from '../../../../validation/define-message'
@@ -12,7 +14,7 @@ const classCapacityCurveRowSchema = z.object({
 
 const classCapacityCurveSchema = z
   .object({
-    rows: z.array(classCapacityCurveRowSchema).default([]),
+    rows: overlayOrderedList(classCapacityCurveRowSchema).default([]),
   })
   .superRefine((curve, ctx) => {
     const seen = new Set<number>()

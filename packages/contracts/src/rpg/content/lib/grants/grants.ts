@@ -1,6 +1,12 @@
 import { z } from 'zod'
 import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
 
+import {
+  overlayOrderedList,
+  overlayRestoreIdRows,
+  overlaySlugList,
+} from '../system-overlay/overlay-presets'
+
 import { contentPoolChoiceSchema } from './choice'
 import { abilitySchema } from '../../../vocab/ability'
 import {
@@ -69,8 +75,8 @@ import { refineCreatureTraitTemplate } from '../../creature/traits/validate'
  */
 export const languageChoiceGrantSchema = contentPoolChoiceSchema
   .extend({
-    from: z.array(languageIdSchema).min(1).optional(),
-    categories: z.array(languageCategorySchema).min(1).optional(),
+    from: overlaySlugList(languageIdSchema).min(1).optional(),
+    categories: overlaySlugList(languageCategorySchema).min(1).optional(),
   })
   .superRefine((val, ctx) => {
     if (val.from === undefined && val.categories === undefined) {
@@ -143,7 +149,7 @@ export const featChoiceGrantSchema = z
     /** Fighter Fighting Style: may replace on later class levels. */
     replaceable: z.boolean().optional(),
     /** Feat slugs surfaced as recommendations in the character builder (not prose). */
-    recommendedFeatIds: z.array(z.string().min(1)).optional(),
+    recommendedFeatIds: overlaySlugList(z.string().min(1)).optional(),
   })
   .superRefine((val, ctx) => {
     if (val.allowAnyQualifying && val.category !== 'epic-boon' && val.category !== 'general') {
@@ -242,14 +248,14 @@ const senseContentGrantSchema = senseSchema.extend({
 const resistancesContentGrantSchema = z.object({
   id: grantRowIdSchema,
   kind: z.literal('resistances'),
-  damageTypes: z.array(damageTypeIdSchema).min(1),
+  damageTypes: overlaySlugList(damageTypeIdSchema).min(1),
 })
 
 /** Chosen damage type(s) — e.g. a Dragonborn's breath or a Goliath's ancestry. */
 const damageTypeContentGrantSchema = z.object({
   id: grantRowIdSchema,
   kind: z.literal('damageType'),
-  damageTypes: z.array(damageTypeIdSchema).min(1),
+  damageTypes: overlaySlugList(damageTypeIdSchema).min(1),
 })
 
 /** Movement grant — set, increase, or match speed for a movement mode. */
@@ -291,7 +297,7 @@ const armorTrainingContentGrantSchema = z.object({
 const languagesContentGrantSchema = z.object({
   id: grantRowIdSchema,
   kind: z.literal('languages'),
-  languageIds: z.array(languageIdSchema).min(1),
+  languageIds: overlaySlugList(languageIdSchema).min(1),
 })
 
 /** Language choice from a constrained pool. */
@@ -300,8 +306,8 @@ const languageChoiceContentGrantSchema = z
     id: grantRowIdSchema,
     kind: z.literal('languageChoice'),
     choose: z.number().int().min(1).default(1),
-    from: z.array(languageIdSchema).min(1).optional(),
-    categories: z.array(languageCategorySchema).min(1).optional(),
+    from: overlaySlugList(languageIdSchema).min(1).optional(),
+    categories: overlaySlugList(languageCategorySchema).min(1).optional(),
   })
   .superRefine((val, ctx) => {
     if (val.from === undefined && val.categories === undefined) {
@@ -318,7 +324,7 @@ const featChoiceContentGrantSchema = z
     choose: z.number().int().min(1).default(1),
     allowAnyQualifying: z.boolean().optional(),
     replaceable: z.boolean().optional(),
-    recommendedFeatIds: z.array(z.string().min(1)).optional(),
+    recommendedFeatIds: overlaySlugList(z.string().min(1)).optional(),
   })
   .superRefine((val, ctx) => {
     if (val.allowAnyQualifying && val.category !== 'epic-boon' && val.category !== 'general') {
@@ -358,7 +364,7 @@ const spellsContentGrantSchema = z
     id: grantRowIdSchema,
     kind: z.literal('spells'),
     ability: abilitySchema,
-    spellIds: z.array(spellReferenceSchema).min(1),
+    spellIds: overlaySlugList(spellReferenceSchema).min(1),
     availability: spellGrantAvailabilitySchema.optional(),
     casting: spellGrantCastingSchema.optional(),
   })
@@ -484,8 +490,7 @@ export const grantGroupSchema = z.object({
     .describe(
       'When this group unlocks. Omit for the default group (granted when the trait or feature is first gained).',
     ),
-  grants: z
-    .array(contentGrantSchema)
+  grants: overlayRestoreIdRows(contentGrantSchema)
     .min(1)
     .describe('Atomic grants that unlock together. At least one grant is required.'),
 })
@@ -500,7 +505,7 @@ export type GrantGroup = z.infer<typeof grantGroupSchema>
  *
  * Use {@link normalizeGrantGroups} to produce a canonical array before storing.
  */
-export const grantGroupsSchema = z.array(grantGroupSchema).superRefine((groups, ctx) => {
+export const grantGroupsSchema = overlayOrderedList(grantGroupSchema).superRefine((groups, ctx) => {
   const seenGrantRowIds = new Set<string>()
   for (const group of groups) {
     for (const grant of group.grants) {

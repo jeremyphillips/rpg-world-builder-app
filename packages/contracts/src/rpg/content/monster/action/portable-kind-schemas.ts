@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
+import { overlaySlugList } from '../../lib/system-overlay/overlay-presets'
 import { limitedUseDraftSchema, limitedUseSchema } from '../../../primitives/limited-use'
 import { entryProvenanceField } from '../../../primitives/provenance'
 import { refineRequirementsForTargetKind } from '../../lib/resolution/target-requirements'
@@ -78,8 +79,8 @@ export function teleportActionSchema<M extends MonsterActionMode>(mode: M) {
 export function takeActionsSchema<M extends MonsterActionMode>(mode: M) {
   const standardActions =
     mode === 'draft'
-      ? z.array(z.enum(BONUS_STANDARD_ACTION_IDS)).default([])
-      : z.array(z.enum(BONUS_STANDARD_ACTION_IDS)).min(1)
+      ? overlaySlugList(z.enum(BONUS_STANDARD_ACTION_IDS)).default([])
+      : overlaySlugList(z.enum(BONUS_STANDARD_ACTION_IDS)).min(1)
   return z
     .object({
       id: z.string().min(1),

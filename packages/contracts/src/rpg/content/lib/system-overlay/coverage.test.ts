@@ -1,32 +1,47 @@
 import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 
+import { overlayAtomic } from './annotate'
 import { compileOverlayPolicy } from './compile-policy'
-import { systemOverlayParticipants } from './participants'
+import { compileSystemOverlayParticipants, systemOverlayParticipants } from './participants'
 
 describe('system overlay policy coverage', () => {
-  it.each(systemOverlayParticipants.map((participant) => participant.id))(
-    '%s classifies every publish and draft collection',
-    (id) => {
-      const participant = systemOverlayParticipants.find((entry) => entry.id === id)
-      expect(participant).toBeDefined()
-      for (const schema of participant!.schemas) {
-        expect(compileOverlayPolicy(schema).issues).toEqual([])
-      }
-    },
-  )
+  it.each(
+    systemOverlayParticipants.map(
+      (participant) => [participant.id, participant.schemas.length] as const,
+    ),
+  )('%s compiles every publish and draft body schema', (id, schemaCount) => {
+    const compiled = compileSystemOverlayParticipants()
+    const forParticipant = compiled.filter((entry) => entry.participantId === id)
+    expect(forParticipant).toHaveLength(schemaCount)
+    for (const entry of forParticipant) {
+      expect(entry.policy).toBeDefined()
+    }
+  })
+
+  it('compiles all participants in one pass', () => {
+    expect(() => compileSystemOverlayParticipants()).not.toThrow()
+  })
 
   it('fails when an array has no decision', () => {
     const schema = z.object({ name: z.string(), extra: z.array(z.string()) })
-    expect(compileOverlayPolicy(schema).issues).toEqual(['extra is an unclassified array'])
+    const result = compileOverlayPolicy(schema)
+    expect(result.ok).toBe(false)
+    if (result.ok) return
+    expect(result.issues).toEqual(['extra is an unannotated array'])
   })
 
   it('does not walk children of an atomic field', () => {
     const schema = z.object({
-      media: z.object({ images: z.array(z.object({ id: z.string().min(1) })) }),
+      media: overlayAtomic(
+        z.object({ images: z.array(z.object({ id: z.string().min(1) })) }),
+        'test media boundary',
+      ),
     })
-    expect(compileOverlayPolicy(schema).issues).toEqual([])
-    expect(compileOverlayPolicy(schema).policy).toMatchObject({
+    const result = compileOverlayPolicy(schema)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.policy).toMatchObject({
       kind: 'deep',
       fields: { media: { kind: 'atomic' } },
     })

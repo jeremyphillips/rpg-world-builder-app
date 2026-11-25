@@ -1,5 +1,18 @@
-export { compileOverlayPolicy, type CompiledOverlayPolicy } from './compile-policy'
-export { collectionDecision, isAtomicPath } from './collection-decisions'
+export {
+  overlayAtomic,
+  overlayIdentityArray,
+  overlayValueArray,
+  readOverlaySchemaMeta,
+  type OverlayCollectionMeta,
+  type OverlayIdentityMeta,
+  type OverlaySchemaMeta,
+  type OverlayValueListMeta,
+} from './annotate'
+export {
+  compileOverlayPolicy,
+  requireCompiledOverlayPolicy,
+  type CompiledOverlayPolicy,
+} from './compile-policy'
 export { overlayIdSchema, UNSAFE_OVERLAY_IDS } from './ids'
 export {
   parseSystemOverlayIntent,
@@ -9,13 +22,28 @@ export {
   type SeedFieldDelta,
   type SeedRowReplace,
 } from './intent'
-export { systemOverlayParticipants, type SystemOverlayParticipantId } from './participants'
+export { overlayPathOverrides } from './path-overrides'
 export {
-  type CollectionDecision,
-  type OverlayPolicyNode,
-  type OverlayPresence,
-  type OverlayUnionBranch,
-} from './policy'
+  assertIntentCollectionMatchesPolicy,
+  assertStoredCollectionMatchesPolicy,
+  restoreCollectionPaths,
+  type OverlayPolicyPath,
+} from './policy-consumers'
+export {
+  compileSystemOverlayParticipants,
+  systemOverlayParticipants,
+  type CompiledParticipantPolicy,
+  type SystemOverlayParticipantId,
+} from './participants'
+export { type OverlayPolicyNode, type OverlayPresence, type OverlayUnionBranch } from './policy'
+export {
+  overlayDeleteEntryIdRows,
+  overlayDeleteIdRows,
+  overlayImmaterialIdRows,
+  overlayOrderedList,
+  overlayRestoreIdRows,
+  overlaySlugList,
+} from './overlay-presets'
 export { collectSchemaCollections, describeOverlaySchema, type SchemaFact } from './schema-tree'
 export {
   parseStoredOverlay,
