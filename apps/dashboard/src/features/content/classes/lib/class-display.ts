@@ -1,6 +1,7 @@
 import {
   availableClassFeatures,
-  createEquipmentCatalogContext,
+  type EquipmentCatalogContext,
+  type EquipmentCatalogScope,
   presentEquipmentReferenceDisplayName,
   resolveEquipmentSlugReference,
   formatToolProficiencyPoolLabel,
@@ -72,13 +73,13 @@ export type ClassDisplayVocabulary = {
 }
 
 export function buildClassEquipmentVocabulary(
-  args: Parameters<typeof createEquipmentCatalogContext>[0],
+  catalog: EquipmentCatalogContext,
+  expectedScope: EquipmentCatalogScope,
 ): ClassDisplayVocabulary {
-  const catalog = createEquipmentCatalogContext(args)
   return {
     resolveEquipmentLabel: (slug) =>
       presentEquipmentReferenceDisplayName(
-        resolveEquipmentSlugReference(slug, catalog, args.scope),
+        resolveEquipmentSlugReference(slug, catalog, expectedScope),
       ),
   }
 }

@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import {
   CLASS_PROGRESSION_TABLE_LABEL,
+  createEquipmentCatalogContext,
   type CharacterClass,
   type SkillProficiency,
   type Subclass,
@@ -85,15 +86,21 @@ export function ClassDetailContent({
   })
 
   const equipmentQuery = useEquipment(campaignId)
-  const vocabulary = useMemo(
-    () =>
-      buildClassEquipmentVocabulary({
-        status: equipmentQuery.isError ? 'error' : equipmentQuery.data ? 'ready' : 'pending',
-        scope: { rulesetId: characterClass.rulesetId, campaignId },
-        equipmentById: new Map(equipmentQuery.data?.map((item) => [item.id, item])),
-      }),
-    [campaignId, characterClass.rulesetId, equipmentQuery.data, equipmentQuery.isError],
-  )
+  const vocabulary = useMemo(() => {
+    const scope = { rulesetId: characterClass.rulesetId, campaignId }
+    const catalog = createEquipmentCatalogContext({
+      status: equipmentQuery.isError ? 'error' : equipmentQuery.isPending ? 'pending' : 'ready',
+      scope,
+      equipmentById: new Map(equipmentQuery.data?.map((item) => [item.id, item])),
+    })
+    return buildClassEquipmentVocabulary(catalog, scope)
+  }, [
+    campaignId,
+    characterClass.rulesetId,
+    equipmentQuery.data,
+    equipmentQuery.isError,
+    equipmentQuery.isPending,
+  ])
 
   const viewModel = buildClassDetailViewModel(characterClass, vocabulary, {
     surface: 'content-detail',

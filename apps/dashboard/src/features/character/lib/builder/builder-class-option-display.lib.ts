@@ -1,6 +1,7 @@
 import { createElement } from 'react'
 import {
   getSlotProgressionKindEntry,
+  createEquipmentCatalogContext,
   resolveSlotProgressionForClass,
   type CharacterBuildCatalog,
   type CharacterClass,
@@ -35,11 +36,14 @@ function buildBuilderClassVocabulary(
     resolveSkillLabel: (slug) =>
       catalog.skillProficiencies.find((skill) => skill.slug === slug)?.name ??
       formatContentReferenceUnavailable('skill-proficiencies'),
-    ...buildClassEquipmentVocabulary({
-      status: 'ready',
+    ...buildClassEquipmentVocabulary(
+      createEquipmentCatalogContext({
+        status: 'ready',
+        scope,
+        equipmentById: new Map(catalog.equipment.map((entry) => [entry.id, entry])),
+      }),
       scope,
-      equipmentById: new Map(catalog.equipment.map((entry) => [entry.id, entry])),
-    }),
+    ),
   }
 }
 

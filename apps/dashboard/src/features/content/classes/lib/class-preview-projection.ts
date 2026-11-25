@@ -1,5 +1,6 @@
 import {
   availableClassFeatures,
+  createEquipmentCatalogContext,
   CLASS_CONTENT_TYPE_TERM,
   type ContentMedia,
   getAbilityCompactLabel,
@@ -394,11 +395,15 @@ export function buildClassPreviewSections(
 
 export function classPreviewVocabulary(ctx: ContentFormCtx): ClassDisplayVocabulary {
   const scope = equipmentReferenceScopeFromContentFormCtx(ctx)
-  return buildClassEquipmentVocabulary({
-    status: scope ? (ctx.equipmentCatalogStatus ?? 'pending') : 'pending',
-    scope: scope ?? { rulesetId: '', campaignId: '' },
-    equipmentById: ctx.equipmentCatalogById,
-  })
+  const expectedScope = scope ?? { rulesetId: '', campaignId: '' }
+  return buildClassEquipmentVocabulary(
+    createEquipmentCatalogContext({
+      status: scope ? (ctx.equipmentCatalogStatus ?? 'pending') : 'pending',
+      scope: expectedScope,
+      equipmentById: ctx.equipmentCatalogById,
+    }),
+    expectedScope,
+  )
 }
 
 export function classDetailSourceFromFormValues(
