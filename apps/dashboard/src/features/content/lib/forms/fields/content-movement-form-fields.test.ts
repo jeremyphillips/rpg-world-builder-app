@@ -107,6 +107,21 @@ describe('content movement form fields', () => {
     expect(movementAlternativeFormToSchema(form)).toEqual(published)
   })
 
+  it('rejects an empty modes list when alternative movement is present', () => {
+    const schema = z
+      .object({ movementAlternative: z.object({ modes: z.array(z.string()), feet: z.number() }) })
+      .superRefine((values, ctx) => {
+        refineMovementAlternativeForm(values.movementAlternative, [{ mode: 'walk', feet: 20 }], ctx)
+      })
+
+    const result = schema.safeParse({ movementAlternative: { modes: [], feet: 20 } })
+    expect(result.success).toBe(false)
+    if (result.success) return
+    expect(
+      result.error.issues.some((issue) => issue.path.join('.') === 'movementAlternative.modes'),
+    ).toBe(true)
+  })
+
   it('rejects fewer than two modes on form refine', () => {
     const schema = z
       .object({ movementAlternative: z.object({ modes: z.array(z.string()), feet: z.number() }) })

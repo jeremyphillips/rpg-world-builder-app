@@ -140,7 +140,7 @@ export function refineMovementAlternativeForm(
   const modes = movementAlternativeSelectedModes(alternative)
   const modesPath = [...pathPrefix, 'modes'] as const
 
-  if (modes.length > 0 && modes.length < 2) {
+  if (modes.length < 2) {
     addCustomRefinementIssue(ctx, movementValidationMessages.alternativeMinModes(), [...modesPath])
   }
 

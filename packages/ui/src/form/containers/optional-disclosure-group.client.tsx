@@ -1,5 +1,6 @@
 'use client'
 
+import * as React from 'react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useFormContext, useFormState, useWatch } from 'react-hook-form'
 
@@ -32,6 +33,10 @@ import {
   type FieldRhythm,
 } from '../../components/ui/field.variants'
 import { cn } from '../../lib/utils'
+import { useFormUiContext } from '../context/form-ui.context'
+import { useFormValidationPresentation } from '../hooks/use-form-validation-presentation.client'
+import { isPresentationSessionExpanded } from '../errors/resolve-field-error-presentation.lib'
+import { pathOwnsIssue } from '../errors/resolve-tab-validation-state'
 
 function objectHasContent(value: unknown): boolean {
   if (value == null || typeof value !== 'object' || Array.isArray(value)) return false
@@ -158,6 +163,9 @@ function OptionalDisclosureGroupBody({
     namePrefix,
   )
   const [manualOpen, setManualOpen] = useState(false)
+  const ui = useFormUiContext()
+  const { issues, hasAttemptedSubmit, hasAttemptedPublish, publishPresentationEnabled } =
+    useFormValidationPresentation()
   const { defaultValues } = useFormState({ name: fullName })
   const defaultsRef = useRef(defaultValues)
   useEffect(() => {
@@ -166,6 +174,28 @@ function OptionalDisclosureGroupBody({
     setManualOpen(false)
   }, [defaultValues])
   const open = manualOpen || (disclosure.expandWhenPopulated !== false && populated)
+  const validationSessionExpanded = isPresentationSessionExpanded({
+    validationPresentation: ui.validationPresentation,
+    hasAttemptedSubmit,
+    hasAttemptedPublish,
+    publishPresentationEnabled,
+  })
+  const hasValidationUnderGroup = React.useMemo(() => {
+    if (!validationSessionExpanded) return false
+    return issues.some((issue) => {
+      const candidates = [issue.path, issue.presentationPath, issue.claim?.target].filter(
+        (path): path is string => typeof path === 'string' && path.length > 0,
+      )
+      return candidates.some(
+        (path) =>
+          path === fullName || pathOwnsIssue(fullName, path) || pathOwnsIssue(path, fullName),
+      )
+    })
+  }, [validationSessionExpanded, issues, fullName])
+  useEffect(() => {
+    if (!hasValidationUnderGroup) return
+    setManualOpen(true)
+  }, [hasValidationUnderGroup])
   const controlId = `${idPrefix}-${fullName.replaceAll('.', '-')}`
   const dependencyValues = useDependsOnValues(
     optionalDisclosureDependsOnPaths(disclosure),

@@ -64,6 +64,8 @@ export {
 } from './resolve-invalid-submit-navigation'
 export {
   pathOwnsIssue,
+  tabPrefixOwnsIssuePath,
+  resolveTabOwnershipPath,
   collectTabPathPrefixes,
   resolveTabValidationState,
   getFirstInvalidTabId,

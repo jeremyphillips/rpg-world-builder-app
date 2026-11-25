@@ -1060,6 +1060,8 @@ export const updateMonsterInputSchema = monsterPublishInputSchema.partial().exte
   experiencePointsOverride: z.number().int().min(0).nullable().optional(),
   hover: z.boolean().nullable().optional(),
   description: z.string().nullable().optional(),
+  movementAlternative: movementAlternativeSchema.nullable().optional(),
+  lair: monsterLairSchema.nullable().optional(),
 })
 
 export type UpdateMonsterInput = z.infer<typeof updateMonsterInputSchema>
@@ -1069,6 +1071,8 @@ export const updateMonsterDraftInputSchema = monsterDraftInputSchema
   .extend({
     creatureFamilyIds: monsterBodyFields.creatureFamilyIds.nullable(),
     classIds: monsterBodyFields.classIds.nullable(),
+    movementAlternative: movementAlternativeSchema.nullable().optional(),
+    lair: monsterLairDraftSchema.nullable().optional(),
   })
   .superRefine((input, ctx) => refineMonsterDraftBody(input as MonsterBodyDraft, ctx))
 

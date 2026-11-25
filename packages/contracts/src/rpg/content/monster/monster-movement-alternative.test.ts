@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { createMonsterDraftInputSchema, createMonsterInputSchema } from '../monster'
+import {
+  createMonsterDraftInputSchema,
+  createMonsterInputSchema,
+  updateMonsterDraftInputSchema,
+  updateMonsterInputSchema,
+} from '../monster'
 import { MONSTER_TEST_BODY } from './test-fixtures'
 
 function parsePublish(overrides: Record<string, unknown> = {}) {
@@ -45,5 +50,23 @@ describe('monster movementAlternative', () => {
 
   it('keeps legacy movement-only documents valid', () => {
     expect(parsePublish().success).toBe(true)
+  })
+
+  it('accepts null movementAlternative tombstones on monster update inputs', () => {
+    expect(
+      updateMonsterInputSchema.safeParse({ movementAlternative: null, slug: 'swarm' }).success,
+    ).toBe(true)
+    expect(
+      updateMonsterDraftInputSchema.safeParse({ movementAlternative: null, slug: 'swarm' }).success,
+    ).toBe(true)
+  })
+
+  it('rejects a persisted-shaped object with a single alternative mode on update', () => {
+    expect(
+      updateMonsterInputSchema.safeParse({
+        movementAlternative: { modes: ['fly'], feet: 20 },
+        slug: 'swarm',
+      }).success,
+    ).toBe(false)
   })
 })
