@@ -55,3 +55,27 @@ export {
   type StoredIdentityCollection,
   type StoredOverlay,
 } from './stored'
+export {
+  applyStoredOverlay,
+  type ApplyStoredOverlayResult,
+  type ApplyStoredOverlaySuccess,
+} from './apply'
+export {
+  reconcileOverlayUpdate,
+  type ReconcileOverlayUpdateResult,
+  type ReconcileOverlayUpdateSuccess,
+} from './reconcile'
+export {
+  parseStoredOverlayInput,
+  emptyStoredOverlay,
+  type ParsedStoredOverlayInput,
+} from './legacy'
+export {
+  type OverlayApplyFailure,
+  type OverlayReconcileFailure,
+  type OverlayReadDiagnostics,
+  type OverlayUnsupportedRetentionFailure,
+  type OverlayUnsupportedVersionFailure,
+  type OverlayValidationFailure,
+  type OverlayInvalidOrderFailure,
+} from './overlay-failures'
