@@ -7,7 +7,7 @@ import {
   HERITAGE_GROUP_LEGEND,
   HERITAGE_NAME_HINT,
 } from './species-heritage-form-labels'
-import { heritageOptionRowObjectSchema, refinePublishedTraitRow } from './species-trait-form-fields'
+import { heritageOptionRowObjectSchema, refinePublishedTraitRow } from './species-trait-form-schema'
 
 export const heritageOptionRowDraftFormSchema = heritageOptionRowObjectSchema()
 

@@ -1,7 +1,8 @@
 import { resolveTraitName, type ContentTrait } from '@rpg/contracts'
 
 import type { MasterDetailRowTitleConfig } from '../../lib/master-detail/master-detail-row-title'
-import { traitItemTitle, type TraitRowForm } from './species-trait-form-fields'
+import { type TraitRowForm } from './species-trait-form-schema'
+import { traitItemTitle } from './species-trait-form-fields'
 
 /** Inline title policy for species traits and heritage options. */
 export function createSpeciesTraitRowTitleConfig(): MasterDetailRowTitleConfig<TraitRowForm> {

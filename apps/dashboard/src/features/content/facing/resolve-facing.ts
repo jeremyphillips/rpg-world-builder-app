@@ -15,7 +15,7 @@ import {
   resolveSpeciesTraitDraftFacing,
   resolveTraitPersistedFacing,
 } from './domains/trait/resolve-trait-facing'
-import type { TraitRowForm } from '../species/lib/species-trait-form-fields'
+import type { TraitRowForm } from '../species/lib/species-trait-form-schema'
 
 export type ResolveFacingRequest =
   | {

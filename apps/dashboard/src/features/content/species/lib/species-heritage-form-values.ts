@@ -21,7 +21,7 @@ import {
   heritageScalarFields,
 } from './species-heritage-form-fields'
 import { heritageOptionItemFields } from './species-trait-form-fields'
-import type { TraitRowForm } from './species-trait-form-fields'
+import type { TraitRowForm } from './species-trait-form-schema'
 import {
   heritageOptionItemDefaultValues,
   traitFromFormRow,

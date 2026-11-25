@@ -1,6 +1,6 @@
 import { useWatch } from 'react-hook-form'
 
-import type { TraitRowForm } from '../species/lib/species-trait-form-fields'
+import type { TraitRowForm } from '../species/lib/species-trait-form-schema'
 import type { FacingHostConfig } from './facing-host-config.types'
 
 export function useSpeciesTraitFacingHost(input: {

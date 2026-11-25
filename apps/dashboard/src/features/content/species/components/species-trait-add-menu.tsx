@@ -3,7 +3,7 @@ import { ButtonDropdown } from '@rpg/ui'
 
 import { buildLabelDescriptionActiveVocabulary, useVocabularySet } from '@/features/vocabulary'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
-import type { TraitRowForm } from '../lib/species-trait-form-fields'
+import type { TraitRowForm } from '../lib/species-trait-form-schema'
 import {
   parseSpeciesTraitAcquisitionId,
   SPECIES_TRAIT_ACQUISITION_GROUPS,

@@ -16,9 +16,9 @@ import {
 } from '../../lib/forms/grants/grant-form-values'
 import {
   createHeritageOptionCampaignAccessDefaults,
-  traitItemTitle,
   type TraitRowForm,
-} from './species-trait-form-fields'
+} from './species-trait-form-schema'
+import { traitItemTitle } from './species-trait-form-fields'
 import type { HeritageOptionRowForm } from './species-heritage-form-fields'
 
 export function createTraitRowDefaultValues(): TraitRowForm {
