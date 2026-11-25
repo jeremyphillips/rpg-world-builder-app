@@ -19,7 +19,9 @@ availability for editors with and without availability controls.
 
 The structured editor panel and the independently persisted resource adapter own
 raw shell imports. The subclass tab owns the independent resource adapter. The
-dashboard import guard enforces these entry points.
+dashboard import guard enforces these entry points. Heritage group fields render
+in the species tab above the options editor. The shared editors own only their
+list, detail, and dialog regions.
 
 ## Component map
 

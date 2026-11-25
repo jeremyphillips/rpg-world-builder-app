@@ -116,34 +116,6 @@ describe('FormEmbeddedMasterDetailEditor', () => {
     expect(screen.queryByRole('menuitem', { name: /Delete trait/i })).not.toBeInTheDocument()
   })
 
-  it('renders leadingContent above the editor grid', () => {
-    function LeadingContentShell() {
-      return (
-        <TestFormShell defaultValues={{ traits: [] }}>
-          <FormEmbeddedMasterDetailEditor
-            formCtx={{}}
-            fieldName="traits"
-            itemFields={[{ type: 'text', name: 'name', label: 'Name' }]}
-            itemNoun={TRAIT_MASTER_DETAIL_ITEM_NOUN}
-            listTitle="Traits"
-            ariaLabel="Traits"
-            addLabel="Add trait"
-            idPrefix="species-trait"
-            leadingContent={<p>Choose how many traits apply.</p>}
-            mapListItem={() => ({ title: '' })}
-          />
-        </TestFormShell>
-      )
-    }
-
-    render(<LeadingContentShell />)
-
-    const leading = screen.getByText('Choose how many traits apply.')
-    const list = screen.getByRole('navigation', { name: 'Traits' })
-
-    expect(leading.compareDocumentPosition(list) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-  })
-
   it('uses makeItemDefaults when appending a row', async () => {
     const user = userEvent.setup()
 

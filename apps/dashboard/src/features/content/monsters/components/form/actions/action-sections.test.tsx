@@ -96,7 +96,7 @@ describe('MonsterActionSections', () => {
 
     const addButtons = screen.getAllByRole('button', { name: 'Add' })
     await user.click(addButtons[0]!)
-    await user.click(await screen.findByRole('menuitem', { name: /Claw/i }))
+    await user.click(await screen.findByRole('menuitem', { name: /^Claw\b/ }))
 
     expect(screen.getByRole('button', { current: true, name: /Claw/i })).toBeInTheDocument()
   })

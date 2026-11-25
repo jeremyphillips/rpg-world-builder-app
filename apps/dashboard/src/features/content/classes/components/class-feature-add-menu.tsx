@@ -12,11 +12,12 @@ import { createAsiFeature } from '../lib/class-asi-features'
 import { createSubclassChoiceFeature } from '../lib/class-subclass-choice-features'
 import { featureToFormRow } from '../lib/class-feature-form-fields'
 import { featureRowShowsInAddMenu } from '../lib/class-feature-authoring'
+import type { MasterDetailAcquisition } from '../../components/master-detail/master-detail-list-panel'
 import { toAcquisitionDropdownItem } from '../../lib/acquisition'
 
 const ADD_MENU_KINDS = CLASS_FEATURE_KINDS.filter(featureRowShowsInAddMenu)
 
-export function ClassFeatureAddMenu({
+export function buildClassFeatureAcquisition({
   features,
   className,
   classSlug,
@@ -26,7 +27,7 @@ export function ClassFeatureAddMenu({
   className: string
   classSlug: string
   onAddRows: (rows: FeatureRowForm[]) => void
-}) {
+}): MasterDetailAcquisition {
   const items = ADD_MENU_KINDS.map((kind) =>
     toAcquisitionDropdownItem({
       id: kind,
@@ -46,37 +47,36 @@ export function ClassFeatureAddMenu({
     }),
   )
 
-  return (
-    <ButtonDropdown
-      label="Add feature"
-      triggerPresentation="addIcon"
-      supportingWrap
-      groups={[]}
-      items={items}
-      onSelectItem={(itemId) => {
-        if (!isClassFeatureKind(itemId) || !featureRowShowsInAddMenu(itemId)) return
-        const kind = itemId
-        if (kind === 'custom') {
-          onAddRows([
-            { name: '', level: 1, grants: [], tables: [], available: true, kind: 'custom' },
-          ])
-          return
-        }
-        if (kind === 'asi') {
-          onAddRows([featureToFormRow(createAsiFeature(1))])
-          return
-        }
-        if (kind === 'subclass-choice' && !classSubclassChoiceAtOccurrenceLimit(features ?? [])) {
-          onAddRows([
-            featureToFormRow(
-              createSubclassChoiceFeature({
-                classSlug: classSlug || 'new-class',
-                className: className || 'New Class',
-              }),
-            ),
-          ])
-        }
-      }}
-    />
-  )
+  return {
+    label: 'Add feature',
+    supportingWrap: true,
+    groups: [],
+    items,
+    onSelectItem: (itemId) => {
+      if (!isClassFeatureKind(itemId) || !featureRowShowsInAddMenu(itemId)) return
+      const kind = itemId
+      if (kind === 'custom') {
+        onAddRows([{ name: '', level: 1, grants: [], tables: [], available: true, kind: 'custom' }])
+        return
+      }
+      if (kind === 'asi') {
+        onAddRows([featureToFormRow(createAsiFeature(1))])
+        return
+      }
+      if (kind === 'subclass-choice' && !classSubclassChoiceAtOccurrenceLimit(features ?? [])) {
+        onAddRows([
+          featureToFormRow(
+            createSubclassChoiceFeature({
+              classSlug: classSlug || 'new-class',
+              className: className || 'New Class',
+            }),
+          ),
+        ])
+      }
+    },
+  }
+}
+
+export function ClassFeatureAddMenu(props: Parameters<typeof buildClassFeatureAcquisition>[0]) {
+  return <ButtonDropdown {...buildClassFeatureAcquisition(props)} triggerPresentation="addIcon" />
 }

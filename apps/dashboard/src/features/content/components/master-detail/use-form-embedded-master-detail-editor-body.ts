@@ -27,7 +27,7 @@ function resolveEmbeddedDetailFields(
   if (!resolveItemFields) {
     return Array.isArray(itemFields) ? itemFields : []
   }
-  return resolveItemFields(selectedRow ? rowAt(selectedRow.formIndex) : undefined)
+  return selectedRow ? resolveItemFields(rowAt(selectedRow.formIndex)) : []
 }
 
 function embeddedMasterDetailRowsArgs<TRow>(input: EditorBodyInput<TRow>) {
@@ -83,7 +83,7 @@ export function useFormEmbeddedMasterDetailEditorBody<TRow = Record<string, unkn
     fieldName,
     itemFields,
     itemNoun,
-    addControl: addControlProp,
+    acquisition: acquisitionProp,
     resolveItemFields,
     resolveFieldSections,
     idPrefix,
@@ -179,7 +179,7 @@ export function useFormEmbeddedMasterDetailEditorBody<TRow = Record<string, unkn
     return sections
   }, [resolveFieldSections, rows])
 
-  const addControl = addControlProp
+  const acquisition = acquisitionProp
 
   const listGroups = useMemo((): MasterDetailListGroup[] | undefined => {
     if (!resolveListGroups) return undefined
@@ -189,9 +189,9 @@ export function useFormEmbeddedMasterDetailEditorBody<TRow = Record<string, unkn
         row: rows.rowAt(row.formIndex),
         formIndex: row.formIndex,
       })),
-      addControl,
+      acquisition,
     })
-  }, [addControl, resolveListGroups, rows, visibleRows])
+  }, [acquisition, resolveListGroups, rows, visibleRows])
 
   return {
     rows,
@@ -205,7 +205,7 @@ export function useFormEmbeddedMasterDetailEditorBody<TRow = Record<string, unkn
     selectedIdentity,
     detailFields,
     detailFieldSections,
-    addControl,
+    acquisition,
     formCtx,
     fieldName,
     idPrefix,

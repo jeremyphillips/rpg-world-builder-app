@@ -1,7 +1,6 @@
 import { useCallback, useMemo } from 'react'
 import { useWatch } from 'react-hook-form'
 import { listCreatureTraitTemplatesForRuleset } from '@rpg/contracts'
-import { ButtonDropdown } from '@rpg/ui'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import { creatureTraitTemplateRow } from '../../../../lib/creature-traits/creature-trait-add-menu'
@@ -125,34 +124,31 @@ export function MonsterTraitsEditor({ ctx }: { ctx: ContentFormCtx }) {
       listTitle={MONSTER_TRAITS_HEADING}
       ariaLabel={MONSTER_TRAITS_HEADING}
       addLabel={MONSTER_ADD_LABEL}
-      addControl={
-        <ButtonDropdown
-          label={MONSTER_ADD_LABEL}
-          searchPlaceholder="Search traits…"
-          triggerPresentation="addIcon"
-          groups={MONSTER_TRAIT_ACQUISITION_GROUPS}
-          supportingWrap
-          items={items}
-          onSelectItem={(id) => {
-            if (id.startsWith('template:')) {
-              const templateId = id.slice('template:'.length)
-              editor.appendRow(creatureTraitTemplateRow(templateId, createMonsterRowId()))
-              return
-            }
-            const choice = parseMonsterTraitAcquisitionId(id)
-            if (!choice) return
-            if (choice.type === 'custom') {
-              editor.appendRow(makeItemDefaults())
-              return
-            }
-            editor.appendRow({
-              id: createMonsterRowId(),
-              preset: choice.presetId,
-              ...monsterTraitPresetDefaults(choice.presetId),
-            })
-          }}
-        />
-      }
+      acquisition={{
+        label: MONSTER_ADD_LABEL,
+        searchPlaceholder: 'Search traits…',
+        groups: MONSTER_TRAIT_ACQUISITION_GROUPS,
+        supportingWrap: true,
+        items,
+        onSelectItem: (id) => {
+          if (id.startsWith('template:')) {
+            const templateId = id.slice('template:'.length)
+            editor.appendRow(creatureTraitTemplateRow(templateId, createMonsterRowId()))
+            return
+          }
+          const choice = parseMonsterTraitAcquisitionId(id)
+          if (!choice) return
+          if (choice.type === 'custom') {
+            editor.appendRow(makeItemDefaults())
+            return
+          }
+          editor.appendRow({
+            id: createMonsterRowId(),
+            preset: choice.presetId,
+            ...monsterTraitPresetDefaults(choice.presetId),
+          })
+        },
+      }}
       idPrefix="monster-trait"
       makeItemDefaults={makeItemDefaults}
       access={{ kind: 'availability', fieldName: 'available' }}

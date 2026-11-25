@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
 
-import { buildAvailabilityCountSupplement } from '../campaign-access/availability-count-supplement'
 import { isMasterDetailRowVisible } from './master-detail-availability-state.lib'
 import type { MasterDetailAvailabilityPresentation } from './master-detail-availability.types'
 import { useMasterDetailAvailabilityFilter } from './use-master-detail-availability-filter'
@@ -34,14 +33,13 @@ export function useMasterDetailCollectionAvailability<
   )
 
   const countSupplement = useMemo(
-    () =>
-      buildAvailabilityCountSupplement({
-        scope: filter.scope,
-        showUnavailable: filter.showUnavailable,
-        hiddenUnavailableCount: filter.hiddenUnavailableCount,
-        onShow: filter.showUnavailableItems,
-        onHide: filter.hideUnavailableItems,
-      }),
+    () => ({
+      scope: filter.scope,
+      showUnavailable: filter.showUnavailable,
+      hiddenUnavailableCount: filter.hiddenUnavailableCount,
+      onShow: filter.showUnavailableItems,
+      onHide: filter.hideUnavailableItems,
+    }),
     [
       filter.hiddenUnavailableCount,
       filter.hideUnavailableItems,

@@ -60,11 +60,11 @@ describe('MasterDetailListPanel', () => {
     expect(screen.getByText('Features')).not.toHaveClass('heading-style-card')
   })
 
-  it('renders addControl in place of the default add button', () => {
+  it('renders the acquisition menu in place of the default add button', () => {
     render(
       <MasterDetailListPanel
         {...baseProps()}
-        addControl={<button type="button">Custom add</button>}
+        acquisition={{ label: 'Custom add', groups: [], items: [], onSelectItem: vi.fn() }}
       />,
     )
 
@@ -200,7 +200,17 @@ describe('MasterDetailListPanel', () => {
   })
 
   it('keeps header and count supplement outside the scroll region', () => {
-    render(<MasterDetailListPanel {...baseProps()} countSupplement={<span>2 available</span>} />)
+    render(
+      <MasterDetailListPanel
+        {...baseProps()}
+        countSupplement={{
+          scope: { availableCount: 2, unavailableCount: 0, visibleCount: 2 },
+          showUnavailable: false,
+          onShow: () => {},
+          onHide: () => {},
+        }}
+      />,
+    )
 
     const scrollRegion = document.querySelector('[data-master-detail-list-scroll]')
     const listShell = scrollRegion?.closest('nav')
@@ -220,7 +230,12 @@ describe('MasterDetailListPanel', () => {
     render(
       <MasterDetailListPanel
         {...baseProps()}
-        countSupplement={<span>22 available · 1 unavailable · Show</span>}
+        countSupplement={{
+          scope: { availableCount: 22, unavailableCount: 1, visibleCount: 22 },
+          showUnavailable: false,
+          onShow: () => {},
+          onHide: () => {},
+        }}
         invalidItemCount={3}
       />,
     )
@@ -286,7 +301,12 @@ describe('MasterDetailListPanel', () => {
         itemNoun={CLASS_FEATURE_MASTER_DETAIL_ITEM_NOUN}
         selectedItemId="bite"
         onSelectItem={onSelectItem}
-        countSupplement={<span>2 available</span>}
+        countSupplement={{
+          scope: { availableCount: 2, unavailableCount: 0, visibleCount: 2 },
+          showUnavailable: false,
+          onShow: () => {},
+          onHide: () => {},
+        }}
         invalidItemCount={1}
         addLabel="Add action"
         groups={[
@@ -389,7 +409,7 @@ describe('MasterDetailListPanel', () => {
         groups={[
           {
             id: 'features',
-            title: <span>Features</span>,
+            title: 'Features',
             items: [],
           },
         ]}

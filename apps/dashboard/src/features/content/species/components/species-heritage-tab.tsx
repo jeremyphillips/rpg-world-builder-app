@@ -3,6 +3,7 @@ import { useFormContext, useWatch } from 'react-hook-form'
 import {
   Button,
   InsetPanel,
+  fieldGroupFlexStackClasses,
   emptyStateWellSupportingClasses,
   emptyStateWellTitleLgClasses,
   Text,
@@ -166,27 +167,27 @@ function HeritageEditor({ formCtx }: { formCtx: ContentFormCtx }) {
   )
 
   return (
-    <FormEmbeddedMasterDetailEditor
-      formCtx={formCtx}
-      fieldName={OPTIONS_FIELD_NAME}
-      itemFields={traitFields}
-      itemNoun={HERITAGE_OPTION_MASTER_DETAIL_ITEM_NOUN}
-      listTitle={HERITAGE_OPTIONS_LIST_TITLE}
-      ariaLabel="Heritage options"
-      addLabel={ADD_HERITAGE_OPTION_LABEL}
-      idPrefix="species-heritage-option"
-      editor={editor}
-      leadingContent={
-        <HeritageScalarSection
-          formCtx={formCtx}
-          heritage={heritage}
-          onRemove={handleRemoveHeritage}
-        />
-      }
-      rowTitle={HERITAGE_OPTION_ROW_TITLE}
-      resolveFieldSections={resolveFieldSections}
-      access={accessConfig}
-    />
+    <div className={fieldGroupFlexStackClasses}>
+      <HeritageScalarSection
+        formCtx={formCtx}
+        heritage={heritage}
+        onRemove={handleRemoveHeritage}
+      />
+      <FormEmbeddedMasterDetailEditor
+        formCtx={formCtx}
+        fieldName={OPTIONS_FIELD_NAME}
+        itemFields={traitFields}
+        itemNoun={HERITAGE_OPTION_MASTER_DETAIL_ITEM_NOUN}
+        listTitle={HERITAGE_OPTIONS_LIST_TITLE}
+        ariaLabel="Heritage options"
+        addLabel={ADD_HERITAGE_OPTION_LABEL}
+        idPrefix="species-heritage-option"
+        editor={editor}
+        rowTitle={HERITAGE_OPTION_ROW_TITLE}
+        resolveFieldSections={resolveFieldSections}
+        access={accessConfig}
+      />
+    </div>
   )
 }
 

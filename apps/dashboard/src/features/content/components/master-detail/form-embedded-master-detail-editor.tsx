@@ -1,6 +1,5 @@
 import type { ReactNode, RefObject } from 'react'
 import { useCallback } from 'react'
-import { fieldGroupFlexStackClasses } from '@rpg/ui'
 import { buildItemDefaultValues, type FormItem } from '@rpg/ui/form'
 
 import type { Availability, AvailabilityReason } from '@/lib/availability'
@@ -28,7 +27,9 @@ import { MasterDetailGrid } from './master-detail-grid'
 import {
   MasterDetailListPanel,
   type MasterDetailListGroup,
+  type MasterDetailAcquisition,
   type MasterDetailListItem,
+  type MasterDetailListPanelProps,
 } from './master-detail-list-panel'
 import type { FacingHostConfig } from '../../facing/facing-host-config.types'
 import type { MasterDetailItemFieldSections } from './master-detail-detail-body'
@@ -43,12 +44,12 @@ type FormEmbeddedMasterDetailEditorBase = {
   /** Singular noun vocabulary for delete dialog, empty copy, and overflow actions. */
   itemNoun: MasterDetailItemNounTerm
   /** Visible collection title in the list header. */
-  listTitle: ReactNode
+  listTitle: string
   /** Accessible name for the list nav — must remain independent from `listTitle`. */
   ariaLabel: string
   addLabel: string
   /** Replaces the default add control (for example a template picker menu). */
-  addControl?: ReactNode
+  acquisition?: MasterDetailAcquisition
   /** Overrides `editor.handleAdd` for the default icon add control. */
   onAdd?: () => void
   /** Row-specific detail fields. When omitted, every row uses `itemFields`. */
@@ -73,11 +74,6 @@ type FormEmbeddedMasterDetailEditorBase = {
   makeItemDefaults?: () => Record<string, unknown>
   /** When false, hides detail overflow delete. Defaults to `true`. */
   showDelete?: boolean
-  /**
-   * Optional fields or chrome rendered above the list/detail grid with standard
-   * field-group spacing (`fieldGroupFlexStackClasses`).
-   */
-  leadingContent?: ReactNode
   resolveRowReasons?: (ctx: {
     row: unknown
     rowKey: string
@@ -96,7 +92,7 @@ type FormEmbeddedMasterDetailEditorBase = {
   /** Optional grouped list rail — row order stays on the field array. */
   resolveListGroups?: (ctx: {
     visibleRows: Array<{ item: MasterDetailListItem; row: unknown; formIndex: number }>
-    addControl?: ReactNode
+    acquisition?: MasterDetailAcquisition
   }) => MasterDetailListGroup[] | undefined
 }
 
@@ -161,7 +157,6 @@ function embeddedCampaignAccessDialog(input: {
 }
 
 function FormEmbeddedMasterDetailEditorBody<TRow = Record<string, unknown>>({
-  leadingContent,
   listTitle,
   ariaLabel,
   addLabel,
@@ -183,7 +178,6 @@ function FormEmbeddedMasterDetailEditorBody<TRow = Record<string, unknown>>({
 
   return (
     <EmbeddedMasterDetailLayout
-      leadingContent={leadingContent}
       listItems={body.listItems}
       listGroups={body.listGroups}
       selectedItemId={body.isSelectedRowVisible ? body.rows.selectedDomainId : null}
@@ -194,7 +188,7 @@ function FormEmbeddedMasterDetailEditorBody<TRow = Record<string, unknown>>({
       countSupplement={body.access ? body.collection.countSupplement : undefined}
       invalidItemCount={body.invalidItemCount}
       onSelectItem={body.handleSelectItem}
-      addControl={body.addControl}
+      acquisition={body.acquisition}
       onAdd={onAdd ?? body.editor.handleAdd}
       editor={body.editor}
       itemFields={body.detailFields}
@@ -221,7 +215,6 @@ function FormEmbeddedMasterDetailEditorBody<TRow = Record<string, unknown>>({
 }
 
 function EmbeddedMasterDetailLayout({
-  leadingContent,
   campaignAccessDialog,
   deleteOpen,
   deleteName,
@@ -237,7 +230,7 @@ function EmbeddedMasterDetailLayout({
   countSupplement,
   invalidItemCount,
   onSelectItem,
-  addControl,
+  acquisition,
   onAdd,
   editor,
   itemFields,
@@ -255,7 +248,6 @@ function EmbeddedMasterDetailLayout({
   facing,
   detailFieldSections,
 }: {
-  leadingContent?: ReactNode
   campaignAccessDialog: ReactNode
   deleteOpen: boolean
   deleteName: string
@@ -265,13 +257,13 @@ function EmbeddedMasterDetailLayout({
   listItems: MasterDetailListItem[]
   listGroups?: MasterDetailListGroup[]
   selectedItemId: string | null
-  listTitle?: ReactNode
+  listTitle?: string
   ariaLabel: string
   addLabel: string
-  countSupplement?: ReactNode
+  countSupplement?: MasterDetailListPanelProps['countSupplement']
   invalidItemCount: number
   onSelectItem: (id: string) => void
-  addControl?: ReactNode
+  acquisition?: MasterDetailAcquisition
   onAdd: () => void
   editor: UseMasterDetailArrayResult
   itemFields: FormItem[]
@@ -303,7 +295,7 @@ function EmbeddedMasterDetailLayout({
         invalidItemCount={invalidItemCount}
         onSelectItem={onSelectItem}
         onListMove={onListMove}
-        {...(addControl ? { addControl } : { onAdd })}
+        {...(acquisition ? { acquisition } : { onAdd })}
       />
       <MasterDetailEditorPanel
         editor={editor}
@@ -335,18 +327,9 @@ function EmbeddedMasterDetailLayout({
       onConfirm={onConfirmDelete}
     />
   )
-  const gridWithLeading = leadingContent ? (
-    <div className={fieldGroupFlexStackClasses}>
-      {leadingContent}
-      {grid}
-    </div>
-  ) : (
-    grid
-  )
-
   return (
     <>
-      {gridWithLeading}
+      {grid}
       {campaignAccessDialog}
       {deleteDialog}
     </>

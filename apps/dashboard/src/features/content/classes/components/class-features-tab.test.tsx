@@ -63,8 +63,16 @@ function readListFeatureTitles(): string[] {
   })
 }
 
-const rage: Feature = { id: 'f1', name: 'Rage', level: 1, description: '', grants: [] }
+const rage: Feature = {
+  kind: 'custom',
+  id: 'f1',
+  name: 'Rage',
+  level: 1,
+  description: '',
+  grants: [],
+}
 const unarmored: Feature = {
+  kind: 'custom',
   id: 'f2',
   name: 'Unarmored Defense',
   level: 1,
@@ -175,6 +183,7 @@ describe('ClassFeaturesTab', () => {
   it('does not reorder level peers when selecting a feature at a different level', async () => {
     const user = userEvent.setup()
     const weaponMastery: Feature = {
+      kind: 'custom',
       id: 'f3',
       name: 'Weapon Mastery',
       level: 1,
@@ -182,6 +191,7 @@ describe('ClassFeaturesTab', () => {
       grants: [],
     }
     const dangerSense: Feature = {
+      kind: 'custom',
       id: 'f4',
       name: 'Danger Sense',
       level: 2,
@@ -189,6 +199,7 @@ describe('ClassFeaturesTab', () => {
       grants: [],
     }
     const recklessAttack: Feature = {
+      kind: 'custom',
       id: 'f5',
       name: 'Reckless Attack',
       level: 2,
@@ -213,9 +224,9 @@ describe('ClassFeaturesTab', () => {
     render(
       <TabShell
         features={[
-          { id: 'f1', name: 'A', level: 1, description: '', grants: [] },
-          { id: 'f2', name: 'B', level: 12, description: '', grants: [] },
-          { id: 'f3', name: 'C', level: 1, description: '', grants: [] },
+          { kind: 'custom', id: 'f1', name: 'A', level: 1, description: '', grants: [] },
+          { kind: 'custom', id: 'f2', name: 'B', level: 12, description: '', grants: [] },
+          { kind: 'custom', id: 'f3', name: 'C', level: 1, description: '', grants: [] },
         ]}
         onFormReady={(form) => {
           formApi = form

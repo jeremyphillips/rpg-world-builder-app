@@ -25,7 +25,7 @@ import {
   removeSpellcastingFromFormValues,
 } from '../lib/class-spellcasting-lifecycle'
 import { buildSpellcastingFeatureAvailabilityFormFields } from '../lib/class-spellcasting-feature-availability-form-fields'
-import { ClassFeatureAddMenu } from './class-feature-add-menu'
+import { buildClassFeatureAcquisition } from './class-feature-add-menu'
 import { useClassFeatureFacingHost } from '../../facing/use-class-feature-facing-host'
 
 const FEATURES_FIELD_NAME = 'features'
@@ -190,14 +190,12 @@ export function ClassFeaturesTab({ formCtx }: ClassFeaturesTabProps) {
         addLabel="Add feature"
         idPrefix="class-feature"
         editor={editor}
-        addControl={
-          <ClassFeatureAddMenu
-            features={features}
-            className={className ?? ''}
-            classSlug={classSlug ?? ''}
-            onAddRows={handleAddFeatureRows}
-          />
-        }
+        acquisition={buildClassFeatureAcquisition({
+          features,
+          className: className ?? '',
+          classSlug: classSlug ?? '',
+          onAddRows: handleAddFeatureRows,
+        })}
         rowTitle={rowTitle}
         resolveListMeta={({ row }) => {
           const featureRow = row as FeatureRowForm | undefined
