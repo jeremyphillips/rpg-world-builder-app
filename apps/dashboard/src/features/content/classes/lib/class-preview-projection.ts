@@ -126,9 +126,7 @@ function classPreviewSkillLabels(slugs: readonly string[], ctx: ContentFormCtx):
     return [formatContentListLoadErrorMessage('skill-proficiencies')]
   }
   return slugs.map((slug) => {
-    const skill = ctx.skillCatalogBySlug
-      ? ctx.skillCatalogBySlug.get(slug)
-      : ctx.options?.skills?.visible.find((entry) => entry.slug === slug)
+    const skill = ctx.skillCatalogBySlug?.get(slug)
     return skill?.name ?? formatContentReferenceUnavailable('skill-proficiencies')
   })
 }

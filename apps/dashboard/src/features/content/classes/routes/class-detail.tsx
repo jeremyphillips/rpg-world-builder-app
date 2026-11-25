@@ -180,7 +180,7 @@ export function ClassDetail() {
           subclassesLoadingError={subclassesQuery.isLoadingError}
           skillProficiencies={skillsQuery.data ?? []}
           skillsPending={skillsQuery.isPending}
-          skillsLoadingError={skillsQuery.isLoadingError}
+          skillsLoadingError={skillsQuery.isError}
         />
       )}
     </ContentDetailResolver>
