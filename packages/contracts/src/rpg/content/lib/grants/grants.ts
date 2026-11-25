@@ -34,6 +34,7 @@ import {
   getLanguageSentenceForm,
   languageCategorySchema,
   languageIdSchema,
+  LANGUAGE_TERM,
 } from '../../../vocab/language'
 import { equipmentGrantSchema } from './equipment-grant'
 import { grantRowIdSchema } from './grant-row-id'
@@ -87,12 +88,19 @@ export function formatLanguageGrantSentence(
 }
 
 /** Compact summary label: "Common language", "Common, Elvish languages", etc. */
-export function formatLanguageGrantCompact(languageIds: readonly string[]): string {
-  const labels = languageIds.map((id) => getLanguageLabel(id))
-  if (languageIds.length === 1) {
-    return `${labels[0]} ${getLanguageProficiencySentenceForm(1)}`
+export function formatLanguageGrantCompact(
+  languageIds: readonly string[],
+  resolveLabel: (id: string) => string | undefined = getLanguageLabel,
+): string {
+  const labels = languageIds.map(resolveLabel).filter((label) => label !== undefined)
+  const parts = []
+  if (labels.length > 0) {
+    parts.push(`${labels.join(', ')} ${getLanguageProficiencySentenceForm(labels.length)}`)
   }
-  return `${labels.join(', ')} ${getLanguageProficiencySentenceForm(2)}`
+  if (labels.length < languageIds.length) {
+    parts.push(`${LANGUAGE_TERM.label} reference unavailable`)
+  }
+  return parts.join(', ')
 }
 
 export function formatLanguageChoiceGrantSentence(grant: LanguageChoiceGrant): string {

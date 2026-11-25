@@ -22,13 +22,6 @@ import type { BuilderOptionDetailsSection } from '@rpg/ui'
 
 export const BUILDER_SPECIES_EYEBROW = getContentTypeItemLabel('species')
 
-function resolveLanguageLabel(
-  languages: readonly CharacterBuildLanguageOption[],
-  languageId: string,
-): string {
-  return languages.find((entry) => entry.id === languageId)?.label ?? languageId
-}
-
 export function buildBuilderSpeciesVocabulary(
   languages: readonly CharacterBuildLanguageOption[],
   spellCatalog: SpellCatalogContext,
@@ -38,7 +31,7 @@ export function buildBuilderSpeciesVocabulary(
 
   return {
     resolveCreatureTypeLabel: (id: string) => getCreatureTypeLabel(creatureTypeVocabulary, id),
-    resolveLanguageLabel: (id: string) => resolveLanguageLabel(languages, id),
+    resolveLanguageLabel: (id: string) => languages.find((entry) => entry.id === id)?.label,
     resolveSenseLabel: (type: string) => getSenseLabelFromVocabulary(senseVocabulary, type),
     spellCatalog,
   }

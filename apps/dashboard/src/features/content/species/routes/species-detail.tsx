@@ -10,7 +10,7 @@ import {
   useCreatureTypeVocabulary,
   useLanguageVocabulary,
   useSenseVocabulary,
-  getLanguageLabelFromVocabulary,
+  findLanguageLabelInVocabulary,
   getSenseLabelFromVocabulary,
 } from '@/features/vocabulary'
 import { getCreatureTypeLabel } from '../lib/creature-type-field-options'
@@ -45,7 +45,7 @@ export function SpeciesDetailContent({ species, campaignId }: SpeciesDetailConte
 
   const viewModel = buildSpeciesDetailViewModel(species, {
     resolveCreatureTypeLabel: (id) => getCreatureTypeLabel(id, { creatureTypeVocabulary }),
-    resolveLanguageLabel: (id) => getLanguageLabelFromVocabulary(languageVocabulary, id),
+    resolveLanguageLabel: (id) => findLanguageLabelInVocabulary(languageVocabulary, id),
     resolveSenseLabel: (type) => getSenseLabelFromVocabulary(senseVocabulary, type),
     spellCatalog,
   })

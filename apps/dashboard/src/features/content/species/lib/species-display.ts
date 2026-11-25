@@ -3,6 +3,7 @@ import {
   formatMovementDisplay,
   CREATURE_SIZE_TERM,
   CREATURE_TYPE_TERM,
+  LANGUAGE_TERM,
   formatCreatureSizeList,
   getVocabularyTermLabel,
   renderTraitFacingBodyHtml,
@@ -40,7 +41,7 @@ export const SPECIES_SECTION_LABELS = { traits: 'Traits' } as const
 
 export type SpeciesDisplayVocabulary = {
   resolveCreatureTypeLabel: (id: string) => string
-  resolveLanguageLabel: (id: string) => string
+  resolveLanguageLabel: (id: string) => string | undefined
 } & Pick<GrantDisplayVocabulary, 'resolveSenseLabel' | 'spellCatalog'>
 
 export type SpeciesDetailItem = {
@@ -120,7 +121,12 @@ function buildSpeciesStatRows(
   if (species.languageAffinities?.length) {
     rows.push({
       label: SPECIES_STAT_LABELS.languageAffinities,
-      value: species.languageAffinities.map((id) => vocabulary.resolveLanguageLabel(id)).join(', '),
+      value: species.languageAffinities
+        .map(
+          (id) =>
+            vocabulary.resolveLanguageLabel(id) ?? `${LANGUAGE_TERM.label} reference unavailable`,
+        )
+        .join(', '),
     })
   }
 
@@ -148,6 +154,7 @@ function mapTraitToDetailItem(trait: SpeciesBodyTrait): SpeciesDetailItem {
 function toGrantDisplayVocabulary(vocabulary: SpeciesDisplayVocabulary): GrantDisplayVocabulary {
   return {
     resolveSenseLabel: vocabulary.resolveSenseLabel,
+    resolveLanguageLabel: vocabulary.resolveLanguageLabel,
     spellCatalog: vocabulary.spellCatalog,
   }
 }

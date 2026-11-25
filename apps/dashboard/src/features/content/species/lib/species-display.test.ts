@@ -185,6 +185,47 @@ describe('species-display', () => {
     })
   })
 
+  it('uses scoped language labels for affinities and saved heritage grants', () => {
+    const species = makeSpecies({
+      ...dwarfWithTraits,
+      languageAffinities: ['river-cant', 'removed-language'],
+      heritage: {
+        id: 'river-lineages',
+        name: 'River Lineages',
+        choose: 1,
+        options: [
+          {
+            kind: 'custom',
+            id: 'river',
+            name: 'River',
+            grantGroups: [
+              {
+                grants: [
+                  {
+                    id: 'river-languages',
+                    kind: 'languages',
+                    languageIds: ['river-cant', 'removed-language'],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    })
+    const display = buildSpeciesDetailViewModel(species, {
+      ...vocabulary,
+      resolveLanguageLabel: (id) => (id === 'river-cant' ? 'Waterway Speech' : undefined),
+    })
+    expect(display.statRows).toContainEqual({
+      label: SPECIES_STAT_LABELS.languageAffinities,
+      value: 'Waterway Speech, Language reference unavailable',
+    })
+    expect(
+      display.sections.find((section) => section.id === 'heritage')?.items[0]?.summaryInline,
+    ).toBe('Waterway Speech language, Language reference unavailable')
+  })
+
   it('builds grouped grant summaries for catalog Drow heritage options', () => {
     const elf = pickSpecies('elf')
     const vocabularyWithSpells = {

@@ -60,9 +60,18 @@ export function buildActiveLanguageCategoryFieldOptions(
   )
 }
 
+export function findLanguageLabelInVocabulary(
+  vocabulary: LanguageVocabulary | undefined,
+  id: string,
+): string | undefined {
+  return vocabulary && Object.hasOwn(vocabulary.labelById, id)
+    ? vocabulary.labelById[id]
+    : undefined
+}
+
 export function getLanguageLabelFromVocabulary(
   vocabulary: LanguageVocabulary | undefined,
   id: string,
 ): string {
-  return vocabulary?.labelById[id] ?? id
+  return findLanguageLabelInVocabulary(vocabulary, id) ?? id
 }
