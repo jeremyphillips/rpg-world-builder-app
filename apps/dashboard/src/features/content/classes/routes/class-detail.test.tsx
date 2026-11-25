@@ -21,6 +21,10 @@ vi.mock('../../lib/usage/content-usage-references-section', () => ({
 vi.mock('../../lib/detail/page/content-detail-section-nav', () => ({
   ContentDetailSectionNav: () => null,
 }))
+vi.mock('../../equipment/hooks/use-equipment', async (importOriginal) => ({
+  ...(await importOriginal()),
+  useEquipment: () => ({ data: [], isError: false }),
+}))
 vi.mock('../../spells/hooks/use-spells', async (importOriginal) => ({
   ...(await importOriginal()),
   useSpells: () => ({ data: [], isPending: false, isError: false }),

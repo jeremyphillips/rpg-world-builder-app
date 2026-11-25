@@ -19,17 +19,11 @@ import { CONTENT_PREVIEW_AS_PLAYER_LABEL } from '../../lib/forms/preview/content
 import { useSkillProficiencies } from '../../skill-proficiencies/hooks/use-skill-proficiencies'
 import { ClassDetailBody } from '../components/detail/class-detail-body'
 import { useSubclasses } from '../hooks/use-subclasses'
-import type { ClassDetailViewModel } from './class-display'
-import { buildClassPreviewDetailViewModel } from './class-preview-projection'
+import {
+  buildClassPreviewDetailViewModel,
+  classPreviewVocabulary,
+} from './class-preview-projection'
 import type { ClassFormValues } from './class-form-fields'
-
-const PREVIEW_TOOL_LABEL_VOCABULARY = {
-  resolveToolLabel: (slug: string) =>
-    slug
-      .split('-')
-      .map((part) => (part.length > 0 ? part.charAt(0).toUpperCase() + part.slice(1) : part))
-      .join(' '),
-}
 
 function classPreviewDisplayImage(
   values: ClassFormValues,
@@ -63,7 +57,8 @@ export function ClassPreviewPlayerHost({
   const skillsEnabled = Boolean(queryCampaignId)
 
   const name = values.name?.trim() || 'Unnamed class'
-  const viewModel = buildClassPreviewDetailViewModel(values, ctx)
+  const vocabulary = classPreviewVocabulary(ctx)
+  const viewModel = buildClassPreviewDetailViewModel(values, vocabulary)
 
   return (
     <DetailPreviewModal
@@ -76,7 +71,7 @@ export function ClassPreviewPlayerHost({
         displayImage={classPreviewDisplayImage(values, ctx)}
         displayFallback={resolveDashboardDetailDisplayFallback('class')}
         imageName={name}
-        viewModel={viewModel as ClassDetailViewModel}
+        viewModel={viewModel}
         subclasses={subclassesQuery.data ?? []}
         subclassesPending={subclassesEnabled && subclassesQuery.isPending}
         subclassesLoadingError={subclassesEnabled && subclassesQuery.isLoadingError}
@@ -85,7 +80,7 @@ export function ClassPreviewPlayerHost({
         skillProficiencies={skillsQuery.data ?? []}
         skillsPending={skillsEnabled && skillsQuery.isPending}
         skillsLoadingError={skillsEnabled && skillsQuery.isLoadingError}
-        vocabulary={PREVIEW_TOOL_LABEL_VOCABULARY}
+        vocabulary={vocabulary}
         pageShell={false}
       />
     </DetailPreviewModal>

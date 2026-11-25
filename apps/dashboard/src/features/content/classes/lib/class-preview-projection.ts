@@ -6,6 +6,7 @@ import {
   getArmorCategoryPreviewLabel,
   getWeaponCategoryPreviewLabel,
 } from '@rpg/contracts'
+import { equipmentReferenceScopeFromContentFormCtx } from '@/lib/content-form-equipment-reference-scope.lib'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import { formatPreviewRailOverflowList, type PreviewRailFact } from '@rpg/ui'
 
@@ -15,7 +16,10 @@ import {
   getContentTypeMidSentenceLabel,
 } from '../../lib/content-type-labels'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
-import { isMeaningfulCharacterCreationToolChoice } from './character-creation/class-character-creation-proficiencies-form-values'
+import {
+  characterCreationProficienciesWithLiveToolLabel,
+  isMeaningfulCharacterCreationToolChoice,
+} from './character-creation/class-character-creation-proficiencies-form-values'
 import {
   CONTENT_PREVIEW_DESCRIPTION_PLACEHOLDER,
   CONTENT_PREVIEW_NOT_SET,
@@ -38,6 +42,7 @@ import { SPELL_SELECTION_MODEL_OPTIONS } from './class-spell-selection-form.lib'
 import { spellcastingFeatureSummaryFromRows } from './class-spellcasting-lifecycle'
 import {
   buildClassDetailViewModel,
+  buildClassEquipmentVocabulary,
   type ClassDetailViewModel,
   type ClassDetailViewModelSource,
   type ClassDisplayVocabulary,
@@ -109,13 +114,6 @@ function identityFacts(values: ClassFormValues): PreviewRailFact[] {
       value: formatPrimaryAbilitiesPreview(values.primaryAbilities),
     },
   ]
-}
-
-function formatSlugLabel(slug: string): string {
-  return slug
-    .split('-')
-    .map((part) => (part.length > 0 ? part.charAt(0).toUpperCase() + part.slice(1) : part))
-    .join(' ')
 }
 
 function classPreviewSkillLabels(slugs: readonly string[], ctx: ContentFormCtx): string[] {
@@ -195,6 +193,7 @@ function buildProficienciesSection(
   ctx: ContentFormCtx,
 ): ContentPreviewSection {
   const proficiencies = values.proficiencies
+  const { resolveEquipmentLabel } = classPreviewVocabulary(ctx)
   const facts: PreviewRailFact[] = []
 
   appendFact(
@@ -204,12 +203,12 @@ function buildProficienciesSection(
   )
   appendFact(facts, CLASS_PREVIEW_FACT_LABELS.armorTraining, [
     ...(proficiencies?.armor?.categories ?? []).map(getArmorCategoryPreviewLabel),
-    ...(proficiencies?.armor?.items ?? []).map(formatSlugLabel),
+    ...(proficiencies?.armor?.items ?? []).map(resolveEquipmentLabel),
   ])
 
   const weapons = [
     ...(proficiencies?.weapons.categories ?? []).map(getWeaponCategoryPreviewLabel),
-    ...(proficiencies?.weapons.items ?? []).map(formatSlugLabel),
+    ...(proficiencies?.weapons.items ?? []).map(resolveEquipmentLabel),
   ]
   appendFact(facts, CLASS_PREVIEW_FACT_LABELS.weapons, weapons)
   appendFact(
@@ -393,15 +392,13 @@ export function buildClassPreviewSections(
   }
 }
 
-function classPreviewVocabulary(ctx: ContentFormCtx): ClassDisplayVocabulary {
-  return {
-    resolveToolLabel: (slug: string) => {
-      const match = ctx.options?.equipment?.visible.find(
-        (item) => item.slug === slug || item.id === slug,
-      )
-      return match?.name ?? formatSlugLabel(slug)
-    },
-  }
+export function classPreviewVocabulary(ctx: ContentFormCtx): ClassDisplayVocabulary {
+  const scope = equipmentReferenceScopeFromContentFormCtx(ctx)
+  return buildClassEquipmentVocabulary({
+    status: scope ? (ctx.equipmentCatalogStatus ?? 'pending') : 'pending',
+    scope: scope ?? { rulesetId: '', campaignId: '' },
+    equipmentById: ctx.equipmentCatalogById,
+  })
 }
 
 export function classDetailSourceFromFormValues(
@@ -419,30 +416,18 @@ export function classDetailSourceFromFormValues(
     ),
     features: featuresFromFormValues(values.features ?? []),
     characterCreation: {
-      proficiencies: {
-        skills: {
-          choices: [
-            {
-              id: 'class-skills',
-              choose: values.characterCreation?.proficiencies?.skills.choose ?? 0,
-              from: values.characterCreation?.proficiencies?.skills.from ?? [],
-            },
-          ],
-        },
-      },
+      proficiencies: characterCreationProficienciesWithLiveToolLabel(
+        values.characterCreation?.proficiencies,
+      ),
     },
   }
 }
 
 export function buildClassPreviewDetailViewModel(
   values: ClassFormValues,
-  ctx: ContentFormCtx,
+  vocabulary: ClassDisplayVocabulary,
 ): ClassDetailViewModel {
-  return buildClassDetailViewModel(
-    classDetailSourceFromFormValues(values),
-    classPreviewVocabulary(ctx),
-    {
-      surface: 'content-detail',
-    },
-  )
+  return buildClassDetailViewModel(classDetailSourceFromFormValues(values), vocabulary, {
+    surface: 'content-detail',
+  })
 }

@@ -80,8 +80,9 @@ export function ClassStep({ context, draft, validationIssues, onDraftChange }: C
       detailsClass,
       context.catalog,
       context.spellcastingProgression,
+      context.rulesScope.type === 'campaign' ? context.rulesScope.campaignId : undefined,
     )
-  }, [context.catalog, context.spellcastingProgression, detailsClass])
+  }, [context.catalog, context.rulesScope, context.spellcastingProgression, detailsClass])
 
   const isDetailsClassSelected = detailsClassId != null && draft.class.classId === detailsClassId
 

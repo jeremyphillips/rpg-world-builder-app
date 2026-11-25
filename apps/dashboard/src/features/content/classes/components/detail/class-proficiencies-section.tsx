@@ -94,7 +94,7 @@ function ToolChoiceLabels({
 }) {
   return (
     <Text variant="supporting" as="span">
-      {optionSlugs.map((slug) => vocabulary.resolveToolLabel(slug)).join(', ')}
+      {optionSlugs.map((slug) => vocabulary.resolveEquipmentLabel(slug)).join(', ')}
     </Text>
   )
 }

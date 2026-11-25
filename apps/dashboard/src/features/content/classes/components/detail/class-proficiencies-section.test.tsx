@@ -9,7 +9,7 @@ import { buildClassDetailViewModel } from '../../lib/class-display'
 import { ClassProficienciesSection } from './class-proficiencies-section'
 
 const vocabulary = {
-  resolveToolLabel: (slug: string) => slug,
+  resolveEquipmentLabel: (slug: string) => slug,
 }
 
 describe('ClassProficienciesSection', () => {

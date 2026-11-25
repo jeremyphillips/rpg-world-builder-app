@@ -4,12 +4,14 @@ import {
   resolveSlotProgressionForClass,
   type CharacterBuildCatalog,
   type CharacterClass,
+  type EquipmentCatalogScope,
   type ResolvedSpellcastingProgressionConfig,
 } from '@rpg/contracts'
 
 import {
   buildClassCardViewModel,
   buildClassDetailViewModel,
+  buildClassEquipmentVocabulary,
   CLASS_SECTION_LABELS,
   formatContentReferenceUnavailable,
   FacingDetailBody,
@@ -22,26 +24,22 @@ export const BUILDER_CLASS_EYEBROW = getContentTypeItemLabel('classes')
 
 type BuilderClassDisplayVocabulary = {
   resolveSkillLabel: (slug: string) => string
-  resolveToolLabel: (slug: string) => string
-}
-
-function formatSlugLabel(slug: string): string {
-  return slug
-    .split('-')
-    .map((part) => (part.length > 0 ? part.charAt(0).toUpperCase() + part.slice(1) : part))
-    .join(' ')
+  resolveEquipmentLabel: (slug: string) => string
 }
 
 function buildBuilderClassVocabulary(
   catalog: Pick<CharacterBuildCatalog, 'equipment' | 'skillProficiencies'>,
+  scope: EquipmentCatalogScope,
 ): BuilderClassDisplayVocabulary {
-  const equipmentBySlug = new Map(catalog.equipment.map((entry) => [entry.slug, entry.name]))
-
   return {
     resolveSkillLabel: (slug) =>
       catalog.skillProficiencies.find((skill) => skill.slug === slug)?.name ??
       formatContentReferenceUnavailable('skill-proficiencies'),
-    resolveToolLabel: (slug) => equipmentBySlug.get(slug) ?? formatSlugLabel(slug),
+    ...buildClassEquipmentVocabulary({
+      status: 'ready',
+      scope,
+      equipmentById: new Map(catalog.equipment.map((entry) => [entry.id, entry])),
+    }),
   }
 }
 
@@ -54,7 +52,7 @@ function resolveChoiceOptionLabels(
   }
 
   if (row.id === 'tools') {
-    return row.optionSlugs.map((slug) => vocabulary.resolveToolLabel(slug))
+    return row.optionSlugs.map((slug) => vocabulary.resolveEquipmentLabel(slug))
   }
 
   return row.optionSlugs
@@ -96,18 +94,18 @@ export function buildClassDetailsSheetContent(
   catalog: Pick<CharacterBuildCatalog, 'equipment' | 'skillProficiencies'> &
     Partial<Pick<CharacterBuildCatalog, 'spells'>>,
   spellcastingProgression?: ResolvedSpellcastingProgressionConfig,
+  campaignId = '',
 ): ClassDetailsSheetContent {
-  const builderVocabulary = buildBuilderClassVocabulary(catalog)
-  const viewModel = buildClassDetailViewModel(
+  const builderVocabulary = buildBuilderClassVocabulary(catalog, {
+    rulesetId: characterClass.rulesetId,
+    campaignId,
+  })
+  const viewModel = buildClassDetailViewModel(characterClass, builderVocabulary, {
+    surface: 'builder-sheet',
     characterClass,
-    { resolveToolLabel: builderVocabulary.resolveToolLabel },
-    {
-      surface: 'builder-sheet',
-      characterClass,
-      spellcastingProgression,
-      spellsById: new Map(catalog.spells?.map((spell) => [spell.id, spell])),
-    },
-  )
+    spellcastingProgression,
+    spellsById: new Map(catalog.spells?.map((spell) => [spell.id, spell])),
+  })
 
   const sections: BuilderOptionDetailsSection[] = []
 

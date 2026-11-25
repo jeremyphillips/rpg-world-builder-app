@@ -17,7 +17,7 @@ import {
 } from './class-display'
 
 const vocabulary = {
-  resolveToolLabel: (slug: string) => pickEquipment(slug).name,
+  resolveEquipmentLabel: (slug: string) => pickEquipment(slug).name,
 }
 
 function getProficienciesSection(viewModel: ReturnType<typeof buildClassDetailViewModel>) {

@@ -13,7 +13,7 @@ const PROGRESSION = srdSpellcastingProgressionFixture()
 const RULESET = 'srd-cc-5.2.1' as const
 
 const vocabulary = {
-  resolveToolLabel: (slug: string) => slug,
+  resolveEquipmentLabel: (slug: string) => slug,
 }
 
 describe('class feature spellcasting facing', () => {
