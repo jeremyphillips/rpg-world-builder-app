@@ -6,11 +6,15 @@ Field-level routing (`prepareFormIssues`, claims, tab badges) remains documented
 
 ## `@rpg/ui/form` evaluator and RHF
 
-**Strategy:** `evaluator-bridge` (`FORM_RHF_INTEGRATION_STRATEGY`).
+**Strategy:** `passive-projection` (`FORM_RHF_INTEGRATION_STRATEGY`). Canonical issues come only from explicit evaluator results (`evaluateFormSchema`, `runFormAction`). The RHF resolver is a side-effect-free projection for controller chrome, modes, and parsed `handleSubmit` output; it never publishes and is not an issue store. The rejected approach is a resolver that doubles as the canonical store: the RHF error tree cannot hold pathless issues or simultaneous parent and child issues. Mounted proof: `form-rhf-strategy.form.test.tsx`.
+
+**Action identity:** a snapshot `stamp` and a per-action `attemptId` are distinct. `runFormAction` re-checks both before each stage and after every await; a superseded attempt returns `blocked` with stage `superseded` and cannot authorize a write. Form and write stages return evaluator `data`, so `persist` receives the write-schema parse.
+
+**Equivalent evaluations:** the resolver and silent validity share a memoized evaluator, so RHF's `isValid` bookkeeping reuses the submit parse for a structurally equal snapshot. An RHF-blocked submit with no canonical issue shows safe retry copy and a console diagnostic (`FORM_BRIDGE_MISMATCH_MESSAGE`).
 
 - `evaluateFormSchema` — pure schema evaluation.
 - `evaluateRoutedFormSchema` — evaluation plus `routeFormIssues` (`valid` | `invalid` | `operation-failure`).
-- `makeResolver` — calls the evaluator; invalid results project to RHF via `projectIssuesToFieldErrors`. Parsed values are returned as `values`. Canonical issues stay on the evaluator result; `formState.errors` is compatibility chrome.
+- `makeResolver` — passive projection of the memoized evaluator; invalid results project to RHF via `projectIssuesToFieldErrors`. Parsed values are returned as `values`. `formState.errors` is compatibility chrome.
 - `createValidateSilently` — calls the evaluator directly (no resolver), so quiet checks do not populate `formState.errors`.
 - `runFormAction` — ordered typed stages; content commit maps stages in the dashboard submit pipeline.
 
@@ -26,7 +30,7 @@ Field-level routing (`prepareFormIssues`, claims, tab badges) remains documented
 
 1. Commit validation (draft or publish intent).
 2. Optional write-schema validation on the prepared wire DTO.
-3. `persist` receives **only** the prepared payload (not raw handler values).
+3. `persist` receives **only** the write-schema parsed payload (not raw handler values). Arbitrary `Error.message` is never shown in the footer; only `ApiError` copy or the safe fallback.
 
 **Producer slots:** `interactive`, `draft-action`, `publish-readiness`, `publish-action`, `serialization`, `api`. **Prepared write:** `ContentPreparedWrite` with sparse path and row-index provenance.
 

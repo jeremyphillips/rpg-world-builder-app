@@ -11,6 +11,17 @@ import { resolveInvalidSubmitNavigation } from '../errors/resolve-invalid-submit
 import type { FormItem } from '../field-config'
 import type { FormUiContextValue } from '../context/form-ui.context'
 
+export const FORM_BRIDGE_MISMATCH_MESSAGE =
+  'Something went wrong while checking this form. Try again or refresh the page.'
+
+function hasAnyErrorMessage(errors: unknown): boolean {
+  if (typeof errors !== 'object' || errors === null) return false
+  if ('message' in errors && typeof (errors as { message?: unknown }).message === 'string') {
+    return (errors as { message: string }).message.length > 0
+  }
+  return Object.values(errors).some(hasAnyErrorMessage)
+}
+
 export type NavigateInvalidSubmitOptions = {
   /** Overrides the id prefix used when resolving the focus target. */
   idPrefix?: string
@@ -47,7 +58,14 @@ export function navigateInvalidSubmit<TFieldValues extends FieldValues>(
     },
   })
 
-  if (!navigation) return
+  if (!navigation) {
+    // RHF blocked submit but no canonical issue is resolvable: bridge failure, never silent.
+    if (!hasAnyErrorMessage(errors)) {
+      console.error('[form-validation] RHF blocked submit without a canonical issue', errors)
+      form.setError('root', { type: 'bridge', message: FORM_BRIDGE_MISMATCH_MESSAGE })
+    }
+    return
+  }
 
   options?.onBeforeFocus?.()
   ui.addValidationSessionExpandKeys(navigation.expandKeys)

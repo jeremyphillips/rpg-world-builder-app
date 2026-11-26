@@ -12,21 +12,35 @@ export class ContentFormValidationOperationFailure extends Error {
   }
 }
 
+export type ContentFormEvaluation<T> =
+  | { kind: 'parsed'; data: T }
+  | { kind: 'invalid'; issues: FormIssue[] }
+
+/** Evaluates once and returns parsed output (coercions, defaults) or routed issues. */
+export function evaluateContentFormSchema<T>(
+  schema: ZodType<T>,
+  values: unknown,
+  fields: FormItem[],
+): ContentFormEvaluation<T> {
+  const formValues =
+    typeof values === 'object' && values !== null ? (values as Record<string, unknown>) : {}
+  const result = evaluateRoutedFormSchema(schema, values, { items: fields, formValues })
+
+  if (result.kind === 'valid') return { kind: 'parsed', data: result.data }
+  if (result.kind === 'operation-failure') {
+    throw new ContentFormValidationOperationFailure(result.message)
+  }
+
+  return { kind: 'invalid', issues: result.issues }
+}
+
 export function normalizeContentFormIssues(
   schema: ZodType,
   values: unknown,
   fields: FormItem[],
 ): FormIssue[] | null {
-  const formValues =
-    typeof values === 'object' && values !== null ? (values as Record<string, unknown>) : {}
-  const result = evaluateRoutedFormSchema(schema, values, { items: fields, formValues })
-
-  if (result.kind === 'valid') return null
-  if (result.kind === 'operation-failure') {
-    throw new ContentFormValidationOperationFailure(result.message)
-  }
-
-  return result.issues
+  const evaluation = evaluateContentFormSchema(schema, values, fields)
+  return evaluation.kind === 'invalid' ? evaluation.issues : null
 }
 
 export function apiValidationIssuesToFormIssues(

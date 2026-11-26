@@ -2,6 +2,8 @@ import type { ContentValidationIntent } from '@rpg/contracts'
 import type { FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 import {
+  FORM_ACTION_SUPERSEDED_STAGE_ID,
+  type FormActionAttempt,
   type FormIssue,
   type FormItem,
   type FormSubmitHandler,
@@ -33,7 +35,8 @@ export type ContentFormCommitRunInput<TValues extends FieldValues> = {
   commitValidationIntent: ContentValidationIntent
   prepareCommitValues?: (values: TValues) => TValues
   prepareWrite?: (values: TValues, form: UseFormReturn<TValues>) => ContentPreparedWrite<unknown>
-  attemptStamp?: number
+  attempt: FormActionAttempt
+  readCurrent: () => FormActionAttempt
   invalidPresentation?: ContentFormInvalidPresentation
   ui: Pick<
     FormUiContextValue,
@@ -46,18 +49,24 @@ export type ContentFormCommitRunInput<TValues extends FieldValues> = {
 export type ContentFormCommitRunResult =
   | { kind: 'success'; session: FormValidationProducerSession }
   | { kind: 'validation-blocked'; session: FormValidationProducerSession }
+  | { kind: 'superseded'; session: FormValidationProducerSession }
   | { kind: 'persist-failed'; session: FormValidationProducerSession; error: unknown }
 
 export async function runContentFormCommitAttempt<TValues extends FieldValues>(
   input: ContentFormCommitRunInput<TValues>,
 ): Promise<ContentFormCommitRunResult> {
-  const stamp = input.attemptStamp ?? 0
+  const { attempt, readCurrent } = input
+  const { stamp } = attempt
+  const isCurrent = () => {
+    const current = readCurrent()
+    return current.stamp === attempt.stamp && current.attemptId === attempt.attemptId
+  }
 
   const pipeline = await runContentFormCommitPipeline(
     { values: input.values, form: input.form },
     {
-      stamp,
-      requiredStamp: input.attemptStamp,
+      attempt,
+      readCurrent,
       formSchema: input.publishSchema,
       writeSchema: input.writeSchema,
       resolverFields: input.resolverFields,
@@ -68,6 +77,9 @@ export async function runContentFormCommitAttempt<TValues extends FieldValues>(
   )
 
   if (pipeline.kind === 'blocked') {
+    if (pipeline.stageId === FORM_ACTION_SUPERSEDED_STAGE_ID) {
+      return { kind: 'superseded', session: input.producerSession }
+    }
     const session = applyCommitValidationBlocked(input, pipeline, stamp)
     return { kind: 'validation-blocked', session }
   }
@@ -76,6 +88,8 @@ export async function runContentFormCommitAttempt<TValues extends FieldValues>(
 
   try {
     await input.persist(commitValues, input.form)
+    // A request already sent cannot be cancelled; its late result must not repaint a newer attempt.
+    if (!isCurrent()) return { kind: 'superseded', session: input.producerSession }
     const session = ingestContentFormValidationIssues(
       input.producerSession,
       input.producerSlot,
@@ -84,6 +98,7 @@ export async function runContentFormCommitAttempt<TValues extends FieldValues>(
     )
     return { kind: 'success', session }
   } catch (error) {
+    if (!isCurrent()) return { kind: 'superseded', session: input.producerSession }
     const session = presentPersistValidationFailure(
       input.form,
       error,

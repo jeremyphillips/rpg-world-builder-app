@@ -354,6 +354,7 @@ export {
   evaluateFormSchema,
   evaluateRoutedFormSchema,
   runFormAction,
+  FORM_ACTION_SUPERSEDED_STAGE_ID,
   projectIssuesToFieldErrors,
   projectInvalidEvaluationToForm,
   FORM_RHF_INTEGRATION_STRATEGY,
@@ -374,6 +375,7 @@ export {
   type FormSchemaEvaluationResult,
   type FormValidationProducerSession,
   type FormValidationProducerSlotState,
+  type FormActionAttempt,
   type RunFormActionOptions,
   type RunFormActionResult,
 } from './lifecycle'

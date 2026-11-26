@@ -2,6 +2,7 @@ import type { FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 import {
   runFormAction,
+  type FormActionAttempt,
   type FormActionStage,
   type FormIssue,
   type FormItem,
@@ -15,7 +16,7 @@ import {
 } from './content-prepared-write.types'
 import {
   ContentFormValidationOperationFailure,
-  normalizeContentFormIssues,
+  evaluateContentFormSchema,
 } from '../validation/normalize-content-form-issues.lib'
 
 const CONTENT_FORM_COMMIT_STAGE_FORM = 'form-evaluate'
@@ -28,8 +29,8 @@ export type ContentFormCommitPipelineInput<TValues extends FieldValues> = {
 }
 
 export type ContentFormCommitPipelineOptions<TValues extends FieldValues> = {
-  stamp: number
-  requiredStamp?: number
+  attempt: FormActionAttempt
+  readCurrent: () => FormActionAttempt
   formSchema: ZodType<TValues>
   writeSchema?: ZodType<unknown>
   resolverFields: FormItem[]
@@ -66,9 +67,9 @@ function createFormEvaluateStage<TValues extends FieldValues>(
     id: CONTENT_FORM_COMMIT_STAGE_FORM,
     intent: 'form-evaluate',
     run: (input) => {
-      const issues = normalizeContentFormIssues(formSchema, input.values, resolverFields)
-      if (issues) return { kind: 'invalid', issues }
-      return { kind: 'parsed', data: input }
+      const evaluated = evaluateContentFormSchema(formSchema, input.values, resolverFields)
+      if (evaluated.kind === 'invalid') return { kind: 'invalid', issues: evaluated.issues }
+      return { kind: 'parsed', data: { ...input, values: evaluated.data } }
     },
   }
 }
@@ -99,9 +100,10 @@ function createWriteValidateStage<TValues extends FieldValues>(
     id: CONTENT_FORM_COMMIT_STAGE_WRITE,
     intent: 'serialization',
     run: (prepared) => {
-      const issues = normalizeContentFormIssues(writeSchema, prepared.payload, resolverFields)
-      if (issues) return { kind: 'invalid', issues }
-      return { kind: 'parsed', data: prepared }
+      const evaluated = evaluateContentFormSchema(writeSchema, prepared.payload, resolverFields)
+      if (evaluated.kind === 'invalid') return { kind: 'invalid', issues: evaluated.issues }
+      // The write-schema parse is the payload persist receives.
+      return { kind: 'parsed', data: { ...prepared, payload: evaluated.data as TValues } }
     },
   }
 }
@@ -122,8 +124,8 @@ export async function runContentFormCommitPipeline<TValues extends FieldValues>(
   let action: RunFormActionResult<ContentPreparedWrite<TValues>>
   try {
     action = await runFormAction<ContentPreparedWrite<TValues>>({
-      stamp: options.stamp,
-      requiredStamp: options.requiredStamp,
+      attempt: options.attempt,
+      readCurrent: options.readCurrent,
       input,
       stages,
     })

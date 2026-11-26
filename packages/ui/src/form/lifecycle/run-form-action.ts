@@ -6,13 +6,25 @@ import type {
   RunFormActionSuccess,
 } from './form-evaluation.types'
 
-export type RunFormActionOptions = {
+/** Identity of one explicit action: snapshot stamp plus a per-action attempt token. */
+export type FormActionAttempt = {
   stamp: number
-  /** When set, abort before running stages if it does not match `stamp`. */
-  requiredStamp?: number
+  attemptId: number
+}
+
+export type RunFormActionOptions = {
+  /** Immutable record captured synchronously, before the first await. */
+  attempt: FormActionAttempt
+  /**
+   * Reads the live stamp and the newest attempt id. The runner compares this to `attempt`
+   * before each stage and again after every await; any mismatch supersedes the action.
+   */
+  readCurrent: () => FormActionAttempt
   stages: readonly FormActionStage[]
   input: unknown
 }
+
+export const FORM_ACTION_SUPERSEDED_STAGE_ID = 'superseded'
 
 async function resolveStage<TInput, TOutput>(
   stage: FormActionStage<TInput, TOutput>,
@@ -28,23 +40,29 @@ async function resolveStage<TInput, TOutput>(
 export async function runFormAction<TFinal = unknown>(
   options: RunFormActionOptions,
 ): Promise<RunFormActionResult<TFinal>> {
-  const { stamp, requiredStamp, stages, input } = options
+  const { attempt, readCurrent, stages, input } = options
+  const { stamp } = attempt
 
-  if (requiredStamp !== undefined && requiredStamp !== stamp) {
-    const blocked: RunFormActionBlocked = {
-      kind: 'blocked',
-      stamp,
-      stageId: 'stamp',
-      message: 'This attempt is no longer current.',
-    }
-    return blocked
+  const isCurrent = () => {
+    const current = readCurrent()
+    return current.stamp === attempt.stamp && current.attemptId === attempt.attemptId
   }
+  const superseded = (): RunFormActionBlocked => ({
+    kind: 'blocked',
+    stamp,
+    stageId: FORM_ACTION_SUPERSEDED_STAGE_ID,
+    message: 'This attempt is no longer current.',
+  })
+
+  if (!isCurrent()) return superseded()
 
   let cursor: unknown = input
   const stageOutputs: Record<string, unknown> = {}
 
   for (const stage of stages) {
+    if (!isCurrent()) return superseded()
     const result = await resolveStage(stage, cursor)
+    if (!isCurrent()) return superseded()
 
     if (result.kind === 'invalid') {
       const blocked: RunFormActionBlocked = {

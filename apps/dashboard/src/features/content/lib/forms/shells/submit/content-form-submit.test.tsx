@@ -212,7 +212,8 @@ describe('useContentFormSubmit', () => {
 
     expect(caught).toBeInstanceOf(Error)
     expect((caught as Error).message).toBe('Network failed')
-    expect(result.current.formError).toBe('Network failed')
+    // Arbitrary Error.message is never forwarded to the footer.
+    expect(result.current.formError).toBe('Could not save.')
   })
 
   it('captures FormUiContext via UiBridge for invalid presentation', async () => {

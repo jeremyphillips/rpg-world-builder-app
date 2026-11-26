@@ -62,9 +62,12 @@ export type RunFormActionBlocked = {
 export type RunFormActionResult<T> = RunFormActionSuccess<T> | RunFormActionBlocked
 
 /**
- * Recorded after Phase 1 bridge prototype. Switch only if mounted criteria fail —
- * see `packages/ui/docs/form-validation-lifecycle.md`.
+ * The one RHF strategy: canonical issues come only from explicit evaluator results
+ * (`evaluateFormSchema` / `runFormAction`). The RHF resolver is a pure, side-effect-free
+ * projection of that evaluator for controller chrome, modes, and parsed `handleSubmit`
+ * output. It never publishes, so it is not an issue store. See
+ * `packages/ui/docs/form-validation-lifecycle.md`.
  */
-export const FORM_RHF_INTEGRATION_STRATEGY = 'evaluator-bridge' as const
+export const FORM_RHF_INTEGRATION_STRATEGY = 'passive-projection' as const
 
-export type FormRhfIntegrationStrategy = typeof FORM_RHF_INTEGRATION_STRATEGY | 'passive-projection'
+export type FormRhfIntegrationStrategy = typeof FORM_RHF_INTEGRATION_STRATEGY

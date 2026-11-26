@@ -22,7 +22,12 @@ export {
   type EvaluateRoutedFormSchemaResult,
 } from './evaluate-routed-form-schema.lib'
 export { projectIssuesToFieldErrors } from './project-issues-to-field-errors.lib'
-export { runFormAction, type RunFormActionOptions } from './run-form-action'
+export {
+  FORM_ACTION_SUPERSEDED_STAGE_ID,
+  runFormAction,
+  type FormActionAttempt,
+  type RunFormActionOptions,
+} from './run-form-action'
 export { projectInvalidEvaluationToForm } from './passive-rhf-projection.client'
 export {
   FORM_VALIDATION_PRODUCER_SLOT_ORDER,

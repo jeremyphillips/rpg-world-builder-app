@@ -27,12 +27,19 @@ function stubForm(): UseFormReturn<Values> {
   } as unknown as UseFormReturn<Values>
 }
 
+function attemptOf(stamp: number, liveStamp = stamp) {
+  return {
+    attempt: { stamp, attemptId: 1 },
+    readCurrent: () => ({ stamp: liveStamp, attemptId: 1 }),
+  }
+}
+
 describe('runContentFormCommitPipeline', () => {
   it('runs evaluate and prepare once with identity provenance', async () => {
     const pipeline = await runContentFormCommitPipeline(
       { values: { name: 'A', level: 2 }, form: stubForm() },
       {
-        stamp: 10,
+        ...attemptOf(10),
         formSchema,
         resolverFields: fields,
         producerSlot: 'publish-action',
@@ -51,7 +58,7 @@ describe('runContentFormCommitPipeline', () => {
     const pipeline = await runContentFormCommitPipeline(
       { values: { name: '', level: 0 }, form: stubForm() },
       {
-        stamp: 11,
+        ...attemptOf(11),
         formSchema,
         resolverFields: fields,
         producerSlot: 'publish-action',
@@ -73,8 +80,7 @@ describe('runContentFormCommitPipeline', () => {
     const pipeline = await runContentFormCommitPipeline(
       { values: { name: 'A', level: 2 }, form: stubForm() },
       {
-        stamp: 12,
-        requiredStamp: 99,
+        ...attemptOf(99, 12),
         formSchema,
         resolverFields: fields,
         producerSlot: 'publish-action',
@@ -84,7 +90,7 @@ describe('runContentFormCommitPipeline', () => {
     expect(pipeline).toEqual(
       expect.objectContaining({
         kind: 'blocked',
-        stageId: 'stamp',
+        stageId: 'superseded',
       }),
     )
   })
@@ -97,7 +103,7 @@ describe('runContentFormCommitPipeline', () => {
     const pipeline = await runContentFormCommitPipeline(
       { values: { name: 'A', level: 2 }, form: stubForm() },
       {
-        stamp: 13,
+        ...attemptOf(13),
         formSchema,
         writeSchema,
         resolverFields: fields,
@@ -111,5 +117,26 @@ describe('runContentFormCommitPipeline', () => {
         stageId: 'write-validate',
       }),
     )
+  })
+
+  it('returns the write-schema parsed payload, not the pre-parse object', async () => {
+    const writeSchema = z.object({ name: z.string().trim(), level: z.coerce.number() })
+    const pipeline = await runContentFormCommitPipeline(
+      { values: { name: 'A', level: 2 }, form: stubForm() },
+      {
+        ...attemptOf(14),
+        formSchema,
+        writeSchema,
+        resolverFields: fields,
+        producerSlot: 'publish-action',
+        prepareWrite: () =>
+          buildIdentityPreparedWrite({ name: '  Hero ', level: '7', extra: true }),
+      },
+    )
+
+    expect(pipeline.kind).toBe('success')
+    if (pipeline.kind === 'success') {
+      expect(pipeline.prepared.payload).toEqual({ name: 'Hero', level: 7 })
+    }
   })
 })

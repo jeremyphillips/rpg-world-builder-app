@@ -1,12 +1,11 @@
 import type { ZodType } from 'zod'
 
-import type { FormItem } from '../field-config'
 import { routeFormIssues } from '../errors/route-form-issues.lib'
 import type { FormIssue } from '../errors/form-issue.types'
 import { evaluateFormSchema, type EvaluateFormSchemaOptions } from './form-schema-evaluator'
 
-export type EvaluateRoutedFormSchemaResult =
-  | { kind: 'valid' }
+export type EvaluateRoutedFormSchemaResult<T = unknown> =
+  | { kind: 'valid'; data: T }
   | { kind: 'invalid'; issues: FormIssue[] }
   | { kind: 'operation-failure'; message: string }
 
@@ -27,21 +26,21 @@ export function evaluateRoutedFormSchema<T>(
   schema: ZodType<T>,
   input: unknown,
   options: EvaluateFormSchemaOptions,
-): EvaluateRoutedFormSchemaResult {
+): EvaluateRoutedFormSchemaResult<T> {
   const formValues = authoringFormValues(input, options)
   const evaluation = evaluateFormSchema(schema, input, { items: options.items, formValues })
 
   if (evaluation.kind === 'parsed') {
-    return { kind: 'valid' }
+    return { kind: 'valid', data: evaluation.data }
   }
 
   if (evaluation.kind === 'operation-failure') {
     return { kind: 'operation-failure', message: evaluation.message }
   }
 
-  const combined = [...evaluation.issues, ...evaluation.rootIssues]
+  // `evaluation.issues` already includes root issues.
   return {
     kind: 'invalid',
-    issues: routeFormIssues(combined, options.items, formValues),
+    issues: routeFormIssues(evaluation.issues, options.items, formValues),
   }
 }

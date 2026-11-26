@@ -1,5 +1,6 @@
 import { useContext, useRef } from 'react'
 import type { FieldValues } from 'react-hook-form'
+import { isApiError } from '@rpg/contracts/shared'
 import {
   createEmptyFormValidationProducerSession,
   FormUiContext,
@@ -11,6 +12,7 @@ import {
 import { resolveContentFormSchema, resolveContentPublishSchema } from '../edit/content-edit-load'
 import { runContentFormCommitAttempt } from './content-form-submit-commit.lib'
 import {
+  ContentFormSubmitSuperseded,
   ContentFormSubmitValidationFailed,
   type ContentFormInvalidPresentation,
   type UseContentFormSubmitOptions,
@@ -44,7 +46,7 @@ export function useContentFormSubmit<TValues extends FieldValues>(
     prepareCommitValues,
     writeSchema,
     prepareWrite,
-    attemptStamp,
+    snapshotStamp = 0,
     persist,
   } = options
 
@@ -57,6 +59,10 @@ export function useContentFormSubmit<TValues extends FieldValues>(
     createEmptyFormValidationProducerSession(),
   )
 
+  const stampRef = useRef(snapshotStamp)
+  stampRef.current = snapshotStamp
+  const attemptCounterRef = useRef(0)
+
   const publishSchema =
     commitValidationIntent === 'publish'
       ? resolveContentPublishSchema(def, ctx)
@@ -68,10 +74,25 @@ export function useContentFormSubmit<TValues extends FieldValues>(
   const { onSubmit, formError } = useSubmitHandler<TValues>({
     fallbackMessage,
     mapError: (error) => {
-      if (error instanceof ContentFormSubmitValidationFailed) return null
-      return mapError?.(error)
+      if (
+        error instanceof ContentFormSubmitValidationFailed ||
+        error instanceof ContentFormSubmitSuperseded
+      ) {
+        return null
+      }
+      const mapped = mapError?.(error)
+      if (mapped !== undefined) return mapped
+      // Server-authored API copy is safe; any other throw (Zod, invariant) is not author copy.
+      return isApiError(error) ? error.message : fallbackMessage
     },
     submit: async (values, form) => {
+      // Captured synchronously, before the first await.
+      const attemptId = ++attemptCounterRef.current
+      const attempt = { stamp: stampRef.current, attemptId }
+      const readCurrent = () => ({
+        stamp: stampRef.current,
+        attemptId: attemptCounterRef.current,
+      })
       const result = await runContentFormCommitAttempt({
         values,
         form,
@@ -82,13 +103,15 @@ export function useContentFormSubmit<TValues extends FieldValues>(
         commitValidationIntent,
         prepareCommitValues,
         prepareWrite,
-        attemptStamp,
+        attempt,
+        readCurrent,
         invalidPresentation,
         ui: uiRef.current,
         producerSession: producerSessionRef.current,
         persist,
       })
 
+      if (result.kind === 'superseded') throw new ContentFormSubmitSuperseded()
       producerSessionRef.current = result.session
       if (result.kind === 'validation-blocked') {
         throw new ContentFormSubmitValidationFailed()

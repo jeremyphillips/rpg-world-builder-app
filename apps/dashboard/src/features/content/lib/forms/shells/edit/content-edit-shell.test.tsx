@@ -232,7 +232,14 @@ describe('ContentEditShell overlay read diagnostics', () => {
       overlayParticipantId: 'monsters' as const,
       schema: z.object({
         name: z.string(),
-        traits: z.array(z.object({ id: z.string(), kind: z.string(), name: z.string() })),
+        traits: z.array(
+          z.object({
+            id: z.string(),
+            kind: z.string(),
+            name: z.string(),
+            description: z.string().optional(),
+          }),
+        ),
       }),
       nameField: () => ({ name: 'name', label: 'Name', type: 'text' as const }),
       toFormValues: (row: typeof entity) => ({ name: row.name, traits: row.traits }),

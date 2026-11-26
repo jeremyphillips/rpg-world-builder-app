@@ -11,6 +11,7 @@ describe('evaluateRoutedFormSchema', () => {
     const schema = z.object({ name: z.string().min(1) })
     expect(evaluateRoutedFormSchema(schema, { name: 'Dragon' }, { items: fields })).toEqual({
       kind: 'valid',
+      data: { name: 'Dragon' },
     })
   })
 

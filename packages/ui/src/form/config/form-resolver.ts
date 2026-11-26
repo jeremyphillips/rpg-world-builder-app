@@ -8,7 +8,7 @@ import type {
 import type { ZodType } from 'zod'
 
 import type { FormItem } from '../field-config'
-import { evaluateFormSchema } from '../lifecycle/form-schema-evaluator'
+import { createMemoizedFormEvaluator } from '../lifecycle/memoized-form-evaluator.lib'
 import { projectIssuesToFieldErrors } from '../lifecycle/project-issues-to-field-errors.lib'
 
 export interface SilentValidationResult {
@@ -21,18 +21,17 @@ const SILENT_RESOLVER_OPTIONS: ResolverOptions<FieldValues> = {
 }
 
 /**
- * RHF resolver backed by the pure {@link evaluateFormSchema} evaluator.
- * Parsed output types (coercion, defaults, omit) match submit `values`.
+ * Passive RHF projection of the pure {@link evaluateFormSchema} evaluator: no publication,
+ * focus, or mutation. Parsed output (coercion, defaults, omit) is what `handleSubmit`
+ * receives. Canonical issues are not stored here — only the evaluator result is canonical.
  */
 export function makeResolver<TFieldValues extends FieldValues>(
   schema: ZodType,
   items: FormItem[],
 ): Resolver<TFieldValues> {
+  const evaluate = createMemoizedFormEvaluator(schema, items)
   return async (values, _context, _options) => {
-    const result = evaluateFormSchema(schema, values, {
-      items,
-      formValues: values as Record<string, unknown>,
-    })
+    const result = evaluate(values)
 
     if (result.kind === 'parsed') {
       return {
@@ -66,12 +65,9 @@ export function createValidateSilently<TFieldValues extends FieldValues>(
   items?: FormItem[],
 ): (values: TFieldValues) => Promise<SilentValidationResult> {
   if (items && 'safeParse' in (schemaOrResolver as ZodType)) {
-    const schema = schemaOrResolver as ZodType
+    const evaluate = createMemoizedFormEvaluator(schemaOrResolver as ZodType, items)
     return async (values) => {
-      const result = evaluateFormSchema(schema, values, {
-        items,
-        formValues: values as Record<string, unknown>,
-      })
+      const result = evaluate(values)
       return { valid: result.kind === 'parsed' }
     }
   }
