@@ -42,17 +42,27 @@ Nested subclasses are **not** entries in `CONTENT_TYPE_INTEGRATION_MANIFEST`.
 
 ## Resolve / merge algorithm
 
-`GET /api/campaigns/:campaignId/content/classes` returns the resolved catalog.
-`resolveCatalogForCampaign` (in `content.service.ts`) does, per content type:
+`GET /api/campaigns/:campaignId/content/:contentType` returns the resolved catalog
+for list consumers. `resolveCatalogForCampaign` (in `content.service.ts`) returns
+**resolved records only** (~30+ call sites). List handlers use
+`resolveContentListForCampaign`, which also returns `overlayFailures` when a
+system overlay cannot be applied.
+
+Per content type the kernel:
 
 1. Load the campaign and its `rulesetId`.
 2. `loadSystem(rulesetId)` — the seed records.
 3. `loadPatches(campaignId)` and `loadHomebrew(campaignId, rulesetId)` from Mongo.
-4. `resolveCatalog(system, patches, homebrew)` (in `lib/`):
-   - deep-merge each patch onto its target by id (`deepMerge`: nested objects
-     merge, **arrays and primitives replace wholesale**),
+4. `resolveCatalog(system, patches, homebrew)` (in `lib/resolve-catalog.ts`):
+   - system rows: `applyStoredOverlay` (contracts kernel — not `deepMerge`),
+   - malformed overlays become `overlayFailures` (omitted from `items` / `records`),
+   - healthy system rows may attach `overlayReadDiagnostics` when non-empty,
    - append homebrew records.
-   - Patches whose target no longer exists in the seed are ignored.
+
+Writes to a target listed in `overlayFailures` return **409** with the failure
+`code` / `message` (not 404). Spell, monster, and subclass write hooks receive
+`overlayFailureIds` so unresolved overlay targets are distinct from unknown ids.
+See [`packages/contracts/src/rpg/content/lib/system-overlay/README.md`](../../../../packages/contracts/src/rpg/content/lib/system-overlay/README.md).
 
 ## Kernel (`lib/`) — type-agnostic, reused by every content type
 
@@ -109,11 +119,13 @@ for campaign members who are not `owner`/`co-owner`.
 See `lib/content-write.service.ts`, `lib/content-status.service.ts`, and each type's
 `*Registration.write` in `*.config.ts`.
 
-### Write baseline regression (all six types)
+### Write baseline regression (eight participants)
 
 Service-level homebrew create, homebrew update, and system overlay patch for
-every registered catalog type are covered in
-[`lib/content-write-baseline.test.ts`](lib/content-write-baseline.test.ts).
+every overlay participant (including `monsters` and nested `subclasses`) are
+covered in [`lib/content-write-baseline.test.ts`](lib/content-write-baseline.test.ts).
+List isolation for malformed overlays lives in
+[`lib/resolve-catalog-overlay-failures.integration.test.ts`](lib/resolve-catalog-overlay-failures.integration.test.ts).
 HTTP POST/PATCH smoke tests live in
 [`content.routes.test.ts`](content.routes.test.ts) (`content write routes`).
 Run these before landing spell-resolution or subclass persistence work.

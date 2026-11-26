@@ -2,7 +2,7 @@ import type {
   CatalogLayer,
   ContentStatus,
   ContentTypeKey,
-  type OverlayReadDiagnostics,
+  OverlayReadDiagnostics,
   ResolvedContentCampaignAccess,
 } from '@rpg/contracts'
 import { emptyContentMediaSchema, type ContentMedia } from '@rpg/contracts'

@@ -11,6 +11,10 @@ import { resolveCatalogForCampaign } from '../content.service'
 import { skillProficiencyWriteConfig } from '../skill-proficiencies/skill-proficiencies.config'
 import { speciesWriteConfig } from '../species/species.config'
 import { spellWriteConfig } from '../spells/spells.config'
+import { monstersWriteConfig } from '../monsters/monsters.config'
+import { subclassWriteConfig } from '../subclasses/subclasses.config'
+import { resolveSubclassesForCampaign } from '../subclasses/list-subclasses'
+import { minimalHomebrewMonsterInput } from '../../../test/fixtures/monsters'
 import { expectHttpErrorAsync } from '../../../test/expect-http-error'
 import { overlayNameOnlyUpdate } from '../../../test/helpers/system-overlay-write'
 import { contentEntityBody } from './resolve-system-overlay.lib'
@@ -143,7 +147,23 @@ const baselineCases: BaselineCase[] = [
     overlayParticipantId: 'skill-proficiencies',
     expectedPatchedSystemName: 'Patched Athletics',
   },
+  {
+    label: 'monsters',
+    config: monstersWriteConfig as ContentWriteConfig<BaselineEntity>,
+    createInput: {
+      ...minimalHomebrewMonsterInput,
+      slug: 'baseline-monster',
+      name: 'Baseline Monster',
+    },
+    homebrewUpdate: { name: 'Updated Baseline Monster' },
+    expectedHomebrewName: 'Updated Baseline Monster',
+    systemTargetSlug: 'kobold-warrior',
+    overlayParticipantId: 'monsters',
+    expectedPatchedSystemName: 'Patched Kobold Warrior',
+  },
 ]
+
+const FIGHTER_CLASS_ID = 'srd-cc-5.2.1:fighter'
 
 describe.each(baselineCases)('content write baseline — $label', (baselineCase) => {
   it('creates homebrew, updates homebrew, patches system, and round-trips via catalog', async () => {
@@ -393,6 +413,62 @@ describe('content write baseline — overlay revision', () => {
           }),
         ),
       { status: 409, code: 'stale_revision' },
+    )
+  })
+})
+
+describe('content write baseline — subclasses', () => {
+  it('creates homebrew, updates homebrew, patches system, and round-trips via catalog', async () => {
+    const campaign = await makeTestCampaign()
+
+    const created = await createHomebrewContent(subclassWriteConfig, campaign.id, {
+      slug: 'baseline-subclass',
+      name: 'Baseline Subclass',
+      classId: FIGHTER_CLASS_ID,
+      tagline: 'Baseline tagline',
+      features: [{ kind: 'custom', id: 'baseline-f1', name: 'Baseline Feature', level: 3 }],
+    })
+    expect(created.catalogLayer).toBe('homebrew')
+    expect(created.classId).toBe(FIGHTER_CLASS_ID)
+
+    const updatedHomebrew = await updateContentEntity(
+      subclassWriteConfig,
+      campaign.id,
+      created.id,
+      {
+        name: 'Updated Baseline Subclass',
+      },
+    )
+    expect(updatedHomebrew.name).toBe('Updated Baseline Subclass')
+
+    const catalogAfterHomebrew = await resolveSubclassesForCampaign(campaign.id, FIGHTER_CLASS_ID)
+    expect(catalogAfterHomebrew.some((record) => record.id === created.id)).toBe(true)
+
+    const systemRecord = catalogAfterHomebrew.find(
+      (record) => record.slug === 'champion' && record.catalogLayer === 'system',
+    )
+    expect(systemRecord).toBeDefined()
+    if (!systemRecord) throw new Error('expected champion subclass')
+
+    const catalogSeed = contentEntityBody(systemRecord as unknown as Record<string, unknown>)
+    const patchedSystem = await updateContentEntity(
+      subclassWriteConfig,
+      campaign.id,
+      systemRecord.id,
+      overlayNameOnlyUpdate({
+        participantId: 'subclasses',
+        catalogSeed,
+        baseline: catalogSeed,
+        name: 'Patched Champion',
+      }),
+    )
+    expect(patchedSystem.name).toBe('Patched Champion')
+
+    const catalogAfterPatch = await resolveSubclassesForCampaign(campaign.id, FIGHTER_CLASS_ID)
+    const reread = catalogAfterPatch.find((record) => record.id === systemRecord.id)
+    expect(reread?.name).toBe('Patched Champion')
+    expect(contentEntityBody(reread as unknown as Record<string, unknown>)).toEqual(
+      contentEntityBody(patchedSystem as unknown as Record<string, unknown>),
     )
   })
 })

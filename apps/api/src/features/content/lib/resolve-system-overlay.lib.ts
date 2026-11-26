@@ -32,6 +32,7 @@ export function contentEntityBody(entity: Record<string, unknown>): Record<strin
     seedRowIdsByPath: _seedRowIdsByPath,
     overlayRevision: _overlayRevision,
     overlayReadDiagnostics: _overlayReadDiagnostics,
+    campaignAccess: _campaignAccess,
     ...body
   } = entity
   return body

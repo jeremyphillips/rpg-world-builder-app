@@ -29,6 +29,18 @@ root is the exception surface (not a prohibition on implementation files).
 Deep dive: [form-lib-conventions.md](../../../../../docs/form-lib-conventions.md),
 [feature-structure.md § Parent content/lib](../../../../../docs/feature-structure.md).
 
+## System overlay authoring
+
+System edits route through `systemOverlayIntent` + `expectedOverlayRevision`.
+[`registry/system-overlay-write-readiness.lib.ts`](./registry/system-overlay-write-readiness.lib.ts)
+blocks save when provenance is missing, baseline is incomplete, revision is
+stale, or the entity appears in list `overlayFailures` (`unresolved_overlay`).
+Edit shells load the full list via `useListQueryResult` so unresolved targets
+surface an alert instead of the form. Non-empty API `overlayReadDiagnostics`
+(identity conflicts, orphaned seed overrides) show a destructive alert but allow
+save unless readiness blocks reconciliation. Contract detail:
+[`system-overlay/README.md`](../../../../../../packages/contracts/src/rpg/content/lib/system-overlay/README.md).
+
 ## `registry/` — ContentFormDef contract
 
 Includes `content-form-registry.ts` and `content-form-key-helpers.ts`. Key helpers

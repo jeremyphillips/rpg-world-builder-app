@@ -4,7 +4,6 @@ import { loadSeedMonsters } from '@rpg/catalog/monsters'
 import { parseStoredOverlayInput } from '@rpg/contracts'
 
 import { makeTestCampaign } from '../../../test/fixtures/campaigns'
-import { expectHttpErrorAsync } from '../../../test/expect-http-error'
 import { overlayUpdateFromBodies } from '../../../test/helpers/system-overlay-write'
 import { useIntegrationDb } from '../../../test/setup/integration-db'
 import { resolveCatalogForCampaign } from '../content.service'
@@ -167,17 +166,16 @@ describe('monster system overlay', () => {
     })
   })
 
-  it('fails closed when an unversioned patch document is stored', async () => {
+  it('omits a monster with an unversioned patch from catalog resolve', async () => {
     const campaign = await makeTestCampaign()
     await MonsterPatchModel.create({
       campaignId: campaign.id,
       targetId: SWARM_ID,
       patch: { traits: [] },
     })
-    await expectHttpErrorAsync(
-      () => resolveCatalogForCampaign(monstersWriteConfig.readConfig, campaign.id),
-      { status: 422, code: 'unsupported_overlay_version' },
-    )
+    const catalog = await resolveCatalogForCampaign(monstersWriteConfig.readConfig, campaign.id)
+    expect(catalog.some((row) => row.id === SWARM_ID)).toBe(false)
+    expect(catalog.length).toBeGreaterThan(0)
   })
 
   it('clears optional classIds on a system monster via overlay intent', async () => {
