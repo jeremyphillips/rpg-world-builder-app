@@ -1,15 +1,12 @@
-import type {
-  CatalogOverlayListFailure,
-  Equipment,
-  SkillProficiency,
-  Spell,
-  SystemRulesetId,
-} from '@rpg/contracts'
+import type { Equipment, SkillProficiency, Spell, SystemRulesetId } from '@rpg/contracts'
 import { CREATURE_FAMILY_SET_ID, collectMonsterCatalogIssues } from '@rpg/contracts'
 import { createMagicPropertyDefinitionProvider } from '@rpg/catalog/magic-properties'
 
 import { HttpError } from '../../../lib/http-error'
-import { resolveCatalogForCampaignWithOverlayContext } from '../content.service'
+import {
+  catalogOverlayFailureSlugs,
+  resolveCatalogForCampaignWithOverlayContext,
+} from '../content.service'
 import { classRegistration } from '../classes/classes.config'
 import {
   resolveVocabularySetForCampaign,
@@ -20,15 +17,6 @@ import { skillProficiencyRegistration } from '../skill-proficiencies/skill-profi
 import { spellRegistration } from '../spells/spells.config'
 import type { ContentWriteContext } from '../lib/content-write-config'
 import { rejectInvalidCreatureTraitTemplates } from '../lib/reject-creature-trait-templates'
-
-function overlayFailureSlugSet(
-  failures: readonly CatalogOverlayListFailure[],
-  failureIds: ReadonlySet<string>,
-): ReadonlySet<string> {
-  return new Set(
-    failures.filter((failure) => failureIds.has(failure.targetId)).map((failure) => failure.slug),
-  )
-}
 
 export async function monstersValidateBeforeWrite(ctx: ContentWriteContext): Promise<void> {
   const rawBody = ctx.effectiveBody ?? ctx.input
@@ -67,10 +55,7 @@ export async function monstersValidateBeforeWrite(ctx: ContentWriteContext): Pro
       spellCatalog: 'ready',
       magicPropertyProvider,
       unresolvedOverlayEquipmentIds: equipmentCtx.overlayFailureIds,
-      unresolvedOverlaySkillSlugs: overlayFailureSlugSet(
-        skillCtx.overlayFailures,
-        skillCtx.overlayFailureIds,
-      ),
+      unresolvedOverlaySkillSlugs: catalogOverlayFailureSlugs(skillCtx.overlayFailures),
       unresolvedOverlaySpellIds: spellCtx.overlayFailureIds,
       unresolvedOverlayClassIds: classCtx.overlayFailureIds,
     },

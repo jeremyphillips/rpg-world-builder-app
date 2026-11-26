@@ -21,9 +21,11 @@ export async function assertSubclassBatchTargetsBelongToClass(
     subclassContentConfig,
     campaignId,
   )
-  const overlayFailureIds = new Set(overlayFailures.map((failure) => failure.targetId))
   for (const entityId of unknownIds) {
-    if (overlayFailureIds.has(entityId)) continue
+    const overlayFailure = overlayFailures.find((failure) => failure.targetId === entityId)
+    if (overlayFailure) {
+      throw new HttpError(409, overlayFailure.code, overlayFailure.message)
+    }
     const match = allSubclasses.find((subclass) => subclass.id === entityId)
     if (match && match.classId !== routeClassId) {
       throw new HttpError(

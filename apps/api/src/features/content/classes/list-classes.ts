@@ -10,7 +10,7 @@ import type { CatalogListFilter } from '../lib/apply-catalog-list-filter'
 import { resolveCatalogListFilter } from '../lib/resolve-catalog-membership-filter'
 import { resolveCatalog } from '../lib/resolve-catalog'
 import { loadSystemContent, loadSystemContentPatches } from '../lib/content-type-config'
-import { resolveContentForCampaign } from '../content-types'
+import { resolveClassesListForCampaign } from './derive-classes-catalog'
 import { buildContentListUsageEnvelope } from '../lib/content-usage/build-content-list-usage-envelope'
 import { contentUsageContextFromRequest } from '../lib/content-usage/content-usage-request-context'
 import { subclassContentConfig } from '../subclasses/subclasses.config'
@@ -61,7 +61,7 @@ export async function resolveSubclassSummariesByClassId(
 export async function listClasses(req: Request, res: Response): Promise<void> {
   const { campaignId } = req.params as { campaignId: string }
   const catalogFilter = resolveCatalogListFilter(req)
-  const items = await resolveContentForCampaign('classes', campaignId)
+  const { items, overlayFailures } = await resolveClassesListForCampaign(campaignId)
   const withCampaignAccess = await attachCampaignAccessForTargetType(campaignId, 'classes', items)
   const visibleClasses = applyCatalogListFilter(withCampaignAccess, catalogFilter)
   const subclassSummaries = await resolveSubclassSummariesByClassId(campaignId, catalogFilter)
@@ -79,6 +79,7 @@ export async function listClasses(req: Request, res: Response): Promise<void> {
 
   res.status(200).json({
     classes: usageEnvelope.items,
+    ...(overlayFailures.length > 0 ? { overlayFailures } : {}),
     ...(usageEnvelope.usageSummaryLabels
       ? { usageSummaryLabels: usageEnvelope.usageSummaryLabels }
       : {}),

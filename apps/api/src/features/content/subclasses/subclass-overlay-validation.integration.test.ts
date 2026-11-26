@@ -112,12 +112,14 @@ describe('subclass overlay validation', () => {
     )
     expect(overlayFailures.some((failure) => failure.targetId === champion.id)).toBe(true)
 
-    await expect(
-      assertSubclassBatchTargetsBelongToClass(campaign.id, FIGHTER_CLASS_ID, [
-        champion.id,
-        healthy.id,
-      ]),
-    ).resolves.toBeUndefined()
+    await expectHttpErrorAsync(
+      () =>
+        assertSubclassBatchTargetsBelongToClass(campaign.id, FIGHTER_CLASS_ID, [
+          champion.id,
+          healthy.id,
+        ]),
+      { status: 409, code: 'unsupported_overlay_version' },
+    )
 
     await expectHttpErrorAsync(
       () => assertSubclassBatchTargetsBelongToClass(campaign.id, FIGHTER_CLASS_ID, [evocation.id]),

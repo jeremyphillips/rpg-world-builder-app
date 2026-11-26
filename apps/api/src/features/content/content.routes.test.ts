@@ -1,7 +1,8 @@
 import request, { type Agent } from 'supertest'
 
 import { loadSeedFeats } from '@rpg/catalog/feats'
-import { loadSeedSubclasses } from '@rpg/catalog/classes'
+import { loadSeedClasses, loadSeedSubclasses } from '@rpg/catalog/classes'
+import { ClassPatchModel } from './classes/class-patch.model'
 import { FeatPatchModel } from './feats/feat-patch.model'
 import { MonsterPatchModel } from './monsters/monster-patch.model'
 import { SubclassPatchModel } from './subclasses/subclass-patch.model'
@@ -1598,6 +1599,50 @@ describe('content list routes — overlay wire', () => {
     expect(ids).not.toContain(broken.id)
     expect(res.body.usageSummaryLabels).toBeDefined()
   })
+
+  it('returns overlayFailures on the classes list while a healthy class stays in classes[]', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+    const classes = loadSeedClasses('srd-cc-5.2.1')
+    const broken = classes.find((row) => row.slug === 'fighter')
+    const healthy = classes.find((row) => row.slug === 'wizard')
+    expect(broken).toBeDefined()
+    expect(healthy).toBeDefined()
+    if (!broken || !healthy) throw new Error('seed classes missing')
+
+    await ClassPatchModel.create({
+      campaignId,
+      targetId: broken.id,
+      patch: { name: 'Unversioned overlay' },
+    })
+    await ClassPatchModel.create({
+      campaignId,
+      targetId: healthy.id,
+      patch: { version: 1, revision: 0, set: { name: 'Healthy Wizard Wire' } },
+    })
+
+    const res = await agent
+      .get(`/api/campaigns/${campaignId}/content/classes`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    expect(res.body.overlayFailures).toEqual([
+      expect.objectContaining({
+        targetId: broken.id,
+        code: 'unsupported_overlay_version',
+        name: broken.name,
+        slug: broken.slug,
+      }),
+    ])
+    const ids = res.body.classes.map((row: { id: string }) => row.id)
+    expect(ids).toContain(healthy.id)
+    expect(ids).not.toContain(broken.id)
+    expect(res.body.classes.find((row: { id: string }) => row.id === healthy.id)?.name).toBe(
+      'Healthy Wizard Wire',
+    )
+    expect(res.body.usageSummaryLabels).toBeDefined()
+  })
+
   it('returns overlayFailures for a broken system subclass and keeps a healthy sibling on the same class list', async () => {
     const { agent, csrfToken } = await registerAndLogin()
     const campaignId = await createTestCampaign(agent, csrfToken)
@@ -1618,9 +1663,20 @@ describe('content list routes — overlay wire', () => {
       .expect(201)
     const healthyId = created.body.subclasses.id as string
 
+    const evocation = loadSeedSubclasses('srd-cc-5.2.1').find(
+      (row) => row.slug === 'school-of-evocation',
+    )
+    expect(evocation).toBeDefined()
+    if (!evocation) throw new Error('seed subclass missing')
+
     await SubclassPatchModel.create({
       campaignId,
       targetId: champion.id,
+      patch: { name: 'Unversioned overlay' },
+    })
+    await SubclassPatchModel.create({
+      campaignId,
+      targetId: evocation.id,
       patch: { name: 'Unversioned overlay' },
     })
 
@@ -1638,6 +1694,9 @@ describe('content list routes — overlay wire', () => {
       'Healthy Fighter Sibling',
     )
     expect(ids).not.toContain(champion.id)
+    expect(
+      res.body.overlayFailures.map((failure: { targetId: string }) => failure.targetId),
+    ).toEqual([champion.id])
   })
 
   it('serializes overlayReadDiagnostics on monster list wire', async () => {

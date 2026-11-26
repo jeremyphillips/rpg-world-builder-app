@@ -38,9 +38,11 @@ stale. It also rejects `unresolvedOverlay: true` when a caller passes that
 signal. Edit shells do not pass it: they load the full list via
 `useListQueryResult` and render an alert instead of the form, so
 `serializeContentFormInput` is never called for those targets and does not take
-the flag. Non-empty API `overlayReadDiagnostics`
-(identity conflicts, orphaned seed overrides) show a destructive alert but allow
-save unless readiness blocks reconciliation. Contract detail:
+the flag. Non-empty API `overlayReadDiagnostics` (identity conflicts, orphaned
+seed overrides) render a warning. Save stays available unless readiness or the
+API rejects the write (including diagnostic updates that would drop stored
+overlay data). `overlayFailures` are a blocking state: the edit shell shows a
+destructive alert and does not render the form. Contract detail:
 [`system-overlay/README.md`](../../../../../../packages/contracts/src/rpg/content/lib/system-overlay/README.md).
 
 ## `registry/` — ContentFormDef contract

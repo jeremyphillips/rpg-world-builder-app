@@ -14,6 +14,23 @@ describe('assertSpeciesClassSlugsExist', () => {
     expect(() => assertSpeciesClassSlugsExist(['fighter', 'wizard'], SRD_CLASSES)).not.toThrow()
   })
 
+  it('rejects an unresolved class slug without calling it unknown', () => {
+    try {
+      assertSpeciesClassSlugsExist(
+        ['fighter'],
+        SRD_CLASSES.filter((row) => row.slug !== 'fighter'),
+        new Set(['fighter']),
+      )
+      throw new Error('expected throw')
+    } catch (err) {
+      expect(err).toMatchObject({ status: 400, code: 'validation_error' })
+      expect((err as HttpError).message).not.toContain('Unknown')
+      expect((err as HttpError).details).toEqual({
+        issues: [expect.objectContaining({ code: 'unresolved_overlay_class' })],
+      })
+    }
+  })
+
   it('rejects unknown class slugs', () => {
     expect(() => assertSpeciesClassSlugsExist(['not-a-class'], SRD_CLASSES)).toThrow(HttpError)
     try {

@@ -9,26 +9,16 @@ import {
   extractSpeciesLanguageIds,
   extractSpeciesSenseTypeIds,
 } from '../../vocabulary'
-import { resolveCatalogForCampaign } from '../content.service'
-import { classContentConfig } from '../classes/classes.config'
+import {
+  catalogOverlayFailureSlugs,
+  resolveCatalogForCampaignWithOverlayContext,
+} from '../content.service'
+import { classRegistration } from '../classes/classes.config'
 import type { ContentWriteContext } from '../lib/content-write-config'
+import { mergeExistingContentBody } from '../lib/resolve-system-overlay.lib'
 import { assertContentSpellReferences } from '../lib/assert-content-spell-references'
 import { rejectInvalidCreatureTraitTemplates } from '../lib/reject-creature-trait-templates'
 import { assertSpeciesClassSlugsFromInput } from './assert-species-class-slugs'
-
-function entityBody(entity: Record<string, unknown>): Record<string, unknown> {
-  const {
-    id: _id,
-    slug: _slug,
-    rulesetId: _rulesetId,
-    catalogLayer: _catalogLayer,
-    campaignId: _campaignId,
-    createdAt: _createdAt,
-    updatedAt: _updatedAt,
-    ...body
-  } = entity
-  return body
-}
 
 export async function speciesValidateBeforeWrite(ctx: ContentWriteContext): Promise<void> {
   const creatureType = ctx.input.creatureType
@@ -38,10 +28,7 @@ export async function speciesValidateBeforeWrite(ctx: ContentWriteContext): Prom
 
   const inputForVocab =
     ctx.mode === 'update' && ctx.existing
-      ? {
-          ...entityBody(ctx.existing as unknown as Record<string, unknown>),
-          ...ctx.input,
-        }
+      ? mergeExistingContentBody(ctx.existing as unknown as Record<string, unknown>, ctx.input)
       : ctx.input
 
   rejectInvalidCreatureTraitTemplates(inputForVocab.traits, ['traits'], { host: 'species' })
@@ -62,7 +49,15 @@ export async function speciesValidateBeforeWrite(ctx: ContentWriteContext): Prom
     ...extractSpeciesLanguageIds(inputForVocab),
   ])
 
-  const classes = await resolveCatalogForCampaign(classContentConfig, ctx.campaignId)
-  assertSpeciesClassSlugsFromInput(inputForVocab, classes)
+  const classContext = await resolveCatalogForCampaignWithOverlayContext(
+    classRegistration.read,
+    ctx.campaignId,
+  )
+  assertSpeciesClassSlugsFromInput(
+    inputForVocab,
+    classContext.records,
+    catalogOverlayFailureSlugs(classContext.overlayFailures),
+    ctx.validationIntent,
+  )
   await assertContentSpellReferences(ctx, inputForVocab)
 }

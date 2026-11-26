@@ -43,10 +43,16 @@ Nested subclasses are **not** entries in `CONTENT_TYPE_INTEGRATION_MANIFEST`.
 ## Resolve / merge algorithm
 
 `GET /api/campaigns/:campaignId/content/:contentType` returns the resolved catalog
-for list consumers. `resolveCatalogForCampaign` (in `content.service.ts`) returns
-**resolved records only** (~30+ call sites). List handlers use
-`resolveContentListForCampaign`, which also returns `overlayFailures` when a
-system overlay cannot be applied.
+for list consumers. `resolveCatalogForCampaign` returns **resolved records only**.
+Authoring list handlers use `resolveContentListForCampaign` (classes go through
+`resolveClassesListForCampaign`) and include `overlayFailures` when a system
+overlay cannot be applied. `GET …/content/classes` is a bespoke handler because
+it attaches resolved-only subclass summaries; it still serializes the same
+`overlayFailures` side channel. `GET …/content/classes/:classId/subclasses`
+includes only overlay failures whose seed row belongs to that parent class.
+Spell `classIds` and species multiclass / level-cap class references are **slugs**.
+Monster classification `classIds` are content ids. Slug is the catalog identity
+key for those references and is not reconstructed from a failed overlay body.
 
 Per content type the kernel:
 

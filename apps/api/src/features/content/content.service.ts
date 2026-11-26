@@ -41,9 +41,10 @@ async function resolveCampaignCatalogKernel<T extends { id: string }>(
 }
 
 /**
- * Resolve a campaign's effective catalog for one content type (type-agnostic):
- * load the campaign's pinned ruleset, then merge system seed + overlay patches +
- * homebrew via the kernel. The system seed is never mutated.
+ * Resolved entities only. Search, usage summaries, and other consumers that must
+ * not treat an unresolved overlay as content. Management list handlers and
+ * reference checks that distinguish "missing" from "overlay failed" use
+ * {@link resolveContentListForCampaign} or {@link resolveCatalogForCampaignWithOverlayContext}.
  */
 export async function resolveCatalogForCampaign<T extends { id: string }>(
   config: ContentTypeConfig<T>,
@@ -53,7 +54,11 @@ export async function resolveCatalogForCampaign<T extends { id: string }>(
   return items
 }
 
-/** List handlers: resolved entities plus overlay apply failures omitted from `items`. */
+/**
+ * List and management resolution: resolved entities plus `overlayFailures` for
+ * system rows whose overlay did not apply. Do not drop `overlayFailures` when
+ * building an authoring list response.
+ */
 export async function resolveContentListForCampaign<T extends { id: string }>(
   config: ContentTypeConfig<T>,
   campaignId: string,
@@ -61,6 +66,7 @@ export async function resolveContentListForCampaign<T extends { id: string }>(
   return resolveCampaignCatalogKernel(config, campaignId)
 }
 
+/** Reference validation: resolved rows plus ids omitted because overlay apply failed. Slug-keyed refs use {@link catalogOverlayFailureSlugs}. */
 export async function resolveCatalogForCampaignWithOverlayContext<T extends { id: string }>(
   config: ContentTypeConfig<T>,
   campaignId: string,
@@ -75,4 +81,11 @@ export async function resolveCatalogForCampaignWithOverlayContext<T extends { id
     overlayFailures,
     overlayFailureIds: new Set(overlayFailures.map((failure) => failure.targetId)),
   }
+}
+
+/** Slugs of system rows omitted from resolved records because overlay apply failed. */
+export function catalogOverlayFailureSlugs(
+  failures: readonly CatalogOverlayListFailure[],
+): ReadonlySet<string> {
+  return new Set(failures.map((failure) => failure.slug))
 }

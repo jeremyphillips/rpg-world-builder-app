@@ -38,6 +38,15 @@ export function contentEntityBody(entity: Record<string, unknown>): Record<strin
   return body
 }
 
+/** Overlay/catalog envelope stripped from an existing row, then overlaid with the write input. */
+export function mergeExistingContentBody(
+  existing: Record<string, unknown> | undefined,
+  input: Record<string, unknown>,
+): Record<string, unknown> {
+  if (!existing) return input
+  return { ...contentEntityBody(existing), ...input }
+}
+
 export function overlayPolicyForValidationIntent(
   participantId: SystemOverlayParticipantId,
   validationIntent: ContentValidationIntent,

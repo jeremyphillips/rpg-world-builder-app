@@ -1,7 +1,10 @@
 import type { Request, Response } from 'express'
 
 import type { CatalogOverlayListFailure, ResolvedSubclass } from '@rpg/contracts'
+import { HttpError } from '../../../lib/http-error'
+import { findCampaignById } from '../../campaign'
 import { resolveContentListForCampaign } from '../content.service'
+import { loadSystemContent } from '../lib/content-type-config'
 import { attachCampaignAccessForTargetType } from '../lib/content-campaign-access.service'
 import { filterCatalogForMembership } from '../lib/filter-catalog-for-viewer'
 import { resolveCatalogMembershipFilter } from '../lib/resolve-catalog-membership-filter'
@@ -24,7 +27,19 @@ export async function resolveSubclassesListForCampaign(
     'subclasses',
     filtered,
   )
-  return { subclasses: withCampaignAccess, overlayFailures }
+  const campaign = await findCampaignById(campaignId)
+  if (!campaign) {
+    throw new HttpError(404, 'not_found', 'Campaign not found.')
+  }
+  const parentSeedIds = new Set(
+    loadSystemContent(subclassContentConfig, campaign.rulesetId)
+      .filter((row) => row.classId === classId)
+      .map((row) => row.id),
+  )
+  return {
+    subclasses: withCampaignAccess,
+    overlayFailures: overlayFailures.filter((failure) => parentSeedIds.has(failure.targetId)),
+  }
 }
 
 /** Resolved subclasses for one class: system + patches + homebrew, with campaign access metadata. */

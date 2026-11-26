@@ -150,6 +150,27 @@ export const monsterEquipmentEdge = {
   },
 }
 
+/**
+ * Slug-keyed class references (spell `classIds`, species multiclass / level caps).
+ * Distinct from {@link monsterClassEdge}, which keys monster classification by content id
+ * and uses publish-only classification copy.
+ */
+export const classSlugReferenceEdge = {
+  policy: {
+    subject: 'class',
+    checks: {
+      unknown: ['draft', 'publish'],
+      unresolvedOverlayTarget: ['draft', 'publish'],
+    },
+  } as const satisfies CatalogReferencePolicy<'class'>,
+  unavailablePlacement: { kind: 'per-ref' } as const,
+  messages: {
+    unknown: 'Unknown class.',
+    unresolvedOverlayTarget:
+      'This class exists in the catalog but its overlay could not be applied.',
+  },
+}
+
 /** Monster classifications reference class content without PC progression or playability. */
 export const monsterClassEdge = {
   policy: {

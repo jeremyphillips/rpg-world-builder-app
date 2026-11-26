@@ -11,6 +11,25 @@ describe('assertSpellClassIdsHaveSpellcasting', () => {
     expect(() => assertSpellClassIdsHaveSpellcasting(['wizard'], SRD_CLASSES)).not.toThrow()
   })
 
+  it('rejects an unresolved class slug separately from a non-caster', () => {
+    try {
+      assertSpellClassIdsHaveSpellcasting(
+        ['wizard', 'fighter'],
+        SRD_CLASSES.filter((row) => row.slug !== 'wizard'),
+        new Set(['wizard']),
+      )
+      throw new Error('expected throw')
+    } catch (err) {
+      const httpError = err as HttpError
+      expect(httpError.message).toContain('overlay could not be applied')
+      expect(httpError.message).toContain('without spellcasting')
+      expect(httpError.message).not.toContain('Unknown')
+      expect(httpError.details).toEqual({
+        issues: [expect.objectContaining({ code: 'unresolved_overlay_class' })],
+      })
+    }
+  })
+
   it('rejects unknown class slugs', () => {
     expect(() => assertSpellClassIdsHaveSpellcasting(['not-a-class'], SRD_CLASSES)).toThrow(
       HttpError,
