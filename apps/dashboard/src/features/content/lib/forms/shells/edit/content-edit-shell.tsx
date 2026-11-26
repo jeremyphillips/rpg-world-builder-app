@@ -26,7 +26,7 @@ import { type AnyContentFormDef, type ContentFormCtx } from '../../registry/cont
 import {
   findContentEditEntity,
   loadContentEditFormState,
-  replaceCachedContentEntity,
+  replaceCachedContentListEntity,
 } from './content-edit-load'
 import {
   ArmorClassAuthoringNotice,
@@ -504,7 +504,7 @@ function ContentEditFormBody({
       }
       const savedRecord = saved as typeof entity & { media?: ContentMedia }
       queryClient.setQueryData(def.queryKey(campaignId), (current: unknown) =>
-        Array.isArray(current) ? replaceCachedContentEntity(current, savedRecord) : current,
+        replaceCachedContentListEntity(current, savedRecord),
       )
       const baseline = stripEditEnvelopeFromFormDefaults(
         {

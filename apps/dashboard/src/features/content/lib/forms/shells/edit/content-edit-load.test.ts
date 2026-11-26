@@ -7,6 +7,7 @@ import {
   findContentEditEntity,
   loadContentEditFormState,
   replaceCachedContentEntity,
+  replaceCachedContentListEntity,
   resolveContentFormSchema,
   resolveContentPublishSchema,
 } from './content-edit-load'
@@ -153,5 +154,23 @@ describe('replaceCachedContentEntity', () => {
       { id: 'b', name: 'Other' },
     ])
     expect(replaceCachedContentEntity(undefined, { id: 'a', name: 'Saved' })).toBeUndefined()
+  })
+
+  it('replaces an entity inside the canonical list-result cache and preserves metadata', () => {
+    const current = {
+      items: [{ id: 'a', name: 'Old', overlayRevision: 4 }],
+      overlayFailures: [{ targetId: 'broken' }],
+    }
+
+    expect(
+      replaceCachedContentListEntity(current, {
+        id: 'a',
+        name: 'Saved',
+        overlayRevision: 5,
+      }),
+    ).toEqual({
+      items: [{ id: 'a', name: 'Saved', overlayRevision: 5 }],
+      overlayFailures: [{ targetId: 'broken' }],
+    })
   })
 })

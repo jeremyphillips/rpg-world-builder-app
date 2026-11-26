@@ -57,6 +57,26 @@ export function replaceCachedContentEntity<T extends { id: string }>(
   return next
 }
 
+/** Replaces an entity in either the legacy array cache or the canonical list-result cache. */
+export function replaceCachedContentListEntity<T extends { id: string }>(
+  current: unknown,
+  saved: T,
+): unknown {
+  if (Array.isArray(current)) return replaceCachedContentEntity(current as readonly T[], saved)
+  if (
+    typeof current !== 'object' ||
+    current === null ||
+    !('items' in current) ||
+    !Array.isArray(current.items)
+  ) {
+    return current
+  }
+  return {
+    ...current,
+    items: replaceCachedContentEntity(current.items as readonly T[], saved),
+  }
+}
+
 function persistedIdentityForEntity(
   def: Pick<AnyContentFormDef, 'overlayParticipantId'>,
   entity: unknown,

@@ -1,8 +1,13 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
+import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
-import { DEFAULT_CONTENT_CAMPAIGN_ACCESS, type OverlayReadDiagnostics } from '@rpg/contracts'
+import {
+  DEFAULT_CONTENT_CAMPAIGN_ACCESS,
+  SYSTEM_OVERLAY_INTENT_FIELD,
+  type OverlayReadDiagnostics,
+} from '@rpg/contracts'
 
 import { ContentEditShell } from './content-edit-shell'
 
@@ -11,7 +16,10 @@ const IDENTITY_COPY =
   'This record has overlay identity conflicts. Review before publishing changes.'
 
 vi.mock('../../registry/resolve-catalog-seed-body.lib', () => ({
-  resolveCatalogSeedBody: () => ({ name: 'Seed Feat' }),
+  resolveCatalogSeedBody: () => ({
+    name: 'Seed Monster',
+    traits: [{ id: 'seed-trait', kind: 'custom', name: 'Seed Trait', description: 'Seed.' }],
+  }),
 }))
 
 vi.mock('../layout/content-authoring-gate', () => ({
@@ -91,11 +99,17 @@ vi.mock('@/components/layout/breadcrumb/use-breadcrumb-label', () => ({
   useSetBreadcrumbLabel: vi.fn(),
 }))
 
+const mutation = vi.hoisted(() => ({ mutateAsync: vi.fn() }))
+
+beforeEach(() => {
+  mutation.mutateAsync.mockReset()
+})
+
 vi.mock('../../../list/use-content-mutations', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../../../list/use-content-mutations')>()
   return {
     ...actual,
-    useContentWriteMutation: vi.fn(() => ({ mutateAsync: vi.fn(), isPending: false })),
+    useContentWriteMutation: vi.fn(() => ({ ...mutation, isPending: false })),
   }
 })
 
@@ -186,6 +200,98 @@ describe('ContentEditShell overlay failure gate', () => {
 })
 
 describe('ContentEditShell overlay read diagnostics', () => {
+  it('submits diagnostic-safe intent, resets from the response, and uses its revision next', async () => {
+    const user = userEvent.setup()
+    const seedTrait = {
+      id: 'seed-trait',
+      kind: 'custom' as const,
+      name: 'Seed Trait',
+      description: 'Seed.',
+    }
+    const homebrewTrait = {
+      id: 'homebrew-trait',
+      kind: 'custom' as const,
+      name: 'Homebrew Trait',
+      description: 'Homebrew.',
+    }
+    const entity = {
+      ...systemEntity({ orphanedSeedOverrides: ['orphan-trait'], identityConflicts: [] }),
+      name: 'Seed Monster',
+      overlayRevision: 4,
+      seedRowIdsByPath: { traits: [seedTrait.id] },
+      traits: [seedTrait, homebrewTrait],
+    }
+    const firstSaved = { ...entity, name: 'Renamed Monster', overlayRevision: 5 }
+    const secondSaved = { ...firstSaved, traits: [seedTrait], overlayRevision: 6 }
+    mutation.mutateAsync.mockResolvedValueOnce(firstSaved).mockResolvedValueOnce(secondSaved)
+
+    const queryKey = ['monsters', 'campaign-1']
+    const def = {
+      routeKey: 'monsters' as const,
+      overlayParticipantId: 'monsters' as const,
+      schema: z.object({
+        name: z.string(),
+        traits: z.array(z.object({ id: z.string(), kind: z.string(), name: z.string() })),
+      }),
+      toFormValues: (row: typeof entity) => ({ name: row.name, traits: row.traits }),
+      normalizeOverlayBody: (values: Record<string, unknown>) => ({
+        name: values.name,
+        traits: values.traits,
+      }),
+      buildTabs: undefined,
+      buildFields: () => [],
+      useListQueryResult: () =>
+        useQuery({
+          queryKey,
+          queryFn: async () => ({ items: [entity], overlayFailures: [] }),
+          initialData: { items: [entity], overlayFailures: [] },
+        }),
+      queryKey: () => queryKey,
+    }
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+
+    render(
+      <QueryClientProvider client={client}>
+        <ContentEditShell
+          def={def as never}
+          campaignId="campaign-1"
+          entityId={entity.id}
+          isPending={false}
+          isError={false}
+          backHref="/monsters"
+          overviewHref="/monsters"
+        />
+      </QueryClientProvider>,
+    )
+
+    expect(screen.getByRole('status')).toHaveTextContent(ORPHAN_COPY)
+    await user.clear(screen.getByRole('textbox', { name: 'Name' }))
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Renamed Monster')
+    await user.click(screen.getByRole('button', { name: /Save changes/i }))
+
+    await waitFor(() => expect(mutation.mutateAsync).toHaveBeenCalledTimes(1))
+    const firstPayload = mutation.mutateAsync.mock.calls[0]![0] as Record<string, unknown>
+    expect(firstPayload.expectedOverlayRevision).toBe(4)
+    expect(firstPayload[SYSTEM_OVERLAY_INTENT_FIELD]).toEqual({
+      set: { name: 'Renamed Monster' },
+    })
+    expect(firstPayload).not.toHaveProperty('overlayReadDiagnostics')
+    expect(firstPayload).not.toHaveProperty('seedRowIdsByPath')
+
+    await waitFor(() =>
+      expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue('Renamed Monster'),
+    )
+    await user.click(screen.getByRole('button', { name: 'Remove persisted homebrew trait' }))
+    await user.click(screen.getByRole('button', { name: /Save changes/i }))
+
+    await waitFor(() => expect(mutation.mutateAsync).toHaveBeenCalledTimes(2))
+    const secondPayload = mutation.mutateAsync.mock.calls[1]![0] as Record<string, unknown>
+    expect(secondPayload.expectedOverlayRevision).toBe(5)
+    expect(secondPayload[SYSTEM_OVERLAY_INTENT_FIELD]).toEqual({
+      collections: { traits: { reset: true } },
+    })
+  })
+
   it('shows a warning for orphaned seed overrides and keeps save enabled', () => {
     renderEditShell(
       systemEntity({ orphanedSeedOverrides: ['orphan-trait'], identityConflicts: [] }),

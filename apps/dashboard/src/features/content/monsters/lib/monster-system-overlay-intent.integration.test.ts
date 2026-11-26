@@ -91,7 +91,7 @@ describe('monster system overlay intent integration', () => {
     expect(intent.collections).toBeUndefined()
   })
 
-  it('resets traits when a persisted homebrew addition is removed back to the catalog seed', () => {
+  it('removes a persisted homebrew addition without classifying it as a seed row', () => {
     const loaded = loadMonsterEdit()
     const baselineValues = {
       ...(loaded.defaultValues as MonsterFormValues),
@@ -128,15 +128,13 @@ describe('monster system overlay intent integration', () => {
         catalogSeed: loaded.catalogSeed,
         overlayBaseline,
         expectedOverlayRevision: loaded.entity.overlayRevision ?? 0,
-        seedRowIdsByPath: {
-          ...(loaded.entity.seedRowIdsByPath ?? {}),
-          traits: [...(loaded.entity.seedRowIdsByPath?.traits ?? []), HOMEBREW_TRAIT_ID],
-        },
+        seedRowIdsByPath: loaded.entity.seedRowIdsByPath,
         dirtyFields: { traits: true },
       },
     ) as Record<string, unknown>
 
-    expect(payload[SYSTEM_OVERLAY_INTENT_FIELD]).toMatchObject({
+    expect(loaded.entity.seedRowIdsByPath?.traits).not.toContain(HOMEBREW_TRAIT_ID)
+    expect(payload[SYSTEM_OVERLAY_INTENT_FIELD]).toEqual({
       collections: { traits: { reset: true } },
     })
   })

@@ -172,9 +172,12 @@ must not reorder. Monster **Defined forms** (`listReorder` on `FormEmbeddedMaste
 `ariaLabel` (nav accessible name), and `itemNoun` (`MasterDetailItemNounTerm` via
 `defineMasterDetailItemNoun` — drives list/detail empty copy and delete labels).
 `ContentFormCtx.embeddedSystemOriginRowIds` and `persistedIdentityRowIdsByPath`
-(loaded from API `seedRowIdsByPath` on edit) drive per-row delete-locking on
-system entities: origin rows stay locked; newly added rows show Homebrew and
-remain deletable from the detail overflow menu.
+drive distinct row metadata on system entities. The edit shell freezes API
+`seedRowIdsByPath` as `embeddedSystemOriginRowIds` for seed-origin delete locks;
+`loadContentEditFormState` derives `persistedIdentityRowIdsByPath` from the
+effective entity and overlay policy. Persisted homebrew rows are therefore
+marked persisted without becoming seed-origin, and remain deletable from the
+detail overflow menu.
 
 Scope notes:
 

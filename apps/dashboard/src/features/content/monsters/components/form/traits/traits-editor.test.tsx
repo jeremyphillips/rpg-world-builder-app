@@ -2,23 +2,32 @@ import { useEffect } from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm, type UseFormReturn } from 'react-hook-form'
-import { describe, expect, it } from 'vitest'
+import { getMonsterBySlug } from '@rpg/catalog/monsters'
+import { SYSTEM_OVERLAY_INTENT_FIELD } from '@rpg/contracts'
+import { describe, expect, it, vi } from 'vitest'
 
 import { buildSeedDamageTypeVocabulary } from '@/features/vocabulary'
 
+import { makeContentFormCtx } from '../../../../lib/fixtures/content-form-ctx'
+import { serializeContentFormInput } from '../../../../lib/forms/registry/content-form-serialize-input.lib'
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
 import {
   resolveMonsterCreateDefaultValues,
   type MonsterFormValues,
 } from '../../../lib/monster-form-values'
+import { monsterFormDef } from '../../../lib/monster-form-def'
 import { MonsterTraitsEditor } from './traits-editor'
 
 function Host({
   values,
   formRef,
+  formCtx,
+  onSubmit,
 }: {
   values?: MonsterFormValues
   formRef?: { current: UseFormReturn<MonsterFormValues> | null }
+  formCtx?: ContentFormCtx
+  onSubmit?: (values: MonsterFormValues) => void
 }) {
   const form = useForm<MonsterFormValues>({
     defaultValues: values ?? { ...resolveMonsterCreateDefaultValues(), name: 'Owl' },
@@ -27,18 +36,133 @@ function Host({
     if (!formRef) return
     formRef.current = form
   }, [form, formRef])
-  const ctx: ContentFormCtx = {
+  const ctx: ContentFormCtx = formCtx ?? {
     entityCatalogLayer: 'homebrew',
     damageTypeVocabulary: buildSeedDamageTypeVocabulary(),
   }
   return (
     <FormProvider {...form}>
-      <MonsterTraitsEditor ctx={ctx} />
+      <form onSubmit={form.handleSubmit((submitted) => onSubmit?.(submitted))}>
+        {onSubmit ? (
+          <label>
+            Monster name
+            <input {...form.register('name')} />
+          </label>
+        ) : null}
+        <MonsterTraitsEditor ctx={ctx} />
+        {onSubmit ? <button type="submit">Save changes</button> : null}
+      </form>
     </FormProvider>
   )
 }
 
 describe('MonsterTraitsEditor', () => {
+  it('navigates mounted system rows and serializes only the intended name and homebrew removal', async () => {
+    const user = userEvent.setup()
+    const seed = getMonsterBySlug('srd-cc-5.2.1', 'kobold-warrior')
+    const seedTraitIds = seed.traits?.map((trait) => trait.id) ?? []
+    const homebrewId = 'persisted-homebrew-trait'
+    const entity = {
+      ...seed,
+      catalogLayer: 'system' as const,
+      status: 'published' as const,
+      overlayRevision: 7,
+      seedRowIdsByPath: { traits: seedTraitIds },
+      overlayReadDiagnostics: {
+        orphanedSeedOverrides: ['removed-seed-trait'],
+        identityConflicts: [],
+      },
+      traits: [
+        ...(seed.traits ?? []),
+        {
+          id: homebrewId,
+          kind: 'custom' as const,
+          name: 'Persisted Homebrew Trait',
+          description: 'Authored outside the catalog.',
+        },
+      ],
+    }
+    const values = monsterFormDef.toFormValues(entity) as MonsterFormValues
+    const baseline = monsterFormDef.normalizeOverlayBody!(
+      values,
+      { entity, armorClassRules: { mode: 'ascending', base: 10 } },
+      'publish',
+    )
+    const payloads: Record<string, unknown>[] = []
+    const formRef: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }
+    const ctx = {
+      ...makeContentFormCtx(),
+      entityCatalogLayer: 'system' as const,
+      rulesetId: 'srd-cc-5.2.1',
+      persistedIdentityRowIdsByPath: {
+        traits: [...seedTraitIds, homebrewId],
+      },
+      embeddedSystemOriginRowIds: {
+        traits: seedTraitIds,
+      },
+    }
+
+    render(
+      <Host
+        values={values}
+        formRef={formRef}
+        formCtx={ctx}
+        onSubmit={(draft) => {
+          payloads.push(
+            serializeContentFormInput(
+              monsterFormDef,
+              draft,
+              { entity, armorClassRules: ctx.armorClassRules },
+              'publish',
+              {
+                operation: 'update',
+                entityId: entity.id,
+                rulesetId: 'srd-cc-5.2.1',
+                catalogSeed: seed as Record<string, unknown>,
+                overlayBaseline: baseline,
+                expectedOverlayRevision: entity.overlayRevision,
+                seedRowIdsByPath: entity.seedRowIdsByPath,
+                dirtyFields: { name: true, traits: true },
+              },
+            ) as Record<string, unknown>,
+          )
+        }}
+      />,
+    )
+
+    const seedTraits = seed.traits ?? []
+    expect(seedTraits.length).toBeGreaterThanOrEqual(2)
+    await user.click(screen.getByRole('button', { name: /Sunlight Sensitivity/i }))
+    await user.click(screen.getByRole('button', { name: /Pack Tactics/i }))
+    await user.click(screen.getByRole('button', { name: /Actions for Pack Tactics/i }))
+    expect(screen.queryByRole('menuitem', { name: /Delete trait/i })).not.toBeInTheDocument()
+    await user.keyboard('{Escape}')
+
+    await user.clear(screen.getByRole('textbox', { name: 'Monster name' }))
+    await user.type(screen.getByRole('textbox', { name: 'Monster name' }), 'Renamed Kobold Warrior')
+    await user.click(screen.getByRole('button', { name: /Save changes/i }))
+    expect(payloads[0]?.[SYSTEM_OVERLAY_INTENT_FIELD]).toEqual({
+      set: { name: 'Renamed Kobold Warrior' },
+    })
+    expect(payloads[0]).not.toHaveProperty('overlayReadDiagnostics')
+    expect(payloads[0]?.expectedOverlayRevision).toBe(7)
+
+    await user.click(screen.getByRole('button', { name: /Persisted Homebrew Trait/i }))
+    await user.click(screen.getByRole('button', { name: /Actions for Persisted Homebrew Trait/i }))
+    expect(screen.getByRole('menuitem', { name: /Delete trait/i })).toBeInTheDocument()
+    await user.click(screen.getByRole('menuitem', { name: /Delete trait/i }))
+    await user.click(screen.getByRole('button', { name: /^Delete$/ }))
+    await user.click(screen.getByRole('button', { name: /Save changes/i }))
+
+    expect(payloads[1]?.[SYSTEM_OVERLAY_INTENT_FIELD]).toMatchObject({
+      set: { name: 'Renamed Kobold Warrior' },
+      collections: { traits: { reset: true } },
+    })
+    expect(entity.seedRowIdsByPath.traits).not.toContain(homebrewId)
+    expect(ctx.persistedIdentityRowIdsByPath.traits).toContain(homebrewId)
+    expect(vi.isMockFunction(serializeContentFormInput)).toBe(false)
+  })
+
   it('does not offer species-only sense templates in the add menu', async () => {
     const user = userEvent.setup()
     render(<Host />)

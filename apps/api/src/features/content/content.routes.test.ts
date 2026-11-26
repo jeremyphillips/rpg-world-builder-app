@@ -26,6 +26,7 @@ import { registerCampaignMember } from '../../test/helpers/campaign-membership'
 import { minimalStandalonePcInput } from '../../test/fixtures/characters'
 import { minimalNpcRequestInput } from '../../test/fixtures/npcs'
 import { setMembershipControlledPcs } from '../../test/helpers/campaign-participation'
+import { overlayUpdateFromBodies } from '../../test/helpers/system-overlay-write'
 import { useIntegrationApp } from '../../test/setup/integration-app'
 
 const getApp = useIntegrationApp()
@@ -370,7 +371,15 @@ describe('content write routes', () => {
     const patchRes = await agent
       .patch(`/api/campaigns/${campaignId}/content/feats/${alert.id}`)
       .set(CSRF_HEADER, csrfToken)
-      .send({ name: 'Route Patched Alert' })
+      .send(
+        overlayUpdateFromBodies({
+          participantId: 'feats',
+          catalogSeed: alert,
+          baseline: alert,
+          draft: { ...alert, name: 'Route Patched Alert' },
+          expectedOverlayRevision: alert.overlayRevision,
+        }),
+      )
       .expect(200)
 
     expect(patchRes.body.feats.catalogLayer).toBe('system')
@@ -505,7 +514,15 @@ describe('content write routes', () => {
     const patchRes = await agent
       .patch(`/api/campaigns/${campaignId}/content/spells/${eldritchBlast.id}`)
       .set(CSRF_HEADER, csrfToken)
-      .send({ resolution: patchedResolution })
+      .send(
+        overlayUpdateFromBodies({
+          participantId: 'spells',
+          catalogSeed: eldritchBlast,
+          baseline: eldritchBlast,
+          draft: { ...eldritchBlast, resolution: patchedResolution },
+          expectedOverlayRevision: eldritchBlast.overlayRevision,
+        }),
+      )
       .expect(200)
 
     expect(patchRes.body.spells.resolution).toEqual(patchedResolution)
