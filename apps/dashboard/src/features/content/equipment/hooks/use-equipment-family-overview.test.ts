@@ -43,8 +43,42 @@ vi.mock('../../lib/forms/registry/resolve-catalog-seed-body.lib', () => ({
 
 const { useEquipmentListResult } = await import('../hooks/use-equipment')
 
+const { useCampaignRulesetLookup } = await import('@/lib/use-campaign-ruleset-lookup')
+
 describe('useEquipmentFamilyOverview', () => {
+  it('keeps overlay failure rows visible while campaign ruleset is loading', () => {
+    vi.mocked(useCampaignRulesetLookup).mockReturnValue({
+      rulesetId: undefined,
+      isPending: true,
+      isError: false,
+    })
+    const failures: CatalogOverlayListFailure[] = [
+      {
+        targetId: 'srd-cc-5.2.1:longsword',
+        slug: 'longsword',
+        name: 'Longsword',
+        code: 'unsupported_overlay_version',
+        message: 'System overlay patch is missing a supported version.',
+      },
+    ]
+    vi.mocked(useEquipmentListResult).mockReturnValue({
+      data: { items: [], overlayFailures: failures },
+      isPending: false,
+      isError: false,
+    })
+
+    const { result } = renderHook(() => useEquipmentFamilyOverview('camp-1', 'weapons'))
+
+    expect(result.current.isPending).toBe(true)
+    expect(result.current.filtered.map((row) => row.id)).toEqual(['srd-cc-5.2.1:longsword'])
+  })
+
   it('keeps overlay failure rows in the matching equipment family using campaign ruleset context', () => {
+    vi.mocked(useCampaignRulesetLookup).mockReturnValue({
+      rulesetId: 'srd-cc-5.2.1',
+      isPending: false,
+      isError: false,
+    })
     const failures: CatalogOverlayListFailure[] = [
       {
         targetId: 'srd-cc-5.2.1:longsword',

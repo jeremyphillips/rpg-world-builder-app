@@ -1,10 +1,13 @@
 import {
   applyStoredOverlay,
+  buildSeedRowIdsByPath,
   reconcileContentProvenance,
   overlayFailureToListEntry,
+  parseStoredOverlayInput,
   type ApiContentTypeKey,
   type CatalogOverlayListFailure,
   type OverlayReadDiagnostics,
+  type StoredOverlay,
   type SystemOverlayParticipantId,
   type SystemRulesetId,
 } from '@rpg/contracts'
@@ -82,6 +85,7 @@ export function resolveCatalog<T extends Identified>(
 
     let mergedBody: Record<string, unknown>
     let readDiagnostics: OverlayReadDiagnostics | undefined
+    let storedOverlay: StoredOverlay | null | undefined
 
     if (!overlay) {
       mergedBody = seedBody
@@ -90,7 +94,15 @@ export function resolveCatalog<T extends Identified>(
         'System overlay patch present but overlayParticipantId is not configured for this content type.',
       )
     } else {
-      const applied = applyStoredOverlay(seedBody, overlay.patch, policy)
+      const parsed = parseStoredOverlayInput(overlay.patch)
+      if (!parsed.ok) {
+        overlayFailures.push(
+          overlayFailureToListEntry(catalogListFailureSeedRow(recordRecord), parsed.failure),
+        )
+        continue
+      }
+      storedOverlay = parsed.overlay
+      const applied = applyStoredOverlay(seedBody, storedOverlay, policy)
       if (!applied.ok) {
         overlayFailures.push(
           overlayFailureToListEntry(catalogListFailureSeedRow(recordRecord), applied.failure),
@@ -103,10 +115,19 @@ export function resolveCatalog<T extends Identified>(
       }
     }
 
+    const systemOverlayReadMeta =
+      policy !== undefined
+        ? {
+            seedRowIdsByPath: buildSeedRowIdsByPath(seedBody, policy),
+            ...(storedOverlay ? { overlayRevision: storedOverlay.revision } : {}),
+          }
+        : {}
+
     const published: Record<string, unknown> = {
       ...recordRecord,
       ...mergedBody,
       status: 'published' as const,
+      ...systemOverlayReadMeta,
       ...(readDiagnostics ? { overlayReadDiagnostics: readDiagnostics } : {}),
     }
     const rulesetId = recordRecord.rulesetId as SystemRulesetId | undefined

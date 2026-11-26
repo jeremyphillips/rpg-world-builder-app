@@ -23,16 +23,25 @@ import { speciesRegistration } from './species/species.config'
 import { spellRegistration } from './spells/spells.config'
 import { monstersRegistration } from './monsters/monsters.config'
 
+type CampaignListResolution<T extends WriteEntityBase> = {
+  items: T[]
+  overlayFailures: CatalogOverlayListFailure[]
+}
+
+/** Pair custom campaign resolvers — list resolution must surface overlay failures. */
+export type CampaignResolverOverrides<T extends WriteEntityBase = WriteEntityBase> = {
+  resolveForCampaign: (campaignId: string) => Promise<T[]>
+  resolveListForCampaign: (campaignId: string) => Promise<CampaignListResolution<T>>
+}
+
 /** Bundled read + write wiring for one content type — the single extension point. */
-export interface ContentTypeRegistration<T extends WriteEntityBase = WriteEntityBase> {
+export type ContentTypeRegistration<T extends WriteEntityBase = WriteEntityBase> = {
   read: ContentTypeConfig<T>
   write: ContentWriteConfig<T>
-  /** Override default `resolveCatalogForCampaign` (classes only today). */
-  resolveForCampaign?: (campaignId: string) => Promise<T[]>
-  resolveListForCampaign?: (
-    campaignId: string,
-  ) => Promise<{ items: T[]; overlayFailures: CatalogOverlayListFailure[] }>
-}
+} & (
+  | { resolveForCampaign?: undefined; resolveListForCampaign?: undefined }
+  | CampaignResolverOverrides<T>
+)
 
 /**
  * The registry of content types. Adding a new type means authoring its
@@ -91,13 +100,10 @@ export async function resolveContentForCampaign(
 export async function resolveContentListForCampaignType(
   type: ContentTypeName,
   campaignId: string,
-): Promise<{ items: WriteEntityBase[]; overlayFailures: CatalogOverlayListFailure[] }> {
+): Promise<CampaignListResolution<WriteEntityBase>> {
   const reg = CONTENT_TYPES[type] as ContentTypeRegistration
   if (reg.resolveListForCampaign) {
     return reg.resolveListForCampaign(campaignId)
-  }
-  if (reg.resolveForCampaign) {
-    return { items: await reg.resolveForCampaign(campaignId), overlayFailures: [] }
   }
   return resolveContentListForCampaign(reg.read, campaignId)
 }

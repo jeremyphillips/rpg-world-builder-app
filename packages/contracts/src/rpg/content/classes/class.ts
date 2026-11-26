@@ -261,6 +261,8 @@ export type CharacterClass = z.infer<typeof classSchema>
 /** Class list row enriched with subclass summaries for overview tables. */
 export const classListItemSchema = classSchema.extend({
   subclasses: z.array(contentSummaryRefSchema),
+  /** Parent-scoped subclass overlay failures visible to this list viewer (summaries stay resolved-only). */
+  unresolvedSubclassOverlayCount: z.number().int().positive().optional(),
 })
 export type ClassListItem = z.infer<typeof classListItemSchema>
 

@@ -4,7 +4,6 @@ import { HttpError } from '../../lib/http-error'
 import { findCampaignById } from '../campaign'
 import type { ContentTypeConfig } from './lib/content-type-config'
 import { loadSystemContent, loadSystemContentPatches } from './lib/content-type-config'
-import { enrichResolvedSystemRecords } from './lib/enrich-system-content-read'
 import { resolveCatalog } from './lib/resolve-catalog'
 
 type CampaignCatalogResolution<T extends { id: string }> = {
@@ -33,11 +32,7 @@ async function resolveCampaignCatalogKernel<T extends { id: string }>(
     ...(contentTypeKey ? { contentTypeKey } : {}),
     overlayParticipantId: config.overlayParticipantId,
   })
-  const seedById = new Map(
-    systemSeed.map((record) => [record.id, record as unknown as Record<string, unknown>]),
-  )
-  const items = enrichResolvedSystemRecords(records, seedById, patches, config.overlayParticipantId)
-  return { items, overlayFailures }
+  return { items: records, overlayFailures }
 }
 
 /**

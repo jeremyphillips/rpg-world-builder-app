@@ -47,8 +47,10 @@ for list consumers. `resolveCatalogForCampaign` returns **resolved records only*
 Authoring list handlers use `resolveContentListForCampaign` (classes go through
 `resolveClassesListForCampaign`) and include `overlayFailures` when a system
 overlay cannot be applied. `GET …/content/classes` is a bespoke handler because
-it attaches resolved-only subclass summaries; it still serializes the same
-`overlayFailures` side channel. List handlers filter failures via
+it attaches resolved-only subclass summaries and, when viewer-filtered subclass
+overlays fail, a per-parent `unresolvedSubclassOverlayCount` on the class row (not
+mixed into `overlayFailures` or subclass summary ids). It still serializes class-level
+`overlayFailures` for broken class overlays. List handlers filter failures via
 `filterOverlayFailuresForListViewer`, which attaches `campaignAccess` and runs
 `applyCatalogListFilter` (see `catalogListModeIncludesOverlayFailures` — play mode
 omits failures). Discovery and reference scopes share the same visibility rules as
@@ -66,10 +68,14 @@ Per content type the kernel:
 2. `loadSystem(rulesetId)` — the seed records.
 3. `loadPatches(campaignId)` and `loadHomebrew(campaignId, rulesetId)` from Mongo.
 4. `resolveCatalog(system, patches, homebrew)` (in `lib/resolve-catalog.ts`):
-   - system rows: `applyStoredOverlay` (contracts kernel — not `deepMerge`),
+   - system rows: parse stored overlay once, `applyStoredOverlay` (contracts kernel),
    - malformed overlays become `overlayFailures` (omitted from `items` / `records`),
-   - healthy system rows may attach `overlayReadDiagnostics` when non-empty,
+   - healthy system rows attach `seedRowIdsByPath`, optional `overlayRevision`, and
+     non-empty `overlayReadDiagnostics`,
    - append homebrew records.
+
+`content-types.ts` list resolution never uses a records-only override without
+`resolveListForCampaign`; custom pairs must supply both (`CampaignResolverOverrides`).
 
 Writes to a target listed in `overlayFailures` return **409** with the failure
 `code` / `message` (not 404). Spell, monster, and subclass write hooks receive
@@ -86,14 +92,19 @@ See [`packages/contracts/src/rpg/content/lib/system-overlay/README.md`](../../..
 | Module                        | Responsibility                                                |
 | ----------------------------- | ------------------------------------------------------------- |
 | `deep-merge.ts`               | Deep-merge objects; arrays/primitives replace                 |
-| `resolve-catalog.ts`          | Merge system + patches + homebrew into the effective list     |
+| `resolve-catalog.ts`          | Apply overlays and homebrew into the effective list           |
 | `assert-slug-available.ts`    | Homebrew slug guard (no campaign dupes; no system shadowing)  |
 | `homebrew-summary.service.ts` | Hub card counts — one round trip over resolved catalogs       |
 | `content-type-config.ts`      | `ContentTypeConfig` — the per-type wiring the kernel consumes |
 
 Each content type contributes only a body schema (in `@rpg/contracts`) + a
-`*.config.ts` exporting a `*Registration` (`read` + `write`, optional
-`resolveForCampaign`), registered once in `content-types.ts`.
+`*.config.ts` exporting a `*Registration` (`read` + `write`, optional paired
+`resolveForCampaign` + `resolveListForCampaign`), registered once in `content-types.ts`.
+
+**Records-only consumers:** `resolveCatalogForCampaign` / `resolveContentForCampaign`
+(search, hub summaries, organization member roster lookup) intentionally omit
+overlay-failure rows. Spell delete guards merge unresolved overlay **seed** bodies via
+`overlay-failure-seed-referrers` so dependency protection does not drop when apply fails.
 
 - `POST /api/campaigns/:campaignId/content/:contentType` — create homebrew (`status` in request body; defaults to `published`)
 - `PATCH /api/campaigns/:campaignId/content/:contentType/:entityId` — update

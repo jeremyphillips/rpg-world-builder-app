@@ -30,21 +30,33 @@ function toSpellReferrerBlocker(referrer: SpellReferrer): ContentUsageBlocker {
 export async function indexContentSpellReferenceBlockersByContentId(
   ctx: ContentUsageResolverContext,
 ): Promise<Map<string, ContentUsageBlocker[]>> {
-  const [{ resolveCatalogForCampaign }, species, classes, subclasses, monsters] = await Promise.all(
-    [
-      import('../../../content.service'),
-      import('../../../species/species.config'),
-      import('../../../classes/classes.config'),
-      import('../../../subclasses/subclasses.config'),
-      import('../../../monsters/monsters.config'),
-    ],
-  )
-  const [speciesRows, classRows, subclassRows, monsterRows] = await Promise.all([
-    resolveCatalogForCampaign(species.speciesRegistration.read, ctx.campaignId),
-    resolveCatalogForCampaign(classes.classRegistration.read, ctx.campaignId),
-    resolveCatalogForCampaign(subclasses.subclassContentConfig, ctx.campaignId),
-    resolveCatalogForCampaign(monsters.monstersRegistration.read, ctx.campaignId),
+  const [species, classes, subclasses, monsters, overlaySeeds] = await Promise.all([
+    import('../../../species/species.config'),
+    import('../../../classes/classes.config'),
+    import('../../../subclasses/subclasses.config'),
+    import('../../../monsters/monsters.config'),
+    import('./overlay-failure-seed-referrers'),
   ])
+  const { resolveCatalogRowsWithOverlayFailureSeeds, mergeOverlayFailureSeedRows } = overlaySeeds
+  const [speciesCtx, classCtx, subclassCtx, monsterCtx] = await Promise.all([
+    resolveCatalogRowsWithOverlayFailureSeeds(species.speciesRegistration.read, ctx.campaignId),
+    resolveCatalogRowsWithOverlayFailureSeeds(classes.classRegistration.read, ctx.campaignId),
+    resolveCatalogRowsWithOverlayFailureSeeds(subclasses.subclassContentConfig, ctx.campaignId),
+    resolveCatalogRowsWithOverlayFailureSeeds(monsters.monstersRegistration.read, ctx.campaignId),
+  ])
+  const speciesRows = mergeOverlayFailureSeedRows(
+    speciesCtx.records,
+    speciesCtx.overlayFailureSeeds,
+  )
+  const classRows = mergeOverlayFailureSeedRows(classCtx.records, classCtx.overlayFailureSeeds)
+  const subclassRows = mergeOverlayFailureSeedRows(
+    subclassCtx.records,
+    subclassCtx.overlayFailureSeeds,
+  )
+  const monsterRows = mergeOverlayFailureSeedRows(
+    monsterCtx.records,
+    monsterCtx.overlayFailureSeeds,
+  )
 
   const referrers: SpellReferrer[] = [
     ...speciesRows.map((row) => ({

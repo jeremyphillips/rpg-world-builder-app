@@ -15,7 +15,11 @@ import {
 
 export function useEquipmentFamilyOverview(campaignId: string, family: EquipmentFamilyPath) {
   const kind = familyPathToEquipmentKind(family)
-  const { rulesetId: campaignRulesetId } = useCampaignRulesetLookup(campaignId)
+  const {
+    rulesetId: campaignRulesetId,
+    isPending: rulesetPending,
+    isError: rulesetError,
+  } = useCampaignRulesetLookup(campaignId)
   const listResult = useEquipmentListResult(campaignId)
   const { data: equipment, isPending, isError } = useContentOverviewMergedData(listResult)
   const { data: usageMeta } = useEquipmentUsageMeta(campaignId)
@@ -28,10 +32,11 @@ export function useEquipmentFamilyOverview(campaignId: string, family: Equipment
     overviewUsageScope: usageMeta?.overviewUsageScope,
   })
   const heading = getEquipmentFamilyLabel(family)
+  const canFamilyFilterOverlayFailures = Boolean(campaignRulesetId)
   const filtered = kind
     ? equipment.filter((item) => {
         if (isContentOverlayFailureOverviewRow(item)) {
-          if (!campaignRulesetId) return false
+          if (!canFamilyFilterOverlayFailures) return true
           const seed = resolveCatalogSeedBody(
             'equipment',
             campaignRulesetId as SystemRulesetId,
@@ -47,8 +52,8 @@ export function useEquipmentFamilyOverview(campaignId: string, family: Equipment
     heading,
     filtered,
     tableConfig,
-    isPending: isPending || columnsPending,
-    isError: isError || columnsError,
+    isPending: isPending || columnsPending || rulesetPending,
+    isError: isError || columnsError || rulesetError,
     newHref: ROUTES.content.equipment.create(campaignId, family),
     newLabel: `New ${heading.replace(/s$/, '')}`,
   }

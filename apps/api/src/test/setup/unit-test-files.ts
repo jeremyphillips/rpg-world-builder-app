@@ -9,6 +9,8 @@ export const unitTestFiles = [
   'src/features/character-import/dnd-beyond-acquisition.service.test.ts',
   'src/features/character/lib/build-character-card-summary-dto.lib.test.ts',
   'src/features/content/content-types.integration-manifest.test.ts',
+  'src/features/content/content-types.test.ts',
+  'src/features/content/classes/resolve-subclass-overlay-failure-counts.test.ts',
   'src/features/content/lib/apply-content-keys.test.ts',
   'src/features/content/lib/assert-slug-available.test.ts',
   'src/features/content/lib/content-type-config.test.ts',

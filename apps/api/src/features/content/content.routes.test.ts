@@ -1976,6 +1976,19 @@ describe('content list routes — overlay wire', () => {
     expect(
       res.body.overlayFailures.map((failure: { targetId: string }) => failure.targetId),
     ).toEqual([champion.id])
+
+    const classesList = await agent
+      .get(`/api/campaigns/${campaignId}/content/classes`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    const fighter = classesList.body.classes.find(
+      (row: { id: string }) => row.id === champion.classId,
+    )
+    expect(fighter?.unresolvedSubclassOverlayCount).toBe(1)
+    expect(
+      (fighter?.subclasses ?? []).map((subclass: { id: string }) => subclass.id),
+    ).not.toContain(champion.id)
   })
 
   it('serializes overlayReadDiagnostics on monster list wire', async () => {

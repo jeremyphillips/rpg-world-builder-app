@@ -15,6 +15,7 @@ import { resolveClassesListForCampaign } from './derive-classes-catalog'
 import { buildContentListUsageEnvelope } from '../lib/content-usage/build-content-list-usage-envelope'
 import { contentUsageContextFromRequest } from '../lib/content-usage/content-usage-request-context'
 import { subclassContentConfig } from '../subclasses/subclasses.config'
+import { resolveSubclassOverlayFailureCountByClassId } from './resolve-subclass-overlay-failure-counts'
 
 /** Membership-filtered subclass summaries grouped by parent class id. */
 export async function resolveSubclassSummariesByClassId(
@@ -71,12 +72,21 @@ export async function listClasses(req: Request, res: Response): Promise<void> {
     overlayFailures,
     catalogFilter,
   )
-  const subclassSummaries = await resolveSubclassSummariesByClassId(campaignId, catalogFilter)
+  const [subclassSummaries, unresolvedSubclassOverlays] = await Promise.all([
+    resolveSubclassSummariesByClassId(campaignId, catalogFilter),
+    resolveSubclassOverlayFailureCountByClassId(campaignId, catalogFilter),
+  ])
 
-  const classes = (visibleClasses as unknown as CharacterClass[]).map((characterClass) => ({
-    ...characterClass,
-    subclasses: subclassSummaries.get(characterClass.id) ?? [],
-  })) satisfies ClassListItem[]
+  const classes = (visibleClasses as unknown as CharacterClass[]).map((characterClass) => {
+    const unresolvedSubclassOverlayCount = unresolvedSubclassOverlays.get(characterClass.id)
+    return {
+      ...characterClass,
+      subclasses: subclassSummaries.get(characterClass.id) ?? [],
+      ...(unresolvedSubclassOverlayCount !== undefined && unresolvedSubclassOverlayCount > 0
+        ? { unresolvedSubclassOverlayCount }
+        : {}),
+    }
+  }) satisfies ClassListItem[]
 
   const usageEnvelope = await buildContentListUsageEnvelope(
     contentUsageContextFromRequest(req, campaignId),

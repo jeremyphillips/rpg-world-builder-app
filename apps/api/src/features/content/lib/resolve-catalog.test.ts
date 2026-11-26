@@ -96,7 +96,14 @@ describe('resolveCatalog', () => {
       [],
       { overlayParticipantId: 'classes' },
     )
-    expect(result).toEqual({ records: publishedSystem, overlayFailures: [] })
+    expect(result.overlayFailures).toEqual([])
+    expect(result.records).toHaveLength(publishedSystem.length)
+    for (const [index, record] of publishedSystem.entries()) {
+      expect(result.records[index]).toEqual(expect.objectContaining(record))
+      expect(result.records[index]).toEqual(
+        expect.objectContaining({ seedRowIdsByPath: expect.any(Object) }),
+      )
+    }
   })
 
   it('keeps untouched traits on a movement-only monster overlay', () => {
@@ -149,6 +156,25 @@ describe('resolveCatalog', () => {
       { overlayParticipantId: 'feats' },
     )
     expect(alert!.name).not.toBe('Other Name')
+  })
+
+  it('attaches seedRowIdsByPath and overlayRevision on resolved system rows', () => {
+    const alert = loadSeedFeats('srd-cc-5.2.1').find((feat) => feat.slug === 'alert')
+    expect(alert).toBeDefined()
+    const { records } = resolveCatalog(
+      [alert!],
+      [
+        {
+          targetId: alert!.id,
+          patch: { version: 1, revision: 2, set: { name: 'Other Name' } },
+        },
+      ],
+      [],
+      { overlayParticipantId: 'feats' },
+    )
+    const resolved = records[0] as Record<string, unknown>
+    expect(resolved.seedRowIdsByPath).toBeDefined()
+    expect(resolved.overlayRevision).toBe(2)
   })
 
   it('isolates a malformed sibling overlay without failing healthy rows', () => {
