@@ -12,7 +12,6 @@ import {
   type ObjectDelta,
   type OverlayApplyFailure,
   type OverlayPolicyNode,
-  type StoredOverlay,
   type SystemOverlayParticipantId,
 } from '@rpg/contracts'
 
@@ -32,6 +31,7 @@ export function contentEntityBody(entity: Record<string, unknown>): Record<strin
     updatedAt: _updatedAt,
     seedRowIdsByPath: _seedRowIdsByPath,
     overlayRevision: _overlayRevision,
+    overlayReadDiagnostics: _overlayReadDiagnostics,
     ...body
   } = entity
   return body
@@ -78,29 +78,15 @@ export function throwOverlayFailure(failure: OverlayApplyFailure): never {
   )
 }
 
-function materializeOverlayDeltaOntoBaseline(
-  baseline: Record<string, unknown>,
-  mergedBody: Record<string, unknown>,
-  overlay: StoredOverlay | null,
+/** Catalog seed row plus overlay-resolved domain fields (matches `resolveCatalog` publish merge). */
+export function resolveSystemCatalogRecord(
+  seedRecord: Record<string, unknown>,
+  stored: unknown,
+  policy: OverlayPolicyNode,
 ): Record<string, unknown> {
-  if (!overlay) return baseline
-  const effective: Record<string, unknown> = { ...baseline }
-
-  for (const key of overlay.clear ?? []) {
-    delete effective[key]
-  }
-
-  for (const key of Object.keys(overlay.collections ?? {})) {
-    if (Object.prototype.hasOwnProperty.call(mergedBody, key)) {
-      effective[key] = mergedBody[key]
-    }
-  }
-
-  for (const [key, value] of Object.entries(overlay.set ?? {})) {
-    effective[key] = mergedBody[key] ?? value
-  }
-
-  return effective
+  const seedBody = contentEntityBody(seedRecord)
+  const mergedBody = resolveSystemBodyWithOverlay(seedBody, stored, policy)
+  return { ...seedRecord, ...mergedBody }
 }
 
 export function resolveSystemBodyWithOverlay(
@@ -114,7 +100,7 @@ export function resolveSystemBodyWithOverlay(
   const applied = applyStoredOverlay(seedBody, parsed.overlay, policy)
   if (!applied.ok) throwOverlayFailure(applied.failure)
 
-  return materializeOverlayDeltaOntoBaseline(seedBody, applied.result.body, parsed.overlay)
+  return applied.result.body
 }
 
 export function readOverlayRevision(patch: unknown): number {
@@ -191,17 +177,8 @@ export function reconcileSystemOverlayWrite(args: {
   )
 
   return {
-    body: catalogOverlayEffectiveBody(args.seedBody, stored, args.policy),
+    body: reconciled.result.body,
     stored,
     unchanged: reconciled.result.unchanged,
   }
-}
-
-/** Same body shape as resolveCatalog: catalog seed plus overlay resolution. */
-export function catalogOverlayEffectiveBody(
-  seedBody: Record<string, unknown>,
-  stored: unknown,
-  policy: OverlayPolicyNode,
-): Record<string, unknown> {
-  return resolveSystemBodyWithOverlay(seedBody, stored, policy)
 }

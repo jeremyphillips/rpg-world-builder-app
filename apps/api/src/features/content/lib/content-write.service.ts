@@ -20,8 +20,8 @@ import { loadSystemContentSlugs } from './content-type-config'
 import { normalizeHomebrewWriteInput } from './apply-content-keys'
 import { assertSlugAvailable } from './assert-slug-available'
 import {
-  catalogOverlayEffectiveBody,
   contentEntityBody,
+  resolveSystemCatalogRecord,
   extractSystemOverlayWriteEnvelope,
   overlayPolicyForValidationIntent,
   readOverlayRevision,
@@ -85,22 +85,6 @@ type StoredEntity = {
 
 function stripUndefined(input: Record<string, unknown>): Record<string, unknown> {
   return Object.fromEntries(Object.entries(input).filter(([, v]) => v !== undefined))
-}
-
-function entityBody(entity: Record<string, unknown>): Record<string, unknown> {
-  const {
-    id: _id,
-    slug: _slug,
-    rulesetId: _rulesetId,
-    catalogLayer: _catalogLayer,
-    status: _status,
-    campaignId: _campaignId,
-    provenance: _provenance,
-    createdAt: _createdAt,
-    updatedAt: _updatedAt,
-    ...body
-  } = entity
-  return body
 }
 
 function wrapContentProvenanceWriteError(err: unknown): never {
@@ -193,7 +177,7 @@ function mergeHomebrewEffectiveBody(
   return merged
 }
 
-function seedBodyForSystemEntity<T extends StoredEntity>(
+function seedRecordForSystemEntity<T extends StoredEntity>(
   config: ContentWriteConfig<T>,
   existing: T,
 ): Record<string, unknown> | undefined {
@@ -202,7 +186,16 @@ function seedBodyForSystemEntity<T extends StoredEntity>(
   if (!rulesetId || !load) return undefined
   const seed = load(rulesetId).find((row) => row.id === existing.id)
   if (!seed) return undefined
-  return contentEntityBody(seed as unknown as Record<string, unknown>)
+  return seed as unknown as Record<string, unknown>
+}
+
+function seedBodyForSystemEntity<T extends StoredEntity>(
+  config: ContentWriteConfig<T>,
+  existing: T,
+): Record<string, unknown> | undefined {
+  const seedRecord = seedRecordForSystemEntity(config, existing)
+  if (!seedRecord) return undefined
+  return contentEntityBody(seedRecord)
 }
 
 function overlayParticipantForConfig<T extends StoredEntity>(
@@ -249,6 +242,7 @@ function reconcileSystemWriteFromUpdate<T extends StoredEntity>(
 } {
   const participantId = overlayParticipantForConfig(config)
   const policy = overlayPolicyForValidationIntent(participantId, validationIntent)
+  const seedRecord = seedRecordForSystemEntity(config, existing)
   const seedBody =
     seedBodyForSystemEntity(config, existing) ??
     contentEntityBody(existing as unknown as Record<string, unknown>)
@@ -294,10 +288,13 @@ function reconcileSystemWriteFromUpdate<T extends StoredEntity>(
     }
   }
 
-  const mergedBody = catalogOverlayEffectiveBody(seedBody, stored, policy)
-  if (mediaChanged) {
-    mergedBody.media = rawNormalized.media
-  }
+  const publishedRecord =
+    seedRecord !== undefined
+      ? resolveSystemCatalogRecord(seedRecord, stored, policy)
+      : { ...contentEntityBody(existing as unknown as Record<string, unknown>), ...reconciled.body }
+  const mergedBody = contentEntityBody(
+    mediaChanged ? { ...publishedRecord, media: rawNormalized.media } : publishedRecord,
+  )
 
   const unchanged = reconciled.unchanged && !mediaChanged
 
@@ -425,14 +422,22 @@ function parseSystemPatchedStoredEntity<T extends StoredEntity>(
   const existingRecord = existing as Record<string, unknown>
   const participantId = overlayParticipantForConfig(config)
   const policy = overlayPolicyForValidationIntent(participantId, validationIntent)
-  const seedBody = seedBodyForSystemEntity(config, existing) ?? contentEntityBody(existingRecord)
-  const mergedBody = catalogOverlayEffectiveBody(seedBody, stored, policy)
+  const seedRecord = seedRecordForSystemEntity(config, existing)
+  if (!seedRecord) {
+    throw new HttpError(500, 'internal_error', 'System entity is missing a catalog seed row.')
+  }
+  const published = {
+    ...resolveSystemCatalogRecord(seedRecord, stored, policy),
+    status: existing.status,
+    catalogLayer: existing.catalogLayer,
+    campaignId: existing.campaignId,
+  }
   const reconciledBody = reconcileContentProvenance({
     authority: 'preserve',
     catalogLayer: 'system',
     rulesetId: existingRecord.rulesetId as SystemRulesetId,
     contentTypeKey: config.typeName as ApiContentTypeKey,
-    normalized: mergedBody,
+    normalized: published,
     existing: existingRecord,
   })
   const entityForParse = {
@@ -954,7 +959,7 @@ export async function updateContentEntity<T extends StoredEntity>(
     entityId,
   )
 
-  const existingBody = entityBody(existing as unknown as Record<string, unknown>)
+  const existingBody = contentEntityBody(existing as unknown as Record<string, unknown>)
   const normalizedRaw = normalizeWriteInput(rawInput, existingBody, 'update')
   const mediaEnvelope = isCatalogMediaContentType(config.typeName)
     ? extractCatalogMediaWriteEnvelope(normalizedRaw)

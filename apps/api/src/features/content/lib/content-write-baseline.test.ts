@@ -203,8 +203,10 @@ describe.each(baselineCases)('content write baseline — $label', (baselineCase)
       baselineCase.config.readConfig,
       campaign.id,
     )
-    expect(catalogAfterPatch.find((record) => record.id === systemRecord.id)?.name).toBe(
-      baselineCase.expectedPatchedSystemName,
+    const reread = catalogAfterPatch.find((record) => record.id === systemRecord.id)
+    expect(reread?.name).toBe(baselineCase.expectedPatchedSystemName)
+    expect(contentEntityBody(reread as unknown as Record<string, unknown>)).toEqual(
+      contentEntityBody(patchedSystem as unknown as Record<string, unknown>),
     )
   })
 })

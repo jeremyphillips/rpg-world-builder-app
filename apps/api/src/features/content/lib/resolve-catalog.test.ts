@@ -8,7 +8,7 @@ import {
   reconcileOverlayUpdate,
 } from '@rpg/contracts'
 
-import { catalogOverlayEffectiveBody, contentEntityBody } from './resolve-system-overlay.lib'
+import { contentEntityBody, resolveSystemBodyWithOverlay } from './resolve-system-overlay.lib'
 import { resolveCatalog } from './resolve-catalog'
 
 interface Record_ {
@@ -104,7 +104,8 @@ describe('resolveCatalog', () => {
     expect(reconciled.ok).toBe(true)
     if (!reconciled.ok) return
 
-    const effective = catalogOverlayEffectiveBody(seedBody, reconciled.result.stored, policy)
+    const effective = resolveSystemBodyWithOverlay(seedBody, reconciled.result.stored, policy)
+    expect(effective).toEqual(reconciled.result.body)
     expect(effective.traits).toEqual(seedBody.traits)
     expect(effective.movement).toEqual({ walk: 30 })
 

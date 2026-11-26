@@ -344,6 +344,24 @@ function storedCollectionAt(
   return collections?.[fieldPath] ?? collections?.[fieldKey]
 }
 
+function overlayTouchesField(
+  slice: ObjectOverlaySlice,
+  fieldKey: string,
+  fieldPath: string,
+  storedCollection: StoredCollection | undefined,
+): boolean {
+  if (storedCollection) return true
+  if (slice.restore?.includes(fieldKey)) return true
+  if (slice.clear?.includes(fieldKey)) return true
+  if (slice.set && Object.prototype.hasOwnProperty.call(slice.set, fieldKey)) return true
+  if (!slice.collections) return false
+  for (const collectionPath of Object.keys(slice.collections)) {
+    if (collectionPath === fieldPath || collectionPath === fieldKey) return true
+    if (collectionPath.startsWith(`${fieldPath}.`)) return true
+  }
+  return false
+}
+
 // fallow-ignore-next-line complexity — walks compiled policy tree while applying overlay slices
 export function resolveDeepObject(
   seedValue: unknown,
@@ -387,6 +405,12 @@ export function resolveDeepObject(
 
     const fieldPath = path ? `${path}.${key}` : key
     const storedCollection = storedCollectionAt(slice.collections, fieldPath, key)
+    if (
+      (node.kind === 'identity' || node.kind === 'value-list' || node.kind === 'deep') &&
+      !overlayTouchesField(slice, key, fieldPath, storedCollection)
+    ) {
+      continue
+    }
     if (node.kind === 'identity' || node.kind === 'value-list') {
       const resolved = resolveCollection(seed[key], storedCollection, node, slice, key, fieldPath)
       if (!resolved.ok) return resolved
