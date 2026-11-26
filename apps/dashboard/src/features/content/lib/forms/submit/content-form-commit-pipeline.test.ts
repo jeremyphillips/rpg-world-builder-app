@@ -139,4 +139,46 @@ describe('runContentFormCommitPipeline', () => {
       expect(pipeline.prepared.payload).toEqual({ name: 'Hero', level: 7 })
     }
   })
+
+  it('turns a Zod parse thrown by prepare into serialization issues', async () => {
+    const pipeline = await runContentFormCommitPipeline(
+      { values: { name: 'A', level: 2 }, form: stubForm() },
+      {
+        ...attemptOf(15),
+        formSchema,
+        resolverFields: fields,
+        producerSlot: 'publish-action',
+        prepareWrite: () => {
+          z.object({ level: z.number().min(9, 'Level too low.') }).parse({ level: 2 })
+          return buildIdentityPreparedWrite({})
+        },
+      },
+    )
+    expect(pipeline).toEqual(expect.objectContaining({ kind: 'blocked', stageId: 'prepare' }))
+    if (pipeline.kind === 'blocked') {
+      expect(pipeline.issues?.[0]).toEqual(expect.objectContaining({ path: 'level' }))
+    }
+  })
+
+  it('maps an unexpected prepare throw to safe operation copy', async () => {
+    const pipeline = await runContentFormCommitPipeline(
+      { values: { name: 'A', level: 2 }, form: stubForm() },
+      {
+        ...attemptOf(16),
+        formSchema,
+        resolverFields: fields,
+        producerSlot: 'publish-action',
+        prepareWrite: () => {
+          throw new Error('{"secret":"raw"}')
+        },
+      },
+    )
+    expect(pipeline).toEqual(
+      expect.objectContaining({
+        kind: 'blocked',
+        stageId: 'prepare',
+        message: 'Validation could not complete. Refresh and try again.',
+      }),
+    )
+  })
 })

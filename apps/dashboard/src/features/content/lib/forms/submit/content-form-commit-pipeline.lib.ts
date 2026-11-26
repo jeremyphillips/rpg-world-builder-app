@@ -4,9 +4,11 @@ import {
   runFormAction,
   type FormActionAttempt,
   type FormActionStage,
+  type FormActionStageResult,
   type FormIssue,
   type FormItem,
   type FormValidationProducerSlot,
+  formIssuesFromZodIssues,
   type RunFormActionResult,
 } from '@rpg/ui/form'
 
@@ -15,11 +17,12 @@ import {
   type ContentPreparedWrite,
 } from './content-prepared-write.types'
 import {
+  CONTENT_FORM_VALIDATION_OPERATION_MESSAGE,
   ContentFormValidationOperationFailure,
   evaluateContentFormSchema,
 } from '../validation/normalize-content-form-issues.lib'
 
-const CONTENT_FORM_COMMIT_STAGE_FORM = 'form-evaluate'
+export const CONTENT_FORM_COMMIT_STAGE_FORM = 'form-evaluate'
 const CONTENT_FORM_COMMIT_STAGE_PREPARE = 'prepare'
 const CONTENT_FORM_COMMIT_STAGE_WRITE = 'write-validate'
 
@@ -74,6 +77,32 @@ function createFormEvaluateStage<TValues extends FieldValues>(
   }
 }
 
+type ZodIssueLike = { path: PropertyKey[]; message: string }
+
+function zodIssuesOf(error: unknown): ZodIssueLike[] | null {
+  if (typeof error !== 'object' || error === null) return null
+  const candidate = error as { name?: unknown; issues?: unknown }
+  if (candidate.name !== 'ZodError' || !Array.isArray(candidate.issues)) return null
+  return candidate.issues as ZodIssueLike[]
+}
+
+/**
+ * Author-correctable serialization failures (a Zod parse inside prepare) become issues for the
+ * serialization slot. Invariants and unexpected throws become the safe operation copy, never
+ * `Error.message` or Zod JSON.
+ */
+function classifyPrepareFailure(error: unknown): FormActionStageResult<never> {
+  const issues = zodIssuesOf(error)
+  if (issues && issues.length > 0) {
+    return { kind: 'invalid', issues: formIssuesFromZodIssues(issues) }
+  }
+  return {
+    kind: 'operation-failure',
+    message: CONTENT_FORM_VALIDATION_OPERATION_MESSAGE,
+    cause: error,
+  }
+}
+
 function createPrepareStage<TValues extends FieldValues>(
   prepareCommitValues?: (values: TValues) => TValues,
   prepareWrite?: (values: TValues, form: UseFormReturn<TValues>) => ContentPreparedWrite<unknown>,
@@ -82,12 +111,16 @@ function createPrepareStage<TValues extends FieldValues>(
     id: CONTENT_FORM_COMMIT_STAGE_PREPARE,
     intent: 'prepare',
     run: ({ values, form }) => {
-      const preparedValues = prepareCommitValues?.(values) ?? values
-      if (prepareWrite) {
-        const prepared = prepareWrite(preparedValues, form)
-        return { kind: 'parsed', data: prepared as ContentPreparedWrite<TValues> }
+      try {
+        const preparedValues = prepareCommitValues?.(values) ?? values
+        if (prepareWrite) {
+          const prepared = prepareWrite(preparedValues, form)
+          return { kind: 'parsed', data: prepared as ContentPreparedWrite<TValues> }
+        }
+        return { kind: 'parsed', data: buildIdentityPreparedWrite(preparedValues) }
+      } catch (error) {
+        return classifyPrepareFailure(error)
       }
-      return { kind: 'parsed', data: buildIdentityPreparedWrite(preparedValues) }
     },
   }
 }

@@ -12,7 +12,10 @@ import {
   type FormValidationProducerSlot,
 } from '@rpg/ui/form'
 
-import { runContentFormCommitPipeline } from '../../submit/content-form-commit-pipeline.lib'
+import {
+  CONTENT_FORM_COMMIT_STAGE_FORM,
+  runContentFormCommitPipeline,
+} from '../../submit/content-form-commit-pipeline.lib'
 import type { ContentPreparedWrite } from '../../submit/content-prepared-write.types'
 import { normalizeContentFormIssues } from '../../validation/normalize-content-form-issues.lib'
 import {
@@ -113,7 +116,7 @@ export async function runContentFormCommitAttempt<TValues extends FieldValues>(
 
 function applyCommitValidationBlocked<TValues extends FieldValues>(
   input: ContentFormCommitRunInput<TValues>,
-  pipeline: { issues?: readonly FormIssue[]; message?: string },
+  pipeline: { stageId: string; issues?: readonly FormIssue[]; message?: string },
   stamp: number,
 ): FormValidationProducerSession {
   if (input.commitValidationIntent === 'publish') {
@@ -122,11 +125,15 @@ function applyCommitValidationBlocked<TValues extends FieldValues>(
 
   let session = input.producerSession
   const { resolverFields: fields, publishSchema, values } = input
+  // Only the form-evaluate stage belongs to the action slot; prepare and write-schema
+  // failures are serialization-boundary results for this attempt.
+  const slot =
+    pipeline.stageId === CONTENT_FORM_COMMIT_STAGE_FORM ? input.producerSlot : 'serialization'
 
   if (pipeline.issues?.length) {
-    session = ingestContentFormValidationIssues(session, input.producerSlot, stamp, pipeline.issues)
+    session = ingestContentFormValidationIssues(session, slot, stamp, pipeline.issues)
     applyCanonicalFormIssuesToRhf(input.form, pipeline.issues)
-  } else if (pipeline.message && fields.length > 0) {
+  } else if (pipeline.message) {
     const routed = normalizeContentFormIssues(publishSchema, values, fields) ?? [
       {
         path: '',
@@ -134,7 +141,7 @@ function applyCommitValidationBlocked<TValues extends FieldValues>(
         severity: 'crossRow' as const,
       },
     ]
-    session = ingestContentFormValidationIssues(session, input.producerSlot, stamp, routed)
+    session = ingestContentFormValidationIssues(session, slot, stamp, routed)
     applyCanonicalFormIssuesToRhf(input.form, routed)
   }
 
