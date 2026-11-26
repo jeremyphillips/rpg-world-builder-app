@@ -32,7 +32,6 @@ import {
 } from './resolve-system-overlay.lib'
 import type { ContentWriteConfig, ContentWriteContext, HomebrewDoc } from './content-write-config'
 import { resolveStoredSchema, resolveWriteInputSchema } from './content-write-config'
-import { stripNullDeep } from './strip-null-deep'
 import {
   EXPECTED_OVERLAY_REVISION_FIELD,
   parseStoredOverlayInput,

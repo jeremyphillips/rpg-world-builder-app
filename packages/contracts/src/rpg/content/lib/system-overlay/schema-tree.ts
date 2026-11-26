@@ -273,7 +273,11 @@ function describeAtomicAnnotated(schema: ZodLike, annotation: OverlaySchemaMeta)
   return { type: 'unsupported', wrapper: schema.def.type, annotation }
 }
 
-function describeOpaque(schema: ZodLike, type: string, annotation?: OverlaySchemaMeta): SchemaFact {
+function describeOpaque(
+  _schema: ZodLike,
+  type: string,
+  annotation?: OverlaySchemaMeta,
+): SchemaFact {
   return { type: 'unsupported', wrapper: type, ...(annotation ? { annotation } : {}) }
 }
 

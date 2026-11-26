@@ -371,16 +371,11 @@ function overlayReadDiagnosticsAlertMessage(
   return parts.length > 0 ? parts.join(' ') : null
 }
 
-function useFrozenSystemOriginRowIds(
-  def: AnyContentFormDef,
-  entity: {
-    id: string
-    catalogLayer: CatalogLayer
-    seedRowIdsByPath?: Readonly<Record<string, readonly string[]>>
-    rulesetId?: string
-  },
-  rulesetId?: string,
-): ContentFormCtx['embeddedSystemOriginRowIds'] {
+function useFrozenSystemOriginRowIds(entity: {
+  id: string
+  catalogLayer: CatalogLayer
+  seedRowIdsByPath?: Readonly<Record<string, readonly string[]>>
+}): ContentFormCtx['embeddedSystemOriginRowIds'] {
   const resolveSeedLocks = () => entity.seedRowIdsByPath
 
   const [systemOrigin, setSystemOrigin] = useState<{
@@ -397,7 +392,6 @@ function useFrozenSystemOriginRowIds(
   } else if (entity.catalogLayer !== 'system' && systemOrigin) {
     setSystemOrigin(null)
   }
-  void rulesetId
   return systemOrigin?.entityId === entity.id ? systemOrigin.ids : undefined
 }
 
@@ -428,7 +422,7 @@ function ContentEditFormBody({
     entityId,
     armorClassRules: authoring.snapshot,
   })
-  const systemOriginRowIds = useFrozenSystemOriginRowIds(def, entity, loaded.layoutCtx.rulesetId)
+  const systemOriginRowIds = useFrozenSystemOriginRowIds(entity)
   const layoutCtx = {
     ...loaded.layoutCtx,
     embeddedSystemOriginRowIds: systemOriginRowIds,

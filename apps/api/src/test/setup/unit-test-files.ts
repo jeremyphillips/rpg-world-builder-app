@@ -20,6 +20,7 @@ export const unitTestFiles = [
   'src/features/content/lib/deep-merge.test.ts',
   'src/features/content/lib/duplication/duplicate-content.test.ts',
   'src/features/content/lib/filter-catalog-for-viewer.test.ts',
+  'src/features/content/lib/filter-overlay-failures-for-list-viewer.test.ts',
   'src/features/content/lib/resolve-catalog.test.ts',
   'src/features/content/lib/reject-creature-trait-templates.test.ts',
   'src/features/content/lib/resolve-catalog-membership-filter.test.ts',

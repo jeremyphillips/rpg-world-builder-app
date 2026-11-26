@@ -17,11 +17,7 @@ import { monstersColumns, monstersFilterSchema } from '../lib/monsters-overview-
 export function MonstersOverview() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()
   const listResult = useMonstersListResult(campaignId)
-  const {
-    data: monsters,
-    isPending,
-    isError,
-  } = useContentOverviewMergedData<WithCampaignAccess<Monster>>(listResult)
+  const { data: monsters, isPending, isError } = useContentOverviewMergedData(listResult)
   return (
     <ContentOverviewShell
       heading={getContentTypeCollectionLabel('monsters')}

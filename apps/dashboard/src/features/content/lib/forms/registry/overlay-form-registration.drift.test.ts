@@ -27,7 +27,13 @@ const OVERLAY_FORM_DEFS: Array<{
   { id: 'skill-proficiencies', def: skillProficiencyFormDef },
   {
     id: 'subclasses',
-    def: { ...subclassFormDef, routeKey: 'classes' },
+    def: {
+      routeKey: 'classes',
+      overlayParticipantId: subclassFormDef.overlayParticipantId,
+      normalizeOverlayBody: subclassFormDef.normalizeOverlayBody as unknown as NonNullable<
+        AnyContentFormDef['normalizeOverlayBody']
+      >,
+    },
     seedFor: resolveSubclassCatalogSeedBody,
   },
 ]

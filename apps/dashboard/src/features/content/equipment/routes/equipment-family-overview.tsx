@@ -1,6 +1,9 @@
 import { useParams } from 'react-router-dom'
 import type { Equipment, WithCampaignAccess } from '@rpg/contracts'
+
+import type { ContentOverlayFailureOverviewRow } from '../../lib/list/create-content-list'
 import type { ColumnDef } from '@rpg/ui'
+import type { FilterSchema } from '@rpg/ui/filters'
 
 import { ROUTES } from '@/app/routes'
 import { useEquipmentFamilyOverview } from '../hooks/use-equipment-family-overview'
@@ -32,7 +35,11 @@ export function EquipmentFamilyOverviewContent({
       {overview.tableConfig ? (
         <EquipmentFamilyTable
           tableConfig={overview.tableConfig}
-          data={overview.filtered}
+          data={
+            overview.filtered as Array<
+              WithCampaignAccess<Equipment> | ContentOverlayFailureOverviewRow
+            >
+          }
           heading={overview.heading}
           campaignId={campaignId}
           family={family}
@@ -50,18 +57,28 @@ function EquipmentFamilyTable({
   family,
 }: {
   tableConfig: FamilyTableConfig
-  data: Equipment[]
+  data: Array<WithCampaignAccess<Equipment> | ContentOverlayFailureOverviewRow>
   heading: string
   campaignId: string
   family: EquipmentFamilyPath
 }) {
   return (
-    <ContentOverviewTable<WithCampaignAccess<Equipment>>
+    <ContentOverviewTable<WithCampaignAccess<Equipment> | ContentOverlayFailureOverviewRow>
       contentTypeKey="equipment"
       campaignId={campaignId}
-      columns={tableConfig.columns as ColumnDef<WithCampaignAccess<Equipment>, unknown>[]}
-      filterSchema={tableConfig.filterSchema}
-      data={data as WithCampaignAccess<Equipment>[]}
+      columns={
+        tableConfig.columns as ColumnDef<
+          WithCampaignAccess<Equipment> | ContentOverlayFailureOverviewRow,
+          unknown
+        >[]
+      }
+      filterSchema={
+        tableConfig.filterSchema as FilterSchema<
+          WithCampaignAccess<Equipment> | ContentOverlayFailureOverviewRow,
+          Record<string, unknown>
+        >
+      }
+      data={data}
       caption={`${heading} available in this campaign`}
       getEditHref={(row) => ROUTES.content.equipment.edit(campaignId, family, row.id)}
     />

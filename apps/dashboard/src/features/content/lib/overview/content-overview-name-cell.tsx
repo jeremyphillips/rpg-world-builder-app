@@ -27,6 +27,7 @@ export type ContentOverviewNameCellProps = {
   queryKeyFn?: (campaignId: string) => readonly unknown[]
   duplicateSource?: DuplicateContentSource
   statusLabel?: string
+  omitAccessMetadata?: boolean
   viewerCharacterRelationships?: ViewerCharacterRelationships
 }
 
@@ -44,6 +45,7 @@ export function ContentOverviewNameCell({
   queryKeyFn,
   duplicateSource,
   statusLabel,
+  omitAccessMetadata = false,
   viewerCharacterRelationships,
 }: ContentOverviewNameCellProps) {
   const draftBadge = status === 'draft' ? <ContentStatusNameBadge status="draft" /> : null
@@ -86,11 +88,13 @@ export function ContentOverviewNameCell({
               source={duplicateSource}
             />
           ) : null}
-          <ContentAccessMetadata
-            campaignAccess={campaignAccess}
-            canManage={canManage}
-            playerVisibility={playerVisibility}
-          />
+          {!omitAccessMetadata ? (
+            <ContentAccessMetadata
+              campaignAccess={campaignAccess}
+              canManage={canManage}
+              playerVisibility={playerVisibility}
+            />
+          ) : null}
         </div>
       ) : null}
     </div>

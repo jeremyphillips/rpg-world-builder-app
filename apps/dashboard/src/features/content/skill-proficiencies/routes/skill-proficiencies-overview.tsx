@@ -23,11 +23,7 @@ import { ContentOverviewTable } from '../../lib/overview/content-overview-table'
 export function SkillProficienciesOverview() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()
   const listResult = useSkillProficienciesListResult(campaignId)
-  const {
-    data: skillProficiencies,
-    isPending,
-    isError,
-  } = useContentOverviewMergedData<WithCampaignAccess<SkillProficiency>>(listResult)
+  const { data: skillProficiencies, isPending, isError } = useContentOverviewMergedData(listResult)
   const { data: usageMeta } = useSkillProficienciesUsageMeta(campaignId)
   const usageSummaryLabels = usageMeta?.usageSummaryLabels
   const overviewUsageScope = usageMeta?.overviewUsageScope

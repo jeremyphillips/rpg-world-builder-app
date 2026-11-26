@@ -26,6 +26,7 @@ const spellMessages = {
 
 const skillMessages = {
   unknown: 'Unknown skill.',
+  unresolvedOverlayTarget: 'This skill exists in the catalog but its overlay could not be applied.',
   notReferenceable: 'Publish this skill before using it on a monster.',
   notCampaignEligible: 'This skill is not available in this campaign.',
   catalogUnavailable: 'Skills could not be loaded. Try again before publishing.',
@@ -33,6 +34,8 @@ const skillMessages = {
 
 const equipmentMessages = {
   unknown: 'Unknown equipment.',
+  unresolvedOverlayTarget:
+    'This equipment exists in the catalog but its overlay could not be applied.',
   catalogUnavailable: 'Equipment could not be loaded. Try again before publishing.',
 }
 

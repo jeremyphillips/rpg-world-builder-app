@@ -17,11 +17,7 @@ import { ContentOverviewTable } from '../../lib/overview/content-overview-table'
 export function ClassesOverview() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()
   const listResult = useClassesListResult(campaignId)
-  const {
-    data: classes,
-    isPending,
-    isError,
-  } = useContentOverviewMergedData<WithCampaignAccess<ClassListItem>>(listResult)
+  const { data: classes, isPending, isError } = useContentOverviewMergedData(listResult)
   const { data: usageMeta } = useClassesUsageMeta(campaignId)
   const usageSummaryLabels = usageMeta?.usageSummaryLabels
   const overviewUsageScope = usageMeta?.overviewUsageScope

@@ -120,4 +120,28 @@ describe('buildSystemOverlayIntent', () => {
     expect(applied.result.body.name).toBe('Edited')
     expect(applied.result.body.traits).toEqual(draft.traits)
   })
+
+  it('emits nested collections under seed row overrides without leaking grants into set', () => {
+    const baseline = { ...seed }
+    const draft = {
+      ...seed,
+      traits: [
+        {
+          id: 'keen-sight',
+          name: 'Keen Sight',
+          grants: [{ id: 'grt_default', label: 'Patched' }],
+        },
+      ],
+    }
+    const intent = buildSystemOverlayIntent({ policy, catalogSeed: seed, baseline, draft })
+    expect(intent.collections?.traits?.overrides?.[0]).toMatchObject({
+      id: 'keen-sight',
+      collections: {
+        grants: {
+          overrides: [{ id: 'grt_default', set: { label: 'Patched' } }],
+        },
+      },
+    })
+    expect(intent.collections?.traits?.overrides?.[0]).not.toHaveProperty('set.grants')
+  })
 })

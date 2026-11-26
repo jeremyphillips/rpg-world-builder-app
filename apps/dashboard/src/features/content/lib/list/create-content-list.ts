@@ -42,13 +42,14 @@ export function overlayFailureOverviewRows(
   failures: readonly CatalogOverlayListFailure[] | undefined,
 ): ContentOverlayFailureOverviewRow[] {
   if (!failures?.length) return []
+  // Structural `WithCampaignAccess` only — `isContentOverlayFailureOverviewRow` owns unresolved UX.
   return failures.map((failure) => ({
     id: failure.targetId,
     name: failure.name,
     slug: failure.slug,
     status: 'published' as const,
     catalogLayer: 'system' as const,
-    campaignAccess: { ...DEFAULT_CONTENT_CAMPAIGN_ACCESS, available: false },
+    campaignAccess: DEFAULT_CONTENT_CAMPAIGN_ACCESS,
     overlayListFailure: failure,
     contentOverlayResolveFailure: true as const,
   }))

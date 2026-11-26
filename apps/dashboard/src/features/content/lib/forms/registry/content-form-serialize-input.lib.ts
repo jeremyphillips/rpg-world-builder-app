@@ -184,5 +184,5 @@ export function serializeContentFormInput<
     ...payload,
     media: prepared,
     [catalogContentMediaExpectedRevisionField]: prepared.revision,
-  } as TInput
+  } as unknown as TInput
 }

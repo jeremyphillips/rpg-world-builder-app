@@ -18,11 +18,7 @@ import { ContentOverviewTable } from '../../lib/overview/content-overview-table'
 export function SpellsOverview() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()
   const listResult = useSpellsListResult(campaignId)
-  const {
-    data: spells,
-    isPending,
-    isError,
-  } = useContentOverviewMergedData<WithCampaignAccess<Spell>>(listResult)
+  const { data: spells, isPending, isError } = useContentOverviewMergedData(listResult)
   const { data: usageMeta } = useSpellsUsageMeta(campaignId)
   const usageSummaryLabels = usageMeta?.usageSummaryLabels
   const overviewUsageScope = usageMeta?.overviewUsageScope

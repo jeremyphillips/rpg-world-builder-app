@@ -62,7 +62,6 @@ function overlayFailureToSubclassListItem(
   return {
     id: failure.targetId,
     name: failure.name,
-    slug: failure.slug,
     catalogLayer: 'system',
     classId,
     overlayResolveFailure: failure,

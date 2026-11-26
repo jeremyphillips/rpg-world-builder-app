@@ -2,7 +2,7 @@ import {
   classHasSpellcasting,
   classSlugReferenceEdge,
   collectCatalogReferenceIssues,
-  getContentTypeCapitalizedSentenceLabel,
+  SPELL_CLASS_REFERENCE_ISSUE_CODE,
   type CharacterClass,
   type ContentValidationIntent,
 } from '@rpg/contracts'
@@ -39,18 +39,16 @@ export function assertSpellClassIdsHaveSpellcasting(
       return cls != null && !classHasSpellcasting(cls)
     })
 
-  if (issues.length === 0 && withoutSpellcasting.length === 0) return
+  const spellcastingIssues = withoutSpellcasting.map(({ slug, index }) => ({
+    path: `classIds.${index}`,
+    code: SPELL_CLASS_REFERENCE_ISSUE_CODE.classWithoutSpellcasting,
+    message: `Class "${bySlug.get(slug)?.name ?? slug}" does not have spellcasting.`,
+  }))
 
-  const messages = issues.map((issue) => issue.message)
-  if (withoutSpellcasting.length > 0) {
-    messages.push(
-      `${getContentTypeCapitalizedSentenceLabel('classes', {
-        plural: withoutSpellcasting.length !== 1,
-      })} without spellcasting: ${withoutSpellcasting
-        .map(({ slug }) => `"${bySlug.get(slug)?.name ?? slug}"`)
-        .join(', ')}.`,
-    )
-  }
+  const allIssues = [...issues, ...spellcastingIssues]
+  if (allIssues.length === 0) return
 
-  throw new HttpError(400, 'validation_error', messages.join(' '), { issues })
+  throw new HttpError(400, 'validation_error', allIssues.map((issue) => issue.message).join(' '), {
+    issues: allIssues,
+  })
 }

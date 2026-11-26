@@ -120,5 +120,12 @@ export function omitContentFilterField<
   TData extends OverviewRow,
   TState extends ContentOverviewBaseFilterState,
 >(schema: FilterSchema<TData, TState>, fieldId: string): FilterSchema<TData, TState> {
-  return createFilterSchema(schema.fields.filter((field) => field.id !== fieldId))
+  return createFilterSchema(
+    schema.fields.filter((field) => field.id !== fieldId),
+    {
+      availability: schema.availability,
+      sanitizeState: schema.sanitizeState,
+      normalizeChange: schema.normalizeChange,
+    },
+  )
 }

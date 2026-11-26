@@ -251,17 +251,19 @@ function diffSeedRow(
   seedRow: Record<string, unknown>,
   draftRow: Record<string, unknown>,
   rowPolicy: OverlayPolicyNode,
-  path: string,
+  _path: string,
 ): Omit<SeedFieldDelta, 'origin' | 'id'> | undefined {
   const activePolicy = overlayPolicyForRow(draftRow, rowPolicy) ?? rowPolicy
   if (activePolicy.kind === 'deep') {
-    const nested = diffObjectLevel(seedRow, draftRow, seedRow, activePolicy, path)
+    const nested = diffObjectLevel(seedRow, draftRow, seedRow, activePolicy, '')
     if (Object.keys(nested).length === 0) return undefined
     if (nested.collections && Object.keys(nested.set ?? {}).length === 0 && !nested.clear) {
       return { collections: nested.collections }
     }
     const set: Record<string, unknown> = { ...(nested.set ?? {}) }
     for (const [key, value] of Object.entries(draftRow)) {
+      const fieldPolicy = activePolicy.fields[key]
+      if (fieldPolicy?.kind === 'identity' || fieldPolicy?.kind === 'value-list') continue
       if (!(key in set) && !overlayValueEqual(seedRow[key], value)) {
         set[key] = value
       }

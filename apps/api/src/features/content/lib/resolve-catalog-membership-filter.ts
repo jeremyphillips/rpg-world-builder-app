@@ -9,19 +9,6 @@ import type { Request } from 'express'
 import { HttpError } from '../../../lib/http-error'
 import type { CatalogListFilter } from './apply-catalog-list-filter'
 import { authorizePlayActorCharacterId } from './authorize-play-actor-character-id'
-import type { CatalogMembershipFilterInput } from './filter-catalog-for-viewer'
-
-/** Membership + optional play-actor query scope for discovery catalog list filtering. */
-export function resolveCatalogMembershipFilter(
-  req: Pick<Request, 'campaignMembership' | 'query'>,
-): CatalogMembershipFilterInput | undefined {
-  const filter = resolveCatalogListFilter(req)
-  if (!filter || filter.mode !== 'discovery') {
-    return undefined
-  }
-  return filter.membership
-}
-
 /** Resolves discovery, reference, or play-catalog filtering for campaign content list routes. */
 export function resolveCatalogListFilter(
   req: Pick<Request, 'campaignMembership' | 'query'>,

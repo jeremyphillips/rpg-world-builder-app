@@ -1,8 +1,11 @@
 import type { CatalogOverlayListFailure, ContentAccessTargetType } from '@rpg/contracts'
 
 import { attachCampaignAccessForTargetType } from './content-campaign-access.service'
-import type { CatalogListFilter } from './apply-catalog-list-filter'
-import { filterCatalogForMembership, filterCatalogForReference } from './filter-catalog-for-viewer'
+import {
+  applyCatalogListFilter,
+  catalogListModeIncludesOverlayFailures,
+  type CatalogListFilter,
+} from './apply-catalog-list-filter'
 
 type OverlayFailureViewerRow = {
   id: string
@@ -22,11 +25,7 @@ export async function filterOverlayFailuresForListViewer(
   failures: readonly CatalogOverlayListFailure[],
   filter: CatalogListFilter | undefined,
 ): Promise<CatalogOverlayListFailure[]> {
-  if (failures.length === 0) {
-    return []
-  }
-
-  if (filter?.mode === 'play') {
+  if (failures.length === 0 || !catalogListModeIncludesOverlayFailures(filter)) {
     return []
   }
 
@@ -42,10 +41,5 @@ export async function filterOverlayFailuresForListViewer(
     seedRows,
   )
 
-  const visible =
-    filter?.mode === 'reference'
-      ? filterCatalogForReference(withCampaignAccess, filter.membership)
-      : filterCatalogForMembership(withCampaignAccess, filter?.membership)
-
-  return visible.map((row) => row.failure)
+  return applyCatalogListFilter(withCampaignAccess, filter).map((row) => row.failure)
 }

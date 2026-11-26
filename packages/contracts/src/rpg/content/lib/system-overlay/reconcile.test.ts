@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 
 import { applyStoredOverlay } from './apply'
+import { storedOverlaySchema } from './stored'
 import { compileOverlayPolicy } from './compile-policy'
 import { overlayImmaterialIdRows, overlayRestoreIdRows } from './overlay-presets'
 import { reconcileOverlayUpdate } from './reconcile'
@@ -188,5 +189,113 @@ describe('reconcileOverlayUpdate', () => {
     expect(traits?.kind).toBe('identity')
     if (traits?.kind !== 'identity') return
     expect(traits.order).toBeUndefined()
+  })
+
+  it('round-trips nested SeedFieldDelta.collections on identity overrides', () => {
+    const baseline = { ...seed }
+    const draft = {
+      ...seed,
+      traits: [
+        {
+          id: 'keen-sight',
+          name: 'Keen Sight',
+          grants: [{ id: 'grt_default', label: 'More' }],
+        },
+      ],
+    }
+    const intent = {
+      collections: {
+        traits: {
+          overrides: [
+            {
+              origin: 'seed' as const,
+              id: 'keen-sight',
+              collections: {
+                grants: {
+                  overrides: [
+                    { origin: 'seed' as const, id: 'grt_default', set: { label: 'More' } },
+                  ],
+                },
+              },
+            },
+          ],
+        },
+      },
+    }
+    const result = reconcileOverlayUpdate(baseline, { version: 1, revision: 0 }, intent, policy)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(storedOverlaySchema.parse(result.result.stored)).toEqual(result.result.stored)
+    const applied = applyStoredOverlay(baseline, result.result.stored, policy)
+    expect(applied.ok).toBe(true)
+    if (!applied.ok) return
+    expect(applied.result.body.traits).toEqual(draft.traits)
+  })
+
+  it('merges sequential SeedFieldDelta intents on the same seed row', () => {
+    const first = reconcileOverlayUpdate(
+      seed,
+      { version: 1, revision: 0 },
+      {
+        collections: {
+          traits: {
+            overrides: [{ origin: 'seed' as const, id: 'keen-sight', set: { name: 'Sight' } }],
+          },
+        },
+      },
+      policy,
+    )
+    expect(first.ok).toBe(true)
+    if (!first.ok) return
+    const second = reconcileOverlayUpdate(
+      seed,
+      first.result.stored,
+      {
+        collections: {
+          traits: {
+            overrides: [{ origin: 'seed' as const, id: 'keen-sight', set: { name: 'Keen' } }],
+          },
+        },
+      },
+      policy,
+    )
+    expect(second.ok).toBe(true)
+    if (!second.ok) return
+    const override = second.result.stored.collections?.traits
+    expect(override?.kind).toBe('identity')
+    if (override?.kind !== 'identity') return
+    expect(override.overrides[0]).toEqual({
+      origin: 'seed',
+      id: 'keen-sight',
+      set: { name: 'Keen' },
+    })
+  })
+
+  it('stores SeedRowReplace overrides', () => {
+    const replace = reconcileOverlayUpdate(
+      seed,
+      { version: 1, revision: 0 },
+      {
+        collections: {
+          traits: {
+            overrides: [
+              {
+                origin: 'seed' as const,
+                id: 'keen-sight',
+                mode: 'replace' as const,
+                row: { id: 'keen-sight', name: 'Replaced' },
+              },
+            ],
+          },
+        },
+      },
+      policy,
+    )
+    expect(replace.ok).toBe(true)
+    if (!replace.ok) return
+    const applied = applyStoredOverlay(seed, replace.result.stored, policy)
+    expect(applied.ok).toBe(true)
+    if (!applied.ok) return
+    expect(applied.result.body.traits).toEqual([{ id: 'keen-sight', name: 'Replaced' }])
   })
 })

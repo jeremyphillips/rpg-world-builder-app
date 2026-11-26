@@ -15,21 +15,31 @@ import {
 } from '../content.service'
 import { classRegistration } from '../classes/classes.config'
 import type { ContentWriteContext } from '../lib/content-write-config'
-import { mergeExistingContentBody } from '../lib/resolve-system-overlay.lib'
+import { contentEntityBody, mergeExistingContentBody } from '../lib/resolve-system-overlay.lib'
 import { assertContentSpellReferences } from '../lib/assert-content-spell-references'
 import { rejectInvalidCreatureTraitTemplates } from '../lib/reject-creature-trait-templates'
 import { assertSpeciesClassSlugsFromInput } from './assert-species-class-slugs'
 
+function validatedSpeciesBody(ctx: ContentWriteContext): Record<string, unknown> {
+  if (ctx.effectiveBody) {
+    return contentEntityBody(ctx.effectiveBody)
+  }
+  if (ctx.mode === 'update' && ctx.existing) {
+    return mergeExistingContentBody(
+      ctx.existing as unknown as Record<string, unknown>,
+      ctx.input,
+    ) as Record<string, unknown>
+  }
+  return ctx.input
+}
+
 export async function speciesValidateBeforeWrite(ctx: ContentWriteContext): Promise<void> {
-  const creatureType = ctx.input.creatureType
+  const inputForVocab = validatedSpeciesBody(ctx)
+
+  const creatureType = inputForVocab.creatureType
   if (typeof creatureType === 'string') {
     await assertCreatureTypesActiveInCampaign(ctx.campaignId, [creatureType])
   }
-
-  const inputForVocab =
-    ctx.mode === 'update' && ctx.existing
-      ? mergeExistingContentBody(ctx.existing as unknown as Record<string, unknown>, ctx.input)
-      : ctx.input
 
   rejectInvalidCreatureTraitTemplates(inputForVocab.traits, ['traits'], { host: 'species' })
   const heritage = inputForVocab.heritage

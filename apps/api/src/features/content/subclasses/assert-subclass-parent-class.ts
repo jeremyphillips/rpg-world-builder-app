@@ -18,7 +18,15 @@ export async function assertSubclassParentClassExists(
     if (overlayFailure) {
       throw new HttpError(409, overlayFailure.code, overlayFailure.message)
     }
-    throw new HttpError(400, 'validation_error', 'Parent class not found in campaign catalog.')
+    throw new HttpError(400, 'validation_error', 'Parent class not found in campaign catalog.', {
+      issues: [
+        {
+          path: 'classId',
+          code: 'unknown_class',
+          message: 'Parent class not found in campaign catalog.',
+        },
+      ],
+    })
   }
   return parentClass
 }
@@ -40,6 +48,15 @@ export function assertSubclassRouteClassId(
       400,
       'validation_error',
       'Body classId must match the route classId or be omitted.',
+      {
+        issues: [
+          {
+            path: 'classId',
+            code: 'mismatched_subclass_parent',
+            message: 'Body classId must match the route classId or be omitted.',
+          },
+        ],
+      },
     )
   }
 

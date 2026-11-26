@@ -1,4 +1,4 @@
-import type { SeedFieldDelta, SeedRowReplace } from './intent'
+import type { CollectionDelta, SeedFieldDelta, SeedRowReplace } from './intent'
 import type { OverlayReadDiagnostics, OverlayApplyFailure } from './overlay-failures'
 import {
   canonicalIdentityOrder,
@@ -479,21 +479,179 @@ export function resolveWithPolicy(
   return resolveDeepObject(seed, slice, activePolicy, '')
 }
 
-export function resolveSeedOverrideIntent(
+function isSeedRowReplace(entry: SeedFieldDelta | SeedRowReplace): entry is SeedRowReplace {
+  return 'mode' in entry && entry.mode === 'replace'
+}
+
+function mergeOverlayStringKeys(left?: string[], right?: string[]): string[] | undefined {
+  const merged = [...new Set([...(left ?? []), ...(right ?? [])])]
+  return merged.length > 0 ? merged : undefined
+}
+
+function seedRowById(
+  seedRows: readonly unknown[],
+  id: string,
+  idKey: 'id' | 'entryId',
+): Record<string, unknown> | undefined {
+  for (const row of seedRows) {
+    const record = asRecord(row)
+    if (record && readIdentityId(record, idKey) === id) return record
+  }
+  return undefined
+}
+
+function reconcileSeedRowOverrideCollections(
   seedRow: Record<string, unknown>,
+  prior: Record<string, StoredCollection> | undefined,
+  deltaCollections: Record<string, CollectionDelta> | undefined,
+  rowPolicy: OverlayPolicyNode,
+  path: string,
+): { collections?: Record<string, StoredCollection>; failure?: ResolveFailure } {
+  if (!deltaCollections || Object.keys(deltaCollections).length === 0) {
+    return { collections: prior }
+  }
+
+  const activePolicy = overlayPolicyForRow(seedRow, rowPolicy) ?? rowPolicy
+  if (activePolicy.kind !== 'deep') {
+    return {
+      failure: {
+        code: 'overlay-validation',
+        issues: [`Nested collection overrides at non-deep row policy ${path}`],
+      },
+    }
+  }
+
+  const collections = { ...(prior ?? {}) }
+  for (const [key, collectionDelta] of Object.entries(deltaCollections)) {
+    const childPolicy = activePolicy.fields[key]
+    if (!childPolicy) {
+      return {
+        failure: {
+          code: 'overlay-validation',
+          issues: [`Unknown nested collection ${path}.${key}`],
+        },
+      }
+    }
+    if (childPolicy.kind === 'identity') {
+      const current = collections[key]
+      if (current?.kind === 'legacy-array') {
+        return {
+          failure: {
+            code: 'unsupported-overlay-retention',
+            retention: 'legacy-array',
+            path: `${path}.${key}`,
+          },
+        }
+      }
+      const reconciled = intentCollectionToStoredIdentity(
+        current?.kind === 'identity' ? current : undefined,
+        collectionDelta,
+        asArray(seedRow[key]),
+        childPolicy,
+      )
+      if (reconciled.failure) return { failure: reconciled.failure }
+      if (reconciled.stored === undefined) delete collections[key]
+      else collections[key] = reconciled.stored
+      continue
+    }
+    if (childPolicy.kind === 'value-list') {
+      const current = collections[key]
+      if (current?.kind === 'legacy-array') {
+        return {
+          failure: {
+            code: 'unsupported-overlay-retention',
+            retention: 'legacy-array',
+            path: `${path}.${key}`,
+          },
+        }
+      }
+      if (collectionDelta.reset) delete collections[key]
+      continue
+    }
+    return {
+      failure: {
+        code: 'overlay-validation',
+        issues: [`Path ${path}.${key} is not an editable collection`],
+      },
+    }
+  }
+
+  return { collections: Object.keys(collections).length > 0 ? collections : undefined }
+}
+
+function pruneSeedOverrideScalarSet(
+  seedRow: Record<string, unknown>,
+  override: StoredSeedOverride,
+  rowPolicy: OverlayPolicyNode,
+): StoredSeedOverride {
+  const activePolicy = overlayPolicyForRow(seedRow, rowPolicy) ?? rowPolicy
+  if (activePolicy.kind !== 'deep' || !override.set) return override
+
+  const nextSet: Record<string, unknown> = { ...override.set }
+  const restore = new Set(override.restore ?? [])
+  for (const key of Object.keys(nextSet)) {
+    const node = activePolicy.fields[key]
+    if (!node) continue
+    if (node.kind !== 'scalar' && node.kind !== 'atomic' && node.kind !== 'value-list') continue
+    if (overlayValueEqual(nextSet[key], seedRow[key])) {
+      delete nextSet[key]
+      restore.add(key)
+    }
+  }
+
+  return {
+    ...override,
+    set: Object.keys(nextSet).length > 0 ? nextSet : undefined,
+    restore: restore.size > 0 ? [...restore] : override.restore,
+  }
+}
+
+function reconcileSeedFieldOverrideIntent(
+  seedRow: Record<string, unknown>,
+  prior: StoredSeedOverride | undefined,
   delta: SeedFieldDelta,
   rowPolicy: OverlayPolicyNode,
   path: string,
-): ResolveResult {
-  const stored: StoredSeedOverride = {
+): { stored?: StoredSeedOverride; failure?: ResolveFailure } {
+  let set: Record<string, unknown> = { ...(prior?.set ?? {}), ...(delta.set ?? {}) }
+  let clear = mergeOverlayStringKeys(prior?.clear, delta.clear)
+  let restore = mergeOverlayStringKeys(prior?.restore, delta.restore)
+
+  for (const key of delta.restore ?? []) {
+    delete set[key]
+  }
+  for (const key of delta.clear ?? []) {
+    delete set[key]
+  }
+
+  const reconciledCollections = reconcileSeedRowOverrideCollections(
+    seedRow,
+    prior?.collections,
+    delta.collections,
+    rowPolicy,
+    path,
+  )
+  if (reconciledCollections.failure) return { failure: reconciledCollections.failure }
+
+  let stored: StoredSeedOverride = {
     origin: 'seed',
     id: delta.id,
-    set: delta.set,
-    clear: delta.clear,
-    restore: delta.restore,
-    collections: delta.collections as Record<string, StoredCollection> | undefined,
+    ...(Object.keys(set).length > 0 ? { set } : {}),
+    ...(clear ? { clear } : {}),
+    ...(restore ? { restore } : {}),
+    ...(reconciledCollections.collections
+      ? { collections: reconciledCollections.collections }
+      : {}),
   }
-  return mergeSeedOverrideRow(seedRow, stored, rowPolicy, path)
+  stored = pruneSeedOverrideScalarSet(seedRow, stored, rowPolicy)
+
+  const hasSignal =
+    stored.set !== undefined ||
+    (stored.clear?.length ?? 0) > 0 ||
+    (stored.restore?.length ?? 0) > 0 ||
+    stored.collections !== undefined
+  if (!hasSignal) return { stored: undefined }
+  return { stored }
 }
 
 export function storedOrderAfterLiveIds(
@@ -537,18 +695,38 @@ export function intentCollectionToStoredIdentity(
   let overrides = [...(current?.overrides ?? [])]
   const byId = new Map(overrides.map((row) => [row.id, row]))
   for (const entry of delta.overrides ?? []) {
-    if ('mode' in entry && entry.mode === 'replace') {
+    if (isSeedRowReplace(entry)) {
       byId.set(entry.id, { origin: 'seed', id: entry.id, mode: 'replace', row: entry.row })
       continue
     }
-    byId.set(entry.id, {
-      origin: 'seed',
-      id: entry.id,
-      set: entry.set,
-      clear: entry.clear,
-      restore: entry.restore,
-      collections: entry.collections as Record<string, StoredCollection> | undefined,
-    })
+    const priorEntry = byId.get(entry.id)
+    const prior =
+      priorEntry &&
+      priorEntry.origin === 'seed' &&
+      !('mode' in priorEntry) &&
+      !('retention' in priorEntry)
+        ? priorEntry
+        : undefined
+    if (priorEntry && 'retention' in priorEntry && priorEntry.retention === 'legacy') {
+      return {
+        failure: {
+          code: 'unsupported-overlay-retention',
+          retention: 'legacy-hold',
+          path: `[${entry.id}]`,
+        },
+      }
+    }
+    const seedRow = seedRowById(seedRows, entry.id, policy.idKey) ?? {}
+    const reconciled = reconcileSeedFieldOverrideIntent(
+      seedRow,
+      prior,
+      entry,
+      policy.row,
+      `[${entry.id}]`,
+    )
+    if (reconciled.failure) return { failure: reconciled.failure }
+    if (reconciled.stored === undefined) byId.delete(entry.id)
+    else byId.set(entry.id, reconciled.stored)
   }
   overrides = [...byId.values()]
 

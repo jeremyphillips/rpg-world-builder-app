@@ -17,11 +17,7 @@ import { ContentOverviewTable } from '../../lib/overview/content-overview-table'
 export function SpeciesOverview() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()
   const listResult = useSpeciesListResult(campaignId)
-  const {
-    data: species,
-    isPending,
-    isError,
-  } = useContentOverviewMergedData<WithCampaignAccess<Species>>(listResult)
+  const { data: species, isPending, isError } = useContentOverviewMergedData(listResult)
   const { data: usageMeta } = useSpeciesUsageMeta(campaignId)
   const usageSummaryLabels = usageMeta?.usageSummaryLabels
   const overviewUsageScope = usageMeta?.overviewUsageScope

@@ -119,6 +119,7 @@ export function patchOverviewColumns<T extends OverviewNameRow>(
           contentTypeKey={context.contentTypeKey}
           queryKeyFn={queryKeyFn}
           statusLabel={overlayFailureOverviewStatusLabel(row.original)}
+          omitAccessMetadata={isContentOverlayFailureOverviewRow(row.original)}
           duplicateSource={
             context.readOnly || isContentOverlayFailureOverviewRow(row.original)
               ? undefined
@@ -132,6 +133,28 @@ export function patchOverviewColumns<T extends OverviewNameRow>(
           viewerCharacterRelationships={row.original.viewerCharacterRelationships}
         />
       ),
+    }
+  })
+}
+
+function guardOverviewColumnsForOverlayFailures<T>(
+  columns: ColumnDef<T, unknown>[],
+): ColumnDef<T, unknown>[] {
+  return columns.map((column) => {
+    const columnId = column.id ?? (column as { accessorKey?: string }).accessorKey
+    if (columnId === 'name') return column
+    const previousCell = column.cell
+    return {
+      ...column,
+      cell: (context) => {
+        if (isContentOverlayFailureOverviewRow(context.row.original)) {
+          return '—'
+        }
+        if (typeof previousCell === 'function') {
+          return previousCell(context)
+        }
+        return null
+      },
     }
   })
 }
@@ -151,14 +174,16 @@ export function useOverviewColumnsWithNameContext<T extends OverviewNameRow>(
 
   return useMemo(
     () =>
-      patchOverviewColumns(stableColumns, {
-        canManage: context.canManage,
-        campaignId: context.campaignId,
-        contentTypeKey: context.contentTypeKey,
-        viewer: context.viewer,
-        getEditHref: context.getEditHref,
-        readOnly: context.readOnly,
-      }),
+      guardOverviewColumnsForOverlayFailures(
+        patchOverviewColumns(stableColumns, {
+          canManage: context.canManage,
+          campaignId: context.campaignId,
+          contentTypeKey: context.contentTypeKey,
+          viewer: context.viewer,
+          getEditHref: context.getEditHref,
+          readOnly: context.readOnly,
+        }),
+      ),
     [
       stableColumns,
       context.canManage,

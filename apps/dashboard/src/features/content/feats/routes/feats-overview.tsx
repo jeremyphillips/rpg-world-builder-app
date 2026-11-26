@@ -17,11 +17,7 @@ import { ContentOverviewTable } from '../../lib/overview/content-overview-table'
 export function FeatsOverview() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()
   const listResult = useFeatsListResult(campaignId)
-  const {
-    data: feats,
-    isPending,
-    isError,
-  } = useContentOverviewMergedData<WithCampaignAccess<Feat>>(listResult)
+  const { data: feats, isPending, isError } = useContentOverviewMergedData(listResult)
   const { data: usageMeta } = useFeatsUsageMeta(campaignId)
   const usageSummaryLabels = usageMeta?.usageSummaryLabels
   const overviewUsageScope = usageMeta?.overviewUsageScope

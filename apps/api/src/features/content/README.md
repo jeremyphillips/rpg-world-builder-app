@@ -48,11 +48,13 @@ Authoring list handlers use `resolveContentListForCampaign` (classes go through
 `resolveClassesListForCampaign`) and include `overlayFailures` when a system
 overlay cannot be applied. `GET …/content/classes` is a bespoke handler because
 it attaches resolved-only subclass summaries; it still serializes the same
-`overlayFailures` side channel. List handlers filter failures through the same
-discovery and reference visibility rules as resolved rows (managers still see
-failures when `campaignAccess.available` is false; players never receive failure
-metadata for `dm_only` or ungranted `specific_players` content). Play-scoped
-list queries omit `overlayFailures`. `GET …/content/classes/:classId/subclasses`
+`overlayFailures` side channel. List handlers filter failures via
+`filterOverlayFailuresForListViewer`, which attaches `campaignAccess` and runs
+`applyCatalogListFilter` (see `catalogListModeIncludesOverlayFailures` — play mode
+omits failures). Discovery and reference scopes share the same visibility rules as
+resolved rows (managers still see failures when `campaignAccess.available` is
+false; players never receive failure metadata for `dm_only` or ungranted
+`specific_players` content). `GET …/content/classes/:classId/subclasses`
 includes only overlay failures whose seed row belongs to that parent class.
 Spell `classIds` and species multiclass / level-cap class references are **slugs**.
 Monster classification `classIds` are content ids. Slug is the catalog identity
@@ -71,7 +73,12 @@ Per content type the kernel:
 
 Writes to a target listed in `overlayFailures` return **409** with the failure
 `code` / `message` (not 404). Spell, monster, and subclass write hooks receive
-`overlayFailureIds` so unresolved overlay targets are distinct from unknown ids.
+`overlayFailureIds` on `resolveCatalogForCampaignWithOverlayContext` (paired with
+`catalogOverlayFailureSlugs` for slug-keyed spell/species class refs). Reference
+validation uses identity-agnostic `unresolvedOverlayTargetKeys` on
+`collectCatalogReferenceIssues` / `collectSpellReferenceIssues`. Spell write hooks
+also receive `overlayFailureIds` so unresolved overlay targets are distinct from
+unknown ids.
 See [`packages/contracts/src/rpg/content/lib/system-overlay/README.md`](../../../../packages/contracts/src/rpg/content/lib/system-overlay/README.md).
 
 ## Kernel (`lib/`) — type-agnostic, reused by every content type

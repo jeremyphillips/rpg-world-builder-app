@@ -143,15 +143,15 @@ const ContentOverviewDataTable = memo(function ContentOverviewDataTable<
     ],
   )
 
-  const getRowClassName = useCallback(
-    (row: { original: T }) =>
-      overviewUnavailableRowClassName(row.original.campaignAccess.available),
-    [],
-  )
+  const getRowClassName = useCallback((row: { original: T }) => {
+    const unresolved = isContentOverlayFailureOverviewRow(row.original)
+    return overviewUnavailableRowClassName(row.original.campaignAccess.available && !unresolved)
+  }, [])
 
   const getCellClassName = useCallback((cell: { column: { id: string }; row: { original: T } }) => {
+    const unresolved = isContentOverlayFailureOverviewRow(cell.row.original)
     return overviewUnavailableNameCellClassName(
-      cell.row.original.campaignAccess.available,
+      cell.row.original.campaignAccess.available && !unresolved,
       cell.column.id,
       OVERVIEW_NAME_COLUMN_ID,
     )

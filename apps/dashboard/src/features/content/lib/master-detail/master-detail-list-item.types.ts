@@ -14,5 +14,5 @@ export type MasterDetailListItem = {
   /** When false, detail overflow hides delete. Not shown on list rows. */
   deletable?: boolean
   /** Broad campaign availability label rendered below the title when unavailable. */
-  availabilityStatusLabel?: 'Unavailable'
+  availabilityStatusLabel?: 'Unavailable' | 'Overlay unresolved'
 }
