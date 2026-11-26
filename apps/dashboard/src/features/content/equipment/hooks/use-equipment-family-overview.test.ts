@@ -73,6 +73,47 @@ describe('useEquipmentFamilyOverview', () => {
     expect(result.current.filtered).toEqual([])
   })
 
+  it('includes unclassified overlay failures when ruleset lookup fails', () => {
+    vi.mocked(useCampaignRulesetLookup).mockReturnValue({
+      rulesetId: undefined,
+      isPending: false,
+      isError: true,
+    })
+    const failures: CatalogOverlayListFailure[] = [
+      {
+        targetId: 'srd-cc-5.2.1:longsword',
+        slug: 'longsword',
+        name: 'Longsword',
+        code: 'unsupported_overlay_version',
+        message: 'System overlay patch is missing a supported version.',
+      },
+      {
+        targetId: 'srd-cc-5.2.1:chain-mail',
+        slug: 'chain-mail',
+        name: 'Chain Mail',
+        code: 'unsupported_overlay_version',
+        message: 'System overlay patch is missing a supported version.',
+      },
+    ]
+    vi.mocked(useEquipmentListResult).mockReturnValue({
+      data: {
+        items: [{ id: 'hb-weapon', kind: 'weapon', name: 'HB Weapon' } as never],
+        overlayFailures: failures,
+      },
+      isPending: false,
+      isError: false,
+    })
+
+    const { result } = renderHook(() => useEquipmentFamilyOverview('camp-1', 'weapons'))
+
+    expect(result.current.isError).toBe(true)
+    expect(result.current.filtered.map((row) => row.id)).toEqual([
+      'hb-weapon',
+      'srd-cc-5.2.1:longsword',
+      'srd-cc-5.2.1:chain-mail',
+    ])
+  })
+
   it('keeps overlay failure rows in the matching equipment family using campaign ruleset context', () => {
     vi.mocked(useCampaignRulesetLookup).mockReturnValue({
       rulesetId: 'srd-cc-5.2.1',

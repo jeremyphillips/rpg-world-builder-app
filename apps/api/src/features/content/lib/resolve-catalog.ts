@@ -90,6 +90,9 @@ export function resolveCatalog<T extends Identified>(
     if (!overlay) {
       mergedBody = seedBody
     } else if (!policy) {
+      // Configuration defect — not a row-level stored overlay failure. Keep fail-fast so miswired
+      // content types surface in tests/deploy guards (`patch-model-overlay-drift`) instead of
+      // masquerading as ordinary list `overlayFailures`.
       throw new Error(
         'System overlay patch present but overlayParticipantId is not configured for this content type.',
       )

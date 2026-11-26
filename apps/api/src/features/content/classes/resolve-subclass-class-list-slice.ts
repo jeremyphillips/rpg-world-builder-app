@@ -14,18 +14,24 @@ export type SubclassClassListSlice = {
   failureCountByClassId: Map<string, number>
 }
 
+/** Raw catalog rows from `resolveContentListForCampaign` (before campaign-access attach). */
+export type SubclassListResolution = {
+  items: ReadonlyArray<Pick<ResolvedSubclass, 'id' | 'classId' | 'name'>>
+  overlayFailures: readonly CatalogOverlayListFailure[]
+}
+
 /**
- * One subclass catalog resolution for `GET …/classes`: resolved-only summaries plus
- * viewer-filtered unresolved counts grouped by parent class id.
+ * Subclass summaries and parent-scoped failure counts for `GET …/classes`. Pass
+ * {@link subclassList} when the caller already resolved the subclass catalog for this request.
  */
 export async function resolveSubclassClassListSlice(
   campaignId: string,
   filter: CatalogListFilter | undefined,
+  subclassList?: SubclassListResolution,
 ): Promise<SubclassClassListSlice> {
-  const { items, overlayFailures } = await resolveContentListForCampaign(
-    subclassContentConfig,
-    campaignId,
-  )
+  const { items, overlayFailures } = subclassList
+    ? subclassList
+    : await resolveContentListForCampaign(subclassContentConfig, campaignId)
 
   const withCampaignAccess = await attachCampaignAccessForTargetType(
     campaignId,

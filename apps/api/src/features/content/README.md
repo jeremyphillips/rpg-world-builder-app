@@ -101,10 +101,16 @@ Each content type contributes only a body schema (in `@rpg/contracts`) + a
 `*.config.ts` exporting a `*Registration` (`read` + `write`, optional paired
 `resolveForCampaign` + `resolveListForCampaign`), registered once in `content-types.ts`.
 
+**Configuration vs stored overlay failures:** missing `overlayParticipantId` on a type
+that has stored patches makes `resolveCatalog` **throw** (deploy/test drift guards in
+`patch-model-overlay-drift.test.ts`). Malformed stored overlays become per-row
+`overlayFailures` instead — see contracts `system-overlay/README.md`.
+
 **Records-only consumers:** `resolveCatalogForCampaign` / `resolveContentForCampaign`
 (search, hub summaries, organization member roster lookup) intentionally omit
-overlay-failure rows. `listClasses` attaches subclass summaries and
-`unresolvedSubclassOverlayCount` from a single `resolveSubclassClassListSlice` pass.
+overlay-failure rows. `listClasses` resolves subclasses once per request and passes that
+result into `resolveSubclassClassListSlice` for summaries and
+`unresolvedSubclassOverlayCount`.
 Authoritative delete guards load catalogs via
 `loadOverlayAwareCatalogRows` (`overlay-failure-seed-referrers`) so unresolved overlay
 **seed** bodies still participate in spell, monster equipment/skill/class, and related

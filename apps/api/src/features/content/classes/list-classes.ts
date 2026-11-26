@@ -5,10 +5,12 @@ import { attachCampaignAccessForTargetType } from '../lib/content-campaign-acces
 import { applyCatalogListFilter } from '../lib/apply-catalog-list-filter'
 import { filterOverlayFailuresForListViewer } from '../lib/filter-overlay-failures-for-list-viewer'
 import { resolveCatalogListFilter } from '../lib/resolve-catalog-membership-filter'
+import { resolveContentListForCampaign } from '../content.service'
 import { resolveClassesListForCampaign } from './derive-classes-catalog'
 import { buildContentListUsageEnvelope } from '../lib/content-usage/build-content-list-usage-envelope'
 import { contentUsageContextFromRequest } from '../lib/content-usage/content-usage-request-context'
 import { resolveSubclassClassListSlice } from './resolve-subclass-class-list-slice'
+import { subclassContentConfig } from '../subclasses/subclasses.config'
 
 /** Classes list enriched with per-class subclass id+name summaries. */
 export async function listClasses(req: Request, res: Response): Promise<void> {
@@ -23,9 +25,11 @@ export async function listClasses(req: Request, res: Response): Promise<void> {
     overlayFailures,
     catalogFilter,
   )
+  const subclassCatalog = await resolveContentListForCampaign(subclassContentConfig, campaignId)
   const { summariesByClassId, failureCountByClassId } = await resolveSubclassClassListSlice(
     campaignId,
     catalogFilter,
+    subclassCatalog,
   )
 
   const classes = (visibleClasses as unknown as CharacterClass[]).map((characterClass) => {

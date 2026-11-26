@@ -59,4 +59,24 @@ describe('resolveSubclassClassListSlice', () => {
     expect(slice.failureCountByClassId.get('class-fighter')).toBe(1)
     expect(contentService.resolveContentListForCampaign).toHaveBeenCalledTimes(1)
   })
+
+  it('reuses request-scoped subclass list without a second catalog resolve', async () => {
+    vi.mocked(contentService.resolveContentListForCampaign).mockClear()
+    const resolution = {
+      items: [
+        {
+          id: 'hb-2',
+          classId: 'class-wizard',
+          name: 'HB Evoker',
+          slug: 'hb-evoker',
+        } as never,
+      ],
+      overlayFailures: [] as const,
+    }
+    const slice = await resolveSubclassClassListSlice('c1', undefined, resolution)
+    expect(slice.summariesByClassId.get('class-wizard')).toEqual([
+      { id: 'hb-2', name: 'HB Evoker' },
+    ])
+    expect(contentService.resolveContentListForCampaign).not.toHaveBeenCalled()
+  })
 })

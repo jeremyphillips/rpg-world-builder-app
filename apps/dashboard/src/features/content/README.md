@@ -40,6 +40,8 @@ lib/
   form-options/     # Level, rich-text link options
   overview/         # List shell, table config, source badge; hooks/ subfolder
                     #   overlay-unresolved synthetic rows bypass campaign-availability hiding
+  equipment/lib/    # equipment-family-overview-filter.lib — ruleset gates before classifying
+                    #   overlay failures by seed kind (see use-equipment-family-overview)
   detail/           # page/, metadata/, section/, row/ — see feature-structure.md
   master-detail/    # Embedded array editor infra
   list/             # List API/query factories, content client

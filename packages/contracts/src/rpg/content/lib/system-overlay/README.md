@@ -28,3 +28,12 @@ When a real `version: 2` is required:
 3. Do not add parallel merge paths or partial-body patch schemas.
 
 Policy compilation, intent building, and tests live beside this module (`apply.ts`, `reconcile.ts`, `build-intent.ts`, …).
+
+## Catalog resolve failures (read path)
+
+| Kind                       | Meaning                                                                                          | Consumer behavior                                                                                  |
+| -------------------------- | ------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
+| **Configuration error**    | Stored patch exists but the content type has no `overlayParticipantId`                           | `resolveCatalog` **throws** — fix wiring before deploy (`patch-model-overlay-drift` in `@rpg/api`) |
+| **Stored overlay failure** | Unversioned document, apply/reconcile rejection, or unsupported retention on a wired participant | Row omitted from resolved `records`; entry in `overlayFailures` for list/management surfaces       |
+
+Search, hub summaries, and other **records-only** consumers use `resolveCatalogForCampaign` and intentionally omit `overlayFailures`. Destructive-operation indexes that must still see seed references use `loadOverlayAwareCatalogRows` in `@rpg/api` (see content README).

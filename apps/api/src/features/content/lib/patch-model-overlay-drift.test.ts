@@ -23,6 +23,7 @@ const PATCH_READ_CONFIGS = [
 
 const PARTICIPANT_IDS = new Set(systemOverlayParticipants.map((p) => p.id))
 
+/** Ensures configuration defects fail in CI before stored patches can masquerade as row failures. */
 describe('patch model overlay participant drift', () => {
   it.each(PATCH_READ_CONFIGS.map((readConfig) => [readConfig.type, readConfig] as const))(
     '%s overlayParticipantId is registered with publish and draft policies',
