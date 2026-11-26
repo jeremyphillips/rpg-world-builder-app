@@ -6,7 +6,12 @@ import { describe, expect, it, vi } from 'vitest'
 import { FormProvider, useForm } from 'react-hook-form'
 import { render, renderHook, act, waitFor } from '@testing-library/react'
 import { z } from 'zod'
-import { FormUiContext, type FormItem, type FormUiContextValue } from '@rpg/ui/form'
+import {
+  createEmptyFormValidationProducerSession,
+  FormUiContext,
+  type FormItem,
+  type FormUiContextValue,
+} from '@rpg/ui/form'
 import type { ReactNode } from 'react'
 
 import {
@@ -15,6 +20,8 @@ import {
   presentContentFormInvalidSubmit,
   useContentFormSubmit,
 } from './content-form-submit'
+import { presentPersistValidationFailure } from './content-form-submit-presentation.lib'
+import { projectCompactedArrayProvenance } from '../../submit/project-compacted-array-provenance.lib'
 import type { AnyContentFormDef, ContentFormCtx } from '../../registry/content-form-registry'
 
 const testSchema = z.object({
@@ -292,6 +299,32 @@ describe('useContentFormSubmit', () => {
     })
 
     expect(form.getFieldState('name').error?.message).toContain('Slug is already taken')
+  })
+})
+
+describe('presentPersistValidationFailure provenance', () => {
+  it('maps API request paths to the authoring row this attempt recorded', () => {
+    const { result } = renderHook(() =>
+      useForm({ defaultValues: { traits: [{ name: 'a' }, { name: 'b' }, { name: 'c' }] } }),
+    )
+    const error = new ApiError(400, 'validation_error', 'Invalid', {
+      issues: [{ path: 'traits.0.name', message: 'Bad name', code: 'custom' }],
+    })
+    let session = createEmptyFormValidationProducerSession()
+    act(() => {
+      session = presentPersistValidationFailure(
+        result.current,
+        error,
+        undefined,
+        null,
+        session,
+        1,
+        // rows 0 and 1 were dropped; request row 0 is authoring row 2
+        projectCompactedArrayProvenance('traits', 3, (i) => i === 2),
+      )
+    })
+    expect(result.current.getFieldState('traits.2.name').error?.message).toBe('Bad name')
+    expect(result.current.getFieldState('traits.0.name').error).toBeUndefined()
   })
 })
 

@@ -109,6 +109,7 @@ export async function runContentFormCommitAttempt<TValues extends FieldValues>(
       input.ui,
       input.producerSession,
       stamp,
+      pipeline.prepared.provenance,
     )
     return { kind: 'persist-failed', session, error }
   }

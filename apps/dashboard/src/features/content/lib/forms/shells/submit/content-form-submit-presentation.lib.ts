@@ -8,10 +8,16 @@ import {
   type FormValidationProducerSession,
 } from '@rpg/ui/form'
 
+import { getApiValidationIssues } from '@rpg/contracts'
+
 import {
-  applyApiErrorValidationToCanonicalRhf,
+  applyCanonicalFormIssuesToRhf,
   ingestContentFormValidationIssues,
 } from '../../validation/ingest-content-form-validation.lib'
+import { apiValidationIssuesToFormIssues } from '../../validation/normalize-content-form-issues.lib'
+import type { ContentPreparedWriteProvenance } from '../../submit/content-prepared-write.types'
+import { mapWireIssuesToAuthoring } from '../../submit/map-wire-issues-to-authoring.lib'
+import { reportUnattributed } from '../../submit/content-form-commit-pipeline.lib'
 import type { ContentFormInvalidPresentation } from './content-form-submit-types.lib'
 
 function resolveFirstInvalidPath<TFieldValues extends FieldValues>(
@@ -72,9 +78,19 @@ export function presentPersistValidationFailure<TFieldValues extends FieldValues
   ui: Pick<FormUiContextValue, 'markSubmitAttempted' | 'addValidationSessionExpandKeys'> | null,
   session: FormValidationProducerSession,
   stamp: number,
+  provenance: ContentPreparedWriteProvenance = {},
 ): FormValidationProducerSession {
-  const routed = applyApiErrorValidationToCanonicalRhf(form, error)
-  if (!routed || !presentation) return session
+  const apiIssues = getApiValidationIssues(error)
+  if (!apiIssues?.length) return session
+  // API paths are request space: resolve through this attempt's provenance before ownership.
+  const attribution = mapWireIssuesToAuthoring(
+    apiValidationIssuesToFormIssues(apiIssues),
+    provenance,
+  )
+  reportUnattributed(attribution.unattributed)
+  const routed = attribution.issues
+  applyCanonicalFormIssuesToRhf(form, routed)
+  if (!presentation) return session
   const nextSession = ingestContentFormValidationIssues(session, 'api', stamp, routed)
   presentContentFormInvalidSubmit(form, ui, presentation, {
     firstInvalidPath: routed[0]?.path,

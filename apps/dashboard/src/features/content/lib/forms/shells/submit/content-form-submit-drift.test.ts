@@ -94,7 +94,6 @@ describe('ContentFormDef create submit drift guard', () => {
   it('requires persist validation failure to paint api issues canonically', () => {
     const source = readFileSync(contentFormSubmitPresentationPath, 'utf8')
 
-    expect(source).toContain('applyApiErrorValidationToCanonicalRhf')
     expect(source).not.toContain('applyValidationIssuesToForm')
   })
 

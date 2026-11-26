@@ -12,6 +12,7 @@ import {
   type RunFormActionResult,
 } from '@rpg/ui/form'
 
+import { mapWireIssuesToAuthoring } from './map-wire-issues-to-authoring.lib'
 import {
   buildIdentityPreparedWrite,
   type ContentPreparedWrite,
@@ -125,6 +126,11 @@ function createPrepareStage<TValues extends FieldValues>(
   }
 }
 
+export function reportUnattributed(paths: readonly string[]): void {
+  if (paths.length === 0) return
+  console.warn('[form-validation] wire issue paths without recorded authoring provenance', paths)
+}
+
 function createWriteValidateStage<TValues extends FieldValues>(
   writeSchema: ZodType<unknown>,
   resolverFields: FormItem[],
@@ -134,7 +140,12 @@ function createWriteValidateStage<TValues extends FieldValues>(
     intent: 'serialization',
     run: (prepared) => {
       const evaluated = evaluateContentFormSchema(writeSchema, prepared.payload, resolverFields)
-      if (evaluated.kind === 'invalid') return { kind: 'invalid', issues: evaluated.issues }
+      if (evaluated.kind === 'invalid') {
+        // Issues are in request space; resolve to this attempt's authoring owners.
+        const attribution = mapWireIssuesToAuthoring(evaluated.issues, prepared.provenance)
+        reportUnattributed(attribution.unattributed)
+        return { kind: 'invalid', issues: attribution.issues }
+      }
       // The write-schema parse is the payload persist receives.
       return { kind: 'parsed', data: { ...prepared, payload: evaluated.data as TValues } }
     },
