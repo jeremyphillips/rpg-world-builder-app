@@ -38,7 +38,5 @@ export type UseContentFormSubmitOptions<TValues extends FieldValues> = {
   prepareCommitValues?: (values: TValues) => TValues
   writeSchema?: import('zod').ZodType<unknown>
   prepareWrite?: (values: TValues, form: UseFormReturn<TValues>) => ContentPreparedWrite<unknown>
-  /** Snapshot stamp for the current form values; bump on authored changes. Defaults to 0. */
-  snapshotStamp?: number
   persist: FormSubmitHandler<TValues>
 }

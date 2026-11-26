@@ -1,5 +1,5 @@
-import { useContext, useRef } from 'react'
-import type { FieldValues } from 'react-hook-form'
+import { useContext, useEffect, useRef } from 'react'
+import { useFormContext, type FieldValues } from 'react-hook-form'
 import { isApiError } from '@rpg/contracts/shared'
 import {
   createEmptyFormValidationProducerSession,
@@ -19,6 +19,7 @@ import {
 } from './content-form-submit-types.lib'
 
 export {
+  ContentFormSubmitSuperseded,
   ContentFormSubmitValidationFailed,
   type ContentFormInvalidPresentation,
   type UseContentFormSubmitOptions,
@@ -46,7 +47,6 @@ export function useContentFormSubmit<TValues extends FieldValues>(
     prepareCommitValues,
     writeSchema,
     prepareWrite,
-    snapshotStamp = 0,
     persist,
   } = options
 
@@ -59,8 +59,9 @@ export function useContentFormSubmit<TValues extends FieldValues>(
     createEmptyFormValidationProducerSession(),
   )
 
-  const stampRef = useRef(snapshotStamp)
-  stampRef.current = snapshotStamp
+  // Snapshot stamp: bumped by UiBridge on authored value change or reset, never on UI state.
+  const stampRef = useRef(0)
+  const persistingRef = useRef(0)
   const attemptCounterRef = useRef(0)
 
   const publishSchema =
@@ -108,7 +109,14 @@ export function useContentFormSubmit<TValues extends FieldValues>(
         invalidPresentation,
         ui: uiRef.current,
         producerSession: producerSessionRef.current,
-        persist,
+        persist: async (wireValues, persistForm) => {
+          persistingRef.current += 1
+          try {
+            await persist(wireValues, persistForm)
+          } finally {
+            persistingRef.current -= 1
+          }
+        },
       })
 
       if (result.kind === 'superseded') throw new ContentFormSubmitSuperseded()
@@ -125,6 +133,17 @@ export function useContentFormSubmit<TValues extends FieldValues>(
   function UiBridge() {
     const ui = useContext(FormUiContext)
     uiRef.current = ui
+    const rhf = useFormContext()
+    useEffect(() => {
+      if (!rhf) return
+      const subscription = rhf.watch((_values, info) => {
+        // A pathless event is a reset. The attempt's own save boundary resets from the
+        // response while persisting; that must not supersede the attempt itself.
+        if (info.name === undefined && persistingRef.current > 0) return
+        stampRef.current += 1
+      })
+      return () => subscription.unsubscribe()
+    }, [rhf])
     return null
   }
 

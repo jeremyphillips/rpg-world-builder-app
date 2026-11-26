@@ -3,13 +3,14 @@
  */
 import { ApiError } from '@rpg/contracts'
 import { describe, expect, it, vi } from 'vitest'
-import { useForm } from 'react-hook-form'
-import { renderHook, act } from '@testing-library/react'
+import { FormProvider, useForm } from 'react-hook-form'
+import { render, renderHook, act, waitFor } from '@testing-library/react'
 import { z } from 'zod'
 import { FormUiContext, type FormItem, type FormUiContextValue } from '@rpg/ui/form'
 import type { ReactNode } from 'react'
 
 import {
+  ContentFormSubmitSuperseded,
   ContentFormSubmitValidationFailed,
   presentContentFormInvalidSubmit,
   useContentFormSubmit,
@@ -291,5 +292,90 @@ describe('useContentFormSubmit', () => {
     })
 
     expect(form.getFieldState('name').error?.message).toContain('Slug is already taken')
+  })
+})
+
+describe('useContentFormSubmit attempt identity', () => {
+  type Harness = {
+    submit: (values: TestValues) => Promise<void>
+    form: ReturnType<typeof useForm<TestValues>>
+    stampProbe: () => string | undefined
+  }
+
+  function mountHarness(persist: (values: TestValues) => Promise<void>): Harness {
+    const handle = {} as Harness
+    function Probe() {
+      const form = useForm<TestValues>({ defaultValues: { name: 'A', level: 2 } })
+      const submit = useContentFormSubmit<TestValues>({
+        def: testDef,
+        ctx: testCtx,
+        fallbackMessage: 'Could not save.',
+        persist: async (values) => persist(values),
+      })
+      handle.form = form
+      handle.submit = (values) => submit.onSubmit(values, form)
+      handle.stampProbe = () => submit.formError
+      const Bridge = submit.UiBridge
+      return (
+        <FormProvider {...form}>
+          <Bridge />
+        </FormProvider>
+      )
+    }
+    render(
+      <FormUiWrapper>
+        <Probe />
+      </FormUiWrapper>,
+    )
+    return handle
+  }
+
+  it('ignores a late success from a superseded same-stamp attempt', async () => {
+    let releaseFirst: () => void = () => undefined
+    const persist = vi
+      .fn()
+      .mockImplementationOnce(() => new Promise<void>((resolve) => (releaseFirst = resolve)))
+      .mockResolvedValueOnce(undefined)
+    const harness = mountHarness(persist)
+
+    let first!: Promise<void>
+    act(() => {
+      first = harness.submit({ name: 'A', level: 2 }).catch((error) => {
+        throw error
+      })
+    })
+    first.catch(() => undefined)
+    await waitFor(() => expect(persist).toHaveBeenCalledTimes(1))
+    await act(async () => {
+      await harness.submit({ name: 'A', level: 2 })
+    })
+    await act(async () => {
+      releaseFirst()
+      await expect(first).rejects.toBeInstanceOf(ContentFormSubmitSuperseded)
+    })
+    expect(persist).toHaveBeenCalledTimes(2)
+    expect(harness.stampProbe()).toBeUndefined()
+  })
+
+  it('supersedes an in-flight attempt when authored values change', async () => {
+    let releaseFirst: () => void = () => undefined
+    const persist = vi
+      .fn()
+      .mockImplementationOnce(() => new Promise<void>((resolve) => (releaseFirst = resolve)))
+    const harness = mountHarness(persist)
+
+    let first!: Promise<void>
+    act(() => {
+      first = harness.submit({ name: 'A', level: 2 })
+    })
+    first.catch(() => undefined)
+    await waitFor(() => expect(persist).toHaveBeenCalledTimes(1))
+    act(() => {
+      harness.form.setValue('name', 'Changed')
+    })
+    await act(async () => {
+      releaseFirst()
+      await expect(first).rejects.toBeInstanceOf(ContentFormSubmitSuperseded)
+    })
   })
 })
