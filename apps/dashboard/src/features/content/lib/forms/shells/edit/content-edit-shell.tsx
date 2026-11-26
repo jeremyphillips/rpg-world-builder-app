@@ -356,8 +356,7 @@ function useFrozenSystemOriginRowIds(
   },
   rulesetId?: string,
 ): ContentFormCtx['embeddedSystemOriginRowIds'] {
-  const resolveSeedLocks = () =>
-    entity.seedRowIdsByPath ?? def.extractEmbeddedSeedRowIds?.(entity as never)
+  const resolveSeedLocks = () => entity.seedRowIdsByPath
 
   const [systemOrigin, setSystemOrigin] = useState<{
     entityId: string

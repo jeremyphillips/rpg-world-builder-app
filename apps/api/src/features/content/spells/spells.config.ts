@@ -62,7 +62,6 @@ function bodyFromCreateInput(input: Record<string, unknown>): Record<string, unk
 
 export const spellContentConfig: ContentTypeConfig<Spell> = {
   type: 'spells',
-  patchReplaceKeys: ['resolution'],
   overlayParticipantId: 'spells',
   system: {
     load: loadSeedSpells,

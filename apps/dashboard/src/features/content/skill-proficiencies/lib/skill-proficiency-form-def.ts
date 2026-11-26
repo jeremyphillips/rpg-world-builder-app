@@ -29,6 +29,7 @@ const skillProficiencyFormDef: ContentFormDef<
   buildFields: buildSkillProficiencyFields,
   toFormValues: skillProficiencyToFormValues,
   toInput: buildSkillProficiencyCreateInput,
+  overlayParticipantId: 'skill-proficiencies',
   normalizeOverlayBody: (values, ctx, validationIntent = 'publish') => {
     const { slug: _slug, ...body } = buildSkillProficiencyCreateInput(
       values,

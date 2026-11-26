@@ -37,20 +37,22 @@ function FormApiCapture({ onReady }: { onReady: (form: UseFormReturn) => void })
 function TabShell({
   features = [] as Feature[],
   entityCatalogLayer,
-  embeddedSeedRowIds,
+  persistedIdentityRowIdsByPath,
   formCtx = {},
   onFormReady,
 }: {
   features?: Feature[]
   entityCatalogLayer?: ContentFormCtx['entityCatalogLayer']
-  embeddedSeedRowIds?: ContentFormCtx['embeddedSeedRowIds']
+  persistedIdentityRowIdsByPath?: ContentFormCtx['persistedIdentityRowIdsByPath']
   formCtx?: ContentFormCtx
   onFormReady?: (form: UseFormReturn) => void
 }) {
   return (
     <TestFormShell defaultValues={{ features }}>
       {onFormReady ? <FormApiCapture onReady={onFormReady} /> : null}
-      <ClassFeaturesTab formCtx={{ entityCatalogLayer, embeddedSeedRowIds, ...formCtx }} />
+      <ClassFeaturesTab
+        formCtx={{ entityCatalogLayer, persistedIdentityRowIdsByPath, ...formCtx }}
+      />
     </TestFormShell>
   )
 }
@@ -108,7 +110,7 @@ describe('ClassFeaturesTab', () => {
   })
 
   it('renders structured meta for each row', () => {
-    render(<TabShell features={[rage]} embeddedSeedRowIds={{ features: ['f1'] }} />)
+    render(<TabShell features={[rage]} persistedIdentityRowIdsByPath={{ features: ['f1'] }} />)
     const list = within(screen.getByRole('navigation', { name: 'Features' }))
     expect(list.getByText('Level 1')).toBeInTheDocument()
     expect(list.getByText('Homebrew')).toBeInTheDocument()
@@ -146,7 +148,7 @@ describe('ClassFeaturesTab', () => {
       <TabShell
         features={[rage]}
         entityCatalogLayer="system"
-        embeddedSeedRowIds={{ features: ['f1'] }}
+        persistedIdentityRowIdsByPath={{ features: ['f1'] }}
         formCtx={{ embeddedSystemOriginRowIds: { features: ['f1'] } }}
       />,
     )

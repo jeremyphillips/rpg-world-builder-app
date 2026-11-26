@@ -140,6 +140,7 @@ const classFormDef: ContentFormDef<
       buildClassCreateInput(values, ctx, validationIntent),
       ctx,
     ) as CreateClassInput,
+  overlayParticipantId: 'classes',
   normalizeOverlayBody: (values, ctx, validationIntent = 'publish') => {
     const { slug: _slug, ...body } = buildClassCreateInput(values, ctx, validationIntent) as Record<
       string,
@@ -150,12 +151,6 @@ const classFormDef: ContentFormDef<
 
   useListQuery: useClasses,
   queryKey: classesQueryKey,
-
-  extractEmbeddedSeedRowIds: (entity) => ({
-    features: entity.features.map((feature) => feature.id),
-    'characterCreation.startingEquipment.options':
-      entity.characterCreation?.startingEquipment?.options.map((option) => option.id) ?? [],
-  }),
 
   preview: {
     buildIdentity: buildClassPreviewIdentity,

@@ -41,7 +41,7 @@ export async function resolveSubclassesForCampaign(
     }).filter((subclass) => subclass.classId === classId),
     seedById,
     patches,
-    subclassContentConfig.type,
+    subclassContentConfig.overlayParticipantId,
   )
 
   return attachCampaignAccessForTargetType(campaignId, 'subclasses', resolved)

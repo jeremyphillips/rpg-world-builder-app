@@ -34,6 +34,7 @@ const equipmentFormDef: ContentFormDef<Equipment, EquipmentFormValues, CreateEqu
   buildFields: buildEquipmentFields,
   toFormValues: equipmentToFormValues,
   toInput: equipmentFormToInput,
+  overlayParticipantId: 'equipment',
   normalizeOverlayBody: (values, ctx, validationIntent = 'publish') => {
     const { slug: _slug, ...body } = equipmentFormToInput(values, ctx, validationIntent) as Record<
       string,

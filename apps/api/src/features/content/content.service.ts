@@ -36,5 +36,5 @@ export async function resolveCatalogForCampaign<T extends { id: string }>(
   const seedById = new Map(
     systemSeed.map((record) => [record.id, record as unknown as Record<string, unknown>]),
   )
-  return enrichResolvedSystemRecords(resolved, seedById, patches, config.type)
+  return enrichResolvedSystemRecords(resolved, seedById, patches, config.overlayParticipantId)
 }

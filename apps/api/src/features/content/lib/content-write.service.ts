@@ -20,6 +20,7 @@ import { loadSystemContentSlugs } from './content-type-config'
 import { normalizeHomebrewWriteInput } from './apply-content-keys'
 import { assertSlugAvailable } from './assert-slug-available'
 import {
+  catalogOverlayEffectiveBody,
   contentEntityBody,
   extractSystemOverlayWriteEnvelope,
   overlayPolicyForValidationIntent,
@@ -29,7 +30,7 @@ import {
 } from './resolve-system-overlay.lib'
 import type { ContentWriteConfig, ContentWriteContext, HomebrewDoc } from './content-write-config'
 import { resolveStoredSchema, resolveWriteInputSchema } from './content-write-config'
-import { stripNullDeep, stripNullDeepFields } from './strip-null-deep'
+import { stripNullDeep } from './strip-null-deep'
 import {
   EXPECTED_OVERLAY_REVISION_FIELD,
   parseStoredOverlayInput,
@@ -201,7 +202,7 @@ function seedBodyForSystemEntity<T extends StoredEntity>(
   if (!rulesetId || !load) return undefined
   const seed = load(rulesetId).find((row) => row.id === existing.id)
   if (!seed) return undefined
-  return entityBody(seed as unknown as Record<string, unknown>)
+  return contentEntityBody(seed as unknown as Record<string, unknown>)
 }
 
 function overlayParticipantForConfig<T extends StoredEntity>(
@@ -278,7 +279,6 @@ function reconcileSystemWriteFromUpdate<T extends StoredEntity>(
 
   const reconciled = reconcileSystemOverlayWrite({
     seedBody,
-    baselineBody: contentEntityBody(existing as unknown as Record<string, unknown>),
     storedInput: existingPatch ?? null,
     intent,
     policy,
@@ -294,7 +294,7 @@ function reconcileSystemWriteFromUpdate<T extends StoredEntity>(
     }
   }
 
-  const mergedBody = { ...reconciled.body }
+  const mergedBody = catalogOverlayEffectiveBody(seedBody, stored, policy)
   if (mediaChanged) {
     mergedBody.media = rawNormalized.media
   }
@@ -416,36 +416,23 @@ async function updateHomebrewRecord<T extends StoredEntity>(
   return resolveStoredSchema(config, validationIntent).parse(entity)
 }
 
-function omitClearedTombstones(
-  body: Record<string, unknown>,
-  tombstoneKeys: readonly string[] | undefined,
-): Record<string, unknown> {
-  if (!tombstoneKeys?.length) return body
-  const next = { ...body }
-  for (const key of tombstoneKeys) {
-    if (next[key] === null) delete next[key]
-  }
-  return next
-}
-
 function parseSystemPatchedStoredEntity<T extends StoredEntity>(
   config: ContentWriteConfig<T>,
   existing: T,
-  mergedBody: Record<string, unknown>,
+  stored: Record<string, unknown>,
+  validationIntent: ContentValidationIntent,
 ): T {
-  const replaced = config.readConfig.patchReplaceKeys?.length
-    ? stripNullDeepFields(mergedBody, config.readConfig.patchReplaceKeys)
-    : mergedBody
-  // Cleared tombstones are absent on the effective record. Identity fields come
-  // from the stored row so a key removed from the body cannot fall back to it.
-  const mergedBodyForParse = omitClearedTombstones(replaced, config.patchTombstoneKeys)
   const existingRecord = existing as Record<string, unknown>
+  const participantId = overlayParticipantForConfig(config)
+  const policy = overlayPolicyForValidationIntent(participantId, validationIntent)
+  const seedBody = seedBodyForSystemEntity(config, existing) ?? contentEntityBody(existingRecord)
+  const mergedBody = catalogOverlayEffectiveBody(seedBody, stored, policy)
   const reconciledBody = reconcileContentProvenance({
     authority: 'preserve',
     catalogLayer: 'system',
     rulesetId: existingRecord.rulesetId as SystemRulesetId,
     contentTypeKey: config.typeName as ApiContentTypeKey,
-    normalized: mergedBodyForParse,
+    normalized: mergedBody,
     existing: existingRecord,
   })
   const entityForParse = {
@@ -518,7 +505,7 @@ async function updateSystemPatch<T extends StoredEntity>(
     }
   }
 
-  return parseSystemPatchedStoredEntity(config, existing, mergedBody)
+  return parseSystemPatchedStoredEntity(config, existing, stored, validationIntent)
 }
 
 async function saveNewHomebrewRecordWithOptionalMedia<T extends StoredEntity>(

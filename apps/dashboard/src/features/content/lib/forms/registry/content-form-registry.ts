@@ -8,6 +8,7 @@ import type {
   ContentTypeKey,
   CatalogLayer,
   ContentValidationIntent,
+  SystemOverlayParticipantId,
   Equipment,
   EquipmentKind,
   OrganizationPractice,
@@ -128,7 +129,7 @@ export type ContentFormCtx = {
    * the row has been persisted. It does not mean the row originated as system
    * content.
    */
-  embeddedSeedRowIds?: Readonly<Record<string, readonly string[]>>
+  persistedIdentityRowIdsByPath?: Readonly<Record<string, readonly string[]>>
   /**
    * Row ids present when a system entity was first loaded in this editor
    * session. Membership is the only system-provenance signal. Later saves must
@@ -223,6 +224,8 @@ export interface ContentFormDef<
     ctx: ContentFormInputCtx<TEntity> | undefined,
     validationIntent: ContentValidationIntent,
   ) => Record<string, unknown>
+  /** Required when `normalizeOverlayBody` is set — must match API `overlayParticipantId`. */
+  overlayParticipantId?: SystemOverlayParticipantId
   /** List query hook; the edit shell uses it to seed the form from cache. */
   useListQuery: (campaignId: string | undefined) => ContentListQueryResult<TEntity>
   /** Query key factory; used to invalidate the list after a successful mutation. */
@@ -232,11 +235,6 @@ export interface ContentFormDef<
    * classes also refresh skill proficiencies when class names change).
    */
   invalidateQueryKeys?: (campaignId: string) => readonly (readonly unknown[])[]
-  /**
-   * Maps a saved entity to seed row domain ids for embedded master-detail
-   * delete-lock and source badge derivation on edit.
-   */
-  extractEmbeddedSeedRowIds?: (entity: TEntity) => Readonly<Record<string, readonly string[]>>
   /** Augments edit layout context after list options resolve (e.g. orphan chip seeds). */
   enrichEditLayoutCtx?: (ctx: ContentFormCtx, entity: TEntity) => ContentFormCtx
   /**

@@ -37,6 +37,7 @@ export {
 } from './participants'
 export { buildSystemOverlayIntent, type BuildSystemOverlayIntentInput } from './build-intent'
 export { buildSeedRowIdsByPath } from './seed-row-ids-by-path'
+export { buildPersistedIdentityRowIdsByPath } from './persisted-identity-row-ids-by-path'
 export { overlayPathToFormFieldPath } from './overlay-form-path'
 export { overlayPolicyForParticipant } from './participant-policies'
 export {

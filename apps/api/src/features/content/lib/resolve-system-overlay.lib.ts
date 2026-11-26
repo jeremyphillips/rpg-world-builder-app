@@ -78,7 +78,7 @@ export function throwOverlayFailure(failure: OverlayApplyFailure): never {
   )
 }
 
-export function materializeOverlayDeltaOntoBaseline(
+function materializeOverlayDeltaOntoBaseline(
   baseline: Record<string, unknown>,
   mergedBody: Record<string, unknown>,
   overlay: StoredOverlay | null,
@@ -164,7 +164,6 @@ export function extractSystemOverlayWriteEnvelope(update: Record<string, unknown
 
 export function reconcileSystemOverlayWrite(args: {
   seedBody: Record<string, unknown>
-  baselineBody?: Record<string, unknown>
   storedInput: unknown
   intent: ObjectDelta
   policy: OverlayPolicyNode
@@ -191,11 +190,18 @@ export function reconcileSystemOverlayWrite(args: {
     }),
   )
 
-  const baseline = args.baselineBody ?? args.seedBody
-
   return {
-    body: materializeOverlayDeltaOntoBaseline(baseline, reconciled.result.body, stored),
+    body: catalogOverlayEffectiveBody(args.seedBody, stored, args.policy),
     stored,
     unchanged: reconciled.result.unchanged,
   }
+}
+
+/** Same body shape as resolveCatalog: catalog seed plus overlay resolution. */
+export function catalogOverlayEffectiveBody(
+  seedBody: Record<string, unknown>,
+  stored: unknown,
+  policy: OverlayPolicyNode,
+): Record<string, unknown> {
+  return resolveSystemBodyWithOverlay(seedBody, stored, policy)
 }

@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
 import { loadSeedFeats } from '@rpg/catalog/feats'
+import { loadSeedMonsters } from '@rpg/catalog/monsters'
+import {
+  buildSystemOverlayIntent,
+  overlayPolicyForParticipant,
+  reconcileOverlayUpdate,
+} from '@rpg/contracts'
 
+import { catalogOverlayEffectiveBody, contentEntityBody } from './resolve-system-overlay.lib'
 import { resolveCatalog } from './resolve-catalog'
 
 interface Record_ {
@@ -76,6 +83,40 @@ describe('resolveCatalog', () => {
       { overlayParticipantId: 'classes' },
     )
     expect(result).toEqual(publishedSystem)
+  })
+
+  it('keeps untouched traits on a movement-only monster overlay', () => {
+    const swarm = loadSeedMonsters('srd-cc-5.2.1').find(
+      (row) => row.id === 'srd-cc-5.2.1:swarm-of-insects',
+    )
+    expect(swarm).toBeDefined()
+    if (!swarm) return
+
+    const seedBody = contentEntityBody(swarm as unknown as Record<string, unknown>)
+    const policy = overlayPolicyForParticipant('monsters')
+    const intent = buildSystemOverlayIntent({
+      policy,
+      catalogSeed: seedBody,
+      baseline: seedBody,
+      draft: { ...seedBody, movement: { walk: 30 } },
+    })
+    const reconciled = reconcileOverlayUpdate(seedBody, null, intent, policy)
+    expect(reconciled.ok).toBe(true)
+    if (!reconciled.ok) return
+
+    const effective = catalogOverlayEffectiveBody(seedBody, reconciled.result.stored, policy)
+    expect(effective.traits).toEqual(seedBody.traits)
+    expect(effective.movement).toEqual({ walk: 30 })
+
+    const resolved = resolveCatalog(
+      [swarm],
+      [{ targetId: swarm.id, patch: reconciled.result.stored }],
+      [],
+      { overlayParticipantId: 'monsters', contentTypeKey: 'monsters' },
+    )[0]
+    const fromCatalog = contentEntityBody(resolved as unknown as Record<string, unknown>)
+    expect(fromCatalog.traits).toEqual(seedBody.traits)
+    expect(fromCatalog.movement).toEqual({ walk: 30 })
   })
 
   it('does not mutate the system seed', () => {

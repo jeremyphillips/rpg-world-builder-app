@@ -55,6 +55,8 @@ export const subclassFormDef = {
       ctx,
     ) as CreateSubclassInput,
 
+  overlayParticipantId: 'subclasses' as const,
+
   normalizeOverlayBody: (
     values: SubclassFormValues,
     classId: string,

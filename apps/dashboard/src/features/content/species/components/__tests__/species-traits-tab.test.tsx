@@ -45,12 +45,12 @@ function TraitsValuesProbe() {
 function TabShell({
   traits = [] as Trait[],
   entityCatalogLayer,
-  embeddedSeedRowIds,
+  persistedIdentityRowIdsByPath,
   embeddedSystemOriginRowIds,
 }: {
   traits?: Trait[]
   entityCatalogLayer?: ContentFormCtx['entityCatalogLayer']
-  embeddedSeedRowIds?: ContentFormCtx['embeddedSeedRowIds']
+  persistedIdentityRowIdsByPath?: ContentFormCtx['persistedIdentityRowIdsByPath']
   embeddedSystemOriginRowIds?: ContentFormCtx['embeddedSystemOriginRowIds']
 }) {
   return (
@@ -59,7 +59,7 @@ function TabShell({
         formCtx={{
           rulesetId: DEFAULT_SYSTEM_RULESET_ID,
           entityCatalogLayer,
-          embeddedSeedRowIds,
+          persistedIdentityRowIdsByPath,
           embeddedSystemOriginRowIds,
         }}
       />
@@ -156,7 +156,7 @@ describe('SpeciesTraitsTab', () => {
   })
 
   it('renders source meta without a Custom or Grant eyebrow', () => {
-    render(<TabShell traits={[darkvision]} embeddedSeedRowIds={{ traits: ['t1'] }} />)
+    render(<TabShell traits={[darkvision]} persistedIdentityRowIdsByPath={{ traits: ['t1'] }} />)
     const list = screen.getByRole('navigation', { name: 'Traits' })
     expect(within(list).getByText('Homebrew')).toBeInTheDocument()
     expect(within(list).queryByText(/Custom/)).not.toBeInTheDocument()
@@ -258,7 +258,7 @@ describe('SpeciesTraitsTab', () => {
       <TabShell
         traits={[darkvision]}
         entityCatalogLayer="system"
-        embeddedSeedRowIds={{ traits: ['t1'] }}
+        persistedIdentityRowIdsByPath={{ traits: ['t1'] }}
         embeddedSystemOriginRowIds={{ traits: ['t1'] }}
       />,
     )

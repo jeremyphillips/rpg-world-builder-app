@@ -16,7 +16,6 @@ import type { FieldValues } from 'react-hook-form'
 import { hasDirtyFields } from '@/lib/form-dirty-state'
 
 import { buildSystemOverlayUpdatePayload } from './build-system-overlay-intent'
-import { overlayParticipantForContentType } from './content-overlay-participant.lib'
 import type { AnyContentFormDef, ContentFormInputCtx } from './content-form-registry'
 import {
   assertSystemOverlayWriteReady,
@@ -104,7 +103,12 @@ export function serializeContentFormInput<
 >(
   def: Pick<
     AnyContentFormDef,
-    'supportsManagedMedia' | 'mediaDomain' | 'routeKey' | 'toInput' | 'normalizeOverlayBody'
+    | 'supportsManagedMedia'
+    | 'mediaDomain'
+    | 'routeKey'
+    | 'toInput'
+    | 'normalizeOverlayBody'
+    | 'overlayParticipantId'
   >,
   values: FieldValues,
   ctx: ContentFormInputCtx<unknown> | undefined,
@@ -124,7 +128,7 @@ export function serializeContentFormInput<
   let payload: Record<string, unknown>
 
   if (isSystemUpdate) {
-    const participantId = overlayParticipantForContentType(def.routeKey as ContentTypeKey)
+    const participantId = def.overlayParticipantId
     const snapshot = assertSystemOverlayWriteReady({
       operation: options.operation,
       catalogLayer,

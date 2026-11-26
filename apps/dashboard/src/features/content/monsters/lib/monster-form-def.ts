@@ -88,13 +88,7 @@ export const monsterFormDef: ContentFormDef<Monster, MonsterFormValues, CreateMo
   buildTabs: buildMonsterTabs,
   buildFields: (ctx) => contentFormFields(monsterFormDef, ctx),
   valueSyncs: buildMonsterFormValueSyncs,
-  extractEmbeddedSeedRowIds: (entity) => ({
-    traits: entity.traits.map((trait) => trait.id),
-    actions: entity.actions.map((action) => action.id),
-    bonusActions: entity.bonusActions.map((action) => action.id),
-    reactions: entity.reactions.map((action) => action.id),
-    'legendaryActions.actions': entity.legendaryActions?.actions.map((action) => action.id) ?? [],
-  }),
+  overlayParticipantId: 'monsters',
   toFormValues: monsterToFormValues,
   enrichEditLayoutCtx: (ctx, entity) => ({
     ...ctx,

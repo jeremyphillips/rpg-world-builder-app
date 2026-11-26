@@ -7,26 +7,12 @@ import {
 
 import type { OverlayPatch } from './resolve-catalog'
 
-type PatchModelParticipant = SystemOverlayParticipantId
-
-const RESPONSE_TYPE_TO_PARTICIPANT: Partial<Record<string, PatchModelParticipant>> = {
-  monsters: 'monsters',
-  species: 'species',
-  classes: 'classes',
-  subclasses: 'subclasses',
-  spells: 'spells',
-  equipment: 'equipment',
-  feats: 'feats',
-  'skill-proficiencies': 'skill-proficiencies',
-}
-
 export function enrichResolvedSystemRecords<T extends { id: string; catalogLayer?: string }>(
   records: readonly T[],
   systemSeedById: ReadonlyMap<string, Record<string, unknown>>,
   patches: readonly OverlayPatch[],
-  contentType: string,
+  participantId: SystemOverlayParticipantId | undefined,
 ): T[] {
-  const participantId = RESPONSE_TYPE_TO_PARTICIPANT[contentType]
   if (!participantId) return [...records]
 
   const policy = overlayPolicyForParticipant(participantId)

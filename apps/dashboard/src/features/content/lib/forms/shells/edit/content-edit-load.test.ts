@@ -102,7 +102,6 @@ describe('loadContentEditFormState', () => {
     const def = {
       schema,
       toFormValues: () => ({ name: 'Elf', slug: 'elf', kind: 'service' }),
-      extractEmbeddedSeedRowIds: () => ({ traits: ['t1'] }),
     } as unknown as ContentFormDef<typeof entity, { name: string }, unknown>
 
     const result = loadContentEditFormState({
@@ -120,7 +119,6 @@ describe('loadContentEditFormState', () => {
       mode: 'edit',
       entityCatalogLayer: 'homebrew',
       equipmentKind: 'weapon',
-      embeddedSeedRowIds: { traits: ['t1'] },
     })
     expect(result.schema).toBe(schema)
     expect(result.defaultValues).toEqual({ name: 'Elf' })

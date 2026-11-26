@@ -1,5 +1,4 @@
 import type { Equipment } from '@rpg/contracts'
-import { CONTENT_MEDIA_REPLACE_KEY } from '@rpg/contracts'
 import {
   createEquipmentDraftInputSchema,
   createEquipmentInputSchema,
@@ -57,7 +56,6 @@ function bodyFromCreateInput(input: Record<string, unknown>): Record<string, unk
 
 export const equipmentContentConfig: ContentTypeConfig<Equipment> = {
   type: 'equipment',
-  patchReplaceKeys: [CONTENT_MEDIA_REPLACE_KEY],
   overlayParticipantId: 'equipment',
   system: {
     load: loadSeedEquipment,

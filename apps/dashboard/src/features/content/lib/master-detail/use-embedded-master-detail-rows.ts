@@ -113,9 +113,9 @@ export function useEmbeddedMasterDetailRows<TRow = Record<string, unknown>>({
   )
   const availabilityDialogRef = useRef<HTMLDivElement>(null)
   const persistedRowIds = useMemo(() => {
-    const ids = formCtx.embeddedSeedRowIds?.[fieldName]
+    const ids = formCtx.persistedIdentityRowIdsByPath?.[fieldName]
     return ids?.length ? new Set(ids) : undefined
-  }, [formCtx.embeddedSeedRowIds, fieldName])
+  }, [formCtx.persistedIdentityRowIdsByPath, fieldName])
   const systemOriginRowIds = useMemo(() => {
     const ids = formCtx.embeddedSystemOriginRowIds?.[fieldName]
     return ids?.length ? new Set(ids) : undefined

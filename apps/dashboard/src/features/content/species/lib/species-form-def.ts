@@ -83,6 +83,7 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
       buildSpeciesCreateInput(values, ctx, validationIntent),
       ctx,
     ) as CreateSpeciesInput,
+  overlayParticipantId: 'species',
   normalizeOverlayBody: (values, ctx, validationIntent = 'publish') => {
     const { slug: _slug, ...body } = buildSpeciesCreateInput(
       values,
@@ -94,11 +95,6 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
 
   useListQuery: useSpecies,
   queryKey: speciesQueryKey,
-
-  extractEmbeddedSeedRowIds: (entity) => ({
-    traits: entity.traits.map((trait) => trait.id),
-    'heritage.options': entity.heritage?.options.map((option) => option.id) ?? [],
-  }),
 
   preview: {
     buildIdentity: buildSpeciesPreviewIdentity,
