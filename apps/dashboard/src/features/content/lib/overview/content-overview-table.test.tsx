@@ -268,9 +268,6 @@ describe('ContentOverviewTable interactions', () => {
     renderOverview(data as ClassRow[])
 
     expect(screen.getByRole('link', { name: 'Class 0' })).toBeInTheDocument()
-    expect(screen.queryByRole('link', { name: 'Broken Class' })).not.toBeInTheDocument()
-
-    await user.click(screen.getByRole('button', { name: 'Show all campaign availability states' }))
 
     const failureName = screen.getByRole('link', { name: 'Broken Class' })
     expect(screen.getByText('Overlay unresolved')).toBeInTheDocument()

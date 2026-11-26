@@ -7,9 +7,10 @@ import {
 
 import {
   campaignAvailabilityFilterFn,
-  deriveCampaignAvailabilityScope as deriveGenericCampaignAvailabilityScope,
   type CampaignAvailabilityScope,
 } from '@/lib/overview/campaign-availability-scope.lib'
+
+import { isContentOverlayFailureOverviewRow } from '../list/content-overlay-overview.lib'
 
 import type { ContentBase } from './content-table-config'
 import { matchesPrimaryTextQuery } from '@rpg/ui/lib/search-document'
@@ -32,6 +33,16 @@ export const DEFAULT_CONTENT_OVERVIEW_FILTER_STATE: ContentOverviewFilterState =
   campaignAvailability: CAMPAIGN_AVAILABILITY_FILTER_DEFAULT,
 }
 
+/** Overlay resolve failures are not campaign-unavailability; keep them visible on the default filter. */
+export function contentRowPassesCampaignAvailabilityFilter<
+  T extends WithCampaignAccess<ContentBase>,
+>(row: T, filter: CampaignAvailabilityFilter): boolean {
+  if (isContentOverlayFailureOverviewRow(row)) {
+    return filter === 'available' || filter === 'all'
+  }
+  return campaignAvailabilityFilterFn(row.campaignAccess.available, filter)
+}
+
 export function matchesContentOverviewFilters<T extends WithCampaignAccess<ContentBase>>(
   row: T,
   filters: ContentOverviewFilterState,
@@ -45,7 +56,7 @@ export function matchesContentOverviewFilters<T extends WithCampaignAccess<Conte
   if (filters.status && row.status !== filters.status) return false
 
   if (!options?.excludeCampaignAvailability) {
-    if (!campaignAvailabilityFilterFn(row.campaignAccess.available, filters.campaignAvailability)) {
+    if (!contentRowPassesCampaignAvailabilityFilter(row, filters.campaignAvailability)) {
       return false
     }
   }
@@ -61,16 +72,18 @@ export function filterContentRows<T extends WithCampaignAccess<ContentBase>>(
   return data.filter((row) => matchesContentOverviewFilters(row, filters, options))
 }
 
-export function deriveCampaignAvailabilityScope<
-  T extends { campaignAccess: ResolvedContentCampaignAccess },
->(
+export function deriveCampaignAvailabilityScope<T extends WithCampaignAccess<ContentBase>>(
   scopedRows: T[],
   filters: Pick<ContentOverviewFilterState, 'campaignAvailability'>,
 ): CampaignAvailabilityScope {
-  return deriveGenericCampaignAvailabilityScope(scopedRows, {
-    isAvailable: (row) => row.campaignAccess.available,
-    filterValue: filters.campaignAvailability,
-  })
+  const campaignRows = scopedRows.filter((row) => !isContentOverlayFailureOverviewRow(row))
+  const availableCount = campaignRows.filter((row) => row.campaignAccess.available).length
+  const unavailableCount = campaignRows.length - availableCount
+  const visibleCount = scopedRows.filter((row) =>
+    contentRowPassesCampaignAvailabilityFilter(row, filters.campaignAvailability),
+  ).length
+
+  return { availableCount, unavailableCount, visibleCount }
 }
 
 export function getCampaignAccessFromRow<

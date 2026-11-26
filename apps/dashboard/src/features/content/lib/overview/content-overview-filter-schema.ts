@@ -13,6 +13,8 @@ import {
   type FilterSchema,
 } from '@rpg/ui/filters'
 
+import { isContentOverlayFailureOverviewRow } from '../list/content-overlay-overview.lib'
+
 import type { ContentBase } from './content-table-config'
 import { CATALOG_LAYER_BADGE, type CatalogLayer } from './catalog-layer-badge'
 import { CONTENT_STATUS_BADGE } from './content-status-badge'
@@ -76,12 +78,16 @@ export function createContentStatusFilter<
   }) as unknown as FilterFieldDef<TData, TState>
 }
 
+function contentOverviewRowCountsAsAvailable(row: OverviewRow): boolean {
+  return isContentOverlayFailureOverviewRow(row) || row.campaignAccess.available
+}
+
 export function createCampaignAvailabilityFilterField<
   TData extends OverviewRow,
   TState extends ContentOverviewBaseFilterState,
 >(): FilterFieldDef<TData, TState> {
-  return createSharedCampaignAvailabilityFilterField<TData, TState>(
-    (row) => row.campaignAccess.available,
+  return createSharedCampaignAvailabilityFilterField<TData, TState>((row) =>
+    contentOverviewRowCountsAsAvailable(row),
   )
 }
 
@@ -104,7 +110,7 @@ export function buildContentFilterSchema<
       createCampaignAvailabilityFilterField<TData, TState>(),
     ],
     {
-      availability: { isAvailable: (row) => row.campaignAccess.available },
+      availability: { isAvailable: (row) => contentOverviewRowCountsAsAvailable(row) },
     },
   )
 }

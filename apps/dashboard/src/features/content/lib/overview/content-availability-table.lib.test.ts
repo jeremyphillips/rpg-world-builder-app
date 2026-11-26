@@ -6,9 +6,12 @@ import {
   type WithCampaignAccess,
 } from '@rpg/contracts'
 
+import { mergeContentListOverviewRows } from '../list/create-content-list'
+
 import type { ContentBase } from './content-table-config'
 import {
   campaignAvailabilityFilterFn,
+  contentRowPassesCampaignAvailabilityFilter,
   deriveCampaignAvailabilityScope,
   filterContentRows,
   matchesContentOverviewFilters,
@@ -92,6 +95,63 @@ describe('deriveCampaignAvailabilityScope', () => {
       availableCount: 2,
       unavailableCount: 1,
       visibleCount: 2,
+    })
+  })
+})
+
+const OVERLAY_FAILURE = mergeContentListOverviewRows(
+  [row('9', 'Healthy', { available: true })],
+  [
+    {
+      targetId: 'class-broken',
+      slug: 'broken-class',
+      name: 'Broken Class',
+      code: 'unsupported_overlay_version',
+      message: 'System overlay patch is missing a supported version.',
+    },
+  ],
+)[1] as TestRow
+
+describe('contentRowPassesCampaignAvailabilityFilter', () => {
+  it('keeps overlay failure rows visible on the default available filter', () => {
+    expect(contentRowPassesCampaignAvailabilityFilter(OVERLAY_FAILURE, 'available')).toBe(true)
+    expect(contentRowPassesCampaignAvailabilityFilter(OVERLAY_FAILURE, 'all')).toBe(true)
+    expect(contentRowPassesCampaignAvailabilityFilter(OVERLAY_FAILURE, 'unavailable')).toBe(false)
+  })
+
+  it('still treats unavailable campaign rows as hidden on the available filter', () => {
+    const unavailable = row('2', 'Warlock', { available: false })
+    expect(contentRowPassesCampaignAvailabilityFilter(unavailable, 'available')).toBe(false)
+  })
+})
+
+describe('filterContentRows with overlay failures', () => {
+  it('shows overlay failures alongside available rows by default', () => {
+    const rows = [...DATA, OVERLAY_FAILURE]
+    const visible = filterContentRows(rows, { campaignAvailability: 'available' })
+    expect(visible.map((item) => item.name)).toEqual(['Wizard', 'Sorcerer', 'Broken Class'])
+  })
+
+  it('hides overlay failures from the unavailable-only filter', () => {
+    const rows = [...DATA, OVERLAY_FAILURE]
+    const visible = filterContentRows(rows, { campaignAvailability: 'unavailable' })
+    expect(visible.map((item) => item.name)).toEqual(['Warlock'])
+  })
+})
+
+describe('deriveCampaignAvailabilityScope with overlay failures', () => {
+  it('does not count overlay failures toward unavailable campaign rows', () => {
+    const rows = [...DATA, OVERLAY_FAILURE]
+    const scoped = filterContentRows(
+      rows,
+      { campaignAvailability: 'available' },
+      { excludeCampaignAvailability: true },
+    )
+
+    expect(deriveCampaignAvailabilityScope(scoped, { campaignAvailability: 'available' })).toEqual({
+      availableCount: 2,
+      unavailableCount: 1,
+      visibleCount: 3,
     })
   })
 })
