@@ -1,4 +1,6 @@
 import {
+  CAMPAIGN_AVAILABILITY_FILTER_DEFAULT,
+  type CampaignAvailabilityFilter,
   type ContentStatus,
   type WithCampaignAccess,
   type ContentTypeKey,
@@ -13,13 +15,22 @@ import {
 } from '@rpg/ui/filters'
 
 import { isContentOverlayFailureOverviewRow } from '../list/content-overlay-overview.lib'
-import { contentRowPassesCampaignAvailabilityFilter } from './content-availability-table.lib'
+import {
+  contentOverviewRowCampaignAvailabilityFilterValue,
+  contentOverviewSchemaRowIsCampaignAvailable,
+  contentRowPassesCampaignAvailabilityFilter,
+} from './content-availability-table.lib'
 
 import type { ContentBase } from './content-table-config'
 import { CATALOG_LAYER_BADGE, type CatalogLayer } from './catalog-layer-badge'
 import { CONTENT_STATUS_BADGE } from './content-status-badge'
 import { shouldPresentCatalogLayer } from '../content-type-presentation'
-import { createCampaignAvailabilityFilterField as createSharedCampaignAvailabilityFilterField } from '@/lib/overview/create-campaign-availability-filter-field'
+import {
+  CAMPAIGN_ACCESS_TABLE_FILTER_ALL,
+  CAMPAIGN_ACCESS_TABLE_FILTER_AVAILABLE,
+  CAMPAIGN_ACCESS_TABLE_FILTER_LABEL,
+  CAMPAIGN_ACCESS_TABLE_FILTER_UNAVAILABLE,
+} from '@/features/content/lib/campaign-access/campaign-access-table-labels'
 
 export type ContentOverviewBaseFilterState = {
   name?: string
@@ -78,26 +89,33 @@ export function createContentStatusFilter<
   }) as unknown as FilterFieldDef<TData, TState>
 }
 
-function contentOverviewRowIsCampaignAvailable(row: OverviewRow): boolean {
-  if (isContentOverlayFailureOverviewRow(row)) return false
-  return row.campaignAccess.available
-}
-
 export function createCampaignAvailabilityFilterField<
   TData extends OverviewRow,
   TState extends ContentOverviewBaseFilterState,
 >(): FilterFieldDef<TData, TState> {
-  const base = createSharedCampaignAvailabilityFilterField<TData, TState>((row) =>
-    contentOverviewRowIsCampaignAvailable(row),
-  )
-  return {
-    ...base,
-    matches: (row, value, state) =>
-      contentRowPassesCampaignAvailabilityFilter(
-        row,
-        value as Parameters<typeof contentRowPassesCampaignAvailabilityFilter>[1],
-      ),
-  }
+  return createEqualsFilter<
+    TData,
+    ContentOverviewBaseFilterState,
+    'campaignAvailability',
+    CampaignAvailabilityFilter
+  >({
+    id: 'campaignAvailability',
+    label: CAMPAIGN_ACCESS_TABLE_FILTER_LABEL,
+    placement: 'advanced',
+    width: 'lg',
+    defaultValue: CAMPAIGN_AVAILABILITY_FILTER_DEFAULT,
+    showAllOption: false,
+    isValueConstraining: (value) => value !== 'all',
+    url: { key: 'availability' },
+    options: [
+      { label: CAMPAIGN_ACCESS_TABLE_FILTER_AVAILABLE, value: 'available' },
+      { label: CAMPAIGN_ACCESS_TABLE_FILTER_UNAVAILABLE, value: 'unavailable' },
+      { label: CAMPAIGN_ACCESS_TABLE_FILTER_ALL, value: 'all' },
+    ],
+    getValue: (row) => contentOverviewRowCampaignAvailabilityFilterValue(row),
+    matches: (row, value) =>
+      contentRowPassesCampaignAvailabilityFilter(row, value as CampaignAvailabilityFilter),
+  }) as unknown as FilterFieldDef<TData, TState>
 }
 
 /** Unresolved rows must not satisfy explicit content-domain filters. */
@@ -134,7 +152,7 @@ export function buildContentFilterSchema<
       createCampaignAvailabilityFilterField<TData, TState>(),
     ],
     {
-      availability: { isAvailable: (row) => contentOverviewRowIsCampaignAvailable(row) },
+      availability: { isAvailable: (row) => contentOverviewSchemaRowIsCampaignAvailable(row) },
     },
   )
 }

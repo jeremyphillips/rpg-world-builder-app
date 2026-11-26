@@ -33,6 +33,15 @@ describe('subclass overlay failure scoping', () => {
     expect(scoped.map((row) => row.targetId)).toEqual(['srd:champion'])
   })
 
+  it('drops failures with unknown seed rows instead of trusting the route class', () => {
+    const scoped = filterSubclassOverlayFailuresForClass(
+      [failure('srd:unknown')],
+      'srd:fighter',
+      'srd-cc-5.2.1',
+    )
+    expect(scoped).toEqual([])
+  })
+
   it('uses seed classId for list items instead of the route when authoritative', () => {
     expect(
       resolveSubclassOverlayFailureClassId(failure('srd:evoker'), 'srd:fighter', 'srd-cc-5.2.1'),

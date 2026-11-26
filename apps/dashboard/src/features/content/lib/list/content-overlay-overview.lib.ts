@@ -6,9 +6,10 @@ import type { ContentOverlayFailureOverviewRow } from './create-content-list'
 export const CONTENT_OVERLAY_UNRESOLVED_STATUS_LABEL = 'Overlay unresolved' as const
 
 /**
- * Synthetic overlay-failure overview rows are manager diagnostics. Use dm_only
- * discoverability metadata so presentation filtering aligns with API list policy
- * without implying all_players campaign access.
+ * Presentation-only discoverability for merged overlay-failure overview rows.
+ * Not authoritative campaign access — bucket math uses
+ * {@link overlayFailureOverviewRowParticipatesInCampaignAvailability} and
+ * {@link contentRowPassesCampaignAvailabilityFilter} instead of this object’s `available` flag.
  */
 export const CONTENT_OVERLAY_FAILURE_ROW_CAMPAIGN_ACCESS: ResolvedContentCampaignAccess = {
   available: true,
@@ -16,6 +17,11 @@ export const CONTENT_OVERLAY_FAILURE_ROW_CAMPAIGN_ACCESS: ResolvedContentCampaig
   participantIds: [],
   unavailableParticipantIds: [],
   effectiveAudience: 'dm_only',
+}
+
+/** Unresolved overlay overview rows sit outside campaign available/unavailable buckets. */
+export function overlayFailureOverviewRowParticipatesInCampaignAvailability(row: unknown): boolean {
+  return !isContentOverlayFailureOverviewRow(row)
 }
 
 export function isContentOverlayFailureOverviewRow(

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { applyFilterSchema, createEqualsFilter } from '@rpg/ui/filters'
 
 import { overlayFailureOverviewRows } from '../list/create-content-list'
+import { contentOverviewRowCampaignAvailabilityFilterValue } from './content-availability-table.lib'
 import { buildContentFilterSchema } from './content-overview-filter-schema'
 
 type Row = WithCampaignAccess<{
@@ -113,5 +114,24 @@ describe('content-overview-filter-schema', () => {
       rows,
     )
     expect(unavailableFiltered.map((row) => row.name)).toEqual([])
+  })
+
+  it('labels overlay rows outside unavailable buckets via campaign availability getValue', () => {
+    const failure = overlayFailureOverviewRows([
+      {
+        targetId: 'class-broken',
+        slug: 'broken',
+        name: 'Broken Class',
+        code: 'unsupported_overlay_version',
+        message: 'Broken',
+      },
+    ])[0]!
+
+    expect(
+      contentOverviewRowCampaignAvailabilityFilterValue({
+        ...failure,
+        hitDie: 10,
+      } as unknown as Row),
+    ).toBe('all')
   })
 })

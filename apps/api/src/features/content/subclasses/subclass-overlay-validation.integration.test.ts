@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest'
 
 import { loadSeedSubclasses } from '@rpg/catalog/classes'
 
-import { SUBCLASS_PARENT_OVERLAY_UNRESOLVED_ISSUE_CODE } from '@rpg/contracts'
+import {
+  SUBCLASS_PARENT_OVERLAY_UNRESOLVED_ISSUE_CODE,
+  SUBCLASS_TARGET_OVERLAY_UNRESOLVED_ISSUE_CODE,
+} from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
 import { makeTestCampaign } from '../../../test/fixtures/campaigns'
@@ -138,14 +141,24 @@ describe('subclass overlay validation', () => {
     )
     expect(overlayFailures.some((failure) => failure.targetId === champion.id)).toBe(true)
 
-    await expectHttpErrorAsync(
-      () =>
-        assertSubclassBatchTargetsBelongToClass(campaign.id, FIGHTER_CLASS_ID, [
-          champion.id,
-          healthy.id,
-        ]),
-      { status: 409, code: 'unsupported_overlay_version' },
-    )
+    try {
+      await assertSubclassBatchTargetsBelongToClass(campaign.id, FIGHTER_CLASS_ID, [
+        champion.id,
+        healthy.id,
+      ])
+      expect.fail('expected overlay-blocked batch target')
+    } catch (error) {
+      expect(error).toBeInstanceOf(HttpError)
+      expect(error).toMatchObject({ status: 409, code: 'unsupported_overlay_version' })
+      expect((error as HttpError).details).toEqual({
+        issues: [
+          expect.objectContaining({
+            path: 'targets.0.entityId',
+            code: SUBCLASS_TARGET_OVERLAY_UNRESOLVED_ISSUE_CODE,
+          }),
+        ],
+      })
+    }
 
     await expectHttpErrorAsync(
       () => assertSubclassBatchTargetsBelongToClass(campaign.id, FIGHTER_CLASS_ID, [evocation.id]),

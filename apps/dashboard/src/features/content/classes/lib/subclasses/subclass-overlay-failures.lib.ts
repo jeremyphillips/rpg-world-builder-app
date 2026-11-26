@@ -13,9 +13,9 @@ export function filterSubclassOverlayFailuresForClass(
 
   return failures.filter((failure) => {
     const seed = resolveSubclassCatalogSeedBody(rulesetId, failure.targetId)
-    if (!seed) return true
+    if (!seed) return false
     const seedClassId = seed.classId
-    return typeof seedClassId !== 'string' || seedClassId === classId
+    return typeof seedClassId === 'string' && seedClassId === classId
   })
 }
 

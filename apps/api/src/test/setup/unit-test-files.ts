@@ -18,6 +18,7 @@ export const unitTestFiles = [
   'src/features/content/lib/content-usage/content-usage-resolvers.test.ts',
   'src/features/content/lib/content-usage/define-content-usage.test.ts',
   'src/features/content/lib/content-usage/reference-sources/characters-extract.test.ts',
+  'src/features/content/lib/content-usage/reference-sources/overlay-failure-seed-referrers.test.ts',
   'src/features/content/lib/content-write-schema.test.ts',
   'src/features/content/lib/deep-merge.test.ts',
   'src/features/content/lib/duplication/duplicate-content.test.ts',

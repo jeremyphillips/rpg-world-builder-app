@@ -32,6 +32,11 @@ export async function resolveCatalogRowsWithOverlayFailureSeeds<
 
   const campaign = await findCampaignById(campaignId)
   if (!campaign) {
+    if (overlayFailures.length > 0) {
+      throw new Error(
+        `Cannot resolve overlay failure seed bodies: campaign ${campaignId} was not found.`,
+      )
+    }
     return { records: items, overlayFailureSeeds: [] }
   }
 

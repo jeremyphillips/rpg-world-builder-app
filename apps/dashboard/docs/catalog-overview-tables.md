@@ -114,6 +114,10 @@ createFilterSchema(fields, {
 ```
 
 - **`availability.isAvailable`** is the SSOT for scope math — not inferred from filter field ids.
+- Unresolved system overlay overview rows use `contentOverviewSchemaRowIsCampaignAvailable` and
+  `contentOverviewRowCampaignAvailabilityFilterValue` (dashboard `content-availability-table.lib`) —
+  they are outside available/unavailable buckets, stay visible on the default available filter, and
+  must not be classified via synthetic row `campaignAccess.available`.
 - The shell renders count + action chrome only; feature pages supply nouns via
   `availabilityEmptyState` when the filtered table is empty but hidden unavailable rows exist.
 

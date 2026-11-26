@@ -10,7 +10,10 @@ import {
   type CampaignAvailabilityScope,
 } from '@/lib/overview/campaign-availability-scope.lib'
 
-import { isContentOverlayFailureOverviewRow } from '../list/content-overlay-overview.lib'
+import {
+  isContentOverlayFailureOverviewRow,
+  overlayFailureOverviewRowParticipatesInCampaignAvailability,
+} from '../list/content-overlay-overview.lib'
 
 import type { ContentBase } from './content-table-config'
 import { matchesPrimaryTextQuery } from '@rpg/ui/lib/search-document'
@@ -31,6 +34,32 @@ export { campaignAvailabilityFilterFn }
 
 export const DEFAULT_CONTENT_OVERVIEW_FILTER_STATE: ContentOverviewFilterState = {
   campaignAvailability: CAMPAIGN_AVAILABILITY_FILTER_DEFAULT,
+}
+
+/**
+ * Whether a row belongs in campaign available/unavailable buckets (scope math, filter getValue).
+ * Unresolved overlay rows are outside both buckets — see `contentRowPassesCampaignAvailabilityFilter`.
+ */
+export function contentOverviewRowParticipatesInCampaignAvailabilityBuckets<
+  T extends WithCampaignAccess<ContentBase>,
+>(row: T): boolean {
+  return overlayFailureOverviewRowParticipatesInCampaignAvailability(row)
+}
+
+/** SSOT for filter-schema `availability.isAvailable` — excludes unresolved overlay rows. */
+export function contentOverviewSchemaRowIsCampaignAvailable<
+  T extends WithCampaignAccess<ContentBase>,
+>(row: T): boolean {
+  if (!contentOverviewRowParticipatesInCampaignAvailabilityBuckets(row)) return false
+  return row.campaignAccess.available
+}
+
+/** Filter-field getValue bucket — overlay rows use `all` so they are never labeled unavailable. */
+export function contentOverviewRowCampaignAvailabilityFilterValue<
+  T extends WithCampaignAccess<ContentBase>,
+>(row: T): CampaignAvailabilityFilter {
+  if (!contentOverviewRowParticipatesInCampaignAvailabilityBuckets(row)) return 'all'
+  return row.campaignAccess.available ? 'available' : 'unavailable'
 }
 
 /** Overlay resolve failures are not campaign-unavailability; keep them visible on the default filter. */

@@ -316,6 +316,60 @@ describe('ContentOverviewTable interactions', () => {
     expect(within(healthyRow).getByRole('checkbox', { name: 'Select Class 0' })).toBeEnabled()
   })
 
+  it('hides overlay failures from the unavailable filter and surfaces the overlay supplement', () => {
+    const unavailable = {
+      ...createRows(1)[0]!,
+      id: 'class-off',
+      name: 'Unavailable Class',
+      campaignAccess: {
+        available: false,
+        visibilityMode: 'dm_only' as const,
+        participantIds: [],
+        unavailableParticipantIds: [],
+        effectiveAudience: 'none' as const,
+      },
+    }
+    const data = mergeContentListOverviewRows(
+      [unavailable],
+      [
+        {
+          targetId: 'class-broken',
+          slug: 'broken-class',
+          name: 'Broken Class',
+          code: 'unsupported_overlay_version',
+          message: 'System overlay patch is missing a supported version.',
+        },
+      ],
+    ) as ClassRow[]
+
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    const router = createMemoryRouter(
+      [
+        {
+          path: '/',
+          element: (
+            <QueryClientProvider client={queryClient}>
+              <ContentOverviewTable<ClassRow, ClassesOverviewFilterState>
+                contentTypeKey="classes"
+                campaignId={CAMPAIGN_ID}
+                columns={columns}
+                filterSchema={classFilterSchema}
+                data={data}
+                getEditHref={(row) => `/classes/${row.id}/edit`}
+              />
+            </QueryClientProvider>
+          ),
+        },
+      ],
+      { initialEntries: ['/?availability=unavailable'] },
+    )
+    render(<RouterProvider router={router} />)
+
+    expect(screen.queryByRole('link', { name: 'Broken Class' })).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Unavailable Class' })).toBeInTheDocument()
+    expect(screen.getByText('1 unresolved overlay row hidden by this filter')).toBeInTheDocument()
+  })
+
   it('sorts healthy class rows by Hit Die while keeping unresolved rows last with placeholders', async () => {
     const user = userEvent.setup()
     const healthyRows = [

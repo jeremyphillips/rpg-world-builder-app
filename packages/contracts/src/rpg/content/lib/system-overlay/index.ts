@@ -97,7 +97,10 @@ export {
   type CatalogOverlayListFailureCode,
   type CatalogOverlayListFailureSeedRow,
 } from './catalog-overlay-list-failures'
-export { SUBCLASS_PARENT_OVERLAY_UNRESOLVED_ISSUE_CODE } from './subclass-overlay-parent'
+export {
+  SUBCLASS_PARENT_OVERLAY_UNRESOLVED_ISSUE_CODE,
+  SUBCLASS_TARGET_OVERLAY_UNRESOLVED_ISSUE_CODE,
+} from './subclass-overlay-parent'
 export {
   overlayReadDiagnosticsSchema,
   type OverlayApplyFailure,

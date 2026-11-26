@@ -11,6 +11,8 @@ import { mergeContentListOverviewRows } from '../list/create-content-list'
 import type { ContentBase } from './content-table-config'
 import {
   campaignAvailabilityFilterFn,
+  contentOverviewRowCampaignAvailabilityFilterValue,
+  contentOverviewRowParticipatesInCampaignAvailabilityBuckets,
   contentRowPassesCampaignAvailabilityFilter,
   deriveCampaignAvailabilityScope,
   filterContentRows,
@@ -111,6 +113,17 @@ const OVERLAY_FAILURE = mergeContentListOverviewRows(
     },
   ],
 )[1] as TestRow
+
+describe('overlay campaign availability buckets', () => {
+  it('excludes overlay rows from participate-in-buckets and filter getValue', () => {
+    expect(contentOverviewRowParticipatesInCampaignAvailabilityBuckets(OVERLAY_FAILURE)).toBe(false)
+    expect(contentOverviewRowCampaignAvailabilityFilterValue(OVERLAY_FAILURE)).toBe('all')
+    expect(contentOverviewRowCampaignAvailabilityFilterValue(row('1', 'Wizard'))).toBe('available')
+    expect(
+      contentOverviewRowCampaignAvailabilityFilterValue(row('2', 'Warlock', { available: false })),
+    ).toBe('unavailable')
+  })
+})
 
 describe('contentRowPassesCampaignAvailabilityFilter', () => {
   it('keeps overlay failure rows visible on the default available filter', () => {
