@@ -30,6 +30,7 @@ import type {
   WeaponPropertyVocabulary,
 } from '@/features/vocabulary'
 
+import type { ContentListFullQueryResult } from '../../list/create-content-list'
 import type { ContentListQueryResult } from '../../list/content-client'
 import type { ContentFormOptionSets } from '../../form-options/content-form-options'
 import type { ContentFormPreviewConfig } from '../preview/content-form-preview.types'
@@ -228,6 +229,8 @@ export interface ContentFormDef<
   overlayParticipantId?: SystemOverlayParticipantId
   /** List query hook; the edit shell uses it to seed the form from cache. */
   useListQuery: (campaignId: string | undefined) => ContentListQueryResult<TEntity>
+  /** Full list payload including `overlayFailures` for edit gating. */
+  useListQueryResult: (campaignId: string | undefined) => ContentListFullQueryResult<TEntity>
   /** Query key factory; used to invalidate the list after a successful mutation. */
   queryKey: (campaignId: string) => readonly unknown[]
   /**

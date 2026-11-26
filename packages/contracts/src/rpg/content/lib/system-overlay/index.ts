@@ -87,6 +87,18 @@ export {
   type ParsedStoredOverlayInput,
 } from './legacy'
 export {
+  catalogOverlayListFailureMessage,
+  catalogOverlayListFailureSchema,
+  overlayApplyFailureToListCode,
+  overlayFailureToListEntry,
+  CATALOG_OVERLAY_LIST_FAILURE_CODES,
+  catalogOverlayListFailureCodeSchema,
+  type CatalogOverlayListFailure,
+  type CatalogOverlayListFailureCode,
+  type CatalogOverlayListFailureSeedRow,
+} from './catalog-overlay-list-failures'
+export {
+  overlayReadDiagnosticsSchema,
   type OverlayApplyFailure,
   type OverlayReconcileFailure,
   type OverlayReadDiagnostics,

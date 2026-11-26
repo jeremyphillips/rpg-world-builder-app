@@ -1,15 +1,15 @@
 import {
+  applyStoredOverlay,
   reconcileContentProvenance,
+  overlayFailureToListEntry,
   type ApiContentTypeKey,
+  type CatalogOverlayListFailure,
+  type OverlayReadDiagnostics,
   type SystemOverlayParticipantId,
   type SystemRulesetId,
 } from '@rpg/contracts'
 
-import {
-  contentEntityBody,
-  overlayPolicyForValidationIntent,
-  resolveSystemBodyWithOverlay,
-} from './resolve-system-overlay.lib'
+import { contentEntityBody, overlayPolicyForValidationIntent } from './resolve-system-overlay.lib'
 
 /** Any stored content record is referenced by its opaque `id`. */
 interface Identified {
@@ -28,6 +28,29 @@ export type ResolveCatalogOptions = {
   validationIntent?: 'publish' | 'draft'
 }
 
+export type ResolveCatalogResult<T> = {
+  records: T[]
+  overlayFailures: CatalogOverlayListFailure[]
+}
+
+function overlayReadDiagnosticsNonEmpty(
+  diagnostics: OverlayReadDiagnostics,
+): diagnostics is OverlayReadDiagnostics {
+  return diagnostics.orphanedSeedOverrides.length > 0 || diagnostics.identityConflicts.length > 0
+}
+
+function catalogListFailureSeedRow(record: Record<string, unknown>): {
+  id: string
+  slug: string
+  name: string
+} {
+  const { id, slug, name } = record
+  if (typeof id !== 'string' || typeof slug !== 'string' || typeof name !== 'string') {
+    throw new Error(`System catalog row is missing id, slug, or name for overlay failure.`)
+  }
+  return { id, slug, name }
+}
+
 /**
  * Resolve a campaign's effective catalog for one content type (type-agnostic):
  *
@@ -35,26 +58,31 @@ export type ResolveCatalogOptions = {
  * 2. append the campaign's homebrew records.
  *
  * Patches whose `targetId` matches no system record are ignored. Unversioned
- * patch documents fail closed when an overlay participant is configured.
+ * patch documents become `overlayFailures` when overlay wiring is present.
  */
 export function resolveCatalog<T extends Identified>(
   system: readonly T[],
   patches: readonly OverlayPatch[],
   homebrew: readonly T[],
   options?: ResolveCatalogOptions,
-): T[] {
+): ResolveCatalogResult<T> {
   const patchByTarget = new Map(patches.map((p) => [p.targetId, p]))
   const participantId = options?.overlayParticipantId
   const policy = participantId
     ? overlayPolicyForValidationIntent(participantId, options?.validationIntent ?? 'publish')
     : undefined
 
-  const resolvedSystem = system.map((record) => {
+  const overlayFailures: CatalogOverlayListFailure[] = []
+  const resolvedSystem: T[] = []
+
+  for (const record of system) {
     const overlay = patchByTarget.get(record.id)
     const recordRecord = record as unknown as Record<string, unknown>
     const seedBody = contentEntityBody(recordRecord)
 
     let mergedBody: Record<string, unknown>
+    let readDiagnostics: OverlayReadDiagnostics | undefined
+
     if (!overlay) {
       mergedBody = seedBody
     } else if (!policy) {
@@ -62,25 +90,38 @@ export function resolveCatalog<T extends Identified>(
         'System overlay patch present but overlayParticipantId is not configured for this content type.',
       )
     } else {
-      mergedBody = resolveSystemBodyWithOverlay(seedBody, overlay.patch, policy)
+      const applied = applyStoredOverlay(seedBody, overlay.patch, policy)
+      if (!applied.ok) {
+        overlayFailures.push(
+          overlayFailureToListEntry(catalogListFailureSeedRow(recordRecord), applied.failure),
+        )
+        continue
+      }
+      mergedBody = applied.result.body
+      if (overlayReadDiagnosticsNonEmpty(applied.result.diagnostics)) {
+        readDiagnostics = applied.result.diagnostics
+      }
     }
 
-    const published = {
+    const published: Record<string, unknown> = {
       ...recordRecord,
       ...mergedBody,
       status: 'published' as const,
+      ...(readDiagnostics ? { overlayReadDiagnostics: readDiagnostics } : {}),
     }
     const rulesetId = recordRecord.rulesetId as SystemRulesetId | undefined
-    if (!rulesetId) return published as T
-    return reconcileContentProvenance({
-      authority: 'preserve',
-      catalogLayer: 'system',
-      rulesetId,
-      contentTypeKey: options?.contentTypeKey,
-      normalized: published,
-      existing: recordRecord,
-    }) as unknown as T
-  })
+    const resolved = !rulesetId
+      ? (published as T)
+      : (reconcileContentProvenance({
+          authority: 'preserve',
+          catalogLayer: 'system',
+          rulesetId,
+          contentTypeKey: options?.contentTypeKey,
+          normalized: published,
+          existing: recordRecord,
+        }) as unknown as T)
+    resolvedSystem.push(resolved)
+  }
 
-  return [...resolvedSystem, ...homebrew]
+  return { records: [...resolvedSystem, ...homebrew], overlayFailures }
 }

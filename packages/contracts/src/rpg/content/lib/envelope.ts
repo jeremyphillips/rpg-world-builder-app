@@ -6,6 +6,7 @@ import {
 import { contentProvenanceSchema } from '../../primitives/provenance'
 import { systemRulesetIdSchema } from '../../primitives/ruleset'
 import { catalogLayerSchema } from '../../vocab/catalog-layer'
+import { overlayReadDiagnosticsSchema } from './system-overlay/overlay-failures'
 
 // ---------------------------------------------------------------------------
 // Content ownership — the reusable envelope every catalog content type extends
@@ -64,6 +65,8 @@ export const contentMetaSchema = z.object({
   seedRowIdsByPath: z.record(z.string().min(1), z.array(z.string().min(1))).optional(),
   /** Latest overlay patch revision for optimistic concurrency (read model only). */
   overlayRevision: z.number().int().min(0).optional(),
+  /** Non-fatal overlay apply diagnostics (read model only; omit when both lists are empty). */
+  overlayReadDiagnostics: overlayReadDiagnosticsSchema.optional(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
 })

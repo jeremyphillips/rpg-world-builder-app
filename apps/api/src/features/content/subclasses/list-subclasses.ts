@@ -1,12 +1,7 @@
 import type { Request, Response } from 'express'
 
-import type { ResolvedSubclass } from '@rpg/contracts'
-
-import { HttpError } from '../../../lib/http-error'
-import { findCampaignById } from '../../campaign'
-import { enrichResolvedSystemRecords } from '../lib/enrich-system-content-read'
-import { resolveCatalog } from '../lib/resolve-catalog'
-import { loadSystemContent, loadSystemContentPatches } from '../lib/content-type-config'
+import type { CatalogOverlayListFailure, ResolvedSubclass } from '@rpg/contracts'
+import { resolveContentListForCampaign } from '../content.service'
 import { attachCampaignAccessForTargetType } from '../lib/content-campaign-access.service'
 import { filterCatalogForMembership } from '../lib/filter-catalog-for-viewer'
 import { resolveCatalogMembershipFilter } from '../lib/resolve-catalog-membership-filter'
@@ -15,41 +10,38 @@ import { contentUsageContextFromRequest } from '../lib/content-usage/content-usa
 import { subclassContentConfig } from './subclasses.config'
 
 /** Resolved subclasses for one class: system + patches + homebrew, with campaign access metadata. */
+export async function resolveSubclassesListForCampaign(
+  campaignId: string,
+  classId: string,
+): Promise<{ subclasses: ResolvedSubclass[]; overlayFailures: CatalogOverlayListFailure[] }> {
+  const { items, overlayFailures } = await resolveContentListForCampaign(
+    subclassContentConfig,
+    campaignId,
+  )
+  const filtered = items.filter((subclass) => subclass.classId === classId)
+  const withCampaignAccess = await attachCampaignAccessForTargetType(
+    campaignId,
+    'subclasses',
+    filtered,
+  )
+  return { subclasses: withCampaignAccess, overlayFailures }
+}
+
+/** Resolved subclasses for one class: system + patches + homebrew, with campaign access metadata. */
 export async function resolveSubclassesForCampaign(
   campaignId: string,
   classId: string,
 ): Promise<ResolvedSubclass[]> {
-  const campaign = await findCampaignById(campaignId)
-  if (!campaign) {
-    throw new HttpError(404, 'not_found', 'Campaign not found.')
-  }
-
-  const { rulesetId } = campaign
-  const systemSeed = loadSystemContent(subclassContentConfig, rulesetId)
-  const [patches, homebrew] = await Promise.all([
-    loadSystemContentPatches(subclassContentConfig, campaignId),
-    subclassContentConfig.loadHomebrew(campaignId, rulesetId),
-  ])
-
-  const seedById = new Map(
-    systemSeed.map((record) => [record.id, record as unknown as Record<string, unknown>]),
-  )
-  const resolved = enrichResolvedSystemRecords(
-    resolveCatalog(systemSeed, patches, homebrew, {
-      contentTypeKey: 'classes',
-      overlayParticipantId: subclassContentConfig.overlayParticipantId,
-    }).filter((subclass) => subclass.classId === classId),
-    seedById,
-    patches,
-    subclassContentConfig.overlayParticipantId,
-  )
-
-  return attachCampaignAccessForTargetType(campaignId, 'subclasses', resolved)
+  const { subclasses } = await resolveSubclassesListForCampaign(campaignId, classId)
+  return subclasses
 }
 
 export async function listSubclasses(req: Request, res: Response): Promise<void> {
   const { campaignId, classId } = req.params as { campaignId: string; classId: string }
-  const subclasses = await resolveSubclassesForCampaign(campaignId, classId)
+  const { subclasses, overlayFailures } = await resolveSubclassesListForCampaign(
+    campaignId,
+    classId,
+  )
   const visible = filterCatalogForMembership(subclasses, resolveCatalogMembershipFilter(req))
   const usageEnvelope = await buildContentListUsageEnvelope(
     contentUsageContextFromRequest(req, campaignId),
@@ -58,6 +50,7 @@ export async function listSubclasses(req: Request, res: Response): Promise<void>
   )
   res.status(200).json({
     subclasses: usageEnvelope.items,
+    ...(overlayFailures.length > 0 ? { overlayFailures } : {}),
     ...(usageEnvelope.usageSummaryLabels
       ? { usageSummaryLabels: usageEnvelope.usageSummaryLabels }
       : {}),

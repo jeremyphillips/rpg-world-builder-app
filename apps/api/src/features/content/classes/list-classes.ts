@@ -39,7 +39,7 @@ export async function resolveSubclassSummariesByClassId(
       contentTypeKey: 'classes',
       overlayParticipantId: subclassContentConfig.overlayParticipantId,
     },
-  )
+  ).records
   const withCampaignAccess = await attachCampaignAccessForTargetType(
     campaignId,
     'subclasses',

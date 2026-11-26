@@ -15,7 +15,7 @@ import type { ClientSession } from 'mongoose'
 
 import { HttpError } from '../../../lib/http-error'
 import { findCampaignById } from '../../campaign'
-import { resolveCatalogForCampaign } from '../content.service'
+import { resolveContentListForCampaign } from '../content.service'
 import { loadSystemContentSlugs } from './content-type-config'
 import { normalizeHomebrewWriteInput } from './apply-content-keys'
 import { assertSlugAvailable } from './assert-slug-available'
@@ -905,9 +905,16 @@ export async function resolveContentEntityForWrite<T extends StoredEntity>(
     throw new HttpError(404, 'not_found', 'Campaign not found.')
   }
 
-  const catalog = await resolveCatalogForCampaign(config.readConfig, campaignId)
+  const { items: catalog, overlayFailures } = await resolveContentListForCampaign(
+    config.readConfig,
+    campaignId,
+  )
   const existing = catalog.find((record) => record.id === entityId)
   if (!existing) {
+    const overlayFailure = overlayFailures.find((failure) => failure.targetId === entityId)
+    if (overlayFailure) {
+      throw new HttpError(409, overlayFailure.code, overlayFailure.message)
+    }
     throw new HttpError(404, 'not_found', 'Content record not found.')
   }
 

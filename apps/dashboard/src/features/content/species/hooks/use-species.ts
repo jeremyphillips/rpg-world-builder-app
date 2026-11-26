@@ -20,3 +20,5 @@ export const useSpeciesUsageMeta = speciesContentList.useUsageMeta
 
 export const { useCreateContent: useCreateSpecies, useUpdateContent: useUpdateSpecies } =
   createContentMutationHooks('species', speciesQueryKey)
+
+export const useSpeciesListResult = speciesContentList.useListQueryResult

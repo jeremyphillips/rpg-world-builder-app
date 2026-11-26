@@ -2,12 +2,13 @@ import {
   API_CONTENT_TYPE_KEYS,
   HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS,
   type ApiContentTypeKey,
+  type CatalogOverlayListFailure,
   type HomebrewSummaryContentType,
 } from '@rpg/contracts'
 
 import { classRegistration } from './classes/classes.config'
 import { resolveClassesForCampaign } from './classes/derive-classes-catalog'
-import { resolveCatalogForCampaign } from './content.service'
+import { resolveCatalogForCampaign, resolveContentListForCampaign } from './content.service'
 import { equipmentRegistration } from './equipment/equipment.config'
 import { featRegistration } from './feats/feats.config'
 import type { ContentTypeConfig } from './lib/content-type-config'
@@ -77,6 +78,18 @@ export async function resolveContentForCampaign(
     return reg.resolveForCampaign(campaignId)
   }
   return resolveCatalogForCampaign(reg.read, campaignId)
+}
+
+/** List route kernel: entities plus overlay failures omitted from `items`. */
+export async function resolveContentListForCampaignType(
+  type: ContentTypeName,
+  campaignId: string,
+): Promise<{ items: WriteEntityBase[]; overlayFailures: CatalogOverlayListFailure[] }> {
+  const reg = CONTENT_TYPES[type] as ContentTypeRegistration
+  if (reg.resolveForCampaign) {
+    return { items: await reg.resolveForCampaign(campaignId), overlayFailures: [] }
+  }
+  return resolveContentListForCampaign(reg.read, campaignId)
 }
 
 export { API_CONTENT_TYPE_KEYS, HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS }

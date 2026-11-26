@@ -8,6 +8,7 @@ export type SystemOverlayWriteNotReadyReason =
   | 'missing_provenance'
   | 'snapshot_mismatch'
   | 'unregistered_participant'
+  | 'unresolved_overlay'
 
 export type SystemOverlayWriteSnapshot = {
   entityId: string
@@ -40,6 +41,8 @@ const REASON_MESSAGES: Record<SystemOverlayWriteNotReadyReason, string> = {
   missing_provenance: 'Seed row locks for this record are missing from the catalog response.',
   snapshot_mismatch: 'This record changed since the form loaded. Refresh and try again.',
   unregistered_participant: 'This content type is not registered for system overlay updates.',
+  unresolved_overlay:
+    'This system record could not be loaded because its overlay is invalid. It cannot be edited until the overlay is fixed.',
 }
 
 export function systemOverlayWriteNotReadyMessage(

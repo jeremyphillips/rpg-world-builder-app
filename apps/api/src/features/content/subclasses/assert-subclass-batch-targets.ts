@@ -1,5 +1,5 @@
 import { HttpError } from '../../../lib/http-error'
-import { resolveCatalogForCampaign } from '../content.service'
+import { resolveContentListForCampaign } from '../content.service'
 import { subclassContentConfig } from './subclasses.config'
 import { resolveSubclassesForCampaign } from './list-subclasses'
 
@@ -17,8 +17,13 @@ export async function assertSubclassBatchTargetsBelongToClass(
     return
   }
 
-  const allSubclasses = await resolveCatalogForCampaign(subclassContentConfig, campaignId)
+  const { items: allSubclasses, overlayFailures } = await resolveContentListForCampaign(
+    subclassContentConfig,
+    campaignId,
+  )
+  const overlayFailureIds = new Set(overlayFailures.map((failure) => failure.targetId))
   for (const entityId of unknownIds) {
+    if (overlayFailureIds.has(entityId)) continue
     const match = allSubclasses.find((subclass) => subclass.id === entityId)
     if (match && match.classId !== routeClassId) {
       throw new HttpError(

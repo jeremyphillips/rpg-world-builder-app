@@ -1,3 +1,5 @@
+import { z } from 'zod'
+
 export type OverlayUnsupportedVersionFailure = {
   code: 'unsupported-overlay-version'
   version: unknown
@@ -31,3 +33,8 @@ export type OverlayReadDiagnostics = {
   orphanedSeedOverrides: readonly string[]
   identityConflicts: readonly string[]
 }
+
+export const overlayReadDiagnosticsSchema = z.object({
+  orphanedSeedOverrides: z.array(z.string().min(1)),
+  identityConflicts: z.array(z.string().min(1)),
+})

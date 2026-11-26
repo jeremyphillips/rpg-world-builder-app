@@ -13,7 +13,7 @@ import {
 import { managedMediaFormDefFields } from '../../lib/forms/registry/managed-media-form-def.lib'
 import { nameField } from '../../lib/forms/fields/content-identity-form-fields'
 import { finalizeContentInput } from '../../lib/forms/registry/content-form-key-helpers'
-import { useSpecies, speciesQueryKey } from '../hooks/use-species'
+import { useSpecies, useSpeciesListResult, speciesQueryKey } from '../hooks/use-species'
 import {
   buildSpeciesTabs,
   createSpeciesDraftFormSchema,
@@ -94,6 +94,7 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
   },
 
   useListQuery: useSpecies,
+  useListQueryResult: useSpeciesListResult,
   queryKey: speciesQueryKey,
 
   preview: {

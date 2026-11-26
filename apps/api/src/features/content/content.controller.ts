@@ -7,7 +7,7 @@ import {
   getContentWriteConfig,
   isContentTypeName,
   isContentWriteType,
-  resolveContentForCampaign,
+  resolveContentListForCampaignType,
 } from './content-types'
 import { createHomebrewContent, updateContentEntity } from './lib/content-write.service'
 import { deleteContentEntity, getContentDeletionAvailability } from './lib/content-deletion.service'
@@ -190,7 +190,10 @@ export async function listContent(req: Request, res: Response): Promise<void> {
     throw new HttpError(404, 'not_found', `Unknown content type "${contentType}".`)
   }
   const writeConfig = getContentWriteConfig(contentType)!
-  const items = await resolveContentForCampaign(contentType, campaignId)
+  const { items, overlayFailures } = await resolveContentListForCampaignType(
+    contentType,
+    campaignId,
+  )
   const withCampaignAccess = await attachCampaignAccessForTargetType(campaignId, contentType, items)
   const visible = applyCatalogListFilter(withCampaignAccess, resolveCatalogListFilter(req))
   const usageEnvelope = await buildContentListUsageEnvelope(
@@ -200,6 +203,7 @@ export async function listContent(req: Request, res: Response): Promise<void> {
   )
   res.status(200).json({
     [writeConfig.responseKey]: usageEnvelope.items,
+    ...(overlayFailures.length > 0 ? { overlayFailures } : {}),
     ...(usageEnvelope.usageSummaryLabels
       ? { usageSummaryLabels: usageEnvelope.usageSummaryLabels }
       : {}),

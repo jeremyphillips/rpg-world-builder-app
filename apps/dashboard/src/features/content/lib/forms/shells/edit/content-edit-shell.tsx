@@ -5,7 +5,7 @@ import type {
   ResolvedContentCampaignAccess,
 } from '@rpg/contracts'
 import { emptyContentMediaSchema, type ContentMedia } from '@rpg/contracts'
-import { Heading, Spinner, Text } from '@rpg/ui'
+import { Alert, Heading, Spinner, Text } from '@rpg/ui'
 import { useQueryClient } from '@tanstack/react-query'
 import { type ReactNode, useMemo, useState } from 'react'
 import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
@@ -19,6 +19,7 @@ import { SubclassUnsavedEditsProvider } from '@/features/content/classes/hooks/s
 import { stripEditEnvelopeFromFormDefaults } from '../../registry/content-form-key-helpers'
 import { serializeContentFormInput } from '../../registry/content-form-serialize-input.lib'
 import { resolveCatalogSeedBody } from '../../registry/resolve-catalog-seed-body.lib'
+import { findContentOverlayListFailure } from '../../../list/create-content-list'
 import { useContentWriteMutation } from '../../../list/use-content-mutations'
 import { type AnyContentFormDef, type ContentFormCtx } from '../../registry/content-form-registry'
 import {
@@ -302,9 +303,18 @@ function ContentEditFormReady({
   formCtx,
   ctx,
 }: Omit<ContentEditFormReadyProps, 'backHref'>) {
-  const entity = findContentEditEntity(def.useListQuery(campaignId).data, entityId)
+  const listResult = def.useListQueryResult(campaignId)
+  const entity = findContentEditEntity(listResult.data?.items, entityId)
+  const overlayFailure = findContentOverlayListFailure(listResult.data?.overlayFailures, entityId)
 
   if (!entity) {
+    if (overlayFailure) {
+      return (
+        <Alert variant="destructive" role="alert">
+          {overlayFailure.message}
+        </Alert>
+      )
+    }
     return (
       <Text variant="destructive" role="alert">
         {notFoundLabel}

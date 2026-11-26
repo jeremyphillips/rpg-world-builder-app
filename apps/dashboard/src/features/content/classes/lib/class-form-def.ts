@@ -12,7 +12,7 @@ import {
 import { managedMediaFormDefFields } from '../../lib/forms/registry/managed-media-form-def.lib'
 import { finalizeContentInput } from '../../lib/forms/registry/content-form-key-helpers'
 import { nameField } from '../../lib/forms/fields/content-identity-form-fields'
-import { classesQueryKey, useClasses } from '../hooks/use-classes'
+import { classesQueryKey, useClasses, useClassesListResult } from '../hooks/use-classes'
 import {
   buildClassTabs,
   classDraftFormSchema,
@@ -150,6 +150,7 @@ const classFormDef: ContentFormDef<
   },
 
   useListQuery: useClasses,
+  useListQueryResult: useClassesListResult,
   queryKey: classesQueryKey,
 
   preview: {

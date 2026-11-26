@@ -1,4 +1,5 @@
 import type {
+  CatalogOverlayListFailure,
   ContentDeletionAvailability,
   ContentDeletionResult,
   ContentEntryUsage,
@@ -23,6 +24,7 @@ export type SubclassListRow = ResolvedSubclass & ContentListUsageFields
 
 export type SubclassesListResult = {
   subclasses: SubclassListRow[]
+  overlayFailures?: CatalogOverlayListFailure[]
   usageSummaryLabels?: ContentUsageSummaryLabels
   overviewUsageScope?: ContentOverviewUsageScope
 }
@@ -33,6 +35,7 @@ export async function fetchSubclasses(
 ): Promise<SubclassesListResult> {
   const body = await request<{
     subclasses: SubclassListRow[]
+    overlayFailures?: CatalogOverlayListFailure[]
     usageSummaryLabels?: ContentUsageSummaryLabels
     overviewUsageScope?: ContentOverviewUsageScope
   }>(
@@ -43,6 +46,7 @@ export async function fetchSubclasses(
 
   return {
     subclasses: body.subclasses,
+    ...(body.overlayFailures?.length ? { overlayFailures: body.overlayFailures } : {}),
     ...(body.usageSummaryLabels ? { usageSummaryLabels: body.usageSummaryLabels } : {}),
     ...(body.overviewUsageScope ? { overviewUsageScope: body.overviewUsageScope } : {}),
   }

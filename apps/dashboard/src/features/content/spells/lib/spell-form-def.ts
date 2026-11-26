@@ -5,7 +5,7 @@ import {
   type ContentFormDef,
 } from '../../lib/forms/registry/content-form-registry'
 import { nameField } from '../../lib/forms/fields/content-identity-form-fields'
-import { useSpells, spellsQueryKey } from '../hooks/use-spells'
+import { useSpells, useSpellsListResult, spellsQueryKey } from '../hooks/use-spells'
 import {
   buildSpellTabs,
   spellDraftFormSchema,
@@ -43,6 +43,7 @@ const spellFormDef: ContentFormDef<Spell, SpellFormValues, CreateSpellInput> & {
     return body
   },
   useListQuery: useSpells,
+  useListQueryResult: useSpellsListResult,
   queryKey: spellsQueryKey,
 
   preview: {

@@ -1,16 +1,23 @@
 import type { CharacterClass } from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
-import { resolveCatalogForCampaign } from '../content.service'
+import { resolveContentListForCampaign } from '../content.service'
 import { classContentConfig } from '../classes/classes.config'
 
 export async function assertSubclassParentClassExists(
   campaignId: string,
   classId: string,
 ): Promise<CharacterClass> {
-  const classes = await resolveCatalogForCampaign(classContentConfig, campaignId)
+  const { items: classes, overlayFailures } = await resolveContentListForCampaign(
+    classContentConfig,
+    campaignId,
+  )
   const parentClass = classes.find((record) => record.id === classId)
   if (!parentClass) {
+    const overlayFailure = overlayFailures.find((failure) => failure.targetId === classId)
+    if (overlayFailure) {
+      throw new HttpError(409, overlayFailure.code, overlayFailure.message)
+    }
     throw new HttpError(400, 'validation_error', 'Parent class not found in campaign catalog.')
   }
   return parentClass

@@ -11,7 +11,7 @@ import {
 } from '../../lib/forms/fields/content-movement-form-fields'
 import { managedMediaFormDefFields } from '../../lib/forms/registry/managed-media-form-def.lib'
 import { nameField } from '../../lib/forms/fields/content-identity-form-fields'
-import { monstersQueryKey, useMonsters } from '../hooks/use-monsters'
+import { monstersQueryKey, useMonsters, useMonstersListResult } from '../hooks/use-monsters'
 import { buildMonsterTabs } from './monster-form-fields'
 import { buildMonsterPreviewIdentity, buildMonsterPreviewSections } from './monster-form-preview'
 import { buildMonsterActionRequirementValueSyncs } from './actions/monster-action-requirement-form-sync'
@@ -104,6 +104,7 @@ export const monsterFormDef: ContentFormDef<Monster, MonsterFormValues, CreateMo
       armorClassRules: ctx?.armorClassRules,
     }) as Record<string, unknown>,
   useListQuery: useMonsters,
+  useListQueryResult: useMonstersListResult,
   queryKey: monstersQueryKey,
   preview: {
     buildIdentity: buildMonsterPreviewIdentity,

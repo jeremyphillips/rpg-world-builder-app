@@ -14,20 +14,24 @@ import { resolveCatalog } from './resolve-catalog'
 interface Record_ {
   id: string
   name: string
+  slug?: string
   hitDie?: number
   status?: 'draft' | 'published'
 }
 
 const system: Record_[] = [
-  { id: 'sys:a', name: 'A', hitDie: 8 },
-  { id: 'sys:b', name: 'B', hitDie: 10 },
+  { id: 'sys:a', name: 'A', slug: 'a', hitDie: 8 },
+  { id: 'sys:b', name: 'B', slug: 'b', hitDie: 10 },
 ]
 
 const publishedSystem = system.map((record) => ({ ...record, status: 'published' as const }))
 
 describe('resolveCatalog', () => {
   it('returns the system catalog with published status when there are no patches or homebrew', () => {
-    expect(resolveCatalog(system, [], [])).toEqual(publishedSystem)
+    expect(resolveCatalog(system, [], [])).toEqual({
+      records: publishedSystem,
+      overlayFailures: [],
+    })
   })
 
   it('throws when a patch exists without overlay participant wiring', () => {
@@ -40,14 +44,22 @@ describe('resolveCatalog', () => {
     ).toThrow('overlayParticipantId is not configured')
   })
 
-  it('rejects unversioned patch documents when overlay wiring is present', () => {
+  it('records unversioned patch documents as overlay failures when overlay wiring is present', () => {
     const alert = loadSeedFeats('srd-cc-5.2.1').find((feat) => feat.slug === 'alert')
     expect(alert).toBeDefined()
-    expect(() =>
-      resolveCatalog([alert!], [{ targetId: alert!.id, patch: { name: 'Patched Alert' } }], [], {
-        overlayParticipantId: 'feats',
+    const result = resolveCatalog(
+      [alert!],
+      [{ targetId: alert!.id, patch: { name: 'Patched Alert' } }],
+      [],
+      { overlayParticipantId: 'feats' },
+    )
+    expect(result.records).toEqual([])
+    expect(result.overlayFailures).toEqual([
+      expect.objectContaining({
+        targetId: alert!.id,
+        code: 'unsupported_overlay_version',
       }),
-    ).toThrow(/supported version/i)
+    ])
   })
 
   it('applies a versioned overlay scalar onto its target by id', () => {
@@ -64,15 +76,16 @@ describe('resolveCatalog', () => {
       [],
       { overlayParticipantId: 'feats' },
     )
-    expect(result[0]?.name).toBe('Watchful Alert')
-    expect(result[0]?.status).toBe('published')
+    expect(result.overlayFailures).toEqual([])
+    expect(result.records[0]?.name).toBe('Watchful Alert')
+    expect(result.records[0]?.status).toBe('published')
   })
 
   it('appends homebrew records after the resolved system records', () => {
-    const homebrew: Record_[] = [{ id: 'hb:1', name: 'Homebrew' }]
+    const homebrew: Record_[] = [{ id: 'hb:1', name: 'Homebrew', slug: 'homebrew' }]
     const result = resolveCatalog(system, [], homebrew)
-    expect(result).toHaveLength(3)
-    expect(result.at(-1)).toEqual({ id: 'hb:1', name: 'Homebrew' })
+    expect(result.records).toHaveLength(3)
+    expect(result.records.at(-1)).toEqual({ id: 'hb:1', name: 'Homebrew', slug: 'homebrew' })
   })
 
   it('ignores patches whose target is not in the system catalog', () => {
@@ -82,7 +95,7 @@ describe('resolveCatalog', () => {
       [],
       { overlayParticipantId: 'classes' },
     )
-    expect(result).toEqual(publishedSystem)
+    expect(result).toEqual({ records: publishedSystem, overlayFailures: [] })
   })
 
   it('keeps untouched traits on a movement-only monster overlay', () => {
@@ -114,7 +127,7 @@ describe('resolveCatalog', () => {
       [{ targetId: swarm.id, patch: reconciled.result.stored }],
       [],
       { overlayParticipantId: 'monsters', contentTypeKey: 'monsters' },
-    )[0]
+    ).records[0]
     const fromCatalog = contentEntityBody(resolved as unknown as Record<string, unknown>)
     expect(fromCatalog.traits).toEqual(seedBody.traits)
     expect(fromCatalog.movement).toEqual({ walk: 30 })
@@ -135,5 +148,28 @@ describe('resolveCatalog', () => {
       { overlayParticipantId: 'feats' },
     )
     expect(alert!.name).not.toBe('Other Name')
+  })
+
+  it('isolates a malformed sibling overlay without failing healthy rows', () => {
+    const feats = loadSeedFeats('srd-cc-5.2.1')
+    const [broken, healthy] = feats.slice(0, 2)
+    expect(broken).toBeDefined()
+    expect(healthy).toBeDefined()
+    const result = resolveCatalog(
+      [broken!, healthy!],
+      [
+        { targetId: broken!.id, patch: { name: 'Bad' } },
+        {
+          targetId: healthy!.id,
+          patch: { version: 1, revision: 0, set: { name: 'Patched Feat' } },
+        },
+      ],
+      [],
+      { overlayParticipantId: 'feats' },
+    )
+    expect(result.records).toHaveLength(1)
+    expect(result.records[0]?.id).toBe(healthy!.id)
+    expect(result.overlayFailures).toHaveLength(1)
+    expect(result.overlayFailures[0]?.targetId).toBe(broken!.id)
   })
 })

@@ -15,3 +15,5 @@ export const monstersQueryKey = monstersContentList.queryKey
 
 export const useMonsters = monstersContentList.useQuery
 export const useMonstersUsageMeta = monstersContentList.useUsageMeta
+
+export const useMonstersListResult = monstersContentList.useListQueryResult
