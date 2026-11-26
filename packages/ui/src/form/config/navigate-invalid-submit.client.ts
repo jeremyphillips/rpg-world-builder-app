@@ -6,6 +6,10 @@ import {
   performInvalidSubmitFocus,
   type InvalidSubmitFocusFallbacks,
 } from './navigate-invalid-submit-focus.lib'
+import {
+  beginInvalidSubmitFocusRequest,
+  isInvalidSubmitFocusRequestCurrent,
+} from './invalid-submit-focus-generation.lib'
 import { scheduleInvalidSubmitFocusWithRevealBudget } from './navigate-invalid-submit-reveal.lib'
 import { resolveInvalidSubmitNavigation } from '../errors/resolve-invalid-submit-navigation'
 import type { FormItem } from '../field-config'
@@ -70,7 +74,11 @@ export function navigateInvalidSubmit<TFieldValues extends FieldValues>(
   options?.onBeforeFocus?.()
   ui.addValidationSessionExpandKeys(navigation.expandKeys)
 
-  const focus = () => performInvalidSubmitFocus(navigation, idPrefix, options?.focusFallbacks)
+  const generation = beginInvalidSubmitFocusRequest()
+  const focus = () => {
+    if (!isInvalidSubmitFocusRequestCurrent(generation)) return
+    performInvalidSubmitFocus(navigation, idPrefix, options?.focusFallbacks)
+  }
 
   if (options?.waitForLayout && options?.usePilotRevealBudget) {
     scheduleInvalidSubmitFocusWithRevealBudget(navigation, idPrefix, focus, options.focusFallbacks)
@@ -79,6 +87,7 @@ export function navigateInvalidSubmit<TFieldValues extends FieldValues>(
 
   if (options?.waitForLayout) {
     window.requestAnimationFrame(() => {
+      if (!isInvalidSubmitFocusRequestCurrent(generation)) return
       window.requestAnimationFrame(focus)
     })
     return

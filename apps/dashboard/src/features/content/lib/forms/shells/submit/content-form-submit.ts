@@ -2,6 +2,7 @@ import { useContext, useEffect, useRef } from 'react'
 import { useFormContext, type FieldValues } from 'react-hook-form'
 import { isApiError } from '@rpg/contracts/shared'
 import {
+  cancelPendingInvalidSubmitFocus,
   createEmptyFormValidationProducerSession,
   FormUiContext,
   useSubmitHandler,
@@ -87,6 +88,7 @@ export function useContentFormSubmit<TValues extends FieldValues>(
       return isApiError(error) ? error.message : fallbackMessage
     },
     submit: async (values, form) => {
+      cancelPendingInvalidSubmitFocus()
       // Captured synchronously, before the first await.
       const attemptId = ++attemptCounterRef.current
       const attempt = { stamp: stampRef.current, attemptId }

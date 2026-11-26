@@ -390,6 +390,40 @@ describe('useContentFormSubmit attempt identity', () => {
     expect(harness.stampProbe()).toBeUndefined()
   })
 
+  it('does not paint persist errors when a superseded attempt fails late', async () => {
+    let releaseFirst: () => void = () => undefined
+    const persist = vi
+      .fn()
+      .mockImplementationOnce(
+        () =>
+          new Promise<void>((_, reject) => {
+            releaseFirst = () =>
+              reject(
+                new ApiError(400, 'validation_error', 'Invalid', {
+                  issues: [{ path: 'name', message: 'Taken', code: 'duplicate' }],
+                }),
+              )
+          }),
+      )
+      .mockResolvedValueOnce(undefined)
+    const harness = mountHarness(persist)
+
+    let first!: Promise<void>
+    act(() => {
+      first = harness.submit({ name: 'A', level: 2 })
+    })
+    first.catch(() => undefined)
+    await waitFor(() => expect(persist).toHaveBeenCalledTimes(1))
+    await act(async () => {
+      await harness.submit({ name: 'A', level: 2 })
+    })
+    await act(async () => {
+      releaseFirst()
+      await expect(first).rejects.toBeInstanceOf(ContentFormSubmitSuperseded)
+    })
+    expect(harness.form.getFieldState('name').error).toBeUndefined()
+  })
+
   it('supersedes an in-flight attempt when authored values change', async () => {
     let releaseFirst: () => void = () => undefined
     const persist = vi

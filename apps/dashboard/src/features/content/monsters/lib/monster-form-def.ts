@@ -21,13 +21,18 @@ import { buildMonsterHitPointsFormValueSyncs } from './statistics/monster-hit-po
 import { buildMonsterLairFormValueSyncs } from './statistics/monster-lair-form-value-sync'
 import { resolveMonsterFormSchema } from './monster-form-schema'
 import { normalizeMonsterFormValues } from './normalize-monster-form-values'
+import { serializeContentFormInput } from '../../lib/forms/registry/content-form-serialize-input.lib'
+import { buildIdentityPreparedWrite } from '../../lib/forms/submit/content-prepared-write.types'
+import type { PrepareSerializedContentFormWriteInput } from '../../lib/forms/submit/prepare-serialized-content-form-write.lib'
 import {
   baselineFromEntity,
   buildMonsterInput,
+  buildMonsterPreparedWrite,
   monsterToFormValues,
   resolveMonsterCreateDefaultValues,
   type MonsterFormValues,
 } from './monster-form-values'
+import type { ContentFormInputCtx } from '../../lib/forms/registry/content-form-registry'
 
 const monsterMediaFields = managedMediaFormDefFields('monsters') as {
   supportsManagedMedia: true
@@ -96,6 +101,30 @@ export const monsterFormDef: ContentFormDef<Monster, MonsterFormValues, CreateMo
   }),
   toInput: (values, ctx, validationIntent = 'publish') =>
     buildMonsterInput(values, ctx, validationIntent),
+  serializePreparedWrite: (input: PrepareSerializedContentFormWriteInput<MonsterFormValues>) => {
+    const entity = input.inputCtx?.entity as { catalogLayer?: string } | undefined
+    if (input.operation === 'update' && entity?.catalogLayer === 'system') {
+      return buildIdentityPreparedWrite(
+        serializeContentFormInput(
+          monsterFormDef,
+          input.values,
+          input.inputCtx as ContentFormInputCtx<Monster> | undefined,
+          input.validationIntent,
+          {
+            operation: input.operation,
+            dirtyFields: input.form.formState.dirtyFields as Record<string, unknown> | undefined,
+            rulesetId: input.rulesetId,
+            ...input.serializeOptions,
+          },
+        ),
+      )
+    }
+    return buildMonsterPreparedWrite(
+      input.values,
+      input.inputCtx as ContentFormInputCtx<Monster> | undefined,
+      input.validationIntent,
+    )
+  },
   normalizeOverlayBody: (values, ctx, validationIntent = 'publish') =>
     normalizeMonsterFormValues(values, {
       baseline: baselineFromEntity(ctx?.entity),

@@ -389,6 +389,7 @@ export {
   type OptionalDisclosureActionVerb,
   type ResolvedOptionalDisclosureActions,
 } from './config/optional-disclosure-actions.lib'
+export { cancelPendingInvalidSubmitFocus } from './config/invalid-submit-focus-generation.lib'
 export { navigateInvalidSubmit } from './config/navigate-invalid-submit.client'
 export { waitForInvalidSubmitTarget } from './config/wait-for-invalid-submit-target.lib'
 export { navigateTabbedFormInvalidSubmit } from './shells/navigate-tabbed-form-invalid-submit.client'

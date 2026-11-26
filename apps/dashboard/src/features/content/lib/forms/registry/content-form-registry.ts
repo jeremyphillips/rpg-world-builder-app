@@ -256,6 +256,15 @@ export interface ContentFormDef<
   preview?: ContentFormPreviewConfig<TFormValues, TPreviewResources>
   /** Displayed AC fields depend on the campaign ruleset and must snapshot it. */
   armorClassRulesSensitive?: boolean
+  /**
+   * When set, prepare write uses this transform for `{ payload, provenance }` instead of
+   * identity provenance on `serializeContentFormInput` alone.
+   */
+  serializePreparedWrite?: (
+    input: import('../submit/prepare-serialized-content-form-write.lib').PrepareSerializedContentFormWriteInput<TFormValues>,
+  ) => import('../submit/content-prepared-write.types').ContentPreparedWrite<
+    Record<string, unknown>
+  >
 }
 
 export type ContentFormValuesCtx = {

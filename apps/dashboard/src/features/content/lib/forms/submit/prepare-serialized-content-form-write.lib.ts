@@ -34,6 +34,14 @@ export type PrepareSerializedContentFormWriteInput<TValues extends FieldValues> 
 export function prepareSerializedContentFormWrite<TValues extends FieldValues>(
   input: PrepareSerializedContentFormWriteInput<TValues>,
 ): ContentPreparedWrite<Record<string, unknown>> {
+  if (input.def.serializePreparedWrite) {
+    const prepared = input.def.serializePreparedWrite(
+      input as PrepareSerializedContentFormWriteInput<FieldValues>,
+    )
+    assertContentPreparedWritePairing(prepared as ContentPreparedWrite<Record<string, unknown>>)
+    return prepared
+  }
+
   const preparedValues = input.prepareFormValues?.(input.values) ?? input.values
   const payload = serializeContentFormInput(
     input.def,

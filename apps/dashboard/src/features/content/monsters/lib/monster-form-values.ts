@@ -46,6 +46,13 @@ import {
   withDefaultSaveResolutionTarget,
   withSaveOutcomeSlots,
 } from './actions/save/monster-save-resolution-target.lib'
+import type { ContentPreparedWrite } from '../../lib/forms/submit/content-prepared-write.types'
+import {
+  createProvenanceAccumulator,
+  finishProvenanceAccumulator,
+  mergeProvenancePart,
+  type ProvenanceAccumulator,
+} from '../../lib/forms/submit/accumulate-prepared-write-provenance.lib'
 import {
   normalizeMonsterFormValues,
   type MonsterNormalizeBaseline,
@@ -326,12 +333,14 @@ export function buildMonsterInput(
   values: MonsterFormValues,
   ctx: ContentFormInputCtx<Monster> | undefined,
   validationIntent: ContentValidationIntent,
+  provenance?: ProvenanceAccumulator,
 ): CreateMonsterInput {
   const normalized = normalizeMonsterFormValues(values, {
     baseline: baselineFromEntity(ctx?.entity),
     intent: validationIntent,
     mode: ctx?.entity ? 'update' : 'create',
     armorClassRules: ctx?.armorClassRules,
+    provenance,
   })
   const slug = slugForInputParse(
     typeof normalized.name === 'string' ? normalized.name : values.name,
@@ -350,4 +359,15 @@ export function buildMonsterInput(
     omitAbsentSystemPatchLists(parsed, normalized, ctx?.entity),
     ctx,
   ) as CreateMonsterInput
+}
+
+export function buildMonsterPreparedWrite(
+  values: MonsterFormValues,
+  ctx: ContentFormInputCtx<Monster> | undefined,
+  validationIntent: ContentValidationIntent,
+): ContentPreparedWrite<CreateMonsterInput> {
+  const acc = createProvenanceAccumulator()
+  const payload = buildMonsterInput(values, ctx, validationIntent, acc)
+  mergeProvenancePart(acc, { pathMap: { name: 'slug' } })
+  return { payload, provenance: finishProvenanceAccumulator(acc) }
 }
