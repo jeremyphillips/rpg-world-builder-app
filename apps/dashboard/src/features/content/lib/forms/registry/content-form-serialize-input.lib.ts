@@ -35,6 +35,7 @@ export type SerializeContentFormInputOptions = {
   expectedOverlayRevision?: number
   entityId?: string
   seedRowIdsByPath?: Readonly<Record<string, readonly string[]>>
+  unresolvedOverlay?: boolean
 }
 
 export function isManagedContentMediaDirty(
@@ -134,6 +135,7 @@ export function serializeContentFormInput<
       catalogLayer,
       participantId,
       entityId: options.entityId,
+      unresolvedOverlay: options.unresolvedOverlay,
       rulesetId: options.rulesetId,
       hasNormalizer: Boolean(def.normalizeOverlayBody),
       catalogSeed: options.catalogSeed,

@@ -151,6 +151,36 @@ describe('serializeContentFormInput', () => {
     expect(def.toInput).not.toHaveBeenCalled()
   })
 
+  it('throws when unresolvedOverlay is set on system update', () => {
+    const def = {
+      routeKey: 'monsters' as const,
+      supportsManagedMedia: false,
+      overlayParticipantId: 'monsters' as const,
+      toInput: vi.fn(() => ({ name: 'Patched' })),
+      normalizeOverlayBody: vi.fn(() => ({ name: 'Patched' })),
+    }
+
+    expect(() =>
+      serializeContentFormInput(
+        def,
+        { name: 'Patched' },
+        { entity: { catalogLayer: 'system', id: 'srd:owlbear', overlayRevision: 0 } },
+        'publish',
+        {
+          operation: 'update',
+          entityId: 'srd:owlbear',
+          rulesetId: 'srd-cc-5.2.1',
+          catalogSeed: { name: 'Seed' },
+          overlayBaseline: { name: 'Seed' },
+          seedRowIdsByPath: {},
+          unresolvedOverlay: true,
+        },
+      ),
+    ).toThrow(SystemOverlayWriteNotReadyError)
+
+    expect(def.normalizeOverlayBody).not.toHaveBeenCalled()
+  })
+
   it('skips media merge when def does not support managed media', () => {
     const def = {
       routeKey: 'spells' as const,

@@ -1,5 +1,6 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
+import * as contracts from '@rpg/contracts'
 import { loadSeedFeats } from '@rpg/catalog/feats'
 import { loadSeedMonsters } from '@rpg/catalog/monsters'
 import {
@@ -171,5 +172,26 @@ describe('resolveCatalog', () => {
     expect(result.records[0]?.id).toBe(healthy!.id)
     expect(result.overlayFailures).toHaveLength(1)
     expect(result.overlayFailures[0]?.targetId).toBe(broken!.id)
+  })
+  it('rethrows when applyStoredOverlay throws instead of recording overlayFailures', () => {
+    const alert = loadSeedFeats('srd-cc-5.2.1').find((feat) => feat.slug === 'alert')
+    expect(alert).toBeDefined()
+    if (!alert) return
+
+    const spy = vi.spyOn(contracts, 'applyStoredOverlay').mockImplementation(() => {
+      throw new Error('programmer')
+    })
+    try {
+      expect(() =>
+        resolveCatalog(
+          [alert],
+          [{ targetId: alert.id, patch: { version: 1, revision: 0, set: { name: 'X' } } }],
+          [],
+          { overlayParticipantId: 'feats' },
+        ),
+      ).toThrow('programmer')
+    } finally {
+      spy.mockRestore()
+    }
   })
 })

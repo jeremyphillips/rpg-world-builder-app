@@ -1,4 +1,10 @@
 import request, { type Agent } from 'supertest'
+
+import { loadSeedFeats } from '@rpg/catalog/feats'
+import { loadSeedSubclasses } from '@rpg/catalog/classes'
+import { FeatPatchModel } from './feats/feat-patch.model'
+import { MonsterPatchModel } from './monsters/monster-patch.model'
+import { SubclassPatchModel } from './subclasses/subclass-patch.model'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -1533,5 +1539,101 @@ describe('content reference-catalog scope', () => {
     expect(playerIds).not.toContain(draftId)
     expect(playerIds).not.toContain(dmOnlyId)
     expect(playerIds).toContain(unavailableId)
+  })
+})
+
+describe('content list routes — overlay wire', () => {
+  it('returns overlayFailures on feat list wire while healthy feats stay in feats[]', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+    const feats = loadSeedFeats('srd-cc-5.2.1')
+    const [broken, healthy] = feats.slice(0, 2)
+    expect(broken).toBeDefined()
+    expect(healthy).toBeDefined()
+    if (!broken || !healthy) throw new Error('seed feats missing')
+
+    await FeatPatchModel.create({
+      campaignId,
+      targetId: broken.id,
+      patch: { name: 'Unversioned overlay' },
+    })
+    await FeatPatchModel.create({
+      campaignId,
+      targetId: healthy.id,
+      patch: { version: 1, revision: 0, set: { name: 'Healthy Feat Wire' } },
+    })
+
+    const res = await agent
+      .get(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    expect(res.body.overlayFailures).toEqual([
+      expect.objectContaining({
+        targetId: broken.id,
+        code: 'unsupported_overlay_version',
+        name: broken.name,
+        slug: broken.slug,
+      }),
+    ])
+    const ids = res.body.feats.map((feat: { id: string }) => feat.id)
+    expect(ids).toContain(healthy.id)
+    expect(ids).not.toContain(broken.id)
+    expect(res.body.usageSummaryLabels).toBeDefined()
+  })
+  it('returns overlayFailures on subclass list wire', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+    const champion = loadSeedSubclasses('srd-cc-5.2.1').find((row) => row.slug === 'champion')
+    expect(champion).toBeDefined()
+    if (!champion) throw new Error('seed subclass missing')
+
+    await SubclassPatchModel.create({
+      campaignId,
+      targetId: champion.id,
+      patch: { name: 'Unversioned overlay' },
+    })
+
+    const res = await agent
+      .get(`/api/campaigns/${campaignId}/content/classes/${champion.classId}/subclasses`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    expect(res.body.overlayFailures).toEqual([
+      expect.objectContaining({ targetId: champion.id, code: 'unsupported_overlay_version' }),
+    ])
+    const ids = res.body.subclasses.map((row: { id: string }) => row.id)
+    expect(ids).not.toContain(champion.id)
+  })
+
+  it('serializes overlayReadDiagnostics on monster list wire', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+    const swarmId = 'srd-cc-5.2.1:swarm-of-insects'
+
+    await MonsterPatchModel.create({
+      campaignId,
+      targetId: swarmId,
+      patch: {
+        version: 1,
+        revision: 0,
+        collections: {
+          traits: {
+            kind: 'identity',
+            overrides: [{ origin: 'seed', id: 'orphan-trait-id', set: { name: 'Gone' } }],
+            additions: [],
+            removedIds: [],
+          },
+        },
+      },
+    })
+
+    const res = await agent
+      .get(`/api/campaigns/${campaignId}/content/monsters`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    const swarm = res.body.monsters.find((row: { id: string }) => row.id === swarmId)
+    expect(swarm?.overlayReadDiagnostics?.orphanedSeedOverrides).toEqual(['orphan-trait-id'])
   })
 })
