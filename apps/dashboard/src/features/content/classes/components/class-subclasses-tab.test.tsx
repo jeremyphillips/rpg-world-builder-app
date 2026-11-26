@@ -4,6 +4,14 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { MemoryRouter } from 'react-router-dom'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 
+const subclassesListResult = vi.hoisted(() =>
+  vi.fn((_campaignId?: string, _classId?: string) => ({
+    data: undefined as unknown,
+    isPending: false,
+    isError: false,
+  })),
+)
+
 import { defaultCampaignRules } from '../../lib/form-options/content-campaign-rules'
 import { makeQueryWrapper } from '@/test/make-wrapper'
 import { SUBCLASSES_FOR_FIGHTER } from '../fixtures'
@@ -17,6 +25,15 @@ beforeAll(() => {
   }
   if (!Element.prototype.scrollIntoView) {
     Element.prototype.scrollIntoView = vi.fn()
+  }
+})
+
+vi.mock('../hooks/use-subclasses', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../hooks/use-subclasses')>()
+  return {
+    ...actual,
+    useSubclassesListResult: (campaignId?: string, classId?: string) =>
+      subclassesListResult(campaignId, classId),
   }
 })
 
@@ -49,10 +66,12 @@ function ClassFormShell({
   ],
   mode = 'edit' as const,
   formCtx = {},
+  loadFromQuery = false,
 }: {
   features?: Array<{ kind?: string; id: string; name: string; level: number; grants: never[] }>
   mode?: 'create' | 'edit'
   formCtx?: Record<string, unknown>
+  loadFromQuery?: boolean
 }) {
   const form = useForm({ defaultValues: { features } })
   return (
@@ -64,7 +83,9 @@ function ClassFormShell({
             classId="srd-cc-5.2.1:fighter"
             mode={mode}
             formCtx={formCtx}
-            subclassesOverride={mode === 'edit' ? SUBCLASSES_FOR_FIGHTER : undefined}
+            subclassesOverride={
+              loadFromQuery || mode !== 'edit' ? undefined : SUBCLASSES_FOR_FIGHTER
+            }
           />
         </FormProvider>
       </QueryWrapper>
@@ -133,5 +154,38 @@ describe('ClassSubclassesTab', () => {
       '/campaigns/camp_1/homebrew/rules-config/character-configuration#subclasses',
     )
     expect(screen.getByRole('button', { name: /Add subclass/i })).toBeInTheDocument()
+  })
+
+  it('lists an overlay failure, shows a blocking alert, and does not mount the editor', async () => {
+    const user = userEvent.setup()
+    const healthy = SUBCLASSES_FOR_FIGHTER[0]
+    expect(healthy).toBeDefined()
+    subclassesListResult.mockReturnValue({
+      isPending: false,
+      isError: false,
+      data: {
+        subclasses: healthy ? [healthy] : [],
+        overlayFailures: [
+          {
+            targetId: 'srd:broken-champion',
+            slug: 'broken-champion',
+            name: 'Broken Champion',
+            code: 'unsupported_overlay_version' as const,
+            message: 'System overlay patch is missing a supported version.',
+          },
+        ],
+      },
+    })
+
+    render(<ClassFormShell loadFromQuery />)
+
+    expect(screen.getByRole('button', { name: /^Champion/ })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /Broken Champion/ }))
+
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'System overlay patch is missing a supported version.',
+    )
+    expect(screen.getByText('Overlay unresolved')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^Save/i })).not.toBeInTheDocument()
   })
 })

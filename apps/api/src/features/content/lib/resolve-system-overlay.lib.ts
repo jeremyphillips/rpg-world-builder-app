@@ -177,9 +177,53 @@ export function reconcileSystemOverlayWrite(args: {
     }),
   )
 
+  assertIdentityConflictAdditionsRetained(args.seedBody, args.policy, args.storedInput, stored)
+
   return {
     body: reconciled.result.body,
     stored,
     unchanged: reconciled.result.unchanged,
   }
+}
+
+function identityAdditionIds(stored: unknown): ReadonlySet<string> {
+  const parsed = parseStoredOverlayInput(stored ?? null)
+  if (!parsed.ok || !parsed.overlay?.collections) return new Set()
+  const ids = new Set<string>()
+  for (const collection of Object.values(parsed.overlay.collections)) {
+    if (collection.kind !== 'identity') continue
+    for (const addition of collection.additions) ids.add(addition.id)
+  }
+  return ids
+}
+
+/**
+ * Identity-conflict additions are hidden because the seed row wins. A reconcile
+ * that drops one (collection reset, removal) would delete homebrew the editor
+ * never showed. Reject that write before persistence.
+ */
+function assertIdentityConflictAdditionsRetained(
+  seedBody: Record<string, unknown>,
+  policy: OverlayPolicyNode,
+  beforeStored: unknown,
+  afterStored: Record<string, unknown>,
+): void {
+  const parsedBefore = parseStoredOverlayInput(beforeStored ?? null)
+  if (!parsedBefore.ok || !parsedBefore.overlay) return
+
+  const applied = applyStoredOverlay(seedBody, parsedBefore.overlay, policy)
+  if (!applied.ok || applied.result.diagnostics.identityConflicts.length === 0) return
+
+  const beforeIds = identityAdditionIds(parsedBefore.overlay)
+  const afterIds = identityAdditionIds(afterStored)
+  const dropped = applied.result.diagnostics.identityConflicts.filter(
+    (id) => beforeIds.has(id) && !afterIds.has(id),
+  )
+  if (dropped.length === 0) return
+
+  throw new HttpError(422, 'overlay_validation', 'Stored system overlay is invalid.', {
+    issues: dropped.map(
+      (id) => `Identity conflict addition ${id} cannot be dropped by this update.`,
+    ),
+  })
 }

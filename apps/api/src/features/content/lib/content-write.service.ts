@@ -3,6 +3,7 @@ import {
   contentStatusToValidationIntent,
   ContentProvenanceWriteError,
   reconcileContentProvenance,
+  toApiValidationIssues,
   type ContentMedia,
   type CatalogLayer,
   type ContentProvenanceWriteAuthority,
@@ -10,6 +11,7 @@ import {
   type ContentValidationIntent,
   type SystemRulesetId,
 } from '@rpg/contracts'
+import { ZodError } from 'zod'
 import { ContentKeyError } from '@rpg/contracts'
 import type { ClientSession } from 'mongoose'
 
@@ -452,7 +454,16 @@ function parseSystemPatchedStoredEntity<T extends StoredEntity>(
     updatedAt: existingRecord.updatedAt,
   }
 
-  return config.storedSchema.parse(entityForParse as unknown as T)
+  try {
+    return config.storedSchema.parse(entityForParse as unknown as T)
+  } catch (err) {
+    if (err instanceof ZodError) {
+      throw new HttpError(400, 'validation_error', 'System overlay update is invalid.', {
+        issues: toApiValidationIssues(err.issues),
+      })
+    }
+    throw err
+  }
 }
 
 async function updateSystemPatch<T extends StoredEntity>(
@@ -482,7 +493,7 @@ async function updateSystemPatch<T extends StoredEntity>(
     throwOverlayFailure(parsedExisting.failure)
   }
 
-  const { mergedBody, stored, unchanged, expectedRevision } = reconcileSystemWriteFromUpdate(
+  const { stored, unchanged, expectedRevision } = reconcileSystemWriteFromUpdate(
     config,
     existing,
     existingPatch,
@@ -490,6 +501,8 @@ async function updateSystemPatch<T extends StoredEntity>(
     rawNormalized,
     validationIntent,
   )
+
+  const parsed = parseSystemPatchedStoredEntity(config, existing, stored, validationIntent)
 
   if (!unchanged) {
     const filter =
@@ -510,7 +523,7 @@ async function updateSystemPatch<T extends StoredEntity>(
     }
   }
 
-  return parseSystemPatchedStoredEntity(config, existing, stored, validationIntent)
+  return parsed
 }
 
 async function saveNewHomebrewRecordWithOptionalMedia<T extends StoredEntity>(

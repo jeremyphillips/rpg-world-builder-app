@@ -8,6 +8,7 @@ import {
 } from '@rpg/contracts'
 
 import { makeTestCampaign } from '../../../test/fixtures/campaigns'
+import { expectHttpErrorAsync } from '../../../test/expect-http-error'
 import { overlayNameOnlyUpdate } from '../../../test/helpers/system-overlay-write'
 import { useIntegrationDb } from '../../../test/setup/integration-db'
 import { resolveContentListForCampaign } from '../content.service'
@@ -73,12 +74,21 @@ async function readStoredPatch(campaignId: string, targetId: string) {
   return doc?.patch ?? null
 }
 
+function traitRows(body: Record<string, unknown>) {
+  return body.traits as Array<{ id: string; name?: string }>
+}
+
 function assertOrphanFixture(seedBody: Record<string, unknown>, stored: Record<string, unknown>) {
   const policy = overlayPolicyForParticipant('monsters')
   const applied = applyStoredOverlay(seedBody, stored, policy)
   expect(applied.ok).toBe(true)
   if (!applied.ok) return
   expect(applied.result.diagnostics.orphanedSeedOverrides).toContain(ORPHAN_TRAIT_ID)
+  expect(traitRows(applied.result.body).map((row) => row.id)).toEqual(
+    traitRows(seedBody).map((row) => row.id),
+  )
+  expect(traitRows(applied.result.body).map((row) => row.id)).not.toContain(ORPHAN_TRAIT_ID)
+  expect(traitRows(applied.result.body).some((row) => row.name === 'Gone')).toBe(false)
 }
 
 describe('system overlay diagnostics write', () => {
@@ -100,6 +110,12 @@ describe('system overlay diagnostics write', () => {
     )
     const swarm = items.find((row) => row.id === SWARM_ID)
     expect(swarm?.overlayReadDiagnostics?.orphanedSeedOverrides).toEqual([ORPHAN_TRAIT_ID])
+    const effective = contentEntityBody(swarm as unknown as Record<string, unknown>)
+    expect(traitRows(effective).map((row) => row.id)).toEqual(
+      traitRows(seedBody).map((row) => row.id),
+    )
+    expect(traitRows(effective).map((row) => row.id)).not.toContain(ORPHAN_TRAIT_ID)
+    expect(traitRows(effective).some((row) => row.name === 'Gone')).toBe(false)
   })
 
   it('orphan fixture: unrelated name-only save preserves stored override and increments revision', async () => {
@@ -170,6 +186,11 @@ describe('system overlay diagnostics write', () => {
     if (!applied.ok) return
     expect(applied.result.diagnostics.identityConflicts).toEqual(['swarm'])
     expect(applied.result.diagnostics.orphanedSeedOverrides).toContain(ORPHAN_TRAIT_ID)
+    const seedTrait = traitRows(applied.result.body).find((row) => row.id === 'swarm')
+    expect(seedTrait?.name).not.toBe('Collision Trait')
+    expect(traitRows(applied.result.body).map((row) => row.id)).toEqual(
+      traitRows(seedBody).map((row) => row.id),
+    )
 
     await MonsterPatchModel.create({
       campaignId: campaign.id,
@@ -177,11 +198,16 @@ describe('system overlay diagnostics write', () => {
       patch: stored,
     })
 
-    const baseline = contentEntityBody(
-      (await resolveContentListForCampaign(monstersWriteConfig.readConfig, campaign.id)).items.find(
-        (row) => row.id === SWARM_ID,
-      ) as unknown as Record<string, unknown>,
+    const listed = (
+      await resolveContentListForCampaign(monstersWriteConfig.readConfig, campaign.id)
+    ).items.find((row) => row.id === SWARM_ID)
+    const effective = contentEntityBody(listed as unknown as Record<string, unknown>)
+    expect(listed?.overlayReadDiagnostics?.identityConflicts).toEqual(['swarm'])
+    expect(traitRows(effective).find((row) => row.id === 'swarm')?.name).not.toBe('Collision Trait')
+    expect(traitRows(effective).map((row) => row.id)).toEqual(
+      traitRows(seedBody).map((row) => row.id),
     )
+    const baseline = effective
     await updateContentEntity(
       monstersWriteConfig,
       campaign.id,
@@ -208,5 +234,68 @@ describe('system overlay diagnostics write', () => {
       await resolveContentListForCampaign(monstersWriteConfig.readConfig, campaign.id)
     ).items.find((row) => row.id === SWARM_ID)
     expect(reread?.overlayReadDiagnostics?.identityConflicts).toEqual(['swarm'])
+    const rereadBody = contentEntityBody(reread as unknown as Record<string, unknown>)
+    expect(traitRows(rereadBody).find((row) => row.id === 'swarm')?.name).not.toBe(
+      'Collision Trait',
+    )
+    expect(traitRows(rereadBody).map((row) => row.id)).toEqual(
+      traitRows(seedBody).map((row) => row.id),
+    )
+  })
+
+  it('negative control: collection reset cannot drop a conflicting homebrew addition', async () => {
+    const campaign = await makeTestCampaign()
+    const seedBody = swarmSeedBody()
+    const stored = identityConflictStoredOverlay(0)
+    const applied = applyStoredOverlay(seedBody, stored, overlayPolicyForParticipant('monsters'))
+    expect(applied.ok).toBe(true)
+    if (!applied.ok) return
+    expect(applied.result.diagnostics.identityConflicts).toEqual(['swarm'])
+
+    await MonsterPatchModel.create({
+      campaignId: campaign.id,
+      targetId: SWARM_ID,
+      patch: stored,
+    })
+
+    await expectHttpErrorAsync(
+      () =>
+        updateContentEntity(monstersWriteConfig, campaign.id, SWARM_ID, {
+          systemOverlayIntent: { collections: { traits: { reset: true } } },
+          expectedOverlayRevision: 0,
+        }),
+      { status: 422, code: 'overlay_validation' },
+    )
+
+    expect(await readStoredPatch(campaign.id, SWARM_ID)).toEqual(stored)
+  })
+
+  it('validation-rejected name leaves a diagnostic-bearing patch and revision unchanged', async () => {
+    const campaign = await makeTestCampaign()
+    const seedBody = swarmSeedBody()
+    const stored = orphanOnlyStoredOverlay(0)
+    assertOrphanFixture(seedBody, stored)
+
+    await MonsterPatchModel.create({
+      campaignId: campaign.id,
+      targetId: SWARM_ID,
+      patch: stored,
+    })
+
+    const listed = (
+      await resolveContentListForCampaign(monstersWriteConfig.readConfig, campaign.id)
+    ).items.find((row) => row.id === SWARM_ID)
+    expect(listed?.overlayReadDiagnostics?.orphanedSeedOverrides).toEqual([ORPHAN_TRAIT_ID])
+
+    await expectHttpErrorAsync(
+      () =>
+        updateContentEntity(monstersWriteConfig, campaign.id, SWARM_ID, {
+          systemOverlayIntent: { set: { name: '' } },
+          expectedOverlayRevision: 0,
+        }),
+      { status: 400, code: 'validation_error' },
+    )
+
+    expect(await readStoredPatch(campaign.id, SWARM_ID)).toEqual(stored)
   })
 })

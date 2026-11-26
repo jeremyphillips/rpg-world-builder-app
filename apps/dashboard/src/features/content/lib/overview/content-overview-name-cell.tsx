@@ -6,6 +6,7 @@ import type {
   ViewerCharacterRelationships,
 } from '@rpg/contracts'
 import { Link } from 'react-router-dom'
+import { TableBadgeCell } from '@rpg/ui'
 
 import type { DuplicateContentSource } from '../duplication/duplicate-content-dialog'
 import { CharacterRelationshipIndicator } from '@/lib/character-relationships/character-relationship-indicator'
@@ -25,6 +26,7 @@ export type ContentOverviewNameCellProps = {
   contentTypeKey?: ContentTypeKey
   queryKeyFn?: (campaignId: string) => readonly unknown[]
   duplicateSource?: DuplicateContentSource
+  statusLabel?: string
   viewerCharacterRelationships?: ViewerCharacterRelationships
 }
 
@@ -41,6 +43,7 @@ export function ContentOverviewNameCell({
   contentTypeKey,
   queryKeyFn,
   duplicateSource,
+  statusLabel,
   viewerCharacterRelationships,
 }: ContentOverviewNameCellProps) {
   const draftBadge = status === 'draft' ? <ContentStatusNameBadge status="draft" /> : null
@@ -58,6 +61,11 @@ export function ContentOverviewNameCell({
           <span className="font-medium text-foreground">{name}</span>
         )}
         {draftBadge}
+        {statusLabel ? (
+          <TableBadgeCell appearance="outline" tone="warning">
+            {statusLabel}
+          </TableBadgeCell>
+        ) : null}
         <CharacterRelationshipIndicator
           viewerCharacterRelationships={viewerCharacterRelationships}
         />
@@ -65,7 +73,11 @@ export function ContentOverviewNameCell({
 
       {showManagerLine || showPlayerLine ? (
         <div className="flex min-h-4 flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs leading-4">
-          {showManagerLine && campaignId && contentTypeKey && queryKeyFn && duplicateSource ? (
+          {showManagerLine &&
+          campaignId &&
+          contentTypeKey &&
+          queryKeyFn &&
+          (editHref || duplicateSource) ? (
             <ContentOverviewUtilityActions
               campaignId={campaignId}
               contentTypeKey={contentTypeKey}

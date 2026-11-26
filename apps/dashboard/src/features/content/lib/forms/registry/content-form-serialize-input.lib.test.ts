@@ -151,7 +151,7 @@ describe('serializeContentFormInput', () => {
     expect(def.toInput).not.toHaveBeenCalled()
   })
 
-  it('throws when unresolvedOverlay is set on system update', () => {
+  it('serializes a ready system update without an unresolved-overlay flag', () => {
     const def = {
       routeKey: 'monsters' as const,
       supportsManagedMedia: false,
@@ -160,25 +160,24 @@ describe('serializeContentFormInput', () => {
       normalizeOverlayBody: vi.fn(() => ({ name: 'Patched' })),
     }
 
-    expect(() =>
-      serializeContentFormInput(
-        def,
-        { name: 'Patched' },
-        { entity: { catalogLayer: 'system', id: 'srd:owlbear', overlayRevision: 0 } },
-        'publish',
-        {
-          operation: 'update',
-          entityId: 'srd:owlbear',
-          rulesetId: 'srd-cc-5.2.1',
-          catalogSeed: { name: 'Seed' },
-          overlayBaseline: { name: 'Seed' },
-          seedRowIdsByPath: {},
-          unresolvedOverlay: true,
-        },
-      ),
-    ).toThrow(SystemOverlayWriteNotReadyError)
+    const result = serializeContentFormInput(
+      def,
+      { name: 'Patched' },
+      { entity: { catalogLayer: 'system', id: 'srd:owlbear', overlayRevision: 0 } },
+      'publish',
+      {
+        operation: 'update',
+        entityId: 'srd:owlbear',
+        rulesetId: 'srd-cc-5.2.1',
+        catalogSeed: { name: 'Seed' },
+        overlayBaseline: { name: 'Seed' },
+        seedRowIdsByPath: {},
+      },
+    ) as { systemOverlayIntent?: unknown }
 
-    expect(def.normalizeOverlayBody).not.toHaveBeenCalled()
+    expect(result.systemOverlayIntent).toBeDefined()
+    expect(def.normalizeOverlayBody).toHaveBeenCalled()
+    expect(def.toInput).not.toHaveBeenCalled()
   })
 
   it('skips media merge when def does not support managed media', () => {

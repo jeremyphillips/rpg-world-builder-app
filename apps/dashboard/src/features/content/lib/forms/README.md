@@ -33,10 +33,12 @@ Deep dive: [form-lib-conventions.md](../../../../../docs/form-lib-conventions.md
 
 System edits route through `systemOverlayIntent` + `expectedOverlayRevision`.
 [`registry/system-overlay-write-readiness.lib.ts`](./registry/system-overlay-write-readiness.lib.ts)
-blocks save when provenance is missing, baseline is incomplete, revision is
-stale, or the entity appears in list `overlayFailures` (`unresolved_overlay`).
-Edit shells load the full list via `useListQueryResult` so unresolved targets
-surface an alert instead of the form. Non-empty API `overlayReadDiagnostics`
+blocks save when provenance is missing, baseline is incomplete, or revision is
+stale. It also rejects `unresolvedOverlay: true` when a caller passes that
+signal. Edit shells do not pass it: they load the full list via
+`useListQueryResult` and render an alert instead of the form, so
+`serializeContentFormInput` is never called for those targets and does not take
+the flag. Non-empty API `overlayReadDiagnostics`
 (identity conflicts, orphaned seed overrides) show a destructive alert but allow
 save unless readiness blocks reconciliation. Contract detail:
 [`system-overlay/README.md`](../../../../../../packages/contracts/src/rpg/content/lib/system-overlay/README.md).

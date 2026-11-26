@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { ClassListItem, WithCampaignAccess } from '@rpg/contracts'
@@ -14,6 +14,7 @@ import {
 } from '../../classes/lib/classes-overview-columns'
 import { buildContentColumns } from './content-table-config'
 import { ContentOverviewTable } from './content-overview-table'
+import { mergeContentListOverviewRows } from '../list/create-content-list'
 import { persistContentOverviewPreferences } from './content-overview-preferences'
 import type * as ContentOverviewPreferencesModule from './content-overview-preferences'
 
@@ -95,7 +96,7 @@ function createRows(count: number): ClassRow[] {
   })) as unknown as ClassRow[]
 }
 
-function renderOverview() {
+function renderOverview(data: ClassRow[] = createRows(8)) {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   const router = createMemoryRouter(
     [
@@ -108,7 +109,7 @@ function renderOverview() {
               campaignId={CAMPAIGN_ID}
               columns={columns}
               filterSchema={classFilterSchema}
-              data={createRows(8)}
+              data={data}
               getEditHref={(row) => `/classes/${row.id}/edit`}
             />
           </QueryClientProvider>
@@ -251,5 +252,48 @@ describe('ContentOverviewTable interactions', () => {
 
     await user.click(screen.getByRole('button', { name: 'Select' }))
     expect(screen.getByRole('checkbox', { name: 'Select Class 0' })).toBeInTheDocument()
+  })
+
+  it('shows a merged overlay failure row without duplicate, selection, or row mutation', async () => {
+    const user = userEvent.setup()
+    const data = mergeContentListOverviewRows(createRows(2), [
+      {
+        targetId: 'class-broken',
+        slug: 'broken-class',
+        name: 'Broken Class',
+        code: 'unsupported_overlay_version',
+        message: 'System overlay patch is missing a supported version.',
+      },
+    ])
+    renderOverview(data as ClassRow[])
+
+    expect(screen.getByRole('link', { name: 'Class 0' })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Broken Class' })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Show all campaign availability states' }))
+
+    const failureName = screen.getByRole('link', { name: 'Broken Class' })
+    expect(screen.getByText('Overlay unresolved')).toBeInTheDocument()
+    expect(failureName).toHaveAttribute('href', '/classes/class-broken')
+    const failureRow = failureName.closest('tr')
+    expect(failureRow).not.toBeNull()
+    if (!failureRow) return
+    expect(within(failureRow).getByRole('link', { name: 'Edit' })).toHaveAttribute(
+      'href',
+      '/classes/class-broken/edit',
+    )
+    expect(within(failureRow).queryByRole('button', { name: 'Duplicate' })).not.toBeInTheDocument()
+    expect(
+      within(failureRow).queryByRole('button', { name: /Open actions for this class/i }),
+    ).not.toBeInTheDocument()
+
+    const healthyRow = screen.getByRole('link', { name: 'Class 0' }).closest('tr')
+    expect(healthyRow).not.toBeNull()
+    if (!healthyRow) return
+    expect(within(healthyRow).getByRole('button', { name: 'Duplicate' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Select' }))
+    expect(within(failureRow).getByRole('checkbox', { name: 'Select Broken Class' })).toBeDisabled()
+    expect(within(healthyRow).getByRole('checkbox', { name: 'Select Class 0' })).toBeEnabled()
   })
 })

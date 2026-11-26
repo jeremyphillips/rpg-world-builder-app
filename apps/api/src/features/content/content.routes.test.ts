@@ -1581,12 +1581,25 @@ describe('content list routes — overlay wire', () => {
     expect(ids).not.toContain(broken.id)
     expect(res.body.usageSummaryLabels).toBeDefined()
   })
-  it('returns overlayFailures on subclass list wire', async () => {
+  it('returns overlayFailures for a broken system subclass and keeps a healthy sibling on the same class list', async () => {
     const { agent, csrfToken } = await registerAndLogin()
     const campaignId = await createTestCampaign(agent, csrfToken)
     const champion = loadSeedSubclasses('srd-cc-5.2.1').find((row) => row.slug === 'champion')
     expect(champion).toBeDefined()
     if (!champion) throw new Error('seed subclass missing')
+
+    const created = await agent
+      .post(`/api/campaigns/${campaignId}/content/classes/${champion.classId}/subclasses`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        slug: 'healthy-fighter-sibling',
+        name: 'Healthy Fighter Sibling',
+        classId: champion.classId,
+        tagline: 'A resolved sibling',
+        features: [{ kind: 'custom', id: 'feature-1', name: 'Test Feature', level: 3 }],
+      })
+      .expect(201)
+    const healthyId = created.body.subclasses.id as string
 
     await SubclassPatchModel.create({
       campaignId,
@@ -1603,6 +1616,10 @@ describe('content list routes — overlay wire', () => {
       expect.objectContaining({ targetId: champion.id, code: 'unsupported_overlay_version' }),
     ])
     const ids = res.body.subclasses.map((row: { id: string }) => row.id)
+    expect(ids).toContain(healthyId)
+    expect(res.body.subclasses.find((row: { id: string }) => row.id === healthyId)?.name).toBe(
+      'Healthy Fighter Sibling',
+    )
     expect(ids).not.toContain(champion.id)
   })
 

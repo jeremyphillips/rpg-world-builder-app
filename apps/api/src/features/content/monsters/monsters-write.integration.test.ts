@@ -5,17 +5,23 @@ import {
   isApiValidationDetails,
 } from '@rpg/contracts'
 
+import { loadSeedSpells } from '@rpg/catalog/spells'
+
 import { makeTestCampaign } from '../../../test/fixtures/campaigns'
 import { minimalHomebrewMonsterInput } from '../../../test/fixtures/monsters'
 import { useIntegrationDb } from '../../../test/setup/integration-db'
 import { HttpError } from '../../../lib/http-error'
-import { resolveCatalogForCampaign } from '../content.service'
+import {
+  resolveCatalogForCampaign,
+  resolveCatalogForCampaignWithOverlayContext,
+} from '../content.service'
 import { promoteContentToPublished } from '../lib/content-status.service'
 import { createHomebrewContent, updateContentEntity } from '../lib/content-write.service'
 import { locationWriteConfig } from '../locations/locations.config'
 import { organizationWriteConfig } from '../organizations/organizations.config'
 import { speciesWriteConfig } from '../species/species.config'
-import { spellWriteConfig } from '../spells/spells.config'
+import { spellRegistration, spellWriteConfig } from '../spells/spells.config'
+import { SpellPatchModel } from '../spells/spell-patch.model'
 import { subclassWriteConfig } from '../subclasses/subclasses.config'
 import { ELDRITCH_BLAST_RESOLUTION } from '@rpg/contracts'
 import { monstersWriteConfig } from './monsters.config'
@@ -755,5 +761,118 @@ describe('monster classification persistence', () => {
         issues: expect.arrayContaining([expect.objectContaining({ path: 'creatureFamilyIds.0' })]),
       },
     })
+  })
+})
+
+function spellCastAction(spellId: string) {
+  return {
+    id: 'cast-spell',
+    kind: 'spell' as const,
+    name: 'Cast',
+    castingAbility: { kind: 'ability' as const, ability: 'int' as const },
+    spells: [{ spellId }],
+  }
+}
+
+describe('overlay reference isolation', () => {
+  it('publishes a monster that references a healthy spell while a sibling spell overlay is malformed', async () => {
+    const campaign = await makeTestCampaign()
+    const spells = loadSeedSpells('srd-cc-5.2.1')
+    const broken = spells.find((spell) => spell.slug === 'fire-bolt')
+    const healthy = spells.find((spell) => spell.slug === 'light')
+    expect(broken).toBeDefined()
+    expect(healthy).toBeDefined()
+    if (!broken || !healthy) return
+
+    await SpellPatchModel.create({
+      campaignId: campaign.id,
+      targetId: broken.id,
+      patch: { name: 'Unversioned overlay' },
+    })
+
+    const spellContext = await resolveCatalogForCampaignWithOverlayContext(
+      spellRegistration.read,
+      campaign.id,
+    )
+    expect(spellContext.overlayFailureIds.has(broken.id)).toBe(true)
+    expect(spellContext.records.some((spell) => spell.id === healthy.id)).toBe(true)
+    expect(spellContext.records.some((spell) => spell.id === broken.id)).toBe(false)
+
+    const created = await createHomebrewContent(
+      monstersWriteConfig,
+      campaign.id,
+      {
+        ...minimalHomebrewMonsterInput,
+        slug: 'healthy-spell-sibling',
+        actions: [...minimalHomebrewMonsterInput.actions, spellCastAction(healthy.id)],
+      },
+      { status: 'draft' },
+    )
+    const published = await promoteContentToPublished(monstersWriteConfig, campaign.id, created.id)
+    expect(published.status).toBe('published')
+  })
+
+  it('reports unresolved_overlay_spell when publishing a ref to a malformed spell overlay', async () => {
+    const campaign = await makeTestCampaign()
+    const broken = loadSeedSpells('srd-cc-5.2.1').find((spell) => spell.slug === 'fire-bolt')
+    expect(broken).toBeDefined()
+    if (!broken) return
+
+    await SpellPatchModel.create({
+      campaignId: campaign.id,
+      targetId: broken.id,
+      patch: { name: 'Unversioned overlay' },
+    })
+    const spellContext = await resolveCatalogForCampaignWithOverlayContext(
+      spellRegistration.read,
+      campaign.id,
+    )
+    expect(spellContext.overlayFailureIds.has(broken.id)).toBe(true)
+
+    try {
+      await createHomebrewContent(monstersWriteConfig, campaign.id, {
+        ...minimalHomebrewMonsterInput,
+        slug: 'unresolved-spell-ref',
+        actions: [...minimalHomebrewMonsterInput.actions, spellCastAction(broken.id)],
+      })
+      throw new Error('expected validation_error')
+    } catch (error) {
+      expect(error).toBeInstanceOf(HttpError)
+      const httpError = error as HttpError
+      expect(httpError.code).toBe('validation_error')
+      expect(httpError.details).toEqual({
+        issues: expect.arrayContaining([
+          expect.objectContaining({ code: 'unresolved_overlay_spell' }),
+        ]),
+      })
+      expect(JSON.stringify(httpError.details)).not.toContain('unknown_spell')
+    }
+  })
+
+  it('reports unknown_spell when publishing a ref to a missing spell id', async () => {
+    const campaign = await makeTestCampaign()
+    const missingId = 'missing-spell-id'
+    const spellContext = await resolveCatalogForCampaignWithOverlayContext(
+      spellRegistration.read,
+      campaign.id,
+    )
+    expect(spellContext.records.some((spell) => spell.id === missingId)).toBe(false)
+    expect(spellContext.overlayFailureIds.has(missingId)).toBe(false)
+
+    try {
+      await createHomebrewContent(monstersWriteConfig, campaign.id, {
+        ...minimalHomebrewMonsterInput,
+        slug: 'unknown-spell-ref',
+        actions: [...minimalHomebrewMonsterInput.actions, spellCastAction(missingId)],
+      })
+      throw new Error('expected validation_error')
+    } catch (error) {
+      expect(error).toBeInstanceOf(HttpError)
+      const httpError = error as HttpError
+      expect(httpError.code).toBe('validation_error')
+      expect(httpError.details).toEqual({
+        issues: expect.arrayContaining([expect.objectContaining({ code: 'unknown_spell' })]),
+      })
+    }
   })
 })

@@ -17,6 +17,7 @@ import {
 } from '@rpg/ui/filters'
 
 import { getContentTypeMidSentenceLabel } from '../../content-type-labels'
+import { isContentOverlayFailureOverviewRow } from '../../list/content-overlay-overview.lib'
 import { useCanManageCampaign } from '@/features/campaign'
 import type { OverviewBulkAction } from '@/lib/overview/overview-bulk-actions-menu'
 import {
@@ -158,7 +159,7 @@ export function useContentOverviewTable<
     selectionLiveRegionId,
     selectionLiveRegionMessage,
     selectionCapDescriptionId,
-    getRowCanSelect,
+    getRowCanSelect: canSelectWithinLimit,
     enterSelectionMode,
     handleExitSelectionMode: exitBulkSelectionMode,
     onRowSelectionChange,
@@ -192,6 +193,11 @@ export function useContentOverviewTable<
       }
     },
     [exitBulkSelectionMode, removeFromSelection],
+  )
+
+  const getRowCanSelect = useCallback(
+    (row: T) => !isContentOverlayFailureOverviewRow(row) && canSelectWithinLimit(row),
+    [canSelectWithinLimit],
   )
 
   const handleExitSelectionMode = useCallback(() => {

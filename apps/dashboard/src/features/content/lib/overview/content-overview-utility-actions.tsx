@@ -14,7 +14,7 @@ export type ContentOverviewUtilityActionsProps = {
   contentTypeKey: ContentTypeKey
   queryKeyFn: (campaignId: string) => readonly unknown[]
   editHref?: string
-  source: DuplicateContentSource
+  source?: DuplicateContentSource
 }
 
 /** Manager-only inline actions on overview name cell line 2. */
@@ -25,7 +25,7 @@ export function ContentOverviewUtilityActions({
   editHref,
   source,
 }: ContentOverviewUtilityActionsProps) {
-  const canDuplicate = canDuplicateContentType(contentTypeKey)
+  const canDuplicate = Boolean(source) && canDuplicateContentType(contentTypeKey)
 
   if (!editHref && !canDuplicate) {
     return null
@@ -39,7 +39,7 @@ export function ContentOverviewUtilityActions({
         </Link>
       ) : null}
       {editHref && canDuplicate ? <span aria-hidden>·</span> : null}
-      {canDuplicate ? (
+      {canDuplicate && source ? (
         <DuplicateContentDialog
           campaignId={campaignId}
           contentTypeKey={contentTypeKey}

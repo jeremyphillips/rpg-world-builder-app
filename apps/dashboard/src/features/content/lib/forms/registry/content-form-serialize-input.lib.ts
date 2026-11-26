@@ -35,7 +35,6 @@ export type SerializeContentFormInputOptions = {
   expectedOverlayRevision?: number
   entityId?: string
   seedRowIdsByPath?: Readonly<Record<string, readonly string[]>>
-  unresolvedOverlay?: boolean
 }
 
 export function isManagedContentMediaDirty(
@@ -98,6 +97,11 @@ function assertCoherentFormMedia(prepared: ContentMedia): void {
 /**
  * Maps validated form values to the content write API payload, merging managed
  * `media` when create/update rules say it belongs on the wire.
+ *
+ * Unresolved overlay targets never reach this function. `ContentEditShell` renders
+ * a blocking alert and omits the form when list `overlayFailures` match the entity
+ * id, so serialize does not take an `unresolvedOverlay` flag. Callers that still
+ * hold that signal can pass it to `assertSystemOverlayWriteReady` directly.
  */
 export function serializeContentFormInput<
   TInput extends Record<string, unknown> = Record<string, unknown>,
@@ -135,7 +139,6 @@ export function serializeContentFormInput<
       catalogLayer,
       participantId,
       entityId: options.entityId,
-      unresolvedOverlay: options.unresolvedOverlay,
       rulesetId: options.rulesetId,
       hasNormalizer: Boolean(def.normalizeOverlayBody),
       catalogSeed: options.catalogSeed,
