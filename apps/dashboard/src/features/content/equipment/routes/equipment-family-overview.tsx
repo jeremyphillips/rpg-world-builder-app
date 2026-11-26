@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom'
 import type { Equipment, WithCampaignAccess } from '@rpg/contracts'
 
 import type { ContentOverlayFailureOverviewRow } from '../../lib/list/create-content-list'
-import type { ColumnDef } from '@rpg/ui'
+import { Alert, type ColumnDef, Text } from '@rpg/ui'
 import type { FilterSchema } from '@rpg/ui/filters'
 
 import { ROUTES } from '@/app/routes'
@@ -32,6 +32,14 @@ export function EquipmentFamilyOverviewContent({
       newHref={overview.newHref}
       newLabel={overview.newLabel}
     >
+      {overview.rulesetLookupFailed ? (
+        <Alert variant="warning" role="status">
+          <Text variant="body">
+            Could not resolve the campaign ruleset. Unresolved overlay rows are listed without
+            family classification until ruleset context is available.
+          </Text>
+        </Alert>
+      ) : null}
       {overview.tableConfig ? (
         <EquipmentFamilyTable
           tableConfig={overview.tableConfig}

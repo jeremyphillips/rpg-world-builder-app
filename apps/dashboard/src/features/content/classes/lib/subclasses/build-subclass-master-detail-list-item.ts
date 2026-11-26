@@ -1,5 +1,6 @@
 import type { MasterDetailListItem } from '../../../components/master-detail/master-detail-list-panel'
 import { CONTENT_OVERLAY_UNRESOLVED_STATUS_LABEL } from '../../../lib/list/content-overlay-overview.lib'
+import { MASTER_DETAIL_UNAVAILABLE_STATUS_LABEL } from '../../../lib/master-detail/master-detail-list-item.types'
 import { masterDetailItemTitle } from '../../../lib/master-detail/master-detail-constants'
 import { subclassMasterDetailMeta } from './subclass-master-detail.lib'
 import { isSubclassDeletable } from './subclass-editor-constants'
@@ -32,7 +33,7 @@ export function buildSubclassMasterDetailListItem({
       ? { availabilityStatusLabel: CONTENT_OVERLAY_UNRESOLVED_STATUS_LABEL }
       : isAvailable
         ? {}
-        : { availabilityStatusLabel: 'Unavailable' as const }),
+        : { availabilityStatusLabel: MASTER_DETAIL_UNAVAILABLE_STATUS_LABEL }),
     deletable:
       item.overlayResolveFailure === undefined &&
       isSubclassDeletable(SOURCE_FOR_DELETABLE[item.catalogLayer], item.id),

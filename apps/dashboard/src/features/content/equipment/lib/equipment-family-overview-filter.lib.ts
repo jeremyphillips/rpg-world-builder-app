@@ -23,7 +23,8 @@ export function equipmentFamilyOverviewHasOverlayFailures(rows: readonly unknown
 /**
  * When overlay failures are present, family membership for unresolved rows requires campaign
  * ruleset context — never guess kind while ruleset is loading. On ruleset lookup failure, include
- * all failure rows (unclassified) alongside kind-filtered resolved rows.
+ * all failure rows (unclassified) alongside kind-filtered resolved rows; the family route shows a
+ * banner while still rendering the table (list/column errors remain full-page errors).
  */
 export function filterEquipmentFamilyOverviewRows<T extends { kind: Equipment['kind'] }>(
   rows: readonly (T | ContentOverlayFailureOverviewRow)[],

@@ -106,7 +106,8 @@ describe('useEquipmentFamilyOverview', () => {
 
     const { result } = renderHook(() => useEquipmentFamilyOverview('camp-1', 'weapons'))
 
-    expect(result.current.isError).toBe(true)
+    expect(result.current.isError).toBe(false)
+    expect(result.current.rulesetLookupFailed).toBe(true)
     expect(result.current.filtered.map((row) => row.id)).toEqual([
       'hb-weapon',
       'srd-cc-5.2.1:longsword',
@@ -151,5 +152,23 @@ describe('useEquipmentFamilyOverview', () => {
       'hb-weapon',
       'srd-cc-5.2.1:longsword',
     ])
+  })
+
+  it('treats ruleset lookup failure as a full-page error when the equipment list also failed', () => {
+    vi.mocked(useCampaignRulesetLookup).mockReturnValue({
+      rulesetId: undefined,
+      isPending: false,
+      isError: true,
+    })
+    vi.mocked(useEquipmentListResult).mockReturnValue({
+      data: undefined,
+      isPending: false,
+      isError: true,
+    })
+
+    const { result } = renderHook(() => useEquipmentFamilyOverview('camp-1', 'weapons'))
+
+    expect(result.current.isError).toBe(true)
+    expect(result.current.rulesetLookupFailed).toBe(false)
   })
 })

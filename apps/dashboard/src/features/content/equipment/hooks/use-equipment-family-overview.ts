@@ -7,6 +7,7 @@ import { useContentOverviewMergedData } from '../../lib/list/create-content-list
 import { useEquipmentListResult, useEquipmentUsageMeta } from '../hooks/use-equipment'
 import {
   equipmentFamilyOverviewAwaitingRulesetForFailures,
+  equipmentFamilyOverviewHasOverlayFailures,
   filterEquipmentFamilyOverviewRows,
 } from '../lib/equipment-family-overview-filter.lib'
 import { useFamilyTableConfig } from '../hooks/use-family-table-config'
@@ -53,12 +54,20 @@ export function useEquipmentFamilyOverview(campaignId: string, family: Equipment
     rulesetGate,
   )
 
+  const listOrColumnsFailed = isError || columnsError
+  const rulesetLookupFailed =
+    rulesetError &&
+    !rulesetPending &&
+    !listOrColumnsFailed &&
+    equipmentFamilyOverviewHasOverlayFailures(equipment)
+
   return {
     heading,
     filtered,
     tableConfig,
     isPending: isPending || columnsPending || rulesetPending || awaitingRulesetForFailures,
-    isError: isError || columnsError || rulesetError,
+    isError: listOrColumnsFailed,
+    rulesetLookupFailed,
     newHref: ROUTES.content.equipment.create(campaignId, family),
     newLabel: `New ${heading.replace(/s$/, '')}`,
   }

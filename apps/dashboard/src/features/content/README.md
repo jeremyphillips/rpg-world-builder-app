@@ -41,7 +41,8 @@ lib/
   overview/         # List shell, table config, source badge; hooks/ subfolder
                     #   overlay-unresolved synthetic rows bypass campaign-availability hiding
   equipment/lib/    # equipment-family-overview-filter.lib — ruleset gates before classifying
-                    #   overlay failures by seed kind (see use-equipment-family-overview)
+                    #   overlay failures by seed kind; ruleset lookup failure with overlay rows
+                    #   shows a warning and unclassified failure rows (not a full-page error)
   detail/           # page/, metadata/, section/, row/ — see feature-structure.md
   master-detail/    # Embedded array editor infra
   list/             # List API/query factories, content client
