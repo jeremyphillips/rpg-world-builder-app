@@ -56,6 +56,28 @@ non-reusable.
 | 7   | **Wiring gaps**                  | Partial landing across layers — see below                                                                                                                        |
 | 8   | **New form slots**               | A new production `kind: 'slot'` that `display`, `visibility`, `optionsResolve`, `hint.resolve`, `derivedMeta`, `valueSyncs`, `dependent`, or `optionalDisclosure` could express. A new or renamed identity must update the [slot register](../../../apps/dashboard/docs/form-slot-register.md) and `form-slot-literal-baseline.json`. Confirm-gated multi-path writes stay feature controllers plus `ConfirmDialog`. Reject raw `<input>`, `<select>`, or `<textarea>` in `components/form/slots/**` (see [.cursor/rules/form-slots.mdc](../../../.cursor/rules/form-slots.mdc)). |
 | 9   | **Metric-only complexity refactors** | Splits/extracts whose only stated goal is passing Fallow; new single-use `*.lib.ts`, pass-through helpers, or extra files without semantic boundary — see [complexity-remediation.md](../../../docs/complexity-remediation.md). Favor simplify-in-place, meaningful tests, consolidate/remove dubious abstractions. |
+| 10  | **Plan compliance and verification** | When approved scope is inferable (PR description, commits, linked plan): missing/incorrect implementation, missing boundary verification, inaccurate “done” claims, weaker test substitution — policy in [AGENTS.md § Approved work](../../../AGENTS.md#approved-work) and [agent-validation.md § Plan execution](../../../docs/agent-validation.md#plan-execution). |
+
+### Plan compliance (lens 10)
+
+Classify findings when relevant:
+
+| Kind | Focus |
+| ---- | ----- |
+| Missing implementation | Mandatory behavior absent from diff |
+| Incorrect implementation | Behavior contradicts stated criteria |
+| Missing required verification | No evidence at the required production boundary |
+| Inaccurate completion claims | Summary/todos/matrix assert done while mandatory criteria open |
+| Optional improvement | Non-mandatory gap |
+
+**Severity:** By risk (data integrity, correctness, security, user-facing impact)—not
+automatic High for every missing test. State separately whether the finding **blocks
+approved-plan acceptance** when scope is known.
+
+**Evidence:** Distinguish **inspected** test source from **freshly executed** runs and
+from author-reported results. File presence or a green unrelated suite does not prove
+boundary verification. Narrow unit success does not satisfy integration/mounted scope
+named in approved work.
 
 ### SSOT rule
 
@@ -198,6 +220,8 @@ Do not add informational praise, coverage summaries, or duplicate merge-blocker 
 
 ## Guardrails
 
+- Do not infer passing verification from test file presence alone; narrow unit green does
+  not prove plan-level integration/mounted requirements ([agent-validation.md](../../../docs/agent-validation.md#plan-execution))
 - No speculative risks without a demonstrable code path
 - Do not equate query failure with empty data
 - Do not confuse UI hiding with server authorization
