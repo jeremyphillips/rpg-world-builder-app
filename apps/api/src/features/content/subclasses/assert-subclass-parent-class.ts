@@ -1,4 +1,4 @@
-import type { CharacterClass } from '@rpg/contracts'
+import { SPELL_CLASS_REFERENCE_ISSUE_CODE, type CharacterClass } from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
 import { resolveContentListForCampaign } from '../content.service'
@@ -22,7 +22,7 @@ export async function assertSubclassParentClassExists(
       issues: [
         {
           path: 'classId',
-          code: 'unknown_class',
+          code: SPELL_CLASS_REFERENCE_ISSUE_CODE.unknownClass,
           message: 'Parent class not found in campaign catalog.',
         },
       ],

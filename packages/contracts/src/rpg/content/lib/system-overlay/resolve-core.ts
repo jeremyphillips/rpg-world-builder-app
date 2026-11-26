@@ -1,4 +1,5 @@
 import type { CollectionDelta, SeedFieldDelta, SeedRowReplace } from './intent'
+import { valueListCollectionIntentIsUnsupported } from './policy-consumers'
 import type { OverlayReadDiagnostics, OverlayApplyFailure } from './overlay-failures'
 import {
   canonicalIdentityOrder,
@@ -565,7 +566,20 @@ function reconcileSeedRowOverrideCollections(
           },
         }
       }
-      if (collectionDelta.reset) delete collections[key]
+      if (collectionDelta.reset) {
+        delete collections[key]
+        continue
+      }
+      if (valueListCollectionIntentIsUnsupported(collectionDelta)) {
+        return {
+          failure: {
+            code: 'overlay-validation',
+            issues: [
+              `Value-list collection at ${path}.${key} only supports reset intent; edit the list via scalar set`,
+            ],
+          },
+        }
+      }
       continue
     }
     return {

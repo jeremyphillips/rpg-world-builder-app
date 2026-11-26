@@ -1,4 +1,5 @@
 import { ROUTES } from '@/app/routes'
+import { useCampaignRulesetLookup } from '@/lib/use-campaign-ruleset-lookup'
 
 import { useContentOverviewMergedData } from '../../lib/list/create-content-list'
 import { isContentOverlayFailureOverviewRow } from '../../lib/list/content-overlay-overview.lib'
@@ -14,6 +15,7 @@ import {
 
 export function useEquipmentFamilyOverview(campaignId: string, family: EquipmentFamilyPath) {
   const kind = familyPathToEquipmentKind(family)
+  const { rulesetId: campaignRulesetId } = useCampaignRulesetLookup(campaignId)
   const listResult = useEquipmentListResult(campaignId)
   const { data: equipment, isPending, isError } = useContentOverviewMergedData(listResult)
   const { data: usageMeta } = useEquipmentUsageMeta(campaignId)
@@ -29,8 +31,12 @@ export function useEquipmentFamilyOverview(campaignId: string, family: Equipment
   const filtered = kind
     ? equipment.filter((item) => {
         if (isContentOverlayFailureOverviewRow(item)) {
-          const rulesetId = item.id.split(':')[0] as SystemRulesetId
-          const seed = resolveCatalogSeedBody('equipment', rulesetId, item.id)
+          if (!campaignRulesetId) return false
+          const seed = resolveCatalogSeedBody(
+            'equipment',
+            campaignRulesetId as SystemRulesetId,
+            item.id,
+          )
           return seed?.kind === kind
         }
         return item.kind === kind

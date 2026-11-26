@@ -16,10 +16,16 @@ import { equipmentRegistration } from '../equipment/equipment.config'
 import { skillProficiencyRegistration } from '../skill-proficiencies/skill-proficiencies.config'
 import { spellRegistration } from '../spells/spells.config'
 import type { ContentWriteContext } from '../lib/content-write-config'
+import { resolveValidatedWriteBody } from '../lib/resolve-system-overlay.lib'
 import { rejectInvalidCreatureTraitTemplates } from '../lib/reject-creature-trait-templates'
 
 export async function monstersValidateBeforeWrite(ctx: ContentWriteContext): Promise<void> {
-  const rawBody = ctx.effectiveBody ?? ctx.input
+  const rawBody = resolveValidatedWriteBody({
+    effectiveBody: ctx.effectiveBody,
+    mode: ctx.mode,
+    existing: ctx.existing as Record<string, unknown> | undefined,
+    input: ctx.input,
+  })
   rejectInvalidCreatureTraitTemplates(rawBody.traits, ['traits'], { host: 'monster' })
   const body = rawBody as Parameters<typeof collectMonsterCatalogIssues>[0]
   const [equipmentCtx, skillCtx, spellCtx, classCtx, familySet] = await Promise.all([

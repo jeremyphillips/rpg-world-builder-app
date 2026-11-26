@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { applyStoredOverlay } from './apply'
 import { storedOverlaySchema } from './stored'
 import { compileOverlayPolicy } from './compile-policy'
-import { overlayImmaterialIdRows, overlayRestoreIdRows } from './overlay-presets'
+import { overlayImmaterialIdRows, overlayRestoreIdRows, overlaySlugList } from './overlay-presets'
 import { reconcileOverlayUpdate } from './reconcile'
 import { overlayValueEqual } from './value-equal'
 
@@ -297,5 +297,151 @@ describe('reconcileOverlayUpdate', () => {
     expect(applied.ok).toBe(true)
     if (!applied.ok) return
     expect(applied.result.body.traits).toEqual([{ id: 'keen-sight', name: 'Replaced' }])
+  })
+})
+
+describe('value-list collection intent integrity', () => {
+  const tagsPolicy = (() => {
+    const rowSchema = z.object({
+      id: z.string().min(1),
+      name: z.string().min(1),
+      tags: overlaySlugList(z.string()).optional(),
+    })
+    const schema = z.object({
+      name: z.string().min(1),
+      traits: overlayRestoreIdRows(rowSchema),
+    })
+    const compiled = compileOverlayPolicy(schema)
+    if (!compiled.ok) throw new Error(compiled.issues.join('\n'))
+    return compiled.policy
+  })()
+
+  const taggedSeed = {
+    name: 'Owlbear',
+    traits: [{ id: 'keen-sight', name: 'Keen Sight', tags: ['perception'] }],
+  }
+
+  it('rejects identity-style collection intent on a top-level value-list path', () => {
+    const tagsSchema = z.object({
+      name: z.string().min(1),
+      tags: overlaySlugList(z.string()),
+    })
+    const compiled = compileOverlayPolicy(tagsSchema)
+    if (!compiled.ok) throw new Error(compiled.issues.join('\n'))
+    const result = reconcileOverlayUpdate(
+      { name: 'Spell', tags: ['fire'] },
+      { version: 1, revision: 0 },
+      {
+        collections: {
+          tags: { removedIds: ['fire'] },
+        },
+      },
+      compiled.policy,
+    )
+    expect(result.ok).toBe(false)
+    if (result.ok) return
+    expect(result.failure).toMatchObject({ code: 'overlay-validation' })
+  })
+
+  it('rejects unsupported nested value-list collection intent inside a seed override', () => {
+    const result = reconcileOverlayUpdate(
+      taggedSeed,
+      { version: 1, revision: 0 },
+      {
+        collections: {
+          traits: {
+            overrides: [
+              {
+                origin: 'seed' as const,
+                id: 'keen-sight',
+                collections: {
+                  tags: { removedIds: ['perception'] },
+                },
+              },
+            ],
+          },
+        },
+      },
+      tagsPolicy,
+    )
+    expect(result.ok).toBe(false)
+    if (result.ok) return
+    expect(result.failure).toMatchObject({ code: 'overlay-validation' })
+  })
+
+  it('applies nested value-list edits through scalar set on a seed override', () => {
+    const result = reconcileOverlayUpdate(
+      taggedSeed,
+      { version: 1, revision: 0 },
+      {
+        collections: {
+          traits: {
+            overrides: [
+              {
+                origin: 'seed' as const,
+                id: 'keen-sight',
+                set: { tags: ['perception', 'alertness'] },
+              },
+            ],
+          },
+        },
+      },
+      tagsPolicy,
+    )
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    const applied = applyStoredOverlay(taggedSeed, result.result.stored, tagsPolicy)
+    expect(applied.ok).toBe(true)
+    if (!applied.ok) return
+    expect(applied.result.body.traits).toEqual([
+      { id: 'keen-sight', name: 'Keen Sight', tags: ['perception', 'alertness'] },
+    ])
+  })
+
+  it('resets nested value-list overlay intent on a seed override', () => {
+    const stored = {
+      version: 1 as const,
+      revision: 1,
+      collections: {
+        traits: {
+          kind: 'identity' as const,
+          overrides: [
+            {
+              origin: 'seed' as const,
+              id: 'keen-sight',
+              collections: {
+                tags: { kind: 'value-list' as const, items: ['custom'] },
+              },
+            },
+          ],
+          additions: [],
+          removedIds: [],
+        },
+      },
+    }
+    const result = reconcileOverlayUpdate(
+      taggedSeed,
+      stored,
+      {
+        collections: {
+          traits: {
+            overrides: [
+              {
+                origin: 'seed' as const,
+                id: 'keen-sight',
+                collections: { tags: { reset: true } },
+              },
+            ],
+          },
+        },
+      },
+      tagsPolicy,
+    )
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    const applied = applyStoredOverlay(taggedSeed, result.result.stored, tagsPolicy)
+    expect(applied.ok).toBe(true)
+    if (!applied.ok) return
+    expect(applied.result.body.traits).toEqual(taggedSeed.traits)
   })
 })

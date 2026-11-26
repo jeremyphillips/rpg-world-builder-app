@@ -1637,6 +1637,180 @@ describe('content list routes — overlay visibility', () => {
       expect.objectContaining({ targetId: broken.id, code: 'unsupported_overlay_version' }),
     ])
   })
+
+  it('scopes specific_players overlay failure visibility to granted play actors', async () => {
+    const owner = await registerAndLoginTestUser(getApp(), {
+      email: 'overlay-specific-owner@example.com',
+      password: 'supersecret',
+      displayName: 'Owner',
+    })
+    const campaignId = await createTestCampaign(owner.agent, owner.csrfToken)
+    const feats = loadSeedFeats('srd-cc-5.2.1')
+    const broken = feats.find((row) => row.slug === 'alert')
+    expect(broken).toBeDefined()
+    if (!broken) throw new Error('seed feat missing')
+
+    await FeatPatchModel.create({
+      campaignId,
+      targetId: broken.id,
+      patch: { name: 'Unversioned overlay' },
+    })
+
+    const grantedMember = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'overlay-granted@example.com',
+      campaignRole: 'pc',
+    })
+    const deniedMember = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'overlay-denied@example.com',
+      campaignRole: 'pc',
+    })
+    const grantedPc = await createPcRecord(
+      { ...minimalStandalonePcInput, name: 'Granted PC' },
+      grantedMember.userId,
+    )
+    const deniedPc = await createPcRecord(
+      { ...minimalStandalonePcInput, name: 'Denied PC' },
+      deniedMember.userId,
+    )
+    await setMembershipControlledPcs({
+      campaignId,
+      userId: grantedMember.userId,
+      controlledCharacterIds: [grantedPc.id],
+    })
+    await setMembershipControlledPcs({
+      campaignId,
+      userId: deniedMember.userId,
+      controlledCharacterIds: [deniedPc.id],
+    })
+
+    await owner.agent
+      .patch(`/api/campaigns/${campaignId}/content/feats/${broken.id}/campaign-access`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({
+        available: true,
+        visibilityMode: 'specific_players',
+        participantIds: [grantedPc.id],
+      })
+      .expect(200)
+
+    const grantedList = await grantedMember.agent
+      .get(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, grantedMember.csrfToken)
+      .expect(200)
+    expect(grantedList.body.overlayFailures).toEqual([
+      expect.objectContaining({ targetId: broken.id }),
+    ])
+
+    const deniedList = await deniedMember.agent
+      .get(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, deniedMember.csrfToken)
+      .expect(200)
+    expect(deniedList.body.overlayFailures ?? []).toEqual([])
+    expect(JSON.stringify(deniedList.body)).not.toContain(broken.slug)
+    expect(JSON.stringify(deniedList.body)).not.toContain(broken.name)
+
+    const ownerList = await owner.agent
+      .get(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .expect(200)
+    expect(ownerList.body.overlayFailures).toEqual([
+      expect.objectContaining({ targetId: broken.id }),
+    ])
+  })
+})
+
+describe('content list routes — nested subclass scopes', () => {
+  const referenceScope = `${CONTENT_CATALOG_SCOPE_QUERY}=${CONTENT_CATALOG_REFERENCE_SCOPE}`
+  const playCatalogScope = `${CONTENT_CATALOG_SCOPE_QUERY}=${CONTENT_CATALOG_PLAY_SCOPE}`
+
+  it('scopes subclass discovery, reference, and play responses to the parent class', async () => {
+    const owner = await registerAndLoginTestUser(getApp(), {
+      email: 'subclass-scope-owner@example.com',
+      password: 'supersecret',
+      displayName: 'Owner',
+    })
+    const campaignId = await createTestCampaign(owner.agent, owner.csrfToken)
+    const subclasses = loadSeedSubclasses('srd-cc-5.2.1')
+    const champion = subclasses.find((row) => row.slug === 'champion')
+    const evocation = subclasses.find((row) => row.slug === 'school-of-evocation')
+    expect(champion).toBeDefined()
+    expect(evocation).toBeDefined()
+    if (!champion || !evocation) throw new Error('seed subclasses missing')
+
+    const healthy = await owner.agent
+      .post(`/api/campaigns/${campaignId}/content/classes/${champion.classId}/subclasses`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({
+        slug: 'fighter-subclass-wire',
+        name: 'Fighter Wire',
+        classId: champion.classId,
+        tagline: 'Visible sibling',
+        features: [{ kind: 'custom', id: 'feature-1', name: 'Feature', level: 3 }],
+      })
+      .expect(201)
+    const healthyId = healthy.body.subclasses.id as string
+
+    await SubclassPatchModel.create({
+      campaignId,
+      targetId: champion.id,
+      patch: { name: 'Unversioned overlay' },
+    })
+    await SubclassPatchModel.create({
+      campaignId,
+      targetId: evocation.id,
+      patch: { name: 'Unversioned overlay' },
+    })
+
+    const member = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'subclass-scope-player@example.com',
+      campaignRole: 'pc',
+    })
+
+    const ownerDiscovery = await owner.agent
+      .get(`/api/campaigns/${campaignId}/content/classes/${champion.classId}/subclasses`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .expect(200)
+    expect(ownerDiscovery.body.overlayFailures).toEqual([
+      expect.objectContaining({ targetId: champion.id }),
+    ])
+    expect(
+      ownerDiscovery.body.overlayFailures.map((entry: { targetId: string }) => entry.targetId),
+    ).not.toContain(evocation.id)
+    expect(ownerDiscovery.body.subclasses.map((row: { id: string }) => row.id)).toContain(healthyId)
+
+    const playerDiscovery = await member.agent
+      .get(`/api/campaigns/${campaignId}/content/classes/${champion.classId}/subclasses`)
+      .set(CSRF_HEADER, member.csrfToken)
+      .expect(200)
+    expect(playerDiscovery.body.overlayFailures).toEqual([
+      expect.objectContaining({ targetId: champion.id }),
+    ])
+
+    const playerReference = await member.agent
+      .get(
+        `/api/campaigns/${campaignId}/content/classes/${champion.classId}/subclasses?${referenceScope}`,
+      )
+      .set(CSRF_HEADER, member.csrfToken)
+      .expect(200)
+    expect(playerReference.body.overlayFailures).toEqual([
+      expect.objectContaining({ targetId: champion.id }),
+    ])
+    expect(playerReference.body.subclasses.map((row: { id: string }) => row.id)).toContain(
+      healthyId,
+    )
+
+    const playList = await member.agent
+      .get(
+        `/api/campaigns/${campaignId}/content/classes/${champion.classId}/subclasses?${playCatalogScope}&${CONTENT_PLAY_ACTOR_KIND_QUERY}=new_pc`,
+      )
+      .set(CSRF_HEADER, member.csrfToken)
+      .expect(200)
+    expect(playList.body.overlayFailures ?? []).toEqual([])
+    expect(playList.body.subclasses.map((row: { id: string }) => row.id)).toContain(healthyId)
+  })
 })
 
 describe('content list routes — overlay wire', () => {

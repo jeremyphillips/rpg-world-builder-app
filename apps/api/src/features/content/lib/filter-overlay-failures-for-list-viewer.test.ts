@@ -28,6 +28,11 @@ const pcMembership = {
   pcCharacterIds: ['pc-1'],
 }
 
+const dualPcMembership = {
+  ...pcMembership,
+  pcCharacterIds: ['pc-a', 'pc-b'],
+}
+
 const failure = {
   targetId: 'srd-cc-5.2.1:broken',
   slug: 'broken',
@@ -37,7 +42,7 @@ const failure = {
 }
 
 describe('filterOverlayFailuresForListViewer', () => {
-  it('returns an empty list for play mode', async () => {
+  it('returns an empty list for play mode regardless of actor eligibility', async () => {
     await expect(
       filterOverlayFailuresForListViewer('camp-1', 'spells', [failure], {
         mode: 'play',
@@ -45,9 +50,17 @@ describe('filterOverlayFailuresForListViewer', () => {
         playActor: { kind: 'new_pc' },
       }),
     ).resolves.toEqual([])
+
+    await expect(
+      filterOverlayFailuresForListViewer('camp-1', 'spells', [failure], {
+        mode: 'play',
+        membership: ownerMembership,
+        playActor: { kind: 'npc' },
+      }),
+    ).resolves.toEqual([])
   })
 
-  it('returns dm_only failures for owners but not for players', async () => {
+  it('returns dm_only failures for owners but not for players in discovery mode', async () => {
     const { attachCampaignAccessForTargetType } = await import('./content-campaign-access.service')
     vi.mocked(attachCampaignAccessForTargetType).mockImplementation(async (_c, _t, rows) =>
       rows.map((row) => ({
@@ -70,6 +83,88 @@ describe('filterOverlayFailuresForListViewer', () => {
       filterOverlayFailuresForListViewer('camp-1', 'spells', [failure], {
         mode: 'discovery',
         membership: pcMembership,
+      }),
+    ).resolves.toEqual([])
+  })
+
+  it('keeps unavailable failures for players in reference mode but hides dm_only failures', async () => {
+    const { attachCampaignAccessForTargetType } = await import('./content-campaign-access.service')
+    const unavailable = {
+      ...failure,
+      targetId: 'srd-cc-5.2.1:unavailable',
+      slug: 'unavailable',
+    }
+    const dmOnly = {
+      ...failure,
+      targetId: 'srd-cc-5.2.1:dm-only',
+      slug: 'dm-only',
+    }
+    vi.mocked(attachCampaignAccessForTargetType).mockImplementation(async (_c, _t, rows) =>
+      rows.map((row) => {
+        if (row.id.includes('unavailable')) {
+          return {
+            ...row,
+            campaignAccess: {
+              ...DEFAULT_CONTENT_CAMPAIGN_ACCESS,
+              available: false,
+              effectiveAudience: 'none' as const,
+            },
+          }
+        }
+        return {
+          ...row,
+          campaignAccess: {
+            ...DEFAULT_CONTENT_CAMPAIGN_ACCESS,
+            visibilityMode: 'dm_only' as const,
+          },
+        }
+      }),
+    )
+
+    await expect(
+      filterOverlayFailuresForListViewer('camp-1', 'spells', [unavailable, dmOnly], {
+        mode: 'reference',
+        membership: pcMembership,
+      }),
+    ).resolves.toEqual([unavailable])
+
+    await expect(
+      filterOverlayFailuresForListViewer('camp-1', 'spells', [unavailable, dmOnly], {
+        mode: 'reference',
+        membership: ownerMembership,
+      }),
+    ).resolves.toEqual([unavailable, dmOnly])
+  })
+
+  it('scopes specific_players failure discovery to granted play actors', async () => {
+    const { attachCampaignAccessForTargetType } = await import('./content-campaign-access.service')
+    const restricted = {
+      ...failure,
+      targetId: 'srd-cc-5.2.1:restricted',
+      slug: 'restricted',
+    }
+    vi.mocked(attachCampaignAccessForTargetType).mockImplementation(async (_c, _t, rows) =>
+      rows.map((row) => ({
+        ...row,
+        campaignAccess: {
+          ...DEFAULT_CONTENT_CAMPAIGN_ACCESS,
+          visibilityMode: 'specific_players' as const,
+          participantIds: ['pc-a'],
+        },
+      })),
+    )
+
+    await expect(
+      filterOverlayFailuresForListViewer('camp-1', 'spells', [restricted], {
+        mode: 'discovery',
+        membership: { ...dualPcMembership, playActorCharacterId: 'pc-a' },
+      }),
+    ).resolves.toEqual([restricted])
+
+    await expect(
+      filterOverlayFailuresForListViewer('camp-1', 'spells', [restricted], {
+        mode: 'discovery',
+        membership: { ...dualPcMembership, playActorCharacterId: 'pc-b' },
       }),
     ).resolves.toEqual([])
   })

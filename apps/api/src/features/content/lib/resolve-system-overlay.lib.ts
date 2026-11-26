@@ -47,6 +47,22 @@ export function mergeExistingContentBody(
   return { ...contentEntityBody(existing), ...input }
 }
 
+/** Domain body hooks validate: reconciled overlay body, merged update, or create input. */
+export function resolveValidatedWriteBody(ctx: {
+  effectiveBody?: Record<string, unknown>
+  mode: 'create' | 'update'
+  existing?: Record<string, unknown>
+  input: Record<string, unknown>
+}): Record<string, unknown> {
+  if (ctx.effectiveBody) {
+    return ctx.effectiveBody
+  }
+  if (ctx.mode === 'update' && ctx.existing) {
+    return mergeExistingContentBody(ctx.existing, ctx.input)
+  }
+  return ctx.input
+}
+
 export function overlayPolicyForValidationIntent(
   participantId: SystemOverlayParticipantId,
   validationIntent: ContentValidationIntent,

@@ -55,6 +55,18 @@ function nodeAtPath(
   return current
 }
 
+/** Identity-style collection intent on a value-list policy path is invalid. */
+export function valueListCollectionIntentIsUnsupported(delta: CollectionDelta): boolean {
+  return (
+    (delta.overrides?.length ?? 0) > 0 ||
+    (delta.additions?.length ?? 0) > 0 ||
+    (delta.removedIds?.length ?? 0) > 0 ||
+    (delta.restoreIds?.length ?? 0) > 0 ||
+    (delta.order?.length ?? 0) > 0 ||
+    delta.restoreOrder === true
+  )
+}
+
 export function assertIntentCollectionMatchesPolicy(
   policy: OverlayPolicyNode,
   collectionPath: string,
@@ -69,6 +81,9 @@ export function assertIntentCollectionMatchesPolicy(
     return undefined
   }
   if (node.kind === 'value-list') {
+    if (valueListCollectionIntentIsUnsupported(delta)) {
+      return `Value-list collection at ${collectionPath} only supports reset intent; edit the list via scalar set`
+    }
     return undefined
   }
   return `Path ${collectionPath} is not an editable collection`

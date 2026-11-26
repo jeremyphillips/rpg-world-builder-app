@@ -9,9 +9,11 @@ import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  classColumns,
   classFilterSchema,
   type ClassesOverviewFilterState,
 } from '../../classes/lib/classes-overview-columns'
+import { useOverviewColumnsWithNameContext } from './content-overview-columns'
 import { buildContentColumns } from './content-table-config'
 import { ContentOverviewTable } from './content-overview-table'
 import { mergeContentListOverviewRows } from '../list/create-content-list'
@@ -275,6 +277,7 @@ describe('ContentOverviewTable interactions', () => {
     const failureRow = failureName.closest('tr')
     expect(failureRow).not.toBeNull()
     if (!failureRow) return
+    expect(within(failureRow).queryByText(/Unavailable/i)).not.toBeInTheDocument()
     expect(within(failureRow).getByRole('link', { name: 'Edit' })).toHaveAttribute(
       'href',
       '/classes/class-broken/edit',
@@ -292,5 +295,72 @@ describe('ContentOverviewTable interactions', () => {
     await user.click(screen.getByRole('button', { name: 'Select' }))
     expect(within(failureRow).getByRole('checkbox', { name: 'Select Broken Class' })).toBeDisabled()
     expect(within(healthyRow).getByRole('checkbox', { name: 'Select Class 0' })).toBeEnabled()
+  })
+
+  it('renders guarded class overview columns for failure rows without domain field accessors', async () => {
+    const healthy = {
+      ...createRows(1)[0]!,
+      features: [],
+      primaryAbilities: ['str'],
+      spellcasting: undefined,
+    }
+    const data = mergeContentListOverviewRows(
+      [healthy],
+      [
+        {
+          targetId: 'class-broken',
+          slug: 'broken-class',
+          name: 'Broken Class',
+          code: 'unsupported_overlay_version',
+          message: 'System overlay patch is missing a supported version.',
+        },
+      ],
+    ) as ClassRow[]
+
+    function OverviewWithClassColumns() {
+      const guarded = useOverviewColumnsWithNameContext(
+        classColumns(CAMPAIGN_ID) as ColumnDef<ClassRow, unknown>[],
+        {
+          canManage: true,
+          campaignId: CAMPAIGN_ID,
+          contentTypeKey: 'classes',
+          viewer: manageViewer,
+          getEditHref: (row) => `/classes/${row.id}/edit`,
+        },
+      )
+      return (
+        <ContentOverviewTable<ClassRow, ClassesOverviewFilterState>
+          contentTypeKey="classes"
+          campaignId={CAMPAIGN_ID}
+          columns={guarded}
+          filterSchema={classFilterSchema}
+          data={data}
+          getEditHref={(row) => `/classes/${row.id}/edit`}
+        />
+      )
+    }
+
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    const router = createMemoryRouter(
+      [
+        {
+          path: '/',
+          element: (
+            <QueryClientProvider client={queryClient}>
+              <OverviewWithClassColumns />
+            </QueryClientProvider>
+          ),
+        },
+      ],
+      { initialEntries: ['/'] },
+    )
+    render(<RouterProvider router={router} />)
+
+    expect(screen.getByRole('link', { name: 'Class 0' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Broken Class' })).toBeInTheDocument()
+    const brokenRow = screen.getByRole('link', { name: 'Broken Class' }).closest('tr')
+    expect(brokenRow).not.toBeNull()
+    if (!brokenRow) return
+    expect(within(brokenRow).getAllByText('—').length).toBeGreaterThan(0)
   })
 })

@@ -15,26 +15,18 @@ import {
 } from '../content.service'
 import { classRegistration } from '../classes/classes.config'
 import type { ContentWriteContext } from '../lib/content-write-config'
-import { contentEntityBody, mergeExistingContentBody } from '../lib/resolve-system-overlay.lib'
+import { resolveValidatedWriteBody } from '../lib/resolve-system-overlay.lib'
 import { assertContentSpellReferences } from '../lib/assert-content-spell-references'
 import { rejectInvalidCreatureTraitTemplates } from '../lib/reject-creature-trait-templates'
 import { assertSpeciesClassSlugsFromInput } from './assert-species-class-slugs'
 
-function validatedSpeciesBody(ctx: ContentWriteContext): Record<string, unknown> {
-  if (ctx.effectiveBody) {
-    return contentEntityBody(ctx.effectiveBody)
-  }
-  if (ctx.mode === 'update' && ctx.existing) {
-    return mergeExistingContentBody(
-      ctx.existing as unknown as Record<string, unknown>,
-      ctx.input,
-    ) as Record<string, unknown>
-  }
-  return ctx.input
-}
-
 export async function speciesValidateBeforeWrite(ctx: ContentWriteContext): Promise<void> {
-  const inputForVocab = validatedSpeciesBody(ctx)
+  const inputForVocab = resolveValidatedWriteBody({
+    effectiveBody: ctx.effectiveBody,
+    mode: ctx.mode,
+    existing: ctx.existing as Record<string, unknown> | undefined,
+    input: ctx.input,
+  })
 
   const creatureType = inputForVocab.creatureType
   if (typeof creatureType === 'string') {

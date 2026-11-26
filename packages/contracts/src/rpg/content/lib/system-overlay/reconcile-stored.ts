@@ -1,6 +1,10 @@
 import type { CollectionDelta, ObjectDelta } from './intent'
 import type { OverlayPolicyNode } from './policy'
 import {
+  assertIntentCollectionMatchesPolicy,
+  valueListCollectionIntentIsUnsupported,
+} from './policy-consumers'
+import {
   applyIntentClearFields,
   applyIntentRestoreFields,
   applyIntentSetFields,
@@ -99,6 +103,16 @@ function reconcileCollection(
       }
     }
     if (delta.reset) return { stored: undefined }
+    if (valueListCollectionIntentIsUnsupported(delta)) {
+      return {
+        failure: {
+          code: 'overlay-validation',
+          issues: [
+            `Value-list collection at ${path} only supports reset intent; edit the list via scalar set`,
+          ],
+        },
+      }
+    }
     return { stored: current }
   }
   return {
@@ -141,6 +155,10 @@ export function reconcileStoredOverlay(
   let next = draft.overlay
   const collections = { ...(next.collections ?? {}) }
   for (const [path, delta] of Object.entries(intent.collections ?? {})) {
+    const policyIssue = assertIntentCollectionMatchesPolicy(policy, path, delta)
+    if (policyIssue) {
+      return { overlay: base, failure: { code: 'overlay-validation', issues: [policyIssue] } }
+    }
     const seedRows = asArray(seedValueAt(seed, path))
     const reconciled = reconcileCollection(seed, seedRows, collections[path], delta, policy, path)
     if (reconciled.failure) return { overlay: base, failure: reconciled.failure }
