@@ -39,6 +39,17 @@ describe('evaluateSystemOverlayWriteReadiness', () => {
     })
   })
 
+  it('blocks unresolved overlay targets', () => {
+    const result = evaluateSystemOverlayWriteReadiness({
+      ...readyInput,
+      unresolvedOverlay: true,
+    })
+    expect(result.ready).toBe(false)
+    if (!result.ready) {
+      expect(result.reason).toBe('unresolved_overlay')
+    }
+  })
+
   it('accepts an empty seedRowIdsByPath object', () => {
     const result = evaluateSystemOverlayWriteReadiness({
       ...readyInput,

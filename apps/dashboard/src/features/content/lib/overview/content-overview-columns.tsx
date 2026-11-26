@@ -18,6 +18,7 @@ import { contentOverviewListQueryKey } from './content-overview-query-keys'
 import { createOverviewColumnDefsSignature } from './content-overview-columns.lib'
 import { type ContentBase, type ContentOverviewNameColumnMeta } from './content-table-config'
 import { resolveReadSurfaceCampaignAccess } from '../campaign-access/resolve-read-surface-campaign-access'
+import { isContentOverlayFailureOverviewRow } from '../list/content-overlay-overview.lib'
 import type { UsedByOverviewColumnMeta } from '@/lib/usage-references/build-used-by-overview-column'
 
 /**
@@ -115,7 +116,7 @@ export function patchOverviewColumns<T extends OverviewNameRow>(
           contentTypeKey={context.contentTypeKey}
           queryKeyFn={queryKeyFn}
           duplicateSource={
-            context.readOnly
+            context.readOnly || isContentOverlayFailureOverviewRow(row.original)
               ? undefined
               : {
                   id: row.original.id,

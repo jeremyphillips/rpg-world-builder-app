@@ -8,14 +8,20 @@ import {
   formatContentCreateHeading,
   getContentTypeCollectionLabel,
 } from '@/features/content/lib/content-type-labels'
-import { useFeats, useFeatsUsageMeta } from '../hooks/use-feats'
+import { useContentOverviewMergedData } from '../../lib/list/create-content-list'
+import { useFeatsListResult, useFeatsUsageMeta } from '../hooks/use-feats'
 import { featsColumns, featsFilterSchema } from '../lib/feats-overview-columns'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
 import { ContentOverviewTable } from '../../lib/overview/content-overview-table'
 
 export function FeatsOverview() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()
-  const { data: feats = [], isPending, isError } = useFeats(campaignId)
+  const listResult = useFeatsListResult(campaignId)
+  const {
+    data: feats,
+    isPending,
+    isError,
+  } = useContentOverviewMergedData<WithCampaignAccess<Feat>>(listResult)
   const { data: usageMeta } = useFeatsUsageMeta(campaignId)
   const usageSummaryLabels = usageMeta?.usageSummaryLabels
   const overviewUsageScope = usageMeta?.overviewUsageScope

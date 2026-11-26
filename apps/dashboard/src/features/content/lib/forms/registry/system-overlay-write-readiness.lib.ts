@@ -56,6 +56,7 @@ export type EvaluateSystemOverlayWriteReadinessInput = {
   catalogLayer?: CatalogLayer
   participantId?: SystemOverlayParticipantId
   entityId?: string
+  unresolvedOverlay?: boolean
   rulesetId?: string
   hasNormalizer: boolean
   catalogSeed?: Record<string, unknown>
@@ -76,6 +77,10 @@ export function evaluateSystemOverlayWriteReadiness(
 ): SystemOverlayWriteReadiness {
   if (input.operation !== 'update' || input.catalogLayer !== 'system') {
     throw new Error('evaluateSystemOverlayWriteReadiness applies only to system content updates.')
+  }
+
+  if (input.unresolvedOverlay) {
+    return notReady('unresolved_overlay')
   }
 
   if (!input.participantId) {

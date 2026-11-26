@@ -148,6 +148,24 @@ describe('collectSpellReferenceIssues', () => {
     { path: 'grantGroups.0.grants.2.spellIds.0', spellId: hiddenSpell.id },
   ]
 
+  it('reports unresolved overlay targets separately from unknown spells', () => {
+    expect(
+      collectSpellReferenceIssues({
+        refs: [{ path: 'spellIds.0', spellId: 'srd:broken' }],
+        spellsById,
+        catalogStatus: 'ready',
+        intent: 'publish',
+        unresolvedOverlayTargetIds: new Set(['srd:broken']),
+      }),
+    ).toEqual([
+      {
+        path: 'spellIds.0',
+        code: 'unresolved_overlay_spell',
+        message: 'This spell exists in the catalog but its overlay could not be applied.',
+      },
+    ])
+  })
+
   it('reports unknown ids on both intents and draft spells only on publish', () => {
     expect(
       collectSpellReferenceIssues({

@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useQuery, type UseQueryResult } from '@tanstack/react-query'
 import type {
   CatalogOverlayListFailure,
@@ -152,4 +153,20 @@ export function createContentQueryHook<T>(
   }
 
   return { queryKey, useQuery: useQueryHook, useUsageMeta, useListQueryResult }
+}
+
+/** Merges healthy list items with synthetic overlay-failure overview rows. */
+export function useContentOverviewMergedData<T extends { id: string }>(
+  listResult: ContentListFullQueryResult<T>,
+) {
+  const data = useMemo(
+    () =>
+      mergeContentListOverviewRows(listResult.data?.items ?? [], listResult.data?.overlayFailures),
+    [listResult.data],
+  )
+  return {
+    data,
+    isPending: listResult.isPending,
+    isError: listResult.isError,
+  }
 }

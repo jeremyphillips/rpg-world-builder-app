@@ -1,4 +1,4 @@
-import type { CatalogLayer, Subclass } from '@rpg/contracts'
+import type { CatalogLayer, CatalogOverlayListFailure, Subclass } from '@rpg/contracts'
 
 import type { SubclassFormValues } from './subclass-form-fields'
 import { serializeSubclassFormValues } from './subclass-form-value-snapshot'
@@ -20,6 +20,7 @@ export type SubclassListItem = {
   name: string
   catalogLayer: CatalogLayer | 'unsaved'
   classId: string
+  overlayResolveFailure?: CatalogOverlayListFailure
 }
 
 export function createSubclassDraft(classId: string): SubclassDraft {
@@ -54,16 +55,35 @@ export function subclassToListItem(
   }
 }
 
+function overlayFailureToSubclassListItem(
+  failure: CatalogOverlayListFailure,
+  classId: string,
+): SubclassListItem {
+  return {
+    id: failure.targetId,
+    name: failure.name,
+    slug: failure.slug,
+    catalogLayer: 'system',
+    classId,
+    overlayResolveFailure: failure,
+  }
+}
+
 export function buildSubclassListItems(
+  classId: string,
   subclasses: Subclass[],
   drafts: SubclassDraft[],
   edits: Record<string, Partial<SubclassFormValues>>,
+  overlayFailures: readonly CatalogOverlayListFailure[] = [],
 ): SubclassListItem[] {
   const seedItems = subclasses.map((subclass) =>
     subclassToListItem(subclass, edits[subclass.id] ?? {}),
   )
   const draftItems = drafts.map((draft) => draftToListItem(draft, edits[draft.id] ?? {}))
-  return [...seedItems, ...draftItems]
+  const failureItems = overlayFailures.map((failure) =>
+    overlayFailureToSubclassListItem(failure, classId),
+  )
+  return [...seedItems, ...failureItems, ...draftItems]
 }
 
 export function resolveSubclassEntity(

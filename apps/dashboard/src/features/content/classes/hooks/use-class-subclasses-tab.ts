@@ -9,7 +9,7 @@ import { useCampaignAccessForm } from '../../lib/campaign-access/campaign-access
 import { useCreateSubclass, useUpdateSubclass } from './use-subclass-mutations'
 import type { FeatureRowForm } from '../lib/class-feature-form-fields'
 import { isSubclassChoiceFeatureRow } from '../lib/class-subclass-choice-features'
-import { useSubclasses } from './use-subclasses'
+import { useSubclassesListResult } from './use-subclasses'
 import { useSubclassEditorState, type SubclassEditorState } from './use-subclass-editor-state'
 import { isDraftSubclassId } from '../lib/subclasses/subclass-editor-constants'
 import type { SubclassFormValues } from '../lib/subclasses/subclass-form-fields'
@@ -62,13 +62,14 @@ function useSubclassTabData(
   const queryEnabled =
     mode === 'edit' && Boolean(campaignId) && Boolean(classId) && subclassesOverride === undefined
 
-  const query = useSubclasses(
+  const query = useSubclassesListResult(
     queryEnabled ? campaignId : undefined,
     queryEnabled ? classId : undefined,
   )
 
   return {
-    subclasses: subclassesOverride ?? query.data ?? EMPTY_SUBCLASSES,
+    subclasses: subclassesOverride ?? query.data?.subclasses ?? EMPTY_SUBCLASSES,
+    overlayFailures: subclassesOverride ? [] : (query.data?.overlayFailures ?? []),
     isPending: subclassesOverride ? false : query.isPending,
   }
 }
@@ -80,13 +81,13 @@ export function useClassSubclassesTabState(
 
   const features = useWatch({ name: 'features' }) as FeatureRowForm[] | undefined
   const subclassChoiceFeature = features?.find(isSubclassChoiceFeatureRow)
-  const { subclasses, isPending } = useSubclassTabData(
+  const { subclasses, overlayFailures, isPending } = useSubclassTabData(
     mode,
     campaignId,
     classId,
     subclassesOverride,
   )
-  const editor = useSubclassEditorState(classId, subclasses)
+  const editor = useSubclassEditorState(classId, subclasses, overlayFailures)
 
   const gate = resolveSubclassTabGate({
     mode,

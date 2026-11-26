@@ -7,7 +7,10 @@ import {
 } from '@rpg/contracts'
 
 import { classRegistration } from './classes/classes.config'
-import { resolveClassesForCampaign } from './classes/derive-classes-catalog'
+import {
+  resolveClassesForCampaign,
+  resolveClassesListForCampaign,
+} from './classes/derive-classes-catalog'
 import { resolveCatalogForCampaign, resolveContentListForCampaign } from './content.service'
 import { equipmentRegistration } from './equipment/equipment.config'
 import { featRegistration } from './feats/feats.config'
@@ -26,6 +29,9 @@ export interface ContentTypeRegistration<T extends WriteEntityBase = WriteEntity
   write: ContentWriteConfig<T>
   /** Override default `resolveCatalogForCampaign` (classes only today). */
   resolveForCampaign?: (campaignId: string) => Promise<T[]>
+  resolveListForCampaign?: (
+    campaignId: string,
+  ) => Promise<{ items: T[]; overlayFailures: CatalogOverlayListFailure[] }>
 }
 
 /**
@@ -36,6 +42,7 @@ const CONTENT_TYPES = {
   classes: {
     ...classRegistration,
     resolveForCampaign: resolveClassesForCampaign,
+    resolveListForCampaign: resolveClassesListForCampaign,
   },
   equipment: equipmentRegistration,
   organizations: organizationRegistration,
@@ -86,6 +93,9 @@ export async function resolveContentListForCampaignType(
   campaignId: string,
 ): Promise<{ items: WriteEntityBase[]; overlayFailures: CatalogOverlayListFailure[] }> {
   const reg = CONTENT_TYPES[type] as ContentTypeRegistration
+  if (reg.resolveListForCampaign) {
+    return reg.resolveListForCampaign(campaignId)
+  }
   if (reg.resolveForCampaign) {
     return { items: await reg.resolveForCampaign(campaignId), overlayFailures: [] }
   }

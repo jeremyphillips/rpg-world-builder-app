@@ -2,6 +2,7 @@ import type {
   CatalogLayer,
   ContentStatus,
   ContentTypeKey,
+  type OverlayReadDiagnostics,
   ResolvedContentCampaignAccess,
 } from '@rpg/contracts'
 import { emptyContentMediaSchema, type ContentMedia } from '@rpg/contracts'
@@ -356,6 +357,20 @@ interface ContentEditFormBodyProps {
   ctx: ContentFormCtx
 }
 
+function overlayReadDiagnosticsAlertMessage(
+  diagnostics: OverlayReadDiagnostics | undefined,
+): string | null {
+  if (!diagnostics) return null
+  const parts: string[] = []
+  if (diagnostics.identityConflicts.length > 0) {
+    parts.push('This record has overlay identity conflicts. Review before publishing changes.')
+  }
+  if (diagnostics.orphanedSeedOverrides.length > 0) {
+    parts.push('Some stored seed overrides no longer match the current catalog seed.')
+  }
+  return parts.length > 0 ? parts.join(' ') : null
+}
+
 function useFrozenSystemOriginRowIds(
   def: AnyContentFormDef,
   entity: {
@@ -521,6 +536,9 @@ function ContentEditFormBody({
     ...defaultValues,
     media: entity.media ?? emptyContentMediaSchema,
   }
+  const overlayDiagnosticsMessage = overlayReadDiagnosticsAlertMessage(
+    (entity as { overlayReadDiagnostics?: OverlayReadDiagnostics }).overlayReadDiagnostics,
+  )
 
   return (
     <ArmorClassAuthoringProvider value={authoring}>
@@ -534,7 +552,16 @@ function ContentEditFormBody({
         layoutCtx={layoutCtx}
         schema={schema}
         formKey={`${entity.id}:${armorClassRulesSignature(authoring.snapshot)}:${authoring.generation}`}
-        formHeaderNotice={<ArmorClassAuthoringNotice />}
+        formHeaderNotice={
+          <>
+            <ArmorClassAuthoringNotice />
+            {overlayDiagnosticsMessage ? (
+              <Alert variant="warning" role="status">
+                {overlayDiagnosticsMessage}
+              </Alert>
+            ) : null}
+          </>
+        }
         defaultValues={formDefaults}
         submitPending={mutation.isPending}
         formError={formError ?? null}

@@ -8,8 +8,9 @@ import {
   getContentTypeCollectionLabel,
   getContentTypeSentenceLabel,
 } from '@/features/content/lib/content-type-labels'
+import { useContentOverviewMergedData } from '../../lib/list/create-content-list'
 import {
-  useSkillProficiencies,
+  useSkillProficienciesListResult,
   useSkillProficienciesUsageMeta,
 } from '../hooks/use-skill-proficiencies'
 import {
@@ -21,7 +22,12 @@ import { ContentOverviewTable } from '../../lib/overview/content-overview-table'
 
 export function SkillProficienciesOverview() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()
-  const { data: skillProficiencies = [], isPending, isError } = useSkillProficiencies(campaignId)
+  const listResult = useSkillProficienciesListResult(campaignId)
+  const {
+    data: skillProficiencies,
+    isPending,
+    isError,
+  } = useContentOverviewMergedData<WithCampaignAccess<SkillProficiency>>(listResult)
   const { data: usageMeta } = useSkillProficienciesUsageMeta(campaignId)
   const usageSummaryLabels = usageMeta?.usageSummaryLabels
   const overviewUsageScope = usageMeta?.overviewUsageScope

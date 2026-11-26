@@ -1,6 +1,7 @@
 import { ROUTES } from '@/app/routes'
 
-import { useEquipment, useEquipmentUsageMeta } from '../hooks/use-equipment'
+import { useContentOverviewMergedData } from '../../lib/list/create-content-list'
+import { useEquipmentListResult, useEquipmentUsageMeta } from '../hooks/use-equipment'
 import { useFamilyTableConfig } from '../hooks/use-family-table-config'
 import {
   familyPathToEquipmentKind,
@@ -10,7 +11,8 @@ import {
 
 export function useEquipmentFamilyOverview(campaignId: string, family: EquipmentFamilyPath) {
   const kind = familyPathToEquipmentKind(family)
-  const { data: equipment = [], isPending, isError } = useEquipment(campaignId)
+  const listResult = useEquipmentListResult(campaignId)
+  const { data: equipment, isPending, isError } = useContentOverviewMergedData(listResult)
   const { data: usageMeta } = useEquipmentUsageMeta(campaignId)
   const {
     tableConfig,

@@ -27,7 +27,13 @@ export function buildSubclassMasterDetailListItem({
     id: item.id,
     title: masterDetailItemTitle(item.name, SUBCLASS_MASTER_DETAIL_ITEM_NOUN),
     meta: subclassMasterDetailMeta(item.id, item.catalogLayer, isModified),
-    ...(isAvailable ? {} : { availabilityStatusLabel: 'Unavailable' as const }),
-    deletable: isSubclassDeletable(SOURCE_FOR_DELETABLE[item.catalogLayer], item.id),
+    ...(item.overlayResolveFailure
+      ? { availabilityStatusLabel: 'Overlay unresolved' as const }
+      : isAvailable
+        ? {}
+        : { availabilityStatusLabel: 'Unavailable' as const }),
+    deletable:
+      item.overlayResolveFailure === undefined &&
+      isSubclassDeletable(SOURCE_FOR_DELETABLE[item.catalogLayer], item.id),
   }
 }

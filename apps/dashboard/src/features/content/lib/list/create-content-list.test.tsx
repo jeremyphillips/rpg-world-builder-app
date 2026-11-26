@@ -45,6 +45,22 @@ describe('createContentListApi', () => {
       usageSummaryLabels: { singular: 'character', plural: 'characters' },
       overviewUsageScope: 'characters',
     })
+
+    mockRequest.mockResolvedValueOnce({
+      equipment: [{ id: 'w1' }],
+      overlayFailures: [
+        {
+          targetId: 'srd:broken',
+          slug: 'broken',
+          name: 'Broken',
+          code: 'overlay_validation',
+          message: 'Stored system overlay is invalid.',
+        },
+      ],
+    })
+
+    const withFailures = await listEquipment('camp-1')
+    expect(withFailures.overlayFailures).toHaveLength(1)
   })
 })
 
