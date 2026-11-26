@@ -471,6 +471,9 @@ function ContentEditFormBody({
           overlayBaseline: overlayBaseline ?? undefined,
           catalogSeed,
           expectedOverlayRevision: (entity as { overlayRevision?: number }).overlayRevision ?? 0,
+          entityId,
+          seedRowIdsByPath: (entity as { seedRowIdsByPath?: Record<string, readonly string[]> })
+            .seedRowIdsByPath,
         },
       }),
     persist: async (wireInput, form) => {

@@ -118,6 +118,7 @@ function renderEditShell(entity: Record<string, unknown>, listData: Record<strin
     routeKey: 'feats' as const,
     overlayParticipantId: 'feats' as const,
     schema: z.object({ name: z.string() }),
+    nameField: () => ({ name: 'name', label: 'Name', type: 'text' as const }),
     toFormValues: (row: { name: string }) => ({ name: row.name }),
     normalizeOverlayBody: (values: Record<string, unknown>) => values,
     buildTabs: undefined,
@@ -233,6 +234,7 @@ describe('ContentEditShell overlay read diagnostics', () => {
         name: z.string(),
         traits: z.array(z.object({ id: z.string(), kind: z.string(), name: z.string() })),
       }),
+      nameField: () => ({ name: 'name', label: 'Name', type: 'text' as const }),
       toFormValues: (row: typeof entity) => ({ name: row.name, traits: row.traits }),
       normalizeOverlayBody: (values: Record<string, unknown>) => ({
         name: values.name,
