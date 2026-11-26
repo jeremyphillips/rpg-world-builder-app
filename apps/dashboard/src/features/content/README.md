@@ -39,7 +39,7 @@ lib/
                     #   root seam: organization-form-projection.ts
   form-options/     # Level, rich-text link options
   overview/         # List shell, table config, source badge; hooks/ subfolder
-                    #   overlay-unresolved synthetic rows bypass campaign-availability hiding
+                    #   overlay-unresolved synthetic rows: presentation-only (API owns failure visibility)
   equipment/lib/    # equipment-family-overview-filter.lib — ruleset gates before classifying
                     #   overlay failures by seed kind; ruleset lookup failure with overlay rows
                     #   shows a warning and unclassified failure rows (not a full-page error)

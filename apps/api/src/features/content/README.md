@@ -56,8 +56,16 @@ mixed into `overlayFailures` or subclass summary ids). It still serializes class
 omits failures). Discovery and reference scopes share the same visibility rules as
 resolved rows (managers still see failures when `campaignAccess.available` is
 false; players never receive failure metadata for `dm_only` or ungranted
-`specific_players` content). `GET …/content/classes/:classId/subclasses`
+`specific_players` content). Play-scoped list requests omit `overlayFailures` entirely
+(`catalogListModeIncludesOverlayFailures`). `GET …/content/classes/:classId/subclasses`
 includes only overlay failures whose seed row belongs to that parent class.
+
+**Dashboard vs API visibility:** List handlers are the authority for who receives
+`overlayFailures` and with what campaign-access semantics. The dashboard may merge those
+failures into synthetic overview rows using presentation-only `dm_only` metadata so manager
+catalog tables can style and filter unresolved rows without re-running authorization. That
+synthetic access must not be treated as a parallel grant or deny signal; non-dashboard
+consumers rely on API-filtered list payloads only.
 Spell `classIds` and species multiclass / level-cap class references are **slugs**.
 Monster classification `classIds` are content ids. Slug is the catalog identity
 key for those references and is not reconstructed from a failed overlay body.

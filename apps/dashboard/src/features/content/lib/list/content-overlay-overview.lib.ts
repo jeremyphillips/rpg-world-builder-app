@@ -6,10 +6,16 @@ import type { ContentOverlayFailureOverviewRow } from './create-content-list'
 export const CONTENT_OVERLAY_UNRESOLVED_STATUS_LABEL = 'Overlay unresolved' as const
 
 /**
- * Presentation-only discoverability for merged overlay-failure overview rows.
- * Not authoritative campaign access — bucket math uses
- * {@link overlayFailureOverviewRowParticipatesInCampaignAvailability} and
- * {@link contentRowPassesCampaignAvailabilityFilter} instead of this object’s `available` flag.
+ * Presentation-only metadata for merged overlay-failure overview rows in the dashboard.
+ *
+ * Authorization and which clients receive `overlayFailures` on list routes are owned by the API
+ * (`filterOverlayFailuresForListViewer` + real `campaignAccess` on each failure target). This object
+ * is not a second authority: it keeps manager overview tables and `filterCatalogRowsForViewer`
+ * aligned with “unresolved” UX (dm-only presentation, outside availability buckets). Other clients
+ * that consume list JSON must apply API policy only.
+ *
+ * Bucket math uses {@link overlayFailureOverviewRowParticipatesInCampaignAvailability} and
+ * {@link contentRowPassesCampaignAvailabilityFilter}, not `campaignAccess.available` on this object.
  */
 export const CONTENT_OVERLAY_FAILURE_ROW_CAMPAIGN_ACCESS: ResolvedContentCampaignAccess = {
   available: true,

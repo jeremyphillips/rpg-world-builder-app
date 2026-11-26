@@ -79,4 +79,11 @@ describe('resolveSubclassClassListSlice', () => {
     ])
     expect(contentService.resolveContentListForCampaign).not.toHaveBeenCalled()
   })
+
+  it('throws when campaign is missing while mapping visible overlay failures to parent counts', async () => {
+    vi.mocked(campaignModule.findCampaignById).mockResolvedValue(null)
+    await expect(resolveSubclassClassListSlice('c1', undefined)).rejects.toThrow(
+      /Cannot resolve subclass overlay failure parent counts/,
+    )
+  })
 })

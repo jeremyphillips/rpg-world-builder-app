@@ -1,11 +1,12 @@
 import type { Request, Response } from 'express'
 
 import type { CatalogOverlayListFailure, ResolvedSubclass } from '@rpg/contracts'
-import { HttpError } from '../../../lib/http-error'
-import { findCampaignById } from '../../campaign'
+
 import { resolveContentListForCampaign } from '../content.service'
-import { loadSystemContent } from '../lib/content-type-config'
-import { attachCampaignAccessForTargetType } from '../lib/content-campaign-access.service'
+import {
+  scopeSubclassesListForClass,
+  type SubclassListResolution,
+} from './scope-subclasses-list-for-class'
 import { applyCatalogListFilter } from '../lib/apply-catalog-list-filter'
 import { filterOverlayFailuresForListViewer } from '../lib/filter-overlay-failures-for-list-viewer'
 import { resolveCatalogListFilter } from '../lib/resolve-catalog-membership-filter'
@@ -18,30 +19,11 @@ export async function resolveSubclassesListForCampaign(
   campaignId: string,
   classId: string,
 ): Promise<{ subclasses: ResolvedSubclass[]; overlayFailures: CatalogOverlayListFailure[] }> {
-  const { items, overlayFailures } = await resolveContentListForCampaign(
-    subclassContentConfig,
-    campaignId,
-  )
-  const filtered = items.filter((subclass) => subclass.classId === classId)
-  const withCampaignAccess = await attachCampaignAccessForTargetType(
-    campaignId,
-    'subclasses',
-    filtered,
-  )
-  const campaign = await findCampaignById(campaignId)
-  if (!campaign) {
-    throw new HttpError(404, 'not_found', 'Campaign not found.')
-  }
-  const parentSeedIds = new Set(
-    loadSystemContent(subclassContentConfig, campaign.rulesetId)
-      .filter((row) => row.classId === classId)
-      .map((row) => row.id),
-  )
-  return {
-    subclasses: withCampaignAccess,
-    overlayFailures: overlayFailures.filter((failure) => parentSeedIds.has(failure.targetId)),
-  }
+  const resolution = await resolveContentListForCampaign(subclassContentConfig, campaignId)
+  return scopeSubclassesListForClass(campaignId, classId, resolution)
 }
+
+export type { SubclassListResolution }
 
 /** Resolved subclasses for one class: system + patches + homebrew, with campaign access metadata. */
 export async function resolveSubclassesForCampaign(

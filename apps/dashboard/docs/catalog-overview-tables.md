@@ -117,7 +117,9 @@ createFilterSchema(fields, {
 - Unresolved system overlay overview rows use `contentOverviewSchemaRowIsCampaignAvailable` and
   `contentOverviewRowCampaignAvailabilityFilterValue` (dashboard `content-availability-table.lib`) —
   they are outside available/unavailable buckets, stay visible on the default available filter, and
-  must not be classified via synthetic row `campaignAccess.available`.
+  must not be classified via synthetic row `campaignAccess.available`. Synthetic `dm_only` on those
+  rows is presentation metadata only; list `overlayFailures` authorization lives on the API
+  (`filterOverlayFailuresForListViewer`).
 - The shell renders count + action chrome only; feature pages supply nouns via
   `availabilityEmptyState` when the filtered table is empty but hidden unavailable rows exist.
 

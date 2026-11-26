@@ -70,7 +70,11 @@ async function overlayFailureCountsForParents(
   if (visibleFailures.length === 0) return new Map()
 
   const campaign = await findCampaignById(campaignId)
-  if (!campaign) return new Map()
+  if (!campaign) {
+    throw new Error(
+      `Cannot resolve subclass overlay failure parent counts: campaign ${campaignId} was not found.`,
+    )
+  }
 
   const classIdBySubclassSeedId = new Map(
     loadSystemContent(subclassContentConfig, campaign.rulesetId).map((row) => [

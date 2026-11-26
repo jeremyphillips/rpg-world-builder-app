@@ -1,11 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import type {
-  CatalogOverlayListFailure,
-  ResolvedSubclass,
-  Subclass,
-  SystemRulesetId,
-} from '@rpg/contracts'
+import type { CatalogOverlayListFailure, ResolvedSubclass, Subclass } from '@rpg/contracts'
 
 import { applySubclassFormEdits } from '../lib/subclasses/apply-subclass-form-edits'
 import {
@@ -53,7 +48,6 @@ export function useSubclassEditorState(
   classId: string | undefined,
   subclasses: ResolvedSubclass[],
   overlayFailures: readonly CatalogOverlayListFailure[] = [],
-  rulesetId?: SystemRulesetId,
 ) {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [drafts, setDrafts] = useState<SubclassDraft[]>([])
@@ -63,10 +57,8 @@ export function useSubclassEditorState(
 
   const listItems = useMemo(
     () =>
-      classId
-        ? buildSubclassListItems(classId, subclasses, drafts, edits, overlayFailures, rulesetId)
-        : [],
-    [classId, subclasses, drafts, edits, overlayFailures, rulesetId],
+      classId ? buildSubclassListItems(classId, subclasses, drafts, edits, overlayFailures) : [],
+    [classId, subclasses, drafts, edits, overlayFailures],
   )
 
   const modifiedIds = useMemo(

@@ -43,9 +43,10 @@ seed overrides) render a warning. Save stays available unless readiness or the
 API rejects the write (including diagnostic updates that would drop stored
 overlay data). `overlayFailures` are a blocking state: the edit shell shows a
 destructive alert and does not render the form. Synthetic overview failure rows
-use `CONTENT_OVERLAY_FAILURE_ROW_CAMPAIGN_ACCESS` (`dm_only`) so dashboard
-discovery filtering mirrors API list policy without re-authorizing failures.
-Contract detail:
+use `CONTENT_OVERLAY_FAILURE_ROW_CAMPAIGN_ACCESS` for presentation only (manager
+overview table UX); API list responses remain the authority for failure visibility.
+Parent-scoped subclass tab lists trust `GET …/subclasses` and do not re-filter failures
+client-side. Contract detail:
 [`system-overlay/README.md`](../../../../../../packages/contracts/src/rpg/content/lib/system-overlay/README.md).
 
 ## `registry/` — ContentFormDef contract
