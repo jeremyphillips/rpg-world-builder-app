@@ -1,7 +1,4 @@
-/**
- * Initial Phase 6 adoption families (evaluator resolver + canonical API paint at boundaries).
- * Deferred workflows remain on {@link FORM_VALIDATION_ADOPTION_ALLOWLIST} until Phase 7 guards.
- */
+/** Adopted form families (evaluator resolver + canonical API paint at boundaries). */
 export const FORM_VALIDATION_ADOPTED_FAMILIES = [
   {
     id: 'content-hub',

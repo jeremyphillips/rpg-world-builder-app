@@ -10,7 +10,7 @@ import {
 
 const repoRoot = join(process.cwd(), '../..')
 
-describe('form validation enforcement (phase 7)', () => {
+describe('form validation enforcement', () => {
   it('scans adopted dashboard and public auth scopes without legacy bypasses', () => {
     const { violations } = scanFormValidationEnforcement(repoRoot)
     expect(violations, violations.map((v) => `${v.file}: ${v.ruleId}`).join('\n')).toEqual([])

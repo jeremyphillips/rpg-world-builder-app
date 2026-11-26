@@ -539,7 +539,26 @@ Top-level content shells share `ContentFormFooter` (`content-form-footer.tsx`) w
 Create handoff URL: `resolveContentPostCreateEditHref` in `content-form-navigation.ts`.
 Submit/error wiring: **`useContentFormSubmit`** for ContentFormDef create/edit page shells
 (`ContentCreateShell`, `ContentEditShell`), create modals, and `ContentFormHost` adapters.
-Adopted tabbed/flat dashboard saves outside `ContentFormDef` use `useAdoptedFormSubmit` (`@/lib/form-validation-adoption.lib`) for canonical API issue paint. Adopted scopes are guarded by `form-validation-enforcement.lib.ts`; RHF paint for content issues goes through `applyCanonicalFormIssuesToRhf`. Nested subclass editor remains separate until aligned in a follow-up.
+Adopted tabbed/flat dashboard saves outside `ContentFormDef` use `useAdoptedFormSubmit` (`@/lib/form-validation-adoption.lib`) for canonical API issue paint. RHF paint for content issues goes through `applyCanonicalFormIssuesToRhf`. Overview: [form-validation-lifecycle.md](../../../packages/ui/docs/form-validation-lifecycle.md). Nested subclass editor remains separate until aligned in a follow-up.
+
+### Validation ownership guards
+
+Scanner: `form-validation-enforcement.lib.ts` + `form-validation-enforcement.test.ts`.
+
+**Roots** (production `*.ts` / `*.tsx`, excluding tests and stories):
+
+- `apps/dashboard/src/features/content`
+- `apps/dashboard/src/features/campaign`
+- `apps/dashboard/src/features/character/npc`
+- `apps/public/src/features/auth`
+
+**Blocked patterns** unless the file is on the exempt list: `useSubmitHandler`, `applyValidationIssuesToForm`, `paintValidationIssuesOnForm`, `applyContentPublishValidation`, `prepareFormIssues`, direct `useFormValidationPresentation`.
+
+**Exempt legacy islands:** `content-form-submit.ts` (commit adapter), `content-publish-validation.lib.ts`, `content-form-presentation-issues.client.ts`, `content-form-validation-rhf.lib.ts`, `content-draft-publish-validation-surface.client.tsx`, `form-validation-enforcement.lib.ts`.
+
+**Drift tests:** `content-form-submit-drift.test.ts`, `campaign-form-validation-adoption.test.ts`, `auth-form-adoption.test.ts`.
+
+`FORM_VALIDATION_ADOPTION_ALLOWLIST` is empty. Adopted family list: `form-validation-adopted-families.ts`.
 
 **Pilot commit pipeline (create/edit shells):** one prepare-once write via
 `prepareSerializedContentFormWrite`, then `runContentFormCommitAttempt` (publish/draft commit
@@ -580,9 +599,8 @@ Create/Save clicks run RHF validation, show eligible errors, and navigate/focus 
 field or tab. Optional `validateSilently` / `useSilentFormValidity` may drive secondary UI (e.g.
 "Ready to create") — not the primary submit gate.
 
-**Quick NPC exception:** Quick NPC create stays on `useSubmitHandler` plus domain libs
-(`TabbedForm`, build-context projection, tabbed submit labels) — do not premature-standardize onto
-`useContentFormSubmit`. Nested picker handoff lifecycle is owned by
+**Quick NPC:** authoring uses `useAdoptedFormSubmit` with domain libs (`TabbedForm`, build-context
+projection, tabbed submit labels) — not `useContentFormSubmit`. Nested picker handoff lifecycle is owned by
 `useRelationshipPickerNestedCreate` and `invokeOnContentCreated` reject semantics (see
 [create-flow.md](./create-flow.md#oncontentcreated-handoff) and
 [cross-content-relationship-ui.md](./cross-content-relationship-ui.md#relationship-picker-nested-create)).

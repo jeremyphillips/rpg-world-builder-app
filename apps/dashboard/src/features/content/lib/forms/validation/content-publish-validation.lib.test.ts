@@ -1,6 +1,8 @@
 /**
  * @vitest-environment jsdom
  */
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { useForm } from 'react-hook-form'
 import { renderHook, act } from '@testing-library/react'
@@ -109,5 +111,18 @@ describe('validateContentPublishValues', () => {
       'Enter a valid number.',
     )
     expect(result.current.getFieldState('name').error?.message).not.toMatch(/Too small|NaN/i)
+  })
+})
+
+describe('content-publish-validation.lib surface', () => {
+  it('does not reintroduce retired dashboard paint helpers', () => {
+    const publishLibPath = join(
+      process.cwd(),
+      'src/features/content/lib/forms/validation/content-publish-validation.lib.ts',
+    )
+    const source = readFileSync(publishLibPath, 'utf8')
+    expect(source).not.toContain('applyValidationIssuesToForm')
+    expect(source).not.toContain('paintValidationIssuesOnForm')
+    expect(source).not.toContain('surfaceContentDraftPublishValidation')
   })
 })

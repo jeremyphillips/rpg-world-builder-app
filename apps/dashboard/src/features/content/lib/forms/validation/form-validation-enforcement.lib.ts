@@ -17,7 +17,7 @@ export const FORM_VALIDATION_LEGACY_RULES: readonly FormValidationLegacyRule[] =
   { id: 'useFormValidationPresentation', pattern: /\buseFormValidationPresentation\b/ },
 ] as const
 
-/** Production scopes where Phase 6 families must not add new validation bypasses. */
+/** Production scopes where adopted families must not add new validation bypasses. */
 export const FORM_VALIDATION_ENFORCEMENT_ROOTS = [
   'apps/dashboard/src/features/content',
   'apps/dashboard/src/features/campaign',
@@ -25,7 +25,7 @@ export const FORM_VALIDATION_ENFORCEMENT_ROOTS = [
   'apps/public/src/features/auth',
 ] as const
 
-/** Legacy islands kept until Phase 8 removes superseded APIs. */
+/** Intentional legacy islands documented in form-validation-lifecycle.md. */
 export const FORM_VALIDATION_RULE_EXEMPT_FILES = new Set([
   'apps/dashboard/src/features/content/lib/forms/shells/submit/content-form-submit.ts',
   'apps/dashboard/src/features/content/lib/forms/validation/content-publish-validation.lib.ts',

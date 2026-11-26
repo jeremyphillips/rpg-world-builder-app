@@ -63,7 +63,7 @@ export type RunFormActionResult<T> = RunFormActionSuccess<T> | RunFormActionBloc
 
 /**
  * Recorded after Phase 1 bridge prototype. Switch only if mounted criteria fail —
- * see `packages/ui/docs/form-lifecycle-phase1.md`.
+ * see `packages/ui/docs/form-validation-lifecycle.md`.
  */
 export const FORM_RHF_INTEGRATION_STRATEGY = 'evaluator-bridge' as const
 

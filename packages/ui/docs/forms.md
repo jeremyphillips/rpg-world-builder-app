@@ -397,6 +397,9 @@ Config union source of truth: [field-config/](../src/form/field-config/) (`Field
 
 ## Validation — contracts-first
 
+Action-runner, content commit, adoption, and repository guards →
+[form-validation-lifecycle.md](./form-validation-lifecycle.md).
+
 Zod schemas live in `@rpg/contracts` — single source of truth for client and server.
 **Never redefine domain shapes in apps.**
 
@@ -664,12 +667,13 @@ Runnable recipes beat copying from docs. Start at `Forms/Form`, `Forms/TabbedFor
 
 ## Further reading
 
-| Doc                                                    | Contents                                               |
-| ------------------------------------------------------ | ------------------------------------------------------ |
-| [field-types.md](./forms/field-types.md)               | richtext, combobox, editableGrid, chips, inputUnit, …  |
-| [containers.md](./forms/containers.md)                 | group, row, columns, stack, array, slot                |
-| [heading-hierarchy.md](./forms/heading-hierarchy.md)   | heading tiers, labelVisibility, migration notes        |
-| [sizing-and-spacing.md](./forms/sizing-and-spacing.md) | size, width, digits, rhythm tokens                     |
-| [patterns.md](./forms/patterns.md)                     | TabbedForm chrome, FormCard, wizard, Storybook index   |
-| [field-config/](../src/form/field-config/)             | Config types — primitives → leaves → containers → libs |
-| [README.md](../README.md)                              | Package overview, wizard pattern                       |
+| Doc                                                            | Contents                                               |
+| -------------------------------------------------------------- | ------------------------------------------------------ |
+| [field-types.md](./forms/field-types.md)                       | richtext, combobox, editableGrid, chips, inputUnit, …  |
+| [containers.md](./forms/containers.md)                         | group, row, columns, stack, array, slot                |
+| [heading-hierarchy.md](./forms/heading-hierarchy.md)           | heading tiers, labelVisibility, migration notes        |
+| [sizing-and-spacing.md](./forms/sizing-and-spacing.md)         | size, width, digits, rhythm tokens                     |
+| [patterns.md](./forms/patterns.md)                             | TabbedForm chrome, FormCard, wizard, Storybook index   |
+| [form-validation-lifecycle.md](./form-validation-lifecycle.md) | Evaluator, content commit, guards, retired APIs        |
+| [field-config/](../src/form/field-config/)                     | Config types — primitives → leaves → containers → libs |
+| [README.md](../README.md)                                      | Package overview, wizard pattern                       |
