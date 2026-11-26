@@ -3,14 +3,18 @@ name: pr-review
 description: >-
   Structured pull-request review for this repo — SSOT violations, parallel
   paths, ownership conflicts, styling hacks, silent failures, wiring gaps, and
-  regressions. Use when reviewing a branch, PR, or diff; not for Bugbot or
-  security-only scans.
+  regressions, approved-plan completeness, implementation fidelity, and
+  verification accuracy. Use when reviewing a branch, PR, or diff; not for
+  Bugbot or security-only scans.
 disable-model-invocation: true
 ---
 
 # PR Review
 
-Read-only review of **behavior introduced by the diff** — not a file inventory.
+Read-only review of **behavior introduced, changed, or required by the approved
+scope** — not a file inventory. For plan-backed work, review both what changed
+and what should have changed, including unchanged consumers that are required
+for adoption or integrity.
 Do not modify files, commit, or push. Do not delegate to subagents unless the
 user explicitly asks to combine with Bugbot or security review.
 
@@ -29,21 +33,34 @@ with user confirmation when checkout would overwrite local changes.
 
 1. Resolve target: current branch, named branch, PR head, or uncommitted only.
 2. Diff via merge base: `git merge-base HEAD <base>` → `git diff <merge-base>…`
-   (default base: repo default branch).
-3. Read [`AGENTS.md`](../../../AGENTS.md), [`docs/architecture-ssot.md`](../../../docs/architecture-ssot.md) when ownership is unclear, and touched-area docs as needed.
-4. Group changes by feature and layer.
-5. Trace user-visible flows; read deleted files/tests for lost guarantees.
+   (default base: repo default branch). For initiative completion, establish the
+   actual implementation range, not just the latest fix commit.
+3. Read [`AGENTS.md`](../../../AGENTS.md),
+   [docs/agent-validation.md](../../../docs/agent-validation.md),
+   [docs/architecture-ssot.md](../../../docs/architecture-ssot.md) when ownership
+   is unclear, and touched-area docs as needed.
+4. **Establish approved scope.** Read the complete applicable plan and approved
+   refinements; distinguish historical investigation from binding decisions.
+   Build a working requirement checklist for plan-backed reviews (lens 10).
+5. Group changes by feature and layer. Trace user-visible flows; read deleted
+   files/tests for lost guarantees.
 6. **SSOT search** — grep or trace for semantic duplication (see below).
-7. **Wiring gap check** — trace changed symbols through layer owners:
-   contracts → API/catalog → dashboard route/query → UI export/story/test.
-8. Write findings using the format below.
+7. **Wiring gap check** — trace changed symbols through actual production owners:
+   contracts → API/catalog → dashboard route/query → UI export/story/test, as
+   applicable. Follow the complete lifecycle, not merely imports or registration.
+8. **Completeness sweep** — reconcile the requirement checklist and previous
+   remediation findings. For each substantive finding, inspect materially
+   equivalent defects in other affected consumers. Group by root cause.
+9. Write findings and verdict using the format below. Qualify the verdict if
+   any required review boundary remains unexamined.
 
 ## Primary lenses
 
-Review **first**. Treat concrete instances as **High by default**. Downgrade to
-Medium only when duplication is intentionally bounded (explicit boundary
-comment, migration shim with follow-up) or styling is strictly local and
-non-reusable.
+Review **first**. For lenses 1–9, treat concrete instances as **High by default**.
+Downgrade to Medium when duplication is intentionally bounded (explicit boundary
+comment, migration shim with approved follow-up) or styling is strictly local and
+non-reusable. Lens 10 uses the risk-based severity and separate acceptance status
+below.
 
 | #   | Lens                             | Look for                                                                                                                                                         |
 | --- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -60,24 +77,83 @@ non-reusable.
 
 ### Plan compliance (lens 10)
 
+When approved scope is available, plan compliance is a **mandatory review pass**,
+not an incidental finding category. Use the approved requirements as the review
+checklist. Follow [AGENTS.md § Approved work](../../../AGENTS.md#approved-work)
+and [agent-validation.md § Plan execution](../../../docs/agent-validation.md#plan-execution).
+
+#### Completeness and implementation fidelity
+
+- Read the full approved plan, authoritative decisions, acceptance criteria, and
+  approved refinements. Establish phase dependencies, the intended review range,
+  and any explicitly deferred workflows. Do not treat historical investigation,
+  completed todos, or post-implementation docs as amendments to approved scope.
+- Account for every mandatory requirement: implementation, negative cases,
+  production adoption, measurable guarantees, phase gates, enforcement, cleanup,
+  and documentation. Include requirements that may be entirely absent from the diff.
+- Trace each requirement to the actual production entry point and owning code.
+  Verify intended semantics, defaults, and failure behavior, not terminology or
+  file structure alone. A helper, registry entry, adapter, renamed wrapper, or
+  test is not proof of production adoption.
+- Verify the intended authority is actually used, and that superseded paths are
+  removed or confined to approved exceptions. Inspect specialized consumers and
+  alternative operation modes; do not infer adoption from a common import.
+- Check for unauthorized scope reductions, substituted architectures, skipped
+  phase gates, and weakened acceptance criteria. Identify genuine approved
+  deviations separately. If scope cannot be established, say what is unknown;
+  do not invent requirements or silently declare them satisfied.
+
 Classify findings when relevant:
 
 | Kind | Focus |
 | ---- | ----- |
-| Missing implementation | Mandatory behavior absent from diff |
+| Missing implementation | Mandatory behavior absent from the resulting implementation |
 | Incorrect implementation | Behavior contradicts stated criteria |
-| Missing required verification | No evidence at the required production boundary |
+| Missing required verification | No adequate evidence at the required boundary |
 | Inaccurate completion claims | Summary/todos/matrix assert done while mandatory criteria open |
 | Optional improvement | Non-mandatory gap |
 
-**Severity:** By risk (data integrity, correctness, security, user-facing impact)—not
-automatic High for every missing test. State separately whether the finding **blocks
-approved-plan acceptance** when scope is known.
+**Severity:** By risk (data integrity, correctness, security, user-facing impact),
+not automatic High for every missing test. State separately whether the finding
+**blocks approved-plan acceptance** within the reviewed scope.
 
-**Evidence:** Distinguish **inspected** test source from **freshly executed** runs and
-from author-reported results. File presence or a green unrelated suite does not prove
-boundary verification. Narrow unit success does not satisfy integration/mounted scope
-named in approved work.
+#### Verification accuracy
+
+Inspect test bodies, fixtures, assertions, and production wiring. Verify that the
+fixture reaches the claimed behavior, that assertions would fail if the guarantee
+were broken, and that mocks do not replace the boundary being verified. Inspect
+removed or weakened tests for lost guarantees. Confirm enforcement checks detect
+representative prohibited behavior, and that exemptions or allowlists do not hide
+incomplete adoption.
+
+Distinguish structural inspection, inspected behavioral coverage, author-reported
+execution, freshly executed verification, and unverified requirements. File presence,
+source-text checks, or narrow unit success do not establish required mounted,
+integration, or browser guarantees. Verify the relevance of prior results to the
+reviewed revision. Require concrete evidence for claimed baseline failures.
+
+Run relevant read-only verification where permitted by repository guidance; do not
+modify tracked files, tests, snapshots, or plans. Respect checkpoint restrictions.
+Report exact commands/results and explain missing required verification. Never
+claim an unexecuted check passed.
+
+#### Acceptance assessment
+
+Track implementation and verification separately. Account for every applicable
+mandatory criterion using:
+
+| Status | Meaning |
+| ------ | ------- |
+| Satisfied | Required implementation and verification established |
+| Partial | Some required implementation or coverage incomplete |
+| Failed | Implementation contradicts the requirement or required verification fails |
+| Unverified | Required evidence unavailable or not established |
+| Deferred | Explicitly excluded by an approved scope decision |
+
+Group criteria with shared evidence; expand gaps individually. Do not independently
+defer mandatory work or declare the approved scope complete while mandatory
+requirements remain partial, failed, or unverified. If review scope is intentionally
+narrow, do not imply acceptance of the entire initiative.
 
 ### SSOT rule
 
@@ -107,7 +183,28 @@ or stale.
 change; flag missing wiring only (bullets above). → [AGENTS.md § Project stage](../../../AGENTS.md#project-stage).
 
 Downgrade to Medium when the PR is explicitly single-layer scoped with
-documented follow-up (comment, ticket, or plan reference).
+an approved deferred follow-up (comment, ticket, or plan reference). This does
+not excuse missing mandatory adoption in a plan that claims full completion.
+
+### Boundary completeness
+
+For changed shared contracts, representations, policies, or primitives, trace the
+applicable lifecycle: construction → validation → transformation → consumption →
+persistence → reload. Inspect actual call sites, including unchanged consumers
+that rely on the changed contract. Look for:
+
+- Missing, empty, malformed, stale, and unsupported inputs.
+- Async completion, reset, replacement, and context changes.
+- Partial success, rejected writes, destructive operations, and authorization scope.
+- Information or identity lost between layers; silent no-ops and misleading fallbacks.
+- Presentation guards that leave underlying operations unsafe.
+- New infrastructure coexisting with the authority it was intended to replace.
+
+Trace the earliest boundary where a guarantee fails and inspect other consumers
+for the same failure pattern. Revisit previous remediation findings for their
+underlying guarantees, not merely their named fixes. Use representative cases for
+materially distinct behaviors; do not require exhaustive Cartesian test matrices
+or speculate beyond a demonstrable code path.
 
 ### Styling hacks
 
@@ -191,6 +288,10 @@ Severity lives in the heading.
 ```
 
 Required: **Evidence**, **Risk**, **Fix**. Optional: **Decision needed**.
+For plan-related findings, include **Plan requirement** (section or criterion),
+**Kind** (lens 10), and **Blocks acceptance** (yes/no). State root cause, affected
+consumers, and the necessary regression proof when relevant. Group equivalent
+findings rather than repeating symptoms.
 
 ## Output structure
 
@@ -216,18 +317,43 @@ Required: **Evidence**, **Risk**, **Fix**. Optional: **Decision needed**.
 Not ready | Close | Ready after fixes | Ready to merge
 ```
 
-Do not add informational praise, coverage summaries, or duplicate merge-blocker sections.
+For plan-backed reviews, include a compact **Plan acceptance** section before
+the verdict:
+
+| Requirement or phase | Implementation evidence | Verification evidence | Status |
+| -------------------- | ----------------------- | --------------------- | ------ |
+
+Account for all mandatory criteria, grouping shared evidence without concealing
+individual gaps. Include a concise **Verification** section with executed commands,
+results, required checks not run, and any blockers or intentionally deferred gates.
+Distinguish inspected evidence and author-reported runs from fresh execution.
+
+The verdict distinguishes merge readiness from approved-plan acceptance. A branch
+with no confirmed merge-blocking production defect may still fail plan acceptance
+or have verification blocked. Identify unreviewed scope and limitations explicitly.
+Do not use “Ready to merge” to imply complete acceptance when mandatory criteria
+remain open.
+
+Do not add informational praise, generic coverage summaries, or duplicate
+merge-blocker sections. Do not repeat findings in the acceptance matrix.
 
 ## Guardrails
 
-- Do not infer passing verification from test file presence alone; narrow unit green does
-  not prove plan-level integration/mounted requirements ([agent-validation.md](../../../docs/agent-validation.md#plan-execution))
 - No speculative risks without a demonstrable code path
 - Do not equate query failure with empty data
 - Do not confuse UI hiding with server authorization
-- Do not flag unchanged legacy unless the PR expands or relies on it
+- Do not flag unrelated unchanged legacy. Inspect unchanged consumers where the PR
+  expands, relies on, or was required to migrate them.
+- Do not stop after the first several findings. Reconcile the approved checklist
+  and complete the equivalent-pattern sweep before issuing a verdict.
+- Do not recommend fixes that contradict approved architectural or product
+  decisions. Documentation, defensive fallbacks, and renamed APIs are not
+  substitutes for required behavior.
+- If scope or evidence is incomplete, report the unreviewed boundaries and qualify
+  acceptance rather than asserting closure.
 - Prefer smallest safe fix over opportunistic refactor
-- Do not require stories/tests where [`AGENTS.md`](../../../AGENTS.md) does not
+- Do not require stories/tests unless required by [`AGENTS.md`](../../../AGENTS.md),
+  approved work, or necessary to substantiate a concrete finding
 
 ## Repo pointers
 
