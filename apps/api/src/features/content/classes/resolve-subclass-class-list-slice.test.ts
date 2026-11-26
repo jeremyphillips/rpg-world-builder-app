@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 
-import { resolveSubclassOverlayFailureCountByClassId } from './resolve-subclass-overlay-failure-counts'
+import { resolveSubclassClassListSlice } from './resolve-subclass-class-list-slice'
 import * as contentService from '../content.service'
 import * as filterModule from '../lib/filter-overlay-failures-for-list-viewer'
 import * as campaignModule from '../../campaign'
@@ -8,6 +8,12 @@ import * as campaignModule from '../../campaign'
 vi.mock('../content.service')
 vi.mock('../lib/filter-overlay-failures-for-list-viewer')
 vi.mock('../../campaign')
+vi.mock('../lib/content-campaign-access.service', () => ({
+  attachCampaignAccessForTargetType: vi.fn(async (_campaignId, _type, items) => items),
+}))
+vi.mock('../lib/apply-catalog-list-filter', () => ({
+  applyCatalogListFilter: vi.fn((items) => items),
+}))
 vi.mock('../lib/content-type-config', () => ({
   loadSystemContent: vi.fn(() => [
     { id: 'sub-1', classId: 'class-fighter', slug: 'champion', name: 'Champion' },
@@ -15,22 +21,22 @@ vi.mock('../lib/content-type-config', () => ({
   ]),
 }))
 
-describe('resolveSubclassOverlayFailureCountByClassId', () => {
+describe('resolveSubclassClassListSlice', () => {
   beforeEach(() => {
     vi.mocked(contentService.resolveContentListForCampaign).mockResolvedValue({
-      items: [],
+      items: [
+        {
+          id: 'hb-1',
+          classId: 'class-fighter',
+          name: 'HB Subclass',
+          slug: 'hb-subclass',
+        } as never,
+      ],
       overlayFailures: [
         {
           targetId: 'sub-1',
           slug: 'champion',
           name: 'Champion',
-          code: 'unsupported_overlay_version',
-          message: 'bad',
-        },
-        {
-          targetId: 'sub-2',
-          slug: 'evoker',
-          name: 'Evoker',
           code: 'unsupported_overlay_version',
           message: 'bad',
         },
@@ -45,9 +51,12 @@ describe('resolveSubclassOverlayFailureCountByClassId', () => {
     } as never)
   })
 
-  it('groups viewer-visible failures by parent class id', async () => {
-    const counts = await resolveSubclassOverlayFailureCountByClassId('c1', undefined)
-    expect(counts.get('class-fighter')).toBe(1)
-    expect(counts.get('class-wizard')).toBe(1)
+  it('returns summaries and parent-scoped failure counts from one list resolution', async () => {
+    const slice = await resolveSubclassClassListSlice('c1', undefined)
+    expect(slice.summariesByClassId.get('class-fighter')).toEqual([
+      { id: 'hb-1', name: 'HB Subclass' },
+    ])
+    expect(slice.failureCountByClassId.get('class-fighter')).toBe(1)
+    expect(contentService.resolveContentListForCampaign).toHaveBeenCalledTimes(1)
   })
 })

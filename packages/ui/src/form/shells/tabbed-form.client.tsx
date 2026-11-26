@@ -126,6 +126,8 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
    * an in-panel action instead of navigating.
    */
   onBeforeActiveTabChange?: (nextTabId: string) => boolean
+  /** When set and matching a tab id, that tab is selected on mount. */
+  defaultActiveTabId?: string
 }
 
 function buildExternalFooterContent(
@@ -180,10 +182,16 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   aside,
   tabRowTrailing,
   onBeforeActiveTabChange,
+  defaultActiveTabId,
 }: TabbedFormProps<TFieldValues>) {
   const generatedFormId = React.useId()
   const formId = id ?? generatedFormId
-  const [activeTabId, setActiveTabIdState] = React.useState(tabs[0]?.id ?? '')
+  const [activeTabId, setActiveTabIdState] = React.useState(() => {
+    if (defaultActiveTabId && tabs.some((tab) => tab.id === defaultActiveTabId)) {
+      return defaultActiveTabId
+    }
+    return tabs[0]?.id ?? ''
+  })
   const setActiveTabId = React.useCallback(
     (nextTabId: string) => {
       if (onBeforeActiveTabChange && !onBeforeActiveTabChange(nextTabId)) return

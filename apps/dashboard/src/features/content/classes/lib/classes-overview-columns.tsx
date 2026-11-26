@@ -16,6 +16,7 @@ import { createBooleanFilter, createEqualsFilter } from '@rpg/ui/filters'
 
 import { ROUTES } from '@/app/routes'
 import { buildCollectionCountColumn } from '@/lib/data-table/column-builders'
+import { classEditSubclassesHref } from './class-edit-navigation.lib'
 import { resolveDashboardContentDisplay } from '../../lib/detail/page/content-display-image'
 import { buildClassContentDisplayImageInput } from '../../lib/detail/page/content-display-image-input'
 import { buildContentColumns } from '../../lib/overview/content-table-config'
@@ -120,9 +121,9 @@ function subclassesOverviewColumn(campaignId: string): ColumnDef<ClassListItem> 
             pluralLabel={CLASS_COLLECTION_LABELS.subclasses.plural}
           />
           {unresolved ? (
-            <Text variant="warning" role="status" asChild>
+            <Text variant="warning" asChild>
               <Link
-                to={ROUTES.content.classes.edit(campaignId, row.original.id)}
+                to={classEditSubclassesHref(campaignId, row.original.id)}
                 className="text-style-caption hover:underline"
               >
                 {unresolved} unresolved subclass overlay{unresolved > 1 ? 's' : ''} — manage

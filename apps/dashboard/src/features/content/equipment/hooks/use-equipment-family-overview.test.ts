@@ -46,7 +46,7 @@ const { useEquipmentListResult } = await import('../hooks/use-equipment')
 const { useCampaignRulesetLookup } = await import('@/lib/use-campaign-ruleset-lookup')
 
 describe('useEquipmentFamilyOverview', () => {
-  it('keeps overlay failure rows visible while campaign ruleset is loading', () => {
+  it('defers overlay failure rows until campaign ruleset is ready', () => {
     vi.mocked(useCampaignRulesetLookup).mockReturnValue({
       rulesetId: undefined,
       isPending: true,
@@ -70,7 +70,7 @@ describe('useEquipmentFamilyOverview', () => {
     const { result } = renderHook(() => useEquipmentFamilyOverview('camp-1', 'weapons'))
 
     expect(result.current.isPending).toBe(true)
-    expect(result.current.filtered.map((row) => row.id)).toEqual(['srd-cc-5.2.1:longsword'])
+    expect(result.current.filtered).toEqual([])
   })
 
   it('keeps overlay failure rows in the matching equipment family using campaign ruleset context', () => {

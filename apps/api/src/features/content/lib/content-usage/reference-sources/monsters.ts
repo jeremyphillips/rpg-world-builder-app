@@ -5,6 +5,7 @@ import { loadSeedMonsters } from '@rpg/catalog/monsters'
 
 import type { ContentUsageResolverContext } from '../content-usage-context'
 import { indexRecordsByContentId } from './index-by-content-id'
+import { loadOverlayAwareCatalogRows } from './overlay-failure-seed-referrers'
 
 type LeanMonster = Pick<
   Monster,
@@ -29,13 +30,8 @@ function toMonsterBlocker(monster: LeanMonster): ContentUsageBlocker {
   }
 }
 
-async function loadCampaignMonsters(campaignId: string): Promise<LeanMonster[]> {
-  const [{ resolveCatalogForCampaign }, { monstersContentConfig }] = await Promise.all([
-    import('../../../content.service'),
-    import('../../../monsters/monsters.config'),
-  ])
-  const monsters = await resolveCatalogForCampaign(monstersContentConfig, campaignId)
-  return monsters.map((monster) => ({
+function toLeanMonster(monster: Monster): LeanMonster {
+  return {
     id: monster.id,
     slug: monster.slug,
     name: monster.name,
@@ -43,7 +39,13 @@ async function loadCampaignMonsters(campaignId: string): Promise<LeanMonster[]> 
     equipment: monster.equipment,
     classIds: monster.classIds,
     proficiencies: monster.proficiencies,
-  }))
+  }
+}
+
+async function loadCampaignMonsters(campaignId: string): Promise<LeanMonster[]> {
+  const { monstersRegistration } = await import('../../../monsters/monsters.config')
+  const monsters = await loadOverlayAwareCatalogRows(monstersRegistration.read, campaignId)
+  return monsters.map((monster) => toLeanMonster(monster as Monster))
 }
 
 export async function indexMonsterEquipmentBlockersByContentId(

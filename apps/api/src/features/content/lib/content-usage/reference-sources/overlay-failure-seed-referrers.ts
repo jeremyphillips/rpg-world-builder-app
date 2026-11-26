@@ -60,3 +60,14 @@ export function mergeOverlayFailureSeedRows<T extends { id: string; slug: string
     .filter((row) => !existingIds.has(row.id))
   return appended.length === 0 ? [...records] : [...records, ...appended]
 }
+
+/** Resolved rows for delete guards — merges seed bodies for overlay failures (not resolved domain entities). */
+export async function loadOverlayAwareCatalogRows<
+  T extends { id: string; slug: string; name: string },
+>(config: ContentTypeConfig<T>, campaignId: string): Promise<T[]> {
+  const { records, overlayFailureSeeds } = await resolveCatalogRowsWithOverlayFailureSeeds(
+    config,
+    campaignId,
+  )
+  return mergeOverlayFailureSeedRows(records, overlayFailureSeeds)
+}

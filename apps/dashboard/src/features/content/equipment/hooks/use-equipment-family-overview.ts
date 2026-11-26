@@ -32,11 +32,11 @@ export function useEquipmentFamilyOverview(campaignId: string, family: Equipment
     overviewUsageScope: usageMeta?.overviewUsageScope,
   })
   const heading = getEquipmentFamilyLabel(family)
-  const canFamilyFilterOverlayFailures = Boolean(campaignRulesetId)
+  const canFamilyFilterOverlayFailures = Boolean(campaignRulesetId) && !rulesetPending
   const filtered = kind
     ? equipment.filter((item) => {
         if (isContentOverlayFailureOverviewRow(item)) {
-          if (!canFamilyFilterOverlayFailures) return true
+          if (!canFamilyFilterOverlayFailures) return false
           const seed = resolveCatalogSeedBody(
             'equipment',
             campaignRulesetId as SystemRulesetId,

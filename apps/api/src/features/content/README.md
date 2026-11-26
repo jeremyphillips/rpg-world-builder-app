@@ -103,8 +103,12 @@ Each content type contributes only a body schema (in `@rpg/contracts`) + a
 
 **Records-only consumers:** `resolveCatalogForCampaign` / `resolveContentForCampaign`
 (search, hub summaries, organization member roster lookup) intentionally omit
-overlay-failure rows. Spell delete guards merge unresolved overlay **seed** bodies via
-`overlay-failure-seed-referrers` so dependency protection does not drop when apply fails.
+overlay-failure rows. `listClasses` attaches subclass summaries and
+`unresolvedSubclassOverlayCount` from a single `resolveSubclassClassListSlice` pass.
+Authoritative delete guards load catalogs via
+`loadOverlayAwareCatalogRows` (`overlay-failure-seed-referrers`) so unresolved overlay
+**seed** bodies still participate in spell, monster equipment/skill/class, and related
+blocker indexes without being treated as resolved domain entities.
 
 - `POST /api/campaigns/:campaignId/content/:contentType` — create homebrew (`status` in request body; defaults to `published`)
 - `PATCH /api/campaigns/:campaignId/content/:contentType/:entityId` — update

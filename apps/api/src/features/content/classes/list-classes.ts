@@ -1,63 +1,14 @@
 import type { Request, Response } from 'express'
 
-import type { CharacterClass, ClassListItem, ContentSummaryRef } from '@rpg/contracts'
-
-import { HttpError } from '../../../lib/http-error'
-import { findCampaignById } from '../../campaign'
+import type { CharacterClass, ClassListItem } from '@rpg/contracts'
 import { attachCampaignAccessForTargetType } from '../lib/content-campaign-access.service'
 import { applyCatalogListFilter } from '../lib/apply-catalog-list-filter'
 import { filterOverlayFailuresForListViewer } from '../lib/filter-overlay-failures-for-list-viewer'
-import type { CatalogListFilter } from '../lib/apply-catalog-list-filter'
 import { resolveCatalogListFilter } from '../lib/resolve-catalog-membership-filter'
-import { resolveCatalog } from '../lib/resolve-catalog'
-import { loadSystemContent, loadSystemContentPatches } from '../lib/content-type-config'
 import { resolveClassesListForCampaign } from './derive-classes-catalog'
 import { buildContentListUsageEnvelope } from '../lib/content-usage/build-content-list-usage-envelope'
 import { contentUsageContextFromRequest } from '../lib/content-usage/content-usage-request-context'
-import { subclassContentConfig } from '../subclasses/subclasses.config'
-import { resolveSubclassOverlayFailureCountByClassId } from './resolve-subclass-overlay-failure-counts'
-
-/** Membership-filtered subclass summaries grouped by parent class id. */
-export async function resolveSubclassSummariesByClassId(
-  campaignId: string,
-  filter: CatalogListFilter | undefined,
-): Promise<Map<string, ContentSummaryRef[]>> {
-  const campaign = await findCampaignById(campaignId)
-  if (!campaign) {
-    throw new HttpError(404, 'not_found', 'Campaign not found.')
-  }
-
-  const { rulesetId } = campaign
-  const [patches, homebrew] = await Promise.all([
-    loadSystemContentPatches(subclassContentConfig, campaignId),
-    subclassContentConfig.loadHomebrew(campaignId, rulesetId),
-  ])
-
-  const resolved = resolveCatalog(
-    loadSystemContent(subclassContentConfig, rulesetId),
-    patches,
-    homebrew,
-    {
-      contentTypeKey: 'classes',
-      overlayParticipantId: subclassContentConfig.overlayParticipantId,
-    },
-  ).records
-  const withCampaignAccess = await attachCampaignAccessForTargetType(
-    campaignId,
-    'subclasses',
-    resolved,
-  )
-  const visible = applyCatalogListFilter(withCampaignAccess, filter)
-
-  const byClassId = new Map<string, ContentSummaryRef[]>()
-  for (const subclass of visible) {
-    const summaries = byClassId.get(subclass.classId) ?? []
-    summaries.push({ id: subclass.id, name: subclass.name })
-    byClassId.set(subclass.classId, summaries)
-  }
-
-  return byClassId
-}
+import { resolveSubclassClassListSlice } from './resolve-subclass-class-list-slice'
 
 /** Classes list enriched with per-class subclass id+name summaries. */
 export async function listClasses(req: Request, res: Response): Promise<void> {
@@ -72,16 +23,16 @@ export async function listClasses(req: Request, res: Response): Promise<void> {
     overlayFailures,
     catalogFilter,
   )
-  const [subclassSummaries, unresolvedSubclassOverlays] = await Promise.all([
-    resolveSubclassSummariesByClassId(campaignId, catalogFilter),
-    resolveSubclassOverlayFailureCountByClassId(campaignId, catalogFilter),
-  ])
+  const { summariesByClassId, failureCountByClassId } = await resolveSubclassClassListSlice(
+    campaignId,
+    catalogFilter,
+  )
 
   const classes = (visibleClasses as unknown as CharacterClass[]).map((characterClass) => {
-    const unresolvedSubclassOverlayCount = unresolvedSubclassOverlays.get(characterClass.id)
+    const unresolvedSubclassOverlayCount = failureCountByClassId.get(characterClass.id)
     return {
       ...characterClass,
-      subclasses: subclassSummaries.get(characterClass.id) ?? [],
+      subclasses: summariesByClassId.get(characterClass.id) ?? [],
       ...(unresolvedSubclassOverlayCount !== undefined && unresolvedSubclassOverlayCount > 0
         ? { unresolvedSubclassOverlayCount }
         : {}),
