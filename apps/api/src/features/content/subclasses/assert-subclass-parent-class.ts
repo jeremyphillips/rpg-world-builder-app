@@ -1,4 +1,4 @@
-import type { CharacterClass } from '@rpg/contracts'
+import { SUBCLASS_PARENT_OVERLAY_UNRESOLVED_ISSUE_CODE, type CharacterClass } from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
 import { resolveContentListForCampaign } from '../content.service'
@@ -16,7 +16,15 @@ export async function assertSubclassParentClassExists(
   if (!parentClass) {
     const overlayFailure = overlayFailures.find((failure) => failure.targetId === classId)
     if (overlayFailure) {
-      throw new HttpError(409, overlayFailure.code, overlayFailure.message)
+      throw new HttpError(409, overlayFailure.code, overlayFailure.message, {
+        issues: [
+          {
+            path: 'classId',
+            code: SUBCLASS_PARENT_OVERLAY_UNRESOLVED_ISSUE_CODE,
+            message: overlayFailure.message,
+          },
+        ],
+      })
     }
     throw new HttpError(400, 'validation_error', 'Parent class not found in campaign catalog.', {
       issues: [

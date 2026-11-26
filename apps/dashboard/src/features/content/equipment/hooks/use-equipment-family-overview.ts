@@ -8,6 +8,7 @@ import { useEquipmentListResult, useEquipmentUsageMeta } from '../hooks/use-equi
 import {
   equipmentFamilyOverviewAwaitingRulesetForFailures,
   equipmentFamilyOverviewHasOverlayFailures,
+  equipmentFamilyUnclassifiedOverlayFailures,
   filterEquipmentFamilyOverviewRows,
 } from '../lib/equipment-family-overview-filter.lib'
 import { useFamilyTableConfig } from '../hooks/use-family-table-config'
@@ -49,6 +50,11 @@ export function useEquipmentFamilyOverview(campaignId: string, family: Equipment
     [equipment, family, rulesetGate],
   )
 
+  const unclassifiedOverlayFailures = useMemo(
+    () => equipmentFamilyUnclassifiedOverlayFailures(equipment, rulesetGate),
+    [equipment, rulesetGate],
+  )
+
   const awaitingRulesetForFailures = equipmentFamilyOverviewAwaitingRulesetForFailures(
     equipment,
     rulesetGate,
@@ -64,6 +70,7 @@ export function useEquipmentFamilyOverview(campaignId: string, family: Equipment
   return {
     heading,
     filtered,
+    unclassifiedOverlayFailures,
     tableConfig,
     isPending: isPending || columnsPending || rulesetPending || awaitingRulesetForFailures,
     isError: listOrColumnsFailed,

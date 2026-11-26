@@ -1,4 +1,14 @@
-import type { CatalogLayer, CatalogOverlayListFailure, Subclass } from '@rpg/contracts'
+import type {
+  CatalogLayer,
+  CatalogOverlayListFailure,
+  Subclass,
+  SystemRulesetId,
+} from '@rpg/contracts'
+
+import {
+  filterSubclassOverlayFailuresForClass,
+  resolveSubclassOverlayFailureClassId,
+} from './subclass-overlay-failures.lib'
 
 import type { SubclassFormValues } from './subclass-form-fields'
 import { serializeSubclassFormValues } from './subclass-form-value-snapshot'
@@ -57,13 +67,14 @@ export function subclassToListItem(
 
 function overlayFailureToSubclassListItem(
   failure: CatalogOverlayListFailure,
-  classId: string,
+  routeClassId: string,
+  rulesetId: SystemRulesetId | undefined,
 ): SubclassListItem {
   return {
     id: failure.targetId,
     name: failure.name,
     catalogLayer: 'system',
-    classId,
+    classId: resolveSubclassOverlayFailureClassId(failure, routeClassId, rulesetId),
     overlayResolveFailure: failure,
   }
 }
@@ -74,13 +85,15 @@ export function buildSubclassListItems(
   drafts: SubclassDraft[],
   edits: Record<string, Partial<SubclassFormValues>>,
   overlayFailures: readonly CatalogOverlayListFailure[] = [],
+  rulesetId?: SystemRulesetId,
 ): SubclassListItem[] {
   const seedItems = subclasses.map((subclass) =>
     subclassToListItem(subclass, edits[subclass.id] ?? {}),
   )
   const draftItems = drafts.map((draft) => draftToListItem(draft, edits[draft.id] ?? {}))
-  const failureItems = overlayFailures.map((failure) =>
-    overlayFailureToSubclassListItem(failure, classId),
+  const scopedFailures = filterSubclassOverlayFailuresForClass(overlayFailures, classId, rulesetId)
+  const failureItems = scopedFailures.map((failure) =>
+    overlayFailureToSubclassListItem(failure, classId, rulesetId),
   )
   return [...seedItems, ...failureItems, ...draftItems]
 }

@@ -7,6 +7,7 @@ import type { FilterSchema } from '@rpg/ui/filters'
 
 import { ROUTES } from '@/app/routes'
 import { useEquipmentFamilyOverview } from '../hooks/use-equipment-family-overview'
+import { CONTENT_OVERLAY_UNRESOLVED_STATUS_LABEL } from '../../lib/list/content-overlay-overview.lib'
 import type { FamilyTableConfig } from '../lib/shared/equipment-family-overview-columns'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
 import { ContentOverviewTable } from '../../lib/overview/content-overview-table'
@@ -35,9 +36,24 @@ export function EquipmentFamilyOverviewContent({
       {overview.rulesetLookupFailed ? (
         <Alert variant="warning" role="status">
           <Text variant="body">
-            Could not resolve the campaign ruleset. Unresolved overlay rows are listed without
-            family classification until ruleset context is available.
+            Could not resolve the campaign ruleset. Unresolved overlay equipment cannot be sorted
+            into families until ruleset context is available.
           </Text>
+        </Alert>
+      ) : null}
+      {overview.unclassifiedOverlayFailures.length > 0 ? (
+        <Alert variant="warning" role="status">
+          <Text variant="body">
+            {overview.unclassifiedOverlayFailures.length === 1
+              ? 'One unresolved overlay item'
+              : `${overview.unclassifiedOverlayFailures.length} unresolved overlay items`}{' '}
+            ({CONTENT_OVERLAY_UNRESOLVED_STATUS_LABEL}) could not be classified for this family:
+          </Text>
+          <ul className="mt-2 list-disc pl-5 text-style-body">
+            {overview.unclassifiedOverlayFailures.map((row) => (
+              <li key={row.id}>{row.name}</li>
+            ))}
+          </ul>
         </Alert>
       ) : null}
       {overview.tableConfig ? (

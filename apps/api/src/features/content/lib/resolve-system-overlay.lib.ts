@@ -1,5 +1,7 @@
 import {
   applyStoredOverlay,
+  catalogOverlayListFailureMessage,
+  overlayApplyFailureToListCode,
   overlayPolicyForParticipant,
   parseStoredOverlayInput,
   parseSystemOverlayIntent,
@@ -71,37 +73,26 @@ export function overlayPolicyForValidationIntent(
 }
 
 export function throwOverlayFailure(failure: OverlayApplyFailure): never {
-  if (failure.code === 'unsupported-overlay-version') {
-    throw new HttpError(
-      422,
-      'unsupported_overlay_version',
-      'System overlay patch is missing a supported version.',
-    )
-  }
+  const code = overlayApplyFailureToListCode(failure)
+  const message = catalogOverlayListFailureMessage(code)
+
   if (failure.code === 'unsupported-overlay-retention') {
-    throw new HttpError(
-      422,
-      'unsupported_overlay_retention',
-      'System overlay uses unsupported retention.',
-      {
-        path: failure.path,
-        retention: failure.retention,
-      },
-    )
+    throw new HttpError(422, code, message, {
+      path: failure.path,
+      retention: failure.retention,
+    })
   }
   if (failure.code === 'overlay-validation') {
-    throw new HttpError(422, 'overlay_validation', 'Stored system overlay is invalid.', {
+    throw new HttpError(422, code, message, {
       issues: failure.issues,
     })
   }
-  throw new HttpError(
-    422,
-    'overlay_invalid_order',
-    'Stored system overlay has invalid collection order.',
-    {
+  if (failure.code === 'overlay-invalid-order') {
+    throw new HttpError(422, code, message, {
       path: failure.path,
-    },
-  )
+    })
+  }
+  throw new HttpError(422, code, message)
 }
 
 /** Catalog seed row plus overlay-resolved domain fields (matches `resolveCatalog` publish merge). */

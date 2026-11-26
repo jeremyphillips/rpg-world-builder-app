@@ -22,9 +22,9 @@ export function equipmentFamilyOverviewHasOverlayFailures(rows: readonly unknown
 
 /**
  * When overlay failures are present, family membership for unresolved rows requires campaign
- * ruleset context — never guess kind while ruleset is loading. On ruleset lookup failure, include
- * all failure rows (unclassified) alongside kind-filtered resolved rows; the family route shows a
- * banner while still rendering the table (list/column errors remain full-page errors).
+ * ruleset context — never guess kind while ruleset is loading. On ruleset lookup failure, omit
+ * unclassified failures from the family table; surface them via
+ * {@link equipmentFamilyUnclassifiedOverlayFailures} (list/column errors remain full-page errors).
  */
 export function filterEquipmentFamilyOverviewRows<T extends { kind: Equipment['kind'] }>(
   rows: readonly (T | ContentOverlayFailureOverviewRow)[],
@@ -43,10 +43,7 @@ export function filterEquipmentFamilyOverviewRows<T extends { kind: Equipment['k
 
   return rows.filter((item) => {
     if (isContentOverlayFailureOverviewRow(item)) {
-      if (ruleset.isError) {
-        return true
-      }
-      if (!ruleset.rulesetId) {
+      if (ruleset.isError || !ruleset.rulesetId) {
         return false
       }
       const seed = resolveCatalogSeedBody('equipment', ruleset.rulesetId, item.id)
@@ -54,6 +51,15 @@ export function filterEquipmentFamilyOverviewRows<T extends { kind: Equipment['k
     }
     return item.kind === kind
   })
+}
+
+/** Overlay failures that cannot be family-classified while ruleset context is missing. */
+export function equipmentFamilyUnclassifiedOverlayFailures(
+  rows: readonly unknown[],
+  ruleset: EquipmentFamilyRulesetGate,
+): ContentOverlayFailureOverviewRow[] {
+  if (!ruleset.isError) return []
+  return rows.filter(isContentOverlayFailureOverviewRow)
 }
 
 /** True when the family table must stay in loading until ruleset can classify overlay failures. */

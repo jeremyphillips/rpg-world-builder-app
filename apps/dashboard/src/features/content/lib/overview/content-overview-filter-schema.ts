@@ -1,5 +1,4 @@
 import {
-  type CampaignAvailabilityFilter,
   type ContentStatus,
   type WithCampaignAccess,
   type ContentTypeKey,
@@ -14,6 +13,7 @@ import {
 } from '@rpg/ui/filters'
 
 import { isContentOverlayFailureOverviewRow } from '../list/content-overlay-overview.lib'
+import { contentRowPassesCampaignAvailabilityFilter } from './content-availability-table.lib'
 
 import type { ContentBase } from './content-table-config'
 import { CATALOG_LAYER_BADGE, type CatalogLayer } from './catalog-layer-badge'
@@ -78,17 +78,26 @@ export function createContentStatusFilter<
   }) as unknown as FilterFieldDef<TData, TState>
 }
 
-function contentOverviewRowCountsAsAvailable(row: OverviewRow): boolean {
-  return isContentOverlayFailureOverviewRow(row) || row.campaignAccess.available
+function contentOverviewRowIsCampaignAvailable(row: OverviewRow): boolean {
+  if (isContentOverlayFailureOverviewRow(row)) return false
+  return row.campaignAccess.available
 }
 
 export function createCampaignAvailabilityFilterField<
   TData extends OverviewRow,
   TState extends ContentOverviewBaseFilterState,
 >(): FilterFieldDef<TData, TState> {
-  return createSharedCampaignAvailabilityFilterField<TData, TState>((row) =>
-    contentOverviewRowCountsAsAvailable(row),
+  const base = createSharedCampaignAvailabilityFilterField<TData, TState>((row) =>
+    contentOverviewRowIsCampaignAvailable(row),
   )
+  return {
+    ...base,
+    matches: (row, value, state) =>
+      contentRowPassesCampaignAvailabilityFilter(
+        row,
+        value as Parameters<typeof contentRowPassesCampaignAvailabilityFilter>[1],
+      ),
+  }
 }
 
 /** Unresolved rows must not satisfy explicit content-domain filters. */
@@ -125,7 +134,7 @@ export function buildContentFilterSchema<
       createCampaignAvailabilityFilterField<TData, TState>(),
     ],
     {
-      availability: { isAvailable: (row) => contentOverviewRowCountsAsAvailable(row) },
+      availability: { isAvailable: (row) => contentOverviewRowIsCampaignAvailable(row) },
     },
   )
 }

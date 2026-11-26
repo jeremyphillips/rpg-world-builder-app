@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import { loadSeedSubclasses } from '@rpg/catalog/classes'
 
+import { SUBCLASS_PARENT_OVERLAY_UNRESOLVED_ISSUE_CODE } from '@rpg/contracts'
+
 import { HttpError } from '../../../lib/http-error'
 import { makeTestCampaign } from '../../../test/fixtures/campaigns'
 import { expectHttpErrorAsync } from '../../../test/expect-http-error'
@@ -46,10 +48,21 @@ describe('subclass overlay validation', () => {
     expect(items.some((row) => row.id === FIGHTER_CLASS_ID)).toBe(false)
     expect(items.some((row) => row.id === WIZARD_CLASS_ID)).toBe(true)
 
-    await expectHttpErrorAsync(
-      () => assertSubclassParentClassExists(campaign.id, FIGHTER_CLASS_ID),
-      { status: 409, code: 'unsupported_overlay_version' },
-    )
+    try {
+      await assertSubclassParentClassExists(campaign.id, FIGHTER_CLASS_ID)
+      expect.fail('expected overlay-blocked parent class')
+    } catch (error) {
+      expect(error).toBeInstanceOf(HttpError)
+      expect(error).toMatchObject({ status: 409, code: 'unsupported_overlay_version' })
+      expect((error as HttpError).details).toEqual({
+        issues: [
+          expect.objectContaining({
+            path: 'classId',
+            code: SUBCLASS_PARENT_OVERLAY_UNRESOLVED_ISSUE_CODE,
+          }),
+        ],
+      })
+    }
   })
 
   it('reports a genuinely missing parent class as validation_error', async () => {

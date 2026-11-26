@@ -43,6 +43,7 @@ import {
 import {
   buildContentOverviewEmptyState,
   buildContentOverviewHiddenSupplement,
+  buildOverlayFailureAvailabilitySupplement,
 } from '../../campaign-access/overview/content-overview-availability-ui.lib'
 import { useContentOverviewBulkSelection } from './use-content-overview-bulk-selection'
 import {
@@ -279,16 +280,38 @@ export function useContentOverviewTable<
   const tablePageSize: ContentOverviewPageSize =
     preferences.pageSize ?? CONTENT_OVERVIEW_PREFERENCES_DEFAULTS.pageSize ?? 20
 
-  const resultSupplement = useMemo(
-    () =>
-      buildContentOverviewHiddenSupplement({
-        scope,
-        campaignAvailability,
-        campaignAvailabilityFilterId,
-        actions,
-      }),
-    [actions, campaignAvailability, campaignAvailabilityFilterId, scope],
-  )
+  const hiddenOverlayFailureCount = useMemo(() => {
+    if (campaignAvailability !== 'unavailable') return 0
+    return discoveryFilteredData.filter(isContentOverlayFailureOverviewRow).length
+  }, [campaignAvailability, discoveryFilteredData])
+
+  const resultSupplement = useMemo(() => {
+    const unavailable = buildContentOverviewHiddenSupplement({
+      scope,
+      campaignAvailability,
+      campaignAvailabilityFilterId,
+      actions,
+    })
+    const overlay = buildOverlayFailureAvailabilitySupplement({
+      hiddenOverlayFailureCount,
+      campaignAvailability,
+      campaignAvailabilityFilterId,
+      actions,
+    })
+    if (!unavailable && !overlay) return null
+    if (unavailable && !overlay) return unavailable
+    if (!unavailable && overlay) return overlay
+    return {
+      label: `${unavailable!.label} · ${overlay!.label}`,
+      action: unavailable!.action ?? overlay!.action,
+    }
+  }, [
+    actions,
+    campaignAvailability,
+    campaignAvailabilityFilterId,
+    hiddenOverlayFailureCount,
+    scope,
+  ])
 
   const emptyState = useCallback(
     () =>

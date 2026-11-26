@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  CONTENT_OVERLAY_FAILURE_ROW_CAMPAIGN_ACCESS,
   isContentOverlayFailureOverviewRow,
   overlayFailureOverviewStatusLabel,
 } from './content-overlay-overview.lib'
@@ -20,6 +21,7 @@ describe('content overlay overview rows', () => {
     expect(merged).toHaveLength(2)
     expect(isContentOverlayFailureOverviewRow(merged[1])).toBe(true)
     expect(overlayFailureOverviewStatusLabel(merged[1])).toBe('Overlay unresolved')
+    expect(merged[1]?.campaignAccess).toEqual(CONTENT_OVERLAY_FAILURE_ROW_CAMPAIGN_ACCESS)
   })
 
   it('returns only items when overlayFailures is empty', () => {

@@ -103,5 +103,15 @@ describe('content-overview-filter-schema', () => {
 
     const defaultFiltered = applyFilterSchema(schema, { campaignAvailability: 'all' }, rows)
     expect(defaultFiltered.map((row) => row.name)).toEqual(['Fighter', 'Broken Class'])
+
+    const availableFiltered = applyFilterSchema(schema, { campaignAvailability: 'available' }, rows)
+    expect(availableFiltered.map((row) => row.name)).toEqual(['Fighter', 'Broken Class'])
+
+    const unavailableFiltered = applyFilterSchema(
+      schema,
+      { campaignAvailability: 'unavailable' },
+      rows,
+    )
+    expect(unavailableFiltered.map((row) => row.name)).toEqual([])
   })
 })

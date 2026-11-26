@@ -36,4 +36,6 @@ Policy compilation, intent building, and tests live beside this module (`apply.t
 | **Configuration error**    | Stored patch exists but the content type has no `overlayParticipantId`                           | `resolveCatalog` **throws** — fix wiring before deploy (`patch-model-overlay-drift` in `@rpg/api`) |
 | **Stored overlay failure** | Unversioned document, apply/reconcile rejection, or unsupported retention on a wired participant | Row omitted from resolved `records`; entry in `overlayFailures` for list/management surfaces       |
 
+Public list and API transport messages for those failures come from `catalogOverlayListFailureMessage` (`catalog-overlay-list-failures.ts`). `@rpg/api` `throwOverlayFailure` consumes the same mapping; validation-issue details remain on the write path only.
+
 Search, hub summaries, and other **records-only** consumers use `resolveCatalogForCampaign` and intentionally omit `overlayFailures`. Destructive-operation indexes that must still see seed references use `loadOverlayAwareCatalogRows` in `@rpg/api` (see content README).

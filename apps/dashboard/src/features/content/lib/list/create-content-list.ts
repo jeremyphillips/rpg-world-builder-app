@@ -7,7 +7,7 @@ import type {
   ContentUsageSummaryLabels,
   ResolvedContentCampaignAccess,
 } from '@rpg/contracts'
-import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
+import { CONTENT_OVERLAY_FAILURE_ROW_CAMPAIGN_ACCESS } from './content-overlay-overview.lib'
 
 import { request } from '@/lib/api-client'
 
@@ -49,7 +49,7 @@ export function overlayFailureOverviewRows(
     slug: failure.slug,
     status: 'published' as const,
     catalogLayer: 'system' as const,
-    campaignAccess: DEFAULT_CONTENT_CAMPAIGN_ACCESS,
+    campaignAccess: CONTENT_OVERLAY_FAILURE_ROW_CAMPAIGN_ACCESS,
     overlayListFailure: failure,
     contentOverlayResolveFailure: true as const,
   }))

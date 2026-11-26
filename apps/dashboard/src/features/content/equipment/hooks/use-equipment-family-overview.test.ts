@@ -108,8 +108,8 @@ describe('useEquipmentFamilyOverview', () => {
 
     expect(result.current.isError).toBe(false)
     expect(result.current.rulesetLookupFailed).toBe(true)
-    expect(result.current.filtered.map((row) => row.id)).toEqual([
-      'hb-weapon',
+    expect(result.current.filtered.map((row) => row.id)).toEqual(['hb-weapon'])
+    expect(result.current.unclassifiedOverlayFailures.map((row) => row.id)).toEqual([
       'srd-cc-5.2.1:longsword',
       'srd-cc-5.2.1:chain-mail',
     ])

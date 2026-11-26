@@ -87,7 +87,7 @@ export function useClassSubclassesTabState(
     classId,
     subclassesOverride,
   )
-  const editor = useSubclassEditorState(classId, subclasses, overlayFailures)
+  const editor = useSubclassEditorState(classId, subclasses, overlayFailures, formCtx.rulesetId)
 
   const gate = resolveSubclassTabGate({
     mode,
