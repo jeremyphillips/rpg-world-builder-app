@@ -91,6 +91,21 @@ export function createCampaignAvailabilityFilterField<
   )
 }
 
+/** Unresolved rows must not satisfy explicit content-domain filters. */
+function guardContentDomainFilterField<
+  TData extends OverviewRow,
+  TState extends ContentOverviewBaseFilterState,
+>(field: FilterFieldDef<TData, TState>): FilterFieldDef<TData, TState> {
+  const previousMatches = field.matches
+  return {
+    ...field,
+    matches: (row, value, state) => {
+      if (isContentOverlayFailureOverviewRow(row)) return false
+      return previousMatches(row, value, state)
+    },
+  }
+}
+
 /** Wraps content-specific fields with shared overview filters. */
 export function buildContentFilterSchema<
   TData extends OverviewRow,
@@ -102,7 +117,7 @@ export function buildContentFilterSchema<
   return createFilterSchema(
     [
       createContentNameFilter<TData, TState>(),
-      ...contentFields,
+      ...contentFields.map(guardContentDomainFilterField),
       ...(shouldPresentCatalogLayer(contentType)
         ? [createCatalogLayerFilter<TData, TState>()]
         : []),

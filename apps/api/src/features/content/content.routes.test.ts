@@ -1811,6 +1811,32 @@ describe('content list routes — nested subclass scopes', () => {
     expect(playList.body.overlayFailures ?? []).toEqual([])
     expect(playList.body.subclasses.map((row: { id: string }) => row.id)).toContain(healthyId)
   })
+
+  it('returns not_found when patching campaign access for an unresolved subclass target', async () => {
+    const owner = await registerAndLoginTestUser(getApp(), {
+      email: 'subclass-access-overlay-owner@example.com',
+      password: 'supersecret',
+      displayName: 'Owner',
+    })
+    const campaignId = await createTestCampaign(owner.agent, owner.csrfToken)
+    const champion = loadSeedSubclasses('srd-cc-5.2.1').find((row) => row.slug === 'champion')
+    expect(champion).toBeDefined()
+    if (!champion) throw new Error('seed subclass missing')
+
+    await SubclassPatchModel.create({
+      campaignId,
+      targetId: champion.id,
+      patch: { name: 'Unversioned overlay' },
+    })
+
+    await owner.agent
+      .patch(
+        `/api/campaigns/${campaignId}/content/classes/${champion.classId}/subclasses/${champion.id}/campaign-access`,
+      )
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({ available: true, visibilityMode: 'all_players', participantIds: [] })
+      .expect(404)
+  })
 })
 
 describe('content list routes — overlay wire', () => {

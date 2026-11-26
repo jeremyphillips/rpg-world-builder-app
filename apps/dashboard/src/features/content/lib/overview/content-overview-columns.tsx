@@ -137,8 +137,6 @@ export function patchOverviewColumns<T extends OverviewNameRow>(
   })
 }
 
-const OVERLAY_FAILURE_ACCESSOR_SENTINEL = '' as const
-
 type OverviewTableRow<T> = {
   original: T
   getValue: (columnId: string) => unknown
@@ -195,7 +193,7 @@ function guardOverviewColumnsForOverlayFailures<T>(
       previousAccessorFn || accessorKey
         ? (row: T, index: number) => {
             if (isContentOverlayFailureOverviewRow(row)) {
-              return OVERLAY_FAILURE_ACCESSOR_SENTINEL
+              return undefined
             }
             if (previousAccessorFn) {
               return previousAccessorFn(row, index)
@@ -210,11 +208,16 @@ function guardOverviewColumnsForOverlayFailures<T>(
     return {
       ...column,
       ...(accessorFn ? { accessorFn } : {}),
-      ...(sortingEnabled ? { sortingFn: guardSortingFn(column.sortingFn) } : {}),
+      ...(sortingEnabled
+        ? { sortingFn: guardSortingFn(column.sortingFn), sortUndefined: 'last' as const }
+        : {}),
       filterFn:
         typeof previousFilterFn === 'function'
           ? (row, columnId, filterValue, addMeta) => {
-              if (isContentOverlayFailureOverviewRow(row.original)) return true
+              if (isContentOverlayFailureOverviewRow(row.original)) {
+                if (filterValue == null || filterValue === '') return true
+                return false
+              }
               return previousFilterFn(row, columnId, filterValue, addMeta)
             }
           : previousFilterFn,

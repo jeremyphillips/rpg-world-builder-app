@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { loadSeedSubclasses } from '@rpg/catalog/classes'
 
+import { HttpError } from '../../../lib/http-error'
 import { makeTestCampaign } from '../../../test/fixtures/campaigns'
 import { expectHttpErrorAsync } from '../../../test/expect-http-error'
 import { useIntegrationDb } from '../../../test/setup/integration-db'
@@ -60,10 +61,21 @@ describe('subclass overlay validation', () => {
     expect(items.some((row) => row.id === 'missing-class')).toBe(false)
     expect(overlayFailures.some((failure) => failure.targetId === 'missing-class')).toBe(false)
 
-    await expectHttpErrorAsync(
-      () => assertSubclassParentClassExists(campaign.id, 'missing-class'),
-      { status: 400, code: 'validation_error' },
-    )
+    try {
+      await assertSubclassParentClassExists(campaign.id, 'missing-class')
+      expect.fail('expected missing parent class validation error')
+    } catch (error) {
+      expect(error).toBeInstanceOf(HttpError)
+      expect(error).toMatchObject({ status: 400, code: 'validation_error' })
+      expect((error as HttpError).details).toEqual({
+        issues: [
+          expect.objectContaining({
+            path: 'classId',
+            code: 'unknown_class',
+          }),
+        ],
+      })
+    }
   })
 
   it('resolves a healthy parent class while a sibling class overlay is broken', async () => {

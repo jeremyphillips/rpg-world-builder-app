@@ -128,11 +128,30 @@ function renderOverview(data: ClassRow[] = createRows(8)) {
 
 const persistPreferencesMock = vi.mocked(persistContentOverviewPreferences)
 
+function hitDieValuesInTableRows(): string[] {
+  return screen
+    .getAllByRole('row')
+    .slice(1)
+    .map((row) => within(row).queryByText(/^d\d+$/)?.textContent ?? '—')
+}
+
+function campaignNameLinkInRow(row: HTMLElement): HTMLElement | null {
+  const links = within(row).getAllByRole('link')
+  return links.find((link) => link.getAttribute('href')?.includes('/campaigns/')) ?? null
+}
+
 describe('ContentOverviewTable interactions', () => {
   beforeEach(() => {
     localStorage.clear()
     persistPreferencesMock.mockClear()
     dataTableRenderCount = 0
+    if (!HTMLElement.prototype.hasPointerCapture) {
+      HTMLElement.prototype.hasPointerCapture = () => false
+    }
+    if (!HTMLElement.prototype.releasePointerCapture) {
+      HTMLElement.prototype.releasePointerCapture = () => undefined
+    }
+    Element.prototype.scrollIntoView = vi.fn()
   })
 
   it('does not spam column preference writes when opening the Filters panel', async () => {
@@ -297,15 +316,112 @@ describe('ContentOverviewTable interactions', () => {
     expect(within(healthyRow).getByRole('checkbox', { name: 'Select Class 0' })).toBeEnabled()
   })
 
-  it('renders guarded class overview columns for failure rows without domain field accessors', async () => {
-    const healthy = {
-      ...createRows(1)[0]!,
-      features: [],
-      primaryAbilities: ['str'],
-      spellcasting: undefined,
+  it('sorts healthy class rows by Hit Die while keeping unresolved rows last with placeholders', async () => {
+    const user = userEvent.setup()
+    const healthyRows = [
+      {
+        ...createRows(1)[0]!,
+        id: 'class-d10',
+        name: 'Ten Die',
+        hitDie: 10,
+        features: [],
+        primaryAbilities: ['str'],
+        spellcasting: undefined,
+      },
+      {
+        ...createRows(1)[0]!,
+        id: 'class-d6',
+        name: 'Six Die',
+        hitDie: 6,
+        features: [],
+        primaryAbilities: ['dex'],
+        spellcasting: undefined,
+      },
+    ]
+    const data = mergeContentListOverviewRows(healthyRows, [
+      {
+        targetId: 'class-broken',
+        slug: 'broken-class',
+        name: 'Broken Class',
+        code: 'unsupported_overlay_version',
+        message: 'System overlay patch is missing a supported version.',
+      },
+    ]) as ClassRow[]
+
+    function OverviewWithClassColumns() {
+      const guarded = useOverviewColumnsWithNameContext(
+        classColumns(CAMPAIGN_ID) as ColumnDef<ClassRow, unknown>[],
+        {
+          canManage: true,
+          campaignId: CAMPAIGN_ID,
+          contentTypeKey: 'classes',
+          viewer: manageViewer,
+          getEditHref: (row) => `/classes/${row.id}/edit`,
+        },
+      )
+      return (
+        <ContentOverviewTable<ClassRow, ClassesOverviewFilterState>
+          contentTypeKey="classes"
+          campaignId={CAMPAIGN_ID}
+          columns={guarded}
+          filterSchema={classFilterSchema}
+          data={data}
+          getEditHref={(row) => `/classes/${row.id}/edit`}
+        />
+      )
     }
+
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    const router = createMemoryRouter(
+      [
+        {
+          path: '/',
+          element: (
+            <QueryClientProvider client={queryClient}>
+              <OverviewWithClassColumns />
+            </QueryClientProvider>
+          ),
+        },
+      ],
+      { initialEntries: ['/'] },
+    )
+    render(<RouterProvider router={router} />)
+
+    expect(screen.getByRole('link', { name: 'Broken Class' })).toBeInTheDocument()
+    const brokenRow = screen.getByRole('link', { name: 'Broken Class' }).closest('tr')
+    expect(brokenRow).not.toBeNull()
+    if (!brokenRow) return
+    expect(within(brokenRow).getAllByText('—').length).toBeGreaterThan(0)
+
+    await user.click(screen.getByRole('button', { name: 'Sort by Hit Die' }))
+
+    expect(hitDieValuesInTableRows()).toEqual(['d6', 'd10', '—'])
+    const lastRow = screen.getAllByRole('row').at(-1)
+    expect(lastRow).toBeDefined()
+    if (lastRow) {
+      expect(campaignNameLinkInRow(lastRow)?.textContent).toBe('Broken Class')
+    }
+
+    await user.click(screen.getByRole('button', { name: 'Sort by Hit Die' }))
+
+    expect(hitDieValuesInTableRows()).toEqual(['d10', 'd6', '—'])
+    expect(screen.getByRole('link', { name: 'Broken Class' })).toBeInTheDocument()
+  })
+
+  it('hides unresolved rows from explicit Hit Die filters but keeps them visible by default', async () => {
+    const user = userEvent.setup()
     const data = mergeContentListOverviewRows(
-      [healthy],
+      [
+        {
+          ...createRows(1)[0]!,
+          id: 'class-d10',
+          name: 'Ten Die',
+          hitDie: 10,
+          features: [],
+          primaryAbilities: ['str'],
+          spellcasting: undefined,
+        },
+      ],
       [
         {
           targetId: 'class-broken',
@@ -356,11 +472,13 @@ describe('ContentOverviewTable interactions', () => {
     )
     render(<RouterProvider router={router} />)
 
-    expect(screen.getByRole('link', { name: 'Class 0' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Broken Class' })).toBeInTheDocument()
-    const brokenRow = screen.getByRole('link', { name: 'Broken Class' }).closest('tr')
-    expect(brokenRow).not.toBeNull()
-    if (!brokenRow) return
-    expect(within(brokenRow).getAllByText('—').length).toBeGreaterThan(0)
+    expect(screen.getByRole('link', { name: 'Ten Die' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('combobox', { name: 'Hit Die' }))
+    await user.click(within(document.body).getByRole('option', { name: 'd10' }))
+
+    expect(screen.getByRole('link', { name: 'Ten Die' })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Broken Class' })).not.toBeInTheDocument()
   })
 })
