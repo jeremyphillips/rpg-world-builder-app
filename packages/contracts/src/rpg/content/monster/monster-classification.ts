@@ -33,6 +33,7 @@ export type MonsterClassification = Pick<
 export type MonsterClassificationCatalogs = {
   creatureFamilies?: ReadonlyMap<string, CreatureFamilyDefinition & { status?: string }>
   classesById?: ReadonlyMap<string, CharacterClass>
+  unresolvedOverlayClassIds?: ReadonlySet<string>
 }
 
 export function collectMonsterClassificationIssues(
@@ -49,6 +50,7 @@ export function collectMonsterClassificationIssues(
     resolve: (key) => catalogs.classesById?.get(key),
     unavailablePlacement: monsterClassEdge.unavailablePlacement,
     messages: monsterClassEdge.messages,
+    unresolvedOverlayTargetKeys: catalogs.unresolvedOverlayClassIds,
   })
   for (const [index, id] of (monster.creatureFamilyIds ?? []).entries()) {
     const family = catalogs.creatureFamilies?.get(id)

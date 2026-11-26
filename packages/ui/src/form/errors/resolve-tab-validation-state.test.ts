@@ -14,6 +14,7 @@ import {
   pathOwnsIssue,
   resolveInvalidSubmitTabId,
   resolveTabValidationState,
+  tabPrefixOwnsIssuePath,
   type TabValidationTab,
 } from './resolve-tab-validation-state'
 
@@ -65,6 +66,12 @@ describe('pathOwnsIssue', () => {
   it('does not match sibling segment prefixes', () => {
     expect(pathOwnsIssue('class', 'className')).toBe(false)
     expect(pathOwnsIssue('name', 'nameplate')).toBe(false)
+  })
+})
+
+describe('tabPrefixOwnsIssuePath', () => {
+  it('matches when the tab prefix is an ancestor of the issue path', () => {
+    expect(tabPrefixOwnsIssuePath('movementAlternative.modes', 'movementAlternative')).toBe(true)
   })
 })
 
@@ -167,6 +174,38 @@ describe('resolveTabValidationState', () => {
     const states = resolveTabValidationState(issues, metaTabs, metaFields)
 
     expect(states.find((state) => state.tabId === 'meta')?.count).toBe(1)
+  })
+
+  it('assigns parent object issues to the tab that owns descendant field prefixes', () => {
+    const statisticsTabs: TabValidationTab[] = [
+      {
+        id: 'statistics',
+        fields: [
+          {
+            kind: 'group',
+            name: 'movementAlternative',
+            fields: [
+              {
+                type: 'chips',
+                name: 'movementAlternative.modes',
+                label: 'Available modes',
+                required: true,
+              },
+            ],
+          },
+        ],
+      },
+    ]
+    const statisticsFields = statisticsTabs.flatMap((tab) => tab.fields)
+    const issues = prepareFormIssues(
+      [{ path: ['movementAlternative'], message: 'Invalid alternative movement.' }],
+      statisticsFields,
+      {},
+    )
+
+    const states = resolveTabValidationState(issues, statisticsTabs, statisticsFields)
+
+    expect(states.find((state) => state.tabId === 'statistics')?.count).toBe(1)
   })
 
   it('routes master-detail header-only tabs via errorPaths (species-style)', () => {

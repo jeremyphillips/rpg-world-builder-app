@@ -41,3 +41,17 @@ Multiattack, and a legendary or reaction reference (including a Parry follow-up)
 target is unavailable in a form where the reference is available. Stored references are
 not changed. A restriction alone makes the retained-statistics sentence “Except for the
 differences noted, its game statistics are the same in each form.”
+
+## Catalog stat-block reference (deferred)
+
+Shape-Shift and similar traits that **replace the entire stat block** with another
+catalog creature (Incubus Form, Succubus Form, polymorph-style “use that creature’s
+statistics”) are not `definedForms`. Those rows stay custom prose until
+`stat-block-replacement` in [srd-mechanical-coverage.md](./srd-mechanical-coverage.md)
+ships.
+
+When implemented, authoring should use the same picker grammar as monster spell and
+equipment pickers ([`CatalogEntityPickerSheet`](../../../apps/dashboard/src/features/content/lib/entity/surfaces/catalog/catalog-entity-picker-sheet.tsx))
+via a monster-domain drawer — not a raw id combobox. The stored edge is a canonical
+content id with campaign/ruleset scope and lifecycle-aware unresolved state, distinct
+from partial form overrides on this document.

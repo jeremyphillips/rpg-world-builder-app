@@ -49,6 +49,7 @@ function bodyFromCreateInput(input: Record<string, unknown>): Record<string, unk
 
 export const featContentConfig: ContentTypeConfig<Feat> = {
   type: 'feats',
+  overlayParticipantId: 'feats',
   system: {
     load: loadSeedFeats,
     slugs: seedFeatSlugs,

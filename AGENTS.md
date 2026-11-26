@@ -25,7 +25,15 @@ only when the user asks for the matching checkpoint (see below)—not after ever
 
 ### Agent validation (default)
 
-For normal Cursor work, finish after **focused validation** of changed behavior.
+For normal Cursor work, finish after **focused validation** of changed behavior when
+no more specific requirements apply (ad hoc tasks).
+
+When the user or an approved refinement establishes mandatory scope and
+verification—in a plan file, conversation, remediation prompt, review follow-up, or
+checklist—that **overrides** this default finish line for scope and verification only,
+not for repository gates. **Priority / risk order** sets sequence; it does not permit
+omitting other approved unblocked work. Detail →
+[docs/agent-validation.md](docs/agent-validation.md#plan-execution).
 
 **Do not** run the pre-commit hook, `pnpm gate:pre-push`, root `pnpm build`, or
 `pnpm coverage` during ordinary agent tasks unless the user explicitly requests a
@@ -55,9 +63,9 @@ narrowest relevant Vitest paths → targeted typecheck/lint when useful → broa
   before `test:affected:gate` or to finish a task; not a hook or CI gate.
 
 When finishing, **report** which checks ran and which repository gates (pre-commit,
-pre-push) were **intentionally deferred**. When the task used a
-`.cursor/plans/*.plan.md`, also sync that plan’s frontmatter `todos` (see **Implementation
-plans**).
+pre-push) were **intentionally deferred**, and whether the handoff is **plan complete**
+or an **incomplete handoff** (see **Approved work**). Sync plan frontmatter `todos`
+when a `.cursor/plans/*.plan.md` applied.
 
 ### Repository gates (checkpoints)
 
@@ -87,21 +95,37 @@ when you need a production bundle of the bench app.
 Turbo scope for typecheck, lint, and build (`gate:ci:quality`, `build:ci`). Skip hooks
 locally only when necessary: `HUSKY=0 git commit` / `HUSKY=0 git push`.
 
-### Implementation plans
+### Approved work
 
-Phased plans must **not** auto-append `test:affected:collect → pre-commit → gate:pre-push`
-to every phase or milestone. Prefer the default agent loop above; name **commit** and
-**push/PR** checkpoints explicitly when full gates belong in the schedule—not after
-each prompt-sized slice of work. Plan footers and verification sections →
+**Completion:** **Plan complete** means every **mandatory** acceptance criterion is
+implemented **and** verified at the stated production boundary. **Implementation complete**
+and **verification complete** are separate. **Incomplete handoff** means mandatory items
+remain partial, failed, blocked, or unverified—report accurately; that is not plan
+complete. Status labels such as Partial or Blocked describe requirement state; they do
+not satisfy completion.
+
+**Checklist:** Derive mandatory vs optional criteria before substantive implementation;
+maintain through execution (session summaries + plan frontmatter when used). Track
+implementation and verification independently. Commits and hook success do not clear
+outstanding mandatory criteria.
+
+**Frontmatter** (`pending | in_progress | completed`): set `completed` only when linked
+mandatory criteria are implemented **and** verified; otherwise `in_progress`. Push/PR
+hook todos stay `pending` until the user requests that checkpoint. In-chat TodoWrite does
+not replace plan frontmatter across sessions.
+
+**Continuation:** Work through all approved unblocked mandatory requirements unless the
+user requests a narrower slice/stop, a genuine blocker applies, a user decision is
+required, or execution limits apply. A difficult harness, fixture, or successful commit is
+not a standalone stop—investigate, preserve the requirement, continue other unblocked
+work. User approval is required to **materially weaken or remove** an approved guarantee,
+not for ordinary adjustments that preserve criteria. No weaker substitution of required
+verification; equivalent existing coverage at the same boundary may suffice—see
+[docs/agent-validation.md](docs/agent-validation.md#plan-execution).
+
+**Plans:** Do not auto-append `test:affected:collect → pre-commit → gate:pre-push` to
+every phase; name commit/push milestones explicitly. Authoring and progress detail →
 [docs/agent-validation.md](docs/agent-validation.md).
-
-**Progress:** frontmatter `todos` (`status: pending | in_progress | completed`) are the
-handoff record for multi-session plan work—not in-chat todo lists. Before ending a turn,
-set each finished checkpoint to `completed`, the active slice to `in_progress`, and do
-not leave finished gates as `pending`. Mark push/PR todos complete only after the user
-requested that checkpoint. Body markdown checklists are acceptance criteria unless a plan
-says otherwise; do not duplicate status there. Detail →
-[docs/agent-validation.md](docs/agent-validation.md#plan-progress).
 
 ## Test failures
 
@@ -122,18 +146,24 @@ Cluster collect output before editing:
   failures.
 - **Suspected flake** — passes when that file runs alone. Do not batch-fix.
 
-Do not add Vitest retries. Fix the highest-confidence shared cause, then rerun
-only the files that failed. Run repository gates only on **commit/checkpoint** or
+Do not add Vitest retries. Fix the highest-confidence shared cause. Distinguish rerun
+**modes** (detail → [docs/agent-validation.md](docs/agent-validation.md#test-rerun-modes)):
+narrow **diagnostic** reruns while fixing; **regression** on affected behavior after
+implementation; **plan final verification** when approved scope names explicit suites—
+diagnostic reruns do not replace the last. Attribute pre-existing failures only with
+concrete baseline evidence; otherwise report **unresolved**. Do not report blocked or
+unexecuted checks as passing. Run repository gates only on **commit/checkpoint** or
 **push/PR/full validation** requests—not as the default follow-up to a clean collect.
 
 ## fallow (code health)
 
-Use the `/fallow` skill for code-health work. Use judgement per finding: fix it
-in code, or — if a fix isn't worth it — propose an inline suppression or a
-`.fallowrc.json` tweak and **consult the user before ignoring**. Production
-complexity thresholds live in `.fallowrc.json` `health`; CRAP uses Istanbul
-coverage from `pnpm coverage` via `--coverage ./coverage/coverage-final.json`
-(pre-push and CI — not pre-commit).
+Use the `/fallow` skill for dead-code and duplication. For **complexity findings**,
+follow [docs/complexity-remediation.md](docs/complexity-remediation.md) — metrics
+signal investigation, not automatic extraction. Enforced numerics live only in
+[`.fallowrc.json`](.fallowrc.json) `health`; pre-commit gates cyclomatic/cognitive
+(`gate:fallow-health`); CRAP gates with Istanbul at pre-push/CI
+(`gate:fallow-health:coverage`). Inline suppressions or `.fallowrc.json` tweaks
+require **user consultation** (see canonical doc).
 
 ## Agent skills
 
@@ -157,7 +187,11 @@ Policy depth for content types → [`docs/content-types.md`](docs/content-types.
 
 ## Constants
 
-Any string literal used in 2+ places → extract to a named constant.
+Extract a named constant when a literal is **shared semantic identity** (vocabulary
+value, route key, rule copy, error code, content-type noun). Do not extract incidental
+duplicates (test titles, log tags, one-off UI copy) or create constants merely to satisfy
+dedup or complexity metrics; small usage does not exempt meaningful shared contracts. See
+[architecture-ssot.md](docs/architecture-ssot.md) and [complexity-remediation.md](docs/complexity-remediation.md).
 
 Closed vocabulary maps in `@rpg/contracts` use a two-layer pattern: `*_TERM`
 (the set concept) plus `*_ENTRIES` (per-value labels). New `*_ENTRIES` maps

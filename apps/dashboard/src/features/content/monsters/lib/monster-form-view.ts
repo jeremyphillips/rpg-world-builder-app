@@ -19,6 +19,7 @@ const TAB_BY_PREFIX: Record<string, string> = {
   armorClass: MONSTER_FORM_TAB.statistics,
   hitPoints: MONSTER_FORM_TAB.statistics,
   movement: MONSTER_FORM_TAB.statistics,
+  movementAlternative: MONSTER_FORM_TAB.statistics,
   hover: MONSTER_FORM_TAB.statistics,
   challengeRating: MONSTER_FORM_TAB.statistics,
   experiencePointsOverride: MONSTER_FORM_TAB.statistics,

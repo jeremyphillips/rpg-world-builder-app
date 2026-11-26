@@ -3,7 +3,10 @@ import { CREATURE_FAMILY_SET_ID, collectMonsterCatalogIssues } from '@rpg/contra
 import { createMagicPropertyDefinitionProvider } from '@rpg/catalog/magic-properties'
 
 import { HttpError } from '../../../lib/http-error'
-import { resolveCatalogForCampaign } from '../content.service'
+import {
+  catalogOverlayFailureSlugs,
+  resolveCatalogForCampaignWithOverlayContext,
+} from '../content.service'
 import { classRegistration } from '../classes/classes.config'
 import {
   resolveVocabularySetForCampaign,
@@ -13,24 +16,32 @@ import { equipmentRegistration } from '../equipment/equipment.config'
 import { skillProficiencyRegistration } from '../skill-proficiencies/skill-proficiencies.config'
 import { spellRegistration } from '../spells/spells.config'
 import type { ContentWriteContext } from '../lib/content-write-config'
+import { resolveValidatedWriteBody } from '../lib/resolve-system-overlay.lib'
 import { rejectInvalidCreatureTraitTemplates } from '../lib/reject-creature-trait-templates'
 
 export async function monstersValidateBeforeWrite(ctx: ContentWriteContext): Promise<void> {
-  const rawBody = ctx.effectiveBody ?? ctx.input
+  const rawBody = resolveValidatedWriteBody({
+    effectiveBody: ctx.effectiveBody,
+    mode: ctx.mode,
+    existing: ctx.existing as Record<string, unknown> | undefined,
+    input: ctx.input,
+  })
   rejectInvalidCreatureTraitTemplates(rawBody.traits, ['traits'], { host: 'monster' })
   const body = rawBody as Parameters<typeof collectMonsterCatalogIssues>[0]
-  const [equipmentCatalog, skillCatalog, spellCatalog, classCatalog, familySet] = await Promise.all(
-    [
-      resolveCatalogForCampaign(equipmentRegistration.read, ctx.campaignId),
-      resolveCatalogForCampaign(skillProficiencyRegistration.read, ctx.campaignId),
-      resolveCatalogForCampaign(spellRegistration.read, ctx.campaignId),
-      resolveCatalogForCampaign(classRegistration.read, ctx.campaignId),
-      resolveVocabularySetForCampaign(
-        vocabularyUsageContextForCampaign(ctx.campaignId),
-        CREATURE_FAMILY_SET_ID,
-      ),
-    ],
-  )
+  const [equipmentCtx, skillCtx, spellCtx, classCtx, familySet] = await Promise.all([
+    resolveCatalogForCampaignWithOverlayContext(equipmentRegistration.read, ctx.campaignId),
+    resolveCatalogForCampaignWithOverlayContext(skillProficiencyRegistration.read, ctx.campaignId),
+    resolveCatalogForCampaignWithOverlayContext(spellRegistration.read, ctx.campaignId),
+    resolveCatalogForCampaignWithOverlayContext(classRegistration.read, ctx.campaignId),
+    resolveVocabularySetForCampaign(
+      vocabularyUsageContextForCampaign(ctx.campaignId),
+      CREATURE_FAMILY_SET_ID,
+    ),
+  ])
+  const equipmentCatalog = equipmentCtx.records
+  const skillCatalog = skillCtx.records
+  const spellCatalog = spellCtx.records
+  const classCatalog = classCtx.records
   const equipmentById = new Map<string, Equipment>(equipmentCatalog.map((row) => [row.id, row]))
   const skillBySlug = new Map<string, SkillProficiency>(skillCatalog.map((row) => [row.slug, row]))
   const spellsById = new Map<string, Spell>(spellCatalog.map((row) => [row.id, row]))
@@ -49,6 +60,10 @@ export async function monstersValidateBeforeWrite(ctx: ContentWriteContext): Pro
       spellsById,
       spellCatalog: 'ready',
       magicPropertyProvider,
+      unresolvedOverlayEquipmentIds: equipmentCtx.overlayFailureIds,
+      unresolvedOverlaySkillSlugs: catalogOverlayFailureSlugs(skillCtx.overlayFailures),
+      unresolvedOverlaySpellIds: spellCtx.overlayFailureIds,
+      unresolvedOverlayClassIds: classCtx.overlayFailureIds,
     },
     ctx.validationIntent,
   )

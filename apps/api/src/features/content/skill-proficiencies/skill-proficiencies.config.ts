@@ -48,6 +48,7 @@ function bodyFromCreateInput(input: Record<string, unknown>): Record<string, unk
 
 export const skillProficiencyContentConfig: ContentTypeConfig<SkillProficiency> = {
   type: 'skill-proficiencies',
+  overlayParticipantId: 'skill-proficiencies',
   system: {
     load: loadSeedSkillProficiencies,
     slugs: seedSkillProficiencySlugs,

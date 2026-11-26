@@ -9,14 +9,16 @@ import {
   formatContentCreateHeading,
   getContentTypeCollectionLabel,
 } from '@/features/content/lib/content-type-labels'
-import { useSpells, useSpellsUsageMeta } from '../hooks/use-spells'
+import { useContentOverviewMergedData } from '../../lib/list/create-content-list'
+import { useSpellsListResult, useSpellsUsageMeta } from '../hooks/use-spells'
 import { spellsColumns, spellsFilterSchema } from '../lib/spells-overview-columns.lib'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
 import { ContentOverviewTable } from '../../lib/overview/content-overview-table'
 
 export function SpellsOverview() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()
-  const { data: spells = [], isPending, isError } = useSpells(campaignId)
+  const listResult = useSpellsListResult(campaignId)
+  const { data: spells, isPending, isError } = useContentOverviewMergedData(listResult)
   const { data: usageMeta } = useSpellsUsageMeta(campaignId)
   const usageSummaryLabels = usageMeta?.usageSummaryLabels
   const overviewUsageScope = usageMeta?.overviewUsageScope

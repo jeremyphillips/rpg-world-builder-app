@@ -1,6 +1,6 @@
 import { countIssueClaimTargets, sortFormIssues } from './group-form-issues'
 import { collectArraySections } from './resolve-field-order'
-import type { FormIssue } from './form-issue.types'
+import type { FormIssue, FormIssueClaimKind } from './form-issue.types'
 import type { FormItem } from '../field-config'
 import { isContainer, resolveFieldConfigPrimaryName } from '../field-config'
 import { resolveColumnsCollapseSequence } from '../config/form-columns-collapse.lib'
@@ -22,6 +22,21 @@ export type TabValidationState = {
 /** Whether `prefix` owns validation issues at `path` (segment-boundary safe). */
 export function pathOwnsIssue(prefix: string, path: string): boolean {
   return path === prefix || path.startsWith(`${prefix}.`)
+}
+
+const FIELD_LIKE_CLAIM: ReadonlySet<FormIssueClaimKind> = new Set(['field', 'slot'])
+
+/** Path used for tab ownership — presentation / claim target when routed, else schema path. */
+export function resolveTabOwnershipPath(issue: FormIssue): string {
+  if (issue.presentationPath) return issue.presentationPath
+  const claim = issue.claim
+  if (claim && FIELD_LIKE_CLAIM.has(claim.kind)) return claim.target
+  return issue.path
+}
+
+/** Whether a tab field prefix owns an issue path (prefix or ancestor/descendant segment match). */
+export function tabPrefixOwnsIssuePath(prefix: string, issuePath: string): boolean {
+  return pathOwnsIssue(prefix, issuePath) || pathOwnsIssue(issuePath, prefix)
 }
 
 function collectPrefixesFromItems(items: readonly FormItem[], prefixes: string[]): void {
@@ -73,10 +88,11 @@ function buildTabPrefixesMap(tabs: readonly TabValidationTab[]): Map<string, str
 }
 
 function findOwningTabId(
-  path: string,
+  issue: FormIssue,
   tabs: readonly TabValidationTab[],
   tabPrefixes: Map<string, string[]>,
 ): string | undefined {
+  const path = resolveTabOwnershipPath(issue)
   let bestTabId: string | undefined
   let bestPrefixLength = -1
   let bestTabIndex = Number.POSITIVE_INFINITY
@@ -86,7 +102,7 @@ function findOwningTabId(
     const prefixes = tabPrefixes.get(tab.id) ?? []
 
     for (const prefix of prefixes) {
-      if (!pathOwnsIssue(prefix, path)) continue
+      if (!tabPrefixOwnsIssuePath(prefix, path)) continue
 
       if (
         prefix.length > bestPrefixLength ||
@@ -123,7 +139,7 @@ export function resolveTabValidationState(
   const orphanIssues: FormIssue[] = []
 
   for (const issue of issues) {
-    const tabId = findOwningTabId(issue.path, tabs, tabPrefixes)
+    const tabId = findOwningTabId(issue, tabs, tabPrefixes)
     if (!tabId) {
       orphanIssues.push(issue)
       continue
@@ -160,7 +176,7 @@ export function getFirstInvalidTabId(
   if (!firstIssue) return undefined
 
   const tabPrefixes = buildTabPrefixesMap(tabs)
-  return findOwningTabId(firstIssue.path, tabs, tabPrefixes)
+  return findOwningTabId(firstIssue, tabs, tabPrefixes)
 }
 
 /**

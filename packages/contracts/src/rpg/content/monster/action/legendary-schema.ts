@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { overlayRestoreIdRows } from '../../lib/system-overlay/overlay-presets'
 import {
   contextualCountDraftSchema,
   contextualCountSchema,
@@ -10,12 +11,12 @@ export { monsterLegendaryActionSchema, monsterLegendaryActionDraftSchema }
 
 export const monsterLegendaryActionsBlockSchema = z.object({
   uses: contextualCountSchema,
-  actions: z.array(monsterLegendaryActionSchema).min(1),
+  actions: overlayRestoreIdRows(monsterLegendaryActionSchema).min(1),
 })
 
 export const monsterLegendaryActionsBlockDraftSchema = z.object({
   uses: contextualCountDraftSchema.optional(),
-  actions: z.array(monsterLegendaryActionDraftSchema).default([]),
+  actions: overlayRestoreIdRows(monsterLegendaryActionDraftSchema).default([]),
 })
 
 export type MonsterLegendaryActionsBlock = z.infer<typeof monsterLegendaryActionsBlockSchema>

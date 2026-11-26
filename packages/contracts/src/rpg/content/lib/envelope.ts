@@ -6,6 +6,7 @@ import {
 import { contentProvenanceSchema } from '../../primitives/provenance'
 import { systemRulesetIdSchema } from '../../primitives/ruleset'
 import { catalogLayerSchema } from '../../vocab/catalog-layer'
+import { overlayReadDiagnosticsSchema } from './system-overlay/overlay-failures'
 
 // ---------------------------------------------------------------------------
 // Content ownership — the reusable envelope every catalog content type extends
@@ -60,22 +61,18 @@ export const contentMetaSchema = z.object({
   status: contentStatusSchema.default('published'),
   campaignId: z.string().min(1).nullable(),
   provenance: contentProvenanceSchema.optional(),
+  /** Restore-collection seed ids for system overlay delete locks (read model only). */
+  seedRowIdsByPath: z.record(z.string().min(1), z.array(z.string().min(1))).optional(),
+  /** Latest overlay patch revision for optimistic concurrency (read model only). */
+  overlayRevision: z.number().int().min(0).optional(),
+  /** Non-fatal overlay apply diagnostics (read model only; omit when both lists are empty). */
+  overlayReadDiagnostics: overlayReadDiagnosticsSchema.optional(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
 })
 
 export type ContentMeta = z.infer<typeof contentMetaSchema>
 
-/**
- * Generic system-patch overlay envelope, shared by every content type. A
- * campaign never mutates a shipped system record; it stores an overlay patch
- * keyed by the base record's `targetId`, deep-merged onto the base at read time.
- *
- * Type modules add the type-specific body via
- * `.extend({ patch: <body>.partial() })`, so the patch/homebrew rules never live
- * in a single content feature. A `(campaignId, targetId)` uniqueness rule (one
- * patch per record per campaign) is enforced at the Mongo/service layer.
- */
 /**
  * Catalog-facing alias for the neutral authored-content primitive. Catalog
  * content types retain this name while campaign-owned world content and seed

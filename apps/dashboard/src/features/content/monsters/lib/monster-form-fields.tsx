@@ -153,7 +153,7 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
     { kind: 'slot', name: 'abilityScores', render: () => <AbilityScoresSlot ctx={ctx} /> },
     ...monsterArmorClassFields(ctx),
     ...monsterHitPointsFields(),
-    movementWithHoverGroup(),
+    movementWithHoverGroup({ includeMovementAlternative: true }),
     ownedSlot('proficiencies.savingThrows'),
   ]
 

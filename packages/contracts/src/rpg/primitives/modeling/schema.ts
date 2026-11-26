@@ -1,6 +1,8 @@
 import { z } from 'zod'
 import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 
+import { overlaySlugList } from '../../content/lib/system-overlay/overlay-presets'
+
 import { modelingBlockerSchema, modelingGapEntrySchema } from './gap-entry'
 import { EXPLICIT_MODELING_STATUSES } from './status'
 
@@ -19,7 +21,7 @@ export const contentModelingSchema = z
     /** Single limitation preventing promotion to the next status rung. */
     blocker: modelingBlockerSchema.optional(),
     /** Residual limitations — omit when none; never persist an empty array. */
-    gaps: z.array(modelingGapEntrySchema).optional(),
+    gaps: overlaySlugList(modelingGapEntrySchema).optional(),
   })
   .superRefine((data, ctx) => {
     if (data.gaps !== undefined && data.gaps.length === 0) {

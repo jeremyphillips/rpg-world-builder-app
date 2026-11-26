@@ -1,6 +1,9 @@
 import { z } from 'zod'
 import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
 
+import { overlayAtomic } from './lib/system-overlay/annotate'
+import { overlaySlugList } from './lib/system-overlay/overlay-presets'
+
 import { personalNameComponentSchema } from '../vocab/personal-name-component'
 import type { PersonalNameComponent } from '../vocab/personal-name-component'
 import type { LanguageId } from '../vocab/language'
@@ -12,13 +15,16 @@ import { formatSlugAsLabel } from '../primitives/format-slug'
 // Species culture — cultural affiliation separate from naming capability.
 // ---------------------------------------------------------------------------
 
-export const speciesNamingConfigSchema = z.discriminatedUnion('supported', [
-  z.object({ supported: z.literal(false) }).strict(),
-  z.object({
-    supported: z.literal(true),
-    personalNameComponents: z.array(personalNameComponentSchema).optional(),
-  }),
-])
+export const speciesNamingConfigSchema = overlayAtomic(
+  z.discriminatedUnion('supported', [
+    z.object({ supported: z.literal(false) }).strict(),
+    z.object({
+      supported: z.literal(true),
+      personalNameComponents: overlaySlugList(personalNameComponentSchema).optional(),
+    }),
+  ]),
+  'species naming capability',
+)
 
 export type SpeciesNamingConfig = z.infer<typeof speciesNamingConfigSchema>
 

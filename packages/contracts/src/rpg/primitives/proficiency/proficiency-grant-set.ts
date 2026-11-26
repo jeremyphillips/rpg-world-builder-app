@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { overlaySlugList } from '../../content/lib/system-overlay/overlay-presets'
 import { languageCategorySchema, languageIdSchema } from '../../vocab/language'
 
 // ---------------------------------------------------------------------------
@@ -10,8 +11,8 @@ import { languageCategorySchema, languageIdSchema } from '../../vocab/language'
 /** Fixed grant bucket: category and/or item slugs granted immediately. */
 export const proficiencyGrantSetSchema = z
   .object({
-    categories: z.array(z.string()).default([]),
-    items: z.array(z.string()).default([]),
+    categories: overlaySlugList(z.string()).default([]),
+    items: overlaySlugList(z.string()).default([]),
   })
   .strict()
 
@@ -28,7 +29,7 @@ export const proficiencyChoiceSchema = z.object({
   id: z.string().min(1),
   label: z.string().optional(),
   choose: z.number().int().min(0),
-  from: z.array(z.string()).default([]),
+  from: overlaySlugList(z.string()).default([]),
 })
 
 export type ProficiencyChoice = z.infer<typeof proficiencyChoiceSchema>
@@ -39,15 +40,15 @@ export function isMeaningfulProficiencyChoice(choice: ProficiencyChoice): boolea
 }
 
 export const languageProficiencyGrantSetSchema = proficiencyGrantSetSchema.extend({
-  categories: z.array(languageCategorySchema).default([]),
-  items: z.array(languageIdSchema).default([]),
+  categories: overlaySlugList(languageCategorySchema).default([]),
+  items: overlaySlugList(languageIdSchema).default([]),
 })
 
 export type LanguageProficiencyGrantSet = z.infer<typeof languageProficiencyGrantSetSchema>
 
 export const languageProficiencyChoiceSchema = proficiencyChoiceSchema.extend({
-  from: z.array(languageIdSchema).default([]),
-  categories: z.array(languageCategorySchema).default([]),
+  from: overlaySlugList(languageIdSchema).default([]),
+  categories: overlaySlugList(languageCategorySchema).default([]),
 })
 
 export type LanguageProficiencyChoice = z.infer<typeof languageProficiencyChoiceSchema>

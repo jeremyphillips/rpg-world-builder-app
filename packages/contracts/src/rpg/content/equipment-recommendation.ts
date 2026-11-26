@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { overlayOrderedList } from './lib/system-overlay/overlay-presets'
+
 import { absoluteLevelSchema } from '../primitives/level'
 import { equipmentPoolSchema } from './lib/grants/equipment-grant'
 
@@ -176,8 +178,8 @@ export const equipmentRecommendationRuleSchema = z.object({
 export type EquipmentRecommendationRule = z.infer<typeof equipmentRecommendationRuleSchema>
 
 export const equipmentRecommendationsSchema = z.object({
-  essential: z.array(equipmentRecommendationRuleSchema).optional(),
-  strong: z.array(equipmentRecommendationRuleSchema).optional(),
+  essential: overlayOrderedList(equipmentRecommendationRuleSchema).optional(),
+  strong: overlayOrderedList(equipmentRecommendationRuleSchema).optional(),
 })
 
 export type EquipmentRecommendations = z.infer<typeof equipmentRecommendationsSchema>

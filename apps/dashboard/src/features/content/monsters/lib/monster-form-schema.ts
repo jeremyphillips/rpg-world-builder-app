@@ -13,7 +13,9 @@ import { z } from 'zod'
 
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import {
+  refineMovementAlternativeForm,
   refineMovementRows,
+  type MovementAlternativeFormValues,
   type MovementRowDraftFormValues,
 } from '../../lib/forms/fields/content-movement-form-fields'
 import { normalizeMonsterFormValues } from './normalize-monster-form-values'
@@ -72,7 +74,15 @@ export function resolveMonsterFormSchema(
     .unknown()
     .superRefine((input, refinementCtx) => {
       if (!isRecord(input) || !Array.isArray(input.movement)) return
-      refineMovementRows(input.movement as MovementRowDraftFormValues[], refinementCtx)
+      const movement = input.movement as MovementRowDraftFormValues[]
+      refineMovementRows(movement, refinementCtx)
+      if (isRecord(input.movementAlternative)) {
+        refineMovementAlternativeForm(
+          input.movementAlternative as MovementAlternativeFormValues,
+          movement,
+          refinementCtx,
+        )
+      }
       if (intent === 'publish' && input.weaponProficiencyReconciliationPending === true) {
         addCustomRefinementIssue(
           refinementCtx,

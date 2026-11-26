@@ -1,0 +1,13 @@
+{
+  "kind": "health",
+  "findings": [
+    {
+      "path": "packages/contracts/src/parser.ts",
+      "name": "parseExpression",
+      "line": 10,
+      "cyclomatic": 22,
+      "cognitive": 12,
+      "exceeded": "cyclomatic"
+    }
+  ]
+}

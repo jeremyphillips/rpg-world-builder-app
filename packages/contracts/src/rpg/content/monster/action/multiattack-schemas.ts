@@ -1,5 +1,8 @@
 import { z } from 'zod'
 
+import { overlayAtomic } from '../../lib/system-overlay/annotate'
+import { overlayOrderedList, overlaySlugList } from '../../lib/system-overlay/overlay-presets'
+
 const multiattackReplacementChoiceSchema = z.object({
   actionId: z.string().min(1),
   spellId: z.string().min(1).optional(),
@@ -13,7 +16,7 @@ const multiattackReplacementChoiceDraftSchema = z.object({
 export const multiattackReplacementSchema = z
   .object({
     count: z.number().int().min(1),
-    choices: z.array(multiattackReplacementChoiceSchema).min(1),
+    choices: overlaySlugList(multiattackReplacementChoiceSchema).min(1),
     replacesActionId: z.string().min(1).optional(),
     attackWord: z.literal('any').optional(),
   })
@@ -22,7 +25,7 @@ export const multiattackReplacementSchema = z
 export const multiattackReplacementDraftSchema = z
   .object({
     count: z.number().int().min(1).optional(),
-    choices: z.array(multiattackReplacementChoiceDraftSchema).default([]),
+    choices: overlaySlugList(multiattackReplacementChoiceDraftSchema).default([]),
     replacesActionId: z.string().min(1).optional(),
     attackWord: z.literal('any').optional(),
   })
@@ -64,7 +67,7 @@ export const multiattackUseChoicePublishedSchema = z
   .object({
     kind: z.literal('use'),
     mode: z.literal('choice'),
-    choices: z.array(multiattackUseChoiceRowSchema).min(1),
+    choices: overlaySlugList(multiattackUseChoiceRowSchema).min(1),
   })
   .strict()
 
@@ -72,19 +75,19 @@ export const multiattackUseChoiceDraftSchema = z
   .object({
     kind: z.literal('use'),
     mode: z.literal('choice').optional(),
-    choices: z.array(multiattackUseChoiceRowDraftSchema).default([]),
+    choices: overlaySlugList(multiattackUseChoiceRowDraftSchema).default([]),
   })
   .strict()
 
 export const multiattackAttackGroupPublishedSchema = z.object({
   count: z.number().int().min(1),
-  actionIds: z.array(z.string().min(1)).min(1),
+  actionIds: overlaySlugList(z.string().min(1)).min(1),
 })
 
 export const multiattackAttackGroupDraftSchema = z
   .object({
     count: z.number().int().min(1).optional(),
-    actionIds: z.array(z.string().min(1)).default([]),
+    actionIds: overlaySlugList(z.string().min(1)).default([]),
     kind: z.literal('use').optional(),
     actionId: z.string().optional(),
     mode: z.literal('choice').optional(),
@@ -99,25 +102,31 @@ export const multiattackAttackGroupDraftSchema = z
     { message: 'Use steps are not attack groups.' },
   )
 
-export const multiattackPublishedStepSchema = z.union([
-  multiattackUseSinglePublishedSchema,
-  multiattackUseChoicePublishedSchema,
-  multiattackAttackGroupPublishedSchema,
-])
+export const multiattackPublishedStepSchema = overlayAtomic(
+  z.union([
+    multiattackUseSinglePublishedSchema,
+    multiattackUseChoicePublishedSchema,
+    multiattackAttackGroupPublishedSchema,
+  ]),
+  'multiattack step clause',
+)
 
-export const multiattackDraftStepSchema = z.union([
-  multiattackUseSingleDraftSchema,
-  multiattackUseChoiceDraftSchema,
-  multiattackAttackGroupDraftSchema,
-])
+export const multiattackDraftStepSchema = overlayAtomic(
+  z.union([
+    multiattackUseSingleDraftSchema,
+    multiattackUseChoiceDraftSchema,
+    multiattackAttackGroupDraftSchema,
+  ]),
+  'multiattack step clause',
+)
 
 export const multiattackAlternativePublishedSchema = z.object({
-  steps: z.array(multiattackPublishedStepSchema).min(1),
+  steps: overlayOrderedList(multiattackPublishedStepSchema).min(1),
   afterUsingActionId: z.string().min(1).optional(),
 })
 
 export const multiattackAlternativeDraftSchema = z.object({
-  steps: z.array(multiattackDraftStepSchema).default([]),
+  steps: overlayOrderedList(multiattackDraftStepSchema).default([]),
   afterUsingActionId: z.string().min(1).optional(),
 })
 

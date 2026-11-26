@@ -7,6 +7,10 @@ Shared catalog UI for creature trait templates. Grant editors stay in
 This folder does not own trait semantics, grant payloads, or a capability
 model. Those live in `@rpg/contracts` and `runtime/creature`. Layering:
 [runtime-resolution-boundaries.md](../../../../../../../packages/contracts/docs/runtime-resolution-boundaries.md).
+Trait inventory, movement-alternative behavior, and blocked exposure/roll work:
+[creature-trait-inventory.md](../../../../../../../packages/contracts/docs/creature-trait-inventory.md).
+Do not add exposure predicates or roll evaluation here — grants stay in contracts;
+execution is blocked until a shared consumer exists.
 Species, class, and feat traits: [content-types.md](../../../../../../../docs/content-types.md#content-traits-custom-vs-grant).
 
 ## What is here

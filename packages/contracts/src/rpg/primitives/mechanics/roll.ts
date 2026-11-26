@@ -1,6 +1,8 @@
 import { z } from 'zod'
 import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 
+import { overlayAtomic } from '../../content/lib/system-overlay/annotate'
+
 import { averageDiceRoll, diceSchema, formatDice, type Dice } from '../dice'
 import { rollValidationMessages } from './roll-messages'
 
@@ -9,16 +11,19 @@ import { rollValidationMessages } from './roll-messages'
 // other mechanics. Allows dice-only, flat-only, or combined (e.g. 2d4+4).
 // ---------------------------------------------------------------------------
 
-export const rollSchema = z
-  .object({
-    dice: diceSchema.optional(),
-    flat: z.number().int().optional(),
-  })
-  .superRefine((val, ctx) => {
-    if (val.dice === undefined && val.flat === undefined) {
-      addCustomRefinementIssue(ctx, rollValidationMessages.atLeastOneRequired())
-    }
-  })
+export const rollSchema = overlayAtomic(
+  z
+    .object({
+      dice: diceSchema.optional(),
+      flat: z.number().int().optional(),
+    })
+    .superRefine((val, ctx) => {
+      if (val.dice === undefined && val.flat === undefined) {
+        addCustomRefinementIssue(ctx, rollValidationMessages.atLeastOneRequired())
+      }
+    }),
+  'roll value replaces wholesale',
+)
 
 export type RollValue = z.infer<typeof rollSchema>
 

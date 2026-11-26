@@ -2,12 +2,13 @@ import type {
   CatalogLayer,
   ContentStatus,
   ContentTypeKey,
+  OverlayReadDiagnostics,
   ResolvedContentCampaignAccess,
 } from '@rpg/contracts'
 import { emptyContentMediaSchema, type ContentMedia } from '@rpg/contracts'
-import { Heading, Spinner, Text } from '@rpg/ui'
+import { Alert, Heading, Spinner, Text } from '@rpg/ui'
 import { useQueryClient } from '@tanstack/react-query'
-import { type ReactNode, useState } from 'react'
+import { type ReactNode, useMemo, useState } from 'react'
 import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 
@@ -18,12 +19,14 @@ import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { SubclassUnsavedEditsProvider } from '@/features/content/classes/hooks/subclass-unsaved-edits-context'
 import { stripEditEnvelopeFromFormDefaults } from '../../registry/content-form-key-helpers'
 import { serializeContentFormInput } from '../../registry/content-form-serialize-input.lib'
+import { resolveCatalogSeedBody } from '../../registry/resolve-catalog-seed-body.lib'
+import { findContentOverlayListFailure } from '../../../list/create-content-list'
 import { useContentWriteMutation } from '../../../list/use-content-mutations'
 import { type AnyContentFormDef, type ContentFormCtx } from '../../registry/content-form-registry'
 import {
   findContentEditEntity,
   loadContentEditFormState,
-  replaceCachedContentEntity,
+  replaceCachedContentListEntity,
 } from './content-edit-load'
 import {
   ArmorClassAuthoringNotice,
@@ -301,9 +304,18 @@ function ContentEditFormReady({
   formCtx,
   ctx,
 }: Omit<ContentEditFormReadyProps, 'backHref'>) {
-  const entity = findContentEditEntity(def.useListQuery(campaignId).data, entityId)
+  const listResult = def.useListQueryResult(campaignId)
+  const entity = findContentEditEntity(listResult.data?.items, entityId)
+  const overlayFailure = findContentOverlayListFailure(listResult.data?.overlayFailures, entityId)
 
   if (!entity) {
+    if (overlayFailure) {
+      return (
+        <Alert variant="destructive" role="alert">
+          {overlayFailure.message}
+        </Alert>
+      )
+    }
     return (
       <Text variant="destructive" role="alert">
         {notFoundLabel}
@@ -345,22 +357,37 @@ interface ContentEditFormBodyProps {
   ctx: ContentFormCtx
 }
 
-function useFrozenSystemOriginRowIds(
-  def: AnyContentFormDef,
-  entity: { id: string; catalogLayer: CatalogLayer },
-): ContentFormCtx['embeddedSystemOriginRowIds'] {
+function overlayReadDiagnosticsAlertMessage(
+  diagnostics: OverlayReadDiagnostics | undefined,
+): string | null {
+  if (!diagnostics) return null
+  const parts: string[] = []
+  if (diagnostics.identityConflicts.length > 0) {
+    parts.push('This record has overlay identity conflicts. Review before publishing changes.')
+  }
+  if (diagnostics.orphanedSeedOverrides.length > 0) {
+    parts.push('Some stored seed overrides no longer match the current catalog seed.')
+  }
+  return parts.length > 0 ? parts.join(' ') : null
+}
+
+function useFrozenSystemOriginRowIds(entity: {
+  id: string
+  catalogLayer: CatalogLayer
+  seedRowIdsByPath?: Readonly<Record<string, readonly string[]>>
+}): ContentFormCtx['embeddedSystemOriginRowIds'] {
+  const resolveSeedLocks = () => entity.seedRowIdsByPath
+
   const [systemOrigin, setSystemOrigin] = useState<{
     entityId: string
     ids: ContentFormCtx['embeddedSystemOriginRowIds']
   } | null>(() =>
-    entity.catalogLayer === 'system'
-      ? { entityId: entity.id, ids: def.extractEmbeddedSeedRowIds?.(entity as never) }
-      : null,
+    entity.catalogLayer === 'system' ? { entityId: entity.id, ids: resolveSeedLocks() } : null,
   )
   if (entity.catalogLayer === 'system' && systemOrigin?.entityId !== entity.id) {
     setSystemOrigin({
       entityId: entity.id,
-      ids: def.extractEmbeddedSeedRowIds?.(entity as never),
+      ids: resolveSeedLocks(),
     })
   } else if (entity.catalogLayer !== 'system' && systemOrigin) {
     setSystemOrigin(null)
@@ -380,7 +407,6 @@ function ContentEditFormBody({
   ctx,
 }: ContentEditFormBodyProps) {
   const queryClient = useQueryClient()
-  const systemOriginRowIds = useFrozenSystemOriginRowIds(def, entity)
   const mutation = useContentWriteMutation(def, campaignId, entityId)
   const authoring = useArmorClassAuthoringSession(
     Boolean(def.armorClassRulesSensitive),
@@ -396,12 +422,29 @@ function ContentEditFormBody({
     entityId,
     armorClassRules: authoring.snapshot,
   })
+  const systemOriginRowIds = useFrozenSystemOriginRowIds(entity)
   const layoutCtx = {
     ...loaded.layoutCtx,
     embeddedSystemOriginRowIds: systemOriginRowIds,
   }
+  const catalogSeed = useMemo(
+    () =>
+      entity.catalogLayer === 'system' && layoutCtx.rulesetId
+        ? resolveCatalogSeedBody(def.routeKey, layoutCtx.rulesetId, entityId)
+        : undefined,
+    [def.routeKey, entity.catalogLayer, entityId, layoutCtx.rulesetId],
+  )
+  const [overlayBaseline, setOverlayBaseline] = useState<Record<string, unknown> | null>(() => {
+    if (entity.catalogLayer !== 'system' || !def.normalizeOverlayBody) return null
+    return def.normalizeOverlayBody(
+      loaded.defaultValues as never,
+      { entity, armorClassRules: layoutCtx.armorClassRules },
+      loaded.validationIntent,
+    )
+  })
   const { schema, validationIntent, defaultValues } = loaded
   const { onSubmit, formError } = useSubmitHandler({
+    // fallow-ignore-next-line complexity — edit submit merges overlay intent, media, and cache sync
     submit: async (values, form) => {
       if (
         armorClassAuthoringIsStale({
@@ -436,6 +479,13 @@ function ContentEditFormBody({
               operation: 'update',
               dirtyFields: form.formState.dirtyFields as Record<string, unknown>,
               rulesetId: layoutCtx.rulesetId,
+              overlayBaseline: overlayBaseline ?? undefined,
+              catalogSeed,
+              expectedOverlayRevision:
+                (entity as { overlayRevision?: number }).overlayRevision ?? 0,
+              entityId,
+              seedRowIdsByPath: (entity as { seedRowIdsByPath?: Record<string, readonly string[]> })
+                .seedRowIdsByPath,
             },
           ),
         )
@@ -448,7 +498,7 @@ function ContentEditFormBody({
       }
       const savedRecord = saved as typeof entity & { media?: ContentMedia }
       queryClient.setQueryData(def.queryKey(campaignId), (current: unknown) =>
-        Array.isArray(current) ? replaceCachedContentEntity(current, savedRecord) : current,
+        replaceCachedContentListEntity(current, savedRecord),
       )
       const baseline = stripEditEnvelopeFromFormDefaults(
         {
@@ -460,6 +510,15 @@ function ContentEditFormBody({
         },
       )
       form.reset(baseline)
+      if (entity.catalogLayer === 'system' && def.normalizeOverlayBody) {
+        setOverlayBaseline(
+          def.normalizeOverlayBody(
+            baseline as never,
+            { entity: savedRecord, armorClassRules: layoutCtx.armorClassRules },
+            validationIntent,
+          ),
+        )
+      }
       if (validationIntent === 'draft') {
         draftPublishValidationSurface.current?.(baseline as FieldValues)
       }
@@ -471,6 +530,9 @@ function ContentEditFormBody({
     ...defaultValues,
     media: entity.media ?? emptyContentMediaSchema,
   }
+  const overlayDiagnosticsMessage = overlayReadDiagnosticsAlertMessage(
+    (entity as { overlayReadDiagnostics?: OverlayReadDiagnostics }).overlayReadDiagnostics,
+  )
 
   return (
     <ArmorClassAuthoringProvider value={authoring}>
@@ -484,7 +546,16 @@ function ContentEditFormBody({
         layoutCtx={layoutCtx}
         schema={schema}
         formKey={`${entity.id}:${armorClassRulesSignature(authoring.snapshot)}:${authoring.generation}`}
-        formHeaderNotice={<ArmorClassAuthoringNotice />}
+        formHeaderNotice={
+          <>
+            <ArmorClassAuthoringNotice />
+            {overlayDiagnosticsMessage ? (
+              <Alert variant="warning" role="status">
+                {overlayDiagnosticsMessage}
+              </Alert>
+            ) : null}
+          </>
+        }
         defaultValues={formDefaults}
         submitPending={mutation.isPending}
         formError={formError ?? null}

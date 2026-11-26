@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { overlayOrderedList, overlaySlugList } from '../../lib/system-overlay/overlay-presets'
 import { abilitySchema } from '../../../vocab/ability'
 import { classSpellcastingFocusKindSchema } from '../../../vocab/spell/class-spellcasting-focus-kind'
 import { spellcastingGearKindSchema } from '../../../vocab/equipment/spellcasting-gear-kind'
@@ -45,22 +46,22 @@ export const spellcastingSchema = z
      * Class-critical spellcasting gear (e.g. Wizard spellbook). Drives essential
      * equipment picker recommendations; not level-gated by spellcasting unlock.
      */
-    requiredGear: z.array(spellcastingGearKindSchema).min(1).optional(),
+    requiredGear: overlaySlugList(spellcastingGearKindSchema).min(1).optional(),
     /**
      * Spellcasting focus kinds this class can use (arcane/druidic focus, holy
      * symbol). Drives equipment picker recommendations; when absent, focus kinds
      * are inferred from starting-equipment package contents.
      */
-    focusKinds: z.array(classSpellcastingFocusKindSchema).min(1).optional(),
+    focusKinds: overlaySlugList(classSpellcastingFocusKindSchema).min(1).optional(),
     cantripSelection: z
       .object({
         change: spellMutationPolicySchema,
       })
       .optional(),
     /** Strong-tier spellcasting gear suggestions beyond required gear and foci. */
-    recommendedGear: z.array(spellcastingGearKindSchema).min(1).optional(),
+    recommendedGear: overlaySlugList(spellcastingGearKindSchema).min(1).optional(),
     /** Advisory starting spell suggestions keyed by semantic target, not selection model. */
-    recommendations: z.array(spellRecommendationSchema).optional(),
+    recommendations: overlayOrderedList(spellRecommendationSchema).optional(),
   })
   .superRefine((spellcasting, ctx) => {
     refinePublishedSpellcasting(spellcasting, ctx)
@@ -74,15 +75,15 @@ export const spellcastingDraftSchema = z.object({
   spellSelection: classSpellSelectionSchema.optional(),
   progression: classSpellcastingProgressionDraftSchema.optional(),
   ability: abilitySchema,
-  requiredGear: z.array(spellcastingGearKindSchema).min(1).optional(),
-  focusKinds: z.array(classSpellcastingFocusKindSchema).min(1).optional(),
+  requiredGear: overlaySlugList(spellcastingGearKindSchema).min(1).optional(),
+  focusKinds: overlaySlugList(classSpellcastingFocusKindSchema).min(1).optional(),
   cantripSelection: z
     .object({
       change: spellMutationPolicySchema,
     })
     .optional(),
-  recommendedGear: z.array(spellcastingGearKindSchema).min(1).optional(),
-  recommendations: z.array(spellRecommendationSchema).optional(),
+  recommendedGear: overlaySlugList(spellcastingGearKindSchema).min(1).optional(),
+  recommendations: overlayOrderedList(spellRecommendationSchema).optional(),
 })
 
 export type SpellcastingDraft = z.infer<typeof spellcastingDraftSchema>

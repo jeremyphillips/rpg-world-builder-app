@@ -7,6 +7,7 @@ import { contentStatusToValidationIntent } from '@rpg/contracts'
 import { stripEditEnvelopeFromFormDefaults } from '../../registry/content-form-key-helpers'
 import { mergeEditLayoutCtx } from './content-edit-form-ctx'
 import type { AnyContentFormDef, ContentFormCtx } from '../../registry/content-form-registry'
+import { persistedIdentityRowIdsByPathForParticipant } from '../../registry/persisted-identity-row-ids.lib'
 
 export function resolveContentFormSchema(
   def: Pick<AnyContentFormDef, 'schema' | 'draftSchema' | 'resolveSchema'>,
@@ -56,6 +57,37 @@ export function replaceCachedContentEntity<T extends { id: string }>(
   return next
 }
 
+/** Replaces an entity in either the legacy array cache or the canonical list-result cache. */
+export function replaceCachedContentListEntity<T extends { id: string }>(
+  current: unknown,
+  saved: T,
+): unknown {
+  if (Array.isArray(current)) return replaceCachedContentEntity(current as readonly T[], saved)
+  if (
+    typeof current !== 'object' ||
+    current === null ||
+    !('items' in current) ||
+    !Array.isArray(current.items)
+  ) {
+    return current
+  }
+  return {
+    ...current,
+    items: replaceCachedContentEntity(current.items as readonly T[], saved),
+  }
+}
+
+function persistedIdentityForEntity(
+  def: Pick<AnyContentFormDef, 'overlayParticipantId'>,
+  entity: unknown,
+): Readonly<Record<string, readonly string[]>> | undefined {
+  if (!def.overlayParticipantId) return undefined
+  return persistedIdentityRowIdsByPathForParticipant(
+    entity as Record<string, unknown>,
+    def.overlayParticipantId,
+  )
+}
+
 export type ContentEditFormLoadInput = {
   def: AnyContentFormDef
   entity: {
@@ -88,27 +120,28 @@ export function loadContentEditFormState({
   entityId,
   armorClassRules,
 }: ContentEditFormLoadInput): ContentEditFormLoadResult {
+  const persistedIdentityRowIdsByPath = persistedIdentityForEntity(def, entity)
   const layoutCtx = {
     ...mergeEditLayoutCtx(optionsCtx, formCtx, campaignId, entityId, entity),
     ...(armorClassRules ? { armorClassRules } : {}),
   }
-  const layoutCtxWithSeeds: ContentFormCtx = def.enrichEditLayoutCtx
+  const layoutCtxWithPersisted: ContentFormCtx = def.enrichEditLayoutCtx
     ? def.enrichEditLayoutCtx(
         {
           ...layoutCtx,
-          embeddedSeedRowIds: def.extractEmbeddedSeedRowIds?.(entity),
+          ...(persistedIdentityRowIdsByPath ? { persistedIdentityRowIdsByPath } : {}),
         },
         entity,
       )
     : {
         ...layoutCtx,
-        embeddedSeedRowIds: def.extractEmbeddedSeedRowIds?.(entity),
+        ...(persistedIdentityRowIdsByPath ? { persistedIdentityRowIdsByPath } : {}),
       }
 
   const validationIntent = validationIntentForEditEntity(entity.status)
 
   return {
-    layoutCtx: { ...layoutCtxWithSeeds, validationIntent },
+    layoutCtx: { ...layoutCtxWithPersisted, validationIntent },
     schema: resolveContentFormSchema(def, layoutCtx, validationIntent),
     validationIntent,
     defaultValues: stripEditEnvelopeFromFormDefaults(

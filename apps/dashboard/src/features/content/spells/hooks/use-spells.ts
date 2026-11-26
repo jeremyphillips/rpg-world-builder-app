@@ -20,3 +20,5 @@ export const useSpellsUsageMeta = spellsContentList.useUsageMeta
 
 export const { useCreateContent: useCreateSpell, useUpdateContent: useUpdateSpell } =
   createContentMutationHooks('spells', spellsQueryKey)
+
+export const useSpellsListResult = spellsContentList.useListQueryResult

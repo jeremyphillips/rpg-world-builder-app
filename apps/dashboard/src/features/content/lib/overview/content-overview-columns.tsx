@@ -18,6 +18,10 @@ import { contentOverviewListQueryKey } from './content-overview-query-keys'
 import { createOverviewColumnDefsSignature } from './content-overview-columns.lib'
 import { type ContentBase, type ContentOverviewNameColumnMeta } from './content-table-config'
 import { resolveReadSurfaceCampaignAccess } from '../campaign-access/resolve-read-surface-campaign-access'
+import {
+  isContentOverlayFailureOverviewRow,
+  overlayFailureOverviewStatusLabel,
+} from '../list/content-overlay-overview.lib'
 import type { UsedByOverviewColumnMeta } from '@/lib/usage-references/build-used-by-overview-column'
 
 /**
@@ -114,8 +118,10 @@ export function patchOverviewColumns<T extends OverviewNameRow>(
           campaignId={context.campaignId}
           contentTypeKey={context.contentTypeKey}
           queryKeyFn={queryKeyFn}
+          statusLabel={overlayFailureOverviewStatusLabel(row.original)}
+          omitAccessMetadata={isContentOverlayFailureOverviewRow(row.original)}
           duplicateSource={
-            context.readOnly
+            context.readOnly || isContentOverlayFailureOverviewRow(row.original)
               ? undefined
               : {
                   id: row.original.id,
@@ -127,6 +133,103 @@ export function patchOverviewColumns<T extends OverviewNameRow>(
           viewerCharacterRelationships={row.original.viewerCharacterRelationships}
         />
       ),
+    }
+  })
+}
+
+type OverviewTableRow<T> = {
+  original: T
+  getValue: (columnId: string) => unknown
+}
+
+type OverviewSortingFn<T> = (
+  rowA: OverviewTableRow<T>,
+  rowB: OverviewTableRow<T>,
+  columnId: string,
+) => number
+
+function overlayFailureSortPosition<T>(row: OverviewTableRow<T>): number | null {
+  return isContentOverlayFailureOverviewRow(row.original) ? 1 : null
+}
+
+function guardSortingFn<T>(previous: unknown): OverviewSortingFn<T> {
+  const base: OverviewSortingFn<T> =
+    typeof previous === 'function'
+      ? (previous as OverviewSortingFn<T>)
+      : (rowA, rowB, columnId) => {
+          const left = rowA.getValue(columnId)
+          const right = rowB.getValue(columnId)
+          if (left === right) return 0
+          if (left == null) return 1
+          if (right == null) return -1
+          return left > right ? 1 : -1
+        }
+
+  return (rowA, rowB, columnId) => {
+    const aOverlay = overlayFailureSortPosition(rowA)
+    const bOverlay = overlayFailureSortPosition(rowB)
+    if (aOverlay !== null && bOverlay !== null) return 0
+    if (aOverlay !== null) return 1
+    if (bOverlay !== null) return -1
+    return base(rowA, rowB, columnId)
+  }
+}
+
+function guardOverviewColumnsForOverlayFailures<T>(
+  columns: ColumnDef<T, unknown>[],
+): ColumnDef<T, unknown>[] {
+  return columns.map((column) => {
+    const columnId = column.id ?? (column as { accessorKey?: string }).accessorKey
+    if (columnId === 'name') return column
+
+    const accessorKey = (column as { accessorKey?: string }).accessorKey
+    const previousAccessorFn = (column as { accessorFn?: (row: T, index: number) => unknown })
+      .accessorFn
+    const previousCell = column.cell
+    const previousFilterFn = column.filterFn
+    const sortingEnabled = column.enableSorting !== false
+
+    const accessorFn =
+      previousAccessorFn || accessorKey
+        ? (row: T, index: number) => {
+            if (isContentOverlayFailureOverviewRow(row)) {
+              return undefined
+            }
+            if (previousAccessorFn) {
+              return previousAccessorFn(row, index)
+            }
+            if (accessorKey) {
+              return (row as Record<string, unknown>)[accessorKey]
+            }
+            return undefined
+          }
+        : undefined
+
+    return {
+      ...column,
+      ...(accessorFn ? { accessorFn } : {}),
+      ...(sortingEnabled
+        ? { sortingFn: guardSortingFn(column.sortingFn), sortUndefined: 'last' as const }
+        : {}),
+      filterFn:
+        typeof previousFilterFn === 'function'
+          ? (row, columnId, filterValue, addMeta) => {
+              if (isContentOverlayFailureOverviewRow(row.original)) {
+                if (filterValue == null || filterValue === '') return true
+                return false
+              }
+              return previousFilterFn(row, columnId, filterValue, addMeta)
+            }
+          : previousFilterFn,
+      cell: (context) => {
+        if (isContentOverlayFailureOverviewRow(context.row.original)) {
+          return '—'
+        }
+        if (typeof previousCell === 'function') {
+          return previousCell(context)
+        }
+        return null
+      },
     }
   })
 }
@@ -146,14 +249,16 @@ export function useOverviewColumnsWithNameContext<T extends OverviewNameRow>(
 
   return useMemo(
     () =>
-      patchOverviewColumns(stableColumns, {
-        canManage: context.canManage,
-        campaignId: context.campaignId,
-        contentTypeKey: context.contentTypeKey,
-        viewer: context.viewer,
-        getEditHref: context.getEditHref,
-        readOnly: context.readOnly,
-      }),
+      guardOverviewColumnsForOverlayFailures(
+        patchOverviewColumns(stableColumns, {
+          canManage: context.canManage,
+          campaignId: context.campaignId,
+          contentTypeKey: context.contentTypeKey,
+          viewer: context.viewer,
+          getEditHref: context.getEditHref,
+          readOnly: context.readOnly,
+        }),
+      ),
     [
       stableColumns,
       context.canManage,

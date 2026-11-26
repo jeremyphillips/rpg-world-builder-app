@@ -1,6 +1,8 @@
 import { z } from 'zod'
 import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
 
+import { overlayRestoreIdRows, overlaySlugList } from './lib/system-overlay/overlay-presets'
+
 import { contentChoiceOptionSchema, contentChoiceSchema } from './lib/grants/choice'
 import {
   equipmentChoiceGrantObjectSchema,
@@ -44,7 +46,7 @@ const startingEquipmentGrantedItemObjectSchema = z
     target: startingEquipmentGrantTargetSchema,
     quantity: z.number().int().min(1).default(1),
     equipped: z.boolean().optional(),
-    modifiers: z.array(equipmentModifierSchema).optional(),
+    modifiers: overlaySlugList(equipmentModifierSchema).optional(),
   })
   .strict()
   .superRefine((grant, ctx) => {
@@ -164,7 +166,7 @@ export type StartingEquipmentItem = z.infer<typeof startingEquipmentItemSchema>
 
 export const startingEquipmentOptionSchema = contentChoiceOptionSchema
   .extend({
-    items: z.array(startingEquipmentItemSchema),
+    items: overlayRestoreIdRows(startingEquipmentItemSchema),
     wealth: characterWealthGrantSchema.optional(),
     available: z.boolean().optional(),
   })
@@ -185,7 +187,7 @@ export type StartingEquipmentOption = z.infer<typeof startingEquipmentOptionSche
 
 export const startingEquipmentChoiceSchema = contentChoiceSchema
   .extend({
-    options: z.array(startingEquipmentOptionSchema).min(1),
+    options: overlayRestoreIdRows(startingEquipmentOptionSchema).min(1),
   })
   .refine((choice) => choice.options.filter(isWealthOnlyStartingEquipmentOption).length <= 1, {
     message: 'At most one wealth-only (starting gold) option is allowed',

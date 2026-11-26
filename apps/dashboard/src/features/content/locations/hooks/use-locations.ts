@@ -18,3 +18,5 @@ export const useLocationsUsageMeta = locationsContentList.useUsageMeta
 
 export const { useCreateContent: useCreateLocation, useUpdateContent: useUpdateLocation } =
   createContentMutationHooks('locations', locationsQueryKey)
+
+export const useLocationsListResult = locationsContentList.useListQueryResult

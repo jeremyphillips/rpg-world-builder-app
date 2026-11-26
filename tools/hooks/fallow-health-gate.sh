@@ -1,18 +1,15 @@
 #!/usr/bin/env bash
-# Gate on fallow complexity (and optional CRAP via coverage). fallow health exits 1
-# even with 0 findings (v2.89); we gate on the human summary line instead.
+# Gate on fallow complexity via JSON policy (see fallow-health-gate.mjs).
+# Pre-commit: cyclomatic and cognitive only. Coverage gate: includes CRAP (Istanbul).
 set -euo pipefail
 
-cmd=(fallow health --production --complexity --format human)
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
 if [[ "${1:-}" == "--coverage" ]]; then
   if [[ $# -lt 2 ]]; then
     echo "usage: fallow-health-gate.sh [--coverage <coverage-final.json>]" >&2
     exit 2
   fi
-  node "$(dirname "$0")/../scripts/sanitize-coverage-final.mjs" "$2"
-  cmd+=(--coverage "$2")
+  exec node "$HOOK_DIR/fallow-health-gate.mjs" --coverage "$2"
 fi
 
-complexity_out=$("${cmd[@]}" 2>&1) || true
-printf '%s\n' "$complexity_out"
-echo "$complexity_out" | grep -Fq '✓ No functions exceed complexity thresholds' || exit 1
+exec node "$HOOK_DIR/fallow-health-gate.mjs"

@@ -1,6 +1,8 @@
 import { z } from 'zod'
 import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
 
+import { overlayOrderedList } from '../content/lib/system-overlay/overlay-presets'
+
 import {
   ABILITY_IDS,
   abilitySchema,
@@ -26,8 +28,7 @@ export const standardArraySchema = z
     message: standardArrayValidationMessages.wrongLength(),
   })
 
-export const abilityScoreOrderSchema = z
-  .array(abilitySchema)
+export const abilityScoreOrderSchema = overlayOrderedList(abilitySchema)
   .length(STANDARD_ARRAY_LENGTH, {
     message: standardArrayValidationMessages.incompleteClassOrder(),
   })

@@ -11,6 +11,8 @@ import {
   setMembershipControlledPcs,
 } from '../../test/helpers/campaign-participation'
 import { minimalStandalonePcInput } from '../../test/fixtures/characters'
+import { loadSeedFeats } from '@rpg/catalog/feats'
+import { FeatPatchModel } from '../content/feats/feat-patch.model'
 import { useIntegrationApp } from '../../test/setup/integration-app'
 
 const getApp = useIntegrationApp()
@@ -281,5 +283,33 @@ describe('GET /api/campaigns/:campaignId/search/catalog', () => {
         document.target.kind === 'game-term' && document.target.termId === 'fey',
     )
     expect(playerDisabledCreatureType).toBeUndefined()
+  })
+  it('still returns healthy catalog documents when a sibling feat overlay is malformed', async () => {
+    const owner = await registerOwner('search-overlay-sibling@example.com')
+    const campaignId = await createTestCampaign(owner.agent, owner.csrfToken, 'Search Overlay')
+
+    const feats = loadSeedFeats('srd-cc-5.2.1')
+    const broken = feats.find((feat) => feat.slug === 'alert')
+    expect(broken).toBeDefined()
+    if (!broken) return
+
+    await FeatPatchModel.create({
+      campaignId,
+      targetId: broken.id,
+      patch: { name: 'Unversioned overlay' },
+    })
+
+    const response = await owner.agent
+      .get(`/api/campaigns/${campaignId}/search/catalog`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .expect(200)
+
+    const featDocs = response.body.documents.filter(
+      (document: { target: { kind: string } }) => document.target.kind === 'feat',
+    )
+    expect(featDocs.length).toBeGreaterThan(0)
+    expect(featDocs.some((doc: { target: { id: string } }) => doc.target.id === broken.id)).toBe(
+      false,
+    )
   })
 })

@@ -471,6 +471,20 @@ Detail: [packages/ui/docs/forms.md](../../../../packages/ui/docs/forms.md),
 **Legacy rename:** equipment formerly used `*-form-input.ts`; target suffix is
 `*-form-values.ts` (completed).
 
+### System overlay identity layers (edit)
+
+| Layer                  | Source                                                   | Role                                                                                           |
+| ---------------------- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| **Catalog seed**       | `@rpg/catalog` via API resolve                           | Immutable system body; overlay intent diffs against `normalizeOverlayBody` output              |
+| **Baseline**           | Form values after load `reset`                           | Dirty detection + overlay reconciliation input; must match post-load tree (no schema defaults) |
+| **Persisted identity** | API `seedRowIdsByPath` → `persistedIdentityRowIdsByPath` | Row ids that have been saved at least once (not provenance)                                    |
+| **System origin**      | Captured on first load in `embeddedSystemOriginRowIds`   | Seed-originated row ids for delete-locking; never grows after first load                       |
+| **Overlay revision**   | API `overlayRevision` on system entities                 | Optimistic concurrency (`expectedOverlayRevision` on PATCH)                                    |
+
+List `overlayFailures` gate edit when a target cannot be resolved (`unresolved_overlay`).
+API `overlayReadDiagnostics` are informational alerts on edit — see
+[`forms/README.md`](../src/features/content/lib/forms/README.md#system-overlay-authoring).
+
 ### Shared infra (exceptions)
 
 These modules support many content types but are **not** per-type form splits:

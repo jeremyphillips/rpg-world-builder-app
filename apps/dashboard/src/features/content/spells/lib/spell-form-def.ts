@@ -5,7 +5,7 @@ import {
   type ContentFormDef,
 } from '../../lib/forms/registry/content-form-registry'
 import { nameField } from '../../lib/forms/fields/content-identity-form-fields'
-import { useSpells, spellsQueryKey } from '../hooks/use-spells'
+import { useSpells, useSpellsListResult, spellsQueryKey } from '../hooks/use-spells'
 import {
   buildSpellTabs,
   spellDraftFormSchema,
@@ -34,7 +34,16 @@ const spellFormDef: ContentFormDef<Spell, SpellFormValues, CreateSpellInput> & {
   toFormValues: spellToFormValues,
   toInput: (values, ctx, validationIntent = 'publish') =>
     buildSpellCreateInput(values, ctx, validationIntent),
+  overlayParticipantId: 'spells',
+  normalizeOverlayBody: (values, ctx, validationIntent = 'publish') => {
+    const { slug: _slug, ...body } = buildSpellCreateInput(values, ctx, validationIntent) as Record<
+      string,
+      unknown
+    >
+    return body
+  },
   useListQuery: useSpells,
+  useListQueryResult: useSpellsListResult,
   queryKey: spellsQueryKey,
 
   preview: {

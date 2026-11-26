@@ -1,6 +1,8 @@
 import {
   formatCreatureTrait,
   formatMonsterStatBlockSubject,
+  getCreatureTraitVocabularyEntry,
+  parseMonsterPresetTraitDraftForFormat,
   resolveTraitName,
   type ContentTrait,
 } from '@rpg/contracts'
@@ -95,11 +97,15 @@ export function monsterTraitResolvedTitle(row: unknown, monsterName: string): st
     return templateDerivedName(row)
   }
   if (isPresetRow(row)) {
+    const parsed = parseMonsterPresetTraitDraftForFormat(row)
+    if (!parsed || parsed.preset === 'spider-climb') {
+      return getCreatureTraitVocabularyEntry(row.preset)?.label ?? row.preset
+    }
     const formatted = formatCreatureTrait({
       subject: formatMonsterStatBlockSubject(monsterName),
-      trait: row as Parameters<typeof formatCreatureTrait>[0]['trait'],
+      trait: parsed,
     })
-    return formatted?.name ?? (typeof row.preset === 'string' ? row.preset : '')
+    return formatted?.name ?? row.preset
   }
   return storedText(isRecord(row) ? row.name : undefined)
 }

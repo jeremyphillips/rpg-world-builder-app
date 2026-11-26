@@ -1,5 +1,4 @@
 import {
-  CONTENT_MEDIA_REPLACE_KEY,
   createMonsterDraftInputSchema,
   createMonsterInputSchema,
   monsterBodySchema,
@@ -68,17 +67,9 @@ function bodyFromCreateInput(input: Record<string, unknown>): Record<string, unk
   return body
 }
 
-const MONSTER_PATCH_REPLACE_KEYS = [
-  CONTENT_MEDIA_REPLACE_KEY,
-  'armorClass',
-  'hitPoints',
-  'movement',
-  'communication',
-] as const
-
 export const monstersContentConfig: ContentTypeConfig<Monster> = {
   type: 'monsters',
-  patchReplaceKeys: [...MONSTER_PATCH_REPLACE_KEYS],
+  overlayParticipantId: 'monsters',
   system: {
     load: loadSeedMonsters,
     slugs: seedMonsterSlugs,
@@ -111,14 +102,6 @@ export const monstersWriteConfig: ContentWriteConfig<Monster> = {
   toHomebrewEntity: toHomebrewMonster,
   bodyFromCreateInput,
   validateBeforeWrite: monstersValidateBeforeWrite,
-  patchReplaceKeys: [...MONSTER_PATCH_REPLACE_KEYS],
-  patchTombstoneKeys: [
-    'experiencePointsOverride',
-    'hover',
-    'description',
-    'creatureFamilyIds',
-    'classIds',
-  ],
 }
 
 export const monstersRegistration = {

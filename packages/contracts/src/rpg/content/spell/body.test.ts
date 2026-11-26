@@ -399,20 +399,24 @@ describe('spell modeling schema', () => {
   })
 
   it('allows modeling in patch bodies', () => {
-    expect(
-      spellPatchSchema.parse({
-        id: 'patch_1',
-        campaignId: 'camp_1',
-        targetId: 'srd-cc-5.2.1:fire-bolt',
-        patch: {
+    const parsed = spellPatchSchema.parse({
+      id: 'patch_1',
+      campaignId: 'camp_1',
+      targetId: 'srd-cc-5.2.1:fire-bolt',
+      patch: {
+        version: 1,
+        revision: 0,
+        set: {
           modeling: {
             reviewedAt: '2026-07-15T00:00:00.000Z',
             gaps: [{ code: 'flammability-rules' }],
           },
         },
-        ...timestamps,
-      }).patch.modeling?.gaps,
-    ).toEqual([{ code: 'flammability-rules' }])
+      },
+      ...timestamps,
+    })
+    const modeling = parsed.patch.set?.modeling as { gaps?: Array<{ code: string }> } | undefined
+    expect(modeling?.gaps).toEqual([{ code: 'flammability-rules' }])
   })
 })
 
@@ -453,9 +457,9 @@ describe('spell resolution PATCH semantics', () => {
         id: 'patch_2',
         campaignId: 'camp_1',
         targetId: 'srd-cc-5.2.1:chill-touch',
-        patch: { resolution: CHILL_TOUCH_RESOLUTION },
+        patch: { version: 1, revision: 0, set: { resolution: CHILL_TOUCH_RESOLUTION } },
         ...timestamps,
-      }).patch.resolution,
+      }).patch.set?.resolution,
     ).toEqual(CHILL_TOUCH_RESOLUTION)
   })
 })

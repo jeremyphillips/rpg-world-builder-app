@@ -7,6 +7,7 @@ import {
   findContentEditEntity,
   loadContentEditFormState,
   replaceCachedContentEntity,
+  replaceCachedContentListEntity,
   resolveContentFormSchema,
   resolveContentPublishSchema,
 } from './content-edit-load'
@@ -102,7 +103,6 @@ describe('loadContentEditFormState', () => {
     const def = {
       schema,
       toFormValues: () => ({ name: 'Elf', slug: 'elf', kind: 'service' }),
-      extractEmbeddedSeedRowIds: () => ({ traits: ['t1'] }),
     } as unknown as ContentFormDef<typeof entity, { name: string }, unknown>
 
     const result = loadContentEditFormState({
@@ -120,7 +120,6 @@ describe('loadContentEditFormState', () => {
       mode: 'edit',
       entityCatalogLayer: 'homebrew',
       equipmentKind: 'weapon',
-      embeddedSeedRowIds: { traits: ['t1'] },
     })
     expect(result.schema).toBe(schema)
     expect(result.defaultValues).toEqual({ name: 'Elf' })
@@ -155,5 +154,23 @@ describe('replaceCachedContentEntity', () => {
       { id: 'b', name: 'Other' },
     ])
     expect(replaceCachedContentEntity(undefined, { id: 'a', name: 'Saved' })).toBeUndefined()
+  })
+
+  it('replaces an entity inside the canonical list-result cache and preserves metadata', () => {
+    const current = {
+      items: [{ id: 'a', name: 'Old', overlayRevision: 4 }],
+      overlayFailures: [{ targetId: 'broken' }],
+    }
+
+    expect(
+      replaceCachedContentListEntity(current, {
+        id: 'a',
+        name: 'Saved',
+        overlayRevision: 5,
+      }),
+    ).toEqual({
+      items: [{ id: 'a', name: 'Saved', overlayRevision: 5 }],
+      overlayFailures: [{ targetId: 'broken' }],
+    })
   })
 })

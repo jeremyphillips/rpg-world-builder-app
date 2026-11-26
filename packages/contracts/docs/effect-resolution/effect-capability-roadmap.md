@@ -47,9 +47,14 @@ content types):
 
 1. **Stat / roll modifiers** — AC, speed, attack/save bonuses, ward values.
    Creature traits can already grant `rollAdjustment` (advantage or disadvantage
-   on attack rolls, saving throws, or ability checks) and `saveOutcomeOverride`
-   (choose to succeed on a failed save). Spell resolution still does not emit
-   those effects. Situational evaluation waits for a roll or encounter consumer.
+   on attack rolls, saving throws, or ability checks, with optional circumstances
+   such as `in-sunlight`) and `saveOutcomeOverride` (choose to succeed on a failed
+   save). Spell resolution still does not emit roll adjustments on the shared
+   envelope. **Evaluation is blocked:** no roll consumer applies, stacks, or
+   cancels these grants in play; environmental predicates (Bright Light vs
+   sunlight-present) are not modeled on spells or zones yet. Exposure mechanics
+   must extend the shared circumstance vocabulary — not trait-local enums. See
+   [creature-trait-inventory.md](../creature-trait-inventory.md#exposure-roll-effects-and-deferred-mechanics).
 2. **Conditions** — apply, remove, save-or-suffer, repeating saves
 3. **Movement and forced movement** — push, pull, jump grants, fall mitigation
 4. **Action grants** — bonus actions, special action types

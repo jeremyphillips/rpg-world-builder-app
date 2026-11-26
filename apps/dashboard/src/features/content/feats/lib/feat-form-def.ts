@@ -2,7 +2,7 @@ import { MAX_CHARACTER_LEVEL, type CreateFeatInput, type Feat } from '@rpg/contr
 
 import { type ContentFormDef } from '../../lib/forms/registry/content-form-registry'
 import { nameField } from '../../lib/forms/fields/content-identity-form-fields'
-import { useFeats, featsQueryKey } from '../hooks/use-feats'
+import { useFeats, useFeatsListResult, featsQueryKey } from '../hooks/use-feats'
 import {
   buildFeatFields,
   createFeatDraftFormSchema,
@@ -27,7 +27,16 @@ const featFormDef: ContentFormDef<Feat, FeatFormValues, CreateFeatInput> = {
   buildFields: buildFeatFields,
   toFormValues: featToFormValues,
   toInput: buildFeatCreateInput,
+  overlayParticipantId: 'feats',
+  normalizeOverlayBody: (values, ctx, validationIntent = 'publish') => {
+    const { slug: _slug, ...body } = buildFeatCreateInput(values, ctx, validationIntent) as Record<
+      string,
+      unknown
+    >
+    return body
+  },
   useListQuery: useFeats,
+  useListQueryResult: useFeatsListResult,
   queryKey: featsQueryKey,
 }
 

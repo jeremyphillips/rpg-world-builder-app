@@ -1,6 +1,8 @@
 import { z } from 'zod'
 import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
 
+import { overlaySlugList } from './lib/system-overlay/overlay-presets'
+
 import { absoluteLevelSchema } from '../primitives/level'
 import { classSlugSchema } from './classes/class'
 import { speciesCharacterCreationValidationMessages } from './species-character-creation-messages'
@@ -45,7 +47,7 @@ export const SPECIES_CLASS_POLICY_MODES_REQUIRING_IDS: readonly SpeciesClassPoli
 export const speciesClassPolicySchema = z
   .object({
     mode: speciesClassPolicyModeSchema,
-    classIds: z.array(classSlugSchema),
+    classIds: overlaySlugList(classSlugSchema),
   })
   .strict()
   .superRefine((value, ctx) => {
@@ -85,7 +87,7 @@ export const speciesLevelLimitsSchema = z
   .object({
     /** `null` means no character-level cap from this species. */
     maxCharacterLevel: absoluteLevelSchema.nullable(),
-    classLevelCaps: z.array(speciesClassLevelCapSchema),
+    classLevelCaps: overlaySlugList(speciesClassLevelCapSchema),
   })
   .strict()
   .superRefine((value, ctx) => {

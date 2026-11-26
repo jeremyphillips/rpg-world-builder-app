@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { ContentResolutionRow } from './content-resolution-policy'
 import {
+  classSlugReferenceEdge,
   collectCatalogReferenceIssues,
   equipmentPresencePolicy,
   skillReferencePolicy,
@@ -18,12 +19,14 @@ const ineligibleRow = {
 
 const spellMessages = {
   unknown: 'Choose a spell from the catalog.',
+  unresolvedOverlayTarget: 'This spell exists in the catalog but its overlay could not be applied.',
   notReferenceable: 'Draft spells cannot be referenced on published content.',
   catalogUnavailable: 'The spell catalog is unavailable, so this reference cannot be checked.',
 }
 
 const skillMessages = {
   unknown: 'Unknown skill.',
+  unresolvedOverlayTarget: 'This skill exists in the catalog but its overlay could not be applied.',
   notReferenceable: 'Publish this skill before using it on a monster.',
   notCampaignEligible: 'This skill is not available in this campaign.',
   catalogUnavailable: 'Skills could not be loaded. Try again before publishing.',
@@ -31,6 +34,8 @@ const skillMessages = {
 
 const equipmentMessages = {
   unknown: 'Unknown equipment.',
+  unresolvedOverlayTarget:
+    'This equipment exists in the catalog but its overlay could not be applied.',
   catalogUnavailable: 'Equipment could not be loaded. Try again before publishing.',
 }
 
@@ -235,6 +240,48 @@ describe('collectCatalogReferenceIssues', () => {
         messages: spellMessages,
       }),
     ).toEqual([])
+  })
+
+  it('matches unresolved overlay keys against slug-based class refs', () => {
+    expect(
+      collectCatalogReferenceIssues({
+        policy: classSlugReferenceEdge.policy,
+        intent: 'publish',
+        catalogStatus: 'ready',
+        refs: [{ path: 'classIds.0', key: 'fighter' }],
+        resolve: () => undefined,
+        unavailablePlacement: classSlugReferenceEdge.unavailablePlacement,
+        messages: classSlugReferenceEdge.messages,
+        unresolvedOverlayTargetKeys: new Set(['fighter']),
+      }),
+    ).toEqual([
+      {
+        path: 'classIds.0',
+        code: 'unresolved_overlay_class',
+        message: 'This class exists in the catalog but its overlay could not be applied.',
+      },
+    ])
+  })
+
+  it('prefers unresolved overlay target over unknown when the id is in the failure set', () => {
+    expect(
+      collectCatalogReferenceIssues({
+        policy: spellReferencePolicy,
+        intent: 'publish',
+        catalogStatus: 'ready',
+        refs: [{ path: 'spellIds.0', key: 'srd-2024:broken-spell' }],
+        resolve: () => undefined,
+        unavailablePlacement: { kind: 'per-ref' },
+        messages: spellMessages,
+        unresolvedOverlayTargetKeys: new Set(['srd-2024:broken-spell']),
+      }),
+    ).toEqual([
+      {
+        path: 'spellIds.0',
+        code: 'unresolved_overlay_spell',
+        message: 'This spell exists in the catalog but its overlay could not be applied.',
+      },
+    ])
   })
 
   it('emits one issue per ref in ref order', () => {

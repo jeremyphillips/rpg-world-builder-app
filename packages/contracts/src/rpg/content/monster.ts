@@ -1,6 +1,14 @@
 import { z } from 'zod'
 import { creatureFamilyIdSchema } from '../vocab/creature-family'
 
+import { overlayAtomic } from './lib/system-overlay/annotate'
+import { mergeSystemOverlayUpdateEnvelope } from './lib/system-overlay/system-overlay-update'
+import {
+  overlayDeleteEntryIdRows,
+  overlayRestoreIdRows,
+  overlaySlugList,
+} from './lib/system-overlay/overlay-presets'
+
 import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
 import { refineContextualCountInLairExceedsNormal } from '../primitives/contextual-count'
 import { abilitySchema } from '../vocab/ability'
@@ -35,6 +43,7 @@ import {
   creatureTraitTemplateOccurrenceMessage,
 } from './creature/traits/creature-trait-template-occurrence'
 import { refineMonsterSenseOccurrence } from './creature/traits/sense-occurrence'
+import { movementAlternativeSchema, refineMovementAlternativeOverlap } from '../vocab/movement-mode'
 import { getCreatureTraitVocabularyEntry } from '../vocab/creature/trait-vocabulary'
 import { refineCreatureTraitTemplate } from './creature/traits/validate'
 import {
@@ -49,7 +58,8 @@ import {
   draftStoredSchema,
   publishStoredSchema,
 } from './lib/content-input-schemas'
-import { contentPatchBaseSchema, type ContentMeta, type Slug } from './lib/envelope'
+import { type ContentMeta, type Slug } from './lib/envelope'
+import { contentStoredOverlayPatchSchema } from './lib/system-overlay/patch-document'
 import {
   mediaBearingAuthoredContentBodySchema,
   mediaBearingDraftAuthoredContentBodySchema,
@@ -162,20 +172,26 @@ import { refineEquipmentInstanceInvariants } from './equipment/instance/instance
 
 import { FIXED_AC_OFFSET_MIN } from '../vocab/mechanics/armor-class-scale'
 
-export const monsterArmorClassSchema = z.object({
-  naturalArmorBonus: z.number().int().min(1).optional(),
-  /** Protection offset for a fixed override. Minimum -10; no maximum. */
-  fixedAcOffset: z.number().int().min(FIXED_AC_OFFSET_MIN).optional(),
-})
+export const monsterArmorClassSchema = overlayAtomic(
+  z.object({
+    naturalArmorBonus: z.number().int().min(1).optional(),
+    /** Protection offset for a fixed override. Minimum -10; no maximum. */
+    fixedAcOffset: z.number().int().min(FIXED_AC_OFFSET_MIN).optional(),
+  }),
+  'armor class options replace wholesale',
+)
 
-export const monsterHitPointsSchema = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('hit-dice'), count: z.number().int().min(1) }),
-  creatureStatBlockHitPointsSchema.extend({ kind: z.literal('fixed') }),
-])
+export const monsterHitPointsSchema = overlayAtomic(
+  z.discriminatedUnion('kind', [
+    z.object({ kind: z.literal('hit-dice'), count: z.number().int().min(1) }),
+    creatureStatBlockHitPointsSchema.extend({ kind: z.literal('fixed') }),
+  ]),
+  'hit point stat block replaces wholesale',
+)
 
 const monsterTraitAvailabilityFields = {
   available: z.boolean().optional(),
-  onlyInFormIds: z.array(z.string().min(1)).optional(),
+  onlyInFormIds: overlaySlugList(z.string().min(1)).optional(),
   ...entryProvenanceField,
 }
 
@@ -322,12 +338,10 @@ export const monsterEquipmentEntrySchema = z.preprocess((value) => {
 export const monsterBodyFields = {
   sizes: creatureSizesSchema,
   creatureType: creatureTypeRefSchema,
-  creatureFamilyIds: z
-    .array(creatureFamilyIdSchema)
+  creatureFamilyIds: overlaySlugList(creatureFamilyIdSchema)
     .refine((ids) => new Set(ids).size === ids.length, 'Creature families must be unique.')
     .optional(),
-  classIds: z
-    .array(z.string().min(1))
+  classIds: overlaySlugList(z.string().min(1))
     .refine((ids) => new Set(ids).size === ids.length, 'Class classifications must be unique.')
     .optional(),
   alignment: creatureAlignmentSchema,
@@ -335,6 +349,7 @@ export const monsterBodyFields = {
   armorClass: monsterArmorClassSchema.default({}),
   hitPoints: monsterHitPointsSchema,
   movement: creatureMovementSchema,
+  movementAlternative: movementAlternativeSchema.optional(),
   hover: z.boolean().optional(),
   senses: creatureSensesSchema,
   communication: creatureCommunicationSchema.default(EMPTY_CREATURE_COMMUNICATION),
@@ -342,18 +357,18 @@ export const monsterBodyFields = {
   experiencePointsOverride: z.number().int().min(0).optional(),
   lair: monsterLairSchema.optional(),
   proficiencies: z.object({
-    savingThrows: z.array(abilitySchema).default([]),
-    skills: z.array(creatureSkillProficiencyEntrySchema).default([]),
-    languages: z.array(creatureLanguageProficiencyEntrySchema).default([]),
+    savingThrows: overlaySlugList(abilitySchema).default([]),
+    skills: overlaySlugList(creatureSkillProficiencyEntrySchema).default([]),
+    languages: overlaySlugList(creatureLanguageProficiencyEntrySchema).default([]),
     additionalLanguageCount: z.number().int().min(1).optional(),
-    weapons: z.array(creatureWeaponProficiencyTargetSchema).default([]),
+    weapons: overlaySlugList(creatureWeaponProficiencyTargetSchema).default([]),
   }),
   defenses: creatureDefensesSchema,
-  equipment: z.array(monsterEquipmentEntrySchema).default([]),
-  traits: z.array(monsterTraitSchema).default([]),
-  actions: z.array(monsterActionSchema).default([]),
-  bonusActions: z.array(monsterBonusActionSchema).default([]),
-  reactions: z.array(monsterReactionSchema).default([]),
+  equipment: overlayDeleteEntryIdRows(monsterEquipmentEntrySchema).default([]),
+  traits: overlayRestoreIdRows(monsterTraitSchema).default([]),
+  actions: overlayRestoreIdRows(monsterActionSchema).default([]),
+  bonusActions: overlayRestoreIdRows(monsterBonusActionSchema).default([]),
+  reactions: overlayRestoreIdRows(monsterReactionSchema).default([]),
   legendaryActions: monsterLegendaryActionsBlockSchema.optional(),
   forms: monsterFormsSchema.optional(),
 } as const
@@ -372,14 +387,15 @@ const monsterBodyDraftSchemaBase = mediaBearingDraftAuthoredContentBodySchema(
   abilityScores: creatureAbilityScoresSchema.partial().optional(),
   hitPoints: monsterHitPointsSchema.optional(),
   movement: creatureMovementSchema.optional(),
+  movementAlternative: movementAlternativeSchema.optional(),
   senses: creatureSensesDraftSchema.optional(),
   challengeRating: challengeRatingSchema.optional(),
   lair: monsterLairDraftSchema.optional(),
-  actions: z.array(monsterActionDraftSchema).default([]),
-  bonusActions: z.array(monsterBonusActionDraftSchema).default([]),
-  reactions: z.array(monsterReactionDraftSchema).default([]),
+  actions: overlayRestoreIdRows(monsterActionDraftSchema).default([]),
+  bonusActions: overlayRestoreIdRows(monsterBonusActionDraftSchema).default([]),
+  reactions: overlayRestoreIdRows(monsterReactionDraftSchema).default([]),
   legendaryActions: monsterLegendaryActionsBlockDraftSchema.optional(),
-  traits: z.array(monsterTraitDraftSchema).default([]),
+  traits: overlayRestoreIdRows(monsterTraitDraftSchema).default([]),
   forms: monsterFormsDraftSchema.optional(),
 })
 
@@ -940,6 +956,7 @@ export function refineMonsterBody(
   refineExperiencePointsOverride(body, ctx, prefix)
   refineMonsterLair(body, ctx, prefix)
   refineMonsterLegendaryResistanceTraits(body.traits, ctx, prefix)
+  refineMovementAlternativeOverlap(body, ctx, prefix)
 }
 
 function refineMonsterLegendaryResistanceTraits(
@@ -1023,6 +1040,7 @@ function refineMonsterDraftBody(
   })
   refineMultiattackReferences(sections, ctx, prefix, { published: false })
   if (body.forms) refineMonsterFormIdentity(body.forms, ctx, prefix, { creatureName: body.name })
+  refineMovementAlternativeOverlap(body, ctx, prefix)
 }
 
 const monsterDraftStoredSchemaBase = draftStoredSchema(monsterBodyDraftSchema).superRefine(
@@ -1049,23 +1067,31 @@ export const createMonsterDraftInputSchema = monsterDraftInputSchema.superRefine
   refineMonsterDraftBody(input as MonsterBodyDraft, ctx),
 )
 
-export const updateMonsterInputSchema = monsterPublishInputSchema.partial().extend({
-  creatureFamilyIds: monsterBodyFields.creatureFamilyIds.nullable(),
-  classIds: monsterBodyFields.classIds.nullable(),
-  experiencePointsOverride: z.number().int().min(0).nullable().optional(),
-  hover: z.boolean().nullable().optional(),
-  description: z.string().nullable().optional(),
-})
+export const updateMonsterInputSchema = mergeSystemOverlayUpdateEnvelope(
+  monsterPublishInputSchema.partial().extend({
+    creatureFamilyIds: monsterBodyFields.creatureFamilyIds.nullable(),
+    classIds: monsterBodyFields.classIds.nullable(),
+    experiencePointsOverride: z.number().int().min(0).nullable().optional(),
+    hover: z.boolean().nullable().optional(),
+    description: z.string().nullable().optional(),
+    movementAlternative: movementAlternativeSchema.nullable().optional(),
+    lair: monsterLairSchema.nullable().optional(),
+  }),
+)
 
 export type UpdateMonsterInput = z.infer<typeof updateMonsterInputSchema>
 
-export const updateMonsterDraftInputSchema = monsterDraftInputSchema
-  .partial()
-  .extend({
-    creatureFamilyIds: monsterBodyFields.creatureFamilyIds.nullable(),
-    classIds: monsterBodyFields.classIds.nullable(),
-  })
-  .superRefine((input, ctx) => refineMonsterDraftBody(input as MonsterBodyDraft, ctx))
+export const updateMonsterDraftInputSchema = mergeSystemOverlayUpdateEnvelope(
+  monsterDraftInputSchema
+    .partial()
+    .extend({
+      creatureFamilyIds: monsterBodyFields.creatureFamilyIds.nullable(),
+      classIds: monsterBodyFields.classIds.nullable(),
+      movementAlternative: movementAlternativeSchema.nullable().optional(),
+      lair: monsterLairDraftSchema.nullable().optional(),
+    })
+    .superRefine((input, ctx) => refineMonsterDraftBody(input as MonsterBodyDraft, ctx)),
+)
 
 export {
   monsterLairDraftSchema,
@@ -1103,9 +1129,7 @@ export type {
 
 export type UpdateMonsterDraftInput = z.infer<typeof updateMonsterDraftInputSchema>
 
-export const monsterPatchSchema = contentPatchBaseSchema.extend({
-  patch: monsterBodySchema.partial(),
-})
+export const monsterPatchSchema = contentStoredOverlayPatchSchema
 
 export type MonsterPatch = z.infer<typeof monsterPatchSchema>
 

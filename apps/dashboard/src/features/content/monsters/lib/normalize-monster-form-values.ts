@@ -24,6 +24,7 @@ import { weaponActionDamageToDraft } from './actions/weapon/monster-weapon-damag
 
 import { applyEffectEndAuthoringToRow } from '../../lib/forms/mechanics/normalize-effect-end-authoring'
 import {
+  movementAlternativeFormToSchema,
   movementRecordToRows,
   movementRowsToRecordForPreview,
 } from '../../lib/forms/fields/content-movement-form-fields'
@@ -42,6 +43,7 @@ export type MonsterNormalizeBaseline = {
   hover?: boolean
   description?: string
   experiencePointsOverride?: number
+  movementAlternative?: Monster['movementAlternative']
   lair?: Monster['lair']
 }
 
@@ -643,6 +645,10 @@ function normalizedMonsterCore(
     armorClass: normalizeArmorClass(values.armorClass, options.armorClassRules),
     hitPoints: normalizeHitPoints(values.hitPoints),
     movement,
+    ...(() => {
+      const movementAlternative = movementAlternativeFormToSchema(values.movementAlternative)
+      return movementAlternative ? { movementAlternative } : {}
+    })(),
     senses: values.senses ?? [],
     communication: normalizeCommunication(values.communication),
     proficiencies: normalizeProficiencies(
@@ -792,4 +798,5 @@ function applyClearableNulls(
   tombstoneClearableKey(normalized, 'hover', baseline.hover, !hasFly)
   tombstoneClearableKey(normalized, 'experiencePointsOverride', baseline.experiencePointsOverride)
   tombstoneClearableKey(normalized, 'lair', baseline.lair)
+  tombstoneClearableKey(normalized, 'movementAlternative', baseline.movementAlternative)
 }

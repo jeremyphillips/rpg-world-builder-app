@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { overlaySlugList } from '../../lib/system-overlay/overlay-presets'
 import { absoluteLevelSchema } from '../../../primitives/level'
 import { spellReferenceSchema } from '../../spell/spell-reference'
 
@@ -12,7 +13,7 @@ export type SpellRecommendationTarget = z.infer<typeof spellRecommendationTarget
 export const spellRecommendationSchema = z.object({
   target: spellRecommendationTargetSchema,
   classLevel: absoluteLevelSchema.optional(),
-  spellIds: z.array(spellReferenceSchema).min(1),
+  spellIds: overlaySlugList(spellReferenceSchema).min(1),
 })
 
 export type SpellRecommendation = z.infer<typeof spellRecommendationSchema>

@@ -1,4 +1,6 @@
 import { z } from 'zod'
+
+import { overlaySlugList } from '../system-overlay/overlay-presets'
 import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
 
 import {
@@ -179,7 +181,7 @@ function refineFilteredEquipmentPool(
 
 const explicitEquipmentPoolSchema = z.object({
   source: z.literal('explicit'),
-  equipmentSlugs: z.array(z.string().min(1)).min(1),
+  equipmentSlugs: overlaySlugList(z.string().min(1)).min(1),
 })
 
 export type ExplicitEquipmentPool = z.infer<typeof explicitEquipmentPoolSchema>
@@ -221,7 +223,7 @@ export const grantedEquipmentItemSchema = z.object({
   equipmentSlug: z.string().min(1),
   quantity: z.number().int().min(1).default(1),
   equipped: z.boolean().optional(),
-  modifiers: z.array(equipmentModifierSchema).optional(),
+  modifiers: overlaySlugList(equipmentModifierSchema).optional(),
 })
 
 export type GrantedEquipmentItem = z.infer<typeof grantedEquipmentItemSchema>

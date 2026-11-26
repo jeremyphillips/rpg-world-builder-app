@@ -1,5 +1,8 @@
 import { z } from 'zod'
 
+import { overlayDeleteIdRows, overlaySlugList } from '../lib/system-overlay/overlay-presets'
+import { mergeSystemOverlayUpdateEnvelope } from '../lib/system-overlay/system-overlay-update'
+
 import { coercedSelectNumberSchema } from '../../primitives/level'
 import { areaGeometrySchema } from '../../primitives/area-geometry'
 import {
@@ -12,12 +15,8 @@ import {
   spellSchoolIdSchema,
   spellTagsSchema,
 } from '../../vocab/spell'
-import {
-  contentBodyBaseSchema,
-  contentMetaSchema,
-  contentPatchBaseSchema,
-  slugSchema,
-} from '../lib/envelope'
+import { contentBodyBaseSchema, contentMetaSchema, slugSchema } from '../lib/envelope'
+import { contentStoredOverlayPatchSchema } from '../lib/system-overlay/patch-document'
 import { classSlugSchema } from '../classes/class'
 import { contentModelingSchema } from '../../primitives/modeling/schema'
 import { SPELL_CONTENT_TYPE_TERM } from '../lib/content-type-terms'
@@ -55,7 +54,7 @@ export const spellBodySchema = contentBodyBaseSchema.extend({
   school: spellSchoolIdSchema,
   level: spellContentLevelSchema,
   /** Class slugs that can learn or cast this spell (SRD or homebrew). */
-  classIds: z.array(classSlugSchema).min(1),
+  classIds: overlaySlugList(classSlugSchema).min(1),
   tags: spellTagsSchema.optional(),
   castingTime: spellCastingTimeSchema,
   range: spellRangeSchema,
@@ -69,7 +68,7 @@ export const spellBodySchema = contentBodyBaseSchema.extend({
   /** Rich-text HTML (TipTap). Upcast body prose — no "Using a Higher-Level Spell Slot" heading. */
   higherLevelSlotEffect: z.string().optional(),
   /** Structured description tables referenced by rich-text embed ids. */
-  tables: z.array(generalTableSchema).optional(),
+  tables: overlayDeleteIdRows(generalTableSchema).optional(),
   /** Structured resolution envelope for spell execution modeling. */
   resolution: spellResolutionSchema.optional(),
   /** Human-reviewed modeling posture; absent until audited. */
@@ -91,7 +90,7 @@ export const spellBodyDraftSchema = draftAuthoredContentBodySchema(
 ).extend({
   school: spellSchoolIdSchema.optional(),
   level: spellContentLevelSchema.optional(),
-  classIds: z.array(classSlugSchema).default([]),
+  classIds: overlaySlugList(classSlugSchema).default([]),
   tags: spellTagsSchema.optional(),
   castingTime: spellCastingTimeSchema.optional(),
   range: spellRangeSchema.optional(),
@@ -101,7 +100,7 @@ export const spellBodyDraftSchema = draftAuthoredContentBodySchema(
   deliveryMethod: spellDeliveryMethodSchema.optional(),
   cantripScaling: z.string().optional(),
   higherLevelSlotEffect: z.string().optional(),
-  tables: z.array(generalTableSchema).optional(),
+  tables: overlayDeleteIdRows(generalTableSchema).optional(),
   resolution: spellResolutionSchema.optional(),
   modeling: contentModelingSchema.optional(),
 })
@@ -133,17 +132,19 @@ export type CreateSpellDraftInput = z.infer<typeof createSpellDraftInputSchema>
  * - `null` → remove stored resolution
  * - object → replace stored resolution entirely
  */
-export const updateSpellInputSchema = createSpellInputSchema.partial().extend({
-  resolution: spellResolutionSchema.nullable().optional(),
-})
+export const updateSpellInputSchema = mergeSystemOverlayUpdateEnvelope(
+  createSpellInputSchema.partial().extend({
+    resolution: spellResolutionSchema.nullable().optional(),
+  }),
+)
 export type UpdateSpellInput = z.infer<typeof updateSpellInputSchema>
 
-export const updateSpellDraftInputSchema = createSpellDraftInputSchema.partial().extend({
-  resolution: spellResolutionSchema.nullable().optional(),
-})
+export const updateSpellDraftInputSchema = mergeSystemOverlayUpdateEnvelope(
+  createSpellDraftInputSchema.partial().extend({
+    resolution: spellResolutionSchema.nullable().optional(),
+  }),
+)
 export type UpdateSpellDraftInput = z.infer<typeof updateSpellDraftInputSchema>
 
-export const spellPatchSchema = contentPatchBaseSchema.extend({
-  patch: spellBodySchema.partial(),
-})
+export const spellPatchSchema = contentStoredOverlayPatchSchema
 export type SpellPatch = z.infer<typeof spellPatchSchema>

@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { overlaySlugList } from '../lib/system-overlay/overlay-presets'
+
 import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 import { entryProvenanceField } from '../../primitives/provenance'
 import {
@@ -147,7 +149,7 @@ const regenerationSchema = z.object({
   preset: z.literal('regeneration'),
   hitPoints: hitPointsField,
   regeneratesAtZeroHp: z.boolean(),
-  interruptedByDamageTypes: z.array(damageTypeIdSchema),
+  interruptedByDamageTypes: overlaySlugList(damageTypeIdSchema),
   ...entryProvenanceField,
 })
 
@@ -288,7 +290,7 @@ const regenerationDraftSchema = z.object({
   preset: z.literal('regeneration'),
   hitPoints: hitPointsField.optional(),
   regeneratesAtZeroHp: z.boolean().optional(),
-  interruptedByDamageTypes: z.array(damageTypeIdSchema).optional(),
+  interruptedByDamageTypes: overlaySlugList(damageTypeIdSchema).optional(),
   ...entryProvenanceField,
 })
 
@@ -368,3 +370,19 @@ export const monsterPresetTraitDraftSchema = z.union([
   elementalRestorationDraftSchema,
   stenchDraftSchema,
 ])
+
+export type MonsterPresetTrait = z.output<typeof monsterPresetTraitSchema>
+export type MonsterPresetTraitDraft = z.infer<typeof monsterPresetTraitDraftSchema>
+export type MonsterPresetTraitForFormat = MonsterPresetTrait | MonsterPresetTraitDraft
+
+export function parseMonsterPresetTraitForFormat(value: unknown): MonsterPresetTrait | undefined {
+  const result = monsterPresetTraitSchema.safeParse(value)
+  return result.success ? result.data : undefined
+}
+
+export function parseMonsterPresetTraitDraftForFormat(
+  value: unknown,
+): MonsterPresetTraitDraft | undefined {
+  const result = monsterPresetTraitDraftSchema.safeParse(value)
+  return result.success ? result.data : undefined
+}

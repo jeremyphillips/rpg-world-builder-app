@@ -1,0 +1,147 @@
+import { describe, expect, it } from 'vitest'
+import { z } from 'zod'
+
+import { applyStoredOverlay } from './apply'
+import { buildSystemOverlayIntent } from './build-intent'
+import { compileOverlayPolicy } from './compile-policy'
+import {
+  overlayImmaterialIdRows,
+  overlayOrderedList,
+  overlayRestoreIdRows,
+} from './overlay-presets'
+import { reconcileOverlayUpdate } from './reconcile'
+
+const traitRowSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  grants: overlayImmaterialIdRows(
+    z.object({ id: z.string().min(1), label: z.string().optional() }),
+  ).optional(),
+})
+
+const fixtureSchema = z.object({
+  name: z.string().min(1),
+  tags: overlayOrderedList(z.string()),
+  traits: overlayRestoreIdRows(traitRowSchema),
+})
+
+const policy = (() => {
+  const compiled = compileOverlayPolicy(fixtureSchema)
+  if (!compiled.ok) throw new Error(compiled.issues.join('\n'))
+  return compiled.policy
+})()
+
+const seed = {
+  name: 'Owlbear',
+  tags: ['beast', 'monstrosity'],
+  traits: [{ id: 'keen-sight', name: 'Keen Sight', grants: [{ id: 'grt_default' }] }],
+}
+
+const armorSeed = { kind: 'armor' as const, name: 'Leather', baseAcOffset: 2 }
+const rootUnionSchema = z.discriminatedUnion('kind', [
+  z.object({ kind: z.literal('armor'), name: z.string(), baseAcOffset: z.number() }),
+  z.object({ kind: z.literal('weapon'), name: z.string(), damage: z.string() }),
+])
+const rootUnionPolicy = (() => {
+  const compiled = compileOverlayPolicy(rootUnionSchema)
+  if (!compiled.ok) throw new Error(compiled.issues.join('\n'))
+  return compiled.policy
+})()
+
+describe('buildSystemOverlayIntent', () => {
+  it('builds scalar deltas for a root discriminated-union body', () => {
+    const intent = buildSystemOverlayIntent({
+      policy: rootUnionPolicy,
+      catalogSeed: armorSeed,
+      baseline: armorSeed,
+      draft: { ...armorSeed, name: 'Patched Leather' },
+    })
+    expect(intent).toEqual({ set: { name: 'Patched Leather' } })
+    const reconciled = reconcileOverlayUpdate(
+      armorSeed,
+      { version: 1, revision: 0 },
+      intent,
+      rootUnionPolicy,
+    )
+    expect(reconciled.ok).toBe(true)
+    if (!reconciled.ok) return
+    const applied = applyStoredOverlay(armorSeed, reconciled.result.stored, rootUnionPolicy)
+    expect(applied.ok).toBe(true)
+    if (!applied.ok) return
+    expect(applied.result.body.name).toBe('Patched Leather')
+  })
+  it('omits unchanged scalars when another collection is still mounted', () => {
+    const baseline = { ...seed, traits: seed.traits }
+    const draft = { ...seed, name: 'Custom Owlbear', traits: seed.traits }
+    const intent = buildSystemOverlayIntent({ policy, catalogSeed: seed, baseline, draft })
+    expect(intent).toEqual({ set: { name: 'Custom Owlbear' } })
+  })
+
+  it('stores nested row name edits without empty grants in intent', () => {
+    const baseline = { ...seed }
+    const draft = {
+      ...seed,
+      traits: [{ id: 'keen-sight', name: 'Sight', grants: [{ id: 'grt_default' }] }],
+    }
+    const intent = buildSystemOverlayIntent({ policy, catalogSeed: seed, baseline, draft })
+    const first = reconcileOverlayUpdate(seed, { version: 1, revision: 0 }, intent, policy)
+    expect(first.ok).toBe(true)
+    if (!first.ok) return
+    const applied = applyStoredOverlay(seed, first.result.stored, policy)
+    expect(applied.ok).toBe(true)
+    if (!applied.ok) return
+    expect(applied.result.body).toEqual(draft)
+  })
+
+  it('resets a collection when draft matches the catalog seed after removing homebrew', () => {
+    const baseline = {
+      ...seed,
+      traits: [...seed.traits, { id: 'extra', name: 'Extra' }],
+    }
+    const draft = { ...seed }
+    const intent = buildSystemOverlayIntent({ policy, catalogSeed: seed, baseline, draft })
+    expect(intent.collections?.traits).toEqual({ reset: true })
+  })
+
+  it('reconciles built intent to match draft for a scalar and nested trait edit', () => {
+    const baseline = { ...seed }
+    const draft = {
+      ...seed,
+      name: 'Edited',
+      traits: [{ id: 'keen-sight', name: 'Keen', grants: [{ id: 'grt_default' }] }],
+    }
+    const intent = buildSystemOverlayIntent({ policy, catalogSeed: seed, baseline, draft })
+    const result = reconcileOverlayUpdate(seed, { version: 1, revision: 0 }, intent, policy)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    const applied = applyStoredOverlay(seed, result.result.stored, policy)
+    expect(applied.ok).toBe(true)
+    if (!applied.ok) return
+    expect(applied.result.body.name).toBe('Edited')
+    expect(applied.result.body.traits).toEqual(draft.traits)
+  })
+
+  it('emits nested collections under seed row overrides without leaking grants into set', () => {
+    const baseline = { ...seed }
+    const draft = {
+      ...seed,
+      traits: [
+        {
+          id: 'keen-sight',
+          name: 'Keen Sight',
+          grants: [{ id: 'grt_default', label: 'Patched' }],
+        },
+      ],
+    }
+    const intent = buildSystemOverlayIntent({ policy, catalogSeed: seed, baseline, draft })
+    expect(intent.collections?.traits?.overrides?.[0]).toMatchObject({
+      id: 'keen-sight',
+      collections: {
+        grants: {
+          overrides: [{ id: 'grt_default', set: { label: 'Patched' } }],
+        },
+      },
+    })
+    expect(intent.collections?.traits?.overrides?.[0]).not.toHaveProperty('set.grants')
+  })
+})
