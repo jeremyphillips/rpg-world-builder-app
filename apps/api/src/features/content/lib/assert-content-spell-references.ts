@@ -23,7 +23,7 @@ export async function assertContentSpellReferences(
     spellsById: new Map<string, Spell>(spells.map((spell) => [spell.id, spell])),
     catalogStatus: 'ready',
     intent: ctx.validationIntent,
-    unresolvedOverlayTargetIds: overlayFailureIds,
+    unresolvedOverlayTargetKeys: overlayFailureIds,
   })
   if (issues.length === 0) return
   throw new HttpError(400, 'validation_error', 'Spell references are invalid.', { issues })

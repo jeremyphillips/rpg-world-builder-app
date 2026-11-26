@@ -203,8 +203,8 @@ type CatalogReferenceCollectorArgs<
   resolve: (key: string) => ContentResolutionRow | undefined
   unavailablePlacement: CatalogReferenceUnavailablePlacement
   messages: CatalogReferenceMessages<P>
-  /** Catalog ids omitted from resolved records due to overlay apply failure (not unknown). */
-  unresolvedOverlayTargetIds?: ReadonlySet<string>
+  /** Ref keys (`refs[].key`) omitted from resolved records due to overlay apply failure (not unknown). */
+  unresolvedOverlayTargetKeys?: ReadonlySet<string>
 }
 
 function checkApplies(checks: object, check: string, intent: ContentValidationIntent): boolean {
@@ -273,12 +273,12 @@ export function collectCatalogReferenceIssues<
   }
 
   const issues: CatalogReferenceIssue<S>[] = []
-  const unresolvedOverlayTargetIds = args.unresolvedOverlayTargetIds
+  const unresolvedOverlayTargetKeys = args.unresolvedOverlayTargetKeys
 
   for (const ref of args.refs) {
     const row = args.resolve(ref.key)
     if (!row) {
-      if (unresolvedOverlayTargetIds?.has(ref.key)) {
+      if (unresolvedOverlayTargetKeys?.has(ref.key)) {
         if (checkApplies(policy.checks, 'unresolvedOverlayTarget', intent)) {
           pushCheckIssue(issues, subject, 'unresolvedOverlayTarget', ref.path, messages)
         }

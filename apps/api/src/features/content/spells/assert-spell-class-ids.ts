@@ -3,7 +3,6 @@ import {
   classSlugReferenceEdge,
   collectCatalogReferenceIssues,
   getContentTypeCapitalizedSentenceLabel,
-  getContentTypeSentenceForm,
   type CharacterClass,
   type ContentValidationIntent,
 } from '@rpg/contracts'
@@ -29,36 +28,29 @@ export function assertSpellClassIdsHaveSpellcasting(
     resolve: (key) => bySlug.get(key),
     unavailablePlacement: classSlugReferenceEdge.unavailablePlacement,
     messages: classSlugReferenceEdge.messages,
-    unresolvedOverlayTargetIds: unresolvedSlugs,
+    unresolvedOverlayTargetKeys: unresolvedSlugs,
   })
 
-  const withoutSpellcasting = classIds.filter((slug) => {
-    if (unresolvedSlugs.has(slug)) return false
-    const cls = bySlug.get(slug)
-    return cls != null && !classHasSpellcasting(cls)
-  })
+  const withoutSpellcasting = classIds
+    .map((slug, index) => ({ slug, index }))
+    .filter(({ slug }) => {
+      if (unresolvedSlugs.has(slug)) return false
+      const cls = bySlug.get(slug)
+      return cls != null && !classHasSpellcasting(cls)
+    })
 
   if (issues.length === 0 && withoutSpellcasting.length === 0) return
 
-  const unknown = classIds.filter((slug) => !bySlug.has(slug) && !unresolvedSlugs.has(slug))
-  const parts: string[] = []
-  if (unknown.length > 0) {
-    parts.push(
-      `Unknown ${getContentTypeSentenceForm('classes', unknown.length)}: ${unknown.map((slug) => `"${slug}"`).join(', ')}.`,
-    )
-  }
-  if (issues.some((issue) => issue.code === 'unresolved_overlay_class')) {
-    parts.push(classSlugReferenceEdge.messages.unresolvedOverlayTarget)
-  }
+  const messages = issues.map((issue) => issue.message)
   if (withoutSpellcasting.length > 0) {
-    parts.push(
+    messages.push(
       `${getContentTypeCapitalizedSentenceLabel('classes', {
         plural: withoutSpellcasting.length !== 1,
       })} without spellcasting: ${withoutSpellcasting
-        .map((slug) => `"${bySlug.get(slug)?.name ?? slug}"`)
+        .map(({ slug }) => `"${bySlug.get(slug)?.name ?? slug}"`)
         .join(', ')}.`,
     )
   }
 
-  throw new HttpError(400, 'validation_error', parts.join(' '), { issues })
+  throw new HttpError(400, 'validation_error', messages.join(' '), { issues })
 }

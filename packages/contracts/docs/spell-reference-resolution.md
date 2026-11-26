@@ -25,7 +25,7 @@ Dashboard authoring builds **`ContentFormCtx.spellCatalogById`** from the campai
 
 API write validation uses the same id universe via `resolveCatalogForCampaign` and `collectSpellReferenceIssues` with `catalogStatus: 'ready'`.
 
-When a system spell row’s overlay fails to apply, that spell id is omitted from the resolved catalog array and listed in `overlayFailures`. Pass those ids to `collectSpellReferenceIssues` as `unresolvedOverlayTargetIds` so references report `unresolved_overlay_spell`, not `unknown_spell`.
+When a system spell row’s overlay fails to apply, that spell id is omitted from the resolved catalog array and listed in `overlayFailures`. Pass those ids to `collectSpellReferenceIssues` as `unresolvedOverlayTargetKeys` so references report `unresolved_overlay_spell`, not `unknown_spell`.
 
 ## Catalog lifecycle (presentation)
 

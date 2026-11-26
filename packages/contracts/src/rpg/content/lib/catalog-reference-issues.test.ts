@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { ContentResolutionRow } from './content-resolution-policy'
 import {
+  classSlugReferenceEdge,
   collectCatalogReferenceIssues,
   equipmentPresencePolicy,
   skillReferencePolicy,
@@ -238,6 +239,27 @@ describe('collectCatalogReferenceIssues', () => {
     ).toEqual([])
   })
 
+  it('matches unresolved overlay keys against slug-based class refs', () => {
+    expect(
+      collectCatalogReferenceIssues({
+        policy: classSlugReferenceEdge.policy,
+        intent: 'publish',
+        catalogStatus: 'ready',
+        refs: [{ path: 'classIds.0', key: 'fighter' }],
+        resolve: () => undefined,
+        unavailablePlacement: classSlugReferenceEdge.unavailablePlacement,
+        messages: classSlugReferenceEdge.messages,
+        unresolvedOverlayTargetKeys: new Set(['fighter']),
+      }),
+    ).toEqual([
+      {
+        path: 'classIds.0',
+        code: 'unresolved_overlay_class',
+        message: 'This class exists in the catalog but its overlay could not be applied.',
+      },
+    ])
+  })
+
   it('prefers unresolved overlay target over unknown when the id is in the failure set', () => {
     expect(
       collectCatalogReferenceIssues({
@@ -248,7 +270,7 @@ describe('collectCatalogReferenceIssues', () => {
         resolve: () => undefined,
         unavailablePlacement: { kind: 'per-ref' },
         messages: spellMessages,
-        unresolvedOverlayTargetIds: new Set(['srd-2024:broken-spell']),
+        unresolvedOverlayTargetKeys: new Set(['srd-2024:broken-spell']),
       }),
     ).toEqual([
       {

@@ -118,7 +118,7 @@ function collectEquipmentRowIssues(
     resolve: (key) => catalogs.equipmentById.get(key),
     unavailablePlacement: monsterEquipmentEdge.unavailablePlacement,
     messages: monsterEquipmentEdge.messages,
-    unresolvedOverlayTargetIds: catalogs.unresolvedOverlayEquipmentIds,
+    unresolvedOverlayTargetKeys: catalogs.unresolvedOverlayEquipmentIds,
   })
   if (referenceIssues.length > 0) {
     issues.push(...referenceIssues)
@@ -237,7 +237,7 @@ function collectSkillIssues(
       resolve: (key) => catalogs.skillBySlug.get(key),
       unavailablePlacement: monsterSkillProficienciesEdge.unavailablePlacement,
       messages: monsterSkillProficienciesEdge.messages,
-      unresolvedOverlayTargetIds: catalogs.unresolvedOverlaySkillSlugs,
+      unresolvedOverlayTargetKeys: catalogs.unresolvedOverlaySkillSlugs,
     }),
   )
 }
@@ -323,7 +323,7 @@ function collectSpellActionIssues(
       spellsById: catalogs.spellsById ?? new Map(),
       catalogStatus: spellCatalog,
       intent,
-      unresolvedOverlayTargetIds: catalogs.unresolvedOverlaySpellIds,
+      unresolvedOverlayTargetKeys: catalogs.unresolvedOverlaySpellIds,
     }),
   )
   if (intent !== 'publish' || spellCatalog !== 'ready') return

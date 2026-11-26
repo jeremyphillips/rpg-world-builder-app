@@ -1560,6 +1560,85 @@ describe('content reference-catalog scope', () => {
   })
 })
 
+describe('content list routes — overlay visibility', () => {
+  it('hides overlayFailures from players when visibility is dm_only but owners still discover them', async () => {
+    const owner = await registerAndLoginTestUser(getApp(), {
+      email: 'overlay-visibility-owner@example.com',
+      password: 'supersecret',
+      displayName: 'Owner',
+    })
+    const campaignId = await createTestCampaign(owner.agent, owner.csrfToken)
+    const feats = loadSeedFeats('srd-cc-5.2.1')
+    const broken = feats.find((row) => row.slug === 'alert')
+    expect(broken).toBeDefined()
+    if (!broken) throw new Error('seed feat missing')
+
+    await FeatPatchModel.create({
+      campaignId,
+      targetId: broken.id,
+      patch: { name: 'Unversioned overlay' },
+    })
+
+    await owner.agent
+      .patch(`/api/campaigns/${campaignId}/content/feats/${broken.id}/campaign-access`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({ available: true, visibilityMode: 'dm_only', participantIds: [] })
+      .expect(200)
+
+    const member = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'overlay-visibility-pc@example.com',
+      campaignRole: 'pc',
+    })
+
+    const memberList = await member.agent
+      .get(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, member.csrfToken)
+      .expect(200)
+
+    expect(memberList.body.overlayFailures ?? []).toEqual([])
+
+    const ownerList = await owner.agent
+      .get(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .expect(200)
+
+    expect(ownerList.body.overlayFailures).toEqual([
+      expect.objectContaining({ targetId: broken.id, code: 'unsupported_overlay_version' }),
+    ])
+  })
+
+  it('keeps overlayFailures visible to owners when campaign availability is off', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+    const feats = loadSeedFeats('srd-cc-5.2.1')
+    const [broken] = feats.slice(2, 3)
+    expect(broken).toBeDefined()
+    if (!broken) throw new Error('seed feat missing')
+
+    await agent
+      .patch(`/api/campaigns/${campaignId}/content/feats/${broken.id}/campaign-access`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ available: false, visibilityMode: 'all_players', participantIds: [] })
+      .expect(200)
+
+    await FeatPatchModel.create({
+      campaignId,
+      targetId: broken.id,
+      patch: { name: 'Unversioned overlay' },
+    })
+
+    const res = await agent
+      .get(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    expect(res.body.overlayFailures).toEqual([
+      expect.objectContaining({ targetId: broken.id, code: 'unsupported_overlay_version' }),
+    ])
+  })
+})
+
 describe('content list routes — overlay wire', () => {
   it('returns overlayFailures on feat list wire while healthy feats stay in feats[]', async () => {
     const { agent, csrfToken } = await registerAndLogin()

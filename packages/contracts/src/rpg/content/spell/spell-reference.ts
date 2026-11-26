@@ -140,7 +140,7 @@ export function collectSpellReferenceIssues(args: {
   spellsById: ReadonlyMap<string, Spell>
   catalogStatus: 'ready' | 'unavailable'
   intent: ContentValidationIntent
-  unresolvedOverlayTargetIds?: ReadonlySet<string>
+  unresolvedOverlayTargetKeys?: ReadonlySet<string>
 }): ContentValidationIssue[] {
   return collectCatalogReferenceIssues({
     policy: authoredSpellIdsEdge.policy,
@@ -150,6 +150,6 @@ export function collectSpellReferenceIssues(args: {
     resolve: (key) => resolveSpellReference(key, args.spellsById),
     unavailablePlacement: authoredSpellIdsEdge.unavailablePlacement,
     messages: authoredSpellIdsEdge.messages,
-    unresolvedOverlayTargetIds: args.unresolvedOverlayTargetIds,
+    unresolvedOverlayTargetKeys: args.unresolvedOverlayTargetKeys,
   })
 }

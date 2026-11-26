@@ -6,6 +6,7 @@ import { HttpError } from '../../../lib/http-error'
 import { findCampaignById } from '../../campaign'
 import { attachCampaignAccessForTargetType } from '../lib/content-campaign-access.service'
 import { applyCatalogListFilter } from '../lib/apply-catalog-list-filter'
+import { filterOverlayFailuresForListViewer } from '../lib/filter-overlay-failures-for-list-viewer'
 import type { CatalogListFilter } from '../lib/apply-catalog-list-filter'
 import { resolveCatalogListFilter } from '../lib/resolve-catalog-membership-filter'
 import { resolveCatalog } from '../lib/resolve-catalog'
@@ -64,6 +65,12 @@ export async function listClasses(req: Request, res: Response): Promise<void> {
   const { items, overlayFailures } = await resolveClassesListForCampaign(campaignId)
   const withCampaignAccess = await attachCampaignAccessForTargetType(campaignId, 'classes', items)
   const visibleClasses = applyCatalogListFilter(withCampaignAccess, catalogFilter)
+  const visibleOverlayFailures = await filterOverlayFailuresForListViewer(
+    campaignId,
+    'classes',
+    overlayFailures,
+    catalogFilter,
+  )
   const subclassSummaries = await resolveSubclassSummariesByClassId(campaignId, catalogFilter)
 
   const classes = (visibleClasses as unknown as CharacterClass[]).map((characterClass) => ({
@@ -79,7 +86,7 @@ export async function listClasses(req: Request, res: Response): Promise<void> {
 
   res.status(200).json({
     classes: usageEnvelope.items,
-    ...(overlayFailures.length > 0 ? { overlayFailures } : {}),
+    ...(visibleOverlayFailures.length > 0 ? { overlayFailures: visibleOverlayFailures } : {}),
     ...(usageEnvelope.usageSummaryLabels
       ? { usageSummaryLabels: usageEnvelope.usageSummaryLabels }
       : {}),

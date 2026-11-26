@@ -9,6 +9,7 @@ import { ClassPatchModel } from '../classes/class-patch.model'
 import { classContentConfig } from '../classes/classes.config'
 import { resolveContentListForCampaign } from '../content.service'
 import { createHomebrewContent } from '../lib/content-write.service'
+import { batchGetContentCampaignAccessAvailability } from '../lib/content-campaign-access.service'
 import { assertSubclassBatchTargetsBelongToClass } from './assert-subclass-batch-targets'
 import { assertSubclassParentClassExists } from './assert-subclass-parent-class'
 import { resolveSubclassesForCampaign } from './list-subclasses'
@@ -125,5 +126,24 @@ describe('subclass overlay validation', () => {
       () => assertSubclassBatchTargetsBelongToClass(campaign.id, FIGHTER_CLASS_ID, [evocation.id]),
       { status: 400, code: 'mixed_subclass_parents' },
     )
+  })
+
+  it('returns not_found for wholly unknown subclass ids from the batch service', async () => {
+    const campaign = await makeTestCampaign()
+    const missingId = 'missing-subclass-id'
+
+    await assertSubclassBatchTargetsBelongToClass(campaign.id, FIGHTER_CLASS_ID, [missingId])
+
+    const batch = await batchGetContentCampaignAccessAvailability(
+      subclassWriteConfig,
+      campaign.id,
+      [missingId],
+    )
+    expect(batch.targets).toEqual([
+      expect.objectContaining({
+        targetId: missingId,
+        failure: expect.objectContaining({ code: 'not_found' }),
+      }),
+    ])
   })
 })

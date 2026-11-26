@@ -82,7 +82,7 @@ function assertSpeciesClassSlugRefs(
     resolve: (key) => bySlug.get(key),
     unavailablePlacement: classSlugReferenceEdge.unavailablePlacement,
     messages: classSlugReferenceEdge.messages,
-    unresolvedOverlayTargetIds: unresolvedSlugs,
+    unresolvedOverlayTargetKeys: unresolvedSlugs,
   })
   if (issues.length === 0) return
   throw new HttpError(400, 'validation_error', issues.map((issue) => issue.message).join(' '), {

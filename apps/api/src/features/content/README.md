@@ -48,7 +48,11 @@ Authoring list handlers use `resolveContentListForCampaign` (classes go through
 `resolveClassesListForCampaign`) and include `overlayFailures` when a system
 overlay cannot be applied. `GET …/content/classes` is a bespoke handler because
 it attaches resolved-only subclass summaries; it still serializes the same
-`overlayFailures` side channel. `GET …/content/classes/:classId/subclasses`
+`overlayFailures` side channel. List handlers filter failures through the same
+discovery and reference visibility rules as resolved rows (managers still see
+failures when `campaignAccess.available` is false; players never receive failure
+metadata for `dm_only` or ungranted `specific_players` content). Play-scoped
+list queries omit `overlayFailures`. `GET …/content/classes/:classId/subclasses`
 includes only overlay failures whose seed row belongs to that parent class.
 Spell `classIds` and species multiclass / level-cap class references are **slugs**.
 Monster classification `classIds` are content ids. Slug is the catalog identity

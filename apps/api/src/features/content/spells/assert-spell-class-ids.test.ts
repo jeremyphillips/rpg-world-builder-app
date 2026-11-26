@@ -39,7 +39,6 @@ describe('assertSpellClassIdsHaveSpellcasting', () => {
     } catch (err) {
       expect(err).toMatchObject({ status: 400, code: 'validation_error' })
       expect((err as HttpError).message).toContain('Unknown class')
-      expect((err as HttpError).message).toContain('not-a-class')
     }
   })
 
@@ -60,6 +59,11 @@ describe('assertSpellClassIdsHaveSpellcasting', () => {
     } catch (err) {
       expect((err as HttpError).message).toContain('Unknown class')
       expect((err as HttpError).message).toContain('without spellcasting')
+      expect((err as HttpError).details).toEqual(
+        expect.objectContaining({
+          issues: [expect.objectContaining({ code: 'unknown_class' })],
+        }),
+      )
     }
   })
 })

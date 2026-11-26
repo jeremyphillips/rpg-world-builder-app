@@ -155,7 +155,7 @@ describe('collectSpellReferenceIssues', () => {
         spellsById,
         catalogStatus: 'ready',
         intent: 'publish',
-        unresolvedOverlayTargetIds: new Set(['srd:broken']),
+        unresolvedOverlayTargetKeys: new Set(['srd:broken']),
       }),
     ).toEqual([
       {

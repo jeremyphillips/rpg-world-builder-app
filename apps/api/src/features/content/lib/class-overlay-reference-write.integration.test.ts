@@ -104,12 +104,37 @@ describe('class overlay reference writes', () => {
       expect(error).toBeInstanceOf(HttpError)
       const httpError = error as HttpError
       expect(httpError.message).toContain('Unknown')
-      expect(httpError.message).toContain('not-a-class')
+      expect(httpError.details).toEqual({
+        issues: [expect.objectContaining({ code: 'unknown_class', path: 'classIds.0' })],
+      })
       expect(JSON.stringify(httpError.details)).not.toContain('unresolved_overlay_class')
     }
   })
 
-  it('rejects a spell reference to an unresolved class separately from a resolved non-caster', async () => {
+  it('rejects a spell class slug whose overlay failed without calling it unknown', async () => {
+    const campaign = await makeTestCampaign()
+    await brokenFighterOverlay(campaign.id)
+
+    try {
+      await createHomebrewContent(spellWriteConfig, campaign.id, {
+        ...spellBase,
+        slug: 'unresolved-class-bolt',
+        classIds: ['fighter'],
+      })
+      throw new Error('expected validation_error')
+    } catch (error) {
+      expect(error).toBeInstanceOf(HttpError)
+      const httpError = error as HttpError
+      expect(httpError.code).toBe('validation_error')
+      expect(httpError.message).not.toContain('Unknown')
+      expect(httpError.message).not.toContain('without spellcasting')
+      expect(httpError.details).toEqual({
+        issues: [expect.objectContaining({ code: 'unresolved_overlay_class' })],
+      })
+    }
+  })
+
+  it('rejects a spell reference to a resolved non-caster without an overlay error', async () => {
     const campaign = await makeTestCampaign()
 
     try {

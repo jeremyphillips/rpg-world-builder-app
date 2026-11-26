@@ -6,8 +6,9 @@ import { findCampaignById } from '../../campaign'
 import { resolveContentListForCampaign } from '../content.service'
 import { loadSystemContent } from '../lib/content-type-config'
 import { attachCampaignAccessForTargetType } from '../lib/content-campaign-access.service'
-import { filterCatalogForMembership } from '../lib/filter-catalog-for-viewer'
-import { resolveCatalogMembershipFilter } from '../lib/resolve-catalog-membership-filter'
+import { applyCatalogListFilter } from '../lib/apply-catalog-list-filter'
+import { filterOverlayFailuresForListViewer } from '../lib/filter-overlay-failures-for-list-viewer'
+import { resolveCatalogListFilter } from '../lib/resolve-catalog-membership-filter'
 import { buildContentListUsageEnvelope } from '../lib/content-usage/build-content-list-usage-envelope'
 import { contentUsageContextFromRequest } from '../lib/content-usage/content-usage-request-context'
 import { subclassContentConfig } from './subclasses.config'
@@ -57,7 +58,14 @@ export async function listSubclasses(req: Request, res: Response): Promise<void>
     campaignId,
     classId,
   )
-  const visible = filterCatalogForMembership(subclasses, resolveCatalogMembershipFilter(req))
+  const catalogFilter = resolveCatalogListFilter(req)
+  const visible = applyCatalogListFilter(subclasses, catalogFilter)
+  const visibleOverlayFailures = await filterOverlayFailuresForListViewer(
+    campaignId,
+    'subclasses',
+    overlayFailures,
+    catalogFilter,
+  )
   const usageEnvelope = await buildContentListUsageEnvelope(
     contentUsageContextFromRequest(req, campaignId),
     'subclasses',
@@ -65,7 +73,7 @@ export async function listSubclasses(req: Request, res: Response): Promise<void>
   )
   res.status(200).json({
     subclasses: usageEnvelope.items,
-    ...(overlayFailures.length > 0 ? { overlayFailures } : {}),
+    ...(visibleOverlayFailures.length > 0 ? { overlayFailures: visibleOverlayFailures } : {}),
     ...(usageEnvelope.usageSummaryLabels
       ? { usageSummaryLabels: usageEnvelope.usageSummaryLabels }
       : {}),

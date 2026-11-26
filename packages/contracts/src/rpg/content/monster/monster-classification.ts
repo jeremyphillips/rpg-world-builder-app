@@ -50,7 +50,7 @@ export function collectMonsterClassificationIssues(
     resolve: (key) => catalogs.classesById?.get(key),
     unavailablePlacement: monsterClassEdge.unavailablePlacement,
     messages: monsterClassEdge.messages,
-    unresolvedOverlayTargetIds: catalogs.unresolvedOverlayClassIds,
+    unresolvedOverlayTargetKeys: catalogs.unresolvedOverlayClassIds,
   })
   for (const [index, id] of (monster.creatureFamilyIds ?? []).entries()) {
     const family = catalogs.creatureFamilies?.get(id)
