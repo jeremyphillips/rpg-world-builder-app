@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 
@@ -17,6 +17,7 @@ import { Form } from '@rpg/ui/form'
 import { ROUTES } from '@/lib/routes'
 import { login, register } from '../api/auth-client'
 import { signupFieldsWithLockedEmail } from '../lib/auth-form-fields'
+import { useAuthFormSubmit } from '../lib/use-auth-form-submit.client'
 
 export interface SignupFormProps {
   /** Called after a successful signup. Defaults to a same-origin redirect to the dashboard. */
@@ -27,7 +28,6 @@ export interface SignupFormProps {
 
 export function SignupForm({ onSuccess, lockedEmail }: SignupFormProps) {
   const searchParams = useSearchParams()
-  const [formError, setFormError] = useState<string | null>(null)
   const returnTo = validateAuthContinuationPath(searchParams.get('returnTo'))
   const emailFromQuery = searchParams.get('email') ?? undefined
   const resolvedLockedEmail = lockedEmail ?? emailFromQuery
@@ -37,20 +37,20 @@ export function SignupForm({ onSuccess, lockedEmail }: SignupFormProps) {
     [resolvedLockedEmail],
   )
 
-  const onSubmit = async (values: RegisterInput) => {
-    setFormError(null)
-    const payload = resolvedLockedEmail ? { ...values, email: resolvedLockedEmail } : values
-
-    try {
+  const { onSubmit, formError } = useAuthFormSubmit<RegisterInput>({
+    schema: registerInputSchema,
+    fields,
+    fallbackMessage: 'Unable to create your account. Please try again.',
+    mapError: (err) => getErrorMessage(err, 'Unable to create your account. Please try again.'),
+    submit: async (values) => {
+      const payload = resolvedLockedEmail ? { ...values, email: resolvedLockedEmail } : values
       await register(payload)
       await login({ email: payload.email, password: payload.password })
       const redirect =
         onSuccess ?? (() => window.location.assign(returnTo ?? CROSS_APP_PATHS.dashboard))
       redirect()
-    } catch (err) {
-      setFormError(getErrorMessage(err, 'Unable to create your account. Please try again.'))
-    }
-  }
+    },
+  })
 
   const loginHref = returnTo
     ? `${ROUTES.login}?returnTo=${encodeURIComponent(returnTo)}${

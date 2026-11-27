@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 
@@ -17,6 +16,7 @@ import { Form } from '@rpg/ui/form'
 import { ROUTES } from '@/lib/routes'
 import { login } from '../api/auth-client'
 import { loginFields } from '../lib/auth-form-fields'
+import { useAuthFormSubmit } from '../lib/use-auth-form-submit.client'
 
 export interface LoginFormProps {
   /** Called after a successful login. Defaults to a same-origin redirect to the dashboard. */
@@ -29,22 +29,22 @@ const fields = loginFields
 
 export function LoginForm({ onSuccess, defaultEmail }: LoginFormProps) {
   const searchParams = useSearchParams()
-  const [formError, setFormError] = useState<string | null>(null)
   const returnTo = validateAuthContinuationPath(searchParams.get('returnTo'))
   const emailFromQuery = searchParams.get('email') ?? undefined
   const initialEmail = defaultEmail ?? emailFromQuery
 
-  const onSubmit = async (values: LoginInput) => {
-    setFormError(null)
-    try {
+  const { onSubmit, formError } = useAuthFormSubmit<LoginInput>({
+    schema: loginInputSchema,
+    fields,
+    fallbackMessage: 'Unable to log in. Please try again.',
+    mapError: (err) => getErrorMessage(err, 'Unable to log in. Please try again.'),
+    submit: async (values) => {
       await login(values)
       const redirect =
         onSuccess ?? (() => window.location.assign(returnTo ?? CROSS_APP_PATHS.dashboard))
       redirect()
-    } catch (err) {
-      setFormError(getErrorMessage(err, 'Unable to log in. Please try again.'))
-    }
-  }
+    },
+  })
 
   const signupHref = returnTo
     ? `${ROUTES.signup}?returnTo=${encodeURIComponent(returnTo)}${

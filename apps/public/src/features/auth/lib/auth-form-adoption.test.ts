@@ -15,6 +15,8 @@ describe('auth form validation adoption', () => {
       expect(source).toContain('fields={')
       expect(source).not.toContain('paintValidationIssuesOnForm')
       expect(source).not.toContain('prepareFormIssues')
+      expect(source).toContain('useAuthFormSubmit')
+      expect(source).not.toContain('setFormError')
     }
   })
 })
