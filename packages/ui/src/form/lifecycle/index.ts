@@ -31,12 +31,19 @@ export {
 export { projectInvalidEvaluationToForm } from './passive-rhf-projection.client'
 export {
   FORM_VALIDATION_PRODUCER_SLOT_ORDER,
+  collectCurrentFormValidationProducerIssues,
   collectFormValidationSessionIssues,
   createEmptyFormValidationProducerSession,
   dedupeFormIssues,
   isFormValidationProducerSlotStale,
+  projectFormValidationProducerIssues,
   readFormValidationProducerSlotIssues,
   replaceFormValidationProducerSlot,
   type FormValidationProducerSession,
   type FormValidationProducerSlotState,
 } from './form-validation-producer-session.lib'
+export {
+  FormValidationProducerProvider,
+  useFormValidationProducerContext,
+  type FormValidationProducerContextValue,
+} from './form-validation-producer-context.client'

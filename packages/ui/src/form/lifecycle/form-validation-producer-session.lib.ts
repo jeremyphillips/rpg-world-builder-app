@@ -1,4 +1,6 @@
 import type { FormIssue } from '../errors/form-issue.types'
+import { routeFormIssues } from '../errors/route-form-issues.lib'
+import type { FormItem } from '../field-config'
 import type { FormValidationProducerSlot } from './form-evaluation.types'
 
 export const FORM_VALIDATION_PRODUCER_SLOT_ORDER: readonly FormValidationProducerSlot[] = [
@@ -82,6 +84,31 @@ export function collectFormValidationSessionIssues(
     if (state) merged.push(...state.issues)
   }
   return dedupeFormIssues(merged)
+}
+
+/** Issues from producer slots that belong to this snapshot stamp (stale slots omitted). */
+export function collectCurrentFormValidationProducerIssues(
+  session: FormValidationProducerSession,
+  stamp: number,
+): FormIssue[] {
+  const merged: FormIssue[] = []
+  for (const slot of FORM_VALIDATION_PRODUCER_SLOT_ORDER) {
+    const state = session.slots[slot]
+    if (!state || isFormValidationProducerSlotStale(state, stamp)) continue
+    merged.push(...state.issues)
+  }
+  return dedupeFormIssues(merged)
+}
+
+export function projectFormValidationProducerIssues(
+  session: FormValidationProducerSession,
+  stamp: number,
+  fields: FormItem[],
+  formValues: Record<string, unknown>,
+): FormIssue[] {
+  const raw = collectCurrentFormValidationProducerIssues(session, stamp)
+  if (raw.length === 0) return []
+  return routeFormIssues(raw, fields, formValues)
 }
 
 export function isFormValidationProducerSlotStale(

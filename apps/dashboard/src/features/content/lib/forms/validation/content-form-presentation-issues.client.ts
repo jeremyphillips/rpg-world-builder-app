@@ -3,8 +3,8 @@
 import { useFormValidationPresentation, type FormItem } from '@rpg/ui/form'
 
 /**
- * Adopted content surfaces read validation through {@link useFormValidationPresentation}
- * instead of merging raw RHF trees alongside the UI presentation snapshot.
+ * Adopted content surfaces read producer slots through {@link useFormValidationPresentation}
+ * when {@link FormValidationProducerProvider} is mounted (content submit UiBridge).
  */
 export function useContentFormPresentationIssues(fieldsOverride?: FormItem[]) {
   return useFormValidationPresentation(fieldsOverride)

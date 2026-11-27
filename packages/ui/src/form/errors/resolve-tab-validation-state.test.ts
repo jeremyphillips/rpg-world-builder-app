@@ -125,6 +125,18 @@ describe('resolveTabValidationState', () => {
     expect(assignedCount).toBe(issues.length)
   })
 
+  it('does not assign orphan issues to the first tab', () => {
+    const issues = prepareFormIssues(
+      [{ path: ['orphanRoot'], message: 'Orphan issue' }],
+      allFields,
+      {},
+    )
+    const states = resolveTabValidationState(issues, tabs, allFields)
+    const assignedCount = states.reduce((total, state) => total + state.count, 0)
+    expect(assignedCount).toBe(0)
+    expect(states.find((state) => state.tabId === tabs[0]!.id)?.count).toBe(0)
+  })
+
   it('breaks equal-prefix ties by tab order', () => {
     const overlappingTabs: TabValidationTab[] = [
       { id: 'first', fields: [{ type: 'text', name: 'shared', label: 'Shared', required: true }] },

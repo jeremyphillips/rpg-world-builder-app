@@ -4,6 +4,8 @@ import * as React from 'react'
 import { useFormContext, useFormState, useWatch } from 'react-hook-form'
 
 import { useFormUiContext } from '../context/form-ui.context'
+import { useFormValidationProducerContext } from '../lifecycle/form-validation-producer-context.client'
+import { projectFormValidationProducerIssues } from '../lifecycle/form-validation-producer-session.lib'
 import type { ArrayItemIssueGroup } from '../errors/form-issue.types'
 import { groupIssuesForItemPrefix } from '../errors/group-form-issues'
 import { prepareFormIssues } from '../errors/resolve-invalid-submit-navigation'
@@ -60,17 +62,36 @@ export function useFormValidationPresentation(fieldsOverride?: FormItem[]) {
   } = useFormUiContext()
   const fields = fieldsOverride ?? contextFields
   const formValues = useWatch() as Record<string, unknown>
+  const producer = useFormValidationProducerContext()
   const { errors, touchedFields } = useFormState()
   const rhfIssues = React.useMemo(
     () => prepareFormIssues(errors, fields, formValues ?? {}),
     [errors, fields, formValues],
   )
+  const producerIssues = React.useMemo(() => {
+    if (!producer) return []
+    return projectFormValidationProducerIssues(
+      producer.session,
+      producer.stamp,
+      fields,
+      formValues ?? {},
+    )
+  }, [producer, fields, formValues])
   // An empty live preview list must not hide errors already painted on the form.
   // Preview issues still win when the publish attempt produced any routed issues.
-  const rawIssues =
-    publishPresentationEnabled && hasAttemptedPublish && publishPresentationIssues.length > 0
-      ? publishPresentationIssues
-      : rhfIssues
+  const rawIssues = React.useMemo(() => {
+    if (producerIssues.length > 0) return producerIssues
+    if (publishPresentationEnabled && hasAttemptedPublish && publishPresentationIssues.length > 0) {
+      return publishPresentationIssues
+    }
+    return rhfIssues
+  }, [
+    hasAttemptedPublish,
+    producerIssues,
+    publishPresentationEnabled,
+    publishPresentationIssues,
+    rhfIssues,
+  ])
   const inactivePaths = React.useMemo(
     () => collectInactiveFieldPaths(fields, formValues ?? {}),
     [fields, formValues],

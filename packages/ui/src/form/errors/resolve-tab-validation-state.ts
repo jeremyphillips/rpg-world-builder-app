@@ -136,19 +136,10 @@ export function resolveTabValidationState(
     issuesByTab.set(tab.id, [])
   }
 
-  const orphanIssues: FormIssue[] = []
-
   for (const issue of issues) {
     const tabId = findOwningTabId(issue, tabs, tabPrefixes)
-    if (!tabId) {
-      orphanIssues.push(issue)
-      continue
-    }
+    if (!tabId) continue
     issuesByTab.get(tabId)?.push(issue)
-  }
-
-  if (orphanIssues.length > 0 && tabs.length > 0) {
-    issuesByTab.get(tabs[0]!.id)?.push(...orphanIssues)
   }
 
   return tabs.map((tab) => {

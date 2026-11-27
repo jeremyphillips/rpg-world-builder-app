@@ -1,10 +1,11 @@
-import { useContext, useEffect, useRef } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { useFormContext, type FieldValues } from 'react-hook-form'
 import { isApiError } from '@rpg/contracts/shared'
 import {
   cancelPendingInvalidSubmitFocus,
   createEmptyFormValidationProducerSession,
   FormUiContext,
+  FormValidationProducerProvider,
   useSubmitHandler,
   type FormValidationProducerSession,
   type UseSubmitHandlerResult,
@@ -56,12 +57,13 @@ export function useContentFormSubmit<TValues extends FieldValues>(
     'markSubmitAttempted' | 'markPublishAttempted' | 'addValidationSessionExpandKeys'
   > | null>(null)
 
-  const producerSessionRef = useRef<FormValidationProducerSession>(
+  const [producerSession, setProducerSession] = useState<FormValidationProducerSession>(() =>
     createEmptyFormValidationProducerSession(),
   )
 
   // Snapshot stamp: bumped by UiBridge on authored value change or reset, never on UI state.
   const stampRef = useRef(0)
+  const [snapshotStamp, setSnapshotStamp] = useState(0)
   const persistingRef = useRef(0)
   const attemptCounterRef = useRef(0)
 
@@ -110,7 +112,7 @@ export function useContentFormSubmit<TValues extends FieldValues>(
         readCurrent,
         invalidPresentation,
         ui: uiRef.current,
-        producerSession: producerSessionRef.current,
+        producerSession,
         persist: async (wireValues, persistForm) => {
           persistingRef.current += 1
           try {
@@ -122,7 +124,7 @@ export function useContentFormSubmit<TValues extends FieldValues>(
       })
 
       if (result.kind === 'superseded') throw new ContentFormSubmitSuperseded()
-      producerSessionRef.current = result.session
+      setProducerSession(result.session)
       if (result.kind === 'validation-blocked') {
         throw new ContentFormSubmitValidationFailed()
       }
@@ -143,10 +145,15 @@ export function useContentFormSubmit<TValues extends FieldValues>(
         // response while persisting; that must not supersede the attempt itself.
         if (info.name === undefined && persistingRef.current > 0) return
         stampRef.current += 1
+        setSnapshotStamp(stampRef.current)
       })
       return () => subscription.unsubscribe()
     }, [rhf])
-    return null
+    return React.createElement(FormValidationProducerProvider, {
+      session: producerSession,
+      stamp: snapshotStamp,
+      children: null,
+    })
   }
 
   return { onSubmit, formError, UiBridge }
