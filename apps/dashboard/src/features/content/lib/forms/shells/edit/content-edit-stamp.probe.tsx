@@ -68,6 +68,7 @@ export function StampEditProbeLayout<TFormValues extends FieldValues>({
         <>
           {content}
           <ProducerApiIssueProbe />
+          <ProducerApiSlotIssueProbe />
         </>
       )}
       footer={() => <button type="submit">{submitLabel}</button>}

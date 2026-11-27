@@ -362,4 +362,97 @@ describe('adopted content producer mounted presentation', () => {
     ).toBeGreaterThan(0)
     expect(persist).not.toHaveBeenCalled()
   })
+
+  it('records publish-action issues on publish submit while draft-action from the prior attempt remains', async () => {
+    const persist = vi.fn()
+    const bindingRef: { current: ReturnType<typeof useContentFormSubmitProducerBinding> | null } = {
+      current: null,
+    }
+    const controls = {
+      draft: async () => undefined as Promise<void>,
+      publish: async () => undefined as Promise<void>,
+    }
+
+    function Harness() {
+      const form = useForm<Values>({ defaultValues: { name: '' } })
+      const binding = useContentFormSubmitProducerBinding()
+      bindingRef.current = binding
+
+      const shared = {
+        def,
+        ctx,
+        fallbackMessage: 'Could not save.',
+        producerBinding: binding,
+        persist,
+      }
+      const draft = useContentFormSubmit<Values>({
+        ...shared,
+        commitValidationIntent: 'draft',
+        mountProducerChrome: false,
+      })
+      const publish = useContentFormSubmit<Values>({
+        ...shared,
+        invalidPresentation: { resolverFields: fields, formId: 'pilot-form' },
+      })
+
+      controls.draft = () => draft.onSubmit({ name: '' }, form)
+      controls.publish = () => publish.onSubmit({ name: '' }, form)
+
+      const Boundary = publish.ProducerBoundary
+      const publishSchemaForRail = resolveContentPublishSchema(def, ctx)
+
+      return (
+        <FormProvider {...form}>
+          <Boundary>
+            <ContentFormPublishValidationBridge
+              schema={publishSchemaForRail}
+              tabs={tabs}
+              onValidationChange={noopPublishIssuesChange}
+            />
+          </Boundary>
+        </FormProvider>
+      )
+    }
+
+    render(
+      <FormUiWrapper>
+        <Harness />
+      </FormUiWrapper>,
+    )
+
+    await act(async () => {
+      try {
+        await controls.draft()
+      } catch (error) {
+        expect(error).toBeInstanceOf(ContentFormSubmitValidationFailed)
+      }
+    })
+
+    await waitFor(() => {
+      expect(
+        bindingRef.current?.producerSession.slots['draft-action']?.issues.length,
+      ).toBeGreaterThan(0)
+    })
+
+    await act(async () => {
+      try {
+        await controls.publish()
+      } catch (error) {
+        expect(error).toBeInstanceOf(ContentFormSubmitValidationFailed)
+      }
+    })
+
+    await waitFor(() => {
+      expect(
+        bindingRef.current?.producerSession.slots['draft-action']?.issues.length,
+      ).toBeGreaterThan(0)
+      expect(
+        bindingRef.current?.producerSession.slots['publish-action']?.issues.length,
+      ).toBeGreaterThan(0)
+      expect(
+        bindingRef.current?.producerSession.slots['publish-readiness']?.issues.length ?? 0,
+      ).toBeGreaterThan(0)
+    })
+    expect(persist).not.toHaveBeenCalled()
+  })
 })
