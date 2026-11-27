@@ -3,15 +3,18 @@
  */
 import { ApiError } from '@rpg/contracts'
 import { describe, expect, it, vi } from 'vitest'
-import { FormProvider, useForm, type UseFormReturn } from 'react-hook-form'
-import { render, renderHook, act, waitFor } from '@testing-library/react'
+import { FormProvider, useFieldArray, useForm, type UseFormReturn } from 'react-hook-form'
+import { render, renderHook, act, waitFor, screen } from '@testing-library/react'
 import { z } from 'zod'
 import {
   collectCurrentFormValidationProducerIssues,
+  collectTabbedFormResolverItems,
   createEmptyFormValidationProducerSession,
   FormUiContext,
+  resolveTabValidationState,
   type FormItem,
   type FormUiContextValue,
+  type TabbedFormTab,
 } from '@rpg/ui/form'
 import type { ReactNode } from 'react'
 
@@ -25,6 +28,7 @@ import {
 import { presentPersistValidationFailure } from './content-form-submit-presentation.lib'
 import { projectCompactedArrayProvenance } from '../../submit/project-compacted-array-provenance.lib'
 import type { AnyContentFormDef, ContentFormCtx } from '../../registry/content-form-registry'
+import { useContentFormPresentationIssues } from '../../validation/content-form-presentation-issues.client'
 
 const testSchema = z.object({
   name: z.string().min(1, 'Name is required.'),
@@ -675,6 +679,196 @@ describe('useContentFormSubmit attempt identity', () => {
     expect(persist).not.toHaveBeenCalled()
     expect(result.current.formError).toBeUndefined()
     expect(form.getFieldState('level').error?.message).toBe('Level too low.')
+  })
+})
+
+const editTabBadgesTabs: TabbedFormTab[] = [
+  {
+    id: 'identity',
+    label: 'Identity',
+    fields: [
+      { name: 'name', label: 'Name', type: 'text' },
+      { name: 'level', label: 'Level', type: 'number' },
+    ],
+    errorPaths: ['name', 'level'],
+  },
+]
+const editTabResolverFields = collectTabbedFormResolverItems(editTabBadgesTabs)
+
+describe('edit shell tab badges from producer projection', () => {
+  it('badges the tab at stamp N and clears after form reset advances the snapshot', async () => {
+    const persist = vi.fn().mockRejectedValueOnce(
+      new ApiError(400, 'validation_error', 'Invalid', {
+        issues: [{ path: 'name', message: 'Slug is already taken', code: 'duplicate' }],
+      }),
+    )
+    const formRef: { current: UseFormReturn<TestValues> | null } = { current: null }
+    const controls = { submit: async () => undefined as Promise<void> }
+
+    function TabBadgeProbe() {
+      const { issues } = useContentFormPresentationIssues(editTabResolverFields)
+      const identityCount =
+        resolveTabValidationState(issues, editTabBadgesTabs, editTabResolverFields).find(
+          (state) => state.tabId === 'identity',
+        )?.count ?? 0
+      return <output data-testid="identity-tab-count">{identityCount}</output>
+    }
+
+    function Harness() {
+      const form = useForm<TestValues>({ defaultValues: { name: 'A', level: 2 } })
+      formRef.current = form
+      const binding = useContentFormSubmitProducerBinding()
+      const contentSubmit = useContentFormSubmit<TestValues>({
+        def: testDef,
+        ctx: { ...testCtx, mode: 'edit' },
+        fallbackMessage: 'Could not save.',
+        producerBinding: binding,
+        invalidPresentation: {
+          resolverFields: editTabResolverFields,
+          formId: 'edit-tabbed-form',
+        },
+        persist: async (values) => persist(values),
+      })
+      controls.submit = () => contentSubmit.onSubmit({ name: 'A', level: 2 }, form)
+      const Boundary = contentSubmit.ProducerBoundary
+      const StampBridge = contentSubmit.ProducerStampBridge
+
+      return (
+        <FormProvider {...form}>
+          <StampBridge />
+          <Boundary>
+            <TabBadgeProbe />
+          </Boundary>
+        </FormProvider>
+      )
+    }
+
+    render(
+      <FormUiWrapper>
+        <Harness />
+      </FormUiWrapper>,
+    )
+
+    await act(async () => {
+      try {
+        await controls.submit()
+      } catch (error) {
+        expect(error).toBeInstanceOf(Error)
+      }
+    })
+
+    await waitFor(() => {
+      expect(screen.getByTestId('identity-tab-count')).toHaveTextContent('1')
+    })
+
+    act(() => {
+      formRef.current!.reset({ name: 'Fresh start', level: 3 })
+    })
+
+    await waitFor(() => {
+      expect(screen.getByTestId('identity-tab-count')).toHaveTextContent('0')
+    })
+  })
+
+  it('clears stale api projection after deleting a collection row advances the snapshot', async () => {
+    const grantsSchema = z.object({
+      name: z.string().min(1),
+      grants: z.array(z.object({ label: z.string().min(1) })),
+    })
+    type GrantValues = z.infer<typeof grantsSchema>
+    const grantDef = {
+      ...testDef,
+      schema: grantsSchema,
+    } as unknown as AnyContentFormDef
+
+    const persist = vi.fn().mockRejectedValueOnce(
+      new ApiError(400, 'validation_error', 'Invalid', {
+        issues: [{ path: 'name', message: 'Slug is already taken', code: 'duplicate' }],
+      }),
+    )
+    const bindingRef: {
+      current: ReturnType<typeof useContentFormSubmitProducerBinding> | null
+    } = { current: null }
+    const controls = {
+      submit: async () => undefined as Promise<void>,
+      removeRow: () => undefined,
+    }
+
+    function Harness() {
+      const form = useForm<GrantValues>({
+        defaultValues: { name: 'A', grants: [{ label: 'One' }, { label: 'Two' }] },
+      })
+      const binding = useContentFormSubmitProducerBinding()
+      bindingRef.current = binding
+      const { remove } = useFieldArray({ control: form.control, name: 'grants' })
+      controls.removeRow = () => remove(0)
+      const contentSubmit = useContentFormSubmit<GrantValues>({
+        def: grantDef,
+        ctx: { ...testCtx, mode: 'edit' },
+        fallbackMessage: 'Could not save.',
+        producerBinding: binding,
+        invalidPresentation: {
+          resolverFields: [
+            { name: 'name', label: 'Name', type: 'text' },
+            {
+              kind: 'array',
+              name: 'grants',
+              fields: [{ name: 'label', label: 'Label', type: 'text' }],
+            },
+          ],
+          formId: 'edit-grants-form',
+        },
+        persist: async (values) => persist(values as unknown as TestValues),
+      })
+      controls.submit = () =>
+        contentSubmit.onSubmit({ name: 'A', grants: [{ label: 'One' }, { label: 'Two' }] }, form)
+      const Boundary = contentSubmit.ProducerBoundary
+      const StampBridge = contentSubmit.ProducerStampBridge
+
+      return (
+        <FormProvider {...form}>
+          <StampBridge />
+          <Boundary>
+            <span data-testid="probe" />
+          </Boundary>
+        </FormProvider>
+      )
+    }
+
+    render(
+      <FormUiWrapper>
+        <Harness />
+      </FormUiWrapper>,
+    )
+
+    await act(async () => {
+      try {
+        await controls.submit()
+      } catch (error) {
+        expect(error).toBeInstanceOf(Error)
+      }
+    })
+
+    expect(
+      collectCurrentFormValidationProducerIssues(
+        bindingRef.current!.producerSession,
+        bindingRef.current!.snapshotStamp,
+      ).some((issue) => issue.path === 'name'),
+    ).toBe(true)
+
+    act(() => {
+      controls.removeRow()
+    })
+
+    await waitFor(() => {
+      expect(bindingRef.current!.snapshotStamp).toBeGreaterThan(0)
+      expect(
+        collectCurrentFormValidationProducerIssues(
+          bindingRef.current!.producerSession,
+          bindingRef.current!.snapshotStamp,
+        ),
+      ).toEqual([])
+    })
   })
 })
 

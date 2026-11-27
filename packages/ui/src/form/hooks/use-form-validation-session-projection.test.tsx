@@ -55,6 +55,23 @@ describe('useFormValidationSessionProjection', () => {
     expect(result.current.issues.map((issue) => issue.path)).toEqual(['name'])
     expect(result.current.usesProducerSession).toBe(true)
   })
+
+  it('drops stale producer slots when the snapshot stamp advances', () => {
+    let session = createEmptyFormValidationProducerSession()
+    session = replaceFormValidationProducerSlot(session, 'api', 1, [
+      { path: 'name', message: 'Taken', severity: 'field' },
+    ])
+
+    const atStampN = renderHook(() => useFormValidationSessionProjection(), {
+      wrapper: ({ children }) => shell({ children, producer: { session, stamp: 1 } }),
+    })
+    expect(atStampN.result.current.issues.map((issue) => issue.path)).toEqual(['name'])
+
+    const atStampNPlusOne = renderHook(() => useFormValidationSessionProjection(), {
+      wrapper: ({ children }) => shell({ children, producer: { session, stamp: 2 } }),
+    })
+    expect(atStampNPlusOne.result.current.issues).toEqual([])
+  })
 })
 
 describe('useFieldIssue session projection', () => {
