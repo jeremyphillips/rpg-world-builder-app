@@ -390,6 +390,81 @@ describe('presentPersistValidationFailure provenance', () => {
   })
 })
 
+describe('useContentFormSubmit prepareWrite provenance at persist', () => {
+  it('remaps api wire paths through prepareWrite provenance before painting', async () => {
+    const persist = vi.fn().mockRejectedValueOnce(
+      new ApiError(400, 'validation_error', 'Invalid', {
+        issues: [{ path: 'slug', message: 'Slug is already taken', code: 'duplicate' }],
+      }),
+    )
+    const bindingRef: {
+      current: ReturnType<typeof useContentFormSubmitProducerBinding> | null
+    } = { current: null }
+    const formRef: { current: UseFormReturn<TestValues> | null } = { current: null }
+    const controls = { submit: async () => undefined as Promise<void> }
+
+    function Harness() {
+      const form = useForm<TestValues>({ defaultValues: { name: 'A', level: 2 } })
+      formRef.current = form
+      const binding = useContentFormSubmitProducerBinding()
+      bindingRef.current = binding
+      const contentSubmit = useContentFormSubmit<TestValues>({
+        def: testDef,
+        ctx: { ...testCtx, mode: 'edit' },
+        fallbackMessage: 'Could not save.',
+        producerBinding: binding,
+        invalidPresentation: {
+          resolverFields: [
+            { name: 'name', label: 'Name', type: 'text' },
+            { name: 'level', label: 'Level', type: 'number' },
+          ],
+          formId: 'provenance-form',
+        },
+        prepareWrite: () => ({
+          payload: { name: 'A', level: 2, slug: 'a' },
+          provenance: { pathMap: { name: 'slug' } },
+        }),
+        persist: async (values, persistForm, meta) => persist(values, persistForm, meta),
+      })
+      controls.submit = () => contentSubmit.onSubmit({ name: 'A', level: 2 }, form)
+      const Boundary = contentSubmit.ProducerBoundary
+
+      return (
+        <FormProvider {...form}>
+          <Boundary>
+            <span data-testid="probe" />
+          </Boundary>
+        </FormProvider>
+      )
+    }
+
+    render(
+      <FormUiWrapper>
+        <Harness />
+      </FormUiWrapper>,
+    )
+
+    await act(async () => {
+      try {
+        await controls.submit()
+      } catch (error) {
+        expect(error).toBeInstanceOf(ApiError)
+      }
+    })
+
+    expect(formRef.current!.getFieldState('name').error?.message).toBe('Slug is already taken')
+    expect(
+      bindingRef.current!.producerSession.slots.api?.issues.some((issue) => issue.path === 'name'),
+    ).toBe(true)
+    expect(
+      collectCurrentFormValidationProducerIssues(
+        bindingRef.current!.producerSession,
+        bindingRef.current!.snapshotStamp,
+      ).some((issue) => issue.path === 'name'),
+    ).toBe(true)
+  })
+})
+
 describe('useContentFormSubmit attempt identity', () => {
   type Harness = {
     submit: (values: TestValues) => Promise<void>
@@ -870,6 +945,87 @@ describe('useContentFormSubmit attempt identity', () => {
       await expect(first).rejects.toBeInstanceOf(ContentFormSubmitSuperseded)
     })
 
+    expect(formRef.current!.getFieldState('name').error).toBeUndefined()
+  })
+
+  it('ignores a late api failure after the user edits a field mid-persist', async () => {
+    let releaseFirst: () => void = () => undefined
+    const persist = vi.fn().mockImplementationOnce(
+      () =>
+        new Promise<void>((_, reject) => {
+          releaseFirst = () =>
+            reject(
+              new ApiError(400, 'validation_error', 'Invalid', {
+                issues: [{ path: 'name', message: 'Taken', code: 'duplicate' }],
+              }),
+            )
+        }),
+    )
+    const bindingRef: {
+      current: ReturnType<typeof useContentFormSubmitProducerBinding> | null
+    } = { current: null }
+    const formRef: { current: UseFormReturn<TestValues> | null } = { current: null }
+    const controls = { submit: async () => undefined as Promise<void> }
+
+    function Harness() {
+      const form = useForm<TestValues>({ defaultValues: { name: 'A', level: 2 } })
+      formRef.current = form
+      const binding = useContentFormSubmitProducerBinding()
+      bindingRef.current = binding
+      const contentSubmit = useContentFormSubmit<TestValues>({
+        def: testDef,
+        ctx: { ...testCtx, mode: 'edit' },
+        fallbackMessage: 'Could not save.',
+        producerBinding: binding,
+        invalidPresentation: {
+          resolverFields: [
+            { name: 'name', label: 'Name', type: 'text' },
+            { name: 'level', label: 'Level', type: 'number' },
+          ],
+          formId: 'edit-form',
+        },
+        persist: async (values, persistForm, meta) => persist(values, persistForm, meta),
+      })
+      controls.submit = () => contentSubmit.onSubmit({ name: 'A', level: 2 }, form)
+      const Boundary = contentSubmit.ProducerBoundary
+
+      return (
+        <FormProvider {...form}>
+          <Boundary>
+            <span data-testid="probe" />
+          </Boundary>
+        </FormProvider>
+      )
+    }
+
+    render(
+      <FormUiWrapper>
+        <Harness />
+      </FormUiWrapper>,
+    )
+
+    let first!: Promise<void>
+    act(() => {
+      first = controls.submit()
+    })
+    first.catch(() => undefined)
+    await waitFor(() => expect(persist).toHaveBeenCalledTimes(1))
+
+    act(() => {
+      formRef.current!.setValue('level', 9, { shouldDirty: true })
+    })
+
+    await act(async () => {
+      releaseFirst()
+      await expect(first).rejects.toBeInstanceOf(ContentFormSubmitSuperseded)
+    })
+
+    expect(
+      collectCurrentFormValidationProducerIssues(
+        bindingRef.current!.producerSession,
+        bindingRef.current!.snapshotStamp,
+      ),
+    ).toEqual([])
     expect(formRef.current!.getFieldState('name').error).toBeUndefined()
   })
 

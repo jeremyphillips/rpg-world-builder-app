@@ -110,12 +110,22 @@ function ClassFeaturesSubmitButton({ onAttempt }: { onAttempt: () => void }) {
   )
 }
 
+type FeatureRowDefault = {
+  kind?: 'custom' | 'spellcasting' | 'subclass-choice'
+  name: string
+  level: number
+  grants: never[]
+  intro?: string
+}
+
 function MountedClassFeaturesHarness({
   ProducerBoundary,
   defaultValues,
+  formCtx = ctx,
 }: {
   ProducerBoundary: ComponentType<{ children: ReactNode }>
-  defaultValues: { features: { kind: 'custom'; name: string; level: number; grants: never[] }[] }
+  defaultValues: { features: FeatureRowDefault[] }
+  formCtx?: typeof ctx
 }) {
   const [attemptedSubmit, setAttemptedSubmit] = useState(false)
   const form = useForm({
@@ -133,7 +143,7 @@ function MountedClassFeaturesHarness({
           onMarkSubmitAttempted={() => setAttemptedSubmit(true)}
         >
           <ProducerBoundary>
-            <ClassFeaturesTab formCtx={ctx} />
+            <ClassFeaturesTab formCtx={formCtx} />
             <RowIssueCountProbe resolver={classFeatureItemFields(ctx)} />
             <FeatureRowIssueSummary resolver={classFeatureItemFields(ctx)} />
             <ClassFeaturesSubmitButton onAttempt={() => setAttemptedSubmit(true)} />
@@ -327,6 +337,37 @@ describe('class feature master-detail validation pilot', () => {
       expect(Number(screen.getByTestId('row-issue-count').textContent)).toBeGreaterThan(0)
     })
     expect(screen.getByLabelText('Introduction')).toBeInTheDocument()
+  })
+
+  it('surfaces subclass-choice availability and row validation together after submit', async () => {
+    const user = userEvent.setup()
+    const ProducerBoundary = liveProducerBoundary([classFeatureResolverField])
+    const disabledCtx = makeContentFormCtx({ campaignRules: { subclassing: { enabled: false } } })
+
+    render(
+      <MountedClassFeaturesHarness
+        ProducerBoundary={ProducerBoundary}
+        formCtx={disabledCtx}
+        defaultValues={{
+          features: [
+            {
+              kind: 'subclass-choice',
+              name: '',
+              level: 3,
+              grants: [],
+            },
+          ],
+        }}
+      />,
+    )
+
+    expect(screen.getByText(/Subclass choices are disabled/i)).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Save features' }))
+
+    await waitFor(() => {
+      expect(Number(screen.getByTestId('row-issue-count').textContent)).toBeGreaterThan(0)
+    })
   })
 
   it('surfaces validation for a row with omitted kind without throwing', async () => {

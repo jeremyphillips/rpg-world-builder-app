@@ -92,17 +92,26 @@ vi.mock('@/components/layout/breadcrumb/use-breadcrumb-label', () => ({
   useSetBreadcrumbLabel: vi.fn(),
 }))
 
-vi.mock('../../submit/prepare-serialized-content-form-write.lib', () => ({
-  prepareSerializedContentFormWrite: () => ({
+const prepareWriteMock = vi.hoisted(() =>
+  vi.fn(() => ({
     payload: { name: 'Feat' },
-    provenance: null,
-  }),
+    provenance: null as { pathMap?: Record<string, string> } | null,
+  })),
+)
+
+vi.mock('../../submit/prepare-serialized-content-form-write.lib', () => ({
+  prepareSerializedContentFormWrite: (...args: unknown[]) => prepareWriteMock(...args),
 }))
 
 const mutation = vi.hoisted(() => ({ mutateAsync: vi.fn() }))
 
 beforeEach(() => {
   mutation.mutateAsync.mockReset()
+  prepareWriteMock.mockReset()
+  prepareWriteMock.mockReturnValue({
+    payload: { name: 'Feat' },
+    provenance: null,
+  })
 })
 
 vi.mock('../../../list/use-content-mutations', async (importOriginal) => {
@@ -207,5 +216,33 @@ describe('ContentEditShell stamp and producer session', () => {
       expect(screen.getByTestId('api-issue-count')).toHaveTextContent('0')
     })
     expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue('Feat B')
+  })
+
+  it('runs prepareSerializedContentFormWrite on the edit shell commit path', async () => {
+    const user = userEvent.setup()
+    prepareWriteMock.mockReturnValue({
+      payload: { name: 'Feat A!', slug: 'feat-a' },
+      provenance: { pathMap: { name: 'slug' } },
+    })
+    mutation.mutateAsync.mockResolvedValueOnce({
+      id: 'feat-a',
+      name: 'Feat A!',
+      catalogLayer: 'homebrew',
+      status: 'published',
+      campaignAccess: DEFAULT_CONTENT_CAMPAIGN_ACCESS,
+    })
+
+    renderStampShell('feat-a', [homebrewFeat('feat-a', 'Feat A')])
+
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), '!')
+    await user.click(screen.getByRole('button', { name: /save changes/i }))
+
+    await waitFor(() => {
+      expect(prepareWriteMock).toHaveBeenCalled()
+      expect(mutation.mutateAsync).toHaveBeenCalledTimes(1)
+    })
+    expect(prepareWriteMock.mock.results[0]?.value).toMatchObject({
+      provenance: { pathMap: { name: 'slug' } },
+    })
   })
 })
