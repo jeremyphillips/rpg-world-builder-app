@@ -161,7 +161,8 @@ function ContentCreateFormBody({
   const {
     onSubmit: onPublish,
     formError: publishFormError,
-    UiBridge,
+    ProducerBoundary,
+    ProducerStampBridge,
   } = useContentFormSubmit<Record<string, unknown>>({
     def,
     ctx,
@@ -187,7 +188,7 @@ function ContentCreateFormBody({
   const {
     onSubmit: onSaveDraft,
     formError: saveDraftFormError,
-    UiBridge: DraftUiBridge,
+    ProducerStampBridge: DraftProducerStampBridge,
   } = useContentFormSubmit<Record<string, unknown>>({
     def,
     ctx,
@@ -255,6 +256,8 @@ function ContentCreateFormBody({
           scrollMode={layout.scrollMode}
           previewEnabled={layout.previewEnabled}
           previewDraftBadge={layout.previewEnabled}
+          producerBoundary={ProducerBoundary}
+          producerStampBridge={<DraftProducerStampBridge />}
           formHeaderPrefix={
             <>
               {layout.previewEnabled ? (
@@ -262,8 +265,6 @@ function ContentCreateFormBody({
                   {heading}
                 </Heading>
               ) : null}
-              <UiBridge />
-              <DraftUiBridge />
               {formHeaderPrefix}
               <ArmorClassAuthoringNotice />
             </>

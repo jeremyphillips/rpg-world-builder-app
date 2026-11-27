@@ -245,10 +245,15 @@ describe('useContentFormSubmit', () => {
       { wrapper: FormUiWrapper },
     )
 
-    renderHook(() => result.current.UiBridge(), { wrapper: FormUiWrapper })
-
     const form = renderHook(() => useForm<TestValues>({ defaultValues: { name: '', level: 0 } }))
       .result.current
+    const StampBridge = result.current.ProducerStampBridge
+    render(
+      <FormProvider {...form}>
+        <StampBridge />
+      </FormProvider>,
+      { wrapper: FormUiWrapper },
+    )
 
     vi.mocked(uiValue.markSubmitAttempted).mockClear()
 
@@ -285,10 +290,15 @@ describe('useContentFormSubmit', () => {
       { wrapper: FormUiWrapper },
     )
 
-    renderHook(() => result.current.UiBridge(), { wrapper: FormUiWrapper })
-
     const form = renderHook(() => useForm<TestValues>({ defaultValues: { name: 'A', level: 1 } }))
       .result.current
+    const StampBridge = result.current.ProducerStampBridge
+    render(
+      <FormProvider {...form}>
+        <StampBridge />
+      </FormProvider>,
+      { wrapper: FormUiWrapper },
+    )
 
     await act(async () => {
       try {
@@ -348,10 +358,12 @@ describe('useContentFormSubmit attempt identity', () => {
       handle.form = form
       handle.submit = (values) => submit.onSubmit(values, form)
       handle.stampProbe = () => submit.formError
-      const Bridge = submit.UiBridge
+      const Boundary = submit.ProducerBoundary
       return (
         <FormProvider {...form}>
-          <Bridge />
+          <Boundary>
+            <div data-testid="producer-child" />
+          </Boundary>
         </FormProvider>
       )
     }

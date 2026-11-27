@@ -128,6 +128,8 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
   onBeforeActiveTabChange?: (nextTabId: string) => boolean
   /** When set and matching a tab id, that tab is selected on mount. */
   defaultActiveTabId?: string
+  /** Wraps field chrome inside {@link FormProvider} for adopted producer sessions. */
+  producerBoundary?: React.ComponentType<{ children: React.ReactNode }>
 }
 
 function buildExternalFooterContent(
@@ -183,6 +185,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   tabRowTrailing,
   onBeforeActiveTabChange,
   defaultActiveTabId,
+  producerBoundary,
 }: TabbedFormProps<TFieldValues>) {
   const generatedFormId = React.useId()
   const formId = id ?? generatedFormId
@@ -352,6 +355,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
         publishPresentationEnabled={publishPresentationEnabled}
         onResetValidationPresentation={onResetValidationPresentation}
         validateSilently={validateSilently as ValidateSilently}
+        producerBoundary={producerBoundary}
         onInvalidSubmit={handleInvalidSubmit}
         onSubmit={onSubmit}
         externalFooter={externalFooter}

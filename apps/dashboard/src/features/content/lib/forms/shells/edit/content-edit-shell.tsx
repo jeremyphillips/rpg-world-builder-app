@@ -138,7 +138,7 @@ interface ContentEditEntityFormProps<
   onSubmit: (values: FieldValues, form: UseFormReturn<FieldValues>) => Promise<void>
   formKey?: string
   formHeaderNotice?: ReactNode
-  submitUiBridge?: ReactNode
+  submitProducerBoundary?: React.ComponentType<{ children: React.ReactNode }>
 }
 
 function ContentEditEntityForm<
@@ -182,7 +182,7 @@ function ContentEditEntityFormBody<
   onSubmit,
   formKey,
   formHeaderNotice,
-  submitUiBridge,
+  submitProducerBoundary,
 }: ContentEditEntityFormProps<TEntity>) {
   useSetBreadcrumbLabel(entity.name)
   const layout = resolveContentFormLayout(def)
@@ -250,9 +250,9 @@ function ContentEditEntityFormBody<
       scrollMode={layout.scrollMode}
       previewEnabled={layout.previewEnabled}
       previewDraftBadge={layout.previewEnabled && entity.status === 'draft'}
+      producerBoundary={submitProducerBoundary}
       formHeaderPrefix={
         <>
-          {submitUiBridge}
           {layout.previewEnabled ? heading : null}
           {formHeaderNotice}
         </>
@@ -449,7 +449,7 @@ function ContentEditFormBody({
     armorClassRules: layoutCtx.armorClassRules,
   }
 
-  const { onSubmit, formError, UiBridge } = useContentFormSubmit<Record<string, unknown>>({
+  const { onSubmit, formError, ProducerBoundary } = useContentFormSubmit<Record<string, unknown>>({
     def,
     ctx: layoutCtx,
     commitValidationIntent: validationIntent,
@@ -540,7 +540,7 @@ function ContentEditFormBody({
             ) : null}
           </>
         }
-        submitUiBridge={<UiBridge />}
+        submitProducerBoundary={ProducerBoundary}
         defaultValues={formDefaults}
         submitPending={mutation.isPending}
         formError={formError ?? null}

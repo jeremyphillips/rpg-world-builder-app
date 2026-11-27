@@ -4,6 +4,7 @@ import type { ZodType } from 'zod'
 import { collectTabbedFormResolverItems, type TabbedFormTab } from '@rpg/ui/form'
 
 import { tryEvaluateContentPublishFormIssues } from './content-publish-validation.lib'
+import { usePublishContentFormProducerSlot } from './publish-content-form-producer-slot.client'
 import {
   useContentPublishValidation,
   type ContentPublishValidation,
@@ -21,6 +22,7 @@ export function ContentFormPublishValidationBridge({
 }) {
   const validation = useContentPublishValidation({ schema, tabs, debounceMs: 0 })
   const { getValues } = useFormContext<FieldValues>()
+  const publishToProducerSlot = usePublishContentFormProducerSlot()
   const fields = useMemo(() => collectTabbedFormResolverItems(tabs), [tabs])
 
   useEffect(() => {
@@ -31,16 +33,17 @@ export function ContentFormPublishValidationBridge({
       fields,
     )
     if (routingFailed) {
-      onValidationChange({ issues: routedIssues })
+      publishToProducerSlot('publish-readiness', routedIssues, onValidationChange)
       return
     }
     // Not-ready with no routed issues is a transient parse — keep the surfaced list.
     if (routedIssues.length === 0 && !validation.isPublishReady) return
-    onValidationChange({ issues: routedIssues })
+    publishToProducerSlot('publish-readiness', routedIssues, onValidationChange)
   }, [
     fields,
     getValues,
     onValidationChange,
+    publishToProducerSlot,
     schema,
     validation.isChecking,
     validation.isPublishReady,

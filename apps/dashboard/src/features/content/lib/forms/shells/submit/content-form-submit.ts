@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { useFormContext, type FieldValues } from 'react-hook-form'
 import { isApiError } from '@rpg/contracts/shared'
 import {
@@ -7,11 +7,14 @@ import {
   FormUiContext,
   FormValidationProducerProvider,
   useSubmitHandler,
+  type FormIssue,
   type FormValidationProducerSession,
+  type FormValidationProducerSlot,
   type UseSubmitHandlerResult,
 } from '@rpg/ui/form'
 
 import { resolveContentFormSchema, resolveContentPublishSchema } from '../edit/content-edit-load'
+import { ingestContentFormValidationIssues } from '../../validation/ingest-content-form-validation.lib'
 import { runContentFormCommitAttempt } from './content-form-submit-commit.lib'
 import {
   ContentFormSubmitSuperseded,
@@ -33,6 +36,11 @@ export {
 
 export type UseContentFormSubmitResult<TValues extends FieldValues> =
   UseSubmitHandlerResult<TValues> & {
+    /** Stamp watch only — use when a second submit hook shares one form boundary. */
+    ProducerStampBridge: () => null
+    /** Wraps field chrome so presentation reads the producer session. */
+    ProducerBoundary: React.ComponentType<{ children: React.ReactNode }>
+    /** @deprecated Prefer {@link ProducerBoundary} + {@link ProducerStampBridge}. */
     UiBridge: () => null
   }
 
@@ -134,7 +142,16 @@ export function useContentFormSubmit<TValues extends FieldValues>(
     },
   })
 
-  function UiBridge() {
+  const replaceSlot = useCallback(
+    (slot: FormValidationProducerSlot, issues: readonly FormIssue[]) => {
+      setProducerSession((prev) =>
+        ingestContentFormValidationIssues(prev, slot, stampRef.current, issues),
+      )
+    },
+    [],
+  )
+
+  function useContentFormSubmitStampWatch() {
     const ui = useContext(FormUiContext)
     uiRef.current = ui
     const rhf = useFormContext()
@@ -149,12 +166,26 @@ export function useContentFormSubmit<TValues extends FieldValues>(
       })
       return () => subscription.unsubscribe()
     }, [rhf])
-    return React.createElement(FormValidationProducerProvider, {
-      session: producerSession,
-      stamp: snapshotStamp,
-      children: null,
-    })
   }
 
-  return { onSubmit, formError, UiBridge }
+  function ProducerStampBridge() {
+    useContentFormSubmitStampWatch()
+    return null
+  }
+
+  function ProducerBoundary({ children }: { children: React.ReactNode }) {
+    useContentFormSubmitStampWatch()
+    const value = useMemo(
+      () => ({ session: producerSession, stamp: snapshotStamp, replaceSlot }),
+      [replaceSlot, producerSession, snapshotStamp],
+    )
+    return React.createElement(FormValidationProducerProvider, { ...value, children })
+  }
+
+  /** @deprecated Use {@link ProducerBoundary} around field chrome. */
+  function UiBridge() {
+    return React.createElement(ProducerStampBridge)
+  }
+
+  return { onSubmit, formError, ProducerBoundary, ProducerStampBridge, UiBridge }
 }

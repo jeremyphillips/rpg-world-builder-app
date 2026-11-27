@@ -58,6 +58,7 @@ interface ContentSchemaFormShellProps<
   headerPrefix?: React.ReactNode
   fields?: FormItem[]
   tabs?: TabbedFormTab[]
+  producerBoundary?: React.ComponentType<{ children: React.ReactNode }>
   previewDraftBadge?: boolean
   scrollMode: ContentFormScrollMode
   previewEnabled: boolean
@@ -140,6 +141,7 @@ function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
   headerPrefix,
   fields,
   tabs,
+  producerBoundary,
   formMode,
   backHref,
   submitLabel,
@@ -280,6 +282,7 @@ function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
               publishPresentationIssues={publishPresentationIssues}
               publishPresentationEnabled={previewEnabled}
               onResetValidationPresentation={resetValidationPresentation}
+              producerBoundary={producerBoundary}
               aside={
                 previewEnabled ? (
                   <ContentPreviewRail
@@ -312,6 +315,7 @@ function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
             scrollBodyClassName={isViewport ? 'pt-8' : undefined}
             header={header}
             footer={footer}
+            producerBoundary={producerBoundary}
           />
         </div>
       )}

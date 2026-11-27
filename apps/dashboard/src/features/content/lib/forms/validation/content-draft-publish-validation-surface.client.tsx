@@ -4,7 +4,6 @@ import { useEffect, useRef } from 'react'
 import type { FieldValues } from 'react-hook-form'
 import { useFormContext } from 'react-hook-form'
 import {
-  createEmptyFormValidationProducerSession,
   navigateInvalidSubmit,
   useFormUiContext,
   type FormIssue,
@@ -20,7 +19,7 @@ import {
 } from './content-draft-publish-validation-surface.ref'
 import { applyCanonicalFormIssuesToRhf } from './content-form-validation-rhf.lib'
 import { tryEvaluateContentPublishFormIssues } from './content-publish-validation.lib'
-import { ingestContentFormValidationIssues } from './ingest-content-form-validation.lib'
+import { usePublishContentFormProducerSlot } from './publish-content-form-producer-slot.client'
 
 export function ContentDraftPublishValidationSurfaceBridge({
   def,
@@ -39,14 +38,16 @@ export function ContentDraftPublishValidationSurfaceBridge({
 }) {
   const form = useFormContext<FieldValues>()
   const ui = useFormUiContext()
+  const publishToProducerSlot = usePublishContentFormProducerSlot()
   const uiRef = useRef(ui)
   const onPublishIssuesChangeRef = useRef(onPublishIssuesChange)
-  const publishReadinessSessionRef = useRef(createEmptyFormValidationProducerSession())
+  const publishToSlotRef = useRef(publishToProducerSlot)
 
   useEffect(() => {
     uiRef.current = ui
     onPublishIssuesChangeRef.current = onPublishIssuesChange
-  }, [onPublishIssuesChange, ui])
+    publishToSlotRef.current = publishToProducerSlot
+  }, [onPublishIssuesChange, publishToProducerSlot, ui])
 
   // Keep this registration stable across presentation resets. Reading `ui` from
   // state would unsubscribe the surface before the post-save microtask runs.
@@ -69,7 +70,7 @@ export function ContentDraftPublishValidationSurfaceBridge({
         currentUi.markSubmitAttempted()
         if (currentUi.publishPresentationEnabled) {
           currentUi.markPublishAttempted()
-          onPublishIssuesChangeRef.current({ issues })
+          publishToSlotRef.current('publish-readiness', issues, onPublishIssuesChangeRef.current)
         }
         return null
       }
@@ -80,16 +81,7 @@ export function ContentDraftPublishValidationSurfaceBridge({
 
       if (currentUi.publishPresentationEnabled) {
         currentUi.markPublishAttempted()
-        const stamp = Date.now()
-        publishReadinessSessionRef.current = ingestContentFormValidationIssues(
-          publishReadinessSessionRef.current,
-          'publish-readiness',
-          stamp,
-          issues,
-        )
-        onPublishIssuesChangeRef.current({
-          issues: publishReadinessSessionRef.current.slots['publish-readiness']?.issues ?? issues,
-        })
+        publishToSlotRef.current('publish-readiness', issues, onPublishIssuesChangeRef.current)
       }
 
       navigateInvalidSubmit(form, publishFields, formId, currentUi)

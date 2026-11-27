@@ -5,6 +5,7 @@ import { FormUiContext, type FormIssue, type FormItem } from '@rpg/ui/form'
 
 import { evaluateContentPublishFormIssues } from '../../validation/content-publish-validation.lib'
 import { applyCanonicalFormIssuesToRhf } from '../../validation/ingest-content-form-validation.lib'
+import { usePublishContentFormProducerSlot } from '../../validation/publish-content-form-producer-slot.client'
 
 type ContentCreatePublishValidationBridgeProps = {
   publishSchema: ZodType<FieldValues>
@@ -25,6 +26,7 @@ export function ContentCreatePublishValidationBridge({
 }: ContentCreatePublishValidationBridgeProps) {
   const form = useFormContext<FieldValues>()
   const ui = useContext(FormUiContext)
+  const publishToProducerSlot = usePublishContentFormProducerSlot()
   const submitCount = form.formState.submitCount
   const prevSubmitCountRef = useRef(submitCount)
 
@@ -40,11 +42,12 @@ export function ContentCreatePublishValidationBridge({
     applyCanonicalFormIssuesToRhf(form, issues)
     ui.markPublishAttempted()
     onPublishAttempted()
-    onPublishIssuesChange({ issues })
+    publishToProducerSlot('publish-readiness', issues, onPublishIssuesChange)
   }, [
     form,
     onPublishAttempted,
     onPublishIssuesChange,
+    publishToProducerSlot,
     publishFields,
     publishSchema,
     submitCount,

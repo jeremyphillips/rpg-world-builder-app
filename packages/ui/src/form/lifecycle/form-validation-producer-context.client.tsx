@@ -2,11 +2,15 @@
 
 import * as React from 'react'
 
+import type { FormIssue } from '../errors/form-issue.types'
+import type { FormValidationProducerSlot } from './form-evaluation.types'
 import type { FormValidationProducerSession } from './form-validation-producer-session.lib'
 
 export type FormValidationProducerContextValue = {
   session: FormValidationProducerSession
   stamp: number
+  /** When set, producers must publish through slot replacement instead of parallel UI state. */
+  replaceSlot?: (slot: FormValidationProducerSlot, issues: readonly FormIssue[]) => void
 }
 
 const FormValidationProducerContext =
@@ -15,9 +19,13 @@ const FormValidationProducerContext =
 export function FormValidationProducerProvider({
   session,
   stamp,
+  replaceSlot,
   children,
 }: FormValidationProducerContextValue & { children: React.ReactNode }) {
-  const value = React.useMemo(() => ({ session, stamp }), [session, stamp])
+  const value = React.useMemo(
+    () => ({ session, stamp, replaceSlot }),
+    [replaceSlot, session, stamp],
+  )
   return (
     <FormValidationProducerContext.Provider value={value}>
       {children}
