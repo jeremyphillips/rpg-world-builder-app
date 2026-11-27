@@ -216,6 +216,15 @@ describe('ContentEditShell monster failed persist producer projection', () => {
       expect(mutation.mutateAsync).toHaveBeenCalledTimes(1)
       expect(screen.getByText(/Name is already in use/i)).toBeInTheDocument()
       expect(screen.getByTestId('api-slot-issue-count')).toHaveTextContent('1')
+      const paintedName = screen.getByRole('textbox', { name: 'Name' })
+      expect(paintedName).toHaveAttribute('aria-invalid', 'true')
+      const describedBy = paintedName.getAttribute('aria-describedby')
+      expect(describedBy).toBeTruthy()
+      if (describedBy) {
+        describedBy.split(/\s+/).forEach((id) => {
+          expect(document.getElementById(id)).toBeTruthy()
+        })
+      }
     })
   })
 })
