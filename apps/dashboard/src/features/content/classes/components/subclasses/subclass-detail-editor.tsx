@@ -36,35 +36,39 @@ export function SubclassDetailEditor(props: SubclassDetailEditorProps) {
   const { subclassId, classId, campaignId, savePending = false, campaignAccessDialogRef } = props
   const panel = useSubclassDetailEditor(props)
 
+  const Shell = panel.SubclassEditorShell
+
   return (
     <FormProvider {...panel.form}>
-      <SubclassEditorCampaignAccessField
-        dialogRef={campaignAccessDialogRef}
-        campaignId={campaignId}
-        classId={classId}
-        subclassId={subclassId}
-        isDraft={isDraftSubclassId(subclassId)}
-        campaignAccess={panel.campaignAccess}
-        onDraftChange={panel.handleCampaignAccessDraft}
-        onPersistedChange={panel.handleCampaignAccessPersisted}
-      />
+      <Shell>
+        <SubclassEditorCampaignAccessField
+          dialogRef={campaignAccessDialogRef}
+          campaignId={campaignId}
+          classId={classId}
+          subclassId={subclassId}
+          isDraft={isDraftSubclassId(subclassId)}
+          campaignAccess={panel.campaignAccess}
+          onDraftChange={panel.handleCampaignAccessDraft}
+          onPersistedChange={panel.handleCampaignAccessPersisted}
+        />
 
-      <FormItems
-        items={wrapMasterDetailDetailFields(panel.fields)}
-        idPrefix={`subclass-editor-${subclassId}`}
-      />
+        <FormItems
+          items={wrapMasterDetailDetailFields(panel.fields)}
+          idPrefix={`subclass-editor-${subclassId}`}
+        />
 
-      <SubclassUsageReferencesSection
-        campaignId={campaignId}
-        classId={classId}
-        subclassId={subclassId}
-      />
+        <SubclassUsageReferencesSection
+          campaignId={campaignId}
+          classId={classId}
+          subclassId={subclassId}
+        />
 
-      <div className="flex flex-wrap items-center justify-end gap-2 border-t border-border pt-4">
-        <Button type="button" disabled={savePending} onClick={panel.handleSave}>
-          Save subclass
-        </Button>
-      </div>
+        <div className="flex flex-wrap items-center justify-end gap-2 border-t border-border pt-4">
+          <Button type="button" disabled={savePending} onClick={panel.handleSave}>
+            Save subclass
+          </Button>
+        </div>
+      </Shell>
     </FormProvider>
   )
 }

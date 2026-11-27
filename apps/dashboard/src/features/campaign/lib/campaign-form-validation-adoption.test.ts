@@ -15,6 +15,7 @@ describe('campaign form validation adoption', () => {
     const source = readFileSync(campaignCreatePath, 'utf8')
 
     expect(source).toContain('WizardStepForm')
+    expect(source).toContain('validateCampaignCreateValues')
     expect(source).not.toContain('useSubmitHandler')
     expect(source).not.toContain('paintValidationIssuesOnForm')
   })
