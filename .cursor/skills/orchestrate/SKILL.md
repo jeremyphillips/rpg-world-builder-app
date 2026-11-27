@@ -48,7 +48,7 @@ Do not pause between approved slices.
 
 Every launch consumes one dispatch, including interrupted, failed, unsuccessful, and verifier launches. Persist the counter before launch. Do not refund a dispatch.
 
-Default limit per run: **12** dispatches. This is provisional until the readiness exercise measures actual usage. A plan may override the limit.
+Default limit per run: **12** dispatches (Phase 3 readiness exercise: Session A **7**, Session C **5**; peak single session **7** with slice limit + remediation—keep **12** for headroom). A plan may override the limit.
 
 ## Remediation
 

@@ -18,6 +18,18 @@ export function parseDispatchId(task) {
   return null
 }
 
+function isPayloadDispatchId(value) {
+  return typeof value === 'string' && parseDispatchId(`Dispatch: ${value}`) === value
+}
+
+export function resolveDispatchId(source) {
+  const payload = source && typeof source === 'object' ? source : {}
+  if (isPayloadDispatchId(payload.dispatch_id)) {
+    return payload.dispatch_id
+  }
+  return parseDispatchId(payload.task)
+}
+
 export function buildLogRecord(input, timestamp) {
   const source = input && typeof input === 'object' ? input : {}
   return {
@@ -27,7 +39,7 @@ export function buildLogRecord(input, timestamp) {
     subagent_model: source.subagent_model ?? null,
     tool_call_id: source.tool_call_id ?? null,
     parent_conversation_id: source.parent_conversation_id ?? null,
-    dispatchId: parseDispatchId(source.task),
+    dispatchId: resolveDispatchId(source),
   }
 }
 

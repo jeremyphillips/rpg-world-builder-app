@@ -5,7 +5,12 @@ import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
-import { parseDispatchId, runHook } from './cursor-subagent-start-log.mjs'
+import {
+  buildLogRecord,
+  parseDispatchId,
+  resolveDispatchId,
+  runHook,
+} from './cursor-subagent-start-log.mjs'
 
 const scriptPath = fileURLToPath(new URL('./cursor-subagent-start-log.mjs', import.meta.url))
 const ALLOW = '{"permission":"allow"}\n'
@@ -101,6 +106,51 @@ describe('cursor-subagent-start-log', () => {
     expect(parseDispatchId('Dispatch: wf-not-a-dispatch')).toBeNull()
     expect(parseDispatchId('wf-not-a-dispatch')).toBeNull()
     expect(parseDispatchId(undefined)).toBeNull()
+  })
+
+  describe('resolveDispatchId', () => {
+    const payloadId = 'wf-payload-only-20261127T160000Z-aa11bb'
+    const taskId = 'wf-task-only-20261127T161000Z-cc22dd'
+
+    it('uses a valid dispatch_id when the task has no dispatch line', () => {
+      expect(
+        resolveDispatchId({
+          dispatch_id: payloadId,
+          task: 'No dispatch in this prompt.',
+        }),
+      ).toBe(payloadId)
+      expect(buildLogRecord({ dispatch_id: payloadId, task: 'Work.' }, 'ts').dispatchId).toBe(
+        payloadId,
+      )
+    })
+
+    it('parses dispatch from the task when dispatch_id is absent', () => {
+      expect(resolveDispatchId({ task: `Dispatch: ${taskId}\nDo the work.` })).toBe(taskId)
+      expect(buildLogRecord({ task: `Dispatch: ${DISPATCH}` }, 'ts').dispatchId).toBe(DISPATCH)
+    })
+
+    it('prefers dispatch_id over a different id parsed from the task', () => {
+      expect(
+        resolveDispatchId({
+          dispatch_id: payloadId,
+          task: `Dispatch: ${taskId}\nDo the work.`,
+        }),
+      ).toBe(payloadId)
+    })
+
+    it('returns null when dispatch_id and task are invalid or missing', () => {
+      expect(resolveDispatchId({})).toBeNull()
+      expect(
+        resolveDispatchId({ dispatch_id: 'wf-not-a-dispatch', task: 'No dispatch.' }),
+      ).toBeNull()
+      expect(resolveDispatchId({ dispatch_id: 42, task: 'No dispatch.' })).toBeNull()
+      expect(
+        resolveDispatchId({
+          dispatch_id: 'wf-not-a-dispatch',
+          task: `Dispatch: ${taskId}`,
+        }),
+      ).toBe(taskId)
+    })
   })
 
   it('parses a dispatch id from a multiline task on the second or third line', () => {

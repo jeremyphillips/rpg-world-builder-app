@@ -72,6 +72,17 @@ the Git hook tiers above.
 
 Unit tests: `pnpm exec vitest run --config tools/hooks/vitest.config.ts tools/hooks/cursor-subagent-start-log.test.mjs`
 
+**Dispatch id shape (hook correlation).** Logged `dispatchId` values must match
+`cursor-subagent-start-log.mjs` — suffix `-<6 lowercase hex>` after the UTC
+timestamp (`wf-<plan-slug>-yyyymmddThhmmssZ-abcdef`). Shorter or longer suffixes
+are not recognized; the hook logs `dispatchId: null` even when the worker prompt
+contains a `Dispatch:` line. Generate exactly six hex characters in prompts (same
+rule as [orchestrate `reference.md`](../../.cursor/skills/orchestrate/reference.md#dispatch-id)).
+
+Resolution order in `buildLogRecord`: optional hook payload field `dispatch_id`
+(when it passes the same shape check) wins; otherwise the first valid id on a
+`Dispatch:` line in `task`.
+
 After a worker returns, the orchestrator can verify the logged model with
 [`agent-workflow-model-check.mjs`](agent-workflow-model-check.mjs) (dispatch id as
 `argv[2]`, allowed model ids after that, default log

@@ -11,8 +11,11 @@ wf-<plan-slug>-<yyyymmddThhmmssZ>-<6 lowercase hex>
 ```
 
 `<plan-slug>` is lowercase letters, digits, and single hyphens. Generate the
-timestamp in UTC and six random hex characters. Every worker prompt starts with
-`Dispatch: <id>`. The id is unique across workflows and sessions.
+timestamp in UTC and **exactly six** random lowercase hex characters (not five or
+seven). Every worker prompt starts with `Dispatch: <id>`. The id is unique across
+workflows and sessions. The subagentStart hook only recognizes this shape; ids
+that fail the regex produce `dispatchId: null` in
+`.tmp/agent-workflow/subagent-start.jsonl`.
 
 ## Snapshot
 
@@ -58,7 +61,9 @@ A hash mismatch or a non-empty diff stops the checkpoint.
 ## Model check
 
 After each return, select log lines for that dispatch ID from
-`.tmp/agent-workflow/subagent-start.jsonl`.
+`.tmp/agent-workflow/subagent-start.jsonl`. Pass the **`dispatchId` field from the
+matching log line** to the model-check CLI, not a longer or alternate suffix from
+the assignment prompt when the two differ.
 
 Continue only when there is exactly one line and `subagent_model` is
 `composer-2.5`, or a premium model the user authorized for that dispatch in
