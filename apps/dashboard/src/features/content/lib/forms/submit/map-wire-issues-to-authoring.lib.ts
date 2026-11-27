@@ -57,13 +57,14 @@ function remapCollectionRow(
  */
 export function mapWireIssuesToAuthoring(
   issues: readonly FormIssue[],
-  provenance: ContentPreparedWriteProvenance,
+  provenance: ContentPreparedWriteProvenance = {},
 ): WireIssueAttribution {
+  const lineage = provenance ?? {}
   const unattributed: string[] = []
   const mapped = issues.map((issue) => {
-    const renamed = applyPathMapInverse(issue.path, provenance.pathMap)
+    const renamed = applyPathMapInverse(issue.path, lineage.pathMap)
     const base = renamed ?? issue.path
-    const row = remapCollectionRow(base, provenance.filteredRowIndexBySourceIndex)
+    const row = remapCollectionRow(base, lineage.filteredRowIndexBySourceIndex)
     if (row.kind === 'mapped') return { ...issue, path: row.path }
     if (row.kind === 'unattributed') {
       unattributed.push(issue.path)

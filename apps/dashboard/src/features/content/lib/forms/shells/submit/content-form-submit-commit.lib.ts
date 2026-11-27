@@ -1,4 +1,6 @@
 import type { ContentValidationIntent } from '@rpg/contracts'
+import { getApiValidationIssues } from '@rpg/contracts'
+import type React from 'react'
 import type { FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 import {
@@ -47,6 +49,7 @@ export type ContentFormCommitRunInput<TValues extends FieldValues> = {
   > | null
   producerSession: FormValidationProducerSession
   persist: FormSubmitHandler<TValues>
+  persistSupersededRef?: React.MutableRefObject<boolean>
 }
 
 export type ContentFormCommitRunResult =
@@ -83,7 +86,7 @@ export async function runContentFormCommitAttempt<TValues extends FieldValues>(
     if (pipeline.stageId === FORM_ACTION_SUPERSEDED_STAGE_ID) {
       return { kind: 'superseded', session: input.producerSession }
     }
-    const session = applyCommitValidationBlocked(input, pipeline, stamp)
+    const session = applyCommitValidationBlocked(input, pipeline, stamp, readCurrent)
     return { kind: 'validation-blocked', session }
   }
 
@@ -101,7 +104,18 @@ export async function runContentFormCommitAttempt<TValues extends FieldValues>(
     )
     return { kind: 'success', session }
   } catch (error) {
-    if (!isCurrent()) return { kind: 'superseded', session: input.producerSession }
+    if (!isCurrent()) {
+      if (readCurrent().attemptId !== attempt.attemptId) {
+        return { kind: 'superseded', session: input.producerSession }
+      }
+      if (input.persistSupersededRef?.current) {
+        input.persistSupersededRef.current = false
+        return { kind: 'superseded', session: input.producerSession }
+      }
+      if (!getApiValidationIssues(error)?.length) {
+        return { kind: 'superseded', session: input.producerSession }
+      }
+    }
     const session = presentPersistValidationFailure(
       input.form,
       error,
@@ -109,7 +123,8 @@ export async function runContentFormCommitAttempt<TValues extends FieldValues>(
       input.ui,
       input.producerSession,
       stamp,
-      pipeline.prepared.provenance,
+      pipeline.prepared.provenance ?? {},
+      readCurrent,
     )
     return { kind: 'persist-failed', session, error }
   }
@@ -119,6 +134,7 @@ function applyCommitValidationBlocked<TValues extends FieldValues>(
   input: ContentFormCommitRunInput<TValues>,
   pipeline: { stageId: string; issues?: readonly FormIssue[]; message?: string },
   stamp: number,
+  readCurrent: () => FormActionAttempt,
 ): FormValidationProducerSession {
   if (input.commitValidationIntent === 'publish') {
     input.ui?.markPublishAttempted()
@@ -132,8 +148,8 @@ function applyCommitValidationBlocked<TValues extends FieldValues>(
     pipeline.stageId === CONTENT_FORM_COMMIT_STAGE_FORM ? input.producerSlot : 'serialization'
 
   if (pipeline.issues?.length) {
-    session = ingestContentFormValidationIssues(session, slot, stamp, pipeline.issues)
     applyCanonicalFormIssuesToRhf(input.form, pipeline.issues)
+    session = ingestContentFormValidationIssues(session, slot, readCurrent().stamp, pipeline.issues)
   } else if (pipeline.message) {
     const routed = normalizeContentFormIssues(publishSchema, values, fields) ?? [
       {
@@ -142,8 +158,8 @@ function applyCommitValidationBlocked<TValues extends FieldValues>(
         severity: 'crossRow' as const,
       },
     ]
-    session = ingestContentFormValidationIssues(session, slot, stamp, routed)
     applyCanonicalFormIssuesToRhf(input.form, routed)
+    session = ingestContentFormValidationIssues(session, slot, readCurrent().stamp, routed)
   }
 
   if (input.invalidPresentation) {

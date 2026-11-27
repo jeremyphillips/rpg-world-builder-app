@@ -1,6 +1,7 @@
 import { getApiValidationIssues, type ApiValidationIssue } from '@rpg/contracts'
 import type { FieldValues, UseFormReturn } from 'react-hook-form'
 import {
+  FORM_VALIDATION_PRODUCER_SLOT_ORDER,
   replaceFormValidationProducerSlot,
   type FormIssue,
   type FormValidationProducerSession,
@@ -37,4 +38,21 @@ export function ingestContentFormValidationIssues(
   issues: readonly FormIssue[],
 ): FormValidationProducerSession {
   return replaceFormValidationProducerSlot(session, slot, stamp, issues)
+}
+
+/** RHF canonical paint can advance the snapshot stamp after slot ingest on the same turn. */
+export function realignFormValidationProducerSessionStamps(
+  session: FormValidationProducerSession,
+  currentStamp: number,
+): FormValidationProducerSession {
+  let next = session
+  let changed = false
+  for (const slot of FORM_VALIDATION_PRODUCER_SLOT_ORDER) {
+    const state = next.slots[slot]
+    if (state?.issues.length && state.stamp !== currentStamp) {
+      next = ingestContentFormValidationIssues(next, slot, currentStamp, state.issues)
+      changed = true
+    }
+  }
+  return changed ? next : session
 }

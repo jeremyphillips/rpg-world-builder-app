@@ -16,7 +16,10 @@ import {
 } from '@rpg/ui/form'
 
 import { resolveContentFormSchema, resolveContentPublishSchema } from '../edit/content-edit-load'
-import { ingestContentFormValidationIssues } from '../../validation/ingest-content-form-validation.lib'
+import {
+  ingestContentFormValidationIssues,
+  realignFormValidationProducerSessionStamps,
+} from '../../validation/ingest-content-form-validation.lib'
 import { consumeContentFormPersistBaselineReset } from './content-form-persist-baseline-reset.lib'
 import { runContentFormCommitAttempt } from './content-form-submit-commit.lib'
 import {
@@ -74,6 +77,8 @@ export function useContentFormSubmit<TValues extends FieldValues>(
   const stampWatchLeasesRef = useRef(0)
   const stampWatchCleanupRef = useRef<(() => void) | null>(null)
   const internalPersistingRef = useRef(0)
+  const persistValuesSnapshotRef = useRef<string | null>(null)
+  const persistSupersededRef = useRef(false)
   const internalUiRef = useRef<Pick<
     import('@rpg/ui/form').FormUiContextValue,
     'markSubmitAttempted' | 'markPublishAttempted' | 'addValidationSessionExpandKeys'
@@ -148,19 +153,25 @@ export function useContentFormSubmit<TValues extends FieldValues>(
         invalidPresentation,
         ui: uiRef.current,
         producerSession,
+        persistSupersededRef,
         persist: async (wireValues, persistForm) => {
           persistingRef.current += 1
+          persistSupersededRef.current = false
+          persistValuesSnapshotRef.current = JSON.stringify(persistForm.getValues())
           const persistMeta = { isAttemptCurrent: isCurrent }
           try {
             await persist(wireValues, persistForm, persistMeta)
           } finally {
             persistingRef.current -= 1
+            persistValuesSnapshotRef.current = null
           }
         },
       })
 
       if (result.kind === 'superseded') throw new ContentFormSubmitSuperseded()
-      setProducerSession(result.session)
+      setProducerSession(
+        realignFormValidationProducerSessionStamps(result.session, stampRef.current),
+      )
       if (result.kind === 'validation-blocked') {
         throw new ContentFormSubmitValidationFailed()
       }
@@ -188,12 +199,22 @@ export function useContentFormSubmit<TValues extends FieldValues>(
       stampWatchLeasesRef.current += 1
       if (stampWatchLeasesRef.current === 1) {
         const subscription = rhf.watch((_values, info) => {
-          if (info.name === undefined && persistingRef.current > 0) {
-            // Post-save baseline sync must not advance the snapshot; user reset during
-            // in-flight persist must, so a late response cannot repaint a newer session.
-            if (consumeContentFormPersistBaselineReset(rhf)) return
-            stampRef.current += 1
-            setSnapshotStamp(stampRef.current)
+          if (persistingRef.current > 0) {
+            if (info.name === undefined && consumeContentFormPersistBaselineReset(rhf)) return
+            const snapshot = persistValuesSnapshotRef.current
+            const shouldBumpForWholeForm =
+              info.name === undefined &&
+              snapshot !== null &&
+              JSON.stringify(rhf.getValues()) !== snapshot
+            const shouldBumpForField = info.name !== undefined
+            if (shouldBumpForWholeForm || shouldBumpForField) {
+              persistSupersededRef.current = true
+              stampRef.current += 1
+              setSnapshotStamp(stampRef.current)
+              if (shouldBumpForWholeForm && snapshot !== null) {
+                persistValuesSnapshotRef.current = JSON.stringify(rhf.getValues())
+              }
+            }
             return
           }
           stampRef.current += 1

@@ -3,6 +3,7 @@ import {
   navigateInvalidSubmit,
   prepareFormIssues,
   resolveInvalidSubmitNavigationFromIssues,
+  type FormActionAttempt,
   type FormItem,
   type FormUiContextValue,
   type FormValidationProducerSession,
@@ -100,6 +101,7 @@ export function presentPersistValidationFailure<TFieldValues extends FieldValues
   session: FormValidationProducerSession,
   stamp: number,
   provenance: ContentPreparedWriteProvenance = {},
+  readCurrent?: () => FormActionAttempt,
 ): FormValidationProducerSession {
   const apiIssues = getApiValidationIssues(error)
   if (!apiIssues?.length) return session
@@ -111,11 +113,17 @@ export function presentPersistValidationFailure<TFieldValues extends FieldValues
   reportUnattributed(attribution.unattributed)
   const routed = attribution.issues
   applyCanonicalFormIssuesToRhf(form, routed)
-  if (!presentation) return session
-  const nextSession = ingestContentFormValidationIssues(session, 'api', stamp, routed)
-  presentContentFormInvalidSubmit(form, ui, presentation, {
-    firstInvalidPath: routed[0]?.path,
-    canonicalIssues: routed,
-  })
+  const paintStamp = readCurrent?.().stamp ?? stamp
+  const nextSession = ingestContentFormValidationIssues(session, 'api', paintStamp, routed)
+  if (presentation) {
+    try {
+      presentContentFormInvalidSubmit(form, ui, presentation, {
+        firstInvalidPath: routed[0]?.path,
+        canonicalIssues: routed,
+      })
+    } catch {
+      // Navigation must not discard producer issues already ingested for this attempt.
+    }
+  }
   return nextSession
 }

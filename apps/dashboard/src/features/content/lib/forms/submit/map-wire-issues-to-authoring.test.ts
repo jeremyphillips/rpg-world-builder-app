@@ -31,6 +31,11 @@ describe('mapWireIssuesToAuthoring', () => {
     expect(unattributed).toEqual(['traits.7.name'])
   })
 
+  it('treats null provenance like empty lineage', () => {
+    const { issues } = mapWireIssuesToAuthoring([issue('name')], null as never)
+    expect(issues.map((i) => i.path)).toEqual(['name'])
+  })
+
   it('applies declared renames and leaves uncovered paths unchanged', () => {
     const { issues } = mapWireIssuesToAuthoring([issue('wire.speed'), issue('name')], {
       pathMap: { 'movement.speed': 'wire.speed' },

@@ -3,7 +3,7 @@
  */
 import { useState } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
@@ -66,6 +66,16 @@ vi.mock('./content-edit-entity-form-state', () => ({
     showLifecycleActions: false,
   }),
 }))
+
+vi.mock('../host/content-form-host-projection', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../host/content-form-host-projection')>()
+  return {
+    ...actual,
+    resolveContentFormNavigationFields: () => [
+      { name: 'name', label: 'Name', type: 'text' as const },
+    ],
+  }
+})
 
 vi.mock('../layout/content-form-shell-layout', async () => {
   const { StampEditProbeLayout } = await import('./content-edit-stamp.probe')
@@ -216,6 +226,28 @@ describe('ContentEditShell stamp and producer session', () => {
       expect(screen.getByTestId('api-issue-count')).toHaveTextContent('0')
     })
     expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue('Feat B')
+  })
+
+  it('keeps api producer issues on the current stamp after a failed save', async () => {
+    const user = userEvent.setup()
+    mutation.mutateAsync.mockRejectedValueOnce(
+      new ApiError(400, 'validation_error', 'Invalid', {
+        issues: [{ path: 'name', message: 'Slug is already taken', code: 'duplicate' }],
+      }),
+    )
+
+    renderStampShell('feat-a', [homebrewFeat('feat-a', 'Feat A')])
+
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), '!')
+    await act(async () => {
+      await user.click(screen.getByRole('button', { name: /save changes/i }))
+    })
+
+    await waitFor(() => expect(mutation.mutateAsync).toHaveBeenCalledTimes(1))
+    await waitFor(() => {
+      expect(screen.getByText(/Slug is already taken/i)).toBeInTheDocument()
+      expect(screen.getByTestId('api-issue-count')).toHaveTextContent('1')
+    })
   })
 
   it('runs prepareSerializedContentFormWrite on the edit shell commit path', async () => {
