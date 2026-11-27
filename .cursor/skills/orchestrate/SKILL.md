@@ -30,19 +30,29 @@ implementation.
 
 ## Loop
 
-1. Snapshot. Read Workflow state. Recover an open assignment. Sweep staleness.
-2. Choose the next stopping outcome, in this order:
-   1. **Run limit reached.** Checkpoint and return an incomplete handoff. Do not dispatch final verification without budget.
-   2. **Eligible work remains and the budget allows it.** Start a slice only when at least 3 dispatches remain.
-   3. **Every mandatory criterion in the active boundary is `verified`, approved `deferred`, or waived.** Dispatch verifier `final` for that boundary. A pass on the whole plan is plan complete. A pass on a narrower boundary is checkpoint complete.
-   4. **No eligible work remains because criteria are unresolved.** Report them. This is an incomplete handoff.
-3. Before a launch, persist the dispatch counter and the active assignment.
-4. Verifier `investigate`. If the criterion is already satisfied, record that and return to step 2.
-5. Implementer for a gap. Then verifier `verify` scoped to the diff plus traced consumers, using the relevant `pr-review` lenses.
-6. On `verified`, persist the outcome, execution result, evidence tree, and dependency scope. Clear the active assignment.
-7. On `failed` or `partial`, follow remediation. Then return to step 2.
+1. Read the approved plan and the authorized run boundary. Snapshot when needed. Read Workflow state. Recover an open assignment. Sweep staleness.
+2. Choose the cheapest next action from existing evidence (see below). If every mandatory criterion in the active boundary is `verified`, approved `deferred`, or waived, dispatch verifier `final` for that boundary when budget allows. A pass on the whole plan is plan complete. A pass on a narrower boundary is checkpoint complete.
+3. Persist the minimal checkpoint in Workflow state. If that write cannot be read back, do not launch.
+4. Persist the dispatch counter, then dispatch that action.
+5. When the action changes code, independently verify the implementation and the evidence (verifier `verify` scoped to the diff plus traced consumers, using the relevant `pr-review` lenses).
+6. Remediate and reverify when the verifier reports a gap.
+7. Persist the outcome, execution result, evidence tree, and dependency scope when verification completes. Clear the active assignment.
+8. Advance inside the authorized boundary and return to step 2.
+9. Stop at that boundary, at the dispatch limit, for unresolved criteria with no eligible work, or for a genuine human decision.
 
-Do not pause between approved slices.
+Choose the action from evidence already in the plan. There is no investigate step before every slice.
+
+- **Implement** when a known implementation gap exists.
+- **Verify** when the requirement may already be satisfied.
+- **Reverify** when the evidence is stale.
+- **Investigate** when behavior or ownership is uncertain, or remediation is exhausted.
+- **Assess** when authorities contradict each other or the same failure has repeated for an architectural reason.
+
+The orchestrator runs commands the read-only verifier names and returns the raw output, including who executed them. The same command on the same tree is not run again only to satisfy the procedure.
+
+At the dispatch limit, or when the next honest action does not fit in the remaining dispatches, persist the recoverable minimal checkpoint, report the next action, and stop. Do not dispatch final verification without budget. Do not skip verification, shrink a criterion, or start work that cannot be verified inside the budget.
+
+Do not pause between approved slices unless a stopping rule applies.
 
 ## Dispatch accounting
 
@@ -68,15 +78,36 @@ Then checkpoint, set the outcome from the latest evidence, report, and continue 
 
 ## Checkpoints and recovery
 
-Workflow state in the plan is the only record. Field list and templates are in [reference.md](reference.md).
+Workflow state in the plan is the only record. Templates are in [reference.md](reference.md). Criterion status stays in the matrix. Phase progress stays in frontmatter todos. The slice log is one line per completed slice.
 
-Write the active assignment before launch. After return, record the model observation, handoff summary, post-tree, and diff scope. After verification, record outcomes and clear the active assignment.
+Write the **minimal active assignment** in `## Workflow state` before launch, and clear it when the outcome is recorded:
+
+- full dispatch id
+- agent and kind
+- criterion ids
+- pre-tree
+- attempt `n/limit`
+- model observation (`pending` until the hook line for that full id is checked)
+
+These fields are not stored in the checkpoint; use authoritative sources on recovery:
+
+| Removed field | Authoritative source |
+| --- | --- |
+| `subagent_id` | Hook line selected by the full dispatch id, once that observation exists |
+| Pre-existing dirty paths | Diff from the pre-tree to the current tree. The pre-tree is the baseline. Recovery preserves it and does not revert. |
+| Expected return | The plan text for the checkpoint’s criterion ids |
+| Start time | Timestamp on that hook line |
+| Assignment-progress status | The active-assignment block is present, or it is `none` |
+
+After return, record the model observation, handoff summary, post-tree, and diff scope. After verification, record outcomes and clear the active assignment.
+
+**Dispatch correlation.** The worker prompt begins with `Dispatch: <full id>`. The checkpoint, the model-check argument, and the hook `dispatchId` are that same full string. Correlation uses the **full id only**; the six-character suffix is not a correlation key. Details: [reference.md](reference.md) § Dispatch ID.
 
 Recovery of an open assignment:
 
-1. Reconcile the model observation for its dispatch ID before any further delegation.
-2. Establish that the worker has stopped. Absence of source changes is not evidence. Use the native signal recorded under Native limitations. If termination cannot be established, require user confirmation before any write dispatch. Never run two implementers in the shared checkout.
-3. Snapshot, diff against the pre-tree, and dispatch verifier `investigate` for any changes. Preserve partial implementation. Do not revert it. Changes outside the expected scope go to the user before they are attributed.
+1. Reconcile the model observation for its full dispatch id before any further delegation.
+2. Identify the worker from the hook line for that full id. Establish termination with the native resume refusal for that `subagent_id`. Absence of source changes is not evidence. If the hook line has no `subagent_id`, termination is unconfirmed: pause for the operator (existing rule; do not store `subagent_id` before launch). If termination cannot be established, require user confirmation before any write dispatch. Never run two implementers in the shared checkout.
+3. Snapshot, diff against the pre-tree, and dispatch verifier `investigate` for any changes. Inspect assignment changes as the diff from the pre-tree. Preserve partial implementation. Do not revert it. Changes outside the expected scope go to the user before they are attributed.
 4. Resume implementation, verification, or remediation. Re-dispatch an interrupted verifier. Do not redo completed evidence that is not stale.
 
 ## Model policy
@@ -111,7 +142,7 @@ Recorded 2026-11-27 after Phase 2 probes. Unproven items stay limitations below.
 | 4 Hook integration | One JSONL line per Task launch when the hook fires. When the hook `task` field includes `Dispatch: wf-…`, `dispatchId` correlates one-to-one. Some custom-agent launches log `dispatchId: null` (hook `task` omitted the dispatch line); treat that as a failed model observation and checkpoint. `subagent_model` is `composer-2.5` when the parent passes `model: composer-2.5`. Completed-agent resume appends a **new** line. | Resume only with a new dispatch ID and a correlated hook line. If `dispatchId` is null, suspend until the payload is understood or the user authorizes proceeding without hook correlation. |
 | 5 Synthetic unauthorized | Controlled log: wrong model, duplicate lines, or zero lines → model check `ok: false` → checkpoint and suspend delegation (demonstrated in orchestrator session). | No live non-default model without user authorization. Real pin **fallback** detection is **not proven**. |
 | 6 Worker termination | **Resume while running:** Task refuses with “Sub-agent is currently running” (native). **Interrupt:** `interrupt: true` on resume stopped a background implementer shell loop within ~2s; log growth ceased. Foreground **Stop** in the parent UI was not exercised in this probe. | If termination is unconfirmed after foreground Stop, require user confirmation before a write dispatch on an open assignment. |
-| 7 Task card | Hook logs `composer-2.5` for pinned dispatches. The agent cannot read the UI card; the user re-checked during probe `wf-probe-20261127T170050Z-card01` and did not see an explicit Composer label. | At Phase 3, the user confirms card vs hook once per session, or records a mismatch and suspends delegation. |
+| 7 Task card | Hook logs `composer-2.5` for pinned dispatches. The agent cannot read the UI card; the user re-checked during probe `wf-probe-20261127T170050Z-card01` and did not see an explicit Composer label. | **Accepted limitation:** hook-reported model is the orchestration signal. Billing identity and UI card labels are unproven. The operator is not asked to confirm the card each session. Suspend only on a failed hook model observation or explicit user-reported mismatch. |
 
 Hook unit tests: `pnpm exec vitest run --config tools/hooks/vitest.config.ts tools/hooks/cursor-subagent-start-log.test.mjs` (7 passed).
 

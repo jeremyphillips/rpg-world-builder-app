@@ -7,15 +7,19 @@ in [SKILL.md](SKILL.md).
 ## Dispatch ID
 
 ```text
-wf-<plan-slug>-<yyyymmddThhmmssZ>-<6 lowercase hex>
+wf-<plan-slug>-<yyyymmddThhmmssZ>-<suffix>
 ```
 
 `<plan-slug>` is lowercase letters, digits, and single hyphens. Generate the
-timestamp in UTC and **exactly six** random lowercase hex characters (not five or
-seven). Every worker prompt starts with `Dispatch: <id>`. The id is unique across
-workflows and sessions. The subagentStart hook only recognizes this shape; ids
-that fail the regex produce `dispatchId: null` in
-`.tmp/agent-workflow/subagent-start.jsonl`.
+timestamp in UTC. `<suffix>` is **exactly six** lowercase hex characters (not five
+or seven). The suffix is not unique and is **not** a correlation key. Workflows
+and sessions correlate on the **full id** only.
+
+Every worker prompt starts with `Dispatch: <full id>`. The checkpoint, the
+model-check CLI argument, and the hook `dispatchId` must be that same full
+string. The hook regex extracts the full id from the `Dispatch:` line; it does
+not accept a suffix alone. A longer or shorter suffix fails the match and
+produces `dispatchId: null` in `.tmp/agent-workflow/subagent-start.jsonl`.
 
 ## Snapshot
 
@@ -60,10 +64,10 @@ A hash mismatch or a non-empty diff stops the checkpoint.
 
 ## Model check
 
-After each return, select log lines for that dispatch ID from
-`.tmp/agent-workflow/subagent-start.jsonl`. Pass the **`dispatchId` field from the
-matching log line** to the model-check CLI, not a longer or alternate suffix from
-the assignment prompt when the two differ.
+After each return, select log lines for the **full** dispatch id from
+`.tmp/agent-workflow/subagent-start.jsonl`. Run the model check with the hook’s
+`dispatchId` value (the full id string), not a suffix alone and not a prompt
+suffix that differs from the logged id when length was wrong.
 
 Continue only when there is exactly one line and `subagent_model` is
 `composer-2.5`, or a premium model the user authorized for that dispatch in
@@ -71,26 +75,35 @@ Workflow state. Zero lines, more than one line, or any other model: checkpoint,
 suspend further delegation, and report. Do not launch another worker.
 
 ```bash
-node tools/hooks/agent-workflow-model-check.mjs <dispatch-id> composer-2.5
+node tools/hooks/agent-workflow-model-check.mjs <full-dispatch-id> composer-2.5
 ```
 
 Pass extra allowed model ids only when Workflow state records that authorization.
+Hook `subagent_model` is not billing and does not prove that a pin cannot fall
+back.
 
 ## Assignment package
 
+The **plan checkpoint** (minimal active assignment) is authoritative before
+launch. It holds only: full dispatch id, agent and kind, criterion ids, pre-tree,
+attempt, and model observation. Do not duplicate removed fields there.
+
+The block below is optional **worker prompt context** the orchestrator may append
+after the `Dispatch:` line. It is not persisted in Workflow state.
+
 ```markdown
-Dispatch: <id>
+Dispatch: <full id>
 Agent: implementer | verifier
 Kind: implement | remediate | investigate | verify | assess | review-plan
 Criterion IDs: <ids>
 Attempt: <n/limit>
 Pre-tree: <tree>
-Pre-existing dirty paths: <paths or none>
 Protected paths: <paths and blob hashes, or none>
-Expected return: <what the parent needs>
 ```
 
-The verifier `verify` kind is `scoped` or `final`, named in the prompt.
+Pre-existing dirty paths and expected return are derivable from the pre-tree and
+plan text on recovery, not stored in the checkpoint. The verifier `verify` kind is
+`scoped` or `final`, named in the prompt.
 
 ## Handoff
 
@@ -128,19 +141,20 @@ Place this section in the plan. It is the only workflow record.
 - Slice log:
 ```
 
-Active assignment, written before launch and cleared after verification:
+Minimal active assignment, written before launch and cleared after verification:
 
 ```markdown
-- Dispatch: <id>
-- subagent_id:
+- Dispatch: <full id>
 - Agent and kind:
 - Criterion IDs:
-- Attempt: <n/limit>
 - Pre-tree:
-- Pre-existing dirty paths:
-- Expected return:
-- Started:
+- Attempt: <n/limit>
+- Model observation: pending
 ```
+
+After return, set model observation from the hook line for that full id. Use the
+hook line’s `subagent_id` only when recovery needs worker identity; do not write
+it into the checkpoint before launch.
 
 ## Usage
 
