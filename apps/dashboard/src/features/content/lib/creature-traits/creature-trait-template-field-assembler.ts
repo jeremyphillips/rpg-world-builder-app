@@ -139,10 +139,39 @@ export function assembleCreatureTraitTemplateFields(input: {
     throw new Error(`Configurable trait template ${templateId} has no fields on ${input.host}.`)
   }
   validateTraitTemplateConfigFields(fields, templateId)
-  return [
-    ...fields.map((field) =>
-      input.visibility ? { ...field, visibility: input.visibility } : field,
-    ),
-    supplementalDetailsField(),
-  ]
+  const visibleFields = fields.map((field) =>
+    input.visibility ? { ...field, visibility: input.visibility } : field,
+  )
+  return [...ownConfigObjectGroups(visibleFields), supplementalDetailsField()]
+}
+
+/** Object schema paths such as `config.uses` own their leaf controls. */
+function ownConfigObjectGroups(fields: FormItem[]): FormItem[] {
+  const grouped = new Map<string, FormItem[]>()
+  const rest: FormItem[] = []
+
+  for (const field of fields) {
+    if (!('name' in field) || typeof field.name !== 'string') {
+      rest.push(field)
+      continue
+    }
+    const segments = field.name.split('.')
+    if (segments.length < 3 || segments[0] !== 'config') {
+      rest.push(field)
+      continue
+    }
+    const objectPath = segments.slice(0, -1).join('.')
+    const current = grouped.get(objectPath) ?? []
+    current.push(field)
+    grouped.set(objectPath, current)
+  }
+
+  const groups: FormItem[] = [...grouped.entries()].map(([name, groupFields]) => ({
+    kind: 'group',
+    name,
+    heading: { label: 'Uses', labelVisibility: 'srOnly' },
+    fields: groupFields,
+  }))
+
+  return [...groups, ...rest]
 }

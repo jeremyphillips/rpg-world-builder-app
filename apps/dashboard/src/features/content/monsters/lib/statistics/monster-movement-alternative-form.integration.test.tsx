@@ -19,6 +19,7 @@ import {
   MOVEMENT_ALTERNATIVE_AVAILABLE_MODES_BASE_HINT,
   MOVEMENT_ALTERNATIVE_AVAILABLE_MODES_SPIDER_CLIMB_HINT,
   MOVEMENT_ALTERNATIVE_MODES_FIELD,
+  movementAlternativeGroupField,
   movementWithHoverGroup,
 } from '../../../lib/forms/fields/content-movement-form-fields'
 import { evaluateContentPublishValidation } from '../../../lib/forms/validation/content-publish-validation.lib'
@@ -99,6 +100,28 @@ describe('monster movement alternative validation', () => {
       'draft',
     )
     expect(omitted).not.toHaveProperty('traits')
+  })
+
+  it('keeps the alternative object issue on the group and the modes issue on Available modes', () => {
+    const fields = [movementAlternativeGroupField()]
+    const parent = prepareFormIssues(
+      [{ path: ['movementAlternative'], message: 'Alternative movement is incomplete.' }],
+      fields,
+      { movementAlternative: { modes: ['fly'], feet: 20 } },
+    )
+    expect(parent[0]).toMatchObject({
+      claim: { kind: 'field', target: 'movementAlternative' },
+    })
+    expect(parent[0]?.claim?.target).not.toBe(MOVEMENT_ALTERNATIVE_MODES_FIELD)
+
+    const modes = prepareFormIssues(
+      [{ path: ['movementAlternative', 'modes'], message: 'Select at least two modes.' }],
+      fields,
+      { movementAlternative: { modes: ['fly'], feet: 20 } },
+    )
+    expect(modes[0]).toMatchObject({
+      claim: { kind: 'field', target: MOVEMENT_ALTERNATIVE_MODES_FIELD },
+    })
   })
 
   it('routes min-mode publish errors to Available modes', async () => {

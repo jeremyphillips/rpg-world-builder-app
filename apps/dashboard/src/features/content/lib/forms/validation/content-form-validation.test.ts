@@ -398,14 +398,7 @@ describe('embedded content sub-forms validation', () => {
     const fields = traitItemFields(ctx)
     assertFieldPathsRegistered(fields)
     assertRegistryCoverage(traitRowFormSchema, fields, {
-      exemptPaths: [
-        ...SERVER_ROW_EXEMPT,
-        ...GRANT_NESTED_EXEMPT,
-        'available',
-        'templateId',
-        // Object-level schema path; leaf bindings are config.uses.normal and config.uses.inLair.
-        'config.uses',
-      ],
+      exemptPaths: [...SERVER_ROW_EXEMPT, ...GRANT_NESTED_EXEMPT, 'available', 'templateId'],
     })
     assertInvalidSubmitUsesRefinedMessages(traitRowFormSchema, fields, {
       invalidValue: { kind: 'custom', name: '', grants: [] },

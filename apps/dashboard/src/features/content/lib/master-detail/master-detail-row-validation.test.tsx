@@ -1,4 +1,10 @@
-import { Form } from '@rpg/ui/form'
+import {
+  createEmptyFormValidationProducerSession,
+  Form,
+  FormValidationProducerProvider,
+  replaceFormValidationProducerSlot,
+} from '@rpg/ui/form'
+import type { ReactNode } from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
@@ -9,6 +15,7 @@ import { makeContentFormCtx } from '@/features/content/lib/fixtures/content-form
 
 import { grantRowFormSchema } from '../forms/grants/grant-form-schema'
 import {
+  countMasterDetailRowsWithIssues,
   masterDetailRowValidationStateLabel,
   useMasterDetailRowValidation,
 } from './master-detail-row-validation'
@@ -25,6 +32,27 @@ const traitsSchema = z.object({
 
 const traitFields = [{ kind: 'array' as const, name: 'traits', fields: traitItemFields(ctx) }]
 
+const rowIssueSession = replaceFormValidationProducerSlot(
+  createEmptyFormValidationProducerSession(),
+  'interactive',
+  1,
+  [
+    {
+      path: 'traits.0.grants.0.weaponProficiencySlugs',
+      message: 'Choose a weapon.',
+      severity: 'field',
+    },
+  ],
+)
+
+function RowIssueBoundary({ children }: { children: ReactNode }) {
+  return (
+    <FormValidationProducerProvider session={rowIssueSession} stamp={1}>
+      {children}
+    </FormValidationProducerProvider>
+  )
+}
+
 function RowIssueCountProbe() {
   const { getRowIssueCount } = useMasterDetailRowValidation('traits', traitItemFields(ctx))
   return <div data-testid="row-issue-count">{getRowIssueCount(0)}</div>
@@ -37,6 +65,14 @@ describe('masterDetailRowValidationStateLabel', () => {
 
   it('uses plural copy for multiple issues', () => {
     expect(masterDetailRowValidationStateLabel(2)).toBe('2 validation issues')
+  })
+})
+
+describe('countMasterDetailRowsWithIssues', () => {
+  it('counts availability-hidden rows in the collection summary', () => {
+    const rows = [{ item: { issueCount: 0 } }, { item: { issueCount: 2 } }]
+    expect(countMasterDetailRowsWithIssues(rows)).toBe(1)
+    expect(countMasterDetailRowsWithIssues(rows, false)).toBe(0)
   })
 })
 
@@ -75,6 +111,7 @@ describe('useMasterDetailRowValidation', () => {
       <Form
         schema={traitsSchema}
         fields={traitFields}
+        producerBoundary={RowIssueBoundary}
         defaultValues={{
           traits: [
             {
