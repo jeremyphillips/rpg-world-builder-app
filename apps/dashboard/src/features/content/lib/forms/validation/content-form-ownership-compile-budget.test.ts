@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { compileFormOwnership, FORM_OWNERSHIP_COMPILE_BUDGET_MS } from '@rpg/ui/form'
+import {
+  collectRowVariantTopologyFields,
+  compileFormOwnership,
+  FORM_OWNERSHIP_COMPILE_BUDGET_MS,
+} from '@rpg/ui/form'
 
 import { buildClassTabs } from '../../../classes/lib/class-form-fields'
+import { buildClassFeatureRowVariantTopology } from '../../../classes/lib/class-feature-form-fields'
 import { buildMonsterTabs } from '../../../monsters/lib/monster-form-fields'
 import { movementAlternativeGroupField } from '../../../lib/forms/fields/content-movement-form-fields'
 
@@ -46,6 +51,21 @@ describe('content form ownership compile pilot budget', () => {
     expect(
       JSON.stringify(movementField).includes('errorPaths') ||
         JSON.stringify(movementField).includes('resolverFields'),
+    ).toBe(false)
+  })
+
+  it('compiles class feature spellcasting intro from declared variant topology', () => {
+    const topology = buildClassFeatureRowVariantTopology({})
+    const variantFields = collectRowVariantTopologyFields(topology)
+    const compiled = compileFormOwnership(variantFields, {})
+
+    expect(compiled.paths.has('intro')).toBe(true)
+    expect(
+      variantFields.some(
+        (item) =>
+          JSON.stringify(item).includes('errorPaths') ||
+          JSON.stringify(item).includes('resolverFields'),
+      ),
     ).toBe(false)
   })
 })
