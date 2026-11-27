@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect } from 'react'
-import { useFormState, useWatch } from 'react-hook-form'
+import { useEffect, useRef } from 'react'
+import { useFormContext, useFormState } from 'react-hook-form'
 
 import { useFormUiContext } from '../context/form-ui.context'
 import { prepareFormIssues } from '../errors/resolve-invalid-submit-navigation'
@@ -16,14 +16,18 @@ export function FormValidationInteractiveProducerBridge({ fields }: { fields: Fo
   const producer = useFormValidationProducerContext()
   const { hasAttemptedSubmit, hasAttemptedPublish } = useFormUiContext()
   const { errors } = useFormState()
-  const formValues = (useWatch() ?? {}) as Record<string, unknown>
+  const { getValues } = useFormContext()
+  const replaceSlotRef = useRef(producer?.replaceSlot)
+  replaceSlotRef.current = producer?.replaceSlot
 
   useEffect(() => {
-    if (!producer?.replaceSlot) return
+    const replaceSlot = replaceSlotRef.current
+    if (!replaceSlot) return
     if (!hasAttemptedSubmit && !hasAttemptedPublish) return
+    const formValues = getValues() as Record<string, unknown>
     const issues = prepareFormIssues(errors, fields, formValues)
-    producer.replaceSlot('interactive', issues)
-  }, [errors, fields, formValues, hasAttemptedPublish, hasAttemptedSubmit, producer])
+    replaceSlot('interactive', issues)
+  }, [errors, fields, getValues, hasAttemptedPublish, hasAttemptedSubmit])
 
   return null
 }

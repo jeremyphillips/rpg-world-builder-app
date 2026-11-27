@@ -1,7 +1,7 @@
 /**
  * @vitest-environment jsdom
  */
-import type { ReactNode } from 'react'
+import { useCallback, useRef, useState, type ReactNode } from 'react'
 import userEvent from '@testing-library/user-event'
 import { render, screen, waitFor } from '@testing-library/react'
 import { beforeAll, describe, expect, it } from 'vitest'
@@ -12,6 +12,8 @@ import {
   FormUiProvider,
   FormValidationInteractiveProducerBridge,
   FormValidationProducerProvider,
+  type FormIssue,
+  type FormValidationProducerSlot,
   makeResolver,
   prepareFormIssues,
   replaceFormValidationProducerSlot,
@@ -33,6 +35,7 @@ import {
 } from '../../../lib/forms/fields/content-movement-form-fields'
 import { formatFieldMessage } from '@rpg/contracts'
 import { evaluateContentPublishValidation } from '../../../lib/forms/validation/content-publish-validation.lib'
+import { ingestContentFormValidationIssues } from '../../../lib/forms/validation/ingest-content-form-validation.lib'
 import { monsterFormDef } from '../monster-form-def'
 import { buildMonsterTabs } from '../monster-form-fields'
 import { MONSTER_FORM_TAB, resolveMonsterFormViewForPath } from '../monster-form-view'
@@ -422,12 +425,25 @@ describe('movement alternative optional disclosure', () => {
     )
     expect(modesIssues).toHaveLength(2)
 
-    let session = createEmptyFormValidationProducerSession()
-    session = replaceFormValidationProducerSlot(session, 'interactive', 1, modesIssues)
-
     function ProducerBoundary({ children }: { children: ReactNode }) {
+      const [session, setSession] = useState(() => createEmptyFormValidationProducerSession())
+      const stampRef = useRef(1)
+      const replaceSlot = useCallback(
+        (slot: FormValidationProducerSlot, issues: readonly FormIssue[]) => {
+          setSession((prev) =>
+            ingestContentFormValidationIssues(prev, slot, stampRef.current, issues),
+          )
+        },
+        [],
+      )
+
       return (
-        <FormValidationProducerProvider session={session} stamp={1}>
+        <FormValidationProducerProvider
+          session={session}
+          stamp={stampRef.current}
+          replaceSlot={replaceSlot}
+        >
+          <FormValidationInteractiveProducerBridge fields={resolverFields} />
           {children}
         </FormValidationProducerProvider>
       )
@@ -437,7 +453,7 @@ describe('movement alternative optional disclosure', () => {
     const overlapCopy = formatFieldMessage(movementValidationMessages.alternativeOverlap())
 
     render(
-      <FormUiProvider fields={resolverFields} publishPresentationEnabled hasAttemptedSubmit>
+      <FormUiProvider fields={resolverFields} publishPresentationEnabled>
         <TabbedForm
           id="monster-movement-dual-reasons"
           schema={publishSchema}

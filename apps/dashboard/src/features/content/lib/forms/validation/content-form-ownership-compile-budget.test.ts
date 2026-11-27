@@ -3,6 +3,7 @@ import { compileFormOwnership, FORM_OWNERSHIP_COMPILE_BUDGET_MS } from '@rpg/ui/
 
 import { buildClassTabs } from '../../../classes/lib/class-form-fields'
 import { buildMonsterTabs } from '../../../monsters/lib/monster-form-fields'
+import { movementAlternativeGroupField } from '../../../lib/forms/fields/content-movement-form-fields'
 
 const PILOT_COMPILE_TARGETS = [
   { name: 'classes', items: buildClassTabs({}) },
@@ -36,4 +37,15 @@ describe('content form ownership compile pilot budget', () => {
       expect(performance.now() - secondStarted).toBeLessThan(FORM_OWNERSHIP_COMPILE_BUDGET_MS)
     },
   )
+
+  it('compiles monster movement alternative modes without validation path metadata', () => {
+    const movementField = movementAlternativeGroupField()
+    const compiled = compileFormOwnership([movementField], {})
+
+    expect(compiled.paths.has('movementAlternative.modes')).toBe(true)
+    expect(
+      JSON.stringify(movementField).includes('errorPaths') ||
+        JSON.stringify(movementField).includes('resolverFields'),
+    ).toBe(false)
+  })
 })

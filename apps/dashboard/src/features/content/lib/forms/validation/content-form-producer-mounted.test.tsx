@@ -129,6 +129,8 @@ describe('adopted content producer mounted presentation', () => {
     expect(persist).not.toHaveBeenCalled()
   })
 
+  // Shared `useContentFormSubmitProducerBinding` + manual `replaceSlot` ingress (edit shell
+  // wraps the same binding inside `ProducerBoundary` once stamp watch is mounted).
   it('clears only publish-readiness after advisory success while draft-action stays', async () => {
     const persist = vi.fn()
     const probeRef: { current: ReturnType<typeof useContentFormPresentationIssues> | null } = {
