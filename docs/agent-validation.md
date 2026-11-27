@@ -20,7 +20,8 @@ Do **not** run pre-commit, `pnpm gate:pre-push`, root `pnpm build`, or `pnpm cov
 unless the user requests a checkpoint below.
 
 Finish by reporting checks run, deferred repository gates, and whether the handoff is
-**plan complete** or **incomplete**. Update plan frontmatter `todos` when a plan applied.
+**plan complete**, **checkpoint complete**, or an **incomplete handoff**. Update plan
+frontmatter `todos` when a plan applied.
 
 ## Checkpoints (user-requested)
 
@@ -57,29 +58,72 @@ Before substantive implementation:
 2. Note the **production boundary** per criterion (unit, `api:integration`, HTTP route,
    mounted UI, static grep, etc.).
 
-During execution, maintain a running view (session summary table is enough):
+During execution, maintain a running view (session summary table is enough). Keep
+the columns distinct: implementation progress, criterion outcome, and execution
+result are not interchangeable.
 
-| Criterion | Impl        | Verify                          | Notes |
-| --------- | ----------- | ------------------------------- | ----- |
-| …         | done / open | pass / fail / blocked / not run |       |
+| Criterion | Impl        | Outcome                                                                             | Executed result                             | Notes |
+| --------- | ----------- | ----------------------------------------------------------------------------------- | ------------------------------------------- | ----- |
+| …         | done / open | `unmet` / `partial` / `failed` / `unverified` / `blocked` / `verified` / `deferred` | `passed` / `failed` / `errored` / `not run` |       |
 
-**Implementation** and **verification** columns are independent. A commit or pre-commit
-success does not mark verification done.
+**Implementation** and **verification** are independent. A commit or pre-commit
+success does not mark verification done. An execution result of `failed`,
+`errored`, or `not run` cannot support a `verified` outcome.
 
 Multi-session: leave enough state in the summary and plan frontmatter so a new session
 can resume without reconstructing scope only at the end.
 
 ### Completion semantics
 
-| Handoff label           | Meaning                                                             |
-| ----------------------- | ------------------------------------------------------------------- |
-| Implementation complete | Required changes for all mandatory criteria are in the tree         |
-| Verification complete   | Required checks for those criteria succeeded at the stated boundary |
-| Plan complete           | All mandatory criteria implemented **and** verified                 |
-| Incomplete handoff      | Any mandatory criterion partial, failed, blocked, or unverified     |
+| Handoff label           | Meaning                                                                                   |
+| ----------------------- | ----------------------------------------------------------------------------------------- |
+| Implementation complete | Required changes for the criteria in scope are in the tree                                |
+| Verification complete   | Required checks for those criteria succeeded at the stated boundary                       |
+| Checkpoint complete     | The **active boundary** gate is met; the rest of the plan may still be open               |
+| Plan complete           | The **whole-plan** gate is met                                                            |
+| Incomplete handoff      | The active boundary is not met, or the run stops with mandatory criteria still unresolved |
 
-Partial, failed, blocked, or unverified mandatory work requires an **incomplete handoff**.
+**Checkpoint complete** and **plan complete** are different labels. Closing a named
+subset (a pilot, a phase, a stopping boundary) is checkpoint complete. Plan complete
+applies only when every mandatory criterion in the whole plan meets the gate rule.
 Honest reporting does not make the work complete.
+
+### Status concepts
+
+These vocabularies stay separate. Criterion outcome is the only value in a plan
+matrix `Status` column. Execution result is recorded per command. Assignment
+progress is recorded only in a plan `## Workflow state` section when a multi-agent
+workflow is in use.
+
+| Concept             | Where it lives       | Values                                                                                                                |
+| ------------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Criterion outcome   | Plan matrix `Status` | `unmet`, `partial`, `failed`, `unverified`, `blocked`, `verified`, `deferred`                                         |
+| Execution result    | Per recorded command | `passed`, `failed`, `errored`, `not run` — with the command, counts, and snapshot tree when one exists                |
+| Assignment progress | Workflow state only  | `dispatched`, `returned`, `verifying`, `remediating n/limit`, `exhausted`, `awaiting decision`, `interrupted`, `done` |
+
+**Criterion outcome** is the current state from the latest applicable evidence:
+
+| Outcome      | Meaning                                                                                         |
+| ------------ | ----------------------------------------------------------------------------------------------- |
+| `unmet`      | Required work is not present and no confirming evidence exists                                  |
+| `partial`    | Some of the required behavior or coverage is present; the criterion is not met                  |
+| `failed`     | The latest applicable evidence shows the requirement is contradicted or a required check failed |
+| `unverified` | Evidence is missing, stale, or cannot be confirmed against the current tree                     |
+| `blocked`    | An external constraint or a pending user decision prevents progress                             |
+| `verified`   | The latest applicable evidence confirms the requirement at the stated boundary                  |
+| `deferred`   | A recorded user approval excludes the criterion from the active gate                            |
+
+### Invalidation and gate rules
+
+- Earlier successful runs stay in the executed-result history. They do not hold the current outcome.
+- Stale or unconfirmable evidence sets the outcome to `unverified` until it is reverified. Missing or stale evidence is never `verified`.
+- A confirmed failure sets `failed` or `partial` and supersedes an earlier `verified`.
+- `exhausted` is assignment progress. It is not an outcome. After exhaustion the outcome stays the latest evidence: `failed`, `partial`, or `unverified`.
+- `blocked` names an external constraint or a pending user decision. Exhaustion alone is never `blocked`.
+- `deferred` requires a recorded user approval. An agent does not defer mandatory work on its own.
+- A slice is not eligible while any prerequisite criterion is not currently `verified`.
+
+**Gate rule.** A gate closes only when every mandatory criterion in its scope is currently `verified`, is approved `deferred`, or has a recorded user waiver.
 
 ### Production boundary and equivalence
 
@@ -145,8 +189,8 @@ record.
 | **Plan final** | Approved scope lists explicit verification | Named suites/commands; diagnostic reruns do not substitute     |
 
 Pre-existing failures: cite concrete baseline evidence (e.g. known failing path on main).
-Otherwise label attribution **unresolved**. Never report blocked or unexecuted checks as
-passing.
+Otherwise label attribution **unresolved**. Never report a `blocked` criterion or a
+`not run` / `errored` execution result as `passed` or as a `verified` outcome.
 
 ## Writing implementation plans
 
@@ -169,6 +213,63 @@ milestones when hooks belong in the schedule.
 - **Continuation rule** for readers: priority orders work; it does not shrink scope.
 - Progress in frontmatter only (`id`, `content`, `status`); use the body for scope and
   verification intent—not a second status system.
+
+## Evidence identity
+
+Applies when work is recorded against a git snapshot (multi-agent workflow or any
+plan that cites an evidence tree). **HEAD is not identity** for uncommitted work.
+The workflow does not auto-commit.
+
+### Snapshot
+
+The orchestrator owns snapshots. The shell sequence (copy the index, stage into
+that copy, `git write-tree`, delete the copy) lives with the orchestration
+reference. The rules here are the authority for what a snapshot means:
+
+1. Copy the real index (`git rev-parse --git-path index`) to a unique temporary index. Never write the real index.
+2. Stage into that copy only (`git add -A` with `GIT_INDEX_FILE` set to the copy).
+3. `git write-tree` on the copy. The resulting tree is the identity.
+4. Delete the copy on success and on failure (`trap`).
+
+The tree covers committed, staged, dirty, and untracked non-ignored content.
+Ignored paths, including `.cursor/` plan files, do not change it.
+
+**Snapshot failure.** A non-zero exit or empty output means the snapshot is
+unavailable. Nothing may be recorded as `verified` against it: checkpoint, set
+the affected outcomes to `unverified`, and report.
+
+**Historical trees.** Confirm a recorded tree with `git cat-file -e <tree>^{tree}`.
+If the object is missing (unreachable trees can be pruned by `git gc`), evidence
+tied to it becomes `unverified` and is reverified conservatively. There are no
+permanent snapshot refs.
+
+### Scopes
+
+- **Implementation diff scope:** `git diff --name-only <pre-tree> <post-tree>`. Paths already dirty at dispatch are pre-existing and are not attributed to the agent.
+- **Verification dependency scope:** declared per criterion, with a confidence note. It is an approximation, not a dependency graph. It includes the changed files, traced production consumers (including newly introduced ones), executed test files, shared contracts and common runtime infrastructure the behavior relies on, and the package and test configuration. When coverage is uncertain, broaden to the owning package directory or invalidate conservatively.
+- **Conservative rule:** any change to root or package configuration (`package.json`, `pnpm-lock.yaml`, tsconfig, Vitest config) invalidates evidence for the affected packages.
+
+### Staleness
+
+Compare with `git diff --name-only <evidence-tree> <current-tree> -- <dependency paths>`.
+A non-empty result sets the criterion to `unverified`. Sweep after every
+implementation, on resume, before final verification, and at every gate.
+
+Snapshot before and after each verification dispatch. If the dependency paths
+differ between those trees, discard the result as `unverified`. Final
+verification evaluates cross-slice effects regardless of earlier dependency
+inventories.
+
+**Uncaptured inputs:** ignored files (`.env*`, generated output, `node_modules`),
+external service and database state, and browser state. Evidence that relies on
+them says so and depends on a fresh rerun.
+
+### Protected-work check
+
+Workflow state may list protected paths with blob hashes, plus a protected diff
+set. At every phase or checkpoint boundary, confirm each hash with
+`git hash-object` and confirm the snapshot diff from the protected baseline
+touches no protected path. `git status` or a dirty-path list is not sufficient.
 
 ## Verifying CI failure propagation
 

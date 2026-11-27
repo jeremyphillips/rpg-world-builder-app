@@ -72,7 +72,7 @@ below.
 | 6   | **Behavior or test regressions** | Changed flows, defaults, navigation, permissions, persisted state; deleted/weakened/stale tests                                                                  |
 | 7   | **Wiring gaps**                  | Partial landing across layers — see below                                                                                                                        |
 | 8   | **New form slots**               | A new production `kind: 'slot'` that `display`, `visibility`, `optionsResolve`, `hint.resolve`, `derivedMeta`, `valueSyncs`, `dependent`, or `optionalDisclosure` could express. A new or renamed identity must update the [slot register](../../../apps/dashboard/docs/form-slot-register.md) and `form-slot-literal-baseline.json`. Confirm-gated multi-path writes stay feature controllers plus `ConfirmDialog`. Reject raw `<input>`, `<select>`, or `<textarea>` in `components/form/slots/**` (see [.cursor/rules/form-slots.mdc](../../../.cursor/rules/form-slots.mdc)). |
-| 9   | **Metric-only complexity refactors** | Splits/extracts whose only stated goal is passing Fallow; new single-use `*.lib.ts`, pass-through helpers, or extra files without semantic boundary — see [complexity-remediation.md](../../../docs/complexity-remediation.md). Favor simplify-in-place, meaningful tests, consolidate/remove dubious abstractions. |
+| 9   | **Accidental complexity** | Metric-only splits and extracts (the only stated goal is passing Fallow; new single-use `*.lib.ts`, pass-through helpers, or extra files without a semantic boundary), plus accidental complexity: redundant state, duplicate branches, dead paths, and abstractions that fail the [pre-abstraction checklist](../../../docs/architecture-ssot.md#pre-abstraction-checklist-agents-and-reviewers). Judgment lives in [complexity-remediation.md](../../../docs/complexity-remediation.md). Favor simplify-in-place, meaningful tests, and consolidating or removing dubious abstractions. |
 | 10  | **Plan compliance and verification** | When approved scope is inferable (PR description, commits, linked plan): missing/incorrect implementation, missing boundary verification, inaccurate “done” claims, weaker test substitution — policy in [AGENTS.md § Approved work](../../../AGENTS.md#approved-work) and [agent-validation.md § Plan execution](../../../docs/agent-validation.md#plan-execution). |
 
 ### Plan compliance (lens 10)
@@ -139,21 +139,44 @@ claim an unexecuted check passed.
 
 #### Acceptance assessment
 
-Track implementation and verification separately. Account for every applicable
-mandatory criterion using:
-
-| Status | Meaning |
-| ------ | ------- |
-| Satisfied | Required implementation and verification established |
-| Partial | Some required implementation or coverage incomplete |
-| Failed | Implementation contradicts the requirement or required verification fails |
-| Unverified | Required evidence unavailable or not established |
-| Deferred | Explicitly excluded by an approved scope decision |
+Track implementation and verification separately. The `Status` column uses the
+criterion outcomes defined in
+[agent-validation.md § Status concepts](../../../docs/agent-validation.md#status-concepts):
+`verified`, `partial`, `failed`, `unverified`, `blocked`, `deferred`, and `unmet`.
+Do not introduce a second outcome vocabulary. Missing or stale evidence is
+`unverified`, never `verified`. `deferred` requires a recorded user approval.
+`blocked` is an external constraint or a pending user decision, not exhaustion.
 
 Group criteria with shared evidence; expand gaps individually. Do not independently
 defer mandatory work or declare the approved scope complete while mandatory
-requirements remain partial, failed, or unverified. If review scope is intentionally
-narrow, do not imply acceptance of the entire initiative.
+requirements remain `partial`, `failed`, `unverified`, `blocked`, or `unmet`. If
+review scope is intentionally narrow, report checkpoint scope separately and do
+not imply acceptance of the entire initiative.
+
+### Assignment-scoped verification
+
+When the review is one assignment rather than a whole branch, apply the same
+method inside a narrower boundary. Do not copy lens text into the assignment
+prompt or the report.
+
+- **Boundary:** the implementation diff plus traced production consumers.
+- **Lenses:** every relevant primary lens (1–10), including ownership, duplicate
+  authority, parallel paths, silent failures, production integration (wiring and
+  boundary completeness), regressions, accidental complexity (lens 9), plan
+  compliance (lens 10), and verification accuracy. Secondary lenses apply when
+  the change touches them.
+- **Out of scope:** repository-wide review.
+- **Output:** the finding format and plan-acceptance table in this skill, limited
+  to the assignment. Record outcomes with the canonical status values above.
+  The orchestration handoff template, when present, carries the same outcomes;
+  it does not redefine them.
+
+A **plan review** (`review-plan`) uses this skill’s lenses and
+[agent-validation.md § Writing implementation plans](../../../docs/agent-validation.md#writing-implementation-plans)
+against the plan text. It checks that mandatory criteria, boundaries, gates, and
+status concepts are stated once and do not contradict
+[AGENTS.md § Approved work](../../../AGENTS.md#approved-work). It does not
+re-author the plan or copy the authoring checklist into the review.
 
 ### SSOT rule
 
