@@ -43,10 +43,10 @@ Fallow runs at commit (complexity/dupes) and again at push with CRAP after cover
 [`fallow-health-gate.sh`](fallow-health-gate.sh) delegates to [`fallow-health-gate.mjs`](fallow-health-gate.mjs)
 (Fallow **2.89** JSON `findings[].exceeded`):
 
-| Mode | Command | Fails on |
-| ---- | ------- | -------- |
-| Pre-commit | `pnpm gate:fallow-health` | `cyclomatic`, `cognitive`, `both` |
-| Coverage | `pnpm gate:fallow-health:coverage` | Any finding, including `crap` (Istanbul) |
+| Mode       | Command                            | Fails on                                 |
+| ---------- | ---------------------------------- | ---------------------------------------- |
+| Pre-commit | `pnpm gate:fallow-health`          | `cyclomatic`, `cognitive`, `both`        |
+| Coverage   | `pnpm gate:fallow-health:coverage` | Any finding, including `crap` (Istanbul) |
 
 Estimated CRAP-only findings do **not** fail pre-commit. Missing `coverage-final.json`
 on the coverage gate exits **2** (fails closed). Fallow exit **2** (parse/config) is
@@ -61,6 +61,16 @@ files touch `@rpg/contracts` Zod sources that feed catalog JSON Schema generatio
 output. CI runs `pnpm gate:json-schemas` on every PR.
 
 Skip all hooks locally: `HUSKY=0 git commit` / `HUSKY=0 git push`.
+
+## Cursor dispatch hook
+
+[`.cursor/hooks.json`](../../.cursor/hooks.json) runs
+[`cursor-subagent-start-log.mjs`](cursor-subagent-start-log.mjs) on `subagentStart`.
+It appends one JSON line to `.tmp/agent-workflow/subagent-start.jsonl` and always
+prints `{"permission":"allow"}`. It does not deny launches, and it is not part of
+the Git hook tiers above.
+
+Unit tests: `pnpm exec vitest run --config tools/hooks/vitest.config.ts tools/hooks/cursor-subagent-start-log.test.mjs`
 
 ## Agent invocation (when to run gates)
 

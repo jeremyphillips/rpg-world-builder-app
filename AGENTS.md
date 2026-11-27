@@ -176,6 +176,9 @@ require **user consultation** (see canonical doc).
 | [`dev-bench`](.cursor/skills/dev-bench/SKILL.md)                                       | Capturing gaps and tickets via `pnpm bench`                                                                              |
 | [`pr-review`](.cursor/skills/pr-review/SKILL.md)                                       | Structured PR review — SSOT drift, parallel paths, ownership, styling hacks, silent failures, wiring gaps                |
 | [`directory-organization-audit`](.cursor/skills/directory-organization-audit/SKILL.md) | Directory organization strategy for crowded or misaligned folders — ownership, flat vs nested structure, move vs extract |
+| [`orchestrate`](.cursor/skills/orchestrate/SKILL.md)                                   | Multi-agent workflow for Standard and Architectural work; Direct edits do not use it                                     |
+
+Multi-agent work starts at `/orchestrate`. Status, gates, and evidence identity stay in [docs/agent-validation.md](docs/agent-validation.md).
 
 Policy depth for content types → [`docs/content-types.md`](docs/content-types.md).
 
