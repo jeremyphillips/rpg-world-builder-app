@@ -104,6 +104,7 @@ export const monsterFormDef: ContentFormDef<Monster, MonsterFormValues, CreateMo
   serializePreparedWrite: (input: PrepareSerializedContentFormWriteInput<MonsterFormValues>) => {
     const entity = input.inputCtx?.entity as { catalogLayer?: string } | undefined
     if (input.operation === 'update' && entity?.catalogLayer === 'system') {
+      // Overlay intent envelope: provenance stays identity until intent paths map to form owners.
       return buildIdentityPreparedWrite(
         serializeContentFormInput(
           monsterFormDef,

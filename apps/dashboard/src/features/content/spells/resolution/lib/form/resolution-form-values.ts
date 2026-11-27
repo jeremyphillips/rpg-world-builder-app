@@ -5,6 +5,8 @@ import {
   type SpellResolution,
 } from '@rpg/contracts'
 
+import type { ProvenanceAccumulator } from '../../../../lib/forms/submit/accumulate-prepared-write-provenance.lib'
+import { recordArrayCompaction } from '../../../../lib/forms/submit/accumulate-prepared-write-provenance.lib'
 import { applicationPatternFromForm } from '../application-pattern/resolution-application-pattern.lib'
 import { EMPTY_RESOLUTION_AREA_OF_EFFECT, resolutionAreaFromForm } from './resolution-area-values'
 import { effectToStored } from './resolution-effect-values'
@@ -97,8 +99,15 @@ function buildSelectionEnvelope(
 /** Normalizes flattened form values to a contract resolution envelope. */
 export function resolutionToStored(
   values: ResolutionFormValues | undefined,
+  provenance?: ProvenanceAccumulator,
 ): SpellResolution | undefined {
   if (!values) return undefined
+
+  if (provenance) {
+    recordArrayCompaction(provenance, 'resolution.effects', values.effects.length, (index) => {
+      return effectToStored(values.effects[index]) !== undefined
+    })
+  }
 
   const effects = values.effects
     .map(effectToStored)

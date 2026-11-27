@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { mapWireIssuesToAuthoring } from '../../lib/forms/submit/map-wire-issues-to-authoring.lib'
+import { apiValidationIssuesToFormIssues } from '../../lib/forms/validation/normalize-content-form-issues.lib'
 import type { FormIssue } from '@rpg/ui/form'
 
 import {
@@ -42,6 +43,27 @@ describe('buildMonsterPreparedWrite provenance', () => {
     )
     const { issues } = mapWireIssuesToAuthoring([issue('slug')], provenance)
     expect(issues[0]!.path).toBe('name')
+  })
+
+  it('correlates API middleware validation_error paths through client ingestion', () => {
+    const values: MonsterFormValues = {
+      ...resolveMonsterCreateDefaultValues(),
+      name: 'Scout',
+      proficiencies: {
+        ...resolveMonsterCreateDefaultValues().proficiencies,
+        skills: [
+          { skill: 'stealth', rank: 'proficient' as const },
+          { skill: 'stealth', rank: 'expertise' as const },
+          { skill: 'perception', rank: 'proficient' as const },
+        ],
+      },
+    }
+    const { provenance } = buildMonsterPreparedWrite(values, undefined, 'draft')
+    const wireIssues = apiValidationIssuesToFormIssues([
+      { path: 'proficiencies.skills.1.skill', message: 'Duplicate skill row', code: 'custom' },
+    ])
+    const { issues } = mapWireIssuesToAuthoring(wireIssues, provenance)
+    expect(issues[0]!.path).toBe('proficiencies.skills.2.skill')
   })
 
   it('records nested multiattack choice compaction with a fragment prefix', () => {
