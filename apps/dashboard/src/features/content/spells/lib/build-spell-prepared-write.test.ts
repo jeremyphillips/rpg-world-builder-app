@@ -56,4 +56,18 @@ describe('buildSpellPreparedWrite provenance', () => {
     const { issues } = mapWireIssuesToAuthoring([issue('tables.0.name')], provenance)
     expect(issues[0]!.path).toBe('tables.1.name')
   })
+
+  it('targets the same authoring row for a local path and a wire path after table pruning', () => {
+    const tableB = { ...reincarnateSpeciesTableFixture, id: 'table-b', name: 'Table B' }
+    const values = publishReadySpellFormValues({
+      description: `<div ${RICH_TEXT_TABLE_EMBED_ATTR}="table-b"></div>`,
+      tables: [reincarnateSpeciesTableFixture, tableB],
+    })
+    const { provenance } = buildSpellPreparedWrite(values, undefined, 'publish')
+
+    const localPath = 'tables.1.name'
+    const wirePath = mapWireIssuesToAuthoring([issue('tables.0.name')], provenance).issues[0]!.path
+
+    expect(wirePath).toBe(localPath)
+  })
 })

@@ -5,9 +5,11 @@ import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 import type { FormItem } from '@rpg/ui/form'
 import {
+  collectCurrentFormValidationProducerIssues,
   createEmptyFormValidationProducerSession,
   replaceFormValidationProducerSlot,
 } from '@rpg/ui/form'
+import { apiValidationIssuesToFormIssues } from './normalize-content-form-issues.lib'
 
 import {
   ContentFormValidationOperationFailure,
@@ -64,5 +66,18 @@ describe('form validation pilot regression', () => {
     expect(provenance.filteredRowIndexBySourceIndex).toEqual({
       actions: { 0: 0, 2: 1, 3: 2 },
     })
+  })
+
+  it('omits api slot issues from stamp N when the session advances to N+1', () => {
+    let session = createEmptyFormValidationProducerSession()
+    const wireIssues = apiValidationIssuesToFormIssues([
+      { path: 'name', message: 'Slug taken', code: 'duplicate' },
+    ])
+    session = replaceFormValidationProducerSlot(session, 'api', 1, wireIssues)
+
+    expect(
+      collectCurrentFormValidationProducerIssues(session, 2).some((issue) => issue.path === 'name'),
+    ).toBe(false)
+    expect(collectCurrentFormValidationProducerIssues(session, 1)).toHaveLength(1)
   })
 })

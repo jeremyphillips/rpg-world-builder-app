@@ -10,16 +10,24 @@ import {
   Form,
   FormValidationInteractiveProducerBridge,
   FormValidationProducerProvider,
+  collectRowVariantTopologyFields,
+  collectTabbedFormResolverItems,
+  compileFormOwnership,
   createEmptyFormValidationProducerSession,
+  resolveTabValidationState,
   type FormIssue,
   type FormItem,
   type FormValidationProducerSlot,
 } from '@rpg/ui/form'
 
 import { makeContentFormCtx } from '../../lib/fixtures/content-form-ctx'
+import { buildClassTabs } from './class-form-fields'
 import { ingestContentFormValidationIssues } from '../../lib/forms/validation/ingest-content-form-validation.lib'
 import { useMasterDetailRowValidation } from '../../lib/master-detail/master-detail-row-validation'
-import { subclassFeatureItemFields } from './class-feature-form-fields'
+import {
+  buildClassFeatureRowVariantTopology,
+  subclassFeatureItemFields,
+} from './class-feature-form-fields'
 import { createSubclassFeatureRowFormSchema } from './class-feature-row-form-schema'
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
 
@@ -71,6 +79,33 @@ function liveProducerBoundary(resolverFields: FormItem[]) {
 }
 
 describe('class feature master-detail validation pilot', () => {
+  it('compiles empty feature variant topology without throwing on missing row kind', () => {
+    const topology = buildClassFeatureRowVariantTopology(ctx)
+    const variantFields = collectRowVariantTopologyFields(topology)
+    expect(() => compileFormOwnership(variantFields, {})).not.toThrow()
+    const compiled = compileFormOwnership(variantFields, {})
+    expect(compiled.paths.has('name')).toBe(true)
+    expect(compiled.paths.has('intro')).toBe(true)
+  })
+
+  it('routes embedded feature row issues to the Features header-only tab', () => {
+    const tabs = buildClassTabs(ctx)
+    const resolverFields = collectTabbedFormResolverItems(tabs)
+    const tabStates = resolveTabValidationState(
+      [
+        {
+          path: 'features.0.name',
+          message: 'Name is required.',
+          severity: 'field',
+        },
+      ],
+      tabs,
+      resolverFields,
+    )
+
+    expect(tabStates.find((state) => state.tabId === 'features')?.count).toBe(1)
+  })
+
   it('surfaces missing name on the row after submit through the interactive producer', async () => {
     const user = userEvent.setup()
     const onSubmit = vi.fn()

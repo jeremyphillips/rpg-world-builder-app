@@ -152,4 +152,81 @@ describe('useContentFormSubmitProducerBinding', () => {
       expect(binding.producerSession.slots['publish-action']?.issues.length).toBeGreaterThan(0)
     })
   })
+
+  it('allows draft save while publish validation still blocks level', async () => {
+    const persist = vi.fn().mockResolvedValue(undefined)
+    const bindingRef: { current: ContentFormSubmitProducerBinding | null } = { current: null }
+    const controls = {
+      draft: async () => undefined as Promise<void>,
+      publish: async () => undefined as Promise<void>,
+    }
+
+    function Harness() {
+      const form = useForm<Values>({ defaultValues: { name: 'Valid draft', level: 2 } })
+      const binding = useContentFormSubmitProducerBinding()
+      bindingRef.current = binding
+      const publish = useContentFormSubmit<Values>({
+        def,
+        ctx,
+        fallbackMessage: 'Could not publish.',
+        producerBinding: binding,
+        persist,
+      })
+      const draft = useContentFormSubmit<Values>({
+        def,
+        ctx,
+        commitValidationIntent: 'draft',
+        fallbackMessage: 'Could not save draft.',
+        producerBinding: binding,
+        mountProducerChrome: false,
+        persist,
+      })
+      controls.draft = () => draft.onSubmit({ name: 'Valid draft', level: 2 }, form)
+      controls.publish = () => publish.onSubmit({ name: 'Valid draft', level: 2 }, form)
+      const Boundary = publish.ProducerBoundary
+      const StampBridge = publish.ProducerStampBridge
+
+      return (
+        <FormProvider {...form}>
+          <StampBridge />
+          <Boundary>
+            <span data-testid="probe" />
+          </Boundary>
+        </FormProvider>
+      )
+    }
+
+    render(
+      <FormUiWrapper>
+        <Harness />
+      </FormUiWrapper>,
+    )
+
+    await act(async () => {
+      await controls.draft()
+    })
+
+    expect(persist).toHaveBeenCalledTimes(1)
+    expect(bindingRef.current?.producerSession.slots['draft-action']?.issues ?? []).toEqual([])
+
+    await act(async () => {
+      try {
+        await controls.publish()
+      } catch (error) {
+        expect(error).toBeInstanceOf(ContentFormSubmitValidationFailed)
+      }
+    })
+
+    await waitFor(() => {
+      const binding = bindingRef.current!
+      const issues = collectCurrentFormValidationProducerIssues(
+        binding.producerSession,
+        binding.snapshotStamp,
+      )
+      expect(issues.some((issue) => issue.path === 'level')).toBe(true)
+      expect(binding.producerSession.slots['draft-action']?.issues ?? []).toEqual([])
+      expect(binding.producerSession.slots['publish-action']?.issues.length).toBeGreaterThan(0)
+    })
+    expect(persist).toHaveBeenCalledTimes(1)
+  })
 })
