@@ -19,18 +19,22 @@ describe('campaign form validation adoption', () => {
     expect(source).not.toContain('paintValidationIssuesOnForm')
   })
 
-  it('uses adopted submit helper on settings', () => {
+  it('uses runner submit on settings', () => {
     const source = readFileSync(campaignSettingsPath, 'utf8')
 
-    expect(source).toContain('useAdoptedFormSubmit')
+    expect(source).toContain('useRunnerFormSubmit')
+    expect(source).not.toContain('useAdoptedFormSubmit')
     expect(source).not.toContain('useSubmitHandler')
     expect(source).toContain('TabbedForm')
+    expect(source).toContain('producerBoundary={ProducerBoundary}')
   })
 
-  it('uses adopted submit helper on invite member dialog', () => {
+  it('uses runner submit on invite member dialog', () => {
     const source = readFileSync(inviteMemberDialogPath, 'utf8')
 
-    expect(source).toContain('useAdoptedFormSubmit')
+    expect(source).toContain('useRunnerFormSubmit')
+    expect(source).not.toContain('useAdoptedFormSubmit')
     expect(source).not.toContain('useSubmitHandler')
+    expect(source).toContain('producerBoundary={ProducerBoundary}')
   })
 })
