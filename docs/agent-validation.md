@@ -23,6 +23,11 @@ Finish by reporting checks run, deferred repository gates, and whether the hando
 **plan complete**, **checkpoint complete**, or an **incomplete handoff**. Update plan
 frontmatter `todos` when a plan applied.
 
+For multi-agent runs, operator-facing summaries use plain-language outcomes first
+(see [.cursor/skills/orchestrate/SKILL.md](../.cursor/skills/orchestrate/SKILL.md)
+**Operator communication**). Keep dispatch ids, snapshot trees, and criterion bookkeeping
+in the plan **Workflow state**, not in default chat reports.
+
 ## Checkpoints (user-requested)
 
 | Intent                      | Run                                                                                                       |

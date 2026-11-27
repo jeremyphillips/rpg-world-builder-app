@@ -21,6 +21,25 @@ commands: [reference.md](reference.md).
 In Standard and Architectural work the orchestrator does not do substantial
 implementation.
 
+## Operator communication
+
+Write for the human operator first. Internal plan ids, dispatch ids, snapshot trees, hook logs, remediation counters, and assignment blocks belong in the plan’s **Workflow state** and slice log — not in default chat progress, decision requests, or completion summaries.
+
+Every operator-facing report should state, in plain language:
+
+1. **Focus** — what slice or outcome we are pursuing and how it fits the initiative.
+2. **Findings** — what we learned or confirmed.
+3. **Changes** — what moved in the product or repo (not merely which matrix row flipped).
+4. **Verification** — what we ran or checked and whether it passed.
+5. **Remaining** — what is still open before the next checkpoint or plan complete.
+6. **You** — whether operator action is needed; if yes, one clear action and why.
+
+Name work by purpose, not package letter alone. Example: say “producers, publish readiness, and footer copy,” then optionally add “(Package C, FV-006, FV-013)” as a secondary reference.
+
+Do not lead with unexplained criterion codes, dispatch suffixes, or git tree hashes. When a limitation is accepted rather than finished, say so explicitly (e.g. “billing identity is an accepted limitation — it does not block the next form-validation run”).
+
+When starting a bounded run, explain what the boundary includes and excludes in user terms before quoting the execute command.
+
 ## Classification
 
 - **Direct.** Localized, no shared contract or package change, low risk. Do not load this skill and do not delegate.
