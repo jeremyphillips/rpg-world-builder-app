@@ -5,6 +5,10 @@ import type { FieldErrors, FieldValues, UseFormReturn } from 'react-hook-form'
 
 import { performInvalidSubmitFocus } from '../config/navigate-invalid-submit-focus.lib'
 import { navigateInvalidSubmit } from '../config/navigate-invalid-submit.client'
+import {
+  beginInvalidSubmitFocusRequest,
+  isInvalidSubmitFocusRequestCurrent,
+} from '../config/invalid-submit-focus-generation.lib'
 import { findArraySectionForIssue } from '../errors/group-form-issues'
 import type { FormIssue } from '../errors/form-issue.types'
 import {
@@ -62,13 +66,18 @@ function focusTabbedFormNavigation(
 ): void {
   ui.addValidationSessionExpandKeys(navigation.expandKeys)
 
-  window.requestAnimationFrame(() => {
-    window.requestAnimationFrame(() => {
-      performInvalidSubmitFocus(navigation, idPrefix, {
-        tabPanelSelector: `[data-tab-panel="${tabId}"]`,
-        tabTriggerSelector: `[data-tab-trigger="${tabId}"]`,
-      })
+  const generation = beginInvalidSubmitFocusRequest()
+  const focus = () => {
+    if (!isInvalidSubmitFocusRequestCurrent(generation)) return
+    performInvalidSubmitFocus(navigation, idPrefix, {
+      tabPanelSelector: `[data-tab-panel="${tabId}"]`,
+      tabTriggerSelector: `[data-tab-trigger="${tabId}"]`,
     })
+  }
+
+  window.requestAnimationFrame(() => {
+    if (!isInvalidSubmitFocusRequestCurrent(generation)) return
+    window.requestAnimationFrame(focus)
   })
 }
 

@@ -7,6 +7,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { render, renderHook, act, waitFor } from '@testing-library/react'
 import { z } from 'zod'
 import {
+  collectCurrentFormValidationProducerIssues,
   createEmptyFormValidationProducerSession,
   FormUiContext,
   type FormItem,
@@ -19,6 +20,7 @@ import {
   ContentFormSubmitValidationFailed,
   presentContentFormInvalidSubmit,
   useContentFormSubmit,
+  useContentFormSubmitProducerBinding,
 } from './content-form-submit'
 import { presentPersistValidationFailure } from './content-form-submit-presentation.lib'
 import { projectCompactedArrayProvenance } from '../../submit/project-compacted-array-provenance.lib'
@@ -456,5 +458,160 @@ describe('useContentFormSubmit attempt identity', () => {
       releaseFirst()
       await expect(first).rejects.toBeInstanceOf(ContentFormSubmitSuperseded)
     })
+  })
+
+  it('does not badge stamp N api issues after the edit snapshot advances to N+1', async () => {
+    const persist = vi.fn().mockRejectedValueOnce(
+      new ApiError(400, 'validation_error', 'Invalid', {
+        issues: [{ path: 'name', message: 'Slug is already taken', code: 'duplicate' }],
+      }),
+    )
+    const bindingRef: {
+      current: ReturnType<typeof useContentFormSubmitProducerBinding> | null
+    } = { current: null }
+    const controls = { submit: async () => undefined as Promise<void> }
+
+    function Harness() {
+      const form = useForm<TestValues>({ defaultValues: { name: 'A', level: 2 } })
+      const binding = useContentFormSubmitProducerBinding()
+      bindingRef.current = binding
+      const contentSubmit = useContentFormSubmit<TestValues>({
+        def: testDef,
+        ctx: { ...testCtx, mode: 'edit' },
+        fallbackMessage: 'Could not save.',
+        producerBinding: binding,
+        invalidPresentation: {
+          resolverFields: [
+            { name: 'name', label: 'Name', type: 'text' },
+            { name: 'level', label: 'Level', type: 'number' },
+          ],
+          formId: 'edit-form',
+        },
+        persist: async (values) => persist(values),
+      })
+      controls.submit = () => contentSubmit.onSubmit({ name: 'A', level: 2 }, form)
+      const Boundary = contentSubmit.ProducerBoundary
+      const StampBridge = contentSubmit.ProducerStampBridge
+
+      return (
+        <FormProvider {...form}>
+          <StampBridge />
+          <Boundary>
+            <span data-testid="probe" />
+          </Boundary>
+        </FormProvider>
+      )
+    }
+
+    render(
+      <FormUiWrapper>
+        <Harness />
+      </FormUiWrapper>,
+    )
+
+    await act(async () => {
+      try {
+        await controls.submit()
+      } catch (error) {
+        expect(error).toBeInstanceOf(Error)
+      }
+    })
+
+    const stampAfterFail = bindingRef.current!.snapshotStamp
+    expect(
+      bindingRef.current!.producerSession.slots.api?.issues.some((issue) => issue.path === 'name'),
+    ).toBe(true)
+    expect(
+      collectCurrentFormValidationProducerIssues(
+        bindingRef.current!.producerSession,
+        stampAfterFail,
+      ).some((issue) => issue.path === 'name'),
+    ).toBe(true)
+
+    act(() => {
+      bindingRef.current!.stampRef.current += 1
+      bindingRef.current!.setSnapshotStamp(bindingRef.current!.stampRef.current)
+    })
+
+    expect(
+      collectCurrentFormValidationProducerIssues(
+        bindingRef.current!.producerSession,
+        bindingRef.current!.snapshotStamp,
+      ),
+    ).toEqual([])
+  })
+
+  it('surfaces serialization issues without Zod JSON in the submit footer', async () => {
+    const persist = vi.fn()
+    const { result } = renderHook(
+      () =>
+        useContentFormSubmit<TestValues>({
+          def: testDef,
+          ctx: testCtx,
+          fallbackMessage: 'Could not save.',
+          invalidPresentation: {
+            resolverFields: [
+              { name: 'name', label: 'Name', type: 'text' },
+              { name: 'level', label: 'Level', type: 'number' },
+            ],
+            formId: 'serialization-form',
+          },
+          prepareWrite: () => {
+            throw new z.ZodError([
+              {
+                code: 'too_small',
+                minimum: 9,
+                type: 'number',
+                inclusive: true,
+                message: 'Level too low.',
+                path: ['level'],
+              },
+            ])
+          },
+          persist,
+        }),
+      { wrapper: FormUiWrapper },
+    )
+
+    const form = renderHook(() => useForm<TestValues>({ defaultValues: { name: 'A', level: 2 } }))
+      .result.current
+
+    await act(async () => {
+      try {
+        await result.current.onSubmit({ name: 'A', level: 2 }, form)
+      } catch (error) {
+        expect(error).toBeInstanceOf(ContentFormSubmitValidationFailed)
+      }
+    })
+
+    expect(persist).not.toHaveBeenCalled()
+    expect(result.current.formError).toBeUndefined()
+    expect(form.getFieldState('level').error?.message).toBe('Level too low.')
+  })
+})
+
+describe('presentContentFormInvalidSubmit bridge on adopted submit', () => {
+  it('sets safe retry root copy when RHF blocks without a resolvable canonical issue', () => {
+    const { result } = renderHook(() =>
+      useForm<TestValues>({ defaultValues: { name: 'A', level: 2 } }),
+    )
+    const diagnostic = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+
+    act(() => {
+      result.current.setError('level', { type: 'custom' })
+    })
+
+    act(() => {
+      presentContentFormInvalidSubmit(result.current, uiValue, {
+        resolverFields: [{ name: 'name', label: 'Name', type: 'text' }],
+        formId: 'adopted-form',
+      })
+    })
+
+    expect(result.current.formState.errors.root?.message).toBe(
+      'Something went wrong while checking this form. Try again or refresh the page.',
+    )
+    expect(diagnostic).toHaveBeenCalled()
+    diagnostic.mockRestore()
   })
 })

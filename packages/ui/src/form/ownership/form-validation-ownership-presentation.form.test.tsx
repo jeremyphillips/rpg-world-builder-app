@@ -141,6 +141,64 @@ describe('form validation ownership presentation', () => {
     expect(states.every((state) => state.count === 0)).toBe(true)
   })
 
+  it('associates header-only tab errors with label, tab badge, and aria when wired', async () => {
+    const user = userEvent.setup()
+    const schema = z.object({
+      name: z.string().min(1),
+      meta: z.object({ title: z.string().min(1, 'Title is required.') }),
+    })
+    type Values = z.infer<typeof schema>
+    const tabs: TabbedFormTab[] = [
+      {
+        id: 'identity',
+        label: 'Identity',
+        fields: [{ type: 'text', name: 'name', label: 'Name', required: true }],
+      },
+      {
+        id: 'meta',
+        label: 'Meta',
+        fields: [],
+        errorPaths: ['meta.title'],
+        resolverFields: [{ type: 'text', name: 'meta.title', label: 'Title', required: true }],
+        header: (
+          <FormItems
+            items={[{ type: 'text', name: 'title', label: 'Title', required: true }]}
+            idPrefix="meta"
+            namePrefix="meta"
+          />
+        ),
+      },
+    ]
+
+    render(
+      <TabbedForm<Values>
+        id="connected-header"
+        schema={schema}
+        tabs={tabs}
+        defaultValues={{ name: 'Valid', meta: { title: '' } }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Meta' }))
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Meta.*1/i })).toBeInTheDocument()
+    })
+    expect(await screen.findByText('Title is required.')).toBeInTheDocument()
+    const title = screen.getByRole('textbox', { name: 'Title' })
+    expect(title).toHaveAttribute('aria-invalid', 'true')
+    const describedBy = title.getAttribute('aria-describedby')
+    expect(describedBy).toBeTruthy()
+    if (describedBy) {
+      describedBy.split(/\s+/).forEach((id) => {
+        expect(document.getElementById(id)).toBeTruthy()
+      })
+    }
+  })
+
   it('does not badge a disconnected header-only tab without errorPaths', async () => {
     const user = userEvent.setup()
     const schema = z.object({

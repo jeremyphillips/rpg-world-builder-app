@@ -10,6 +10,7 @@ import type { FormDensity } from '../form-density'
 import { FormValueSyncEffects } from '../chrome/form-value-sync-effects.client'
 import type { FormUiContextValue, FormValidationPresentation } from '../context/form-ui.context'
 import type { FormIssue } from '../errors/form-issue.types'
+import { cancelPendingInvalidSubmitFocus } from '../config/invalid-submit-focus-generation.lib'
 import { navigateTabbedFormInvalidSubmit } from './navigate-tabbed-form-invalid-submit.client'
 import { TabbedFormChromeContext } from './tabbed-form-chrome.context'
 import type { ValidateSilently } from '../context/form-ui.context'
@@ -198,9 +199,12 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   const setActiveTabId = React.useCallback(
     (nextTabId: string) => {
       if (onBeforeActiveTabChange && !onBeforeActiveTabChange(nextTabId)) return
+      if (nextTabId !== activeTabId) {
+        cancelPendingInvalidSubmitFocus()
+      }
       setActiveTabIdState(nextTabId)
     },
-    [onBeforeActiveTabChange],
+    [activeTabId, onBeforeActiveTabChange],
   )
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = React.useState(false)
   const markSubmitAttempted = React.useCallback(() => {
