@@ -4,7 +4,6 @@
  * Production entry for class embedded features: real `classFormDef` tabs,
  * `useContentFormSubmit`, and producer session — not the isolated ClassFeaturesTab harness.
  */
-import { useMemo } from 'react'
 import type { CharacterClass } from '@rpg/contracts'
 import { getClassBySlug } from '@rpg/catalog/classes'
 import { render, screen, waitFor, within } from '@testing-library/react'
