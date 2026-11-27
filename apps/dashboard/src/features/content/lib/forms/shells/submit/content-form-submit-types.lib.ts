@@ -4,6 +4,7 @@ import type { FormItem, FormSubmitHandler, MapFormError } from '@rpg/ui/form'
 
 import type { AnyContentFormDef, ContentFormCtx } from '../../registry/content-form-registry'
 import type { ContentPreparedWrite } from '../../submit/content-prepared-write.types'
+import type { ContentFormSubmitProducerBinding } from './content-form-submit-producer-binding.client'
 
 /** Internal sentinel — commit validation failed after field errors were applied. */
 export class ContentFormSubmitValidationFailed extends Error {
@@ -39,4 +40,11 @@ export type UseContentFormSubmitOptions<TValues extends FieldValues> = {
   writeSchema?: import('zod').ZodType<unknown>
   prepareWrite?: (values: TValues, form: UseFormReturn<TValues>) => ContentPreparedWrite<unknown>
   persist: FormSubmitHandler<TValues>
+  /** Share one producer session between publish and draft submit hooks on create. */
+  producerBinding?: ContentFormSubmitProducerBinding
+  /**
+   * When false, this hook does not mount stamp watch or producer chrome (use the primary hook's
+   * {@link UseContentFormSubmitResult.ProducerBoundary}).
+   */
+  mountProducerChrome?: boolean
 }

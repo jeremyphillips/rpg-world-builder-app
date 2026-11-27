@@ -17,6 +17,7 @@ export type ContentFormHostFormProps<TFormValues extends FieldValues> = {
   header?: () => React.ReactNode
   valueSyncs?: FormValueSync[]
   formKey?: string
+  producerBoundary?: React.ComponentType<{ children: React.ReactNode }>
 }
 
 /** Leave-guard bridge — close chrome calls `requestClose`; submit uses `runTrustedClose`. */
@@ -155,6 +156,7 @@ export function ContentFormHost<TFormValues extends FieldValues>({
       density={resolvedDensity}
       formError={formError}
       header={form.header}
+      producerBoundary={form.producerBoundary}
       onSubmit={handleSubmit}
       externalFooter
       contentWrapper={(content) => (

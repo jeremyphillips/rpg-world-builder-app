@@ -33,6 +33,10 @@ export {
   presentContentFormInvalidSubmit,
   focusFormPath,
 } from './content-form-submit-presentation.lib'
+export {
+  useContentFormSubmitProducerBinding,
+  type ContentFormSubmitProducerBinding,
+} from './content-form-submit-producer-binding.client'
 
 export type UseContentFormSubmitResult<TValues extends FieldValues> =
   UseSubmitHandlerResult<TValues> & {
@@ -58,22 +62,31 @@ export function useContentFormSubmit<TValues extends FieldValues>(
     writeSchema,
     prepareWrite,
     persist,
+    producerBinding,
+    mountProducerChrome = true,
   } = options
 
-  const uiRef = useRef<Pick<
+  const attemptCounterRef = useRef(0)
+  const internalStampRef = useRef(0)
+  const internalPersistingRef = useRef(0)
+  const internalUiRef = useRef<Pick<
     import('@rpg/ui/form').FormUiContextValue,
     'markSubmitAttempted' | 'markPublishAttempted' | 'addValidationSessionExpandKeys'
   > | null>(null)
 
-  const [producerSession, setProducerSession] = useState<FormValidationProducerSession>(() =>
+  const stampRef = producerBinding?.stampRef ?? internalStampRef
+  const persistingRef = producerBinding?.persistingRef ?? internalPersistingRef
+  const uiRef = producerBinding?.uiRef ?? internalUiRef
+
+  const [ownedSession, setOwnedSession] = useState<FormValidationProducerSession>(() =>
     createEmptyFormValidationProducerSession(),
   )
+  const [ownedSnapshotStamp, setOwnedSnapshotStamp] = useState(0)
 
-  // Snapshot stamp: bumped by UiBridge on authored value change or reset, never on UI state.
-  const stampRef = useRef(0)
-  const [snapshotStamp, setSnapshotStamp] = useState(0)
-  const persistingRef = useRef(0)
-  const attemptCounterRef = useRef(0)
+  const producerSession = producerBinding?.producerSession ?? ownedSession
+  const setProducerSession = producerBinding?.setProducerSession ?? setOwnedSession
+  const snapshotStamp = producerBinding?.snapshotStamp ?? ownedSnapshotStamp
+  const setSnapshotStamp = producerBinding?.setSnapshotStamp ?? setOwnedSnapshotStamp
 
   const publishSchema =
     commitValidationIntent === 'publish'
@@ -169,11 +182,21 @@ export function useContentFormSubmit<TValues extends FieldValues>(
   }
 
   function ProducerStampBridge() {
+    if (!mountProducerChrome) return null
+    return React.createElement(ProducerStampBridgeActive)
+  }
+
+  function ProducerStampBridgeActive() {
     useContentFormSubmitStampWatch()
     return null
   }
 
   function ProducerBoundary({ children }: { children: React.ReactNode }) {
+    if (!mountProducerChrome) return React.createElement(React.Fragment, null, children)
+    return React.createElement(ProducerBoundaryActive, { children })
+  }
+
+  function ProducerBoundaryActive({ children }: { children: React.ReactNode }) {
     useContentFormSubmitStampWatch()
     const value = useMemo(
       () => ({ session: producerSession, stamp: snapshotStamp, replaceSlot }),

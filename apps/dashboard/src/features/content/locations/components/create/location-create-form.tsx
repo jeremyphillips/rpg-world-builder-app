@@ -1,5 +1,12 @@
 import type { z } from 'zod'
-import { useEffect, useRef, useState, type MutableRefObject, type ReactNode } from 'react'
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ComponentType,
+  type MutableRefObject,
+  type ReactNode,
+} from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useFormContext, useFormState } from 'react-hook-form'
 import { type ContentCampaignAccessPatch, type CreateLocationInput } from '@rpg/contracts'
@@ -261,7 +268,7 @@ type LocationCreateFormShellProps = LocationCreateFormBodyProps & {
   formDefaultValues?: Record<string, unknown>
   formValueSyncs?: FormValueSync[]
   onDetailsStatusChange?: (status: CreateWorkflowPanelStatus) => void
-  submitUiBridge?: () => null
+  submitProducerBoundary?: ComponentType<{ children: ReactNode }>
 }
 
 function LocationCreateFormShell({
@@ -287,7 +294,7 @@ function LocationCreateFormShell({
   formDefaultValues,
   formValueSyncs = locationFormValueSyncs,
   onDetailsStatusChange,
-  submitUiBridge,
+  submitProducerBoundary,
 }: LocationCreateFormShellProps) {
   useEffect(() => {
     onPendingChange?.(pending)
@@ -323,11 +330,10 @@ function LocationCreateFormShell({
           },
           valueSyncs: formValueSyncs,
           formKey,
+          producerBoundary: submitProducerBoundary,
           header: () => {
-            const SubmitUiBridge = submitUiBridge
             return (
               <>
-                {SubmitUiBridge ? <SubmitUiBridge /> : null}
                 {buildingSetupApplication ? (
                   <LocationBuildingSetupProjectionBridge application={buildingSetupApplication} />
                 ) : null}
@@ -404,7 +410,7 @@ function LocationBuildingCreateForm(props: LocationCreateFormBodyProps) {
     omitBuildingForm: Boolean(buildingSetupApplication),
   })
 
-  const { onSubmit, formError, UiBridge } = useContentFormSubmit<LocationDraftFormValues>({
+  const { onSubmit, formError, ProducerBoundary } = useContentFormSubmit<LocationDraftFormValues>({
     def: locationFormDef,
     ctx: locationCtx,
     fallbackMessage: 'Could not create building.',
@@ -492,7 +498,7 @@ function LocationBuildingCreateForm(props: LocationCreateFormBodyProps) {
       pending={compositionPending}
       onSubmit={onSubmit}
       formError={formError}
-      submitUiBridge={UiBridge}
+      submitProducerBoundary={ProducerBoundary}
       onDetailsStatusChange={onDetailsStatusChange}
       formDefaultValues={{
         ...(setupClassification ? { classification: setupClassification } : {}),
@@ -529,7 +535,7 @@ function LocationGenericCreateForm(props: LocationCreateFormBodyProps) {
 
   const fields = contentFormFields(locationFormDef, locationCtx)
 
-  const { onSubmit, formError, UiBridge } = useContentFormSubmit<LocationDraftFormValues>({
+  const { onSubmit, formError, ProducerBoundary } = useContentFormSubmit<LocationDraftFormValues>({
     def: locationFormDef,
     ctx: locationCtx,
     fallbackMessage: 'Could not create locations.',
@@ -588,7 +594,7 @@ function LocationGenericCreateForm(props: LocationCreateFormBodyProps) {
       pending={mutation.isPending}
       onSubmit={onSubmit}
       formError={formError}
-      submitUiBridge={UiBridge}
+      submitProducerBoundary={ProducerBoundary}
     />
   )
 }
@@ -618,7 +624,7 @@ function LocationSettlementCreateForm(
     afterDescription: buildSettlementStartingDistrictsFormItems(guidance),
   })
 
-  const { onSubmit, formError, UiBridge } = useContentFormSubmit<LocationDraftFormValues>({
+  const { onSubmit, formError, ProducerBoundary } = useContentFormSubmit<LocationDraftFormValues>({
     def: locationFormDef,
     ctx: locationCtx,
     fallbackMessage: 'Could not create locations.',
@@ -696,7 +702,7 @@ function LocationSettlementCreateForm(
       extraUnsavedEdits={settlementComposition.isDirty || undefined}
       onSubmit={onSubmit}
       formError={formError}
-      submitUiBridge={UiBridge}
+      submitProducerBoundary={ProducerBoundary}
     />
   )
 }

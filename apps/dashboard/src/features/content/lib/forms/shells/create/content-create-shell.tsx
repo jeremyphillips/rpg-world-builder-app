@@ -38,7 +38,10 @@ import { resolveContentFormSchema } from '../edit/content-edit-load'
 import { intentToStatus } from './content-create-intent'
 import { createWithDeferredCampaignAccess } from '../../../campaign-access/create-with-deferred-campaign-access'
 import { CAMPAIGN_ACCESS_CREATE_DEFERRED_ERROR } from '../../../campaign-access/campaign-access-labels'
-import { useContentFormSubmit } from '../submit/content-form-submit'
+import {
+  useContentFormSubmit,
+  useContentFormSubmitProducerBinding,
+} from '../submit/content-form-submit'
 import { resolveContentFormNavigationFields } from '../host/content-form-host-projection'
 import { resolveContentFormCreateDefaultValues } from '../../registry/content-form-registry'
 
@@ -158,14 +161,16 @@ function ContentCreateFormBody({
     formId: formKey,
   }
 
+  const producerBinding = useContentFormSubmitProducerBinding()
+
   const {
     onSubmit: onPublish,
     formError: publishFormError,
     ProducerBoundary,
-    ProducerStampBridge,
   } = useContentFormSubmit<Record<string, unknown>>({
     def,
     ctx,
+    producerBinding,
     fallbackMessage: `Could not create ${def.routeKey}.`,
     prepareCommitValues,
     invalidPresentation,
@@ -185,14 +190,14 @@ function ContentCreateFormBody({
     },
   })
 
-  const {
-    onSubmit: onSaveDraft,
-    formError: saveDraftFormError,
-    ProducerStampBridge: DraftProducerStampBridge,
-  } = useContentFormSubmit<Record<string, unknown>>({
+  const { onSubmit: onSaveDraft, formError: saveDraftFormError } = useContentFormSubmit<
+    Record<string, unknown>
+  >({
     def,
     ctx,
     commitValidationIntent: 'draft',
+    producerBinding,
+    mountProducerChrome: false,
     fallbackMessage: `Could not save ${def.routeKey} draft.`,
     prepareCommitValues,
     invalidPresentation,
@@ -257,7 +262,6 @@ function ContentCreateFormBody({
           previewEnabled={layout.previewEnabled}
           previewDraftBadge={layout.previewEnabled}
           producerBoundary={ProducerBoundary}
-          producerStampBridge={<DraftProducerStampBridge />}
           formHeaderPrefix={
             <>
               {layout.previewEnabled ? (
