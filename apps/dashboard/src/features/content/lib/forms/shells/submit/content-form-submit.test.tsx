@@ -26,6 +26,7 @@ import {
   useContentFormSubmitProducerBinding,
 } from './content-form-submit'
 import { presentPersistValidationFailure } from './content-form-submit-presentation.lib'
+import { buildIdentityPreparedWrite } from '../../submit/content-prepared-write.types'
 import { projectCompactedArrayProvenance } from '../../submit/project-compacted-array-provenance.lib'
 import type { AnyContentFormDef, ContentFormCtx } from '../../registry/content-form-registry'
 import { useContentFormPresentationIssues } from '../../validation/content-form-presentation-issues.client'
@@ -177,6 +178,43 @@ describe('useContentFormSubmit', () => {
       expect.objectContaining({ isAttemptCurrent: expect.any(Function) }),
     )
     expect(result.current.formError).toBeUndefined()
+  })
+
+  it('persists the write-schema parsed prepare payload', async () => {
+    const persist = vi.fn().mockResolvedValue(undefined)
+    const writeSchema = z.object({
+      name: z.string().trim(),
+      level: z.coerce.number(),
+    })
+
+    const { result } = renderHook(() =>
+      useContentFormSubmit<TestValues>({
+        def: testDef,
+        ctx: testCtx,
+        fallbackMessage: 'Could not save.',
+        writeSchema,
+        prepareWrite: () =>
+          buildIdentityPreparedWrite({
+            name: '  Hero ',
+            level: '7',
+          } as unknown as TestValues),
+        persist,
+      }),
+    )
+
+    const form = renderHook(() =>
+      useForm<TestValues>({ defaultValues: { name: '  Hero ', level: 7 } }),
+    ).result.current
+
+    await act(async () => {
+      await result.current.onSubmit({ name: '  Hero ', level: 7 }, form)
+    })
+
+    expect(persist).toHaveBeenCalledWith(
+      { name: 'Hero', level: 7 },
+      form,
+      expect.objectContaining({ isAttemptCurrent: expect.any(Function) }),
+    )
   })
 
   it('persists prepared commit values, not raw handler values', async () => {
