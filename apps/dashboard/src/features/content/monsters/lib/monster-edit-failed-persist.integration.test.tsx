@@ -60,6 +60,8 @@ function systemSwarmEntity() {
   }
 }
 
+type MonsterEditLoadResult = ReturnType<typeof loadSwarmEdit>
+
 function loadSwarmEdit() {
   const entity = systemSwarmEntity()
   const optionsCtx = makeContentFormCtx({
@@ -85,11 +87,52 @@ function loadSwarmEdit() {
   }
 }
 
+const DUPLICATE_SKILL_ROWS = [
+  { skill: 'stealth', rank: 'proficient' as const },
+  { skill: 'stealth', rank: 'expertise' as const },
+  { skill: 'perception', rank: 'proficient' as const },
+]
+
+function loadDuplicateSkillsEdit() {
+  const entity = {
+    ...systemSwarmEntity(),
+    catalogLayer: 'homebrew' as const,
+    status: 'draft' as const,
+  }
+  const optionsCtx = makeContentFormCtx({
+    equipmentCatalogStatus: 'ready',
+    equipmentCatalogById: new Map(),
+    skillCatalogStatus: 'ready',
+    skillCatalogBySlug: new Map(),
+    spellCatalogStatus: 'ready',
+    spellCatalogById: new Map(),
+    rulesetId: RULESET_ID,
+  })
+  return {
+    entity,
+    catalogSeed: undefined as Record<string, unknown> | undefined,
+    ...loadContentEditFormState({
+      def: monsterFormDef,
+      entity,
+      optionsCtx,
+      campaignId: TEST_CAMPAIGN_ID,
+      entityId: entity.id,
+      armorClassRules: optionsCtx.armorClassRules,
+    }),
+  }
+}
+
 const mutateAsync = vi.hoisted(() => vi.fn())
 const prepareWriteSpy = vi.hoisted(() => vi.fn())
 
-function renderMonsterEditPersistHarness() {
-  const loaded = loadSwarmEdit()
+type MonsterPersistHarnessOptions = {
+  stageValues?: (values: MonsterFormValues) => MonsterFormValues
+}
+
+function renderMonsterEditPersistHarness(
+  loaded: MonsterEditLoadResult = loadSwarmEdit(),
+  options?: MonsterPersistHarnessOptions,
+) {
   const { entity, layoutCtx, schema, defaultValues, validationIntent, catalogSeed } = loaded
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   const formKey = `monster-edit:${entity.id}`
@@ -109,7 +152,7 @@ function renderMonsterEditPersistHarness() {
 
   function Harness() {
     const [overlayBaseline, setOverlayBaseline] = useState<Record<string, unknown> | null>(() =>
-      monsterFormDef.normalizeOverlayBody
+      entity.catalogLayer === 'system' && monsterFormDef.normalizeOverlayBody
         ? monsterFormDef.normalizeOverlayBody(
             defaultValues as MonsterFormValues,
             { entity, armorClassRules: layoutCtx.armorClassRules },
@@ -196,8 +239,11 @@ function renderMonsterEditPersistHarness() {
               <button
                 type="button"
                 onClick={() => {
+                  const values = form.getValues() as MonsterFormValues
                   // Same adopted onSubmit TabbedForm calls after a successful native submit.
-                  void onSubmit(form.getValues(), form).catch(() => undefined)
+                  void onSubmit(options?.stageValues?.(values) ?? values, form).catch(
+                    () => undefined,
+                  )
                 }}
               >
                 Save changes
@@ -326,6 +372,44 @@ describe('monster edit failed persist producer projection', () => {
       },
     })
     expect(mutateAsync.mock.calls[0]![0]).toEqual(expectedPrepared.payload)
+  })
+
+  it('remaps duplicate skill wire paths through prepare provenance after persist rejection', async () => {
+    const user = userEvent.setup({ delay: null })
+    mutateAsync.mockRejectedValueOnce(
+      new ApiError(400, 'validation_error', 'Invalid monster', {
+        issues: [
+          {
+            path: 'proficiencies.skills.1.skill',
+            message: 'Duplicate skill row',
+            code: 'custom',
+          },
+        ],
+      }),
+    )
+
+    renderMonsterEditPersistHarness(loadDuplicateSkillsEdit(), {
+      stageValues: (values) => ({
+        ...values,
+        name: `${values.name}x`,
+        proficiencies: {
+          ...values.proficiencies,
+          skills: DUPLICATE_SKILL_ROWS,
+        },
+      }),
+    })
+
+    await user.click(screen.getByRole('button', { name: /save changes/i }))
+
+    await waitFor(() => {
+      expect(prepareWriteSpy).toHaveBeenCalledTimes(1)
+      expect(mutateAsync).toHaveBeenCalledTimes(1)
+      expect(screen.getByTestId('api-slot-issue-count')).toHaveTextContent('1')
+    })
+
+    const preparedFromPath = prepareWriteSpy.mock.calls[0]![0]
+    expect(preparedFromPath.provenance).toBeTruthy()
+    expect(mutateAsync.mock.calls[0]![0]).toEqual(preparedFromPath.payload)
   })
 
   it('does not paint api issues when a superseded same-stamp attempt fails late', async () => {
