@@ -1,8 +1,8 @@
 import type { FieldValues, UseFormReturn } from 'react-hook-form'
 import {
-  buildFieldControlId,
   navigateInvalidSubmit,
-  resolveInvalidSubmitNavigation,
+  prepareFormIssues,
+  resolveInvalidSubmitNavigationFromIssues,
   type FormItem,
   type FormUiContextValue,
   type FormValidationProducerSession,
@@ -24,18 +24,28 @@ function resolveFirstInvalidPath<TFieldValues extends FieldValues>(
   form: UseFormReturn<TFieldValues>,
   fields: FormItem[],
   formId: string,
+  canonicalIssues?: readonly import('@rpg/ui/form').FormIssue[],
 ): string | undefined {
-  const navigation = resolveInvalidSubmitNavigation({
-    errors: form.formState.errors,
-    fields,
-    idPrefix: formId,
-    getItemValues: (fullName, index) => {
-      const value = form.getValues(`${fullName}.${index}` as never)
-      return typeof value === 'object' && value !== null
-        ? (value as Record<string, unknown>)
-        : undefined
-    },
-  })
+  const getItemValues = (fullName: string, index: number) => {
+    const value = form.getValues(`${fullName}.${index}` as never)
+    return typeof value === 'object' && value !== null
+      ? (value as Record<string, unknown>)
+      : undefined
+  }
+  const navigation = canonicalIssues
+    ? resolveInvalidSubmitNavigationFromIssues(canonicalIssues, {
+        fields,
+        idPrefix: formId,
+        getItemValues,
+      })
+    : resolveInvalidSubmitNavigationFromIssues(
+        prepareFormIssues(
+          form.formState.errors,
+          fields,
+          form.getValues() as Record<string, unknown>,
+        ),
+        { fields, idPrefix: formId, getItemValues },
+      )
   return navigation?.firstIssue.path
 }
 
@@ -43,11 +53,21 @@ export function presentContentFormInvalidSubmit<TFieldValues extends FieldValues
   form: UseFormReturn<TFieldValues>,
   ui: Pick<FormUiContextValue, 'markSubmitAttempted' | 'addValidationSessionExpandKeys'> | null,
   presentation: ContentFormInvalidPresentation,
-  options?: { firstInvalidPath?: string },
+  options?: {
+    firstInvalidPath?: string
+    canonicalIssues?: readonly import('@rpg/ui/form').FormIssue[]
+  },
 ): void {
+  const canonicalIssues =
+    options?.canonicalIssues ??
+    prepareFormIssues(
+      form.formState.errors,
+      presentation.resolverFields,
+      form.getValues() as Record<string, unknown>,
+    )
   const firstPath =
     options?.firstInvalidPath ??
-    resolveFirstInvalidPath(form, presentation.resolverFields, presentation.formId)
+    resolveFirstInvalidPath(form, presentation.resolverFields, presentation.formId, canonicalIssues)
   const viewId =
     firstPath && presentation.resolveViewForPath
       ? presentation.resolveViewForPath(firstPath)
@@ -67,6 +87,7 @@ export function presentContentFormInvalidSubmit<TFieldValues extends FieldValues
     form.formState.errors,
     {
       ...(viewId ? { waitForLayout: true, usePilotRevealBudget: true } : {}),
+      canonicalIssues,
     },
   )
 }
@@ -94,33 +115,7 @@ export function presentPersistValidationFailure<TFieldValues extends FieldValues
   const nextSession = ingestContentFormValidationIssues(session, 'api', stamp, routed)
   presentContentFormInvalidSubmit(form, ui, presentation, {
     firstInvalidPath: routed[0]?.path,
+    canonicalIssues: routed,
   })
   return nextSession
-}
-
-/** Activates the view that owns `path`, then focuses that control or `[data-form-focus]`. */
-export function focusFormPath(
-  path: string,
-  presentation: Pick<
-    ContentFormInvalidPresentation,
-    'formId' | 'resolveViewForPath' | 'activateView'
-  >,
-): void {
-  const viewId = presentation.resolveViewForPath?.(path)
-  if (viewId) presentation.activateView?.(viewId)
-  window.requestAnimationFrame(() => {
-    window.requestAnimationFrame(() => {
-      const control = document.getElementById(
-        buildFieldControlId(presentation.formId, undefined, path),
-      )
-      const marked = document.querySelector(`[data-form-focus="${path}"]`)
-      const element = control ?? marked
-      if (!(element instanceof HTMLElement)) return
-      element.scrollIntoView({ block: 'center' })
-      const focusable = element.matches('button, input, select, textarea, [tabindex]')
-        ? element
-        : element.querySelector<HTMLElement>('button, input, select, textarea, [tabindex]')
-      focusable?.focus()
-    })
-  })
 }

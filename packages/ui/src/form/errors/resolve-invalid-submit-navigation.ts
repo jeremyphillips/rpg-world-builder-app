@@ -75,13 +75,13 @@ export type ResolveInvalidSubmitNavigationOptions = {
   getItemValues?: (fullName: string, index: number) => Record<string, unknown> | undefined
 }
 
-/** Resolve first invalid issue, expand keys, and focus target after a failed submit. */
-export function resolveInvalidSubmitNavigation(
+function resolveInvalidSubmitNavigationFromPrepared(
+  preparedIssues: FormIssue[],
   options: ResolveInvalidSubmitNavigationOptions,
 ): InvalidSubmitNavigation | undefined {
-  const sections = collectArraySections(options.fields)
-  const preparedIssues = prepareFormIssues(options.errors, options.fields)
   if (preparedIssues.length === 0) return undefined
+
+  const sections = collectArraySections(options.fields)
 
   const classified = preparedIssues.map((issue) => {
     const section = sections
@@ -118,6 +118,25 @@ export function resolveInvalidSubmitNavigation(
   )
 
   return { firstIssue, expandKeys, focusControlId }
+}
+
+/** Resolve navigation from an already-routed canonical issue list (producer projection). */
+export function resolveInvalidSubmitNavigationFromIssues(
+  issues: readonly FormIssue[],
+  options: Omit<ResolveInvalidSubmitNavigationOptions, 'errors'>,
+): InvalidSubmitNavigation | undefined {
+  return resolveInvalidSubmitNavigationFromPrepared([...issues], {
+    ...options,
+    errors: {},
+  })
+}
+
+/** Resolve first invalid issue, expand keys, and focus target after a failed submit. */
+export function resolveInvalidSubmitNavigation(
+  options: ResolveInvalidSubmitNavigationOptions,
+): InvalidSubmitNavigation | undefined {
+  const preparedIssues = prepareFormIssues(options.errors, options.fields)
+  return resolveInvalidSubmitNavigationFromPrepared(preparedIssues, options)
 }
 
 function isZodIssueList(

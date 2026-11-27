@@ -12,8 +12,10 @@ import {
 } from './invalid-submit-focus-generation.lib'
 import { scheduleInvalidSubmitFocusWithRevealBudget } from './navigate-invalid-submit-reveal.lib'
 import { resolveInvalidSubmitNavigation } from '../errors/resolve-invalid-submit-navigation'
+import type { FormIssue } from '../errors/form-issue.types'
 import type { FormItem } from '../field-config'
 import type { FormUiContextValue } from '../context/form-ui.context'
+import { resolveInvalidSubmitNavigationFromIssues } from '../errors/resolve-invalid-submit-navigation'
 
 export const FORM_BRIDGE_MISMATCH_MESSAGE =
   'Something went wrong while checking this form. Try again or refresh the page.'
@@ -36,6 +38,8 @@ export type NavigateInvalidSubmitOptions = {
   /** When set with `waitForLayout`, polls for the target within the pilot reveal budget. */
   usePilotRevealBudget?: boolean
   focusFallbacks?: InvalidSubmitFocusFallbacks
+  /** When set, navigation and Review read the producer projection instead of re-flattening RHF. */
+  canonicalIssues?: readonly FormIssue[]
 }
 
 export function navigateInvalidSubmit<TFieldValues extends FieldValues>(
@@ -50,17 +54,28 @@ export function navigateInvalidSubmit<TFieldValues extends FieldValues>(
 
   const idPrefix = options?.idPrefix ?? formId
 
-  const navigation = resolveInvalidSubmitNavigation({
-    errors,
-    fields,
-    idPrefix,
-    getItemValues: (fullName, index) => {
-      const value = form.getValues(`${fullName}.${index}` as never)
-      return typeof value === 'object' && value !== null
-        ? (value as Record<string, unknown>)
-        : undefined
-    },
-  })
+  const navigation = options?.canonicalIssues
+    ? resolveInvalidSubmitNavigationFromIssues(options.canonicalIssues, {
+        fields,
+        idPrefix,
+        getItemValues: (fullName, index) => {
+          const value = form.getValues(`${fullName}.${index}` as never)
+          return typeof value === 'object' && value !== null
+            ? (value as Record<string, unknown>)
+            : undefined
+        },
+      })
+    : resolveInvalidSubmitNavigation({
+        errors,
+        fields,
+        idPrefix,
+        getItemValues: (fullName, index) => {
+          const value = form.getValues(`${fullName}.${index}` as never)
+          return typeof value === 'object' && value !== null
+            ? (value as Record<string, unknown>)
+            : undefined
+        },
+      })
 
   if (!navigation) {
     // RHF blocked submit but no canonical issue is resolvable: bridge failure, never silent.

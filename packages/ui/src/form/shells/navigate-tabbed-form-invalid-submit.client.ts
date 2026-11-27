@@ -13,6 +13,7 @@ import {
 } from '../errors/resolve-tab-validation-state'
 import {
   prepareFormIssues,
+  resolveInvalidSubmitNavigationFromIssues,
   resolveValidationExpandKeys,
   type InvalidSubmitNavigation,
 } from '../errors/resolve-invalid-submit-navigation'
@@ -81,8 +82,9 @@ export function navigateTabbedFormToTabIssue<TFieldValues extends FieldValues>(
   tabId: string,
   setActiveTabId: (tabId: string) => void,
   errors: FieldErrors<TFieldValues> = form.formState.errors,
+  canonicalIssues?: readonly FormIssue[],
 ): void {
-  const issues = prepareFormIssues(errors, fields)
+  const issues = canonicalIssues ?? prepareFormIssues(errors, fields)
   const tabState = resolveTabValidationState(issues, tabs, fields).find(
     (state) => state.tabId === tabId,
   )
@@ -108,10 +110,11 @@ export function navigateTabbedFormInvalidSubmit<TFieldValues extends FieldValues
   errors: FieldErrors<TFieldValues>,
   setActiveTabId: (tabId: string) => void,
   activeTabId?: string,
+  canonicalIssues?: readonly FormIssue[],
 ): void {
   ui.markSubmitAttempted()
 
-  const issues = prepareFormIssues(errors, fields)
+  const issues = canonicalIssues ?? prepareFormIssues(errors, fields)
   const tabId = resolveInvalidSubmitTabId(issues, tabs, fields, activeTabId)
 
   if (!tabId) {

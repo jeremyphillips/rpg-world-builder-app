@@ -58,6 +58,7 @@ export {
   buildValidationSessionExpandKey,
   resolveValidationExpandKeys,
   resolveInvalidSubmitNavigation,
+  resolveInvalidSubmitNavigationFromIssues,
   prepareFormIssues,
   findArrayConfigAtPath,
   type ValidationSessionExpandKey,

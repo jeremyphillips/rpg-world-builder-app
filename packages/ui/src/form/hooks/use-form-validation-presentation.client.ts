@@ -3,20 +3,15 @@
 import * as React from 'react'
 import { useFormContext, useFormState, useWatch } from 'react-hook-form'
 
-import { useFormUiContext } from '../context/form-ui.context'
-import { useFormValidationProducerContext } from '../lifecycle/form-validation-producer-context.client'
-import { projectFormValidationProducerIssues } from '../lifecycle/form-validation-producer-session.lib'
 import type { ArrayItemIssueGroup } from '../errors/form-issue.types'
 import { groupIssuesForItemPrefix } from '../errors/group-form-issues'
-import { prepareFormIssues } from '../errors/resolve-invalid-submit-navigation'
 import type { FormItem } from '../field-config'
 import { collectArraySections, resolveSectionFieldOrder } from '../errors/resolve-field-order'
 import {
-  collectInactiveFieldPaths,
-  filterIssuesForPresentation,
   isPresentationSessionExpanded,
   shouldShowFieldErrorPresentation,
 } from '../errors/resolve-field-error-presentation.lib'
+import { useFormValidationSessionProjection } from './use-form-validation-session-projection.client'
 
 function walkTouched(node: unknown, prefix: string, touchedPaths: string[]): void {
   if (node === true) {
@@ -52,42 +47,17 @@ function isItemPrefixTouched(itemPrefix: string, touchedPaths: readonly string[]
 }
 
 export function useFormValidationPresentation(fieldsOverride?: FormItem[]) {
+  const session = useFormValidationSessionProjection(fieldsOverride)
   const {
-    validationPresentation,
+    fields,
+    issues,
+    inactivePaths,
     hasAttemptedSubmit,
     hasAttemptedPublish,
     publishPresentationEnabled,
-    fields: contextFields,
-  } = useFormUiContext()
-  const fields = fieldsOverride ?? contextFields
-  const formValues = useWatch() as Record<string, unknown>
-  const producer = useFormValidationProducerContext()
-  const { errors, touchedFields } = useFormState()
-  const rhfIssues = React.useMemo(
-    () => prepareFormIssues(errors, fields, formValues ?? {}),
-    [errors, fields, formValues],
-  )
-  const producerIssues = React.useMemo(() => {
-    if (!producer) return []
-    return projectFormValidationProducerIssues(
-      producer.session,
-      producer.stamp,
-      fields,
-      formValues ?? {},
-    )
-  }, [producer, fields, formValues])
-  const rawIssues = React.useMemo(() => {
-    if (producer) return producerIssues
-    return rhfIssues
-  }, [producer, producerIssues, rhfIssues])
-  const inactivePaths = React.useMemo(
-    () => collectInactiveFieldPaths(fields, formValues ?? {}),
-    [fields, formValues],
-  )
-  const issues = React.useMemo(
-    () => filterIssuesForPresentation(rawIssues, inactivePaths),
-    [rawIssues, inactivePaths],
-  )
+    validationPresentation,
+    touchedFields,
+  } = session
   const touchedPaths = React.useMemo(() => flattenTouchedPaths(touchedFields), [touchedFields])
 
   const sessionFlags = React.useMemo(

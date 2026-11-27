@@ -7,8 +7,12 @@ import type { ZodType } from 'zod'
 import {
   TabbedForm,
   collectTabbedFormResolverItems,
+  FormValidationProducerProvider,
   makeResolver,
   prepareFormIssues,
+  replaceFormValidationProducerSlot,
+  createEmptyFormValidationProducerSession,
+  projectFormValidationProducerIssues,
   resolveTabValidationState,
 } from '@rpg/ui/form'
 import { getMonsterBySlug } from '@rpg/catalog/monsters'
@@ -239,6 +243,24 @@ describe('monster movement alternative validation', () => {
 })
 
 describe('movement alternative optional disclosure', () => {
+  it('keeps a collapsed-but-applicable modes issue in producer projection', () => {
+    const fields = [movementAlternativeGroupField()]
+    let session = createEmptyFormValidationProducerSession()
+    session = replaceFormValidationProducerSlot(session, 'publish-action', 1, [
+      {
+        path: 'movementAlternative.modes',
+        message: 'Select at least two modes.',
+        severity: 'field',
+        claim: { kind: 'field', target: 'movementAlternative.modes' },
+      },
+    ])
+    const projected = projectFormValidationProducerIssues(session, 1, fields, {
+      movementAlternative: { modes: ['fly'], feet: 20 },
+    })
+    expect(projected.some((issue) => issue.claim?.target === 'movementAlternative.modes')).toBe(
+      true,
+    )
+  })
   it('renders Available modes when swarm loads with alternative movement', async () => {
     const defaultValues = swarmFormValues()
     const tabs = [

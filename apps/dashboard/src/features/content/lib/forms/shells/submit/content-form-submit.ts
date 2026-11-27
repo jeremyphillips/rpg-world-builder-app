@@ -5,6 +5,7 @@ import {
   cancelPendingInvalidSubmitFocus,
   createEmptyFormValidationProducerSession,
   FormUiContext,
+  FormValidationInteractiveProducerBridge,
   FormValidationProducerProvider,
   useSubmitHandler,
   type FormIssue,
@@ -29,10 +30,8 @@ export {
   type ContentFormInvalidPresentation,
   type UseContentFormSubmitOptions,
 } from './content-form-submit-types.lib'
-export {
-  presentContentFormInvalidSubmit,
-  focusFormPath,
-} from './content-form-submit-presentation.lib'
+export { presentContentFormInvalidSubmit } from './content-form-submit-presentation.lib'
+export { focusFormPath } from './content-form-editor-focus.lib'
 export {
   useContentFormSubmitProducerBinding,
   type ContentFormSubmitProducerBinding,
@@ -202,7 +201,14 @@ export function useContentFormSubmit<TValues extends FieldValues>(
       () => ({ session: producerSession, stamp: snapshotStamp, replaceSlot }),
       [replaceSlot, producerSession, snapshotStamp],
     )
-    return React.createElement(FormValidationProducerProvider, { ...value, children })
+    return React.createElement(
+      FormValidationProducerProvider,
+      { ...value },
+      React.createElement(FormValidationInteractiveProducerBridge, {
+        fields: invalidPresentation?.resolverFields ?? [],
+      }),
+      children,
+    )
   }
 
   /** @deprecated Use {@link ProducerBoundary} around field chrome. */

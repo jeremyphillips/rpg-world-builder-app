@@ -47,3 +47,4 @@ export {
   useFormValidationProducerContext,
   type FormValidationProducerContextValue,
 } from './form-validation-producer-context.client'
+export { FormValidationInteractiveProducerBridge } from './form-validation-interactive-producer-bridge.client'
