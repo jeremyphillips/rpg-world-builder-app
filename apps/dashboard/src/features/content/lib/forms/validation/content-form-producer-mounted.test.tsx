@@ -369,8 +369,8 @@ describe('adopted content producer mounted presentation', () => {
       current: null,
     }
     const controls = {
-      draft: async () => undefined as Promise<void>,
-      publish: async () => undefined as Promise<void>,
+      draft: async (): Promise<void> => {},
+      publish: async (): Promise<void> => {},
     }
 
     function Harness() {
