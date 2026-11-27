@@ -21,4 +21,19 @@ describe('content form ownership compile pilot budget', () => {
       expect(elapsed).toBeLessThan(FORM_OWNERSHIP_COMPILE_BUDGET_MS)
     },
   )
+
+  it.each(PILOT_COMPILE_TARGETS)(
+    'reuses the same static ownership index when $name config identity is unchanged',
+    ({ items }) => {
+      const first = compileFormOwnership(items, {})
+      const second = compileFormOwnership(items, {})
+
+      expect(second.paths.size).toBe(first.paths.size)
+      expect([...second.paths].sort()).toEqual([...first.paths].sort())
+
+      const secondStarted = performance.now()
+      compileFormOwnership(items, {})
+      expect(performance.now() - secondStarted).toBeLessThan(FORM_OWNERSHIP_COMPILE_BUDGET_MS)
+    },
+  )
 })
