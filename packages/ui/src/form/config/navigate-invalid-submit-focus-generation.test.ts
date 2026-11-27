@@ -14,6 +14,31 @@ import type { FormItem } from '../field-config'
 const ui = { markSubmitAttempted: vi.fn(), addValidationSessionExpandKeys: vi.fn() }
 
 describe('invalid submit focus generation', () => {
+  it('polls for focus targets when pilot reveal budget is enabled', async () => {
+    vi.useFakeTimers()
+    const focus = vi.fn()
+    const element = document.createElement('input')
+    element.id = 'form-notes'
+    element.focus = focus
+    document.body.append(element)
+
+    const form = {
+      formState: { errors: { notes: { type: 'validation', message: 'Required' } } },
+      getValues: vi.fn(),
+      setError: vi.fn(),
+    } as unknown as UseFormReturn<{ notes: string }>
+
+    const fields: FormItem[] = [{ type: 'text', name: 'notes', label: 'Notes' }]
+
+    navigateInvalidSubmit(form, fields, 'form', ui, undefined, {
+      waitForLayout: true,
+      usePilotRevealBudget: true,
+    })
+    await vi.advanceTimersByTimeAsync(32)
+    expect(focus).toHaveBeenCalled()
+    vi.useRealTimers()
+  })
+
   it('does not focus when a newer attempt cancels the pending request', () => {
     vi.useFakeTimers()
     const focus = vi.fn()

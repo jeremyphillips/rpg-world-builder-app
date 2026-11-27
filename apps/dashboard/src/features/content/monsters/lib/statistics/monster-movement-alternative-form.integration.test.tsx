@@ -1,6 +1,8 @@
 /**
  * @vitest-environment jsdom
  */
+import type { ReactNode } from 'react'
+import userEvent from '@testing-library/user-event'
 import { render, screen, waitFor } from '@testing-library/react'
 import { beforeAll, describe, expect, it } from 'vitest'
 import type { ZodType } from 'zod'
@@ -242,6 +244,17 @@ describe('monster movement alternative validation', () => {
   })
 })
 
+function collapsedMovementAlternativeField() {
+  const base = movementAlternativeGroupField()
+  return {
+    ...base,
+    optionalDisclosure: {
+      ...base.optionalDisclosure!,
+      expandWhenPopulated: false,
+    },
+  } as typeof base
+}
+
 describe('movement alternative optional disclosure', () => {
   it('keeps a collapsed-but-applicable modes issue in producer projection', () => {
     const fields = [movementAlternativeGroupField()]
@@ -298,5 +311,70 @@ describe('movement alternative optional disclosure', () => {
     expect(modesParticipant?.querySelector('[data-field-intrinsic-spill]')).toBeTruthy()
     const hintNode = modesParticipant?.querySelector('[id$="-hint"]')
     expect(hintNode?.textContent).toContain(MOVEMENT_ALTERNATIVE_AVAILABLE_MODES_BASE_HINT)
+  })
+
+  it('retains a collapsed optional-disclosure issue until expand or submit', async () => {
+    const user = userEvent.setup()
+    const publishSchema = resolveMonsterFormSchema(ctx, 'publish') as ZodType<MonsterFormValues>
+    const movementField = collapsedMovementAlternativeField()
+    const tabs = [
+      {
+        id: MONSTER_FORM_TAB.statistics,
+        label: 'Statistics',
+        fields: [movementField],
+      },
+    ]
+    const defaultValues = resolveMonsterCreateDefaultValues()
+    defaultValues.name = 'Collapsed alt'
+    defaultValues.sizes = ['medium']
+    defaultValues.creatureType = 'beast'
+    defaultValues.alignment = 'u'
+    defaultValues.challengeRating = '1/8'
+    defaultValues.movement = [{ mode: 'walk', feet: 20 }]
+    defaultValues.movementAlternative = { modes: ['fly'], feet: 20 }
+
+    let session = createEmptyFormValidationProducerSession()
+    session = replaceFormValidationProducerSlot(session, 'publish-action', 1, [
+      {
+        path: MOVEMENT_ALTERNATIVE_MODES_FIELD,
+        message: 'Choose at least 2 available modes.',
+        severity: 'field',
+        claim: { kind: 'field', target: MOVEMENT_ALTERNATIVE_MODES_FIELD },
+      },
+    ])
+
+    function ProducerBoundary({ children }: { children: ReactNode }) {
+      return (
+        <FormValidationProducerProvider session={session} stamp={1}>
+          {children}
+        </FormValidationProducerProvider>
+      )
+    }
+
+    render(
+      <TabbedForm
+        id="monster-movement-collapsed"
+        schema={publishSchema}
+        tabs={tabs}
+        defaultValues={defaultValues}
+        producerBoundary={ProducerBoundary}
+        validationPresentation="progressive"
+        onSubmit={() => {}}
+        footer={<button type="submit">Publish</button>}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Add alternative movement' })).toBeInTheDocument()
+    expect(screen.queryByText('Choose at least 2 available modes.')).not.toBeInTheDocument()
+    expect(screen.queryByText('Available modes')).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Publish' }))
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: /Statistics.*1 field needs attention/i }),
+      ).toBeInTheDocument()
+      expect(screen.getByText('Choose at least 2 available modes.')).toBeInTheDocument()
+    })
   })
 })

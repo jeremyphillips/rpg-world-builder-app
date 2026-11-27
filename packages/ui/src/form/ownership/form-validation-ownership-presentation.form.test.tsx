@@ -8,11 +8,17 @@ import { render, screen, waitFor } from '@testing-library/react'
 import { z } from 'zod'
 
 import { Form } from '../shells/form.client'
+import { TabbedForm } from '../shells/tabbed-form.client'
+import type { TabbedFormTab } from '../shells/tabbed-form-panels.lib'
 import type { FormItem } from '../field-config'
+import { FormItems } from '../containers/form-items.client'
 import { resolveTabValidationState } from '../errors/resolve-tab-validation-state'
 import { prepareFormIssues } from '../errors/resolve-invalid-submit-navigation'
+import { FormActionsBar } from '../chrome/form-actions-bar'
 import {
+  collectCurrentFormValidationProducerIssues,
   createEmptyFormValidationProducerSession,
+  projectFormValidationProducerIssues,
   replaceFormValidationProducerSlot,
 } from '../lifecycle/form-validation-producer-session.lib'
 
@@ -111,5 +117,160 @@ describe('form validation ownership presentation', () => {
     session = replaceFormValidationProducerSlot(session, 'publish-readiness', 3, [])
     expect(session.slots['publish-readiness']?.issues).toEqual([])
     expect(session.slots['publish-action']?.issues).toHaveLength(1)
+  })
+
+  it('keeps pathless form issues off tab badges', () => {
+    const tabs = [
+      {
+        id: 'identity',
+        label: 'Identity',
+        fields: [{ type: 'text', name: 'name', label: 'Name' }],
+      },
+      { id: 'notes', label: 'Notes', fields: [{ type: 'text', name: 'notes', label: 'Notes' }] },
+    ]
+    const issues = prepareFormIssues(
+      [{ path: [], message: 'Review this form and try again.' }],
+      tabs[0].fields,
+    )
+    expect(issues[0]?.claim?.kind).toBe('form')
+    const states = resolveTabValidationState(
+      issues,
+      tabs,
+      tabs.flatMap((tab) => tab.fields),
+    )
+    expect(states.every((state) => state.count === 0)).toBe(true)
+  })
+
+  it('does not badge a disconnected header-only tab without errorPaths', async () => {
+    const user = userEvent.setup()
+    const schema = z.object({
+      name: z.string().min(1),
+      meta: z.object({ title: z.string().min(1, 'Title is required.') }),
+    })
+    type Values = z.infer<typeof schema>
+    const tabs: TabbedFormTab[] = [
+      {
+        id: 'identity',
+        label: 'Identity',
+        fields: [{ type: 'text', name: 'name', label: 'Name', required: true }],
+      },
+      {
+        id: 'meta',
+        label: 'Meta',
+        fields: [],
+        header: (
+          <FormItems
+            items={[{ type: 'text', name: 'title', label: 'Title', required: true }]}
+            idPrefix="meta"
+            namePrefix="meta"
+          />
+        ),
+      },
+    ]
+
+    render(
+      <TabbedForm<Values>
+        id="disconnected-header"
+        schema={schema}
+        tabs={tabs}
+        defaultValues={{ name: 'Valid', meta: { title: '' } }}
+        onSubmit={vi.fn()}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Meta' }))
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Identity' })).not.toHaveTextContent(/\d/)
+      expect(screen.getByRole('button', { name: 'Meta' })).not.toHaveTextContent(/\d/)
+    })
+  })
+
+  it('shows operation copy in the footer without raw Zod transport', () => {
+    render(
+      <FormActionsBar formError="Could not save this form. Review your entries and try again." />,
+    )
+    const alert = screen.getByRole('alert')
+    expect(alert).toHaveTextContent('Could not save this form')
+    expect(alert.textContent).not.toMatch(/invalid_type/i)
+    expect(alert.textContent).not.toMatch(/^\s*\[/)
+  })
+
+  it('drops stale producer slots after snapshot stamp advances (delayed index guard)', () => {
+    const fields: FormItem[] = [
+      {
+        kind: 'array',
+        name: 'grants',
+        fields: [{ type: 'text', name: 'label', label: 'Label', required: true }],
+      },
+    ]
+    let session = createEmptyFormValidationProducerSession()
+    session = replaceFormValidationProducerSlot(session, 'api', 1, [
+      {
+        path: 'grants.0.label',
+        message: 'Required',
+        severity: 'field',
+        claim: { kind: 'field', target: 'grants.0.label' },
+      },
+    ])
+    session = replaceFormValidationProducerSlot(session, 'interactive', 2, [
+      {
+        path: 'grants.0.label',
+        message: 'Required on current snapshot',
+        severity: 'field',
+        claim: { kind: 'field', target: 'grants.0.label' },
+      },
+    ])
+
+    expect(collectCurrentFormValidationProducerIssues(session, 2)).toHaveLength(1)
+    expect(collectCurrentFormValidationProducerIssues(session, 2)[0]?.message).toBe(
+      'Required on current snapshot',
+    )
+    expect(
+      projectFormValidationProducerIssues(session, 2, fields, { grants: [{ label: '' }] }),
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          path: 'grants.0.label',
+          claim: { kind: 'field', target: 'grants.0.label' },
+        }),
+      ]),
+    )
+    expect(collectCurrentFormValidationProducerIssues(session, 1)).toHaveLength(1)
+    expect(collectCurrentFormValidationProducerIssues(session, 2)).not.toEqual(
+      collectCurrentFormValidationProducerIssues(session, 1),
+    )
+  })
+
+  it('projects draft-action issues after publish-readiness clears on the same stamp', () => {
+    let session = createEmptyFormValidationProducerSession()
+    session = replaceFormValidationProducerSlot(session, 'draft-action', 2, [
+      {
+        path: 'name',
+        message: 'Name required for draft',
+        severity: 'field',
+        claim: { kind: 'field', target: 'name' },
+      },
+    ])
+    session = replaceFormValidationProducerSlot(session, 'publish-readiness', 2, [
+      { path: 'level', message: 'Advisory only', severity: 'field' },
+    ])
+    session = replaceFormValidationProducerSlot(session, 'publish-readiness', 2, [])
+
+    const fields: FormItem[] = [
+      { type: 'text', name: 'name', label: 'Name' },
+      { type: 'number', name: 'level', label: 'Level' },
+    ]
+
+    expect(session.slots['publish-readiness']?.issues).toEqual([])
+    expect(session.slots['draft-action']?.issues).toHaveLength(1)
+    const projected = projectFormValidationProducerIssues(session, 2, fields, {
+      name: '',
+      level: 1,
+    })
+    expect(projected.some((issue) => issue.path === 'name')).toBe(true)
+    expect(projected.some((issue) => issue.path === 'level')).toBe(false)
   })
 })
