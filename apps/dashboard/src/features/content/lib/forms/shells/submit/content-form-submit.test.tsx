@@ -472,7 +472,13 @@ describe('useContentFormSubmit attempt identity', () => {
     stampProbe: () => string | undefined
   }
 
-  function mountHarness(persist: (values: TestValues) => Promise<void>): Harness {
+  function mountHarness(
+    persist: (
+      values: TestValues,
+      form?: UseFormReturn<TestValues>,
+      meta?: { isAttemptCurrent?: () => boolean },
+    ) => Promise<void>,
+  ): Harness {
     const handle = {} as Harness
     function Probe() {
       const form = useForm<TestValues>({ defaultValues: { name: 'A', level: 2 } })
@@ -480,7 +486,7 @@ describe('useContentFormSubmit attempt identity', () => {
         def: testDef,
         ctx: testCtx,
         fallbackMessage: 'Could not save.',
-        persist: async (values) => persist(values),
+        persist: async (values, persistForm, meta) => persist(values, persistForm, meta),
       })
       handle.form = form
       handle.submit = (values) => submit.onSubmit(values, form)
@@ -729,6 +735,54 @@ describe('useContentFormSubmit attempt identity', () => {
       await expect(first).rejects.toBeInstanceOf(ContentFormSubmitSuperseded)
     })
     expect(currentFlags).toEqual([true, true, false])
+  })
+
+  it('does not treat the first persist completion as authoritative after a same-stamp second attempt', async () => {
+    const completions: string[] = []
+    let releaseFirst: () => void = () => undefined
+    const persist = vi
+      .fn()
+      .mockImplementationOnce(
+        async (
+          _values: TestValues,
+          _form: UseFormReturn<TestValues>,
+          meta?: { isAttemptCurrent?: () => boolean },
+        ) => {
+          await new Promise<void>((resolve) => {
+            releaseFirst = resolve
+          })
+          if (meta?.isAttemptCurrent?.()) completions.push('first')
+        },
+      )
+      .mockImplementationOnce(
+        async (
+          _values: TestValues,
+          _form: UseFormReturn<TestValues>,
+          meta?: { isAttemptCurrent?: () => boolean },
+        ) => {
+          if (meta?.isAttemptCurrent?.()) completions.push('second')
+        },
+      )
+    const harness = mountHarness(persist)
+
+    let first!: Promise<void>
+    act(() => {
+      first = harness.submit({ name: 'A', level: 2 })
+    })
+    first.catch(() => undefined)
+    await waitFor(() => expect(persist).toHaveBeenCalledTimes(1))
+
+    await act(async () => {
+      await harness.submit({ name: 'A', level: 2 })
+    })
+    expect(persist).toHaveBeenCalledTimes(2)
+    expect(completions).toEqual(['second'])
+
+    await act(async () => {
+      releaseFirst()
+      await expect(first).rejects.toBeInstanceOf(ContentFormSubmitSuperseded)
+    })
+    expect(completions).toEqual(['second'])
   })
 
   it('does not paint persist errors when a superseded attempt fails late', async () => {
