@@ -119,4 +119,30 @@ describe('edit shell failed persist producer projection', () => {
       expect(screen.getByTestId('api-issue-count')).toHaveTextContent('1')
     })
   })
+
+  it('maps wire slug paths to the name field via prepare provenance on edit persist rejection', async () => {
+    const user = userEvent.setup()
+    prepareWriteMock.mockReturnValue({
+      payload: { name: 'Feat A!', slug: 'feat-a' },
+      provenance: { pathMap: { name: 'slug' } },
+    })
+    mutateAsync.mockRejectedValueOnce(
+      new ApiError(400, 'validation_error', 'Invalid', {
+        issues: [{ path: 'slug', message: 'Slug is already taken', code: 'duplicate' }],
+      }),
+    )
+
+    renderEditPersistHarness()
+
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), '!')
+    await act(async () => {
+      await user.click(screen.getByRole('button', { name: /save changes/i }))
+    })
+
+    await waitFor(() => {
+      expect(mutateAsync).toHaveBeenCalledTimes(1)
+      expect(screen.getByText(/Slug is already taken/i)).toBeInTheDocument()
+      expect(screen.getByTestId('api-issue-count')).toHaveTextContent('1')
+    })
+  })
 })
