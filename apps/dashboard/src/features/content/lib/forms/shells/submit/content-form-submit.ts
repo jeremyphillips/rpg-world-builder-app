@@ -16,6 +16,7 @@ import {
 
 import { resolveContentFormSchema, resolveContentPublishSchema } from '../edit/content-edit-load'
 import { ingestContentFormValidationIssues } from '../../validation/ingest-content-form-validation.lib'
+import { consumeContentFormPersistBaselineReset } from './content-form-persist-baseline-reset.lib'
 import { runContentFormCommitAttempt } from './content-form-submit-commit.lib'
 import {
   ContentFormSubmitSuperseded,
@@ -170,9 +171,14 @@ export function useContentFormSubmit<TValues extends FieldValues>(
     useEffect(() => {
       if (!rhf) return
       const subscription = rhf.watch((_values, info) => {
-        // A pathless event is a reset. The attempt's own save boundary resets from the
-        // response while persisting; that must not supersede the attempt itself.
-        if (info.name === undefined && persistingRef.current > 0) return
+        if (info.name === undefined && persistingRef.current > 0) {
+          // Post-save baseline sync must not advance the snapshot; user reset during
+          // in-flight persist must, so a late response cannot repaint a newer session.
+          if (consumeContentFormPersistBaselineReset(rhf)) return
+          stampRef.current += 1
+          setSnapshotStamp(stampRef.current)
+          return
+        }
         stampRef.current += 1
         setSnapshotStamp(stampRef.current)
       })

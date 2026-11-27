@@ -550,6 +550,79 @@ describe('useContentFormSubmit attempt identity', () => {
     ).toEqual([])
   })
 
+  it('ignores a late api failure after the user resets the form mid-persist', async () => {
+    let releaseFirst: () => void = () => undefined
+    const persist = vi.fn().mockImplementationOnce(
+      () =>
+        new Promise<void>((_, reject) => {
+          releaseFirst = () =>
+            reject(
+              new ApiError(400, 'validation_error', 'Invalid', {
+                issues: [{ path: 'name', message: 'Taken', code: 'duplicate' }],
+              }),
+            )
+        }),
+    )
+    const formRef: { current: UseFormReturn<TestValues> | null } = { current: null }
+    const controls = { submit: async () => undefined as Promise<void> }
+
+    function Harness() {
+      const form = useForm<TestValues>({ defaultValues: { name: 'A', level: 2 } })
+      formRef.current = form
+      const binding = useContentFormSubmitProducerBinding()
+      const contentSubmit = useContentFormSubmit<TestValues>({
+        def: testDef,
+        ctx: { ...testCtx, mode: 'edit' },
+        fallbackMessage: 'Could not save.',
+        producerBinding: binding,
+        invalidPresentation: {
+          resolverFields: [
+            { name: 'name', label: 'Name', type: 'text' },
+            { name: 'level', label: 'Level', type: 'number' },
+          ],
+          formId: 'edit-form',
+        },
+        persist: async (values) => persist(values),
+      })
+      controls.submit = () => contentSubmit.onSubmit({ name: 'A', level: 2 }, form)
+      const Boundary = contentSubmit.ProducerBoundary
+      const StampBridge = contentSubmit.ProducerStampBridge
+
+      return (
+        <FormProvider {...form}>
+          <StampBridge />
+          <Boundary>
+            <span data-testid="probe" />
+          </Boundary>
+        </FormProvider>
+      )
+    }
+
+    render(
+      <FormUiWrapper>
+        <Harness />
+      </FormUiWrapper>,
+    )
+
+    let first!: Promise<void>
+    act(() => {
+      first = controls.submit()
+    })
+    first.catch(() => undefined)
+    await waitFor(() => expect(persist).toHaveBeenCalledTimes(1))
+
+    act(() => {
+      formRef.current!.reset({ name: 'Cleared', level: 1 })
+    })
+
+    await act(async () => {
+      releaseFirst()
+      await expect(first).rejects.toBeInstanceOf(ContentFormSubmitSuperseded)
+    })
+
+    expect(formRef.current!.getFieldState('name').error).toBeUndefined()
+  })
+
   it('ignores a late api failure after the user replaces values mid-persist', async () => {
     let releaseFirst: () => void = () => undefined
     const persist = vi.fn().mockImplementationOnce(

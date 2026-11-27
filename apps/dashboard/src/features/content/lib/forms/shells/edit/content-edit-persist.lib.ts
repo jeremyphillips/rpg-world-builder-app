@@ -3,6 +3,7 @@ import { emptyContentMediaSchema } from '@rpg/contracts'
 import type { QueryClient } from '@tanstack/react-query'
 import type { FieldValues, UseFormReturn } from 'react-hook-form'
 
+import { markContentFormPersistBaselineReset } from '../submit/content-form-persist-baseline-reset.lib'
 import { stripEditEnvelopeFromFormDefaults } from '../../registry/content-form-key-helpers'
 import type { AnyContentFormDef, ContentFormCtx } from '../../registry/content-form-registry'
 import {
@@ -59,6 +60,7 @@ export async function persistContentEditUpdate<
     },
   ) as FieldValues
 
+  markContentFormPersistBaselineReset(form)
   form.reset(baseline)
 
   if (entity.catalogLayer === 'system' && def.normalizeOverlayBody) {
