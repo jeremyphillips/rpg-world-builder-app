@@ -9,6 +9,8 @@ import type { ZodType } from 'zod'
 import {
   TabbedForm,
   collectTabbedFormResolverItems,
+  FormUiProvider,
+  FormValidationInteractiveProducerBridge,
   FormValidationProducerProvider,
   makeResolver,
   prepareFormIssues,
@@ -375,6 +377,71 @@ describe('movement alternative optional disclosure', () => {
         screen.getByRole('button', { name: /Statistics.*1 field needs attention/i }),
       ).toBeInTheDocument()
       expect(screen.getByText('Choose at least 2 available modes.')).toBeInTheDocument()
+    })
+  })
+
+  it('badges statistics with adopted producer boundary and full tab resolver fields', async () => {
+    const user = userEvent.setup()
+    const publishSchema = resolveMonsterFormSchema(ctx, 'publish') as ZodType<MonsterFormValues>
+    const movementField = collapsedMovementAlternativeField()
+    const statisticsTab = {
+      id: MONSTER_FORM_TAB.statistics,
+      label: 'Statistics',
+      fields: [movementField],
+    }
+    const resolverFields = collectTabbedFormResolverItems([statisticsTab])
+    const defaultValues = resolveMonsterCreateDefaultValues()
+    defaultValues.name = 'Collapsed adopted'
+    defaultValues.sizes = ['medium']
+    defaultValues.creatureType = 'beast'
+    defaultValues.alignment = 'u'
+    defaultValues.challengeRating = '1/8'
+    defaultValues.movement = [{ mode: 'walk', feet: 20 }]
+    defaultValues.movementAlternative = { modes: ['fly'], feet: 20 }
+
+    let session = createEmptyFormValidationProducerSession()
+    session = replaceFormValidationProducerSlot(session, 'publish-action', 1, [
+      {
+        path: MOVEMENT_ALTERNATIVE_MODES_FIELD,
+        message: 'Choose at least 2 available modes.',
+        severity: 'field',
+        claim: { kind: 'field', target: MOVEMENT_ALTERNATIVE_MODES_FIELD },
+      },
+    ])
+
+    function EditShellProducerBoundary({ children }: { children: ReactNode }) {
+      return (
+        <FormValidationProducerProvider session={session} stamp={1}>
+          <FormValidationInteractiveProducerBridge fields={resolverFields} />
+          {children}
+        </FormValidationProducerProvider>
+      )
+    }
+
+    render(
+      <FormUiProvider fields={resolverFields} hasAttemptedPublish publishPresentationEnabled>
+        <TabbedForm
+          id="monster-movement-adopted-boundary"
+          schema={publishSchema}
+          tabs={[statisticsTab]}
+          defaultValues={defaultValues}
+          producerBoundary={EditShellProducerBoundary}
+          validationPresentation="progressive"
+          publishPresentationEnabled
+          onSubmit={() => {}}
+          footer={<button type="submit">Publish</button>}
+        />
+      </FormUiProvider>,
+    )
+
+    expect(screen.queryByText('Choose at least 2 available modes.')).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Publish' }))
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: /Statistics.*1 field needs attention/i }),
+      ).toBeInTheDocument()
     })
   })
 })
