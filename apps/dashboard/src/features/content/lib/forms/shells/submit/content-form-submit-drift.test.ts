@@ -122,8 +122,10 @@ describe('ContentFormDef create submit drift guard', () => {
     const source = readFileSync(monsterStatisticsPanelPath, 'utf8')
 
     expect(source).toContain('useContentFormPresentationIssues')
+    expect(source).toContain('useFieldIssue')
     expect(source).not.toContain('flattenFormIssues')
     expect(source).not.toContain('useFormValidationPresentation')
+    expect(source).not.toContain('publishPresentationIssues')
   })
 
   it('requires duplicate content dialog to use adopted submit helper', () => {

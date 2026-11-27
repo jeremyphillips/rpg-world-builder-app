@@ -28,8 +28,10 @@ import {
   MOVEMENT_ALTERNATIVE_AVAILABLE_MODES_SPIDER_CLIMB_HINT,
   MOVEMENT_ALTERNATIVE_MODES_FIELD,
   movementAlternativeGroupField,
+  movementValidationMessages,
   movementWithHoverGroup,
 } from '../../../lib/forms/fields/content-movement-form-fields'
+import { formatFieldMessage } from '@rpg/contracts'
 import { evaluateContentPublishValidation } from '../../../lib/forms/validation/content-publish-validation.lib'
 import { monsterFormDef } from '../monster-form-def'
 import { buildMonsterTabs } from '../monster-form-fields'
@@ -377,6 +379,84 @@ describe('movement alternative optional disclosure', () => {
         screen.getByRole('button', { name: /Statistics.*1 field needs attention/i }),
       ).toBeInTheDocument()
       expect(screen.getByText('Choose at least 2 available modes.')).toBeInTheDocument()
+    })
+  })
+
+  it('shows two distinct modes reasons on the mounted producer after publish', async () => {
+    const user = userEvent.setup()
+    const publishSchema = resolveMonsterFormSchema(ctx, 'publish') as ZodType<MonsterFormValues>
+    const movementField = movementAlternativeGroupField()
+    const statisticsTab = {
+      id: MONSTER_FORM_TAB.statistics,
+      label: 'Statistics',
+      fields: [movementField],
+    }
+    const resolverFields = collectTabbedFormResolverItems([statisticsTab])
+    const defaultValues = resolveMonsterCreateDefaultValues()
+    defaultValues.name = 'Overlap modes'
+    defaultValues.sizes = ['medium']
+    defaultValues.creatureType = 'beast'
+    defaultValues.alignment = 'u'
+    defaultValues.challengeRating = '1/8'
+    defaultValues.movement = [
+      { mode: 'walk', feet: 20 },
+      { mode: 'climb', feet: 10 },
+    ]
+    defaultValues.movementAlternative = { modes: ['climb'], feet: 20 }
+
+    const publishIssues = evaluateContentPublishValidation(
+      publishSchema,
+      defaultValues as never,
+      resolverFields,
+    )
+    expect(publishIssues).not.toBeNull()
+    const routed = prepareFormIssues(
+      publishIssues!.map((issue) => ({ path: issue.path.split('.'), message: issue.message })),
+      resolverFields,
+      defaultValues as Record<string, unknown>,
+    )
+    const modesIssues = routed.filter(
+      (issue) =>
+        issue.claim?.target === MOVEMENT_ALTERNATIVE_MODES_FIELD ||
+        issue.path === MOVEMENT_ALTERNATIVE_MODES_FIELD,
+    )
+    expect(modesIssues).toHaveLength(2)
+
+    let session = createEmptyFormValidationProducerSession()
+    session = replaceFormValidationProducerSlot(session, 'interactive', 1, modesIssues)
+
+    function ProducerBoundary({ children }: { children: ReactNode }) {
+      return (
+        <FormValidationProducerProvider session={session} stamp={1}>
+          {children}
+        </FormValidationProducerProvider>
+      )
+    }
+
+    const minCopy = formatFieldMessage(movementValidationMessages.alternativeMinModes())
+    const overlapCopy = formatFieldMessage(movementValidationMessages.alternativeOverlap())
+
+    render(
+      <FormUiProvider fields={resolverFields} publishPresentationEnabled hasAttemptedSubmit>
+        <TabbedForm
+          id="monster-movement-dual-reasons"
+          schema={publishSchema}
+          tabs={[statisticsTab]}
+          defaultValues={defaultValues}
+          producerBoundary={ProducerBoundary}
+          validationPresentation="progressive"
+          publishPresentationEnabled
+          onSubmit={() => {}}
+          footer={<button type="submit">Publish</button>}
+        />
+      </FormUiProvider>,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Publish' }))
+
+    await waitFor(() => {
+      expect(screen.getByText(minCopy, { exact: false })).toBeInTheDocument()
+      expect(screen.getByText(overlapCopy, { exact: false })).toBeInTheDocument()
     })
   })
 
