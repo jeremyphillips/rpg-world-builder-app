@@ -68,6 +68,8 @@ function FormUiWrapper({ children }: { children: ReactNode }) {
   return <FormUiContext.Provider value={uiValue}>{children}</FormUiContext.Provider>
 }
 
+function noopPublishIssuesChange() {}
+
 describe('adopted content producer mounted presentation', () => {
   it('projects publish-action slot issues after a failed submit', async () => {
     const persist = vi.fn()
@@ -97,11 +99,9 @@ describe('adopted content producer mounted presentation', () => {
       handle.form = form
       handle.submit = () => contentSubmit.onSubmit({ name: '' }, form)
       const Boundary = contentSubmit.ProducerBoundary
-      const StampBridge = contentSubmit.ProducerStampBridge
 
       return (
         <FormProvider {...form}>
-          <StampBridge />
           <Boundary>
             <Probe />
           </Boundary>
@@ -248,5 +248,118 @@ describe('adopted content producer mounted presentation', () => {
       },
       { timeout: 2000 },
     )
+  })
+
+  it('adopted ProducerBoundary keeps draft-action while publish-readiness clears on edit', async () => {
+    const persist = vi.fn()
+    const probeRef: { current: ReturnType<typeof useContentFormPresentationIssues> | null } = {
+      current: null,
+    }
+    const bindingRef: { current: ReturnType<typeof useContentFormSubmitProducerBinding> | null } = {
+      current: null,
+    }
+    const controls = {
+      draft: async () => undefined as Promise<void>,
+      fixName: () => undefined,
+    }
+    type HarnessHandle = {
+      form: UseFormReturn<Values>
+    }
+    const handle = {} as HarnessHandle
+
+    function Probe() {
+      probeRef.current = useContentFormPresentationIssues(fields)
+      return null
+    }
+
+    function Harness() {
+      const form = useForm<Values>({ defaultValues: { name: '' } })
+      const binding = useContentFormSubmitProducerBinding()
+      bindingRef.current = binding
+      handle.form = form
+
+      const draft = useContentFormSubmit<Values>({
+        def,
+        ctx,
+        commitValidationIntent: 'draft',
+        fallbackMessage: 'Could not save draft.',
+        producerBinding: binding,
+        mountProducerChrome: false,
+        persist,
+      })
+      const publish = useContentFormSubmit<Values>({
+        def,
+        ctx,
+        fallbackMessage: 'Could not publish.',
+        producerBinding: binding,
+        invalidPresentation: { resolverFields: fields, formId: 'pilot-form' },
+        persist,
+      })
+
+      controls.draft = () => draft.onSubmit({ name: '' }, form)
+      controls.fixName = () => {
+        form.setValue('name', 'Saved name', { shouldDirty: true })
+      }
+
+      const Boundary = publish.ProducerBoundary
+      const publishSchemaForRail = resolveContentPublishSchema(def, ctx)
+
+      return (
+        <FormProvider {...form}>
+          <Boundary>
+            <ContentFormPublishValidationBridge
+              schema={publishSchemaForRail}
+              tabs={tabs}
+              onValidationChange={noopPublishIssuesChange}
+            />
+            <Probe />
+          </Boundary>
+        </FormProvider>
+      )
+    }
+
+    render(
+      <FormUiWrapper>
+        <Harness />
+      </FormUiWrapper>,
+    )
+
+    await act(async () => {
+      try {
+        await controls.draft()
+      } catch (error) {
+        expect(error).toBeInstanceOf(ContentFormSubmitValidationFailed)
+      }
+    })
+
+    await waitFor(() => {
+      expect(
+        bindingRef.current?.producerSession.slots['draft-action']?.issues.length,
+      ).toBeGreaterThan(0)
+      expect(
+        bindingRef.current?.producerSession.slots['publish-readiness']?.issues.length ?? 0,
+      ).toBeGreaterThan(0)
+    })
+
+    const stampBeforeEdit = bindingRef.current!.snapshotStamp
+
+    act(() => {
+      controls.fixName()
+    })
+
+    await waitFor(
+      () => {
+        expect(bindingRef.current?.producerSession.slots['publish-readiness']?.issues).toEqual([])
+      },
+      { timeout: 2000 },
+    )
+
+    expect(bindingRef.current!.snapshotStamp).toBeGreaterThanOrEqual(stampBeforeEdit)
+
+    // Slot keeps the draft attempt batch; publish-readiness alone cleared at the new stamp.
+    expect(
+      bindingRef.current?.producerSession.slots['draft-action']?.issues.length,
+    ).toBeGreaterThan(0)
+    expect(persist).not.toHaveBeenCalled()
   })
 })

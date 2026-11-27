@@ -51,6 +51,10 @@ export function dedupeFormIssues(issues: readonly FormIssue[]): FormIssue[] {
   return deduped
 }
 
+function producerIssueListKey(issues: readonly FormIssue[]): string {
+  return issues.map((issue) => `${issue.path}\0${issue.message}`).join('\n')
+}
+
 /**
  * Replace one producer slot, including with an empty success list. Other slots are unchanged.
  */
@@ -60,13 +64,22 @@ export function replaceFormValidationProducerSlot(
   stamp: number,
   issues: readonly FormIssue[],
 ): FormValidationProducerSession {
+  const deduped = dedupeFormIssues(issues)
+  const existing = session.slots[slot]
+  if (
+    existing &&
+    existing.stamp === stamp &&
+    producerIssueListKey(existing.issues) === producerIssueListKey(deduped)
+  ) {
+    return session
+  }
   return {
     slots: {
       ...session.slots,
       [slot]: {
         slot,
         stamp,
-        issues: dedupeFormIssues(issues),
+        issues: deduped,
       },
     },
   }

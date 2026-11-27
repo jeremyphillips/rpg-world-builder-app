@@ -1,9 +1,16 @@
+/**
+ * @vitest-environment jsdom
+ */
+import { ApiError } from '@rpg/contracts'
+import { act, renderHook } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
+import { useForm } from 'react-hook-form'
 
 import { reincarnateSpeciesTableFixture } from '@rpg/contracts'
 import { RICH_TEXT_TABLE_EMBED_ATTR } from '@rpg/ui'
-import type { FormIssue } from '@rpg/ui/form'
+import { createEmptyFormValidationProducerSession, type FormIssue } from '@rpg/ui/form'
 
+import { presentPersistValidationFailure } from '../../lib/forms/shells/submit/content-form-submit-presentation.lib'
 import { mapWireIssuesToAuthoring } from '../../lib/forms/submit/map-wire-issues-to-authoring.lib'
 import { spellFormSchema, type SpellFormValues } from './spell-form-fields'
 import {
@@ -69,5 +76,35 @@ describe('buildSpellPreparedWrite provenance', () => {
     const wirePath = mapWireIssuesToAuthoring([issue('tables.0.name')], provenance).issues[0]!.path
 
     expect(wirePath).toBe(localPath)
+  })
+
+  it('paints persisted API table errors on the authoring row via presentPersistValidationFailure', () => {
+    const tableB = { ...reincarnateSpeciesTableFixture, id: 'table-b', name: 'Table B' }
+    const values = publishReadySpellFormValues({
+      description: `<div ${RICH_TEXT_TABLE_EMBED_ATTR}="table-b"></div>`,
+      tables: [reincarnateSpeciesTableFixture, tableB],
+    })
+    const { provenance } = buildSpellPreparedWrite(values, undefined, 'publish')
+    const { result } = renderHook(() => useForm<SpellFormValues>({ defaultValues: values }))
+    const error = new ApiError(400, 'validation_error', 'Invalid', {
+      issues: [{ path: 'tables.0.name', message: 'Table name required.', code: 'custom' }],
+    })
+
+    act(() => {
+      presentPersistValidationFailure(
+        result.current,
+        error,
+        undefined,
+        null,
+        createEmptyFormValidationProducerSession(),
+        1,
+        provenance,
+      )
+    })
+
+    expect(result.current.getFieldState('tables.1.name').error?.message).toBe(
+      'Table name required.',
+    )
+    expect(result.current.getFieldState('tables.0.name').error).toBeUndefined()
   })
 })

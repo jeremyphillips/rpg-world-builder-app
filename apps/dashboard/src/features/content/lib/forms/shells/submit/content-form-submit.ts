@@ -9,6 +9,7 @@ import {
   FormValidationProducerProvider,
   useSubmitHandler,
   type FormIssue,
+  type FormItem,
   type FormValidationProducerSession,
   type FormValidationProducerSlot,
   type UseSubmitHandlerResult,
@@ -24,6 +25,8 @@ import {
   type ContentFormInvalidPresentation,
   type UseContentFormSubmitOptions,
 } from './content-form-submit-types.lib'
+
+const EMPTY_RESOLVER_FIELDS: FormItem[] = []
 
 export {
   ContentFormSubmitSuperseded,
@@ -68,6 +71,8 @@ export function useContentFormSubmit<TValues extends FieldValues>(
 
   const attemptCounterRef = useRef(0)
   const internalStampRef = useRef(0)
+  const stampWatchLeasesRef = useRef(0)
+  const stampWatchCleanupRef = useRef<(() => void) | null>(null)
   const internalPersistingRef = useRef(0)
   const internalUiRef = useRef<Pick<
     import('@rpg/ui/form').FormUiContextValue,
@@ -95,6 +100,11 @@ export function useContentFormSubmit<TValues extends FieldValues>(
 
   const producerSlot =
     commitValidationIntent === 'publish' ? ('publish-action' as const) : ('draft-action' as const)
+
+  const interactiveResolverFields = useMemo(
+    () => invalidPresentation?.resolverFields ?? EMPTY_RESOLVER_FIELDS,
+    [invalidPresentation?.resolverFields],
+  )
 
   const { onSubmit, formError } = useSubmitHandler<TValues>({
     fallbackMessage,
@@ -175,19 +185,29 @@ export function useContentFormSubmit<TValues extends FieldValues>(
     const rhf = useFormContext()
     useEffect(() => {
       if (!rhf) return
-      const subscription = rhf.watch((_values, info) => {
-        if (info.name === undefined && persistingRef.current > 0) {
-          // Post-save baseline sync must not advance the snapshot; user reset during
-          // in-flight persist must, so a late response cannot repaint a newer session.
-          if (consumeContentFormPersistBaselineReset(rhf)) return
+      stampWatchLeasesRef.current += 1
+      if (stampWatchLeasesRef.current === 1) {
+        const subscription = rhf.watch((_values, info) => {
+          if (info.name === undefined && persistingRef.current > 0) {
+            // Post-save baseline sync must not advance the snapshot; user reset during
+            // in-flight persist must, so a late response cannot repaint a newer session.
+            if (consumeContentFormPersistBaselineReset(rhf)) return
+            stampRef.current += 1
+            setSnapshotStamp(stampRef.current)
+            return
+          }
           stampRef.current += 1
           setSnapshotStamp(stampRef.current)
-          return
+        })
+        stampWatchCleanupRef.current = () => subscription.unsubscribe()
+      }
+      return () => {
+        stampWatchLeasesRef.current -= 1
+        if (stampWatchLeasesRef.current === 0) {
+          stampWatchCleanupRef.current?.()
+          stampWatchCleanupRef.current = null
         }
-        stampRef.current += 1
-        setSnapshotStamp(stampRef.current)
-      })
-      return () => subscription.unsubscribe()
+      }
     }, [rhf])
   }
 
@@ -216,7 +236,7 @@ export function useContentFormSubmit<TValues extends FieldValues>(
       FormValidationProducerProvider,
       { ...value },
       React.createElement(FormValidationInteractiveProducerBridge, {
-        fields: invalidPresentation?.resolverFields ?? [],
+        fields: interactiveResolverFields,
       }),
       children,
     )

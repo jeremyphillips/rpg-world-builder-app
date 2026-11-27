@@ -20,12 +20,17 @@ export function FormValidationInteractiveProducerBridge({ fields }: { fields: Fo
   const replaceSlotRef = useRef(producer?.replaceSlot)
   replaceSlotRef.current = producer?.replaceSlot
 
+  const publishedSignatureRef = useRef<string | null>(null)
+
   useEffect(() => {
     const replaceSlot = replaceSlotRef.current
     if (!replaceSlot) return
     if (!hasAttemptedSubmit && !hasAttemptedPublish) return
     const formValues = getValues() as Record<string, unknown>
     const issues = prepareFormIssues(errors, fields, formValues)
+    const signature = issues.map((issue) => `${issue.path}\0${issue.message}`).join('\n')
+    if (signature === publishedSignatureRef.current) return
+    publishedSignatureRef.current = signature
     replaceSlot('interactive', issues)
   }, [errors, fields, getValues, hasAttemptedPublish, hasAttemptedSubmit])
 
