@@ -26,6 +26,7 @@ import {
   useContentFormSubmitProducerBinding,
 } from './content-form-submit'
 import { presentPersistValidationFailure } from './content-form-submit-presentation.lib'
+import * as contentFormCommitPipeline from '../../submit/content-form-commit-pipeline.lib'
 import { buildIdentityPreparedWrite } from '../../submit/content-prepared-write.types'
 import { projectCompactedArrayProvenance } from '../../submit/project-compacted-array-provenance.lib'
 import type { AnyContentFormDef, ContentFormCtx } from '../../registry/content-form-registry'
@@ -1394,6 +1395,69 @@ describe('edit shell tab badges from producer projection', () => {
 })
 
 describe('presentContentFormInvalidSubmit bridge on adopted submit', () => {
+  it('does not persist when adopted submit hits an rhf and canonical bridge mismatch', async () => {
+    const persist = vi.fn()
+    const diagnostic = vi.spyOn(console, 'error').mockImplementation(() => undefined)
+    const pipelineSpy = vi
+      .spyOn(contentFormCommitPipeline, 'runContentFormCommitPipeline')
+      .mockResolvedValue({
+        kind: 'blocked',
+        stageId: contentFormCommitPipeline.CONTENT_FORM_COMMIT_STAGE_FORM,
+      })
+    const formRef: { current: UseFormReturn<TestValues> | null } = { current: null }
+    const controls = { submit: async () => undefined as Promise<void> }
+
+    function Harness() {
+      const form = useForm<TestValues>({ defaultValues: { name: 'A', level: 2 } })
+      formRef.current = form
+      const contentSubmit = useContentFormSubmit<TestValues>({
+        def: testDef,
+        ctx: testCtx,
+        fallbackMessage: 'Could not save.',
+        invalidPresentation: {
+          resolverFields: [{ name: 'name', label: 'Name', type: 'text' }],
+          formId: 'adopted-form',
+        },
+        persist,
+      })
+      controls.submit = () => contentSubmit.onSubmit({ name: 'A', level: 2 }, form)
+      const Boundary = contentSubmit.ProducerBoundary
+
+      return (
+        <FormProvider {...form}>
+          <Boundary>{null}</Boundary>
+        </FormProvider>
+      )
+    }
+
+    render(
+      <FormUiWrapper>
+        <Harness />
+      </FormUiWrapper>,
+    )
+
+    act(() => {
+      formRef.current!.setError('level', { type: 'custom' })
+    })
+
+    await expect(
+      act(async () => {
+        await controls.submit()
+      }),
+    ).rejects.toBeInstanceOf(ContentFormSubmitValidationFailed)
+
+    expect(persist).not.toHaveBeenCalled()
+    await waitFor(() => {
+      expect(formRef.current!.getFieldState('root').error?.message).toBe(
+        'Something went wrong while checking this form. Try again or refresh the page.',
+      )
+    })
+    expect(diagnostic).toHaveBeenCalled()
+
+    pipelineSpy.mockRestore()
+    diagnostic.mockRestore()
+  })
+
   it('sets safe retry root copy when RHF blocks without a resolvable canonical issue', () => {
     const { result } = renderHook(() =>
       useForm<TestValues>({ defaultValues: { name: 'A', level: 2 } }),

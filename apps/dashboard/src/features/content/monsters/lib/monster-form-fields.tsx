@@ -264,13 +264,6 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       label: 'Actions',
       fields: actions,
       ...actionValidation,
-      errorPaths: [
-        'actions',
-        'bonusActions',
-        'reactions',
-        'legendaryActions',
-        'legendaryActions.actions',
-      ],
       resolverFields: [
         ...actionValidation.resolverFields,
         embeddedArrayResolverField('bonusActions', 'Bonus actions', {

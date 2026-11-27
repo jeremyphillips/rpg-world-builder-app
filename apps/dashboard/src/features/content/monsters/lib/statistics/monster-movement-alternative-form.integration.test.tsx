@@ -1,11 +1,14 @@
 /**
  * @vitest-environment jsdom
  */
-import { useCallback, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useContext, useRef, useState, type ReactNode } from 'react'
+import { useFormContext, useFormState } from 'react-hook-form'
 import userEvent from '@testing-library/user-event'
-import { render, screen, waitFor } from '@testing-library/react'
-import { beforeAll, describe, expect, it } from 'vitest'
+import { render, screen, waitFor, within } from '@testing-library/react'
+import { beforeAll, describe, expect, it, vi } from 'vitest'
 import type { ZodType } from 'zod'
+import { z } from 'zod'
+import { addCustomRefinementIssue } from '@rpg/contracts'
 import {
   TabbedForm,
   collectTabbedFormResolverItems,
@@ -13,6 +16,7 @@ import {
   FormValidationInteractiveProducerBridge,
   FormValidationProducerProvider,
   type FormIssue,
+  type FormItem,
   type FormValidationProducerSlot,
   makeResolver,
   prepareFormIssues,
@@ -20,8 +24,11 @@ import {
   createEmptyFormValidationProducerSession,
   projectFormValidationProducerIssues,
   resolveTabValidationState,
+  FormUiContext,
 } from '@rpg/ui/form'
+import { QueryClientProvider } from '@tanstack/react-query'
 import { getMonsterBySlug } from '@rpg/catalog/monsters'
+import { makeTestQueryClient } from '@/test/render'
 
 import { makeContentFormCtx } from '../../../lib/fixtures/content-form-ctx'
 import { augmentTabsWithHoistedName } from '../../../lib/forms/shells/layout/content-schema-form-tabs.lib'
@@ -30,12 +37,19 @@ import {
   MOVEMENT_ALTERNATIVE_AVAILABLE_MODES_SPIDER_CLIMB_HINT,
   MOVEMENT_ALTERNATIVE_AVAILABLE_MODES_LABEL,
   MOVEMENT_ALTERNATIVE_MODES_FIELD,
+  movementAlternativeFormSchema,
   movementAlternativeGroupField,
+  movementRowDraftFormSchema,
   movementValidationMessages,
   movementWithHoverGroup,
+  refineMovementAlternativeForm,
 } from '../../../lib/forms/fields/content-movement-form-fields'
+import { MountedPublishCanonicalBridge } from '../../../lib/forms/validation/mounted-publish-canonical-bridge.client'
 import { formatFieldMessage } from '@rpg/contracts'
-import { evaluateContentPublishValidation } from '../../../lib/forms/validation/content-publish-validation.lib'
+import {
+  evaluateContentPublishFormIssues,
+  evaluateContentPublishValidation,
+} from '../../../lib/forms/validation/content-publish-validation.lib'
 import { ingestContentFormValidationIssues } from '../../../lib/forms/validation/ingest-content-form-validation.lib'
 import { monsterFormDef } from '../monster-form-def'
 import { buildMonsterTabs } from '../monster-form-fields'
@@ -47,6 +61,7 @@ import {
   resolveMonsterCreateDefaultValues,
   type MonsterFormValues,
 } from '../monster-form-values'
+import { monsterFormTestValues } from '../monster-form-test-values'
 
 beforeAll(() => {
   if (!HTMLElement.prototype.hasPointerCapture) {
@@ -251,6 +266,53 @@ describe('monster movement alternative validation', () => {
     expect(issues).toBeNull()
   })
 })
+
+function CanonicalPublishIssuesProbe({
+  publishSchema,
+  publishFields,
+}: {
+  publishSchema: z.ZodType
+  publishFields: FormItem[]
+}) {
+  const form = useFormContext()
+  const ui = useContext(FormUiContext)
+  if (!ui.hasAttemptedPublish && !ui.hasAttemptedSubmit) return null
+  const issues =
+    evaluateContentPublishFormIssues(publishSchema, form.getValues(), publishFields) ?? []
+  if (!issues.length) return null
+  return (
+    <div data-testid="canonical-publish-issues-probe">
+      {issues.map((issue) => (
+        <p
+          key={`${issue.path}:${issue.claim?.target ?? issue.path}`}
+          data-issue-target={issue.claim?.target}
+        >
+          {issue.message}
+        </p>
+      ))}
+    </div>
+  )
+}
+
+function RhfCanonicalErrorProbe({
+  parentPath,
+  childPath,
+}: {
+  parentPath: string
+  childPath: string
+}) {
+  const form = useFormContext()
+  useFormState({ name: parentPath as never })
+  useFormState({ name: childPath as never })
+  const parent = form.getFieldState(parentPath as never).error?.message
+  const child = form.getFieldState(childPath as never).error?.message
+  return (
+    <div data-testid="rhf-canonical-error-probe">
+      {parent ? <p data-testid="rhf-parent-error">{parent}</p> : null}
+      {child ? <p data-testid="rhf-child-error">{child}</p> : null}
+    </div>
+  )
+}
 
 function collapsedMovementAlternativeField() {
   const base = movementAlternativeGroupField()
@@ -549,6 +611,274 @@ describe('movement alternative optional disclosure', () => {
     await waitFor(() => {
       expect(
         screen.getByRole('button', { name: /Statistics.*1 field needs attention/i }),
+      ).toBeInTheDocument()
+    })
+  })
+
+  it('shows parent movementAlternative and child modes issues after adopted publish submit', async () => {
+    const user = userEvent.setup()
+    const movementField = movementAlternativeGroupField()
+    const statisticsTab = {
+      id: MONSTER_FORM_TAB.statistics,
+      label: 'Statistics',
+      fields: [movementField],
+    }
+    const resolverFields = collectTabbedFormResolverItems([statisticsTab])
+    const publishSchema = z
+      .object({
+        movement: z.array(movementRowDraftFormSchema),
+        movementAlternative: movementAlternativeFormSchema.optional(),
+      })
+      .superRefine((values, ctx) => {
+        if (values.movementAlternative && values.movementAlternative.modes.length === 1) {
+          addCustomRefinementIssue(ctx, 'Alternative movement is incomplete.', [
+            'movementAlternative',
+          ])
+        }
+        refineMovementAlternativeForm(values.movementAlternative, values.movement, ctx)
+      })
+    type Values = z.infer<typeof publishSchema>
+    const defaultValues: Values = {
+      movement: [{ mode: 'walk', feet: 20 }],
+      movementAlternative: { modes: ['fly'], feet: 20 },
+    }
+    const parentCopy = 'Alternative movement is incomplete.'
+    const modesCopy = formatFieldMessage(movementValidationMessages.alternativeMinModes())
+    function EditShellProducerBoundary({ children }: { children: ReactNode }) {
+      const [session, setSession] = useState(() => createEmptyFormValidationProducerSession())
+      const stampRef = useRef(0)
+      const replaceSlot = useCallback(
+        (slot: FormValidationProducerSlot, issues: readonly FormIssue[]) => {
+          setSession((prev) =>
+            ingestContentFormValidationIssues(prev, slot, stampRef.current, issues),
+          )
+        },
+        [],
+      )
+
+      return (
+        <FormValidationProducerProvider
+          session={session}
+          stamp={stampRef.current}
+          replaceSlot={replaceSlot}
+        >
+          <FormValidationInteractiveProducerBridge fields={resolverFields} />
+          <MountedPublishCanonicalBridge
+            publishSchema={publishSchema}
+            publishFields={resolverFields}
+          />
+          <CanonicalPublishIssuesProbe
+            publishSchema={publishSchema}
+            publishFields={resolverFields}
+          />
+          <RhfCanonicalErrorProbe
+            parentPath="movementAlternative"
+            childPath={MOVEMENT_ALTERNATIVE_MODES_FIELD}
+          />
+          {children}
+        </FormValidationProducerProvider>
+      )
+    }
+
+    render(
+      <FormUiProvider fields={resolverFields} publishPresentationEnabled>
+        <TabbedForm
+          id="monster-movement-parent-child"
+          schema={publishSchema}
+          tabs={[statisticsTab]}
+          defaultValues={defaultValues}
+          producerBoundary={EditShellProducerBoundary}
+          validationPresentation="progressive"
+          publishPresentationEnabled
+          onSubmit={vi.fn()}
+          footer={<button type="submit">Publish</button>}
+        />
+      </FormUiProvider>,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Publish' }))
+
+    const formRoot = () => {
+      const form = document.getElementById('monster-movement-parent-child')
+      expect(form).toBeTruthy()
+      return form as HTMLElement
+    }
+
+    await waitFor(() => {
+      const scoped = within(formRoot())
+      expect(scoped.getByTestId('rhf-child-error')).toHaveTextContent(
+        /at least two alternative movement modes/i,
+      )
+      const modesGroup = scoped.getByRole('group', {
+        name: MOVEMENT_ALTERNATIVE_AVAILABLE_MODES_LABEL,
+      })
+      expect(modesGroup).toHaveAttribute('aria-invalid', 'true')
+    })
+
+    await waitFor(() => {
+      const scoped = within(formRoot())
+      const [canonicalProbe] = scoped.getAllByTestId('canonical-publish-issues-probe')
+      expect(canonicalProbe).toBeTruthy()
+      expect(canonicalProbe.querySelectorAll('p')).toHaveLength(2)
+      expect(
+        canonicalProbe.querySelector('[data-issue-target="movementAlternative"]'),
+      ).toHaveTextContent(parentCopy)
+      expect(
+        canonicalProbe.querySelector(`[data-issue-target="${MOVEMENT_ALTERNATIVE_MODES_FIELD}"]`),
+      ).toHaveTextContent(modesCopy)
+    })
+
+    const routed =
+      evaluateContentPublishFormIssues(publishSchema, defaultValues, resolverFields) ?? []
+    expect(routed).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          path: 'movementAlternative',
+          claim: { kind: 'field', target: 'movementAlternative' },
+          message: parentCopy,
+        }),
+        expect.objectContaining({
+          path: MOVEMENT_ALTERNATIVE_MODES_FIELD,
+          claim: { kind: 'field', target: MOVEMENT_ALTERNATIVE_MODES_FIELD },
+        }),
+      ]),
+    )
+  })
+})
+
+describe('monster TabbedForm campaign availability discovery', () => {
+  const allTabs = augmentTabsWithHoistedName(buildMonsterTabs(ctx), monsterFormDef.nameField(ctx))
+  const actionsTab = allTabs.find((tab) => tab.id === MONSTER_FORM_TAB.actions)!
+  const traitsTab = allTabs.find((tab) => tab.id === MONSTER_FORM_TAB.traits)!
+  const draftSchema = resolveMonsterFormSchema(ctx, 'draft') as ZodType<MonsterFormValues>
+
+  function availabilityHiddenProducerBoundary(issuePath: string, message: string) {
+    return function ProducerBoundary({ children }: { children: ReactNode }) {
+      const session = replaceFormValidationProducerSlot(
+        createEmptyFormValidationProducerSession(),
+        'publish-action',
+        1,
+        [
+          {
+            path: issuePath,
+            message,
+            severity: 'field',
+          },
+        ],
+      )
+
+      return (
+        <FormValidationProducerProvider session={session} stamp={1}>
+          {children}
+        </FormValidationProducerProvider>
+      )
+    }
+  }
+
+  it('counts validation on availability-hidden actions at the monster TabbedForm harness', async () => {
+    const values = monsterFormTestValues({
+      name: 'Hidden action issue',
+      actions: [
+        {
+          id: 'visible',
+          kind: 'special',
+          name: 'Visible Strike',
+          available: true,
+          description: '<p>Ready</p>',
+        },
+        {
+          id: 'hidden',
+          kind: 'special',
+          name: 'Hidden Strike',
+          available: false,
+          description: '',
+        },
+      ],
+    })
+
+    render(
+      <QueryClientProvider client={makeTestQueryClient()}>
+        <TabbedForm<MonsterFormValues>
+          id="monster-tabbed-hidden-action"
+          schema={draftSchema}
+          tabs={[actionsTab]}
+          defaultValues={values}
+          producerBoundary={availabilityHiddenProducerBoundary(
+            'actions.1.description',
+            'Add a description.',
+          )}
+          validationPresentation="progressive"
+          hasAttemptedPublish
+          publishPresentationEnabled
+          onSubmit={vi.fn()}
+        />
+      </QueryClientProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getAllByRole('button', { name: /Visible Strike/i }).length).toBeGreaterThan(0)
+    })
+    expect(screen.queryByRole('button', { name: /Hidden Strike/i })).not.toBeInTheDocument()
+
+    await waitFor(() => {
+      const validationBadges = screen.getAllByText('1', { selector: '[aria-hidden="true"]' })
+      expect(validationBadges.length).toBeGreaterThan(0)
+      expect(
+        screen.getByRole('button', { name: /Show all campaign availability states/i }),
+      ).toBeInTheDocument()
+    })
+  })
+
+  it('counts validation on availability-hidden traits at the monster TabbedForm harness', async () => {
+    const values = monsterFormTestValues({
+      name: 'Hidden trait issue',
+      traits: [
+        {
+          id: 'visible-trait',
+          kind: 'custom',
+          name: 'Visible Trait',
+          available: true,
+          description: '<p>Ready</p>',
+        },
+        {
+          id: 'hidden-trait',
+          kind: 'custom',
+          name: 'Hidden Trait',
+          available: false,
+          description: '',
+        },
+      ],
+    })
+
+    render(
+      <QueryClientProvider client={makeTestQueryClient()}>
+        <TabbedForm<MonsterFormValues>
+          id="monster-tabbed-hidden-trait"
+          schema={draftSchema}
+          tabs={[traitsTab]}
+          defaultValues={values}
+          producerBoundary={availabilityHiddenProducerBoundary(
+            'traits.1.description',
+            'Add a description.',
+          )}
+          validationPresentation="progressive"
+          hasAttemptedPublish
+          publishPresentationEnabled
+          onSubmit={vi.fn()}
+        />
+      </QueryClientProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getAllByRole('button', { name: /Visible Trait/i }).length).toBeGreaterThan(0)
+    })
+    expect(screen.queryByRole('button', { name: /Hidden Trait/i })).not.toBeInTheDocument()
+
+    await waitFor(() => {
+      const validationBadges = screen.getAllByText('1', { selector: '[aria-hidden="true"]' })
+      expect(validationBadges.length).toBeGreaterThan(0)
+      expect(
+        screen.getByRole('button', { name: /Show all campaign availability states/i }),
       ).toBeInTheDocument()
     })
   })

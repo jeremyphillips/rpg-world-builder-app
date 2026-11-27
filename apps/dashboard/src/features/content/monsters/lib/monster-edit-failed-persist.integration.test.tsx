@@ -294,6 +294,38 @@ describe('monster edit failed persist producer projection', () => {
       expect(screen.getByText(/Name is already in use/i)).toBeInTheDocument()
       expect(screen.getByTestId('api-slot-issue-count')).toHaveTextContent('1')
     })
+
+    const preparedFromPath = prepareWriteSpy.mock.calls[0]![0]
+    expect(mutateAsync.mock.calls[0]![0]).toEqual(preparedFromPath.payload)
+    expect(mutateAsync.mock.calls[0]![0]).not.toEqual(preparedFromPath)
+
+    const loaded = loadSwarmEdit()
+    const values = {
+      ...(loaded.defaultValues as MonsterFormValues),
+      name: 'Swarm of Insectsx',
+    }
+    const overlayBaseline = monsterFormDef.normalizeOverlayBody!(
+      loaded.defaultValues as MonsterFormValues,
+      { entity: loaded.entity, armorClassRules: loaded.layoutCtx.armorClassRules },
+      loaded.validationIntent,
+    )
+    const expectedPrepared = prepareSerializedContentFormWrite({
+      def: monsterFormDef,
+      values,
+      form: { formState: { dirtyFields: { name: true } } } as never,
+      inputCtx: { entity: loaded.entity, armorClassRules: loaded.layoutCtx.armorClassRules },
+      validationIntent: loaded.validationIntent,
+      operation: 'update',
+      rulesetId: RULESET_ID,
+      serializeOptions: {
+        overlayBaseline,
+        catalogSeed: loaded.catalogSeed,
+        expectedOverlayRevision: loaded.entity.overlayRevision ?? 0,
+        entityId: loaded.entity.id,
+        seedRowIdsByPath: loaded.entity.seedRowIdsByPath,
+      },
+    })
+    expect(mutateAsync.mock.calls[0]![0]).toEqual(expectedPrepared.payload)
   })
 
   it('does not paint api issues when a superseded same-stamp attempt fails late', async () => {
