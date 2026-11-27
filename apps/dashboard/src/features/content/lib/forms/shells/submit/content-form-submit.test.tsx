@@ -171,7 +171,11 @@ describe('useContentFormSubmit', () => {
     })
 
     expect(persist).toHaveBeenCalledOnce()
-    expect(persist).toHaveBeenCalledWith({ name: 'A', level: 1 }, form)
+    expect(persist).toHaveBeenCalledWith(
+      { name: 'A', level: 1 },
+      form,
+      expect.objectContaining({ isAttemptCurrent: expect.any(Function) }),
+    )
     expect(result.current.formError).toBeUndefined()
   })
 
@@ -197,7 +201,11 @@ describe('useContentFormSubmit', () => {
     })
 
     expect(persist).toHaveBeenCalledOnce()
-    expect(persist).toHaveBeenCalledWith({ name: 'A', level: 1 }, form)
+    expect(persist).toHaveBeenCalledWith(
+      { name: 'A', level: 1 },
+      form,
+      expect.objectContaining({ isAttemptCurrent: expect.any(Function) }),
+    )
   })
 
   it('sets formError and rejects when persist throws', async () => {
@@ -380,6 +388,48 @@ describe('useContentFormSubmit attempt identity', () => {
     )
     return handle
   }
+
+  it('skips persist baseline sync when the attempt is stale before reset', async () => {
+    let releaseFirst: () => void = () => undefined
+    const persist = vi
+      .fn()
+      .mockImplementationOnce(
+        async (
+          _values: TestValues,
+          form: UseFormReturn<TestValues>,
+          meta?: { isAttemptCurrent?: () => boolean },
+        ) => {
+          await new Promise<void>((resolve) => {
+            releaseFirst = resolve
+          })
+          if (meta?.isAttemptCurrent?.()) {
+            form.reset({ name: 'Server baseline', level: 9 })
+          }
+        },
+      )
+      .mockResolvedValueOnce(undefined)
+    const harness = mountHarness(persist)
+
+    let first!: Promise<void>
+    act(() => {
+      first = harness.submit({ name: 'A', level: 2 }).catch((error) => {
+        throw error
+      })
+    })
+    first.catch(() => undefined)
+    await waitFor(() => expect(persist).toHaveBeenCalledTimes(1))
+
+    act(() => {
+      harness.form.setValue('name', 'User session', { shouldDirty: true })
+    })
+
+    await act(async () => {
+      releaseFirst()
+      await expect(first).rejects.toBeInstanceOf(ContentFormSubmitSuperseded)
+    })
+
+    expect(harness.form.getValues('name')).toBe('User session')
+  })
 
   it('ignores a late success from a superseded same-stamp attempt', async () => {
     let releaseFirst: () => void = () => undefined

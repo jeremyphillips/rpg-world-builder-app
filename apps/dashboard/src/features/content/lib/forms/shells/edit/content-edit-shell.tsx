@@ -476,7 +476,7 @@ function ContentEditFormBody({
             .seedRowIdsByPath,
         },
       }),
-    persist: async (wireInput, form) => {
+    persist: async (wireInput, form, meta) => {
       if (
         armorClassAuthoringIsStale({
           sensitive: authoring.sensitive,
@@ -503,6 +503,7 @@ function ContentEditFormBody({
         queryClient,
         setOverlayBaseline,
         validationIntent,
+        isAttemptCurrent: meta?.isAttemptCurrent,
       })
       if (validationIntent === 'draft') {
         draftPublishValidationSurface.current?.(baseline)

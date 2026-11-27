@@ -119,6 +119,10 @@ export function useContentFormSubmit<TValues extends FieldValues>(
         stamp: stampRef.current,
         attemptId: attemptCounterRef.current,
       })
+      const isCurrent = () => {
+        const current = readCurrent()
+        return current.stamp === attempt.stamp && current.attemptId === attempt.attemptId
+      }
       const result = await runContentFormCommitAttempt({
         values,
         form,
@@ -136,8 +140,9 @@ export function useContentFormSubmit<TValues extends FieldValues>(
         producerSession,
         persist: async (wireValues, persistForm) => {
           persistingRef.current += 1
+          const persistMeta = { isAttemptCurrent: isCurrent }
           try {
-            await persist(wireValues, persistForm)
+            await persist(wireValues, persistForm, persistMeta)
           } finally {
             persistingRef.current -= 1
           }

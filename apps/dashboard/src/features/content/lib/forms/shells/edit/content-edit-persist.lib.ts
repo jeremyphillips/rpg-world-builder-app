@@ -23,6 +23,7 @@ export type ContentEditPersistInput<TEntity extends { id: string; catalogLayer: 
   queryClient: QueryClient
   setOverlayBaseline: (baseline: Record<string, unknown> | null) => void
   validationIntent: ContentValidationIntent
+  isAttemptCurrent?: () => boolean
 }
 
 export async function persistContentEditUpdate<
@@ -59,6 +60,10 @@ export async function persistContentEditUpdate<
       stripKind: layoutCtx.equipmentKind != null,
     },
   ) as FieldValues
+
+  if (input.isAttemptCurrent?.() === false) {
+    return baseline
+  }
 
   markContentFormPersistBaselineReset(form)
   form.reset(baseline)
