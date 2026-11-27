@@ -61,6 +61,14 @@ describe('useFormValidationPresentation producer authority', () => {
     expect(result.current.issues.map((issue) => issue.path)).toEqual(['name'])
   })
 
+  it('does not replace RHF issues with publishPresentationIssues when no producer is mounted', () => {
+    const { result } = renderHook(() => useFormValidationPresentation(), {
+      wrapper: ({ children }) => shell({ children }),
+    })
+
+    expect(result.current.issues.map((issue) => issue.path)).not.toContain('level')
+  })
+
   it('returns an empty list from producer projection when slots are clear', () => {
     const session = createEmptyFormValidationProducerSession()
     const { result } = renderHook(() => useFormValidationPresentation(), {

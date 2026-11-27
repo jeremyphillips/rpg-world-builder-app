@@ -56,7 +56,6 @@ export function useFormValidationPresentation(fieldsOverride?: FormItem[]) {
     validationPresentation,
     hasAttemptedSubmit,
     hasAttemptedPublish,
-    publishPresentationIssues,
     publishPresentationEnabled,
     fields: contextFields,
   } = useFormUiContext()
@@ -79,18 +78,8 @@ export function useFormValidationPresentation(fieldsOverride?: FormItem[]) {
   }, [producer, fields, formValues])
   const rawIssues = React.useMemo(() => {
     if (producer) return producerIssues
-    if (publishPresentationEnabled && hasAttemptedPublish && publishPresentationIssues.length > 0) {
-      return publishPresentationIssues
-    }
     return rhfIssues
-  }, [
-    hasAttemptedPublish,
-    producer,
-    producerIssues,
-    publishPresentationEnabled,
-    publishPresentationIssues,
-    rhfIssues,
-  ])
+  }, [producer, producerIssues, rhfIssues])
   const inactivePaths = React.useMemo(
     () => collectInactiveFieldPaths(fields, formValues ?? {}),
     [fields, formValues],

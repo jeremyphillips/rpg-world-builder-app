@@ -70,10 +70,17 @@ describe('form-validation-producer-session', () => {
     const issues = dedupeFormIssues([
       issue('name', 'Required', {
         messageId: 'required',
+        ruleId: 'required',
         claim: { kind: 'field', target: 'name' },
       }),
       issue('name', 'Required', {
         messageId: 'required',
+        ruleId: 'required',
+        claim: { kind: 'field', target: 'name' },
+      }),
+      issue('name', 'Too short', {
+        messageId: 'required',
+        ruleId: 'min',
         claim: { kind: 'field', target: 'name' },
       }),
       issue('name', 'Name is required', {
@@ -81,7 +88,7 @@ describe('form-validation-producer-session', () => {
         claim: { kind: 'field', target: 'name' },
       }),
     ])
-    expect(issues).toHaveLength(2)
+    expect(issues).toHaveLength(3)
   })
 })
 

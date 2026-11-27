@@ -22,6 +22,12 @@ export function resolveArrayRowFields(
 ): FormItem[] {
   const topology = config.item?.rowVariantTopology
   const resolver = config.item?.resolveFields
+  const hasRow = row !== undefined && row !== null
+
+  if (!hasRow) {
+    if (topology) return resolveFieldsForRowVariantTopology(topology, row)
+    return config.fields
+  }
 
   if (topology && resolver) {
     try {

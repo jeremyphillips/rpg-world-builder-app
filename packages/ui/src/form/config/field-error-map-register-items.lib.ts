@@ -56,10 +56,9 @@ function registerArrayItem(
   if (item.item?.resolveFields) {
     const rows = readArrayItemRows(formValues, arrayKey)
     if (rows.length === 0) {
-      const emptyRowFields = item.item.rowVariantTopology
-        ? collectRowVariantTopologyFields(item.item.rowVariantTopology)
-        : resolveArrayRowFields(item, undefined, 0)
-      registerItems(registry, `${arrayKey}.*`, emptyRowFields, formValues)
+      if (!item.item.rowVariantTopology && item.fields.length > 0) {
+        registerItems(registry, `${arrayKey}.*`, item.fields, formValues)
+      }
       return
     }
     rows.forEach((row, index) => {

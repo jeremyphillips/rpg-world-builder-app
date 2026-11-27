@@ -26,12 +26,12 @@ export function createEmptyFormValidationProducerSession(): FormValidationProduc
   return { slots: {} }
 }
 
-export function issueDedupKey(issue: FormIssue): string {
+export function issueDedupKey(issue: FormIssue): string | undefined {
+  if (!issue.ruleId) return undefined
   const owner = issue.claim?.target ?? issue.presentationPath ?? issue.path
   const messageId = issue.messageId ?? ''
   const params = issue.messageParams ? JSON.stringify(issue.messageParams) : ''
-  const ruleId = issue.message
-  return `${messageId}|${params}|${owner}|${ruleId}`
+  return `${messageId}|${params}|${owner}|${issue.ruleId}`
 }
 
 /** Drop duplicates when messageId, params, owner id, and rule copy all match. */
@@ -40,6 +40,10 @@ export function dedupeFormIssues(issues: readonly FormIssue[]): FormIssue[] {
   const deduped: FormIssue[] = []
   for (const issue of issues) {
     const key = issueDedupKey(issue)
+    if (!key) {
+      deduped.push(issue)
+      continue
+    }
     if (seen.has(key)) continue
     seen.add(key)
     deduped.push(issue)
