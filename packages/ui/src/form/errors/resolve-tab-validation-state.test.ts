@@ -14,6 +14,7 @@ import {
   pathOwnsIssue,
   resolveInvalidSubmitTabId,
   resolveTabValidationState,
+  tabPrefixOwnsIssuePath,
   type TabValidationTab,
 } from './resolve-tab-validation-state'
 
@@ -68,6 +69,12 @@ describe('pathOwnsIssue', () => {
   })
 })
 
+describe('tabPrefixOwnsIssuePath', () => {
+  it('matches when the tab prefix is an ancestor of the issue path', () => {
+    expect(tabPrefixOwnsIssuePath('movementAlternative.modes', 'movementAlternative')).toBe(true)
+  })
+})
+
 describe('collectTabPathPrefixes', () => {
   it('collects leaf, container-nested, and array names', () => {
     expect(collectTabPathPrefixes(identityTab)).toEqual(['name', 'className'])
@@ -116,6 +123,18 @@ describe('resolveTabValidationState', () => {
 
     const assignedCount = states.reduce((total, state) => total + state.count, 0)
     expect(assignedCount).toBe(issues.length)
+  })
+
+  it('does not assign orphan issues to the first tab', () => {
+    const issues = prepareFormIssues(
+      [{ path: ['orphanRoot'], message: 'Orphan issue' }],
+      allFields,
+      {},
+    )
+    const states = resolveTabValidationState(issues, tabs, allFields)
+    const assignedCount = states.reduce((total, state) => total + state.count, 0)
+    expect(assignedCount).toBe(0)
+    expect(states.find((state) => state.tabId === tabs[0]!.id)?.count).toBe(0)
   })
 
   it('breaks equal-prefix ties by tab order', () => {
@@ -167,6 +186,38 @@ describe('resolveTabValidationState', () => {
     const states = resolveTabValidationState(issues, metaTabs, metaFields)
 
     expect(states.find((state) => state.tabId === 'meta')?.count).toBe(1)
+  })
+
+  it('assigns parent object issues to the tab that owns descendant field prefixes', () => {
+    const statisticsTabs: TabValidationTab[] = [
+      {
+        id: 'statistics',
+        fields: [
+          {
+            kind: 'group',
+            name: 'movementAlternative',
+            fields: [
+              {
+                type: 'chips',
+                name: 'movementAlternative.modes',
+                label: 'Available modes',
+                required: true,
+              },
+            ],
+          },
+        ],
+      },
+    ]
+    const statisticsFields = statisticsTabs.flatMap((tab) => tab.fields)
+    const issues = prepareFormIssues(
+      [{ path: ['movementAlternative'], message: 'Invalid alternative movement.' }],
+      statisticsFields,
+      {},
+    )
+
+    const states = resolveTabValidationState(issues, statisticsTabs, statisticsFields)
+
+    expect(states.find((state) => state.tabId === 'statistics')?.count).toBe(1)
   })
 
   it('routes master-detail header-only tabs via errorPaths (species-style)', () => {

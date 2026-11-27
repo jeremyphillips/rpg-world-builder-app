@@ -10,6 +10,7 @@ import {
   type SkillProficiency,
   type Spell,
   type Species,
+  type SystemRulesetId,
   type WeaponCategory,
   isWeaponEquipment,
 } from '@rpg/contracts'
@@ -105,7 +106,7 @@ function catalogQueryStatus(query: QueryState): 'error' | 'pending' | 'ready' {
 
 function buildContentFormCtx(input: {
   campaignId: string | undefined
-  rulesetId: string | undefined
+  rulesetId: SystemRulesetId | undefined
   campaignRules: ContentFormCtx['campaignRules']
   spellcastingProgression: ContentFormCtx['spellcastingProgression']
   vocabulary: Pick<

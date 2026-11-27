@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { overlayOrderedList } from '../../lib/system-overlay/overlay-presets'
+
 import { absoluteLevelSchema } from '../../../primitives/level'
 import { progressionExtensionSchema } from '../../../vocab/spell/progression-extension'
 
@@ -15,7 +17,7 @@ const classGainCurveRowSchema = z.object({
 
 export const classGainProgressionSchema = z.object({
   curve: z.object({
-    rows: z.array(classGainCurveRowSchema).default([]),
+    rows: overlayOrderedList(classGainCurveRowSchema).default([]),
   }),
   extension: progressionExtensionSchema.default('zero'),
 })

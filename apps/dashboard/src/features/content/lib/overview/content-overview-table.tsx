@@ -20,6 +20,7 @@ import { OverviewTableFrame } from '@/lib/data-table/overview-table-frame'
 import type { OverviewBulkAction } from '@/lib/overview/overview-bulk-actions-menu'
 
 import { ContentOverviewRowActions } from './content-overview-row-actions'
+import { isContentOverlayFailureOverviewRow } from '../list/content-overlay-overview.lib'
 import { ContentBulkActionsMenu } from './content-bulk-actions-menu'
 import { ContentOverviewTableBulkDialogs } from './content-overview-table-bulk-dialogs'
 import type {
@@ -116,20 +117,21 @@ const ContentOverviewDataTable = memo(function ContentOverviewDataTable<
   selectTriggerRef,
 }: ContentOverviewDataTableProps<T>) {
   const rowActions = useCallback(
-    (row: T) => (
-      <ContentOverviewRowActions
-        campaignId={campaignId}
-        contentTypeKey={contentTypeKey}
-        entityId={row.id}
-        entityName={row.name}
-        itemLabel={itemLabel}
-        campaignAccess={row.campaignAccess}
-        campaignAvailabilityFilter={campaignAvailability}
-        canManage={canManage}
-        onRowRemoved={() => restoreFocusRef.current(row.id)}
-        triggerRef={(element) => registerActionTrigger(row.id, element)}
-      />
-    ),
+    (row: T) =>
+      isContentOverlayFailureOverviewRow(row) ? null : (
+        <ContentOverviewRowActions
+          campaignId={campaignId}
+          contentTypeKey={contentTypeKey}
+          entityId={row.id}
+          entityName={row.name}
+          itemLabel={itemLabel}
+          campaignAccess={row.campaignAccess}
+          campaignAvailabilityFilter={campaignAvailability}
+          canManage={canManage}
+          onRowRemoved={() => restoreFocusRef.current(row.id)}
+          triggerRef={(element) => registerActionTrigger(row.id, element)}
+        />
+      ),
     [
       campaignAvailability,
       campaignId,
@@ -141,15 +143,15 @@ const ContentOverviewDataTable = memo(function ContentOverviewDataTable<
     ],
   )
 
-  const getRowClassName = useCallback(
-    (row: { original: T }) =>
-      overviewUnavailableRowClassName(row.original.campaignAccess.available),
-    [],
-  )
+  const getRowClassName = useCallback((row: { original: T }) => {
+    const unresolved = isContentOverlayFailureOverviewRow(row.original)
+    return overviewUnavailableRowClassName(row.original.campaignAccess.available && !unresolved)
+  }, [])
 
   const getCellClassName = useCallback((cell: { column: { id: string }; row: { original: T } }) => {
+    const unresolved = isContentOverlayFailureOverviewRow(cell.row.original)
     return overviewUnavailableNameCellClassName(
-      cell.row.original.campaignAccess.available,
+      cell.row.original.campaignAccess.available && !unresolved,
       cell.column.id,
       OVERVIEW_NAME_COLUMN_ID,
     )

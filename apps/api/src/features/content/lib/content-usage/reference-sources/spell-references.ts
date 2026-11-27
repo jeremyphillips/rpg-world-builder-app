@@ -30,20 +30,19 @@ function toSpellReferrerBlocker(referrer: SpellReferrer): ContentUsageBlocker {
 export async function indexContentSpellReferenceBlockersByContentId(
   ctx: ContentUsageResolverContext,
 ): Promise<Map<string, ContentUsageBlocker[]>> {
-  const [{ resolveCatalogForCampaign }, species, classes, subclasses, monsters] = await Promise.all(
-    [
-      import('../../../content.service'),
-      import('../../../species/species.config'),
-      import('../../../classes/classes.config'),
-      import('../../../subclasses/subclasses.config'),
-      import('../../../monsters/monsters.config'),
-    ],
-  )
+  const [species, classes, subclasses, monsters, overlaySeeds] = await Promise.all([
+    import('../../../species/species.config'),
+    import('../../../classes/classes.config'),
+    import('../../../subclasses/subclasses.config'),
+    import('../../../monsters/monsters.config'),
+    import('./overlay-failure-seed-referrers'),
+  ])
+  const { loadOverlayAwareCatalogRows } = overlaySeeds
   const [speciesRows, classRows, subclassRows, monsterRows] = await Promise.all([
-    resolveCatalogForCampaign(species.speciesRegistration.read, ctx.campaignId),
-    resolveCatalogForCampaign(classes.classRegistration.read, ctx.campaignId),
-    resolveCatalogForCampaign(subclasses.subclassContentConfig, ctx.campaignId),
-    resolveCatalogForCampaign(monsters.monstersRegistration.read, ctx.campaignId),
+    loadOverlayAwareCatalogRows(species.speciesRegistration.read, ctx.campaignId),
+    loadOverlayAwareCatalogRows(classes.classRegistration.read, ctx.campaignId),
+    loadOverlayAwareCatalogRows(subclasses.subclassContentConfig, ctx.campaignId),
+    loadOverlayAwareCatalogRows(monsters.monstersRegistration.read, ctx.campaignId),
   ])
 
   const referrers: SpellReferrer[] = [

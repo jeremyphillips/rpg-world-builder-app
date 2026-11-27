@@ -1,5 +1,10 @@
 import { z } from 'zod'
 
+import { overlaySlugList } from './lib/system-overlay/overlay-presets'
+import {
+  mergeSystemOverlayUpdateEnvelope,
+  systemOverlayUpdateEnvelopeSchema,
+} from './lib/system-overlay/system-overlay-update'
 import { massSchema, speedRateSchema, weightSchema } from '../primitives/units'
 import { diceSchema } from '../primitives/dice'
 import { abilitySchema } from '../vocab/ability'
@@ -24,7 +29,8 @@ import { vehicleCategorySchema } from '../vocab/equipment/vehicle-category'
 import { BASE_AC_OFFSET_RANGE, FIXED_AC_OFFSET_MIN } from '../vocab/mechanics/armor-class-scale'
 import { magicItemCategorySchema } from '../vocab/magic-item/category'
 import { magicItemRaritySchema } from '../vocab/magic-item/rarity'
-import { contentMetaSchema, contentPatchBaseSchema, slugSchema } from './lib/envelope'
+import { contentMetaSchema, slugSchema } from './lib/envelope'
+import { contentStoredOverlayPatchSchema } from './lib/system-overlay/patch-document'
 import { EQUIPMENT_CONTENT_TYPE_TERM } from './lib/content-type-terms'
 import { draftAuthoredContentBodySchema } from './lib/draft-authored-content'
 import { createDraftInputSchema } from './lib/content-input-schemas'
@@ -338,7 +344,7 @@ const equipmentBaseDraftSchema = draftAuthoredContentBodySchema(
 ).extend({
   cost: equipmentBaseSchema.shape.cost.optional(),
   weight: weightSchema.optional(),
-  tags: z.array(z.string()).optional(),
+  tags: overlaySlugList(z.string()).optional(),
 })
 
 const weaponEquipmentBodyDraftFields = equipmentBaseDraftSchema.extend({
@@ -348,7 +354,7 @@ const weaponEquipmentBodyDraftFields = equipmentBaseDraftSchema.extend({
   damage: weaponDamageSchema.optional(),
   damageType: weaponDamageTypeSchema.optional(),
   versatileDamage: diceSchema.optional(),
-  properties: z.array(weaponPropertySchema).optional(),
+  properties: overlaySlugList(weaponPropertySchema).optional(),
   mastery: weaponMasterySchema.optional(),
   range: weaponRangeSchema.optional(),
   specialRules: z.string().optional(),
@@ -375,9 +381,9 @@ const adventuringGearEquipmentBodyDraftFields = equipmentBaseDraftSchema.extend(
   spellcastingGearKind: spellcastingGearKindSchema.optional(),
   bundleSize: z.number().int().min(1).optional(),
   storage: z.string().optional(),
-  properties: z.array(z.string()).optional(),
+  properties: overlaySlugList(z.string()).optional(),
   capacity: z.string().optional(),
-  holySymbolUsage: z.array(holySymbolUsageSchema).min(1).optional(),
+  holySymbolUsage: overlaySlugList(holySymbolUsageSchema).min(1).optional(),
   alsoWeaponSlug: slugSchema.optional(),
 })
 
@@ -385,8 +391,8 @@ const toolEquipmentBodyDraftFields = equipmentBaseDraftSchema.extend({
   kind: z.literal('tool'),
   toolCategory: toolCategorySchema.optional(),
   ability: abilitySchema.optional(),
-  utilizes: z.array(toolUtilizeActionSchema).optional(),
-  crafts: z.array(z.string().min(1)).optional(),
+  utilizes: overlaySlugList(toolUtilizeActionSchema).optional(),
+  crafts: overlaySlugList(z.string().min(1)).optional(),
 })
 
 const mountEquipmentBodyDraftFields = equipmentBaseDraftSchema.extend({
@@ -479,7 +485,7 @@ export const createEquipmentDraftInputSchema = z.discriminatedUnion('kind', [
 
 export type CreateEquipmentDraftInput = z.infer<typeof createEquipmentDraftInputSchema>
 
-export const updateEquipmentDraftInputSchema = z.discriminatedUnion('kind', [
+const updateEquipmentDraftInputBase = z.discriminatedUnion('kind', [
   weaponEquipmentBodyDraftFields
     .extend({ slug: slugSchema })
     .partial()
@@ -514,9 +520,13 @@ export const updateEquipmentDraftInputSchema = z.discriminatedUnion('kind', [
     .extend({ kind: magicItemBodySchema.shape.kind }),
 ])
 
+export const updateEquipmentDraftInputSchema = z.union([
+  systemOverlayUpdateEnvelopeSchema,
+  mergeSystemOverlayUpdateEnvelope(updateEquipmentDraftInputBase),
+])
 export type UpdateEquipmentDraftInput = z.infer<typeof updateEquipmentDraftInputSchema>
 
-export const updateEquipmentInputSchema = z.discriminatedUnion('kind', [
+const updateEquipmentInputBase = z.discriminatedUnion('kind', [
   weaponEquipmentBodyFields
     .extend({ slug: slugSchema })
     .partial()
@@ -548,22 +558,14 @@ export const updateEquipmentInputSchema = z.discriminatedUnion('kind', [
     .extend({ kind: magicItemBodySchema.shape.kind }),
 ])
 
+export const updateEquipmentInputSchema = z.union([
+  systemOverlayUpdateEnvelopeSchema,
+  mergeSystemOverlayUpdateEnvelope(updateEquipmentInputBase),
+])
+
 export type UpdateEquipmentInput = z.infer<typeof updateEquipmentInputSchema>
 
-export const equipmentPatchSchema = contentPatchBaseSchema.extend({
-  patch: z.discriminatedUnion('kind', [
-    weaponEquipmentBodyFields.partial().extend({ kind: weaponEquipmentKindFields.kind }),
-    armorEquipmentBodyFields.partial().extend({ kind: armorEquipmentKindFields.kind }),
-    adventuringGearEquipmentBodyFields
-      .partial()
-      .extend({ kind: adventuringGearEquipmentKindFields.kind }),
-    toolBodySchema.partial().extend({ kind: toolBodySchema.shape.kind }),
-    mountBodySchema.partial().extend({ kind: mountBodySchema.shape.kind }),
-    vehicleBodySchema.partial().extend({ kind: vehicleBodySchema.shape.kind }),
-    serviceBodySchema.partial().extend({ kind: serviceBodySchema.shape.kind }),
-    magicItemBodySchema.partial().extend({ kind: magicItemBodySchema.shape.kind }),
-  ]),
-})
+export const equipmentPatchSchema = contentStoredOverlayPatchSchema
 
 export type EquipmentPatch = z.infer<typeof equipmentPatchSchema>
 

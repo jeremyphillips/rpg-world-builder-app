@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { overlayOrderedList } from '../../lib/system-overlay/overlay-presets'
+
 import { effectEndSchema } from '../../../primitives/mechanics/effect-end'
 import { damageTypeIdSchema } from '../../../vocab/damage'
 import { weaponDamageDraftSchema } from '../../equipment/weapon-variant'
@@ -46,7 +48,7 @@ const attackOnHitDraftEffectSchema = z.discriminatedUnion('kind', [
 ])
 
 export const attackOnHitDraftSchema = z.object({
-  effects: z.array(attackOnHitDraftEffectSchema).optional(),
+  effects: overlayOrderedList(attackOnHitDraftEffectSchema).optional(),
 })
 
 export {

@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { overlayAtomic } from './system-overlay/annotate'
 import { formatSlugAsLabel } from '../../primitives/format-slug'
 import { absoluteLevelSchema } from '../../primitives/level'
 import {
@@ -66,15 +67,15 @@ export type RequirementExpression =
   | { kind: 'all'; requirements: RequirementExpression[] }
   | { kind: 'any'; requirements: RequirementExpression[] }
 
-export const requirementExpressionSchema: z.ZodType<RequirementExpression> = z.lazy(() =>
+const requirementExpressionCoreSchema: z.ZodType<RequirementExpression> = z.lazy(() =>
   z.discriminatedUnion('kind', [
     z.object({
       kind: z.literal('all'),
-      requirements: z.array(requirementExpressionSchema).min(1),
+      requirements: z.array(requirementExpressionCoreSchema).min(1),
     }),
     z.object({
       kind: z.literal('any'),
-      requirements: z.array(requirementExpressionSchema).min(1),
+      requirements: z.array(requirementExpressionCoreSchema).min(1),
     }),
     requirementMinLevelSchema,
     requirementAbilityMinimumSchema,
@@ -82,6 +83,11 @@ export const requirementExpressionSchema: z.ZodType<RequirementExpression> = z.l
     requirementFeatureSchema,
     requirementSpellcastingSchema,
   ]),
+)
+
+export const requirementExpressionSchema: z.ZodType<RequirementExpression> = overlayAtomic(
+  requirementExpressionCoreSchema,
+  'composable eligibility tree',
 )
 
 /** Title-cases a kebab-case feature id for display (e.g. `fighting-style` → `Fighting Style Feature`). */

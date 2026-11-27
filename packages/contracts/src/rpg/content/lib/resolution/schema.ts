@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
+import { overlayOrderedList, overlayRestoreIdRows } from '../system-overlay/overlay-presets'
 import { areaGeometrySchema } from '../../../primitives/area-geometry'
 import { rollSchema } from '../../../primitives/mechanics/roll'
 import { abilitySchema } from '../../../vocab/ability'
@@ -122,7 +123,7 @@ export type ResolutionEffect = z.infer<typeof resolutionEffectSchema>
 
 export const resolutionOutcomeSchema = z.object({
   result: z.enum(RESOLUTION_OUTCOME_RESULTS),
-  effects: z.array(resolutionOutcomeEffectSchema).default([]),
+  effects: overlayOrderedList(resolutionOutcomeEffectSchema).default([]),
   repeatSave: repeatSaveSchema.optional(),
 })
 
@@ -168,8 +169,8 @@ export const effectResolutionFieldShape = {
   origin: resolutionOriginSchema.optional(),
   areaOfEffect: areaGeometrySchema.optional(),
   occupantRequirements: resolutionTargetRequirementsSchema.optional(),
-  effects: z.array(resolutionEffectSchema),
-  outcomes: z.array(resolutionOutcomeSchema).min(1),
+  effects: overlayRestoreIdRows(resolutionEffectSchema),
+  outcomes: overlayOrderedList(resolutionOutcomeSchema).min(1),
 }
 
 export type EffectResolutionValidationInput = {

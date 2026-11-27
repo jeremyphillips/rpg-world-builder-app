@@ -893,6 +893,54 @@ describe('TabbedForm', () => {
     )
   })
 
+  it('cancels pending Review focus when the user switches tabs manually', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+    const validationSchema = z.object({
+      name: z.string().min(1, 'Name is required'),
+      notes: z.string().min(1, 'Notes are required'),
+    })
+
+    type ValidationValues = z.infer<typeof validationSchema>
+
+    const validationTabs: TabbedFormTab[] = [
+      {
+        id: 'identity',
+        label: 'Identity',
+        fields: [{ type: 'text', name: 'name', label: 'Name', required: true }],
+      },
+      {
+        id: 'notes',
+        label: 'Notes',
+        fields: [{ type: 'text', name: 'notes', label: 'Notes', required: true }],
+      },
+    ]
+
+    render(
+      <TabbedForm<ValidationValues>
+        id="review-cancel-form"
+        schema={validationSchema}
+        tabs={validationTabs}
+        onSubmit={vi.fn()}
+        defaultValues={{ name: 'Valid name', notes: '' }}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+    await user.click(screen.getByRole('button', { name: 'Review Notes' }))
+    await user.click(screen.getByRole('button', { name: 'Identity' }))
+
+    await vi.runAllTimersAsync()
+
+    expect(screen.getByRole('textbox', { name: 'Notes' })).not.toHaveFocus()
+    expect(within(getSectionsNav()).getByRole('button', { name: /Identity/i })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    vi.useRealTimers()
+  })
+
   it('clears tab badges and the validation summary after errors are fixed', async () => {
     const user = userEvent.setup()
     const onSubmit = vi.fn()

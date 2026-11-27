@@ -45,6 +45,7 @@ export {
 } from './resolve-field-error-message'
 export {
   findRoutedIssueForFieldPath,
+  findRoutedIssuesForFieldPath,
   findRoutedIssuesForSlot,
   resolveFieldIssueDisplayMessage,
 } from './resolve-field-issue.lib'
@@ -57,6 +58,7 @@ export {
   buildValidationSessionExpandKey,
   resolveValidationExpandKeys,
   resolveInvalidSubmitNavigation,
+  resolveInvalidSubmitNavigationFromIssues,
   prepareFormIssues,
   findArrayConfigAtPath,
   type ValidationSessionExpandKey,
@@ -64,6 +66,8 @@ export {
 } from './resolve-invalid-submit-navigation'
 export {
   pathOwnsIssue,
+  tabPrefixOwnsIssuePath,
+  resolveTabOwnershipPath,
   collectTabPathPrefixes,
   resolveTabValidationState,
   getFirstInvalidTabId,

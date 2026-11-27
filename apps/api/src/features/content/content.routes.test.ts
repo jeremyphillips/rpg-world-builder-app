@@ -1,4 +1,11 @@
 import request, { type Agent } from 'supertest'
+
+import { loadSeedFeats } from '@rpg/catalog/feats'
+import { loadSeedClasses, loadSeedSubclasses } from '@rpg/catalog/classes'
+import { ClassPatchModel } from './classes/class-patch.model'
+import { FeatPatchModel } from './feats/feat-patch.model'
+import { MonsterPatchModel } from './monsters/monster-patch.model'
+import { SubclassPatchModel } from './subclasses/subclass-patch.model'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -20,6 +27,7 @@ import { registerCampaignMember } from '../../test/helpers/campaign-membership'
 import { minimalStandalonePcInput } from '../../test/fixtures/characters'
 import { minimalNpcRequestInput } from '../../test/fixtures/npcs'
 import { setMembershipControlledPcs } from '../../test/helpers/campaign-participation'
+import { overlayUpdateFromBodies } from '../../test/helpers/system-overlay-write'
 import { useIntegrationApp } from '../../test/setup/integration-app'
 
 const getApp = useIntegrationApp()
@@ -364,7 +372,15 @@ describe('content write routes', () => {
     const patchRes = await agent
       .patch(`/api/campaigns/${campaignId}/content/feats/${alert.id}`)
       .set(CSRF_HEADER, csrfToken)
-      .send({ name: 'Route Patched Alert' })
+      .send(
+        overlayUpdateFromBodies({
+          participantId: 'feats',
+          catalogSeed: alert,
+          baseline: alert,
+          draft: { ...alert, name: 'Route Patched Alert' },
+          expectedOverlayRevision: alert.overlayRevision,
+        }),
+      )
       .expect(200)
 
     expect(patchRes.body.feats.catalogLayer).toBe('system')
@@ -499,7 +515,15 @@ describe('content write routes', () => {
     const patchRes = await agent
       .patch(`/api/campaigns/${campaignId}/content/spells/${eldritchBlast.id}`)
       .set(CSRF_HEADER, csrfToken)
-      .send({ resolution: patchedResolution })
+      .send(
+        overlayUpdateFromBodies({
+          participantId: 'spells',
+          catalogSeed: eldritchBlast,
+          baseline: eldritchBlast,
+          draft: { ...eldritchBlast, resolution: patchedResolution },
+          expectedOverlayRevision: eldritchBlast.overlayRevision,
+        }),
+      )
       .expect(200)
 
     expect(patchRes.body.spells.resolution).toEqual(patchedResolution)
@@ -1533,5 +1557,468 @@ describe('content reference-catalog scope', () => {
     expect(playerIds).not.toContain(draftId)
     expect(playerIds).not.toContain(dmOnlyId)
     expect(playerIds).toContain(unavailableId)
+  })
+})
+
+describe('content list routes — overlay visibility', () => {
+  it('hides overlayFailures from players when visibility is dm_only but owners still discover them', async () => {
+    const owner = await registerAndLoginTestUser(getApp(), {
+      email: 'overlay-visibility-owner@example.com',
+      password: 'supersecret',
+      displayName: 'Owner',
+    })
+    const campaignId = await createTestCampaign(owner.agent, owner.csrfToken)
+    const feats = loadSeedFeats('srd-cc-5.2.1')
+    const broken = feats.find((row) => row.slug === 'alert')
+    expect(broken).toBeDefined()
+    if (!broken) throw new Error('seed feat missing')
+
+    await FeatPatchModel.create({
+      campaignId,
+      targetId: broken.id,
+      patch: { name: 'Unversioned overlay' },
+    })
+
+    await owner.agent
+      .patch(`/api/campaigns/${campaignId}/content/feats/${broken.id}/campaign-access`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({ available: true, visibilityMode: 'dm_only', participantIds: [] })
+      .expect(200)
+
+    const member = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'overlay-visibility-pc@example.com',
+      campaignRole: 'pc',
+    })
+
+    const memberList = await member.agent
+      .get(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, member.csrfToken)
+      .expect(200)
+
+    expect(memberList.body.overlayFailures ?? []).toEqual([])
+
+    const ownerList = await owner.agent
+      .get(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .expect(200)
+
+    expect(ownerList.body.overlayFailures).toEqual([
+      expect.objectContaining({ targetId: broken.id, code: 'unsupported_overlay_version' }),
+    ])
+  })
+
+  it('keeps overlayFailures visible to owners when campaign availability is off', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+    const feats = loadSeedFeats('srd-cc-5.2.1')
+    const [broken] = feats.slice(2, 3)
+    expect(broken).toBeDefined()
+    if (!broken) throw new Error('seed feat missing')
+
+    await agent
+      .patch(`/api/campaigns/${campaignId}/content/feats/${broken.id}/campaign-access`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({ available: false, visibilityMode: 'all_players', participantIds: [] })
+      .expect(200)
+
+    await FeatPatchModel.create({
+      campaignId,
+      targetId: broken.id,
+      patch: { name: 'Unversioned overlay' },
+    })
+
+    const res = await agent
+      .get(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    expect(res.body.overlayFailures).toEqual([
+      expect.objectContaining({ targetId: broken.id, code: 'unsupported_overlay_version' }),
+    ])
+  })
+
+  it('scopes specific_players overlay failure visibility to granted play actors', async () => {
+    const owner = await registerAndLoginTestUser(getApp(), {
+      email: 'overlay-specific-owner@example.com',
+      password: 'supersecret',
+      displayName: 'Owner',
+    })
+    const campaignId = await createTestCampaign(owner.agent, owner.csrfToken)
+    const feats = loadSeedFeats('srd-cc-5.2.1')
+    const broken = feats.find((row) => row.slug === 'alert')
+    expect(broken).toBeDefined()
+    if (!broken) throw new Error('seed feat missing')
+
+    await FeatPatchModel.create({
+      campaignId,
+      targetId: broken.id,
+      patch: { name: 'Unversioned overlay' },
+    })
+
+    const grantedMember = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'overlay-granted@example.com',
+      campaignRole: 'pc',
+    })
+    const deniedMember = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'overlay-denied@example.com',
+      campaignRole: 'pc',
+    })
+    const grantedPc = await createPcRecord(
+      { ...minimalStandalonePcInput, name: 'Granted PC' },
+      grantedMember.userId,
+    )
+    const deniedPc = await createPcRecord(
+      { ...minimalStandalonePcInput, name: 'Denied PC' },
+      deniedMember.userId,
+    )
+    await setMembershipControlledPcs({
+      campaignId,
+      userId: grantedMember.userId,
+      controlledCharacterIds: [grantedPc.id],
+    })
+    await setMembershipControlledPcs({
+      campaignId,
+      userId: deniedMember.userId,
+      controlledCharacterIds: [deniedPc.id],
+    })
+
+    await owner.agent
+      .patch(`/api/campaigns/${campaignId}/content/feats/${broken.id}/campaign-access`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({
+        available: true,
+        visibilityMode: 'specific_players',
+        participantIds: [grantedPc.id],
+      })
+      .expect(200)
+
+    const grantedList = await grantedMember.agent
+      .get(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, grantedMember.csrfToken)
+      .expect(200)
+    expect(grantedList.body.overlayFailures).toEqual([
+      expect.objectContaining({ targetId: broken.id }),
+    ])
+
+    const deniedList = await deniedMember.agent
+      .get(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, deniedMember.csrfToken)
+      .expect(200)
+    expect(deniedList.body.overlayFailures ?? []).toEqual([])
+    expect(JSON.stringify(deniedList.body)).not.toContain(broken.slug)
+    expect(JSON.stringify(deniedList.body)).not.toContain(broken.name)
+
+    const ownerList = await owner.agent
+      .get(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .expect(200)
+    expect(ownerList.body.overlayFailures).toEqual([
+      expect.objectContaining({ targetId: broken.id }),
+    ])
+  })
+})
+
+describe('content list routes — nested subclass scopes', () => {
+  const referenceScope = `${CONTENT_CATALOG_SCOPE_QUERY}=${CONTENT_CATALOG_REFERENCE_SCOPE}`
+  const playCatalogScope = `${CONTENT_CATALOG_SCOPE_QUERY}=${CONTENT_CATALOG_PLAY_SCOPE}`
+
+  it('scopes subclass discovery, reference, and play responses to the parent class', async () => {
+    const owner = await registerAndLoginTestUser(getApp(), {
+      email: 'subclass-scope-owner@example.com',
+      password: 'supersecret',
+      displayName: 'Owner',
+    })
+    const campaignId = await createTestCampaign(owner.agent, owner.csrfToken)
+    const subclasses = loadSeedSubclasses('srd-cc-5.2.1')
+    const champion = subclasses.find((row) => row.slug === 'champion')
+    const evocation = subclasses.find((row) => row.slug === 'school-of-evocation')
+    expect(champion).toBeDefined()
+    expect(evocation).toBeDefined()
+    if (!champion || !evocation) throw new Error('seed subclasses missing')
+
+    const healthy = await owner.agent
+      .post(`/api/campaigns/${campaignId}/content/classes/${champion.classId}/subclasses`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({
+        slug: 'fighter-subclass-wire',
+        name: 'Fighter Wire',
+        classId: champion.classId,
+        tagline: 'Visible sibling',
+        features: [{ kind: 'custom', id: 'feature-1', name: 'Feature', level: 3 }],
+      })
+      .expect(201)
+    const healthyId = healthy.body.subclasses.id as string
+
+    await SubclassPatchModel.create({
+      campaignId,
+      targetId: champion.id,
+      patch: { name: 'Unversioned overlay' },
+    })
+    await SubclassPatchModel.create({
+      campaignId,
+      targetId: evocation.id,
+      patch: { name: 'Unversioned overlay' },
+    })
+
+    const member = await registerCampaignMember(getApp(), {
+      campaignId,
+      email: 'subclass-scope-player@example.com',
+      campaignRole: 'pc',
+    })
+
+    const ownerDiscovery = await owner.agent
+      .get(`/api/campaigns/${campaignId}/content/classes/${champion.classId}/subclasses`)
+      .set(CSRF_HEADER, owner.csrfToken)
+      .expect(200)
+    expect(ownerDiscovery.body.overlayFailures).toEqual([
+      expect.objectContaining({ targetId: champion.id }),
+    ])
+    expect(
+      ownerDiscovery.body.overlayFailures.map((entry: { targetId: string }) => entry.targetId),
+    ).not.toContain(evocation.id)
+    expect(ownerDiscovery.body.subclasses.map((row: { id: string }) => row.id)).toContain(healthyId)
+
+    const playerDiscovery = await member.agent
+      .get(`/api/campaigns/${campaignId}/content/classes/${champion.classId}/subclasses`)
+      .set(CSRF_HEADER, member.csrfToken)
+      .expect(200)
+    expect(playerDiscovery.body.overlayFailures).toEqual([
+      expect.objectContaining({ targetId: champion.id }),
+    ])
+
+    const playerReference = await member.agent
+      .get(
+        `/api/campaigns/${campaignId}/content/classes/${champion.classId}/subclasses?${referenceScope}`,
+      )
+      .set(CSRF_HEADER, member.csrfToken)
+      .expect(200)
+    expect(playerReference.body.overlayFailures).toEqual([
+      expect.objectContaining({ targetId: champion.id }),
+    ])
+    expect(playerReference.body.subclasses.map((row: { id: string }) => row.id)).toContain(
+      healthyId,
+    )
+
+    const playList = await member.agent
+      .get(
+        `/api/campaigns/${campaignId}/content/classes/${champion.classId}/subclasses?${playCatalogScope}&${CONTENT_PLAY_ACTOR_KIND_QUERY}=new_pc`,
+      )
+      .set(CSRF_HEADER, member.csrfToken)
+      .expect(200)
+    expect(playList.body.overlayFailures ?? []).toEqual([])
+    expect(playList.body.subclasses.map((row: { id: string }) => row.id)).toContain(healthyId)
+  })
+
+  it('returns not_found when patching campaign access for an unresolved subclass target', async () => {
+    const owner = await registerAndLoginTestUser(getApp(), {
+      email: 'subclass-access-overlay-owner@example.com',
+      password: 'supersecret',
+      displayName: 'Owner',
+    })
+    const campaignId = await createTestCampaign(owner.agent, owner.csrfToken)
+    const champion = loadSeedSubclasses('srd-cc-5.2.1').find((row) => row.slug === 'champion')
+    expect(champion).toBeDefined()
+    if (!champion) throw new Error('seed subclass missing')
+
+    await SubclassPatchModel.create({
+      campaignId,
+      targetId: champion.id,
+      patch: { name: 'Unversioned overlay' },
+    })
+
+    await owner.agent
+      .patch(
+        `/api/campaigns/${campaignId}/content/classes/${champion.classId}/subclasses/${champion.id}/campaign-access`,
+      )
+      .set(CSRF_HEADER, owner.csrfToken)
+      .send({ available: true, visibilityMode: 'all_players', participantIds: [] })
+      .expect(404)
+  })
+})
+
+describe('content list routes — overlay wire', () => {
+  it('returns overlayFailures on feat list wire while healthy feats stay in feats[]', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+    const feats = loadSeedFeats('srd-cc-5.2.1')
+    const [broken, healthy] = feats.slice(0, 2)
+    expect(broken).toBeDefined()
+    expect(healthy).toBeDefined()
+    if (!broken || !healthy) throw new Error('seed feats missing')
+
+    await FeatPatchModel.create({
+      campaignId,
+      targetId: broken.id,
+      patch: { name: 'Unversioned overlay' },
+    })
+    await FeatPatchModel.create({
+      campaignId,
+      targetId: healthy.id,
+      patch: { version: 1, revision: 0, set: { name: 'Healthy Feat Wire' } },
+    })
+
+    const res = await agent
+      .get(`/api/campaigns/${campaignId}/content/feats`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    expect(res.body.overlayFailures).toEqual([
+      expect.objectContaining({
+        targetId: broken.id,
+        code: 'unsupported_overlay_version',
+        name: broken.name,
+        slug: broken.slug,
+      }),
+    ])
+    const ids = res.body.feats.map((feat: { id: string }) => feat.id)
+    expect(ids).toContain(healthy.id)
+    expect(ids).not.toContain(broken.id)
+    expect(res.body.usageSummaryLabels).toBeDefined()
+  })
+
+  it('returns overlayFailures on the classes list while a healthy class stays in classes[]', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+    const classes = loadSeedClasses('srd-cc-5.2.1')
+    const broken = classes.find((row) => row.slug === 'fighter')
+    const healthy = classes.find((row) => row.slug === 'wizard')
+    expect(broken).toBeDefined()
+    expect(healthy).toBeDefined()
+    if (!broken || !healthy) throw new Error('seed classes missing')
+
+    await ClassPatchModel.create({
+      campaignId,
+      targetId: broken.id,
+      patch: { name: 'Unversioned overlay' },
+    })
+    await ClassPatchModel.create({
+      campaignId,
+      targetId: healthy.id,
+      patch: { version: 1, revision: 0, set: { name: 'Healthy Wizard Wire' } },
+    })
+
+    const res = await agent
+      .get(`/api/campaigns/${campaignId}/content/classes`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    expect(res.body.overlayFailures).toEqual([
+      expect.objectContaining({
+        targetId: broken.id,
+        code: 'unsupported_overlay_version',
+        name: broken.name,
+        slug: broken.slug,
+      }),
+    ])
+    const ids = res.body.classes.map((row: { id: string }) => row.id)
+    expect(ids).toContain(healthy.id)
+    expect(ids).not.toContain(broken.id)
+    expect(res.body.classes.find((row: { id: string }) => row.id === healthy.id)?.name).toBe(
+      'Healthy Wizard Wire',
+    )
+    expect(res.body.usageSummaryLabels).toBeDefined()
+  })
+
+  it('returns overlayFailures for a broken system subclass and keeps a healthy sibling on the same class list', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+    const champion = loadSeedSubclasses('srd-cc-5.2.1').find((row) => row.slug === 'champion')
+    expect(champion).toBeDefined()
+    if (!champion) throw new Error('seed subclass missing')
+
+    const created = await agent
+      .post(`/api/campaigns/${campaignId}/content/classes/${champion.classId}/subclasses`)
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        slug: 'healthy-fighter-sibling',
+        name: 'Healthy Fighter Sibling',
+        classId: champion.classId,
+        tagline: 'A resolved sibling',
+        features: [{ kind: 'custom', id: 'feature-1', name: 'Test Feature', level: 3 }],
+      })
+      .expect(201)
+    const healthyId = created.body.subclasses.id as string
+
+    const evocation = loadSeedSubclasses('srd-cc-5.2.1').find(
+      (row) => row.slug === 'school-of-evocation',
+    )
+    expect(evocation).toBeDefined()
+    if (!evocation) throw new Error('seed subclass missing')
+
+    await SubclassPatchModel.create({
+      campaignId,
+      targetId: champion.id,
+      patch: { name: 'Unversioned overlay' },
+    })
+    await SubclassPatchModel.create({
+      campaignId,
+      targetId: evocation.id,
+      patch: { name: 'Unversioned overlay' },
+    })
+
+    const res = await agent
+      .get(`/api/campaigns/${campaignId}/content/classes/${champion.classId}/subclasses`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    expect(res.body.overlayFailures).toEqual([
+      expect.objectContaining({ targetId: champion.id, code: 'unsupported_overlay_version' }),
+    ])
+    const ids = res.body.subclasses.map((row: { id: string }) => row.id)
+    expect(ids).toContain(healthyId)
+    expect(res.body.subclasses.find((row: { id: string }) => row.id === healthyId)?.name).toBe(
+      'Healthy Fighter Sibling',
+    )
+    expect(ids).not.toContain(champion.id)
+    expect(
+      res.body.overlayFailures.map((failure: { targetId: string }) => failure.targetId),
+    ).toEqual([champion.id])
+
+    const classesList = await agent
+      .get(`/api/campaigns/${campaignId}/content/classes`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    const fighter = classesList.body.classes.find(
+      (row: { id: string }) => row.id === champion.classId,
+    )
+    expect(fighter?.unresolvedSubclassOverlayCount).toBe(1)
+    expect(
+      (fighter?.subclasses ?? []).map((subclass: { id: string }) => subclass.id),
+    ).not.toContain(champion.id)
+  })
+
+  it('serializes overlayReadDiagnostics on monster list wire', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+    const swarmId = 'srd-cc-5.2.1:swarm-of-insects'
+
+    await MonsterPatchModel.create({
+      campaignId,
+      targetId: swarmId,
+      patch: {
+        version: 1,
+        revision: 0,
+        collections: {
+          traits: {
+            kind: 'identity',
+            overrides: [{ origin: 'seed', id: 'orphan-trait-id', set: { name: 'Gone' } }],
+            additions: [],
+            removedIds: [],
+          },
+        },
+      },
+    })
+
+    const res = await agent
+      .get(`/api/campaigns/${campaignId}/content/monsters`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    const swarm = res.body.monsters.find((row: { id: string }) => row.id === swarmId)
+    expect(swarm?.overlayReadDiagnostics?.orphanedSeedOverrides).toEqual(['orphan-trait-id'])
   })
 })

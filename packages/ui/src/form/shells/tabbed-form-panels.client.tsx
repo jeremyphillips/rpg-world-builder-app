@@ -85,7 +85,10 @@ export function useTabbedFormSetup<TFieldValues extends FieldValues>({
     warnHeaderOnlyTabValidationWiring(tabs)
   }, [tabs])
 
-  const validateSilently = React.useMemo(() => createValidateSilently(resolver), [resolver])
+  const validateSilently = React.useMemo(
+    () => createValidateSilently(schema, resolverItems),
+    [schema, resolverItems],
+  )
 
   return { form, validateSilently }
 }

@@ -1,4 +1,6 @@
 import { z } from 'zod'
+
+import { overlaySlugList } from '../system-overlay/overlay-presets'
 import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
 
 import { fieldValidationMessages } from '../../../../validation/messages'
@@ -9,7 +11,7 @@ import { contentUsageBlockerSchema } from '../content-usage-blocker'
 export const contentCampaignAccessSchema = z.object({
   available: z.boolean(),
   visibilityMode: contentVisibilityModeSchema,
-  participantIds: z.array(z.string()),
+  participantIds: overlaySlugList(z.string()),
 })
 
 export type ContentCampaignAccess = z.infer<typeof contentCampaignAccessSchema>

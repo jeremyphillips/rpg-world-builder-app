@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { overlayAtomic } from '../content/lib/system-overlay/annotate'
+
 // ---------------------------------------------------------------------------
 // Die faces — the standard polyhedral set. Shared primitive for any dice
 // notation (hit dice, damage, monster hit dice, ...).
@@ -9,8 +11,11 @@ export const DIE_FACES = [4, 6, 8, 10, 12, 20, 100] as const
 
 export type DieFace = (typeof DIE_FACES)[number]
 
-export const dieFaceSchema = z.union(
-  DIE_FACES.map((f) => z.literal(f)) as [z.ZodLiteral<DieFace>, ...z.ZodLiteral<DieFace>[]],
+export const dieFaceSchema = overlayAtomic(
+  z.union(
+    DIE_FACES.map((f) => z.literal(f)) as [z.ZodLiteral<DieFace>, ...z.ZodLiteral<DieFace>[]],
+  ),
+  'die face literal',
 )
 
 // ---------------------------------------------------------------------------
@@ -22,8 +27,11 @@ export const CLASS_HIT_DICE = [6, 8, 10, 12] as const satisfies readonly DieFace
 
 export type HitDie = (typeof CLASS_HIT_DICE)[number]
 
-export const hitDieSchema = z.union(
-  CLASS_HIT_DICE.map((f) => z.literal(f)) as [z.ZodLiteral<HitDie>, ...z.ZodLiteral<HitDie>[]],
+export const hitDieSchema = overlayAtomic(
+  z.union(
+    CLASS_HIT_DICE.map((f) => z.literal(f)) as [z.ZodLiteral<HitDie>, ...z.ZodLiteral<HitDie>[]],
+  ),
+  'class hit die literal',
 )
 
 /** Formats a hit die as a human-readable string (e.g. `8` → `"d8"`). */
@@ -37,10 +45,13 @@ export function formatHitDie(face: HitDie): string {
 // "2d6"). Use `formatDice` for display.
 // ---------------------------------------------------------------------------
 
-export const diceSchema = z.object({
-  count: z.number().int().min(1),
-  faces: dieFaceSchema,
-})
+export const diceSchema = overlayAtomic(
+  z.object({
+    count: z.number().int().min(1),
+    faces: dieFaceSchema,
+  }),
+  'dice expression replaces wholesale',
+)
 
 export type Dice = z.infer<typeof diceSchema>
 

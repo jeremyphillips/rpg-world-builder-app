@@ -1,4 +1,5 @@
 import {
+  CAMPAIGN_AVAILABILITY_FILTER_DEFAULT,
   type CampaignAvailabilityFilter,
   type ContentStatus,
   type WithCampaignAccess,
@@ -13,11 +14,23 @@ import {
   type FilterSchema,
 } from '@rpg/ui/filters'
 
+import { isContentOverlayFailureOverviewRow } from '../list/content-overlay-overview.lib'
+import {
+  contentOverviewRowCampaignAvailabilityFilterValue,
+  contentOverviewSchemaRowIsCampaignAvailable,
+  contentRowPassesCampaignAvailabilityFilter,
+} from './content-availability-table.lib'
+
 import type { ContentBase } from './content-table-config'
 import { CATALOG_LAYER_BADGE, type CatalogLayer } from './catalog-layer-badge'
 import { CONTENT_STATUS_BADGE } from './content-status-badge'
 import { shouldPresentCatalogLayer } from '../content-type-presentation'
-import { createCampaignAvailabilityFilterField as createSharedCampaignAvailabilityFilterField } from '@/lib/overview/create-campaign-availability-filter-field'
+import {
+  CAMPAIGN_ACCESS_TABLE_FILTER_ALL,
+  CAMPAIGN_ACCESS_TABLE_FILTER_AVAILABLE,
+  CAMPAIGN_ACCESS_TABLE_FILTER_LABEL,
+  CAMPAIGN_ACCESS_TABLE_FILTER_UNAVAILABLE,
+} from '@/features/content/lib/campaign-access/campaign-access-table-labels'
 
 export type ContentOverviewBaseFilterState = {
   name?: string
@@ -80,9 +93,44 @@ export function createCampaignAvailabilityFilterField<
   TData extends OverviewRow,
   TState extends ContentOverviewBaseFilterState,
 >(): FilterFieldDef<TData, TState> {
-  return createSharedCampaignAvailabilityFilterField<TData, TState>(
-    (row) => row.campaignAccess.available,
-  )
+  return createEqualsFilter<
+    TData,
+    ContentOverviewBaseFilterState,
+    'campaignAvailability',
+    CampaignAvailabilityFilter
+  >({
+    id: 'campaignAvailability',
+    label: CAMPAIGN_ACCESS_TABLE_FILTER_LABEL,
+    placement: 'advanced',
+    width: 'lg',
+    defaultValue: CAMPAIGN_AVAILABILITY_FILTER_DEFAULT,
+    showAllOption: false,
+    isValueConstraining: (value) => value !== 'all',
+    url: { key: 'availability' },
+    options: [
+      { label: CAMPAIGN_ACCESS_TABLE_FILTER_AVAILABLE, value: 'available' },
+      { label: CAMPAIGN_ACCESS_TABLE_FILTER_UNAVAILABLE, value: 'unavailable' },
+      { label: CAMPAIGN_ACCESS_TABLE_FILTER_ALL, value: 'all' },
+    ],
+    getValue: (row) => contentOverviewRowCampaignAvailabilityFilterValue(row),
+    matches: (row, value) =>
+      contentRowPassesCampaignAvailabilityFilter(row, value as CampaignAvailabilityFilter),
+  }) as unknown as FilterFieldDef<TData, TState>
+}
+
+/** Unresolved rows must not satisfy explicit content-domain filters. */
+function guardContentDomainFilterField<
+  TData extends OverviewRow,
+  TState extends ContentOverviewBaseFilterState,
+>(field: FilterFieldDef<TData, TState>): FilterFieldDef<TData, TState> {
+  const previousMatches = field.matches
+  return {
+    ...field,
+    matches: (row, value, state) => {
+      if (isContentOverlayFailureOverviewRow(row)) return false
+      return previousMatches(row, value, state)
+    },
+  }
 }
 
 /** Wraps content-specific fields with shared overview filters. */
@@ -96,7 +144,7 @@ export function buildContentFilterSchema<
   return createFilterSchema(
     [
       createContentNameFilter<TData, TState>(),
-      ...contentFields,
+      ...contentFields.map(guardContentDomainFilterField),
       ...(shouldPresentCatalogLayer(contentType)
         ? [createCatalogLayerFilter<TData, TState>()]
         : []),
@@ -104,7 +152,7 @@ export function buildContentFilterSchema<
       createCampaignAvailabilityFilterField<TData, TState>(),
     ],
     {
-      availability: { isAvailable: (row) => row.campaignAccess.available },
+      availability: { isAvailable: (row) => contentOverviewSchemaRowIsCampaignAvailable(row) },
     },
   )
 }
@@ -114,5 +162,12 @@ export function omitContentFilterField<
   TData extends OverviewRow,
   TState extends ContentOverviewBaseFilterState,
 >(schema: FilterSchema<TData, TState>, fieldId: string): FilterSchema<TData, TState> {
-  return createFilterSchema(schema.fields.filter((field) => field.id !== fieldId))
+  return createFilterSchema(
+    schema.fields.filter((field) => field.id !== fieldId),
+    {
+      availability: schema.availability,
+      sanitizeState: schema.sanitizeState,
+      normalizeChange: schema.normalizeChange,
+    },
+  )
 }

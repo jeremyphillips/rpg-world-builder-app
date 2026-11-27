@@ -7,7 +7,7 @@ import {
   getContentWriteConfig,
   isContentTypeName,
   isContentWriteType,
-  resolveContentForCampaign,
+  resolveContentListForCampaignType,
 } from './content-types'
 import { createHomebrewContent, updateContentEntity } from './lib/content-write.service'
 import { deleteContentEntity, getContentDeletionAvailability } from './lib/content-deletion.service'
@@ -24,6 +24,7 @@ import {
 } from './lib/content-campaign-access.service'
 import { getHomebrewContentSummary } from './lib/homebrew-summary.service'
 import { applyCatalogListFilter } from './lib/apply-catalog-list-filter'
+import { filterOverlayFailuresForListViewer } from './lib/filter-overlay-failures-for-list-viewer'
 import { resolveCatalogListFilter } from './lib/resolve-catalog-membership-filter'
 import { duplicateContentEntity } from './lib/duplication/duplicate-content.service'
 import { duplicateContentRequestSchema } from './lib/duplication/duplicate-content.types'
@@ -190,9 +191,19 @@ export async function listContent(req: Request, res: Response): Promise<void> {
     throw new HttpError(404, 'not_found', `Unknown content type "${contentType}".`)
   }
   const writeConfig = getContentWriteConfig(contentType)!
-  const items = await resolveContentForCampaign(contentType, campaignId)
+  const { items, overlayFailures } = await resolveContentListForCampaignType(
+    contentType,
+    campaignId,
+  )
   const withCampaignAccess = await attachCampaignAccessForTargetType(campaignId, contentType, items)
-  const visible = applyCatalogListFilter(withCampaignAccess, resolveCatalogListFilter(req))
+  const catalogFilter = resolveCatalogListFilter(req)
+  const visible = applyCatalogListFilter(withCampaignAccess, catalogFilter)
+  const visibleOverlayFailures = await filterOverlayFailuresForListViewer(
+    campaignId,
+    writeConfig.campaignAccessTargetType ?? writeConfig.typeName,
+    overlayFailures,
+    catalogFilter,
+  )
   const usageEnvelope = await buildContentListUsageEnvelope(
     contentUsageContextFromRequest(req, campaignId),
     contentType as ContentUsageSurfaceKey,
@@ -200,6 +211,7 @@ export async function listContent(req: Request, res: Response): Promise<void> {
   )
   res.status(200).json({
     [writeConfig.responseKey]: usageEnvelope.items,
+    ...(visibleOverlayFailures.length > 0 ? { overlayFailures: visibleOverlayFailures } : {}),
     ...(usageEnvelope.usageSummaryLabels
       ? { usageSummaryLabels: usageEnvelope.usageSummaryLabels }
       : {}),

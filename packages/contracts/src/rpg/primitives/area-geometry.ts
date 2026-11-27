@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { overlayAtomic } from '../content/lib/system-overlay/annotate'
 import type { GameTermEntry, VocabularyTerm } from '../vocab/types'
 import { getTermCompactLabel } from '../vocab/types'
 
@@ -148,15 +149,18 @@ const areaGeometrySpecialSchema = z
  *
  * TODO(spell.effect.area-origin): Model area origin and movement semantics.
  */
-export const areaGeometrySchema = z.discriminatedUnion('shape', [
-  areaGeometrySphereSchema,
-  areaGeometryEmanationSchema,
-  areaGeometryConeSchema,
-  areaGeometryCubeSchema,
-  areaGeometryLineSchema,
-  areaGeometryCylinderSchema,
-  areaGeometrySpecialSchema,
-])
+export const areaGeometrySchema = overlayAtomic(
+  z.discriminatedUnion('shape', [
+    areaGeometrySphereSchema,
+    areaGeometryEmanationSchema,
+    areaGeometryConeSchema,
+    areaGeometryCubeSchema,
+    areaGeometryLineSchema,
+    areaGeometryCylinderSchema,
+    areaGeometrySpecialSchema,
+  ]),
+  'area geometry replaces wholesale',
+)
 
 export type AreaGeometry = z.infer<typeof areaGeometrySchema>
 

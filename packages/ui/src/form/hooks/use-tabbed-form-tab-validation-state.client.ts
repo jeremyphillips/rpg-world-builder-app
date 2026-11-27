@@ -10,7 +10,7 @@ import {
   collectTabbedFormResolverItems,
   type TabbedFormTab,
 } from '../shells/tabbed-form-panels.lib'
-import { useFormValidationPresentation } from './use-form-validation-presentation.client'
+import { useFormValidationSessionProjection } from './use-form-validation-session-projection.client'
 
 const EMPTY_TAB_VALIDATION_STATE: TabValidationState = {
   tabId: '',
@@ -34,7 +34,7 @@ function gateTabValidationState(
 export function useTabbedFormTabValidationState(tabs: TabbedFormTab[]) {
   const allFields = React.useMemo(() => collectTabbedFormResolverItems(tabs), [tabs])
   const { issues, hasAttemptedSubmit, hasAttemptedPublish } =
-    useFormValidationPresentation(allFields)
+    useFormValidationSessionProjection(allFields)
 
   const tabStates = React.useMemo(
     () => resolveTabValidationState(issues, tabs, allFields),

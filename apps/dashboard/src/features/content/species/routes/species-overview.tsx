@@ -8,14 +8,16 @@ import {
   formatContentOverviewCaption,
   getContentTypeCollectionLabel,
 } from '@/features/content/lib/content-type-labels'
-import { useSpecies, useSpeciesUsageMeta } from '../hooks/use-species'
+import { useContentOverviewMergedData } from '../../lib/list/create-content-list'
+import { useSpeciesListResult, useSpeciesUsageMeta } from '../hooks/use-species'
 import { speciesColumns, speciesFilterSchema } from '../lib/species-overview-columns'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
 import { ContentOverviewTable } from '../../lib/overview/content-overview-table'
 
 export function SpeciesOverview() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()
-  const { data: species = [], isPending, isError } = useSpecies(campaignId)
+  const listResult = useSpeciesListResult(campaignId)
+  const { data: species, isPending, isError } = useContentOverviewMergedData(listResult)
   const { data: usageMeta } = useSpeciesUsageMeta(campaignId)
   const usageSummaryLabels = usageMeta?.usageSummaryLabels
   const overviewUsageScope = usageMeta?.overviewUsageScope

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useWatch } from 'react-hook-form'
 
-import type { ContentCampaignAccessPatch, ResolvedSubclass } from '@rpg/contracts'
+import type { ContentCampaignAccessPatch, ResolvedSubclass, SystemRulesetId } from '@rpg/contracts'
 import { getErrorMessage } from '@rpg/contracts'
 
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
@@ -9,7 +9,7 @@ import { useCampaignAccessForm } from '../../lib/campaign-access/campaign-access
 import { useCreateSubclass, useUpdateSubclass } from './use-subclass-mutations'
 import type { FeatureRowForm } from '../lib/class-feature-form-fields'
 import { isSubclassChoiceFeatureRow } from '../lib/class-subclass-choice-features'
-import { useSubclasses } from './use-subclasses'
+import { useSubclassesListResult } from './use-subclasses'
 import { useSubclassEditorState, type SubclassEditorState } from './use-subclass-editor-state'
 import { isDraftSubclassId } from '../lib/subclasses/subclass-editor-constants'
 import type { SubclassFormValues } from '../lib/subclasses/subclass-form-fields'
@@ -19,6 +19,7 @@ import {
   type SubclassTabGateKind,
   type SubclassTabMode,
 } from '../lib/subclasses/subclass-tab-state.lib'
+import { resolveSubclassCatalogSeedBody } from '../../lib/forms/registry/resolve-catalog-seed-body.lib'
 import {
   reportSubclassSaveResult,
   saveDraftSubclass,
@@ -61,13 +62,14 @@ function useSubclassTabData(
   const queryEnabled =
     mode === 'edit' && Boolean(campaignId) && Boolean(classId) && subclassesOverride === undefined
 
-  const query = useSubclasses(
+  const query = useSubclassesListResult(
     queryEnabled ? campaignId : undefined,
     queryEnabled ? classId : undefined,
   )
 
   return {
-    subclasses: subclassesOverride ?? query.data ?? EMPTY_SUBCLASSES,
+    subclasses: subclassesOverride ?? query.data?.subclasses ?? EMPTY_SUBCLASSES,
+    overlayFailures: subclassesOverride ? [] : (query.data?.overlayFailures ?? []),
     isPending: subclassesOverride ? false : query.isPending,
   }
 }
@@ -79,13 +81,13 @@ export function useClassSubclassesTabState(
 
   const features = useWatch({ name: 'features' }) as FeatureRowForm[] | undefined
   const subclassChoiceFeature = features?.find(isSubclassChoiceFeatureRow)
-  const { subclasses, isPending } = useSubclassTabData(
+  const { subclasses, overlayFailures, isPending } = useSubclassTabData(
     mode,
     campaignId,
     classId,
     subclassesOverride,
   )
-  const editor = useSubclassEditorState(classId, subclasses)
+  const editor = useSubclassEditorState(classId, subclasses, overlayFailures)
 
   const gate = resolveSubclassTabGate({
     mode,
@@ -117,8 +119,9 @@ export function useSubclassTabSave(args: {
   campaignId: string
   classId: string
   editor: SubclassEditorState
+  rulesetId?: SystemRulesetId
 }) {
-  const { campaignId, classId, editor } = args
+  const { campaignId, classId, editor, rulesetId } = args
   const campaignAccessForm = useCampaignAccessForm()
   const createMutation = useCreateSubclass(campaignId, classId)
   const updateMutation = useUpdateSubclass(campaignId, classId)
@@ -129,7 +132,11 @@ export function useSubclassTabSave(args: {
 
   const handleSave = async (
     values: SubclassFormValues,
-    options?: { campaignAccessDraft?: ContentCampaignAccessPatch | null; accessOnly?: boolean },
+    options?: {
+      campaignAccessDraft?: ContentCampaignAccessPatch | null
+      accessOnly?: boolean
+      overlayBaseline?: Record<string, unknown> | null
+    },
   ) => {
     if (!editor.selectedId) return
     const selectedId = editor.selectedId
@@ -153,6 +160,11 @@ export function useSubclassTabSave(args: {
         return
       }
 
+      const catalogSeed =
+        editor.selectedEntity?.catalogLayer === 'system' && rulesetId
+          ? resolveSubclassCatalogSeedBody(rulesetId, selectedId)
+          : undefined
+
       const result = await saveExistingSubclass({
         subclassId: selectedId,
         classId,
@@ -166,6 +178,16 @@ export function useSubclassTabSave(args: {
         saveAccess: () => campaignAccessForm.save(),
         updateBody: ({ subclassId, input }) => updateMutation.mutateAsync({ subclassId, input }),
         onBodySaved: editor.clearEditsFor,
+        overlayBaseline: options?.overlayBaseline ?? undefined,
+        catalogSeed,
+        expectedOverlayRevision:
+          (editor.selectedEntity as { overlayRevision?: number } | undefined)?.overlayRevision ?? 0,
+        rulesetId,
+        seedRowIdsByPath: (
+          editor.selectedEntity as
+            | { seedRowIdsByPath?: Record<string, readonly string[]> }
+            | undefined
+        )?.seedRowIdsByPath,
       })
       reportSubclassSaveResult(result, editor.selectedEntity?.name ?? 'Subclass', setSaveError)
     } catch (err) {

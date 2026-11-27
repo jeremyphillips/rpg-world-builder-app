@@ -28,7 +28,10 @@ import {
   heritageScalarFields,
 } from '../../../species/lib/species-heritage-form-fields'
 import { traitRowFormSchema } from '../../../species/lib/species-trait-form-schema'
-import { traitItemFields } from '../../../species/lib/species-trait-form-fields'
+import {
+  traitItemFields,
+  traitRowVariantTopologyFields,
+} from '../../../species/lib/species-trait-form-fields'
 import {
   classFeatureItemFields,
   createFeatureRowFormSchema,
@@ -395,7 +398,7 @@ describe('embedded content sub-forms validation', () => {
   const ctx = {}
 
   it('species trait rows', () => {
-    const fields = traitItemFields(ctx)
+    const fields = traitRowVariantTopologyFields(ctx)
     assertFieldPathsRegistered(fields)
     assertRegistryCoverage(traitRowFormSchema, fields, {
       exemptPaths: [...SERVER_ROW_EXEMPT, ...GRANT_NESTED_EXEMPT, 'available', 'templateId'],

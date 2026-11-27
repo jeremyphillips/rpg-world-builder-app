@@ -5,6 +5,10 @@ import type { FieldErrors, FieldValues, UseFormReturn } from 'react-hook-form'
 
 import { performInvalidSubmitFocus } from '../config/navigate-invalid-submit-focus.lib'
 import { navigateInvalidSubmit } from '../config/navigate-invalid-submit.client'
+import {
+  beginInvalidSubmitFocusRequest,
+  isInvalidSubmitFocusRequestCurrent,
+} from '../config/invalid-submit-focus-generation.lib'
 import { findArraySectionForIssue } from '../errors/group-form-issues'
 import type { FormIssue } from '../errors/form-issue.types'
 import {
@@ -13,6 +17,7 @@ import {
 } from '../errors/resolve-tab-validation-state'
 import {
   prepareFormIssues,
+  resolveInvalidSubmitNavigationFromIssues,
   resolveValidationExpandKeys,
   type InvalidSubmitNavigation,
 } from '../errors/resolve-invalid-submit-navigation'
@@ -61,13 +66,18 @@ function focusTabbedFormNavigation(
 ): void {
   ui.addValidationSessionExpandKeys(navigation.expandKeys)
 
-  window.requestAnimationFrame(() => {
-    window.requestAnimationFrame(() => {
-      performInvalidSubmitFocus(navigation, idPrefix, {
-        tabPanelSelector: `[data-tab-panel="${tabId}"]`,
-        tabTriggerSelector: `[data-tab-trigger="${tabId}"]`,
-      })
+  const generation = beginInvalidSubmitFocusRequest()
+  const focus = () => {
+    if (!isInvalidSubmitFocusRequestCurrent(generation)) return
+    performInvalidSubmitFocus(navigation, idPrefix, {
+      tabPanelSelector: `[data-tab-panel="${tabId}"]`,
+      tabTriggerSelector: `[data-tab-trigger="${tabId}"]`,
     })
+  }
+
+  window.requestAnimationFrame(() => {
+    if (!isInvalidSubmitFocusRequestCurrent(generation)) return
+    window.requestAnimationFrame(focus)
   })
 }
 
@@ -81,8 +91,9 @@ export function navigateTabbedFormToTabIssue<TFieldValues extends FieldValues>(
   tabId: string,
   setActiveTabId: (tabId: string) => void,
   errors: FieldErrors<TFieldValues> = form.formState.errors,
+  canonicalIssues?: readonly FormIssue[],
 ): void {
-  const issues = prepareFormIssues(errors, fields)
+  const issues = canonicalIssues ?? prepareFormIssues(errors, fields)
   const tabState = resolveTabValidationState(issues, tabs, fields).find(
     (state) => state.tabId === tabId,
   )
@@ -108,10 +119,11 @@ export function navigateTabbedFormInvalidSubmit<TFieldValues extends FieldValues
   errors: FieldErrors<TFieldValues>,
   setActiveTabId: (tabId: string) => void,
   activeTabId?: string,
+  canonicalIssues?: readonly FormIssue[],
 ): void {
   ui.markSubmitAttempted()
 
-  const issues = prepareFormIssues(errors, fields)
+  const issues = canonicalIssues ?? prepareFormIssues(errors, fields)
   const tabId = resolveInvalidSubmitTabId(issues, tabs, fields, activeTabId)
 
   if (!tabId) {

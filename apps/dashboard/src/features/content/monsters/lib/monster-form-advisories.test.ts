@@ -126,4 +126,14 @@ describe('collectMonsterFormAdvisories', () => {
     values.bonusActions = [{ id: 'step', kind: 'teleport', name: 'Teleport', distanceFeet: 40 }]
     expect(collectMonsterFormAdvisories(values, new Map())).toEqual([])
   })
+
+  it('does not advisory spider climb when climb is an alternative mode', () => {
+    const values = {
+      traits: [{ id: 'climb', preset: 'spider-climb' }],
+      movement: [{ mode: 'walk', feet: 20 }],
+      movementAlternative: { modes: ['climb', 'fly'], feet: 20 },
+    } as unknown as MonsterFormValues
+
+    expect(collectMonsterFormAdvisories(values, new Map())).toEqual([])
+  })
 })

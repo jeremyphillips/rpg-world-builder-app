@@ -4,7 +4,12 @@ import {
   type ContentTraitKind,
   type GrantGroups,
 } from '@rpg/contracts'
-import { type FieldVisibility, type FormItem } from '@rpg/ui/form'
+import {
+  collectRowVariantTopologyFields,
+  type ArrayRowVariantTopology,
+  type FieldVisibility,
+  type FormItem,
+} from '@rpg/ui/form'
 
 import { creatureTraitTemplateFields } from '../../lib/creature-traits/creature-trait-template-fields'
 import type { TraitRowForm } from './species-trait-form-schema'
@@ -30,6 +35,88 @@ export function visibleForGrantOverrides(): FieldVisibility {
     dependsOn: ['kind', 'overrideDisplay'],
     visibleWhen: (watched) => watched['kind'] === 'grant' && watched['overrideDisplay'] === true,
   }
+}
+
+function traitCustomBranchFields(ctx: ContentFormCtx): FormItem[] {
+  return [
+    {
+      type: 'text',
+      name: 'name',
+      label: 'Name',
+      required: true,
+    },
+    {
+      type: 'richtext',
+      name: 'description',
+      label: 'Description',
+      linkable: true,
+      internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
+      contentTypeOptions: ctx.options?.richTextContentTypeOptions,
+    },
+  ]
+}
+
+function traitGrantBranchFields(ctx: ContentFormCtx): FormItem[] {
+  return [
+    {
+      type: 'text',
+      name: 'nameOverride',
+      label: 'Name override',
+    },
+    {
+      kind: 'group',
+      heading: {
+        label: TRAIT_OVERRIDE_DISPLAY_LABEL,
+        hint: TRAIT_DERIVED_DISPLAY_DESCRIPTION,
+        labelVisibility: 'srOnly',
+      },
+      fields: [
+        {
+          type: 'switch',
+          name: 'overrideDisplay',
+          label: TRAIT_OVERRIDE_DISPLAY_LABEL,
+        },
+        {
+          type: 'richtext',
+          name: 'details',
+          label: 'Details',
+          linkable: true,
+          internalLinkOptions: ctx.options?.richTextInternalLinkOptions,
+          contentTypeOptions: ctx.options?.richTextContentTypeOptions,
+          optionalDisclosure: { intent: 'add', actionSubject: 'details' },
+          visibility: visibleForGrantOverrides(),
+        },
+      ],
+    },
+    ...grantArrayFields(GRANT_TYPES, GRANT_TYPE_LABELS, ctx),
+  ]
+}
+
+function traitTemplateBranchFields(ctx: ContentFormCtx): FormItem[] {
+  return [
+    {
+      type: 'text',
+      name: 'nameOverride',
+      label: 'Name override',
+    },
+    ...creatureTraitTemplateFields(),
+  ]
+}
+
+export function buildSpeciesTraitRowVariantTopology(ctx: ContentFormCtx): ArrayRowVariantTopology {
+  return {
+    variants: {
+      custom: traitCustomBranchFields(ctx),
+      grant: traitGrantBranchFields(ctx),
+      template: traitTemplateBranchFields(ctx),
+    },
+    fallback: traitCustomBranchFields(ctx),
+  }
+}
+
+/** Compiler registration across declared trait branches (empty rows use topology only). */
+export function traitRowVariantTopologyFields(ctx: ContentFormCtx): FormItem[] {
+  return collectRowVariantTopologyFields(buildSpeciesTraitRowVariantTopology(ctx))
 }
 
 export function traitItemFields(ctx: ContentFormCtx): FormItem[] {

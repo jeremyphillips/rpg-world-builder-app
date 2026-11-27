@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { overlayOrderedList } from '../../content/lib/system-overlay/overlay-presets'
 import { effectConditionSchema } from '../../vocab/effect-condition'
 import { effectEndSchema } from './effect-end'
 import { damageRollValueSchema } from './effect-value'
@@ -34,7 +35,7 @@ export const orderedEffectSchema = z.discriminatedUnion('kind', [
   orderedNoteEffectSchema,
 ])
 
-export const orderedEffectsSchema = z.array(orderedEffectSchema)
+export const orderedEffectsSchema = overlayOrderedList(orderedEffectSchema)
 
 /** Condition ids already present on an ordered effect list, in first-seen order. */
 export function precedingConditionIdsFromEffects(effects: unknown): string[] {

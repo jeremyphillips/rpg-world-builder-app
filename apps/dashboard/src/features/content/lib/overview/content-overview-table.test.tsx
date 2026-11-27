@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { ClassListItem, WithCampaignAccess } from '@rpg/contracts'
@@ -9,11 +9,14 @@ import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  classColumns,
   classFilterSchema,
   type ClassesOverviewFilterState,
 } from '../../classes/lib/classes-overview-columns'
+import { useOverviewColumnsWithNameContext } from './content-overview-columns'
 import { buildContentColumns } from './content-table-config'
 import { ContentOverviewTable } from './content-overview-table'
+import { mergeContentListOverviewRows } from '../list/create-content-list'
 import { persistContentOverviewPreferences } from './content-overview-preferences'
 import type * as ContentOverviewPreferencesModule from './content-overview-preferences'
 
@@ -95,7 +98,7 @@ function createRows(count: number): ClassRow[] {
   })) as unknown as ClassRow[]
 }
 
-function renderOverview() {
+function renderOverview(data: ClassRow[] = createRows(8)) {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   const router = createMemoryRouter(
     [
@@ -108,7 +111,7 @@ function renderOverview() {
               campaignId={CAMPAIGN_ID}
               columns={columns}
               filterSchema={classFilterSchema}
-              data={createRows(8)}
+              data={data}
               getEditHref={(row) => `/classes/${row.id}/edit`}
             />
           </QueryClientProvider>
@@ -125,11 +128,30 @@ function renderOverview() {
 
 const persistPreferencesMock = vi.mocked(persistContentOverviewPreferences)
 
+function hitDieValuesInTableRows(): string[] {
+  return screen
+    .getAllByRole('row')
+    .slice(1)
+    .map((row) => within(row).queryByText(/^d\d+$/)?.textContent ?? '—')
+}
+
+function campaignNameLinkInRow(row: HTMLElement): HTMLElement | null {
+  const links = within(row).getAllByRole('link')
+  return links.find((link) => link.getAttribute('href')?.includes('/campaigns/')) ?? null
+}
+
 describe('ContentOverviewTable interactions', () => {
   beforeEach(() => {
     localStorage.clear()
     persistPreferencesMock.mockClear()
     dataTableRenderCount = 0
+    if (!HTMLElement.prototype.hasPointerCapture) {
+      HTMLElement.prototype.hasPointerCapture = () => false
+    }
+    if (!HTMLElement.prototype.releasePointerCapture) {
+      HTMLElement.prototype.releasePointerCapture = () => undefined
+    }
+    Element.prototype.scrollIntoView = vi.fn()
   })
 
   it('does not spam column preference writes when opening the Filters panel', async () => {
@@ -251,5 +273,266 @@ describe('ContentOverviewTable interactions', () => {
 
     await user.click(screen.getByRole('button', { name: 'Select' }))
     expect(screen.getByRole('checkbox', { name: 'Select Class 0' })).toBeInTheDocument()
+  })
+
+  it('shows a merged overlay failure row without duplicate, selection, or row mutation', async () => {
+    const user = userEvent.setup()
+    const data = mergeContentListOverviewRows(createRows(2), [
+      {
+        targetId: 'class-broken',
+        slug: 'broken-class',
+        name: 'Broken Class',
+        code: 'unsupported_overlay_version',
+        message: 'System overlay patch is missing a supported version.',
+      },
+    ])
+    renderOverview(data as ClassRow[])
+
+    expect(screen.getByRole('link', { name: 'Class 0' })).toBeInTheDocument()
+
+    const failureName = screen.getByRole('link', { name: 'Broken Class' })
+    expect(screen.getByText('Overlay unresolved')).toBeInTheDocument()
+    expect(failureName).toHaveAttribute('href', '/classes/class-broken')
+    const failureRow = failureName.closest('tr')
+    expect(failureRow).not.toBeNull()
+    if (!failureRow) return
+    expect(within(failureRow).queryByText(/Unavailable/i)).not.toBeInTheDocument()
+    expect(within(failureRow).getByRole('link', { name: 'Edit' })).toHaveAttribute(
+      'href',
+      '/classes/class-broken/edit',
+    )
+    expect(within(failureRow).queryByRole('button', { name: 'Duplicate' })).not.toBeInTheDocument()
+    expect(
+      within(failureRow).queryByRole('button', { name: /Open actions for this class/i }),
+    ).not.toBeInTheDocument()
+
+    const healthyRow = screen.getByRole('link', { name: 'Class 0' }).closest('tr')
+    expect(healthyRow).not.toBeNull()
+    if (!healthyRow) return
+    expect(within(healthyRow).getByRole('button', { name: 'Duplicate' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Select' }))
+    expect(within(failureRow).getByRole('checkbox', { name: 'Select Broken Class' })).toBeDisabled()
+    expect(within(healthyRow).getByRole('checkbox', { name: 'Select Class 0' })).toBeEnabled()
+  })
+
+  it('hides overlay failures from the unavailable filter and surfaces the overlay supplement', () => {
+    const unavailable = {
+      ...createRows(1)[0]!,
+      id: 'class-off',
+      name: 'Unavailable Class',
+      campaignAccess: {
+        available: false,
+        visibilityMode: 'dm_only' as const,
+        participantIds: [],
+        unavailableParticipantIds: [],
+        effectiveAudience: 'none' as const,
+      },
+    }
+    const data = mergeContentListOverviewRows(
+      [unavailable],
+      [
+        {
+          targetId: 'class-broken',
+          slug: 'broken-class',
+          name: 'Broken Class',
+          code: 'unsupported_overlay_version',
+          message: 'System overlay patch is missing a supported version.',
+        },
+      ],
+    ) as ClassRow[]
+
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    const router = createMemoryRouter(
+      [
+        {
+          path: '/',
+          element: (
+            <QueryClientProvider client={queryClient}>
+              <ContentOverviewTable<ClassRow, ClassesOverviewFilterState>
+                contentTypeKey="classes"
+                campaignId={CAMPAIGN_ID}
+                columns={columns}
+                filterSchema={classFilterSchema}
+                data={data}
+                getEditHref={(row) => `/classes/${row.id}/edit`}
+              />
+            </QueryClientProvider>
+          ),
+        },
+      ],
+      { initialEntries: ['/?availability=unavailable'] },
+    )
+    render(<RouterProvider router={router} />)
+
+    expect(screen.queryByRole('link', { name: 'Broken Class' })).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Unavailable Class' })).toBeInTheDocument()
+    expect(screen.getByText('1 unresolved overlay row hidden by this filter')).toBeInTheDocument()
+  })
+
+  it('sorts healthy class rows by Hit Die while keeping unresolved rows last with placeholders', async () => {
+    const user = userEvent.setup()
+    const healthyRows = [
+      {
+        ...createRows(1)[0]!,
+        id: 'class-d10',
+        name: 'Ten Die',
+        hitDie: 10,
+        features: [],
+        primaryAbilities: ['str'],
+        spellcasting: undefined,
+      },
+      {
+        ...createRows(1)[0]!,
+        id: 'class-d6',
+        name: 'Six Die',
+        hitDie: 6,
+        features: [],
+        primaryAbilities: ['dex'],
+        spellcasting: undefined,
+      },
+    ]
+    const data = mergeContentListOverviewRows(healthyRows, [
+      {
+        targetId: 'class-broken',
+        slug: 'broken-class',
+        name: 'Broken Class',
+        code: 'unsupported_overlay_version',
+        message: 'System overlay patch is missing a supported version.',
+      },
+    ]) as ClassRow[]
+
+    function OverviewWithClassColumns() {
+      const guarded = useOverviewColumnsWithNameContext(
+        classColumns(CAMPAIGN_ID) as ColumnDef<ClassRow, unknown>[],
+        {
+          canManage: true,
+          campaignId: CAMPAIGN_ID,
+          contentTypeKey: 'classes',
+          viewer: manageViewer,
+          getEditHref: (row) => `/classes/${row.id}/edit`,
+        },
+      )
+      return (
+        <ContentOverviewTable<ClassRow, ClassesOverviewFilterState>
+          contentTypeKey="classes"
+          campaignId={CAMPAIGN_ID}
+          columns={guarded}
+          filterSchema={classFilterSchema}
+          data={data}
+          getEditHref={(row) => `/classes/${row.id}/edit`}
+        />
+      )
+    }
+
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    const router = createMemoryRouter(
+      [
+        {
+          path: '/',
+          element: (
+            <QueryClientProvider client={queryClient}>
+              <OverviewWithClassColumns />
+            </QueryClientProvider>
+          ),
+        },
+      ],
+      { initialEntries: ['/'] },
+    )
+    render(<RouterProvider router={router} />)
+
+    expect(screen.getByRole('link', { name: 'Broken Class' })).toBeInTheDocument()
+    const brokenRow = screen.getByRole('link', { name: 'Broken Class' }).closest('tr')
+    expect(brokenRow).not.toBeNull()
+    if (!brokenRow) return
+    expect(within(brokenRow).getAllByText('—').length).toBeGreaterThan(0)
+
+    await user.click(screen.getByRole('button', { name: 'Sort by Hit Die' }))
+
+    expect(hitDieValuesInTableRows()).toEqual(['d6', 'd10', '—'])
+    const lastRow = screen.getAllByRole('row').at(-1)
+    expect(lastRow).toBeDefined()
+    if (lastRow) {
+      expect(campaignNameLinkInRow(lastRow)?.textContent).toBe('Broken Class')
+    }
+
+    await user.click(screen.getByRole('button', { name: 'Sort by Hit Die' }))
+
+    expect(hitDieValuesInTableRows()).toEqual(['d10', 'd6', '—'])
+    expect(screen.getByRole('link', { name: 'Broken Class' })).toBeInTheDocument()
+  })
+
+  it('hides unresolved rows from explicit Hit Die filters but keeps them visible by default', async () => {
+    const user = userEvent.setup()
+    const data = mergeContentListOverviewRows(
+      [
+        {
+          ...createRows(1)[0]!,
+          id: 'class-d10',
+          name: 'Ten Die',
+          hitDie: 10,
+          features: [],
+          primaryAbilities: ['str'],
+          spellcasting: undefined,
+        },
+      ],
+      [
+        {
+          targetId: 'class-broken',
+          slug: 'broken-class',
+          name: 'Broken Class',
+          code: 'unsupported_overlay_version',
+          message: 'System overlay patch is missing a supported version.',
+        },
+      ],
+    ) as ClassRow[]
+
+    function OverviewWithClassColumns() {
+      const guarded = useOverviewColumnsWithNameContext(
+        classColumns(CAMPAIGN_ID) as ColumnDef<ClassRow, unknown>[],
+        {
+          canManage: true,
+          campaignId: CAMPAIGN_ID,
+          contentTypeKey: 'classes',
+          viewer: manageViewer,
+          getEditHref: (row) => `/classes/${row.id}/edit`,
+        },
+      )
+      return (
+        <ContentOverviewTable<ClassRow, ClassesOverviewFilterState>
+          contentTypeKey="classes"
+          campaignId={CAMPAIGN_ID}
+          columns={guarded}
+          filterSchema={classFilterSchema}
+          data={data}
+          getEditHref={(row) => `/classes/${row.id}/edit`}
+        />
+      )
+    }
+
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    const router = createMemoryRouter(
+      [
+        {
+          path: '/',
+          element: (
+            <QueryClientProvider client={queryClient}>
+              <OverviewWithClassColumns />
+            </QueryClientProvider>
+          ),
+        },
+      ],
+      { initialEntries: ['/'] },
+    )
+    render(<RouterProvider router={router} />)
+
+    expect(screen.getByRole('link', { name: 'Broken Class' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Ten Die' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('combobox', { name: 'Hit Die' }))
+    await user.click(within(document.body).getByRole('option', { name: 'd10' }))
+
+    expect(screen.getByRole('link', { name: 'Ten Die' })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Broken Class' })).not.toBeInTheDocument()
   })
 })

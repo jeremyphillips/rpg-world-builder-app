@@ -2,6 +2,7 @@ import { useCallback, useMemo } from 'react'
 import type { FormItem } from '@rpg/ui/form'
 
 import { duplicateMasterDetailRow } from '../../lib/master-detail/duplicate-master-detail-row'
+import { countMasterDetailRowsWithIssues } from '../../lib/master-detail/master-detail-row-validation'
 import type { EmbeddedMasterDetailRow } from '../../lib/master-detail/build-embedded-master-detail-rows'
 import { useEmbeddedMasterDetailRows } from '../../lib/master-detail/use-embedded-master-detail-rows'
 import { useMasterDetailCollectionAvailability } from '../../lib/master-detail/use-master-detail-collection-availability'
@@ -124,10 +125,10 @@ export function useFormEmbeddedMasterDetailEditorBody<TRow = Record<string, unkn
 
   const listItems = useMemo(() => visibleRows.map((row) => row.item), [visibleRows])
 
-  const invalidItemCount = useMemo(() => {
-    if (!rows.showRowBadges) return 0
-    return listItems.filter((item) => (item.issueCount ?? 0) > 0).length
-  }, [listItems, rows.showRowBadges])
+  const invalidItemCount = useMemo(
+    () => countMasterDetailRowsWithIssues(rows.allRows, rows.showRowBadges),
+    [rows.allRows, rows.showRowBadges],
+  )
 
   const isSelectedRowVisible = access
     ? collection.isSelectedVisible

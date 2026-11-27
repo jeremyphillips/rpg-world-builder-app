@@ -6,8 +6,14 @@ import { RICH_TEXT_TABLE_EMBED_ATTR } from '@rpg/ui'
 import { makeSpell } from '@/test/fixtures/factories/spell'
 
 import { spellFormSchema, type SpellFormValues } from './spell-form-fields'
+import type { FormIssue } from '@rpg/ui/form'
+import { ELDRITCH_BLAST_RESOLUTION } from '@rpg/contracts'
+
+import { mapWireIssuesToAuthoring } from '../../lib/forms/submit/map-wire-issues-to-authoring.lib'
+import { resolutionToForm } from '../resolution/lib/form/resolution-form-values'
 import {
   buildSpellCreateInput,
+  buildSpellPreparedWrite,
   spellCastingTimeFromFormValues,
   spellCastingTimeToFormValues,
   spellCreateDefaultValues,
@@ -197,5 +203,30 @@ describe('buildSpellCreateInput scaling prose', () => {
     expect(input).not.toHaveProperty('hasHigherLevelSlotEffect')
     expect(input.cantripScaling).toBeUndefined()
     expect(input.higherLevelSlotEffect).toBe('<p>Damage increases by 1d6 per slot above 1.</p>')
+  })
+})
+
+const preparedWriteIssue = (path: string): FormIssue => ({
+  path,
+  message: 'bad',
+  severity: 'field',
+})
+
+describe('buildSpellPreparedWrite resolution provenance', () => {
+  it('records effect row compaction when empty effect rows drop', () => {
+    const eldritchBlast = resolutionToForm(ELDRITCH_BLAST_RESOLUTION)!
+    const values = publishReadySpellFormValues({
+      resolution: {
+        ...eldritchBlast,
+        effects: [{ id: 'dropped', kind: 'damage' as const }, ...eldritchBlast.effects],
+      },
+    })
+    const { provenance } = buildSpellPreparedWrite(values, undefined, 'publish')
+    expect(provenance.filteredRowIndexBySourceIndex?.['resolution.effects']?.[1]).toBe(0)
+    const { issues } = mapWireIssuesToAuthoring(
+      [preparedWriteIssue('resolution.effects.0.damageType')],
+      provenance,
+    )
+    expect(issues[0]!.path).toBe('resolution.effects.1.damageType')
   })
 })

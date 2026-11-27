@@ -14,14 +14,21 @@ const CODE_OWNER = 'packages/contracts/src/rpg/content/lib/catalog-reference-iss
 
 const WIRE_CODES = [
   'unknown_spell',
+  'unresolved_overlay_spell',
   'spell_not_referenceable',
   'spell_catalog_unavailable',
   'unknown_skill',
+  'unresolved_overlay_skill',
   'skill_not_referenceable',
   'skill_not_campaign_eligible',
   'skill_catalog_unavailable',
   'unknown_equipment',
+  'unresolved_overlay_equipment',
   'equipment_catalog_unavailable',
+  'unknown_class',
+  'unresolved_overlay_class',
+  'class_not_referenceable',
+  'class_catalog_unavailable',
 ] as const
 
 const PREDICATE_CALL_EXCEPTIONS = new Set([

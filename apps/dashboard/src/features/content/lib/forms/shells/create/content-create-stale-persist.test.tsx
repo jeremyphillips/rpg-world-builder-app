@@ -64,6 +64,25 @@ vi.mock('../../registry/content-form-serialize-input.lib', async () => {
   }
 })
 
+vi.mock('../../submit/content-form-commit-pipeline.lib', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('../../submit/content-form-commit-pipeline.lib')>()
+  return {
+    ...actual,
+    runContentFormCommitPipeline: vi.fn(async (input, options) => {
+      const preparedValues = options.prepareCommitValues?.(input.values) ?? input.values
+      const prepared = options.prepareWrite
+        ? options.prepareWrite(preparedValues, input.form)
+        : { payload: preparedValues, provenance: {} }
+      return {
+        kind: 'success' as const,
+        prepared,
+        action: { kind: 'success' as const, data: prepared },
+      }
+    }),
+  }
+})
+
 vi.mock('../../validation/content-publish-validation.lib', async () => {
   const actual = await vi.importActual('../../validation/content-publish-validation.lib')
   return {

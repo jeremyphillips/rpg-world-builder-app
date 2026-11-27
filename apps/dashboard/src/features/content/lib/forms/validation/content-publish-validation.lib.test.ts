@@ -1,6 +1,8 @@
 /**
  * @vitest-environment jsdom
  */
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { useForm } from 'react-hook-form'
 import { renderHook, act } from '@testing-library/react'
@@ -8,8 +10,8 @@ import { z } from 'zod'
 import { formatFieldMessage } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 
+import { applyCanonicalFormIssuesToRhf } from './content-form-validation-rhf.lib'
 import {
-  applyValidationIssuesToForm,
   validateContentPublishValues,
   zodIssuesToValidationIssues,
 } from './content-publish-validation.lib'
@@ -26,16 +28,16 @@ describe('zodIssuesToValidationIssues', () => {
   })
 })
 
-describe('applyValidationIssuesToForm', () => {
+describe('applyCanonicalFormIssuesToRhf', () => {
   it('sets field errors for dotted paths', () => {
     const { result } = renderHook(() =>
       useForm<{ name: string; level: number }>({ defaultValues: { name: '', level: 0 } }),
     )
 
     act(() => {
-      applyValidationIssuesToForm(result.current, [
-        { path: 'name', message: 'Name is required.' },
-        { path: 'level', message: 'Level is required.' },
+      applyCanonicalFormIssuesToRhf(result.current, [
+        { path: 'name', message: 'Name is required.', severity: 'field' },
+        { path: 'level', message: 'Level is required.', severity: 'field' },
       ])
     })
 
@@ -109,5 +111,18 @@ describe('validateContentPublishValues', () => {
       'Enter a valid number.',
     )
     expect(result.current.getFieldState('name').error?.message).not.toMatch(/Too small|NaN/i)
+  })
+})
+
+describe('content-publish-validation.lib surface', () => {
+  it('does not reintroduce retired dashboard paint helpers', () => {
+    const publishLibPath = join(
+      process.cwd(),
+      'src/features/content/lib/forms/validation/content-publish-validation.lib.ts',
+    )
+    const source = readFileSync(publishLibPath, 'utf8')
+    expect(source).not.toContain('applyValidationIssuesToForm')
+    expect(source).not.toContain('paintValidationIssuesOnForm')
+    expect(source).not.toContain('surfaceContentDraftPublishValidation')
   })
 })

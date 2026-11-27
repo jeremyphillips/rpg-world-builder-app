@@ -1,17 +1,37 @@
-import type { CharacterClass } from '@rpg/contracts'
+import { SUBCLASS_PARENT_OVERLAY_UNRESOLVED_ISSUE_CODE, type CharacterClass } from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
-import { resolveCatalogForCampaign } from '../content.service'
+import { resolveContentListForCampaign } from '../content.service'
 import { classContentConfig } from '../classes/classes.config'
+import { subclassOverlayUnresolvedHttpError } from './subclass-overlay-http-error.lib'
 
 export async function assertSubclassParentClassExists(
   campaignId: string,
   classId: string,
 ): Promise<CharacterClass> {
-  const classes = await resolveCatalogForCampaign(classContentConfig, campaignId)
+  const { items: classes, overlayFailures } = await resolveContentListForCampaign(
+    classContentConfig,
+    campaignId,
+  )
   const parentClass = classes.find((record) => record.id === classId)
   if (!parentClass) {
-    throw new HttpError(400, 'validation_error', 'Parent class not found in campaign catalog.')
+    const overlayFailure = overlayFailures.find((failure) => failure.targetId === classId)
+    if (overlayFailure) {
+      throw subclassOverlayUnresolvedHttpError(
+        overlayFailure,
+        'classId',
+        SUBCLASS_PARENT_OVERLAY_UNRESOLVED_ISSUE_CODE,
+      )
+    }
+    throw new HttpError(400, 'validation_error', 'Parent class not found in campaign catalog.', {
+      issues: [
+        {
+          path: 'classId',
+          code: 'unknown_class',
+          message: 'Parent class not found in campaign catalog.',
+        },
+      ],
+    })
   }
   return parentClass
 }
@@ -33,6 +53,15 @@ export function assertSubclassRouteClassId(
       400,
       'validation_error',
       'Body classId must match the route classId or be omitted.',
+      {
+        issues: [
+          {
+            path: 'classId',
+            code: 'mismatched_subclass_parent',
+            message: 'Body classId must match the route classId or be omitted.',
+          },
+        ],
+      },
     )
   }
 

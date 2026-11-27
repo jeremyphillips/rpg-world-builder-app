@@ -116,6 +116,7 @@ describe('legendary resistance heading parity', () => {
         name: 'Lich',
         lair: { enabled: false },
         forms: { profileFormId: 'true', trueForm: { kind: 'profile' }, definedForms: [] },
+        movement: [{ mode: 'walk', feet: 30 }],
       },
     })
     expect(species?.status).toBe('ready')
@@ -130,7 +131,10 @@ describe('resolveMonsterTraitDraftFacing', () => {
   it('previews preset sentences in the shell panel', () => {
     const resolution = resolveMonsterTraitDraftFacing({
       row: { id: 'fly', preset: 'flyby' },
-      monster: { name: 'Owl' },
+      monster: {
+        name: 'Owl',
+        movement: [{ mode: 'walk', feet: 30 }],
+      },
     })
     expect(resolution?.status).toBe('ready')
     if (!resolution || resolution.status !== 'ready') return

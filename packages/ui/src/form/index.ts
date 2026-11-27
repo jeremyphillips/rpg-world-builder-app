@@ -261,6 +261,7 @@ export {
   type ArrayAddMenuPresentationMap,
   type ArrayRelationshipAddAction,
   type ArrayItemConfig,
+  type ArrayRowVariantTopology,
   type ArrayItemHeaderVisibility,
   type ArrayFilterSelectConfig,
   type ArrayFilterSelectFn,
@@ -332,6 +333,11 @@ export {
 } from '../components/ui/dice-formula-field.lib'
 export type { FieldSize } from '../components/ui/field.client'
 export type { ArrayResolveFieldsFn } from './config/array/array-resolve-fields.lib'
+export { collectRowVariantTopologyFields } from './config/array/array-row-variant-topology.lib'
+export {
+  compileFormOwnership,
+  type CompiledFormOwnership,
+} from './ownership/compile-form-ownership.lib'
 export {
   makeFieldErrorMap,
   safeParseWithFieldErrors,
@@ -344,6 +350,41 @@ export {
   createValidateSilently,
   type SilentValidationResult,
 } from './config/form-resolver'
+export {
+  evaluateFormSchema,
+  evaluateRoutedFormSchema,
+  runFormAction,
+  FORM_ACTION_SUPERSEDED_STAGE_ID,
+  projectIssuesToFieldErrors,
+  projectInvalidEvaluationToForm,
+  FORM_RHF_INTEGRATION_STRATEGY,
+  FORM_OWNERSHIP_COMPILE_BUDGET_MS,
+  FORM_VALIDATION_PILOT_REVEAL_BUDGET_MS,
+  FORM_VALIDATION_PRODUCER_SLOT_ORDER,
+  collectCurrentFormValidationProducerIssues,
+  collectFormValidationSessionIssues,
+  createEmptyFormValidationProducerSession,
+  dedupeFormIssues,
+  isFormValidationProducerSlotStale,
+  projectFormValidationProducerIssues,
+  readFormValidationProducerSlotIssues,
+  replaceFormValidationProducerSlot,
+  FormValidationProducerProvider,
+  FormValidationInteractiveProducerBridge,
+  useFormValidationProducerContext,
+  type FormValidationProducerContextValue,
+  type EvaluateFormSchemaOptions,
+  type EvaluateRoutedFormSchemaResult,
+  type FormActionStage,
+  type FormActionStageResult,
+  type FormRhfIntegrationStrategy,
+  type FormSchemaEvaluationResult,
+  type FormValidationProducerSession,
+  type FormValidationProducerSlotState,
+  type FormActionAttempt,
+  type RunFormActionOptions,
+  type RunFormActionResult,
+} from './lifecycle'
 export { resolveDependsOnWatchName } from './config/form-depends-on.lib'
 export { disableOptionsUsedInSiblingRows } from './config/array-unique-select.lib'
 export {
@@ -354,7 +395,9 @@ export {
   type OptionalDisclosureActionVerb,
   type ResolvedOptionalDisclosureActions,
 } from './config/optional-disclosure-actions.lib'
+export { cancelPendingInvalidSubmitFocus } from './config/invalid-submit-focus-generation.lib'
 export { navigateInvalidSubmit } from './config/navigate-invalid-submit.client'
+export { waitForInvalidSubmitTarget } from './config/wait-for-invalid-submit-target.lib'
 export { navigateTabbedFormInvalidSubmit } from './shells/navigate-tabbed-form-invalid-submit.client'
 export { performInvalidSubmitFocus } from './config/navigate-invalid-submit-focus.lib'
 export {
@@ -378,7 +421,9 @@ export {
   resolveNestedFieldErrorMessage,
   buildValidationSessionExpandKey,
   resolveInvalidSubmitNavigation,
+  resolveInvalidSubmitNavigationFromIssues,
   prepareFormIssues,
+  routeFormIssues,
   resolveTabValidationState,
   collectTabPathPrefixes,
   pathOwnsIssue,
@@ -394,6 +439,7 @@ export {
   useDebouncedArrayValidationTrigger,
 } from './hooks/use-form-validation-presentation.client'
 export { useFieldIssue, type FieldIssuePresentation } from './hooks/use-field-issue.client'
+export { useFormValidationSessionProjection } from './hooks/use-form-validation-session-projection.client'
 export { useSlotIssues, type SlotIssuePresentation } from './context/slot-issue.context'
 export { useProgressiveFieldValidationTrigger } from './hooks/use-progressive-field-validation-trigger.client'
 export {

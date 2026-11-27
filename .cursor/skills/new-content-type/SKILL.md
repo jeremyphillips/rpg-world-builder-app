@@ -47,7 +47,7 @@ Full checklist and file matrix → [reference.md](./reference.md). Policy depth
 2. **Integration manifest** — add entry in [`CONTENT_TYPE_INTEGRATION_MANIFEST`](../../../tools/content-types/src/content-type-integration-manifest.ts) (`satisfies Record<ContentTypeKey, …>` enforces completeness). Declare API and dashboard metadata only as those integrations are implemented.
 3. **Contracts schema** — `packages/contracts/src/rpg/content/<type>.ts` + barrel export + co-located tests.
 4. **Catalog capability** — set manifest `catalog.bundledContent`; only bundled types add `packages/catalog/src/<type>/` JSON, loaders, tests, and package exports. Do not create empty seed packages for campaign-authored types.
-5. **API** — `*.config.ts` (import `@rpg/catalog/<type>` only when bundled) with optional `system` capability + one line in `content-types.ts`. Add `CONTENT_PROJECTORS` row for global search; register `defineContentUsage` in `content-usage-registrations.ts` (surface keys derive from `API_CONTENT_TYPE_KEYS` + subclasses).
+5. **API** — `*.config.ts` (import `@rpg/catalog/<type>` only when bundled) with optional `system` capability + one line in `content-types.ts`. Add `CONTENT_PROJECTORS` row for global search; register `defineContentUsage` in `content-usage-registrations.ts` (surface keys derive from `API_CONTENT_TYPE_KEYS` + subclasses). **Bundled system types:** complete [System overlay slice](#system-overlay-slice-bundled-only) (participant id, drift lists, reference/delete guards).
 6. **Dashboard** — sub-area folder: list/detail routes, `*-display.ts` view model, form def side-effect into `contentFormRegistry`, lazy routes, `CONTENT_ROUTES`, router tree. Authorable types: `content-form-navigation.ts` (`ROUTE_KEY_TO_CONTENT_ROUTE_SECTION`). Sidebar: `VISIBLE_SIDEBAR_CONTENT`, `CAMPAIGN_SIDEBAR_CONTENT_SECTION` (Game Library vs World), `sidebar-nav-icons.ts` via `contentIdentityIcon('…')`. Form tabs that _are_ a catalog role alias through `content-form-tab-icons.ts` when applicable. Global search: extend `globalSearchTargetSchema` + `resolve-global-search-href.ts` (exhaustive `never` default).
    - Before `*-overview-columns.tsx`: run [Overview table UX](#overview-table-ux) if the user did not specify columns or filters.
    - Optional `ContentFormDef.preview` (identity / sections / player detail). Class is the reference; omit the block to keep NarrowPage. Drift: `buildSections` keys must equal `buildTabs` ids.
@@ -69,8 +69,9 @@ constraints: report-only unless user asks to fix
 
 1. Read manifest entry in `CONTENT_TYPE_INTEGRATION_MANIFEST`.
 2. Compare contracts keys/terms/capabilities, catalog package, API registry, dashboard folder/routes/form/sidebar.
-3. **Report missing integration points** before generating changes.
-4. Run drift tests if the user asks to verify.
+3. **Bundled types:** audit [System overlay slice](#system-overlay-slice-bundled-only) (participant policy, `PATCH_READ_CONFIGS`, form drift, usage/delete seed merge).
+4. **Report missing integration points** before generating changes.
+5. Run drift tests if the user asks to verify.
 
 ---
 
@@ -140,6 +141,35 @@ Reference patterns → [reference.md § Overview columns](./reference.md#overvie
 
 ---
 
+## System overlay slice (bundled only)
+
+Campaign managers patch **system** seed rows via versioned overlays. Homebrew rows
+are full documents — no overlay participant. Skip this slice when
+`catalog.bundledContent: 'none'` or the type has no `system` catalog capability.
+
+Depth → [`packages/contracts/src/rpg/content/lib/system-overlay/README.md`](../../../packages/contracts/src/rpg/content/lib/system-overlay/README.md)
+and [`apps/api/src/features/content/README.md`](../../../apps/api/src/features/content/README.md).
+Checklist rows → [reference.md § System overlay](./reference.md#system-overlay-bundled-types).
+
+| Layer      | Deliverable |
+| ---------- | ----------- |
+| Contracts  | Participant + publish/draft policy in `systemOverlayParticipants` (schema-owned tree beside kernel) |
+| API        | `overlayParticipantId` on read config; append config to `PATCH_READ_CONFIGS` in `patch-model-overlay-drift.test.ts` |
+| API        | List resolve inherits `overlayFailures` from `resolveCatalog`; standard list handler — no extra controller unless nested (classes/subclasses) |
+| API        | Write hooks validate `effectiveBody` (overlay-only updates must not bypass domain rules) |
+| API        | Outbound catalog refs → `collectCatalogReferenceIssues` with `unresolvedOverlayTargetKeys` (not local `unknown_*` codes) |
+| API        | Delete/usage graphs that must see seed bodies when apply failed → `loadOverlayAwareCatalogRows` |
+| Dashboard  | Form def: `overlayParticipantId`, `normalizeOverlayBody`; row in `overlay-form-registration.drift.test.ts` |
+| Dashboard  | Overview/list: shared `createContentList` + `useContentOverviewMergedData`; availability via `content-availability-table.lib` (not synthetic row `campaignAccess`) |
+
+**Subclasses** are a nested overlay participant (`subclasses`) — not a manifest
+entry. Class list wires parent-scoped failure counts and batch 409 issue codes;
+see API content README.
+
+Do not duplicate overlay kernel docs in this skill.
+
+---
+
 ## Managed media slice
 
 When the type opts into `ContentMedia` (not identity-fallback-only), wire the
@@ -196,6 +226,8 @@ Run the drift tests that apply to the layers you touched (focused paths first):
 | Contracts         | `content-type-term-coverage.test.ts`, `content-display-fallback.test.ts`, `content-type-presentation.test.ts`, `content-access-capabilities.test.ts`, `resolve-content-media-domain.test.ts` |
 | Catalog           | `packages/catalog/src/content-type-integration-manifest.test.ts` |
 | API               | `content-types.integration-manifest.test.ts`, `content-usage-registrations.test.ts`, `apply-content-keys.test.ts` (when duplication nested paths change) |
+| API overlay       | `patch-model-overlay-drift.test.ts` (extend `PATCH_READ_CONFIGS` when adding participant); optional type row in `resolve-catalog-overlay-failures.integration.test.ts` |
+| Dashboard overlay | `overlay-form-registration.drift.test.ts` when form def exists |
 | Dashboard routes  | `content-routes.integration-manifest.test.ts`                    |
 | Dashboard sidebar | `content-registry.test.ts`, `campaign-sidebar-content-section.test.ts`, `sidebar-nav-icons.test.ts`, `build-campaign-sidebar-sections.test.ts` |
 | Dashboard forms   | `content-form-registry.test.ts`, `content-managed-media-form-schemas.test.ts`, `content-form-preview-coverage.test.ts`, `content-form-validation.test.ts` |
@@ -223,6 +255,9 @@ Pre-commit and pre-push hooks run only at user-requested checkpoints — see
 | Preview rail / sidebar icon drift     | Missing fallback map row or `sidebar-nav-icons` `contentIdentityIcon` entry |
 | Media form drift                      | Domain map updated but not `managedMediaFormDefFields` / `withManagedContentMediaFormSchema` |
 | Usage API 500 / missing Used By       | No `defineContentUsage` registration for new `API_CONTENT_TYPE_KEYS` entry |
+| Overlay patch throws at read          | `overlayParticipantId` missing on read config — fix wiring, not row `overlayFailures` |
+| Overlay drift false negative          | New bundled type not added to `PATCH_READ_CONFIGS` or `OVERLAY_FORM_DEFS` |
+| Delete guard misses broken system row | Usage resolver used resolved list only — need `loadOverlayAwareCatalogRows` when refs live on seed |
 | Wrong sidebar section                 | Missing `CAMPAIGN_SIDEBAR_CONTENT_SECTION` row — type defaults into Game Library |
 | Non-bundled catalog test failure      | Update `contentTypeKeysWithoutBundledContent()` expectation in `@rpg/content-types` when adding another `bundledContent: 'none'` type |
 

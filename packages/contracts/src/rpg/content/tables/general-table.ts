@@ -1,6 +1,9 @@
 import { z } from 'zod'
 import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 
+import { overlayAtomic } from '../lib/system-overlay/annotate'
+import { overlayDeleteIdRows } from '../lib/system-overlay/overlay-presets'
+
 import { slugSchema } from '../lib/envelope'
 
 import { keysFromEntries } from '../../vocab/enum-schema'
@@ -106,7 +109,7 @@ function refineRowCells(
 
 export const generalTableRowSchema = z.object({
   id: slugSchema,
-  cells: z.record(z.string(), z.unknown()),
+  cells: overlayAtomic(z.record(z.string(), z.unknown()), 'row cell map replaces wholesale'),
 })
 
 export type GeneralTableRow = z.infer<typeof generalTableRowSchema>
@@ -116,8 +119,8 @@ export const generalTableSchema = z
     id: slugSchema,
     name: z.string().trim().min(1),
     kind: z.enum(GENERAL_TABLE_KINDS),
-    columns: z.array(tableColumnDefSchema).min(1),
-    rows: z.array(generalTableRowSchema).min(1),
+    columns: overlayDeleteIdRows(tableColumnDefSchema).min(1),
+    rows: overlayDeleteIdRows(generalTableRowSchema).min(1),
   })
   .superRefine((table, ctx) => {
     refineUniqueColumnIds(table.columns, ctx, ['columns'])

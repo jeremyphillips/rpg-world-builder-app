@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
-import { ConfirmDialog, Text } from '@rpg/ui'
+import { Alert, ConfirmDialog, Text } from '@rpg/ui'
 
 import type { ResolvedSubclass } from '@rpg/contracts'
 
@@ -96,6 +96,7 @@ function ClassSubclassesTabBody({
     campaignId,
     classId,
     editor,
+    rulesetId: formCtx.rulesetId,
   })
   const [switchTargetId, setSwitchTargetId] = useState<string | null>(null)
   const [accessOverrides, setAccessOverrides] = useState<Record<string, boolean>>({})
@@ -237,8 +238,16 @@ function ClassSubclassesTabBody({
           countSupplement={countSupplement}
           selectedIdentity={isSelectedVisible ? selectedIdentity : undefined}
           onDelete={editor.selectedId ? () => handleDeleteRequest(editor.selectedId!) : undefined}
-          renderDetail={({ rowId }) =>
-            editor.selectedValues ? (
+          renderDetail={({ rowId }) => {
+            const listItem = editor.listItems.find((item) => item.id === rowId)
+            if (listItem?.overlayResolveFailure) {
+              return (
+                <Alert variant="destructive" role="alert">
+                  {listItem.overlayResolveFailure.message}
+                </Alert>
+              )
+            }
+            return editor.selectedValues ? (
               <SubclassDetailEditor
                 key={rowId}
                 subclassId={rowId}
@@ -257,7 +266,7 @@ function ClassSubclassesTabBody({
                 onSave={handleSave}
               />
             ) : null
-          }
+          }}
         />
       </div>
 

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSearchParams } from 'react-router-dom'
 import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 import {
@@ -28,6 +29,10 @@ import {
 } from '../../preview/content-preview-rail'
 import { ContentPreviewUiProvider } from '../../preview/content-preview-ui-context'
 import { resolveContentPublishSchema } from '../edit/content-edit-load'
+import {
+  CONTENT_FORM_TAB_SEARCH_PARAM,
+  resolveContentFormTabFromSearch,
+} from './content-form-tab-search.lib'
 import { ContentFormPublishValidationBridge } from '../../validation/content-form-publish-validation.client'
 import { ContentCreatePublishValidationBridge } from './content-create-publish-validation-bridge.client'
 import { ContentDraftPublishValidationSurfaceBridge } from '../../validation/content-draft-publish-validation-surface.client'
@@ -53,6 +58,7 @@ interface ContentSchemaFormShellProps<
   headerPrefix?: React.ReactNode
   fields?: FormItem[]
   tabs?: TabbedFormTab[]
+  producerBoundary?: React.ComponentType<{ children: React.ReactNode }>
   previewDraftBadge?: boolean
   scrollMode: ContentFormScrollMode
   previewEnabled: boolean
@@ -135,6 +141,7 @@ function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
   headerPrefix,
   fields,
   tabs,
+  producerBoundary,
   formMode,
   backHref,
   submitLabel,
@@ -147,6 +154,7 @@ function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
   scrollMode,
   previewEnabled,
 }: ContentSchemaFormShellProps<TFormValues>) {
+  const [searchParams] = useSearchParams()
   const [hasAttemptedPublish, setHasAttemptedPublish] = React.useState(false)
   const [publishPresentationIssues, setPublishPresentationIssues] = React.useState<FormIssue[]>([])
   const markPublishAttempted = React.useCallback(() => {
@@ -185,6 +193,14 @@ function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
         ? augmentTabsWithHoistedName(tabs, headerProps.def.nameField(headerProps.ctx))
         : undefined,
     [headerProps.ctx, headerProps.def, tabs],
+  )
+  const defaultActiveTabId = React.useMemo(
+    () =>
+      resolveContentFormTabFromSearch(
+        tabbedFormTabs,
+        searchParams.get(CONTENT_FORM_TAB_SEARCH_PARAM),
+      ),
+    [searchParams, tabbedFormTabs],
   )
   const publishFields = React.useMemo(
     () => (tabbedFormTabs ? collectTabbedFormResolverItems(tabbedFormTabs) : (fields ?? [])),
@@ -251,6 +267,7 @@ function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
               uiStateKey={formKey}
               schema={schema}
               tabs={tabbedFormTabs}
+              defaultActiveTabId={defaultActiveTabId}
               defaultValues={defaultValues}
               valueSyncs={valueSyncs}
               onSubmit={handleSubmit}
@@ -265,6 +282,7 @@ function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
               publishPresentationIssues={publishPresentationIssues}
               publishPresentationEnabled={previewEnabled}
               onResetValidationPresentation={resetValidationPresentation}
+              producerBoundary={producerBoundary}
               aside={
                 previewEnabled ? (
                   <ContentPreviewRail
@@ -297,6 +315,7 @@ function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
             scrollBodyClassName={isViewport ? 'pt-8' : undefined}
             header={header}
             footer={footer}
+            producerBoundary={producerBoundary}
           />
         </div>
       )}

@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react'
-import { useFormContext, useFormState, useWatch } from 'react-hook-form'
+import { useFormContext, useWatch } from 'react-hook-form'
 import {
   ABILITY_IDS,
   ABILITY_SCORE_MAX,
@@ -7,13 +7,13 @@ import {
   NEUTRAL_ABILITY_SCORE,
 } from '@rpg/contracts'
 import { SemanticText, Text } from '@rpg/ui'
-import { flattenFormIssues, useFormValidationPresentation } from '@rpg/ui/form'
+import { useFieldIssue } from '@rpg/ui/form'
+import { useContentFormPresentationIssues } from '../../../../lib/forms/validation/content-form-presentation-issues.client'
 
 import { AbilityScoreNumeric } from '@/components/ability-score'
 
 import { MONSTER_ABILITY_SCORES_HEADING } from '../../../lib/monster-form-labels'
 import {
-  statisticsFieldIsInvalid,
   statisticsIssueLabel,
   statisticsIssuesForDisplay,
   type StatisticsFieldIssue,
@@ -25,17 +25,10 @@ import { MonsterAbilitySaveProficiencyFooter } from './ability-save-proficiency-
 const StatisticsIssuesContext = createContext<readonly StatisticsFieldIssue[]>([])
 
 function useStatisticsIssues(): readonly StatisticsFieldIssue[] {
-  const { errors } = useFormState()
-  const presentation = useFormValidationPresentation()
-  const rhfIssues = flattenFormIssues(errors)
-  const source = presentation.isPresentationSessionExpanded
-    ? [...presentation.issues, ...rhfIssues]
-    : rhfIssues
-  return statisticsIssuesForDisplay(source)
-}
-
-function statisticsInvalid(path: string, issues: readonly StatisticsFieldIssue[]): boolean {
-  return statisticsFieldIsInvalid(issues, path)
+  const presentation = useContentFormPresentationIssues()
+  return statisticsIssuesForDisplay(
+    presentation.issues.map((issue) => ({ path: issue.path, message: issue.message })),
+  )
 }
 
 function StatisticsIssueList() {
@@ -91,12 +84,17 @@ function AbilityScoreField({
   values: MonsterFormValues
 }) {
   const form = useFormContext<MonsterFormValues>()
-  const issues = useContext(StatisticsIssuesContext)
   const stored = values.abilityScores?.[ability]
   const displayScore = stored ?? NEUTRAL_ABILITY_SCORE
   const proficient = values.proficiencies?.savingThrows?.includes(ability) ?? false
   const scorePath = `abilityScores.${ability}`
-  const saveInvalid = statisticsInvalid('proficiencies.savingThrows', issues)
+  const scoreIssue = useFieldIssue(scorePath)
+  const saveIssue = useFieldIssue('proficiencies.savingThrows')
+  const outOfRange =
+    typeof displayScore === 'number' &&
+    (displayScore < ABILITY_SCORE_MIN || displayScore > ABILITY_SCORE_MAX)
+  const scoreInvalid = scoreIssue.hasIssue || scoreIssue.invalid === true || outOfRange
+  const saveInvalid = saveIssue.hasIssue || saveIssue.invalid === true
 
   return (
     <AbilityScoreNumeric
@@ -104,7 +102,7 @@ function AbilityScoreField({
       size="sm"
       min={ABILITY_SCORE_MIN}
       max={ABILITY_SCORE_MAX}
-      invalid={statisticsInvalid(scorePath, issues)}
+      invalid={scoreInvalid}
       value={displayScore}
       footer={
         <MonsterAbilitySaveProficiencyFooter

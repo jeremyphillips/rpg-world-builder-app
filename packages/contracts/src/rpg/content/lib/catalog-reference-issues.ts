@@ -9,22 +9,26 @@ import { isContentCampaignEligible, isContentReferenceable } from './content-res
 export const CATALOG_REFERENCE_ISSUE_CODE = {
   class: {
     unknown: 'unknown_class',
+    unresolvedOverlayTarget: 'unresolved_overlay_class',
     notReferenceable: 'class_not_referenceable',
     catalogUnavailable: 'class_catalog_unavailable',
   },
   spell: {
     unknown: 'unknown_spell',
+    unresolvedOverlayTarget: 'unresolved_overlay_spell',
     notReferenceable: 'spell_not_referenceable',
     catalogUnavailable: 'spell_catalog_unavailable',
   },
   skill: {
     unknown: 'unknown_skill',
+    unresolvedOverlayTarget: 'unresolved_overlay_skill',
     notReferenceable: 'skill_not_referenceable',
     notCampaignEligible: 'skill_not_campaign_eligible',
     catalogUnavailable: 'skill_catalog_unavailable',
   },
   equipment: {
     unknown: 'unknown_equipment',
+    unresolvedOverlayTarget: 'unresolved_overlay_equipment',
     catalogUnavailable: 'equipment_catalog_unavailable',
   },
 } as const
@@ -64,6 +68,7 @@ export const spellReferencePolicy = {
   subject: 'spell',
   checks: {
     unknown: ['draft', 'publish'],
+    unresolvedOverlayTarget: ['draft', 'publish'],
     notReferenceable: ['publish'],
     catalogUnavailable: ['publish'],
   },
@@ -74,6 +79,7 @@ export const skillReferencePolicy = {
   subject: 'skill',
   checks: {
     unknown: ['publish'],
+    unresolvedOverlayTarget: ['publish'],
     notReferenceable: ['publish'],
     notCampaignEligible: ['publish'],
     catalogUnavailable: ['publish'],
@@ -85,6 +91,7 @@ export const equipmentPresencePolicy = {
   subject: 'equipment',
   checks: {
     unknown: ['draft', 'publish'],
+    unresolvedOverlayTarget: ['draft', 'publish'],
     catalogUnavailable: ['publish'],
   },
 } as const satisfies CatalogReferencePolicy<'equipment'>
@@ -98,6 +105,8 @@ export const authoredSpellIdsEdge = {
   unavailablePlacement: { kind: 'per-ref' } as const satisfies CatalogReferenceUnavailablePlacement,
   messages: {
     unknown: 'Choose a spell from the catalog.',
+    unresolvedOverlayTarget:
+      'This spell exists in the catalog but its overlay could not be applied.',
     notReferenceable: 'Draft spells cannot be referenced on published content.',
     catalogUnavailable: 'The spell catalog is unavailable, so this reference cannot be checked.',
   },
@@ -115,6 +124,8 @@ export const monsterSkillProficienciesEdge = {
   } as const satisfies CatalogReferenceUnavailablePlacement,
   messages: {
     unknown: 'Unknown skill.',
+    unresolvedOverlayTarget:
+      'This skill exists in the catalog but its overlay could not be applied.',
     notReferenceable: 'Publish this skill before using it on a monster.',
     notCampaignEligible: 'This skill is not available in this campaign.',
     catalogUnavailable: 'Skills could not be loaded. Try again before publishing.',
@@ -133,7 +144,30 @@ export const monsterEquipmentEdge = {
   } as const satisfies CatalogReferenceUnavailablePlacement,
   messages: {
     unknown: 'Unknown equipment.',
+    unresolvedOverlayTarget:
+      'This equipment exists in the catalog but its overlay could not be applied.',
     catalogUnavailable: 'Equipment could not be loaded. Try again before publishing.',
+  },
+}
+
+/**
+ * Slug-keyed class references (spell `classIds`, species multiclass / level caps).
+ * Distinct from {@link monsterClassEdge}, which keys monster classification by content id
+ * and uses publish-only classification copy.
+ */
+export const classSlugReferenceEdge = {
+  policy: {
+    subject: 'class',
+    checks: {
+      unknown: ['draft', 'publish'],
+      unresolvedOverlayTarget: ['draft', 'publish'],
+    },
+  } as const satisfies CatalogReferencePolicy<'class'>,
+  unavailablePlacement: { kind: 'per-ref' } as const,
+  messages: {
+    unknown: 'Unknown class.',
+    unresolvedOverlayTarget:
+      'This class exists in the catalog but its overlay could not be applied.',
   },
 }
 
@@ -143,6 +177,7 @@ export const monsterClassEdge = {
     subject: 'class',
     checks: {
       unknown: ['publish'],
+      unresolvedOverlayTarget: ['publish'],
       notReferenceable: ['publish'],
       catalogUnavailable: ['publish'],
     },
@@ -150,6 +185,8 @@ export const monsterClassEdge = {
   unavailablePlacement: { kind: 'per-ref' } as const,
   messages: {
     unknown: 'Choose a class classification from the catalog.',
+    unresolvedOverlayTarget:
+      'This class exists in the catalog but its overlay could not be applied.',
     notReferenceable: 'Publish this class before using it as a classification.',
     catalogUnavailable: 'Class classifications could not be loaded. Try again before publishing.',
   },
@@ -166,6 +203,8 @@ type CatalogReferenceCollectorArgs<
   resolve: (key: string) => ContentResolutionRow | undefined
   unavailablePlacement: CatalogReferenceUnavailablePlacement
   messages: CatalogReferenceMessages<P>
+  /** Ref keys (`refs[].key`) omitted from resolved records due to overlay apply failure (not unknown). */
+  unresolvedOverlayTargetKeys?: ReadonlySet<string>
 }
 
 function checkApplies(checks: object, check: string, intent: ContentValidationIntent): boolean {
@@ -234,9 +273,17 @@ export function collectCatalogReferenceIssues<
   }
 
   const issues: CatalogReferenceIssue<S>[] = []
+  const unresolvedOverlayTargetKeys = args.unresolvedOverlayTargetKeys
+
   for (const ref of args.refs) {
     const row = args.resolve(ref.key)
     if (!row) {
+      if (unresolvedOverlayTargetKeys?.has(ref.key)) {
+        if (checkApplies(policy.checks, 'unresolvedOverlayTarget', intent)) {
+          pushCheckIssue(issues, subject, 'unresolvedOverlayTarget', ref.path, messages)
+        }
+        continue
+      }
       if (checkApplies(policy.checks, 'unknown', intent)) {
         pushCheckIssue(issues, subject, 'unknown', ref.path, messages)
       }

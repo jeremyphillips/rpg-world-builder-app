@@ -25,6 +25,12 @@ export const SPELL_REFERENCE_ISSUE_CODE = {
   spellCatalogUnavailable: CATALOG_REFERENCE_ISSUE_CODE.spell.catalogUnavailable,
 } as const
 
+export const SPELL_CLASS_REFERENCE_ISSUE_CODE = {
+  unknownClass: CATALOG_REFERENCE_ISSUE_CODE.class.unknown,
+  unresolvedOverlayClass: CATALOG_REFERENCE_ISSUE_CODE.class.unresolvedOverlayTarget,
+  classWithoutSpellcasting: 'class_without_spellcasting',
+} as const
+
 /** Walks grant rows and recommendation lists for persisted spell references. */
 export function collectAuthoredSpellReferences(
   body: unknown,
@@ -140,6 +146,7 @@ export function collectSpellReferenceIssues(args: {
   spellsById: ReadonlyMap<string, Spell>
   catalogStatus: 'ready' | 'unavailable'
   intent: ContentValidationIntent
+  unresolvedOverlayTargetKeys?: ReadonlySet<string>
 }): ContentValidationIssue[] {
   return collectCatalogReferenceIssues({
     policy: authoredSpellIdsEdge.policy,
@@ -149,5 +156,6 @@ export function collectSpellReferenceIssues(args: {
     resolve: (key) => resolveSpellReference(key, args.spellsById),
     unavailablePlacement: authoredSpellIdsEdge.unavailablePlacement,
     messages: authoredSpellIdsEdge.messages,
+    unresolvedOverlayTargetKeys: args.unresolvedOverlayTargetKeys,
   })
 }

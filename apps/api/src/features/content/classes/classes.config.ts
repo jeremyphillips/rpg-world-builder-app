@@ -1,5 +1,4 @@
 import type { CharacterClass, ClassStored } from '@rpg/contracts'
-import { CONTENT_MEDIA_REPLACE_KEY } from '@rpg/contracts'
 import {
   classDraftStoredSchema,
   classStoredBodySchema,
@@ -13,6 +12,7 @@ import {
 import type { ZodType } from 'zod'
 
 import { assertContentSpellReferences } from '../lib/assert-content-spell-references'
+import { resolveValidatedWriteBody } from '../lib/resolve-system-overlay.lib'
 import type { ContentTypeConfig } from '../lib/content-type-config'
 import type {
   ContentWriteConfig,
@@ -67,7 +67,7 @@ function prepareHomebrewUpdate(
 
 export const classContentConfig: ContentTypeConfig<CharacterClass> = {
   type: 'classes',
-  patchReplaceKeys: [CONTENT_MEDIA_REPLACE_KEY],
+  overlayParticipantId: 'classes',
   system: {
     load: (rulesetId) => loadSeedClassesStored(rulesetId) as CharacterClass[],
     slugs: seedClassSlugs,
@@ -85,7 +85,15 @@ export const classContentConfig: ContentTypeConfig<CharacterClass> = {
 }
 
 async function validateClassBeforeWrite(ctx: ContentWriteContext): Promise<void> {
-  await assertContentSpellReferences(ctx, ctx.effectiveBody ?? ctx.input)
+  await assertContentSpellReferences(
+    ctx,
+    resolveValidatedWriteBody({
+      effectiveBody: ctx.effectiveBody,
+      mode: ctx.mode,
+      existing: ctx.existing as Record<string, unknown> | undefined,
+      input: ctx.input,
+    }),
+  )
 }
 
 export const classWriteConfig: ContentWriteConfig<CharacterClass> = {

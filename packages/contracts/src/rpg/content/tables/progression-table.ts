@@ -1,6 +1,8 @@
 import { z } from 'zod'
 import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 
+import { overlayDeleteIdRows } from '../lib/system-overlay/overlay-presets'
+
 import { slugSchema } from '../lib/envelope'
 
 import { keysFromEntries } from '../../vocab/enum-schema'
@@ -54,7 +56,7 @@ export const progressionTableSchema = z
     id: slugSchema,
     name: z.string().trim().min(1),
     kind: z.enum(PROGRESSION_TABLE_KINDS),
-    columns: z.array(progressionTableColumnSchema).min(1),
+    columns: overlayDeleteIdRows(progressionTableColumnSchema).min(1),
   })
   .superRefine((table, ctx) => {
     refineUniqueColumnIds(table.columns, ctx, ['columns'])

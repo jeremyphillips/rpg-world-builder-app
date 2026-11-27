@@ -13,7 +13,7 @@ import {
   type TrailingFieldActionConfig,
 } from '@rpg/ui/form'
 
-import { useSubmitHandler } from '@/lib/use-submit-handler'
+import { useAdoptedFormSubmit } from '@/lib/form-validation-adoption.lib'
 
 import { useSpeciesNameTrailingAction } from '../../../hooks/use-species-name-trailing-action'
 import { useCreateNpc } from '../../hooks/use-create-npc'
@@ -302,8 +302,8 @@ export function QuickNpcAuthoringForm({
     [buildContext, createContext, organization?.members?.titles, setup],
   )
 
-  const { onSubmit, formError } = useSubmitHandler<QuickNpcAuthoringTabFormValues>({
-    submit: async (tabValues) => {
+  const { onSubmit, formError } = useAdoptedFormSubmit<QuickNpcAuthoringTabFormValues>(
+    async (tabValues) => {
       if (!isQuickNpcSetupStillValid(setup, buildContext)) {
         onChangeSetup({
           equipmentSelections: tabValues.equipmentSelections,
@@ -346,12 +346,12 @@ export function QuickNpcAuthoringForm({
         throw error
       }
     },
-    fallbackMessage: QUICK_NPC_CREATE_FALLBACK_ERROR,
-    mapError: (error) => {
+    QUICK_NPC_CREATE_FALLBACK_ERROR,
+    (error) => {
       if (isQuickNpcNarrativeGenerationFailedError(error)) return error.message
       return formatQuickNpcCreationError(error)
     },
-  })
+  )
 
   return (
     <QuickNpcPreparedBuildProvider>

@@ -30,6 +30,8 @@ export type FormIssue = {
   message: string
   /** Shorter summary label for collapsed row chrome; falls back to `message`. */
   summaryMessage?: string
+  /** Producer rule identity. Dedup uses this, never {@link message}. */
+  ruleId?: string
   /** Stable message id from a {@link defineMessage} catalog when encoded in the payload. */
   messageId?: string
   /** Interpolation params from a {@link defineMessage} catalog when encoded in the payload. */

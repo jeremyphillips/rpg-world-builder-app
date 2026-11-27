@@ -7,9 +7,9 @@ const { model, models, Schema } = mongoose
 /**
  * Shared schema shape for all content-type patch models. Every content type's
  * per-campaign overlay patch stores the same envelope: which campaign issued
- * it, which system record it targets, and the partial body to deep-merge at
- * read time. The `patch` body is validated by the contract (`*PatchSchema`)
- * before insert; Mongoose treats it as opaque `Mixed` here.
+ * it, which system record it targets, and a versioned `StoredOverlay` payload.
+ * API writes validate with `storedOverlaySchema` before `$set`; Mongoose keeps
+ * `patch` as opaque `Mixed`.
  */
 function buildPatchSchema() {
   const schema = new Schema(

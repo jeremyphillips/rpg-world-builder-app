@@ -24,6 +24,26 @@ function fieldName(field: FormItem): string | undefined {
   return 'name' in field && typeof field.name === 'string' ? field.name : undefined
 }
 
+function listedFieldNames(fields: readonly FormItem[]): Array<string | undefined> {
+  return fields.flatMap((field) => {
+    if ('kind' in field && field.kind === 'group' && field.name === 'config.uses') {
+      return field.fields.map(fieldName)
+    }
+    return [fieldName(field)]
+  })
+}
+
+function findField(fields: readonly FormItem[], name: string): FormItem | undefined {
+  for (const field of fields) {
+    if (fieldName(field) === name) return field
+    if ('kind' in field && field.kind === 'group') {
+      const nested = findField(field.fields, name)
+      if (nested) return nested
+    }
+  }
+  return undefined
+}
+
 function numberField(name: string) {
   return { type: 'number', name, label: 'Fixture value' } as const
 }
@@ -70,11 +90,11 @@ describe('assembleCreatureTraitTemplateFields', () => {
       templateId: LEGENDARY_RESISTANCE,
       host: 'species',
     })
-    expect(species.map(fieldName)).toEqual([NORMAL_USES, 'details'])
+    expect(listedFieldNames(species)).toEqual([NORMAL_USES, LAIR_USES, 'details'])
 
     const monster = monsterTraitTemplateFields(LEGENDARY_RESISTANCE)
-    expect(monster.map(fieldName)).toEqual([NORMAL_USES, LAIR_USES, 'details'])
-    const visibility = monster.find((field) => fieldName(field) === LAIR_USES)?.visibility
+    expect(listedFieldNames(monster)).toEqual([NORMAL_USES, LAIR_USES, 'details'])
+    const visibility = findField(monster, LAIR_USES)?.visibility
     if (!visibility) throw new Error('Missing lair visibility')
     const [dependency] = visibility.dependsOn
     expect(resolveDependsOnWatchName(dependency!, 'traits.0')).toBe('lair.enabled')

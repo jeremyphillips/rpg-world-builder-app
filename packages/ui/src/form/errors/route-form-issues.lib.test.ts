@@ -57,14 +57,61 @@ describe('routeFormIssues via prepareFormIssues', () => {
     })
   })
 
-  it('routes missing object paths to the first descendant control in field order', () => {
+  it('keeps a parent object issue on the named group', () => {
+    const issues = prepareFormIssues(
+      { movementAlternative: { message: 'Choose a mode', type: 'custom' } },
+      [
+        {
+          kind: 'group',
+          name: 'movementAlternative',
+          heading: { label: 'Alternative movement' },
+          fields: [
+            {
+              type: 'text',
+              name: 'movementAlternative.modes',
+              label: 'Available modes',
+              required: true,
+            },
+          ],
+        },
+      ],
+    )
+    expect(issues[0]).toMatchObject({
+      path: 'movementAlternative',
+      claim: { kind: 'field', target: 'movementAlternative' },
+    })
+    const child = prepareFormIssues(
+      { movementAlternative: { modes: { message: 'Required', type: 'custom' } } },
+      [
+        {
+          kind: 'group',
+          name: 'movementAlternative',
+          heading: { label: 'Alternative movement' },
+          fields: [
+            {
+              type: 'text',
+              name: 'movementAlternative.modes',
+              label: 'Available modes',
+              required: true,
+            },
+          ],
+        },
+      ],
+    )
+    expect(child[0]).toMatchObject({
+      path: 'movementAlternative.modes',
+      claim: { kind: 'field', target: 'movementAlternative.modes' },
+    })
+  })
+
+  it('keeps object path issues on the form summary when no compiled owner claims them', () => {
     const issues = prepareFormIssues(
       { resolution: { method: { message: 'Required', type: 'custom' } } },
       saveFields,
     )
     expect(issues[0]).toMatchObject({
       path: 'resolution.method',
-      claim: { kind: 'field', target: 'resolution.method.ability' },
+      claim: { kind: 'form', target: 'form' },
     })
   })
 
@@ -113,10 +160,9 @@ describe('collectIssueClaimReport', () => {
     })
 
     expect(report.length).toBeGreaterThan(0)
-    expect(report.every((entry) => entry.claim.kind !== 'form')).toBe(true)
-    expect(report.find((entry) => entry.path.endsWith('resolution.method'))?.claim.kind).toBe(
-      'field',
-    )
+    const methodIssue = report.find((entry) => entry.path.endsWith('resolution.method'))
+    expect(methodIssue?.claim.kind).toBe('form')
+    expect(report.some((entry) => entry.claim.kind === 'field')).toBe(true)
   })
 })
 

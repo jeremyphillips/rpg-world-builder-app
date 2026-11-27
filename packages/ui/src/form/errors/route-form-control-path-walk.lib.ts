@@ -80,12 +80,12 @@ function walkArrayItems(
 
   const arrayItems = readValueAt(params.formValues, arrayPath)
   const rows = Array.isArray(arrayItems) ? arrayItems : []
-  const indexes = rows.length > 0 ? rows.map((_, index) => index) : [0]
+  if (rows.length === 0) return
 
-  for (const index of indexes) {
+  for (const [index, row] of rows.entries()) {
     const itemPrefix = `${arrayPath}.${index}`
     const rowFields = item.item?.resolveFields
-      ? resolveArrayRowFields(item, rows[index], index)
+      ? resolveArrayRowFields(item, row, index)
       : item.fields
     walkOrderedControlPaths(rowFields, itemPrefix, params)
   }

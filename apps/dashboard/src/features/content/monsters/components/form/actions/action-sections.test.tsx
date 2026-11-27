@@ -134,7 +134,7 @@ describe('MonsterActionSections', () => {
     const ctx: ContentFormCtx = {
       ...readyCtx,
       entityCatalogLayer: 'system',
-      embeddedSeedRowIds: {
+      persistedIdentityRowIdsByPath: {
         'legendaryActions.actions': ['deathly-teleport', 'disrupt-life', 'frightening-gaze'],
       },
     }
@@ -169,7 +169,7 @@ describe('MonsterActionSections', () => {
     const ctx: ContentFormCtx = {
       ...readyCtx,
       entityCatalogLayer: 'system',
-      embeddedSeedRowIds: { 'legendaryActions.actions': ['deathly-teleport'] },
+      persistedIdentityRowIdsByPath: { 'legendaryActions.actions': ['deathly-teleport'] },
     }
     render(<Host ctx={ctx} values={lichLegendaryValues} formRef={formRef} />)
 

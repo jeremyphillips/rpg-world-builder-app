@@ -10,6 +10,7 @@ import {
   isManagedContentMediaDirty,
   serializeContentFormInput,
 } from './content-form-serialize-input.lib'
+import { SystemOverlayWriteNotReadyError } from './system-overlay-write-readiness.lib'
 
 const mediaEnabledDef = {
   routeKey: 'classes' as const,
@@ -127,6 +128,56 @@ describe('serializeContentFormInput', () => {
         { operation: 'update', dirtyFields: { media: true } },
       ),
     ).toThrow(/missing attachment/)
+  })
+
+  it('throws instead of posting partial body for system update without overlay context', () => {
+    const def = {
+      routeKey: 'monsters' as const,
+      supportsManagedMedia: false,
+      toInput: vi.fn(() => ({ name: 'Patched' })),
+      normalizeOverlayBody: vi.fn(() => ({ name: 'Patched' })),
+    }
+
+    expect(() =>
+      serializeContentFormInput(
+        def,
+        { name: 'Patched' },
+        { entity: { catalogLayer: 'system', id: 'srd:owlbear' } },
+        'publish',
+        { operation: 'update', entityId: 'srd:owlbear' },
+      ),
+    ).toThrow(SystemOverlayWriteNotReadyError)
+
+    expect(def.toInput).not.toHaveBeenCalled()
+  })
+
+  it('serializes a ready system update without an unresolved-overlay flag', () => {
+    const def = {
+      routeKey: 'monsters' as const,
+      supportsManagedMedia: false,
+      overlayParticipantId: 'monsters' as const,
+      toInput: vi.fn(() => ({ name: 'Patched' })),
+      normalizeOverlayBody: vi.fn(() => ({ name: 'Patched' })),
+    }
+
+    const result = serializeContentFormInput(
+      def,
+      { name: 'Patched' },
+      { entity: { catalogLayer: 'system', id: 'srd:owlbear', overlayRevision: 0 } },
+      'publish',
+      {
+        operation: 'update',
+        entityId: 'srd:owlbear',
+        rulesetId: 'srd-cc-5.2.1',
+        catalogSeed: { name: 'Seed' },
+        overlayBaseline: { name: 'Seed' },
+        seedRowIdsByPath: {},
+      },
+    ) as { systemOverlayIntent?: unknown }
+
+    expect(result.systemOverlayIntent).toBeDefined()
+    expect(def.normalizeOverlayBody).toHaveBeenCalled()
+    expect(def.toInput).not.toHaveBeenCalled()
   })
 
   it('skips media merge when def does not support managed media', () => {

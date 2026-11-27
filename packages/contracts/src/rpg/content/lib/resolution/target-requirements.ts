@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
+import { overlaySlugList } from '../system-overlay/overlay-presets'
 import { defineMessage } from '../../../../validation/define-message'
 import { creatureSizeSchema } from '../../../vocab/creature-size'
 import { creatureTypeSchema } from '../../../vocab/creature-type'
@@ -80,7 +81,7 @@ const creatureTypeRequirementSchema = z
   .object({
     kind: z.literal('creature-type'),
     mode: z.enum(['include', 'exclude']),
-    ids: z.array(creatureTypeSchema).min(1),
+    ids: overlaySlugList(creatureTypeSchema).min(1),
   })
   .strict()
   .superRefine((row, ctx) => {
@@ -91,7 +92,7 @@ const conditionRequirementSchema = z
   .object({
     kind: z.literal('condition'),
     presence: z.enum(['has', 'lacks']),
-    ids: z.array(effectConditionSchema).min(1),
+    ids: overlaySlugList(effectConditionSchema).min(1),
   })
   .strict()
   .superRefine((row, ctx) => {
@@ -108,7 +109,7 @@ const anyOfRequirementSchema = z
   .object({
     kind: z.literal('any-of'),
     willing: z.boolean().optional(),
-    conditionIds: z.array(effectConditionSchema).optional(),
+    conditionIds: overlaySlugList(effectConditionSchema).optional(),
   })
   .strict()
   .superRefine((row, ctx) => {
@@ -146,9 +147,9 @@ export const resolutionTargetRequirementSchema = z.discriminatedUnion('kind', [
 
 export type ResolutionTargetRequirement = z.infer<typeof resolutionTargetRequirementSchema>
 
-export const resolutionTargetRequirementsSchema = z
-  .array(resolutionTargetRequirementSchema)
-  .superRefine(refineRequirementList)
+export const resolutionTargetRequirementsSchema = overlaySlugList(
+  resolutionTargetRequirementSchema,
+).superRefine(refineRequirementList)
 
 function refineUniqueIds(ids: readonly string[], ctx: z.RefinementCtx, path: PropertyKey[]): void {
   if (new Set(ids).size === ids.length) return

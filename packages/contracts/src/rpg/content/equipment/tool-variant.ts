@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { overlaySlugList } from '../lib/system-overlay/overlay-presets'
+
 import { abilitySchema } from '../../vocab/ability'
 import { toolCategorySchema } from '../../vocab/equipment/tool-category'
 
@@ -34,8 +36,8 @@ export const toolEquipmentKindFields = {
   toolCategory: toolCategorySchema,
   /** The ability a check with this tool typically uses. */
   ability: abilitySchema,
-  utilizes: z.array(toolUtilizeActionSchema).min(1),
-  crafts: z.array(z.string().min(1)).optional(),
+  utilizes: overlaySlugList(toolUtilizeActionSchema).min(1),
+  crafts: overlaySlugList(z.string().min(1)).optional(),
 } as const
 
 export const toolEquipmentKindSchema = z.object(toolEquipmentKindFields)

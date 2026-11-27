@@ -7,6 +7,7 @@ import {
   formatShowUnavailableAriaLabel,
 } from '../campaign-access-table-labels'
 import { buildOverviewAvailabilitySupplement } from '@/lib/overview/overview-availability-supplement'
+import type { ResultSummarySupplement } from '@/lib/data-table/overview-result-summary'
 import { resolveAvailabilityFilteredEmptyCopy } from '@/lib/overview/availability-empty-state-copy.lib'
 import type { CampaignAvailabilityScope } from '@/lib/overview/campaign-availability-scope.lib'
 
@@ -18,6 +19,40 @@ type FilterNoticeActions<TFilters> = {
     value: TFilters[FilterFieldId<TFilters>],
     options?: { history?: 'push' },
   ) => void
+}
+
+/** Supplement when unresolved overlay rows are hidden by the unavailable availability filter. */
+export function buildOverlayFailureAvailabilitySupplement<TFilters>({
+  hiddenOverlayFailureCount,
+  campaignAvailability,
+  campaignAvailabilityFilterId,
+  actions,
+}: {
+  hiddenOverlayFailureCount: number
+  campaignAvailability: CampaignAvailabilityFilter
+  campaignAvailabilityFilterId: FilterFieldId<TFilters>
+  actions: FilterNoticeActions<TFilters>
+}): ResultSummarySupplement | null {
+  if (campaignAvailability !== 'unavailable' || hiddenOverlayFailureCount <= 0) return null
+
+  const label =
+    hiddenOverlayFailureCount === 1
+      ? '1 unresolved overlay row hidden by this filter'
+      : `${hiddenOverlayFailureCount} unresolved overlay rows hidden by this filter`
+
+  return {
+    label,
+    action: {
+      label: 'Show all',
+      accessibleName: 'Show all campaign availability including unresolved overlays',
+      onClick: () =>
+        actions.setFilterValue(
+          campaignAvailabilityFilterId,
+          'all' as TFilters[FilterFieldId<TFilters>],
+          { history: 'push' },
+        ),
+    },
+  }
 }
 
 /** Utility-row supplemental copy for filter-scoped hidden unavailable counts. */

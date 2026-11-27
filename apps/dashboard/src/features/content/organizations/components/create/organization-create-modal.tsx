@@ -84,7 +84,7 @@ function OrganizationCreateModalForm({
 
   const formKey = `organization-create-modal-${campaignId}`
 
-  const { onSubmit, formError, UiBridge } = useContentFormSubmit<OrganizationFormValues>({
+  const { onSubmit, formError, ProducerBoundary } = useContentFormSubmit<OrganizationFormValues>({
     def: organizationFormDef,
     ctx,
     fallbackMessage: 'Could not create organizations.',
@@ -153,9 +153,9 @@ function OrganizationCreateModalForm({
           validationIntent: 'draft',
           formKey,
         }),
+        producerBoundary: ProducerBoundary,
         header: () => (
           <>
-            <UiBridge />
             <OrganizationAuthoringPresetBridge />
             <ContentFormHeader
               def={organizationFormDef}

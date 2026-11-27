@@ -1,11 +1,22 @@
+import { Link } from 'react-router-dom'
+
 import type { ClassListItem, Spellcasting, WithCampaignAccess } from '@rpg/contracts'
 import type { ContentOverviewUsageScope, ContentUsageSummaryLabels } from '@rpg/contracts'
-import { BooleanCell, dataTableColumnChromeMeta, dataTableWidthMeta, SortableHeader } from '@rpg/ui'
+import {
+  BooleanCell,
+  CollectionSummaryCell,
+  dataTableColumnChromeMeta,
+  dataTableColumnMeta,
+  dataTableWidthMeta,
+  SortableHeader,
+  Text,
+} from '@rpg/ui'
 import type { ColumnDef } from '@rpg/ui'
 import { createBooleanFilter, createEqualsFilter } from '@rpg/ui/filters'
 
 import { ROUTES } from '@/app/routes'
 import { buildCollectionCountColumn } from '@/lib/data-table/column-builders'
+import { classEditSubclassesHref } from './class-edit-navigation.lib'
 import { resolveDashboardContentDisplay } from '../../lib/detail/page/content-display-image'
 import { buildClassContentDisplayImageInput } from '../../lib/detail/page/content-display-image-input'
 import { buildContentColumns } from '../../lib/overview/content-table-config'
@@ -50,14 +61,6 @@ const CLASS_MIDDLE_COLUMNS: ColumnDef<ClassListItem>[] = [
     },
   },
   buildCollectionCountColumn<ClassListItem>({
-    id: 'subclasses',
-    label: CLASS_COLLECTION_LABELS.subclasses.column,
-    getItems: resolveSubclassSummaryItems,
-    getCount: (row) => row.subclasses.length,
-    singularLabel: CLASS_COLLECTION_LABELS.subclasses.singular,
-    pluralLabel: CLASS_COLLECTION_LABELS.subclasses.plural,
-  }),
-  buildCollectionCountColumn<ClassListItem>({
     id: 'features',
     label: CLASS_COLLECTION_LABELS.features.column,
     getItems: resolveClassFeatureSummaryItems,
@@ -100,6 +103,45 @@ export const classFilterSchema = buildContentFilterSchema<ClassRow, ClassesOverv
   ],
 )
 
+function subclassesOverviewColumn(campaignId: string): ColumnDef<ClassListItem> {
+  return {
+    id: 'subclasses',
+    accessorFn: (row) => row.subclasses.length,
+    header: ({ column }) => (
+      <SortableHeader column={column}>{CLASS_COLLECTION_LABELS.subclasses.column}</SortableHeader>
+    ),
+    cell: ({ row }) => {
+      const unresolved = row.original.unresolvedSubclassOverlayCount
+      return (
+        <div className="flex min-w-0 flex-col gap-1">
+          <CollectionSummaryCell
+            items={resolveSubclassSummaryItems(row.original)}
+            count={row.original.subclasses.length}
+            singularLabel={CLASS_COLLECTION_LABELS.subclasses.singular}
+            pluralLabel={CLASS_COLLECTION_LABELS.subclasses.plural}
+          />
+          {unresolved ? (
+            <Text variant="warning" asChild>
+              <Link
+                to={classEditSubclassesHref(campaignId, row.original.id)}
+                className="text-style-caption hover:underline"
+              >
+                {unresolved} unresolved subclass overlay{unresolved > 1 ? 's' : ''} — manage
+              </Link>
+            </Text>
+          ) : null}
+        </div>
+      )
+    },
+    sortingFn: 'basic',
+    meta: {
+      label: CLASS_COLLECTION_LABELS.subclasses.column,
+      ...dataTableColumnMeta.data,
+      ...dataTableWidthMeta('collectionCount'),
+    },
+  }
+}
+
 /** Class column definitions with the name cell linked to the class detail page. */
 export function classColumns(
   campaignId: string,
@@ -108,7 +150,12 @@ export function classColumns(
     overviewUsageScope?: ContentOverviewUsageScope
   },
 ) {
-  return buildContentColumns<ClassListItem>(CLASS_MIDDLE_COLUMNS, {
+  const columns: ColumnDef<ClassListItem>[] = [
+    ...CLASS_MIDDLE_COLUMNS.slice(0, 2),
+    subclassesOverviewColumn(campaignId),
+    ...CLASS_MIDDLE_COLUMNS.slice(2),
+  ]
+  return buildContentColumns<ClassListItem>(columns, {
     ...usage,
     contentType: 'classes',
     resolveOverviewDisplay: (row) =>

@@ -22,3 +22,5 @@ export const {
   useCreateContent: useCreateSkillProficiency,
   useUpdateContent: useUpdateSkillProficiency,
 } = createContentMutationHooks('skill-proficiencies', skillProficienciesQueryKey)
+
+export const useSkillProficienciesListResult = skillProficienciesContentList.useListQueryResult

@@ -273,12 +273,12 @@ describe('updateClassInputSchema', () => {
 })
 
 describe('classPatchSchema', () => {
-  it('accepts an overlay with a partial patch body', () => {
+  it('accepts a versioned stored overlay document', () => {
     const patch = {
       id: 'patch_1',
       campaignId: 'camp_1',
       targetId: fighter.id,
-      patch: { hitDie: 12 },
+      patch: { version: 1 as const, revision: 0, set: { hitDie: 12 } },
       ...timestamps,
     }
     expect(classPatchSchema.safeParse(patch).success).toBe(true)
@@ -290,12 +290,12 @@ describe('classPatchSchema', () => {
     )
   })
 
-  it('validates fields inside the patch body', () => {
+  it('rejects negative overlay revision', () => {
     const patch = {
       id: 'patch_1',
       campaignId: 'camp_1',
       targetId: fighter.id,
-      patch: { hitDie: 4 },
+      patch: { version: 1 as const, revision: -1 },
       ...timestamps,
     }
     expect(classPatchSchema.safeParse(patch).success).toBe(false)
@@ -433,17 +433,17 @@ describe('subclass-choice class feature kind', () => {
 })
 
 describe('subclassPatchSchema', () => {
-  it('accepts an overlay with a partial patch body', () => {
+  it('accepts a versioned stored overlay document', () => {
     const patch = {
       id: 'patch_1',
       campaignId: 'camp_1',
       targetId: 'srd-cc-5.2.1:champion',
       createdAt: timestamps.createdAt,
       updatedAt: timestamps.updatedAt,
-      patch: { name: 'Champion (Custom)' },
+      patch: { version: 1 as const, revision: 1, set: { name: 'Champion (Custom)' } },
     }
     expect(subclassPatchSchema.safeParse(patch).success).toBe(true)
-    expect(subclassPatchSchema.parse(patch).patch).toEqual({ name: 'Champion (Custom)' })
+    expect(subclassPatchSchema.parse(patch).patch.set).toEqual({ name: 'Champion (Custom)' })
   })
 })
 

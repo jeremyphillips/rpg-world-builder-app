@@ -84,6 +84,10 @@ export type MonsterCatalogs = MonsterClassificationCatalogs & {
   magicPropertyProvider?: MagicPropertyDefinitionProvider
   spellsById?: ReadonlyMap<string, Spell>
   spellCatalog?: MonsterCatalogLoadStatus
+  unresolvedOverlayEquipmentIds?: ReadonlySet<string>
+  /** Overlay apply failures keyed by skill slug (same key as proficiency refs). */
+  unresolvedOverlaySkillSlugs?: ReadonlySet<string>
+  unresolvedOverlaySpellIds?: ReadonlySet<string>
 }
 
 function issue(
@@ -114,6 +118,7 @@ function collectEquipmentRowIssues(
     resolve: (key) => catalogs.equipmentById.get(key),
     unavailablePlacement: monsterEquipmentEdge.unavailablePlacement,
     messages: monsterEquipmentEdge.messages,
+    unresolvedOverlayTargetKeys: catalogs.unresolvedOverlayEquipmentIds,
   })
   if (referenceIssues.length > 0) {
     issues.push(...referenceIssues)
@@ -232,6 +237,7 @@ function collectSkillIssues(
       resolve: (key) => catalogs.skillBySlug.get(key),
       unavailablePlacement: monsterSkillProficienciesEdge.unavailablePlacement,
       messages: monsterSkillProficienciesEdge.messages,
+      unresolvedOverlayTargetKeys: catalogs.unresolvedOverlaySkillSlugs,
     }),
   )
 }
@@ -317,6 +323,7 @@ function collectSpellActionIssues(
       spellsById: catalogs.spellsById ?? new Map(),
       catalogStatus: spellCatalog,
       intent,
+      unresolvedOverlayTargetKeys: catalogs.unresolvedOverlaySpellIds,
     }),
   )
   if (intent !== 'publish' || spellCatalog !== 'ready') return

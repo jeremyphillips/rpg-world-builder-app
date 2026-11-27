@@ -6,7 +6,11 @@ import {
   TRAIT_OVERRIDE_DISPLAY_LABEL,
 } from './species-trait-form-labels'
 import { traitRowDraftFormSchema, traitRowFormSchema } from './species-trait-form-schema'
-import { heritageOptionItemFields, traitItemFields } from './species-trait-form-fields'
+import {
+  heritageOptionItemFields,
+  traitItemFields,
+  traitRowVariantTopologyFields,
+} from './species-trait-form-fields'
 
 function userFacingKindSelects(fields: ReturnType<typeof flattenFields>) {
   return fields.filter(
@@ -40,9 +44,31 @@ describe('species trait field configuration', () => {
     expect(names).not.toContain('name')
   })
 
-  it('omits grant name override from the field list', () => {
+  it('registers name on the custom branch and nameOverride on grant/template topology', () => {
+    const ctx = {} as Parameters<typeof traitItemFields>[0]
+    const topology = traitRowVariantTopologyFields(ctx)
+    const names = flattenFields(topology)
+      .filter((field) => field.type === 'text')
+      .map((field) => resolveFieldConfigPrimaryName(field))
+    expect(names).toContain('name')
+    expect(names).toContain('nameOverride')
+    expect(JSON.stringify(topology)).toContain('config.uses.normal')
+  })
+
+  it('omits grant name override from the mounted body field list', () => {
     const serialized = JSON.stringify(traitItemFields({} as Parameters<typeof traitItemFields>[0]))
     expect(serialized).not.toContain('"nameOverride"')
+  })
+
+  it('documents name as an inline-title domain exclusion on the mounted trait body', () => {
+    const bodyNames = flattenFields(
+      traitItemFields({} as Parameters<typeof traitItemFields>[0]),
+    ).map((field) => resolveFieldConfigPrimaryName(field))
+    expect(bodyNames).not.toContain('name')
+    const topologyNames = flattenFields(
+      traitRowVariantTopologyFields({} as Parameters<typeof traitItemFields>[0]),
+    ).map((field) => resolveFieldConfigPrimaryName(field))
+    expect(topologyNames).toContain('name')
   })
 
   it('defaults omitted kind to custom on the draft schema', () => {

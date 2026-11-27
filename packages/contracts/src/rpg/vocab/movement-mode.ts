@@ -1,5 +1,8 @@
 import { z } from 'zod'
 import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
+
+import { overlayAtomic } from '../content/lib/system-overlay/annotate'
+import { overlaySlugList } from '../content/lib/system-overlay/overlay-presets'
 import { standardFeet } from '../primitives/distance-presets'
 
 import { closedSetEnum, keysFromEntries, vocabEnumFromEntries } from './enum-schema'
@@ -146,7 +149,7 @@ export const movementSpeedFeetSchema = z.union(
  */
 export type MovementSpeeds = Partial<Record<MovementMode, number>>
 
-export const movementSpeedsSchema: z.ZodType<MovementSpeeds> = z
+const movementSpeedsCoreSchema = z
   .record(z.string(), speedFeetSchema)
   .superRefine((movement, ctx) => {
     const keys = Object.keys(movement)
@@ -161,8 +164,7 @@ export const movementSpeedsSchema: z.ZodType<MovementSpeeds> = z
     }
   })
 
-/** Draft movement map — allows an empty object; still validates mode keys when present. */
-export const movementSpeedsDraftSchema: z.ZodType<MovementSpeeds> = z
+const movementSpeedsDraftCoreSchema = z
   .record(z.string(), speedFeetSchema)
   .superRefine((movement, ctx) => {
     for (const key of Object.keys(movement)) {
@@ -171,10 +173,81 @@ export const movementSpeedsDraftSchema: z.ZodType<MovementSpeeds> = z
       }
     }
   })
-  .default({})
+
+export const movementSpeedsSchema: z.ZodType<MovementSpeeds> = overlayAtomic(
+  movementSpeedsCoreSchema,
+  'movement speed map replaces wholesale',
+)
+
+/** Draft movement map — allows an empty object; still validates mode keys when present. */
+export const movementSpeedsDraftSchema: z.ZodType<MovementSpeeds> = overlayAtomic(
+  movementSpeedsDraftCoreSchema,
+  'movement speed map replaces wholesale',
+).default({})
 
 export type CreatureLikeMovement = {
   movement: MovementSpeeds
+}
+
+export type MovementModeAvailability = 'guaranteed' | 'alternative' | 'absent'
+
+export type CreatureMovementDefinition = CreatureLikeMovement & {
+  movementAlternative?: MovementAlternative
+}
+
+const movementAlternativeModesSchema = overlaySlugList(extraMovementModeSchema)
+  .min(2, 'At least two alternative movement modes are required.')
+  .max(EXTRA_MOVEMENT_MODES.length)
+  .superRefine((modes, ctx) => {
+    if (new Set(modes).size !== modes.length) {
+      addCustomRefinementIssue(ctx, 'Alternative movement modes must be distinct.', ['modes'])
+    }
+  })
+
+/** GM's-choice movement pair at a single speed — sibling to fixed `movement`, not extra keys in the map. */
+export const movementAlternativeSchema = z
+  .object({
+    modes: movementAlternativeModesSchema,
+    feet: overlayAtomic(movementSpeedFeetSchema, 'preset alternative movement speed feet literal'),
+  })
+  .strict()
+
+export type MovementAlternative = z.infer<typeof movementAlternativeSchema>
+
+/** Returns whether a movement mode is fixed, listed as an alternative, or absent on the definition. */
+export function movementModeAvailability(
+  definition: CreatureMovementDefinition,
+  mode: MovementMode,
+): MovementModeAvailability {
+  if (definition.movement[mode] !== undefined) return 'guaranteed'
+  const alternative = definition.movementAlternative
+  if (alternative?.modes.includes(mode as ExtraMovementMode)) return 'alternative'
+  return 'absent'
+}
+
+/** Rejects a mode appearing in both fixed `movement` and `movementAlternative` (monster body refine). */
+export function refineMovementAlternativeOverlap(
+  body: { movement?: MovementSpeeds; movementAlternative?: MovementAlternative },
+  ctx: z.RefinementCtx,
+  prefix: (string | number)[] = [],
+): void {
+  const movement = body.movement
+  const alternative = body.movementAlternative
+  if (!movement || !alternative) return
+  for (const mode of alternative.modes) {
+    if (movement[mode] === undefined) continue
+    const label = getMovementModeLabel(mode)
+    addCustomRefinementIssue(
+      ctx,
+      `${label} cannot appear in both fixed movement and movement alternative.`,
+      [...prefix, 'movementAlternative', 'modes'],
+    )
+    addCustomRefinementIssue(
+      ctx,
+      `${label} cannot appear in both fixed movement and movement alternative.`,
+      [...prefix, 'movement', mode],
+    )
+  }
 }
 
 /** Normalizes movement for any creature-like content record. */
@@ -196,10 +269,34 @@ export function resolveCreatureMovement(entity: CreatureLikeMovement): MovementS
  * @example formatMovementDisplay({ walk: 30 }) // → "Walk 30 ft"
  * @example formatMovementDisplay({ walk: 30, fly: 60 }) // → "Walk 30 ft, Fly 60 ft"
  */
-export function formatMovementDisplay(speeds: MovementSpeeds, unit: 'ft' | 'ft.' = 'ft'): string {
-  return MOVEMENT_MODES.filter((mode) => speeds[mode] !== undefined)
-    .map((mode) => `${getMovementModeLabel(mode)} ${speeds[mode]} ${unit}`)
-    .join(', ')
+export function formatMovementDisplay(
+  speeds: MovementSpeeds,
+  unit: 'ft' | 'ft.' = 'ft',
+  alternative?: MovementAlternative,
+): string {
+  const fixedModes = MOVEMENT_MODES.filter((mode) => speeds[mode] !== undefined)
+  const omitWalkLabel =
+    unit === 'ft.' &&
+    alternative !== undefined &&
+    fixedModes.length === 1 &&
+    fixedModes[0] === 'walk'
+  const parts: string[] = []
+  for (const mode of fixedModes) {
+    const feet = speeds[mode]!
+    if (omitWalkLabel && mode === 'walk') {
+      parts.push(`${feet} ${unit}`)
+    } else {
+      parts.push(`${getMovementModeLabel(mode)} ${feet} ${unit}`)
+    }
+  }
+  if (alternative) {
+    const orderedAltModes = MOVEMENT_MODES.filter((mode): mode is ExtraMovementMode =>
+      (alternative.modes as readonly string[]).includes(mode),
+    )
+    const orPhrase = orderedAltModes.map(getMovementModeLabel).join(' or ')
+    parts.push(`${orPhrase} ${alternative.feet} ${unit} (GM's choice)`)
+  }
+  return parts.join(', ')
 }
 
 // ---------------------------------------------------------------------------

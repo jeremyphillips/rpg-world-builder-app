@@ -1333,5 +1333,94 @@
         }
       ]
     }
+  },
+  {
+    "id": "srd-cc-5.2.1:swarm-of-insects",
+    "slug": "swarm-of-insects",
+    "rulesetId": "srd-cc-5.2.1",
+    "catalogLayer": "system",
+    "provenance": {
+      "citation": {
+        "documentId": "srd-5.2.1",
+        "locator": {
+          "section": "Monsters"
+        }
+      }
+    },
+    "status": "published",
+    "campaignId": null,
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-01-01T00:00:00.000Z",
+    "name": "Swarm of Insects",
+    "description": "<p>A writhing mass of Tiny insects that moves as one creature.</p>",
+    "sizes": ["medium"],
+    "creatureType": "beast",
+    "alignment": "unaligned",
+    "abilityScores": {
+      "str": 3,
+      "dex": 13,
+      "con": 14,
+      "int": 1,
+      "wis": 7,
+      "cha": 1
+    },
+    "armorClass": {},
+    "hitPoints": {
+      "kind": "hit-dice",
+      "count": 3
+    },
+    "movement": {
+      "walk": 20
+    },
+    "movementAlternative": {
+      "modes": ["climb", "fly"],
+      "feet": 20
+    },
+    "senses": [
+      {
+        "type": "blindsight",
+        "range": 30
+      }
+    ],
+    "challengeRating": "1/2",
+    "proficiencies": {
+      "savingThrows": [],
+      "skills": [],
+      "languages": [],
+      "weapons": []
+    },
+    "defenses": {
+      "vulnerabilities": [],
+      "resistances": [],
+      "immunities": [],
+      "conditionImmunities": []
+    },
+    "equipment": [],
+    "traits": [
+      {
+        "id": "swarm",
+        "preset": "swarm",
+        "noun": "insect",
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/swarm-of-insects/swarm"
+          }
+        }
+      },
+      {
+        "id": "spider-climb",
+        "preset": "spider-climb",
+        "provenance": {
+          "excerpt": {
+            "documentId": "srd-5.2.1",
+            "excerptId": "monsters/swarm-of-insects/spider-climb"
+          }
+        }
+      }
+    ],
+    "actions": [],
+    "bonusActions": [],
+    "reactions": []
   }
 ]

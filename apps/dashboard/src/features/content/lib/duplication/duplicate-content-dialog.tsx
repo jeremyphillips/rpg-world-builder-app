@@ -5,7 +5,7 @@ import { canDuplicateContentType, type CatalogLayer, type ContentTypeKey } from 
 import { Modal } from '@rpg/ui'
 import { Form, FormSaveFooter } from '@rpg/ui/form'
 
-import { useSubmitHandler } from '@/lib/use-submit-handler'
+import { useAdoptedFormSubmit } from '@/lib/form-validation-adoption.lib'
 import { notifyDuplicateContentCreated } from '@/lib/notify'
 
 import { resolveContentPostCreateEditHref } from '../forms/shells/layout/content-form-navigation'
@@ -55,8 +55,8 @@ export function DuplicateContentDialog({
 
   const { mutateAsync, isPending } = useDuplicateContent(campaignId, contentTypeKey, queryKeyFn)
 
-  const { onSubmit, formError } = useSubmitHandler<DuplicateContentFormValues>({
-    submit: async (values, form) => {
+  const { onSubmit, formError } = useAdoptedFormSubmit<DuplicateContentFormValues>(
+    async (values, form) => {
       const saved = await mutateAsync({
         entityId: source.id,
         name: values.name,
@@ -72,8 +72,8 @@ export function DuplicateContentDialog({
       )
       notifyDuplicateContentCreated()
     },
-    fallbackMessage: DUPLICATE_CONTENT_FALLBACK_ERROR,
-  })
+    DUPLICATE_CONTENT_FALLBACK_ERROR,
+  )
 
   if (!canDuplicateContentType(contentTypeKey)) {
     return null

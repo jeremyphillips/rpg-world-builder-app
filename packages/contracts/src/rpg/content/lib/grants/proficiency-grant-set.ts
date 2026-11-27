@@ -1,6 +1,8 @@
 import { z } from 'zod'
 import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
 
+import { overlaySlugList } from '../system-overlay/overlay-presets'
+
 import { toolCategorySchema } from '../../../vocab/equipment/tool-category'
 import { skillSchema } from '../../skill-proficiency'
 import {
@@ -42,13 +44,13 @@ export { isMeaningfulProficiencyChoice, proficiencyChoiceSchema, proficiencyGran
 // ---------------------------------------------------------------------------
 
 export const toolProficiencyGrantSetSchema = proficiencyGrantSetSchema.extend({
-  categories: z.array(toolCategorySchema).default([]),
+  categories: overlaySlugList(toolCategorySchema).default([]),
 })
 
 export type ToolProficiencyGrantSet = z.infer<typeof toolProficiencyGrantSetSchema>
 
 export const skillProficiencyGrantSetSchema = proficiencyGrantSetSchema.extend({
-  items: z.array(skillSchema).default([]),
+  items: overlaySlugList(skillSchema).default([]),
 })
 
 export type SkillProficiencyGrantSet = z.infer<typeof skillProficiencyGrantSetSchema>
@@ -70,7 +72,7 @@ function refineMeaningfulChoiceGroup(
 
 export const proficiencyChoiceGroupSchema = z
   .object({
-    choices: z.array(proficiencyChoiceSchema).min(1),
+    choices: overlaySlugList(proficiencyChoiceSchema).min(1),
   })
   .superRefine((group, ctx) => {
     refineMeaningfulChoiceGroup(group.choices, ctx)
@@ -79,14 +81,14 @@ export const proficiencyChoiceGroupSchema = z
 export type ProficiencyChoiceGroup = z.infer<typeof proficiencyChoiceGroupSchema>
 
 export const skillProficiencyChoiceSchema = proficiencyChoiceSchema.extend({
-  from: z.array(skillSchema).default([]),
+  from: overlaySlugList(skillSchema).default([]),
 })
 
 export type SkillProficiencyChoice = z.infer<typeof skillProficiencyChoiceSchema>
 
 export const skillProficiencyChoiceGroupSchema = z
   .object({
-    choices: z.array(skillProficiencyChoiceSchema).min(1),
+    choices: overlaySlugList(skillProficiencyChoiceSchema).min(1),
   })
   .superRefine((group, ctx) => {
     refineMeaningfulChoiceGroup(group.choices, ctx)
@@ -96,7 +98,7 @@ export type SkillProficiencyChoiceGroup = z.infer<typeof skillProficiencyChoiceG
 
 /** Draft skill choice group — choices may be empty while authoring. */
 export const skillProficiencyChoiceGroupDraftSchema = z.object({
-  choices: z.array(skillProficiencyChoiceSchema).default([]),
+  choices: overlaySlugList(skillProficiencyChoiceSchema).default([]),
 })
 
 export type SkillProficiencyChoiceGroupDraft = z.infer<
@@ -105,7 +107,7 @@ export type SkillProficiencyChoiceGroupDraft = z.infer<
 
 const toolProficiencyChoiceObjectSchema = proficiencyChoiceSchema.omit({ from: true }).extend({
   pool: toolProficiencyPoolSchema.optional(),
-  from: z.array(z.string()).optional(),
+  from: overlaySlugList(z.string()).optional(),
 })
 
 /**
@@ -158,7 +160,7 @@ export type ToolProficiencyChoice = z.infer<typeof toolProficiencyChoiceObjectSc
 
 export const toolProficiencyChoiceGroupSchema = z
   .object({
-    choices: z.array(toolProficiencyChoiceSchema).min(1),
+    choices: overlaySlugList(toolProficiencyChoiceSchema).min(1),
   })
   .superRefine((group, ctx) => {
     refineMeaningfulToolChoiceGroup(group.choices, ctx)
@@ -168,7 +170,7 @@ export type ToolProficiencyChoiceGroup = z.infer<typeof toolProficiencyChoiceGro
 
 /** Draft tool choice group — choices may be empty while authoring. */
 export const toolProficiencyChoiceGroupDraftSchema = z.object({
-  choices: z.array(toolProficiencyChoiceSchema).default([]),
+  choices: overlaySlugList(toolProficiencyChoiceSchema).default([]),
 })
 
 export type ToolProficiencyChoiceGroupDraft = z.infer<typeof toolProficiencyChoiceGroupDraftSchema>

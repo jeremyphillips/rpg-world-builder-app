@@ -1,4 +1,5 @@
 import {
+  type CreatureTraitPresetId,
   getCreatureTraitPresetSentence,
   isConfigurableCreatureTraitPreset,
 } from '../../content/creature/trait-presets'
@@ -8,11 +9,15 @@ import {
   type CreatureTraitFormatRow,
 } from './format-configurable-trait'
 
+export type CreatureTraitPresetFormatRow = Omit<CreatureTraitFormatRow, 'preset'> & {
+  preset: CreatureTraitPresetId
+}
+
 export type FormatCreatureTraitInput = {
   /** Phrase from the caller’s subject adapter, such as `the hell hound`. */
   subject: string
   /** Preset row. Configurable fields are read from this object. */
-  trait: CreatureTraitFormatRow
+  trait: CreatureTraitPresetFormatRow
 }
 
 export type FormattedCreatureTrait = {

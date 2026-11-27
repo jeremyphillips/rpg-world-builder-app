@@ -12,7 +12,7 @@ import {
 import { managedMediaFormDefFields } from '../../lib/forms/registry/managed-media-form-def.lib'
 import { finalizeContentInput } from '../../lib/forms/registry/content-form-key-helpers'
 import { nameField } from '../../lib/forms/fields/content-identity-form-fields'
-import { classesQueryKey, useClasses } from '../hooks/use-classes'
+import { classesQueryKey, useClasses, useClassesListResult } from '../hooks/use-classes'
 import {
   buildClassTabs,
   classDraftFormSchema,
@@ -140,15 +140,18 @@ const classFormDef: ContentFormDef<
       buildClassCreateInput(values, ctx, validationIntent),
       ctx,
     ) as CreateClassInput,
+  overlayParticipantId: 'classes',
+  normalizeOverlayBody: (values, ctx, validationIntent = 'publish') => {
+    const { slug: _slug, ...body } = buildClassCreateInput(values, ctx, validationIntent) as Record<
+      string,
+      unknown
+    >
+    return body
+  },
 
   useListQuery: useClasses,
+  useListQueryResult: useClassesListResult,
   queryKey: classesQueryKey,
-
-  extractEmbeddedSeedRowIds: (entity) => ({
-    features: entity.features.map((feature) => feature.id),
-    'characterCreation.startingEquipment.options':
-      entity.characterCreation?.startingEquipment?.options.map((option) => option.id) ?? [],
-  }),
 
   preview: {
     buildIdentity: buildClassPreviewIdentity,

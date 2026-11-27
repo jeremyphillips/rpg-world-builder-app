@@ -135,12 +135,16 @@ describe('updateFeatInputSchema', () => {
 })
 
 describe('featPatchSchema', () => {
-  it('accepts an overlay with a partial patch body', () => {
+  it('accepts a versioned stored overlay document', () => {
     const patch = {
       id: 'patch_1',
       campaignId: 'camp_1',
       targetId: grappler.id,
-      patch: { description: '<p>Updated benefit prose.</p>' },
+      patch: {
+        version: 1 as const,
+        revision: 1,
+        set: { description: '<p>Updated benefit prose.</p>' },
+      },
       ...timestamps,
     }
     expect(featPatchSchema.safeParse(patch).success).toBe(true)
@@ -152,12 +156,12 @@ describe('featPatchSchema', () => {
     )
   })
 
-  it('validates fields inside the patch body', () => {
+  it('rejects malformed overlay version', () => {
     const patch = {
       id: 'patch_1',
       campaignId: 'camp_1',
       targetId: grappler.id,
-      patch: { category: 'custom' },
+      patch: { version: 1 as const, revision: -1, set: { name: 'X' } },
       ...timestamps,
     }
     expect(featPatchSchema.safeParse(patch).success).toBe(false)

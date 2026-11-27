@@ -18,25 +18,41 @@ function prefixSlotIssuePath(slotPath: string, issuePath: string): string {
   return `${parent}.${issuePath}`
 }
 
+function issueClaimsField(issue: FormIssue, fieldPath: string): boolean {
+  return (
+    (issue.claim?.kind === 'field' || issue.claim?.kind === 'slot') &&
+    issue.claim.target === fieldPath
+  )
+}
+
+/** Every issue whose claim target is this control or slot path. */
+export function findRoutedIssuesForFieldPath(
+  issues: readonly FormIssue[],
+  fieldPath: string,
+): FormIssue[] {
+  return issues.filter((issue) => issueClaimsField(issue, fieldPath))
+}
+
 /** First issue whose claim target is this control or slot path. */
 export function findRoutedIssueForFieldPath(
   issues: readonly FormIssue[],
   fieldPath: string,
 ): FormIssue | undefined {
-  return issues.find(
-    (issue) =>
-      (issue.claim?.kind === 'field' || issue.claim?.kind === 'slot') &&
-      issue.claim.target === fieldPath,
-  )
+  return findRoutedIssuesForFieldPath(issues, fieldPath)[0]
 }
 
-/** Decoded copy for a control that routing claimed. */
+/** Decoded copy for a control. Distinct claimed reasons all stay visible. */
 export function resolveFieldIssueDisplayMessage(
   fieldPath: string,
   issues: readonly FormIssue[],
 ): string | undefined {
-  const routed = findRoutedIssueForFieldPath(issues, fieldPath)
-  return routed ? resolveFieldErrorMessage(routed.message) : undefined
+  const messages: string[] = []
+  for (const issue of findRoutedIssuesForFieldPath(issues, fieldPath)) {
+    const decoded = resolveFieldErrorMessage(issue.message)
+    if (!decoded || messages.includes(decoded)) continue
+    messages.push(decoded)
+  }
+  return messages.length > 0 ? messages.join(' ') : undefined
 }
 
 export function findRoutedIssuesForSlot(

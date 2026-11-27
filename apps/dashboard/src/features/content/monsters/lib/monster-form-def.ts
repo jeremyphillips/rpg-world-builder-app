@@ -11,7 +11,7 @@ import {
 } from '../../lib/forms/fields/content-movement-form-fields'
 import { managedMediaFormDefFields } from '../../lib/forms/registry/managed-media-form-def.lib'
 import { nameField } from '../../lib/forms/fields/content-identity-form-fields'
-import { monstersQueryKey, useMonsters } from '../hooks/use-monsters'
+import { monstersQueryKey, useMonsters, useMonstersListResult } from '../hooks/use-monsters'
 import { buildMonsterTabs } from './monster-form-fields'
 import { buildMonsterPreviewIdentity, buildMonsterPreviewSections } from './monster-form-preview'
 import { buildMonsterActionRequirementValueSyncs } from './actions/monster-action-requirement-form-sync'
@@ -20,12 +20,19 @@ import { buildMultiattackUseRepetitionValueSyncs } from './actions/multiattack/m
 import { buildMonsterHitPointsFormValueSyncs } from './statistics/monster-hit-points-form.lib'
 import { buildMonsterLairFormValueSyncs } from './statistics/monster-lair-form-value-sync'
 import { resolveMonsterFormSchema } from './monster-form-schema'
+import { normalizeMonsterFormValues } from './normalize-monster-form-values'
+import { serializeContentFormInput } from '../../lib/forms/registry/content-form-serialize-input.lib'
+import { buildIdentityPreparedWrite } from '../../lib/forms/submit/content-prepared-write.types'
+import type { PrepareSerializedContentFormWriteInput } from '../../lib/forms/submit/prepare-serialized-content-form-write.lib'
 import {
+  baselineFromEntity,
   buildMonsterInput,
+  buildMonsterPreparedWrite,
   monsterToFormValues,
   resolveMonsterCreateDefaultValues,
   type MonsterFormValues,
 } from './monster-form-values'
+import type { ContentFormInputCtx } from '../../lib/forms/registry/content-form-registry'
 
 const monsterMediaFields = managedMediaFormDefFields('monsters') as {
   supportsManagedMedia: true
@@ -86,13 +93,7 @@ export const monsterFormDef: ContentFormDef<Monster, MonsterFormValues, CreateMo
   buildTabs: buildMonsterTabs,
   buildFields: (ctx) => contentFormFields(monsterFormDef, ctx),
   valueSyncs: buildMonsterFormValueSyncs,
-  extractEmbeddedSeedRowIds: (entity) => ({
-    traits: entity.traits.map((trait) => trait.id),
-    actions: entity.actions.map((action) => action.id),
-    bonusActions: entity.bonusActions.map((action) => action.id),
-    reactions: entity.reactions.map((action) => action.id),
-    'legendaryActions.actions': entity.legendaryActions?.actions.map((action) => action.id) ?? [],
-  }),
+  overlayParticipantId: 'monsters',
   toFormValues: monsterToFormValues,
   enrichEditLayoutCtx: (ctx, entity) => ({
     ...ctx,
@@ -100,7 +101,40 @@ export const monsterFormDef: ContentFormDef<Monster, MonsterFormValues, CreateMo
   }),
   toInput: (values, ctx, validationIntent = 'publish') =>
     buildMonsterInput(values, ctx, validationIntent),
+  serializePreparedWrite: (input: PrepareSerializedContentFormWriteInput<MonsterFormValues>) => {
+    const entity = input.inputCtx?.entity as { catalogLayer?: string } | undefined
+    if (input.operation === 'update' && entity?.catalogLayer === 'system') {
+      // Overlay intent envelope: provenance stays identity until intent paths map to form owners.
+      return buildIdentityPreparedWrite(
+        serializeContentFormInput(
+          monsterFormDef,
+          input.values,
+          input.inputCtx as ContentFormInputCtx<Monster> | undefined,
+          input.validationIntent,
+          {
+            operation: input.operation,
+            dirtyFields: input.form.formState.dirtyFields as Record<string, unknown> | undefined,
+            rulesetId: input.rulesetId,
+            ...input.serializeOptions,
+          },
+        ),
+      )
+    }
+    return buildMonsterPreparedWrite(
+      input.values,
+      input.inputCtx as ContentFormInputCtx<Monster> | undefined,
+      input.validationIntent,
+    )
+  },
+  normalizeOverlayBody: (values, ctx, validationIntent = 'publish') =>
+    normalizeMonsterFormValues(values, {
+      baseline: baselineFromEntity(ctx?.entity),
+      intent: validationIntent,
+      mode: 'update',
+      armorClassRules: ctx?.armorClassRules,
+    }) as Record<string, unknown>,
   useListQuery: useMonsters,
+  useListQueryResult: useMonstersListResult,
   queryKey: monstersQueryKey,
   preview: {
     buildIdentity: buildMonsterPreviewIdentity,

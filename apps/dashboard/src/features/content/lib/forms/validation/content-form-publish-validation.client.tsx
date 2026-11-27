@@ -1,55 +1,13 @@
-import { useEffect, useMemo } from 'react'
-import { useFormContext, type FieldValues } from 'react-hook-form'
+import { useEffect, useRef } from 'react'
+import type { FieldValues } from 'react-hook-form'
 import type { ZodType } from 'zod'
-import {
-  collectTabbedFormResolverItems,
-  prepareFormIssues,
-  type FormIssue,
-  type TabbedFormTab,
-} from '@rpg/ui/form'
+import type { TabbedFormTab } from '@rpg/ui/form'
 
-import {
-  evaluateContentPublishValidation,
-  CONTENT_PUBLISH_VALIDATION_ROUTING_FAILED_MESSAGE,
-} from './content-publish-validation.lib'
+import { usePublishContentFormProducerSlot } from './publish-content-form-producer-slot.client'
 import {
   useContentPublishValidation,
   type ContentPublishValidation,
 } from './use-content-publish-validation'
-
-type RoutedPublishIssues = { status: 'ok'; issues: FormIssue[] } | { status: 'failed' }
-
-function routedPublishIssues(
-  schema: ZodType<FieldValues>,
-  values: FieldValues,
-  fields: ReturnType<typeof collectTabbedFormResolverItems>,
-): RoutedPublishIssues {
-  try {
-    const fresh = evaluateContentPublishValidation(schema, values, fields)
-    if (!fresh) return { status: 'ok', issues: [] }
-    return {
-      status: 'ok',
-      issues: prepareFormIssues(
-        fresh.map((issue) => ({
-          path: issue.path.split('.'),
-          message: issue.message,
-        })),
-        fields,
-        values as Record<string, unknown>,
-      ),
-    }
-  } catch {
-    return { status: 'failed' }
-  }
-}
-
-function routingFailedIssue(): FormIssue {
-  return {
-    path: '',
-    message: CONTENT_PUBLISH_VALIDATION_ROUTING_FAILED_MESSAGE,
-    severity: 'crossRow',
-  }
-}
 
 /** Bridges live publish validation into {@link FormUiProvider} presentation props. */
 export function ContentFormPublishValidationBridge({
@@ -62,24 +20,27 @@ export function ContentFormPublishValidationBridge({
   onValidationChange: (validation: Pick<ContentPublishValidation, 'issues'>) => void
 }) {
   const validation = useContentPublishValidation({ schema, tabs, debounceMs: 0 })
-  const { getValues } = useFormContext<FieldValues>()
-  const fields = useMemo(() => collectTabbedFormResolverItems(tabs), [tabs])
+  const publishToProducerSlot = usePublishContentFormProducerSlot()
+  const publishedSignatureRef = useRef<string | null>(null)
 
   useEffect(() => {
     if (validation.isChecking) return
-    const routed = routedPublishIssues(schema, getValues(), fields)
-    if (routed.status === 'failed') {
-      onValidationChange({ issues: [routingFailedIssue()] })
-      return
-    }
     // Not-ready with no routed issues is a transient parse — keep the surfaced list.
-    if (routed.issues.length === 0 && !validation.isPublishReady) return
-    onValidationChange({ issues: routed.issues })
+    if (validation.issues.length === 0 && !validation.isPublishReady) return
+
+    const signature = validation.isPublishReady
+      ? '__ready__'
+      : validation.issues.map((issue) => `${issue.path}\0${issue.message}`).join('\n')
+    if (signature === publishedSignatureRef.current) return
+    publishedSignatureRef.current = signature
+    publishToProducerSlot(
+      'publish-readiness',
+      validation.isPublishReady ? [] : validation.issues,
+      onValidationChange,
+    )
   }, [
-    fields,
-    getValues,
     onValidationChange,
-    schema,
+    publishToProducerSlot,
     validation.isChecking,
     validation.isPublishReady,
     validation.issues,

@@ -4,7 +4,7 @@ import { Heading, Icon, Spinner, Text } from '@rpg/ui'
 import { TabbedForm, FormSaveFooter, type TabbedFormTab } from '@rpg/ui/form'
 
 import { PageShell } from '@/components/layout/page/page-shell'
-import { useSubmitHandler } from '@/lib/use-submit-handler'
+import { useAdoptedFormSubmit } from '@/lib/form-validation-adoption.lib'
 import { notifySaveSuccess } from '@/lib/notify'
 import { FormUnsavedChangesGuard } from '@/lib/form-unsaved-changes-guard'
 import { useLocations } from '@/features/content'
@@ -73,11 +73,14 @@ export function CampaignSettings() {
     ]
   }, [campaignId, locations])
 
-  const { onSubmit, formError } = useSubmitHandler<CampaignSettingsValues>(async (values, form) => {
-    await mutateAsync(buildUpdateCampaignInput(values))
-    form.reset(values)
-    notifySaveSuccess()
-  }, 'Could not save campaign.')
+  const { onSubmit, formError } = useAdoptedFormSubmit<CampaignSettingsValues>(
+    async (values, form) => {
+      await mutateAsync(buildUpdateCampaignInput(values))
+      form.reset(values)
+      notifySaveSuccess()
+    },
+    'Could not save campaign.',
+  )
 
   let body: ReactNode
 

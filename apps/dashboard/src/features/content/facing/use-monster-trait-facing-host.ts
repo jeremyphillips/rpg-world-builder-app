@@ -13,6 +13,10 @@ export function useMonsterTraitFacingHost(input: {
   const name = useWatch<MonsterFormValues, 'name'>({ name: 'name' })
   const lair = useWatch<MonsterFormValues, 'lair'>({ name: 'lair' })
   const forms = useWatch<MonsterFormValues, 'forms'>({ name: 'forms' })
+  const movement = useWatch<MonsterFormValues, 'movement'>({ name: 'movement' })
+  const movementAlternative = useWatch<MonsterFormValues, 'movementAlternative'>({
+    name: 'movementAlternative',
+  })
 
   const selectedRow = useWatch({
     name: rowPrefix as 'traits.0',
@@ -28,6 +32,6 @@ export function useMonsterTraitFacingHost(input: {
     source: 'draft',
     hostId: 'monster-traits',
     row: selectedRow,
-    monster: { name: name ?? '', lair, forms },
+    monster: { name: name ?? '', lair, forms, movement, movementAlternative },
   }
 }

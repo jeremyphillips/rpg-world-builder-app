@@ -1,14 +1,10 @@
 import { ACTION_PRESET_IDS, monsterSectionAllowsPreset } from '@rpg/contracts'
-import {
-  collectTabbedFormResolverItems,
-  prepareFormIssues,
-  safeParseWithFieldErrors,
-  type FormIssue,
-} from '@rpg/ui/form'
+import { collectTabbedFormResolverItems, type FormIssue } from '@rpg/ui/form'
 import { collectIssueClaimReport, toRegisteredFormShape } from '@rpg/ui/form/test-utils'
 import type { ZodType } from 'zod'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
+import { evaluateContentPublishFormIssues } from '../../../../lib/forms/validation/content-publish-validation.lib'
 import { buildMonsterTabs } from '../../monster-form-fields'
 import { resolveMonsterFormSchema } from '../../monster-form-schema'
 import { monsterActionRowResolveFields } from '../../monster-master-detail-validation-fields'
@@ -106,13 +102,7 @@ export function monsterRoutedIssues(
   section: MonsterActionSection = 'actions',
 ): FormIssue[] {
   const values = monsterClaimValues(action, shape, section)
-  const parsed = safeParseWithFieldErrors(monsterClaimSchema, values, monsterClaimFields)
-  if (parsed.success) return []
-  return prepareFormIssues(
-    parsed.error.issues,
-    monsterClaimFields,
-    values as Record<string, unknown>,
-  )
+  return evaluateContentPublishFormIssues(monsterClaimSchema, values, monsterClaimFields) ?? []
 }
 
 export function blankSaveAction() {

@@ -5,7 +5,6 @@ import type { FieldValues } from 'react-hook-form'
 import { useFormContext } from 'react-hook-form'
 import {
   navigateInvalidSubmit,
-  prepareFormIssues,
   useFormUiContext,
   type FormIssue,
   type FormItem,
@@ -18,11 +17,9 @@ import {
   draftPublishValidationSurface,
   type DraftPublishValidationSurface,
 } from './content-draft-publish-validation-surface.ref'
-import {
-  CONTENT_PUBLISH_VALIDATION_ROUTING_FAILED_MESSAGE,
-  evaluateContentPublishValidation,
-  paintValidationIssuesOnForm,
-} from './content-publish-validation.lib'
+import { applyCanonicalFormIssuesToRhf } from './content-form-validation-rhf.lib'
+import { tryEvaluateContentPublishFormIssues } from './content-publish-validation.lib'
+import { usePublishContentFormProducerSlot } from './publish-content-form-producer-slot.client'
 
 export function ContentDraftPublishValidationSurfaceBridge({
   def,
@@ -41,13 +38,16 @@ export function ContentDraftPublishValidationSurfaceBridge({
 }) {
   const form = useFormContext<FieldValues>()
   const ui = useFormUiContext()
+  const publishToProducerSlot = usePublishContentFormProducerSlot()
   const uiRef = useRef(ui)
   const onPublishIssuesChangeRef = useRef(onPublishIssuesChange)
+  const publishToSlotRef = useRef(publishToProducerSlot)
 
   useEffect(() => {
     uiRef.current = ui
     onPublishIssuesChangeRef.current = onPublishIssuesChange
-  }, [onPublishIssuesChange, ui])
+    publishToSlotRef.current = publishToProducerSlot
+  }, [onPublishIssuesChange, publishToProducerSlot, ui])
 
   // Keep this registration stable across presentation resets. Reading `ui` from
   // state would unsubscribe the surface before the post-save microtask runs.
@@ -60,45 +60,28 @@ export function ContentDraftPublishValidationSurfaceBridge({
     const surface: DraftPublishValidationSurface = (values) => {
       const publishSchema = resolveContentPublishSchema(def, ctx)
       const currentUi = uiRef.current
-      let issues: ReturnType<typeof evaluateContentPublishValidation>
-      try {
-        issues = evaluateContentPublishValidation(publishSchema, values, publishFields)
-      } catch {
-        paintValidationIssuesOnForm(form, [
-          { path: '', message: CONTENT_PUBLISH_VALIDATION_ROUTING_FAILED_MESSAGE },
-        ])
+      const { issues, routingFailed } = tryEvaluateContentPublishFormIssues(
+        publishSchema,
+        values,
+        publishFields,
+      )
+      if (routingFailed) {
+        applyCanonicalFormIssuesToRhf(form, issues)
         currentUi.markSubmitAttempted()
         if (currentUi.publishPresentationEnabled) {
           currentUi.markPublishAttempted()
-          onPublishIssuesChangeRef.current({
-            issues: [
-              {
-                path: '',
-                message: CONTENT_PUBLISH_VALIDATION_ROUTING_FAILED_MESSAGE,
-                severity: 'crossRow',
-              },
-            ],
-          })
+          publishToSlotRef.current('publish-readiness', issues, onPublishIssuesChangeRef.current)
         }
         return null
       }
-      if (!issues) return null
+      if (issues.length === 0) return null
 
-      paintValidationIssuesOnForm(form, issues)
+      applyCanonicalFormIssuesToRhf(form, issues)
       currentUi.markSubmitAttempted()
 
       if (currentUi.publishPresentationEnabled) {
         currentUi.markPublishAttempted()
-        onPublishIssuesChangeRef.current({
-          issues: prepareFormIssues(
-            issues.map((issue) => ({
-              path: issue.path.split('.'),
-              message: issue.message,
-            })),
-            publishFields,
-            values as Record<string, unknown>,
-          ),
-        })
+        publishToSlotRef.current('publish-readiness', issues, onPublishIssuesChangeRef.current)
       }
 
       navigateInvalidSubmit(form, publishFields, formId, currentUi)

@@ -10,12 +10,14 @@ import {
 } from '@/features/content/lib/content-type-labels'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
 import { ContentOverviewTable } from '../../lib/overview/content-overview-table'
-import { useMonsters } from '../hooks/use-monsters'
+import { useContentOverviewMergedData } from '../../lib/list/create-content-list'
+import { useMonstersListResult } from '../hooks/use-monsters'
 import { monstersColumns, monstersFilterSchema } from '../lib/monsters-overview-columns'
 
 export function MonstersOverview() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()
-  const { data: monsters = [], isPending, isError } = useMonsters(campaignId)
+  const listResult = useMonstersListResult(campaignId)
+  const { data: monsters, isPending, isError } = useContentOverviewMergedData(listResult)
   return (
     <ContentOverviewShell
       heading={getContentTypeCollectionLabel('monsters')}

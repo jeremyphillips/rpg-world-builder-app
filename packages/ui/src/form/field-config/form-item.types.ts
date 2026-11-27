@@ -390,12 +390,26 @@ export interface ArrayAddActionConfig {
 /** Item-level header chrome visibility — mirrors {@link FieldLabelVisibility} naming. */
 export type ArrayItemHeaderVisibility = 'auto' | 'hidden'
 
+/** Declared row shapes for ownership registration without probing fabricated rows. */
+export type ArrayRowVariantTopology = {
+  /** Object key selecting {@link variants}. @default `'kind'` */
+  discriminatorKey?: string
+  /** Per-discriminator field trees (relative to the array row prefix). */
+  variants: Record<string, readonly FormItem[]>
+  /** Malformed or unknown discriminator rows. */
+  fallback?: readonly FormItem[]
+  /** Fields present on every variant (for example hoisted `name`). */
+  shared?: readonly FormItem[]
+}
+
 export interface ArrayItemConfig {
   /**
    * When set, row badges, error maps, and issue routing expand one field tree per
    * stored array item instead of the static {@link ArrayConfig.fields} template.
    */
   resolveFields?: ArrayResolveFieldsFn
+  /** Static variant topology for registry compilation when rows are empty or incomplete. */
+  rowVariantTopology?: ArrayRowVariantTopology
   variant?: ArrayItemVariant
   /** @default raised */
   surface?: SurfaceConfig

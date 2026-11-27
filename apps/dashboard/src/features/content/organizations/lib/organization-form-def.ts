@@ -13,7 +13,11 @@ import {
   organizationToFormValues,
   type OrganizationFormValues,
 } from '../../lib/forms/organization-form-projection'
-import { organizationsQueryKey, useOrganizations } from '../hooks/use-organizations'
+import {
+  organizationsQueryKey,
+  useOrganizations,
+  useOrganizationsListResult,
+} from '../hooks/use-organizations'
 import { resolveDiscoverableOrganizationMemberClasses } from './members/organization-member-class-discoverable.lib'
 
 const organizationFormDef: ContentFormDef<
@@ -40,6 +44,7 @@ const organizationFormDef: ContentFormDef<
   toFormValues: organizationToFormValues,
   toInput: buildOrganizationCreateInput,
   useListQuery: useOrganizations,
+  useListQueryResult: useOrganizationsListResult,
   queryKey: organizationsQueryKey,
 }
 

@@ -13,6 +13,7 @@ High-level ownership and prevention policy for this monorepo. This document is a
 | Monster acquisition recipes     | [apps/dashboard/docs/monster-action-acquisition-ssot.md](../apps/dashboard/docs/monster-action-acquisition-ssot.md)                                                                                                                        |
 | System ruleset identity & scope | [packages/contracts/docs/structure.md § System ruleset identity](../packages/contracts/docs/structure.md#system-ruleset-identity-primitivesrulesetts), plan [default_ruleset_ssot](../.cursor/plans/default_ruleset_ssot_c13d26cc.plan.md) |
 | Dead-code / Fallow usage        | [tools/fallow/README.md](../tools/fallow/README.md)                                                                                                                                                                                        |
+| Complexity remediation          | [complexity-remediation.md](./complexity-remediation.md) (investigation: [analysis/complexity-threshold-investigation.md](./analysis/complexity-threshold-investigation.md))                                                             |
 | PR review lenses                | [.cursor/skills/pr-review/SKILL.md](../.cursor/skills/pr-review/SKILL.md)                                                                                                                                                                  |
 
 ## Four prevention problems
@@ -196,6 +197,8 @@ Before adding a string union, registry, exported helper, resolver, or kind:
 4. For new **exports**, name the consumer or public API role.
 5. For monster actions, assume **section × kind × category** composition — not one
    composer per kind ([authoring coverage test](../apps/dashboard/src/features/content/monsters/lib/actions/detail-fields/section-composers-authoring-coverage.test.ts)).
+6. On a Fallow complexity finding, follow [complexity-remediation.md](./complexity-remediation.md)
+   (includes challenge/removal of unjustified abstractions, not only new ones).
 
 ---
 

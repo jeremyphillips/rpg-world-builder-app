@@ -1,125 +1,58 @@
-import { useContext, useRef } from 'react'
-import type { ContentValidationIntent } from '@rpg/contracts'
-import { getApiValidationIssues } from '@rpg/contracts'
-import type { FieldValues, UseFormReturn } from 'react-hook-form'
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { useFormContext, type FieldValues } from 'react-hook-form'
+import { isApiError } from '@rpg/contracts/shared'
 import {
-  buildFieldControlId,
+  cancelPendingInvalidSubmitFocus,
+  createEmptyFormValidationProducerSession,
   FormUiContext,
-  navigateInvalidSubmit,
-  resolveInvalidSubmitNavigation,
+  FormValidationInteractiveProducerBridge,
+  FormValidationProducerProvider,
   useSubmitHandler,
+  type FormIssue,
   type FormItem,
-  type FormSubmitHandler,
-  type FormUiContextValue,
-  type MapFormError,
+  type FormValidationProducerSession,
+  type FormValidationProducerSlot,
   type UseSubmitHandlerResult,
 } from '@rpg/ui/form'
 
-import {
-  applyContentPublishValidation,
-  applyValidationIssuesToForm,
-} from '../../validation/content-publish-validation.lib'
-import type { AnyContentFormDef, ContentFormCtx } from '../../registry/content-form-registry'
 import { resolveContentFormSchema, resolveContentPublishSchema } from '../edit/content-edit-load'
+import {
+  ingestContentFormValidationIssues,
+  realignFormValidationProducerSessionStamps,
+} from '../../validation/ingest-content-form-validation.lib'
+import { consumeContentFormPersistBaselineReset } from './content-form-persist-baseline-reset.lib'
+import { runContentFormCommitAttempt } from './content-form-submit-commit.lib'
+import {
+  ContentFormSubmitSuperseded,
+  ContentFormSubmitValidationFailed,
+  type ContentFormInvalidPresentation,
+  type UseContentFormSubmitOptions,
+} from './content-form-submit-types.lib'
 
-/** Internal sentinel — commit validation failed after field errors were applied. */
-export class ContentFormSubmitValidationFailed extends Error {
-  constructor() {
-    super('Content form commit validation failed.')
-    this.name = 'ContentFormSubmitValidationFailed'
-  }
-}
+const EMPTY_RESOLVER_FIELDS: FormItem[] = []
 
-export type ContentFormInvalidPresentation = {
-  /** Fields for invalid-submit focus (include hoisted identity/name). */
-  resolverFields: FormItem[]
-  formId: string
-  /** Feature-owned: which view/tab owns a failing path. Shared code never hard-codes tab ids. */
-  resolveViewForPath?: (path: string) => string | undefined
-  activateView?: (viewId: string) => void
-}
-
-export type UseContentFormSubmitOptions<TValues extends FieldValues> = {
-  def: AnyContentFormDef
-  ctx: ContentFormCtx
-  /** Final commit intent — default `'publish'`. */
-  commitValidationIntent?: ContentValidationIntent
-  fallbackMessage: string
-  mapError?: MapFormError
-  invalidPresentation?: ContentFormInvalidPresentation
-  /** Applied immediately before commit schema validation. Persist still receives raw form values. */
-  prepareCommitValues?: (values: TValues) => TValues
-  /** Feature-owned persistence — called only after commit validation passes. */
-  persist: FormSubmitHandler<TValues>
-}
+export {
+  ContentFormSubmitSuperseded,
+  ContentFormSubmitValidationFailed,
+  type ContentFormInvalidPresentation,
+  type UseContentFormSubmitOptions,
+} from './content-form-submit-types.lib'
+export { presentContentFormInvalidSubmit } from './content-form-submit-presentation.lib'
+export { focusFormPath } from './content-form-editor-focus.lib'
+export {
+  useContentFormSubmitProducerBinding,
+  type ContentFormSubmitProducerBinding,
+} from './content-form-submit-producer-binding.client'
 
 export type UseContentFormSubmitResult<TValues extends FieldValues> =
   UseSubmitHandlerResult<TValues> & {
-    /** Render inside the form header so invalid-submit focus can expand sections. */
+    /** Stamp watch only — use when a second submit hook shares one form boundary. */
+    ProducerStampBridge: () => null
+    /** Wraps field chrome so presentation reads the producer session. */
+    ProducerBoundary: React.ComponentType<{ children: React.ReactNode }>
+    /** @deprecated Prefer {@link ProducerBoundary}; use {@link ProducerStampBridge} only for a second lease on a shared form. */
     UiBridge: () => null
   }
-
-function resolveFirstInvalidPath<TFieldValues extends FieldValues>(
-  form: UseFormReturn<TFieldValues>,
-  fields: FormItem[],
-  formId: string,
-): string | undefined {
-  const navigation = resolveInvalidSubmitNavigation({
-    errors: form.formState.errors,
-    fields,
-    idPrefix: formId,
-    getItemValues: (fullName, index) => {
-      const value = form.getValues(`${fullName}.${index}` as never)
-      return typeof value === 'object' && value !== null
-        ? (value as Record<string, unknown>)
-        : undefined
-    },
-  })
-  return navigation?.firstIssue.path
-}
-
-export function presentContentFormInvalidSubmit<TFieldValues extends FieldValues>(
-  form: UseFormReturn<TFieldValues>,
-  ui: Pick<FormUiContextValue, 'markSubmitAttempted' | 'addValidationSessionExpandKeys'> | null,
-  presentation: ContentFormInvalidPresentation,
-  options?: { firstInvalidPath?: string },
-): void {
-  const firstPath =
-    options?.firstInvalidPath ??
-    resolveFirstInvalidPath(form, presentation.resolverFields, presentation.formId)
-  const viewId =
-    firstPath && presentation.resolveViewForPath
-      ? presentation.resolveViewForPath(firstPath)
-      : undefined
-
-  if (viewId && presentation.activateView) {
-    presentation.activateView(viewId)
-  }
-
-  if (!ui) return
-
-  const errors = form.formState.errors
-
-  navigateInvalidSubmit(form, presentation.resolverFields, presentation.formId, ui, errors, {
-    ...(viewId ? { waitForLayout: true } : {}),
-  })
-}
-
-function presentPersistValidationFailure<TFieldValues extends FieldValues>(
-  form: UseFormReturn<TFieldValues>,
-  error: unknown,
-  presentation: ContentFormInvalidPresentation | undefined,
-  ui: Pick<FormUiContextValue, 'markSubmitAttempted' | 'addValidationSessionExpandKeys'> | null,
-): void {
-  const issues = getApiValidationIssues(error)
-  if (!issues || !presentation) return
-
-  form.clearErrors()
-  applyValidationIssuesToForm(form, issues)
-  presentContentFormInvalidSubmit(form, ui, presentation, {
-    firstInvalidPath: issues[0]?.path,
-  })
-}
 
 export function useContentFormSubmit<TValues extends FieldValues>(
   options: UseContentFormSubmitOptions<TValues>,
@@ -132,86 +65,208 @@ export function useContentFormSubmit<TValues extends FieldValues>(
     mapError,
     invalidPresentation,
     prepareCommitValues,
+    writeSchema,
+    prepareWrite,
     persist,
+    producerBinding,
+    mountProducerChrome = true,
   } = options
 
-  const uiRef = useRef<Pick<
-    FormUiContextValue,
+  const attemptCounterRef = useRef(0)
+  const internalStampRef = useRef(0)
+  const stampWatchLeasesRef = useRef(0)
+  const stampWatchCleanupRef = useRef<(() => void) | null>(null)
+  const internalPersistingRef = useRef(0)
+  const persistValuesSnapshotRef = useRef<string | null>(null)
+  const persistSupersededRef = useRef(false)
+  const internalUiRef = useRef<Pick<
+    import('@rpg/ui/form').FormUiContextValue,
     'markSubmitAttempted' | 'markPublishAttempted' | 'addValidationSessionExpandKeys'
   > | null>(null)
+
+  const stampRef = producerBinding?.stampRef ?? internalStampRef
+  const persistingRef = producerBinding?.persistingRef ?? internalPersistingRef
+  const uiRef = producerBinding?.uiRef ?? internalUiRef
+
+  const [ownedSession, setOwnedSession] = useState<FormValidationProducerSession>(() =>
+    createEmptyFormValidationProducerSession(),
+  )
+  const [ownedSnapshotStamp, setOwnedSnapshotStamp] = useState(0)
+
+  const producerSession = producerBinding?.producerSession ?? ownedSession
+  const setProducerSession = producerBinding?.setProducerSession ?? setOwnedSession
+  const snapshotStamp = producerBinding?.snapshotStamp ?? ownedSnapshotStamp
+  const setSnapshotStamp = producerBinding?.setSnapshotStamp ?? setOwnedSnapshotStamp
 
   const publishSchema =
     commitValidationIntent === 'publish'
       ? resolveContentPublishSchema(def, ctx)
       : resolveContentFormSchema(def, ctx, commitValidationIntent)
 
+  const producerSlot =
+    commitValidationIntent === 'publish' ? ('publish-action' as const) : ('draft-action' as const)
+
+  const interactiveResolverFields = useMemo(
+    () => invalidPresentation?.resolverFields ?? EMPTY_RESOLVER_FIELDS,
+    [invalidPresentation?.resolverFields],
+  )
+
   const { onSubmit, formError } = useSubmitHandler<TValues>({
     fallbackMessage,
     mapError: (error) => {
-      if (error instanceof ContentFormSubmitValidationFailed) return null
-      return mapError?.(error)
+      if (
+        error instanceof ContentFormSubmitValidationFailed ||
+        error instanceof ContentFormSubmitSuperseded
+      ) {
+        return null
+      }
+      const mapped = mapError?.(error)
+      if (mapped !== undefined) return mapped
+      // Server-authored API copy is safe; any other throw (Zod, invariant) is not author copy.
+      return isApiError(error) ? error.message : fallbackMessage
     },
     submit: async (values, form) => {
-      const commitValues = prepareCommitValues?.(values) ?? values
-      const issues = applyContentPublishValidation(
+      cancelPendingInvalidSubmitFocus()
+      // Captured synchronously, before the first await.
+      const attemptId = ++attemptCounterRef.current
+      const attempt = { stamp: stampRef.current, attemptId }
+      const readCurrent = () => ({
+        stamp: stampRef.current,
+        attemptId: attemptCounterRef.current,
+      })
+      const isCurrent = () => {
+        const current = readCurrent()
+        return current.stamp === attempt.stamp && current.attemptId === attempt.attemptId
+      }
+      const result = await runContentFormCommitAttempt({
+        values,
         form,
         publishSchema,
-        commitValues,
-        invalidPresentation?.resolverFields ?? [],
+        writeSchema,
+        resolverFields: invalidPresentation?.resolverFields ?? [],
+        producerSlot,
+        commitValidationIntent,
+        prepareCommitValues,
+        prepareWrite,
+        attempt,
+        readCurrent,
+        invalidPresentation,
+        ui: uiRef.current,
+        producerSession,
+        persistSupersededRef,
+        persist: async (wireValues, persistForm) => {
+          persistingRef.current += 1
+          persistSupersededRef.current = false
+          persistValuesSnapshotRef.current = JSON.stringify(persistForm.getValues())
+          const persistMeta = { isAttemptCurrent: isCurrent }
+          try {
+            await persist(wireValues, persistForm, persistMeta)
+          } finally {
+            persistingRef.current -= 1
+            persistValuesSnapshotRef.current = null
+          }
+        },
+      })
+
+      if (result.kind === 'superseded') throw new ContentFormSubmitSuperseded()
+      setProducerSession(
+        realignFormValidationProducerSessionStamps(result.session, stampRef.current),
       )
-      if (issues) {
-        if (commitValidationIntent === 'publish') {
-          uiRef.current?.markPublishAttempted()
-        }
-        if (invalidPresentation) {
-          presentContentFormInvalidSubmit(form, uiRef.current, invalidPresentation, {
-            firstInvalidPath: issues[0]?.path,
-          })
-        }
+      if (result.kind === 'validation-blocked') {
         throw new ContentFormSubmitValidationFailed()
       }
-
-      try {
-        await persist(values, form)
-      } catch (err) {
-        presentPersistValidationFailure(form, err, invalidPresentation, uiRef.current)
-        throw err
+      if (result.kind === 'persist-failed') {
+        throw result.error
       }
     },
   })
 
-  function UiBridge() {
+  const replaceSlot = useCallback(
+    (slot: FormValidationProducerSlot, issues: readonly FormIssue[]) => {
+      setProducerSession((prev) =>
+        ingestContentFormValidationIssues(prev, slot, stampRef.current, issues),
+      )
+    },
+    [],
+  )
+
+  function useContentFormSubmitStampWatch() {
     const ui = useContext(FormUiContext)
     uiRef.current = ui
+    const rhf = useFormContext()
+    useEffect(() => {
+      if (!rhf) return
+      stampWatchLeasesRef.current += 1
+      if (stampWatchLeasesRef.current === 1) {
+        const subscription = rhf.watch((_values, info) => {
+          if (persistingRef.current > 0) {
+            if (info.name === undefined && consumeContentFormPersistBaselineReset(rhf)) return
+            const snapshot = persistValuesSnapshotRef.current
+            const shouldBumpForWholeForm =
+              info.name === undefined &&
+              snapshot !== null &&
+              JSON.stringify(rhf.getValues()) !== snapshot
+            const shouldBumpForField = info.name !== undefined
+            if (shouldBumpForWholeForm || shouldBumpForField) {
+              persistSupersededRef.current = true
+              stampRef.current += 1
+              setSnapshotStamp(stampRef.current)
+              if (shouldBumpForWholeForm && snapshot !== null) {
+                persistValuesSnapshotRef.current = JSON.stringify(rhf.getValues())
+              }
+            }
+            return
+          }
+          stampRef.current += 1
+          setSnapshotStamp(stampRef.current)
+        })
+        stampWatchCleanupRef.current = () => subscription.unsubscribe()
+      }
+      return () => {
+        stampWatchLeasesRef.current -= 1
+        if (stampWatchLeasesRef.current === 0) {
+          stampWatchCleanupRef.current?.()
+          stampWatchCleanupRef.current = null
+        }
+      }
+    }, [rhf])
+  }
+
+  function ProducerStampBridge() {
+    if (!mountProducerChrome) return null
+    return React.createElement(ProducerStampBridgeActive)
+  }
+
+  function ProducerStampBridgeActive() {
+    useContentFormSubmitStampWatch()
     return null
   }
 
-  return { onSubmit, formError, UiBridge }
-}
+  function ProducerBoundary({ children }: { children: React.ReactNode }) {
+    if (!mountProducerChrome) return React.createElement(React.Fragment, null, children)
+    return React.createElement(ProducerBoundaryActive, { children })
+  }
 
-/** Activates the view that owns `path`, then focuses that control or `[data-form-focus]`. */
-export function focusFormPath(
-  path: string,
-  presentation: Pick<
-    ContentFormInvalidPresentation,
-    'formId' | 'resolveViewForPath' | 'activateView'
-  >,
-): void {
-  const viewId = presentation.resolveViewForPath?.(path)
-  if (viewId) presentation.activateView?.(viewId)
-  window.requestAnimationFrame(() => {
-    window.requestAnimationFrame(() => {
-      const control = document.getElementById(
-        buildFieldControlId(presentation.formId, undefined, path),
-      )
-      const marked = document.querySelector(`[data-form-focus="${path}"]`)
-      const element = control ?? marked
-      if (!(element instanceof HTMLElement)) return
-      element.scrollIntoView({ block: 'center' })
-      const focusable = element.matches('button, input, select, textarea, [tabindex]')
-        ? element
-        : element.querySelector<HTMLElement>('button, input, select, textarea, [tabindex]')
-      focusable?.focus()
-    })
-  })
+  function ProducerBoundaryActive({ children }: { children: React.ReactNode }) {
+    useContentFormSubmitStampWatch()
+    const value = useMemo(
+      () => ({ session: producerSession, stamp: snapshotStamp, replaceSlot }),
+      [replaceSlot, producerSession, snapshotStamp],
+    )
+    return React.createElement(
+      FormValidationProducerProvider,
+      { ...value },
+      React.createElement(FormValidationInteractiveProducerBridge, {
+        fields: interactiveResolverFields,
+      }),
+      children,
+    )
+  }
+
+  /** @deprecated Use {@link ProducerBoundary} around field chrome. */
+  function UiBridge() {
+    return React.createElement(ProducerStampBridge)
+  }
+
+  return { onSubmit, formError, ProducerBoundary, ProducerStampBridge, UiBridge }
 }

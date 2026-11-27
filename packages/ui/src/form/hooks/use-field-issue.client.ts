@@ -10,7 +10,7 @@ import {
   isFieldPathEligibleForPresentation,
   shouldShowFieldErrorPresentation,
 } from '../errors/resolve-field-error-presentation.lib'
-import { useFormValidationPresentation } from './use-form-validation-presentation.client'
+import { useFormValidationSessionProjection } from './use-form-validation-session-projection.client'
 
 export type UseFieldIssueOptions = {
   /** Whether the control should show invalid chrome when an issue exists. */
@@ -23,12 +23,41 @@ export type FieldIssuePresentation = {
   hasIssue: boolean
 }
 
+function flattenTouchedPaths(
+  touchedFields: unknown,
+  prefix = '',
+  touchedPaths: string[] = [],
+): string[] {
+  if (touchedFields === true) {
+    if (prefix) touchedPaths.push(prefix)
+    return touchedPaths
+  }
+  if (Array.isArray(touchedFields)) {
+    touchedFields.forEach((entry, index) => {
+      if (entry === undefined || entry === null) return
+      flattenTouchedPaths(entry, `${prefix}.${index}`, touchedPaths)
+    })
+    return touchedPaths
+  }
+  if (typeof touchedFields !== 'object' || touchedFields === null) return touchedPaths
+  for (const [key, value] of Object.entries(touchedFields)) {
+    if (value === undefined || value === null) continue
+    const nextPath = prefix ? `${prefix}.${key}` : key
+    flattenTouchedPaths(value, nextPath, touchedPaths)
+  }
+  return touchedPaths
+}
+
 /** Routed validation state for one bound control path. */
 export function useFieldIssue(
   fieldPath: string | undefined,
   options: UseFieldIssueOptions = {},
 ): FieldIssuePresentation {
-  const presentation = useFormValidationPresentation()
+  const presentation = useFormValidationSessionProjection()
+  const touchedPaths = React.useMemo(
+    () => flattenTouchedPaths(presentation.touchedFields),
+    [presentation.touchedFields],
+  )
   const eligible =
     options.eligible ??
     (fieldPath === undefined ||
@@ -49,7 +78,7 @@ export function useFieldIssue(
       fieldPath,
       session,
       presentation.inactivePaths,
-      presentation.touchedPaths,
+      touchedPaths,
     )
 
     return visible ? decoded : undefined
@@ -61,8 +90,8 @@ export function useFieldIssue(
     presentation.inactivePaths,
     presentation.issues,
     presentation.publishPresentationEnabled,
-    presentation.touchedPaths,
     presentation.validationPresentation,
+    touchedPaths,
   ])
 
   const hasIssue = React.useMemo(() => {

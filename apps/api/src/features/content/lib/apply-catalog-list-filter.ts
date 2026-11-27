@@ -8,6 +8,12 @@ import {
   filterCatalogForReference,
 } from './filter-catalog-for-viewer'
 
+export function catalogListModeIncludesOverlayFailures(
+  filter: CatalogListFilter | undefined,
+): boolean {
+  return filter?.mode !== 'play'
+}
+
 export type CatalogListFilter =
   | { mode: 'discovery'; membership: CatalogMembershipFilterInput | undefined }
   | {

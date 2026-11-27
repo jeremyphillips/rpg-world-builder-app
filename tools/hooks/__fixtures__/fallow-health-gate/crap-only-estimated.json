@@ -1,0 +1,22 @@
+{
+  "kind": "health",
+  "schema_version": 7,
+  "summary": {
+    "functions_above_threshold": 1,
+    "max_cyclomatic_threshold": 20,
+    "max_cognitive_threshold": 25,
+    "max_crap_threshold": 133
+  },
+  "findings": [
+    {
+      "path": "apps/example/hooks/use-save.ts",
+      "name": "handleSave",
+      "line": 42,
+      "cyclomatic": 15,
+      "cognitive": 8,
+      "exceeded": "crap",
+      "crap": 240,
+      "coverage_source": "estimated"
+    }
+  ]
+}

@@ -5,7 +5,7 @@ import {
   type ClassStored,
 } from '@rpg/contracts'
 
-import { resolveCatalogForCampaign } from '../content.service'
+import { resolveCatalogForCampaign, resolveContentListForCampaign } from '../content.service'
 import { classContentConfig } from './classes.config'
 
 /** Parse a single stored class record for API responses. */
@@ -20,4 +20,15 @@ export function parseClassReadModel(stored: ClassStored): CharacterClass {
 export async function resolveClassesForCampaign(campaignId: string): Promise<CharacterClass[]> {
   const storedClasses = await resolveCatalogForCampaign(classContentConfig, campaignId)
   return (storedClasses as ClassStored[]).map((cls) => parseClassReadModel(cls))
+}
+
+export async function resolveClassesListForCampaign(campaignId: string) {
+  const { items, overlayFailures } = await resolveContentListForCampaign(
+    classContentConfig,
+    campaignId,
+  )
+  return {
+    items: (items as ClassStored[]).map((cls) => parseClassReadModel(cls)),
+    overlayFailures,
+  }
 }

@@ -13,6 +13,19 @@ function capitalSubject(subject: string): string {
   return subject.charAt(0).toUpperCase() + subject.slice(1)
 }
 
+/** Shared spider climb rule tail — unconditional and conditional sentences compose from this once. */
+export const SPIDER_CLIMB_RULE_TAIL =
+  ' can climb difficult surfaces, including along ceilings, without needing to make an ability check.' as const
+
+/** Subject-led clause for conditional spider climb (e.g. after an “If …” prefix). */
+export function formatSpiderClimbRuleClause(subject: string): string {
+  return `${subject}${SPIDER_CLIMB_RULE_TAIL}`
+}
+
+function spiderClimbPresetSentence(subject: string): string {
+  return `${capitalSubject(subject)}${SPIDER_CLIMB_RULE_TAIL}`
+}
+
 export const CREATURE_TRAIT_PRESET_ENTRIES = {
   amphibious: {
     sentence: (subject) => `${capitalSubject(subject)} can breathe air and water.`,
@@ -49,8 +62,7 @@ export const CREATURE_TRAIT_PRESET_ENTRIES = {
     sentence: (subject) => `With a 10-foot running start, ${subject} can Long Jump up to 25 feet.`,
   },
   'spider-climb': {
-    sentence: (subject) =>
-      `${capitalSubject(subject)} can climb difficult surfaces, including along ceilings, without needing to make an ability check.`,
+    sentence: spiderClimbPresetSentence,
   },
   tunneler: {
     sentence: (subject) =>
