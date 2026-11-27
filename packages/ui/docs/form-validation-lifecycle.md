@@ -70,13 +70,15 @@ Do not reintroduce on adopted surfaces:
 
 ## Related tests
 
-| Test / lib                                                                | Role                                          |
-| ------------------------------------------------------------------------- | --------------------------------------------- |
-| `content-form-validation.test.ts`                                         | Catalog sweep / registration coverage         |
-| `form-validation-pilot-regression.test.ts`                                | Publish slots, operation failures, provenance |
-| `content-form-submit-drift.test.ts`                                       | Content shell bypass drift                    |
-| `form-validation-enforcement.test.ts`                                     | Repository filesystem guard                   |
-| `campaign-form-validation-adoption.test.ts`, `auth-form-adoption.test.ts` | Family drift                                  |
-| `content-publish-validation.lib.test.ts`                                  | Publish lib behavior + retired surface guard  |
+| Test / lib                                                                | Role                                                          |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| `content-form-validation.test.ts`                                         | Catalog sweep / registration coverage                         |
+| `form-validation-pilot-regression.test.ts`                                | Publish slots, operation failures, provenance                 |
+| `content-form-submit-drift.test.ts`                                       | Content shell bypass drift                                    |
+| `class-edit-features-pipeline.integration.test.tsx`                       | Class `classFormDef` + features master-detail at commit entry |
+| `content-edit-shell-monster-failed-persist.integration.test.tsx`          | Monster edit shell + structured API paint                     |
+| `form-validation-enforcement.test.ts`                                     | Repository filesystem guard                                   |
+| `campaign-form-validation-adoption.test.ts`, `auth-form-adoption.test.ts` | Family drift                                                  |
+| `content-publish-validation.lib.test.ts`                                  | Publish lib behavior + retired surface guard                  |
 
 Historical plan narrative: `.cursor/plans/form_validation_ownership_architecture.plan.md` (archive only; this doc is authoritative for day-to-day work).

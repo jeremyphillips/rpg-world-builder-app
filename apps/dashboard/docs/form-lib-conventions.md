@@ -321,6 +321,14 @@ paths. `errorPaths` drives tab UX; `resolverFields` drives validation message co
 `content-form-tab-icons.ts` (`TabbedFormTab.leadingIcon`). Non-form chrome tabs (e.g. class
 subclasses management) set `skipHeaderOnlyValidationWiring: true`.
 
+**Pilot cutover (tabbed catalog forms):** monsters, classes, species, spells, and equipment
+routes commit through `useContentFormSubmit` with `FormValidationProducerProvider` on create/edit
+shells. Embedded master-detail tabs (class **Features**, monster actions/traits, species traits)
+declare validation via `embeddedMasterDetailTabValidation`; row copy and badges use
+`useContentFormPresentationIssues` / `useMasterDetailRowValidation`, not `useFormValidationPresentation`.
+Registry drift for tab prefix ownership: `content-form-tab-ownership.test.ts`. Class features at
+the production commit boundary: `class-edit-features-pipeline.integration.test.tsx`.
+
 **Tests:** `assertHeaderOnlyTabsHaveValidationWiring(tabs)` in
 `tabbed-form-validation-test-utils.ts` — used by `content-form-tab-ownership.test.ts`
 and co-located form tests.
