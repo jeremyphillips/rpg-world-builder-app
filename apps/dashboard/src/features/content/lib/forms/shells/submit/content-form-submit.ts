@@ -38,7 +38,6 @@ export {
   type UseContentFormSubmitOptions,
 } from './content-form-submit-types.lib'
 export { presentContentFormInvalidSubmit } from './content-form-submit-presentation.lib'
-export { focusFormPath } from './content-form-editor-focus.lib'
 export {
   useContentFormSubmitProducerBinding,
   type ContentFormSubmitProducerBinding,

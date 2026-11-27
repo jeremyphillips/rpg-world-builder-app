@@ -547,7 +547,7 @@ Top-level content shells share `ContentFormFooter` (`content-form-footer.tsx`) w
 Create handoff URL: `resolveContentPostCreateEditHref` in `content-form-navigation.ts`.
 Submit/error wiring: **`useContentFormSubmit`** for ContentFormDef create/edit page shells
 (`ContentCreateShell`, `ContentEditShell`), create modals, and `ContentFormHost` adapters.
-Adopted tabbed/flat dashboard saves outside `ContentFormDef` use `useAdoptedFormSubmit` (`@/lib/form-validation-adoption.lib`) for canonical API issue paint. RHF paint for content issues goes through `applyCanonicalFormIssuesToRhf`. Overview: [form-validation-lifecycle.md](../../../packages/ui/docs/form-validation-lifecycle.md). Nested subclass editor remains separate until aligned in a follow-up.
+Adopted tabbed/flat dashboard saves outside `ContentFormDef` use `useRunnerFormSubmit` (`@/lib/runner-form-submit.lib`) on `runContentFormCommitAttempt` with producer sessions. Public login/signup use `useAuthFormSubmit` (`apps/public/.../use-auth-form-submit.client.ts`). Campaign create calls `validateCampaignCreateValues` before dispatch. The nested **subclass editor** owns an isolated `FormUiProvider` + `useRunnerFormSubmit` session; the class Subclasses tab stays exempt from parent tab ownership (`content-form-tab-ownership.test.ts`). **`useAdoptedFormSubmit`** remains only on quick NPC (`FORM_VALIDATION_ADOPTION_ALLOWLIST`). RHF paint for content issues goes through `applyCanonicalFormIssuesToRhf`. Overview: [form-validation-lifecycle.md](../../../packages/ui/docs/form-validation-lifecycle.md).
 
 ### Validation ownership guards
 
@@ -560,13 +560,13 @@ Scanner: `form-validation-enforcement.lib.ts` + `form-validation-enforcement.tes
 - `apps/dashboard/src/features/character/npc`
 - `apps/public/src/features/auth`
 
-**Blocked patterns** unless the file is on the exempt list: `useSubmitHandler`, `applyValidationIssuesToForm`, `paintValidationIssuesOnForm`, `applyContentPublishValidation`, `prepareFormIssues`, direct `useFormValidationPresentation`.
+**Blocked patterns** unless the file is on the exempt list or adoption allowlist: `useSubmitHandler`, `useAdoptedFormSubmit`, `applyValidationIssuesToForm`, `paintValidationIssuesOnForm`, `applyContentPublishValidation`, `prepareFormIssues`, direct `useFormValidationPresentation`.
 
 **Exempt legacy islands:** `content-form-submit.ts` (commit adapter), `content-publish-validation.lib.ts`, `content-form-presentation-issues.client.ts`, `content-form-validation-rhf.lib.ts`, `content-draft-publish-validation-surface.client.tsx`, `form-validation-enforcement.lib.ts`.
 
 **Drift tests:** `content-form-submit-drift.test.ts`, `campaign-form-validation-adoption.test.ts`, `auth-form-adoption.test.ts`.
 
-`FORM_VALIDATION_ADOPTION_ALLOWLIST` is empty. Adopted family list: `form-validation-adopted-families.ts`.
+`FORM_VALIDATION_ADOPTION_ALLOWLIST` names deferred families (quick NPC). Adopted family list: `form-validation-adopted-families.ts`. Family guard: `form-validation-family-adoption.guard.test.ts`.
 
 **Pilot commit pipeline (create/edit shells):** one prepare-once write via
 `prepareSerializedContentFormWrite`, then `runContentFormCommitAttempt` (publish/draft commit

@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { FORM_VALIDATION_ADOPTION_ALLOWLIST } from './form-validation-adoption-allowlist'
 import {
   FORM_VALIDATION_ENFORCEMENT_ROOTS,
+  FORM_VALIDATION_LEGACY_RULES,
   scanFormValidationEnforcement,
 } from './form-validation-enforcement.lib'
 
@@ -23,6 +24,13 @@ describe('form validation enforcement', () => {
       'apps/dashboard/src/features/character/npc',
       'apps/public/src/features/auth',
     ])
+  })
+
+  it('detects representative legacy bypass patterns', () => {
+    const sample = 'const x = useAdoptedFormSubmit(fn, msg)'
+    for (const rule of FORM_VALIDATION_LEGACY_RULES) {
+      expect(rule.pattern.test(sample), rule.id).toBe(rule.id === 'useAdoptedFormSubmit')
+    }
   })
 
   it('documents deferred quick-npc on the adoption allowlist until phase 8', () => {
