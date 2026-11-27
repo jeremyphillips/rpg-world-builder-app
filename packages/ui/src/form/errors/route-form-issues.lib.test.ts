@@ -57,6 +57,53 @@ describe('routeFormIssues via prepareFormIssues', () => {
     })
   })
 
+  it('keeps a parent object issue on the named group', () => {
+    const issues = prepareFormIssues(
+      { movementAlternative: { message: 'Choose a mode', type: 'custom' } },
+      [
+        {
+          kind: 'group',
+          name: 'movementAlternative',
+          heading: { label: 'Alternative movement' },
+          fields: [
+            {
+              type: 'text',
+              name: 'movementAlternative.modes',
+              label: 'Available modes',
+              required: true,
+            },
+          ],
+        },
+      ],
+    )
+    expect(issues[0]).toMatchObject({
+      path: 'movementAlternative',
+      claim: { kind: 'field', target: 'movementAlternative' },
+    })
+    const child = prepareFormIssues(
+      { movementAlternative: { modes: { message: 'Required', type: 'custom' } } },
+      [
+        {
+          kind: 'group',
+          name: 'movementAlternative',
+          heading: { label: 'Alternative movement' },
+          fields: [
+            {
+              type: 'text',
+              name: 'movementAlternative.modes',
+              label: 'Available modes',
+              required: true,
+            },
+          ],
+        },
+      ],
+    )
+    expect(child[0]).toMatchObject({
+      path: 'movementAlternative.modes',
+      claim: { kind: 'field', target: 'movementAlternative.modes' },
+    })
+  })
+
   it('keeps object path issues on the form summary when no compiled owner claims them', () => {
     const issues = prepareFormIssues(
       { resolution: { method: { message: 'Required', type: 'custom' } } },

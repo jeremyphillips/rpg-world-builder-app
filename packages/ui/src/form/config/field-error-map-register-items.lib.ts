@@ -149,6 +149,16 @@ function registerContainerItem(
     return
   }
 
+  if (item.kind === 'group' && item.name) {
+    const groupKey = prefix ? `${prefix}.${item.name}` : item.name
+    registry.set(groupKey, {
+      label: item.heading?.label ?? item.name,
+      category: 'text',
+      role: 'control',
+      exactPath: true,
+    })
+  }
+
   registerItems(registry, prefix, item.fields as FormItem[], formValues)
 }
 

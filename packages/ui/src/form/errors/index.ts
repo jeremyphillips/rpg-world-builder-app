@@ -45,6 +45,7 @@ export {
 } from './resolve-field-error-message'
 export {
   findRoutedIssueForFieldPath,
+  findRoutedIssuesForFieldPath,
   findRoutedIssuesForSlot,
   resolveFieldIssueDisplayMessage,
 } from './resolve-field-issue.lib'
