@@ -7,7 +7,7 @@ import { useMemo, useState } from 'react'
 import { ApiError } from '@rpg/contracts'
 import { getMonsterBySlug } from '@rpg/catalog/monsters'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
@@ -21,6 +21,10 @@ import { makeContentFormCtx, TEST_CAMPAIGN_ID } from '../../lib/fixtures/content
 import { augmentTabsWithHoistedName } from '../../lib/forms/shells/layout/content-schema-form-tabs.lib'
 import { ContentFormWriteGateProvider } from '../../lib/forms/shells/layout/content-form-write-gate'
 import { loadContentEditFormState } from '../../lib/forms/shells/edit/content-edit-load'
+import {
+  ProducerApiIssueProbe,
+  ProducerApiSlotIssueProbe,
+} from '../../lib/forms/shells/edit/content-edit-stamp.probe'
 import { persistContentEditUpdate } from '../../lib/forms/shells/edit/content-edit-persist.lib'
 import { prepareSerializedContentFormWrite } from '../../lib/forms/submit/prepare-serialized-content-form-write.lib'
 import { useContentFormSubmit } from '../../lib/forms/shells/submit/content-form-submit'
@@ -181,6 +185,13 @@ function renderMonsterEditPersistHarness() {
             validationPresentation="progressive"
             publishPresentationEnabled
             producerBoundary={ProducerBoundary}
+            contentWrapper={(content) => (
+              <>
+                {content}
+                <ProducerApiIssueProbe />
+                <ProducerApiSlotIssueProbe />
+              </>
+            )}
             footer={(form) => (
               <button
                 type="button"
@@ -280,6 +291,60 @@ describe('monster edit failed persist producer projection', () => {
     await waitFor(() => {
       expect(prepareWriteSpy).toHaveBeenCalledTimes(1)
       expect(mutateAsync).toHaveBeenCalledTimes(1)
+      expect(screen.getByText(/Name is already in use/i)).toBeInTheDocument()
+      expect(screen.getByTestId('api-slot-issue-count')).toHaveTextContent('1')
+    })
+  })
+
+  it('does not paint api issues when a superseded same-stamp attempt fails late', async () => {
+    const user = userEvent.setup({ delay: null })
+    const loaded = loadSwarmEdit()
+    const savedName = 'Swarm of Insects!'
+    let releaseFirst: () => void = () => undefined
+
+    mutateAsync
+      .mockImplementationOnce(
+        () =>
+          new Promise<void>((_, reject) => {
+            releaseFirst = () =>
+              reject(
+                new ApiError(400, 'validation_error', 'Invalid monster', {
+                  issues: [{ path: 'name', message: 'Name is already in use.', code: 'duplicate' }],
+                }),
+              )
+          }),
+      )
+      .mockResolvedValueOnce({
+        ...loaded.entity,
+        name: savedName,
+      })
+
+    renderMonsterEditPersistHarness()
+
+    const nameField = await screen.findByRole('textbox', { name: 'Name' })
+    await user.type(nameField, '!')
+
+    const save = screen.getByRole('button', { name: /save changes/i })
+    let first!: Promise<void>
+    act(() => {
+      first = user.click(save).then(() => undefined)
+    })
+    first.catch(() => undefined)
+    await waitFor(() => expect(mutateAsync).toHaveBeenCalledTimes(1))
+
+    await act(async () => {
+      await user.click(save)
+    })
+    await waitFor(() => expect(mutateAsync).toHaveBeenCalledTimes(2))
+
+    await act(async () => {
+      releaseFirst()
+      await first
+    })
+
+    await waitFor(() => {
+      expect(screen.queryByText(/Name is already in use/i)).not.toBeInTheDocument()
+      expect(screen.getByTestId('api-slot-issue-count')).toHaveTextContent('0')
     })
   })
 })
