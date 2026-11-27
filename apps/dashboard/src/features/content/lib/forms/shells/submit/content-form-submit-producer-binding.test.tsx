@@ -98,11 +98,9 @@ describe('useContentFormSubmitProducerBinding', () => {
       controls.draft = () => draft.onSubmit({ name: '', level: 2 }, form)
       controls.publish = () => publish.onSubmit({ name: '', level: 2 }, form)
       const Boundary = publish.ProducerBoundary
-      const StampBridge = publish.ProducerStampBridge
 
       return (
         <FormProvider {...form}>
-          <StampBridge />
           <Boundary>
             <span data-testid="probe" />
           </Boundary>
@@ -184,11 +182,9 @@ describe('useContentFormSubmitProducerBinding', () => {
       controls.draft = () => draft.onSubmit({ name: 'Valid draft', level: 2 }, form)
       controls.publish = () => publish.onSubmit({ name: 'Valid draft', level: 2 }, form)
       const Boundary = publish.ProducerBoundary
-      const StampBridge = publish.ProducerStampBridge
 
       return (
         <FormProvider {...form}>
-          <StampBridge />
           <Boundary>
             <span data-testid="probe" />
           </Boundary>

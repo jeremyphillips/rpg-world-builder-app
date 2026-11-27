@@ -53,7 +53,6 @@ interface ContentFormLayoutProps<TFormValues extends FieldValues> {
   formHeaderPrefix?: React.ReactNode
   /** Wraps field chrome for adopted content submit producer sessions. */
   producerBoundary?: React.ComponentType<{ children: React.ReactNode }>
-  producerStampBridge?: React.ReactNode
   previewDraftBadge?: boolean
   scrollMode: ContentFormScrollMode
   previewEnabled: boolean
@@ -85,7 +84,6 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
   onLeaveGuardReady,
   formHeaderPrefix,
   producerBoundary,
-  producerStampBridge,
   previewDraftBadge = false,
   scrollMode,
   previewEnabled,
@@ -143,12 +141,7 @@ export function ContentFormLayout<TFormValues extends FieldValues>({
         identityLayout: CONTENT_FORM_IDENTITY_LAYOUT_INLINE,
         availabilityPresentation: CONTENT_FORM_AVAILABILITY_PRESENTATION_DIALOG,
       }}
-      headerPrefix={
-        <>
-          {producerStampBridge}
-          {formHeaderPrefix}
-        </>
-      }
+      headerPrefix={formHeaderPrefix}
       producerBoundary={producerBoundary}
       previewDraftBadge={previewDraftBadge}
       scrollMode={scrollMode}

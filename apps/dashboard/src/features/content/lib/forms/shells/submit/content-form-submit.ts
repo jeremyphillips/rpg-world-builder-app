@@ -50,7 +50,7 @@ export type UseContentFormSubmitResult<TValues extends FieldValues> =
     ProducerStampBridge: () => null
     /** Wraps field chrome so presentation reads the producer session. */
     ProducerBoundary: React.ComponentType<{ children: React.ReactNode }>
-    /** @deprecated Prefer {@link ProducerBoundary} + {@link ProducerStampBridge}. */
+    /** @deprecated Prefer {@link ProducerBoundary}; use {@link ProducerStampBridge} only for a second lease on a shared form. */
     UiBridge: () => null
   }
 

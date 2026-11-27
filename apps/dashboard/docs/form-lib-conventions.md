@@ -580,7 +580,8 @@ optional write schema / `prepareWrite`) → canonical issue ingestion + RHF pain
 field errors and ingest the `api` producer slot; other persist failures set `formError` and reject.
 Success chrome (trusted close, navigate) runs only after a resolved submit.
 
-Render the returned `UiBridge` inside the form header so invalid-submit focus can expand sections.
+Render the returned `ProducerBoundary` around form fields (and `ProducerStampBridge` only when a
+second submit hook shares the same form without mounting its own boundary).
 Feature-owned tab mapping uses `invalidPresentation.resolveViewForPath` / `activateView` — shared code
 never hard-codes tab ids.
 

@@ -276,7 +276,7 @@ describe('useContentFormSubmit', () => {
     expect(result.current.formError).toBe('Could not save.')
   })
 
-  it('captures FormUiContext via UiBridge for invalid presentation', async () => {
+  it('captures FormUiContext via producer boundary for invalid presentation', async () => {
     const persist = vi.fn()
     const activateView = vi.fn()
 
@@ -299,10 +299,10 @@ describe('useContentFormSubmit', () => {
 
     const form = renderHook(() => useForm<TestValues>({ defaultValues: { name: '', level: 0 } }))
       .result.current
-    const StampBridge = result.current.ProducerStampBridge
+    const Boundary = result.current.ProducerBoundary
     render(
       <FormProvider {...form}>
-        <StampBridge />
+        <Boundary>{null}</Boundary>
       </FormProvider>,
       { wrapper: FormUiWrapper },
     )
@@ -344,10 +344,10 @@ describe('useContentFormSubmit', () => {
 
     const form = renderHook(() => useForm<TestValues>({ defaultValues: { name: 'A', level: 1 } }))
       .result.current
-    const StampBridge = result.current.ProducerStampBridge
+    const Boundary = result.current.ProducerBoundary
     render(
       <FormProvider {...form}>
-        <StampBridge />
+        <Boundary>{null}</Boundary>
       </FormProvider>,
       { wrapper: FormUiWrapper },
     )
@@ -585,11 +585,9 @@ describe('useContentFormSubmit attempt identity', () => {
       })
       controls.submit = () => contentSubmit.onSubmit({ name: 'A', level: 2 }, form)
       const Boundary = contentSubmit.ProducerBoundary
-      const StampBridge = contentSubmit.ProducerStampBridge
 
       return (
         <FormProvider {...form}>
-          <StampBridge />
           <Boundary>
             <span data-testid="probe" />
           </Boundary>
@@ -822,11 +820,9 @@ describe('useContentFormSubmit attempt identity', () => {
       })
       controls.submit = () => contentSubmit.onSubmit({ name: 'A', level: 2 }, form)
       const Boundary = contentSubmit.ProducerBoundary
-      const StampBridge = contentSubmit.ProducerStampBridge
 
       return (
         <FormProvider {...form}>
-          <StampBridge />
           <Boundary>
             <span data-testid="probe" />
           </Boundary>
@@ -911,11 +907,9 @@ describe('useContentFormSubmit attempt identity', () => {
       })
       controls.submit = () => contentSubmit.onSubmit({ name: 'A', level: 2 }, form)
       const Boundary = contentSubmit.ProducerBoundary
-      const StampBridge = contentSubmit.ProducerStampBridge
 
       return (
         <FormProvider {...form}>
-          <StampBridge />
           <Boundary>
             <span data-testid="probe" />
           </Boundary>
@@ -1069,11 +1063,9 @@ describe('useContentFormSubmit attempt identity', () => {
       })
       controls.submit = () => contentSubmit.onSubmit({ name: 'A', level: 2 }, form)
       const Boundary = contentSubmit.ProducerBoundary
-      const StampBridge = contentSubmit.ProducerStampBridge
 
       return (
         <FormProvider {...form}>
-          <StampBridge />
           <Boundary>
             <span data-testid="probe" />
           </Boundary>
@@ -1210,11 +1202,9 @@ describe('edit shell tab badges from producer projection', () => {
       })
       controls.submit = () => contentSubmit.onSubmit({ name: 'A', level: 2 }, form)
       const Boundary = contentSubmit.ProducerBoundary
-      const StampBridge = contentSubmit.ProducerStampBridge
 
       return (
         <FormProvider {...form}>
-          <StampBridge />
           <Boundary>
             <TabBadgeProbe />
           </Boundary>
@@ -1302,11 +1292,9 @@ describe('edit shell tab badges from producer projection', () => {
       controls.submit = () =>
         contentSubmit.onSubmit({ name: 'A', grants: [{ label: 'One' }, { label: 'Two' }] }, form)
       const Boundary = contentSubmit.ProducerBoundary
-      const StampBridge = contentSubmit.ProducerStampBridge
 
       return (
         <FormProvider {...form}>
-          <StampBridge />
           <Boundary>
             <span data-testid="probe" />
           </Boundary>
