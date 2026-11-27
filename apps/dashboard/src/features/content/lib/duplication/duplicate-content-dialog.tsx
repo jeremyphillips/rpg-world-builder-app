@@ -5,7 +5,7 @@ import { canDuplicateContentType, type CatalogLayer, type ContentTypeKey } from 
 import { Modal } from '@rpg/ui'
 import { Form, FormSaveFooter } from '@rpg/ui/form'
 
-import { useAdoptedFormSubmit } from '@/lib/form-validation-adoption.lib'
+import { useRunnerFormSubmit } from '@/lib/runner-form-submit.lib'
 import { notifyDuplicateContentCreated } from '@/lib/notify'
 
 import { resolveContentPostCreateEditHref } from '../forms/shells/layout/content-form-navigation'
@@ -55,24 +55,29 @@ export function DuplicateContentDialog({
 
   const { mutateAsync, isPending } = useDuplicateContent(campaignId, contentTypeKey, queryKeyFn)
 
-  const { onSubmit, formError } = useAdoptedFormSubmit<DuplicateContentFormValues>(
-    async (values, form) => {
-      const saved = await mutateAsync({
-        entityId: source.id,
-        name: values.name,
-        idempotencyKey: idempotencyKeyRef.current,
-      })
-      form.reset(buildDuplicateContentDefaultValues(source.name))
-      setOpen(false)
-      void navigate(
-        resolveContentPostCreateEditHref({ routeKey: contentTypeKey }, campaignId, {
-          id: (saved as { id: string }).id,
-          kind: (saved as { kind?: unknown }).kind ?? source.kind,
-        }),
-      )
-      notifyDuplicateContentCreated()
+  const { onSubmit, formError, ProducerBoundary } = useRunnerFormSubmit<DuplicateContentFormValues>(
+    {
+      schema: duplicateContentFormSchema,
+      resolverFields: duplicateContentFormFields,
+      formId: `duplicate-content-${source.id}`,
+      fallbackMessage: DUPLICATE_CONTENT_FALLBACK_ERROR,
+      persist: async (values, form) => {
+        const saved = await mutateAsync({
+          entityId: source.id,
+          name: values.name,
+          idempotencyKey: idempotencyKeyRef.current,
+        })
+        form.reset(buildDuplicateContentDefaultValues(source.name))
+        setOpen(false)
+        void navigate(
+          resolveContentPostCreateEditHref({ routeKey: contentTypeKey }, campaignId, {
+            id: (saved as { id: string }).id,
+            kind: (saved as { kind?: unknown }).kind ?? source.kind,
+          }),
+        )
+        notifyDuplicateContentCreated()
+      },
     },
-    DUPLICATE_CONTENT_FALLBACK_ERROR,
   )
 
   if (!canDuplicateContentType(contentTypeKey)) {
@@ -96,6 +101,7 @@ export function DuplicateContentDialog({
               defaultValues={buildDuplicateContentDefaultValues(source.name)}
               onSubmit={onSubmit}
               formError={formError}
+              producerBoundary={ProducerBoundary}
               footer={(form) => (
                 <FormSaveFooter
                   pending={isPending || form.formState.isSubmitting}

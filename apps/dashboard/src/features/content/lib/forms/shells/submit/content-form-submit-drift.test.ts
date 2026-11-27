@@ -130,10 +130,11 @@ describe('ContentFormDef create submit drift guard', () => {
     expect(source).not.toContain('publishPresentationIssues')
   })
 
-  it('requires duplicate content dialog to use adopted submit helper', () => {
+  it('requires duplicate content dialog to use runner submit helper', () => {
     const source = readFileSync(duplicateContentDialogPath, 'utf8')
 
-    expect(source).toContain('useAdoptedFormSubmit')
+    expect(source).toContain('useRunnerFormSubmit')
+    expect(source).not.toContain('useAdoptedFormSubmit')
     expect(source).not.toContain('useSubmitHandler')
   })
 

@@ -47,7 +47,7 @@ Create/edit shells use `prepareSerializedContentFormWrite` + `useContentFormSubm
 
 **Adoption inventory:** `apps/dashboard/src/features/content/lib/forms/validation/form-validation-adopted-families.ts` (families and surfaces).
 
-**Outside ContentFormDef:** `useAdoptedFormSubmit` (`apps/dashboard/src/lib/form-validation-adoption.lib.ts`) for tabbed/flat saves with the same API → RHF paint policy.
+**Outside ContentFormDef:** `useRunnerFormSubmit` (`apps/dashboard/src/lib/runner-form-submit.lib.ts`) for tabbed/flat dashboard saves on `runContentFormCommitPipeline` + producer sessions. **`useAdoptedFormSubmit`** remains only on deferred quick NPC until that workflow is adopted.
 
 Dashboard authoring detail: [form-lib-conventions.md](../../../apps/dashboard/docs/form-lib-conventions.md#validation-ownership-guards).
 

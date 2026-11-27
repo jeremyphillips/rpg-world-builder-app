@@ -5,20 +5,20 @@ export const FORM_VALIDATION_ADOPTED_FAMILIES = [
     surfaces: [
       'ContentFormDef create/edit shells (useContentFormSubmit)',
       'location create (useContentFormSubmit)',
-      'duplicate content dialog (useAdoptedFormSubmit)',
+      'duplicate content dialog (useRunnerFormSubmit)',
     ],
   },
   {
     id: 'campaign',
     surfaces: [
       'campaign create wizard (WizardStepForm)',
-      'campaign settings (useAdoptedFormSubmit)',
-      'invite member dialog (useAdoptedFormSubmit)',
+      'campaign settings (useRunnerFormSubmit)',
+      'invite member dialog (useRunnerFormSubmit)',
     ],
   },
   {
     id: 'public-auth',
-    surfaces: ['login and signup Form (makeResolver via schema)'],
+    surfaces: ['login and signup Form (useAuthFormSubmit + runFormAction)'],
   },
   {
     id: 'content-master-detail',
@@ -30,6 +30,6 @@ export const FORM_VALIDATION_ADOPTED_FAMILIES = [
   },
   {
     id: 'quick-npc',
-    surfaces: ['quick npc authoring (useAdoptedFormSubmit)'],
+    surfaces: ['quick npc authoring (deferred; FORM_VALIDATION_ADOPTION_ALLOWLIST)'],
   },
 ] as const

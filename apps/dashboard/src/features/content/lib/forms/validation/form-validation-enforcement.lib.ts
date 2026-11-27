@@ -15,6 +15,7 @@ export const FORM_VALIDATION_LEGACY_RULES: readonly FormValidationLegacyRule[] =
   { id: 'applyContentPublishValidation', pattern: /\bapplyContentPublishValidation\b/ },
   { id: 'prepareFormIssues', pattern: /\bprepareFormIssues\b/ },
   { id: 'useFormValidationPresentation', pattern: /\buseFormValidationPresentation\b/ },
+  { id: 'useAdoptedFormSubmit', pattern: /\buseAdoptedFormSubmit\b/ },
 ] as const
 
 /** Production scopes where adopted families must not add new validation bypasses. */

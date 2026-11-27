@@ -25,8 +25,8 @@ describe('form validation enforcement', () => {
     ])
   })
 
-  it('keeps an empty adoption allowlist after phase 8', () => {
-    expect(FORM_VALIDATION_ADOPTION_ALLOWLIST).toEqual([])
+  it('documents deferred quick-npc on the adoption allowlist until phase 8', () => {
+    expect(FORM_VALIDATION_ADOPTION_ALLOWLIST.map((e) => e.family)).toEqual(['quick-npc'])
     for (const path of FORM_VALIDATION_ENFORCEMENT_ROOTS) {
       expect(existsSync(join(repoRoot, path))).toBe(true)
     }
