@@ -96,9 +96,34 @@ describe('cursor-subagent-start-log', () => {
   })
 
   it('parses a dispatch id and ignores nearby text', () => {
-    expect(parseDispatchId(`before ${DISPATCH} after`)).toBe(DISPATCH)
+    expect(parseDispatchId(`before ${DISPATCH} after`)).toBeNull()
+    expect(parseDispatchId(`Dispatch: ${DISPATCH}`)).toBe(DISPATCH)
+    expect(parseDispatchId('Dispatch: wf-not-a-dispatch')).toBeNull()
     expect(parseDispatchId('wf-not-a-dispatch')).toBeNull()
     expect(parseDispatchId(undefined)).toBeNull()
+  })
+
+  it('parses a dispatch id from a multiline task on the second or third line', () => {
+    const id = 'wf-readiness-20261127T162000Z-ab12cd'
+    expect(parseDispatchId(`Preamble line one.\nDispatch: ${id}\nDo the work.`)).toBe(id)
+    expect(
+      parseDispatchId(`Preamble line one.\nMore context.\nDispatch: ${id}\nTail instruction.`),
+    ).toBe(id)
+  })
+
+  it('parses a dispatch id whose six-character suffix is not limited to hex digits', () => {
+    const id = 'wf-readiness-20261127T162000Z-g7h8i9'
+    expect(parseDispatchId(`Dispatch: ${id}`)).toBe(id)
+  })
+
+  it('records dispatch id from a multiline task when logging', () => {
+    const id = 'wf-readiness-20261127T162000Z-b2c3d4'
+    const lines = []
+    const task = `Kind: remediate\nDispatch: ${id}\nDo the work.`
+    const { stdout } = capture(validInput(task), (line) => lines.push(line))
+    expect(stdout).toBe(ALLOW)
+    expect(lines).toHaveLength(1)
+    expect(JSON.parse(lines[0]).dispatchId).toBe(id)
   })
 
   it('does not throw from the CLI and writes exactly the permission JSON', () => {

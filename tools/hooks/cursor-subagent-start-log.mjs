@@ -4,12 +4,18 @@ import { fileURLToPath } from 'node:url'
 
 const ALLOW = '{"permission":"allow"}\n'
 const LOG_RELATIVE = '.tmp/agent-workflow/subagent-start.jsonl'
-const DISPATCH_ID = /wf-[a-z0-9]+(?:-[a-z0-9]+)*-\d{8}T\d{6}Z-[0-9a-f]{6}/
+const DISPATCH_ID = /wf-[a-z0-9]+(?:-[a-z0-9]+)*-\d{8}T\d{6}Z-[a-z0-9]{6}/
+const DISPATCH_LINE = /^Dispatch:\s*(.*)$/
 
 export function parseDispatchId(task) {
   if (typeof task !== 'string') return null
-  const match = task.match(DISPATCH_ID)
-  return match ? match[0] : null
+  for (const line of task.split(/\r?\n/)) {
+    const dispatchLine = line.match(DISPATCH_LINE)
+    if (!dispatchLine) continue
+    const match = dispatchLine[1].match(DISPATCH_ID)
+    if (match) return match[0]
+  }
+  return null
 }
 
 export function buildLogRecord(input, timestamp) {

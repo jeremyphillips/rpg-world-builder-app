@@ -66,18 +66,7 @@ Workflow state. Zero lines, more than one line, or any other model: checkpoint,
 suspend further delegation, and report. Do not launch another worker.
 
 ```bash
-node --input-type=module -e '
-const fs = await import("node:fs");
-const id = process.argv[1];
-const allowed = new Set(process.argv.slice(2));
-const path = ".tmp/agent-workflow/subagent-start.jsonl";
-const lines = fs.existsSync(path)
-  ? fs.readFileSync(path, "utf8").split("\n").filter(Boolean).map((line) => JSON.parse(line)).filter((row) => row.dispatchId === id)
-  : [];
-const ok = lines.length === 1 && allowed.has(lines[0].subagent_model);
-console.log(JSON.stringify({ count: lines.length, model: lines[0]?.subagent_model ?? null, ok }));
-process.exit(ok ? 0 : 2);
-' <dispatch-id> composer-2.5
+node tools/hooks/agent-workflow-model-check.mjs <dispatch-id> composer-2.5
 ```
 
 Pass extra allowed model ids only when Workflow state records that authorization.

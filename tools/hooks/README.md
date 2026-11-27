@@ -72,6 +72,19 @@ the Git hook tiers above.
 
 Unit tests: `pnpm exec vitest run --config tools/hooks/vitest.config.ts tools/hooks/cursor-subagent-start-log.test.mjs`
 
+After a worker returns, the orchestrator can verify the logged model with
+[`agent-workflow-model-check.mjs`](agent-workflow-model-check.mjs) (dispatch id as
+`argv[2]`, allowed model ids after that, default log
+`.tmp/agent-workflow/subagent-start.jsonl`). Procedure and when to checkpoint live in
+[orchestrate `reference.md`](../../.cursor/skills/orchestrate/reference.md#model-check)—not
+duplicated here.
+
+```bash
+node tools/hooks/agent-workflow-model-check.mjs <dispatch-id> composer-2.5
+```
+
+Unit tests: `pnpm exec vitest run --config tools/hooks/vitest.config.ts tools/hooks/agent-workflow-model-check.test.mjs`
+
 ## Agent invocation (when to run gates)
 
 Agents follow [AGENTS.md](../../AGENTS.md) **Agent validation** by default: narrow
