@@ -267,6 +267,94 @@ describe('class feature master-detail validation pilot', () => {
     ).toBeInTheDocument()
   })
 
+  it('badges invalid rows when no feature row is selected at submit', async () => {
+    const user = userEvent.setup()
+    const ProducerBoundary = liveProducerBoundary([classFeatureResolverField])
+
+    render(
+      <MountedClassFeaturesHarness
+        ProducerBoundary={ProducerBoundary}
+        defaultValues={{
+          features: [
+            {
+              kind: 'custom',
+              name: '',
+              level: 1,
+              grants: [],
+            },
+            {
+              kind: 'custom',
+              name: '',
+              level: 2,
+              grants: [],
+            },
+          ],
+        }}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Save features' }))
+
+    await waitFor(() => {
+      expect(Number(screen.getByTestId('rows-with-issues').textContent)).toBe(2)
+    })
+  })
+
+  it('mounts spellcasting row and keeps intro in the variant field set after submit', async () => {
+    const user = userEvent.setup()
+    const ProducerBoundary = liveProducerBoundary([classFeatureResolverField])
+
+    render(
+      <MountedClassFeaturesHarness
+        ProducerBoundary={ProducerBoundary}
+        defaultValues={{
+          features: [
+            {
+              kind: 'spellcasting',
+              name: '',
+              level: 1,
+              grants: [],
+              intro: '',
+            },
+          ],
+        }}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Save features' }))
+
+    await waitFor(() => {
+      expect(Number(screen.getByTestId('row-issue-count').textContent)).toBeGreaterThan(0)
+    })
+    expect(screen.getByLabelText('Introduction')).toBeInTheDocument()
+  })
+
+  it('surfaces validation for a row with omitted kind without throwing', async () => {
+    const user = userEvent.setup()
+    const ProducerBoundary = liveProducerBoundary([classFeatureResolverField])
+
+    render(
+      <MountedClassFeaturesHarness
+        ProducerBoundary={ProducerBoundary}
+        defaultValues={{
+          features: [
+            {
+              name: '',
+              level: 1,
+              grants: [],
+            },
+          ],
+        }}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Save features' }))
+
+    await waitFor(() => {
+      expect(Number(screen.getByTestId('row-issue-count').textContent)).toBeGreaterThan(0)
+    })
+  })
+
   it('badges multiple invalid feature rows in the list summary after submit', async () => {
     const user = userEvent.setup()
     const ProducerBoundary = liveProducerBoundary([classFeatureResolverField])

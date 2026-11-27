@@ -580,6 +580,84 @@ describe('useContentFormSubmit attempt identity', () => {
     expect(harness.stampProbe()).toBeUndefined()
   })
 
+  it('treats only the later same-stamp persist as current when attempts overlap', async () => {
+    const currentFlags: boolean[] = []
+    let releaseFirst: () => void = () => undefined
+    const persist = vi
+      .fn()
+      .mockImplementationOnce(
+        async (
+          _values: TestValues,
+          _form: UseFormReturn<TestValues>,
+          meta?: { isAttemptCurrent?: () => boolean },
+        ) => {
+          currentFlags.push(meta?.isAttemptCurrent?.() ?? false)
+          await new Promise<void>((resolve) => {
+            releaseFirst = resolve
+          })
+          currentFlags.push(meta?.isAttemptCurrent?.() ?? false)
+        },
+      )
+      .mockImplementationOnce(
+        async (
+          _values: TestValues,
+          _form: UseFormReturn<TestValues>,
+          meta?: { isAttemptCurrent?: () => boolean },
+        ) => {
+          currentFlags.push(meta?.isAttemptCurrent?.() ?? false)
+        },
+      )
+    const controls = { submit: async () => undefined as Promise<void> }
+
+    function Harness() {
+      const form = useForm<TestValues>({ defaultValues: { name: 'A', level: 2 } })
+      const contentSubmit = useContentFormSubmit<TestValues>({
+        def: testDef,
+        ctx: testCtx,
+        fallbackMessage: 'Could not save.',
+        persist: async (values, persistForm, meta) => persist(values, persistForm, meta),
+      })
+      controls.submit = (values) => contentSubmit.onSubmit(values, form)
+      const Boundary = contentSubmit.ProducerBoundary
+
+      return (
+        <FormProvider {...form}>
+          <Boundary>
+            <span data-testid="probe" />
+          </Boundary>
+        </FormProvider>
+      )
+    }
+
+    render(
+      <FormUiWrapper>
+        <Harness />
+      </FormUiWrapper>,
+    )
+
+    let first!: Promise<void>
+    act(() => {
+      first = controls.submit({ name: 'A', level: 2 })
+    })
+    first.catch(() => undefined)
+    await waitFor(() => expect(persist).toHaveBeenCalledTimes(1))
+    expect(currentFlags).toEqual([true])
+
+    let second!: Promise<void>
+    await act(async () => {
+      second = controls.submit({ name: 'A', level: 2 })
+      await second
+    })
+    expect(persist).toHaveBeenCalledTimes(2)
+    expect(currentFlags).toEqual([true, true])
+
+    await act(async () => {
+      releaseFirst()
+      await expect(first).rejects.toBeInstanceOf(ContentFormSubmitSuperseded)
+    })
+    expect(currentFlags).toEqual([true, true, false])
+  })
+
   it('does not paint persist errors when a superseded attempt fails late', async () => {
     let releaseFirst: () => void = () => undefined
     const persist = vi
