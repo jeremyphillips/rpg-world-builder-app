@@ -140,7 +140,7 @@ describe('adopted content producer mounted presentation', () => {
       current: null,
     }
     const controls = {
-      draft: async () => undefined as Promise<void>,
+      draft: async (): Promise<void> => {},
       fixName: () => undefined,
     }
 
@@ -259,7 +259,7 @@ describe('adopted content producer mounted presentation', () => {
       current: null,
     }
     const controls = {
-      draft: async () => undefined as Promise<void>,
+      draft: async (): Promise<void> => {},
       fixName: () => undefined,
     }
     type HarnessHandle = {
