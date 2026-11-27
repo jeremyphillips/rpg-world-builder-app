@@ -55,6 +55,21 @@ describe('form validation pilot regression', () => {
     expect(session.slots['publish-action']?.issues).toHaveLength(1)
   })
 
+  it('preserves authored schema messages versus generic Zod labels at the evaluation boundary', () => {
+    const authoredSchema = z.object({
+      name: z.string().min(1, 'Use a display name for this entry.'),
+    })
+    const genericSchema = z.object({ name: z.number() })
+
+    const authored = normalizeContentFormIssues(authoredSchema, { name: '' }, fields)
+    const generic = normalizeContentFormIssues(genericSchema, { name: 'oops' }, fields)
+
+    expect(authored?.[0]?.message).toBe('Use a display name for this entry.')
+    expect(generic?.[0]?.message).not.toBe('Use a display name for this entry.')
+    expect(generic?.[0]?.message).toMatch(/name/i)
+    expect(generic?.[0]?.message).not.toMatch(/invalid_type/i)
+  })
+
   it('routes publish validation once at the boundary for tabbed preview consumers', () => {
     const schema = z.object({ name: z.string().min(1, 'Name is required.') })
     expect(evaluateContentPublishFormIssues(schema, { name: '' }, fields)?.[0]?.path).toBe('name')

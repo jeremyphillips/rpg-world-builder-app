@@ -147,7 +147,10 @@ function applyCommitValidationBlocked<TValues extends FieldValues>(
   const slot =
     pipeline.stageId === CONTENT_FORM_COMMIT_STAGE_FORM ? input.producerSlot : 'serialization'
 
+  let canonicalIssues: readonly FormIssue[] = []
+
   if (pipeline.issues?.length) {
+    canonicalIssues = pipeline.issues
     applyCanonicalFormIssuesToRhf(input.form, pipeline.issues)
     session = ingestContentFormValidationIssues(session, slot, readCurrent().stamp, pipeline.issues)
   } else if (pipeline.message) {
@@ -158,13 +161,15 @@ function applyCommitValidationBlocked<TValues extends FieldValues>(
         severity: 'crossRow' as const,
       },
     ]
+    canonicalIssues = routed
     applyCanonicalFormIssuesToRhf(input.form, routed)
     session = ingestContentFormValidationIssues(session, slot, readCurrent().stamp, routed)
   }
 
   if (input.invalidPresentation) {
     presentContentFormInvalidSubmit(input.form, input.ui, input.invalidPresentation, {
-      firstInvalidPath: pipeline.issues?.[0]?.path,
+      firstInvalidPath: canonicalIssues[0]?.path,
+      canonicalIssues,
     })
   }
 

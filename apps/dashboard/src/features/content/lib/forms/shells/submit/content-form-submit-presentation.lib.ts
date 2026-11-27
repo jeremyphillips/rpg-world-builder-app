@@ -1,9 +1,9 @@
 import type { FieldValues, UseFormReturn } from 'react-hook-form'
 import {
   navigateInvalidSubmit,
-  prepareFormIssues,
   resolveInvalidSubmitNavigationFromIssues,
   type FormActionAttempt,
+  type FormIssue,
   type FormItem,
   type FormUiContextValue,
   type FormValidationProducerSession,
@@ -25,7 +25,7 @@ function resolveFirstInvalidPath<TFieldValues extends FieldValues>(
   form: UseFormReturn<TFieldValues>,
   fields: FormItem[],
   formId: string,
-  canonicalIssues?: readonly import('@rpg/ui/form').FormIssue[],
+  canonicalIssues: readonly FormIssue[],
 ): string | undefined {
   const getItemValues = (fullName: string, index: number) => {
     const value = form.getValues(`${fullName}.${index}` as never)
@@ -33,20 +33,11 @@ function resolveFirstInvalidPath<TFieldValues extends FieldValues>(
       ? (value as Record<string, unknown>)
       : undefined
   }
-  const navigation = canonicalIssues
-    ? resolveInvalidSubmitNavigationFromIssues(canonicalIssues, {
-        fields,
-        idPrefix: formId,
-        getItemValues,
-      })
-    : resolveInvalidSubmitNavigationFromIssues(
-        prepareFormIssues(
-          form.formState.errors,
-          fields,
-          form.getValues() as Record<string, unknown>,
-        ),
-        { fields, idPrefix: formId, getItemValues },
-      )
+  const navigation = resolveInvalidSubmitNavigationFromIssues(canonicalIssues, {
+    fields,
+    idPrefix: formId,
+    getItemValues,
+  })
   return navigation?.firstIssue.path
 }
 
@@ -54,20 +45,14 @@ export function presentContentFormInvalidSubmit<TFieldValues extends FieldValues
   form: UseFormReturn<TFieldValues>,
   ui: Pick<FormUiContextValue, 'markSubmitAttempted' | 'addValidationSessionExpandKeys'> | null,
   presentation: ContentFormInvalidPresentation,
-  options?: {
+  options: {
+    canonicalIssues: readonly FormIssue[]
     firstInvalidPath?: string
-    canonicalIssues?: readonly import('@rpg/ui/form').FormIssue[]
   },
 ): void {
-  const canonicalIssues =
-    options?.canonicalIssues ??
-    prepareFormIssues(
-      form.formState.errors,
-      presentation.resolverFields,
-      form.getValues() as Record<string, unknown>,
-    )
+  const { canonicalIssues, firstInvalidPath: firstPathOverride } = options
   const firstPath =
-    options?.firstInvalidPath ??
+    firstPathOverride ??
     resolveFirstInvalidPath(form, presentation.resolverFields, presentation.formId, canonicalIssues)
   const viewId =
     firstPath && presentation.resolveViewForPath

@@ -79,15 +79,22 @@ describe('presentContentFormInvalidSubmit', () => {
     })
 
     act(() => {
-      presentContentFormInvalidSubmit(result.current, uiValue, {
-        resolverFields: [
-          { name: 'name', label: 'Name', type: 'text' },
-          { name: 'level', label: 'Level', type: 'number' },
-        ],
-        formId: 'test-form',
-        resolveViewForPath: () => 'details',
-        activateView: vi.fn(),
-      })
+      presentContentFormInvalidSubmit(
+        result.current,
+        uiValue,
+        {
+          resolverFields: [
+            { name: 'name', label: 'Name', type: 'text' },
+            { name: 'level', label: 'Level', type: 'number' },
+          ],
+          formId: 'test-form',
+          resolveViewForPath: () => 'details',
+          activateView: vi.fn(),
+        },
+        {
+          canonicalIssues: [{ path: 'name', message: 'Name is required.', severity: 'field' }],
+        },
+      )
     })
 
     expect(uiValue.markSubmitAttempted).toHaveBeenCalled()
@@ -109,7 +116,10 @@ describe('presentContentFormInvalidSubmit', () => {
           resolveViewForPath: () => 'details',
           activateView,
         },
-        { firstInvalidPath: 'name' },
+        {
+          firstInvalidPath: 'name',
+          canonicalIssues: [{ path: 'name', message: 'Name is required.', severity: 'field' }],
+        },
       )
     })
 
@@ -1469,10 +1479,17 @@ describe('presentContentFormInvalidSubmit bridge on adopted submit', () => {
     })
 
     act(() => {
-      presentContentFormInvalidSubmit(result.current, uiValue, {
-        resolverFields: [{ name: 'name', label: 'Name', type: 'text' }],
-        formId: 'adopted-form',
-      })
+      presentContentFormInvalidSubmit(
+        result.current,
+        uiValue,
+        {
+          resolverFields: [{ name: 'name', label: 'Name', type: 'text' }],
+          formId: 'adopted-form',
+        },
+        {
+          canonicalIssues: [],
+        },
+      )
     })
 
     expect(result.current.formState.errors.root?.message).toBe(
