@@ -28,6 +28,7 @@ import { augmentTabsWithHoistedName } from '../../../lib/forms/shells/layout/con
 import {
   MOVEMENT_ALTERNATIVE_AVAILABLE_MODES_BASE_HINT,
   MOVEMENT_ALTERNATIVE_AVAILABLE_MODES_SPIDER_CLIMB_HINT,
+  MOVEMENT_ALTERNATIVE_AVAILABLE_MODES_LABEL,
   MOVEMENT_ALTERNATIVE_MODES_FIELD,
   movementAlternativeGroupField,
   movementValidationMessages,
@@ -473,6 +474,17 @@ describe('movement alternative optional disclosure', () => {
     await waitFor(() => {
       expect(screen.getByText(minCopy, { exact: false })).toBeInTheDocument()
       expect(screen.getByText(overlapCopy, { exact: false })).toBeInTheDocument()
+      const modesGroup = screen.getByRole('group', {
+        name: MOVEMENT_ALTERNATIVE_AVAILABLE_MODES_LABEL,
+      })
+      expect(modesGroup).toHaveAttribute('aria-invalid', 'true')
+      const describedBy = modesGroup.getAttribute('aria-describedby')
+      expect(describedBy).toBeTruthy()
+      if (describedBy) {
+        describedBy.split(/\s+/).forEach((id) => {
+          expect(document.getElementById(id)).toBeTruthy()
+        })
+      }
     })
   })
 

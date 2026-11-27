@@ -78,13 +78,17 @@ describe('resolve-field-error-presentation.lib', () => {
       inactivePaths: new Set<string>(),
       touchedPaths: [] as string[],
     }
-    expect(resolvePresentedFieldError('ignored', 'name', presentation).error).toBeUndefined()
-    expect(
-      resolvePresentedFieldError('ignored', 'name', {
-        ...presentation,
-        touchedPaths: ['name'],
-      }).error,
-    ).toBe('Name is required.')
+    const collapsed = resolvePresentedFieldError('ignored', 'name', presentation)
+    expect(collapsed.error).toBeUndefined()
+    expect(collapsed.hasError).toBe(true)
+    expect(collapsed.invalid).toBe(true)
+
+    const expanded = resolvePresentedFieldError('ignored', 'name', {
+      ...presentation,
+      touchedPaths: ['name'],
+    })
+    expect(expanded.error).toBe('Name is required.')
+    expect(expanded.invalid).toBe(true)
   })
 
   it('treats interactivity-disabled fields as inactive for presentation', () => {

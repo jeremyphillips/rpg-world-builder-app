@@ -91,7 +91,7 @@ export function resolvePresentedFieldError(
 
   return {
     error: visibleError,
-    invalid: visibleError ? true : undefined,
+    invalid: hasError ? true : undefined,
     hasError,
   }
 }
