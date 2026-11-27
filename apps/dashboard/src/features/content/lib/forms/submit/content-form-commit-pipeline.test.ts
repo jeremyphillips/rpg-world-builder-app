@@ -160,6 +160,48 @@ describe('runContentFormCommitPipeline', () => {
     }
   })
 
+  it('maps write-schema paths through prepare provenance at the serialization stage', async () => {
+    const writeSchema = z.object({
+      proficiencies: z.object({
+        skills: z.array(z.object({ skill: z.string().min(1, 'Skill is required.') })),
+      }),
+    })
+    const pipeline = await runContentFormCommitPipeline(
+      { values: { name: 'A', level: 2 }, form: stubForm() },
+      {
+        ...attemptOf(17),
+        formSchema,
+        writeSchema,
+        resolverFields: fields,
+        producerSlot: 'publish-action',
+        prepareWrite: () => ({
+          payload: {
+            name: 'Scout',
+            proficiencies: {
+              skills: [{ skill: 'stealth' }, { skill: '' }],
+            },
+          },
+          provenance: {
+            pathMap: { name: 'slug' },
+            filteredRowIndexBySourceIndex: {
+              'proficiencies.skills': { 0: 0, 2: 1 },
+            },
+          },
+        }),
+      },
+    )
+
+    expect(pipeline).toEqual(
+      expect.objectContaining({
+        kind: 'blocked',
+        stageId: 'write-validate',
+      }),
+    )
+    if (pipeline.kind === 'blocked') {
+      expect(pipeline.issues?.[0]?.path).toBe('proficiencies.skills.2.skill')
+    }
+  })
+
   it('maps an unexpected prepare throw to safe operation copy', async () => {
     const pipeline = await runContentFormCommitPipeline(
       { values: { name: 'A', level: 2 }, form: stubForm() },

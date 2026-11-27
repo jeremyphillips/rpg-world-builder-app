@@ -88,12 +88,14 @@ describe('ContentFormDef create submit drift guard', () => {
     const source = readFileSync(contentFormSubmitCommitPath, 'utf8')
 
     expect(source).toContain('runContentFormCommitPipeline')
+    expect(source).toContain('pipeline.prepared.provenance')
     expect(source).not.toContain('applyContentPublishValidation')
   })
 
   it('requires persist validation failure to paint api issues canonically', () => {
     const source = readFileSync(contentFormSubmitPresentationPath, 'utf8')
 
+    expect(source).toContain('mapWireIssuesToAuthoring')
     expect(source).not.toContain('applyValidationIssuesToForm')
   })
 
