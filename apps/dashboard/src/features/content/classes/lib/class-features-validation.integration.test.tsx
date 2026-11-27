@@ -29,7 +29,10 @@ import { makeContentFormCtx } from '../../lib/fixtures/content-form-ctx'
 import { buildClassTabs } from './class-form-fields'
 import { embeddedArrayResolverField } from '../../lib/forms/validation/tabbed-form-resolver-fields'
 import { ingestContentFormValidationIssues } from '../../lib/forms/validation/ingest-content-form-validation.lib'
-import { useMasterDetailRowValidation } from '../../lib/master-detail/master-detail-row-validation'
+import {
+  countMasterDetailRowsWithIssues,
+  useMasterDetailRowValidation,
+} from '../../lib/master-detail/master-detail-row-validation'
 import {
   buildClassFeatureRowVariantTopology,
   classFeatureItemFields,
@@ -81,6 +84,16 @@ function RowIssueCountProbe({
   return <div data-testid="row-issue-count">{getRowIssueCount(0)}</div>
 }
 
+function FeatureRowIssueSummary({
+  resolver = classFeatureItemFields(ctx),
+}: {
+  resolver?: FormItem[]
+}) {
+  const { getRowIssueCount } = useMasterDetailRowValidation('features', resolver)
+  const rows = [0, 1].map((index) => ({ item: { issueCount: getRowIssueCount(index) } }))
+  return <div data-testid="rows-with-issues">{countMasterDetailRowsWithIssues(rows)}</div>
+}
+
 function ClassFeaturesSubmitButton({ onAttempt }: { onAttempt: () => void }) {
   const { trigger } = useFormContext()
 
@@ -122,6 +135,7 @@ function MountedClassFeaturesHarness({
           <ProducerBoundary>
             <ClassFeaturesTab formCtx={ctx} />
             <RowIssueCountProbe resolver={classFeatureItemFields(ctx)} />
+            <FeatureRowIssueSummary resolver={classFeatureItemFields(ctx)} />
             <ClassFeaturesSubmitButton onAttempt={() => setAttemptedSubmit(true)} />
           </ProducerBoundary>
         </FormUiProvider>
@@ -251,5 +265,42 @@ describe('class feature master-detail validation pilot', () => {
         name: /Unnamed Feature/i,
       }),
     ).toBeInTheDocument()
+  })
+
+  it('badges multiple invalid feature rows in the list summary after submit', async () => {
+    const user = userEvent.setup()
+    const ProducerBoundary = liveProducerBoundary([classFeatureResolverField])
+
+    render(
+      <MountedClassFeaturesHarness
+        ProducerBoundary={ProducerBoundary}
+        defaultValues={{
+          features: [
+            {
+              kind: 'custom',
+              name: '',
+              level: 1,
+              grants: [],
+            },
+            {
+              kind: 'custom',
+              name: '',
+              level: 2,
+              grants: [],
+            },
+          ],
+        }}
+      />,
+    )
+
+    const list = within(screen.getByRole('navigation', { name: 'Features' }))
+    await user.click(list.getByRole('button', { name: /Level 2/i }))
+    await user.click(list.getByRole('button', { name: /Level 1/i }))
+
+    await user.click(screen.getByRole('button', { name: 'Save features' }))
+
+    await waitFor(() => {
+      expect(Number(screen.getByTestId('rows-with-issues').textContent)).toBe(2)
+    })
   })
 })

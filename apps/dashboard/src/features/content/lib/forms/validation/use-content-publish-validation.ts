@@ -55,6 +55,7 @@ export function useContentPublishValidation<TValues extends FieldValues>({
 }): ContentPublishValidation {
   const { control, getValues } = useFormContext<TValues>()
   const watchedValues = useWatch({ control })
+  const valuesSnapshot = JSON.stringify(watchedValues)
   const fields = useMemo(() => collectTabbedFormResolverItems(tabs), [tabs])
 
   const [validation, setValidation] = useState<ContentPublishValidation>(() => ({
@@ -83,7 +84,7 @@ export function useContentPublishValidation<TValues extends FieldValues>({
     return () => {
       clearTimeout(timeoutId)
     }
-  }, [debounceMs, fields, getValues, schema, tabs, watchedValues])
+  }, [debounceMs, fields, getValues, schema, tabs, valuesSnapshot])
 
   return validation
 }
