@@ -1,10 +1,12 @@
 /**
  * @vitest-environment jsdom
  */
-import { useCallback, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useRef, useState, type ComponentType, type ReactNode } from 'react'
 import userEvent from '@testing-library/user-event'
-import { render, screen, waitFor } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { render, screen, waitFor, within } from '@testing-library/react'
+import { beforeAll, describe, expect, it, vi } from 'vitest'
+import { MemoryRouter } from 'react-router-dom'
+import { FormProvider, useForm, useFormContext } from 'react-hook-form'
 import { z } from 'zod'
 import {
   Form,
@@ -14,25 +16,51 @@ import {
   collectTabbedFormResolverItems,
   compileFormOwnership,
   createEmptyFormValidationProducerSession,
+  FormUiProvider,
+  makeResolver,
   resolveTabValidationState,
   type FormIssue,
   type FormItem,
   type FormValidationProducerSlot,
 } from '@rpg/ui/form'
 
+import { ClassFeaturesTab } from '../components/class-features-tab'
 import { makeContentFormCtx } from '../../lib/fixtures/content-form-ctx'
 import { buildClassTabs } from './class-form-fields'
+import { embeddedArrayResolverField } from '../../lib/forms/validation/tabbed-form-resolver-fields'
 import { ingestContentFormValidationIssues } from '../../lib/forms/validation/ingest-content-form-validation.lib'
 import { useMasterDetailRowValidation } from '../../lib/master-detail/master-detail-row-validation'
 import {
   buildClassFeatureRowVariantTopology,
+  classFeatureItemFields,
+  classFeatureRowResolveFields,
   subclassFeatureItemFields,
 } from './class-feature-form-fields'
-import { createSubclassFeatureRowFormSchema } from './class-feature-row-form-schema'
+import {
+  createFeatureRowFormSchema,
+  createSubclassFeatureRowFormSchema,
+} from './class-feature-row-form-schema'
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
+
+beforeAll(() => {
+  if (!HTMLElement.prototype.hasPointerCapture) {
+    HTMLElement.prototype.hasPointerCapture = () => false
+    HTMLElement.prototype.setPointerCapture = () => {}
+    HTMLElement.prototype.releasePointerCapture = () => {}
+  }
+})
 
 const ctx = makeContentFormCtx()
 const maxLevel = effectiveMaxFromCtx(ctx)
+
+const classFeatureResolverField = embeddedArrayResolverField('features', 'Features', {
+  itemFields: classFeatureItemFields(ctx),
+  resolveItemFields: classFeatureRowResolveFields(ctx),
+  rowVariantTopology: buildClassFeatureRowVariantTopology(ctx),
+})
+const classFeaturesSchema = z.object({
+  features: z.array(createFeatureRowFormSchema(maxLevel)),
+})
 
 const schema = z.object({
   features: z.array(createSubclassFeatureRowFormSchema(maxLevel)),
@@ -44,12 +72,62 @@ const featureArrayField = {
   fields: subclassFeatureItemFields(ctx),
 }
 
-function RowIssueCountProbe() {
-  const { getRowIssueCount } = useMasterDetailRowValidation(
-    'features',
-    subclassFeatureItemFields(ctx),
-  )
+function RowIssueCountProbe({
+  resolver = subclassFeatureItemFields(ctx),
+}: {
+  resolver?: FormItem[]
+}) {
+  const { getRowIssueCount } = useMasterDetailRowValidation('features', resolver)
   return <div data-testid="row-issue-count">{getRowIssueCount(0)}</div>
+}
+
+function ClassFeaturesSubmitButton({ onAttempt }: { onAttempt: () => void }) {
+  const { trigger } = useFormContext()
+
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        onAttempt()
+        void trigger()
+      }}
+    >
+      Save features
+    </button>
+  )
+}
+
+function MountedClassFeaturesHarness({
+  ProducerBoundary,
+  defaultValues,
+}: {
+  ProducerBoundary: ComponentType<{ children: ReactNode }>
+  defaultValues: { features: { kind: 'custom'; name: string; level: number; grants: never[] }[] }
+}) {
+  const [attemptedSubmit, setAttemptedSubmit] = useState(false)
+  const form = useForm({
+    defaultValues,
+    resolver: makeResolver(classFeaturesSchema, [classFeatureResolverField]),
+    mode: 'onSubmit',
+  })
+
+  return (
+    <MemoryRouter>
+      <FormProvider {...form}>
+        <FormUiProvider
+          fields={[classFeatureResolverField]}
+          hasAttemptedSubmit={attemptedSubmit}
+          onMarkSubmitAttempted={() => setAttemptedSubmit(true)}
+        >
+          <ProducerBoundary>
+            <ClassFeaturesTab formCtx={ctx} />
+            <RowIssueCountProbe resolver={classFeatureItemFields(ctx)} />
+            <ClassFeaturesSubmitButton onAttempt={() => setAttemptedSubmit(true)} />
+          </ProducerBoundary>
+        </FormUiProvider>
+      </FormProvider>
+    </MemoryRouter>
+  )
 }
 
 function liveProducerBoundary(resolverFields: FormItem[]) {
@@ -141,5 +219,37 @@ describe('class feature master-detail validation pilot', () => {
       expect(Number(screen.getByTestId('row-issue-count').textContent)).toBeGreaterThan(0)
     })
     expect(onSubmit).not.toHaveBeenCalled()
+  })
+
+  it('mounts ClassFeaturesTab and badges the custom feature row after submit', async () => {
+    const user = userEvent.setup()
+    const ProducerBoundary = liveProducerBoundary([classFeatureResolverField])
+
+    render(
+      <MountedClassFeaturesHarness
+        ProducerBoundary={ProducerBoundary}
+        defaultValues={{
+          features: [
+            {
+              kind: 'custom',
+              name: '',
+              level: 1,
+              grants: [],
+            },
+          ],
+        }}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Save features' }))
+
+    await waitFor(() => {
+      expect(Number(screen.getByTestId('row-issue-count').textContent)).toBeGreaterThan(0)
+    })
+    expect(
+      within(screen.getByRole('navigation', { name: 'Features' })).getByRole('button', {
+        name: /Unnamed Feature/i,
+      }),
+    ).toBeInTheDocument()
   })
 })

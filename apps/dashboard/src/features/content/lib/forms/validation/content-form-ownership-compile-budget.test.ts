@@ -7,6 +7,7 @@ import {
 
 import { buildClassTabs } from '../../../classes/lib/class-form-fields'
 import { buildClassFeatureRowVariantTopology } from '../../../classes/lib/class-feature-form-fields'
+import { buildEquipmentFields } from '../../../equipment/lib/equipment-form-fields'
 import { buildMonsterTabs } from '../../../monsters/lib/monster-form-fields'
 import { movementAlternativeGroupField } from '../../../lib/forms/fields/content-movement-form-fields'
 
@@ -52,6 +53,20 @@ describe('content form ownership compile pilot budget', () => {
       JSON.stringify(movementField).includes('errorPaths') ||
         JSON.stringify(movementField).includes('resolverFields'),
     ).toBe(false)
+  })
+
+  it('compiles equipment weapon and armor kind topologies within the pilot budget', () => {
+    for (const kind of ['weapon', 'armor'] as const) {
+      const fields = buildEquipmentFields({ equipmentKind: kind })
+      const started = performance.now()
+      const compiled = compileFormOwnership(fields, {})
+      expect(performance.now() - started).toBeLessThan(FORM_OWNERSHIP_COMPILE_BUDGET_MS)
+      expect(compiled.paths.size).toBeGreaterThan(0)
+      expect(
+        JSON.stringify(fields).includes('errorPaths') ||
+          JSON.stringify(fields).includes('resolverFields'),
+      ).toBe(false)
+    }
   })
 
   it('compiles class feature spellcasting intro from declared variant topology', () => {

@@ -469,6 +469,90 @@ describe('useContentFormSubmit attempt identity', () => {
     expect(harness.form.getValues('name')).toBe('User session')
   })
 
+  it('ignores a late api rejection when a same-stamp attempt already finished', async () => {
+    let releaseFirst: () => void = () => undefined
+    const persist = vi
+      .fn()
+      .mockImplementationOnce(
+        () =>
+          new Promise<void>((_, reject) => {
+            releaseFirst = () =>
+              reject(
+                new ApiError(400, 'validation_error', 'Invalid', {
+                  issues: [{ path: 'name', message: 'Taken', code: 'duplicate' }],
+                }),
+              )
+          }),
+      )
+      .mockResolvedValueOnce(undefined)
+    const bindingRef: {
+      current: ReturnType<typeof useContentFormSubmitProducerBinding> | null
+    } = { current: null }
+    const controls = { submit: async () => undefined as Promise<void> }
+
+    function Harness() {
+      const form = useForm<TestValues>({ defaultValues: { name: 'A', level: 2 } })
+      const binding = useContentFormSubmitProducerBinding()
+      bindingRef.current = binding
+      const contentSubmit = useContentFormSubmit<TestValues>({
+        def: testDef,
+        ctx: { ...testCtx, mode: 'edit' },
+        fallbackMessage: 'Could not save.',
+        producerBinding: binding,
+        invalidPresentation: {
+          resolverFields: [
+            { name: 'name', label: 'Name', type: 'text' },
+            { name: 'level', label: 'Level', type: 'number' },
+          ],
+          formId: 'edit-form',
+        },
+        persist: async (values) => persist(values),
+      })
+      controls.submit = () => contentSubmit.onSubmit({ name: 'A', level: 2 }, form)
+      const Boundary = contentSubmit.ProducerBoundary
+      const StampBridge = contentSubmit.ProducerStampBridge
+
+      return (
+        <FormProvider {...form}>
+          <StampBridge />
+          <Boundary>
+            <span data-testid="probe" />
+          </Boundary>
+        </FormProvider>
+      )
+    }
+
+    render(
+      <FormUiWrapper>
+        <Harness />
+      </FormUiWrapper>,
+    )
+
+    let first!: Promise<void>
+    act(() => {
+      first = controls.submit()
+    })
+    first.catch(() => undefined)
+    await waitFor(() => expect(persist).toHaveBeenCalledTimes(1))
+
+    await act(async () => {
+      await controls.submit()
+    })
+
+    await act(async () => {
+      releaseFirst()
+      await expect(first).rejects.toBeInstanceOf(ContentFormSubmitSuperseded)
+    })
+
+    expect(persist).toHaveBeenCalledTimes(2)
+    expect(
+      collectCurrentFormValidationProducerIssues(
+        bindingRef.current!.producerSession,
+        bindingRef.current!.snapshotStamp,
+      ).some((issue) => issue.path === 'name'),
+    ).toBe(false)
+  })
+
   it('ignores a late success from a superseded same-stamp attempt', async () => {
     let releaseFirst: () => void = () => undefined
     const persist = vi
