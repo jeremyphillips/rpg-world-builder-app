@@ -1,5 +1,6 @@
 import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { useFormContext, type FieldValues } from 'react-hook-form'
+import { getApiValidationIssues } from '@rpg/contracts'
 import { isApiError } from '@rpg/contracts/shared'
 import {
   cancelPendingInvalidSubmitFocus,
@@ -25,7 +26,6 @@ import { runContentFormCommitAttempt } from './content-form-submit-commit.lib'
 import {
   ContentFormSubmitSuperseded,
   ContentFormSubmitValidationFailed,
-  type ContentFormInvalidPresentation,
   type UseContentFormSubmitOptions,
 } from './content-form-submit-types.lib'
 
@@ -47,11 +47,9 @@ export {
 export type UseContentFormSubmitResult<TValues extends FieldValues> =
   UseSubmitHandlerResult<TValues> & {
     /** Stamp watch only — use when a second submit hook shares one form boundary. */
-    ProducerStampBridge: () => null
+    ProducerStampBridge: () => React.ReactNode
     /** Wraps field chrome so presentation reads the producer session. */
     ProducerBoundary: React.ComponentType<{ children: React.ReactNode }>
-    /** @deprecated Prefer {@link ProducerBoundary}; use {@link ProducerStampBridge} only for a second lease on a shared form. */
-    UiBridge: () => null
   }
 
 export function useContentFormSubmit<TValues extends FieldValues>(
@@ -122,7 +120,10 @@ export function useContentFormSubmit<TValues extends FieldValues>(
       }
       const mapped = mapError?.(error)
       if (mapped !== undefined) return mapped
-      // Server-authored API copy is safe; any other throw (Zod, invariant) is not author copy.
+      if (isApiError(error) && getApiValidationIssues(error)?.length) {
+        return null
+      }
+      // Server-authored API copy is safe when there are no field issues; any other throw is not author copy.
       return isApiError(error) ? error.message : fallbackMessage
     },
     submit: async (values, form) => {
@@ -253,20 +254,18 @@ export function useContentFormSubmit<TValues extends FieldValues>(
       () => ({ session: producerSession, stamp: snapshotStamp, replaceSlot }),
       [replaceSlot, producerSession, snapshotStamp],
     )
-    return React.createElement(
-      FormValidationProducerProvider,
-      { ...value },
-      React.createElement(FormValidationInteractiveProducerBridge, {
-        fields: interactiveResolverFields,
-      }),
-      children,
-    )
+    return React.createElement(FormValidationProducerProvider, {
+      ...value,
+      children: React.createElement(
+        React.Fragment,
+        null,
+        React.createElement(FormValidationInteractiveProducerBridge, {
+          fields: interactiveResolverFields,
+        }),
+        children,
+      ),
+    })
   }
 
-  /** @deprecated Use {@link ProducerBoundary} around field chrome. */
-  function UiBridge() {
-    return React.createElement(ProducerStampBridge)
-  }
-
-  return { onSubmit, formError, ProducerBoundary, ProducerStampBridge, UiBridge }
+  return { onSubmit, formError, ProducerBoundary, ProducerStampBridge }
 }

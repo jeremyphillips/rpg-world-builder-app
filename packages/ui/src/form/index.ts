@@ -380,6 +380,7 @@ export {
   type FormRhfIntegrationStrategy,
   type FormSchemaEvaluationResult,
   type FormValidationProducerSession,
+  type FormValidationProducerSlot,
   type FormValidationProducerSlotState,
   type FormActionAttempt,
   type RunFormActionOptions,
