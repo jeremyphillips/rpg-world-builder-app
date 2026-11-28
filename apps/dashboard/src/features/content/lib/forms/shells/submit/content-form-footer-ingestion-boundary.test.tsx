@@ -37,7 +37,7 @@ const resolverFields: FormItem[] = [
 const testDef = {
   schema: testSchema,
   createDefaultValues: { name: '', level: 0 },
-  nameField: (): FormItem => resolverFields[0],
+  nameField: (): FormItem => resolverFields[0]!,
   buildFields: (): FormItem[] => resolverFields,
 } as unknown as AnyContentFormDef
 
@@ -70,7 +70,7 @@ function footerText(formError: string | undefined, rootMessage: string | undefin
 describe('footer ingestion boundary (Package C)', () => {
   it('maps author-correctable prepareWrite ZodError on name and level without footer leakage', async () => {
     const persist = vi.fn()
-    const controls = { submit: async () => undefined as Promise<void> }
+    const controls = { submit: async (): Promise<void> => {} }
     const formRef: { current: ReturnType<typeof useForm<TestValues>> | null } = { current: null }
     const submitRef: {
       current: ReturnType<typeof useContentFormSubmit<TestValues>> | null
@@ -92,19 +92,17 @@ describe('footer ingestion boundary (Package C)', () => {
             {
               code: 'too_small',
               minimum: 1,
-              type: 'string',
               inclusive: true,
               message: 'Name must be present on wire.',
               path: ['name'],
-            },
+            } as z.ZodIssue,
             {
               code: 'too_small',
               minimum: 9,
-              type: 'number',
               inclusive: true,
               message: 'Level too low for wire.',
               path: ['level'],
-            },
+            } as z.ZodIssue,
           ])
         },
         persist,
@@ -155,7 +153,7 @@ describe('footer ingestion boundary (Package C)', () => {
         issues: [{ path: 'name', message: 'Slug is already taken', code: 'duplicate' }],
       }),
     )
-    const controls = { submit: async () => undefined as Promise<void> }
+    const controls = { submit: async (): Promise<void> => {} }
     const formRef: { current: ReturnType<typeof useForm<TestValues>> | null } = { current: null }
     const submitRef: {
       current: ReturnType<typeof useContentFormSubmit<TestValues>> | null
@@ -211,7 +209,7 @@ describe('footer ingestion boundary (Package C)', () => {
 
   it('uses fallback footer copy for plain persist errors, never raw Error.message', async () => {
     const persist = vi.fn().mockRejectedValue(new Error('Network failed'))
-    const controls = { submit: async () => undefined as Promise<void> }
+    const controls = { submit: async (): Promise<void> => {} }
     const submitRef: {
       current: ReturnType<typeof useContentFormSubmit<TestValues>> | null
     } = { current: null }
@@ -261,7 +259,7 @@ describe('footer ingestion boundary (Package C)', () => {
 
   it('surfaces safe operation copy for JSON-shaped prepare throws without raw message in footer', async () => {
     const persist = vi.fn()
-    const controls = { submit: async () => undefined as Promise<void> }
+    const controls = { submit: async (): Promise<void> => {} }
     const formRef: { current: ReturnType<typeof useForm<TestValues>> | null } = { current: null }
     const submitRef: {
       current: ReturnType<typeof useContentFormSubmit<TestValues>> | null

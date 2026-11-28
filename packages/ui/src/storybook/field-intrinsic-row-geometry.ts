@@ -112,7 +112,7 @@ export async function assertFieldIntrinsicRowParticipant(
 export function participantWidthDelta(
   withHint: HTMLElement,
   withoutHint: HTMLElement,
-  tolerance = DEFAULT_TOLERANCE_PX,
+  _tolerance = DEFAULT_TOLERANCE_PX,
 ): number {
   return Math.abs(
     withHint.getBoundingClientRect().width - withoutHint.getBoundingClientRect().width,

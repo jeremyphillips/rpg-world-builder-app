@@ -52,7 +52,7 @@ describe('contentEntityArtworkRulesetId', () => {
     expect(
       contentEntityArtworkRulesetId({
         entityRulesetId: 'srd-cc-5.2.1',
-        rulesetId: 'other-ruleset',
+        rulesetId: 'other-ruleset' as 'srd-cc-5.2.1',
       }),
     ).toBe('srd-cc-5.2.1')
   })

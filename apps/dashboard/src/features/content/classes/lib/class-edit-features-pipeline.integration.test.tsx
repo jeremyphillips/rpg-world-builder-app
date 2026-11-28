@@ -4,7 +4,7 @@
  * Production entry for class embedded features: real `classFormDef` tabs,
  * `useContentFormSubmit`, and producer session — not the isolated ClassFeaturesTab harness.
  */
-import type { CharacterClass } from '@rpg/contracts'
+import { DEFAULT_CONTENT_CAMPAIGN_ACCESS, type CharacterClass } from '@rpg/contracts'
 import { getClassBySlug } from '@rpg/catalog/classes'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -62,7 +62,7 @@ function systemFighterEntity(): CharacterClass {
     ...catalog!,
     catalogLayer: 'system',
     status: 'published',
-    campaignAccess: catalog!.campaignAccess ?? { participants: [], campaignId: TEST_CAMPAIGN_ID },
+    campaignAccess: DEFAULT_CONTENT_CAMPAIGN_ACCESS,
     overlayRevision: 0,
   } as CharacterClass
 }
@@ -176,6 +176,8 @@ describe('class edit features validation pipeline (FV-016)', () => {
           name: '',
           level: 1,
           grants: [],
+          available: true,
+          tables: [],
         },
       ],
     })

@@ -5,6 +5,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 
 import type { ClassListItem } from '@rpg/contracts'
+import { getClassBySlug } from '@rpg/catalog/classes'
 
 import { CLASS_EDIT_SUBCLASSES_TAB, classEditSubclassesHref } from './class-edit-navigation.lib'
 import { classColumns } from './classes-overview-columns'
@@ -15,15 +16,7 @@ describe('classes overview subclass overlay warning', () => {
     const campaignId = 'camp-1'
     const classId = 'class-fighter'
     const row: ClassListItem = {
-      id: classId,
-      name: 'Fighter',
-      slug: 'fighter',
-      rulesetId: 'srd-cc-5.2.1',
-      catalogLayer: 'system',
-      status: 'published',
-      hitDie: 10,
-      primaryAbilities: ['str'],
-      features: [],
+      ...getClassBySlug('srd-cc-5.2.1', 'fighter')!,
       subclasses: [],
       unresolvedSubclassOverlayCount: 2,
     }

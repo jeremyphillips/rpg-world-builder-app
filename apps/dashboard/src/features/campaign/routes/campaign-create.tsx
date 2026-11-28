@@ -22,10 +22,7 @@ import {
   type CreateIdentityValues,
   type FlavorValues,
 } from '../lib/settings/campaign-profile-form-fields'
-import {
-  buildCreateCampaignInput,
-  type CampaignCreateValues,
-} from '../lib/settings/campaign-settings-form-values'
+import { buildCreateCampaignInput } from '../lib/settings/campaign-settings-form-values'
 import { validateCampaignCreateValues } from '../lib/campaign-create-validation.lib'
 import {
   attachCampaignBannerMedia,

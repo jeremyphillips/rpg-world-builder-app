@@ -3,7 +3,6 @@ import type {
   ContentAccessTargetType,
   ContentCampaignAccessPatch,
   ContentTypeKey,
-  ContentValidationIntent,
 } from '@rpg/contracts'
 import { emptyContentMediaSchema } from '@rpg/contracts'
 import { Heading, Text } from '@rpg/ui'
@@ -35,7 +34,6 @@ import { resolveContentPostCreateEditHref } from '../layout/content-form-navigat
 
 import { prepareSerializedContentFormWrite } from '../../submit/prepare-serialized-content-form-write.lib'
 import { resolveContentFormSchema } from '../edit/content-edit-load'
-import { intentToStatus } from './content-create-intent'
 import { createWithDeferredCampaignAccess } from '../../../campaign-access/create-with-deferred-campaign-access'
 import { CAMPAIGN_ACCESS_CREATE_DEFERRED_ERROR } from '../../../campaign-access/campaign-access-labels'
 import {

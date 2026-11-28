@@ -24,7 +24,7 @@ const readyCtx: ContentFormCtx = {
   equipmentCatalogById: new Map(),
 }
 
-function ProducerHost({ values, children }: { values: MonsterFormValues; children: ReactNode }) {
+function ProducerHost({ children }: { values: MonsterFormValues; children: ReactNode }) {
   const session = replaceFormValidationProducerSlot(
     createEmptyFormValidationProducerSession(),
     'publish-action',

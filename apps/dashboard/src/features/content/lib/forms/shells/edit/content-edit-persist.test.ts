@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import type { UseFormReturn } from 'react-hook-form'
+import type { FieldValues, UseFormReturn } from 'react-hook-form'
 import { z } from 'zod'
 
 import { consumeContentFormPersistBaselineReset } from '../submit/content-form-persist-baseline-reset.lib'
@@ -8,7 +8,7 @@ import { persistContentEditUpdate } from './content-edit-persist.lib'
 describe('persistContentEditUpdate baseline sync guard', () => {
   it('skips post-save reset when isAttemptCurrent is false', async () => {
     const reset = vi.fn()
-    const form = { reset, resetField: vi.fn() } as unknown as UseFormReturn<{ name: string }>
+    const form = { reset, resetField: vi.fn() } as unknown as UseFormReturn<FieldValues>
 
     const def = {
       schema: z.object({ name: z.string() }),
@@ -36,7 +36,7 @@ describe('persistContentEditUpdate baseline sync guard', () => {
 
   it('applies post-save reset when isAttemptCurrent is true', async () => {
     const reset = vi.fn()
-    const form = { reset, resetField: vi.fn() } as unknown as UseFormReturn<{ name: string }>
+    const form = { reset, resetField: vi.fn() } as unknown as UseFormReturn<FieldValues>
 
     const def = {
       schema: z.object({ name: z.string() }),

@@ -170,12 +170,12 @@ export function useSubclassDetailEditor({
     void onSaveRef.current(form.getValues(), { accessOnly: true })
   }
 
-  function SubclassEditorShell({ children }: { children: React.ReactNode }) {
-    return React.createElement(
-      FormUiProvider,
-      { fields, uiStateKey: `subclass-editor-${subclassId}` },
-      React.createElement(ProducerBoundary, null, children),
-    )
+  function SubclassEditorShell({ children }: { children: React.ReactNode }): React.ReactElement {
+    return React.createElement(FormUiProvider, {
+      fields,
+      uiStateKey: `subclass-editor-${subclassId}`,
+      children: React.createElement(ProducerBoundary, null, children),
+    })
   }
 
   return {

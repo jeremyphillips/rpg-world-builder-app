@@ -156,13 +156,15 @@ export async function runContentFormCommitPipeline<TValues extends FieldValues>(
   input: ContentFormCommitPipelineInput<TValues>,
   options: ContentFormCommitPipelineOptions<TValues>,
 ): Promise<ContentFormCommitPipelineResult<TValues>> {
-  const stages: FormActionStage[] = [
+  const stages = [
     createFormEvaluateStage(options.formSchema, options.resolverFields),
     createPrepareStage(options.prepareCommitValues, options.prepareWrite),
-  ]
+  ] as FormActionStage[]
 
   if (options.writeSchema) {
-    stages.push(createWriteValidateStage(options.writeSchema, options.resolverFields))
+    stages.push(
+      createWriteValidateStage(options.writeSchema, options.resolverFields) as FormActionStage,
+    )
   }
 
   let action: RunFormActionResult<ContentPreparedWrite<TValues>>

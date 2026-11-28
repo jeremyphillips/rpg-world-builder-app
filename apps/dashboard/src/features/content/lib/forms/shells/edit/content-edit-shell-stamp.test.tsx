@@ -103,14 +103,17 @@ vi.mock('@/components/layout/breadcrumb/use-breadcrumb-label', () => ({
 }))
 
 const prepareWriteMock = vi.hoisted(() =>
-  vi.fn(() => ({
-    payload: { name: 'Feat' },
-    provenance: null as { pathMap?: Record<string, string> } | null,
-  })),
+  vi.fn(
+    (_input?: unknown) =>
+      ({
+        payload: { name: 'Feat' },
+        provenance: {},
+      }) as { payload: Record<string, unknown>; provenance: Record<string, unknown> },
+  ),
 )
 
 vi.mock('../../submit/prepare-serialized-content-form-write.lib', () => ({
-  prepareSerializedContentFormWrite: (...args: unknown[]) => prepareWriteMock(...args),
+  prepareSerializedContentFormWrite: (input: unknown) => prepareWriteMock(input),
 }))
 
 const mutation = vi.hoisted(() => ({ mutateAsync: vi.fn() }))
@@ -120,7 +123,7 @@ beforeEach(() => {
   prepareWriteMock.mockReset()
   prepareWriteMock.mockReturnValue({
     payload: { name: 'Feat' },
-    provenance: null,
+    provenance: {},
   })
 })
 
@@ -255,7 +258,7 @@ describe('ContentEditShell stamp and producer session', () => {
     prepareWriteMock.mockReturnValue({
       payload: { name: 'Feat A!', slug: 'feat-a' },
       provenance: { pathMap: { name: 'slug' } },
-    })
+    } as { payload: Record<string, unknown>; provenance: { pathMap?: Record<string, string> } })
     mutation.mutateAsync.mockResolvedValueOnce({
       id: 'feat-a',
       name: 'Feat A!',

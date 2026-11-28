@@ -203,14 +203,6 @@ const CLASS_FEATURE_KIND_FIELD_SECTIONS = {
   (ctx: ContentFormCtx, options?: FeatureFieldOptions) => MasterDetailItemFieldSections
 >
 
-function assertClassFeatureKind(
-  row: Pick<FeatureRowForm, 'kind'> | undefined,
-): asserts row is Pick<FeatureRowForm, 'kind'> & { kind: ClassFeatureKind } {
-  if (!row?.kind) {
-    throw new Error('Class feature row is missing kind')
-  }
-}
-
 function classFeatureMalformedFieldSections(
   ctx: ContentFormCtx,
   options?: FeatureFieldOptions,

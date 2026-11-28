@@ -2,7 +2,7 @@
  * @vitest-environment jsdom
  */
 import { useCallback, useContext, useRef, useState, type ReactNode } from 'react'
-import { useFormContext, useFormState } from 'react-hook-form'
+import { useFormContext, useFormState, type FieldValues } from 'react-hook-form'
 import userEvent from '@testing-library/user-event'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
@@ -154,13 +154,16 @@ describe('monster movement alternative validation', () => {
   })
 
   it('routes min-mode publish errors to Available modes', async () => {
-    const publishSchema = resolveMonsterFormSchema(ctx, 'publish') as ZodType<MonsterFormValues>
+    const publishSchema = resolveMonsterFormSchema(
+      ctx,
+      'publish',
+    ) as unknown as ZodType<MonsterFormValues>
     const fields = publishFields()
     const values = resolveMonsterCreateDefaultValues()
     values.name = 'Alt test'
     values.sizes = ['medium']
     values.creatureType = 'beast'
-    values.alignment = 'u'
+    values.alignment = 'unaligned'
     values.challengeRating = '1/8'
     values.movement = [{ mode: 'walk', feet: 20 }]
     values.movementAlternative = { modes: ['fly'], feet: 20 }
@@ -195,12 +198,15 @@ describe('monster movement alternative validation', () => {
   it('assigns alternative validation to the statistics tab', () => {
     const tabs = augmentTabsWithHoistedName(buildMonsterTabs(ctx), monsterFormDef.nameField(ctx))
     const fields = collectTabbedFormResolverItems(tabs)
-    const publishSchema = resolveMonsterFormSchema(ctx, 'publish') as ZodType<MonsterFormValues>
+    const publishSchema = resolveMonsterFormSchema(
+      ctx,
+      'publish',
+    ) as unknown as ZodType<MonsterFormValues>
     const values = resolveMonsterCreateDefaultValues()
     values.name = 'Overlap test'
     values.sizes = ['medium']
     values.creatureType = 'beast'
-    values.alignment = 'u'
+    values.alignment = 'unaligned'
     values.challengeRating = '1/8'
     values.movement = [
       { mode: 'walk', feet: 20 },
@@ -224,13 +230,16 @@ describe('monster movement alternative validation', () => {
   })
 
   it('rejects publish when alternative movement is open with no modes selected', () => {
-    const publishSchema = resolveMonsterFormSchema(ctx, 'publish') as ZodType<MonsterFormValues>
+    const publishSchema = resolveMonsterFormSchema(
+      ctx,
+      'publish',
+    ) as unknown as ZodType<MonsterFormValues>
     const fields = publishFields()
     const values = resolveMonsterCreateDefaultValues()
     values.name = 'Empty alt'
     values.sizes = ['medium']
     values.creatureType = 'beast'
-    values.alignment = 'u'
+    values.alignment = 'unaligned'
     values.challengeRating = '1/8'
     values.movement = [{ mode: 'walk', feet: 20 }]
     values.movementAlternative = { modes: [], feet: undefined }
@@ -240,13 +249,16 @@ describe('monster movement alternative validation', () => {
   })
 
   it('does not publish-validate cleared unsaved alternative as a field error', () => {
-    const publishSchema = resolveMonsterFormSchema(ctx, 'publish') as ZodType<MonsterFormValues>
+    const publishSchema = resolveMonsterFormSchema(
+      ctx,
+      'publish',
+    ) as unknown as ZodType<MonsterFormValues>
     const fields = publishFields()
     const values = resolveMonsterCreateDefaultValues()
     values.name = 'No alt'
     values.sizes = ['medium']
     values.creatureType = 'beast'
-    values.alignment = 'u'
+    values.alignment = 'unaligned'
     values.challengeRating = '1/8'
     values.movement = [{ mode: 'walk', feet: 20 }]
     values.movementAlternative = undefined
@@ -257,7 +269,10 @@ describe('monster movement alternative validation', () => {
   })
 
   it('does not publish-validate swarm edit after removing alternative', () => {
-    const publishSchema = resolveMonsterFormSchema(ctx, 'publish') as ZodType<MonsterFormValues>
+    const publishSchema = resolveMonsterFormSchema(
+      ctx,
+      'publish',
+    ) as unknown as ZodType<MonsterFormValues>
     const fields = publishFields()
     const values = swarmFormValues()
     values.movementAlternative = undefined
@@ -271,7 +286,7 @@ function CanonicalPublishIssuesProbe({
   publishSchema,
   publishFields,
 }: {
-  publishSchema: z.ZodType
+  publishSchema: z.ZodType<FieldValues>
   publishFields: FormItem[]
 }) {
   const form = useFormContext()
@@ -314,15 +329,18 @@ function RhfCanonicalErrorProbe({
   )
 }
 
-function collapsedMovementAlternativeField() {
+function collapsedMovementAlternativeField(): FormItem {
   const base = movementAlternativeGroupField()
+  if (!('optionalDisclosure' in base) || !base.optionalDisclosure) {
+    throw new Error('expected optional disclosure on movement alternative group')
+  }
   return {
     ...base,
     optionalDisclosure: {
-      ...base.optionalDisclosure!,
+      ...base.optionalDisclosure,
       expandWhenPopulated: false,
     },
-  } as typeof base
+  }
 }
 
 describe('movement alternative optional disclosure', () => {
@@ -357,7 +375,7 @@ describe('movement alternative optional disclosure', () => {
     render(
       <TabbedForm
         id="monster-movement-alt"
-        schema={resolveMonsterFormSchema(ctx, 'draft') as ZodType<MonsterFormValues>}
+        schema={resolveMonsterFormSchema(ctx, 'draft') as unknown as ZodType<MonsterFormValues>}
         tabs={tabs}
         defaultValues={defaultValues}
         onSubmit={() => {}}
@@ -385,7 +403,10 @@ describe('movement alternative optional disclosure', () => {
 
   it('retains a collapsed optional-disclosure issue until expand or submit', async () => {
     const user = userEvent.setup()
-    const publishSchema = resolveMonsterFormSchema(ctx, 'publish') as ZodType<MonsterFormValues>
+    const publishSchema = resolveMonsterFormSchema(
+      ctx,
+      'publish',
+    ) as unknown as ZodType<MonsterFormValues>
     const movementField = collapsedMovementAlternativeField()
     const tabs = [
       {
@@ -398,7 +419,7 @@ describe('movement alternative optional disclosure', () => {
     defaultValues.name = 'Collapsed alt'
     defaultValues.sizes = ['medium']
     defaultValues.creatureType = 'beast'
-    defaultValues.alignment = 'u'
+    defaultValues.alignment = 'unaligned'
     defaultValues.challengeRating = '1/8'
     defaultValues.movement = [{ mode: 'walk', feet: 20 }]
     defaultValues.movementAlternative = { modes: ['fly'], feet: 20 }
@@ -450,7 +471,10 @@ describe('movement alternative optional disclosure', () => {
 
   it('shows two distinct modes reasons on the mounted producer after publish', async () => {
     const user = userEvent.setup()
-    const publishSchema = resolveMonsterFormSchema(ctx, 'publish') as ZodType<MonsterFormValues>
+    const publishSchema = resolveMonsterFormSchema(
+      ctx,
+      'publish',
+    ) as unknown as ZodType<MonsterFormValues>
     const movementField = movementAlternativeGroupField()
     const statisticsTab = {
       id: MONSTER_FORM_TAB.statistics,
@@ -462,7 +486,7 @@ describe('movement alternative optional disclosure', () => {
     defaultValues.name = 'Overlap modes'
     defaultValues.sizes = ['medium']
     defaultValues.creatureType = 'beast'
-    defaultValues.alignment = 'u'
+    defaultValues.alignment = 'unaligned'
     defaultValues.challengeRating = '1/8'
     defaultValues.movement = [
       { mode: 'walk', feet: 20 },
@@ -552,7 +576,10 @@ describe('movement alternative optional disclosure', () => {
 
   it('badges statistics with adopted producer boundary and full tab resolver fields', async () => {
     const user = userEvent.setup()
-    const publishSchema = resolveMonsterFormSchema(ctx, 'publish') as ZodType<MonsterFormValues>
+    const publishSchema = resolveMonsterFormSchema(
+      ctx,
+      'publish',
+    ) as unknown as ZodType<MonsterFormValues>
     const movementField = collapsedMovementAlternativeField()
     const statisticsTab = {
       id: MONSTER_FORM_TAB.statistics,
@@ -564,7 +591,7 @@ describe('movement alternative optional disclosure', () => {
     defaultValues.name = 'Collapsed adopted'
     defaultValues.sizes = ['medium']
     defaultValues.creatureType = 'beast'
-    defaultValues.alignment = 'u'
+    defaultValues.alignment = 'unaligned'
     defaultValues.challengeRating = '1/8'
     defaultValues.movement = [{ mode: 'walk', feet: 20 }]
     defaultValues.movementAlternative = { modes: ['fly'], feet: 20 }
@@ -719,6 +746,7 @@ describe('movement alternative optional disclosure', () => {
       const scoped = within(formRoot())
       const [canonicalProbe] = scoped.getAllByTestId('canonical-publish-issues-probe')
       expect(canonicalProbe).toBeTruthy()
+      if (!canonicalProbe) return
       expect(canonicalProbe.querySelectorAll('p')).toHaveLength(2)
       expect(
         canonicalProbe.querySelector('[data-issue-target="movementAlternative"]'),
@@ -750,7 +778,10 @@ describe('monster TabbedForm campaign availability discovery', () => {
   const allTabs = augmentTabsWithHoistedName(buildMonsterTabs(ctx), monsterFormDef.nameField(ctx))
   const actionsTab = allTabs.find((tab) => tab.id === MONSTER_FORM_TAB.actions)!
   const traitsTab = allTabs.find((tab) => tab.id === MONSTER_FORM_TAB.traits)!
-  const draftSchema = resolveMonsterFormSchema(ctx, 'draft') as ZodType<MonsterFormValues>
+  const draftSchema = resolveMonsterFormSchema(
+    ctx,
+    'draft',
+  ) as unknown as ZodType<MonsterFormValues>
 
   function availabilityHiddenProducerBoundary(issuePath: string, message: string) {
     return function ProducerBoundary({ children }: { children: ReactNode }) {

@@ -38,8 +38,8 @@ const fields: FormItem[] = [
 ]
 
 const tabs: TabbedFormTab[] = [
-  { id: 'identity', label: 'Identity', fields: [fields[0]], errorPaths: ['name'] },
-  { id: 'stats', label: 'Stats', fields: [fields[1]], errorPaths: ['level'] },
+  { id: 'identity', label: 'Identity', fields: [fields[0]!], errorPaths: ['name'] },
+  { id: 'stats', label: 'Stats', fields: [fields[1]!], errorPaths: ['level'] },
 ]
 
 const def = {
@@ -49,7 +49,7 @@ const def = {
     level: z.coerce.number().optional(),
   }),
   createDefaultValues: { name: '', level: 2 },
-  nameField: (): FormItem => fields[0],
+  nameField: (): FormItem => fields[0]!,
   buildFields: (): FormItem[] => fields,
 } as unknown as AnyContentFormDef
 

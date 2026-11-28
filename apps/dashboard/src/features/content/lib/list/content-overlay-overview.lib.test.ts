@@ -21,7 +21,11 @@ describe('content overlay overview rows', () => {
     expect(merged).toHaveLength(2)
     expect(isContentOverlayFailureOverviewRow(merged[1])).toBe(true)
     expect(overlayFailureOverviewStatusLabel(merged[1])).toBe('Overlay unresolved')
-    expect(merged[1]?.campaignAccess).toEqual(CONTENT_OVERLAY_FAILURE_ROW_CAMPAIGN_ACCESS)
+    const failureRow = merged[1]
+    expect(isContentOverlayFailureOverviewRow(failureRow)).toBe(true)
+    if (isContentOverlayFailureOverviewRow(failureRow)) {
+      expect(failureRow.campaignAccess).toEqual(CONTENT_OVERLAY_FAILURE_ROW_CAMPAIGN_ACCESS)
+    }
   })
 
   it('returns only items when overlayFailures is empty', () => {

@@ -20,12 +20,11 @@ import {
   resolveMonsterCreateDefaultValues,
   type MonsterFormValues,
 } from '../../../monsters/lib/monster-form-values'
-import { buildSpellTabs } from '../../../spells/lib/spell-form-fields'
+import { buildSpellTabs, type SpellFormValues } from '../../../spells/lib/spell-form-fields'
 import {
   buildSpellPreparedWrite,
   spellCreateDefaultValues,
   SPELL_SCALING_FORM_DEFAULTS,
-  type SpellFormValues,
 } from '../../../spells/lib/spell-form-values'
 import { makeContentFormCtx } from '../../fixtures/content-form-ctx'
 import { presentPersistValidationFailure } from '../shells/submit/content-form-submit-presentation.lib'

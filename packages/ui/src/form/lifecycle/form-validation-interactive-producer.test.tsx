@@ -15,7 +15,7 @@ import {
 } from './form-validation-producer-session.lib'
 import { FormValidationProducerProvider } from './form-validation-producer-context.client'
 import type { FormIssue } from '../errors/form-issue.types'
-import type { FormValidationProducerSlot } from '../form-evaluation.types'
+import type { FormValidationProducerSlot } from './form-evaluation.types'
 import { FormValidationInteractiveProducerBridge } from './form-validation-interactive-producer-bridge.client'
 import { createValidateSilently } from '../config/form-resolver'
 

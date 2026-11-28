@@ -11,6 +11,17 @@ import {
 
 const repoRoot = join(process.cwd(), '../..')
 
+/** Minimal source snippets that must trip each legacy rule regex (§6 representative bypass). */
+const FORM_VALIDATION_BYPASS_FIXTURES: Record<string, string> = {
+  useSubmitHandler: 'export function x() { return useSubmitHandler() }',
+  applyValidationIssuesToForm: 'applyValidationIssuesToForm(issues, form)',
+  paintValidationIssuesOnForm: 'paintValidationIssuesOnForm(issues, form)',
+  applyContentPublishValidation: 'applyContentPublishValidation(result)',
+  prepareFormIssues: 'const routed = prepareFormIssues(errors, fields)',
+  useFormValidationPresentation: 'const p = useFormValidationPresentation()',
+  useAdoptedFormSubmit: 'const x = useAdoptedFormSubmit(fn, msg)',
+}
+
 describe('form validation enforcement', () => {
   it('scans adopted dashboard and public auth scopes without legacy bypasses', () => {
     const { violations } = scanFormValidationEnforcement(repoRoot)
@@ -26,10 +37,14 @@ describe('form validation enforcement', () => {
     ])
   })
 
-  it('detects representative legacy bypass patterns', () => {
-    const sample = 'const x = useAdoptedFormSubmit(fn, msg)'
+  it('detects representative legacy bypass patterns for every enforcement rule', () => {
+    expect(Object.keys(FORM_VALIDATION_BYPASS_FIXTURES).sort()).toEqual(
+      FORM_VALIDATION_LEGACY_RULES.map((rule) => rule.id).sort(),
+    )
     for (const rule of FORM_VALIDATION_LEGACY_RULES) {
-      expect(rule.pattern.test(sample), rule.id).toBe(rule.id === 'useAdoptedFormSubmit')
+      const fixture = FORM_VALIDATION_BYPASS_FIXTURES[rule.id]
+      expect(fixture, rule.id).toBeDefined()
+      expect(rule.pattern.test(fixture!), rule.id).toBe(true)
     }
   })
 

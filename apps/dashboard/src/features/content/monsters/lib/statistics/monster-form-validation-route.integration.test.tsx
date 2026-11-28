@@ -100,7 +100,7 @@ function invalidMovementPublishValues(): MonsterFormValues {
   values.name = ''
   values.sizes = ['medium']
   values.creatureType = 'beast'
-  values.alignment = 'u'
+  values.alignment = 'unaligned'
   values.challengeRating = '1/8'
   values.movement = [{ mode: 'walk', feet: 20 }]
   values.movementAlternative = { modes: ['fly'], feet: 20 }
@@ -118,7 +118,7 @@ function invalidNameOnlyPublishValues(): MonsterFormValues {
   values.name = ''
   values.sizes = ['medium']
   values.creatureType = 'beast'
-  values.alignment = 'u'
+  values.alignment = 'unaligned'
   values.challengeRating = '1/8'
   values.movement = [{ mode: 'walk', feet: 20 }]
   return values
@@ -127,7 +127,10 @@ function invalidNameOnlyPublishValues(): MonsterFormValues {
 describe('monster form validation route (integration)', () => {
   it('exposes aria-invalid on identity name after a failed publish', async () => {
     const user = userEvent.setup()
-    const publishSchema = resolveMonsterFormSchema(ctx, 'publish') as ZodType<MonsterFormValues>
+    const publishSchema = resolveMonsterFormSchema(
+      ctx,
+      'publish',
+    ) as unknown as ZodType<MonsterFormValues>
     const tabs = monsterPilotTabs()
     const resolverFields = collectTabbedFormResolverItems(tabs)
     const defaultValues = invalidNameOnlyPublishValues()
@@ -168,7 +171,10 @@ describe('monster form validation route (integration)', () => {
 
   it('exposes aria-invalid on statistics movement group after Review Statistics', async () => {
     const user = userEvent.setup()
-    const publishSchema = resolveMonsterFormSchema(ctx, 'publish') as ZodType<MonsterFormValues>
+    const publishSchema = resolveMonsterFormSchema(
+      ctx,
+      'publish',
+    ) as unknown as ZodType<MonsterFormValues>
     const tabs = monsterPilotTabs()
     const resolverFields = collectTabbedFormResolverItems(tabs)
     const defaultValues = validIdentityInvalidMovementPublishValues()
@@ -219,7 +225,10 @@ describe('monster form validation route (integration)', () => {
   it('cancels pending Review focus when the author picks another monster tab', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true })
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
-    const publishSchema = resolveMonsterFormSchema(ctx, 'publish') as ZodType<MonsterFormValues>
+    const publishSchema = resolveMonsterFormSchema(
+      ctx,
+      'publish',
+    ) as unknown as ZodType<MonsterFormValues>
     const tabs = monsterPilotTabs()
     const resolverFields = collectTabbedFormResolverItems(tabs)
     const defaultValues = invalidMovementPublishValues()

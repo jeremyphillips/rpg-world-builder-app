@@ -12,16 +12,19 @@ import { persistContentEditUpdate } from './content-edit-persist.lib'
 import { StampEditProbeLayout } from './content-edit-stamp.probe'
 import { useContentFormSubmit } from '../submit/content-form-submit'
 import type { AnyContentFormDef, ContentFormCtx } from '../../registry/content-form-registry'
+import type { ContentPreparedWrite } from '../../submit/content-prepared-write.types'
 
 const prepareWriteMock = vi.hoisted(() =>
-  vi.fn(() => ({
-    payload: { name: 'Feat A!' },
-    provenance: null as { pathMap?: Record<string, string> } | null,
-  })),
+  vi.fn(
+    (_input?: unknown): ContentPreparedWrite<Record<string, unknown>> => ({
+      payload: { name: 'Feat A!' },
+      provenance: {},
+    }),
+  ),
 )
 
 vi.mock('../../submit/prepare-serialized-content-form-write.lib', () => ({
-  prepareSerializedContentFormWrite: (...args: unknown[]) => prepareWriteMock(...args),
+  prepareSerializedContentFormWrite: (input: unknown) => prepareWriteMock(input),
 }))
 
 const mutateAsync = vi.hoisted(() => vi.fn())
@@ -52,7 +55,7 @@ function renderEditPersistHarness() {
         resolverFields: [{ name: 'name', label: 'Name', type: 'text' }],
         formId: 'feat-a-harness',
       },
-      prepareWrite: () => prepareWriteMock(),
+      prepareWrite: () => prepareWriteMock() as ContentPreparedWrite<unknown>,
       persist: async (wireInput, form, meta) =>
         persistContentEditUpdate({
           def: featDef,
@@ -75,7 +78,7 @@ function renderEditPersistHarness() {
         defaultValues={{ name: 'Feat A' }}
         formKey="feat-a-harness"
         formError={contentSubmit.formError ?? null}
-        onSubmit={contentSubmit.onSubmit}
+        onSubmit={contentSubmit.onSubmit as never}
         producerBoundary={contentSubmit.ProducerBoundary}
       />
     )
@@ -94,7 +97,7 @@ describe('edit shell failed persist producer projection', () => {
     prepareWriteMock.mockReset()
     prepareWriteMock.mockReturnValue({
       payload: { name: 'Feat A!' },
-      provenance: null,
+      provenance: {},
     })
   })
 
@@ -125,7 +128,7 @@ describe('edit shell failed persist producer projection', () => {
     prepareWriteMock.mockReturnValue({
       payload: { name: 'Feat A!', slug: 'feat-a' },
       provenance: { pathMap: { name: 'slug' } },
-    })
+    } as ContentPreparedWrite<Record<string, unknown>>)
     mutateAsync.mockRejectedValueOnce(
       new ApiError(400, 'validation_error', 'Invalid', {
         issues: [{ path: 'slug', message: 'Slug is already taken', code: 'duplicate' }],

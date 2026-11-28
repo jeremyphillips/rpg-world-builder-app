@@ -1866,7 +1866,6 @@
     "apps/dashboard/src/features/content/lib/forms/shells/session/content-save-session.lib.ts:runContentSaveSession",
     "apps/dashboard/src/features/content/lib/forms/shells/submit/content-form-submit.ts:ContentFormSubmitValidationFailed",
     "apps/dashboard/src/features/content/lib/forms/shells/submit/content-form-submit.ts:presentContentFormInvalidSubmit",
-    "apps/dashboard/src/features/content/lib/forms/shells/submit/content-form-submit.ts:focusFormPath",
     "apps/dashboard/src/features/content/lib/forms/validation/content-publish-validation.lib.ts:zodIssuesToValidationIssues",
     "apps/dashboard/src/features/content/lib/forms/validation/content-publish-validation.lib.ts:surfaceContentDraftPublishValidation",
     "apps/dashboard/src/features/content/lib/forms/validation/set-nested-form-value.lib.ts:setNestedFormValue",

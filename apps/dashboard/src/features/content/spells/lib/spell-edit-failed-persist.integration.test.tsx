@@ -11,6 +11,7 @@ import userEvent from '@testing-library/user-event'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { RICH_TEXT_TABLE_EMBED_ATTR } from '@rpg/ui'
 import { TabbedForm, collectTabbedFormResolverItems, FormUiProvider } from '@rpg/ui/form'
+import type { FieldValues, UseFormReturn } from 'react-hook-form'
 
 import { buildSeedDamageTypeVocabulary } from '@/features/vocabulary'
 
@@ -34,8 +35,8 @@ import {
   buildSpellCreateInput,
   SPELL_SCALING_FORM_DEFAULTS,
   spellCreateDefaultValues,
-  type SpellFormValues,
 } from './spell-form-values'
+import type { SpellFormValues } from './spell-form-fields'
 
 const RULESET_ID = 'srd-cc-5.2.1'
 
@@ -89,8 +90,8 @@ function loadSpellTablesEdit() {
     campaignId: TEST_CAMPAIGN_ID,
     createdAt: '2026-01-01T00:00:00.000Z',
     updatedAt: '2026-01-01T00:00:00.000Z',
-    slug: 'arcane-tables',
     ...buildSpellCreateInput(PRUNED_SPELL_TABLES_VALUES, optionsCtx, 'draft'),
+    slug: 'arcane-tables',
   } as Spell
   return {
     entity,
@@ -191,7 +192,7 @@ function renderSpellEditPersistHarness(
           campaignId: TEST_CAMPAIGN_ID,
           layoutCtx,
           wireInput: wireInput as Record<string, unknown>,
-          form,
+          form: form as unknown as UseFormReturn<FieldValues>,
           mutation: { mutateAsync },
           queryClient: client,
           setOverlayBaseline,

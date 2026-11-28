@@ -28,6 +28,7 @@ import {
   CONTENT_PREVIEW_STATUS_OFF,
 } from '../../lib/forms/preview/content-form-preview-copy'
 import { resolveContentPreviewSectionPresentation } from '../../lib/forms/preview/content-preview-section-state'
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 
 const emptyCtx = {}
 
@@ -182,7 +183,8 @@ describe('species preview projection', () => {
         ...equipmentCatalog.scope,
         equipmentCatalogStatus: 'ready',
         equipmentCatalogById: equipmentCatalog.equipmentById,
-      },
+        rulesetId: 'srd-cc-5.2.1',
+      } as ContentFormCtx,
     )
 
     for (const display of [published, preview]) {
@@ -205,7 +207,8 @@ describe('species preview projection', () => {
           ...equipmentCatalog.scope,
           equipmentCatalogStatus,
           equipmentCatalogById: equipmentCatalog.equipmentById,
-        },
+          rulesetId: 'srd-cc-5.2.1',
+        } as ContentFormCtx,
       )
 
       expect(

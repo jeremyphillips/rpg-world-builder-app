@@ -165,7 +165,7 @@ function registerContainerItem(
 export function registerFormItems(
   registry: Map<string, RegistryEntry>,
   prefix: string,
-  items: FormItem[],
+  items: readonly FormItem[],
   formValues?: Record<string, unknown>,
 ): void {
   for (const item of items) {

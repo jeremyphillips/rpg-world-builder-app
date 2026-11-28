@@ -48,7 +48,7 @@ describe('runContentFormCommitPipeline', () => {
     )
 
     expect(pipeline.kind).toBe('success')
-    if (pipeline.kind === 'success') {
+    if (pipeline.kind === 'success' && pipeline.action.kind === 'success') {
       expect(pipeline.prepared).toEqual(buildIdentityPreparedWrite({ name: 'A', level: 2 }))
       expect(pipeline.action.stageOutputs.prepare).toEqual(pipeline.prepared)
     }

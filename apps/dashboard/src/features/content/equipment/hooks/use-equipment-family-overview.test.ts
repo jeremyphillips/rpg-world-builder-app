@@ -8,6 +8,7 @@ import { useEquipmentFamilyOverview } from './use-equipment-family-overview'
 
 vi.mock('@/lib/use-campaign-ruleset-lookup', () => ({
   useCampaignRulesetLookup: vi.fn(() => ({
+    lookup: { status: 'resolved', rulesetId: 'srd-cc-5.2.1' },
     rulesetId: 'srd-cc-5.2.1',
     isPending: false,
     isError: false,
@@ -48,6 +49,7 @@ const { useCampaignRulesetLookup } = await import('@/lib/use-campaign-ruleset-lo
 describe('useEquipmentFamilyOverview', () => {
   it('defers overlay failure rows until campaign ruleset is ready', () => {
     vi.mocked(useCampaignRulesetLookup).mockReturnValue({
+      lookup: { status: 'unresolved', reason: 'loading' },
       rulesetId: undefined,
       isPending: true,
       isError: false,
@@ -75,6 +77,7 @@ describe('useEquipmentFamilyOverview', () => {
 
   it('includes unclassified overlay failures when ruleset lookup fails', () => {
     vi.mocked(useCampaignRulesetLookup).mockReturnValue({
+      lookup: { status: 'unresolved', reason: 'error' },
       rulesetId: undefined,
       isPending: false,
       isError: true,
@@ -117,6 +120,7 @@ describe('useEquipmentFamilyOverview', () => {
 
   it('keeps overlay failure rows in the matching equipment family using campaign ruleset context', () => {
     vi.mocked(useCampaignRulesetLookup).mockReturnValue({
+      lookup: { status: 'resolved', rulesetId: 'srd-cc-5.2.1' },
       rulesetId: 'srd-cc-5.2.1',
       isPending: false,
       isError: false,
@@ -156,6 +160,7 @@ describe('useEquipmentFamilyOverview', () => {
 
   it('treats ruleset lookup failure as a full-page error when the equipment list also failed', () => {
     vi.mocked(useCampaignRulesetLookup).mockReturnValue({
+      lookup: { status: 'unresolved', reason: 'error' },
       rulesetId: undefined,
       isPending: false,
       isError: true,

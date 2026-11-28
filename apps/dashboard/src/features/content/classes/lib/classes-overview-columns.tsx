@@ -9,7 +9,6 @@ import {
   dataTableColumnMeta,
   dataTableWidthMeta,
   SortableHeader,
-  Text,
 } from '@rpg/ui'
 import type { ColumnDef } from '@rpg/ui'
 import { createBooleanFilter, createEqualsFilter } from '@rpg/ui/filters'
@@ -121,14 +120,12 @@ function subclassesOverviewColumn(campaignId: string): ColumnDef<ClassListItem> 
             pluralLabel={CLASS_COLLECTION_LABELS.subclasses.plural}
           />
           {unresolved ? (
-            <Text variant="warning" asChild>
-              <Link
-                to={classEditSubclassesHref(campaignId, row.original.id)}
-                className="text-style-caption hover:underline"
-              >
-                {unresolved} unresolved subclass overlay{unresolved > 1 ? 's' : ''} — manage
-              </Link>
-            </Text>
+            <Link
+              to={classEditSubclassesHref(campaignId, row.original.id)}
+              className="text-style-caption text-warning hover:underline"
+            >
+              {unresolved} unresolved subclass overlay{unresolved > 1 ? 's' : ''} — manage
+            </Link>
           ) : null}
         </div>
       )

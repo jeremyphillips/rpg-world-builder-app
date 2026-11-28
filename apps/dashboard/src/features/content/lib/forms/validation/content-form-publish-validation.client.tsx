@@ -36,7 +36,7 @@ export function ContentFormPublishValidationBridge({
     publishToProducerSlot(
       'publish-readiness',
       validation.isPublishReady ? [] : validation.issues,
-      onValidationChange,
+      (result) => onValidationChange({ issues: [...result.issues] }),
     )
   }, [
     onValidationChange,

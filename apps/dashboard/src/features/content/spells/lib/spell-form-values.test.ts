@@ -218,7 +218,10 @@ describe('buildSpellPreparedWrite resolution provenance', () => {
     const values = publishReadySpellFormValues({
       resolution: {
         ...eldritchBlast,
-        effects: [{ id: 'dropped', kind: 'damage' as const }, ...eldritchBlast.effects],
+        effects: [
+          { id: 'dropped', kind: 'damage' as const, roll: {}, damageType: 'force' },
+          ...eldritchBlast.effects,
+        ],
       },
     })
     const { provenance } = buildSpellPreparedWrite(values, undefined, 'publish')

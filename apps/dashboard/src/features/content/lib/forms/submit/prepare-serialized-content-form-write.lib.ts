@@ -16,7 +16,12 @@ import {
 export type PrepareSerializedContentFormWriteInput<TValues extends FieldValues> = {
   def: Pick<
     AnyContentFormDef,
-    'supportsManagedMedia' | 'mediaDomain' | 'routeKey' | 'toInput' | 'normalizeOverlayBody'
+    | 'supportsManagedMedia'
+    | 'mediaDomain'
+    | 'routeKey'
+    | 'toInput'
+    | 'normalizeOverlayBody'
+    | 'serializePreparedWrite'
   >
   values: TValues
   form: UseFormReturn<TValues>

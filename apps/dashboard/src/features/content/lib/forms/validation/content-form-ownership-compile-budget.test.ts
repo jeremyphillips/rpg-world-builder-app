@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   collectRowVariantTopologyFields,
+  collectTabbedFormResolverItems,
   compileFormOwnership,
   FORM_OWNERSHIP_COMPILE_BUDGET_MS,
   type FormItem,
@@ -13,8 +14,8 @@ import { buildMonsterTabs } from '../../../monsters/lib/monster-form-fields'
 import { movementAlternativeGroupField } from '../../../lib/forms/fields/content-movement-form-fields'
 
 const PILOT_COMPILE_TARGETS = [
-  { name: 'classes', items: buildClassTabs({}) },
-  { name: 'monsters', items: buildMonsterTabs({}) },
+  { name: 'classes', items: collectTabbedFormResolverItems(buildClassTabs({})) },
+  { name: 'monsters', items: collectTabbedFormResolverItems(buildMonsterTabs({})) },
 ] as const
 
 const FV_015_COMPILE_RECORD_PREFIX = 'FV-015-compile-record:'
@@ -55,7 +56,7 @@ describe('content form ownership compile pilot budget', () => {
   )
 
   it('compiles monster tab topology once per unchanged config identity (FV-015)', () => {
-    const items = buildMonsterTabs({})
+    const items = collectTabbedFormResolverItems(buildMonsterTabs({}))
     const { compiled: first, elapsedMs: firstElapsed } = recordOwnershipCompile(
       'monsters',
       1,

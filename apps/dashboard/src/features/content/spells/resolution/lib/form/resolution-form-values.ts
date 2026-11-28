@@ -105,7 +105,8 @@ export function resolutionToStored(
 
   if (provenance) {
     recordArrayCompaction(provenance, 'resolution.effects', values.effects.length, (index) => {
-      return effectToStored(values.effects[index]) !== undefined
+      const effect = values.effects[index]
+      return effect !== undefined && effectToStored(effect) !== undefined
     })
   }
 

@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import { pickMonster } from '@/test/fixtures/pick'
 
+import type { MonsterFormValues } from '../monster-form-values'
+
 import { buildMonsterDetailViewModel } from '../monster-display'
 import {
   resolveTemplateTraitStatBlockRulesFacing,
@@ -62,11 +64,21 @@ describe('resolveTraitStatBlockRulesFacing', () => {
     }
     const previewOn = resolveTraitStatBlockRulesFacingForFormRow({
       row,
-      monster: { name: monster.name, lair: { enabled: true }, forms: monster.forms },
+      monster: {
+        name: monster.name,
+        movement: monster.movement as MonsterFormValues['movement'],
+        lair: { enabled: true },
+        forms: monster.forms,
+      },
     })
     const previewOff = resolveTraitStatBlockRulesFacingForFormRow({
       row,
-      monster: { name: monster.name, lair: { enabled: false }, forms: monster.forms },
+      monster: {
+        name: monster.name,
+        movement: monster.movement as MonsterFormValues['movement'],
+        lair: { enabled: false },
+        forms: monster.forms,
+      },
     })
     expect(previewOn?.heading).toBe('Legendary Resistance (4/Day, or 5/Day in Lair)')
     expect(previewOff?.heading).toBe('Legendary Resistance (4/Day)')
@@ -74,19 +86,26 @@ describe('resolveTraitStatBlockRulesFacing', () => {
 
   it('matches draft and published spider climb when climb is an alternative', () => {
     const movement = { walk: 20 }
-    const movementAlternative = { modes: ['climb', 'fly'], feet: 20 as const }
-    const row = { id: 'climb', preset: 'spider-climb' }
+    const movementAlternative = {
+      modes: ['climb', 'fly'] as Array<'climb' | 'fly'>,
+      feet: 20 as const,
+    }
+    const row = { id: 'climb', preset: 'spider-climb' as const }
     const draft = resolveTraitStatBlockRulesFacingForFormRow({
       row,
       monster: {
         name: 'Swarm of Insects',
         movement: [{ mode: 'walk', feet: 20 }],
-        movementAlternative: { modes: ['climb', 'fly'], feet: 20 },
+        movementAlternative: { modes: ['climb', 'fly'] as const, feet: 20 as const },
       },
     })
     const published = resolveTraitStatBlockRulesFacing({
       trait: row,
-      monster: { name: 'Swarm of Insects', movement, movementAlternative },
+      monster: {
+        name: 'Swarm of Insects',
+        movement,
+        movementAlternative,
+      },
       record: row,
     })
     expect(draft?.proseText).toBe(published?.proseText)

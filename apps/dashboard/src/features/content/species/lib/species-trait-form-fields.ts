@@ -92,7 +92,7 @@ function traitGrantBranchFields(ctx: ContentFormCtx): FormItem[] {
   ]
 }
 
-function traitTemplateBranchFields(ctx: ContentFormCtx): FormItem[] {
+function traitTemplateBranchFields(_ctx: ContentFormCtx): FormItem[] {
   return [
     {
       type: 'text',

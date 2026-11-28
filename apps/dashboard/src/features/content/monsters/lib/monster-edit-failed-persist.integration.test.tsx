@@ -10,6 +10,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import type { FieldValues, UseFormReturn } from 'react-hook-form'
+import type { ZodType } from 'zod'
 import {
   TabbedForm,
   collectTabbedFormResolverItems,
@@ -110,7 +112,7 @@ function loadDuplicateSkillsEdit() {
   })
   return {
     entity,
-    catalogSeed: undefined as Record<string, unknown> | undefined,
+    catalogSeed: {} as Record<string, unknown>,
     ...loadContentEditFormState({
       def: monsterFormDef,
       entity,
@@ -205,7 +207,7 @@ function renderMonsterEditPersistHarness(
           campaignId: TEST_CAMPAIGN_ID,
           layoutCtx,
           wireInput: wireInput as Record<string, unknown>,
-          form,
+          form: form as unknown as UseFormReturn<FieldValues>,
           mutation: { mutateAsync },
           queryClient: client,
           setOverlayBaseline,
@@ -220,7 +222,7 @@ function renderMonsterEditPersistHarness(
           <TabbedForm<MonsterFormValues>
             id={formKey}
             uiStateKey={formKey}
-            schema={schema}
+            schema={schema as ZodType<MonsterFormValues>}
             tabs={tabs}
             defaultValues={defaultValues as MonsterFormValues}
             onSubmit={onSubmit}
@@ -388,7 +390,7 @@ describe('monster edit failed persist producer projection', () => {
       }),
     )
 
-    renderMonsterEditPersistHarness(loadDuplicateSkillsEdit(), {
+    renderMonsterEditPersistHarness(loadDuplicateSkillsEdit() as unknown as MonsterEditLoadResult, {
       stageValues: (values) => ({
         ...values,
         name: `${values.name}x`,

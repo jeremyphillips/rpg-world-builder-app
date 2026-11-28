@@ -7,6 +7,7 @@ import { getMonsterBySlug } from '@rpg/catalog/monsters'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import type { ZodType } from 'zod'
 import { TabbedForm, collectTabbedFormResolverItems, FormUiProvider } from '@rpg/ui/form'
 
 import { makeContentFormCtx, TEST_CAMPAIGN_ID } from '../../lib/fixtures/content-form-ctx'
@@ -114,7 +115,7 @@ function renderMonsterCreatePersistHarness() {
           <TabbedForm<MonsterFormValues>
             id={formKey}
             uiStateKey={formKey}
-            schema={schema}
+            schema={schema as unknown as ZodType<MonsterFormValues>}
             tabs={tabs}
             defaultValues={defaultValues}
             onSubmit={onSubmit}

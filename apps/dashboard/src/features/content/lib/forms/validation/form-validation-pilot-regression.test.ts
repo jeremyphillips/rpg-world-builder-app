@@ -85,9 +85,7 @@ describe('form validation pilot regression', () => {
 
   it('omits api slot issues from stamp N when the session advances to N+1', () => {
     let session = createEmptyFormValidationProducerSession()
-    const wireIssues = apiValidationIssuesToFormIssues([
-      { path: 'name', message: 'Slug taken', code: 'duplicate' },
-    ])
+    const wireIssues = apiValidationIssuesToFormIssues([{ path: 'name', message: 'Slug taken' }])
     session = replaceFormValidationProducerSlot(session, 'api', 1, wireIssues)
 
     expect(

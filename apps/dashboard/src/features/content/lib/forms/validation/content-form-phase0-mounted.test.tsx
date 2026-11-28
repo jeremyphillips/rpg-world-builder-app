@@ -5,7 +5,7 @@
  * TabbedForm submit with adopted producer and canonical publish paint.
  */
 import { useCallback, useContext, useRef, useState, type ReactNode } from 'react'
-import { useFormContext } from 'react-hook-form'
+import { useFormContext, type UseFormReturn } from 'react-hook-form'
 import userEvent from '@testing-library/user-event'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
@@ -20,6 +20,7 @@ import {
   FormValidationInteractiveProducerBridge,
   FormValidationProducerProvider,
   FormUiContext,
+  type FormIssue,
   type FormItem,
   type FormValidationProducerSlot,
   type TabbedFormTab,
@@ -231,6 +232,7 @@ describe('content form phase 0 mounted presentation', () => {
     await waitFor(() => {
       const [canonicalProbe] = within(formRoot()).getAllByTestId('canonical-publish-issues-probe')
       expect(canonicalProbe).toBeTruthy()
+      if (!canonicalProbe) return
       expect(canonicalProbe.querySelectorAll('p')).toHaveLength(2)
       expect(
         canonicalProbe.querySelector('[data-issue-target="movementAlternative"]'),
@@ -409,12 +411,14 @@ describe('content form phase 0 mounted presentation', () => {
       schema: submitSchema,
       draftSchema: submitSchema,
       createDefaultValues: { name: 'Ready', level: 2 },
-      nameField: (): FormItem => submitFields[0],
+      nameField: (): FormItem => submitFields[0]!,
       buildFields: (): FormItem[] => submitFields,
     } as unknown as AnyContentFormDef
     const submitCtx = { campaignId: 'camp-1', mode: 'create' } as ContentFormCtx
     const user = userEvent.setup()
-    const controls = { submit: async () => undefined as Promise<void> }
+    const controls: {
+      submit: (values: SubmitValues, form: UseFormReturn<SubmitValues>) => Promise<void>
+    } = { submit: async () => {} }
 
     function Harness() {
       const binding = useContentFormSubmitProducerBinding()
@@ -432,11 +436,10 @@ describe('content form phase 0 mounted presentation', () => {
             {
               code: 'too_small',
               minimum: 1,
-              type: 'string',
               inclusive: true,
               message: 'Name must be present on wire.',
               path: ['name'],
-            },
+            } as z.ZodIssue,
           ])
         },
         persist,

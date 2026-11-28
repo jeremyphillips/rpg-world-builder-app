@@ -566,7 +566,9 @@ Scanner: `form-validation-enforcement.lib.ts` + `form-validation-enforcement.tes
 
 **Drift tests:** `content-form-submit-drift.test.ts`, `campaign-form-validation-adoption.test.ts`, `auth-form-adoption.test.ts`.
 
-`FORM_VALIDATION_ADOPTION_ALLOWLIST` names deferred families (quick NPC). Adopted family list: `form-validation-adopted-families.ts`. Family guard: `form-validation-family-adoption.guard.test.ts`.
+`FORM_VALIDATION_ADOPTION_ALLOWLIST` names deferred families only (today: quick NPC with a named cutover milestone—not an empty placeholder list). Adopted family list: `form-validation-adopted-families.ts`. Family guard: `form-validation-family-adoption.guard.test.ts`.
+
+**Phase 8 barrel contract:** `applyValidationIssuesToForm` and `paintValidationIssuesOnForm` are not exported from `@rpg/ui/form` (retired). `prepareFormIssues` and `flattenFormIssues` remain on the UI barrel for invalid-submit navigation and grant characterization tests; adopted production trees in the enforcement roots must not import them. Invalid-submit focus/navigation uses shared `@rpg/ui/form` helpers (`navigateInvalidSubmit`, `performInvalidSubmitFocus`, tabbed invalid-submit shell)—not the removed `focusFormPath` dashboard helper.
 
 **Pilot commit pipeline (create/edit shells):** one prepare-once write via
 `prepareSerializedContentFormWrite`, then `runContentFormCommitAttempt` (publish/draft commit

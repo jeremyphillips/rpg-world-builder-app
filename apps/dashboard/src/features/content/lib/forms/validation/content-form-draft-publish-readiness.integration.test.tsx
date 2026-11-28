@@ -46,7 +46,7 @@ const def = {
     level: z.number().optional(),
   }),
   createDefaultValues: { name: '', level: 2 },
-  nameField: (): FormItem => fields[0],
+  nameField: (): FormItem => fields[0]!,
   buildFields: (): FormItem[] => fields,
 } as unknown as AnyContentFormDef
 
@@ -79,8 +79,8 @@ describe('draft save with publish readiness still projected', () => {
       current: null,
     }
     const controls = {
-      draft: async () => undefined as Promise<void>,
-      publish: async () => undefined as Promise<void>,
+      draft: async (): Promise<void> => {},
+      publish: async (): Promise<void> => {},
     }
 
     function Harness() {

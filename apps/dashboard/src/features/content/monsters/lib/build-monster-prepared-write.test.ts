@@ -60,7 +60,7 @@ describe('buildMonsterPreparedWrite provenance', () => {
     }
     const { provenance } = buildMonsterPreparedWrite(values, undefined, 'draft')
     const wireIssues = apiValidationIssuesToFormIssues([
-      { path: 'proficiencies.skills.1.skill', message: 'Duplicate skill row', code: 'custom' },
+      { path: 'proficiencies.skills.1.skill', message: 'Duplicate skill row' },
     ])
     const { issues } = mapWireIssuesToAuthoring(wireIssues, provenance)
     expect(issues[0]!.path).toBe('proficiencies.skills.2.skill')

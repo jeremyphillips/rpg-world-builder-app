@@ -133,7 +133,7 @@ export async function runContentFormCommitAttempt<TValues extends FieldValues>(
 function applyCommitValidationBlocked<TValues extends FieldValues>(
   input: ContentFormCommitRunInput<TValues>,
   pipeline: { stageId: string; issues?: readonly FormIssue[]; message?: string },
-  stamp: number,
+  _stamp: number,
   readCurrent: () => FormActionAttempt,
 ): FormValidationProducerSession {
   if (input.commitValidationIntent === 'publish') {

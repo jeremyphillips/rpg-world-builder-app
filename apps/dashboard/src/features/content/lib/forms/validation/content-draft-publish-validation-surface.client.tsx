@@ -86,7 +86,7 @@ export function ContentDraftPublishValidationSurfaceBridge({
 
       navigateInvalidSubmit(form, publishFields, formId, currentUi)
 
-      return issues
+      return issues as unknown as ReturnType<DraftPublishValidationSurface>
     }
 
     draftPublishValidationSurface.current = surface

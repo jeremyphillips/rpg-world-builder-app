@@ -122,14 +122,13 @@ describe('invalid submit focus generation', () => {
       setError: vi.fn(),
     } as unknown as UseFormReturn<{ name: string }>
 
-    const fields = [{ type: 'text', name: 'name', label: 'Name' }]
+    const fields: FormItem[] = [{ type: 'text', name: 'name', label: 'Name' }]
 
     const { unmount } = render(
-      React.createElement(
-        FormUiProvider,
-        { fields },
-        React.createElement('div', { 'data-form-mount': true }),
-      ),
+      React.createElement(FormUiProvider, {
+        fields,
+        children: React.createElement('div', { 'data-form-mount': true }),
+      }),
     )
     navigateInvalidSubmit(form, fields, 'form', ui)
     unmount()

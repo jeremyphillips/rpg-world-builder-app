@@ -52,8 +52,10 @@ describe('form validation ownership presentation', () => {
       { id: 'a', label: 'A', fields: [{ type: 'text', name: 'a', label: 'A' } as FormItem] },
       { id: 'b', label: 'B', fields: [{ type: 'text', name: 'b', label: 'B' } as FormItem] },
     ]
-    const issues = prepareFormIssues([{ path: ['orphan'], message: 'Orphan' }], tabs[0].fields)
-    const states = resolveTabValidationState(issues, tabs, [...tabs[0].fields, ...tabs[1].fields])
+    const tabA = tabs[0]!
+    const tabB = tabs[1]!
+    const issues = prepareFormIssues([{ path: ['orphan'], message: 'Orphan' }], tabA.fields)
+    const states = resolveTabValidationState(issues, tabs, [...tabA.fields, ...tabB.fields])
     expect(states.every((state) => state.count === 0)).toBe(true)
   })
 
@@ -120,7 +122,7 @@ describe('form validation ownership presentation', () => {
   })
 
   it('keeps pathless form issues off tab badges', () => {
-    const tabs = [
+    const tabs: TabbedFormTab[] = [
       {
         id: 'identity',
         label: 'Identity',
@@ -128,9 +130,10 @@ describe('form validation ownership presentation', () => {
       },
       { id: 'notes', label: 'Notes', fields: [{ type: 'text', name: 'notes', label: 'Notes' }] },
     ]
+    const identityTab = tabs[0]!
     const issues = prepareFormIssues(
       [{ path: [], message: 'Review this form and try again.' }],
-      tabs[0].fields,
+      identityTab.fields,
     )
     expect(issues[0]?.claim?.kind).toBe('form')
     const states = resolveTabValidationState(

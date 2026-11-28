@@ -38,7 +38,7 @@ export type ContentFormPersistHandler<TValues extends FieldValues> = (
   values: TValues,
   form: UseFormReturn<TValues>,
   meta?: ContentFormPersistMeta,
-) => Promise<void>
+) => Promise<void | FieldValues>
 
 export type UseContentFormSubmitOptions<TValues extends FieldValues> = {
   def: AnyContentFormDef

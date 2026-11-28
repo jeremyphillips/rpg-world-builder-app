@@ -91,9 +91,8 @@ describe('MonsterTraitsEditor', () => {
     const payloads: Record<string, unknown>[] = []
     const formRef: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }
     const ctx = {
-      ...makeContentFormCtx(),
+      ...makeContentFormCtx({ rulesetId: 'srd-cc-5.2.1' }),
       entityCatalogLayer: 'system' as const,
-      rulesetId: 'srd-cc-5.2.1',
       persistedIdentityRowIdsByPath: {
         traits: [...seedTraitIds, homebrewId],
       },

@@ -3,7 +3,13 @@
  */
 import { ApiError } from '@rpg/contracts'
 import { describe, expect, it, vi } from 'vitest'
-import { FormProvider, useFieldArray, useForm, type UseFormReturn } from 'react-hook-form'
+import {
+  FormProvider,
+  useFieldArray,
+  useForm,
+  type FieldValues,
+  type UseFormReturn,
+} from 'react-hook-form'
 import { render, renderHook, act, waitFor, screen } from '@testing-library/react'
 import { z } from 'zod'
 import {
@@ -412,7 +418,7 @@ describe('useContentFormSubmit prepareWrite provenance at persist', () => {
       current: ReturnType<typeof useContentFormSubmitProducerBinding> | null
     } = { current: null }
     const formRef: { current: UseFormReturn<TestValues> | null } = { current: null }
-    const controls = { submit: async () => undefined as Promise<void> }
+    const controls = { submit: async (): Promise<void> => {} }
 
     function Harness() {
       const form = useForm<TestValues>({ defaultValues: { name: 'A', level: 2 } })
@@ -580,7 +586,7 @@ describe('useContentFormSubmit attempt identity', () => {
     const bindingRef: {
       current: ReturnType<typeof useContentFormSubmitProducerBinding> | null
     } = { current: null }
-    const controls = { submit: async () => undefined as Promise<void> }
+    const controls = { submit: async (): Promise<void> => {} }
 
     function Harness() {
       const form = useForm<TestValues>({ defaultValues: { name: 'A', level: 2 } })
@@ -697,7 +703,9 @@ describe('useContentFormSubmit attempt identity', () => {
           currentFlags.push(meta?.isAttemptCurrent?.() ?? false)
         },
       )
-    const controls = { submit: async () => undefined as Promise<void> }
+    const controls: { submit: (values: TestValues) => Promise<void> } = {
+      submit: async () => {},
+    }
 
     function Harness() {
       const form = useForm<TestValues>({ defaultValues: { name: 'A', level: 2 } })
@@ -862,7 +870,7 @@ describe('useContentFormSubmit attempt identity', () => {
       current: ReturnType<typeof useContentFormSubmitProducerBinding> | null
     } = { current: null }
     const formRef: { current: UseFormReturn<TestValues> | null } = { current: null }
-    const controls = { submit: async () => undefined as Promise<void> }
+    const controls = { submit: async (): Promise<void> => {} }
 
     function Harness() {
       const form = useForm<TestValues>({ defaultValues: { name: 'A', level: 2 } })
@@ -950,7 +958,7 @@ describe('useContentFormSubmit attempt identity', () => {
         }),
     )
     const formRef: { current: UseFormReturn<TestValues> | null } = { current: null }
-    const controls = { submit: async () => undefined as Promise<void> }
+    const controls = { submit: async (): Promise<void> => {} }
 
     function Harness() {
       const form = useForm<TestValues>({ defaultValues: { name: 'A', level: 2 } })
@@ -1024,7 +1032,7 @@ describe('useContentFormSubmit attempt identity', () => {
       current: ReturnType<typeof useContentFormSubmitProducerBinding> | null
     } = { current: null }
     const formRef: { current: UseFormReturn<TestValues> | null } = { current: null }
-    const controls = { submit: async () => undefined as Promise<void> }
+    const controls = { submit: async (): Promise<void> => {} }
 
     function Harness() {
       const form = useForm<TestValues>({ defaultValues: { name: 'A', level: 2 } })
@@ -1105,7 +1113,7 @@ describe('useContentFormSubmit attempt identity', () => {
       current: ReturnType<typeof useContentFormSubmitProducerBinding> | null
     } = { current: null }
     const formRef: { current: UseFormReturn<TestValues> | null } = { current: null }
-    const controls = { submit: async () => undefined as Promise<void> }
+    const controls = { submit: async (): Promise<void> => {} }
 
     function Harness() {
       const form = useForm<TestValues>({ defaultValues: { name: 'A', level: 2 } })
@@ -1189,11 +1197,10 @@ describe('useContentFormSubmit attempt identity', () => {
               {
                 code: 'too_small',
                 minimum: 9,
-                type: 'number',
                 inclusive: true,
                 message: 'Level too low.',
                 path: ['level'],
-              },
+              } as z.ZodIssue,
             ])
           },
           persist,
@@ -1239,7 +1246,7 @@ describe('edit shell tab badges from producer projection', () => {
       }),
     )
     const formRef: { current: UseFormReturn<TestValues> | null } = { current: null }
-    const controls = { submit: async () => undefined as Promise<void> }
+    const controls = { submit: async (): Promise<void> => {} }
 
     function TabBadgeProbe() {
       const { issues } = useContentFormPresentationIssues(editTabResolverFields)
@@ -1323,8 +1330,11 @@ describe('edit shell tab badges from producer projection', () => {
     const bindingRef: {
       current: ReturnType<typeof useContentFormSubmitProducerBinding> | null
     } = { current: null }
-    const controls = {
-      submit: async () => undefined as Promise<void>,
+    const controls: {
+      submit: () => Promise<void>
+      removeRow: () => void
+    } = {
+      submit: async () => {},
       removeRow: () => undefined,
     }
 
@@ -1415,7 +1425,7 @@ describe('presentContentFormInvalidSubmit bridge on adopted submit', () => {
         stageId: contentFormCommitPipeline.CONTENT_FORM_COMMIT_STAGE_FORM,
       })
     const formRef: { current: UseFormReturn<TestValues> | null } = { current: null }
-    const controls = { submit: async () => undefined as Promise<void> }
+    const controls = { submit: async (): Promise<void> => {} }
 
     function Harness() {
       const form = useForm<TestValues>({ defaultValues: { name: 'A', level: 2 } })
@@ -1458,9 +1468,10 @@ describe('presentContentFormInvalidSubmit bridge on adopted submit', () => {
 
     expect(persist).not.toHaveBeenCalled()
     await waitFor(() => {
-      expect(formRef.current!.getFieldState('root').error?.message).toBe(
-        'Something went wrong while checking this form. Try again or refresh the page.',
-      )
+      expect(
+        (formRef.current as unknown as UseFormReturn<FieldValues>).getFieldState('root').error
+          ?.message,
+      ).toBe('Something went wrong while checking this form. Try again or refresh the page.')
     })
     expect(diagnostic).toHaveBeenCalled()
 

@@ -12,7 +12,7 @@ import { createEmptyFormValidationProducerSession, type FormIssue } from '@rpg/u
 
 import { presentPersistValidationFailure } from '../../lib/forms/shells/submit/content-form-submit-presentation.lib'
 import { mapWireIssuesToAuthoring } from '../../lib/forms/submit/map-wire-issues-to-authoring.lib'
-import { spellFormSchema, type SpellFormValues } from './spell-form-fields'
+import type { SpellFormValues } from './spell-form-fields'
 import {
   buildSpellPreparedWrite,
   spellCreateDefaultValues,

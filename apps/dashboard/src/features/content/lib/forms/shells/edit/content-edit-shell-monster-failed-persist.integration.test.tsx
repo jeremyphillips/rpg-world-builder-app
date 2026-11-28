@@ -110,10 +110,10 @@ vi.mock('../layout/content-form-shell-layout', async () => {
       )
     }
     return React.createElement(StampEditProbeLayout, {
-      ...rest,
-      defaultValues,
+      ...(rest as Record<string, unknown>),
+      defaultValues: defaultValues as Record<string, unknown>,
       onSubmit: handleSubmit,
-    })
+    } as never)
   }
 
   return {

@@ -19,6 +19,7 @@ import {
   formatStatBlockRollExpression,
   type Equipment,
   type Monster,
+  type MonsterPresetTraitForFormat,
   type MonsterAction,
   type MonsterBonusAction,
   type MonsterLegendaryAction,
@@ -552,7 +553,7 @@ function mapPresetMonsterTrait(
   if (typeof record.preset !== 'string') return undefined
   const facing = resolvePresetTraitStatBlockRulesFacing({
     id: trait.id,
-    preset: record.preset,
+    preset: record.preset as MonsterPresetTraitForFormat['preset'],
     monsterName: monster.name,
     trait: trait as never,
     movement: {

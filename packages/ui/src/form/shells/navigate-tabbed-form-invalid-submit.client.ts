@@ -17,7 +17,6 @@ import {
 } from '../errors/resolve-tab-validation-state'
 import {
   prepareFormIssues,
-  resolveInvalidSubmitNavigationFromIssues,
   resolveValidationExpandKeys,
   type InvalidSubmitNavigation,
 } from '../errors/resolve-invalid-submit-navigation'

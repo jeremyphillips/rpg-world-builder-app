@@ -71,8 +71,8 @@ describe('useContentFormSubmitProducerBinding', () => {
     const persist = vi.fn().mockResolvedValue(undefined)
     const bindingRef: { current: ContentFormSubmitProducerBinding | null } = { current: null }
     const controls = {
-      draft: async () => undefined as Promise<void>,
-      publish: async () => undefined as Promise<void>,
+      draft: async (): Promise<void> => {},
+      publish: async (): Promise<void> => {},
     }
 
     function Harness() {
@@ -155,8 +155,8 @@ describe('useContentFormSubmitProducerBinding', () => {
     const persist = vi.fn().mockResolvedValue(undefined)
     const bindingRef: { current: ContentFormSubmitProducerBinding | null } = { current: null }
     const controls = {
-      draft: async () => undefined as Promise<void>,
-      publish: async () => undefined as Promise<void>,
+      draft: async (): Promise<void> => {},
+      publish: async (): Promise<void> => {},
     }
 
     function Harness() {

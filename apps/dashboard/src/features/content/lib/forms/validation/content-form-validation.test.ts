@@ -28,10 +28,7 @@ import {
   heritageScalarFields,
 } from '../../../species/lib/species-heritage-form-fields'
 import { traitRowFormSchema } from '../../../species/lib/species-trait-form-schema'
-import {
-  traitItemFields,
-  traitRowVariantTopologyFields,
-} from '../../../species/lib/species-trait-form-fields'
+import { traitRowVariantTopologyFields } from '../../../species/lib/species-trait-form-fields'
 import {
   classFeatureItemFields,
   createFeatureRowFormSchema,

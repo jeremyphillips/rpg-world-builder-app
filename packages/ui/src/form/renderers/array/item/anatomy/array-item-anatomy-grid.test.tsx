@@ -216,7 +216,14 @@ describe('ArrayItemAnatomyGrid', () => {
 
   it('splits intrinsic spill for auto participants with below-label hints', () => {
     render(
-      <ArrayItemAnatomyGrid fieldWidths={['auto', 'md']}>
+      <ArrayItemAnatomyGrid
+        fieldWidths={['auto', 'md']}
+        actions={
+          <button type="button" aria-label="Remove item">
+            Remove
+          </button>
+        }
+      >
         <Field.Root
           id="modes"
           width="auto"

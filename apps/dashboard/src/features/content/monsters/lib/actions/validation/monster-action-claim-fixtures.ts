@@ -1,6 +1,7 @@
 import { ACTION_PRESET_IDS, monsterSectionAllowsPreset } from '@rpg/contracts'
 import { collectTabbedFormResolverItems, type FormIssue } from '@rpg/ui/form'
 import { collectIssueClaimReport, toRegisteredFormShape } from '@rpg/ui/form/test-utils'
+import type { FieldValues } from 'react-hook-form'
 import type { ZodType } from 'zod'
 
 import type { ContentFormCtx } from '../../../../lib/forms/registry/content-form-registry'
@@ -102,7 +103,13 @@ export function monsterRoutedIssues(
   section: MonsterActionSection = 'actions',
 ): FormIssue[] {
   const values = monsterClaimValues(action, shape, section)
-  return evaluateContentPublishFormIssues(monsterClaimSchema, values, monsterClaimFields) ?? []
+  return (
+    evaluateContentPublishFormIssues(
+      monsterClaimSchema as ZodType<FieldValues>,
+      values,
+      monsterClaimFields,
+    ) ?? []
+  )
 }
 
 export function blankSaveAction() {

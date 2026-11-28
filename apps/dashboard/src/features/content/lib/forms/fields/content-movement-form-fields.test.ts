@@ -34,7 +34,11 @@ function alternativeGroupFromFactory() {
   const alternativeGroup = monsterGroup.fields.find(
     (field) => isContainer(field) && field.kind === 'group' && field.name === 'movementAlternative',
   )
-  if (!isContainer(alternativeGroup) || alternativeGroup.kind !== 'group') {
+  if (
+    alternativeGroup === undefined ||
+    !isContainer(alternativeGroup) ||
+    alternativeGroup.kind !== 'group'
+  ) {
     throw new Error('expected movementAlternative group')
   }
   return alternativeGroup
@@ -60,7 +64,7 @@ describe('content movement form fields', () => {
   it('configures alternative modes as multi-select chips with min two selections', () => {
     const alternativeGroup = alternativeGroupFromFactory()
     const row = alternativeGroup.fields.find((field) => isContainer(field) && field.kind === 'row')
-    if (!isContainer(row) || row.kind !== 'row') {
+    if (row === undefined || !isContainer(row) || row.kind !== 'row') {
       throw new Error('expected movementAlternative row')
     }
     const chips = row.fields.find(
@@ -120,7 +124,7 @@ describe('content movement form fields', () => {
   })
 
   it('round-trips published alternatives through form values', () => {
-    const published = { modes: ['fly', 'climb'] as const, feet: 20 as const }
+    const published = { modes: ['fly', 'climb'] as ('fly' | 'climb')[], feet: 20 as const }
     const form = movementAlternativeRecordToForm(published)
     expect(form).toEqual({ modes: ['fly', 'climb'], feet: 20 })
     expect(movementAlternativeFormToSchema(form)).toEqual(published)
@@ -130,7 +134,14 @@ describe('content movement form fields', () => {
     const schema = z
       .object({ movementAlternative: z.object({ modes: z.array(z.string()), feet: z.number() }) })
       .superRefine((values, ctx) => {
-        refineMovementAlternativeForm(values.movementAlternative, [{ mode: 'walk', feet: 20 }], ctx)
+        refineMovementAlternativeForm(
+          {
+            modes: values.movementAlternative.modes as ('swim' | 'climb' | 'burrow' | 'fly')[],
+            feet: values.movementAlternative.feet as 20,
+          },
+          [{ mode: 'walk', feet: 20 }],
+          ctx,
+        )
       })
 
     const result = schema.safeParse({ movementAlternative: { modes: [], feet: 20 } })
@@ -145,7 +156,14 @@ describe('content movement form fields', () => {
     const schema = z
       .object({ movementAlternative: z.object({ modes: z.array(z.string()), feet: z.number() }) })
       .superRefine((values, ctx) => {
-        refineMovementAlternativeForm(values.movementAlternative, [{ mode: 'walk', feet: 20 }], ctx)
+        refineMovementAlternativeForm(
+          {
+            modes: values.movementAlternative.modes as ('swim' | 'climb' | 'burrow' | 'fly')[],
+            feet: values.movementAlternative.feet as 20,
+          },
+          [{ mode: 'walk', feet: 20 }],
+          ctx,
+        )
       })
 
     const result = schema.safeParse({ movementAlternative: { modes: ['fly'], feet: 20 } })
@@ -277,6 +295,6 @@ describe('content movement form fields', () => {
     if (!isContainer(group) || group.kind !== 'group') {
       throw new Error('expected movementAlternative group field')
     }
-    expect(group.optionalDisclosure?.seedWhen?.()).toEqual({ modes: [], feet: undefined })
+    expect(group.optionalDisclosure?.seedWhen?.({})).toEqual({ modes: [], feet: undefined })
   })
 })
