@@ -2,7 +2,10 @@ import type { ResolvedContentCampaignAccess } from '@rpg/contracts'
 
 import type { AvailabilityReason } from '@/lib/availability'
 
-import type { MasterDetailListItem } from './master-detail-list-item.types'
+import {
+  MASTER_DETAIL_UNAVAILABLE_STATUS_LABEL,
+  type MasterDetailListItem,
+} from './master-detail-list-item.types'
 import type { ContentFormCtx } from '../forms/registry/content-form-registry'
 import { resolveMasterDetailRowKey } from './content-campaign-availability'
 import { buildEmbeddedMasterDetailListItem } from './build-embedded-master-detail-list-item'
@@ -122,7 +125,7 @@ export function buildEmbeddedMasterDetailRows({
       formIndex,
       item: {
         ...listItem,
-        ...(isAvailable ? {} : { availabilityStatusLabel: 'Unavailable' as const }),
+        ...(isAvailable ? {} : { availabilityStatusLabel: MASTER_DETAIL_UNAVAILABLE_STATUS_LABEL }),
       },
       availability,
       ...(access ? { localCampaignAccess } : {}),

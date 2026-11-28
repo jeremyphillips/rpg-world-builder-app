@@ -101,7 +101,11 @@ function MonsterEditShellHarness({
   )
   const publishFields = useMemo(() => collectTabbedFormResolverItems(tabs), [tabs])
   const publishSchema = useMemo(
-    () => resolveMonsterFormSchema(layoutCtx, 'publish') as unknown as ZodType<MonsterFormValues>,
+    () =>
+      resolveMonsterFormSchema(
+        layoutCtx,
+        'publish',
+      ) as unknown as unknown as ZodType<MonsterFormValues>,
     [layoutCtx],
   )
   const [hasAttemptedPublish, setHasAttemptedPublish] = useState(false)
@@ -121,7 +125,7 @@ function MonsterEditShellHarness({
         <ContentFormWriteGateProvider>
           <TabbedForm<MonsterFormValues>
             id="monster-edit"
-            schema={schema as ZodType<MonsterFormValues>}
+            schema={schema as unknown as ZodType<MonsterFormValues>}
             tabs={tabs}
             defaultValues={defaultValues as MonsterFormValues}
             valueSyncs={

@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
+import { overlayOrderedList, overlaySlugList } from '../../lib/system-overlay/overlay-presets'
 import { attackOnHitSchema } from '../../../primitives/mechanics/attack-on-hit'
 import { limitedUseDraftSchema, limitedUseSchema } from '../../../primitives/limited-use'
 import { abilitySchema } from '../../../vocab/ability'
@@ -52,8 +53,8 @@ export function strict<T extends z.ZodType, M extends MonsterActionMode>(
 }
 
 export function multiattackStepsSchema<M extends MonsterActionMode>(mode: M) {
-  const draft = z.array(multiattackDraftStepSchema).default([])
-  const published = z.array(multiattackPublishedStepSchema).min(1)
+  const draft = overlayOrderedList(multiattackDraftStepSchema).default([])
+  const published = overlayOrderedList(multiattackPublishedStepSchema).min(1)
   return (mode === 'draft' ? draft : published) as M extends 'draft'
     ? typeof draft
     : typeof published
@@ -71,7 +72,9 @@ export function monsterActionFields<M extends MonsterActionMode>(mode: M) {
     limitedUse: limitedUse.optional(),
   })
   const spells =
-    mode === 'draft' ? z.array(spellEntrySchema).default([]) : z.array(spellEntrySchema).min(1)
+    mode === 'draft'
+      ? overlaySlugList(spellEntrySchema).default([])
+      : overlaySlugList(spellEntrySchema).min(1)
   const savingThrow = savingThrowFieldSchema(mode) as M extends 'draft'
     ? z.ZodOptional<typeof savingThrowEffectDraftSchema>
     : z.ZodOptional<typeof savingThrowEffectSchema>
@@ -82,7 +85,7 @@ export function monsterActionFields<M extends MonsterActionMode>(mode: M) {
     limitedUse: limitedUse.optional(),
     onceUntilNextTurn: z.literal(true).optional(),
     available: z.boolean().optional(),
-    onlyInFormIds: z.array(z.string().min(1)).optional(),
+    onlyInFormIds: overlaySlugList(z.string().min(1)).optional(),
     ...entryProvenanceField,
   }
   const {
@@ -97,8 +100,8 @@ export function monsterActionFields<M extends MonsterActionMode>(mode: M) {
   } = identity
   const actionIds =
     mode === 'draft'
-      ? z.array(z.string().min(1)).default([])
-      : z.array(z.string().min(1)).min(1, ACTION_REFERENCE_CHOOSE_FROM_ACTIONS)
+      ? overlaySlugList(z.string().min(1)).default([])
+      : overlaySlugList(z.string().min(1)).min(1, ACTION_REFERENCE_CHOOSE_FROM_ACTIONS)
   const monsterAbilitySourceSchema = z.discriminatedUnion('kind', [
     z.object({ kind: z.literal('spellcasting'), castingAbility: castingAbilitySchema }),
     z.object({
@@ -128,8 +131,8 @@ export function monsterActionFields<M extends MonsterActionMode>(mode: M) {
       form: naturalAttackFormSchema.optional(),
       mode: strict(weaponModeSchema, mode),
       properties: (mode === 'draft'
-        ? z.array(naturalWeaponPropertySchema).optional()
-        : z.array(naturalWeaponPropertySchema).default([])) as M extends 'draft'
+        ? overlaySlugList(naturalWeaponPropertySchema).optional()
+        : overlaySlugList(naturalWeaponPropertySchema).default([])) as M extends 'draft'
         ? z.ZodOptional<z.ZodArray<typeof naturalWeaponPropertySchema>>
         : z.ZodDefault<z.ZodArray<typeof naturalWeaponPropertySchema>>,
       reach: reachFeetSchema.optional(),
@@ -149,8 +152,8 @@ export function monsterActionFields<M extends MonsterActionMode>(mode: M) {
       bonusSource: strict(monsterAbilitySourceSchema, mode),
       modes:
         mode === 'draft'
-          ? z.array(z.enum(attackModes)).min(1).optional()
-          : z.array(z.enum(attackModes)).min(1),
+          ? overlaySlugList(z.enum(attackModes)).min(1).optional()
+          : overlaySlugList(z.enum(attackModes)).min(1),
       reach: reachFeetSchema.optional(),
       range: weaponRangeSchema.optional(),
       damage: (mode === 'draft'
@@ -184,7 +187,7 @@ export function monsterActionFields<M extends MonsterActionMode>(mode: M) {
       profile: z.literal(PRIMARY_SPELLCASTING_PROFILE).optional(),
       castingAbility: strict(castingAbilitySchema, mode),
       spellInvocation: z.literal('use-entry').optional(),
-      omittedComponents: z.array(spellComponentIdSchema).optional(),
+      omittedComponents: overlaySlugList(spellComponentIdSchema).optional(),
       spells: strict(spells, mode),
       description: z.string().optional(),
     }),

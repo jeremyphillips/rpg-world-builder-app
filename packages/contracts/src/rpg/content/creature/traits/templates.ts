@@ -124,20 +124,17 @@ export const CREATURE_TRAIT_TEMPLATE_ENTRIES = {
   },
   'sunlight-sensitivity': {
     label: 'Sunlight Sensitivity',
-    description: 'Disadvantage on attack rolls and Wisdom (Perception) checks while in sunlight.',
+    description: 'Disadvantage on attack rolls and ability checks while in sunlight.',
     rulesetIds: [DEFAULT_SYSTEM_RULESET_ID],
     hosts: SPECIES_AND_MONSTER_HOSTS,
     occurrence: 'one',
     configSchema: NO_CONFIG,
     formatRules: (_config, voice) =>
-      `While in sunlight, ${traitSubjectCap(voice)} ${traitHasForVoice(voice)} Disadvantage on attack rolls and Wisdom (Perception) checks.`,
+      `While in sunlight, ${traitSubjectCap(voice)} ${traitHasForVoice(voice)} Disadvantage on attack rolls and ability checks.`,
     resolveGrants: () => [
       rollGrant({
         mode: 'disadvantage',
-        rolls: [
-          { kind: 'attack' },
-          { kind: 'ability-check', ability: 'wis', skillId: 'perception' },
-        ],
+        rolls: [{ kind: 'attack' }, { kind: 'ability-check' }],
         circumstance: { kind: 'in-sunlight' },
       }),
     ],

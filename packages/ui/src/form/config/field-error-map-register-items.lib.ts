@@ -1,3 +1,4 @@
+import { collectRowVariantTopologyFields } from './array/array-row-variant-topology.lib'
 import { readArrayItemRows, resolveArrayRowFields } from './array/array-resolve-fields.lib'
 import type { FormItem } from '../field-config'
 import { resolveColumnsCollapseSequence } from './form-columns-collapse.lib'
@@ -43,15 +44,21 @@ function registerArrayItem(
     exactPath: true,
   })
 
+  if (item.item?.rowVariantTopology) {
+    registerItems(
+      registry,
+      `${arrayKey}.*`,
+      collectRowVariantTopologyFields(item.item.rowVariantTopology),
+      formValues,
+    )
+  }
+
   if (item.item?.resolveFields) {
     const rows = readArrayItemRows(formValues, arrayKey)
     if (rows.length === 0) {
-      registerItems(
-        registry,
-        `${arrayKey}.0`,
-        resolveArrayRowFields(item, undefined, 0),
-        formValues,
-      )
+      if (!item.item.rowVariantTopology && item.fields.length > 0) {
+        registerItems(registry, `${arrayKey}.*`, item.fields, formValues)
+      }
       return
     }
     rows.forEach((row, index) => {
@@ -142,13 +149,23 @@ function registerContainerItem(
     return
   }
 
+  if (item.kind === 'group' && item.name) {
+    const groupKey = prefix ? `${prefix}.${item.name}` : item.name
+    registry.set(groupKey, {
+      label: item.heading?.label ?? item.name,
+      category: 'text',
+      role: 'control',
+      exactPath: true,
+    })
+  }
+
   registerItems(registry, prefix, item.fields as FormItem[], formValues)
 }
 
 export function registerFormItems(
   registry: Map<string, RegistryEntry>,
   prefix: string,
-  items: FormItem[],
+  items: readonly FormItem[],
   formValues?: Record<string, unknown>,
 ): void {
   for (const item of items) {

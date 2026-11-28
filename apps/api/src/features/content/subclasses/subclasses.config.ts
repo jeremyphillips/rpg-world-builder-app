@@ -7,6 +7,7 @@ import {
 } from '@rpg/contracts'
 
 import { assertContentSpellReferences } from '../lib/assert-content-spell-references'
+import { resolveValidatedWriteBody } from '../lib/resolve-system-overlay.lib'
 import type { ContentTypeConfig } from '../lib/content-type-config'
 import type {
   ContentWriteConfig,
@@ -57,11 +58,20 @@ async function validateSubclassBeforeWrite(ctx: ContentWriteContext): Promise<vo
   }
 
   await assertSubclassParentClassExists(ctx.campaignId, classId)
-  await assertContentSpellReferences(ctx, ctx.effectiveBody ?? ctx.input)
+  await assertContentSpellReferences(
+    ctx,
+    resolveValidatedWriteBody({
+      effectiveBody: ctx.effectiveBody,
+      mode: ctx.mode,
+      existing: ctx.existing as Record<string, unknown> | undefined,
+      input: ctx.input,
+    }),
+  )
 }
 
 export const subclassContentConfig: ContentTypeConfig<Subclass> = {
   type: 'subclasses',
+  overlayParticipantId: 'subclasses',
   system: {
     load: loadSeedSubclasses,
     slugs: seedSubclassSlugs,

@@ -19,6 +19,7 @@ import {
   formatStatBlockRollExpression,
   type Equipment,
   type Monster,
+  type MonsterPresetTraitForFormat,
   type MonsterAction,
   type MonsterBonusAction,
   type MonsterLegendaryAction,
@@ -205,6 +206,7 @@ function formatSpeedStatRow(monster: Monster): ContentStatRowData {
       ? formatMonsterSpeedStatRow({
           sizes: monster.sizes,
           movement: monster.movement,
+          movementAlternative: monster.movementAlternative,
           hover: monster.hover,
           forms: monster.forms,
           monsterName: monster.name,
@@ -212,7 +214,7 @@ function formatSpeedStatRow(monster: Monster): ContentStatRowData {
         })
       : undefined) ??
     (() => {
-      const movement = formatMovementDisplay(monster.movement, 'ft.')
+      const movement = formatMovementDisplay(monster.movement, 'ft.', monster.movementAlternative)
       return movement && monster.hover ? `${movement} (hover)` : movement
     })()
   return {
@@ -546,14 +548,18 @@ function traitRecord(trait: Monster['traits'][number]): Record<string, unknown> 
 function mapPresetMonsterTrait(
   trait: Monster['traits'][number],
   record: Record<string, unknown>,
-  monsterName: string,
+  monster: Pick<Monster, 'name' | 'movement' | 'movementAlternative'>,
 ): MonsterTraitItemViewModel | undefined {
   if (typeof record.preset !== 'string') return undefined
   const facing = resolvePresetTraitStatBlockRulesFacing({
     id: trait.id,
-    preset: record.preset,
-    monsterName,
+    preset: record.preset as MonsterPresetTraitForFormat['preset'],
+    monsterName: monster.name,
     trait: trait as never,
+    movement: {
+      movement: monster.movement,
+      movementAlternative: monster.movementAlternative,
+    },
   })
   return {
     id: trait.id,
@@ -610,7 +616,7 @@ function mapMonsterTrait(
 ): MonsterTraitItemViewModel {
   const record = traitRecord(trait)
   const mapped =
-    mapPresetMonsterTrait(trait, record, monster.name) ??
+    mapPresetMonsterTrait(trait, record, monster) ??
     mapTemplateMonsterTrait(trait, record, monster) ??
     mapNamedMonsterTrait(trait, record, monster, derived)
   const ids = 'onlyInFormIds' in trait ? trait.onlyInFormIds : undefined

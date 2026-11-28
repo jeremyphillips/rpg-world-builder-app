@@ -1,4 +1,7 @@
 import { z } from 'zod'
+
+import { overlayAtomic } from '../lib/system-overlay/annotate'
+import { overlaySlugList } from '../lib/system-overlay/overlay-presets'
 import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 
 import { diceSchema, dieFaceSchema } from '../../primitives/dice'
@@ -72,15 +75,21 @@ export const weaponDamageSchema = rollSchema
  * Draft weapon damage. Partial dice are kept; empty rolls are not rejected.
  * Publish still uses {@link weaponDamageSchema}.
  */
-export const weaponDamageDraftSchema = z.object({
-  dice: z
-    .object({
-      count: z.number().int().min(1).optional(),
-      faces: dieFaceSchema.optional(),
-    })
-    .optional(),
-  flat: z.number().int().optional(),
-})
+export const weaponDamageDraftSchema = overlayAtomic(
+  z.object({
+    dice: overlayAtomic(
+      z
+        .object({
+          count: z.number().int().min(1).optional(),
+          faces: dieFaceSchema.optional(),
+        })
+        .optional(),
+      'draft weapon damage dice',
+    ),
+    flat: z.number().int().optional(),
+  }),
+  'draft weapon damage roll',
+)
 
 export type WeaponDamage = RollValue
 
@@ -117,7 +126,7 @@ export const weaponEquipmentKindFields = {
   damageType: weaponDamageTypeSchema.optional(),
   /** Dice rolled when wielded two-handed; present only when 'versatile' in properties. */
   versatileDamage: diceSchema.optional(),
-  properties: z.array(weaponPropertySchema),
+  properties: overlaySlugList(weaponPropertySchema),
   mastery: weaponMasterySchema,
   /** Normal/long throw or fire range in feet. Present for thrown/ranged weapons. */
   range: weaponRangeSchema.optional(),

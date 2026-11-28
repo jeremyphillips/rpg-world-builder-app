@@ -1,16 +1,30 @@
-import { ROUTES } from '@/app/routes'
+import { useMemo } from 'react'
 
-import { useEquipment, useEquipmentUsageMeta } from '../hooks/use-equipment'
+import { ROUTES } from '@/app/routes'
+import { useCampaignRulesetLookup } from '@/lib/use-campaign-ruleset-lookup'
+
+import { useContentOverviewMergedData } from '../../lib/list/create-content-list'
+import { useEquipmentListResult, useEquipmentUsageMeta } from '../hooks/use-equipment'
+import {
+  equipmentFamilyOverviewAwaitingRulesetForFailures,
+  equipmentFamilyOverviewHasOverlayFailures,
+  equipmentFamilyUnclassifiedOverlayFailures,
+  filterEquipmentFamilyOverviewRows,
+} from '../lib/equipment-family-overview-filter.lib'
 import { useFamilyTableConfig } from '../hooks/use-family-table-config'
 import {
-  familyPathToEquipmentKind,
   getEquipmentFamilyLabel,
   type EquipmentFamilyPath,
 } from '../lib/shared/equipment-family-paths'
 
 export function useEquipmentFamilyOverview(campaignId: string, family: EquipmentFamilyPath) {
-  const kind = familyPathToEquipmentKind(family)
-  const { data: equipment = [], isPending, isError } = useEquipment(campaignId)
+  const {
+    rulesetId: campaignRulesetId,
+    isPending: rulesetPending,
+    isError: rulesetError,
+  } = useCampaignRulesetLookup(campaignId)
+  const listResult = useEquipmentListResult(campaignId)
+  const { data: equipment, isPending, isError } = useContentOverviewMergedData(listResult)
   const { data: usageMeta } = useEquipmentUsageMeta(campaignId)
   const {
     tableConfig,
@@ -21,14 +35,46 @@ export function useEquipmentFamilyOverview(campaignId: string, family: Equipment
     overviewUsageScope: usageMeta?.overviewUsageScope,
   })
   const heading = getEquipmentFamilyLabel(family)
-  const filtered = kind ? equipment.filter((item) => item.kind === kind) : []
+
+  const rulesetGate = useMemo(
+    () => ({
+      rulesetId: campaignRulesetId,
+      isPending: rulesetPending,
+      isError: rulesetError,
+    }),
+    [campaignRulesetId, rulesetPending, rulesetError],
+  )
+
+  const filtered = useMemo(
+    () => filterEquipmentFamilyOverviewRows(equipment, family, rulesetGate),
+    [equipment, family, rulesetGate],
+  )
+
+  const unclassifiedOverlayFailures = useMemo(
+    () => equipmentFamilyUnclassifiedOverlayFailures(equipment, rulesetGate),
+    [equipment, rulesetGate],
+  )
+
+  const awaitingRulesetForFailures = equipmentFamilyOverviewAwaitingRulesetForFailures(
+    equipment,
+    rulesetGate,
+  )
+
+  const listOrColumnsFailed = isError || columnsError
+  const rulesetLookupFailed =
+    rulesetError &&
+    !rulesetPending &&
+    !listOrColumnsFailed &&
+    equipmentFamilyOverviewHasOverlayFailures(equipment)
 
   return {
     heading,
     filtered,
+    unclassifiedOverlayFailures,
     tableConfig,
-    isPending: isPending || columnsPending,
-    isError: isError || columnsError,
+    isPending: isPending || columnsPending || rulesetPending || awaitingRulesetForFailures,
+    isError: listOrColumnsFailed,
+    rulesetLookupFailed,
     newHref: ROUTES.content.equipment.create(campaignId, family),
     newLabel: `New ${heading.replace(/s$/, '')}`,
   }

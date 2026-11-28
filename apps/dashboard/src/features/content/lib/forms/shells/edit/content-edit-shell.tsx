@@ -2,29 +2,29 @@ import type {
   CatalogLayer,
   ContentStatus,
   ContentTypeKey,
+  OverlayReadDiagnostics,
   ResolvedContentCampaignAccess,
 } from '@rpg/contracts'
 import { emptyContentMediaSchema, type ContentMedia } from '@rpg/contracts'
-import { Heading, Spinner, Text } from '@rpg/ui'
+import { Alert, Heading, Spinner, Text } from '@rpg/ui'
 import { useQueryClient } from '@tanstack/react-query'
-import { type ReactNode, useState } from 'react'
+import { type ReactNode, useMemo, useState } from 'react'
 import type { DefaultValues, FieldValues, UseFormReturn } from 'react-hook-form'
 import type { ZodType } from 'zod'
 
 import { ContentFormPageShell } from '../layout/content-form-page-shell'
 import { resolveContentFormLayout } from '../layout/content-form-layout.lib'
 import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
-import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { SubclassUnsavedEditsProvider } from '@/features/content/classes/hooks/subclass-unsaved-edits-context'
-import { stripEditEnvelopeFromFormDefaults } from '../../registry/content-form-key-helpers'
-import { serializeContentFormInput } from '../../registry/content-form-serialize-input.lib'
+import { prepareSerializedContentFormWrite } from '../../submit/prepare-serialized-content-form-write.lib'
+import { useContentFormSubmit } from '../submit/content-form-submit'
+import { resolveContentFormNavigationFields } from '../host/content-form-host-projection'
+import { persistContentEditUpdate } from './content-edit-persist.lib'
+import { resolveCatalogSeedBody } from '../../registry/resolve-catalog-seed-body.lib'
+import { findContentOverlayListFailure } from '../../../list/create-content-list'
 import { useContentWriteMutation } from '../../../list/use-content-mutations'
 import { type AnyContentFormDef, type ContentFormCtx } from '../../registry/content-form-registry'
-import {
-  findContentEditEntity,
-  loadContentEditFormState,
-  replaceCachedContentEntity,
-} from './content-edit-load'
+import { findContentEditEntity, loadContentEditFormState } from './content-edit-load'
 import {
   ArmorClassAuthoringNotice,
   ArmorClassAuthoringProvider,
@@ -41,10 +41,6 @@ import { ContentEditLifecycleActions } from './content-edit-lifecycle-actions'
 import { ContentEditPublishProvider } from './content-edit-publish-context'
 import { ContentEditHeadingBadges } from '../../../campaign-access/content-edit-heading-badges'
 import { ContentEditEntityFormDialogs } from './content-edit-entity-form-dialogs'
-import {
-  CONTENT_MEDIA_STALE_FORM_MESSAGE,
-  extractStaleMediaFromError,
-} from './content-edit-stale-media.lib'
 import { draftPublishValidationSurface } from '../../validation/content-draft-publish-validation-surface.ref'
 
 function ContentEditFormHeading({
@@ -142,6 +138,7 @@ interface ContentEditEntityFormProps<
   onSubmit: (values: FieldValues, form: UseFormReturn<FieldValues>) => Promise<void>
   formKey?: string
   formHeaderNotice?: ReactNode
+  submitProducerBoundary?: React.ComponentType<{ children: React.ReactNode }>
 }
 
 function ContentEditEntityForm<
@@ -185,6 +182,7 @@ function ContentEditEntityFormBody<
   onSubmit,
   formKey,
   formHeaderNotice,
+  submitProducerBoundary,
 }: ContentEditEntityFormProps<TEntity>) {
   useSetBreadcrumbLabel(entity.name)
   const layout = resolveContentFormLayout(def)
@@ -252,6 +250,7 @@ function ContentEditEntityFormBody<
       scrollMode={layout.scrollMode}
       previewEnabled={layout.previewEnabled}
       previewDraftBadge={layout.previewEnabled && entity.status === 'draft'}
+      producerBoundary={submitProducerBoundary}
       formHeaderPrefix={
         <>
           {layout.previewEnabled ? heading : null}
@@ -301,9 +300,18 @@ function ContentEditFormReady({
   formCtx,
   ctx,
 }: Omit<ContentEditFormReadyProps, 'backHref'>) {
-  const entity = findContentEditEntity(def.useListQuery(campaignId).data, entityId)
+  const listResult = def.useListQueryResult(campaignId)
+  const entity = findContentEditEntity(listResult.data?.items, entityId)
+  const overlayFailure = findContentOverlayListFailure(listResult.data?.overlayFailures, entityId)
 
   if (!entity) {
+    if (overlayFailure) {
+      return (
+        <Alert variant="destructive" role="alert">
+          {overlayFailure.message}
+        </Alert>
+      )
+    }
     return (
       <Text variant="destructive" role="alert">
         {notFoundLabel}
@@ -345,22 +353,37 @@ interface ContentEditFormBodyProps {
   ctx: ContentFormCtx
 }
 
-function useFrozenSystemOriginRowIds(
-  def: AnyContentFormDef,
-  entity: { id: string; catalogLayer: CatalogLayer },
-): ContentFormCtx['embeddedSystemOriginRowIds'] {
+function overlayReadDiagnosticsAlertMessage(
+  diagnostics: OverlayReadDiagnostics | undefined,
+): string | null {
+  if (!diagnostics) return null
+  const parts: string[] = []
+  if (diagnostics.identityConflicts.length > 0) {
+    parts.push('This record has overlay identity conflicts. Review before publishing changes.')
+  }
+  if (diagnostics.orphanedSeedOverrides.length > 0) {
+    parts.push('Some stored seed overrides no longer match the current catalog seed.')
+  }
+  return parts.length > 0 ? parts.join(' ') : null
+}
+
+function useFrozenSystemOriginRowIds(entity: {
+  id: string
+  catalogLayer: CatalogLayer
+  seedRowIdsByPath?: Readonly<Record<string, readonly string[]>>
+}): ContentFormCtx['embeddedSystemOriginRowIds'] {
+  const resolveSeedLocks = () => entity.seedRowIdsByPath
+
   const [systemOrigin, setSystemOrigin] = useState<{
     entityId: string
     ids: ContentFormCtx['embeddedSystemOriginRowIds']
   } | null>(() =>
-    entity.catalogLayer === 'system'
-      ? { entityId: entity.id, ids: def.extractEmbeddedSeedRowIds?.(entity as never) }
-      : null,
+    entity.catalogLayer === 'system' ? { entityId: entity.id, ids: resolveSeedLocks() } : null,
   )
   if (entity.catalogLayer === 'system' && systemOrigin?.entityId !== entity.id) {
     setSystemOrigin({
       entityId: entity.id,
-      ids: def.extractEmbeddedSeedRowIds?.(entity as never),
+      ids: resolveSeedLocks(),
     })
   } else if (entity.catalogLayer !== 'system' && systemOrigin) {
     setSystemOrigin(null)
@@ -380,7 +403,6 @@ function ContentEditFormBody({
   ctx,
 }: ContentEditFormBodyProps) {
   const queryClient = useQueryClient()
-  const systemOriginRowIds = useFrozenSystemOriginRowIds(def, entity)
   const mutation = useContentWriteMutation(def, campaignId, entityId)
   const authoring = useArmorClassAuthoringSession(
     Boolean(def.armorClassRulesSensitive),
@@ -396,13 +418,65 @@ function ContentEditFormBody({
     entityId,
     armorClassRules: authoring.snapshot,
   })
+  const systemOriginRowIds = useFrozenSystemOriginRowIds(entity)
   const layoutCtx = {
     ...loaded.layoutCtx,
     embeddedSystemOriginRowIds: systemOriginRowIds,
   }
+  const catalogSeed = useMemo(
+    () =>
+      entity.catalogLayer === 'system' && layoutCtx.rulesetId
+        ? resolveCatalogSeedBody(def.routeKey, layoutCtx.rulesetId, entityId)
+        : undefined,
+    [def.routeKey, entity.catalogLayer, entityId, layoutCtx.rulesetId],
+  )
+  const [overlayBaseline, setOverlayBaseline] = useState<Record<string, unknown> | null>(() => {
+    if (entity.catalogLayer !== 'system' || !def.normalizeOverlayBody) return null
+    return def.normalizeOverlayBody(
+      loaded.defaultValues as never,
+      { entity, armorClassRules: layoutCtx.armorClassRules },
+      loaded.validationIntent,
+    )
+  })
   const { schema, validationIntent, defaultValues } = loaded
-  const { onSubmit, formError } = useSubmitHandler({
-    submit: async (values, form) => {
+  const formKey = `${entity.id}:${armorClassRulesSignature(authoring.snapshot)}:${authoring.generation}`
+
+  const serializeInputCtx = {
+    entity,
+    weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
+    campaignRules: layoutCtx.campaignRules,
+    equipmentKind: layoutCtx.equipmentKind,
+    armorClassRules: layoutCtx.armorClassRules,
+  }
+
+  const { onSubmit, formError, ProducerBoundary } = useContentFormSubmit<Record<string, unknown>>({
+    def,
+    ctx: layoutCtx,
+    commitValidationIntent: validationIntent,
+    fallbackMessage: `Could not update ${def.routeKey}.`,
+    invalidPresentation: {
+      resolverFields: resolveContentFormNavigationFields(def, layoutCtx),
+      formId: formKey,
+    },
+    prepareWrite: (values, form) =>
+      prepareSerializedContentFormWrite({
+        def,
+        values,
+        form,
+        inputCtx: serializeInputCtx,
+        validationIntent,
+        operation: 'update',
+        rulesetId: layoutCtx.rulesetId,
+        serializeOptions: {
+          overlayBaseline: overlayBaseline ?? undefined,
+          catalogSeed,
+          expectedOverlayRevision: (entity as { overlayRevision?: number }).overlayRevision ?? 0,
+          entityId,
+          seedRowIdsByPath: (entity as { seedRowIdsByPath?: Record<string, readonly string[]> })
+            .seedRowIdsByPath,
+        },
+      }),
+    persist: async (wireInput, form, meta) => {
       if (
         armorClassAuthoringIsStale({
           sensitive: authoring.sensitive,
@@ -415,62 +489,35 @@ function ContentEditFormBody({
       }
 
       if (validationIntent === 'draft') {
-        draftPublishValidationSurface.current?.(values as FieldValues)
+        draftPublishValidationSurface.current?.(form.getValues())
       }
 
-      let saved: unknown
-      try {
-        saved = await mutation.mutateAsync(
-          serializeContentFormInput(
-            def,
-            values,
-            {
-              entity,
-              weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
-              campaignRules: layoutCtx.campaignRules,
-              equipmentKind: layoutCtx.equipmentKind,
-              armorClassRules: layoutCtx.armorClassRules,
-            },
-            validationIntent,
-            {
-              operation: 'update',
-              dirtyFields: form.formState.dirtyFields as Record<string, unknown>,
-              rulesetId: layoutCtx.rulesetId,
-            },
-          ),
-        )
-      } catch (error) {
-        const serverMedia = extractStaleMediaFromError(error)
-        if (serverMedia === undefined) throw error
-
-        form.resetField('media', { defaultValue: serverMedia })
-        throw new Error(CONTENT_MEDIA_STALE_FORM_MESSAGE, { cause: error })
-      }
-      const savedRecord = saved as typeof entity & { media?: ContentMedia }
-      queryClient.setQueryData(def.queryKey(campaignId), (current: unknown) =>
-        Array.isArray(current) ? replaceCachedContentEntity(current, savedRecord) : current,
-      )
-      const baseline = stripEditEnvelopeFromFormDefaults(
-        {
-          ...def.toFormValues(saved, { armorClassRules: layoutCtx.armorClassRules }),
-          media: savedRecord.media ?? emptyContentMediaSchema,
-        },
-        {
-          stripKind: layoutCtx.equipmentKind != null,
-        },
-      )
-      form.reset(baseline)
+      const baseline = await persistContentEditUpdate({
+        def,
+        entity,
+        campaignId,
+        layoutCtx,
+        wireInput: wireInput as Record<string, unknown>,
+        form,
+        mutation,
+        queryClient,
+        setOverlayBaseline,
+        validationIntent,
+        isAttemptCurrent: meta?.isAttemptCurrent,
+      })
       if (validationIntent === 'draft') {
-        draftPublishValidationSurface.current?.(baseline as FieldValues)
+        draftPublishValidationSurface.current?.(baseline)
       }
     },
-    fallbackMessage: `Could not update ${def.routeKey}.`,
   })
 
   const formDefaults = authoring.keptValues ?? {
     ...defaultValues,
     media: entity.media ?? emptyContentMediaSchema,
   }
+  const overlayDiagnosticsMessage = overlayReadDiagnosticsAlertMessage(
+    (entity as { overlayReadDiagnostics?: OverlayReadDiagnostics }).overlayReadDiagnostics,
+  )
 
   return (
     <ArmorClassAuthoringProvider value={authoring}>
@@ -483,8 +530,18 @@ function ContentEditFormBody({
         headingFn={headingFn}
         layoutCtx={layoutCtx}
         schema={schema}
-        formKey={`${entity.id}:${armorClassRulesSignature(authoring.snapshot)}:${authoring.generation}`}
-        formHeaderNotice={<ArmorClassAuthoringNotice />}
+        formKey={formKey}
+        formHeaderNotice={
+          <>
+            <ArmorClassAuthoringNotice />
+            {overlayDiagnosticsMessage ? (
+              <Alert variant="warning" role="status">
+                {overlayDiagnosticsMessage}
+              </Alert>
+            ) : null}
+          </>
+        }
+        submitProducerBoundary={ProducerBoundary}
         defaultValues={formDefaults}
         submitPending={mutation.isPending}
         formError={formError ?? null}

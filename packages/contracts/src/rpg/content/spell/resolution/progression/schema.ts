@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { overlayOrderedList } from '../../../lib/system-overlay/overlay-presets'
+
 import { rollSchema } from '../../../../primitives/mechanics/roll'
 
 // ---------------------------------------------------------------------------
@@ -98,7 +100,7 @@ export type SpellResolutionProgressionThresholdEntry = z.infer<
 export const spellResolutionProgressionThresholdTrackSchema = z.object({
   kind: z.literal('thresholds'),
   reference: spellResolutionProgressionReferenceSchema,
-  entries: z.array(spellResolutionProgressionThresholdEntrySchema).min(1),
+  entries: overlayOrderedList(spellResolutionProgressionThresholdEntrySchema).min(1),
 })
 
 export const spellResolutionProgressionLinearTrackSchema = z.object({
@@ -116,7 +118,7 @@ export type SpellResolutionProgressionTrack = z.infer<typeof spellResolutionProg
 
 export const spellResolutionProgressionSchema = z.object({
   basis: spellResolutionProgressionBasisSchema,
-  tracks: z.array(spellResolutionProgressionTrackSchema).min(1),
+  tracks: overlayOrderedList(spellResolutionProgressionTrackSchema).min(1),
 })
 
 export type SpellResolutionProgression = z.infer<typeof spellResolutionProgressionSchema>

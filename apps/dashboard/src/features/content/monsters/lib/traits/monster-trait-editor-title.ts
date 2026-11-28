@@ -1,8 +1,11 @@
 import {
-  formatCreatureTrait,
+  formatMonsterPresetTrait,
   formatMonsterStatBlockSubject,
+  getCreatureTraitVocabularyEntry,
+  parseMonsterPresetTraitDraftForFormat,
   resolveTraitName,
   type ContentTrait,
+  type CreatureMovementDefinition,
 } from '@rpg/contracts'
 
 function isRecord(row: unknown): row is Record<string, unknown> {
@@ -95,11 +98,16 @@ export function monsterTraitResolvedTitle(row: unknown, monsterName: string): st
     return templateDerivedName(row)
   }
   if (isPresetRow(row)) {
-    const formatted = formatCreatureTrait({
-      subject: formatMonsterStatBlockSubject(monsterName),
-      trait: row as Parameters<typeof formatCreatureTrait>[0]['trait'],
-    })
-    return formatted?.name ?? (typeof row.preset === 'string' ? row.preset : '')
+    const parsed = parseMonsterPresetTraitDraftForFormat(row)
+    if (!parsed || parsed.preset === 'spider-climb') {
+      return getCreatureTraitVocabularyEntry(row.preset)?.label ?? row.preset
+    }
+    const formatted = formatMonsterPresetTrait(
+      formatMonsterStatBlockSubject(monsterName),
+      parsed,
+      {} as CreatureMovementDefinition,
+    )
+    return formatted?.name ?? row.preset
   }
   return storedText(isRecord(row) ? row.name : undefined)
 }

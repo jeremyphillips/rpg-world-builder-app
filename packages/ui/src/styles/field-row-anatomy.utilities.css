@@ -10,4 +10,32 @@
   .field-row-anatomy-grid[data-field-row-collapsed] [data-field-row-divider] {
     display: none;
   }
+
+  /*
+   * Intrinsic (`auto`) row participants: column width from label ∪ control;
+   * spill wrappers wrap hints/errors without widening the track.
+   */
+  .field-row-anatomy-grid [data-field-row-participant][data-field-width='auto'],
+  .array-item-anatomy-grid [data-field-row-participant][data-field-width='auto'] {
+    grid-template-columns: minmax(0, max-content);
+    justify-items: stretch;
+  }
+
+  .field-row-anatomy-grid
+    [data-field-row-participant][data-field-width='auto']
+    [data-field-control-region],
+  .array-item-anatomy-grid
+    [data-field-row-participant][data-field-width='auto']
+    [data-field-control-region] {
+    width: max-content;
+    min-width: min-content;
+    justify-self: start;
+  }
+
+  [data-field-intrinsic-spill] {
+    box-sizing: border-box;
+    width: 0;
+    min-width: 100%;
+    overflow-wrap: anywhere;
+  }
 }

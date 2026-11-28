@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { renderHook } from '@testing-library/react'
+import { renderHook, waitFor } from '@testing-library/react'
 
 import { makeQueryWrapper } from '@/test/make-wrapper'
 
@@ -45,6 +45,22 @@ describe('createContentListApi', () => {
       usageSummaryLabels: { singular: 'character', plural: 'characters' },
       overviewUsageScope: 'characters',
     })
+
+    mockRequest.mockResolvedValueOnce({
+      equipment: [{ id: 'w1' }],
+      overlayFailures: [
+        {
+          targetId: 'srd:broken',
+          slug: 'broken',
+          name: 'Broken',
+          code: 'overlay_validation',
+          message: 'Stored system overlay is invalid.',
+        },
+      ],
+    })
+
+    const withFailures = await listEquipment('camp-1')
+    expect(withFailures.overlayFailures).toHaveLength(1)
   })
 })
 
@@ -71,5 +87,28 @@ describe('createContentQueryHook', () => {
 
     expect(result.current.isFetching).toBe(false)
     expect(listFn).not.toHaveBeenCalled()
+  })
+
+  it('selects resolved items and omits overlay failure rows', async () => {
+    const listFn = vi.fn().mockResolvedValue({
+      items: [{ id: 'healthy' }],
+      overlayFailures: [
+        {
+          targetId: 'broken',
+          slug: 'broken',
+          name: 'Broken',
+          code: 'overlay_validation',
+          message: 'Stored system overlay is invalid.',
+        },
+      ],
+    })
+    const { useQuery } = createContentQueryHook(config, listFn)
+
+    const { result } = renderHook(() => useQuery('camp-1'), {
+      wrapper: makeQueryWrapper(),
+    })
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+    expect(result.current.data).toEqual([{ id: 'healthy' }])
   })
 })

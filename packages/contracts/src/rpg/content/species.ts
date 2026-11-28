@@ -1,6 +1,9 @@
 import { z } from 'zod'
 
-import { contentMetaSchema, contentPatchBaseSchema, slugSchema } from './lib/envelope'
+import { overlayRestoreIdRows, overlaySlugList } from './lib/system-overlay/overlay-presets'
+import { mergeSystemOverlayUpdateEnvelope } from './lib/system-overlay/system-overlay-update'
+import { contentMetaSchema, slugSchema } from './lib/envelope'
+import { contentStoredOverlayPatchSchema } from './lib/system-overlay/patch-document'
 import {
   mediaBearingAuthoredContentBodySchema,
   mediaBearingDraftAuthoredContentBodySchema,
@@ -59,14 +62,14 @@ export type SpeciesHeritageOption = z.infer<typeof speciesHeritageOptionSchema>
  * Wording like "lineage" vs "ancestry" lives in `name`, not a separate field.
  */
 export const speciesHeritageSchema = contentNamedChoiceSchema.extend({
-  options: z.array(speciesHeritageOptionSchema).min(1),
+  options: overlayRestoreIdRows(speciesHeritageOptionSchema).min(1),
 })
 
 export type SpeciesHeritage = z.infer<typeof speciesHeritageSchema>
 
 /** Draft heritage — options may be empty while authoring. */
 export const speciesHeritageDraftSchema = contentNamedChoiceSchema.omit({ options: true }).extend({
-  options: z.array(speciesHeritageOptionSchema).default([]),
+  options: overlayRestoreIdRows(speciesHeritageOptionSchema).default([]),
 })
 
 export type SpeciesHeritageDraft = z.infer<typeof speciesHeritageDraftSchema>
@@ -89,10 +92,10 @@ export const speciesBodySchema = mediaBearingAuthoredContentBodySchema.extend({
    * selectable pools. On the classless level-0 chassis they are granted when
    * `retainSpeciesLanguages` is enabled. They do not grant languages once a class applies.
    */
-  languageAffinities: z.array(languageIdSchema).optional(),
+  languageAffinities: overlaySlugList(languageIdSchema).optional(),
   /** Cultural affiliation and naming capability for generator integration. */
   culture: speciesCultureConfigSchema.optional(),
-  traits: z.array(speciesBodyTraitSchema),
+  traits: overlayRestoreIdRows(speciesBodyTraitSchema),
   heritage: speciesHeritageSchema.optional(),
   /** Species-authored data consumed only when the campaign enables the matching rule. */
   characterCreation: speciesCharacterCreationSchema.optional(),
@@ -109,9 +112,9 @@ export const speciesBodyDraftSchema = mediaBearingDraftAuthoredContentBodySchema
   movement: movementSpeedsDraftSchema,
   hover: z.boolean().optional(),
   /** See {@link speciesBodySchema} `languageAffinities`. */
-  languageAffinities: z.array(languageIdSchema).optional(),
+  languageAffinities: overlaySlugList(languageIdSchema).optional(),
   culture: speciesCultureConfigSchema.optional(),
-  traits: z.array(speciesBodyTraitSchema).default([]),
+  traits: overlayRestoreIdRows(speciesBodyTraitSchema).default([]),
   heritage: speciesHeritageDraftSchema.optional(),
   characterCreation: speciesCharacterCreationSchema.optional(),
 })
@@ -142,23 +145,20 @@ export type CreateSpeciesInput = z.infer<typeof createSpeciesInputSchema>
 export const createSpeciesDraftInputSchema = createDraftInputSchema(speciesBodyDraftSchema)
 export type CreateSpeciesDraftInput = z.infer<typeof createSpeciesDraftInputSchema>
 
-export const updateSpeciesInputSchema = speciesBodySchema
-  .partial()
-  .extend({ slug: slugSchema.optional() })
-  .superRefine((input, ctx) => {
-    if (input.traits) refineSpeciesTraits(input.traits, ctx)
-  })
+export const updateSpeciesInputSchema = mergeSystemOverlayUpdateEnvelope(
+  speciesBodySchema
+    .partial()
+    .extend({ slug: slugSchema.optional() })
+    .superRefine((input, ctx) => {
+      if (input.traits) refineSpeciesTraits(input.traits, ctx)
+    }),
+)
 export type UpdateSpeciesInput = z.infer<typeof updateSpeciesInputSchema>
 
-export const updateSpeciesDraftInputSchema = createSpeciesDraftInputSchema.partial()
+export const updateSpeciesDraftInputSchema = mergeSystemOverlayUpdateEnvelope(
+  createSpeciesDraftInputSchema.partial(),
+)
 export type UpdateSpeciesDraftInput = z.infer<typeof updateSpeciesDraftInputSchema>
 
-/**
- * System-patch overlay. Reuses the generic envelope; only the type-specific
- * `patch` body differs. `.partial()` is shallow; the read-time merge handles
- * deep-merging (arrays replaced wholesale).
- */
-export const speciesPatchSchema = contentPatchBaseSchema.extend({
-  patch: speciesBodySchema.partial(),
-})
+export const speciesPatchSchema = contentStoredOverlayPatchSchema
 export type SpeciesPatch = z.infer<typeof speciesPatchSchema>

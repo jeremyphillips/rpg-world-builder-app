@@ -35,8 +35,8 @@ export function mergeEditLayoutCtx(
     mode: 'edit',
     entityCatalogLayer: entity?.catalogLayer,
     entitySlug: entity?.slug,
-    rulesetId: optionsCtx.rulesetId,
-    entityRulesetId: entity?.rulesetId,
+    rulesetId: optionsCtx.rulesetId as ContentFormCtx['rulesetId'],
+    entityRulesetId: entity?.rulesetId as ContentFormCtx['rulesetId'],
     equipmentKind: formCtx?.equipmentKind ?? entityEquipmentKind(entity),
   }
 }

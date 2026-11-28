@@ -10,6 +10,7 @@ import type { FormDensity } from '../form-density'
 import { FormValueSyncEffects } from '../chrome/form-value-sync-effects.client'
 import type { FormUiContextValue, FormValidationPresentation } from '../context/form-ui.context'
 import type { FormIssue } from '../errors/form-issue.types'
+import { cancelPendingInvalidSubmitFocus } from '../config/invalid-submit-focus-generation.lib'
 import { navigateTabbedFormInvalidSubmit } from './navigate-tabbed-form-invalid-submit.client'
 import { TabbedFormChromeContext } from './tabbed-form-chrome.context'
 import type { ValidateSilently } from '../context/form-ui.context'
@@ -126,6 +127,10 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
    * an in-panel action instead of navigating.
    */
   onBeforeActiveTabChange?: (nextTabId: string) => boolean
+  /** When set and matching a tab id, that tab is selected on mount. */
+  defaultActiveTabId?: string
+  /** Wraps field chrome inside {@link FormProvider} for adopted producer sessions. */
+  producerBoundary?: React.ComponentType<{ children: React.ReactNode }>
 }
 
 function buildExternalFooterContent(
@@ -180,16 +185,26 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   aside,
   tabRowTrailing,
   onBeforeActiveTabChange,
+  defaultActiveTabId,
+  producerBoundary,
 }: TabbedFormProps<TFieldValues>) {
   const generatedFormId = React.useId()
   const formId = id ?? generatedFormId
-  const [activeTabId, setActiveTabIdState] = React.useState(tabs[0]?.id ?? '')
+  const [activeTabId, setActiveTabIdState] = React.useState(() => {
+    if (defaultActiveTabId && tabs.some((tab) => tab.id === defaultActiveTabId)) {
+      return defaultActiveTabId
+    }
+    return tabs[0]?.id ?? ''
+  })
   const setActiveTabId = React.useCallback(
     (nextTabId: string) => {
       if (onBeforeActiveTabChange && !onBeforeActiveTabChange(nextTabId)) return
+      if (nextTabId !== activeTabId) {
+        cancelPendingInvalidSubmitFocus()
+      }
       setActiveTabIdState(nextTabId)
     },
-    [onBeforeActiveTabChange],
+    [activeTabId, onBeforeActiveTabChange],
   )
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = React.useState(false)
   const markSubmitAttempted = React.useCallback(() => {
@@ -344,6 +359,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
         publishPresentationEnabled={publishPresentationEnabled}
         onResetValidationPresentation={onResetValidationPresentation}
         validateSilently={validateSilently as ValidateSilently}
+        producerBoundary={producerBoundary}
         onInvalidSubmit={handleInvalidSubmit}
         onSubmit={onSubmit}
         externalFooter={externalFooter}

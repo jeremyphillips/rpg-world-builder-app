@@ -12,6 +12,7 @@ import { FieldControlRegion, FieldLabelRegion, FieldMessageRegion } from './fiel
 import { resolveFieldPresentation } from './field-row-presentation.lib'
 import { cn } from '../../lib/utils'
 import { FieldLayoutLabelRegionContent } from './field-layout-label-region.client'
+import { FieldLayoutMessageRegionContent } from './field-layout-message-region.client'
 import { useOwnedLabelVisibility } from './owned-label-visibility.lib'
 import { resolveFieldLayoutRecommendation } from './field-recommendation.lib'
 import type { FieldLayoutRecommendation } from './field-recommendation.types'
@@ -65,7 +66,11 @@ export function FieldLayout({
   labelVisibility,
   showMessageRegion = true,
 }: FieldLayoutProps) {
-  const { hintPosition, controlSize: contextControlSize } = useFieldRootContext('FieldLayout')
+  const {
+    hintPosition,
+    controlSize: contextControlSize,
+    autoRowIntrinsicSizing,
+  } = useFieldRootContext('FieldLayout')
   const resolvedControlSize = controlSize ?? contextControlSize
   const visibility = useOwnedLabelVisibility(labelVisibility)
   const resolvedRecommendation = resolveFieldLayoutRecommendation(hintPosition, recommendation)
@@ -99,14 +104,16 @@ export function FieldLayout({
           showVisibleLabel={showVisibleLabel}
           label={showVisibleLabel ? label : null}
           recommendation={resolvedRecommendation}
+          autoRowIntrinsicSizing={autoRowIntrinsicSizing}
         />
       </FieldLabelRegion>
       <FieldControlRegion>{bandedControl}</FieldControlRegion>
       {showMessageRegion ? (
         <FieldMessageRegion size={size}>
-          <Field.DerivedMeta />
-          {hintPosition === 'below-control' ? <Field.Hint /> : null}
-          <Field.Error />
+          <FieldLayoutMessageRegionContent
+            hintPosition={hintPosition}
+            autoRowIntrinsicSizing={autoRowIntrinsicSizing}
+          />
         </FieldMessageRegion>
       ) : null}
     </>

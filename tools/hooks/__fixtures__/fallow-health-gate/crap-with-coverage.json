@@ -1,0 +1,15 @@
+{
+  "kind": "health",
+  "findings": [
+    {
+      "path": "apps/example/hooks/use-save.ts",
+      "name": "handleSave",
+      "line": 42,
+      "cyclomatic": 15,
+      "cognitive": 8,
+      "exceeded": "crap",
+      "crap": 200,
+      "coverage_source": "istanbul"
+    }
+  ]
+}

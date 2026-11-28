@@ -3,7 +3,6 @@ import type {
   ContentAccessTargetType,
   ContentCampaignAccessPatch,
   ContentTypeKey,
-  ContentValidationIntent,
 } from '@rpg/contracts'
 import { emptyContentMediaSchema } from '@rpg/contracts'
 import { Heading, Text } from '@rpg/ui'
@@ -26,7 +25,6 @@ import {
 } from '../layout/content-form-layout.lib'
 import type { UnsavedChangesConfirmController } from '@/lib/form-unsaved-changes-guard'
 import { notifyContentCreated } from '@/lib/notify'
-import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { formatContentCreateActionLabel } from '../../../content-type-labels'
 import { useContentWriteMutation } from '../../../list/use-content-mutations'
 import { ContentAuthoringGate } from '../layout/content-authoring-gate'
@@ -34,12 +32,14 @@ import { ContentFormOptionsGate, ContentFormLayout } from '../layout/content-for
 import { type AnyContentFormDef, type ContentFormCtx } from '../../registry/content-form-registry'
 import { resolveContentPostCreateEditHref } from '../layout/content-form-navigation'
 
-import { serializeContentFormInput } from '../../registry/content-form-serialize-input.lib'
+import { prepareSerializedContentFormWrite } from '../../submit/prepare-serialized-content-form-write.lib'
 import { resolveContentFormSchema } from '../edit/content-edit-load'
-import { intentToStatus } from './content-create-intent'
 import { createWithDeferredCampaignAccess } from '../../../campaign-access/create-with-deferred-campaign-access'
 import { CAMPAIGN_ACCESS_CREATE_DEFERRED_ERROR } from '../../../campaign-access/campaign-access-labels'
-import { useContentFormSubmit } from '../submit/content-form-submit'
+import {
+  useContentFormSubmit,
+  useContentFormSubmitProducerBinding,
+} from '../submit/content-form-submit'
 import { resolveContentFormNavigationFields } from '../host/content-form-host-projection'
 import { resolveContentFormCreateDefaultValues } from '../../registry/content-form-registry'
 
@@ -108,10 +108,16 @@ function ContentCreateFormBody({
     | ((values: Record<string, unknown>) => Record<string, unknown>)
     | undefined
 
-  const createEntity = async (
-    values: Record<string, unknown>,
+  const serializeInputCtx = {
+    weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
+    campaignRules: ctx.campaignRules,
+    equipmentKind: ctx.equipmentKind,
+    armorClassRules: authoringCtx.armorClassRules,
+  }
+
+  const persistCreatedEntity = async (
+    createBody: Record<string, unknown>,
     status: 'draft' | 'published',
-    validationIntent: ContentValidationIntent,
     form?: UseFormReturn<FieldValues>,
   ) => {
     if (
@@ -125,22 +131,11 @@ function ContentCreateFormBody({
       return
     }
 
-    const preparedValues = prepareSubmitValues?.(values) ?? values
-    const inputCtx = {
-      weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
-      campaignRules: ctx.campaignRules,
-      equipmentKind: ctx.equipmentKind,
-      armorClassRules: authoringCtx.armorClassRules,
-    }
     const { entity: created, deferredAccessFailed } = await createWithDeferredCampaignAccess({
       campaignId,
       routeKey: def.routeKey,
       createInput: {
-        ...(serializeContentFormInput(def, preparedValues, inputCtx, validationIntent, {
-          operation: 'create',
-          dirtyFields: form?.formState.dirtyFields as Record<string, unknown> | undefined,
-          rulesetId: ctx.rulesetId,
-        }) as Record<string, unknown>),
+        ...createBody,
         status,
       },
       mutateAsync: (input) => mutation.mutateAsync(input) as Promise<{ id: string }>,
@@ -164,32 +159,66 @@ function ContentCreateFormBody({
     formId: formKey,
   }
 
+  const producerBinding = useContentFormSubmitProducerBinding()
+
   const {
     onSubmit: onPublish,
     formError: publishFormError,
-    UiBridge,
+    ProducerBoundary,
   } = useContentFormSubmit<Record<string, unknown>>({
     def,
     ctx,
+    producerBinding,
     fallbackMessage: `Could not create ${def.routeKey}.`,
     prepareCommitValues,
     invalidPresentation,
-    persist: async (values, form) => {
-      await createEntity(values, intentToStatus('publish'), 'publish', form)
+    prepareWrite: (values, form) =>
+      prepareSerializedContentFormWrite({
+        def,
+        values,
+        form,
+        inputCtx: serializeInputCtx,
+        validationIntent: 'publish',
+        operation: 'create',
+        rulesetId: ctx.rulesetId,
+        prepareFormValues: prepareSubmitValues,
+      }),
+    persist: async (wireInput, form) => {
+      await persistCreatedEntity(wireInput as Record<string, unknown>, 'published', form)
     },
   })
 
-  const { onSubmit: onSaveDraft, formError: saveDraftFormError } = useSubmitHandler(
-    async (values, form) => {
+  const { onSubmit: onSaveDraft, formError: saveDraftFormError } = useContentFormSubmit<
+    Record<string, unknown>
+  >({
+    def,
+    ctx,
+    commitValidationIntent: 'draft',
+    producerBinding,
+    mountProducerChrome: false,
+    fallbackMessage: `Could not save ${def.routeKey} draft.`,
+    prepareCommitValues,
+    invalidPresentation,
+    prepareWrite: (values, form) =>
+      prepareSerializedContentFormWrite({
+        def,
+        values,
+        form,
+        inputCtx: serializeInputCtx,
+        validationIntent: 'draft',
+        operation: 'create',
+        rulesetId: ctx.rulesetId,
+        prepareFormValues: prepareSubmitValues,
+      }),
+    persist: async (wireInput, form) => {
       setSaveDraftPending(true)
       try {
-        await createEntity(values, intentToStatus('save_draft'), 'draft', form)
+        await persistCreatedEntity(wireInput as Record<string, unknown>, 'draft', form)
       } finally {
         setSaveDraftPending(false)
       }
     },
-    `Could not save ${def.routeKey} draft.`,
-  )
+  })
 
   return (
     <ArmorClassAuthoringProvider value={authoring}>
@@ -230,6 +259,7 @@ function ContentCreateFormBody({
           scrollMode={layout.scrollMode}
           previewEnabled={layout.previewEnabled}
           previewDraftBadge={layout.previewEnabled}
+          producerBoundary={ProducerBoundary}
           formHeaderPrefix={
             <>
               {layout.previewEnabled ? (
@@ -237,7 +267,6 @@ function ContentCreateFormBody({
                   {heading}
                 </Heading>
               ) : null}
-              <UiBridge />
               {formHeaderPrefix}
               <ArmorClassAuthoringNotice />
             </>

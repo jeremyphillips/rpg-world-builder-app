@@ -1,6 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, type RefObject } from 'react'
 import { useForm } from 'react-hook-form'
-import { makeResolver } from '@rpg/ui/form'
+import { FormUiProvider, makeResolver } from '@rpg/ui/form'
+import { useRunnerFormSubmit } from '@/lib/runner-form-submit.lib'
+import {
+  ContentFormSubmitSuperseded,
+  ContentFormSubmitValidationFailed,
+} from '../../lib/forms/shells/submit/content-form-submit-types.lib'
 import type { ContentCampaignAccessPatch, ResolvedSubclass } from '@rpg/contracts'
 import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
 
@@ -16,6 +21,7 @@ import { subclassFormDef } from '../lib/subclasses/subclass-form-values'
 
 type UseSubclassDetailEditorOptions = {
   subclassId: string
+  classId: string
   entity?: ResolvedSubclass
   defaultValues: SubclassFormValues
   defaultFeatureLevel?: number
@@ -26,14 +32,21 @@ type UseSubclassDetailEditorOptions = {
   onAvailabilityChange: (subclassId: string, isAvailable: boolean) => void
   onSave: (
     values: SubclassFormValues,
-    options?: { campaignAccessDraft?: ContentCampaignAccessPatch | null; accessOnly?: boolean },
+    options?: {
+      campaignAccessDraft?: ContentCampaignAccessPatch | null
+      accessOnly?: boolean
+      overlayBaseline?: Record<string, unknown> | null
+    },
   ) => Promise<void>
+  overlayBaselineRef?: RefObject<Record<string, unknown> | null>
 }
 
 export function useSubclassDetailEditor({
   subclassId,
+  classId,
   entity,
   defaultValues,
+  overlayBaselineRef: externalOverlayBaselineRef,
   defaultFeatureLevel,
   formCtx,
   isBodyDirty = false,
@@ -47,6 +60,19 @@ export function useSubclassDetailEditor({
   if (!fields[0]) {
     throw new Error('Subclass fields must include a name field.')
   }
+
+  const internalOverlayBaselineRef = useRef<Record<string, unknown> | null>(null)
+  const overlayBaselineRef = externalOverlayBaselineRef ?? internalOverlayBaselineRef
+
+  useEffect(() => {
+    if (entity?.catalogLayer !== 'system') {
+      overlayBaselineRef.current = null
+      return
+    }
+    overlayBaselineRef.current = subclassFormDef.normalizeOverlayBody!(defaultValues, classId, {
+      entity,
+    })
+  }, [classId, defaultValues, entity, overlayBaselineRef])
 
   const onSaveRef = useRef(onSave)
   const onValuesChangeRef = useRef(onValuesChange)
@@ -96,11 +122,32 @@ export function useSubclassDetailEditor({
     onAvailabilityChangeRef.current(subclassId, patch.available)
   }
 
+  const { onSubmit: runSubclassSave, ProducerBoundary } = useRunnerFormSubmit<SubclassFormValues>({
+    schema: subclassFormDef.schema,
+    resolverFields: fields,
+    formId: `subclass-editor-${subclassId}`,
+    fallbackMessage: 'Could not save subclass.',
+    mountProducerChrome: true,
+    persist: async (values) => {
+      if (isDraftSubclassId(subclassId)) {
+        await onSaveRef.current(values, { campaignAccessDraft: campaignAccessDraftRef.current })
+        return
+      }
+      await onSaveRef.current(values, { overlayBaseline: overlayBaselineRef.current })
+    },
+  })
+
   const handleSave = () => {
     if (isDraftSubclassId(subclassId)) {
-      void form.handleSubmit((values: SubclassFormValues) =>
-        onSaveRef.current(values, { campaignAccessDraft: campaignAccessDraftRef.current }),
-      )()
+      void runSubclassSave(form.getValues(), form).catch((error) => {
+        if (
+          error instanceof ContentFormSubmitValidationFailed ||
+          error instanceof ContentFormSubmitSuperseded
+        ) {
+          return
+        }
+        throw error
+      })
       return
     }
 
@@ -108,11 +155,27 @@ export function useSubclassDetailEditor({
     if (!hasUnsavedEdits) return
 
     if (isBodyDirty) {
-      void form.handleSubmit((values: SubclassFormValues) => onSaveRef.current(values))()
+      void runSubclassSave(form.getValues(), form).catch((error) => {
+        if (
+          error instanceof ContentFormSubmitValidationFailed ||
+          error instanceof ContentFormSubmitSuperseded
+        ) {
+          return
+        }
+        throw error
+      })
       return
     }
 
     void onSaveRef.current(form.getValues(), { accessOnly: true })
+  }
+
+  function SubclassEditorShell({ children }: { children: React.ReactNode }): React.ReactElement {
+    return React.createElement(FormUiProvider, {
+      fields,
+      uiStateKey: `subclass-editor-${subclassId}`,
+      children: React.createElement(ProducerBoundary, null, children),
+    })
   }
 
   return {
@@ -122,5 +185,6 @@ export function useSubclassDetailEditor({
     handleCampaignAccessDraft,
     handleCampaignAccessPersisted,
     handleSave,
+    SubclassEditorShell,
   }
 }

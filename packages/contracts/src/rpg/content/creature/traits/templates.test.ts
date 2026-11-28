@@ -14,6 +14,8 @@ import {
   isCreatureTraitTemplateEligibleForHost,
   listCreatureTraitTemplatesForRuleset,
 } from './templates'
+import { formatCreatureRollAdjustmentSentence } from '../effects'
+import { creatureRollAdjustmentSchema } from '../effects'
 import { collectCreatureTraitTemplateIssues } from './validate'
 
 describe('creature trait templates', () => {
@@ -103,6 +105,26 @@ describe('creature trait templates', () => {
         config: { uses: { normal: 0 } },
       }).success,
     ).toBe(false)
+  })
+
+  it('aligns sunlight sensitivity grants and rules with attack rolls and ability checks', () => {
+    const template = getCreatureTraitTemplate('sunlight-sensitivity')
+    expect(template?.description).toBe(
+      'Disadvantage on attack rolls and ability checks while in sunlight.',
+    )
+    const rules = template?.formatRules({}, { agreement: 'stat-block', subject: 'the kobold' })
+    expect(rules).toContain('attack rolls and ability checks')
+    expect(rules).not.toContain('Perception')
+    const [grant] = template?.resolveGrants({}) ?? []
+    expect(grant).toMatchObject({ kind: 'rollAdjustment' })
+    expect(creatureRollAdjustmentSchema.parse(grant)).toEqual({
+      mode: 'disadvantage',
+      rolls: [{ kind: 'attack' }, { kind: 'ability-check' }],
+      circumstance: { kind: 'in-sunlight' },
+    })
+    expect(formatCreatureRollAdjustmentSentence(creatureRollAdjustmentSchema.parse(grant))).toBe(
+      'Disadvantage on attack rolls and ability checks while in sunlight.',
+    )
   })
 
   it('strips legacy descriptionOverride on parse', () => {

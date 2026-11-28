@@ -2,12 +2,16 @@ import {
   API_CONTENT_TYPE_KEYS,
   HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS,
   type ApiContentTypeKey,
+  type CatalogOverlayListFailure,
   type HomebrewSummaryContentType,
 } from '@rpg/contracts'
 
 import { classRegistration } from './classes/classes.config'
-import { resolveClassesForCampaign } from './classes/derive-classes-catalog'
-import { resolveCatalogForCampaign } from './content.service'
+import {
+  resolveClassesForCampaign,
+  resolveClassesListForCampaign,
+} from './classes/derive-classes-catalog'
+import { resolveCatalogForCampaign, resolveContentListForCampaign } from './content.service'
 import { equipmentRegistration } from './equipment/equipment.config'
 import { featRegistration } from './feats/feats.config'
 import type { ContentTypeConfig } from './lib/content-type-config'
@@ -19,13 +23,25 @@ import { speciesRegistration } from './species/species.config'
 import { spellRegistration } from './spells/spells.config'
 import { monstersRegistration } from './monsters/monsters.config'
 
+type CampaignListResolution<T extends WriteEntityBase> = {
+  items: T[]
+  overlayFailures: CatalogOverlayListFailure[]
+}
+
+/** Pair custom campaign resolvers — list resolution must surface overlay failures. */
+export type CampaignResolverOverrides<T extends WriteEntityBase = WriteEntityBase> = {
+  resolveForCampaign: (campaignId: string) => Promise<T[]>
+  resolveListForCampaign: (campaignId: string) => Promise<CampaignListResolution<T>>
+}
+
 /** Bundled read + write wiring for one content type — the single extension point. */
-export interface ContentTypeRegistration<T extends WriteEntityBase = WriteEntityBase> {
+export type ContentTypeRegistration<T extends WriteEntityBase = WriteEntityBase> = {
   read: ContentTypeConfig<T>
   write: ContentWriteConfig<T>
-  /** Override default `resolveCatalogForCampaign` (classes only today). */
-  resolveForCampaign?: (campaignId: string) => Promise<T[]>
-}
+} & (
+  | { resolveForCampaign?: undefined; resolveListForCampaign?: undefined }
+  | CampaignResolverOverrides<T>
+)
 
 /**
  * The registry of content types. Adding a new type means authoring its
@@ -35,6 +51,7 @@ const CONTENT_TYPES = {
   classes: {
     ...classRegistration,
     resolveForCampaign: resolveClassesForCampaign,
+    resolveListForCampaign: resolveClassesListForCampaign,
   },
   equipment: equipmentRegistration,
   organizations: organizationRegistration,
@@ -77,6 +94,18 @@ export async function resolveContentForCampaign(
     return reg.resolveForCampaign(campaignId)
   }
   return resolveCatalogForCampaign(reg.read, campaignId)
+}
+
+/** List route kernel: entities plus overlay failures omitted from `items`. */
+export async function resolveContentListForCampaignType(
+  type: ContentTypeName,
+  campaignId: string,
+): Promise<CampaignListResolution<WriteEntityBase>> {
+  const reg = CONTENT_TYPES[type] as ContentTypeRegistration
+  if (reg.resolveListForCampaign) {
+    return reg.resolveListForCampaign(campaignId)
+  }
+  return resolveContentListForCampaign(reg.read, campaignId)
 }
 
 export { API_CONTENT_TYPE_KEYS, HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS }

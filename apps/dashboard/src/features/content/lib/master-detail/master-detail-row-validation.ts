@@ -4,15 +4,24 @@ import {
   collectArraySections,
   groupIssuesForItemPrefix,
   resolveSectionFieldOrder,
-  useFormValidationPresentation,
   type FormIssue,
   type FormItem,
 } from '@rpg/ui/form'
 
+import { useContentFormPresentationIssues } from '../forms/validation/content-form-presentation-issues.client'
 import {
   embeddedArrayResolverField,
   type EmbeddedArrayResolverFieldInput,
 } from '../forms/validation/tabbed-form-resolver-fields'
+
+/** Collection summary includes rows hidden by availability. Reveal changes the list, not the count. */
+export function countMasterDetailRowsWithIssues(
+  rows: readonly { item: { issueCount?: number } }[],
+  showRowBadges = true,
+): number {
+  if (!showRowBadges) return 0
+  return rows.filter((row) => (row.item.issueCount ?? 0) > 0).length
+}
 
 /** Visually-hidden validation state appended to a master-detail list row button. */
 export function masterDetailRowValidationStateLabel(count: number): string {
@@ -37,7 +46,7 @@ export function useMasterDetailRowValidation(
   const formValues = useWatch() as Record<string, unknown>
 
   const { issues, hasAttemptedSubmit, hasAttemptedPublish } =
-    useFormValidationPresentation(resolverFields)
+    useContentFormPresentationIssues(resolverFields)
 
   const showRowBadges = hasAttemptedSubmit || hasAttemptedPublish
 

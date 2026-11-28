@@ -93,6 +93,21 @@ Resolved spells with incomplete targeting semantics declare gap codes on
 [`spell-modeling-manifest.ts`](../../../../catalog/src/spells/spell-modeling-manifest.ts)
 and [`spell-modeling.md`](../../../../catalog/docs/spell-modeling.md)).
 
+## Advantage, disadvantage, and circumstances (blocked)
+
+Spell `resolution` effects today cover damage, healing, conditions (incomplete),
+and attack/save methods — not `creatureRollAdjustmentSchema`-shaped modifiers.
+When spell text grants advantage or disadvantage (or reacts to illumination or
+sunlight), that semantics should reuse the same grant payload as creature traits
+after spell resolution grows an emitter — not a parallel spell-only disadvantage
+schema.
+
+Until then, situational attack/save/check modifiers on spells stay prose or
+`modeling` gap codes. Runtime evaluation waits on the shared roll consumer
+documented under `creature-roll-adjustment-evaluation` in
+[srd-mechanical-coverage.md](../srd-mechanical-coverage.md). Spell reference ids
+remain [spell-reference-resolution.md](../spell-reference-resolution.md) only.
+
 ## Dashboard authoring
 
 Mode visibility matrix, cleanup rules, and form round-trip:

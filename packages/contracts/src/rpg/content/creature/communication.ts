@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
+import { overlayAtomic } from '../lib/system-overlay/annotate'
 import { SENSE_RANGES } from '../../vocab/sense'
 import { creatureTelepathyMessages } from './communication-messages'
 
@@ -9,11 +10,14 @@ export const TELEPATHY_MILE_FEET = 5280
 
 const SENSE_RANGE_PRESETS: readonly number[] = SENSE_RANGES
 
-export const creatureCommunicationSchema = z
-  .object({
-    telepathy: z.number().int().min(0).optional(),
-  })
-  .strict()
+export const creatureCommunicationSchema = overlayAtomic(
+  z
+    .object({
+      telepathy: z.number().int().min(0).optional(),
+    })
+    .strict(),
+  'telepathy range replaces wholesale',
+)
 
 export type CreatureCommunication = z.infer<typeof creatureCommunicationSchema>
 

@@ -1,10 +1,14 @@
+import { loadSeedSubclasses } from '@rpg/catalog/classes'
 import { type Agent } from 'supertest'
 import { describe, expect, it } from 'vitest'
+
+import { SUBCLASS_TARGET_OVERLAY_UNRESOLVED_ISSUE_CODE } from '@rpg/contracts'
 
 import { CSRF_HEADER } from '../../../lib/cookies'
 import { createTestCampaign, registerAndLoginTestUser } from '../../../test/auth-agent'
 import { minimalNpcRequestInput } from '../../../test/fixtures/npcs'
 import { useIntegrationApp } from '../../../test/setup/integration-app'
+import { SubclassPatchModel } from './subclass-patch.model'
 
 const getApp = useIntegrationApp()
 const FIGHTER_CLASS_ID = 'srd-cc-5.2.1:fighter'
@@ -178,6 +182,36 @@ describe('subclass write routes', () => {
       .set(CSRF_HEADER, csrfToken)
       .send({ classId: 'srd-cc-5.2.1:wizard', name: 'Mismatch' })
       .expect(400)
+  })
+
+  it('returns structured 409 when batch targets an unresolved subclass overlay', async () => {
+    const { agent, csrfToken } = await registerAndLogin()
+    const campaignId = await createTestCampaign(agent, csrfToken)
+    const champion = loadSeedSubclasses('srd-cc-5.2.1').find((row) => row.slug === 'champion')
+    expect(champion).toBeDefined()
+    if (!champion) return
+
+    await SubclassPatchModel.create({
+      campaignId,
+      targetId: champion.id,
+      patch: { name: 'Unversioned overlay' },
+    })
+
+    const res = await agent
+      .post(
+        `/api/campaigns/${campaignId}/content/classes/${FIGHTER_CLASS_ID}/subclasses/campaign-access-availability/batch`,
+      )
+      .set(CSRF_HEADER, csrfToken)
+      .send({ targets: [{ entityId: champion.id }] })
+      .expect(409)
+
+    expect(res.body.error?.code).toBe('unsupported_overlay_version')
+    expect(res.body.error?.details?.issues).toEqual([
+      expect.objectContaining({
+        path: 'targets.0.entityId',
+        code: SUBCLASS_TARGET_OVERLAY_UNRESOLVED_ISSUE_CODE,
+      }),
+    ])
   })
 
   it('rejects subclass batch requests when targets belong to a different parent class', async () => {

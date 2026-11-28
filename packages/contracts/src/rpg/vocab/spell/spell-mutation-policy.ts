@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { overlayAtomic } from '../../content/lib/system-overlay/annotate'
 import { REST_KIND_ENTRIES } from '../rest'
 import type { GameTermEntry, VocabularyTerm } from '../types'
 import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
@@ -46,7 +47,10 @@ export type SpellMutationOperation = keyof typeof SPELL_MUTATION_OPERATION_ENTRI
 
 export const spellMutationOperationSchema = vocabEnumFromEntries(SPELL_MUTATION_OPERATION_ENTRIES)
 
-export const spellMutationReplaceLimitSchema = z.union([z.number().int().min(1), z.literal('all')])
+export const spellMutationReplaceLimitSchema = overlayAtomic(
+  z.union([z.number().int().min(1), z.literal('all')]),
+  'spell replacement count or all',
+)
 
 export type SpellMutationReplaceLimit = z.infer<typeof spellMutationReplaceLimitSchema>
 

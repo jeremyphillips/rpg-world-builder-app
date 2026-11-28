@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { overlaySlugList } from '../../content/lib/system-overlay/overlay-presets'
 import { armorCategorySchema } from '../../vocab/armor/category'
 import { weaponCategorySchema } from '../../vocab/weapon/category'
 import { proficiencyGrantSetSchema } from './proficiency-grant-set'
@@ -10,13 +11,13 @@ import { proficiencyGrantSetSchema } from './proficiency-grant-set'
 // ---------------------------------------------------------------------------
 
 export const armorProficiencyGrantSetSchema = proficiencyGrantSetSchema.extend({
-  categories: z.array(armorCategorySchema).default([]),
+  categories: overlaySlugList(armorCategorySchema).default([]),
 })
 
 export type ArmorProficiencyGrantSet = z.infer<typeof armorProficiencyGrantSetSchema>
 
 export const weaponProficiencyGrantSetSchema = proficiencyGrantSetSchema.extend({
-  categories: z.array(weaponCategorySchema).default([]),
+  categories: overlaySlugList(weaponCategorySchema).default([]),
 })
 
 export type WeaponProficiencyGrantSet = z.infer<typeof weaponProficiencyGrantSetSchema>

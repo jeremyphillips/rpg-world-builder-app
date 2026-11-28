@@ -148,21 +148,6 @@ function findAncestorControlClaim(
   return undefined
 }
 
-function findDescendantControlClaim(
-  path: string,
-  context: RouteFormIssuesContext,
-): FormIssueClaim | undefined {
-  const descendant = context.orderedControlPaths.find((controlPath) => {
-    if (!controlPath.startsWith(`${path}.`) || controlPath === path) return false
-    const match = registryEntryAt(context.registry, controlPath)
-    return match !== undefined && canClaimEntry(match.entry, 'ancestor', controlPath, match.path)
-  })
-  if (!descendant) return undefined
-  const match = registryEntryAt(context.registry, descendant)
-  if (!match) return undefined
-  return buildClaim(descendant, claimKindForEntry(descendant, match.entry, context.slotPaths))
-}
-
 function findRowClaim(issue: FormIssue): FormIssueClaim | undefined {
   if (issue.itemPrefix) {
     return buildClaim(issue.itemPrefix, 'row')
@@ -209,7 +194,6 @@ function routeSingleIssue(issue: FormIssue, context: RouteFormIssuesContext): Fo
     findExactControlClaim(enriched.path, context) ??
     findSlotOwnershipClaim(enriched.path, context.slotOwnerships) ??
     findAncestorControlClaim(enriched.path, context) ??
-    findDescendantControlClaim(enriched.path, context) ??
     resolveFallbackClaim(enriched)
 
   const presentationPath =

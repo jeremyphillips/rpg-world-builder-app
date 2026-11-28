@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "hooks": {
+    "subagentStart": [
+      {
+        "command": "node tools/hooks/cursor-subagent-start-log.mjs"
+      }
+    ]
+  }
+}

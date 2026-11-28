@@ -39,6 +39,10 @@ lib/
                     #   root seam: organization-form-projection.ts
   form-options/     # Level, rich-text link options
   overview/         # List shell, table config, source badge; hooks/ subfolder
+                    #   overlay-unresolved synthetic rows: presentation-only (API owns failure visibility)
+  equipment/lib/    # equipment-family-overview-filter.lib — ruleset gates before classifying
+                    #   overlay failures by seed kind; ruleset lookup failure with overlay rows
+                    #   shows a warning and unclassified failure rows (not a full-page error)
   detail/           # page/, metadata/, section/, row/ — see feature-structure.md
   master-detail/    # Embedded array editor infra
   list/             # List API/query factories, content client
@@ -170,10 +174,13 @@ must not reorder. Monster **Defined forms** (`listReorder` on `FormEmbeddedMaste
 `FormEmbeddedMasterDetailEditor` requires separate `listTitle` (visible header),
 `ariaLabel` (nav accessible name), and `itemNoun` (`MasterDetailItemNounTerm` via
 `defineMasterDetailItemNoun` — drives list/detail empty copy and delete labels).
-Pass `ContentFormCtx.embeddedSeedRowIds`
-(populated on edit via `ContentFormDef.extractEmbeddedSeedRowIds`) so only seed
-rows lock on system entities; newly added rows show Homebrew and remain deletable
-from the detail overflow menu.
+`ContentFormCtx.embeddedSystemOriginRowIds` and `persistedIdentityRowIdsByPath`
+drive distinct row metadata on system entities. The edit shell freezes API
+`seedRowIdsByPath` as `embeddedSystemOriginRowIds` for seed-origin delete locks;
+`loadContentEditFormState` derives `persistedIdentityRowIdsByPath` from the
+effective entity and overlay policy. Persisted homebrew rows are therefore
+marked persisted without becoming seed-origin, and remain deletable from the
+detail overflow menu.
 
 Scope notes:
 
@@ -193,8 +200,8 @@ Scope notes:
   see [campaign-access/README.md](lib/campaign-access/README.md) and
   [availability.md](../../../docs/availability.md#persisted-campaign-access-nested-master-detail).
 
-`ContentFormCtx.entityCatalogLayer` (set by the create/edit shells) plus
-`embeddedSeedRowIds` lets the editor derive per-row delete-locking when the
+`ContentFormCtx.entityCatalogLayer` (set by the create/edit shells) plus the
+identity provenance fields above lets the editor derive per-row delete-locking when the
 embedded element has no own `source` (e.g. protecting a system class's saved
 features, starting equipment packages, species traits, or heritage options). The same
 policy applies to subclasses via `isSubclassDeletable`

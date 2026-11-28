@@ -17,6 +17,7 @@ import {
 } from '@rpg/ui/filters'
 
 import { getContentTypeMidSentenceLabel } from '../../content-type-labels'
+import { isContentOverlayFailureOverviewRow } from '../../list/content-overlay-overview.lib'
 import { useCanManageCampaign } from '@/features/campaign'
 import type { OverviewBulkAction } from '@/lib/overview/overview-bulk-actions-menu'
 import {
@@ -42,6 +43,7 @@ import {
 import {
   buildContentOverviewEmptyState,
   buildContentOverviewHiddenSupplement,
+  buildOverlayFailureAvailabilitySupplement,
 } from '../../campaign-access/overview/content-overview-availability-ui.lib'
 import { useContentOverviewBulkSelection } from './use-content-overview-bulk-selection'
 import {
@@ -158,7 +160,7 @@ export function useContentOverviewTable<
     selectionLiveRegionId,
     selectionLiveRegionMessage,
     selectionCapDescriptionId,
-    getRowCanSelect,
+    getRowCanSelect: canSelectWithinLimit,
     enterSelectionMode,
     handleExitSelectionMode: exitBulkSelectionMode,
     onRowSelectionChange,
@@ -192,6 +194,11 @@ export function useContentOverviewTable<
       }
     },
     [exitBulkSelectionMode, removeFromSelection],
+  )
+
+  const getRowCanSelect = useCallback(
+    (row: T) => !isContentOverlayFailureOverviewRow(row) && canSelectWithinLimit(row),
+    [canSelectWithinLimit],
   )
 
   const handleExitSelectionMode = useCallback(() => {
@@ -273,16 +280,38 @@ export function useContentOverviewTable<
   const tablePageSize: ContentOverviewPageSize =
     preferences.pageSize ?? CONTENT_OVERVIEW_PREFERENCES_DEFAULTS.pageSize ?? 20
 
-  const resultSupplement = useMemo(
-    () =>
-      buildContentOverviewHiddenSupplement({
-        scope,
-        campaignAvailability,
-        campaignAvailabilityFilterId,
-        actions,
-      }),
-    [actions, campaignAvailability, campaignAvailabilityFilterId, scope],
-  )
+  const hiddenOverlayFailureCount = useMemo(() => {
+    if (campaignAvailability !== 'unavailable') return 0
+    return discoveryFilteredData.filter(isContentOverlayFailureOverviewRow).length
+  }, [campaignAvailability, discoveryFilteredData])
+
+  const resultSupplement = useMemo(() => {
+    const unavailable = buildContentOverviewHiddenSupplement({
+      scope,
+      campaignAvailability,
+      campaignAvailabilityFilterId,
+      actions,
+    })
+    const overlay = buildOverlayFailureAvailabilitySupplement({
+      hiddenOverlayFailureCount,
+      campaignAvailability,
+      campaignAvailabilityFilterId,
+      actions,
+    })
+    if (!unavailable && !overlay) return null
+    if (unavailable && !overlay) return unavailable
+    if (!unavailable && overlay) return overlay
+    return {
+      label: `${unavailable!.label} · ${overlay!.label}`,
+      action: unavailable!.action ?? overlay!.action,
+    }
+  }, [
+    actions,
+    campaignAvailability,
+    campaignAvailabilityFilterId,
+    hiddenOverlayFailureCount,
+    scope,
+  ])
 
   const emptyState = useCallback(
     () =>

@@ -5,20 +5,25 @@ import {
   isApiValidationDetails,
 } from '@rpg/contracts'
 
+import { loadSeedSpells } from '@rpg/catalog/spells'
+
 import { makeTestCampaign } from '../../../test/fixtures/campaigns'
 import { minimalHomebrewMonsterInput } from '../../../test/fixtures/monsters'
 import { useIntegrationDb } from '../../../test/setup/integration-db'
 import { HttpError } from '../../../lib/http-error'
-import { resolveCatalogForCampaign } from '../content.service'
+import {
+  resolveCatalogForCampaign,
+  resolveCatalogForCampaignWithOverlayContext,
+} from '../content.service'
 import { promoteContentToPublished } from '../lib/content-status.service'
 import { createHomebrewContent, updateContentEntity } from '../lib/content-write.service'
 import { locationWriteConfig } from '../locations/locations.config'
 import { organizationWriteConfig } from '../organizations/organizations.config'
 import { speciesWriteConfig } from '../species/species.config'
-import { spellWriteConfig } from '../spells/spells.config'
+import { spellRegistration, spellWriteConfig } from '../spells/spells.config'
+import { SpellPatchModel } from '../spells/spell-patch.model'
 import { subclassWriteConfig } from '../subclasses/subclasses.config'
 import { ELDRITCH_BLAST_RESOLUTION } from '@rpg/contracts'
-import { MonsterPatchModel } from './monster-patch.model'
 import { monstersWriteConfig } from './monsters.config'
 import { monstersValidateBeforeWrite } from './monsters-write-hooks'
 
@@ -415,7 +420,7 @@ describe('monster write validation', () => {
     ).resolves.toBeUndefined()
   })
 
-  it('clears homebrew nulls and stores system-patch tombstones', async () => {
+  it('clears homebrew nulls on optional monster fields', async () => {
     const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(monstersWriteConfig, campaign.id, {
       ...minimalHomebrewMonsterInput,
@@ -431,44 +436,6 @@ describe('monster write validation', () => {
     })
     expect(cleared.hover).toBeUndefined()
     expect(cleared.experiencePointsOverride).toBeUndefined()
-
-    const catalog = await resolveCatalogForCampaign(monstersWriteConfig.readConfig, campaign.id)
-    const kobold = catalog.find(
-      (row) => row.slug === 'kobold-warrior' && row.catalogLayer === 'system',
-    )
-    expect(kobold).toBeDefined()
-    if (!kobold) return
-
-    await updateContentEntity(monstersWriteConfig, campaign.id, kobold.id, {
-      challengeRating: '0',
-      experiencePointsOverride: 0,
-    })
-    await updateContentEntity(monstersWriteConfig, campaign.id, kobold.id, {
-      challengeRating: '1/8',
-      experiencePointsOverride: null,
-    })
-
-    const stored = await MonsterPatchModel.findOne({
-      campaignId: campaign.id,
-      targetId: kobold.id,
-    }).lean()
-    expect(stored?.patch.experiencePointsOverride).toBeNull()
-
-    const afterOmit = await updateContentEntity(monstersWriteConfig, campaign.id, kobold.id, {
-      name: kobold.name,
-    })
-    expect(afterOmit.experiencePointsOverride).toBeUndefined()
-    const stillTombstoned = await MonsterPatchModel.findOne({
-      campaignId: campaign.id,
-      targetId: kobold.id,
-    }).lean()
-    expect(stillTombstoned?.patch.experiencePointsOverride).toBeNull()
-
-    const restored = await updateContentEntity(monstersWriteConfig, campaign.id, kobold.id, {
-      challengeRating: '0',
-      experiencePointsOverride: 0,
-    })
-    expect(restored.experiencePointsOverride).toBe(0)
   })
 
   it('publishes a weapon action that references unequipped equipment', async () => {
@@ -492,46 +459,6 @@ describe('monster write validation', () => {
     )
     const published = await promoteContentToPublished(monstersWriteConfig, campaign.id, created.id)
     expect(published.status).toBe('published')
-  })
-
-  it('preserves untouched action rows on a system patch and a no-op resave', async () => {
-    const campaign = await makeTestCampaign()
-    const catalog = await resolveCatalogForCampaign(monstersWriteConfig.readConfig, campaign.id)
-    const kobold = catalog.find(
-      (row) => row.slug === 'kobold-warrior' && row.catalogLayer === 'system',
-    )
-    expect(kobold).toBeDefined()
-    if (!kobold) return
-
-    const actions = kobold.actions.map((action, index) =>
-      index === 0 ? { ...action, name: 'Renamed strike' } : action,
-    )
-    const patch = {
-      senses: kobold.senses,
-      equipment: kobold.equipment,
-      traits: kobold.traits,
-      actions,
-      bonusActions: kobold.bonusActions,
-      reactions: kobold.reactions,
-    }
-    const saved = await updateContentEntity(monstersWriteConfig, campaign.id, kobold.id, patch)
-    expect(saved.actions[0]?.name).toBe('Renamed strike')
-    expect(saved.actions.slice(1)).toEqual(kobold.actions.slice(1))
-    expect(saved.bonusActions).toEqual(kobold.bonusActions)
-    expect(saved.reactions).toEqual(kobold.reactions)
-
-    const stored = await MonsterPatchModel.findOne({
-      campaignId: campaign.id,
-      targetId: kobold.id,
-    }).lean()
-    await updateContentEntity(monstersWriteConfig, campaign.id, kobold.id, patch)
-    const again = await MonsterPatchModel.findOne({
-      campaignId: campaign.id,
-      targetId: kobold.id,
-    }).lean()
-    expect(again?.patch.actions).toEqual(stored?.patch.actions)
-    expect(again?.patch.bonusActions).toEqual(stored?.patch.bonusActions)
-    expect(again?.patch.reactions).toEqual(stored?.patch.reactions)
   })
 })
 
@@ -801,14 +728,6 @@ describe('monster classification persistence', () => {
     expect(cleared.creatureFamilyIds).toBeUndefined()
     expect(cleared.classIds).toBeUndefined()
   })
-  it('clears a seeded class classification with a system patch tombstone', async () => {
-    const campaign = await makeTestCampaign()
-    const id = 'srd-cc-5.2.1:mage'
-    await updateContentEntity(monstersWriteConfig, campaign.id, id, { classIds: null })
-    const catalog = await resolveCatalogForCampaign(monstersWriteConfig.readConfig, campaign.id)
-    expect(catalog.find((row) => row.id === id)?.classIds).toBeUndefined()
-  })
-
   it('round-trips defined forms', async () => {
     const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(monstersWriteConfig, campaign.id, {
@@ -842,5 +761,118 @@ describe('monster classification persistence', () => {
         issues: expect.arrayContaining([expect.objectContaining({ path: 'creatureFamilyIds.0' })]),
       },
     })
+  })
+})
+
+function spellCastAction(spellId: string) {
+  return {
+    id: 'cast-spell',
+    kind: 'spell' as const,
+    name: 'Cast',
+    castingAbility: { kind: 'ability' as const, ability: 'int' as const },
+    spells: [{ spellId }],
+  }
+}
+
+describe('overlay reference isolation', () => {
+  it('publishes a monster that references a healthy spell while a sibling spell overlay is malformed', async () => {
+    const campaign = await makeTestCampaign()
+    const spells = loadSeedSpells('srd-cc-5.2.1')
+    const broken = spells.find((spell) => spell.slug === 'fire-bolt')
+    const healthy = spells.find((spell) => spell.slug === 'light')
+    expect(broken).toBeDefined()
+    expect(healthy).toBeDefined()
+    if (!broken || !healthy) return
+
+    await SpellPatchModel.create({
+      campaignId: campaign.id,
+      targetId: broken.id,
+      patch: { name: 'Unversioned overlay' },
+    })
+
+    const spellContext = await resolveCatalogForCampaignWithOverlayContext(
+      spellRegistration.read,
+      campaign.id,
+    )
+    expect(spellContext.overlayFailureIds.has(broken.id)).toBe(true)
+    expect(spellContext.records.some((spell) => spell.id === healthy.id)).toBe(true)
+    expect(spellContext.records.some((spell) => spell.id === broken.id)).toBe(false)
+
+    const created = await createHomebrewContent(
+      monstersWriteConfig,
+      campaign.id,
+      {
+        ...minimalHomebrewMonsterInput,
+        slug: 'healthy-spell-sibling',
+        actions: [...minimalHomebrewMonsterInput.actions, spellCastAction(healthy.id)],
+      },
+      { status: 'draft' },
+    )
+    const published = await promoteContentToPublished(monstersWriteConfig, campaign.id, created.id)
+    expect(published.status).toBe('published')
+  })
+
+  it('reports unresolved_overlay_spell when publishing a ref to a malformed spell overlay', async () => {
+    const campaign = await makeTestCampaign()
+    const broken = loadSeedSpells('srd-cc-5.2.1').find((spell) => spell.slug === 'fire-bolt')
+    expect(broken).toBeDefined()
+    if (!broken) return
+
+    await SpellPatchModel.create({
+      campaignId: campaign.id,
+      targetId: broken.id,
+      patch: { name: 'Unversioned overlay' },
+    })
+    const spellContext = await resolveCatalogForCampaignWithOverlayContext(
+      spellRegistration.read,
+      campaign.id,
+    )
+    expect(spellContext.overlayFailureIds.has(broken.id)).toBe(true)
+
+    try {
+      await createHomebrewContent(monstersWriteConfig, campaign.id, {
+        ...minimalHomebrewMonsterInput,
+        slug: 'unresolved-spell-ref',
+        actions: [...minimalHomebrewMonsterInput.actions, spellCastAction(broken.id)],
+      })
+      throw new Error('expected validation_error')
+    } catch (error) {
+      expect(error).toBeInstanceOf(HttpError)
+      const httpError = error as HttpError
+      expect(httpError.code).toBe('validation_error')
+      expect(httpError.details).toEqual({
+        issues: expect.arrayContaining([
+          expect.objectContaining({ code: 'unresolved_overlay_spell' }),
+        ]),
+      })
+      expect(JSON.stringify(httpError.details)).not.toContain('unknown_spell')
+    }
+  })
+
+  it('reports unknown_spell when publishing a ref to a missing spell id', async () => {
+    const campaign = await makeTestCampaign()
+    const missingId = 'missing-spell-id'
+    const spellContext = await resolveCatalogForCampaignWithOverlayContext(
+      spellRegistration.read,
+      campaign.id,
+    )
+    expect(spellContext.records.some((spell) => spell.id === missingId)).toBe(false)
+    expect(spellContext.overlayFailureIds.has(missingId)).toBe(false)
+
+    try {
+      await createHomebrewContent(monstersWriteConfig, campaign.id, {
+        ...minimalHomebrewMonsterInput,
+        slug: 'unknown-spell-ref',
+        actions: [...minimalHomebrewMonsterInput.actions, spellCastAction(missingId)],
+      })
+      throw new Error('expected validation_error')
+    } catch (error) {
+      expect(error).toBeInstanceOf(HttpError)
+      const httpError = error as HttpError
+      expect(httpError.code).toBe('validation_error')
+      expect(httpError.details).toEqual({
+        issues: expect.arrayContaining([expect.objectContaining({ code: 'unknown_spell' })]),
+      })
+    }
   })
 })

@@ -26,6 +26,7 @@ function hasStableId(value: unknown): value is { id: string; name: string } {
   return hasName(value) && typeof value.id === 'string' && value.id.length > 0
 }
 
+// fallow-ignore-next-line complexity
 function stableIdentifiedArray(
   incoming: unknown[] | undefined,
   existing?: unknown[],
@@ -39,20 +40,36 @@ function stableIdentifiedArray(
     assertStableContentIds(existingRows, incoming.filter(hasStableId))
   }
 
-  return assignStableContentIds(incomingRows, existingRows).map((row) => {
-    if (!Array.isArray(row.options)) return row
-
-    const existingRow = existingRows.find((candidate) => candidate.id === row.id)
-    const existingOptions =
-      existingRow && 'options' in existingRow && Array.isArray(existingRow.options)
-        ? existingRow.options
-        : undefined
-
-    return {
-      ...row,
-      options: stableIdentifiedArray(row.options, existingOptions) ?? row.options,
+  const assigned = assignStableContentIds(incomingRows, existingRows)
+  let namedIndex = 0
+  const stabilized: unknown[] = []
+  for (const row of incoming) {
+    if (hasName(row)) {
+      const named = assigned[namedIndex]
+      namedIndex += 1
+      if (!named) continue
+      if (!Array.isArray(named.options)) {
+        stabilized.push(named)
+        continue
+      }
+      const existingRow = existingRows.find((candidate) => candidate.id === named.id)
+      const existingOptions =
+        existingRow && 'options' in existingRow && Array.isArray(existingRow.options)
+          ? existingRow.options
+          : undefined
+      stabilized.push({
+        ...named,
+        options: stableIdentifiedArray(named.options, existingOptions) ?? named.options,
+      })
+      continue
     }
-  })
+    // Preset monster traits have an id and no name. Dropping them made a
+    // traits update look like a request that only contained named rows.
+    if (isRecord(row) && typeof row.id === 'string' && row.id.length > 0) {
+      stabilized.push(row)
+    }
+  }
+  return stabilized
 }
 
 function forceRegenerateIdentifiedArray(

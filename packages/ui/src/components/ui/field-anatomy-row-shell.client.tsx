@@ -6,13 +6,35 @@ import type { FieldLabelVisibility } from '../../form/form-heading.lib'
 import { FieldRadiogroupLabel } from './field-label-content'
 import type { FieldControlBand } from './field-control-band.variants'
 import { resolveFieldAnatomyWidth, type FieldChrome } from './field-chrome.variants'
-import { Field, type FieldSize } from './field.client'
+import { Field, type FieldSize, useFieldRootContext } from './field.client'
 import type { FieldWidth } from './field-control.variants'
 import { FieldLayout } from './field-layout'
 import type { FieldHintPosition } from './field.variants'
 
 export type FieldAnatomyRowControlProps = {
   labelId: string | undefined
+}
+
+function FieldAnatomyRowControlGroup({
+  labelId,
+  showFieldLabel,
+  children,
+}: {
+  labelId: string
+  showFieldLabel: boolean
+  children: ReactNode
+}) {
+  const { describedBy, hasError } = useFieldRootContext('FieldAnatomyRowShell')
+  return (
+    <div
+      role="group"
+      aria-labelledby={showFieldLabel ? labelId : undefined}
+      aria-describedby={describedBy}
+      aria-invalid={hasError || undefined}
+    >
+      {children}
+    </div>
+  )
 }
 
 export interface FieldAnatomyRowShellProps {
@@ -90,9 +112,9 @@ export function FieldAnatomyRowShell({
           ) : null
         }
         control={
-          <div role="group" aria-labelledby={showFieldLabel ? labelId : undefined}>
+          <FieldAnatomyRowControlGroup labelId={labelId} showFieldLabel={showFieldLabel}>
             {children({ labelId: showFieldLabel ? labelId : undefined })}
-          </div>
+          </FieldAnatomyRowControlGroup>
         }
       />
     </Field.Root>

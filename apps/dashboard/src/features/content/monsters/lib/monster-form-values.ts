@@ -31,7 +31,9 @@ import type { MonsterHitPointStash } from './statistics/monster-variant-transiti
 import type { WeaponProficiencyMode } from '../../classes/lib/class-form-constants'
 import type { ContentFormInputCtx } from '../../lib/forms/registry/content-form-registry'
 import {
+  movementAlternativeRecordToForm,
   movementRecordToRows,
+  type MovementAlternativeFormValues,
   type MovementRowDraftFormValues,
 } from '../../lib/forms/fields/content-movement-form-fields'
 import {
@@ -44,6 +46,13 @@ import {
   withDefaultSaveResolutionTarget,
   withSaveOutcomeSlots,
 } from './actions/save/monster-save-resolution-target.lib'
+import type { ContentPreparedWrite } from '../../lib/forms/submit/content-prepared-write.types'
+import {
+  createProvenanceAccumulator,
+  finishProvenanceAccumulator,
+  mergeProvenancePart,
+  type ProvenanceAccumulator,
+} from '../../lib/forms/submit/accumulate-prepared-write-provenance.lib'
 import {
   normalizeMonsterFormValues,
   type MonsterNormalizeBaseline,
@@ -87,6 +96,7 @@ export type MonsterFormValues = FieldValues & {
   }
   hitPoints: Monster['hitPoints'] | { kind: 'fixed'; average?: number; formula?: string }
   movement: MovementRowDraftFormValues[]
+  movementAlternative?: MovementAlternativeFormValues
   hover?: boolean
   senses: Array<{ type: Monster['senses'][number]['type']; range?: number }>
   communication: Monster['communication']
@@ -234,6 +244,9 @@ export function monsterToFormValues(
     hitPoints: entity.hitPoints,
     ...hitPointsAuthoringFromEntity(entity),
     movement: movementRecordToRows(entity.movement),
+    ...(entity.movementAlternative
+      ? { movementAlternative: movementAlternativeRecordToForm(entity.movementAlternative) }
+      : {}),
     hover: entity.hover,
     senses: entity.senses ?? [],
     communication: entity.communication ?? {},
@@ -282,10 +295,32 @@ export function monsterToFormValues(
   return values
 }
 
-function baselineFromEntity(entity: Monster | undefined): MonsterNormalizeBaseline | undefined {
+/**
+ * Lists whose absence must survive update schema defaults. `monsterBodySchema`
+ * fills a missing array with `[]`, and a system patch stores that as a clear.
+ */
+const MONSTER_SYSTEM_PATCH_LIST_KEYS = ['traits', 'actions', 'bonusActions', 'reactions'] as const
+
+function omitAbsentSystemPatchLists(
+  parsed: Record<string, unknown>,
+  normalized: Record<string, unknown>,
+  entity: Monster | undefined,
+): Record<string, unknown> {
+  if (entity?.catalogLayer !== 'system') return parsed
+  const next = { ...parsed }
+  for (const key of MONSTER_SYSTEM_PATCH_LIST_KEYS) {
+    if (!Object.prototype.hasOwnProperty.call(normalized, key)) delete next[key]
+  }
+  return next
+}
+
+export function baselineFromEntity(
+  entity: Monster | undefined,
+): MonsterNormalizeBaseline | undefined {
   if (!entity) return undefined
   return {
     hover: entity.hover,
+    movementAlternative: entity.movementAlternative,
     creatureFamilyIds: entity.creatureFamilyIds,
     classIds: entity.classIds,
     description: entity.description,
@@ -298,12 +333,14 @@ export function buildMonsterInput(
   values: MonsterFormValues,
   ctx: ContentFormInputCtx<Monster> | undefined,
   validationIntent: ContentValidationIntent,
+  provenance?: ProvenanceAccumulator,
 ): CreateMonsterInput {
   const normalized = normalizeMonsterFormValues(values, {
     baseline: baselineFromEntity(ctx?.entity),
     intent: validationIntent,
     mode: ctx?.entity ? 'update' : 'create',
     armorClassRules: ctx?.armorClassRules,
+    provenance,
   })
   const slug = slugForInputParse(
     typeof normalized.name === 'string' ? normalized.name : values.name,
@@ -317,5 +354,20 @@ export function buildMonsterInput(
     : validationIntent === 'draft'
       ? createMonsterDraftInputSchema
       : createMonsterInputSchema
-  return finalizeContentInput(schema.parse(payload), ctx) as CreateMonsterInput
+  const parsed = schema.parse(payload) as Record<string, unknown>
+  return finalizeContentInput(
+    omitAbsentSystemPatchLists(parsed, normalized, ctx?.entity),
+    ctx,
+  ) as CreateMonsterInput
+}
+
+export function buildMonsterPreparedWrite(
+  values: MonsterFormValues,
+  ctx: ContentFormInputCtx<Monster> | undefined,
+  validationIntent: ContentValidationIntent,
+): ContentPreparedWrite<CreateMonsterInput> {
+  const acc = createProvenanceAccumulator()
+  const payload = buildMonsterInput(values, ctx, validationIntent, acc)
+  mergeProvenancePart(acc, { pathMap: { name: 'slug' } })
+  return { payload, provenance: finishProvenanceAccumulator(acc) }
 }

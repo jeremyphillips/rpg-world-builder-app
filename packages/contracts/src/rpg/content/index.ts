@@ -26,6 +26,13 @@ export * from './monster/form-availability'
 export * from './monster/forms-plan'
 export * from './monster/action/action-removal-plan'
 export * from './creature/trait-presets'
+export {
+  parseMonsterPresetTraitDraftForFormat,
+  parseMonsterPresetTraitForFormat,
+  type MonsterPresetTrait,
+  type MonsterPresetTraitDraft,
+  type MonsterPresetTraitForFormat,
+} from './creature/trait-preset-schema'
 export type { CreatureTraitDurationUnit } from './creature/trait-duration'
 export * from './creature/effects'
 export * from './creature/traits'

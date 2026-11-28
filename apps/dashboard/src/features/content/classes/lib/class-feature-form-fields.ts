@@ -9,7 +9,11 @@ import {
   type ClassFeatureKind,
 } from '@rpg/contracts'
 import { normalizeRichTextHtml } from '@rpg/ui'
-import { type FormItem } from '@rpg/ui/form'
+import {
+  collectRowVariantTopologyFields,
+  type ArrayRowVariantTopology,
+  type FormItem,
+} from '@rpg/ui/form'
 
 import {
   appendGrantCountSummaryPart,
@@ -199,11 +203,32 @@ const CLASS_FEATURE_KIND_FIELD_SECTIONS = {
   (ctx: ContentFormCtx, options?: FeatureFieldOptions) => MasterDetailItemFieldSections
 >
 
-function assertClassFeatureKind(
-  row: Pick<FeatureRowForm, 'kind'> | undefined,
-): asserts row is Pick<FeatureRowForm, 'kind'> & { kind: ClassFeatureKind } {
-  if (!row?.kind) {
-    throw new Error('Class feature row is missing kind')
+function classFeatureMalformedFieldSections(
+  ctx: ContentFormCtx,
+  options?: FeatureFieldOptions,
+): MasterDetailItemFieldSections {
+  return {
+    leading: [featureLevelRow(ctx, options)],
+    primary: [
+      {
+        type: 'text',
+        name: 'name',
+        label: 'Name',
+        required: true,
+      },
+      {
+        type: 'select',
+        name: 'kind',
+        label: 'Kind',
+        options: [
+          { value: 'custom', label: 'Custom' },
+          { value: 'asi', label: 'ASI' },
+          { value: 'spellcasting', label: 'Spellcasting' },
+          { value: 'subclass-choice', label: 'Subclass choice' },
+        ],
+        required: true,
+      },
+    ],
   }
 }
 
@@ -212,8 +237,31 @@ export function resolveClassFeatureFieldSections(
   ctx: ContentFormCtx,
   options?: FeatureFieldOptions,
 ): MasterDetailItemFieldSections {
-  assertClassFeatureKind(row)
+  if (!row?.kind) {
+    return classFeatureMalformedFieldSections(ctx, options)
+  }
   return CLASS_FEATURE_KIND_FIELD_SECTIONS[row.kind](ctx, options)
+}
+
+export function buildClassFeatureRowVariantTopology(
+  ctx: ContentFormCtx,
+  options?: FeatureFieldOptions,
+): ArrayRowVariantTopology {
+  const kinds = [
+    'custom',
+    'asi',
+    'spellcasting',
+    'subclass-choice',
+  ] as const satisfies readonly ClassFeatureKind[]
+  const variants = Object.fromEntries(
+    kinds.map((kind) => [kind, resolveClassFeatureItemFields({ kind }, ctx, options)]),
+  ) as Record<string, FormItem[]>
+
+  return {
+    shared: [{ type: 'text', name: 'name', label: 'Name', required: true }],
+    variants,
+    fallback: resolveClassFeatureItemFields({ kind: 'custom' }, ctx, options),
+  }
 }
 
 export function resolveClassFeatureItemFields(
@@ -251,12 +299,12 @@ export function subclassFeatureItemFields(
   ]
 }
 
-/** Default field list for validation wiring and empty-row templates. */
+/** Union of declared row variants for validation wiring and empty-row templates. */
 export function classFeatureItemFields(
   ctx: ContentFormCtx,
   options?: FeatureFieldOptions,
 ): FormItem[] {
-  return resolveClassFeatureItemFields({ kind: 'custom' }, ctx, options)
+  return collectRowVariantTopologyFields(buildClassFeatureRowVariantTopology(ctx, options))
 }
 
 function optionalRichTextField(value: string | undefined): string | undefined {

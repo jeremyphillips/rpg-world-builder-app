@@ -22,10 +22,8 @@ import {
   type CreateIdentityValues,
   type FlavorValues,
 } from '../lib/settings/campaign-profile-form-fields'
-import {
-  buildCreateCampaignInput,
-  type CampaignCreateValues,
-} from '../lib/settings/campaign-settings-form-values'
+import { buildCreateCampaignInput } from '../lib/settings/campaign-settings-form-values'
+import { validateCampaignCreateValues } from '../lib/campaign-create-validation.lib'
 import {
   attachCampaignBannerMedia,
   readImageFileDimensions,
@@ -66,7 +64,18 @@ export function CampaignCreate() {
 
   const onComplete = async (values: Record<string, unknown>) => {
     setCreateError(null)
-    const createValues = values as CampaignCreateValues
+
+    const validated = await validateCampaignCreateValues(values)
+    if (validated.kind === 'invalid') {
+      setCreateError('Complete required fields before creating the campaign.')
+      return
+    }
+    if (validated.kind === 'operation-failure') {
+      setCreateError(validated.message)
+      return
+    }
+
+    const createValues = validated.data
 
     try {
       if (createValues.banner?.[0]) {

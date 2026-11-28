@@ -1,10 +1,15 @@
 import { useMemo, type ReactNode } from 'react'
 import { useParams } from 'react-router-dom'
 import { Heading, Icon, Spinner, Text } from '@rpg/ui'
-import { TabbedForm, FormSaveFooter, type TabbedFormTab } from '@rpg/ui/form'
+import {
+  TabbedForm,
+  FormSaveFooter,
+  collectTabbedFormResolverItems,
+  type TabbedFormTab,
+} from '@rpg/ui/form'
 
 import { PageShell } from '@/components/layout/page/page-shell'
-import { useSubmitHandler } from '@/lib/use-submit-handler'
+import { useRunnerFormSubmit } from '@/lib/runner-form-submit.lib'
 import { notifySaveSuccess } from '@/lib/notify'
 import { FormUnsavedChangesGuard } from '@/lib/form-unsaved-changes-guard'
 import { useLocations } from '@/features/content'
@@ -73,11 +78,28 @@ export function CampaignSettings() {
     ]
   }, [campaignId, locations])
 
-  const { onSubmit, formError } = useSubmitHandler<CampaignSettingsValues>(async (values, form) => {
-    await mutateAsync(buildUpdateCampaignInput(values))
-    form.reset(values)
-    notifySaveSuccess()
-  }, 'Could not save campaign.')
+  const resolverFields = useMemo(() => collectTabbedFormResolverItems(tabs), [tabs])
+
+  const { onSubmit, formError, ProducerBoundary } = useRunnerFormSubmit<CampaignSettingsValues>({
+    schema: campaignSettingsSchema,
+    resolverFields,
+    formId: `campaign-settings-${campaign?.id ?? campaignId ?? 'new'}`,
+    invalidPresentation: {
+      resolverFields,
+      formId: `campaign-settings-${campaign?.id ?? campaignId ?? 'new'}`,
+      resolveViewForPath: (path) => {
+        if (path.startsWith('flavor') || path === 'description') return 'flavor'
+        if (path.startsWith('world') || path === 'defaultLocationId') return 'world'
+        return 'identity'
+      },
+    },
+    fallbackMessage: 'Could not save campaign.',
+    persist: async (values, form) => {
+      await mutateAsync(buildUpdateCampaignInput(values))
+      form.reset(values)
+      notifySaveSuccess()
+    },
+  })
 
   let body: ReactNode
 
@@ -100,6 +122,8 @@ export function CampaignSettings() {
         onSubmit={onSubmit}
         formError={formError}
         documentScroll
+        publishPresentationEnabled
+        producerBoundary={ProducerBoundary}
         footer={(form) => (
           <>
             <FormUnsavedChangesGuard />

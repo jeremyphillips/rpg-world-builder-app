@@ -12,7 +12,7 @@ export type RegistryLookup = {
 
 /** Field lookup keyed by dot path. Concrete array indexes and `*` keys both resolve. */
 export function buildFieldRegistry(
-  items: FormItem[],
+  items: readonly FormItem[],
   formValues?: Record<string, unknown>,
 ): Map<string, RegistryEntry> {
   const registry = new Map<string, RegistryEntry>()

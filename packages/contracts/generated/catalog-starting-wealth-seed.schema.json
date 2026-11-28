@@ -98,48 +98,21 @@
                       "type": "object",
                       "properties": {
                         "count": {
-                          "type": "integer",
-                          "minimum": 1,
-                          "maximum": 9007199254740991
+                          "$ref": "#/definitions/__schema3"
                         },
                         "faces": {
-                          "anyOf": [
-                            {
-                              "type": "number",
-                              "const": 4
-                            },
-                            {
-                              "type": "number",
-                              "const": 6
-                            },
-                            {
-                              "type": "number",
-                              "const": 8
-                            },
-                            {
-                              "type": "number",
-                              "const": 10
-                            },
-                            {
-                              "type": "number",
-                              "const": 12
-                            },
-                            {
-                              "type": "number",
-                              "const": 20
-                            },
-                            {
-                              "type": "number",
-                              "const": 100
-                            }
-                          ]
+                          "$ref": "#/definitions/__schema4"
                         }
                       },
                       "required": [
                         "count",
                         "faces"
                       ],
-                      "additionalProperties": false
+                      "additionalProperties": false,
+                      "overlay": {
+                        "kind": "atomic",
+                        "reason": "dice expression replaces wholesale"
+                      }
                     },
                     "multiplier": {
                       "type": "integer",
@@ -181,7 +154,7 @@
           "default": [],
           "allOf": [
             {
-              "$ref": "#/definitions/__schema3"
+              "$ref": "#/definitions/__schema12"
             }
           ]
         }
@@ -202,6 +175,68 @@
       "maximum": 100
     },
     "__schema3": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "__schema4": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/__schema5"
+        },
+        {
+          "$ref": "#/definitions/__schema6"
+        },
+        {
+          "$ref": "#/definitions/__schema7"
+        },
+        {
+          "$ref": "#/definitions/__schema8"
+        },
+        {
+          "$ref": "#/definitions/__schema9"
+        },
+        {
+          "$ref": "#/definitions/__schema10"
+        },
+        {
+          "$ref": "#/definitions/__schema11"
+        }
+      ],
+      "overlay": {
+        "kind": "atomic",
+        "reason": "die face literal"
+      }
+    },
+    "__schema5": {
+      "type": "number",
+      "const": 4
+    },
+    "__schema6": {
+      "type": "number",
+      "const": 6
+    },
+    "__schema7": {
+      "type": "number",
+      "const": 8
+    },
+    "__schema8": {
+      "type": "number",
+      "const": 10
+    },
+    "__schema9": {
+      "type": "number",
+      "const": 12
+    },
+    "__schema10": {
+      "type": "number",
+      "const": 20
+    },
+    "__schema11": {
+      "type": "number",
+      "const": 100
+    },
+    "__schema12": {
       "type": "array",
       "items": {
         "type": "object",

@@ -1,5 +1,13 @@
+import { useMemo } from 'react'
 import { useQuery, type UseQueryResult } from '@tanstack/react-query'
-import type { ContentOverviewUsageScope, ContentUsageSummaryLabels } from '@rpg/contracts'
+import type {
+  CatalogOverlayListFailure,
+  ContentOverviewUsageScope,
+  ContentStatus,
+  ContentUsageSummaryLabels,
+  ResolvedContentCampaignAccess,
+} from '@rpg/contracts'
+import { CONTENT_OVERLAY_FAILURE_ROW_CAMPAIGN_ACCESS } from './content-overlay-overview.lib'
 
 import { request } from '@/lib/api-client'
 
@@ -13,8 +21,52 @@ export type ContentListConfig = {
 
 export type ContentListResult<T> = {
   items: T[]
+  overlayFailures?: CatalogOverlayListFailure[]
   usageSummaryLabels?: ContentUsageSummaryLabels
   overviewUsageScope?: ContentOverviewUsageScope
+}
+
+/** Synthetic overview row for system records whose overlay could not be applied. */
+export type ContentOverlayFailureOverviewRow = {
+  id: string
+  name: string
+  slug: string
+  status: ContentStatus
+  catalogLayer: 'system'
+  campaignAccess: ResolvedContentCampaignAccess
+  overlayListFailure: CatalogOverlayListFailure
+  contentOverlayResolveFailure: true
+}
+
+export function overlayFailureOverviewRows(
+  failures: readonly CatalogOverlayListFailure[] | undefined,
+): ContentOverlayFailureOverviewRow[] {
+  if (!failures?.length) return []
+  // Structural `WithCampaignAccess` only — `isContentOverlayFailureOverviewRow` owns unresolved UX.
+  return failures.map((failure) => ({
+    id: failure.targetId,
+    name: failure.name,
+    slug: failure.slug,
+    status: 'published' as const,
+    catalogLayer: 'system' as const,
+    campaignAccess: CONTENT_OVERLAY_FAILURE_ROW_CAMPAIGN_ACCESS,
+    overlayListFailure: failure,
+    contentOverlayResolveFailure: true as const,
+  }))
+}
+
+export function mergeContentListOverviewRows<T extends { id: string }>(
+  items: readonly T[],
+  failures: readonly CatalogOverlayListFailure[] | undefined,
+): Array<T | ContentOverlayFailureOverviewRow> {
+  return [...items, ...overlayFailureOverviewRows(failures)]
+}
+
+export function findContentOverlayListFailure(
+  failures: readonly CatalogOverlayListFailure[] | undefined,
+  entityId: string,
+): CatalogOverlayListFailure | undefined {
+  return failures?.find((failure) => failure.targetId === entityId)
 }
 
 export type ContentListUsageMeta = {
@@ -24,7 +76,11 @@ export type ContentListUsageMeta = {
 
 type ContentListResponseBody<T> = Record<
   string,
-  T[] | ContentUsageSummaryLabels | ContentOverviewUsageScope | undefined
+  | T[]
+  | CatalogOverlayListFailure[]
+  | ContentUsageSummaryLabels
+  | ContentOverviewUsageScope
+  | undefined
 >
 
 export function createContentListApi<T>(config: ContentListConfig) {
@@ -36,8 +92,10 @@ export function createContentListApi<T>(config: ContentListConfig) {
       undefined,
       errorMessage,
     )
+    const overlayFailures = body.overlayFailures as CatalogOverlayListFailure[] | undefined
     return {
       items: (body[responseKey] as T[]) ?? [],
+      ...(overlayFailures?.length ? { overlayFailures } : {}),
       ...(body.usageSummaryLabels
         ? { usageSummaryLabels: body.usageSummaryLabels as ContentUsageSummaryLabels }
         : {}),
@@ -47,6 +105,11 @@ export function createContentListApi<T>(config: ContentListConfig) {
     }
   }
 }
+
+export type ContentListFullQueryResult<T> = Pick<
+  UseQueryResult<ContentListResult<T>>,
+  'data' | 'isPending' | 'isError'
+>
 
 export function createContentQueryHook<T>(
   config: ContentListConfig,
@@ -81,5 +144,30 @@ export function createContentQueryHook<T>(
     })
   }
 
-  return { queryKey, useQuery: useQueryHook, useUsageMeta }
+  /** Full list payload — edit shell and overview failure rows. */
+  function useListQueryResult(campaignId: string | undefined): ContentListFullQueryResult<T> {
+    return useQuery({
+      queryKey: campaignId ? queryKey(campaignId) : [],
+      queryFn: () => listFn(campaignId!),
+      enabled: Boolean(campaignId),
+    })
+  }
+
+  return { queryKey, useQuery: useQueryHook, useUsageMeta, useListQueryResult }
+}
+
+/** Merges healthy list items with synthetic overlay-failure overview rows. */
+export function useContentOverviewMergedData<T extends { id: string }>(
+  listResult: ContentListFullQueryResult<T>,
+) {
+  const data = useMemo(
+    () =>
+      mergeContentListOverviewRows(listResult.data?.items ?? [], listResult.data?.overlayFailures),
+    [listResult.data],
+  )
+  return {
+    data,
+    isPending: listResult.isPending,
+    isError: listResult.isError,
+  }
 }

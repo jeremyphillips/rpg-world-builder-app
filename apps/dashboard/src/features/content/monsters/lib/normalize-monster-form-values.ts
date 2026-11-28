@@ -24,6 +24,7 @@ import { weaponActionDamageToDraft } from './actions/weapon/monster-weapon-damag
 
 import { applyEffectEndAuthoringToRow } from '../../lib/forms/mechanics/normalize-effect-end-authoring'
 import {
+  movementAlternativeFormToSchema,
   movementRecordToRows,
   movementRowsToRecordForPreview,
 } from '../../lib/forms/fields/content-movement-form-fields'
@@ -34,6 +35,8 @@ import {
   coerceCreatureWeaponProficienciesForForm,
   MONSTER_DEFAULT_WEAPON_PROFICIENCY_MODE,
 } from './creature-details/monster-weapon-proficiencies-form.lib'
+import type { ProvenanceAccumulator } from '../../lib/forms/submit/accumulate-prepared-write-provenance.lib'
+import { recordArrayCompaction } from '../../lib/forms/submit/accumulate-prepared-write-provenance.lib'
 import type { MonsterFormValues } from './monster-form-values'
 
 export type MonsterNormalizeBaseline = {
@@ -42,6 +45,7 @@ export type MonsterNormalizeBaseline = {
   hover?: boolean
   description?: string
   experiencePointsOverride?: number
+  movementAlternative?: Monster['movementAlternative']
   lair?: Monster['lair']
 }
 
@@ -50,6 +54,8 @@ export type NormalizeMonsterFormOptions = {
   intent: ContentValidationIntent
   mode?: 'create' | 'update'
   armorClassRules?: ArmorClassRules
+  /** When set, filter/compact traversals record source row identity for API issue attribution. */
+  provenance?: ProvenanceAccumulator
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -200,12 +206,21 @@ function effectRowForKind(row: Record<string, unknown>): Record<string, unknown>
 }
 
 /** Drops an untouched effect shell. A started row stays, including an incomplete one. */
-function omitEmptyOnHit(cleaned: Record<string, unknown>): void {
+function omitEmptyOnHit(
+  cleaned: Record<string, unknown>,
+  provenance: ProvenanceAccumulator | undefined,
+  effectsPath: string | undefined,
+): void {
   if (!isRecord(cleaned.onHit)) return
   const rows = cleaned.onHit.effects
   if (!Array.isArray(rows)) {
     delete cleaned.onHit
     return
+  }
+  if (provenance && effectsPath) {
+    recordArrayCompaction(provenance, effectsPath, rows.length, (index) =>
+      effectRowHasInput(rows[index]),
+    )
   }
   const authored = rows
     .filter(effectRowHasInput)
@@ -248,8 +263,20 @@ function keepMultiattackLiteralTrue(record: Record<string, unknown>, key: string
   else delete record[key]
 }
 
-function filterMultiattackChoiceRows(rows: unknown): unknown[] {
+function filterMultiattackChoiceRows(
+  rows: unknown,
+  provenance: ProvenanceAccumulator | undefined,
+  collectionPath: string | undefined,
+): unknown[] {
   if (!Array.isArray(rows)) return []
+  if (provenance && collectionPath) {
+    recordArrayCompaction(provenance, collectionPath, rows.length, (index) => {
+      const row = rows[index]
+      if (!isRecord(row)) return false
+      const actionId = row.actionId
+      return typeof actionId === 'string' && actionId.trim().length > 0
+    })
+  }
   return rows
     .filter((row) => {
       if (!isRecord(row)) return false
@@ -270,7 +297,11 @@ function normalizeMultiattackAttackGroupStep(step: Record<string, unknown>): voi
   else delete step.count
 }
 
-function normalizeMultiattackUseStepRow(step: Record<string, unknown>): void {
+function normalizeMultiattackUseStepRow(
+  step: Record<string, unknown>,
+  provenance: ProvenanceAccumulator | undefined,
+  choicesPath: string | undefined,
+): void {
   step.kind = 'use'
   delete step.actionIds
   if (step.mode !== 'single' && step.mode !== 'choice') step.mode = 'single'
@@ -281,27 +312,40 @@ function normalizeMultiattackUseStepRow(step: Record<string, unknown>): void {
     keepMultiattackLiteralTrue(step, 'optional')
     if (step.actionId === '') delete step.actionId
   } else {
-    step.choices = filterMultiattackChoiceRows(step.choices)
+    step.choices = filterMultiattackChoiceRows(step.choices, provenance, choicesPath)
   }
   delete step.whenAvailable
 }
 
-function normalizeMultiattackDraftStep(step: Record<string, unknown>): void {
+function normalizeMultiattackDraftStep(
+  step: Record<string, unknown>,
+  provenance: ProvenanceAccumulator | undefined,
+  choicesPath: string | undefined,
+): void {
   if (!isMultiattackUseClause(step)) {
     normalizeMultiattackAttackGroupStep(step)
     return
   }
-  normalizeMultiattackUseStepRow(step)
+  normalizeMultiattackUseStepRow(step, provenance, choicesPath)
 }
 
-function applyMultiattackDraft(cleaned: Record<string, unknown>): void {
+function applyMultiattackDraft(
+  cleaned: Record<string, unknown>,
+  provenance: ProvenanceAccumulator | undefined,
+  pathPrefix: string | undefined,
+): void {
   if (cleaned.kind !== 'multiattack') return
 
   if (Array.isArray(cleaned.steps)) {
-    cleaned.steps = cleaned.steps.map((step) => {
+    cleaned.steps = cleaned.steps.map((step, stepIndex) => {
       if (!isRecord(step)) return step
       const next = { ...step }
-      normalizeMultiattackDraftStep(next)
+      const stepPath = pathPrefix ? `${pathPrefix}.steps.${stepIndex}` : undefined
+      const choicesPath =
+        stepPath && isMultiattackUseClause(next) && next.mode === 'choice'
+          ? `${stepPath}.choices`
+          : undefined
+      normalizeMultiattackDraftStep(next, provenance, choicesPath)
       return next
     })
   }
@@ -312,7 +356,12 @@ function applyMultiattackDraft(cleaned: Record<string, unknown>): void {
     if (count) replacement.count = count
     else delete replacement.count
     if (replacement.replacesActionId === '') delete replacement.replacesActionId
-    replacement.choices = filterMultiattackChoiceRows(replacement.choices)
+    const replacementChoicesPath = pathPrefix ? `${pathPrefix}.replacement.choices` : undefined
+    replacement.choices = filterMultiattackChoiceRows(
+      replacement.choices,
+      provenance,
+      replacementChoicesPath,
+    )
     if (replacement.attackWord === true) replacement.attackWord = 'any'
     if (replacement.attackWord !== 'any') delete replacement.attackWord
     delete replacement.whenAvailable
@@ -322,10 +371,15 @@ function applyMultiattackDraft(cleaned: Record<string, unknown>): void {
   if (isRecord(cleaned.alternative)) {
     const alternative = { ...cleaned.alternative }
     if (Array.isArray(alternative.steps)) {
-      alternative.steps = alternative.steps.map((step) => {
+      alternative.steps = alternative.steps.map((step, stepIndex) => {
         if (!isRecord(step)) return step
         const next = { ...step }
-        normalizeMultiattackDraftStep(next)
+        const stepPath = pathPrefix ? `${pathPrefix}.alternative.steps.${stepIndex}` : undefined
+        const choicesPath =
+          stepPath && isMultiattackUseClause(next) && next.mode === 'choice'
+            ? `${stepPath}.choices`
+            : undefined
+        normalizeMultiattackDraftStep(next, provenance, choicesPath)
         return next
       })
     }
@@ -432,15 +486,18 @@ function normalizeAction(
   action: unknown,
   section: 'actions' | 'bonusActions' | 'reactions' | 'legendaryActions',
   intent: ContentValidationIntent,
+  pathPrefix: string | undefined,
+  provenance: ProvenanceAccumulator | undefined,
 ): unknown {
   if (!isRecord(action)) return action
   const cleaned = omitEmptyStrings(action)
   if (!isRecord(cleaned)) return cleaned
   applyRichTextFields(cleaned)
-  omitEmptyOnHit(cleaned)
+  const effectsPath = pathPrefix ? `${pathPrefix}.onHit.effects` : undefined
+  omitEmptyOnHit(cleaned, provenance, effectsPath)
   applyReactionTriggerDraft(cleaned, section)
   applyTurnAndInvocationDraft(cleaned, section)
-  applyMultiattackDraft(cleaned)
+  applyMultiattackDraft(cleaned, provenance, pathPrefix)
   applyLimitedUseDraft(cleaned)
   if (cleaned.kind === 'shape-shift' && typeof cleaned.prerequisite === 'string') {
     const prerequisite = normalizePrerequisite(cleaned.prerequisite)
@@ -488,7 +545,15 @@ function normalizeHitPoints(hitPoints: MonsterFormValues['hitPoints']): Record<s
 
 function dedupeSkillProficiencies(
   skills: MonsterFormValues['proficiencies']['skills'],
+  provenance: ProvenanceAccumulator | undefined,
 ): MonsterFormValues['proficiencies']['skills'] {
+  if (provenance) {
+    recordArrayCompaction(provenance, 'proficiencies.skills', skills.length, (index) => {
+      const skill = skills[index]!.skill
+      const first = skills.findIndex((row) => row.skill === skill)
+      return first === index
+    })
+  }
   const seen = new Set<string>()
   const next: MonsterFormValues['proficiencies']['skills'] = []
   for (const row of skills) {
@@ -519,6 +584,7 @@ function normalizeLanguageProficiencies(
 function normalizeProficiencies(
   proficiencies: MonsterFormValues['proficiencies'],
   weaponProficiencyMode: MonsterFormValues['weaponProficiencyMode'],
+  provenance: ProvenanceAccumulator | undefined,
 ): Record<string, unknown> {
   const coercedWeapons = coerceCreatureWeaponProficienciesForForm(proficiencies.weapons)
   const grantSet = weaponProficiencyGrantSetFromMode(
@@ -530,7 +596,7 @@ function normalizeProficiencies(
   )
   return {
     ...proficiencies,
-    skills: dedupeSkillProficiencies(proficiencies.skills ?? []),
+    skills: dedupeSkillProficiencies(proficiencies.skills ?? [], provenance),
     languages: normalizeLanguageProficiencies(proficiencies.languages),
     weapons,
   }
@@ -567,10 +633,17 @@ function normalizeTraitRichText(value: unknown): unknown {
 function normalizedLegendaryBlock(
   values: MonsterFormValues,
   intent: ContentValidationIntent,
+  provenance: ProvenanceAccumulator | undefined,
 ): Record<string, unknown> | undefined {
   const block = values.legendaryActions
-  const actions = (block?.actions ?? []).map((action) =>
-    normalizeAction(action, 'legendaryActions', intent),
+  const actions = (block?.actions ?? []).map((action, index) =>
+    normalizeAction(
+      action,
+      'legendaryActions',
+      intent,
+      `legendaryActions.actions.${index}`,
+      provenance,
+    ),
   )
   if (actions.length === 0) return undefined
   const normalized: Record<string, unknown> = { actions }
@@ -587,15 +660,18 @@ function normalizedLegendaryBlock(
 function normalizedActionSections(
   values: MonsterFormValues,
   intent: ContentValidationIntent,
+  provenance: ProvenanceAccumulator | undefined,
 ): Record<string, unknown> {
-  const legendaryActions = normalizedLegendaryBlock(values, intent)
+  const legendaryActions = normalizedLegendaryBlock(values, intent, provenance)
   return {
-    actions: (values.actions ?? []).map((action) => normalizeAction(action, 'actions', intent)),
-    bonusActions: (values.bonusActions ?? []).map((action) =>
-      normalizeAction(action, 'bonusActions', intent),
+    actions: (values.actions ?? []).map((action, index) =>
+      normalizeAction(action, 'actions', intent, `actions.${index}`, provenance),
     ),
-    reactions: (values.reactions ?? []).map((action) =>
-      normalizeAction(action, 'reactions', intent),
+    bonusActions: (values.bonusActions ?? []).map((action, index) =>
+      normalizeAction(action, 'bonusActions', intent, `bonusActions.${index}`, provenance),
+    ),
+    reactions: (values.reactions ?? []).map((action, index) =>
+      normalizeAction(action, 'reactions', intent, `reactions.${index}`, provenance),
     ),
     ...(legendaryActions ? { legendaryActions } : {}),
   }
@@ -630,6 +706,7 @@ function normalizedMonsterCore(
   values: MonsterFormValues,
   options: NormalizeMonsterFormOptions,
   movement: Record<string, number>,
+  provenance: ProvenanceAccumulator | undefined,
 ): Record<string, unknown> {
   const lair = normalizeLair(values.lair)
   return {
@@ -643,17 +720,22 @@ function normalizedMonsterCore(
     armorClass: normalizeArmorClass(values.armorClass, options.armorClassRules),
     hitPoints: normalizeHitPoints(values.hitPoints),
     movement,
+    ...(() => {
+      const movementAlternative = movementAlternativeFormToSchema(values.movementAlternative)
+      return movementAlternative ? { movementAlternative } : {}
+    })(),
     senses: values.senses ?? [],
     communication: normalizeCommunication(values.communication),
     proficiencies: normalizeProficiencies(
       values.proficiencies,
       values.weaponProficiencyMode ?? MONSTER_DEFAULT_WEAPON_PROFICIENCY_MODE,
+      provenance,
     ),
     defenses: values.defenses,
     equipment: values.equipment,
     traits: normalizeTraitRichText(omitEmptyStrings(values.traits)),
     ...(isUsableMonsterForms(values.forms) ? { forms: normalizeMonsterForms(values.forms) } : {}),
-    ...normalizedActionSections(values, options.intent),
+    ...normalizedActionSections(values, options.intent, provenance),
     ...(lair ? { lair } : {}),
   }
 }
@@ -673,8 +755,9 @@ export function normalizeMonsterFormValues(
   const movementRecord = movementRowsToRecordForPreview(movementRowsForNormalize(values.movement))
   const hasFly = typeof movementRecord.fly === 'number'
   const challengeRating = values.challengeRating
+  const provenance = options.provenance
 
-  const normalized = normalizedMonsterCore(values, options, movementRecord)
+  const normalized = normalizedMonsterCore(values, options, movementRecord, provenance)
 
   applyOptionalScalars(normalized, values, challengeRating, hasFly)
   if (options.mode === 'update' && options.baseline) {
@@ -792,4 +875,5 @@ function applyClearableNulls(
   tombstoneClearableKey(normalized, 'hover', baseline.hover, !hasFly)
   tombstoneClearableKey(normalized, 'experiencePointsOverride', baseline.experiencePointsOverride)
   tombstoneClearableKey(normalized, 'lair', baseline.lair)
+  tombstoneClearableKey(normalized, 'movementAlternative', baseline.movementAlternative)
 }

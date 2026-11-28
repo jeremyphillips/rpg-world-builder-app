@@ -9,7 +9,9 @@ Follow the conventions in [AGENTS.md](../../AGENTS.md).
 ≤ 100 characters — see AGENTS.md **Commits**.
 
 **Default agent work:** focused validation (narrow tests, targeted typecheck/lint,
-optional affected checks)—see AGENTS.md **Agent validation**. Pre-commit is fast;
+optional affected checks)—see AGENTS.md **Agent validation**. Explicit approved scope and
+verification override that default finish line; see AGENTS.md **Approved work** (hooks
+unchanged). Pre-commit is fast;
 broad affected tests run at push via `gate:pre-push`. Finish without running hooks,
 `gate:pre-push`, root `pnpm build`, or `pnpm coverage` unless the user asks for a
 commit/checkpoint or push/PR/full validation.

@@ -6,6 +6,7 @@ import type { FieldValues } from 'react-hook-form'
 import type { FormItem } from '../field-config'
 import type { SilentValidationResult } from '../config/form-resolver'
 import type { FormIssue } from '../errors/form-issue.types'
+import { cancelPendingInvalidSubmitFocus } from '../config/invalid-submit-focus-generation.lib'
 
 export type FormValidationPresentation = 'progressive' | 'always'
 
@@ -163,6 +164,8 @@ export function FormUiProvider({
     setLocalHasAttemptedSubmit(false)
     setLocalHasAttemptedPublish(false)
   }, [onResetValidationPresentation])
+
+  React.useEffect(() => () => cancelPendingInvalidSubmitFocus(), [])
 
   const value = React.useMemo(
     () => ({

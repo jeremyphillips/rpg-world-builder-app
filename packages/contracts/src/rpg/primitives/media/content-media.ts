@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { overlayAtomic } from '../../content/lib/system-overlay/annotate'
 import { contentImageSchema } from './content-image'
 import { contentMediaRoleSourceSchema } from './content-media-source'
 import { imagePresentationSchema } from './image-presentation'
@@ -26,13 +27,16 @@ export const contentMediaRolesSchema = z
 export type ContentMediaRoles = z.infer<typeof contentMediaRolesSchema>
 
 /** Ordered gallery with independent role assignments. */
-export const contentMediaSchema = z
-  .object({
-    revision: z.number().int().nonnegative(),
-    images: z.array(contentImageSchema),
-    roles: contentMediaRolesSchema,
-  })
-  .strict()
+export const contentMediaSchema = overlayAtomic(
+  z
+    .object({
+      revision: z.number().int().nonnegative(),
+      images: z.array(contentImageSchema),
+      roles: contentMediaRolesSchema,
+    })
+    .strict(),
+  'gallery and role assignments replace wholesale',
+)
 
 export type ContentMedia = z.infer<typeof contentMediaSchema>
 

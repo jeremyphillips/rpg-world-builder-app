@@ -13,7 +13,7 @@ import {
 import { managedMediaFormDefFields } from '../../lib/forms/registry/managed-media-form-def.lib'
 import { nameField } from '../../lib/forms/fields/content-identity-form-fields'
 import { finalizeContentInput } from '../../lib/forms/registry/content-form-key-helpers'
-import { useSpecies, speciesQueryKey } from '../hooks/use-species'
+import { useSpecies, useSpeciesListResult, speciesQueryKey } from '../hooks/use-species'
 import {
   buildSpeciesTabs,
   createSpeciesDraftFormSchema,
@@ -83,14 +83,19 @@ const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesIn
       buildSpeciesCreateInput(values, ctx, validationIntent),
       ctx,
     ) as CreateSpeciesInput,
+  overlayParticipantId: 'species',
+  normalizeOverlayBody: (values, ctx, validationIntent = 'publish') => {
+    const { slug: _slug, ...body } = buildSpeciesCreateInput(
+      values,
+      ctx,
+      validationIntent,
+    ) as Record<string, unknown>
+    return body
+  },
 
   useListQuery: useSpecies,
+  useListQueryResult: useSpeciesListResult,
   queryKey: speciesQueryKey,
-
-  extractEmbeddedSeedRowIds: (entity) => ({
-    traits: entity.traits.map((trait) => trait.id),
-    'heritage.options': entity.heritage?.options.map((option) => option.id) ?? [],
-  }),
 
   preview: {
     buildIdentity: buildSpeciesPreviewIdentity,

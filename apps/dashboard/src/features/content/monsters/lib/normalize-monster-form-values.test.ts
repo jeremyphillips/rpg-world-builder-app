@@ -64,6 +64,21 @@ describe('normalizeMonsterFormValues', () => {
     expect(updated.experiencePointsOverride).toBeNull()
   })
 
+  it('tombstones movementAlternative on update when baseline had a persisted alternative', () => {
+    const values = resolveMonsterCreateDefaultValues()
+    values.challengeRating = '1/2'
+    values.movementAlternative = undefined
+
+    const updated = normalizeMonsterFormValues(values, {
+      intent: 'draft',
+      mode: 'update',
+      baseline: {
+        movementAlternative: { modes: ['climb', 'fly'], feet: 20 },
+      },
+    })
+    expect(updated.movementAlternative).toBeNull()
+  })
+
   it('keeps a CR 0 override and drops empty telepathy', () => {
     const values = resolveMonsterCreateDefaultValues()
     values.challengeRating = '0'

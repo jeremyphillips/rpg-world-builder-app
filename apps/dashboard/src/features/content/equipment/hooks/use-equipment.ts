@@ -20,3 +20,5 @@ export const useEquipmentUsageMeta = equipmentContentList.useUsageMeta
 
 export const { useCreateContent: useCreateEquipment, useUpdateContent: useUpdateEquipment } =
   createContentMutationHooks('equipment', equipmentQueryKey)
+
+export const useEquipmentListResult = equipmentContentList.useListQueryResult

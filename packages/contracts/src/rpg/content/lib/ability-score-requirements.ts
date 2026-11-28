@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { overlayAtomic } from './system-overlay/annotate'
 import { defineMessage, formatFieldMessage } from '../../../validation/define-message'
 import { joinNaturalList } from '../../primitives/prose'
 import {
@@ -21,7 +22,10 @@ import {
 // resolving advisories.
 // ---------------------------------------------------------------------------
 
-export const abilityScoreRequirementsSchema = z.partialRecord(abilitySchema, abilityScoreSchema)
+export const abilityScoreRequirementsSchema = overlayAtomic(
+  z.partialRecord(abilitySchema, abilityScoreSchema),
+  'ability score minimum map',
+)
 
 export type AbilityScoreRequirements = z.infer<typeof abilityScoreRequirementsSchema>
 

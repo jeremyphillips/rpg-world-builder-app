@@ -2,6 +2,12 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm } from 'react-hook-form'
 import { describe, expect, it } from 'vitest'
+import {
+  createEmptyFormValidationProducerSession,
+  FormUiProvider,
+  FormValidationProducerProvider,
+  replaceFormValidationProducerSlot,
+} from '@rpg/ui/form'
 
 import { MonsterStatisticsPanel } from './statistics-panel'
 import {
@@ -106,6 +112,50 @@ describe('MonsterStatisticsPanel', () => {
       expect(latest?.proficiencies?.savingThrows).toContain('str')
     })
     expect(latest?.abilityScores?.str).toBeUndefined()
+  })
+
+  it('reads ability score invalid state from the interactive producer session', () => {
+    const defaults = resolveMonsterCreateDefaultValues()
+    defaults.abilityScores.str = 12
+    let session = createEmptyFormValidationProducerSession()
+    session = replaceFormValidationProducerSlot(session, 'interactive', 1, [
+      {
+        path: 'abilityScores.str',
+        message: 'Strength score is out of range.',
+        severity: 'field',
+        claim: { kind: 'field', target: 'abilityScores.str' },
+      },
+    ])
+
+    function ProducerHost() {
+      const form = useForm<MonsterFormValues>({ defaultValues: defaults })
+      return (
+        <FormUiProvider
+          fields={[{ type: 'number', name: 'abilityScores.str', label: 'Strength score' }]}
+          hasAttemptedSubmit
+          validationPresentation="always"
+        >
+          <FormProvider {...form}>
+            <FormValidationProducerProvider session={session} stamp={1}>
+              <MonsterStatisticsPanel
+                ctx={{
+                  equipmentCatalogStatus: 'ready',
+                  equipmentCatalogById: new Map(),
+                  skillCatalogStatus: 'ready',
+                }}
+              />
+            </FormValidationProducerProvider>
+          </FormProvider>
+        </FormUiProvider>
+      )
+    }
+
+    render(<ProducerHost />)
+
+    expect(screen.getByRole('button', { name: 'Strength score' })).toHaveAttribute(
+      'aria-invalid',
+      'true',
+    )
   })
 
   it('steps an out-of-range stored score down by one and keeps it invalid', async () => {

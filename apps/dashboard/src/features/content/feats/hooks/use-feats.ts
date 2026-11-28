@@ -20,3 +20,5 @@ export const useFeatsUsageMeta = featsContentList.useUsageMeta
 
 export const { useCreateContent: useCreateFeat, useUpdateContent: useUpdateFeat } =
   createContentMutationHooks('feats', featsQueryKey)
+
+export const useFeatsListResult = featsContentList.useListQueryResult

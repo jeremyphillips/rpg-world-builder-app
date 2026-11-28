@@ -98,6 +98,8 @@ export interface FormProps<TFieldValues extends FieldValues> {
    * badges on untouched rows appear only after the first failed submit.
    */
   validationPresentation?: FormValidationPresentation
+  /** Wraps field chrome inside {@link FormProvider} for adopted producer sessions. */
+  producerBoundary?: React.ComponentType<{ children: React.ReactNode }>
 }
 
 function buildExternalFooterContent(
@@ -144,14 +146,15 @@ export function Form<TFieldValues extends FieldValues>({
   density,
   valueSyncs,
   validationPresentation,
+  producerBoundary,
 }: FormProps<TFieldValues>) {
   const generatedId = React.useId()
   const formId = id ?? generatedId
 
   const resolver = React.useMemo(() => makeResolver<TFieldValues>(schema, fields), [schema, fields])
   const validateSilently = React.useMemo(
-    () => createValidateSilently(resolver) as ValidateSilently,
-    [resolver],
+    () => createValidateSilently(schema, fields) as ValidateSilently,
+    [schema, fields],
   )
 
   // Capture defaults once at mount. RHF v7.52+ auto-resets when `defaultValues`
@@ -194,6 +197,7 @@ export function Form<TFieldValues extends FieldValues>({
       density={density}
       validationPresentation={validationPresentation}
       validateSilently={validateSilently}
+      producerBoundary={producerBoundary}
       onSubmit={onSubmit}
       externalFooter={externalFooter}
       externalFooterContent={externalFooterContent}

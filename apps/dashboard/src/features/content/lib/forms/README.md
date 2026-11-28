@@ -29,6 +29,26 @@ root is the exception surface (not a prohibition on implementation files).
 Deep dive: [form-lib-conventions.md](../../../../../docs/form-lib-conventions.md),
 [feature-structure.md § Parent content/lib](../../../../../docs/feature-structure.md).
 
+## System overlay authoring
+
+System edits route through `systemOverlayIntent` + `expectedOverlayRevision`.
+[`registry/system-overlay-write-readiness.lib.ts`](./registry/system-overlay-write-readiness.lib.ts)
+blocks save when provenance is missing, baseline is incomplete, or revision is
+stale. It also rejects `unresolvedOverlay: true` when a caller passes that
+signal. Edit shells do not pass it: they load the full list via
+`useListQueryResult` and render an alert instead of the form, so
+`serializeContentFormInput` is never called for those targets and does not take
+the flag. Non-empty API `overlayReadDiagnostics` (identity conflicts, orphaned
+seed overrides) render a warning. Save stays available unless readiness or the
+API rejects the write (including diagnostic updates that would drop stored
+overlay data). `overlayFailures` are a blocking state: the edit shell shows a
+destructive alert and does not render the form. Synthetic overview failure rows
+use `CONTENT_OVERLAY_FAILURE_ROW_CAMPAIGN_ACCESS` for presentation only (manager
+overview table UX); API list responses remain the authority for failure visibility.
+Parent-scoped subclass tab lists trust `GET …/subclasses` and do not re-filter failures
+client-side. Contract detail:
+[`system-overlay/README.md`](../../../../../../packages/contracts/src/rpg/content/lib/system-overlay/README.md).
+
 ## `registry/` — ContentFormDef contract
 
 Includes `content-form-registry.ts` and `content-form-key-helpers.ts`. Key helpers

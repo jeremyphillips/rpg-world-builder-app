@@ -31,6 +31,13 @@ import {
   slugForInputParse,
 } from '../../lib/forms/registry/content-form-key-helpers'
 import type { ContentFormInputCtx } from '../../lib/forms/registry/content-form-registry'
+import type { ContentPreparedWrite } from '../../lib/forms/submit/content-prepared-write.types'
+import {
+  createProvenanceAccumulator,
+  finishProvenanceAccumulator,
+  mergeProvenancePart,
+  type ProvenanceAccumulator,
+} from '../../lib/forms/submit/accumulate-prepared-write-provenance.lib'
 import { SPELL_AREA_GEOMETRY_NONE, SPELL_DELIVERY_METHOD_NONE } from './spell-form-labels'
 import type { SpellFormValues } from './spell-form-fields'
 import { resolutionToForm, resolutionToStored } from '../resolution/lib/form/resolution-form-values'
@@ -569,6 +576,7 @@ export function trySpellAreaOfEffectFromFormValues(
 export function resolutionToPatchInput(
   values: SpellFormValues,
   ctx?: ContentFormInputCtx<Spell>,
+  provenance?: ProvenanceAccumulator,
 ): Spell['resolution'] | null | undefined {
   const hadStoredResolution = ctx?.entity?.resolution != null
   const configured = isResolutionFormConfigured(values as Record<string, unknown>)
@@ -577,7 +585,7 @@ export function resolutionToPatchInput(
     return hadStoredResolution ? null : undefined
   }
 
-  return resolutionToStored(values.resolution as ResolutionFormValues | undefined)
+  return resolutionToStored(values.resolution as ResolutionFormValues | undefined, provenance)
 }
 
 export function spellToFormValues(entity: Spell): SpellFormValues {
@@ -634,11 +642,16 @@ function spellIdentityWireFields(
   persistedValues: Omit<SpellFormValues, 'effects'>,
   ctx?: ContentFormInputCtx<Spell>,
   validationIntent: ContentValidationIntent = 'publish',
+  provenance?: ProvenanceAccumulator,
 ) {
   const school = spellSchoolForWire(persistedValues.school, validationIntent)
 
   const description = persistedValues.description || undefined
-  const tables = pruneSpellTablesToDescriptionEmbeds(description, persistedValues.tables ?? [])
+  const tables = pruneSpellTablesToDescriptionEmbeds(
+    description,
+    persistedValues.tables ?? [],
+    provenance,
+  )
 
   return {
     slug: slugForInputParse(persistedValues.name, ctx),
@@ -690,12 +703,16 @@ function spellDraftOptionalCastingBlock(persistedValues: Omit<SpellFormValues, '
   }
 }
 
-function spellPublishWirePayload(values: SpellFormValues, ctx?: ContentFormInputCtx<Spell>) {
+function spellPublishWirePayload(
+  values: SpellFormValues,
+  ctx?: ContentFormInputCtx<Spell>,
+  provenance?: ProvenanceAccumulator,
+) {
   const { effects: _effects, ...persistedValues } = values
-  const resolution = resolutionToPatchInput(values, ctx)
+  const resolution = resolutionToPatchInput(values, ctx, provenance)
 
   return {
-    ...spellIdentityWireFields(persistedValues, ctx, 'publish'),
+    ...spellIdentityWireFields(persistedValues, ctx, 'publish', provenance),
     level: persistedValues.level,
     classIds: persistedValues.classIds,
     castingTime: spellCastingTimeFromFormValues(
@@ -710,13 +727,17 @@ function spellPublishWirePayload(values: SpellFormValues, ctx?: ContentFormInput
   }
 }
 
-function spellDraftWirePayload(values: SpellFormValues, ctx?: ContentFormInputCtx<Spell>) {
+function spellDraftWirePayload(
+  values: SpellFormValues,
+  ctx?: ContentFormInputCtx<Spell>,
+  provenance?: ProvenanceAccumulator,
+) {
   const { effects: _effects, ...persistedValues } = values
-  const resolution = resolutionToPatchInput(values, ctx)
+  const resolution = resolutionToPatchInput(values, ctx, provenance)
   const tags = spellTagsFromFormValues(persistedValues.tags)
 
   return {
-    ...spellIdentityWireFields(persistedValues, ctx, 'draft'),
+    ...spellIdentityWireFields(persistedValues, ctx, 'draft', provenance),
     ...spellDraftOptionalCastingBlock(persistedValues),
     ...(tags ? { tags } : {}),
     ...spellOptionalAreaAndDelivery(persistedValues),
@@ -728,12 +749,13 @@ export function buildSpellCreateInput(
   values: SpellFormValues,
   ctx?: ContentFormInputCtx<Spell>,
   validationIntent: ContentValidationIntent = 'publish',
+  provenance?: ProvenanceAccumulator,
 ): CreateSpellInput {
   const isUpdate = Boolean(ctx?.entity)
   const payload =
     validationIntent === 'draft'
-      ? spellDraftWirePayload(values, ctx)
-      : spellPublishWirePayload(values, ctx)
+      ? spellDraftWirePayload(values, ctx, provenance)
+      : spellPublishWirePayload(values, ctx, provenance)
   const schema =
     validationIntent === 'draft'
       ? isUpdate
@@ -745,4 +767,15 @@ export function buildSpellCreateInput(
   const input = schema.parse(payload)
 
   return finalizeContentInput(input, ctx) as CreateSpellInput
+}
+
+export function buildSpellPreparedWrite(
+  values: SpellFormValues,
+  ctx?: ContentFormInputCtx<Spell>,
+  validationIntent: ContentValidationIntent = 'publish',
+): ContentPreparedWrite<CreateSpellInput> {
+  const acc = createProvenanceAccumulator()
+  const payload = buildSpellCreateInput(values, ctx, validationIntent, acc)
+  mergeProvenancePart(acc, { pathMap: { name: 'slug' } })
+  return { payload, provenance: finishProvenanceAccumulator(acc) }
 }

@@ -16,6 +16,7 @@ import { MasterDetailDeleteDialog } from '../../../../components/master-detail/m
 import { MasterDetailGrid } from '../../../../components/master-detail/master-detail-grid'
 import { MasterDetailListPanel } from '../../../../components/master-detail/master-detail-list-panel'
 import { masterDetailItemNounLabel } from '../../../../lib/master-detail/master-detail-constants'
+import { countMasterDetailRowsWithIssues } from '../../../../lib/master-detail/master-detail-row-validation'
 import { useEmbeddedMasterDetailRows } from '../../../../lib/master-detail/use-embedded-master-detail-rows'
 import { useMasterDetailCollectionAvailability } from '../../../../lib/master-detail/use-master-detail-collection-availability'
 import {
@@ -371,14 +372,10 @@ export function MonsterActionSections({ ctx }: { ctx: ContentFormCtx }) {
     () => new Set(collection.visibleItems.map((item) => item.rowId)),
     [collection.visibleItems],
   )
-  const invalidItemCount = MONSTER_ACTION_SECTIONS.reduce((count, section) => {
-    return (
-      count +
-      rowsBySection[section].allRows.filter(
-        (row) => visibleIds.has(row.item.id) && (row.item.issueCount ?? 0) > 0,
-      ).length
-    )
-  }, 0)
+  const invalidItemCount = MONSTER_ACTION_SECTIONS.reduce(
+    (count, section) => count + countMasterDetailRowsWithIssues(rowsBySection[section].allRows),
+    0,
+  )
   const deleteLocated = sections.locate(sections.deleteTargetId)
   const deleteReferences = deleteLocated
     ? actionsReferencingAction(

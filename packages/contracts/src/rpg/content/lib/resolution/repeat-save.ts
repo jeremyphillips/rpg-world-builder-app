@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { overlayOrderedList } from '../system-overlay/overlay-presets'
 import {
   EFFECT_END_BOUNDARIES,
   EFFECT_END_PARTICIPANTS,
@@ -16,7 +17,7 @@ export const repeatSaveTimingSchema = z.object({
 export type RepeatSaveTiming = z.infer<typeof repeatSaveTimingSchema>
 
 export const repeatSaveSecondFailureSchema = z.object({
-  effects: z.array(resolutionOutcomeEffectSchema).optional(),
+  effects: overlayOrderedList(resolutionOutcomeEffectSchema).optional(),
   note: z.string().trim().optional(),
 })
 

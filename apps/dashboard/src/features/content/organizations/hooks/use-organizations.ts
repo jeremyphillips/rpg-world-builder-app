@@ -18,3 +18,5 @@ export const useOrganizationsUsageMeta = organizationsContentList.useUsageMeta
 
 export const { useCreateContent: useCreateOrganization, useUpdateContent: useUpdateOrganization } =
   createContentMutationHooks('organizations', organizationsQueryKey)
+
+export const useOrganizationsListResult = organizationsContentList.useListQueryResult

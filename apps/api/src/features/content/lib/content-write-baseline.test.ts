@@ -11,8 +11,17 @@ import { resolveCatalogForCampaign } from '../content.service'
 import { skillProficiencyWriteConfig } from '../skill-proficiencies/skill-proficiencies.config'
 import { speciesWriteConfig } from '../species/species.config'
 import { spellWriteConfig } from '../spells/spells.config'
+import { monstersWriteConfig } from '../monsters/monsters.config'
+import { subclassWriteConfig } from '../subclasses/subclasses.config'
+import { resolveSubclassesForCampaign } from '../subclasses/list-subclasses'
+import { minimalHomebrewMonsterInput } from '../../../test/fixtures/monsters'
+import { expectHttpErrorAsync } from '../../../test/expect-http-error'
+import { overlayNameOnlyUpdate } from '../../../test/helpers/system-overlay-write'
+import { contentEntityBody } from './resolve-system-overlay.lib'
 import { createHomebrewContent, updateContentEntity } from './content-write.service'
+import { FeatPatchModel } from '../feats/feat-patch.model'
 import type { ContentWriteConfig, WriteEntityBase } from './content-write-config'
+import type { SystemOverlayParticipantId } from '@rpg/contracts'
 
 useIntegrationDb()
 
@@ -25,7 +34,7 @@ type BaselineCase = {
   homebrewUpdate: Record<string, unknown>
   expectedHomebrewName: string
   systemTargetSlug: string
-  systemPatch: Record<string, unknown>
+  overlayParticipantId: SystemOverlayParticipantId
   expectedPatchedSystemName: string
 }
 
@@ -49,7 +58,7 @@ const baselineCases: BaselineCase[] = [
     homebrewUpdate: { name: 'Updated Baseline Class' },
     expectedHomebrewName: 'Updated Baseline Class',
     systemTargetSlug: 'fighter',
-    systemPatch: { name: 'Patched Fighter' },
+    overlayParticipantId: 'classes',
     expectedPatchedSystemName: 'Patched Fighter',
   },
   {
@@ -67,7 +76,7 @@ const baselineCases: BaselineCase[] = [
     homebrewUpdate: { kind: 'armor', name: 'Updated Baseline Armor' },
     expectedHomebrewName: 'Updated Baseline Armor',
     systemTargetSlug: 'leather-armor',
-    systemPatch: { kind: 'armor', name: 'Patched Leather Armor' },
+    overlayParticipantId: 'equipment',
     expectedPatchedSystemName: 'Patched Leather Armor',
   },
   {
@@ -88,7 +97,7 @@ const baselineCases: BaselineCase[] = [
     homebrewUpdate: { name: 'Updated Baseline Bolt' },
     expectedHomebrewName: 'Updated Baseline Bolt',
     systemTargetSlug: 'fire-bolt',
-    systemPatch: { name: 'Patched Fire Bolt' },
+    overlayParticipantId: 'spells',
     expectedPatchedSystemName: 'Patched Fire Bolt',
   },
   {
@@ -103,7 +112,7 @@ const baselineCases: BaselineCase[] = [
     homebrewUpdate: { name: 'Updated Baseline Feat' },
     expectedHomebrewName: 'Updated Baseline Feat',
     systemTargetSlug: 'alert',
-    systemPatch: { name: 'Patched Alert' },
+    overlayParticipantId: 'feats',
     expectedPatchedSystemName: 'Patched Alert',
   },
   {
@@ -120,7 +129,7 @@ const baselineCases: BaselineCase[] = [
     homebrewUpdate: { name: 'Updated Baseline Folk' },
     expectedHomebrewName: 'Updated Baseline Folk',
     systemTargetSlug: 'human',
-    systemPatch: { name: 'Patched Human' },
+    overlayParticipantId: 'species',
     expectedPatchedSystemName: 'Patched Human',
   },
   {
@@ -135,10 +144,26 @@ const baselineCases: BaselineCase[] = [
     homebrewUpdate: { name: 'Updated Baseline Skill' },
     expectedHomebrewName: 'Updated Baseline Skill',
     systemTargetSlug: 'athletics',
-    systemPatch: { name: 'Patched Athletics' },
+    overlayParticipantId: 'skill-proficiencies',
     expectedPatchedSystemName: 'Patched Athletics',
   },
+  {
+    label: 'monsters',
+    config: monstersWriteConfig as ContentWriteConfig<BaselineEntity>,
+    createInput: {
+      ...minimalHomebrewMonsterInput,
+      slug: 'baseline-monster',
+      name: 'Baseline Monster',
+    },
+    homebrewUpdate: { name: 'Updated Baseline Monster' },
+    expectedHomebrewName: 'Updated Baseline Monster',
+    systemTargetSlug: 'kobold-warrior',
+    overlayParticipantId: 'monsters',
+    expectedPatchedSystemName: 'Patched Kobold Warrior',
+  },
 ]
+
+const FIGHTER_CLASS_ID = 'srd-cc-5.2.1:fighter'
 
 describe.each(baselineCases)('content write baseline — $label', (baselineCase) => {
   it('creates homebrew, updates homebrew, patches system, and round-trips via catalog', async () => {
@@ -178,11 +203,17 @@ describe.each(baselineCases)('content write baseline — $label', (baselineCase)
     if (!systemRecord) throw new Error(`expected system seed ${baselineCase.systemTargetSlug}`)
     expect(systemRecord.status).toBe('published')
 
+    const catalogSeed = contentEntityBody(systemRecord as unknown as Record<string, unknown>)
     const patchedSystem = await updateContentEntity(
       baselineCase.config,
       campaign.id,
       systemRecord.id,
-      baselineCase.systemPatch,
+      overlayNameOnlyUpdate({
+        participantId: baselineCase.overlayParticipantId,
+        catalogSeed,
+        baseline: catalogSeed,
+        name: baselineCase.expectedPatchedSystemName,
+      }),
     )
     expect(patchedSystem.catalogLayer).toBe('system')
     expect(patchedSystem.name).toBe(baselineCase.expectedPatchedSystemName)
@@ -192,8 +223,10 @@ describe.each(baselineCases)('content write baseline — $label', (baselineCase)
       baselineCase.config.readConfig,
       campaign.id,
     )
-    expect(catalogAfterPatch.find((record) => record.id === systemRecord.id)?.name).toBe(
-      baselineCase.expectedPatchedSystemName,
+    const reread = catalogAfterPatch.find((record) => record.id === systemRecord.id)
+    expect(reread?.name).toBe(baselineCase.expectedPatchedSystemName)
+    expect(contentEntityBody(reread as unknown as Record<string, unknown>)).toEqual(
+      contentEntityBody(patchedSystem as unknown as Record<string, unknown>),
     )
   })
 })
@@ -313,6 +346,130 @@ describe('content write baseline — draft status', () => {
 
     const catalog = await resolveCatalogForCampaign(spellWriteConfig.readConfig, campaign.id)
     expect(catalog.find((record) => record.id === created.id)?.name).toBe('Untitled Spell')
+  })
+})
+
+describe('content write baseline — overlay revision', () => {
+  it('increments overlay revision and rejects stale expected revision', async () => {
+    const campaign = await makeTestCampaign()
+    const catalog = await resolveCatalogForCampaign(featWriteConfig.readConfig, campaign.id)
+    const systemRecord = catalog.find(
+      (record) => record.slug === 'alert' && record.catalogLayer === 'system',
+    )
+    expect(systemRecord).toBeDefined()
+    if (!systemRecord) throw new Error('expected alert feat')
+
+    const catalogSeed = contentEntityBody(systemRecord as unknown as Record<string, unknown>)
+    await updateContentEntity(
+      featWriteConfig,
+      campaign.id,
+      systemRecord.id,
+      overlayNameOnlyUpdate({
+        participantId: 'feats',
+        catalogSeed,
+        baseline: catalogSeed,
+        name: 'Revision One',
+        expectedOverlayRevision: 0,
+      }),
+    )
+
+    const patchAfterFirst = await FeatPatchModel.findOne({
+      campaignId: campaign.id,
+      targetId: systemRecord.id,
+    }).lean<{ patch: { revision: number } }>()
+    expect(patchAfterFirst?.patch.revision).toBe(1)
+
+    await updateContentEntity(
+      featWriteConfig,
+      campaign.id,
+      systemRecord.id,
+      overlayNameOnlyUpdate({
+        participantId: 'feats',
+        catalogSeed: { ...catalogSeed, name: 'Revision One' },
+        baseline: { ...catalogSeed, name: 'Revision One' },
+        name: 'Revision Two',
+        expectedOverlayRevision: 1,
+      }),
+    )
+
+    const patchAfterSecond = await FeatPatchModel.findOne({
+      campaignId: campaign.id,
+      targetId: systemRecord.id,
+    }).lean<{ patch: { revision: number } }>()
+    expect(patchAfterSecond?.patch.revision).toBe(2)
+
+    await expectHttpErrorAsync(
+      () =>
+        updateContentEntity(
+          featWriteConfig,
+          campaign.id,
+          systemRecord.id,
+          overlayNameOnlyUpdate({
+            participantId: 'feats',
+            catalogSeed: { ...catalogSeed, name: 'Revision Two' },
+            baseline: { ...catalogSeed, name: 'Revision Two' },
+            name: 'Stale Revision',
+            expectedOverlayRevision: 1,
+          }),
+        ),
+      { status: 409, code: 'stale_revision' },
+    )
+  })
+})
+
+describe('content write baseline — subclasses', () => {
+  it('creates homebrew, updates homebrew, patches system, and round-trips via catalog', async () => {
+    const campaign = await makeTestCampaign()
+
+    const created = await createHomebrewContent(subclassWriteConfig, campaign.id, {
+      slug: 'baseline-subclass',
+      name: 'Baseline Subclass',
+      classId: FIGHTER_CLASS_ID,
+      tagline: 'Baseline tagline',
+      features: [{ kind: 'custom', id: 'baseline-f1', name: 'Baseline Feature', level: 3 }],
+    })
+    expect(created.catalogLayer).toBe('homebrew')
+    expect(created.classId).toBe(FIGHTER_CLASS_ID)
+
+    const updatedHomebrew = await updateContentEntity(
+      subclassWriteConfig,
+      campaign.id,
+      created.id,
+      {
+        name: 'Updated Baseline Subclass',
+      },
+    )
+    expect(updatedHomebrew.name).toBe('Updated Baseline Subclass')
+
+    const catalogAfterHomebrew = await resolveSubclassesForCampaign(campaign.id, FIGHTER_CLASS_ID)
+    expect(catalogAfterHomebrew.some((record) => record.id === created.id)).toBe(true)
+
+    const systemRecord = catalogAfterHomebrew.find(
+      (record) => record.slug === 'champion' && record.catalogLayer === 'system',
+    )
+    expect(systemRecord).toBeDefined()
+    if (!systemRecord) throw new Error('expected champion subclass')
+
+    const catalogSeed = contentEntityBody(systemRecord as unknown as Record<string, unknown>)
+    const patchedSystem = await updateContentEntity(
+      subclassWriteConfig,
+      campaign.id,
+      systemRecord.id,
+      overlayNameOnlyUpdate({
+        participantId: 'subclasses',
+        catalogSeed,
+        baseline: catalogSeed,
+        name: 'Patched Champion',
+      }),
+    )
+    expect(patchedSystem.name).toBe('Patched Champion')
+
+    const catalogAfterPatch = await resolveSubclassesForCampaign(campaign.id, FIGHTER_CLASS_ID)
+    const reread = catalogAfterPatch.find((record) => record.id === systemRecord.id)
+    expect(reread?.name).toBe('Patched Champion')
+    expect(contentEntityBody(reread as unknown as Record<string, unknown>)).toEqual(
+      contentEntityBody(patchedSystem as unknown as Record<string, unknown>),
+    )
   })
 })
 

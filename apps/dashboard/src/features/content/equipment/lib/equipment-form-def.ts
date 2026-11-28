@@ -4,7 +4,7 @@ import { type CreateEquipmentInput, type Equipment } from '@rpg/contracts'
 import { type ContentFormDef } from '../../lib/forms/registry/content-form-registry'
 import { managedMediaFormDefFields } from '../../lib/forms/registry/managed-media-form-def.lib'
 import { nameField } from '../../lib/forms/fields/content-identity-form-fields'
-import { useEquipment, equipmentQueryKey } from '../hooks/use-equipment'
+import { useEquipment, useEquipmentListResult, equipmentQueryKey } from '../hooks/use-equipment'
 import { equipmentEconomyFormDefaults } from './equipment-economy-form-values'
 import {
   buildEquipmentFields,
@@ -34,7 +34,16 @@ const equipmentFormDef: ContentFormDef<Equipment, EquipmentFormValues, CreateEqu
   buildFields: buildEquipmentFields,
   toFormValues: equipmentToFormValues,
   toInput: equipmentFormToInput,
+  overlayParticipantId: 'equipment',
+  normalizeOverlayBody: (values, ctx, validationIntent = 'publish') => {
+    const { slug: _slug, ...body } = equipmentFormToInput(values, ctx, validationIntent) as Record<
+      string,
+      unknown
+    >
+    return body
+  },
   useListQuery: useEquipment,
+  useListQueryResult: useEquipmentListResult,
   queryKey: equipmentQueryKey,
 }
 

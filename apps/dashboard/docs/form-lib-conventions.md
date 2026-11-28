@@ -321,6 +321,14 @@ paths. `errorPaths` drives tab UX; `resolverFields` drives validation message co
 `content-form-tab-icons.ts` (`TabbedFormTab.leadingIcon`). Non-form chrome tabs (e.g. class
 subclasses management) set `skipHeaderOnlyValidationWiring: true`.
 
+**Pilot cutover (tabbed catalog forms):** monsters, classes, species, spells, and equipment
+routes commit through `useContentFormSubmit` with `FormValidationProducerProvider` on create/edit
+shells. Embedded master-detail tabs (class **Features**, monster actions/traits, species traits)
+declare validation via `embeddedMasterDetailTabValidation`; row copy and badges use
+`useContentFormPresentationIssues` / `useMasterDetailRowValidation`, not `useFormValidationPresentation`.
+Registry drift for tab prefix ownership: `content-form-tab-ownership.test.ts`. Class features at
+the production commit boundary: `class-edit-features-pipeline.integration.test.tsx`.
+
 **Tests:** `assertHeaderOnlyTabsHaveValidationWiring(tabs)` in
 `tabbed-form-validation-test-utils.ts` — used by `content-form-tab-ownership.test.ts`
 and co-located form tests.
@@ -471,6 +479,20 @@ Detail: [packages/ui/docs/forms.md](../../../../packages/ui/docs/forms.md),
 **Legacy rename:** equipment formerly used `*-form-input.ts`; target suffix is
 `*-form-values.ts` (completed).
 
+### System overlay identity layers (edit)
+
+| Layer                  | Source                                                   | Role                                                                                           |
+| ---------------------- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| **Catalog seed**       | `@rpg/catalog` via API resolve                           | Immutable system body; overlay intent diffs against `normalizeOverlayBody` output              |
+| **Baseline**           | Form values after load `reset`                           | Dirty detection + overlay reconciliation input; must match post-load tree (no schema defaults) |
+| **Persisted identity** | API `seedRowIdsByPath` → `persistedIdentityRowIdsByPath` | Row ids that have been saved at least once (not provenance)                                    |
+| **System origin**      | Captured on first load in `embeddedSystemOriginRowIds`   | Seed-originated row ids for delete-locking; never grows after first load                       |
+| **Overlay revision**   | API `overlayRevision` on system entities                 | Optimistic concurrency (`expectedOverlayRevision` on PATCH)                                    |
+
+List `overlayFailures` gate edit when a target cannot be resolved (`unresolved_overlay`).
+API `overlayReadDiagnostics` are informational alerts on edit — see
+[`forms/README.md`](../src/features/content/lib/forms/README.md#system-overlay-authoring).
+
 ### Shared infra (exceptions)
 
 These modules support many content types but are **not** per-type form splits:
@@ -523,9 +545,36 @@ Top-level content shells share `ContentFormFooter` (`content-form-footer.tsx`) w
 | **Edit**   | `[Discard changes]` `[Save changes]` | `hasDirtyFields(dirtyFields)` — disabled when clean, `pending`, read-only, or Armor Class rules are stale | Stay on edit route; reset baseline from `def.toFormValues(saved, { armorClassRules })` using the authoring snapshot; one toast from coordinated save session (`onSaved`) — access-only uses availability copy, body or combined uses `notifySaveSuccess` |
 
 Create handoff URL: `resolveContentPostCreateEditHref` in `content-form-navigation.ts`.
-Submit/error wiring: `useContentFormSubmit` for ContentFormDef create modals and hosts;
-`useSubmitHandler` alone for edit shells and non–ContentFormDef surfaces. Nested subclass editor remains
-separate until aligned in a follow-up.
+Submit/error wiring: **`useContentFormSubmit`** for ContentFormDef create/edit page shells
+(`ContentCreateShell`, `ContentEditShell`), create modals, and `ContentFormHost` adapters.
+Adopted tabbed/flat dashboard saves outside `ContentFormDef` use `useRunnerFormSubmit` (`@/lib/runner-form-submit.lib`) on `runContentFormCommitAttempt` with producer sessions. Public login/signup use `useAuthFormSubmit` (`apps/public/.../use-auth-form-submit.client.ts`). Campaign create calls `validateCampaignCreateValues` before dispatch. The nested **subclass editor** owns an isolated `FormUiProvider` + `useRunnerFormSubmit` session; the class Subclasses tab stays exempt from parent tab ownership (`content-form-tab-ownership.test.ts`). **`useAdoptedFormSubmit`** remains only on quick NPC (`FORM_VALIDATION_ADOPTION_ALLOWLIST`). RHF paint for content issues goes through `applyCanonicalFormIssuesToRhf`. Overview: [form-validation-lifecycle.md](../../../packages/ui/docs/form-validation-lifecycle.md).
+
+### Validation ownership guards
+
+Scanner: `form-validation-enforcement.lib.ts` + `form-validation-enforcement.test.ts`.
+
+**Roots** (production `*.ts` / `*.tsx`, excluding tests and stories):
+
+- `apps/dashboard/src/features/content`
+- `apps/dashboard/src/features/campaign`
+- `apps/dashboard/src/features/character/npc`
+- `apps/public/src/features/auth`
+
+**Blocked patterns** unless the file is on the exempt list or adoption allowlist: `useSubmitHandler`, `useAdoptedFormSubmit`, `applyValidationIssuesToForm`, `paintValidationIssuesOnForm`, `applyContentPublishValidation`, `prepareFormIssues`, direct `useFormValidationPresentation`.
+
+**Exempt legacy islands:** `content-form-submit.ts` (commit adapter), `content-publish-validation.lib.ts`, `content-form-presentation-issues.client.ts`, `content-form-validation-rhf.lib.ts`, `content-draft-publish-validation-surface.client.tsx`, `form-validation-enforcement.lib.ts`.
+
+**Drift tests:** `content-form-submit-drift.test.ts`, `campaign-form-validation-adoption.test.ts`, `auth-form-adoption.test.ts`.
+
+`FORM_VALIDATION_ADOPTION_ALLOWLIST` names deferred families only (today: quick NPC with a named cutover milestone—not an empty placeholder list). Adopted family list: `form-validation-adopted-families.ts`. Family guard: `form-validation-family-adoption.guard.test.ts`.
+
+**Phase 8 barrel contract:** `applyValidationIssuesToForm` and `paintValidationIssuesOnForm` are not exported from `@rpg/ui/form` (retired). `prepareFormIssues` and `flattenFormIssues` remain on the UI barrel for invalid-submit navigation and grant characterization tests; adopted production trees in the enforcement roots must not import them. Invalid-submit focus/navigation uses shared `@rpg/ui/form` helpers (`navigateInvalidSubmit`, `performInvalidSubmitFocus`, tabbed invalid-submit shell)—not the removed `focusFormPath` dashboard helper.
+
+**Pilot commit pipeline (create/edit shells):** one prepare-once write via
+`prepareSerializedContentFormWrite`, then `runContentFormCommitAttempt` (publish/draft commit
+validation → optional write schema → `persist`). Do not call `serializeContentFormInput` or
+`resolveContentFormSchema(..., 'publish').parse()` in feature submit handlers. Edit persistence goes
+through `persistContentEditUpdate` after the pipeline returns the prepared payload.
 
 #### `useContentFormSubmit` (ContentFormDef create)
 
@@ -534,12 +583,15 @@ route publish/create submit through `useContentFormSubmit` in
 [`content-form-submit.ts`](../src/features/content/lib/forms/shells/submit/content-form-submit.ts).
 Do **not** call `resolveContentFormSchema(..., 'publish').parse()` in feature submit handlers.
 
-The hook runs: draft validation (RHF, already done) → commit validation via
-`validateContentPublishValues` → invalid-submit presentation (field errors, optional tab/view reveal)
-→ feature-owned `persist`. Commit-invalid failures reject without `formError`; persist failures set
-`formError` and reject. Success chrome (trusted close, navigate) runs only after a resolved submit.
+The hook runs: RHF resolver (already on the form) → `runContentFormCommitPipeline` (commit schema,
+optional write schema / `prepareWrite`) → canonical issue ingestion + RHF paint on validation block
+→ feature-owned `persist` with the prepared payload. Commit-invalid failures throw
+`ContentFormSubmitValidationFailed` without `formError`; structured API validation failures paint
+field errors and ingest the `api` producer slot; other persist failures set `formError` and reject.
+Success chrome (trusted close, navigate) runs only after a resolved submit.
 
-Render the returned `UiBridge` inside the form header so invalid-submit focus can expand sections.
+Render the returned `ProducerBoundary` around form fields (and `ProducerStampBridge` only when a
+second submit hook shares the same form without mounting its own boundary).
 Feature-owned tab mapping uses `invalidPresentation.resolveViewForPath` / `activateView` — shared code
 never hard-codes tab ids.
 
@@ -558,9 +610,8 @@ Create/Save clicks run RHF validation, show eligible errors, and navigate/focus 
 field or tab. Optional `validateSilently` / `useSilentFormValidity` may drive secondary UI (e.g.
 "Ready to create") — not the primary submit gate.
 
-**Quick NPC exception:** Quick NPC create stays on `useSubmitHandler` plus domain libs
-(`TabbedForm`, build-context projection, tabbed submit labels) — do not premature-standardize onto
-`useContentFormSubmit`. Nested picker handoff lifecycle is owned by
+**Quick NPC:** authoring uses `useAdoptedFormSubmit` with domain libs (`TabbedForm`, build-context
+projection, tabbed submit labels) — not `useContentFormSubmit`. Nested picker handoff lifecycle is owned by
 `useRelationshipPickerNestedCreate` and `invokeOnContentCreated` reject semantics (see
 [create-flow.md](./create-flow.md#oncontentcreated-handoff) and
 [cross-content-relationship-ui.md](./cross-content-relationship-ui.md#relationship-picker-nested-create)).

@@ -16,6 +16,18 @@ const fieldIssue = (path: string, target: string, message: string): FormIssue =>
 })
 
 describe('resolve-field-issue.lib', () => {
+  it('shows both distinct reasons claimed for one control', () => {
+    const issues = [
+      fieldIssue('modes', 'modes', 'Select at least one mode.'),
+      fieldIssue('modes', 'modes', 'Modes overlap.'),
+      fieldIssue('name', 'name', 'Name is required.'),
+    ]
+    expect(resolveFieldIssueDisplayMessage('modes', issues)).toBe(
+      'Select at least one mode. Modes overlap.',
+    )
+    expect(resolveFieldIssueDisplayMessage('name', issues)).toBe('Name is required.')
+  })
+
   it('shows only the issue claimed for the control', () => {
     const issues = [fieldIssue('grants.0.language', 'grants.0.language', 'Choose a language.')]
     expect(resolveFieldIssueDisplayMessage('grants.0.language', issues)).toBe('Choose a language.')

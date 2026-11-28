@@ -1,11 +1,50 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  creatureRollTargetSchema,
   formatCreatureRollAdjustmentSentence,
   formatCreatureSaveOutcomeOverrideNotation,
 } from './effects'
 
+describe('creatureRollTargetSchema', () => {
+  it('allows an ability check without an ability or skill', () => {
+    expect(creatureRollTargetSchema.parse({ kind: 'ability-check' })).toEqual({
+      kind: 'ability-check',
+    })
+  })
+
+  it('keeps ability-scoped checks and rejects skill without ability', () => {
+    expect(creatureRollTargetSchema.parse({ kind: 'ability-check', ability: 'wis' })).toEqual({
+      kind: 'ability-check',
+      ability: 'wis',
+    })
+    expect(
+      creatureRollTargetSchema.parse({
+        kind: 'ability-check',
+        ability: 'wis',
+        skillId: 'perception',
+      }),
+    ).toEqual({
+      kind: 'ability-check',
+      ability: 'wis',
+      skillId: 'perception',
+    })
+    expect(
+      creatureRollTargetSchema.safeParse({ kind: 'ability-check', skillId: 'perception' }).success,
+    ).toBe(false)
+  })
+})
+
 describe('formatCreatureRollAdjustmentSentence', () => {
+  it('prints unqualified ability checks when ability is omitted', () => {
+    expect(
+      formatCreatureRollAdjustmentSentence({
+        mode: 'disadvantage',
+        rolls: [{ kind: 'attack' }, { kind: 'ability-check' }],
+        circumstance: { kind: 'in-sunlight' },
+      }),
+    ).toBe('Disadvantage on attack rolls and ability checks while in sunlight.')
+  })
   it('formats pack tactics without a creature subject', () => {
     expect(
       formatCreatureRollAdjustmentSentence({

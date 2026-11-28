@@ -27,7 +27,7 @@ optional `resolveListMeta` for eyebrows and kind labels. Row display titles come
 
 ## Baselines
 
-`embeddedSeedRowIds` is every embedded id on the latest saved entity. `loadContentEditFormState` rebuilds it from the list-cache entity. A successful save writes that entity into the list cache before the refetch. A failed save does not.
+`persistedIdentityRowIdsByPath` is every embedded id on the latest saved entity. `loadContentEditFormState` rebuilds it from the list-cache entity via `buildPersistedIdentityRowIdsByPath`. A successful save writes that entity into the list cache before the refetch. A failed save does not.
 
 `embeddedSystemOriginRowIds` is frozen from the first load of a system entity in the session. Later saves must not add ids to it. A homebrew parent has no system-origin set.
 

@@ -1,65 +1,91 @@
-import type { CharacterClass } from '@rpg/contracts'
+import {
+  classSlugReferenceEdge,
+  collectCatalogReferenceIssues,
+  type CharacterClass,
+  type ContentValidationIntent,
+} from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
 
 function collectClassSlugsFromCharacterCreation(
   characterCreation: Record<string, unknown> | undefined,
-): string[] {
+): Array<{ path: string; key: string }> {
   if (!characterCreation) return []
 
-  const slugs: string[] = []
+  const refs: Array<{ path: string; key: string }> = []
   const multiclassing = characterCreation.multiclassing as
     | { classPolicy?: { classIds?: string[] } }
     | undefined
-  if (multiclassing?.classPolicy?.classIds) {
-    slugs.push(...multiclassing.classPolicy.classIds)
-  }
+  multiclassing?.classPolicy?.classIds?.forEach((key, index) => {
+    refs.push({
+      path: `characterCreation.multiclassing.classPolicy.classIds.${index}`,
+      key,
+    })
+  })
 
   const levelLimits = characterCreation.levelLimits as
     | { classLevelCaps?: { classId: string }[] }
     | undefined
-  if (levelLimits?.classLevelCaps) {
-    slugs.push(...levelLimits.classLevelCaps.map((cap) => cap.classId))
-  }
+  levelLimits?.classLevelCaps?.forEach((cap, index) => {
+    refs.push({
+      path: `characterCreation.levelLimits.classLevelCaps.${index}.classId`,
+      key: cap.classId,
+    })
+  })
 
-  return slugs
+  return refs
 }
 
 /**
- * Ensures species multiclassing / level-limit class references resolve to a
- * campaign class slug (system seed, overlay patch, or homebrew).
+ * Species multiclass and level-cap class references are slugs. `unresolvedSlugs`
+ * are catalog rows omitted because overlay apply failed (not missing classes).
  */
 export function assertSpeciesClassSlugsExist(
   classSlugs: string[],
   resolvedClasses: CharacterClass[],
+  unresolvedSlugs: ReadonlySet<string> = new Set(),
+  intent: ContentValidationIntent = 'publish',
 ): void {
   if (classSlugs.length === 0) return
-
-  const bySlug = new Map(resolvedClasses.map((cls) => [cls.slug, cls]))
-  const unknown: string[] = []
-
-  for (const slug of classSlugs) {
-    if (!bySlug.has(slug)) {
-      unknown.push(slug)
-    }
-  }
-
-  if (unknown.length === 0) return
-
-  const label = unknown.length === 1 ? 'class' : 'classes'
-  throw new HttpError(
-    400,
-    'validation_error',
-    `Unknown ${label}: ${unknown.map((slug) => `"${slug}"`).join(', ')}.`,
+  assertSpeciesClassSlugRefs(
+    classSlugs.map((key, index) => ({ path: `classIds.${index}`, key })),
+    resolvedClasses,
+    unresolvedSlugs,
+    intent,
   )
 }
 
-/** Collects class slugs from a species write payload and validates them. */
 export function assertSpeciesClassSlugsFromInput(
   input: Record<string, unknown>,
   resolvedClasses: CharacterClass[],
+  unresolvedSlugs: ReadonlySet<string> = new Set(),
+  intent: ContentValidationIntent = 'publish',
 ): void {
   const characterCreation = input.characterCreation as Record<string, unknown> | undefined
-  const slugs = collectClassSlugsFromCharacterCreation(characterCreation)
-  assertSpeciesClassSlugsExist(slugs, resolvedClasses)
+  const refs = collectClassSlugsFromCharacterCreation(characterCreation)
+  assertSpeciesClassSlugRefs(refs, resolvedClasses, unresolvedSlugs, intent)
+}
+
+function assertSpeciesClassSlugRefs(
+  refs: readonly { path: string; key: string }[],
+  resolvedClasses: CharacterClass[],
+  unresolvedSlugs: ReadonlySet<string>,
+  intent: ContentValidationIntent,
+): void {
+  if (refs.length === 0) return
+  const bySlug = new Map(resolvedClasses.map((cls) => [cls.slug, cls]))
+  const issues = collectCatalogReferenceIssues({
+    policy: classSlugReferenceEdge.policy,
+    intent,
+    catalogStatus: 'ready',
+    refs,
+    resolve: (key) => bySlug.get(key),
+    unavailablePlacement: classSlugReferenceEdge.unavailablePlacement,
+    messages: classSlugReferenceEdge.messages,
+    unresolvedOverlayTargetKeys: unresolvedSlugs,
+  })
+  if (issues.length === 0) return
+  throw new HttpError(400, 'validation_error', issues.map((issue) => issue.message).join(' '), {
+    issues,
+  })
 }

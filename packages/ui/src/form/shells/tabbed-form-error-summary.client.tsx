@@ -2,12 +2,13 @@
 import { Icon } from '../../components/ui/icon/icon'
 
 import * as React from 'react'
-import { useFormContext, useFormState } from 'react-hook-form'
+import { useFormContext } from 'react-hook-form'
 
 import { cn } from '../../lib/utils'
 import { useFormUiContext } from '../context/form-ui.context'
 import type { FormItem } from '../field-config'
 import { useTabbedFormTabValidationState } from '../hooks/use-tabbed-form-tab-validation-state.client'
+import { useFormValidationSessionProjection } from '../hooks/use-form-validation-session-projection.client'
 import {
   buildTabbedFormErrorSummaryMessage,
   buildTabbedFormReviewLabel,
@@ -38,8 +39,8 @@ export function TabbedFormErrorSummary({
   className,
 }: TabbedFormErrorSummaryProps) {
   const form = useFormContext()
-  const { errors } = useFormState()
   const ui = useFormUiContext()
+  const { issues: projectionIssues } = useFormValidationSessionProjection(fields)
   const { hasAttemptedSubmit, tabStates } = useTabbedFormTabValidationState(tabs)
 
   const invalidTabs = React.useMemo(
@@ -49,9 +50,19 @@ export function TabbedFormErrorSummary({
 
   const handleReviewTab = React.useCallback(
     (tabId: string) => {
-      navigateTabbedFormToTabIssue(form, fields, formId, tabs, ui, tabId, onActiveTabChange, errors)
+      navigateTabbedFormToTabIssue(
+        form,
+        fields,
+        formId,
+        tabs,
+        ui,
+        tabId,
+        onActiveTabChange,
+        form.formState.errors,
+        projectionIssues,
+      )
     },
-    [form, fields, formId, tabs, ui, onActiveTabChange, errors],
+    [form, fields, formId, onActiveTabChange, projectionIssues, tabs, ui],
   )
 
   if (!hasAttemptedSubmit || invalidTabs.length === 0) return null

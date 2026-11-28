@@ -85,6 +85,11 @@ interface SchemaFormShellProps<TFieldValues extends FieldValues> {
   /** Footer chrome published to {@link FormShellFooterSlot} when {@link externalFooter} is true. */
   externalFooterContent?: FormShellExternalFooterContent | null
   children: React.ReactNode
+  /**
+   * Optional wrapper inside {@link FormProvider} around field chrome so adopted
+   * producer sessions surround presentation hooks.
+   */
+  producerBoundary?: React.ComponentType<{ children: React.ReactNode }>
 }
 
 function SchemaFormExternalFooterPublisher<TFieldValues extends FieldValues>({
@@ -229,9 +234,17 @@ export function SchemaFormShell<TFieldValues extends FieldValues>({
   className,
   externalFooter,
   externalFooterContent,
+  producerBoundary: ProducerBoundary,
   children,
 }: SchemaFormShellProps<TFieldValues>) {
   const sectionContext = React.useMemo(() => ({ depth: 0, namedGroupDepth: 0, density }), [density])
+
+  const fieldTree = (
+    <RelationshipArrayControllerProvider>
+      <RelationshipArrayPickerHost fields={fields} />
+      <FormSectionContext.Provider value={sectionContext}>{children}</FormSectionContext.Provider>
+    </RelationshipArrayControllerProvider>
+  )
 
   return (
     <FormProvider {...form}>
@@ -259,12 +272,7 @@ export function SchemaFormShell<TFieldValues extends FieldValues>({
             externalFooter={externalFooter}
             externalFooterContent={externalFooterContent}
           >
-            <RelationshipArrayControllerProvider>
-              <RelationshipArrayPickerHost fields={fields} />
-              <FormSectionContext.Provider value={sectionContext}>
-                {children}
-              </FormSectionContext.Provider>
-            </RelationshipArrayControllerProvider>
+            {ProducerBoundary ? <ProducerBoundary>{fieldTree}</ProducerBoundary> : fieldTree}
           </SchemaFormElement>
         </FormUiProvider>
       </FileFieldPropsProvider>

@@ -213,4 +213,36 @@ describe('ArrayItemAnatomyGrid', () => {
     expect(grid?.querySelector('[data-field-row-anatomy]')).toBeNull()
     expect(grid?.querySelector('.field-row-anatomy-grid')).toBeNull()
   })
+
+  it('splits intrinsic spill for auto participants with below-label hints', () => {
+    render(
+      <ArrayItemAnatomyGrid
+        fieldWidths={['auto', 'md']}
+        actions={
+          <button type="button" aria-label="Remove item">
+            Remove
+          </button>
+        }
+      >
+        <Field.Root
+          id="modes"
+          width="auto"
+          hint="Pick at least two modes."
+          anatomy
+          rowParticipation
+        >
+          <FieldLayout
+            label={<Field.Label>Modes</Field.Label>}
+            control={<Input aria-label="Modes" defaultValue="" />}
+          />
+        </Field.Root>
+        <ParticipantField id="speed" label="Speed" />
+      </ArrayItemAnatomyGrid>,
+    )
+
+    const labelRegion = document.querySelector('[data-field-label-region]')
+    expect(labelRegion?.querySelector('[data-field-intrinsic-sizing]')).toBeTruthy()
+    expect(labelRegion?.querySelector('[data-field-intrinsic-spill]')).toBeTruthy()
+    expect(screen.getByText('Pick at least two modes.')).toHaveAttribute('id', 'modes-hint')
+  })
 })

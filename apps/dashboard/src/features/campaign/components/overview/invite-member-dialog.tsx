@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { ActionButton, Button, Modal } from '@rpg/ui'
 import { Form, FormFooterActions } from '@rpg/ui/form'
 
-import { useSubmitHandler } from '@/lib/use-submit-handler'
+import { useRunnerFormSubmit } from '@/lib/runner-form-submit.lib'
 
 import {
   INVITE_MEMBER_DIALOG_COPY,
@@ -46,8 +46,13 @@ export function InviteMemberDialog({
     }
   }
 
-  const { onSubmit, formError } = useSubmitHandler<InviteMemberValues>({
-    submit: async (values, form) => {
+  const { onSubmit, formError, ProducerBoundary } = useRunnerFormSubmit<InviteMemberValues>({
+    schema: inviteMemberSchema,
+    resolverFields: inviteMemberFields,
+    formId: `invite-member-${campaignId}`,
+    fallbackMessage: INVITE_MEMBER_DIALOG_COPY.fallbackError,
+    mapError: mapInviteSendError,
+    persist: async (values, form) => {
       const result = await mutateAsync(values.email.trim())
       if (result.invite.deliveryStatus === 'failed') {
         setDeliveryFailed(true)
@@ -58,8 +63,6 @@ export function InviteMemberDialog({
       setDeliveryFailed(false)
       handleOpenChange(false)
     },
-    fallbackMessage: INVITE_MEMBER_DIALOG_COPY.fallbackError,
-    mapError: mapInviteSendError,
   })
 
   return (
@@ -100,6 +103,7 @@ export function InviteMemberDialog({
                   defaultValues={inviteMemberDefaultValues}
                   onSubmit={onSubmit}
                   formError={formError}
+                  producerBoundary={ProducerBoundary}
                   footer={() => (
                     <FormFooterActions
                       pending={isPending}

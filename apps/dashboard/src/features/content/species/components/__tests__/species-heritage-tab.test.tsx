@@ -40,14 +40,14 @@ function TabShell({
   entityCatalogLayer,
   campaignId = 'camp-1',
   entityId = 'species-1',
-  embeddedSeedRowIds,
+  persistedIdentityRowIdsByPath,
   embeddedSystemOriginRowIds,
 }: {
   heritage?: HeritageForm
   entityCatalogLayer?: ContentFormCtx['entityCatalogLayer']
   campaignId?: string
   entityId?: string
-  embeddedSeedRowIds?: ContentFormCtx['embeddedSeedRowIds']
+  persistedIdentityRowIdsByPath?: ContentFormCtx['persistedIdentityRowIdsByPath']
   embeddedSystemOriginRowIds?: ContentFormCtx['embeddedSystemOriginRowIds']
 }) {
   return (
@@ -59,7 +59,7 @@ function TabShell({
               entityCatalogLayer,
               campaignId,
               entityId,
-              embeddedSeedRowIds,
+              persistedIdentityRowIdsByPath,
               embeddedSystemOriginRowIds,
             }}
           />
@@ -148,7 +148,7 @@ describe('SpeciesHeritageTab', () => {
       <TabShell
         heritage={draconicHeritageForm}
         entityCatalogLayer="system"
-        embeddedSeedRowIds={{ 'heritage.options': ['o1'] }}
+        persistedIdentityRowIdsByPath={{ 'heritage.options': ['o1'] }}
         embeddedSystemOriginRowIds={{ 'heritage.options': ['o1'] }}
       />,
     )

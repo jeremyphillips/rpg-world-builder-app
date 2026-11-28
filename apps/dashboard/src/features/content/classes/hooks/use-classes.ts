@@ -20,3 +20,5 @@ export const useClassesUsageMeta = classesContentList.useUsageMeta
 
 export const { useCreateContent: useCreateClass, useUpdateContent: useUpdateClass } =
   createContentMutationHooks('classes', classesQueryKey)
+
+export const useClassesListResult = classesContentList.useListQueryResult

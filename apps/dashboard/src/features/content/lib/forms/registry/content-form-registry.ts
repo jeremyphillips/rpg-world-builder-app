@@ -8,6 +8,8 @@ import type {
   ContentTypeKey,
   CatalogLayer,
   ContentValidationIntent,
+  SystemOverlayParticipantId,
+  SystemRulesetId,
   Equipment,
   EquipmentKind,
   OrganizationPractice,
@@ -29,6 +31,7 @@ import type {
   WeaponPropertyVocabulary,
 } from '@/features/vocabulary'
 
+import type { ContentListFullQueryResult } from '../../list/create-content-list'
 import type { ContentListQueryResult } from '../../list/content-client'
 import type { ContentFormOptionSets } from '../../form-options/content-form-options'
 import type { ContentFormPreviewConfig } from '../preview/content-form-preview.types'
@@ -52,9 +55,9 @@ export type ContentFormCtx = {
   /** Immutable catalog slug on edit — omitted from RHF because slug is envelope-only. */
   entitySlug?: string
   /** Campaign catalog ruleset from the campaign record (authoring catalogs, equipment scope, monster provider). */
-  rulesetId?: string
+  rulesetId?: SystemRulesetId
   /** Entity ruleset on edit — artwork and entity-facing identity; does not override campaign catalog ruleset. */
-  entityRulesetId?: string
+  entityRulesetId?: SystemRulesetId
   /** Resolved campaign rule overrides (defaults when absent). */
   campaignRules?: ResolvedCampaignRules
   /** Resolved spellcasting progression records (seed + campaign patch). */
@@ -128,7 +131,7 @@ export type ContentFormCtx = {
    * the row has been persisted. It does not mean the row originated as system
    * content.
    */
-  embeddedSeedRowIds?: Readonly<Record<string, readonly string[]>>
+  persistedIdentityRowIdsByPath?: Readonly<Record<string, readonly string[]>>
   /**
    * Row ids present when a system entity was first loaded in this editor
    * session. Membership is the only system-provenance signal. Later saves must
@@ -214,8 +217,21 @@ export interface ContentFormDef<
     ctx?: ContentFormInputCtx<TEntity>,
     validationIntent?: ContentValidationIntent,
   ) => TCreateInput
+  /**
+   * Normalized overlay body for baseline/draft diffs on system updates. Must match
+   * the tree used after load `reset`, without intent-schema defaults.
+   */
+  normalizeOverlayBody?: (
+    formValues: TFormValues,
+    ctx: ContentFormInputCtx<TEntity> | undefined,
+    validationIntent: ContentValidationIntent,
+  ) => Record<string, unknown>
+  /** Required when `normalizeOverlayBody` is set — must match API `overlayParticipantId`. */
+  overlayParticipantId?: SystemOverlayParticipantId
   /** List query hook; the edit shell uses it to seed the form from cache. */
   useListQuery: (campaignId: string | undefined) => ContentListQueryResult<TEntity>
+  /** Full list payload including `overlayFailures` for edit gating. */
+  useListQueryResult: (campaignId: string | undefined) => ContentListFullQueryResult<TEntity>
   /** Query key factory; used to invalidate the list after a successful mutation. */
   queryKey: (campaignId: string) => readonly unknown[]
   /**
@@ -223,11 +239,6 @@ export interface ContentFormDef<
    * classes also refresh skill proficiencies when class names change).
    */
   invalidateQueryKeys?: (campaignId: string) => readonly (readonly unknown[])[]
-  /**
-   * Maps a saved entity to seed row domain ids for embedded master-detail
-   * delete-lock and source badge derivation on edit.
-   */
-  extractEmbeddedSeedRowIds?: (entity: TEntity) => Readonly<Record<string, readonly string[]>>
   /** Augments edit layout context after list options resolve (e.g. orphan chip seeds). */
   enrichEditLayoutCtx?: (ctx: ContentFormCtx, entity: TEntity) => ContentFormCtx
   /**
@@ -245,6 +256,15 @@ export interface ContentFormDef<
   preview?: ContentFormPreviewConfig<TFormValues, TPreviewResources>
   /** Displayed AC fields depend on the campaign ruleset and must snapshot it. */
   armorClassRulesSensitive?: boolean
+  /**
+   * When set, prepare write uses this transform for `{ payload, provenance }` instead of
+   * identity provenance on `serializeContentFormInput` alone.
+   */
+  serializePreparedWrite?: (
+    input: import('../submit/prepare-serialized-content-form-write.lib').PrepareSerializedContentFormWriteInput<TFormValues>,
+  ) => import('../submit/content-prepared-write.types').ContentPreparedWrite<
+    Record<string, unknown>
+  >
 }
 
 export type ContentFormValuesCtx = {

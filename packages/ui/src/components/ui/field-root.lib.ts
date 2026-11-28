@@ -24,6 +24,7 @@ export type FieldRootContextInput = {
   hasDerivedMeta: boolean
   /** Omitted on the root means readers fall through to visible. Nested roots do not inherit. */
   labelVisibility?: FieldLabelVisibility
+  autoRowIntrinsicSizing: boolean
 }
 
 export function buildFieldRootContextValue(input: FieldRootContextInput) {
@@ -57,6 +58,7 @@ export function buildFieldRootContextValue(input: FieldRootContextInput) {
     error: input.error,
     hint: input.hint,
     hintIcon: input.hint ? input.hintIcon : undefined,
+    autoRowIntrinsicSizing: input.autoRowIntrinsicSizing,
   }
 }
 

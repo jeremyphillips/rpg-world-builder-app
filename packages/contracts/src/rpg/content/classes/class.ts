@@ -1,14 +1,17 @@
 import { z } from 'zod'
 import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
+
+import {
+  overlayDeleteIdRows,
+  overlayRestoreIdRows,
+  overlaySlugList,
+} from '../lib/system-overlay/overlay-presets'
+import { mergeSystemOverlayUpdateEnvelope } from '../lib/system-overlay/system-overlay-update'
 import { abilitySchema } from '../../vocab/ability'
 import { hitDieSchema } from '../../primitives/dice'
 import { absoluteLevelSchema } from '../../primitives/level'
-import {
-  contentBodyBaseSchema,
-  contentMetaSchema,
-  contentPatchBaseSchema,
-  slugSchema,
-} from '../lib/envelope'
+import { contentBodyBaseSchema, contentMetaSchema, slugSchema } from '../lib/envelope'
+import { contentStoredOverlayPatchSchema } from '../lib/system-overlay/patch-document'
 import {
   mediaBearingAuthoredContentBodySchema,
   mediaBearingDraftAuthoredContentBodySchema,
@@ -98,7 +101,7 @@ function refineClassFeatureGrantUnlockLevels(
 }
 
 const classFeatureTablesField = {
-  tables: z.array(contentTableSchema).optional(),
+  tables: overlayDeleteIdRows(contentTableSchema).optional(),
 } as const
 
 export const customClassFeatureSchema = customContentTraitSchema
@@ -174,7 +177,7 @@ export const subclassFeatureSchema = z.preprocess(normalizeContentTrait, customC
 export type SubclassFeature = z.infer<typeof subclassFeatureSchema>
 
 export const classProficienciesSchema = z.object({
-  savingThrows: z.array(abilitySchema).min(1).max(3), // relaxed for homebrew (SRD uses 2)
+  savingThrows: overlaySlugList(abilitySchema).min(1).max(3), // relaxed for homebrew (SRD uses 2)
   armor: armorProficiencyGrantSetSchema,
   weapons: weaponProficiencyGrantSetSchema,
   tools: toolProficiencyGrantSetSchema.optional(),
@@ -185,7 +188,7 @@ export type ClassProficiencies = z.infer<typeof classProficienciesSchema>
 
 /** Draft class proficiencies — saving throws and nested buckets may be empty while authoring. */
 export const classProficienciesDraftSchema = z.object({
-  savingThrows: z.array(abilitySchema).max(3).default([]),
+  savingThrows: overlaySlugList(abilitySchema).max(3).default([]),
   armor: armorProficiencyGrantSetSchema,
   weapons: weaponProficiencyGrantSetSchema,
   tools: toolProficiencyGrantSetSchema.optional(),
@@ -199,11 +202,11 @@ export type ClassProficienciesDraft = z.infer<typeof classProficienciesDraftSche
 // ---------------------------------------------------------------------------
 
 const classStoredBodyBaseSchema = mediaBearingAuthoredContentBodySchema.extend({
-  primaryAbilities: z.array(abilitySchema).min(1),
+  primaryAbilities: overlaySlugList(abilitySchema).min(1),
   hitDie: hitDieSchema,
   spellcasting: spellcastingSchema.optional(),
   proficiencies: classProficienciesSchema,
-  features: z.array(classBodyFeatureSchema),
+  features: overlayRestoreIdRows(classBodyFeatureSchema),
   characterCreation: classCharacterCreationSchema.optional(),
 })
 
@@ -218,11 +221,11 @@ export type ClassStoredBody = z.infer<typeof classStoredBodySchema>
 export const classBodyDraftSchema = mediaBearingDraftAuthoredContentBodySchema(
   CLASS_CONTENT_TYPE_TERM.label,
 ).extend({
-  primaryAbilities: z.array(abilitySchema).max(2).optional(),
+  primaryAbilities: overlaySlugList(abilitySchema).max(2).optional(),
   hitDie: hitDieSchema.optional(),
   spellcasting: spellcastingDraftSchema.optional(),
   proficiencies: classProficienciesDraftSchema.optional(),
-  features: z.array(classBodyFeatureSchema).default([]),
+  features: overlayRestoreIdRows(classBodyFeatureSchema).default([]),
   characterCreation: classCharacterCreationDraftSchema.optional(),
 })
 
@@ -258,6 +261,8 @@ export type CharacterClass = z.infer<typeof classSchema>
 /** Class list row enriched with subclass summaries for overview tables. */
 export const classListItemSchema = classSchema.extend({
   subclasses: z.array(contentSummaryRefSchema),
+  /** Parent-scoped subclass overlay failures visible to this list viewer (summaries stay resolved-only). */
+  unresolvedSubclassOverlayCount: z.number().int().positive().optional(),
 })
 export type ClassListItem = z.infer<typeof classListItemSchema>
 
@@ -376,21 +381,21 @@ export type CreateClassInput = z.infer<typeof createClassInputBaseSchema>
 export const createClassDraftInputSchema = createDraftInputSchema(classBodyDraftSchema)
 export type CreateClassDraftInput = z.infer<typeof createClassDraftInputSchema>
 
-export const updateClassInputSchema = createClassInputBaseSchema.partial()
+export const updateClassInputSchema = mergeSystemOverlayUpdateEnvelope(
+  createClassInputBaseSchema.partial(),
+)
 export type UpdateClassInput = z.infer<typeof updateClassInputSchema>
 
-export const updateClassDraftInputSchema = createClassDraftInputSchema.partial()
+export const updateClassDraftInputSchema = mergeSystemOverlayUpdateEnvelope(
+  createClassDraftInputSchema.partial(),
+)
 export type UpdateClassDraftInput = z.infer<typeof updateClassDraftInputSchema>
 
 /**
  * System-patch overlay. Reuses the generic envelope; only the type-specific
- * `patch` body differs. `.partial()` is shallow (Zod v4 has no `deepPartial`);
- * the read-time merge does the deep-merge, replacing arrays wholesale (see the
- * Deferred block).
+ * Versioned stored overlay (`StoredOverlay`) reconciled at write and applied at read.
  */
-export const classPatchSchema = contentPatchBaseSchema.extend({
-  patch: classStoredBodyBaseSchema.partial(),
-})
+export const classPatchSchema = contentStoredOverlayPatchSchema
 export type ClassPatch = z.infer<typeof classPatchSchema>
 
 // ---------------------------------------------------------------------------
@@ -404,12 +409,12 @@ export const subclassPatchableBodySchema = contentBodyBaseSchema.extend({
   /** Short italic lead-in matching the SRD's em-formatted tagline (e.g. "Channel Rage into Violent Fury"). */
   tagline: z.string().optional(),
   /** Optional on patch/update payloads; full records default to `[]` via `subclassBodySchema`. */
-  features: z.array(subclassFeatureSchema).optional(),
+  features: overlayDeleteIdRows(subclassFeatureSchema).optional(),
 })
 
 /** The editable shape: what a form authors and what a patch overrides. */
 export const subclassBodySchema = subclassPatchableBodySchema.extend({
-  features: z.array(subclassFeatureSchema).default([]),
+  features: overlayDeleteIdRows(subclassFeatureSchema).default([]),
 })
 
 export type SubclassBody = z.infer<typeof subclassBodySchema>
@@ -426,18 +431,12 @@ export type ResolvedSubclass = z.infer<typeof resolvedSubclassSchema>
 export const createSubclassInputSchema = subclassBodySchema.extend({ slug: slugSchema })
 export type CreateSubclassInput = z.infer<typeof createSubclassInputSchema>
 
-export const updateSubclassInputSchema = subclassPatchableBodySchema
-  .extend({ slug: slugSchema })
-  .partial()
+export const updateSubclassInputSchema = mergeSystemOverlayUpdateEnvelope(
+  subclassPatchableBodySchema.extend({ slug: slugSchema }).partial(),
+)
 export type UpdateSubclassInput = z.infer<typeof updateSubclassInputSchema>
 
-/**
- * System-patch overlay for subclass body fields. Deep-merge semantics match
- * `classPatchSchema` — arrays replace wholesale at read time.
- */
-export const subclassPatchSchema = contentPatchBaseSchema.extend({
-  patch: subclassPatchableBodySchema.partial(),
-})
+export const subclassPatchSchema = contentStoredOverlayPatchSchema
 export type SubclassPatch = z.infer<typeof subclassPatchSchema>
 
 /** Opaque class slug — resolve display names from resolved catalog `name` at read/UI time. */

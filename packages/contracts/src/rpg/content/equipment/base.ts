@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { overlaySlugList } from '../lib/system-overlay/overlay-presets'
+
 import { equipmentCostSchema } from '../../primitives/money'
 import { weightSchema } from '../../primitives/units'
 import { mediaBearingAuthoredContentBodySchema } from '../lib/media/media-bearing-content'
@@ -8,7 +10,7 @@ import { mediaBearingAuthoredContentBodySchema } from '../lib/media/media-bearin
 export const equipmentBaseSchema = mediaBearingAuthoredContentBodySchema.extend({
   cost: equipmentCostSchema,
   weight: weightSchema.optional(),
-  tags: z.array(z.string()).optional(),
+  tags: overlaySlugList(z.string()).optional(),
 })
 
 export type EquipmentBaseFields = z.infer<typeof equipmentBaseSchema>

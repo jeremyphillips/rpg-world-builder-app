@@ -23,6 +23,7 @@ patterns, and vocab rules → [`docs/content-types.md`](../../../docs/content-ty
 | 3    | Catalog   | Bundled types only: `index.ts` loaders + `index.test.ts`; `package.json` export. No-bundle types omit the package.                                        |
 | 4    | API       | Patch/homebrew Mongoose models when needed                                                                                                                |
 | 5    | API       | `<type>.config.ts` — import `@rpg/catalog/<type>` only when `bundledContent: 'bundled'`                                                                 |
+| 5a   | Overlay   | Bundled system only — see [§ System overlay](#system-overlay-bundled-types)                                                                              |
 | 5b   | API       | `CONTENT_PROJECTORS` + `defineContentUsage` registration                                                                                                  |
 | 6    | API       | One line in `content-types.ts`                                                                                                                            |
 | 7    | API       | List route — automatic after step 6 (no controller change)                                                                                                |
@@ -45,6 +46,24 @@ patterns, and vocab rules → [`docs/content-types.md`](../../../docs/content-ty
 | 10b  | Dashboard | `factories/<type>.ts` + `CONTENT_TEST_FACTORY_REGISTRY` entry (synthetic `makeX`; catalog via `pickX`)                                                    |
 | —    | Gates     | All [layer drift tests](#drift-test-map) green                                                                                                            |
 | —    | Contracts | A field that stores a catalog reference uses `collectCatalogReferenceIssues` with a host edge whose resolver defines the key (content id or slug). Do not add a local issue-code entry for these kinds. Registration is not mechanically guaranteed. |
+
+---
+
+## System overlay (bundled types)
+
+Skip when `catalog.bundledContent: 'none'`. Policy → contracts
+[`system-overlay/README.md`](../../../packages/contracts/src/rpg/content/lib/system-overlay/README.md).
+
+| Step | Layer     | Deliverable |
+| ---- | --------- | ----------- |
+| O1   | Contracts | Policy participant id matches API `overlayParticipantId`; publish + draft trees compile |
+| O2   | API       | `overlayParticipantId` on `read` config; append to `PATCH_READ_CONFIGS` in `patch-model-overlay-drift.test.ts` |
+| O3   | API       | Reference validations pass `unresolvedOverlayTargetKeys` for overlay list failures |
+| O4   | API       | Usage/delete indexes that index seed refs → `loadOverlayAwareCatalogRows` when applicable |
+| O5   | Dashboard | `overlayParticipantId` + `normalizeOverlayBody` on form def; `OVERLAY_FORM_DEFS` in `overlay-form-registration.drift.test.ts` |
+| O6   | Dashboard | Overview uses merged list payload (`useContentOverviewMergedData`) and shared availability helpers |
+
+Subclasses: nested participant — wire under classes API/dashboard, not integration manifest.
 
 ---
 
@@ -142,6 +161,8 @@ Query helpers (for drift tests): `@rpg/content-types` exports
 | Contracts         | `content-type-term-coverage.test.ts`, `content-display-fallback.test.ts`, `content-type-presentation.test.ts`, `content-access-capabilities.test.ts`, `resolve-content-media-domain.test.ts` | Keys, terms, media/fallback maps |
 | Catalog           | `packages/catalog/src/content-type-integration-manifest.test.ts`     | Export subpaths                   |
 | API               | `content-types.integration-manifest.test.ts`, `content-usage-registrations.test.ts`, `apply-content-keys.test.ts` | Registry ↔ manifest, usage surfaces |
+| API overlay       | `patch-model-overlay-drift.test.ts`, `resolve-catalog-overlay-failures.integration.test.ts` (per-type cases as needed) | Participant wiring, list failure wire |
+| Dashboard overlay | `overlay-form-registration.drift.test.ts` | Form def ↔ participant |
 | Dashboard routes  | `content-routes.integration-manifest.test.ts`                        | `CONTENT_ROUTES` ↔ `routeSection` |
 | Dashboard sidebar | `content-registry.test.ts`, `campaign-sidebar-content-section.test.ts`, `sidebar-nav-icons.test.ts` | Sidebar, section map, icons       |
 | Dashboard forms   | `content-form-registry.test.ts`, `content-managed-media-form-schemas.test.ts`, `content-form-preview-coverage.test.ts` | Forms, media, preview ↔ tabs      |
@@ -175,6 +196,7 @@ Detail: [testing.md § Content test factories](../../../apps/dashboard/docs/test
 | Requirement expressions | [`docs/content-types.md`](../../../docs/content-types.md) § Requirement expressions                                                                 |
 | Content traits / grants | [`docs/content-types.md`](../../../docs/content-types.md) § Content traits                                                                          |
 | Subclasses (nested)     | [`docs/content-types.md`](../../../docs/content-types.md) § Subclass ownership                                                                      |
+| System overlay          | [`system-overlay/README.md`](../../../packages/contracts/src/rpg/content/lib/system-overlay/README.md), [`apps/api/src/features/content/README.md`](../../../apps/api/src/features/content/README.md) |
 | Vocab audit             | [`docs/content-types.md`](../../../docs/content-types.md) § Audit CLI                                                                               |
 | Equipment families      | [`equipment/README.md`](../../../apps/dashboard/src/features/content/equipment/README.md)                                                           |
 | Spells / resolution     | [spell-resolution skill](../spell-resolution/SKILL.md)                                                                                              |

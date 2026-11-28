@@ -11,6 +11,28 @@ describe('assertSpellClassIdsHaveSpellcasting', () => {
     expect(() => assertSpellClassIdsHaveSpellcasting(['wizard'], SRD_CLASSES)).not.toThrow()
   })
 
+  it('rejects an unresolved class slug separately from a non-caster', () => {
+    try {
+      assertSpellClassIdsHaveSpellcasting(
+        ['wizard', 'fighter'],
+        SRD_CLASSES.filter((row) => row.slug !== 'wizard'),
+        new Set(['wizard']),
+      )
+      throw new Error('expected throw')
+    } catch (err) {
+      const httpError = err as HttpError
+      expect(httpError.message).toContain('overlay could not be applied')
+      expect(httpError.message).toContain('does not have spellcasting')
+      expect(httpError.message).not.toContain('Unknown')
+      expect((httpError.details as { issues?: unknown[] } | undefined)?.issues).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ code: 'unresolved_overlay_class' }),
+          expect.objectContaining({ code: 'class_without_spellcasting', path: 'classIds.1' }),
+        ]),
+      )
+    }
+  })
+
   it('rejects unknown class slugs', () => {
     expect(() => assertSpellClassIdsHaveSpellcasting(['not-a-class'], SRD_CLASSES)).toThrow(
       HttpError,
@@ -20,7 +42,6 @@ describe('assertSpellClassIdsHaveSpellcasting', () => {
     } catch (err) {
       expect(err).toMatchObject({ status: 400, code: 'validation_error' })
       expect((err as HttpError).message).toContain('Unknown class')
-      expect((err as HttpError).message).toContain('not-a-class')
     }
   })
 
@@ -30,8 +51,15 @@ describe('assertSpellClassIdsHaveSpellcasting', () => {
       assertSpellClassIdsHaveSpellcasting(['fighter'], SRD_CLASSES)
     } catch (err) {
       expect(err).toMatchObject({ status: 400, code: 'validation_error' })
-      expect((err as HttpError).message).toContain('without spellcasting')
+      expect((err as HttpError).message).toContain('does not have spellcasting')
       expect((err as HttpError).message).toContain('Fighter')
+      expect(((err as HttpError).details as { issues?: unknown[] }).issues).toEqual([
+        {
+          path: 'classIds.0',
+          code: 'class_without_spellcasting',
+          message: 'Class "Fighter" does not have spellcasting.',
+        },
+      ])
     }
   })
 
@@ -40,7 +68,13 @@ describe('assertSpellClassIdsHaveSpellcasting', () => {
       assertSpellClassIdsHaveSpellcasting(['fighter', 'not-a-class'], SRD_CLASSES)
     } catch (err) {
       expect((err as HttpError).message).toContain('Unknown class')
-      expect((err as HttpError).message).toContain('without spellcasting')
+      expect((err as HttpError).message).toContain('does not have spellcasting')
+      expect(((err as HttpError).details as { issues?: unknown[] }).issues).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ code: 'unknown_class' }),
+          expect.objectContaining({ code: 'class_without_spellcasting' }),
+        ]),
+      )
     }
   })
 })
